@@ -2,7 +2,7 @@ import React from 'react';
 import styled from 'styled-components';
 import { Icon } from 'components';
 import IconGoogle from 'static/images/svg/icon-google.svg';
-import { BASE_API_URL, BASE_APP_URL } from 'common/constants';
+import { API_URL, APP_URL, REDIRECT_AUTH_ENDPOINT } from 'common/constants';
 
 const Wrapper = styled.div`
   display: flex;
@@ -61,9 +61,7 @@ const AuthText = styled.div`
   margin-left: 20px;
 `;
 
-const authEndpoint = `${BASE_API_URL}/connect/google?redirect_uri=${BASE_APP_URL}/${
-  process.env.REDIRECT_AUTH_ENDPOINT
-}`;
+const authEndpoint = `${API_URL}/connect/google?redirect_uri=${APP_URL}/${REDIRECT_AUTH_ENDPOINT}`; // TODO: Get endpoints configuration from the api server.
 
 const AuthContainer = () => (
   <Wrapper>

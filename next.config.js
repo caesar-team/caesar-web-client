@@ -1,11 +1,19 @@
 /* eslint-disable */
 
-const path = require('path');
+const envFile = `.env.${
+  process.env.NODE_ENV !== 'production' ? 'development' : 'production'
+  }`;
+
+if (require('fs').existsSync(envFile)) {
+  require('dotenv').config({
+    path: `.env.${
+      process.env.NODE_ENV !== 'production' ? 'development' : 'production'
+      }`,
+  });
+}
+
 const withPlugins = require('next-compose-plugins');
 const withCss = require('@zeit/next-css');
-const DotenvPlugin = require('dotenv-webpack');
-
-const getEnvFile = dev => (dev ? 'development' : 'production');
 
 // fix: prevents error when .css files are required by node
 if (typeof require !== 'undefined') {
@@ -13,15 +21,21 @@ if (typeof require !== 'undefined') {
 }
 
 module.exports = withPlugins([withCss], {
+  publicRuntimeConfig: { // Will be available on both server and client
+    TEST: true,
+    NODE_ENV: process.env.NODE_ENV,
+    IS_PROD: process.env.NODE_ENV === 'production',
+    API_URL: `${process.env.API_PROTOCOL}://${process.env.API_HOST}`,
+    APP_URL: `${process.env.APP_PROTOCOL}://${process.env.APP_HOST}${
+      process.env.NODE_ENV === 'development' ? `:${process.env.APP_PORT}` : ''
+      }`,
+    REDIRECT_AUTH_ENDPOINT: process.env.REDIRECT_AUTH_ENDPOINT,
+  },
   webpack: (config, { dev }) => {
     config.plugins = config.plugins || [];
 
     config.plugins = [
       ...config.plugins,
-      new DotenvPlugin({
-        path: path.join(__dirname, `.env.${getEnvFile(dev)}`),
-        systemvars: true,
-      }),
     ];
 
     config.module.rules.push({

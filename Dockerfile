@@ -14,9 +14,9 @@ COPY yarn.lock .
 FROM base AS dependencies
 #RUN apk add --update python build-base
 # install node packages
-RUN yarn install --production --no-progress
+#RUN yarn install --production --no-progress
 # copy production node_modules aside
-RUN cp -R node_modules prod_node_modules
+#RUN cp -R node_modules prod_node_modules
 # install ALL node_modules, including 'devDependencies'
 RUN yarn install --no-progress
 
@@ -27,21 +27,22 @@ ENV NODE_ENV=production
 # ---- Test & Build ----
 # run linters, setup and tests
 FROM dependencies AS build
-COPY . .
+#COPY . .
 # Setup environment variables
 ENV NODE_ENV=production
-RUN yarn build --no-progress
+#RUN yarn build --no-progress
 
 #
 # ---- Release ----
 FROM base AS release
 RUN apk add --update bash && rm -rf /var/cache/apk/*
 # copy production node_modules
-COPY --from=dependencies /var/app/prod_node_modules ./node_modules
-COPY --from=build /var/app/.next ./.next
+COPY --from=dependencies /var/app/node_modules ./node_modules
+#COPY --from=build /var/app/.next ./.next
+COPY ./ ./
 
 # Setup environment variables
 ENV NODE_ENV=production
 # expose port and define CMD
 EXPOSE 3000
-CMD yarn start
+CMD yarn prod

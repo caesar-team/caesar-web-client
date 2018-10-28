@@ -1,10 +1,8 @@
-export const BASE_API_URL = `${process.env.API_PROTOCOL}://${
-  process.env.API_HOST
-}`;
+import getConfig from 'next/config';
 
-export const BASE_APP_URL = `${process.env.APP_PROTOCOL}://${
-  process.env.APP_HOST
-}${process.env.NODE_ENV === 'development' ? `:${process.env.APP_PORT}` : ''}`;
+const { publicRuntimeConfig } = getConfig();
+
+export const { API_URL, APP_URL, REDIRECT_AUTH_ENDPOINT } = publicRuntimeConfig;
 
 export const DEFAULT_IDLE_TIMEOUT = 5 * 60 * 1000;
 

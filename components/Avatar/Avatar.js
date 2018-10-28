@@ -1,7 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
 import { Avatar as AntdAvatar } from 'antd';
-import { BASE_API_URL } from 'common/constants';
+import { API_URL } from 'common/constants';
 
 const StyledAvatar = styled(AntdAvatar)`
   margin-left: -16px;
@@ -25,7 +25,7 @@ const Avatar = ({ name, avatar, size = 40, children }) => {
   }
 
   if (avatar) {
-    return <StyledAvatar size={size} src={`${BASE_API_URL}/${avatar}`} />;
+    return <StyledAvatar size={size} src={`${API_URL}/${avatar}`} />;
   }
 
   const personLetters = name ? name.slice(0, 2).toUpperCase() : '';

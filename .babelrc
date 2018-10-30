@@ -1,0 +1,26 @@
+{
+  "presets": ["next/babel"],
+  "plugins": [
+    [
+      "module-resolver",
+      {
+        "root": ["./"],
+        "alias": {
+          "common": "./common",
+          "components": "./components",
+          "containers": "./containers",
+          "pages": "./pages",
+          "static": "./static"
+        }
+      }
+    ],
+    [
+      "wrap-in-js",
+      {
+        "extensions": ["less$"]
+      }
+    ],
+    ["import", { "libraryName": "antd" }],
+    ["styled-components", { "ssr": true, "displayName": true, "preprocess": false } ]
+  ]
+}

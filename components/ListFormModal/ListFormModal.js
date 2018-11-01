@@ -85,7 +85,13 @@ class ListFormModal extends Component {
                 },
               ],
               initialValue: label,
-            })(<Input placeholder="Enter new list name..." size="large" />)}
+            })(
+              <Input
+                autoFocus
+                placeholder="Enter new list name..."
+                size="large"
+              />,
+            )}
           </FormItem>
         </Form>
       </Modal>

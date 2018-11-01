@@ -30,6 +30,7 @@ module.exports = withPlugins([withCss], {
       process.env.NODE_ENV === 'development' ? `:${process.env.APP_PORT}` : ''
       }`,
     REDIRECT_AUTH_ENDPOINT: process.env.REDIRECT_AUTH_ENDPOINT,
+    MAX_UPLOADING_FILE_SIZE: process.env.MAX_UPLOADING_FILE_SIZE,
   },
   webpack: (config, { dev }) => {
     config.plugins = config.plugins || [];

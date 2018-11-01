@@ -61,7 +61,8 @@ const AuthText = styled.div`
   margin-left: 20px;
 `;
 
-const authEndpoint = `${API_URL}/connect/google?redirect_uri=${APP_URL}/${REDIRECT_AUTH_ENDPOINT}`; // TODO: Get endpoints configuration from the api server.
+// TODO: Get endpoints configuration from the api server.
+const authEndpoint = `${API_URL}/connect/google?redirect_uri=${APP_URL}/${REDIRECT_AUTH_ENDPOINT}`;
 
 const AuthContainer = () => (
   <Wrapper>

@@ -1,10 +1,11 @@
 import React, { Component } from 'react';
 import styled from 'styled-components';
-import { Button, Form, Input, Select, Upload } from 'antd';
+import { Button, Form, Input, Select, Upload, message } from 'antd';
 import { PasswordInput } from 'components/Input';
 import { Icon } from 'components/Icon';
 import InboxIcon from 'static/images/svg/icon-inbox.svg';
 import {
+  MAX_UPLOADING_FILE_SIZE,
   TRASH_TYPE,
   POST_WORKFLOW_CREATE_MODE,
   POST_WORKFLOW_EDIT_MODE,
@@ -32,6 +33,10 @@ const FormItem = styled(Item)`
   label {
     font-size: 18px;
     color: #888b90;
+
+    &:after {
+      content: none;
+    }
   }
 
   .ant-form-item-required:before {
@@ -118,6 +123,8 @@ const RemoveButtonWrapper = styled.div`
   align-items: center;
 `;
 
+const MAX_FILE_SIZE_MB = Number(MAX_UPLOADING_FILE_SIZE) / 1024 / 1024;
+
 const ITEM_LAYOUT = {
   labelCol: { span: 6 },
   wrapperCol: { span: 18 },
@@ -128,14 +135,17 @@ const hasFieldsErrors = fieldsError =>
 
 const hasFormErrors = (mode, getFieldsError, isFieldTouched) => {
   if (mode === POST_WORKFLOW_EDIT_MODE) {
-    return hasFieldsErrors(getFieldsError(['name', 'login', 'pass']));
+    return hasFieldsErrors(
+      getFieldsError(['name', 'login', 'pass', 'website']),
+    );
   }
 
   return (
-    hasFieldsErrors(getFieldsError(['name', 'login', 'pass'])) ||
+    hasFieldsErrors(getFieldsError(['name', 'login', 'pass', 'website'])) ||
     !isFieldTouched('name') ||
     !isFieldTouched('login') ||
-    !isFieldTouched('pass')
+    !isFieldTouched('pass') ||
+    !isFieldTouched('website')
   );
 };
 
@@ -147,8 +157,12 @@ const renderOptions = list =>
   ));
 
 class CredentialsForm extends Component {
+  state = this.prepareInitialState();
+
   handleSubmit = event => {
     event.preventDefault();
+
+    const { files } = this.state;
 
     const {
       form,
@@ -163,19 +177,47 @@ class CredentialsForm extends Component {
           mode === POST_WORKFLOW_EDIT_MODE
             ? onFinishEditWorkflow
             : onFinishCreateWorkflow;
-        action(values);
+        action({ ...values, attachments: files });
       }
     });
   };
 
-  // prevent sending on backend by default
-  handleBeforeUpload = () => false;
+  // prevent sending on backend by default and check size
+  handleBeforeUpload = file => {
+    const fileSizeMB = file.size / 1024 / 1024;
+
+    if (fileSizeMB > MAX_FILE_SIZE_MB) {
+      message.error(
+        `File «${file.name}» must be smaller than ${MAX_FILE_SIZE_MB}MB!`,
+      );
+      return false;
+    }
+
+    this.setState(prevState => ({
+      files: [...prevState.files, file],
+    }));
+
+    return false;
+  };
 
   // ugly hack for special case: post has edit mode and you want to delete
   // a file. Without that it will be crashed
   normalizeFile = ({ fileList }) => fileList;
 
+  prepareInitialState() {
+    const {
+      post: {
+        secret: { attachments },
+      },
+    } = this.props;
+
+    return {
+      files: attachments,
+    };
+  }
+
   render() {
+    const { files } = this.state;
     const {
       allLists,
       mode,
@@ -186,7 +228,7 @@ class CredentialsForm extends Component {
     } = this.props;
 
     const {
-      secret: { name, login, pass, note, attachments },
+      secret: { name, login, pass, website, note },
       listId,
     } = post;
     const {
@@ -200,6 +242,8 @@ class CredentialsForm extends Component {
     const nameError = isFieldTouched('name') && getFieldError('name');
     const loginError = isFieldTouched('login') && getFieldError('login');
     const passwordError = isFieldTouched('pass') && getFieldError('pass');
+    const websiteError = isFieldTouched('website') && getFieldError('website');
+
     const submitIsDisabled = hasFormErrors(
       mode,
       getFieldsError,
@@ -263,6 +307,16 @@ class CredentialsForm extends Component {
             />,
           )}
         </FormItem>
+        <FormItem
+          label="Website"
+          validateStatus={websiteError ? 'error' : ''}
+          {...ITEM_LAYOUT}
+        >
+          {getFieldDecorator('website', {
+            rules: rules.website,
+            initialValue: website,
+          })(<Input name="website" placeholder="..." size="large" />)}
+        </FormItem>
         <FormItem label="List" {...ITEM_LAYOUT}>
           {getFieldDecorator('listId', {
             initialValue: listId,
@@ -279,13 +333,12 @@ class CredentialsForm extends Component {
         </FormItem>
         <FormItem label="Attachments">
           {getFieldDecorator('attachments', {
-            valuePropName: 'fileList',
             getValueFromEvent: this.normalizeFile,
-            initialValue: attachments,
           })(
             <Uploader
               multiple
               name="attachments"
+              fileList={files}
               beforeUpload={this.handleBeforeUpload}
             >
               <StyledUploadIcon component={InboxIcon} />

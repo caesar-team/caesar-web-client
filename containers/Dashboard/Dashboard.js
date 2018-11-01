@@ -179,7 +179,7 @@ class DashboardContainer extends Component {
   };
 
   handleMoveToTrash = async () => {
-    const { list, workInProgressPost } = this.state;
+    const { list, selectedListId, workInProgressPost } = this.state;
 
     const { mode, ...rest } = workInProgressPost;
     const {
@@ -202,18 +202,24 @@ class DashboardContainer extends Component {
       await updateMovePost(postId, { listId: trashNodeId });
       message.success(`The post «${name}» was moved to trash.`);
 
+      const newList = replaceNode(
+        updateNode(list, postId, data),
+        postId,
+        trashNodeId,
+      );
+      const nextWorkInProgressNode = findNode(newList, selectedListId).model;
+      const nextWorkInProgress =
+        nextWorkInProgressNode.children.length > 0
+          ? nextWorkInProgressNode.children[0]
+          : null;
+
       this.setState(prevState => ({
         ...prevState,
         workInProgressPost: {
-          ...data,
+          ...nextWorkInProgress,
           mode: POST_REVIEW_MODE,
         },
-        selectedListId: trashNodeId,
-        list: replaceNode(
-          updateNode(prevState.list, postId, data),
-          postId,
-          trashNodeId,
-        ),
+        list: newList,
       }));
     } catch (e) {
       console.log(e);

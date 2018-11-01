@@ -29,7 +29,7 @@ app.prepare().then(() => {
 
   server.use(helmet());
   server.use(cookieParser());
-
+  server.use(express.static('static'));
   server.get('/logout', (req, res) => {
     res.clearCookie('token');
     res.redirect('/auth');

@@ -242,7 +242,7 @@ class CredentialsForm extends Component {
     const nameError = isFieldTouched('name') && getFieldError('name');
     const loginError = isFieldTouched('login') && getFieldError('login');
     const passwordError = isFieldTouched('pass') && getFieldError('pass');
-    const websiteError = isFieldTouched('website') && getFieldError('website');
+    const websiteError = getFieldError('website');
 
     const submitIsDisabled = hasFormErrors(
       mode,

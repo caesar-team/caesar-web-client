@@ -29,6 +29,8 @@ module.exports = withPlugins([withCss], {
     APP_URL: `${process.env.APP_PROTOCOL}://${process.env.APP_HOST}${
       process.env.NODE_ENV === 'development' ? `:${process.env.APP_PORT}` : ''
       }`,
+    API_BASE_PATH: process.env.API_BASE_PATH,
+    AUTH_ENDPOINT: process.env.AUTH_ENDPOINT,
     REDIRECT_AUTH_ENDPOINT: process.env.REDIRECT_AUTH_ENDPOINT,
     MAX_UPLOADING_FILE_SIZE: process.env.MAX_UPLOADING_FILE_SIZE,
   },

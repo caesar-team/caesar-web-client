@@ -6,7 +6,7 @@
   "author": "<hello@caesar.team>",
   "license": "MIT",
   "scripts": {
-    "dev": "node server.js",
+    "dev": "next",
     "build": "next build",
     "start": "NODE_ENV=production node server.js",
     "prod": "yarn build && yarn start"

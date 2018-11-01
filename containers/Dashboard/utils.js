@@ -34,11 +34,13 @@ export const prepareFiles = attachments =>
 export const prepareAttachments = files => {
   if (!files.length) return Promise.resolve([]);
 
-  const originalFiles = files.map(({ originFileObj }) => originFileObj);
+  const originalFiles = files.map(
+    file => (file.originFileObj ? file.originFileObj : file),
+  );
 
   return Promise.all(originalFiles.map(fileToBase64)).then(preparedFiles =>
     preparedFiles.map((preparedFile, index) => ({
-      name: originalFiles[index].name,
+      name: files[index].name,
       raw: preparedFile,
     })),
   );
@@ -53,6 +55,7 @@ export const initialCredentials = listId => ({
     name: '',
     login: '',
     pass: '',
+    website: '',
     note: '',
     attachments: [],
   },

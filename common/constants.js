@@ -2,7 +2,12 @@ import getConfig from 'next/config';
 
 const { publicRuntimeConfig } = getConfig();
 
-export const { API_URL, APP_URL, REDIRECT_AUTH_ENDPOINT } = publicRuntimeConfig;
+export const {
+  API_URL,
+  APP_URL,
+  REDIRECT_AUTH_ENDPOINT,
+  MAX_UPLOADING_FILE_SIZE,
+} = publicRuntimeConfig;
 
 export const DEFAULT_IDLE_TIMEOUT = 5 * 60 * 1000;
 

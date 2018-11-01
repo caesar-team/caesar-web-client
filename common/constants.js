@@ -4,7 +4,9 @@ const { publicRuntimeConfig } = getConfig();
 
 export const {
   API_URL,
+  API_BASE_PATH,
   APP_URL,
+  AUTH_ENDPOINT,
   REDIRECT_AUTH_ENDPOINT,
   MAX_UPLOADING_FILE_SIZE,
 } = publicRuntimeConfig;

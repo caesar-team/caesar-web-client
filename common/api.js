@@ -15,7 +15,7 @@ const softExit = () => {
 };
 
 const callApi = axios.create({
-  baseURL: `${API_URL}/api`,
+  baseURL: `${API_URL}`,
 });
 
 callApi.interceptors.request.use(config => {

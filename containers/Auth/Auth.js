@@ -68,11 +68,11 @@ const AuthContainer = () => (
   <Wrapper>
     <InnerWrapper>
       <NiceToMeetYouText>Nice to meet you!</NiceToMeetYouText>
-      <WelcomeText>Welcome to CaesarApp</WelcomeText>
+      <WelcomeText>Welcome to Caesar</WelcomeText>
       <AuthWrapper>
         <AuthLink href={authEndpoint}>
           <Icon component={IconGoogle} size={40} />
-          <AuthText>Sign up via Google</AuthText>
+          <AuthText>Sign in via Google</AuthText>
         </AuthLink>
       </AuthWrapper>
     </InnerWrapper>

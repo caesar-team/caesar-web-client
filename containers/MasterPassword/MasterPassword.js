@@ -63,11 +63,17 @@ const StyledPasswordInput = styled(PasswordInput)`
   }
 `;
 
+const Error = styled.div`
+  font-size: 15px;
+  color: #f5222d;
+  margin-top: 15px;
+`;
+
 const StyledButton = styled(Button)`
   width: 100%;
   height: 60px;
   font-size: 18px;
-  margin-top: 50px;
+  margin-top: 40px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -133,6 +139,7 @@ class MasterPassword extends Component {
       onSetMasterPassword();
     } catch (e) {
       this.setState({
+        isFailed: true,
         isLoading: false,
       });
     }
@@ -141,6 +148,7 @@ class MasterPassword extends Component {
   handleChangePassword = name => value => {
     this.setState(prevState => ({
       ...prevState,
+      isFailed: false,
       [name]: value,
     }));
   };
@@ -155,6 +163,7 @@ class MasterPassword extends Component {
     const { isFullWorkflow } = this.props;
 
     return {
+      isFailed: false,
       isLoading: false,
       step: isFullWorkflow
         ? STEP_CREATE_MASTER_PASSWORD
@@ -197,11 +206,16 @@ class MasterPassword extends Component {
 
   renderConfirmStep() {
     const { isFullWorkflow } = this.props;
-    const { step, password, confirmPassword, isLoading } = this.state;
+    const { step, password, confirmPassword, isLoading, isFailed } = this.state;
+
+    const errorText = isFullWorkflow
+      ? 'Something wrong, please try again'
+      : 'Wrong password';
 
     const isDisabledButton =
       !checkIsPasswordValid(REGEXP_TEXT_MATCH, confirmPassword) ||
-      (isFullWorkflow && password !== confirmPassword);
+      (isFullWorkflow && password !== confirmPassword) ||
+      isFailed;
 
     return (
       <Form onSubmit={this.handleClickConfirm}>
@@ -218,6 +232,7 @@ class MasterPassword extends Component {
           placeholder="Enter your password…"
           onChange={this.handleChangePassword('confirmPassword')}
         />
+        {isFailed && <Error>{errorText}</Error>}
         <StyledButton
           type="primary"
           disabled={isDisabledButton}

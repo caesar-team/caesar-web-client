@@ -144,8 +144,7 @@ const hasFormErrors = (mode, getFieldsError, isFieldTouched) => {
     hasFieldsErrors(getFieldsError(['name', 'login', 'pass', 'website'])) ||
     !isFieldTouched('name') ||
     !isFieldTouched('login') ||
-    !isFieldTouched('pass') ||
-    !isFieldTouched('website')
+    !isFieldTouched('pass')
   );
 };
 
@@ -198,6 +197,12 @@ class CredentialsForm extends Component {
     }));
 
     return false;
+  };
+
+  handleRemoveFile = file => {
+    this.setState(prevState => ({
+      files: prevState.files.filter(({ uid }) => uid !== file.uid),
+    }));
   };
 
   // ugly hack for special case: post has edit mode and you want to delete
@@ -340,6 +345,7 @@ class CredentialsForm extends Component {
               name="attachments"
               fileList={files}
               beforeUpload={this.handleBeforeUpload}
+              onRemove={this.handleRemoveFile}
             >
               <StyledUploadIcon component={InboxIcon} />
               <UploaderText>

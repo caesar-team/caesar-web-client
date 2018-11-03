@@ -224,7 +224,7 @@ class CredentialsPost extends Component {
       </Fragment>
     );
 
-    const renderedWebsiteRow = (
+    const renderedWebsiteRow = website && (
       <Fragment>
         <StyledRow>
           <Col span={6}>

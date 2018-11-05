@@ -2,13 +2,13 @@
 
 const envFile = `.env.${
   process.env.NODE_ENV !== 'production' ? 'development' : 'production'
-  }`;
+}`;
 
 if (require('fs').existsSync(envFile)) {
   require('dotenv').config({
     path: `.env.${
       process.env.NODE_ENV !== 'production' ? 'development' : 'production'
-      }`,
+    }`,
   });
 }
 
@@ -28,10 +28,13 @@ module.exports = withPlugins([withCss], {
     API_URL: `${process.env.API_PROTOCOL}://${process.env.API_HOST}`,
     APP_URL: `${process.env.APP_PROTOCOL}://${process.env.APP_HOST}${
       process.env.NODE_ENV === 'development' ? `:${process.env.APP_PORT}` : ''
-      }`,
+    }`,
+    API_BASE_PATH: process.env.API_BASE_PATH,
+    AUTH_ENDPOINT: process.env.AUTH_ENDPOINT,
     REDIRECT_AUTH_ENDPOINT: process.env.REDIRECT_AUTH_ENDPOINT,
+    MAX_UPLOADING_FILE_SIZE: process.env.MAX_UPLOADING_FILE_SIZE,
   },
-  webpack: (config, { dev }) => {
+  webpack: config => {
     config.plugins = config.plugins || [];
 
     config.plugins = [

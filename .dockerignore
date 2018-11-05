@@ -1,0 +1,6 @@
+/.idea
+/.next
+.env.production
+.env.development
+yarn-error.log
+/node_modules

@@ -167,7 +167,7 @@ class CredentialsPost extends Component {
         listId,
         shared,
         owner: isOwner,
-        secret: { name, login, pass, note, attachments },
+        secret: { name, login, pass, website, note, attachments },
       },
     } = this.props;
 
@@ -217,6 +217,27 @@ class CredentialsPost extends Component {
               component={CopyIcon}
               size={16}
               onClick={this.handleCopy('pass')}
+            />
+          </IconsWrapper>
+        </StyledRow>
+        <Divider />
+      </Fragment>
+    );
+
+    const renderedWebsiteRow = website && (
+      <Fragment>
+        <StyledRow>
+          <Col span={6}>
+            <Left>Website</Left>
+          </Col>
+          <Col span={14}>
+            <Right>{website}</Right>
+          </Col>
+          <IconsWrapper span={4}>
+            <StyledIcon
+              component={CopyIcon}
+              size={16}
+              onClick={this.handleCopy('website')}
             />
           </IconsWrapper>
         </StyledRow>
@@ -302,6 +323,7 @@ class CredentialsPost extends Component {
         />
         {renderedLoginRow}
         {renderedPasswordRow}
+        {renderedWebsiteRow}
         {renderedListRow}
         {renderedNoteRow}
         {renderedAttachmentsRow}

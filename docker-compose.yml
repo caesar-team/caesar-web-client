@@ -1,0 +1,13 @@
+version: '3.5'
+
+services:
+    node:
+        image: node:8.12-alpine
+        volumes:
+            - .:/home/node
+        working_dir: /home/node
+        command: sh -c "yarn && yarn dev"
+        expose:
+            - 3000
+        ports:
+            - 3000:3000

@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { API_URL, API_BASE_PATH } from './constants';
+import { API_URL } from './constants';
 import { getToken, removeToken } from './utils/token';
 import { isClient } from './utils/isEnvironment';
 
@@ -15,7 +15,7 @@ const softExit = () => {
 };
 
 const callApi = axios.create({
-  baseURL: `${API_URL}/${API_BASE_PATH}`,
+  baseURL: `${API_URL}/api`,
 });
 
 callApi.interceptors.request.use(config => {
@@ -64,13 +64,9 @@ export const getUsers = token =>
     },
   });
 
-export const postSetMaster = password =>
-  callApi.post('/master/set', { master: password });
+export const postKeys = data => callApi.post('/keys', data);
 
-export const postCheckMaster = password =>
-  callApi.post('/master/check', { master: password });
-
-export const getPasswordStatus = () => callApi.post('/master/created');
+export const getKeys = () => callApi.get('/keys');
 
 // post
 export const getList = token =>

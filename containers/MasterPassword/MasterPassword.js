@@ -2,7 +2,6 @@ import React, { Component } from 'react';
 import styled from 'styled-components';
 import { Button } from 'antd';
 import { match } from 'common/utils/match';
-import { postSetMaster, postCheckMaster } from 'common/api';
 import { PasswordInput, Icon } from '../../components';
 import {
   REGEXP_TEXT_MATCH,
@@ -117,25 +116,14 @@ class MasterPassword extends Component {
     event.preventDefault();
 
     const { confirmPassword } = this.state;
-    const {
-      isFullWorkflow,
-      onSetMasterPassword = Function.prototype,
-    } = this.props;
+    const { onSetMasterPassword } = this.props;
 
-    const action = isFullWorkflow ? postSetMaster : postCheckMaster;
-
-    this.setState({
-      isLoading: true,
-    });
-
-    try {
-      await action(confirmPassword);
-      onSetMasterPassword();
-    } catch (e) {
-      this.setState({
-        isLoading: false,
-      });
-    }
+    this.setState(
+      {
+        isLoading: true,
+      },
+      () => onSetMasterPassword(confirmPassword),
+    );
   };
 
   handleChangePassword = name => value => {

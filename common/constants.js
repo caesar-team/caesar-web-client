@@ -9,6 +9,7 @@ export const {
   AUTH_ENDPOINT,
   REDIRECT_AUTH_ENDPOINT,
   MAX_UPLOADING_FILE_SIZE,
+  LENGTH_KEY,
 } = publicRuntimeConfig;
 
 export const DEFAULT_IDLE_TIMEOUT = 5 * 60 * 1000;

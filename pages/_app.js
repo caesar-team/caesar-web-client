@@ -1,9 +1,11 @@
 import React from 'react';
 // eslint-disable-next-line
 import { default as NextApp, Container } from 'next/app';
+import NodeRSA from 'node-rsa';
+import openpgp, { message } from 'openpgp';
 import { entryResolver } from 'common/utils/entryResolver';
-import { DEFAULT_IDLE_TIMEOUT } from 'common/constants';
-import { getPasswordStatus } from 'common/api';
+import { DEFAULT_IDLE_TIMEOUT, LENGTH_KEY } from 'common/constants';
+import { getKeys, postKeys } from 'common/api';
 import { SessionChecker, Loader } from '../components';
 import { MasterPassword } from '../containers';
 
@@ -23,22 +25,43 @@ export default class App extends NextApp {
   async componentDidMount() {
     if (this.props.router.route !== '/auth') {
       const {
-        data: { created: isMasterPasswordCreated },
-      } = await getPasswordStatus();
+        data: { publicKey, encryptedPrivateKey },
+      } = await getKeys();
+
+      this.privateKey = null;
+      this.publicKey = publicKey;
+      this.encryptedPrivateKey = encryptedPrivateKey;
+
+      const isFullWorkflow = !publicKey || !encryptedPrivateKey;
 
       const isSetPassword =
         sessionStorage.getItem('isSetPassword') &&
         sessionStorage.getItem('isSetPassword') === '1';
 
       this.setState({
-        isFullWorkflow: !isMasterPasswordCreated,
+        isFullWorkflow,
         shouldShowLoader: false,
         shouldShowMasterPassword: !isSetPassword,
       });
     }
   }
 
-  handleSetMasterPassword = () => {
+  async generateKeys(password) {
+    const key = new NodeRSA({ b: LENGTH_KEY });
+
+    const options = {
+      message: message.fromText(key.exportKey('private')),
+      passwords: password,
+    };
+
+    const encrypted = await openpgp.encrypt(options);
+    const encryptedPrivateKey = encrypted.data;
+
+    await postKeys({
+      encryptedPrivateKey,
+      publicKey: key.exportKey('public'),
+    });
+
     this.setState(
       {
         shouldShowMasterPassword: false,
@@ -48,6 +71,44 @@ export default class App extends NextApp {
         sessionStorage.setItem('isSetPassword', '1');
       },
     );
+  }
+
+  async validateKeys(password) {
+    try {
+      const decryptedSessionKeys = await openpgp.decryptSessionKeys({
+        message: await message.readArmored(this.encryptedPrivateKey),
+        passwords: password,
+      });
+      const decrypted = await openpgp.decrypt({
+        sessionKeys: decryptedSessionKeys[0],
+        message: await message.readArmored(this.encryptedPrivateKey),
+      });
+
+      this.privateKey = decrypted.data;
+
+      this.setState(
+        {
+          shouldShowMasterPassword: false,
+          isFullWorkflow: false,
+        },
+        () => {
+          sessionStorage.setItem('isSetPassword', '1');
+        },
+      );
+    } catch (error) {
+      this.setState({
+        isError: true,
+      });
+    }
+  }
+
+  handleSetMasterPassword = async password => {
+    const { isFullWorkflow } = this.state;
+
+    // eslint-disable-next-line
+    (await isFullWorkflow)
+      ? this.generateKeys(password)
+      : this.validateKeys(password);
   };
 
   handleInactiveTimeout = () => {
@@ -63,6 +124,7 @@ export default class App extends NextApp {
     const { router } = this.props;
 
     return {
+      isError: false,
       isFullWorkflow: true,
       shouldShowLoader: router.route !== '/auth',
       shouldShowMasterPassword: false,
@@ -71,6 +133,7 @@ export default class App extends NextApp {
 
   render() {
     const {
+      isError,
       isFullWorkflow,
       shouldShowMasterPassword,
       shouldShowLoader,
@@ -88,6 +151,7 @@ export default class App extends NextApp {
       return (
         <Container>
           <MasterPassword
+            isError={isError}
             isFullWorkflow={isFullWorkflow}
             onSetMasterPassword={this.handleSetMasterPassword}
           />
@@ -101,7 +165,11 @@ export default class App extends NextApp {
           timeout={DEFAULT_IDLE_TIMEOUT}
           onFinishTimeout={this.handleInactiveTimeout}
         >
-          <Component {...pageProps} />
+          <Component
+            privateKey={this.privateKey}
+            publicKey={this.publicKey}
+            {...pageProps}
+          />
         </SessionChecker>
       </Container>
     );

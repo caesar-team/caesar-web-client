@@ -2,7 +2,12 @@ import React from 'react';
 import styled from 'styled-components';
 import { Icon } from 'components';
 import IconGoogle from 'static/images/svg/icon-google.svg';
-import { API_URL, APP_URL, AUTH_ENDPOINT, REDIRECT_AUTH_ENDPOINT } from 'common/constants';
+import {
+  API_URL,
+  APP_URL,
+  AUTH_ENDPOINT,
+  REDIRECT_AUTH_ENDPOINT,
+} from 'common/constants';
 
 const Wrapper = styled.div`
   display: flex;

@@ -64,13 +64,9 @@ export const getUsers = token =>
     },
   });
 
-export const postSetMaster = password =>
-  callApi.post('/master/set', { master: password });
+export const postKeys = data => callApi.post('/keys', data);
 
-export const postCheckMaster = password =>
-  callApi.post('/master/check', { master: password });
-
-export const getPasswordStatus = () => callApi.post('/master/created');
+export const getKeys = () => callApi.get('/keys');
 
 // post
 export const getList = token =>

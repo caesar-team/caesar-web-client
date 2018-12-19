@@ -3,6 +3,7 @@ import styled from 'styled-components';
 import { Layout, Modal, message } from 'antd';
 import deepequal from 'fast-deep-equal';
 import memoize from 'memoize-one';
+import * as openpgp from 'openpgp';
 import { Post, PostList, Sidebar, Header, InviteModal } from 'components';
 import {
   createTree,
@@ -29,6 +30,7 @@ import {
   updatePost,
   removePost,
 } from 'common/api';
+import DecryptWorker from 'common/decrypt.worker';
 import { prepareAttachments, prepareFiles, initialPostData } from './utils';
 
 const { Sider } = Layout;
@@ -61,6 +63,12 @@ const RightColumnWrapper = styled(Layout)`
 // TODO: add helper method for update and replace node after any changing
 // TODO: add helper method for construct workInProgressPost from parts
 
+function getListWithoutChildren(list) {
+  const { children, ...rest } = list;
+
+  return { ...rest, children: [] };
+}
+
 class DashboardContainer extends Component {
   state = this.prepareInitialState();
 
@@ -68,17 +76,51 @@ class DashboardContainer extends Component {
     list.reduce((acc, item) => ({ ...acc, [item.id]: item }), {}),
   );
 
+  componentDidMount() {
+    this.worker = new DecryptWorker();
+
+    this.worker.addEventListener('message', this.handleWorkerMessage);
+
+    this.worker.postMessage({
+      event: 'toDecryptList',
+      data: {
+        list: this.props.list,
+        privateKey: this.props.privateKey,
+        password: this.props.password,
+      },
+    });
+  }
+
+  componentWillUnmount() {
+    this.worker.removeEventListener('message', this.handleWorkerMessage);
+  }
+
+  handleWorkerMessage = msg => {
+    const { list } = this.state;
+
+    const {
+      data: { event, data },
+    } = msg;
+
+    switch (event) {
+      case 'fromDecryptList': {
+        this.setState({
+          list: addNode(list, data.node.model.listId, data.node.model),
+        });
+
+        break;
+      }
+
+      default:
+        break;
+    }
+  };
+
   handleClickSection = ({ key }) => {
-    this.setState(prevState => ({
+    this.setState({
       selectedListId: key,
-      workInProgressPost:
-        prevState.selectedListId === key
-          ? prevState.workInProgressPost
-          : {
-              mode: POST_REVIEW_MODE,
-              ...findNode(prevState.list, key).model.children[0],
-            },
-    }));
+      workInProgressPost: null,
+    });
   };
 
   handleClickPost = postId => () => {
@@ -227,15 +269,27 @@ class DashboardContainer extends Component {
   };
 
   handleFinishCreateWorkflow = async ({ listId, attachments, ...secret }) => {
+    const { publicKey } = this.props;
+
     try {
       const preparedAttachments = await prepareAttachments(attachments);
+      const item = {
+        ...secret,
+        attachments: preparedAttachments,
+      };
+
+      const options = {
+        message: openpgp.message.fromText(JSON.stringify(item)),
+        publicKeys: (await openpgp.key.readArmored(publicKey)).keys,
+      };
+
+      const encrypted = await openpgp.encrypt(options);
+      const encryptedItem = encrypted.data;
+
       const data = {
         listId,
         type: POST_CREDENTIALS_TYPE,
-        secret: {
-          ...secret,
-          attachments: preparedAttachments,
-        },
+        secret: encryptedItem,
       };
 
       const {
@@ -243,11 +297,15 @@ class DashboardContainer extends Component {
       } = await postCreatePost(data);
 
       const newPost = {
-        lastUpdated,
         id: postId,
+        listId,
+        lastUpdated,
+        favorite: false,
         shared: [],
+        tags: [],
         owner: true,
-        ...data,
+        secret: item,
+        type: POST_CREDENTIALS_TYPE,
       };
 
       this.setState(prevState => ({
@@ -264,6 +322,7 @@ class DashboardContainer extends Component {
   };
 
   handleFinishEditWorkflow = async ({ listId, attachments, ...secret }) => {
+    const { publicKey } = this.props;
     const { workInProgressPost } = this.state;
 
     try {
@@ -291,7 +350,17 @@ class DashboardContainer extends Component {
       const promises = [];
 
       if (isSecretChanged) {
-        promises.push(updatePost(workInProgressPost.id, { secret: data }));
+        const options = {
+          message: openpgp.message.fromText(JSON.stringify(data)),
+          publicKeys: (await openpgp.key.readArmored(publicKey)).keys,
+        };
+
+        const encrypted = await openpgp.encrypt(options);
+        const encryptedItem = encrypted.data;
+
+        promises.push(
+          updatePost(workInProgressPost.id, { secret: encryptedItem }),
+        );
       }
 
       if (isListIdChanged) {
@@ -414,22 +483,20 @@ class DashboardContainer extends Component {
 
     const root = {
       type: ROOT_TYPE,
-      children: list,
+      children: [
+        getListWithoutChildren(list[0]),
+        { ...list[1], children: list[1].children.map(getListWithoutChildren) },
+        getListWithoutChildren(list[2]),
+      ],
     };
 
     const tree = createTree(root);
-    const workInProgressPost = selectedListId
-      ? findNode(tree, selectedListId).model.children[0]
-      : null;
 
     return {
       isVisibleInviteModal: false,
       list: tree,
       selectedListId,
-      workInProgressPost: {
-        ...workInProgressPost,
-        mode: POST_REVIEW_MODE,
-      },
+      workInProgressPost: null,
     };
   }
 
@@ -440,7 +507,7 @@ class DashboardContainer extends Component {
       },
     } = this.state;
 
-    if (!children) {
+    if (!children || !children.length) {
       return [];
     }
 
@@ -464,13 +531,18 @@ class DashboardContainer extends Component {
       isVisibleInviteModal,
     } = this.state;
 
+    if (
+      !list ||
+      !list.model ||
+      !list.model.children ||
+      !list.model.children.length
+    ) {
+      return null;
+    }
+
     const {
       model: { children },
     } = list;
-
-    if (!list || !list.model || !list.model.children) {
-      return null;
-    }
 
     const allLists = this.prepareAllList();
     const selectedList = findNode(list, selectedListId).model;

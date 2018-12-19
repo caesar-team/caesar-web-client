@@ -1,16 +1,25 @@
 import React from 'react';
 // eslint-disable-next-line
 import { default as NextApp, Container } from 'next/app';
-import NodeRSA from 'node-rsa';
-import openpgp, { message } from 'openpgp';
+import * as openpgp from 'openpgp';
 import { entryResolver } from 'common/utils/entryResolver';
 import { DEFAULT_IDLE_TIMEOUT, LENGTH_KEY } from 'common/constants';
+import OpenPGPWorker from 'common/openpgp.worker';
+import { uuid4 } from 'common/utils/uuid4';
 import { getKeys, postKeys } from 'common/api';
 import { SessionChecker, Loader } from '../components';
 import { MasterPassword } from '../containers';
 
 export default class App extends NextApp {
   state = this.prepareInitialState();
+
+  worker = null;
+
+  publicKey = null;
+
+  privateKey = null;
+
+  password = null;
 
   static async getInitialProps({ Component, router, ctx }) {
     entryResolver({ router, ctx });
@@ -24,77 +33,78 @@ export default class App extends NextApp {
 
   async componentDidMount() {
     if (this.props.router.route !== '/auth') {
-      const {
-        data: { publicKey, encryptedPrivateKey },
-      } = await getKeys();
-
-      this.privateKey = null;
-      this.publicKey = publicKey;
-      this.encryptedPrivateKey = encryptedPrivateKey;
-
-      const isFullWorkflow = !publicKey || !encryptedPrivateKey;
-
-      const isSetPassword =
-        sessionStorage.getItem('isSetPassword') &&
-        sessionStorage.getItem('isSetPassword') === '1';
-
-      this.setState({
-        isFullWorkflow,
-        shouldShowLoader: false,
-        shouldShowMasterPassword: !isSetPassword,
-      });
+      this.initOpenPGPWorker();
+      this.initWorkflow();
     }
   }
 
-  async generateKeys(password) {
-    const key = new NodeRSA({ b: LENGTH_KEY });
+  initOpenPGPWorker() {
+    openpgp.config.aead_protect = false;
 
+    this.worker = new OpenPGPWorker();
+
+    openpgp.initWorker({ workers: [this.worker] });
+  }
+
+  async initWorkflow() {
+    const {
+      data: { publicKey, encryptedPrivateKey },
+    } = await getKeys();
+
+    this.privateKey = null;
+    this.publicKey = publicKey;
+    this.encryptedPrivateKey = encryptedPrivateKey;
+
+    const isFullWorkflow = !publicKey || !encryptedPrivateKey;
+
+    this.setState({
+      isFullWorkflow,
+      shouldShowLoader: false,
+      shouldShowMasterPassword: true,
+    });
+  }
+
+  async generateKeys(password) {
     const options = {
-      message: message.fromText(key.exportKey('private')),
-      passwords: password,
+      userIds: [{ name: uuid4() }],
+      numBits: LENGTH_KEY,
+      passphrase: password,
     };
 
-    const encrypted = await openpgp.encrypt(options);
-    const encryptedPrivateKey = encrypted.data;
+    const { publicKeyArmored, privateKeyArmored } = await openpgp.generateKey(
+      options,
+    );
+
+    this.publicKey = publicKeyArmored;
+    this.privateKey = privateKeyArmored;
+    this.password = password;
 
     await postKeys({
-      encryptedPrivateKey,
-      publicKey: key.exportKey('public'),
+      publicKey: publicKeyArmored,
+      encryptedPrivateKey: privateKeyArmored,
     });
 
-    this.setState(
-      {
-        shouldShowMasterPassword: false,
-        isFullWorkflow: false,
-      },
-      () => {
-        sessionStorage.setItem('isSetPassword', '1');
-      },
-    );
+    this.setState({
+      shouldShowMasterPassword: false,
+      isFullWorkflow: false,
+    });
   }
 
   async validateKeys(password) {
     try {
-      const decryptedSessionKeys = await openpgp.decryptSessionKeys({
-        message: await message.readArmored(this.encryptedPrivateKey),
-        passwords: password,
-      });
-      const decrypted = await openpgp.decrypt({
-        sessionKeys: decryptedSessionKeys[0],
-        message: await message.readArmored(this.encryptedPrivateKey),
-      });
+      const privateKeyObj = (await openpgp.key.readArmored(
+        this.encryptedPrivateKey,
+      )).keys[0];
 
-      this.privateKey = decrypted.data;
+      await privateKeyObj.decrypt(password);
 
-      this.setState(
-        {
-          shouldShowMasterPassword: false,
-          isFullWorkflow: false,
-        },
-        () => {
-          sessionStorage.setItem('isSetPassword', '1');
-        },
-      );
+      this.privateKey = this.encryptedPrivateKey;
+      this.password = password;
+
+      this.setState({
+        shouldShowMasterPassword: false,
+        isFullWorkflow: false,
+      });
     } catch (error) {
       this.setState({
         isError: true,
@@ -112,12 +122,9 @@ export default class App extends NextApp {
   };
 
   handleInactiveTimeout = () => {
-    this.setState(
-      {
-        shouldShowMasterPassword: true,
-      },
-      () => sessionStorage.setItem('isSetPassword', '0'),
-    );
+    this.setState({
+      shouldShowMasterPassword: true,
+    });
   };
 
   prepareInitialState() {
@@ -168,6 +175,7 @@ export default class App extends NextApp {
           <Component
             privateKey={this.privateKey}
             publicKey={this.publicKey}
+            password={this.password}
             {...pageProps}
           />
         </SessionChecker>

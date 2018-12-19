@@ -5,15 +5,10 @@ import { getToken } from 'common/utils/token';
 import { DashboardContainer } from '../containers';
 import { Head } from '../components';
 
-const DashboardPage = ({ list, user, members, predefinedListId }) => (
+const DashboardPage = props => (
   <Fragment>
     <Head title="Dashboard" />
-    <DashboardContainer
-      list={list}
-      user={user}
-      members={members}
-      predefinedListId={predefinedListId}
-    />
+    <DashboardContainer {...props} />
   </Fragment>
 );
 

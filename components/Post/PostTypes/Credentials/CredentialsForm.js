@@ -144,8 +144,7 @@ const hasFormErrors = (mode, getFieldsError, isFieldTouched) => {
     hasFieldsErrors(getFieldsError(['name', 'login', 'pass', 'website'])) ||
     !isFieldTouched('name') ||
     !isFieldTouched('login') ||
-    !isFieldTouched('pass') ||
-    !isFieldTouched('website')
+    !isFieldTouched('pass')
   );
 };
 

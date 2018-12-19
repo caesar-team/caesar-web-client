@@ -14,13 +14,14 @@ if (require('fs').existsSync(envFile)) {
 
 const withPlugins = require('next-compose-plugins');
 const withCss = require('@zeit/next-css');
+const withWorkers = require('@zeit/next-workers');
 
 // fix: prevents error when .css files are required by node
 if (typeof require !== 'undefined') {
   require.extensions['.css'] = file => {};
 }
 
-module.exports = withPlugins([withCss], {
+module.exports = withPlugins([withCss, withWorkers], {
   publicRuntimeConfig: { // Will be available on both server and client
     TEST: true,
     NODE_ENV: process.env.NODE_ENV,
@@ -38,9 +39,7 @@ module.exports = withPlugins([withCss], {
   webpack: (config, { dev }) => {
     config.plugins = config.plugins || [];
 
-    config.plugins = [
-      ...config.plugins,
-    ];
+    config.output.globalObject = 'this';
 
     config.module.rules.push({
       test: /\.svg(\?v=\d\.\d\.\d)?$/,

@@ -1,6 +1,13 @@
 import getConfig from 'next/config';
 
-const { publicRuntimeConfig } = getConfig();
+let publicRuntimeConfig = {};
+
+const config = getConfig();
+
+if (config) {
+  // eslint-disable-next-line
+  publicRuntimeConfig = config.publicRuntimeConfig;
+}
 
 export const {
   API_URL,
@@ -13,6 +20,7 @@ export const {
 } = publicRuntimeConfig;
 
 export const DEFAULT_IDLE_TIMEOUT = 5 * 60 * 1000;
+export const MAX_SIZE_RANDOM_BUFFER = 60000;
 
 export const ROOT_TYPE = 'root';
 export const INBOX_TYPE = 'inbox';

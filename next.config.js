@@ -42,6 +42,9 @@ module.exports = withPlugins([withCss, withWorkers], {
     config.output.globalObject = 'this';
 
     config.module.rules.push({
+        test: /\.worker\.js$/,
+        loader: 'babel-loader',
+      },{
       test: /\.svg(\?v=\d\.\d\.\d)?$/,
       use: [
         {

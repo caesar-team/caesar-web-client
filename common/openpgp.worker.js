@@ -2,13 +2,18 @@
 self.window = self;
 
 const openpgp = require('openpgp');
+const constants = require('../common/constants');
+
+const { MAX_SIZE_RANDOM_BUFFER } = constants;
 
 let randomQueue = [];
-const MAX_SIZE_RANDOM_BUFFER = 60000;
 
 function randomCallback() {
   if (!randomQueue.length) {
-    self.postMessage({ event: 'request-seed', amount: MAX_SIZE_RANDOM_BUFFER });
+    window.postMessage({
+      event: 'request-seed',
+      amount: MAX_SIZE_RANDOM_BUFFER,
+    });
   }
 
   return new Promise(resolve => {
@@ -19,10 +24,12 @@ function randomCallback() {
 openpgp.crypto.random.randomBuffer.init(MAX_SIZE_RANDOM_BUFFER, randomCallback);
 
 function seedRandom(buffer) {
+  let uintBuffer = buffer;
+
   if (!(buffer instanceof Uint8Array)) {
-    buffer = new Uint8Array(buffer);
+    uintBuffer = new Uint8Array(buffer);
   }
-  openpgp.crypto.random.randomBuffer.set(buffer);
+  openpgp.crypto.random.randomBuffer.set(uintBuffer);
 }
 
 function configure(config) {
@@ -75,7 +82,9 @@ window.onmessage = event => {
     case 'seed-random':
       seedRandom(msg.buf);
 
-      let queueCopy = randomQueue;
+      // eslint-disable-next-line
+      const queueCopy = randomQueue;
+
       randomQueue = [];
       for (let i = 0; i < queueCopy.length; i++) {
         queueCopy[i]();

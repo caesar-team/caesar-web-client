@@ -24,11 +24,11 @@ import {
   POST_CREDENTIALS_TYPE,
 } from 'common/constants';
 import {
-  postCreatePost,
-  updateMovePost,
-  updateSharePost,
-  updatePost,
-  removePost,
+  postCreateItem,
+  updateMoveItem,
+  postInviteItem,
+  updateItem,
+  removeItem,
 } from 'common/api';
 import DecryptWorker from 'common/decrypt.worker';
 import { prepareAttachments, prepareFiles, initialPostData } from './utils';
@@ -205,7 +205,7 @@ class DashboardContainer extends Component {
         : null;
 
     try {
-      await removePost(workInProgressPost.id);
+      await removeItem(workInProgressPost.id);
 
       this.setState(prevState => ({
         ...prevState,
@@ -241,7 +241,7 @@ class DashboardContainer extends Component {
         },
       };
 
-      await updateMovePost(postId, { listId: trashNodeId });
+      await updateMoveItem(postId, { listId: trashNodeId });
       message.success(`The post «${name}» was moved to trash.`);
 
       const newList = replaceNode(
@@ -294,7 +294,7 @@ class DashboardContainer extends Component {
 
       const {
         data: { id: postId, lastUpdated },
-      } = await postCreatePost(data);
+      } = await postCreateItem(data);
 
       const newPost = {
         id: postId,
@@ -322,7 +322,7 @@ class DashboardContainer extends Component {
   };
 
   handleFinishEditWorkflow = async ({ listId, attachments, ...secret }) => {
-    const { publicKey } = this.props;
+    const { publicKey, members } = this.props;
     const { workInProgressPost } = this.state;
 
     try {
@@ -359,12 +359,36 @@ class DashboardContainer extends Component {
         const encryptedItem = encrypted.data;
 
         promises.push(
-          updatePost(workInProgressPost.id, { secret: encryptedItem }),
+          updateItem(workInProgressPost.id, { secret: encryptedItem }),
         );
+
+        const invitedMembers = members.filter(({ id }) =>
+          workInProgressPost.shared.includes(id),
+        );
+
+        const invitePromises = invitedMembers.map(async member => {
+          const opts = {
+            message: openpgp.message.fromText(JSON.stringify(data)),
+            publicKeys: (await openpgp.key.readArmored(member.publicKey)).keys,
+          };
+
+          return openpgp.encrypt(opts);
+        });
+
+        const encryptedData = await Promise.all(invitePromises);
+
+        const invites = encryptedData.map((encrypt, index) => ({
+          userId: invitedMembers[index].id,
+          secret: encrypt.data,
+        }));
+
+        await postInviteItem(workInProgressPost.id, {
+          invites,
+        });
       }
 
       if (isListIdChanged) {
-        promises.push(updateMovePost(workInProgressPost.id, { listId }));
+        promises.push(updateMoveItem(workInProgressPost.id, { listId }));
       }
 
       const [
@@ -413,7 +437,7 @@ class DashboardContainer extends Component {
 
     const inboxNodeId = list.model.children[0].id;
 
-    await updateMovePost(workInProgressPost.id, { listId: inboxNodeId });
+    await updateMoveItem(workInProgressPost.id, { listId: inboxNodeId });
 
     this.setState(prevState => ({
       ...prevState,
@@ -441,11 +465,32 @@ class DashboardContainer extends Component {
   };
 
   handleInviteMembers = async memberIds => {
+    const { members } = this.props;
     const { workInProgressPost } = this.state;
 
+    const invitedMembers = members.filter(({ id }) => memberIds.includes(id));
+
+    const promises = invitedMembers.map(async member => {
+      const options = {
+        message: openpgp.message.fromText(
+          JSON.stringify(workInProgressPost.secret),
+        ),
+        publicKeys: (await openpgp.key.readArmored(member.publicKey)).keys,
+      };
+
+      return openpgp.encrypt(options);
+    });
+
+    const encrypted = await Promise.all(promises);
+
+    const invites = encrypted.map((encrypt, index) => ({
+      userId: invitedMembers[index].id,
+      secret: encrypt.data,
+    }));
+
     try {
-      await updateSharePost(workInProgressPost.id, {
-        userIds: memberIds,
+      await postInviteItem(workInProgressPost.id, {
+        invites,
       });
 
       const data = {

@@ -76,22 +76,25 @@ export const getList = token =>
     },
   });
 
-export const getPost = postId => callApi.get(`/posts/${postId}`);
+export const getItem = itemId => callApi.get(`/items/${itemId}`);
 
-export const postCreatePost = data => callApi.post('/post', data);
+export const postCreateItem = data => callApi.post('/item', data);
 
-export const getListPosts = listId => callApi.get(`/post?listId=${listId}`);
+export const getListItems = listId => callApi.get(`/item?listId=${listId}`);
 
-export const removePost = postId => callApi.delete(`/post/${postId}`);
+export const removeItem = itemId => callApi.delete(`/item/${itemId}`);
 
-export const updateMovePost = (postId, data) =>
-  callApi.patch(`/post/${postId}/move`, data);
+export const updateMoveItem = (itemId, data) =>
+  callApi.patch(`/item/${itemId}/move`, data);
 
-export const updatePost = (postId, data) =>
-  callApi.patch(`/post/${postId}`, data);
+export const updateItem = (itemId, data) =>
+  callApi.patch(`/item/${itemId}`, data);
 
-export const updateSharePost = (postId, data) =>
-  callApi.patch(`/post/${postId}/share`, data);
+export const updateShareItem = (itemId, data) =>
+  callApi.patch(`/item/${itemId}/share`, data);
+
+export const postInviteItem = (itemId, data) =>
+  callApi.post(`/invite/${itemId}`, data);
 
 // list
 export const postCreateList = data => callApi.post('/list', data);

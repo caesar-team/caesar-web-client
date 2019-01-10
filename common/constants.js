@@ -19,6 +19,7 @@ export const {
   LENGTH_KEY,
 } = publicRuntimeConfig;
 
+export const PORTAL_ID = 'portal';
 export const DEFAULT_IDLE_TIMEOUT = 5 * 60 * 1000;
 export const MAX_SIZE_RANDOM_BUFFER = 60000;
 
@@ -57,4 +58,15 @@ export const POST_CREDIT_CARD_TYPE = 'card';
 export const POST_TYPES = {
   POST_CREDENTIALS_TYPE,
   POST_CREDIT_CARD_TYPE,
+};
+
+export const KEY_CODES = {
+  TAB: 9,
+  ENTER: 13,
+  ESC: 27,
+  SPACE: 32,
+  ARROW_UP: 38,
+  ARROW_LEFT: 37,
+  ARROW_RIGHT: 39,
+  ARROW_DOWN: 40,
 };

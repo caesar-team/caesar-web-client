@@ -1,10 +1,18 @@
 import React, { Component, Fragment } from 'react';
 import styled from 'styled-components';
-import { Layout, Modal, message } from 'antd';
+import { Layout, Modal } from 'antd';
 import deepequal from 'fast-deep-equal';
 import memoize from 'memoize-one';
 import * as openpgp from 'openpgp';
-import { Post, PostList, Sidebar, Header, InviteModal } from 'components';
+import {
+  Item,
+  List,
+  Panel,
+  InviteModal,
+  MenuList,
+  Icon,
+  withNotification,
+} from 'components';
 import {
   createTree,
   findNode,
@@ -31,7 +39,7 @@ import {
   removeItem,
 } from 'common/api';
 import DecryptWorker from 'common/decrypt.worker';
-import { prepareAttachments, prepareFiles, initialPostData } from './utils';
+import { initialPostData } from './utils';
 
 const { Sider } = Layout;
 
@@ -60,14 +68,29 @@ const RightColumnWrapper = styled(Layout)`
   flex-direction: column;
 `;
 
+const LogoWrapper = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-bottom: 1px solid #eaeaea;
+  padding: 23px 0 21px;
+`;
+
+const CenterWrapper = styled.div`
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+`;
+
+const RowWrapper = styled.div`
+  display: flex;
+  width: 100%;
+`;
+
 // TODO: add helper method for update and replace node after any changing
 // TODO: add helper method for construct workInProgressPost from parts
 
-function getListWithoutChildren(list) {
-  const { children, ...rest } = list;
-
-  return { ...rest, children: [] };
-}
+const getListWithoutChildren = list => ({ ...list, children: [] });
 
 class DashboardContainer extends Component {
   state = this.prepareInitialState();
@@ -116,28 +139,28 @@ class DashboardContainer extends Component {
     }
   };
 
-  handleClickSection = ({ key }) => {
+  handleClickMenuItem = id => () => {
     this.setState({
-      selectedListId: key,
+      selectedListId: id,
       workInProgressPost: null,
     });
   };
 
-  handleClickPost = postId => () => {
+  handleClickItem = itemId => () => {
     const { list } = this.state;
 
-    const post = findNode(list, postId).model;
+    const item = findNode(list, itemId).model;
 
     this.setState(prevState => ({
       ...prevState,
       workInProgressPost: {
         mode: POST_REVIEW_MODE,
-        ...post,
+        ...item,
       },
     }));
   };
 
-  handleClickCreatePost = () => {
+  handleClickCreateItem = () => {
     this.setState(prevState => ({
       ...prevState,
       workInProgressPost: {
@@ -159,10 +182,6 @@ class DashboardContainer extends Component {
       ...prevState,
       workInProgressPost: {
         ...post,
-        secret: {
-          ...post.secret,
-          attachments: prepareFiles(post.secret.attachments),
-        },
         mode: POST_WORKFLOW_EDIT_MODE,
       },
     }));
@@ -221,6 +240,7 @@ class DashboardContainer extends Component {
   };
 
   handleMoveToTrash = async () => {
+    const { notification } = this.props;
     const { list, selectedListId, workInProgressPost } = this.state;
 
     const { mode, ...rest } = workInProgressPost;
@@ -230,19 +250,21 @@ class DashboardContainer extends Component {
     } = rest;
 
     try {
-      const preparedAttachments = await prepareAttachments(attachments);
       const trashNodeId = list.model.children[2].id;
       const data = {
         ...rest,
         listId: trashNodeId,
         secret: {
           ...rest.secret,
-          attachments: preparedAttachments,
+          attachments,
         },
       };
 
       await updateMoveItem(postId, { listId: trashNodeId });
-      message.success(`The post «${name}» was moved to trash.`);
+
+      notification.show({
+        text: `The post «${name}» was moved to trash.`,
+      });
 
       const newList = replaceNode(
         updateNode(list, postId, data),
@@ -272,10 +294,9 @@ class DashboardContainer extends Component {
     const { publicKey } = this.props;
 
     try {
-      const preparedAttachments = await prepareAttachments(attachments);
       const item = {
         ...secret,
-        attachments: preparedAttachments,
+        attachments,
       };
 
       const options = {
@@ -326,11 +347,9 @@ class DashboardContainer extends Component {
     const { workInProgressPost } = this.state;
 
     try {
-      const preparedAttachments = await prepareAttachments(attachments);
-
       const data = {
         ...secret,
-        attachments: preparedAttachments,
+        attachments,
       };
 
       const isSecretChanged = !deepequal(workInProgressPost.secret, data);
@@ -458,7 +477,13 @@ class DashboardContainer extends Component {
     }));
   };
 
-  handleClickShare = () => {
+  handleClickCloseItem = () => {
+    this.setState({
+      workInProgressPost: null,
+    });
+  };
+
+  handleClickInvite = () => {
     this.setState({
       isVisibleInviteModal: true,
     });
@@ -576,68 +601,71 @@ class DashboardContainer extends Component {
       isVisibleInviteModal,
     } = this.state;
 
-    if (
-      !list ||
-      !list.model ||
-      !list.model.children ||
-      !list.model.children.length
-    ) {
-      return null;
-    }
-
     const {
       model: { children },
     } = list;
 
     const allLists = this.prepareAllList();
-    const selectedList = findNode(list, selectedListId).model;
+    const selectedListModel = findNode(list, selectedListId);
+    const selectedList = selectedListModel.model;
     const trashList = findNode(list, node => node.model.type === TRASH_TYPE)
       .model;
 
-    const shouldShowPost = !!workInProgressPost;
-    const activePostId = workInProgressPost ? workInProgressPost.id : null;
-    const isTrashPost =
+    const itemPath = selectedListModel
+      ? selectedListModel
+          .getPath()
+          .map(node => node.model.label)
+          .slice(1)
+      : null;
+    const activeItemId = workInProgressPost ? workInProgressPost.id : null;
+    const isTrashItem =
       workInProgressPost && workInProgressPost.listId === trashList.id;
 
     return (
       <Fragment>
         <Wrapper>
           <SidebarWrapper width={240}>
-            <Sidebar
-              selectedKeys={selectedListId}
-              sections={children}
-              onClickSection={this.handleClickSection}
+            <LogoWrapper>
+              <Icon name="logo" height={25} />
+            </LogoWrapper>
+            <MenuList
+              selectedListId={selectedListId}
+              list={children}
+              onClick={this.handleClickMenuItem}
             />
           </SidebarWrapper>
-          <MiddleColumnWrapper>
-            <PostList
-              title={selectedList.label}
-              activePostId={activePostId}
-              list={selectedList.children}
-              members={this.normalize(members)}
-              onClickPost={this.handleClickPost}
-              onClickCreatePost={this.handleClickCreatePost}
-            />
-          </MiddleColumnWrapper>
-          <RightColumnWrapper>
-            <Header withBorder user={user} />
-            {shouldShowPost && (
-              <Post
-                isTrashPost={isTrashPost}
-                post={workInProgressPost}
-                allLists={allLists}
-                members={this.normalize(members)}
-                onClickShare={this.handleClickShare}
-                onClickEditPost={this.handleClickEditPost}
-                onClickMoveToTrash={this.handleClickMoveToTrash}
-                onFinishCreateWorkflow={this.handleFinishCreateWorkflow}
-                onFinishEditWorkflow={this.handleFinishEditWorkflow}
-                onCancelWorkflow={this.handleClickCancelWorkflow}
-                onClickRestorePost={this.handleClickRestorePost}
-                onClickRemovePost={this.handleClickRemovePost}
-              />
-            )}
-          </RightColumnWrapper>
+          <CenterWrapper>
+            <Panel />
+            <RowWrapper>
+              <MiddleColumnWrapper>
+                <List
+                  title={selectedList.label}
+                  activeItemId={activeItemId}
+                  list={selectedList}
+                  onClickItem={this.handleClickItem}
+                  onClickCreateItem={this.handleClickCreateItem}
+                />
+              </MiddleColumnWrapper>
+              <RightColumnWrapper>
+                <Item
+                  isTrashItem={isTrashItem}
+                  post={workInProgressPost}
+                  allLists={allLists}
+                  itemPath={itemPath}
+                  members={this.normalize(members)}
+                  onClickCloseItem={this.handleClickCloseItem}
+                  onClickInvite={this.handleClickInvite}
+                  onClickEditPost={this.handleClickEditPost}
+                  onClickMoveToTrash={this.handleClickMoveToTrash}
+                  onFinishCreateWorkflow={this.handleFinishCreateWorkflow}
+                  onFinishEditWorkflow={this.handleFinishEditWorkflow}
+                  onCancelWorkflow={this.handleClickCancelWorkflow}
+                  onClickRestorePost={this.handleClickRestorePost}
+                  onClickRemovePost={this.handleClickRemovePost}
+                />
+              </RightColumnWrapper>
+            </RowWrapper>
+          </CenterWrapper>
         </Wrapper>
         {isVisibleInviteModal && (
           <InviteModal
@@ -652,4 +680,4 @@ class DashboardContainer extends Component {
   }
 }
 
-export default DashboardContainer;
+export default withNotification(DashboardContainer);

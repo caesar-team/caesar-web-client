@@ -16,7 +16,6 @@ import {
   LIST_WORKFLOW_CREATE_MODE,
   LIST_TYPE,
 } from 'common/constants';
-import LogoIcon from 'static/images/svg/icon-logo.svg';
 import { initialListData } from './utils';
 
 const Wrapper = styled(Layout)`
@@ -259,7 +258,6 @@ class ManageListContainer extends Component {
         <Wrapper>
           <TopWrapper>
             <LogoWrapper>
-              <StyledIcon component={LogoIcon} />
             </LogoWrapper>
             <Header user={user} />
           </TopWrapper>

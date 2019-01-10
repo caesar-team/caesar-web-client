@@ -1,13 +1,15 @@
 import React, { Component } from 'react';
 import styled from 'styled-components';
-import { Button } from 'antd';
+import { Formik, FastField } from 'formik';
 import { match } from 'common/utils/match';
-import { PasswordInput, Icon } from '../../components';
+import { checkError } from 'common/utils/formikUtils';
+import { Icon, Button, MasterPasswordInput, Link } from '../../components';
 import {
   REGEXP_TEXT_MATCH,
   STEP_CONFIRM_MASTER_PASSWORD,
   STEP_CREATE_MASTER_PASSWORD,
 } from './constants';
+import { passwordSchema, createConfirmPasswordSchema } from './schema';
 
 const Wrapper = styled.div`
   display: flex;
@@ -16,121 +18,73 @@ const Wrapper = styled.div`
   align-items: center;
   width: 100vw;
   height: 100vh;
-  background: #fff;
+`;
+
+const Title = styled.div`
+  font-size: 36px;
+  letter-spacing: 1px;
+  color: ${({ theme }) => theme.black};
+  margin-bottom: 32px;
+  text-align: center;
+`;
+
+const SetMasterPasswordText = styled.div`
+  font-size: 18px;
+  letter-spacing: 0.6px;
+  color: ${({ theme }) => theme.gray};
+  text-align: center;
+  margin-bottom: 45px;
 `;
 
 const InnerWrapper = styled.div`
   display: flex;
   flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  background: #fff;
-  padding: 90px;
-  min-width: 540px;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
-`;
-
-const NiceToMeetYouText = styled.div`
-  font-size: 24px;
-  color: #2e2f31;
-  text-transform: uppercase;
-`;
-
-const SetMasterPasswordText = styled.div`
-  font-size: 18px;
-  color: #888b90;
-  margin: 20px 0 20px;
-  text-align: center;
-`;
-
-const Form = styled.form`
+  max-width: 400px;
   width: 100%;
-`;
-
-const Label = styled.div`
-  font-size: 18px;
-  color: #888b90;
-  text-align: center;
-  margin-bottom: 20px;
-`;
-
-const StyledPasswordInput = styled(PasswordInput)`
-  > input {
-    height: 60px;
-    font-size: 18px;
-    padding: 20px;
-  }
 `;
 
 const StyledButton = styled(Button)`
   width: 100%;
   height: 60px;
   font-size: 18px;
-  margin-top: 50px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  margin-top: 45px;
+`;
 
-  &[disabled],
-  &[disabled]:hover {
-    color: #fff;
-    background: #3d70ff;
-    opacity: 0.5;
+const LogoWrapper = styled.div`
+  position: absolute;
+  top: 20px;
+  left: 60px;
+`;
+
+const Form = styled.form``;
+
+const BottomWrapper = styled.div`
+  margin-top: 40px;
+  text-align: center;
+  font-size: 18px;
+  letter-spacing: 0.6px;
+  color: ${({ theme }) => theme.gray};
+`;
+
+const BackText = styled.a`
+  font-size: 14px;
+  letter-spacing: 0.4px;
+  color: ${({ theme }) => theme.black};
+  margin-left: 10px;
+
+  &:hover {
+    color: ${({ theme }) => theme.gray};
   }
 `;
-
-const ReturnToStepWrapper = styled.div`
-  position: absolute;
-  display: flex;
-  align-items: center;
-  top: 60px;
-  left: 140px;
-  cursor: pointer;
-`;
-
-const ReturnTo = styled.div`
-  font-size: 18px;
-  color: #888b90;
-  margin-left: 6px;
-`;
-
-const StyledIcon = styled(Icon)`
-  margin-top: 2px;
-`;
-
-const checkIsPasswordValid = (rules, value) =>
-  rules.every(({ regexp }) => regexp.test(value));
 
 class MasterPassword extends Component {
   state = this.prepareInitialState();
 
-  handleClickNext = event => {
-    event.preventDefault();
-
+  handleSubmitPassword = ({ password }) => {
     this.setState({
+      password,
       step: STEP_CONFIRM_MASTER_PASSWORD,
     });
-  };
-
-  handleClickConfirm = async event => {
-    event.preventDefault();
-
-    const { confirmPassword } = this.state;
-    const { onSetMasterPassword } = this.props;
-
-    this.setState(
-      {
-        isLoading: true,
-      },
-      () => onSetMasterPassword(confirmPassword),
-    );
-  };
-
-  handleChangePassword = name => value => {
-    this.setState(prevState => ({
-      ...prevState,
-      [name]: value,
-    }));
   };
 
   handleClickReturn = () => {
@@ -143,87 +97,98 @@ class MasterPassword extends Component {
     const { isFullWorkflow } = this.props;
 
     return {
-      isLoading: false,
       step: isFullWorkflow
         ? STEP_CREATE_MASTER_PASSWORD
         : STEP_CONFIRM_MASTER_PASSWORD,
       password: '',
-      confirmPassword: '',
     };
   }
 
   renderCreateStep() {
     const { password } = this.state;
 
-    const isDisabledButton = !checkIsPasswordValid(REGEXP_TEXT_MATCH, password);
-
     return (
-      <Form onSubmit={this.handleClickNext}>
-        <SetMasterPasswordText>
-          Create master password for Caesar
-        </SetMasterPasswordText>
-        <Label>Master password</Label>
-        <StyledPasswordInput
-          autoFocus
-          withIndicator
-          rules={REGEXP_TEXT_MATCH}
-          name="password"
-          value={password}
-          placeholder="Enter your password…"
-          onChange={this.handleChangePassword('password')}
-        />
-        <StyledButton
-          type="primary"
-          htmlType="submit"
-          disabled={isDisabledButton}
-        >
-          Next <StyledIcon type="right" />
-        </StyledButton>
-      </Form>
+      <Formik
+        key="password"
+        initialValues={{ password }}
+        isInitialValid={passwordSchema.isValidSync({ password })}
+        validationSchema={passwordSchema}
+        onSubmit={this.handleSubmitPassword}
+        render={({ errors, touched, handleSubmit, isSubmitting, isValid }) => (
+          <Form onSubmit={handleSubmit}>
+            <Title>Master Password</Title>
+            <SetMasterPasswordText>
+              Create master password for Caesar
+            </SetMasterPasswordText>
+            <FastField
+              name="password"
+              render={({ field }) => (
+                <MasterPasswordInput
+                  {...field}
+                  autoFocus
+                  withIndicator
+                  rules={REGEXP_TEXT_MATCH}
+                  error={checkError(touched, errors, 'password')}
+                />
+              )}
+            />
+            <StyledButton htmlType="submit" disabled={isSubmitting || !isValid}>
+              Continue
+            </StyledButton>
+            <BottomWrapper>
+              or <Link to="/logout">log out</Link>
+            </BottomWrapper>
+          </Form>
+        )}
+      />
     );
   }
 
   renderConfirmStep() {
-    const { isFullWorkflow } = this.props;
-    const { step, password, confirmPassword, isLoading } = this.state;
-
-    const isDisabledButton =
-      !checkIsPasswordValid(REGEXP_TEXT_MATCH, confirmPassword) ||
-      (isFullWorkflow && password !== confirmPassword);
+    const { password } = this.state;
+    const { isFullWorkflow, onSubmit } = this.props;
 
     return (
-      <Form onSubmit={this.handleClickConfirm}>
-        <SetMasterPasswordText>
-          {isFullWorkflow
-            ? 'Confirm your master password'
-            : 'Write your master password'}
-        </SetMasterPasswordText>
-        <Label>Master password</Label>
-        <StyledPasswordInput
-          autoFocus
-          key={step}
-          name="confirmPassword"
-          placeholder="Enter your password…"
-          onChange={this.handleChangePassword('confirmPassword')}
-        />
-        <StyledButton
-          type="primary"
-          disabled={isDisabledButton}
-          loading={isLoading}
-          onClick={this.handleClickConfirm}
-        >
-          Confirm
-        </StyledButton>
-      </Form>
+      <Formik
+        key="confirmPassword"
+        initialValues={{ confirmPassword: '' }}
+        validationSchema={createConfirmPasswordSchema(password)}
+        onSubmit={onSubmit}
+        render={({ errors, touched, handleSubmit, isSubmitting, isValid }) => (
+          <Form onSubmit={handleSubmit}>
+            <Title>Сonfirmation</Title>
+            <SetMasterPasswordText>
+              Confirm your master password
+            </SetMasterPasswordText>
+            <FastField
+              name="confirmPassword"
+              render={({ field }) => (
+                <MasterPasswordInput
+                  {...field}
+                  autoFocus
+                  error={checkError(touched, errors, 'confirmPassword')}
+                />
+              )}
+            />
+            <StyledButton htmlType="submit" disabled={isSubmitting || !isValid}>
+              Confirm
+            </StyledButton>
+            {isFullWorkflow && (
+              <BottomWrapper>
+                <Icon name="arrow-back" width={20} height={20} />
+                <BackText onClick={this.handleClickReturn}>
+                  Back to the previous step
+                </BackText>
+              </BottomWrapper>
+            )}
+          </Form>
+        )}
+      />
     );
   }
 
   render() {
-    const { isFullWorkflow } = this.props;
     const { step } = this.state;
-
-    const shouldShowBackButton =
-      isFullWorkflow && step === STEP_CONFIRM_MASTER_PASSWORD;
 
     const renderedStep = match(
       step,
@@ -236,16 +201,10 @@ class MasterPassword extends Component {
 
     return (
       <Wrapper>
-        {shouldShowBackButton && (
-          <ReturnToStepWrapper onClick={this.handleClickReturn}>
-            <Icon type="left" size="large" />
-            <ReturnTo>Back to previous step</ReturnTo>
-          </ReturnToStepWrapper>
-        )}
-        <InnerWrapper>
-          <NiceToMeetYouText>Nice to meet you!</NiceToMeetYouText>
-          {renderedStep}
-        </InnerWrapper>
+        <LogoWrapper>
+          <Icon name="logo" width={120} height={25} />
+        </LogoWrapper>
+        <InnerWrapper>{renderedStep}</InnerWrapper>
       </Wrapper>
     );
   }

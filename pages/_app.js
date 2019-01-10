@@ -1,14 +1,19 @@
 import React from 'react';
 // eslint-disable-next-line
 import { default as NextApp, Container } from 'next/app';
+import { ThemeProvider, createGlobalStyle } from 'styled-components';
 import * as openpgp from 'openpgp';
+import globalStyles from 'common/styles/globalStyles';
 import { entryResolver } from 'common/utils/entryResolver';
-import { DEFAULT_IDLE_TIMEOUT, LENGTH_KEY } from 'common/constants';
+import { DEFAULT_IDLE_TIMEOUT } from 'common/constants';
 import OpenPGPWorker from 'common/openpgp.worker';
-import { uuid4 } from 'common/utils/uuid4';
+import { generateKeys, validateKeys } from 'common/utils/key';
 import { getKeys, postKeys } from 'common/api';
-import { SessionChecker, Loader } from '../components';
+import theme from 'common/theme';
+import { SessionChecker, Loader, NotificationProvider } from '../components';
 import { MasterPassword } from '../containers';
+
+const GlobalStyles = createGlobalStyle`${globalStyles}`;
 
 export default class App extends NextApp {
   state = this.prepareInitialState();
@@ -64,39 +69,32 @@ export default class App extends NextApp {
     });
   }
 
-  async generateKeys(password) {
-    const options = {
-      userIds: [{ name: uuid4() }],
-      numBits: LENGTH_KEY,
-      passphrase: password,
-    };
+  async generateKeys(password, { setSubmitting, setErrors }) {
+    const { publicKey, privateKey } = await generateKeys(password);
 
-    const { publicKeyArmored, privateKeyArmored } = await openpgp.generateKey(
-      options,
-    );
-
-    this.publicKey = publicKeyArmored;
-    this.privateKey = privateKeyArmored;
+    this.publicKey = publicKey;
+    this.privateKey = privateKey;
     this.password = password;
 
-    await postKeys({
-      publicKey: publicKeyArmored,
-      encryptedPrivateKey: privateKeyArmored,
-    });
+    try {
+      await postKeys({
+        publicKey,
+        encryptedPrivateKey: privateKey,
+      });
 
-    this.setState({
-      shouldShowMasterPassword: false,
-      isFullWorkflow: false,
-    });
+      this.setState({
+        shouldShowMasterPassword: false,
+        isFullWorkflow: false,
+      });
+    } catch (error) {
+      setErrors({ confirmPassword: 'Something wrong' });
+      setSubmitting(false);
+    }
   }
 
-  async validateKeys(password) {
+  async validateKeys(password, { setSubmitting, setErrors }) {
     try {
-      const privateKeyObj = (await openpgp.key.readArmored(
-        this.encryptedPrivateKey,
-      )).keys[0];
-
-      await privateKeyObj.decrypt(password);
+      await validateKeys(password, this.encryptedPrivateKey);
 
       this.privateKey = this.encryptedPrivateKey;
       this.password = password;
@@ -106,19 +104,18 @@ export default class App extends NextApp {
         isFullWorkflow: false,
       });
     } catch (error) {
-      this.setState({
-        isError: true,
-      });
+      setErrors({ confirmPassword: 'Wrong password' });
+      setSubmitting(false);
     }
   }
 
-  handleSetMasterPassword = async password => {
+  handleSubmit = async ({ confirmPassword: password }, FormikBag) => {
     const { isFullWorkflow } = this.state;
 
     // eslint-disable-next-line
     (await isFullWorkflow)
-      ? this.generateKeys(password)
-      : this.validateKeys(password);
+      ? this.generateKeys(password, FormikBag)
+      : this.validateKeys(password, FormikBag);
   };
 
   handleInactiveTimeout = () => {
@@ -140,7 +137,6 @@ export default class App extends NextApp {
 
   render() {
     const {
-      isError,
       isFullWorkflow,
       shouldShowMasterPassword,
       shouldShowLoader,
@@ -156,30 +152,37 @@ export default class App extends NextApp {
 
     if (shouldShowMasterPasswordWorkflow) {
       return (
-        <Container>
-          <MasterPassword
-            isError={isError}
-            isFullWorkflow={isFullWorkflow}
-            onSetMasterPassword={this.handleSetMasterPassword}
-          />
-        </Container>
+        <ThemeProvider theme={theme}>
+          <Container>
+            <GlobalStyles />
+            <MasterPassword
+              isFullWorkflow={isFullWorkflow}
+              onSubmit={this.handleSubmit}
+            />
+          </Container>
+        </ThemeProvider>
       );
     }
 
     return (
-      <Container>
-        <SessionChecker
-          timeout={DEFAULT_IDLE_TIMEOUT}
-          onFinishTimeout={this.handleInactiveTimeout}
-        >
-          <Component
-            privateKey={this.privateKey}
-            publicKey={this.publicKey}
-            password={this.password}
-            {...pageProps}
-          />
-        </SessionChecker>
-      </Container>
+      <ThemeProvider theme={theme}>
+        <NotificationProvider>
+          <Container>
+            <GlobalStyles />
+            <SessionChecker
+              timeout={DEFAULT_IDLE_TIMEOUT}
+              onFinishTimeout={this.handleInactiveTimeout}
+            >
+              <Component
+                privateKey={this.privateKey}
+                publicKey={this.publicKey}
+                password={this.password}
+                {...pageProps}
+              />
+            </SessionChecker>
+          </Container>
+        </NotificationProvider>
+      </ThemeProvider>
     );
   }
 }

@@ -15,14 +15,16 @@ if (require('fs').existsSync(envFile)) {
 const withPlugins = require('next-compose-plugins');
 const withCss = require('@zeit/next-css');
 const withWorkers = require('@zeit/next-workers');
+const withFonts = require('next-fonts');
+const withOptimizedImages = require('next-optimized-images');
 
 // fix: prevents error when .css files are required by node
 if (typeof require !== 'undefined') {
   require.extensions['.css'] = file => {};
 }
 
-module.exports = withPlugins([withCss, withWorkers], {
-  publicRuntimeConfig: { // Will be available on both server and client
+module.exports = withPlugins([withCss, withWorkers, withFonts, withOptimizedImages], {
+  publicRuntimeConfig: {
     TEST: true,
     NODE_ENV: process.env.NODE_ENV,
     IS_PROD: process.env.NODE_ENV === 'production',
@@ -37,28 +39,13 @@ module.exports = withPlugins([withCss, withWorkers], {
     LENGTH_KEY: process.env.LENGTH_KEY,
   },
   webpack: (config, { dev }) => {
-    config.plugins = config.plugins || [];
-
     config.output.globalObject = 'this';
 
     config.module.rules.push({
         test: /\.worker\.js$/,
         loader: 'babel-loader',
-      },{
-      test: /\.svg(\?v=\d\.\d\.\d)?$/,
-      use: [
-        {
-          loader: 'babel-loader',
-        },
-        {
-          loader: '@svgr/webpack',
-          options: {
-            babel: false,
-            icon: true,
-          },
-        },
-      ],
-    }, {
+      },
+      {
         test: /\.(less)/,
         loader: 'emit-file-loader',
         options: {

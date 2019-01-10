@@ -1,47 +1,56 @@
 import React, { Component } from 'react';
 import styled from 'styled-components';
-import { Modal, Input, List, Button } from 'antd';
-import { Scrollbars } from 'react-custom-scrollbars';
+import { List } from 'antd';
 import memoize from 'memoize-one';
-import { Icon } from '../Icon';
 import Member from './Member';
+import { Modal } from '../Modal';
+import { Input } from '../Input';
+import { Scrollbar } from '../Scrollbar';
+import { Icon } from '../Icon';
+import { Button } from '../Button';
 
-const StyledModal = styled(Modal)`
-  .ant-modal-title {
-    font-size: 24px;
-    color: #2e2f31;
-    text-align: center;
-  }
-`;
-
-const Scrollbar = styled(Scrollbars)`
-  height: 400px !important;
+const Title = styled.div`
+  display: flex;
+  justify-content: center;
+  font-size: 18px;
+  font-weight: bold;
+  letter-spacing: 0.6px;
+  color: ${({ theme }) => theme.black};
+  text-transform: uppercase;
+  margin-bottom: 25px;
 `;
 
 const StyledInput = styled(Input)`
-  height: 60px;
-
-  input {
-    font-size: 18px;
-    padding-left: 54px !important;
+  ${Input.InputField} {
+    height: 50px;
+    border: 1px solid ${({ theme }) => theme.gallery};
+    border-radius: 3px;
+    padding: 15px 20px 15px 54px;
+    font-size: 16px;
   }
+`;
+
+const StyledIcon = styled(Icon)`
+  fill: ${({ theme }) => theme.gallery};
 `;
 
 const ListWrapper = styled.div`
   display: flex;
   flex-direction: column;
-  margin-top: 12px;
+  margin-top: 20px;
 `;
 
 const ListTitle = styled.div`
   font-size: 18px;
-  color: #888b90;
+  letter-spacing: 0.6px;
+  color: ${({ theme }) => theme.emperor};
 `;
 
 const MembersWrapper = styled.div`
+  display: flex;
+  flex-direction: column;
   min-height: 400px;
-  max-height: 400px;
-  overflow-y: auto;
+  margin-top: 15px;
 `;
 
 const ButtonsWrapper = styled.div`
@@ -98,53 +107,45 @@ class InviteModal extends Component {
     };
   }
 
-  render() {
-    const { members, onCancel = Function.prototype } = this.props;
+  renderMemberList() {
+    const { members } = this.props;
     const { filterText, invitedIds } = this.state;
 
     const filteredMembers = this.filter(members, filterText);
 
+    return filteredMembers.map(({ id, ...member }) => (
+      <Member
+        key={id}
+        {...member}
+        isInvited={invitedIds.includes(id)}
+        onClickAdd={this.handleClickAdd(id)}
+        onClickRemove={this.handleClickRemove(id)}
+      />
+    ));
+  }
+
+  render() {
+    const { filterText } = this.state;
+
     return (
-      <StyledModal
-        visible
-        centered
-        title="Invite"
-        footer={false}
-        onCancel={onCancel}
-      >
+      <Modal isOpen minWidth={420}>
+        <Title>Invite</Title>
         <StyledInput
           placeholder="name@4xxi.com"
-          prefix={<Icon type="search" size="large" />}
           value={filterText}
           onChange={this.handleChange}
+          prefix={<StyledIcon name="search" width={20} height={20} />}
         />
         <ListWrapper>
-          <ListTitle>All members</ListTitle>
+          <ListTitle>Team members</ListTitle>
           <MembersWrapper>
-            <Scrollbar>
-              <List
-                bordered={false}
-                size="large"
-                dataSource={filteredMembers}
-                renderItem={({ id, ...props }) => (
-                  <Member
-                    key={id}
-                    {...props}
-                    isInvited={invitedIds.includes(id)}
-                    onClickAdd={this.handleClickAdd(id)}
-                    onClickRemove={this.handleClickRemove(id)}
-                  />
-                )}
-              />
-            </Scrollbar>
+            {this.renderMemberList()}
           </MembersWrapper>
         </ListWrapper>
         <ButtonsWrapper>
-          <Button type="primary" onClick={this.handleSubmit} size="large">
-            Invite
-          </Button>
+          <Button onClick={this.handleSubmit}>INVITE</Button>
         </ButtonsWrapper>
-      </StyledModal>
+      </Modal>
     );
   }
 }

@@ -164,7 +164,6 @@ class ManageList extends Component {
           <StyledButton
             type="primary"
             shape="circle"
-            icon="plus"
             onClick={onClickCreateList}
           />
         </ButtonWrapper>

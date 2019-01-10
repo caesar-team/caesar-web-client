@@ -1,13 +1,12 @@
 import React from 'react';
-import styled from 'styled-components';
-import { Icon } from 'components';
-import IconGoogle from 'static/images/svg/icon-google.svg';
+import styled, { withTheme } from 'styled-components';
 import {
   API_URL,
   APP_URL,
   AUTH_ENDPOINT,
   REDIRECT_AUTH_ENDPOINT,
 } from 'common/constants';
+import { Icon } from '../../components';
 
 const Wrapper = styled.div`
   display: flex;
@@ -16,41 +15,47 @@ const Wrapper = styled.div`
   align-items: center;
   width: 100vw;
   height: 100vh;
-  background: #3d70ff;
+  background: ${({ theme }) => theme.white};
 `;
 
-const InnerWrapper = styled.div`
+const IconWrapper = styled.div`
   display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  background: #fff;
-  padding: 90px;
-  border-radius: 2px;
+  margin-bottom: 100px;
 `;
 
 const NiceToMeetYouText = styled.div`
-  font-size: 24px;
-  color: #2e2f31;
+  font-size: 36px;
+  color: ${({ theme }) => theme.black};
+  letter-spacing: 1px;
   text-align: center;
-  text-transform: uppercase;
+  margin-bottom: 32px;
 `;
 
 const WelcomeText = styled.div`
   font-size: 18px;
-  color: #888b90;
-  margin-top: 20px;
+  letter-spacing: 0.6px;
+  color: ${({ theme }) => theme.gray};
+  margin-bottom: 100px;
 `;
 
 const AuthWrapper = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
-  width: 100%;
-  margin-top: 55px;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+  height: 70px;
   cursor: pointer;
-  border-radius: 2px;
+  border-radius: 3px;
+  box-shadow: 0 11px 23px 0 rgba(0, 0, 0, 0.1);
+  background-color: #000000;
+`;
+
+const GoogleLogoWrapper = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: rgba(255, 255, 255, 0.15);
+  width: 70px;
+  height: 100%;
 `;
 
 const AuthLink = styled.a`
@@ -61,27 +66,30 @@ const AuthLink = styled.a`
 `;
 
 const AuthText = styled.div`
-  color: #2e2f31;
   font-size: 18px;
-  margin-left: 20px;
+  letter-spacing: 0.6px;
+  color: ${({ theme }) => theme.white};
 `;
 
 // TODO: Get endpoints configuration from the api server.
 const authEndpoint = `${API_URL}/${AUTH_ENDPOINT}?redirect_uri=${APP_URL}/${REDIRECT_AUTH_ENDPOINT}`;
 
-const AuthContainer = () => (
+const AuthContainer = ({ theme }) => (
   <Wrapper>
-    <InnerWrapper>
-      <NiceToMeetYouText>Nice to meet you!</NiceToMeetYouText>
-      <WelcomeText>Welcome to Caesar</WelcomeText>
-      <AuthWrapper>
-        <AuthLink href={authEndpoint}>
-          <Icon component={IconGoogle} size={40} />
-          <AuthText>Sign in via Google</AuthText>
-        </AuthLink>
-      </AuthWrapper>
-    </InnerWrapper>
+    <IconWrapper>
+      <Icon name="logo" height={45} />
+    </IconWrapper>
+    <NiceToMeetYouText>Nice to meet you!</NiceToMeetYouText>
+    <WelcomeText>Welcome to Caesar</WelcomeText>
+    <AuthWrapper>
+      <GoogleLogoWrapper>
+        <Icon name="google" width={25} height={25} fill={theme.white} />
+      </GoogleLogoWrapper>
+      <AuthLink href={authEndpoint}>
+        <AuthText>Sign in via Google</AuthText>
+      </AuthLink>
+    </AuthWrapper>
   </Wrapper>
 );
 
-export default AuthContainer;
+export default withTheme(AuthContainer);

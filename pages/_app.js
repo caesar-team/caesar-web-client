@@ -11,7 +11,7 @@ import { generateKeys, validateKeys } from 'common/utils/key';
 import { getKeys, postKeys } from 'common/api';
 import theme from 'common/theme';
 import { SessionChecker, Loader, NotificationProvider } from '../components';
-import { MasterPassword } from '../containers';
+import { MasterPassword, Lock } from '../containers';
 
 const GlobalStyles = createGlobalStyle`${globalStyles}`;
 
@@ -87,7 +87,7 @@ export default class App extends NextApp {
         isFullWorkflow: false,
       });
     } catch (error) {
-      setErrors({ confirmPassword: 'Something wrong' });
+      setErrors({ password: 'Something wrong' });
       setSubmitting(false);
     }
   }
@@ -104,12 +104,12 @@ export default class App extends NextApp {
         isFullWorkflow: false,
       });
     } catch (error) {
-      setErrors({ confirmPassword: 'Wrong password' });
+      setErrors({ password: 'Wrong password' });
       setSubmitting(false);
     }
   }
 
-  handleSubmit = async ({ confirmPassword: password }, FormikBag) => {
+  handleSubmit = async ({ password }, FormikBag) => {
     const { isFullWorkflow } = this.state;
 
     // eslint-disable-next-line
@@ -155,10 +155,11 @@ export default class App extends NextApp {
         <ThemeProvider theme={theme}>
           <Container>
             <GlobalStyles />
-            <MasterPassword
-              isFullWorkflow={isFullWorkflow}
-              onSubmit={this.handleSubmit}
-            />
+            {isFullWorkflow ? (
+              <MasterPassword onSubmit={this.handleSubmit} />
+            ) : (
+              <Lock onSubmit={this.handleSubmit} />
+            )}
           </Container>
         </ThemeProvider>
       );

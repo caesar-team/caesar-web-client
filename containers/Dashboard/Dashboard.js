@@ -1,6 +1,6 @@
 import React, { Component, Fragment } from 'react';
 import styled from 'styled-components';
-import { Layout, Modal } from 'antd';
+import { Layout } from 'antd';
 import deepequal from 'fast-deep-equal';
 import memoize from 'memoize-one';
 import * as openpgp from 'openpgp';
@@ -9,6 +9,7 @@ import {
   List,
   Panel,
   InviteModal,
+  ConfirmModal,
   MenuList,
   Icon,
   withNotification,
@@ -188,28 +189,14 @@ class DashboardContainer extends Component {
   };
 
   handleClickMoveToTrash = () => {
-    Modal.confirm({
-      centered: true,
-      title: 'Warning',
-      content: 'Are you sure you want to move the post to trash?',
-      okText: 'Remove',
-      cancelText: 'Cancel',
-      onOk: this.handleMoveToTrash,
-      okButtonProps: { type: 'danger', size: 'large' },
-      cancelButtonProps: { size: 'large' },
+    this.setState({
+      isVisibleMoveToTrashModal: true,
     });
   };
 
   handleClickRemovePost = () => {
-    Modal.confirm({
-      centered: true,
-      title: 'Warning',
-      content: 'Are you sure you want to delete the post?',
-      okText: 'Remove',
-      cancelText: 'Cancel',
-      onOk: this.handleRemovePost,
-      okButtonProps: { type: 'danger', size: 'large' },
-      cancelButtonProps: { size: 'large' },
+    this.setState({
+      isVisibleRemoveModal: true,
     });
   };
 
@@ -228,6 +215,7 @@ class DashboardContainer extends Component {
 
       this.setState(prevState => ({
         ...prevState,
+        isVisibleRemoveModal: false,
         workInProgressPost: {
           ...nextWorkInProgress,
           mode: POST_REVIEW_MODE,
@@ -279,6 +267,7 @@ class DashboardContainer extends Component {
 
       this.setState(prevState => ({
         ...prevState,
+        isVisibleMoveToTrashModal: false,
         workInProgressPost: {
           ...nextWorkInProgress,
           mode: POST_REVIEW_MODE,
@@ -483,6 +472,13 @@ class DashboardContainer extends Component {
     });
   };
 
+  handleCloseConfirmModal = () => {
+    this.setState({
+      isVisibleMoveToTrashModal: false,
+      isVisibleRemoveModal: false,
+    });
+  };
+
   handleClickInvite = () => {
     this.setState({
       isVisibleInviteModal: true,
@@ -564,6 +560,8 @@ class DashboardContainer extends Component {
 
     return {
       isVisibleInviteModal: false,
+      isVisibleMoveToTrashModal: false,
+      isVisibleRemoveModal: false,
       list: tree,
       selectedListId,
       workInProgressPost: null,
@@ -599,6 +597,8 @@ class DashboardContainer extends Component {
       selectedListId,
       workInProgressPost,
       isVisibleInviteModal,
+      isVisibleMoveToTrashModal,
+      isVisibleRemoveModal,
     } = this.state;
 
     const {
@@ -675,6 +675,18 @@ class DashboardContainer extends Component {
             onCancel={this.handleCloseModal}
           />
         )}
+        <ConfirmModal
+          isOpen={isVisibleMoveToTrashModal}
+          description="Are you sure you want to move the post to trash?"
+          onClickOk={this.handleMoveToTrash}
+          onClickCancel={this.handleCloseConfirmModal}
+        />
+        <ConfirmModal
+          isOpen={isVisibleRemoveModal}
+          description="Are you sure you want to delete the post?"
+          onClickOk={this.handleRemovePost}
+          onClickCancel={this.handleCloseConfirmModal}
+        />
       </Fragment>
     );
   }

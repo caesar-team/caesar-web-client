@@ -87,6 +87,10 @@ class MasterPassword extends Component {
     });
   };
 
+  handleSubmitConfirmPassword = ({ confirmPassword }, formikBag) => {
+    this.props.onSubmit({ password: confirmPassword }, formikBag);
+  };
+
   handleClickReturn = () => {
     this.setState({
       step: STEP_CREATE_MASTER_PASSWORD,
@@ -94,12 +98,8 @@ class MasterPassword extends Component {
   };
 
   prepareInitialState() {
-    const { isFullWorkflow } = this.props;
-
     return {
-      step: isFullWorkflow
-        ? STEP_CREATE_MASTER_PASSWORD
-        : STEP_CONFIRM_MASTER_PASSWORD,
+      step: STEP_CREATE_MASTER_PASSWORD,
       password: '',
     };
   }
@@ -146,14 +146,13 @@ class MasterPassword extends Component {
 
   renderConfirmStep() {
     const { password } = this.state;
-    const { isFullWorkflow, onSubmit } = this.props;
 
     return (
       <Formik
         key="confirmPassword"
         initialValues={{ confirmPassword: '' }}
         validationSchema={createConfirmPasswordSchema(password)}
-        onSubmit={onSubmit}
+        onSubmit={this.handleSubmitConfirmPassword}
         render={({ errors, touched, handleSubmit, isSubmitting, isValid }) => (
           <Form onSubmit={handleSubmit}>
             <Title>Сonfirmation</Title>
@@ -173,14 +172,12 @@ class MasterPassword extends Component {
             <StyledButton htmlType="submit" disabled={isSubmitting || !isValid}>
               Confirm
             </StyledButton>
-            {isFullWorkflow && (
-              <BottomWrapper>
-                <Icon name="arrow-back" width={20} height={20} />
-                <BackText onClick={this.handleClickReturn}>
-                  Back to the previous step
-                </BackText>
-              </BottomWrapper>
-            )}
+            <BottomWrapper>
+              <Icon name="arrow-back" width={20} height={20} />
+              <BackText onClick={this.handleClickReturn}>
+                Back to the previous step
+              </BackText>
+            </BottomWrapper>
           </Form>
         )}
       />

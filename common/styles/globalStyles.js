@@ -10,7 +10,7 @@ export default `
     -webkit-font-smoothing: antialiased;
     background-color: #fff;
     min-width: 20rem;
-    font-family: 'Muli';
+    font-family: 'AvenirNext';
     font-weight: normal;
     font-style: normal;
   }
@@ -20,7 +20,7 @@ export default `
   optgroup,
   select,
   textarea {
-    font-family: 'Muli';
+    font-family: 'AvenirNext';
     font-weight: normal;
     font-style: normal;
   }

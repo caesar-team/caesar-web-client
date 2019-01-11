@@ -1,6 +1,7 @@
 import 'static/images/svg/icon-arrow-back.svg?sprite';
 import 'static/images/svg/icon-arrow-down.svg?sprite';
 import 'static/images/svg/icon-arrow-left.svg?sprite';
+import 'static/images/svg/icon-arrow-next.svg?sprite';
 import 'static/images/svg/icon-arrow-right.svg?sprite';
 import 'static/images/svg/icon-arrow-up.svg?sprite';
 import 'static/images/svg/icon-clip.svg?sprite';

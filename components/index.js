@@ -2,11 +2,18 @@ export { Avatar, AvatarsList } from './Avatar';
 export { Badge } from './Badge';
 export { Breadcrumbs } from './Breadcrumbs';
 export { Button } from './Button';
+export { ConfirmModal } from './ConfirmModal';
 export { File } from './File';
 export { Head } from './Head';
 export { Header } from './Header';
 export { Icon } from './Icon';
-export { Input, PasswordInput, MasterPasswordInput, TextArea } from './Input';
+export {
+  LockInput,
+  Input,
+  PasswordInput,
+  MasterPasswordInput,
+  TextArea,
+} from './Input';
 export { InviteModal } from './InviteModal';
 export { Item } from './Item';
 export { Label } from './Label';

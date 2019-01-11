@@ -33,10 +33,6 @@ const List = ({
   onClickItem = Function.prototype,
   onClickCreateItem = Function.prototype,
 }) => {
-  // if (!list || list.children.every(child => child.type === LIST_TYPE)) {
-  //   return null;
-  // }
-
   const renderedItems = list.children.map(({ id, ...props }) => {
     const isActive = id === activeItemId;
 

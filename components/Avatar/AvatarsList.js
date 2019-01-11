@@ -6,6 +6,14 @@ const Wrapper = styled.div`
   display: flex;
 `;
 
+const StyledAvatar = styled(Avatar)`
+  margin-right: -10px;
+
+  &:last-child {
+    margin-right: 0;
+  }
+`;
+
 const DEFAULT_VISIBLE_AVATARS_COUNT = 3;
 
 const AvatarsList = ({
@@ -19,7 +27,7 @@ const AvatarsList = ({
 
   const renderedAvatars = visibleAvatars
     .map(({ name, avatar }, index) => (
-      <Avatar key={index} name={name} avatar={avatar} />
+      <StyledAvatar key={index} name={name} avatar={avatar} />
     ))
     .concat(
       shouldShowLast ? (

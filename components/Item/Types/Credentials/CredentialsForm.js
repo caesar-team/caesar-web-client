@@ -13,6 +13,7 @@ import {
   TextArea,
   File,
   Icon,
+  FormInput,
 } from 'components';
 import { schema } from './schema';
 
@@ -45,14 +46,6 @@ const TitleInput = styled(Input)`
     font-size: 36px;
     letter-spacing: 1px;
     color: ${({ theme }) => theme.black};
-  }
-`;
-
-const FormInput = styled(Input)`
-  ${Input.InputField} {
-    padding: 0 15px 10px;
-    color: ${({ theme }) => theme.black};
-    border-bottom: 1px solid ${({ theme }) => theme.gallery};
   }
 `;
 

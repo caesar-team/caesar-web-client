@@ -1,11 +1,9 @@
 import React, { Component } from 'react';
 import styled from 'styled-components';
-import { List } from 'antd';
 import memoize from 'memoize-one';
 import Member from './Member';
 import { Modal } from '../Modal';
 import { Input } from '../Input';
-import { Scrollbar } from '../Scrollbar';
 import { Icon } from '../Icon';
 import { Button } from '../Button';
 
@@ -138,9 +136,7 @@ class InviteModal extends Component {
         />
         <ListWrapper>
           <ListTitle>Team members</ListTitle>
-          <MembersWrapper>
-            {this.renderMemberList()}
-          </MembersWrapper>
+          <MembersWrapper>{this.renderMemberList()}</MembersWrapper>
         </ListWrapper>
         <ButtonsWrapper>
           <Button onClick={this.handleSubmit}>INVITE</Button>

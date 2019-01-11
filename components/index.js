@@ -26,3 +26,5 @@ export { Scrollbar } from './Scrollbar';
 export { Select } from './Select';
 export { SessionChecker } from './SessionChecker';
 export { Uploader } from './Uploader';
+export { FormInput } from './FormInput';
+export { Modal } from './Modal';

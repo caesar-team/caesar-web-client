@@ -9,6 +9,7 @@ import 'static/images/svg/icon-close.svg?sprite';
 import 'static/images/svg/icon-copy.svg?sprite';
 import 'static/images/svg/icon-credit-card.svg?sprite';
 import 'static/images/svg/icon-download.svg?sprite';
+import 'static/images/svg/icon-edit.svg?sprite';
 import 'static/images/svg/icon-eye-off.svg?sprite';
 import 'static/images/svg/icon-eye-on.svg?sprite';
 import 'static/images/svg/icon-favorite.svg?sprite';

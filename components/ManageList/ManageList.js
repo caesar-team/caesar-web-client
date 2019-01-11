@@ -1,6 +1,7 @@
 import React, { Component, Fragment } from 'react';
 import styled from 'styled-components';
 import { Button } from 'components/Button';
+import { AvatarsList } from 'components/Avatar';
 import Link from 'next/link';
 import { Icon } from '../Icon';
 
@@ -64,24 +65,11 @@ const ListName = styled.div`
 const ListNameLink = styled.a`
   color: ${({ theme }) => theme.black};
   margin-right: 10px;
-
-  &:hover {
-    text-decoration: dashed;
-  }
-`;
-
-const MembersColumn = styled.div`
-  display: flex;
-  align-items: center;
 `;
 
 const StyledIcon = styled(Icon)`
   cursor: pointer;
   fill: #888b90;
-`;
-
-const EmptyBlock = styled.div`
-  width: 100px;
 `;
 
 class ManageList extends Component {
@@ -103,8 +91,15 @@ class ManageList extends Component {
 
   render() {
     const { hoverRowIndex } = this.state;
-
-    const { list, onClickCreateList = Function.prototype } = this.props;
+    const {
+      list,
+      members,
+      onClickCreateList = Function.prototype,
+    } = this.props;
+    const generateAvatars = sharedIds => {
+      console.log(sharedIds, sharedIds.map(id => members[id].avatar));
+      return sharedIds.map(id => members[id]);
+    };
 
     return (
       <Fragment>
@@ -139,7 +134,9 @@ class ManageList extends Component {
                       query: { listId: listItem.id },
                     }}
                   >
-                    <ListNameLink>{listItem.label}</ListNameLink>
+                    <ListNameLink isHovered={index === hoverRowIndex}>
+                      {listItem.label}
+                    </ListNameLink>
                   </Link>
                   {index === hoverRowIndex && (
                     <StyledIcon name="edit" width="14" height="14" />
@@ -150,9 +147,10 @@ class ManageList extends Component {
                 {listItem.count}
               </TableCol>
               <TableCol align="right" width="33.33333%">
-                <MembersColumn>
-                  <EmptyBlock />
-                </MembersColumn>
+                <AvatarsList
+                  visibleCount="4"
+                  avatars={generateAvatars(listItem.shared)}
+                />
               </TableCol>
             </TableRow>
           ))}

@@ -2,7 +2,7 @@ import React, { Component, createRef } from 'react';
 import styled from 'styled-components';
 import { KEY_CODES } from 'common/constants';
 import { elementIsFocused } from 'common/utils/domUtils';
-import { Icon } from 'components';
+import { Icon } from '../Icon';
 import Overlay from './Overlay';
 
 const CloseButton = styled.button`

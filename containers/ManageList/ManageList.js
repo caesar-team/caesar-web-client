@@ -15,7 +15,7 @@ import {
   LIST_WORKFLOW_CREATE_MODE,
   LIST_TYPE,
 } from 'common/constants';
-import { initialListData } from './utils';
+import { initialListData, memberAdapter } from './utils';
 
 const Wrapper = styled(Layout)`
   height: 100vh;
@@ -191,12 +191,13 @@ class ManageListContainer extends Component {
   };
 
   prepareInitialState() {
-    const { list } = this.props;
+    const { list, members } = this.props;
 
     return {
       isVisibleModal: false,
       workInProgressList: null,
       list: createTree(list[1]),
+      members: memberAdapter(members),
     };
   }
 
@@ -213,8 +214,7 @@ class ManageListContainer extends Component {
 
   render() {
     const { user } = this.props;
-    const { isVisibleModal, workInProgressList } = this.state;
-
+    const { isVisibleModal, workInProgressList, members } = this.state;
     const postList = this.preparePostList();
 
     return (
@@ -229,6 +229,7 @@ class ManageListContainer extends Component {
           <ManageListWrapper>
             <ManageList
               list={postList}
+              members={members}
               onClickCreateList={this.handleClickCreateList}
               onClickEditList={this.handleClickEditList}
               onClickRemoveList={this.handleClickRemovePost}

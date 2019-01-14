@@ -17,7 +17,7 @@ spec:
   template:
     metadata:
       labels:
-        app: php-example
+        app: caesarapp-web-app
     spec:
       containers:
       - env:

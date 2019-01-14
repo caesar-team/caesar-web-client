@@ -2,16 +2,10 @@ stages:
   - name: Publish image
     steps:
       - publishImageConfig:
-          imagePullSecrets:
-            - name: dockerhub
           dockerfilePath: ./Dockerfile
           buildContext: .
           tag: caesarteam/caesar-web-client:${CICD_GIT_BRANCH}
-          pushRemote: true
-#  - name: Deploy
-#    steps:
-#      - applyYamlConfig:
-#          path: ./deploy/deployment.yaml
-branch:
-  include: [ developer, feature/*]
-  exclude: [ master ]
+  - name: Deploy
+    steps:
+      - applyYamlConfig:
+          path: ./deploy/deployment.yaml

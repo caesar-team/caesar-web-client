@@ -3,6 +3,7 @@ export { Badge } from './Badge';
 export { Breadcrumbs } from './Breadcrumbs';
 export { Button } from './Button';
 export { ConfirmModal } from './ConfirmModal';
+export { Dropdown } from './Dropdown';
 export { File } from './File';
 export { Head } from './Head';
 export { Header } from './Header';

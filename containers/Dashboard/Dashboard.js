@@ -621,6 +621,7 @@ class DashboardContainer extends Component {
     const isTrashItem =
       workInProgressPost && workInProgressPost.listId === trashList.id;
 
+    console.log(user);
     return (
       <Fragment>
         <Wrapper>
@@ -635,7 +636,7 @@ class DashboardContainer extends Component {
             />
           </SidebarWrapper>
           <CenterWrapper>
-            <Panel />
+            <Panel user={user} />
             <RowWrapper>
               <MiddleColumnWrapper>
                 <List

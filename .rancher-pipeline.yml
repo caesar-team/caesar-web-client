@@ -1,11 +1,12 @@
 stages:
-  - name: Publish image
-    steps:
-      - publishImageConfig:
-          dockerfilePath: ./Dockerfile
-          buildContext: .
-          tag: caesarteam/caesar-web-client:${CICD_GIT_BRANCH}
-  - name: Deploy
-    steps:
-      - applyYamlConfig:
-          path: ./deploy/deployment.yaml
+- name: Publish image
+  steps:
+  - publishImageConfig:
+      dockerfilePath: ./Dockerfile
+      buildContext: .
+      tag: caesarteam/caesar-web-client:${CICD_GIT_BRANCH}
+      registry: index.docker.io
+- name: Deploy
+  steps:
+  - applyYamlConfig:
+      path: ./deploy/deployment.yaml

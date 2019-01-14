@@ -1,7 +1,6 @@
 import React, { Component, Fragment } from 'react';
 import styled from 'styled-components';
 import { Layout, Modal, message } from 'antd';
-import Link from 'next/link';
 import { Header, ManageList, ListFormModal, Icon } from 'components';
 import { postCreateList, updateList, removeList } from 'common/api';
 import {
@@ -16,66 +15,39 @@ import {
   LIST_WORKFLOW_CREATE_MODE,
   LIST_TYPE,
 } from 'common/constants';
-import { initialListData } from './utils';
+import { initialListData, memberAdapter } from './utils';
 
 const Wrapper = styled(Layout)`
   height: 100vh;
+  background-color: ${({ theme }) => theme.lightBlue};
 `;
 
 const TopWrapper = styled.div`
   display: flex;
+  min-height: 70px;
   justify-content: space-between;
   align-items: center;
   background: #fff;
-  border-bottom: 1px solid #eaeaea;
+  border-bottom: ${({ theme }) => theme.gallery};
 `;
 
 const LogoWrapper = styled.div`
-  height: 60px;
   display: flex;
+  width: 115px;
+  margin-left: 60px;
   justify-content: center;
   align-items: center;
-  width: 240px;
-`;
-
-const StyledIcon = styled(Icon)`
-  > svg {
-    width: 88px;
-    height: 16px;
-  }
-`;
-
-const MiddleColumnWrapper = styled(Layout)`
-  display: flex;
-  flex-direction: column;
-  background: #fff;
-  border-left: 1px solid #eaeaea;
-  border-right: 1px solid #eaeaea;
 `;
 
 const ManageListWrapper = styled.div`
-  padding: 0 60px;
-`;
-
-const ReturnTo = styled.div`
-  display: flex;
-  align-items: center;
-  margin: 20px 0 20px 60px;
-  cursor: pointer;
-`;
-
-const ReturnLink = styled.a`
-  font-size: 18px;
-  color: #888b90;
-  margin-left: 10px;
+  width: 100%;
+  max-width: 1060px;
+  padding: 30px 20px 0;
+  margin: 0 auto;
 `;
 
 class ManageListContainer extends Component {
   state = this.prepareInitialState();
-
-  newListFormRef = formRef => {
-    this.formRef = formRef;
-  };
 
   handleClickCreateList = () => {
     this.setState({
@@ -103,9 +75,6 @@ class ManageListContainer extends Component {
   };
 
   handleCreateList = async ({ label }) => {
-    const {
-      props: { form },
-    } = this.formRef;
     const { list } = this.state;
 
     const listsNodeId = list.model.id;
@@ -136,12 +105,7 @@ class ManageListContainer extends Component {
       } = e;
 
       if (errors && errors.label) {
-        form.setFields({
-          label: {
-            value: label,
-            errors: errors.label.map(errorText => new Error(errorText)),
-          },
-        });
+        console.log(errors.label);
       }
     }
   };
@@ -227,12 +191,13 @@ class ManageListContainer extends Component {
   };
 
   prepareInitialState() {
-    const { list } = this.props;
+    const { list, members } = this.props;
 
     return {
       isVisibleModal: false,
       workInProgressList: null,
       list: createTree(list[1]),
+      members: memberAdapter(members),
     };
   }
 
@@ -249,8 +214,7 @@ class ManageListContainer extends Component {
 
   render() {
     const { user } = this.props;
-    const { isVisibleModal, workInProgressList } = this.state;
-
+    const { isVisibleModal, workInProgressList, members } = this.state;
     const postList = this.preparePostList();
 
     return (
@@ -258,32 +222,24 @@ class ManageListContainer extends Component {
         <Wrapper>
           <TopWrapper>
             <LogoWrapper>
+              <Icon name="logo" height={25} width={120} />
             </LogoWrapper>
             <Header user={user} />
           </TopWrapper>
-          <MiddleColumnWrapper>
-            <ReturnTo>
-              <Icon type="left" />
-              <Link href="/">
-                <ReturnLink>Return to dashboard</ReturnLink>
-              </Link>
-            </ReturnTo>
-            <ManageListWrapper>
-              <ManageList
-                list={postList}
-                onClickCreateList={this.handleClickCreateList}
-                onClickEditList={this.handleClickEditList}
-                onClickRemoveList={this.handleClickRemovePost}
-              />
-            </ManageListWrapper>
-          </MiddleColumnWrapper>
+          <ManageListWrapper>
+            <ManageList
+              list={postList}
+              members={members}
+              onClickCreateList={this.handleClickCreateList}
+              onClickEditList={this.handleClickEditList}
+              onClickRemoveList={this.handleClickRemovePost}
+            />
+          </ManageListWrapper>
         </Wrapper>
         {isVisibleModal && (
           <ListFormModal
             list={workInProgressList}
-            wrappedComponentRef={this.newListFormRef}
             onCreate={this.handleCreateList}
-            onUpdate={this.handleUpdateList}
             onCancel={this.handleCancel}
           />
         )}

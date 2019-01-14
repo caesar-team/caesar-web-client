@@ -9,9 +9,9 @@ const { Item } = Menu;
 
 const Wrapper = styled.div`
   display: flex;
+  padding: 0 30px;
   justify-content: flex-end;
   align-items: center;
-  padding: 9px 60px 10px;
   border-left: none;
   width: 100%;
   border-bottom: ${({ withBorder }) =>

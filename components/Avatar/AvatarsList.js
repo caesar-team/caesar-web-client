@@ -18,6 +18,7 @@ const DEFAULT_VISIBLE_AVATARS_COUNT = 3;
 
 const AvatarsList = ({
   avatars = [],
+  isSmall,
   visibleCount = DEFAULT_VISIBLE_AVATARS_COUNT,
   ...props
 }) => {
@@ -27,11 +28,13 @@ const AvatarsList = ({
 
   const renderedAvatars = visibleAvatars
     .map(({ name, avatar }, index) => (
-      <StyledAvatar key={index} name={name} avatar={avatar} />
+      <StyledAvatar isSmall={isSmall} key={index} name={name} avatar={avatar} />
     ))
     .concat(
       shouldShowLast ? (
-        <Avatar key={visibleAvatars.length}>+{invisibleCount}</Avatar>
+        <Avatar isSmall={isSmall} key={visibleAvatars.length}>
+          +{invisibleCount}
+        </Avatar>
       ) : null,
     );
 

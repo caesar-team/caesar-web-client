@@ -2,7 +2,27 @@ import React, { Component, createRef } from 'react';
 import styled from 'styled-components';
 import { KEY_CODES } from 'common/constants';
 import { elementIsFocused } from 'common/utils/domUtils';
+import { Icon } from '../Icon';
 import Overlay from './Overlay';
+
+const CloseButton = styled.button`
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  padding: 0;
+  cursor: pointer;
+  background: none;
+  border: none;
+  transition: 0.35s;
+
+  &:hover {
+    opacity: 0.75;
+  }
+`;
+
+const StyledIcon = styled(Icon)`
+  fill: ${({ theme }) => theme.gray};
+`;
 
 const ContentWrapper = styled.div`
   position: absolute;
@@ -12,7 +32,7 @@ const ContentWrapper = styled.div`
   background: ${({ theme }) => theme.white};
   border-radius: 3px;
   outline: none;
-  padding: 40px;
+  padding: 30px 40px 40px;
 
   ${({ minWidth }) => minWidth && `min-width: ${minWidth}px`};
 `;
@@ -116,7 +136,7 @@ class Portal extends Component {
     this.shouldClose = null;
   };
 
-  handleClickCloseIcon = event => {
+  handleClickCloseButton = event => {
     if (this.shouldClose === null) {
       this.shouldClose = true;
     }
@@ -182,6 +202,9 @@ class Portal extends Component {
           onKeyDown={this.handleKeyDown}
           {...props}
         >
+          <CloseButton onClick={this.handleClickCloseButton}>
+            <StyledIcon name="close" width="20" height="20" />
+          </CloseButton>
           {children}
         </ContentWrapper>
       </Overlay>

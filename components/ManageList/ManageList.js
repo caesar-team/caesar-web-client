@@ -4,6 +4,7 @@ import { Button } from 'components/Button';
 import { AvatarsList } from 'components/Avatar';
 import Link from 'next/link';
 import { Icon } from '../Icon';
+import { ListOptions } from './ListOptions';
 
 const getTableColAlignStyles = ({ align }) => {
   switch (align) {
@@ -30,6 +31,7 @@ const Table = styled.div`
 
 const TableRow = styled.div`
   display: flex;
+  align-items: center;
   margin-bottom: 5px;
   font-size: 18px;
   line-height: 1.3;
@@ -47,7 +49,7 @@ const TableHeader = styled(TableRow)`
 const TableCol = styled.div`
   display: flex;
   width: ${({ width }) => width || '100%'};
-  padding: 12px 15px 13px;
+  padding: 10px 15px;
 
   ${getTableColAlignStyles};
 `;
@@ -57,14 +59,28 @@ const TableName = styled.div`
   color: ${({ theme }) => theme.black};
 `;
 
+const ListNameLink = styled.a`
+  display: inline-block;
+  color: ${({ theme }) => theme.black};
+  margin-right: 10px;
+  border-bottom: 1px dashed transparent;
+`;
+
 const ListName = styled.div`
   display: flex;
   align-items: center;
+
+  &:hover {
+    ${ListNameLink} {
+      color: ${({ theme }) => theme.black};
+      border-color: ${({ theme }) => theme.black};
+    }
+  }
 `;
 
-const ListNameLink = styled.a`
-  color: ${({ theme }) => theme.black};
-  margin-right: 10px;
+const MembersCol = styled.div`
+  display: flex;
+  align-items: center;
 `;
 
 const StyledIcon = styled(Icon)`
@@ -77,7 +93,7 @@ class ManageList extends Component {
     hoverRowIndex: null,
   };
 
-  handleMouseEnter = index => () => {
+  handleMouseEnter = index => {
     this.setState({
       hoverRowIndex: index,
     });
@@ -95,11 +111,9 @@ class ManageList extends Component {
       list,
       members,
       onClickCreateList = Function.prototype,
+      onClickRemoveList = Function.prototype,
     } = this.props;
-    const generateAvatars = sharedIds => {
-      console.log(sharedIds, sharedIds.map(id => members[id].avatar));
-      return sharedIds.map(id => members[id]);
-    };
+    const generateAvatars = sharedIds => sharedIds.map(id => members[id]);
 
     return (
       <Fragment>
@@ -125,7 +139,7 @@ class ManageList extends Component {
             <TableRow key={listItem.id}>
               <TableCol align="left" width="33.33333%">
                 <ListName
-                  onMouseEnter={this.handleMouseEnter(index)}
+                  onMouseEnter={() => this.handleMouseEnter(index)}
                   onMouseLeave={this.handleMouseLeave}
                 >
                   <Link
@@ -134,9 +148,7 @@ class ManageList extends Component {
                       query: { listId: listItem.id },
                     }}
                   >
-                    <ListNameLink isHovered={index === hoverRowIndex}>
-                      {listItem.label}
-                    </ListNameLink>
+                    <ListNameLink>{listItem.label}</ListNameLink>
                   </Link>
                   {index === hoverRowIndex && (
                     <StyledIcon name="edit" width="14" height="14" />
@@ -147,10 +159,18 @@ class ManageList extends Component {
                 {listItem.count}
               </TableCol>
               <TableCol align="right" width="33.33333%">
-                <AvatarsList
-                  visibleCount="4"
-                  avatars={generateAvatars(listItem.shared)}
-                />
+                <MembersCol>
+                  <AvatarsList
+                    isSmall
+                    visibleCount="4"
+                    avatars={generateAvatars(listItem.shared)}
+                  />
+                  <ListOptions
+                    index={index}
+                    listId={listItem.id}
+                    onClickRemoveList={onClickRemoveList}
+                  />
+                </MembersCol>
               </TableCol>
             </TableRow>
           ))}

@@ -15,8 +15,8 @@ const Wrapper = styled.div`
   position: relative;
   overflow: hidden;
   vertical-align: middle;
-  width: 40px;
-  height: 40px;
+  width: ${({ isSmall }) => (isSmall ? '30px' : '40px')};
+  height: ${({ isSmall }) => (isSmall ? '30px' : '40px')};
   line-height: 40px;
   border-radius: 50%;
 `;
@@ -29,14 +29,14 @@ const Image = styled.img`
   border-style: none;
 `;
 
-const Avatar = ({ name, avatar, children }) => {
+const Avatar = ({ name, avatar, children, isSmall }) => {
   if (children) {
     return <Wrapper>{children}</Wrapper>;
   }
 
   if (avatar) {
     return (
-      <Wrapper>
+      <Wrapper isSmall={isSmall}>
         <Image src={`${API_URL}/${avatar}`} />
       </Wrapper>
     );

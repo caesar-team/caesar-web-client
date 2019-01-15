@@ -29,7 +29,6 @@ export {
   NotificationProvider,
   withNotification,
 } from './Notification';
-export { Panel } from './Panel';
 export { Scrollbar } from './Scrollbar';
 export { Select } from './Select';
 export { SessionChecker } from './SessionChecker';

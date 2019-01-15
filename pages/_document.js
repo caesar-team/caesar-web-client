@@ -3,7 +3,6 @@ import React from 'react';
 import { default as NextDocument, Head, Main, NextScript } from 'next/document';
 import { ServerStyleSheet } from 'styled-components';
 import { PORTAL_ID } from 'common/constants';
-import styles from 'common/styles/antd.overrides.less';
 import sprite from 'svg-sprite-loader/runtime/sprite.build';
 
 export default class Document extends NextDocument {
@@ -24,7 +23,6 @@ export default class Document extends NextDocument {
         <Head>
           <meta name="viewport" content="width=device-width, initial-scale=1" />
           {this.props.styleTags}
-          <style dangerouslySetInnerHTML={{ __html: styles }} />
           <link
             rel="apple-touch-icon"
             sizes="76x76"

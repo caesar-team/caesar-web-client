@@ -1,10 +1,10 @@
 import React, { Component, Fragment } from 'react';
 import styled from 'styled-components';
-import { Layout } from 'components/Layout';
 import deepequal from 'fast-deep-equal';
 import memoize from 'memoize-one';
 import * as openpgp from 'openpgp';
 import {
+  Layout,
   Item,
   List,
   InviteModal,

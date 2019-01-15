@@ -70,6 +70,10 @@ const Anchor = styled.a`
   }
 `;
 
+const StyledIcon = styled(Icon)`
+  fill: ${({ theme }) => theme.gray};
+`;
+
 const Options = (
   <Fragment>
     <Option key="lists">
@@ -99,7 +103,7 @@ export const Header = ({ user }) => (
         <Avatar {...user} name={user.email} />
         <StyledDropdown overlay={Options}>
           <UserName>{user.email}</UserName>
-          <Icon name="arrow-down" width={10} height={16} fill="#888" />
+          <StyledIcon name="arrow-down" width={10} height={16} />
         </StyledDropdown>
       </UserSection>
     </RightWrapper>

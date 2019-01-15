@@ -5,36 +5,39 @@ import { Icon } from '../Icon';
 import { Avatar } from '../Avatar';
 import { Dropdown } from '../Dropdown';
 
-const Wrapper = styled.div`
+const Wrapper = styled.header`
   display: flex;
-  justify-content: flex-end;
-  align-items: center;
   border-bottom: 1px solid ${({ theme }) => theme.gallery};
-  border-left: 1px solid ${({ theme }) => theme.gallery};
   width: 100%;
   background-color: ${({ theme }) => theme.white};
-  padding: 0 30px;
   max-height: 70px;
   min-height: 70px;
 `;
 
-const SearchSection = styled.div`
+const LeftWrapper = styled.div`
   display: flex;
-  justify-content: space-between;
   align-items: center;
+  width: 300px;
+  flex-shrink: 0;
+  padding-left: 60px;
 `;
 
-const SearchText = styled.div`
-  font-size: 16px;
-  letter-spacing: 0.5px;
-  color: ${({ theme }) => theme.gray};
-  margin-left: 20px;
+const RightWrapper = styled.div`
+  display: flex;
+  align-items: center;
+  flex-grow: 1;
+  padding: 0 30px;
+`;
+
+const LogoLink = styled.a`
+  display: block;
 `;
 
 const UserSection = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
+  margin-left: auto;
 `;
 
 const UserName = styled.div`
@@ -43,10 +46,6 @@ const UserName = styled.div`
   color: ${({ theme }) => theme.black};
   margin-left: 15px;
   margin-right: 15px;
-`;
-
-const SearchIcon = styled(Icon)`
-  fill: ${({ theme }) => theme.gray};
 `;
 
 const StyledDropdown = styled(Dropdown)`
@@ -86,20 +85,23 @@ const Options = (
   </Fragment>
 );
 
-const Panel = ({ user }) => (
+export const Header = ({ user }) => (
   <Wrapper>
-    {/*<SearchSection>*/}
-    {/*<SearchIcon name="search" width={18} height={18} />*/}
-    {/*<SearchText>Search by Caesar… </SearchText>*/}
-    {/*</SearchSection>*/}
-    <UserSection>
-      <Avatar {...user} name={user.email} />
-      <StyledDropdown overlay={Options}>
-        <UserName>{user.email}</UserName>
-        <Icon name="arrow-down" width={10} height={16} fill="#888" />
-      </StyledDropdown>
-    </UserSection>
+    <LeftWrapper>
+      <Link href="/">
+        <LogoLink>
+          <Icon name="logo" width={116} height={25} />
+        </LogoLink>
+      </Link>
+    </LeftWrapper>
+    <RightWrapper>
+      <UserSection>
+        <Avatar {...user} name={user.email} />
+        <StyledDropdown overlay={Options}>
+          <UserName>{user.email}</UserName>
+          <Icon name="arrow-down" width={10} height={16} fill="#888" />
+        </StyledDropdown>
+      </UserSection>
+    </RightWrapper>
   </Wrapper>
 );
-
-export default Panel;

@@ -6,7 +6,6 @@ export { ConfirmModal } from './ConfirmModal';
 export { Dropdown } from './Dropdown';
 export { File } from './File';
 export { Head } from './Head';
-export { Header } from './Header';
 export { Icon } from './Icon';
 export {
   LockInput,
@@ -29,10 +28,10 @@ export {
   NotificationProvider,
   withNotification,
 } from './Notification';
-export { Panel } from './Panel';
 export { Scrollbar } from './Scrollbar';
 export { Select } from './Select';
 export { SessionChecker } from './SessionChecker';
 export { Uploader } from './Uploader';
 export { FormInput } from './FormInput';
 export { Modal } from './Modal';
+export { Layout } from './Layout';

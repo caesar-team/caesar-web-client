@@ -1,17 +1,15 @@
 import React, { Component, Fragment } from 'react';
 import styled from 'styled-components';
-import { Layout } from 'antd';
 import deepequal from 'fast-deep-equal';
 import memoize from 'memoize-one';
 import * as openpgp from 'openpgp';
 import {
+  Layout,
   Item,
   List,
-  Panel,
   InviteModal,
   ConfirmModal,
   MenuList,
-  Icon,
   withNotification,
 } from 'components';
 import {
@@ -42,50 +40,26 @@ import {
 import DecryptWorker from 'common/decrypt.worker';
 import { initialPostData } from './utils';
 
-const { Sider } = Layout;
-
-const Wrapper = styled(Layout)`
-  height: 100vh;
-  flex: initial;
-`;
-
-const SidebarWrapper = styled(Sider)`
-  background: #fff;
-  height: 100vh;
-`;
-
-const MiddleColumnWrapper = styled(Layout)`
-  display: flex;
-  flex: initial;
+const MiddleColumnWrapper = styled.div`
   width: 400px;
-  min-width: 400px;
-  background: #f5f6fa;
-  border-left: 1px solid #eaeaea;
-  border-right: 1px solid #eaeaea;
+  flex-shrink: 0;
+  background: ${({ theme }) => theme.lightBlue};
+  border-left: ${({ theme }) => theme.gallery};
+  border-right: ${({ theme }) => theme.gallery};
 `;
 
-const RightColumnWrapper = styled(Layout)`
-  background: #fff;
-  flex-direction: column;
-`;
-
-const LogoWrapper = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-bottom: 1px solid #eaeaea;
-  padding: 23px 0 21px;
+const RightColumnWrapper = styled.div`
+  flex-grow: 1;
 `;
 
 const CenterWrapper = styled.div`
   display: flex;
-  flex-direction: column;
   width: 100%;
 `;
 
-const RowWrapper = styled.div`
-  display: flex;
-  width: 100%;
+const Sidebar = styled.aside`
+  width: 300px;
+  flex-shrink: 0;
 `;
 
 // TODO: add helper method for update and replace node after any changing
@@ -621,53 +595,46 @@ class DashboardContainer extends Component {
     const isTrashItem =
       workInProgressPost && workInProgressPost.listId === trashList.id;
 
-    console.log(user);
     return (
       <Fragment>
-        <Wrapper>
-          <SidebarWrapper width={300}>
-            <LogoWrapper>
-              <Icon name="logo" height={25} />
-            </LogoWrapper>
-            <MenuList
-              selectedListId={selectedListId}
-              list={children}
-              onClick={this.handleClickMenuItem}
-            />
-          </SidebarWrapper>
+        <Layout user={user}>
           <CenterWrapper>
-            <Panel user={user} />
-            <RowWrapper>
-              <MiddleColumnWrapper>
-                <List
-                  title={selectedList.label}
-                  activeItemId={activeItemId}
-                  list={selectedList}
-                  onClickItem={this.handleClickItem}
-                  onClickCreateItem={this.handleClickCreateItem}
-                />
-              </MiddleColumnWrapper>
-              <RightColumnWrapper>
-                <Item
-                  isTrashItem={isTrashItem}
-                  post={workInProgressPost}
-                  allLists={allLists}
-                  itemPath={itemPath}
-                  members={this.normalize(members)}
-                  onClickCloseItem={this.handleClickCloseItem}
-                  onClickInvite={this.handleClickInvite}
-                  onClickEditPost={this.handleClickEditPost}
-                  onClickMoveToTrash={this.handleClickMoveToTrash}
-                  onFinishCreateWorkflow={this.handleFinishCreateWorkflow}
-                  onFinishEditWorkflow={this.handleFinishEditWorkflow}
-                  onCancelWorkflow={this.handleClickCancelWorkflow}
-                  onClickRestorePost={this.handleClickRestorePost}
-                  onClickRemovePost={this.handleClickRemovePost}
-                />
-              </RightColumnWrapper>
-            </RowWrapper>
+            <Sidebar>
+              <MenuList
+                selectedListId={selectedListId}
+                list={children}
+                onClick={this.handleClickMenuItem}
+              />
+            </Sidebar>
+            <MiddleColumnWrapper>
+              <List
+                title={selectedList.label}
+                activeItemId={activeItemId}
+                list={selectedList}
+                onClickItem={this.handleClickItem}
+                onClickCreateItem={this.handleClickCreateItem}
+              />
+            </MiddleColumnWrapper>
+            <RightColumnWrapper>
+              <Item
+                isTrashItem={isTrashItem}
+                post={workInProgressPost}
+                allLists={allLists}
+                itemPath={itemPath}
+                members={this.normalize(members)}
+                onClickCloseItem={this.handleClickCloseItem}
+                onClickInvite={this.handleClickInvite}
+                onClickEditPost={this.handleClickEditPost}
+                onClickMoveToTrash={this.handleClickMoveToTrash}
+                onFinishCreateWorkflow={this.handleFinishCreateWorkflow}
+                onFinishEditWorkflow={this.handleFinishEditWorkflow}
+                onCancelWorkflow={this.handleClickCancelWorkflow}
+                onClickRestorePost={this.handleClickRestorePost}
+                onClickRemovePost={this.handleClickRemovePost}
+              />
+            </RightColumnWrapper>
           </CenterWrapper>
-        </Wrapper>
+        </Layout>
         {isVisibleInviteModal && (
           <InviteModal
             members={members}

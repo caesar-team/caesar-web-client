@@ -13,7 +13,6 @@ if (require('fs').existsSync(envFile)) {
 }
 
 const withPlugins = require('next-compose-plugins');
-const withCss = require('@zeit/next-css');
 const withWorkers = require('@zeit/next-workers');
 const withFonts = require('next-fonts');
 const withOptimizedImages = require('next-optimized-images');
@@ -23,7 +22,7 @@ if (typeof require !== 'undefined') {
   require.extensions['.css'] = file => {};
 }
 
-module.exports = withPlugins([withCss, withWorkers, withFonts, withOptimizedImages], {
+module.exports = withPlugins([withWorkers, withFonts, withOptimizedImages], {
   publicRuntimeConfig: {
     TEST: true,
     NODE_ENV: process.env.NODE_ENV,
@@ -44,21 +43,6 @@ module.exports = withPlugins([withCss, withWorkers, withFonts, withOptimizedImag
     config.module.rules.push({
         test: /\.worker\.js$/,
         loader: 'babel-loader',
-      },
-      {
-        test: /\.(less)/,
-        loader: 'emit-file-loader',
-        options: {
-          name: 'dist/[path][name].[ext]'
-        }
-      },
-      {
-        test: /\.less$/,
-        use: [
-          'babel-loader',
-          'raw-loader',
-          { loader: 'less-loader', options: { javascriptEnabled: true } }
-        ]
       });
 
     return config;

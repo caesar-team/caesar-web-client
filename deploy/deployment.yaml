@@ -17,7 +17,6 @@ spec:
     type: RollingUpdate
   template:
     metadata:
-      namespace: default
       labels:
         app: caesarapp-web-app
     spec:

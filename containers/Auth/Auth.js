@@ -46,7 +46,12 @@ const AuthWrapper = styled.div`
   cursor: pointer;
   border-radius: 3px;
   box-shadow: 0 11px 23px 0 rgba(0, 0, 0, 0.1);
-  background-color: #000000;
+  background-color: ${({ theme }) => theme.black};
+  transition: all 0.2s;
+
+  &:hover {
+    background-color: ${({ theme }) => theme.emperor};
+  }
 `;
 
 const GoogleLogoWrapper = styled.div`
@@ -62,7 +67,7 @@ const AuthLink = styled.a`
   display: flex;
   align-items: center;
   padding: 20px 0;
-  margin: 0 80px;
+  margin: 0 60px 0 50px;
 `;
 
 const AuthText = styled.div`

@@ -51,7 +51,12 @@ const List = ({
     <Wrapper>
       <TitleWrapper>
         <Title>{title}</Title>
-        <Button color="white" icon="plus" onClick={onClickCreateItem} />
+        <Button
+          color="white"
+          icon="plus"
+          onClick={onClickCreateItem}
+          isHoverBlackBackground
+        />
       </TitleWrapper>
       <Scrollbar>{renderedItems}</Scrollbar>
     </Wrapper>

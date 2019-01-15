@@ -1,6 +1,7 @@
 ﻿apiVersion: apps/v1beta2
 kind: Deployment
 metadata:
+  namespace: default
   name: caesarapp-web-app
   labels:
     app: caesarapp-web-app

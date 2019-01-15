@@ -2,6 +2,7 @@
 kind: Deployment
 metadata:
   name: caesarapp-web-app
+  namespace: default
   labels:
     app: caesarapp-web-app
 spec:
@@ -16,6 +17,7 @@ spec:
     type: RollingUpdate
   template:
     metadata:
+      namespace: default
       labels:
         app: caesarapp-web-app
     spec:

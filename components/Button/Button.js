@@ -24,7 +24,20 @@ const getButtonHoverStyles = ({ color, theme }) => {
       background-color: ${theme.emperor};
     `,
     white: `
+      color: ${theme.black};
       background-color: ${theme.white};
+      border: 1px solid ${theme.black};
+    `,
+  };
+
+  return colorsMap[color];
+};
+
+const getButtonHoverBlackBackgroundStyles = ({ color, theme }) => {
+  const colorsMap = {
+    white: `
+      color: ${theme.white};
+      background-color: ${theme.black};
       border: 1px solid ${theme.black};
     `,
   };
@@ -44,6 +57,7 @@ const StyledButton = styled.button`
   outline: none;
   cursor: pointer;
   padding: 10px 20px;
+  transition: all 0.2s;
 
   ${({ onlyIcon }) =>
     onlyIcon &&
@@ -60,7 +74,10 @@ const StyledButton = styled.button`
   ${getButtonStyles};
 
   &:hover {
-    ${getButtonHoverStyles};
+    ${({ isHoverBlackBackground }) =>
+      isHoverBlackBackground
+        ? getButtonHoverBlackBackgroundStyles
+        : getButtonHoverStyles};
   }
 `;
 
@@ -73,22 +90,21 @@ const Button = ({
   color = 'black',
   htmlType = 'button',
   children,
+  isHoverBlackBackground,
   ...props
 }) => {
-  const isBlack = color === 'black';
   const onlyIcon = !children;
   const withIcon = !!icon;
 
   return (
-    <StyledButton type={htmlType} color={color} onlyIcon={onlyIcon} {...props}>
-      {icon && (
-        <Icon
-          name={icon}
-          width={14}
-          height={14}
-          fill={isBlack ? '#fff' : '#505050'}
-        />
-      )}
+    <StyledButton
+      isHoverBlackBackground={isHoverBlackBackground}
+      type={htmlType}
+      color={color}
+      onlyIcon={onlyIcon}
+      {...props}
+    >
+      {icon && <Icon name={icon} width={14} height={14} isInButton />}
       {!onlyIcon && <Text withMargin={withIcon}>{children}</Text>}
     </StyledButton>
   );

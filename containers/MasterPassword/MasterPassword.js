@@ -114,7 +114,14 @@ class MasterPassword extends Component {
         isInitialValid={passwordSchema.isValidSync({ password })}
         validationSchema={passwordSchema}
         onSubmit={this.handleSubmitPassword}
-        render={({ errors, touched, handleSubmit, isSubmitting, isValid }) => (
+        render={({
+          errors,
+          touched,
+          handleSubmit,
+          isSubmitting,
+          isValid,
+          dirty,
+        }) => (
           <Form onSubmit={handleSubmit}>
             <Title>Master Password</Title>
             <SetMasterPasswordText>
@@ -128,7 +135,7 @@ class MasterPassword extends Component {
                   autoFocus
                   withIndicator
                   rules={REGEXP_TEXT_MATCH}
-                  error={checkError(touched, errors, 'password')}
+                  error={dirty ? checkError(touched, errors, 'password') : null}
                 />
               )}
             />

@@ -5,6 +5,7 @@ import StrengthIndicator from './StrengthIndicator';
 import { Icon } from '../Icon';
 
 const Wrapper = styled.div`
+  position: relative;
   display: flex;
   flex-direction: column;
 `;
@@ -40,7 +41,8 @@ const StyledStrengthIndicator = styled(StrengthIndicator)`
 `;
 
 const Error = styled.div`
-  margin-top: 8px;
+  position: absolute;
+  top: 68px;
   font-size: 14px;
   letter-spacing: 0.4px;
   color: ${({ theme }) => theme.red};

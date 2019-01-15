@@ -37,7 +37,7 @@ const Lock = ({ onSubmit }) => (
       initialValues={{ password: '' }}
       validationSchema={passwordSchema}
       onSubmit={onSubmit}
-      render={({ errors, touched, handleSubmit, submitForm }) => (
+      render={({ errors, touched, handleSubmit, submitForm, dirty }) => (
         <Form onSubmit={handleSubmit}>
           <FastField
             name="password"
@@ -46,7 +46,7 @@ const Lock = ({ onSubmit }) => (
                 {...field}
                 autoFocus
                 onClick={submitForm}
-                error={checkError(touched, errors, 'password')}
+                error={dirty ? checkError(touched, errors, 'password') : null}
               />
             )}
           />

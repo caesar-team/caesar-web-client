@@ -14,6 +14,7 @@ const Box = styled.div`
   flex-direction: column;
   top: 40px;
   right: 0;
+  z-index: 100;
   border-radius: 3px;
   background-color: ${({ theme }) => theme.white};
   border: 1px solid ${({ theme }) => theme.gallery};

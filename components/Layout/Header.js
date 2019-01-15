@@ -52,6 +52,7 @@ const StyledDropdown = styled(Dropdown)`
   display: flex;
   flex-direction: row;
   align-items: center;
+  cursor: pointer;
 `;
 
 const Option = styled.div`
@@ -67,6 +68,10 @@ const Anchor = styled.a`
   &:hover {
     color: ${({ theme }) => theme.gray};
   }
+`;
+
+const StyledIcon = styled(Icon)`
+  fill: ${({ theme }) => theme.gray};
 `;
 
 const Options = (
@@ -98,7 +103,7 @@ export const Header = ({ user }) => (
         <Avatar {...user} name={user.email} />
         <StyledDropdown overlay={Options}>
           <UserName>{user.email}</UserName>
-          <Icon name="arrow-down" width={10} height={16} />
+          <StyledIcon name="arrow-down" width={10} height={16} />
         </StyledDropdown>
       </UserSection>
     </RightWrapper>

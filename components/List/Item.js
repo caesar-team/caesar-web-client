@@ -4,11 +4,15 @@ import { Icon } from '../Icon';
 
 const Row = styled.div`
   display: flex;
-  padding: 15px 40px 20px;
+  padding: 15px 30px 20px;
   background: ${({ theme, isActive }) =>
     isActive ? theme.white : theme.lightBlue};
   cursor: pointer;
   border-bottom: 1px solid ${({ theme }) => theme.gallery};
+
+  &:first-child {
+    border-top: 1px solid ${({ theme }) => theme.gallery};
+  }
 `;
 
 const ItemType = styled.div`
@@ -19,6 +23,7 @@ const ItemType = styled.div`
   border-radius: 3px;
   margin-right: 20px;
   width: 40px;
+  min-width: 40px;
   height: 40px;
 `;
 

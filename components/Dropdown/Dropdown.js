@@ -8,9 +8,10 @@ const Wrapper = styled.div`
 `;
 
 const Box = styled.div`
+  position: absolute;
+  z-index: 1;
   display: flex;
   flex-direction: column;
-  position: absolute;
   top: 40px;
   right: 0;
   border-radius: 3px;

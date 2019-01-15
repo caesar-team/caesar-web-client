@@ -4,12 +4,19 @@ import { Header } from './Header';
 
 const LayoutWrapper = styled.div`
   min-height: 100vh;
+
+  display: flex;
+  flex-direction: column;
+`;
+
+const Main = styled.main`
+  flex-grow: 1;
 `;
 
 const Layout = ({ children, user }) => (
   <LayoutWrapper>
     <Header user={user} />
-    <main>{children}</main>
+    <Main>{children}</Main>
   </LayoutWrapper>
 );
 

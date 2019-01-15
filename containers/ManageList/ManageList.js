@@ -1,11 +1,9 @@
 import React, { Component, Fragment } from 'react';
 import styled from 'styled-components';
-import { Layout } from 'antd';
 import {
-  Header,
+  Layout,
   ManageList,
   ListFormModal,
-  Icon,
   ConfirmModal,
   withNotification,
 } from 'components';
@@ -23,28 +21,6 @@ import {
   LIST_TYPE,
 } from 'common/constants';
 import { initialListData, memberAdapter } from './utils';
-
-const Wrapper = styled(Layout)`
-  height: 100vh;
-  background-color: ${({ theme }) => theme.lightBlue};
-`;
-
-const TopWrapper = styled.div`
-  display: flex;
-  min-height: 70px;
-  justify-content: space-between;
-  align-items: center;
-  background: #fff;
-  border-bottom: ${({ theme }) => theme.gallery};
-`;
-
-const LogoWrapper = styled.div`
-  display: flex;
-  width: 115px;
-  margin-left: 60px;
-  justify-content: center;
-  align-items: center;
-`;
 
 const ManageListWrapper = styled.div`
   width: 100%;
@@ -236,13 +212,7 @@ class ManageListContainer extends Component {
 
     return (
       <Fragment>
-        <Wrapper>
-          <TopWrapper>
-            <LogoWrapper>
-              <Icon name="logo" height={25} width={120} />
-            </LogoWrapper>
-            <Header user={user} />
-          </TopWrapper>
+        <Layout user={user}>
           <ManageListWrapper>
             <ManageList
               list={postList}
@@ -252,7 +222,7 @@ class ManageListContainer extends Component {
               onClickRemoveList={this.handleClickRemovePost}
             />
           </ManageListWrapper>
-        </Wrapper>
+        </Layout>
         {isVisibleModal && (
           <ListFormModal
             list={workInProgressList}

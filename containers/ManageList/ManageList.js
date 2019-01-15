@@ -1,8 +1,12 @@
 import React, { Component, Fragment } from 'react';
 import styled from 'styled-components';
-import { Layout, Modal, message } from 'antd';
-import Link from 'next/link';
-import { Header, ManageList, ListFormModal, Icon } from 'components';
+import {
+  Layout,
+  ManageList,
+  ListFormModal,
+  ConfirmModal,
+  withNotification,
+} from 'components';
 import { postCreateList, updateList, removeList } from 'common/api';
 import {
   createTree,
@@ -16,67 +20,17 @@ import {
   LIST_WORKFLOW_CREATE_MODE,
   LIST_TYPE,
 } from 'common/constants';
-import LogoIcon from 'static/images/svg/icon-logo.svg';
-import { initialListData } from './utils';
-
-const Wrapper = styled(Layout)`
-  height: 100vh;
-`;
-
-const TopWrapper = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  background: #fff;
-  border-bottom: 1px solid #eaeaea;
-`;
-
-const LogoWrapper = styled.div`
-  height: 60px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  width: 240px;
-`;
-
-const StyledIcon = styled(Icon)`
-  > svg {
-    width: 88px;
-    height: 16px;
-  }
-`;
-
-const MiddleColumnWrapper = styled(Layout)`
-  display: flex;
-  flex-direction: column;
-  background: #fff;
-  border-left: 1px solid #eaeaea;
-  border-right: 1px solid #eaeaea;
-`;
+import { initialListData, memberAdapter } from './utils';
 
 const ManageListWrapper = styled.div`
-  padding: 0 60px;
-`;
-
-const ReturnTo = styled.div`
-  display: flex;
-  align-items: center;
-  margin: 20px 0 20px 60px;
-  cursor: pointer;
-`;
-
-const ReturnLink = styled.a`
-  font-size: 18px;
-  color: #888b90;
-  margin-left: 10px;
+  width: 100%;
+  max-width: 1060px;
+  padding: 30px 20px 0;
+  margin: 0 auto;
 `;
 
 class ManageListContainer extends Component {
   state = this.prepareInitialState();
-
-  newListFormRef = formRef => {
-    this.formRef = formRef;
-  };
 
   handleClickCreateList = () => {
     this.setState({
@@ -104,9 +58,6 @@ class ManageListContainer extends Component {
   };
 
   handleCreateList = async ({ label }) => {
-    const {
-      props: { form },
-    } = this.formRef;
     const { list } = this.state;
 
     const listsNodeId = list.model.id;
@@ -137,12 +88,7 @@ class ManageListContainer extends Component {
       } = e;
 
       if (errors && errors.label) {
-        form.setFields({
-          label: {
-            value: label,
-            errors: errors.label.map(errorText => new Error(errorText)),
-          },
-        });
+        console.log(errors.label);
       }
     }
   };
@@ -191,30 +137,28 @@ class ManageListContainer extends Component {
   };
 
   handleClickRemovePost = listId => () => {
-    Modal.confirm({
-      centered: true,
-      title: 'Warning',
-      content: 'Are you sure you want to delete the list?',
-      okText: 'Remove',
-      cancelText: 'Cancel',
-      onOk: this.handleRemoveList(listId),
-      okButtonProps: { type: 'danger', size: 'large' },
-      cancelButtonProps: { size: 'large' },
+    this.setState({
+      removingListId: listId,
     });
   };
 
-  handleRemoveList = listId => async () => {
-    const { list } = this.state;
+  handleRemoveList = async () => {
+    const { notification } = this.props;
+    const { list, removingListId } = this.state;
 
-    const { label } = findNode(list, listId).model;
+    const { label } = findNode(list, removingListId).model;
 
     try {
-      await removeList(listId);
-      message.success(`The list «${label}» was removed.`);
+      await removeList(removingListId);
+
+      notification.show({
+        text: `The list «${label}» was removed.`,
+      });
 
       this.setState(prevState => ({
         ...prevState,
-        list: removeNode(prevState.list, listId),
+        removeListId: null,
+        list: removeNode(prevState.list, removingListId),
       }));
     } catch (e) {
       //
@@ -227,13 +171,21 @@ class ManageListContainer extends Component {
     });
   };
 
+  handleCloseConfirmModal = () => {
+    this.setState({
+      removingListId: null,
+    });
+  };
+
   prepareInitialState() {
-    const { list } = this.props;
+    const { list, members } = this.props;
 
     return {
+      removingListId: null,
       isVisibleModal: false,
       workInProgressList: null,
       list: createTree(list[1]),
+      members: memberAdapter(members),
     };
   }
 
@@ -250,48 +202,43 @@ class ManageListContainer extends Component {
 
   render() {
     const { user } = this.props;
-    const { isVisibleModal, workInProgressList } = this.state;
-
+    const {
+      isVisibleModal,
+      workInProgressList,
+      members,
+      removingListId,
+    } = this.state;
     const postList = this.preparePostList();
 
     return (
       <Fragment>
-        <Wrapper>
-          <TopWrapper>
-            <LogoWrapper>
-              <StyledIcon component={LogoIcon} />
-            </LogoWrapper>
-            <Header user={user} />
-          </TopWrapper>
-          <MiddleColumnWrapper>
-            <ReturnTo>
-              <Icon type="left" />
-              <Link href="/">
-                <ReturnLink>Return to dashboard</ReturnLink>
-              </Link>
-            </ReturnTo>
-            <ManageListWrapper>
-              <ManageList
-                list={postList}
-                onClickCreateList={this.handleClickCreateList}
-                onClickEditList={this.handleClickEditList}
-                onClickRemoveList={this.handleClickRemovePost}
-              />
-            </ManageListWrapper>
-          </MiddleColumnWrapper>
-        </Wrapper>
+        <Layout user={user}>
+          <ManageListWrapper>
+            <ManageList
+              list={postList}
+              members={members}
+              onClickCreateList={this.handleClickCreateList}
+              onClickEditList={this.handleClickEditList}
+              onClickRemoveList={this.handleClickRemovePost}
+            />
+          </ManageListWrapper>
+        </Layout>
         {isVisibleModal && (
           <ListFormModal
             list={workInProgressList}
-            wrappedComponentRef={this.newListFormRef}
             onCreate={this.handleCreateList}
-            onUpdate={this.handleUpdateList}
             onCancel={this.handleCancel}
           />
         )}
+        <ConfirmModal
+          isOpen={!!removingListId}
+          description="Are you sure you want to delete the list?"
+          onClickOk={this.handleRemoveList}
+          onClickCancel={this.handleCloseConfirmModal}
+        />
       </Fragment>
     );
   }
 }
 
-export default ManageListContainer;
+export default withNotification(ManageListContainer);

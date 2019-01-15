@@ -1,10 +1,17 @@
 import React, { Component, Fragment } from 'react';
 import styled from 'styled-components';
-import { Layout, Modal, message } from 'antd';
 import deepequal from 'fast-deep-equal';
 import memoize from 'memoize-one';
 import * as openpgp from 'openpgp';
-import { Post, PostList, Sidebar, Header, InviteModal } from 'components';
+import {
+  Layout,
+  Item,
+  List,
+  InviteModal,
+  ConfirmModal,
+  MenuList,
+  withNotification,
+} from 'components';
 import {
   createTree,
   findNode,
@@ -31,43 +38,34 @@ import {
   removeItem,
 } from 'common/api';
 import DecryptWorker from 'common/decrypt.worker';
-import { prepareAttachments, prepareFiles, initialPostData } from './utils';
+import { initialPostData } from './utils';
 
-const { Sider } = Layout;
-
-const Wrapper = styled(Layout)`
-  height: 100vh;
-  flex: initial;
-`;
-
-const SidebarWrapper = styled(Sider)`
-  background: #fff;
-  height: 100vh;
-`;
-
-const MiddleColumnWrapper = styled(Layout)`
-  display: flex;
-  flex: initial;
+const MiddleColumnWrapper = styled.div`
   width: 400px;
-  min-width: 400px;
-  background: #f5f6fa;
-  border-left: 1px solid #eaeaea;
-  border-right: 1px solid #eaeaea;
+  flex-shrink: 0;
+  background: ${({ theme }) => theme.lightBlue};
+  border-left: ${({ theme }) => theme.gallery};
+  border-right: ${({ theme }) => theme.gallery};
 `;
 
-const RightColumnWrapper = styled(Layout)`
-  background: #fff;
-  flex-direction: column;
+const RightColumnWrapper = styled.div`
+  flex-grow: 1;
+`;
+
+const CenterWrapper = styled.div`
+  display: flex;
+  width: 100%;
+`;
+
+const Sidebar = styled.aside`
+  width: 300px;
+  flex-shrink: 0;
 `;
 
 // TODO: add helper method for update and replace node after any changing
 // TODO: add helper method for construct workInProgressPost from parts
 
-function getListWithoutChildren(list) {
-  const { children, ...rest } = list;
-
-  return { ...rest, children: [] };
-}
+const getListWithoutChildren = list => ({ ...list, children: [] });
 
 class DashboardContainer extends Component {
   state = this.prepareInitialState();
@@ -116,28 +114,28 @@ class DashboardContainer extends Component {
     }
   };
 
-  handleClickSection = ({ key }) => {
+  handleClickMenuItem = id => () => {
     this.setState({
-      selectedListId: key,
+      selectedListId: id,
       workInProgressPost: null,
     });
   };
 
-  handleClickPost = postId => () => {
+  handleClickItem = itemId => () => {
     const { list } = this.state;
 
-    const post = findNode(list, postId).model;
+    const item = findNode(list, itemId).model;
 
     this.setState(prevState => ({
       ...prevState,
       workInProgressPost: {
         mode: POST_REVIEW_MODE,
-        ...post,
+        ...item,
       },
     }));
   };
 
-  handleClickCreatePost = () => {
+  handleClickCreateItem = () => {
     this.setState(prevState => ({
       ...prevState,
       workInProgressPost: {
@@ -159,38 +157,20 @@ class DashboardContainer extends Component {
       ...prevState,
       workInProgressPost: {
         ...post,
-        secret: {
-          ...post.secret,
-          attachments: prepareFiles(post.secret.attachments),
-        },
         mode: POST_WORKFLOW_EDIT_MODE,
       },
     }));
   };
 
   handleClickMoveToTrash = () => {
-    Modal.confirm({
-      centered: true,
-      title: 'Warning',
-      content: 'Are you sure you want to move the post to trash?',
-      okText: 'Remove',
-      cancelText: 'Cancel',
-      onOk: this.handleMoveToTrash,
-      okButtonProps: { type: 'danger', size: 'large' },
-      cancelButtonProps: { size: 'large' },
+    this.setState({
+      isVisibleMoveToTrashModal: true,
     });
   };
 
   handleClickRemovePost = () => {
-    Modal.confirm({
-      centered: true,
-      title: 'Warning',
-      content: 'Are you sure you want to delete the post?',
-      okText: 'Remove',
-      cancelText: 'Cancel',
-      onOk: this.handleRemovePost,
-      okButtonProps: { type: 'danger', size: 'large' },
-      cancelButtonProps: { size: 'large' },
+    this.setState({
+      isVisibleRemoveModal: true,
     });
   };
 
@@ -209,6 +189,7 @@ class DashboardContainer extends Component {
 
       this.setState(prevState => ({
         ...prevState,
+        isVisibleRemoveModal: false,
         workInProgressPost: {
           ...nextWorkInProgress,
           mode: POST_REVIEW_MODE,
@@ -221,6 +202,7 @@ class DashboardContainer extends Component {
   };
 
   handleMoveToTrash = async () => {
+    const { notification } = this.props;
     const { list, selectedListId, workInProgressPost } = this.state;
 
     const { mode, ...rest } = workInProgressPost;
@@ -230,19 +212,21 @@ class DashboardContainer extends Component {
     } = rest;
 
     try {
-      const preparedAttachments = await prepareAttachments(attachments);
       const trashNodeId = list.model.children[2].id;
       const data = {
         ...rest,
         listId: trashNodeId,
         secret: {
           ...rest.secret,
-          attachments: preparedAttachments,
+          attachments,
         },
       };
 
       await updateMoveItem(postId, { listId: trashNodeId });
-      message.success(`The post «${name}» was moved to trash.`);
+
+      notification.show({
+        text: `The post «${name}» was moved to trash.`,
+      });
 
       const newList = replaceNode(
         updateNode(list, postId, data),
@@ -257,6 +241,7 @@ class DashboardContainer extends Component {
 
       this.setState(prevState => ({
         ...prevState,
+        isVisibleMoveToTrashModal: false,
         workInProgressPost: {
           ...nextWorkInProgress,
           mode: POST_REVIEW_MODE,
@@ -272,10 +257,9 @@ class DashboardContainer extends Component {
     const { publicKey } = this.props;
 
     try {
-      const preparedAttachments = await prepareAttachments(attachments);
       const item = {
         ...secret,
-        attachments: preparedAttachments,
+        attachments,
       };
 
       const options = {
@@ -326,11 +310,9 @@ class DashboardContainer extends Component {
     const { workInProgressPost } = this.state;
 
     try {
-      const preparedAttachments = await prepareAttachments(attachments);
-
       const data = {
         ...secret,
-        attachments: preparedAttachments,
+        attachments,
       };
 
       const isSecretChanged = !deepequal(workInProgressPost.secret, data);
@@ -458,7 +440,20 @@ class DashboardContainer extends Component {
     }));
   };
 
-  handleClickShare = () => {
+  handleClickCloseItem = () => {
+    this.setState({
+      workInProgressPost: null,
+    });
+  };
+
+  handleCloseConfirmModal = () => {
+    this.setState({
+      isVisibleMoveToTrashModal: false,
+      isVisibleRemoveModal: false,
+    });
+  };
+
+  handleClickInvite = () => {
     this.setState({
       isVisibleInviteModal: true,
     });
@@ -539,6 +534,8 @@ class DashboardContainer extends Component {
 
     return {
       isVisibleInviteModal: false,
+      isVisibleMoveToTrashModal: false,
+      isVisibleRemoveModal: false,
       list: tree,
       selectedListId,
       workInProgressPost: null,
@@ -574,60 +571,59 @@ class DashboardContainer extends Component {
       selectedListId,
       workInProgressPost,
       isVisibleInviteModal,
+      isVisibleMoveToTrashModal,
+      isVisibleRemoveModal,
     } = this.state;
-
-    if (
-      !list ||
-      !list.model ||
-      !list.model.children ||
-      !list.model.children.length
-    ) {
-      return null;
-    }
 
     const {
       model: { children },
     } = list;
 
     const allLists = this.prepareAllList();
-    const selectedList = findNode(list, selectedListId).model;
+    const selectedListModel = findNode(list, selectedListId);
+    const selectedList = selectedListModel.model;
     const trashList = findNode(list, node => node.model.type === TRASH_TYPE)
       .model;
 
-    const shouldShowPost = !!workInProgressPost;
-    const activePostId = workInProgressPost ? workInProgressPost.id : null;
-    const isTrashPost =
+    const itemPath = selectedListModel
+      ? selectedListModel
+          .getPath()
+          .map(node => node.model.label)
+          .slice(1)
+      : null;
+    const activeItemId = workInProgressPost ? workInProgressPost.id : null;
+    const isTrashItem =
       workInProgressPost && workInProgressPost.listId === trashList.id;
 
     return (
       <Fragment>
-        <Wrapper>
-          <SidebarWrapper width={240}>
-            <Sidebar
-              selectedKeys={selectedListId}
-              sections={children}
-              onClickSection={this.handleClickSection}
-            />
-          </SidebarWrapper>
-          <MiddleColumnWrapper>
-            <PostList
-              title={selectedList.label}
-              activePostId={activePostId}
-              list={selectedList.children}
-              members={this.normalize(members)}
-              onClickPost={this.handleClickPost}
-              onClickCreatePost={this.handleClickCreatePost}
-            />
-          </MiddleColumnWrapper>
-          <RightColumnWrapper>
-            <Header withBorder user={user} />
-            {shouldShowPost && (
-              <Post
-                isTrashPost={isTrashPost}
+        <Layout user={user}>
+          <CenterWrapper>
+            <Sidebar>
+              <MenuList
+                selectedListId={selectedListId}
+                list={children}
+                onClick={this.handleClickMenuItem}
+              />
+            </Sidebar>
+            <MiddleColumnWrapper>
+              <List
+                title={selectedList.label}
+                activeItemId={activeItemId}
+                list={selectedList}
+                onClickItem={this.handleClickItem}
+                onClickCreateItem={this.handleClickCreateItem}
+              />
+            </MiddleColumnWrapper>
+            <RightColumnWrapper>
+              <Item
+                isTrashItem={isTrashItem}
                 post={workInProgressPost}
                 allLists={allLists}
+                itemPath={itemPath}
                 members={this.normalize(members)}
-                onClickShare={this.handleClickShare}
+                onClickCloseItem={this.handleClickCloseItem}
+                onClickInvite={this.handleClickInvite}
                 onClickEditPost={this.handleClickEditPost}
                 onClickMoveToTrash={this.handleClickMoveToTrash}
                 onFinishCreateWorkflow={this.handleFinishCreateWorkflow}
@@ -636,9 +632,9 @@ class DashboardContainer extends Component {
                 onClickRestorePost={this.handleClickRestorePost}
                 onClickRemovePost={this.handleClickRemovePost}
               />
-            )}
-          </RightColumnWrapper>
-        </Wrapper>
+            </RightColumnWrapper>
+          </CenterWrapper>
+        </Layout>
         {isVisibleInviteModal && (
           <InviteModal
             members={members}
@@ -647,9 +643,21 @@ class DashboardContainer extends Component {
             onCancel={this.handleCloseModal}
           />
         )}
+        <ConfirmModal
+          isOpen={isVisibleMoveToTrashModal}
+          description="Are you sure you want to move the post to trash?"
+          onClickOk={this.handleMoveToTrash}
+          onClickCancel={this.handleCloseConfirmModal}
+        />
+        <ConfirmModal
+          isOpen={isVisibleRemoveModal}
+          description="Are you sure you want to delete the post?"
+          onClickOk={this.handleRemovePost}
+          onClickCancel={this.handleCloseConfirmModal}
+        />
       </Fragment>
     );
   }
 }
 
-export default DashboardContainer;
+export default withNotification(DashboardContainer);

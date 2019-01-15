@@ -625,7 +625,7 @@ class DashboardContainer extends Component {
     return (
       <Fragment>
         <Wrapper>
-          <SidebarWrapper width={240}>
+          <SidebarWrapper width={300}>
             <LogoWrapper>
               <Icon name="logo" height={25} />
             </LogoWrapper>

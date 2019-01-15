@@ -27,7 +27,7 @@ export default class Document extends NextDocument {
           <style dangerouslySetInnerHTML={{ __html: styles }} />
           <link
             rel="apple-touch-icon"
-            sizes="76x76"
+            sizes="180x180"
             href="/static/images/favicon/apple-touch-icon.png"
           />
           <link

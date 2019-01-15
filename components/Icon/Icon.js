@@ -5,15 +5,16 @@ import './icons';
 const Svg = styled.svg`
   display: inline-block;
   vertical-align: middle;
+  fill: ${({ isInButton }) => (isInButton ? 'currentColor' : '')};
 `;
 
-const Icon = ({ name, ...props }) => {
+const Icon = ({ name, isInButton, ...props }) => {
   if (!name) {
     return null;
   }
 
   return (
-    <Svg {...props}>
+    <Svg isInButton={isInButton} {...props}>
       <use xlinkHref={`#icon-${name}--sprite`} />
     </Svg>
   );

@@ -264,7 +264,8 @@ class Credentials extends Component {
             <Title>{name}</Title>
             <UpdatedDate>Last updated Nov 16, 2018 12:30 PM </UpdatedDate>
           </TitleWrapper>
-          <Icon name="favorite" width={20} height={20} fill="#888" />
+          {/* TODO: Uncomment to show favorite icon */}
+          {/* <Icon name="favorite" width={20} height={20} fill="#888" /> */}
         </Row>
         <InviteRow>
           <Row>

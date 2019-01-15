@@ -53,6 +53,7 @@ const StyledDropdown = styled(Dropdown)`
   display: flex;
   flex-direction: row;
   align-items: center;
+  cursor: pointer;
 `;
 
 const Option = styled.div`
@@ -88,14 +89,14 @@ const Options = (
 const Panel = ({ user }) => (
   <Wrapper>
     {/*<SearchSection>*/}
-      {/*<SearchIcon name="search" width={18} height={18} />*/}
-      {/*<SearchText>Search by Caesar… </SearchText>*/}
+    {/*<SearchIcon name="search" width={18} height={18} />*/}
+    {/*<SearchText>Search by Caesar… </SearchText>*/}
     {/*</SearchSection>*/}
     <UserSection>
       <Avatar {...user} name={user.email} />
       <StyledDropdown overlay={Options}>
         <UserName>{user.email}</UserName>
-        <Icon name="arrow-down" width={10} height={16} />
+        <Icon name="arrow-down" width={10} height={16} fill="#888" />
       </StyledDropdown>
     </UserSection>
   </Wrapper>

@@ -64,7 +64,12 @@ const ConfirmModal = ({
   onClickOk,
   onClickCancel,
 }) => (
-  <Modal isOpen={isOpen}>
+  <Modal
+    isOpen={isOpen}
+    shouldCloseOnEsc
+    shouldCloseOnOverlayClick
+    onRequestClose={onClickCancel}
+  >
     <Wrapper>
       <Header>
         <Icon />

@@ -182,7 +182,7 @@ class Portal extends Component {
 
   render() {
     const { isOpen, beforeClose } = this.state;
-    const { children, ...props } = this.props;
+    const { children, onRequestClose, ...props } = this.props;
 
     const shouldBeClosed = !isOpen && !beforeClose;
 

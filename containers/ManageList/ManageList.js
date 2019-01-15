@@ -1,7 +1,14 @@
 import React, { Component, Fragment } from 'react';
 import styled from 'styled-components';
-import { Layout, Modal, message } from 'antd';
-import { Header, ManageList, ListFormModal, Icon } from 'components';
+import { Layout } from 'antd';
+import {
+  Header,
+  ManageList,
+  ListFormModal,
+  Icon,
+  ConfirmModal,
+  withNotification,
+} from 'components';
 import { postCreateList, updateList, removeList } from 'common/api';
 import {
   createTree,
@@ -154,30 +161,28 @@ class ManageListContainer extends Component {
   };
 
   handleClickRemovePost = listId => () => {
-    Modal.confirm({
-      centered: true,
-      title: 'Warning',
-      content: 'Are you sure you want to delete the list?',
-      okText: 'Remove',
-      cancelText: 'Cancel',
-      onOk: this.handleRemoveList(listId),
-      okButtonProps: { type: 'danger', size: 'large' },
-      cancelButtonProps: { size: 'large' },
+    this.setState({
+      removingListId: listId,
     });
   };
 
-  handleRemoveList = listId => async () => {
-    const { list } = this.state;
+  handleRemoveList = async () => {
+    const { notification } = this.props;
+    const { list, removingListId } = this.state;
 
-    const { label } = findNode(list, listId).model;
+    const { label } = findNode(list, removingListId).model;
 
     try {
-      await removeList(listId);
-      message.success(`The list «${label}» was removed.`);
+      await removeList(removingListId);
+
+      notification.show({
+        text: `The list «${label}» was removed.`,
+      });
 
       this.setState(prevState => ({
         ...prevState,
-        list: removeNode(prevState.list, listId),
+        removeListId: null,
+        list: removeNode(prevState.list, removingListId),
       }));
     } catch (e) {
       //
@@ -190,10 +195,17 @@ class ManageListContainer extends Component {
     });
   };
 
+  handleCloseConfirmModal = () => {
+    this.setState({
+      removingListId: null,
+    });
+  };
+
   prepareInitialState() {
     const { list, members } = this.props;
 
     return {
+      removingListId: null,
       isVisibleModal: false,
       workInProgressList: null,
       list: createTree(list[1]),
@@ -214,7 +226,12 @@ class ManageListContainer extends Component {
 
   render() {
     const { user } = this.props;
-    const { isVisibleModal, workInProgressList, members } = this.state;
+    const {
+      isVisibleModal,
+      workInProgressList,
+      members,
+      removingListId,
+    } = this.state;
     const postList = this.preparePostList();
 
     return (
@@ -243,9 +260,15 @@ class ManageListContainer extends Component {
             onCancel={this.handleCancel}
           />
         )}
+        <ConfirmModal
+          isOpen={!!removingListId}
+          description="Are you sure you want to delete the list?"
+          onClickOk={this.handleRemoveList}
+          onClickCancel={this.handleCloseConfirmModal}
+        />
       </Fragment>
     );
   }
 }
 
-export default ManageListContainer;
+export default withNotification(ManageListContainer);

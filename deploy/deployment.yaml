@@ -2,7 +2,6 @@
 kind: Deployment
 metadata:
   name: caesarapp-web-app
-  namespace: default
   labels:
     app: caesarapp-web-app
 spec:

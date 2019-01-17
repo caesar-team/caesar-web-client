@@ -1,5 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
+import { formatDate } from 'common/utils/dateFormatter';
 import { Icon } from '../Icon';
 
 const Row = styled.div`
@@ -78,7 +79,7 @@ const Item = ({
       <Details>
         <Title>{name}</Title>
         <Box>
-          <Text>{lastUpdated}</Text>
+          <Text>{formatDate(lastUpdated)}</Text>
           <Box>
             {shouldShowAttachments && (
               <Box>

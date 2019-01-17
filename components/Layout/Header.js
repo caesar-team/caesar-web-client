@@ -20,6 +20,7 @@ const LeftWrapper = styled.div`
   width: 300px;
   flex-shrink: 0;
   padding-left: 60px;
+  border-right: 1px solid ${({ theme }) => theme.gallery};
 `;
 
 const RightWrapper = styled.div`
@@ -92,7 +93,7 @@ const Options = (
 export const Header = ({ user }) => (
   <Wrapper>
     <LeftWrapper>
-      <Link href="/">
+      <Link href="/" passHref>
         <LogoLink>
           <Icon name="logo" width={116} height={25} />
         </LogoLink>
@@ -103,7 +104,7 @@ export const Header = ({ user }) => (
         <Avatar {...user} name={user.email} />
         <StyledDropdown overlay={Options}>
           <UserName>{user.email}</UserName>
-          <StyledIcon name="arrow-down" width={10} height={16} />
+          <StyledIcon name="arrow-down-small" width={10} height={16} />
         </StyledDropdown>
       </UserSection>
     </RightWrapper>

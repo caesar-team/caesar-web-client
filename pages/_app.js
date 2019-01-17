@@ -8,10 +8,10 @@ import { entryResolver } from 'common/utils/entryResolver';
 import { DEFAULT_IDLE_TIMEOUT } from 'common/constants';
 import OpenPGPWorker from 'common/openpgp.worker';
 import { generateKeys, validateKeys } from 'common/utils/key';
-import { getKeys, postKeys } from 'common/api';
+import { getKeys, postKeys, checkTwoFactor } from 'common/api';
 import theme from 'common/theme';
 import { SessionChecker, Loader, NotificationProvider } from '../components';
-import { MasterPassword, Lock } from '../containers';
+import { MasterPassword, Lock, TwoFactorAuthentication } from '../containers';
 
 const GlobalStyles = createGlobalStyle`${globalStyles}`;
 
@@ -84,6 +84,7 @@ export default class App extends NextApp {
 
       this.setState({
         shouldShowMasterPassword: false,
+        shouldShowTwoFactorAuthentication: true,
         isFullWorkflow: false,
       });
     } catch (error) {
@@ -118,6 +119,25 @@ export default class App extends NextApp {
       : this.validateKeys(password, FormikBag);
   };
 
+  handleTwoFactorAuthenticationSubmit = async (
+    { code },
+    { setSubmitting, setErrors },
+  ) => {
+    try {
+      await checkTwoFactor({
+        _auth_code: code,
+        _trusted: true,
+      });
+
+      this.setState({
+        shouldShowTwoFactorAuthentication: false,
+      });
+    } catch (error) {
+      setErrors({ code: 'Something wrong' });
+      setSubmitting(false);
+    }
+  };
+
   handleInactiveTimeout = () => {
     this.setState({
       shouldShowMasterPassword: true,
@@ -132,6 +152,7 @@ export default class App extends NextApp {
       isFullWorkflow: true,
       shouldShowLoader: router.route !== '/auth',
       shouldShowMasterPassword: false,
+      shouldShowTwoFactorAuthentication: true,
     };
   }
 
@@ -140,6 +161,7 @@ export default class App extends NextApp {
       isFullWorkflow,
       shouldShowMasterPassword,
       shouldShowLoader,
+      shouldShowTwoFactorAuthentication,
     } = this.state;
     const { Component, pageProps, router } = this.props;
 
@@ -160,6 +182,19 @@ export default class App extends NextApp {
             ) : (
               <Lock onSubmit={this.handleSubmit} />
             )}
+          </Container>
+        </ThemeProvider>
+      );
+    }
+
+    if (shouldShowTwoFactorAuthentication) {
+      return (
+        <ThemeProvider theme={theme}>
+          <Container>
+            <GlobalStyles />
+            <TwoFactorAuthentication
+              onSubmit={this.handleTwoFactorAuthenticationSubmit}
+            />
           </Container>
         </ThemeProvider>
       );

@@ -66,6 +66,8 @@ export const getUsers = token =>
 
 export const postKeys = data => callApi.post('/keys', data);
 
+export const checkTwoFactor = data => callApi.post('/2fa_check', data);
+
 export const getKeys = () => callApi.get('/keys');
 
 // post

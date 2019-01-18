@@ -15,7 +15,6 @@ const DashboardPage = props => (
 DashboardPage.getInitialProps = async ({ req, query }) => {
   try {
     const token = isServer ? req.cookies.token : getToken();
-
     const { data: list } = await getList(token);
     const { data: user } = await getUserSelf(token);
     const { data: members } = await getUsers(token);

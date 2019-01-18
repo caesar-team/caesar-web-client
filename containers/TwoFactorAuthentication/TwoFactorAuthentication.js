@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import styled from 'styled-components';
+import Router from 'next/router';
 import { Formik } from 'formik';
 import {
   AuthDescription,
@@ -15,6 +16,8 @@ import {
   STEP_CONFIRM_TWO_FACTOR_AUTHENTICATION,
 } from './constants';
 import { codeSchema } from './schema';
+import { checkTwoFactor, createTwoFactor } from '../../common/api';
+import { setToken } from '../../common/utils/token';
 
 const InnerWrapper = styled.div`
   max-width: 400px;
@@ -77,10 +80,7 @@ const Error = styled.div`
 `;
 
 class TwoFactorAuthentication extends Component {
-  state = {
-    code: '',
-    step: STEP_CREATE_TWO_FACTOR_AUTHENTICATION,
-  };
+  state = this.prepareInitialState();
 
   handleClickReturn = () => {
     this.setState({
@@ -94,26 +94,80 @@ class TwoFactorAuthentication extends Component {
     });
   };
 
-  renderCreateStep = () => (
-    <div>
-      <AuthTitle>Two Factor Authentication</AuthTitle>
-      <AuthDescription>
-        Scan the QR code above or manually enter in the application.
-      </AuthDescription>
-      <InnerWrapper>
-        <QrCodeImage />
-        <QrCodeKeyWrapper>
-          <QrCodeKeyTitle>Key:</QrCodeKeyTitle>
-          <QrCodeKey>11144432</QrCodeKey>
-        </QrCodeKeyWrapper>
-        <NextButton onClick={this.handleClickNext}>Next</NextButton>
-      </InnerWrapper>
-    </div>
-  );
+  handleTwoFactorAuthenticationCreate = async (
+    { code },
+    { setSubmitting, setErrors },
+  ) => {
+    try {
+      await createTwoFactor({
+        authCode: code,
+        secret: this.props.code,
+      });
+      this.props.initialize(() => Router.replace('/'));
+    } catch (error) {
+      setErrors({ code: 'Wrong code' });
+      setSubmitting(false);
+    }
+  };
+
+  handleTwoFactorAuthenticationCheck = async (
+    { code },
+    { setSubmitting, setErrors },
+  ) => {
+    try {
+      const {
+        data: { token },
+      } = await checkTwoFactor({
+        authCode: code,
+        trusted: true,
+      });
+
+      setToken(token);
+      this.props.initialize(() => Router.replace('/'));
+    } catch (error) {
+      setErrors({ code: 'Wrong code' });
+      setSubmitting(false);
+    }
+  };
+
+  prepareInitialState() {
+    const { isCheck } = this.props;
+
+    return {
+      code: '',
+      step: isCheck
+        ? STEP_CONFIRM_TWO_FACTOR_AUTHENTICATION
+        : STEP_CREATE_TWO_FACTOR_AUTHENTICATION,
+    };
+  }
+
+  renderCreateStep = () => {
+    const { qr, code } = this.props;
+
+    return (
+      <div>
+        <AuthTitle>Two Factor Authentication</AuthTitle>
+        <AuthDescription>
+          Scan the QR code above or manually enter in the application.
+        </AuthDescription>
+        <InnerWrapper>
+          <QrCodeImage src={qr} />
+          <QrCodeKeyWrapper>
+            <QrCodeKeyTitle>Key:</QrCodeKeyTitle>
+            <QrCodeKey>{code}</QrCodeKey>
+          </QrCodeKeyWrapper>
+          <NextButton onClick={this.handleClickNext}>Next</NextButton>
+        </InnerWrapper>
+      </div>
+    );
+  };
 
   renderConfirmStep = () => {
     const { code } = this.state;
-    const { onSubmit } = this.props;
+    const { isCheck } = this.props;
+    const action = isCheck
+      ? this.handleTwoFactorAuthenticationCheck
+      : this.handleTwoFactorAuthenticationCreate;
 
     return (
       <div>
@@ -126,7 +180,7 @@ class TwoFactorAuthentication extends Component {
           initialValues={{ code }}
           isInitialValid={codeSchema.isValidSync({ code })}
           validationSchema={codeSchema}
-          onSubmit={onSubmit}
+          onSubmit={action}
           render={({
             errors,
             handleSubmit,

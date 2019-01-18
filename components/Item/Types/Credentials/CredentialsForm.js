@@ -238,7 +238,12 @@ const CredentialsForm = ({
           </Row>
           <AttachmentsSection>
             <Attachment>Attachments</Attachment>
-            <Uploader name="attachments" onChange={setFieldValue} />
+            <Uploader
+              name="attachments"
+              files={values.attachments}
+              multiple
+              onChange={setFieldValue}
+            />
             <Attachments>
               {renderAttachments(values, setFieldValue)}
             </Attachments>

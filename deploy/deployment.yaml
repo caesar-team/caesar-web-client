@@ -1,15 +1,13 @@
-﻿apiVersion: apps/v1
+﻿apiVersion: apps/v1beta2
 kind: Deployment
 metadata:
-  namespace: default
   name: caesarapp-web-app
-  labels:
-    app: caesarapp-web-app
+  namespace: default
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: caesarapp-web-app
+      workload.user.cattle.io/workloadselector: deployment-default-caesarapp-web-app
   strategy:
     rollingUpdate:
       maxSurge: 1
@@ -17,14 +15,52 @@ spec:
     type: RollingUpdate
   template:
     metadata:
+      namespace: default
       labels:
         app: caesarapp-web-app
+        workload.user.cattle.io/workloadselector: deployment-default-caesarapp-web-app
     spec:
+      containers:
+        - env:
+            - name: API_BASE_PATH
+              value: api
+            - name: API_HOST
+              value: dev.caesarapp.io
+            - name: API_PROTOCOL
+              value: https
+            - name: APP_HOST
+              value: dev.caesarapp.io
+            - name: APP_PORT
+              value: "3000"
+            - name: APP_PROTOCOL
+              value: https
+            - name: AUTH_ENDPOINT
+              value: connect/google
+            - name: NODE_ENV
+              value: production
+            - name: REDIRECT_AUTH_ENDPOINT
+              value: check_auth
+          image: ${CICD_IMAGE}:${CICD_GIT_BRANCH}
+          imagePullPolicy: Always
+          name: caesarapp-web-app
+          ports:
+            - containerPort: 3000
+              name: 3000tcp01
+              protocol: TCP
+          resources: {}
+          securityContext:
+            allowPrivilegeEscalation: false
+            privileged: false
+            readOnlyRootFilesystem: false
+            runAsNonRoot: false
+          stdin: true
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          tty: true
+      dnsPolicy: ClusterFirst
       imagePullSecrets:
         - name: dockerhub
       restartPolicy: Always
-      containers:
-        containers:
-          - name: caesarapp-web-app
-            image: ${CICD_IMAGE}:${CICD_GIT_BRANCH}
-            imagePullPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      terminationGracePeriodSeconds: 30

@@ -24,24 +24,7 @@ spec:
         - name: dockerhub
       restartPolicy: Always
       containers:
-        - env:
-          - name: API_BASE_PATH
-            value: api
-          - name: API_HOST
-            value: dev.caesarapp.io
-          - name: API_PROTOCOL
-            value: https
-          - name: APP_HOST
-            value: dev.caesarapp.io
-          - name: APP_PORT
-            value: "3000"
-          - name: APP_PROTOCOL
-            value: https
-          - name: AUTH_ENDPOINT
-            value: connect/google
-          - name: NODE_ENV
-            value: production
-          - name: REDIRECT_AUTH_ENDPOINT
-            value: check_auth
-        image: ${CICD_IMAGE}:${CICD_GIT_BRANCH}
-        imagePullPolicy: Always
+        containers:
+          - name: caesarapp-web-app
+            image: ${CICD_IMAGE}:${CICD_GIT_BRANCH}
+            imagePullPolicy: Always

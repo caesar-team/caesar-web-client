@@ -13,6 +13,7 @@ import 'static/images/svg/icon-edit.svg?sprite';
 import 'static/images/svg/icon-eye-off.svg?sprite';
 import 'static/images/svg/icon-eye-on.svg?sprite';
 import 'static/images/svg/icon-favorite.svg?sprite';
+import 'static/images/svg/icon-favorite-active.svg?sprite';
 import 'static/images/svg/icon-google.svg?sprite';
 import 'static/images/svg/icon-group.svg?sprite';
 import 'static/images/svg/icon-history.svg?sprite';

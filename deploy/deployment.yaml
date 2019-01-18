@@ -40,7 +40,7 @@ spec:
               value: production
             - name: REDIRECT_AUTH_ENDPOINT
               value: check_auth
-          image: ${CICD_IMAGE}:${CICD_GIT_BRANCH}
+          image: caesarteam/caesar-web-client:${CICD_GIT_BRANCH}
           imagePullPolicy: Always
           name: caesarapp-web-app
           ports:

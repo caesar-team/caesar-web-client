@@ -15,6 +15,8 @@ const Container = styled.div`
     ${({ theme, isDragActive }) => (isDragActive ? theme.blue : theme.gray)};
   width: 100%;
   padding: 24px 0;
+  cursor: pointer;
+  outline: none;
 `;
 
 const Text = styled.span`

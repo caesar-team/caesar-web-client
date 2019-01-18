@@ -9,7 +9,7 @@ import { Scrollbar } from '../Scrollbar';
 const Wrapper = styled.div`
   display: flex;
   flex-direction: column;
-  padding: 10px 60px;
+  padding: 20px 60px;
   height: calc(100vh - 70px);
 `;
 

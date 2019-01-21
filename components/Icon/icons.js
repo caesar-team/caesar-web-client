@@ -1,9 +1,17 @@
+// Need to change all arrows to 7-14 and delete 2-5
 import 'static/images/svg/icon-arrow-back.svg?sprite';
-import 'static/images/svg/icon-arrow-down.svg?sprite';
 import 'static/images/svg/icon-arrow-left.svg?sprite';
 import 'static/images/svg/icon-arrow-next.svg?sprite';
 import 'static/images/svg/icon-arrow-right.svg?sprite';
-import 'static/images/svg/icon-arrow-up.svg?sprite';
+// Need to change all arrows to this 7-14 and delete 2-5
+import 'static/images/svg/icon-arrow-up-big.svg?sprite';
+import 'static/images/svg/icon-arrow-up-small.svg?sprite';
+import 'static/images/svg/icon-arrow-down-big.svg?sprite';
+import 'static/images/svg/icon-arrow-down-small.svg?sprite';
+import 'static/images/svg/icon-arrow-left-big.svg?sprite';
+import 'static/images/svg/icon-arrow-left-small.svg?sprite';
+import 'static/images/svg/icon-arrow-right-big.svg?sprite';
+import 'static/images/svg/icon-arrow-right-small.svg?sprite';
 import 'static/images/svg/icon-clip.svg?sprite';
 import 'static/images/svg/icon-close.svg?sprite';
 import 'static/images/svg/icon-copy.svg?sprite';

@@ -1,15 +1,8 @@
 import React, { Component } from 'react';
 import styled from 'styled-components';
-import {
-  Avatar,
-  AvatarsList,
-  Breadcrumbs,
-  Button,
-  File,
-  Icon,
-  Label,
-} from 'components';
+import { Avatar, AvatarsList, Button, File, Icon, Label } from 'components';
 import { downloadFile } from 'common/utils/file';
+import { formatDate } from 'common/utils/dateFormatter';
 import { copyToClipboard } from 'common/utils/clipboard';
 
 const Wrapper = styled.div`
@@ -23,12 +16,8 @@ const Row = styled.div`
   align-items: center;
 `;
 
-const TopRow = styled(Row)`
-  padding: 4px 0;
-`;
-
 const InviteRow = styled(Row)`
-  margin-top: 28px;
+  margin-top: 10px;
 `;
 
 const StyledButton = styled(Button)`
@@ -43,6 +32,7 @@ const ButtonsWrapper = styled.div`
 const TitleWrapper = styled.div`
   display: flex;
   flex-direction: column;
+  padding: 4px 0;
 `;
 
 const Title = styled.div`
@@ -79,8 +69,18 @@ const StyledAvatarsList = styled(AvatarsList)`
   margin-right: 30px;
 `;
 
+const InviteButton = styled(Button)`
+  text-transform: uppercase;
+`;
+
+const EditButton = styled(Button)`
+  padding-right: 13px;
+  padding-left: 13px;
+  text-transform: uppercase;
+`;
+
 const StyledEyeIcon = styled(Icon)`
-  margin-right: 22px;
+  margin-right: 20px;
   cursor: pointer;
   fill: ${({ theme }) => theme.gray};
 `;
@@ -88,7 +88,7 @@ const StyledEyeIcon = styled(Icon)`
 const FieldWrapper = styled.div`
   display: flex;
   flex-direction: column;
-  margin-top: 36px;
+  margin-top: 55px;
 `;
 
 const Field = styled.div`
@@ -97,6 +97,7 @@ const Field = styled.div`
   width: 100%;
   border-bottom: 1px solid ${({ theme }) => theme.gallery};
   margin-bottom: 24px;
+  padding-bottom: 5px;
 
   &:last-child {
     margin-bottom: 0;
@@ -111,7 +112,7 @@ const FieldValue = styled.div`
   letter-spacing: 0.6px;
   color: ${({ theme }) => theme.black};
   width: 100%;
-  padding-left: 15px;
+  padding: 0 15px;
   margin-top: 12px;
 `;
 
@@ -120,10 +121,25 @@ const StyledIcon = styled(Icon)`
   fill: ${({ theme }) => theme.gray};
 `;
 
+const StyledWebsiteLink = styled.a`
+  text-decoration: none;
+  cursor: pointer;
+  color: inherit;
+  transition: all 0.2s;
+
+  &:hover {
+    color: ${({ theme }) => theme.emperor};
+  }
+`;
+
 const AttachmentsWrapper = styled.div`
   display: flex;
   flex-direction: column;
   margin-top: 52px;
+`;
+
+const AttachmentsHeaderRow = styled(Row)`
+  align-items: flex-start;
 `;
 
 const Attachments = styled.div`
@@ -134,16 +150,34 @@ const Attachments = styled.div`
   margin-bottom: 24px;
 `;
 
+const StyledDownloadIcon = styled(Icon)`
+  margin-right: 10px;
+  vertical-align: baseline;
+  transition: all 0.2s;
+`;
+
 const DownloadAll = styled.div`
   font-size: 14px;
   letter-spacing: 0.4px;
   color: ${({ theme }) => theme.black};
   cursor: pointer;
-  margin-left: 10px;
+  transition: all 0.2s;
+
+  &:hover {
+    color: ${({ theme }) => theme.emperor};
+
+    svg {
+      fill: ${({ theme }) => theme.emperor};
+    }
+  }
 `;
 
 const StyledFile = styled(File)`
   margin-bottom: 30px;
+  margin-right: auto;
+  padding-right: 10px;
+  cursor: pointer;
+  transition: all 0.2s;
 
   &:last-child {
     margin-bottom: 30px;
@@ -206,6 +240,7 @@ class Credentials extends Component {
       onClickRestorePost,
       post: {
         listId,
+        lastUpdated,
         shared,
         owner: isOwner,
         secret: { name, login, pass, website, note, attachments },
@@ -231,8 +266,8 @@ class Credentials extends Component {
 
     return (
       <Wrapper>
-        <TopRow>
-          <Breadcrumbs list={itemPath} />
+        <Row>
+          <UpdatedDate>Last updated {formatDate(lastUpdated)}</UpdatedDate>
           <Row>
             {isTrashItem ? (
               <ButtonsWrapper>
@@ -248,9 +283,9 @@ class Credentials extends Component {
                 </StyledButton>
               </ButtonsWrapper>
             ) : (
-              <Button color="white" icon="pencil" onClick={onClickEditPost}>
+              <EditButton color="white" icon="pencil" onClick={onClickEditPost}>
                 Edit
-              </Button>
+              </EditButton>
             )}
             <StyledButton
               color="white"
@@ -258,11 +293,10 @@ class Credentials extends Component {
               onClick={onClickCloseItem}
             />
           </Row>
-        </TopRow>
+        </Row>
         <Row>
           <TitleWrapper>
             <Title>{name}</Title>
-            <UpdatedDate>Last updated Nov 16, 2018 12:30 PM </UpdatedDate>
           </TitleWrapper>
           {/* TODO: Uncomment to show favorite icon */}
           {/* <Icon name="favorite" width={20} height={20} fill="#888" /> */}
@@ -278,9 +312,9 @@ class Credentials extends Component {
           <Row>
             <StyledAvatarsList avatars={avatars} />
             {!isTrashItem && (
-              <Button color="black" onClick={onClickInvite}>
-                INVITE
-              </Button>
+              <InviteButton color="black" onClick={onClickInvite}>
+                Invite
+              </InviteButton>
             )}
           </Row>
         </InviteRow>
@@ -288,39 +322,47 @@ class Credentials extends Component {
           <Field>
             <Label>Login</Label>
             <Row>
-              <FieldValue>{login}</FieldValue>
-              <StyledIcon
-                name="copy"
-                width={20}
-                height={20}
-                onClick={this.handleCopy('login')}
-              />
+              <FieldValue>
+                {login}
+                <StyledIcon
+                  name="copy"
+                  width={19}
+                  height={19}
+                  onClick={this.handleCopy('login')}
+                />
+              </FieldValue>
             </Row>
           </Field>
           <Field>
             <Label>Password</Label>
             <Row>
-              <FieldValue>{pwd}</FieldValue>
-              <Row>
-                <StyledEyeIcon
-                  name={eyeIconName}
-                  width={20}
-                  height={20}
-                  onClick={this.handleTogglePasswordVisibility}
-                />
-                <StyledIcon
-                  name="copy"
-                  width={20}
-                  height={20}
-                  onClick={this.handleCopy('pass')}
-                />
-              </Row>
+              <FieldValue>
+                {pwd}
+                <Row>
+                  <StyledEyeIcon
+                    name={eyeIconName}
+                    width={20}
+                    height={20}
+                    onClick={this.handleTogglePasswordVisibility}
+                  />
+                  <StyledIcon
+                    name="copy"
+                    width={19}
+                    height={19}
+                    onClick={this.handleCopy('pass')}
+                  />
+                </Row>
+              </FieldValue>
             </Row>
           </Field>
           {shouldShowWebsite && (
             <Field>
               <Label>Website</Label>
-              <FieldValue>{website}</FieldValue>
+              <FieldValue>
+                <StyledWebsiteLink href={website} target="_blank">
+                  {website}
+                </StyledWebsiteLink>
+              </FieldValue>
             </Field>
           )}
           <Field>
@@ -336,15 +378,15 @@ class Credentials extends Component {
         </FieldWrapper>
         {shouldShowAttachments && (
           <AttachmentsWrapper>
-            <Row>
+            <AttachmentsHeaderRow>
               <Attachments>Attachments</Attachments>
               <Row>
-                <Icon name="download" width={14} height={14} />
                 <DownloadAll onClick={this.handleClickDownloadFiles}>
+                  <StyledDownloadIcon name="download" width={14} height={14} />
                   Download {attachments.length} files
                 </DownloadAll>
               </Row>
-            </Row>
+            </AttachmentsHeaderRow>
             {renderedAttachments}
           </AttachmentsWrapper>
         )}

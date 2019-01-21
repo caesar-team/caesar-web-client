@@ -1,6 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
-import { LIST_TYPE } from 'common/constants';
+import { FAVORITES_TYPE } from 'common/constants';
 import { Button, Scrollbar } from 'components';
 import Item from './Item';
 import EmptyList from './EmptyList';
@@ -17,7 +17,8 @@ const TitleWrapper = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 11px 30px;
+  min-height: 61px;
+  padding: 10px 30px;
   background-color: ${({ theme }) => theme.white};
   border-bottom: 1px solid ${({ theme }) => theme.gallery};
 `;
@@ -59,16 +60,20 @@ const List = ({
     return <Scrollbar>{renderedItems}</Scrollbar>;
   };
 
+  const isFavorite = list.type === FAVORITES_TYPE;
+
   return (
     <Wrapper>
       <TitleWrapper>
         <Title>{title}</Title>
-        <Button
-          color="white"
-          icon="plus"
-          onClick={onClickCreateItem}
-          isHoverBlackBackground
-        />
+        {!isFavorite && (
+          <Button
+            color="white"
+            icon="plus"
+            onClick={onClickCreateItem}
+            isHoverBlackBackground
+          />
+        )}
       </TitleWrapper>
       {renderedList()}
     </Wrapper>

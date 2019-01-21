@@ -6,7 +6,6 @@ import { Icon } from '../Icon';
 const LogoLink = styled.a`
   display: block;
   transition: 0.3s;
-  cursor: pointer;
 
   &:hover {
     opacity: 0.75;
@@ -14,7 +13,7 @@ const LogoLink = styled.a`
 `;
 
 export const Logo = () => (
-  <Link href="/">
+  <Link href="/" passHref>
     <LogoLink>
       <Icon name="logo" width={116} height={25} />
     </LogoLink>

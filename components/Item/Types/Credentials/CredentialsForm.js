@@ -36,6 +36,11 @@ const ButtonWrapper = styled.div`
 
 const CancelButton = styled(Button)`
   margin-right: 20px;
+  text-transform: uppercase;
+`;
+
+const SubmitButton = styled(Button)`
+  text-transform: uppercase;
 `;
 
 const TitleInput = styled(Input)`
@@ -139,7 +144,7 @@ const CredentialsForm = ({
 
   const action = isEditMode ? onFinishEditWorkflow : onFinishCreateWorkflow;
 
-  const buttonText = isEditMode ? 'UPDATE' : 'ADD';
+  const buttonText = isEditMode ? 'Update' : 'Add';
   const shouldShowRemoveButton = isEditMode;
 
   const preparedOptions = allLists.map(({ id, label }) => ({
@@ -166,11 +171,11 @@ const CredentialsForm = ({
         <Form onSubmit={handleSubmit}>
           <ButtonWrapper>
             <CancelButton color="white" onClick={onCancelWorkflow}>
-              CANCEL
+              Cancel
             </CancelButton>
-            <Button htmlType="submit" disabled={isSubmitting || !isValid}>
+            <SubmitButton htmlType="submit" disabled={isSubmitting || !isValid}>
               {buttonText}
-            </Button>
+            </SubmitButton>
           </ButtonWrapper>
           <FastField
             name="name"

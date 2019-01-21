@@ -44,11 +44,11 @@ const MiddleColumnWrapper = styled.div`
   width: 400px;
   flex-shrink: 0;
   background: ${({ theme }) => theme.lightBlue};
-  border-left: 1px solid ${({ theme }) => theme.gallery};
   border-right: 1px solid ${({ theme }) => theme.gallery};
 `;
 
 const RightColumnWrapper = styled.div`
+  position: relative;
   flex-grow: 1;
 `;
 
@@ -60,6 +60,7 @@ const CenterWrapper = styled.div`
 const Sidebar = styled.aside`
   width: 300px;
   flex-shrink: 0;
+  border-right: 1px solid ${({ theme }) => theme.gallery};
 `;
 
 // TODO: add helper method for update and replace node after any changing

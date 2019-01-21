@@ -2,13 +2,12 @@
 kind: Deployment
 metadata:
   name: caesarapp-web-app
-  labels:
-    app: caesarapp-web-app
+  namespace: default
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: caesarapp-web-app
+      workload.user.cattle.io/workloadselector: deployment-default-caesarapp-web-app
   strategy:
     rollingUpdate:
       maxSurge: 1
@@ -16,8 +15,10 @@ spec:
     type: RollingUpdate
   template:
     metadata:
+      namespace: default
       labels:
         app: caesarapp-web-app
+        workload.user.cattle.io/workloadselector: deployment-default-caesarapp-web-app
     spec:
       containers:
         - env:
@@ -39,7 +40,7 @@ spec:
               value: production
             - name: REDIRECT_AUTH_ENDPOINT
               value: check_auth
-          image: ${CICD_IMAGE}:${CICD_GIT_BRANCH}
+          image: caesarteam/caesar-web-client:${CICD_GIT_BRANCH}
           imagePullPolicy: Always
           name: caesarapp-web-app
           ports:

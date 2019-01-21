@@ -30,6 +30,7 @@ const AuthWrapper = styled.div`
   align-items: center;
   margin-top: 50px;
   height: 70px;
+  text-decoration: none;
   cursor: pointer;
   border-radius: 3px;
   box-shadow: 0 11px 23px 0 rgba(0, 0, 0, 0.1);
@@ -50,15 +51,9 @@ const GoogleLogoWrapper = styled.div`
   height: 100%;
 `;
 
-const AuthLink = styled.a`
-  display: flex;
-  align-items: center;
+const AuthText = styled.div`
   padding: 20px 0;
   margin: 0 60px 0 50px;
-  text-decoration: none;
-`;
-
-const AuthText = styled.div`
   font-size: 18px;
   letter-spacing: 0.6px;
   color: ${({ theme }) => theme.white};
@@ -74,13 +69,11 @@ const AuthContainer = ({ theme }) => (
     </IconWrapper>
     <AuthTitle>Nice to meet you!</AuthTitle>
     <AuthDescription>Welcome to Caesar</AuthDescription>
-    <AuthWrapper>
+    <AuthWrapper href={authEndpoint}>
       <GoogleLogoWrapper>
         <Icon name="google" width={25} height={25} fill={theme.white} />
       </GoogleLogoWrapper>
-      <AuthLink href={authEndpoint}>
-        <AuthText>Sign in via Google</AuthText>
-      </AuthLink>
+      <AuthText>Sign in via Google</AuthText>
     </AuthWrapper>
   </Wrapper>
 );

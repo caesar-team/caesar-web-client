@@ -41,7 +41,13 @@ const StyledIcon = styled(Icon)`
     isDragActive ? theme.blue : theme.gray};
 `;
 
-const Uploader = ({ name, multiple, accept, onChange }) => {
+const Uploader = ({
+  name,
+  multiple,
+  accept,
+  onChange,
+  files: previousFiles,
+}) => {
   const handleDrop = async acceptedFiles => {
     const previews = await filesToBase64(acceptedFiles);
     const files = acceptedFiles.map(({ name: fileName }, index) => ({
@@ -49,7 +55,7 @@ const Uploader = ({ name, multiple, accept, onChange }) => {
       raw: previews[index],
     }));
 
-    onChange(name, files);
+    onChange(name, [...previousFiles, ...files]);
   };
 
   return (

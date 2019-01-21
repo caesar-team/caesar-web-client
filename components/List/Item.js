@@ -4,6 +4,7 @@ import { formatDate } from 'common/utils/dateFormatter';
 import { Icon } from '../Icon';
 
 const Row = styled.div`
+  position: relative;
   display: flex;
   padding: 20px 30px 20px;
   background: ${({ theme, isActive }) =>

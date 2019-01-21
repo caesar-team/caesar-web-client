@@ -422,21 +422,38 @@ class DashboardContainer extends Component {
 
   handleToggleFavorites = id => async () => {
     try {
-      await toggleFavorite(id);
+      const { data } = await toggleFavorite(id);
 
-      this.setState(prevState => ({
-        ...prevState,
-        workInProgressItem: {
-          ...prevState.workInProgressItem,
-          favorite: !prevState.workInProgressItem.favorite,
-        },
-        list: updateNode(prevState.list, id, {
-          ...prevState.workInProgressItem,
-          favorite: !prevState.workInProgressItem.favorite,
-        }),
-      }));
+      this.setState(prevState => {
+        const newFavorites = { ...prevState.favorites };
+
+        if (data.favorite) {
+          newFavorites.children.push({
+            ...prevState.workInProgressItem,
+            favorite: !prevState.workInProgressItem.favorite,
+          });
+        } else {
+          const itemIndex = newFavorites.children
+            .map(item => item.id)
+            .indexOf(id);
+          newFavorites.children.splice(itemIndex, 1);
+        }
+
+        return {
+          ...prevState,
+          workInProgressItem: {
+            ...prevState.workInProgressItem,
+            favorite: !prevState.workInProgressItem.favorite,
+          },
+          list: updateNode(prevState.list, id, {
+            ...prevState.workInProgressItem,
+            favorite: !prevState.workInProgressItem.favorite,
+          }),
+          favorites: newFavorites,
+        };
+      });
     } catch (error) {
-      console.log(error);
+      console.error(error);
     }
   };
 

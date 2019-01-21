@@ -40,15 +40,10 @@ export default class App extends NextApp {
       : {};
   }
 
-  initialize = async resolve => {
-    this.initOpenPGPWorker();
-    await this.initWorkflow();
-    if (typeof resolve === 'function') resolve();
-  };
-
   async componentDidMount() {
     if (this.props.router.route !== '/auth') {
-      this.initialize();
+      this.initOpenPGPWorker();
+      await this.initWorkflow();
     }
   }
 
@@ -60,7 +55,7 @@ export default class App extends NextApp {
     openpgp.initWorker({ workers: [this.worker] });
   }
 
-  async initWorkflow() {
+  initWorkflow = async (callback = Function.prototype) => {
     const {
       data: { publicKey, encryptedPrivateKey },
     } = await getKeys();
@@ -76,7 +71,8 @@ export default class App extends NextApp {
       shouldShowLoader: false,
       shouldShowMasterPassword: true,
     });
-  }
+    callback();
+  };
 
   async generateKeys(password, { setSubmitting, setErrors }) {
     const { publicKey, privateKey } = await generateKeys(password);
@@ -187,7 +183,7 @@ export default class App extends NextApp {
                 privateKey={this.privateKey}
                 publicKey={this.publicKey}
                 password={this.password}
-                initialize={this.initialize}
+                initialize={this.initWorkflow}
                 {...pageProps}
               />
             </SessionChecker>

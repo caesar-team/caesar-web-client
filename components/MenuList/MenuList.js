@@ -16,11 +16,26 @@ const MenuItem = styled.div`
   letter-spacing: 0.6px;
   font-size: 18px;
   font-weight: ${({ isActive }) => (isActive ? 'bold' : 'normal')};
+  text-transform: capitalize;
   color: ${({ theme, isActive }) => (isActive ? theme.black : theme.emperor)};
   background-color: ${({ theme, isActive }) =>
     isActive ? theme.snow : theme.white};
   cursor: pointer;
-  padding: 16px 20px 16px ${({ isNested }) => (isNested ? '80px' : '60px')};
+  padding: 13px 20px 13px ${({ isNested }) => (isNested ? '80px' : '60px')};
+  transition: all 0.2s;
+
+  &:hover {
+    background-color: ${({ theme }) => theme.snow};
+
+    svg {
+      fill: ${({ theme }) => theme.middleGray};
+    }
+  }
+`;
+
+const StyledIcon = styled(Icon)`
+  fill: ${({ theme }) => theme.black};
+  transition: all 0.2s;
 `;
 
 class MenuList extends Component {
@@ -51,13 +66,13 @@ class MenuList extends Component {
         );
       }
       case LIST_TYPE: {
-        const iconName = isVisibleList ? 'arrow-up' : 'arrow-down';
+        const iconName = isVisibleList ? 'arrow-up-big' : 'arrow-down-big';
 
         return (
           <div key={id}>
             <MenuItem key={id} onClick={this.handleToggle}>
               {label}
-              <Icon name={iconName} width={14} height={14} />
+              <StyledIcon name={iconName} width={14} height={14} />
             </MenuItem>
             {isVisibleList && (
               <div>

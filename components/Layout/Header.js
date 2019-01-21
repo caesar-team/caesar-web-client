@@ -1,4 +1,4 @@
-import React, { Fragment } from 'react';
+import React, { Component, Fragment } from 'react';
 import styled from 'styled-components';
 import Link from 'next/link';
 import { Icon } from '../Icon';
@@ -20,6 +20,7 @@ const LeftWrapper = styled.div`
   width: 300px;
   flex-shrink: 0;
   padding-left: 60px;
+  border-right: 1px solid ${({ theme }) => theme.gallery};
 `;
 
 const RightWrapper = styled.div`
@@ -43,16 +44,22 @@ const UserSection = styled.div`
 const UserName = styled.div`
   font-size: 16px;
   letter-spacing: 0.5px;
-  color: ${({ theme }) => theme.black};
   margin-left: 15px;
   margin-right: 15px;
 `;
 
 const StyledDropdown = styled(Dropdown)`
   display: flex;
+  padding: 20px 0;
+  color: ${({ theme }) => theme.black};
   flex-direction: row;
   align-items: center;
   cursor: pointer;
+  transition: all 0.2s;
+
+  &:hover {
+    color: ${({ theme }) => theme.emperor};
+  }
 `;
 
 const Option = styled.div`
@@ -64,6 +71,10 @@ const Option = styled.div`
 
 const Anchor = styled.a`
   color: ${({ theme }) => theme.black};
+  white-space: nowrap;
+  text-decoration: none;
+  cursor: pointer;
+  transition: all 0.2s;
 
   &:hover {
     color: ${({ theme }) => theme.gray};
@@ -89,23 +100,44 @@ const Options = (
   </Fragment>
 );
 
-export const Header = ({ user }) => (
-  <Wrapper>
-    <LeftWrapper>
-      <Link href="/">
-        <LogoLink>
-          <Icon name="logo" width={116} height={25} />
-        </LogoLink>
-      </Link>
-    </LeftWrapper>
-    <RightWrapper>
-      <UserSection>
-        <Avatar {...user} name={user.email} />
-        <StyledDropdown overlay={Options}>
-          <UserName>{user.email}</UserName>
-          <StyledIcon name="arrow-down" width={10} height={16} />
-        </StyledDropdown>
-      </UserSection>
-    </RightWrapper>
-  </Wrapper>
-);
+export class Header extends Component {
+  state = {
+    isDropdownOpened: false,
+  };
+
+  toggleDropdown = isDropdownOpened => {
+    this.setState({
+      isDropdownOpened,
+    });
+  };
+
+  render() {
+    const { user } = this.props;
+    const { isDropdownOpened } = this.state;
+
+    return (
+      <Wrapper>
+        <LeftWrapper>
+          <Link href="/" passHref>
+            <LogoLink>
+              <Icon name="logo" width={116} height={25} />
+            </LogoLink>
+          </Link>
+        </LeftWrapper>
+        <RightWrapper>
+          <UserSection>
+            <Avatar {...user} name={user.email} />
+            <StyledDropdown overlay={Options} onToggle={this.toggleDropdown}>
+              <UserName>{user.email}</UserName>
+              <StyledIcon
+                name={isDropdownOpened ? 'arrow-up-small' : 'arrow-down-small'}
+                width={10}
+                height={16}
+              />
+            </StyledDropdown>
+          </UserSection>
+        </RightWrapper>
+      </Wrapper>
+    );
+  }
+}

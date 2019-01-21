@@ -98,7 +98,7 @@ class Select extends Component {
     const { value, options, placeholder } = this.props;
     const { isOpened } = this.state;
 
-    const iconName = isOpened ? 'arrow-up' : 'arrow-down';
+    const iconName = isOpened ? 'arrow-up-big' : 'arrow-down-big';
     const selectedLabel = value
       ? options.find(({ value: optionValue }) => optionValue === value).label
       : placeholder;

@@ -1,10 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
 
-const Wrapper = styled.div`
-  display: flex;
-`;
-
 const FileExt = styled.div`
   position: relative;
   display: flex;
@@ -18,6 +14,7 @@ const FileExt = styled.div`
   color: ${({ theme }) => theme.white};
   border-radius: 3px 0 3px 3px;
   cursor: pointer;
+  transition: all 0.2s;
 
   &:before {
     content: '';
@@ -32,18 +29,6 @@ const FileExt = styled.div`
     border-color: ${({ theme }) =>
       `${theme.white} ${theme.white} transparent transparent`};
     border-radius: 0 0 0 3px;
-  }
-
-  &:hover {
-    background: ${({ theme }) => theme.black};
-    color: ${({ theme }) => theme.white};
-    font-size: 0;
-    background: url(/static/images/svg/icon-download-white.svg) no-repeat center
-      ${({ theme }) => theme.black};
-
-    &:before {
-      background: ${({ theme }) => theme.black};
-    }
   }
 `;
 
@@ -66,6 +51,28 @@ const FileSize = styled.div`
   line-height: 14px;
   letter-spacing: 0.4px;
   color: ${({ theme }) => theme.gray};
+`;
+
+const Wrapper = styled.div`
+  display: flex;
+
+  &:hover {
+    ${FileExt} {
+      background: ${({ theme }) => theme.black};
+      color: ${({ theme }) => theme.white};
+      font-size: 0;
+      background: url(/static/images/svg/icon-download-white.svg) no-repeat
+        center ${({ theme }) => theme.black};
+
+      &:before {
+        background: ${({ theme }) => theme.black};
+      }
+    }
+
+    ${FileName} {
+      color: ${({ theme }) => theme.emperor};
+    }
+  }
 `;
 
 const units = ['bytes', 'KB', 'MB'];

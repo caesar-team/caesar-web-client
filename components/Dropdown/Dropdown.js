@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import styled from 'styled-components';
+import enhanceWithClickOutside from 'react-click-outside';
 
 const Wrapper = styled.div`
   display: flex;
@@ -12,7 +13,7 @@ const Box = styled.div`
   z-index: 1;
   display: flex;
   flex-direction: column;
-  top: 40px;
+  top: 60px;
   right: 0;
   z-index: 100;
   border-radius: 3px;
@@ -24,10 +25,22 @@ const Option = styled.div`
   padding: 10px 30px;
 `;
 
-class Dropdown extends Component {
+const Button = styled.button`
+  border: none;
+  background-color: transparent;
+  outline: none;
+`;
+
+class DropdownInner extends Component {
   state = {
     isOpen: false,
   };
+
+  componentDidUpdate(prevProps, prevState) {
+    if (prevState.isOpen !== this.state.isOpen) {
+      this.props.onToggle(this.state.isOpen);
+    }
+  }
 
   handleClick = value => () => {
     const { name, onClick } = this.props;
@@ -40,6 +53,12 @@ class Dropdown extends Component {
       isOpen: !prevState.isOpen,
     }));
   };
+
+  handleClickOutside() {
+    this.setState({
+      isOpen: false,
+    });
+  }
 
   renderOptions() {
     const { options } = this.props;
@@ -59,15 +78,13 @@ class Dropdown extends Component {
 
     return (
       <Wrapper>
-        <div className={className} onMouseEnter={this.handleToggle}>
+        <Button type="button" className={className} onClick={this.handleToggle}>
           {children}
-        </div>
-        {isOpen && (
-          <Box onMouseLeave={this.handleToggle}>{renderedOptions}</Box>
-        )}
+        </Button>
+        {isOpen && <Box>{renderedOptions}</Box>}
       </Wrapper>
     );
   }
 }
 
-export default Dropdown;
+export const Dropdown = enhanceWithClickOutside(DropdownInner);

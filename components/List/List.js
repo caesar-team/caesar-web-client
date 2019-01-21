@@ -3,25 +3,29 @@ import styled from 'styled-components';
 import { LIST_TYPE } from 'common/constants';
 import { Button, Scrollbar } from 'components';
 import Item from './Item';
+import EmptyList from './EmptyList';
 
 const Wrapper = styled.div`
   position: relative;
   display: flex;
   flex-direction: column;
   height: 100vh;
+  background-color: ${({ theme }) => theme.white};
 `;
 
 const TitleWrapper = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 18px 30px;
+  padding: 11px 30px;
   background-color: ${({ theme }) => theme.white};
+  border-bottom: 1px solid ${({ theme }) => theme.gallery};
 `;
 
 const Title = styled.div`
   font-size: 18px;
   font-weight: bold;
+  text-transform: capitalize;
   letter-spacing: 0.6px;
   color: ${({ theme }) => theme.black};
 `;
@@ -47,6 +51,14 @@ const List = ({
     );
   });
 
+  const renderedList = () => {
+    if (list.children.length === 0) {
+      return <EmptyList />;
+    }
+
+    return <Scrollbar>{renderedItems}</Scrollbar>;
+  };
+
   return (
     <Wrapper>
       <TitleWrapper>
@@ -58,7 +70,7 @@ const List = ({
           isHoverBlackBackground
         />
       </TitleWrapper>
-      <Scrollbar>{renderedItems}</Scrollbar>
+      {renderedList()}
     </Wrapper>
   );
 };

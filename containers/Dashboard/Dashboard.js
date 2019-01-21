@@ -44,8 +44,8 @@ const MiddleColumnWrapper = styled.div`
   width: 400px;
   flex-shrink: 0;
   background: ${({ theme }) => theme.lightBlue};
-  border-left: ${({ theme }) => theme.gallery};
-  border-right: ${({ theme }) => theme.gallery};
+  border-left: 1px solid ${({ theme }) => theme.gallery};
+  border-right: 1px solid ${({ theme }) => theme.gallery};
 `;
 
 const RightColumnWrapper = styled.div`

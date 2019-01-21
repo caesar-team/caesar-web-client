@@ -27,6 +27,7 @@ export const ROOT_TYPE = 'root';
 export const INBOX_TYPE = 'inbox';
 export const LIST_TYPE = 'list';
 export const TRASH_TYPE = 'trash';
+export const FAVORITES_TYPE = 'favorites';
 export const LIST_TYPES = {
   ROOT_TYPE,
   INBOX_TYPE,
@@ -34,13 +35,13 @@ export const LIST_TYPES = {
   TRASH_TYPE,
 };
 
-export const POST_REVIEW_MODE = 'review';
-export const POST_WORKFLOW_EDIT_MODE = 'edit';
-export const POST_WORKFLOW_CREATE_MODE = 'create';
-export const POST_MODES = {
-  POST_REVIEW_MODE,
-  POST_WORKFLOW_EDIT_MODE,
-  POST_WORKFLOW_CREATE_MODE,
+export const ITEM_REVIEW_MODE = 'review';
+export const ITEM_WORKFLOW_EDIT_MODE = 'edit';
+export const ITEM_WORKFLOW_CREATE_MODE = 'create';
+export const ITEM_MODES = {
+  ITEM_REVIEW_MODE,
+  ITEM_WORKFLOW_EDIT_MODE,
+  ITEM_WORKFLOW_CREATE_MODE,
 };
 
 export const LIST_REVIEW_MODE = 'review';
@@ -53,11 +54,11 @@ export const LIST_MODES = {
 };
 
 // mb some types are not included here, don't have enough information
-export const POST_CREDENTIALS_TYPE = 'credentials';
-export const POST_CREDIT_CARD_TYPE = 'card';
-export const POST_TYPES = {
-  POST_CREDENTIALS_TYPE,
-  POST_CREDIT_CARD_TYPE,
+export const ITEM_CREDENTIALS_TYPE = 'credentials';
+export const ITEM_CREDIT_CARD_TYPE = 'card';
+export const ITEM_TYPES = {
+  ITEM_CREDENTIALS_TYPE,
+  ITEM_CREDIT_CARD_TYPE,
 };
 
 export const KEY_CODES = {

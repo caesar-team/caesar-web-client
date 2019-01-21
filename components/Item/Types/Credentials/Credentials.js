@@ -29,13 +29,8 @@ const ButtonsWrapper = styled.div`
   justify-content: space-between;
 `;
 
-const TitleWrapper = styled.div`
-  display: flex;
-  flex-direction: column;
-  padding: 4px 0;
-`;
-
 const Title = styled.div`
+  padding: 4px 0;
   font-size: 36px;
   letter-spacing: 1px;
   color: ${({ theme }) => theme.black};
@@ -184,6 +179,20 @@ const StyledFile = styled(File)`
   }
 `;
 
+const FavoriteButton = styled.button`
+  align-self: flex-start;
+  margin-top: 20px;
+  padding: 0;
+  cursor: pointer;
+  background: none;
+  border: none;
+  transition: 0.3s;
+
+  &:hover {
+    opacity: 0.75;
+  }
+`;
+
 class Credentials extends Component {
   state = {
     isPasswordVisible: false,
@@ -197,7 +206,7 @@ class Credentials extends Component {
 
   handleCopy = field => () => {
     const {
-      post: { secret },
+      item: { secret },
     } = this.props;
 
     copyToClipboard(secret[field]);
@@ -205,7 +214,7 @@ class Credentials extends Component {
 
   handleClickDownloadFiles = () => {
     const {
-      post: {
+      item: {
         secret: { attachments },
       },
     } = this.props;
@@ -215,7 +224,7 @@ class Credentials extends Component {
 
   handleClickDownloadFile = index => () => {
     const {
-      post: {
+      item: {
         secret: { attachments },
       },
     } = this.props;
@@ -232,16 +241,18 @@ class Credentials extends Component {
       isTrashItem,
       allLists,
       members,
-      itemPath,
       onClickCloseItem,
-      onClickRemovePost,
-      onClickEditPost,
+      onClickRemoveItem,
+      onClickEditItem,
       onClickInvite,
-      onClickRestorePost,
-      post: {
+      onClickRestoreItem,
+      onToggleFavorites,
+      item: {
+        id: itemId,
         listId,
         lastUpdated,
         shared,
+        favorite,
         owner: isOwner,
         secret: { name, login, pass, website, note, attachments },
       },
@@ -271,19 +282,19 @@ class Credentials extends Component {
           <Row>
             {isTrashItem ? (
               <ButtonsWrapper>
-                <Button color="white" onClick={onClickRestorePost}>
+                <Button color="white" onClick={onClickRestoreItem}>
                   Restore
                 </Button>
                 <StyledButton
                   color="white"
                   icon="trash"
-                  onClick={onClickRemovePost}
+                  onClick={onClickRemoveItem}
                 >
                   Remove
                 </StyledButton>
               </ButtonsWrapper>
             ) : (
-              <EditButton color="white" icon="pencil" onClick={onClickEditPost}>
+              <EditButton color="white" icon="pencil" onClick={onClickEditItem}>
                 Edit
               </EditButton>
             )}
@@ -295,11 +306,14 @@ class Credentials extends Component {
           </Row>
         </Row>
         <Row>
-          <TitleWrapper>
-            <Title>{name}</Title>
-          </TitleWrapper>
-          {/* TODO: Uncomment to show favorite icon */}
-          {/* <Icon name="favorite" width={20} height={20} fill="#888" /> */}
+          <Title>{name}</Title>
+          <FavoriteButton onClick={onToggleFavorites(itemId)}>
+            <Icon
+              name={favorite ? 'favorite-active' : 'favorite'}
+              width={20}
+              height={20}
+            />
+          </FavoriteButton>
         </Row>
         <InviteRow>
           <Row>

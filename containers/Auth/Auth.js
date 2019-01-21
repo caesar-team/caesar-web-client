@@ -24,7 +24,7 @@ const IconWrapper = styled.div`
   margin-bottom: 100px;
 `;
 
-const AuthWrapper = styled.div`
+const AuthWrapper = styled.a`
   display: flex;
   justify-content: center;
   align-items: center;

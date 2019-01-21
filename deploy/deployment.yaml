@@ -25,11 +25,11 @@ spec:
             - name: API_BASE_PATH
               value: api
             - name: API_HOST
-              value: dev.caesarapp.io
+              value: dev.caesar.team
             - name: API_PROTOCOL
               value: https
             - name: APP_HOST
-              value: dev.caesarapp.io
+              value: dev.caesar.team
             - name: APP_PORT
               value: "3000"
             - name: APP_PROTOCOL

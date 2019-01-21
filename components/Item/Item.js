@@ -18,7 +18,6 @@ const Item = ({
   post,
   allLists,
   members = {},
-  itemPath,
   onClickCloseItem = Function.prototype,
   onClickEditPost = Function.prototype,
   onClickInvite = Function.prototype,
@@ -62,7 +61,6 @@ const Item = ({
           post={post}
           members={members}
           allLists={allLists}
-          itemPath={itemPath}
           onClickCloseItem={onClickCloseItem}
           onClickRemovePost={onClickRemovePost}
           onClickEditPost={onClickEditPost}

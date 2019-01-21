@@ -25,6 +25,7 @@ import {
   INBOX_TYPE,
   LIST_TYPE,
   TRASH_TYPE,
+  FAVORITES_TYPE,
   POST_REVIEW_MODE,
   POST_WORKFLOW_CREATE_MODE,
   POST_WORKFLOW_EDIT_MODE,
@@ -103,8 +104,21 @@ class DashboardContainer extends Component {
 
     switch (event) {
       case 'fromDecryptList': {
-        this.setState({
-          list: addNode(list, data.node.model.listId, data.node.model),
+        this.setState(prevState => {
+          const newNode = data.node.model;
+          const favorites = [...prevState.favorites.children];
+
+          if (newNode.favorite) {
+            favorites.push(newNode);
+          }
+
+          return {
+            list: addNode(list, newNode.listId, newNode),
+            favorites: {
+              ...prevState.favorites,
+              children: favorites,
+            },
+          };
         });
 
         break;
@@ -530,7 +544,6 @@ class DashboardContainer extends Component {
         getListWithoutChildren(list[2]),
       ],
     };
-
     const tree = createTree(root);
 
     return {
@@ -538,6 +551,12 @@ class DashboardContainer extends Component {
       isVisibleMoveToTrashModal: false,
       isVisibleRemoveModal: false,
       list: tree,
+      favorites: {
+        id: FAVORITES_TYPE,
+        label: FAVORITES_TYPE,
+        type: FAVORITES_TYPE,
+        children: [],
+      },
       selectedListId,
       workInProgressPost: null,
     };
@@ -569,6 +588,7 @@ class DashboardContainer extends Component {
     const { user, members } = this.props;
     const {
       list,
+      favorites,
       selectedListId,
       workInProgressPost,
       isVisibleInviteModal,
@@ -580,18 +600,15 @@ class DashboardContainer extends Component {
       model: { children },
     } = list;
 
+    const renderList = [children[0], children[1], favorites, children[2]];
     const allLists = this.prepareAllList();
-    const selectedListModel = findNode(list, selectedListId);
-    const selectedList = selectedListModel.model;
+    const selectedList =
+      selectedListId === FAVORITES_TYPE
+        ? favorites
+        : findNode(list, selectedListId).model;
     const trashList = findNode(list, node => node.model.type === TRASH_TYPE)
       .model;
 
-    const itemPath = selectedListModel
-      ? selectedListModel
-          .getPath()
-          .map(node => node.model.label)
-          .slice(1)
-      : null;
     const activeItemId = workInProgressPost ? workInProgressPost.id : null;
     const isTrashItem =
       workInProgressPost && workInProgressPost.listId === trashList.id;
@@ -603,7 +620,7 @@ class DashboardContainer extends Component {
             <Sidebar>
               <MenuList
                 selectedListId={selectedListId}
-                list={children}
+                list={renderList}
                 onClick={this.handleClickMenuItem}
               />
             </Sidebar>
@@ -621,7 +638,6 @@ class DashboardContainer extends Component {
                 isTrashItem={isTrashItem}
                 post={workInProgressPost}
                 allLists={allLists}
-                itemPath={itemPath}
                 members={this.normalize(members)}
                 onClickCloseItem={this.handleClickCloseItem}
                 onClickInvite={this.handleClickInvite}

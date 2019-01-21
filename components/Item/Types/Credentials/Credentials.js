@@ -29,13 +29,8 @@ const ButtonsWrapper = styled.div`
   justify-content: space-between;
 `;
 
-const TitleWrapper = styled.div`
-  display: flex;
-  flex-direction: column;
-  padding: 4px 0;
-`;
-
 const Title = styled.div`
+  padding: 4px 0;
   font-size: 36px;
   letter-spacing: 1px;
   color: ${({ theme }) => theme.black};
@@ -184,6 +179,20 @@ const StyledFile = styled(File)`
   }
 `;
 
+const FavoriteButton = styled.button`
+  align-self: flex-start;
+  margin-top: 20px;
+  padding: 0;
+  cursor: pointer;
+  background: none;
+  border: none;
+  transition: 0.3s;
+
+  &:hover {
+    opacity: 0.75;
+  }
+`;
+
 class Credentials extends Component {
   state = {
     isPasswordVisible: false,
@@ -232,7 +241,6 @@ class Credentials extends Component {
       isTrashItem,
       allLists,
       members,
-      itemPath,
       onClickCloseItem,
       onClickRemovePost,
       onClickEditPost,
@@ -242,6 +250,7 @@ class Credentials extends Component {
         listId,
         lastUpdated,
         shared,
+        favorite,
         owner: isOwner,
         secret: { name, login, pass, website, note, attachments },
       },
@@ -295,11 +304,14 @@ class Credentials extends Component {
           </Row>
         </Row>
         <Row>
-          <TitleWrapper>
-            <Title>{name}</Title>
-          </TitleWrapper>
-          {/* TODO: Uncomment to show favorite icon */}
-          {/* <Icon name="favorite" width={20} height={20} fill="#888" /> */}
+          <Title>{name}</Title>
+          <FavoriteButton>
+            <Icon
+              name={favorite ? 'favorite-active' : 'favorite'}
+              width={20}
+              height={20}
+            />
+          </FavoriteButton>
         </Row>
         <InviteRow>
           <Row>

@@ -27,6 +27,7 @@ export const ROOT_TYPE = 'root';
 export const INBOX_TYPE = 'inbox';
 export const LIST_TYPE = 'list';
 export const TRASH_TYPE = 'trash';
+export const FAVORITES_TYPE = 'favorites';
 export const LIST_TYPES = {
   ROOT_TYPE,
   INBOX_TYPE,

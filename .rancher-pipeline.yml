@@ -5,6 +5,7 @@ stages:
       dockerfilePath: ./Dockerfile
       buildContext: .
       tag: caesarteam/caesar-web-client:${CICD_GIT_BRANCH}
+      pushRemote: true
       registry: index.docker.io
 - name: Deploy
   steps:
@@ -12,4 +13,4 @@ stages:
       path: ./deploy/deployment.yaml
 # branch conditions for the pipeline
 branch:
-  include: [develop]
+  include: [develop, master]

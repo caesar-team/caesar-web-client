@@ -6,15 +6,16 @@ import {
   AUTH_ENDPOINT,
   REDIRECT_AUTH_ENDPOINT,
 } from 'common/constants';
-import { Icon } from '../../components';
+import { Icon, AuthTitle } from 'components';
+import AuthDescription from '../../components/AuthDescription/AuthDescription';
 
 const Wrapper = styled.div`
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  width: 100vw;
-  height: 100vh;
+  min-height: 100vh;
+  padding: 20px;
   background: ${({ theme }) => theme.white};
 `;
 
@@ -23,25 +24,11 @@ const IconWrapper = styled.div`
   margin-bottom: 100px;
 `;
 
-const NiceToMeetYouText = styled.div`
-  font-size: 36px;
-  color: ${({ theme }) => theme.black};
-  letter-spacing: 1px;
-  text-align: center;
-  margin-bottom: 32px;
-`;
-
-const WelcomeText = styled.div`
-  font-size: 18px;
-  letter-spacing: 0.6px;
-  color: ${({ theme }) => theme.gray};
-  margin-bottom: 100px;
-`;
-
-const AuthWrapper = styled.a`
+const AuthWrapper = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
+  margin-top: 50px;
   height: 70px;
   text-decoration: none;
   cursor: pointer;
@@ -80,8 +67,8 @@ const AuthContainer = ({ theme }) => (
     <IconWrapper>
       <Icon name="logo" height={45} />
     </IconWrapper>
-    <NiceToMeetYouText>Nice to meet you!</NiceToMeetYouText>
-    <WelcomeText>Welcome to Caesar</WelcomeText>
+    <AuthTitle>Nice to meet you!</AuthTitle>
+    <AuthDescription>Welcome to Caesar</AuthDescription>
     <AuthWrapper href={authEndpoint}>
       <GoogleLogoWrapper>
         <Icon name="google" width={25} height={25} fill={theme.white} />

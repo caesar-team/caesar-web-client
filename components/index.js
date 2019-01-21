@@ -35,3 +35,8 @@ export { Uploader } from './Uploader';
 export { FormInput } from './FormInput';
 export { Modal } from './Modal';
 export { Layout } from './Layout';
+export { AuthLayout } from './Layout';
+export { AuthTitle } from './AuthTitle';
+export { AuthDescription } from './AuthDescription';
+export { BackButton } from './BackButton';
+export { CodeInput } from './CodeInput';

@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { Icon } from '../Icon';
 import { Avatar } from '../Avatar';
 import { Dropdown } from '../Dropdown';
+import { Logo } from './Logo';
 
 const Wrapper = styled.header`
   display: flex;
@@ -28,10 +29,6 @@ const RightWrapper = styled.div`
   align-items: center;
   flex-grow: 1;
   padding: 0 30px;
-`;
-
-const LogoLink = styled.a`
-  display: block;
 `;
 
 const UserSection = styled.div`
@@ -118,11 +115,7 @@ export class Header extends Component {
     return (
       <Wrapper>
         <LeftWrapper>
-          <Link href="/" passHref>
-            <LogoLink>
-              <Icon name="logo" width={116} height={25} />
-            </LogoLink>
-          </Link>
+          <Logo />
         </LeftWrapper>
         <RightWrapper>
           <UserSection>

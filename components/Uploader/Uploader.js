@@ -44,7 +44,7 @@ const Uploader = ({
   multiple,
   accept,
   onChange,
-  files: previusFiles,
+  files: previousFiles,
 }) => {
   const handleDrop = async acceptedFiles => {
     const previews = await filesToBase64(acceptedFiles);
@@ -53,7 +53,7 @@ const Uploader = ({
       raw: previews[index],
     }));
 
-    onChange(name, [...previusFiles, ...files]);
+    onChange(name, [...previousFiles, ...files]);
   };
 
   return (

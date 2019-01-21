@@ -206,7 +206,7 @@ class Credentials extends Component {
 
   handleCopy = field => () => {
     const {
-      post: { secret },
+      item: { secret },
     } = this.props;
 
     copyToClipboard(secret[field]);
@@ -214,7 +214,7 @@ class Credentials extends Component {
 
   handleClickDownloadFiles = () => {
     const {
-      post: {
+      item: {
         secret: { attachments },
       },
     } = this.props;
@@ -224,7 +224,7 @@ class Credentials extends Component {
 
   handleClickDownloadFile = index => () => {
     const {
-      post: {
+      item: {
         secret: { attachments },
       },
     } = this.props;
@@ -242,11 +242,13 @@ class Credentials extends Component {
       allLists,
       members,
       onClickCloseItem,
-      onClickRemovePost,
-      onClickEditPost,
+      onClickRemoveItem,
+      onClickEditItem,
       onClickInvite,
-      onClickRestorePost,
-      post: {
+      onClickRestoreItem,
+      onToggleFavorites,
+      item: {
+        id: itemId,
         listId,
         lastUpdated,
         shared,
@@ -280,19 +282,19 @@ class Credentials extends Component {
           <Row>
             {isTrashItem ? (
               <ButtonsWrapper>
-                <Button color="white" onClick={onClickRestorePost}>
+                <Button color="white" onClick={onClickRestoreItem}>
                   Restore
                 </Button>
                 <StyledButton
                   color="white"
                   icon="trash"
-                  onClick={onClickRemovePost}
+                  onClick={onClickRemoveItem}
                 >
                   Remove
                 </StyledButton>
               </ButtonsWrapper>
             ) : (
-              <EditButton color="white" icon="pencil" onClick={onClickEditPost}>
+              <EditButton color="white" icon="pencil" onClick={onClickEditItem}>
                 Edit
               </EditButton>
             )}
@@ -305,7 +307,7 @@ class Credentials extends Component {
         </Row>
         <Row>
           <Title>{name}</Title>
-          <FavoriteButton>
+          <FavoriteButton onClick={onToggleFavorites(itemId)}>
             <Icon
               name={favorite ? 'favorite-active' : 'favorite'}
               width={20}

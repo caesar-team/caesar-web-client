@@ -103,10 +103,10 @@ const Item = ({
             )}
           </Box>
         </Box>
-        {favorite && (
-          <FavoriteIcon name="favorite-active" width={14} height={14} />
-        )}
       </Details>
+      {favorite && (
+        <FavoriteIcon name="favorite-active" width={14} height={14} />
+      )}
     </Row>
   );
 };

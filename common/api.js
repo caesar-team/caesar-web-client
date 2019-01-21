@@ -103,3 +103,5 @@ export const updateList = (listId, data) =>
   callApi.patch(`list/${listId}`, data);
 
 export const removeList = listId => callApi.delete(`/list/${listId}`);
+
+export const toggleFavorite = id => callApi.post(`/item/${id}/favorite`);

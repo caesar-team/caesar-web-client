@@ -26,9 +26,13 @@ export default class App extends NextApp {
 
   password = null;
 
+  static getDerivedStateFromProps(nextProps) {
+    if (nextProps.router.route === '/2fa') return { shouldShowLoader: false };
+    return null;
+  }
+
   static async getInitialProps({ Component, router, ctx }) {
     entryResolver({ router, ctx });
-
     return Component.getInitialProps
       ? {
           pageProps: await Component.getInitialProps(ctx),
@@ -39,7 +43,7 @@ export default class App extends NextApp {
   async componentDidMount() {
     if (this.props.router.route !== '/auth') {
       this.initOpenPGPWorker();
-      this.initWorkflow();
+      await this.initWorkflow();
     }
   }
 
@@ -51,7 +55,7 @@ export default class App extends NextApp {
     openpgp.initWorker({ workers: [this.worker] });
   }
 
-  async initWorkflow() {
+  initWorkflow = async (callback = Function.prototype) => {
     const {
       data: { publicKey, encryptedPrivateKey },
     } = await getKeys();
@@ -67,7 +71,8 @@ export default class App extends NextApp {
       shouldShowLoader: false,
       shouldShowMasterPassword: true,
     });
-  }
+    callback();
+  };
 
   async generateKeys(password, { setSubmitting, setErrors }) {
     const { publicKey, privateKey } = await generateKeys(password);
@@ -130,7 +135,7 @@ export default class App extends NextApp {
     return {
       isError: false,
       isFullWorkflow: true,
-      shouldShowLoader: router.route !== '/auth',
+      shouldShowLoader: router.route !== '/auth' && router.route !== '/2fa',
       shouldShowMasterPassword: false,
     };
   }
@@ -178,6 +183,7 @@ export default class App extends NextApp {
                 privateKey={this.privateKey}
                 publicKey={this.publicKey}
                 password={this.password}
+                initialize={this.initWorkflow}
                 {...pageProps}
               />
             </SessionChecker>

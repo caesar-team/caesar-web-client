@@ -3,7 +3,15 @@ import styled from 'styled-components';
 import { Formik, FastField } from 'formik';
 import { match } from 'common/utils/match';
 import { checkError } from 'common/utils/formikUtils';
-import { Icon, Button, MasterPasswordInput, Link } from '../../components';
+import {
+  AuthLayout,
+  BackButton,
+  Button,
+  MasterPasswordInput,
+  Link,
+  AuthTitle,
+  AuthDescription,
+} from 'components';
 import {
   REGEXP_TEXT_MATCH,
   STEP_CONFIRM_MASTER_PASSWORD,
@@ -11,34 +19,7 @@ import {
 } from './constants';
 import { passwordSchema, createConfirmPasswordSchema } from './schema';
 
-const Wrapper = styled.div`
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  width: 100vw;
-  height: 100vh;
-`;
-
-const Title = styled.div`
-  font-size: 36px;
-  letter-spacing: 1px;
-  color: ${({ theme }) => theme.black};
-  margin-bottom: 32px;
-  text-align: center;
-`;
-
-const SetMasterPasswordText = styled.div`
-  font-size: 18px;
-  letter-spacing: 0.6px;
-  color: ${({ theme }) => theme.gray};
-  text-align: center;
-  margin-bottom: 45px;
-`;
-
 const InnerWrapper = styled.div`
-  display: flex;
-  flex-direction: column;
   max-width: 400px;
   width: 100%;
 `;
@@ -50,31 +31,12 @@ const StyledButton = styled(Button)`
   margin-top: 45px;
 `;
 
-const LogoWrapper = styled.div`
-  position: absolute;
-  top: 20px;
-  left: 60px;
-`;
-
-const Form = styled.form``;
-
 const BottomWrapper = styled.div`
   margin-top: 40px;
   text-align: center;
   font-size: 18px;
   letter-spacing: 0.6px;
   color: ${({ theme }) => theme.gray};
-`;
-
-const BackText = styled.a`
-  font-size: 14px;
-  letter-spacing: 0.4px;
-  color: ${({ theme }) => theme.black};
-  margin-left: 10px;
-
-  &:hover {
-    color: ${({ theme }) => theme.gray};
-  }
 `;
 
 class MasterPassword extends Component {
@@ -122,11 +84,9 @@ class MasterPassword extends Component {
           isValid,
           dirty,
         }) => (
-          <Form onSubmit={handleSubmit}>
-            <Title>Master Password</Title>
-            <SetMasterPasswordText>
-              Create master password for Caesar
-            </SetMasterPasswordText>
+          <form onSubmit={handleSubmit}>
+            <AuthTitle>Master Password</AuthTitle>
+            <AuthDescription>Create master password for Caesar</AuthDescription>
             <FastField
               name="password"
               render={({ field }) => (
@@ -145,7 +105,7 @@ class MasterPassword extends Component {
             <BottomWrapper>
               or <Link to="/logout">log out</Link>
             </BottomWrapper>
-          </Form>
+          </form>
         )}
       />
     );
@@ -161,11 +121,9 @@ class MasterPassword extends Component {
         validationSchema={createConfirmPasswordSchema(password)}
         onSubmit={this.handleSubmitConfirmPassword}
         render={({ errors, touched, handleSubmit, isSubmitting, isValid }) => (
-          <Form onSubmit={handleSubmit}>
-            <Title>Сonfirmation</Title>
-            <SetMasterPasswordText>
-              Confirm your master password
-            </SetMasterPasswordText>
+          <form onSubmit={handleSubmit}>
+            <AuthTitle>Сonfirmation</AuthTitle>
+            <AuthDescription>Confirm your master password</AuthDescription>
             <FastField
               name="confirmPassword"
               render={({ field }) => (
@@ -180,12 +138,11 @@ class MasterPassword extends Component {
               Confirm
             </StyledButton>
             <BottomWrapper>
-              <Icon name="arrow-back" width={20} height={20} />
-              <BackText onClick={this.handleClickReturn}>
+              <BackButton onClick={this.handleClickReturn}>
                 Back to the previous step
-              </BackText>
+              </BackButton>
             </BottomWrapper>
-          </Form>
+          </form>
         )}
       />
     );
@@ -204,12 +161,9 @@ class MasterPassword extends Component {
     );
 
     return (
-      <Wrapper>
-        <LogoWrapper>
-          <Icon name="logo" width={120} height={25} />
-        </LogoWrapper>
+      <AuthLayout>
         <InnerWrapper>{renderedStep}</InnerWrapper>
-      </Wrapper>
+      </AuthLayout>
     );
   }
 }

@@ -4,9 +4,10 @@ import { Header } from './Header';
 
 const LayoutWrapper = styled.div`
   min-height: 100vh;
-
   display: flex;
   flex-direction: column;
+  color: ${({ theme }) => theme.black};
+  font-size: 14px;
 `;
 
 const Main = styled.main`

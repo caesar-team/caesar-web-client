@@ -27,8 +27,6 @@ const StyledLogo = styled(Icon)`
   fill: ${({ theme }) => theme.white};
 `;
 
-const Form = styled.form``;
-
 const Lock = ({ onSubmit }) => (
   <Wrapper>
     <StyledLogo name="logo" width={210} height={45} />
@@ -38,7 +36,7 @@ const Lock = ({ onSubmit }) => (
       validationSchema={passwordSchema}
       onSubmit={onSubmit}
       render={({ errors, touched, handleSubmit, submitForm, dirty }) => (
-        <Form onSubmit={handleSubmit}>
+        <form onSubmit={handleSubmit}>
           <FastField
             name="password"
             render={({ field }) => (
@@ -50,7 +48,7 @@ const Lock = ({ onSubmit }) => (
               />
             )}
           />
-        </Form>
+        </form>
       )}
     />
   </Wrapper>

@@ -1,4 +1,5 @@
 import axios from 'axios';
+import Router from 'next/router';
 import { API_URL, API_BASE_PATH } from './constants';
 import { getToken, removeToken } from './utils/token';
 import { isClient } from './utils/isEnvironment';
@@ -32,13 +33,32 @@ callApi.interceptors.request.use(config => {
     : config;
 });
 
+const processNotAuth = status => {
+  switch (status) {
+    case 'not_passed':
+      Router.push({
+        pathname: '/2fa',
+        query: { isCheck: true },
+      });
+      break;
+    case 'not_active':
+      Router.push({
+        pathname: '/2fa',
+      });
+      break;
+    default:
+      softExit();
+      break;
+  }
+};
+
 callApi.interceptors.response.use(
   config => config,
   error => {
     if (error.response) {
       switch (error.response.status) {
         case 401:
-          softExit();
+          processNotAuth(error.response.data['2fa']);
           break;
         default:
           break;
@@ -66,7 +86,13 @@ export const getUsers = token =>
 
 export const postKeys = data => callApi.post('/keys', data);
 
+export const createTwoFactor = data => callApi.post('/2fa/activate', data);
+
+export const checkTwoFactor = data => callApi.post('/2fa', data);
+
 export const getKeys = () => callApi.get('/keys');
+
+export const getQrCode = () => callApi.get('/2fa');
 
 // post
 export const getList = token =>

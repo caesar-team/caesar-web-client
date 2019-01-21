@@ -1,7 +1,7 @@
 import { DateTime } from 'luxon';
 
 export function formatDate(date) {
-  return DateTime.fromFormat(date, 'LLL dd, yyyy hh:mm a').toFormat(
-    'LLL dd, yyyy hh:mm a',
-  );
+  const dateFormat = 'LLL dd, yyyy hh:mm a';
+
+  return DateTime.fromFormat(date, dateFormat).toFormat(dateFormat);
 }

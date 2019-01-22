@@ -4,6 +4,7 @@ import { formatDate } from 'common/utils/dateFormatter';
 import { Icon } from '../Icon';
 
 const Row = styled.div`
+  position: relative;
   display: flex;
   padding: 20px 30px 20px;
   background: ${({ theme, isActive }) =>
@@ -25,6 +26,7 @@ const ItemType = styled.div`
 `;
 
 const Details = styled.div`
+  position: relative;
   display: flex;
   flex-direction: column;
   width: 100%;
@@ -60,12 +62,19 @@ const StyledIcon = styled(Icon)`
   margin-right: 5px;
 `;
 
+const FavoriteIcon = styled(Icon)`
+  position: absolute;
+  top: 8px;
+  right: 8px;
+`;
+
 const Item = ({
   id,
   lastUpdated,
   secret: { name, attachments },
   shared,
   isActive = false,
+  favorite,
   onClickItem = Function.prototype,
 }) => {
   const shouldShowMembers = shared.length > 0;
@@ -96,6 +105,9 @@ const Item = ({
           </Box>
         </Box>
       </Details>
+      {favorite && (
+        <FavoriteIcon name="favorite-active" width={14} height={14} />
+      )}
     </Row>
   );
 };

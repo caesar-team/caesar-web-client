@@ -1,6 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
-import { POST_REVIEW_MODE, POST_CREDENTIALS_TYPE } from 'common/constants';
+import { ITEM_REVIEW_MODE, ITEM_CREDENTIALS_TYPE } from 'common/constants';
 import { matchStrict } from 'common/utils/match';
 import EmptyItem from './EmptyItem';
 import { Credentials, CredentialsForm } from './Types';
@@ -15,32 +15,32 @@ const Wrapper = styled.div`
 
 const Item = ({
   isTrashItem = false,
-  post,
+  item,
   allLists,
   members = {},
-  itemPath,
   onClickCloseItem = Function.prototype,
-  onClickEditPost = Function.prototype,
+  onClickEditItem = Function.prototype,
   onClickInvite = Function.prototype,
   onFinishCreateWorkflow = Function.prototype,
   onFinishEditWorkflow = Function.prototype,
   onCancelWorkflow = Function.prototype,
-  onClickRemovePost = Function.prototype,
-  onClickRestorePost = Function.prototype,
+  onClickRemoveItem = Function.prototype,
+  onClickRestoreItem = Function.prototype,
   onClickMoveToTrash = Function.prototype,
+  onToggleFavorites = Function.prototype,
 }) => {
-  if (!post) {
+  if (!item) {
     return <EmptyItem />;
   }
 
-  const { mode, type } = post;
+  const { mode, type } = item;
 
-  const renderedPostForm = matchStrict(
+  const renderedItemForm = matchStrict(
     type,
     {
-      [POST_CREDENTIALS_TYPE]: (
+      [ITEM_CREDENTIALS_TYPE]: (
         <CredentialsForm
-          post={post}
+          item={item}
           allLists={allLists}
           mode={mode}
           onFinishCreateWorkflow={onFinishCreateWorkflow}
@@ -53,21 +53,21 @@ const Item = ({
     null,
   );
 
-  const renderedPost = matchStrict(
+  const renderedItem = matchStrict(
     type,
     {
-      [POST_CREDENTIALS_TYPE]: (
+      [ITEM_CREDENTIALS_TYPE]: (
         <Credentials
           isTrashItem={isTrashItem}
-          post={post}
+          item={item}
           members={members}
           allLists={allLists}
-          itemPath={itemPath}
           onClickCloseItem={onClickCloseItem}
-          onClickRemovePost={onClickRemovePost}
-          onClickEditPost={onClickEditPost}
+          onClickRemoveItem={onClickRemoveItem}
+          onClickEditItem={onClickEditItem}
           onClickInvite={onClickInvite}
-          onClickRestorePost={onClickRestorePost}
+          onClickRestoreItem={onClickRestoreItem}
+          onToggleFavorites={onToggleFavorites}
         />
       ),
     },
@@ -77,7 +77,7 @@ const Item = ({
   return (
     <Wrapper>
       <Scrollbar>
-        {mode === POST_REVIEW_MODE ? renderedPost : renderedPostForm}
+        {mode === ITEM_REVIEW_MODE ? renderedItem : renderedItemForm}
       </Scrollbar>
     </Wrapper>
   );

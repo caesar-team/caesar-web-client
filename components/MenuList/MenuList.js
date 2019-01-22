@@ -1,6 +1,11 @@
-import React, { Component, Fragment } from 'react';
+import React, { Component } from 'react';
 import styled from 'styled-components';
-import { LIST_TYPE, INBOX_TYPE, TRASH_TYPE } from 'common/constants';
+import {
+  LIST_TYPE,
+  INBOX_TYPE,
+  TRASH_TYPE,
+  FAVORITES_TYPE,
+} from 'common/constants';
 import Icon from '../Icon/Icon';
 import Badge from '../Badge/Badge';
 
@@ -55,6 +60,7 @@ class MenuList extends Component {
 
     switch (type) {
       case INBOX_TYPE:
+      case FAVORITES_TYPE:
       case TRASH_TYPE: {
         const isActive = id === selectedListId;
 

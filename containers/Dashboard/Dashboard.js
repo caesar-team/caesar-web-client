@@ -25,10 +25,11 @@ import {
   INBOX_TYPE,
   LIST_TYPE,
   TRASH_TYPE,
-  POST_REVIEW_MODE,
-  POST_WORKFLOW_CREATE_MODE,
-  POST_WORKFLOW_EDIT_MODE,
-  POST_CREDENTIALS_TYPE,
+  FAVORITES_TYPE,
+  ITEM_REVIEW_MODE,
+  ITEM_WORKFLOW_CREATE_MODE,
+  ITEM_WORKFLOW_EDIT_MODE,
+  ITEM_CREDENTIALS_TYPE,
 } from 'common/constants';
 import {
   postCreateItem,
@@ -36,9 +37,10 @@ import {
   postInviteItem,
   updateItem,
   removeItem,
+  toggleFavorite,
 } from 'common/api';
 import DecryptWorker from 'common/decrypt.worker';
-import { initialPostData } from './utils';
+import { initialItemData } from './utils';
 
 const MiddleColumnWrapper = styled.div`
   width: 400px;
@@ -103,8 +105,21 @@ class DashboardContainer extends Component {
 
     switch (event) {
       case 'fromDecryptList': {
-        this.setState({
-          list: addNode(list, data.node.model.listId, data.node.model),
+        this.setState(prevState => {
+          const newNode = data.node.model;
+          const favorites = [...prevState.favorites.children];
+
+          if (newNode.favorite) {
+            favorites.push(newNode);
+          }
+
+          return {
+            list: addNode(list, newNode.listId, newNode),
+            favorites: {
+              ...prevState.favorites,
+              children: favorites,
+            },
+          };
         });
 
         break;
@@ -118,7 +133,7 @@ class DashboardContainer extends Component {
   handleClickMenuItem = id => () => {
     this.setState({
       selectedListId: id,
-      workInProgressPost: null,
+      workInProgressItem: null,
     });
   };
 
@@ -129,8 +144,8 @@ class DashboardContainer extends Component {
 
     this.setState(prevState => ({
       ...prevState,
-      workInProgressPost: {
-        mode: POST_REVIEW_MODE,
+      workInProgressItem: {
+        mode: ITEM_REVIEW_MODE,
         ...item,
       },
     }));
@@ -139,26 +154,26 @@ class DashboardContainer extends Component {
   handleClickCreateItem = () => {
     this.setState(prevState => ({
       ...prevState,
-      workInProgressPost: {
-        ...initialPostData(POST_CREDENTIALS_TYPE, prevState.selectedListId),
-        mode: POST_WORKFLOW_CREATE_MODE,
+      workInProgressItem: {
+        ...initialItemData(ITEM_CREDENTIALS_TYPE, prevState.selectedListId),
+        mode: ITEM_WORKFLOW_CREATE_MODE,
       },
     }));
   };
 
-  handleClickEditPost = () => {
+  handleClickEditItem = () => {
     const {
       list,
-      workInProgressPost: { id: postId },
+      workInProgressItem: { id: itemId },
     } = this.state;
 
-    const post = findNode(list, postId).model;
+    const item = findNode(list, itemId).model;
 
     this.setState(prevState => ({
       ...prevState,
-      workInProgressPost: {
-        ...post,
-        mode: POST_WORKFLOW_EDIT_MODE,
+      workInProgressItem: {
+        ...item,
+        mode: ITEM_WORKFLOW_EDIT_MODE,
       },
     }));
   };
@@ -169,16 +184,16 @@ class DashboardContainer extends Component {
     });
   };
 
-  handleClickRemovePost = () => {
+  handleClickRemoveItem = () => {
     this.setState({
       isVisibleRemoveModal: true,
     });
   };
 
-  handleRemovePost = async () => {
-    const { workInProgressPost, selectedListId, list } = this.state;
+  handleRemoveItem = async () => {
+    const { workInProgressItem, selectedListId, list } = this.state;
 
-    const newList = removeNode(list, workInProgressPost.id);
+    const newList = removeNode(list, workInProgressItem.id);
     const nextWorkInProgressNode = findNode(newList, selectedListId).model;
     const nextWorkInProgress =
       nextWorkInProgressNode.children.length > 0
@@ -186,14 +201,14 @@ class DashboardContainer extends Component {
         : null;
 
     try {
-      await removeItem(workInProgressPost.id);
+      await removeItem(workInProgressItem.id);
 
       this.setState(prevState => ({
         ...prevState,
         isVisibleRemoveModal: false,
-        workInProgressPost: {
+        workInProgressItem: {
           ...nextWorkInProgress,
-          mode: POST_REVIEW_MODE,
+          mode: ITEM_REVIEW_MODE,
         },
         list: newList,
       }));
@@ -204,11 +219,11 @@ class DashboardContainer extends Component {
 
   handleMoveToTrash = async () => {
     const { notification } = this.props;
-    const { list, selectedListId, workInProgressPost } = this.state;
+    const { list, selectedListId, workInProgressItem } = this.state;
 
-    const { mode, ...rest } = workInProgressPost;
+    const { mode, ...rest } = workInProgressItem;
     const {
-      id: postId,
+      id: itemId,
       secret: { name, attachments },
     } = rest;
 
@@ -223,15 +238,15 @@ class DashboardContainer extends Component {
         },
       };
 
-      await updateMoveItem(postId, { listId: trashNodeId });
+      await updateMoveItem(itemId, { listId: trashNodeId });
 
       notification.show({
         text: `The post «${name}» was moved to trash.`,
       });
 
       const newList = replaceNode(
-        updateNode(list, postId, data),
-        postId,
+        updateNode(list, itemId, data),
+        itemId,
         trashNodeId,
       );
       const nextWorkInProgressNode = findNode(newList, selectedListId).model;
@@ -243,9 +258,9 @@ class DashboardContainer extends Component {
       this.setState(prevState => ({
         ...prevState,
         isVisibleMoveToTrashModal: false,
-        workInProgressPost: {
+        workInProgressItem: {
           ...nextWorkInProgress,
-          mode: POST_REVIEW_MODE,
+          mode: ITEM_REVIEW_MODE,
         },
         list: newList,
       }));
@@ -273,16 +288,16 @@ class DashboardContainer extends Component {
 
       const data = {
         listId,
-        type: POST_CREDENTIALS_TYPE,
+        type: ITEM_CREDENTIALS_TYPE,
         secret: encryptedItem,
       };
 
       const {
-        data: { id: postId, lastUpdated },
+        data: { id: itemId, lastUpdated },
       } = await postCreateItem(data);
 
-      const newPost = {
-        id: postId,
+      const newItem = {
+        id: itemId,
         listId,
         lastUpdated,
         favorite: false,
@@ -290,16 +305,16 @@ class DashboardContainer extends Component {
         tags: [],
         owner: true,
         secret: item,
-        type: POST_CREDENTIALS_TYPE,
+        type: ITEM_CREDENTIALS_TYPE,
       };
 
       this.setState(prevState => ({
         ...prevState,
-        workInProgressPost: {
-          ...newPost,
-          mode: POST_REVIEW_MODE,
+        workInProgressItem: {
+          ...newItem,
+          mode: ITEM_REVIEW_MODE,
         },
-        list: addNode(prevState.list, listId, newPost),
+        list: addNode(prevState.list, listId, newItem),
       }));
     } catch (e) {
       console.log(e);
@@ -308,7 +323,7 @@ class DashboardContainer extends Component {
 
   handleFinishEditWorkflow = async ({ listId, attachments, ...secret }) => {
     const { publicKey, members } = this.props;
-    const { workInProgressPost } = this.state;
+    const { workInProgressItem } = this.state;
 
     try {
       const data = {
@@ -316,16 +331,16 @@ class DashboardContainer extends Component {
         attachments,
       };
 
-      const isSecretChanged = !deepequal(workInProgressPost.secret, data);
-      const isListIdChanged = listId !== workInProgressPost.listId;
+      const isSecretChanged = !deepequal(workInProgressItem.secret, data);
+      const isListIdChanged = listId !== workInProgressItem.listId;
 
       if (!isSecretChanged && !isListIdChanged) {
         return this.setState(prevState => ({
           ...prevState,
-          workInProgressPost: {
-            ...prevState.workInProgressPost,
+          workInProgressItem: {
+            ...prevState.workInProgressItem,
             secret: data,
-            mode: POST_REVIEW_MODE,
+            mode: ITEM_REVIEW_MODE,
           },
         }));
       }
@@ -342,11 +357,11 @@ class DashboardContainer extends Component {
         const encryptedItem = encrypted.data;
 
         promises.push(
-          updateItem(workInProgressPost.id, { secret: encryptedItem }),
+          updateItem(workInProgressItem.id, { secret: encryptedItem }),
         );
 
         const invitedMembers = members.filter(({ id }) =>
-          workInProgressPost.shared.includes(id),
+          workInProgressItem.shared.includes(id),
         );
 
         const invitePromises = invitedMembers.map(async member => {
@@ -365,13 +380,13 @@ class DashboardContainer extends Component {
           secret: encrypt.data,
         }));
 
-        await postInviteItem(workInProgressPost.id, {
+        await postInviteItem(workInProgressItem.id, {
           invites,
         });
       }
 
       if (isListIdChanged) {
-        promises.push(updateMoveItem(workInProgressPost.id, { listId }));
+        promises.push(updateMoveItem(workInProgressItem.id, { listId }));
       }
 
       const [
@@ -383,20 +398,20 @@ class DashboardContainer extends Component {
       this.setState(prevState => ({
         ...prevState,
         selectedListId: listId,
-        workInProgressPost: {
-          ...prevState.workInProgressPost,
+        workInProgressItem: {
+          ...prevState.workInProgressItem,
           listId,
           lastUpdated,
-          mode: POST_REVIEW_MODE,
+          mode: ITEM_REVIEW_MODE,
           secret: data,
         },
         list: replaceNode(
-          updateNode(prevState.list, workInProgressPost.id, {
+          updateNode(prevState.list, workInProgressItem.id, {
             listId,
             lastUpdated,
             secret: data,
           }),
-          workInProgressPost.id,
+          workInProgressItem.id,
           listId,
         ),
       }));
@@ -405,37 +420,74 @@ class DashboardContainer extends Component {
     }
   };
 
+  handleToggleFavorites = id => async () => {
+    try {
+      const { data } = await toggleFavorite(id);
+
+      this.setState(prevState => {
+        const newFavorites = { ...prevState.favorites };
+
+        if (data.favorite) {
+          newFavorites.children.push({
+            ...prevState.workInProgressItem,
+            favorite: !prevState.workInProgressItem.favorite,
+          });
+        } else {
+          const itemIndex = newFavorites.children
+            .map(item => item.id)
+            .indexOf(id);
+          newFavorites.children.splice(itemIndex, 1);
+        }
+
+        return {
+          ...prevState,
+          workInProgressItem: {
+            ...prevState.workInProgressItem,
+            favorite: !prevState.workInProgressItem.favorite,
+          },
+          list: updateNode(prevState.list, id, {
+            ...prevState.workInProgressItem,
+            favorite: !prevState.workInProgressItem.favorite,
+          }),
+          favorites: newFavorites,
+        };
+      });
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
   handleClickCancelWorkflow = () => {
     this.setState(prevState => ({
       ...prevState,
-      workInProgressPost:
-        prevState.workInProgressPost.mode === POST_WORKFLOW_EDIT_MODE
-          ? { ...prevState.workInProgressPost, mode: POST_REVIEW_MODE }
+      workInProgressItem:
+        prevState.workInProgressItem.mode === ITEM_WORKFLOW_EDIT_MODE
+          ? { ...prevState.workInProgressItem, mode: ITEM_REVIEW_MODE }
           : null,
     }));
   };
 
-  handleClickRestorePost = async () => {
-    const { list, workInProgressPost } = this.state;
+  handleClickRestoreItem = async () => {
+    const { list, workInProgressItem } = this.state;
 
     const inboxNodeId = list.model.children[0].id;
 
-    await updateMoveItem(workInProgressPost.id, { listId: inboxNodeId });
+    await updateMoveItem(workInProgressItem.id, { listId: inboxNodeId });
 
     this.setState(prevState => ({
       ...prevState,
       selectedListId: inboxNodeId,
-      workInProgressPost: {
-        ...prevState.workInProgressPost,
-        mode: POST_REVIEW_MODE,
+      workInProgressItem: {
+        ...prevState.workInProgressItem,
+        mode: ITEM_REVIEW_MODE,
         listId: inboxNodeId,
       },
       list: replaceNode(
-        updateNode(prevState.list, workInProgressPost.id, {
-          secret: workInProgressPost.secret,
+        updateNode(prevState.list, workInProgressItem.id, {
+          secret: workInProgressItem.secret,
           listId: inboxNodeId,
         }),
-        workInProgressPost.id,
+        workInProgressItem.id,
         inboxNodeId,
       ),
     }));
@@ -443,7 +495,7 @@ class DashboardContainer extends Component {
 
   handleClickCloseItem = () => {
     this.setState({
-      workInProgressPost: null,
+      workInProgressItem: null,
     });
   };
 
@@ -462,14 +514,14 @@ class DashboardContainer extends Component {
 
   handleInviteMembers = async memberIds => {
     const { members } = this.props;
-    const { workInProgressPost } = this.state;
+    const { workInProgressItem } = this.state;
 
     const invitedMembers = members.filter(({ id }) => memberIds.includes(id));
 
     const promises = invitedMembers.map(async member => {
       const options = {
         message: openpgp.message.fromText(
-          JSON.stringify(workInProgressPost.secret),
+          JSON.stringify(workInProgressItem.secret),
         ),
         publicKeys: (await openpgp.key.readArmored(member.publicKey)).keys,
       };
@@ -485,20 +537,20 @@ class DashboardContainer extends Component {
     }));
 
     try {
-      await postInviteItem(workInProgressPost.id, {
+      await postInviteItem(workInProgressItem.id, {
         invites,
       });
 
       const data = {
-        ...workInProgressPost,
+        ...workInProgressItem,
         shared: memberIds,
       };
 
       this.setState(prevState => ({
         ...prevState,
         isVisibleInviteModal: false,
-        workInProgressPost: data,
-        list: updateNode(prevState.list, workInProgressPost.id, data),
+        workInProgressItem: data,
+        list: updateNode(prevState.list, workInProgressItem.id, data),
       }));
     } catch (e) {
       console.log(e);
@@ -530,7 +582,6 @@ class DashboardContainer extends Component {
         getListWithoutChildren(list[2]),
       ],
     };
-
     const tree = createTree(root);
 
     return {
@@ -538,8 +589,14 @@ class DashboardContainer extends Component {
       isVisibleMoveToTrashModal: false,
       isVisibleRemoveModal: false,
       list: tree,
+      favorites: {
+        id: FAVORITES_TYPE,
+        label: FAVORITES_TYPE,
+        type: FAVORITES_TYPE,
+        children: [],
+      },
       selectedListId,
-      workInProgressPost: null,
+      workInProgressItem: null,
     };
   }
 
@@ -569,8 +626,9 @@ class DashboardContainer extends Component {
     const { user, members } = this.props;
     const {
       list,
+      favorites,
       selectedListId,
-      workInProgressPost,
+      workInProgressItem,
       isVisibleInviteModal,
       isVisibleMoveToTrashModal,
       isVisibleRemoveModal,
@@ -580,21 +638,18 @@ class DashboardContainer extends Component {
       model: { children },
     } = list;
 
+    const renderList = [children[0], children[1], favorites, children[2]];
     const allLists = this.prepareAllList();
-    const selectedListModel = findNode(list, selectedListId);
-    const selectedList = selectedListModel.model;
+    const selectedList =
+      selectedListId === FAVORITES_TYPE
+        ? favorites
+        : findNode(list, selectedListId).model;
     const trashList = findNode(list, node => node.model.type === TRASH_TYPE)
       .model;
 
-    const itemPath = selectedListModel
-      ? selectedListModel
-          .getPath()
-          .map(node => node.model.label)
-          .slice(1)
-      : null;
-    const activeItemId = workInProgressPost ? workInProgressPost.id : null;
+    const activeItemId = workInProgressItem ? workInProgressItem.id : null;
     const isTrashItem =
-      workInProgressPost && workInProgressPost.listId === trashList.id;
+      workInProgressItem && workInProgressItem.listId === trashList.id;
 
     return (
       <Fragment>
@@ -603,7 +658,7 @@ class DashboardContainer extends Component {
             <Sidebar>
               <MenuList
                 selectedListId={selectedListId}
-                list={children}
+                list={renderList}
                 onClick={this.handleClickMenuItem}
               />
             </Sidebar>
@@ -619,19 +674,19 @@ class DashboardContainer extends Component {
             <RightColumnWrapper>
               <Item
                 isTrashItem={isTrashItem}
-                post={workInProgressPost}
+                item={workInProgressItem}
                 allLists={allLists}
-                itemPath={itemPath}
                 members={this.normalize(members)}
                 onClickCloseItem={this.handleClickCloseItem}
                 onClickInvite={this.handleClickInvite}
-                onClickEditPost={this.handleClickEditPost}
+                onClickEditItem={this.handleClickEditItem}
                 onClickMoveToTrash={this.handleClickMoveToTrash}
                 onFinishCreateWorkflow={this.handleFinishCreateWorkflow}
                 onFinishEditWorkflow={this.handleFinishEditWorkflow}
                 onCancelWorkflow={this.handleClickCancelWorkflow}
-                onClickRestorePost={this.handleClickRestorePost}
-                onClickRemovePost={this.handleClickRemovePost}
+                onClickRestoreItem={this.handleClickRestoreItem}
+                onClickRemoveItem={this.handleClickRemoveItem}
+                onToggleFavorites={this.handleToggleFavorites}
               />
             </RightColumnWrapper>
           </CenterWrapper>
@@ -639,7 +694,7 @@ class DashboardContainer extends Component {
         {isVisibleInviteModal && (
           <InviteModal
             members={members}
-            shared={workInProgressPost.shared}
+            shared={workInProgressItem.shared}
             onClickInvite={this.handleInviteMembers}
             onCancel={this.handleCloseModal}
           />
@@ -653,7 +708,7 @@ class DashboardContainer extends Component {
         <ConfirmModal
           isOpen={isVisibleRemoveModal}
           description="Are you sure you want to delete the post?"
-          onClickOk={this.handleRemovePost}
+          onClickOk={this.handleRemoveItem}
           onClickCancel={this.handleCloseConfirmModal}
         />
       </Fragment>

@@ -2,7 +2,7 @@ import React from 'react';
 import styled from 'styled-components';
 import { Formik, FastField } from 'formik';
 import { checkError } from 'common/utils/formikUtils';
-import { POST_WORKFLOW_EDIT_MODE } from 'common/constants';
+import { ITEM_WORKFLOW_EDIT_MODE } from 'common/constants';
 import {
   Uploader,
   Input,
@@ -156,7 +156,7 @@ const renderAttachments = ({ attachments = [] }, setFieldValue) =>
   ));
 
 const CredentialsForm = ({
-  post: { secret, listId },
+  item: { secret, listId },
   allLists,
   mode,
   onFinishCreateWorkflow,
@@ -164,7 +164,7 @@ const CredentialsForm = ({
   onCancelWorkflow,
   onClickMoveToTrash,
 }) => {
-  const isEditMode = mode === POST_WORKFLOW_EDIT_MODE;
+  const isEditMode = mode === ITEM_WORKFLOW_EDIT_MODE;
 
   const action = isEditMode ? onFinishEditWorkflow : onFinishCreateWorkflow;
 

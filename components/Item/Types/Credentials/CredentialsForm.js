@@ -7,7 +7,6 @@ import {
   Uploader,
   Input,
   PasswordInput,
-  Label,
   Button,
   Select,
   TextArea,
@@ -20,9 +19,10 @@ import { schema } from './schema';
 const Form = styled.form``;
 
 const Row = styled.div`
+  position: relative;
   display: flex;
   flex-direction: column;
-  margin-bottom: 24px;
+  margin-bottom: 50px;
 
   &:last-child {
     margin-bottom: 0;
@@ -44,26 +44,44 @@ const SubmitButton = styled(Button)`
 `;
 
 const TitleInput = styled(Input)`
-  margin-bottom: 60px;
+  margin-top: 5px;
+  margin-bottom: 65px;
 
   ${Input.InputField} {
     padding: 0;
     font-size: 36px;
     letter-spacing: 1px;
     color: ${({ theme }) => theme.black};
+
+    &::placeholder {
+      padding-left: 8px;
+      color: ${({ theme }) => theme.lightGray};
+    }
+
+    &:focus {
+      background-color: ${({ theme }) => theme.white};
+    }
   }
 `;
 
 const FormPasswordInput = styled(PasswordInput)`
   ${Input.InputField} {
-    padding: 0 15px 10px;
+    padding: 5px 15px;
     color: ${({ theme }) => theme.black};
-    border-bottom: 1px solid ${({ theme }) => theme.gallery};
   }
 
   ${Input.PostFix} {
     right: 0;
   }
+`;
+
+const AdditionalLabel = styled.div`
+  position: absolute;
+  top: -20px;
+  left: 15px;
+  font-size: 14px;
+  letter-spacing: 0.4px;
+  color: ${({ theme }) => theme.gray};
 `;
 
 const AttachmentsSection = styled.div`
@@ -83,7 +101,7 @@ const Attachment = styled.div`
 const Attachments = styled.div`
   display: flex;
   flex-direction: column;
-  margin-top: 20px;
+  margin-top: 30px;
 `;
 
 const FileRow = styled.div`
@@ -106,6 +124,12 @@ const RemoveButtonWrapper = styled.div`
   display: flex;
   justify-content: flex-end;
   margin-top: 50px;
+`;
+
+const StyledRemoveButton = styled(Button)`
+  padding-right: 15px;
+  padding-left: 15px;
+  text-transform: uppercase;
 `;
 
 const createInitialValues = (secret, listId) => ({
@@ -189,43 +213,46 @@ const CredentialsForm = ({
             )}
           />
           <Row>
-            <Label>Login</Label>
             <FastField
               name="login"
               render={({ field }) => (
                 <FormInput
                   {...field}
+                  label="Login"
+                  withBorder
                   error={checkError(touched, errors, 'login')}
                 />
               )}
             />
           </Row>
           <Row>
-            <Label>Password</Label>
             <FastField
               name="pass"
               render={({ field }) => (
                 <FormPasswordInput
                   {...field}
+                  withBorder
+                  label="Password"
                   error={checkError(touched, errors, 'pass')}
                 />
               )}
             />
           </Row>
           <Row>
-            <Label>Website</Label>
             <FastField
               name="website"
               render={({ field }) => (
                 <FormInput
                   {...field}
+                  withBorder
+                  label="Website"
                   error={checkError(touched, errors, 'website')}
                 />
               )}
             />
           </Row>
           <Row>
-            <Label>List</Label>
+            <AdditionalLabel>List</AdditionalLabel>
             <Select
               name="listId"
               placeholder="Select option"
@@ -235,7 +262,7 @@ const CredentialsForm = ({
             />
           </Row>
           <Row>
-            <Label>Note</Label>
+            <AdditionalLabel>Notes</AdditionalLabel>
             <FastField
               name="note"
               render={({ field }) => <TextArea {...field} />}
@@ -255,9 +282,13 @@ const CredentialsForm = ({
           </AttachmentsSection>
           {shouldShowRemoveButton && (
             <RemoveButtonWrapper>
-              <Button color="white" icon="trash" onClick={onClickMoveToTrash}>
-                REMOVE
-              </Button>
+              <StyledRemoveButton
+                color="white"
+                icon="trash"
+                onClick={onClickMoveToTrash}
+              >
+                Remove
+              </StyledRemoveButton>
             </RemoveButtonWrapper>
           )}
         </Form>

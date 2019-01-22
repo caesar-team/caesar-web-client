@@ -1,11 +1,10 @@
 import * as yup from 'yup';
+import { errorMessages } from 'common/utils/errorMessages';
 
 export const schema = yup.object({
-  name: yup.string().required(),
-  login: yup.string().required(),
-  pass: yup
-    .string()
-    .required('The field can not be empty. Please enter at least 1 character.'),
+  name: yup.string().required(errorMessages.required),
+  login: yup.string().required(errorMessages.required),
+  pass: yup.string().required(errorMessages.required),
   website: yup
     .string()
     .matches(

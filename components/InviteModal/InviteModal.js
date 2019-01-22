@@ -124,9 +124,16 @@ class InviteModal extends Component {
 
   render() {
     const { filterText } = this.state;
+    const { onCancel } = this.props;
 
     return (
-      <Modal isOpen minWidth={420}>
+      <Modal
+        isOpen
+        minWidth={420}
+        onRequestClose={onCancel}
+        shouldCloseOnEsc
+        shouldCloseOnOverlayClick
+      >
         <Title>Invite</Title>
         <StyledInput
           placeholder="name@4xxi.com"

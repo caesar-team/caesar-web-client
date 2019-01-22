@@ -1,9 +1,13 @@
 import React from 'react';
 // eslint-disable-next-line
 import { default as NextDocument, Head, Main, NextScript } from 'next/document';
-import { ServerStyleSheet } from 'styled-components';
+import styled, { ServerStyleSheet } from 'styled-components';
 import { PORTAL_ID } from 'common/constants';
 import sprite from 'svg-sprite-loader/runtime/sprite.build';
+
+const Body = styled.body`
+  overflow-y: hidden;
+`;
 
 export default class Document extends NextDocument {
   static getInitialProps({ renderPage }) {
@@ -49,12 +53,12 @@ export default class Document extends NextDocument {
           <meta name="msapplication-TileColor" content="#da532c" />
           <meta name="theme-color" content="#ffffff" />
         </Head>
-        <body>
+        <Body>
           <div dangerouslySetInnerHTML={{ __html: this.props.spriteContent }} />
           <div id={PORTAL_ID} />
           <Main />
           <NextScript />
-        </body>
+        </Body>
       </html>
     );
   }

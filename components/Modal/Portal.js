@@ -14,6 +14,7 @@ const CloseButton = styled.button`
   background: none;
   border: none;
   transition: 0.35s;
+  outline: none;
 
   &:hover {
     opacity: 0.75;
@@ -54,6 +55,10 @@ class Portal extends Component {
     if (this.props.isOpen) {
       this.open();
     }
+
+    document.addEventListener('keyup', event => {
+      if (event.keyCode === KEY_CODES.ESC) this.requestClose(event);
+    });
   }
 
   componentDidUpdate(prevProps, prevState) {
@@ -182,7 +187,7 @@ class Portal extends Component {
 
   render() {
     const { isOpen, beforeClose } = this.state;
-    const { children, onRequestClose, ...props } = this.props;
+    const { children, onRequestClose, shouldCloseOnEsc, ...props } = this.props;
 
     const shouldBeClosed = !isOpen && !beforeClose;
 

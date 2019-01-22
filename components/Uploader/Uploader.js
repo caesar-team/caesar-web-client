@@ -10,13 +10,14 @@ const Container = styled.div`
   justify-content: center;
   align-items: center;
   background-color: ${({ theme, isDragActive }) =>
-    isDragActive ? theme.lightBlue : theme.snow};
+    isDragActive ? theme.lightBlueUploader : theme.snow};
   border: 1px dashed
     ${({ theme, isDragActive }) => (isDragActive ? theme.blue : theme.gray)};
   width: 100%;
   padding: 24px 0;
   cursor: pointer;
   outline: none;
+  transition: all 0.2s;
 `;
 
 const Text = styled.span`
@@ -39,6 +40,7 @@ const Link = styled.a`
 const StyledIcon = styled(Icon)`
   fill: ${({ theme, isDragActive }) =>
     isDragActive ? theme.blue : theme.gray};
+  transition: all 0.2s;
 `;
 
 const Uploader = ({

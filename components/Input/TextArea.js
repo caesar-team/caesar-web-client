@@ -31,7 +31,7 @@ const TextAreaField = styled.textarea`
   resize: none;
 
   &::placeholder {
-    color: ${({ theme }) => theme.gray};
+    color: ${({ theme }) => theme.lightGray};
   }
 `;
 
@@ -55,7 +55,12 @@ const TextArea = ({
   return (
     <Label className={className}>
       {children && <LabelText>{children}</LabelText>}
-      <TextAreaField isError={isError} value={value} {...props} />
+      <TextAreaField
+        isError={isError}
+        value={value}
+        placeholder={placeholder}
+        {...props}
+      />
       {error && <Error>{error}</Error>}
     </Label>
   );

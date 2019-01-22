@@ -11,6 +11,7 @@ const theme = {
   alto: '#d6d6d6',
   blue: '#3385ff',
   lightBlue: '#f5f6f7',
+  lightBlueUploader: '#f5f9ff',
   red: '#ff3355',
 };
 

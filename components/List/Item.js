@@ -92,13 +92,13 @@ const Item = ({
           <Box>
             {shouldShowAttachments && (
               <Box>
-                <StyledIcon name="clip" width={16} height={16} />
+                <StyledIcon name="clip" width={14} height={14} />
                 <Text>{attachments.length}</Text>
               </Box>
             )}
             {shouldShowMembers && (
               <StyledBox>
-                <StyledIcon name="group" width={16} height={16} />
+                <StyledIcon name="group" width={14} height={14} />
                 <Text>{shared.length}</Text>
               </StyledBox>
             )}

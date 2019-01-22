@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import styled from 'styled-components';
+import enhanceWithClickOutside from 'react-click-outside';
 import { Icon } from '../Icon';
 
 const Wrapper = styled.div`
@@ -13,14 +14,14 @@ const SelectedOption = styled.div`
   justify-content: space-between;
   align-items: center;
   border-bottom: 1px solid ${({ theme }) => theme.gallery};
-  padding: 0 0 10px;
+  padding: 5px 15px;
+  cursor: pointer;
 `;
 
 const ValueText = styled.div`
   font-size: 18px;
   letter-spacing: 0.6px;
   color: ${({ theme }) => theme.black};
-  padding-left: 15px;
 `;
 
 const Box = styled.div`
@@ -50,15 +51,15 @@ const Option = styled.div`
   }
 `;
 
-class Select extends Component {
+class SelectInner extends Component {
   state = {
     isOpened: false,
   };
 
-  handleClickOpen = () => {
-    this.setState({
-      isOpened: true,
-    });
+  handleClickToggle = () => {
+    this.setState(prevState => ({
+      isOpened: !prevState.isOpened,
+    }));
   };
 
   handleClick = value => () => {
@@ -75,6 +76,12 @@ class Select extends Component {
       },
     );
   };
+
+  handleClickOutside() {
+    this.setState({
+      isOpened: false,
+    });
+  }
 
   renderOptions() {
     const { value, options } = this.props;
@@ -105,7 +112,7 @@ class Select extends Component {
 
     return (
       <Wrapper>
-        <SelectedOption onClick={this.handleClickOpen}>
+        <SelectedOption onClick={this.handleClickToggle}>
           <ValueText>{selectedLabel}</ValueText>
           <Icon name={iconName} width={16} height={16} />
         </SelectedOption>
@@ -115,4 +122,4 @@ class Select extends Component {
   }
 }
 
-export default Select;
+export const Select = enhanceWithClickOutside(SelectInner);

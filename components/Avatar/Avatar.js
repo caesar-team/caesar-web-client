@@ -29,14 +29,14 @@ const Image = styled.img`
   border-style: none;
 `;
 
-const Avatar = ({ name, avatar, children, isSmall }) => {
+const Avatar = ({ name, avatar, children, isSmall, ...props }) => {
   if (children) {
-    return <Wrapper>{children}</Wrapper>;
+    return <Wrapper {...props}>{children}</Wrapper>;
   }
 
   if (avatar) {
     return (
-      <Wrapper isSmall={isSmall}>
+      <Wrapper isSmall={isSmall} {...props}>
         <Image src={`${API_URL}/${avatar}`} />
       </Wrapper>
     );
@@ -44,7 +44,7 @@ const Avatar = ({ name, avatar, children, isSmall }) => {
 
   const personLetters = name ? name.slice(0, 2).toUpperCase() : '';
 
-  return <Wrapper>{personLetters}</Wrapper>;
+  return <Wrapper {...props}>{personLetters}</Wrapper>;
 };
 
 export default Avatar;

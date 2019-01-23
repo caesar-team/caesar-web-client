@@ -64,7 +64,24 @@ const StyledAvatarsList = styled(AvatarsList)`
   margin-right: 30px;
 `;
 
-const InviteButton = styled(Button)`
+const InviteButton = styled.button`
+  width: 40px;
+  height: 40px;
+  margin-right: -10px;
+  color: ${({ theme }) => theme.emperor};
+  border: 1px dashed ${({ theme }) => theme.gallery};
+  border-radius: 50%;
+  outline: none;
+  cursor: pointer;
+  transition: all 0.2s;
+
+  &:hover {
+    color: ${({ theme }) => theme.black};
+    border-color: ${({ theme }) => theme.emperor};
+  }
+`;
+
+const ShareButton = styled(Button)`
   text-transform: uppercase;
 `;
 
@@ -186,6 +203,7 @@ const FavoriteButton = styled.button`
   cursor: pointer;
   background: none;
   border: none;
+  outline: none;
   transition: 0.3s;
 
   &:hover {
@@ -240,6 +258,7 @@ class Credentials extends Component {
     const {
       isTrashItem,
       allLists,
+      user,
       members,
       onClickCloseItem,
       onClickRemoveItem,
@@ -259,7 +278,16 @@ class Credentials extends Component {
     } = this.props;
 
     const pwd = isPasswordVisible ? pass : pass.replace(/./g, '*');
-    const avatars = invited.map(item => members[item.userId]);
+    const avatars = invited.reduce((accumulator, item) => {
+      if (user.id === item.userId) {
+        accumulator.unshift(user);
+      } else {
+        accumulator.push(members[item.userId]);
+      }
+
+      return accumulator;
+    }, []);
+    const owner = user.id === ownerId ? user : members[ownerId];
     const listName = allLists.find(({ id }) => id === listId).label;
     const eyeIconName = isPasswordVisible ? 'eye-off' : 'eye-on';
 
@@ -317,19 +345,24 @@ class Credentials extends Component {
         </Row>
         <InviteRow>
           <Row>
-            <Avatar name="dspiridonov@4xxi.com" />
+            <Avatar
+              name={owner ? owner.name : ''}
+              avatar={owner ? owner.avatar : ''}
+            />
             <Owner>
-              <OwnerName>James White</OwnerName>
+              <OwnerName>{owner ? owner.name : ''}</OwnerName>
               <OwnerStatus>owner</OwnerStatus>
             </Owner>
           </Row>
           <Row>
-            <StyledAvatarsList avatars={avatars} />
             {!isTrashItem && (
-              <InviteButton color="black" onClick={onClickInvite}>
-                Invite
+              <InviteButton onClick={onClickInvite}>
+                <Icon name="plus" width={14} height={14} isInButton />
               </InviteButton>
             )}
+            <StyledAvatarsList avatars={avatars} />
+            {/* TODO: Uncomment to show share btn */}
+            {/* {!isTrashItem && <ShareButton color="black">Share</ShareButton>} */}
           </Row>
         </InviteRow>
         <FieldWrapper>

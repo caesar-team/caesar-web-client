@@ -17,6 +17,7 @@ const Item = ({
   isTrashItem = false,
   item,
   allLists,
+  user,
   members = {},
   onClickCloseItem = Function.prototype,
   onClickEditItem = Function.prototype,
@@ -60,6 +61,7 @@ const Item = ({
         <Credentials
           isTrashItem={isTrashItem}
           item={item}
+          user={user}
           members={members}
           allLists={allLists}
           onClickCloseItem={onClickCloseItem}

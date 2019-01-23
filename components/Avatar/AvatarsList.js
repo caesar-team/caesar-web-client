@@ -8,6 +8,7 @@ const Wrapper = styled.div`
 
 const StyledAvatar = styled(Avatar)`
   margin-right: -10px;
+  border: 1px solid ${({ theme }) => theme.white};
 
   &:last-child {
     margin-right: 0;

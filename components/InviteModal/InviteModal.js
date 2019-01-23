@@ -97,11 +97,11 @@ class InviteModal extends Component {
   };
 
   prepareInitialState() {
-    const { shared } = this.props;
+    const { invited } = this.props;
 
     return {
       filterText: '',
-      invitedIds: shared,
+      invitedIds: invited,
     };
   }
 

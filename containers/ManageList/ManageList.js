@@ -196,7 +196,7 @@ class ManageListContainer extends Component {
       id,
       label,
       count: children.length,
-      shared: children.reduce((acc, post) => [...acc, ...post.shared], []),
+      invited: children.reduce((acc, post) => [...acc, ...post.invited], []),
     }));
   }
 

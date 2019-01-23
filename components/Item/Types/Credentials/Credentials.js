@@ -251,15 +251,15 @@ class Credentials extends Component {
         id: itemId,
         listId,
         lastUpdated,
-        shared,
+        invited,
         favorite,
-        owner: isOwner,
+        ownerId,
         secret: { name, login, pass, website, note, attachments },
       },
     } = this.props;
 
     const pwd = isPasswordVisible ? pass : pass.replace(/./g, '*');
-    const avatars = shared.map(userId => members[userId]);
+    const avatars = invited.map(item => members[item.userId]);
     const listName = allLists.find(({ id }) => id === listId).label;
     const eyeIconName = isPasswordVisible ? 'eye-off' : 'eye-on';
 

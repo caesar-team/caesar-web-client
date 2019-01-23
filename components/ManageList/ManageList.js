@@ -113,7 +113,8 @@ class ManageList extends Component {
       onClickCreateList = Function.prototype,
       onClickRemoveList = Function.prototype,
     } = this.props;
-    const generateAvatars = sharedIds => sharedIds.map(id => members[id]);
+    const generateAvatars = invitedIds =>
+      invitedIds.map(item => members[item.id]);
 
     return (
       <Fragment>
@@ -163,7 +164,7 @@ class ManageList extends Component {
                   <AvatarsList
                     isSmall
                     visibleCount="4"
-                    avatars={generateAvatars(listItem.shared)}
+                    avatars={generateAvatars(listItem.invited)}
                   />
                   <ListOptions
                     index={index}

@@ -49,7 +49,7 @@ export const prepareAttachments = files => {
 export const initialCredentials = listId => ({
   listId,
   type: ITEM_CREDENTIALS_TYPE,
-  shared: [],
+  invited: [],
   owner: true,
   secret: {
     name: '',

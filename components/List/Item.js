@@ -72,12 +72,12 @@ const Item = ({
   id,
   lastUpdated,
   secret: { name, attachments },
-  shared,
+  invited,
   isActive = false,
   favorite,
   onClickItem = Function.prototype,
 }) => {
-  const shouldShowMembers = shared.length > 0;
+  const shouldShowMembers = invited.length > 0;
   const shouldShowAttachments = attachments && attachments.length > 0;
 
   return (
@@ -99,7 +99,7 @@ const Item = ({
             {shouldShowMembers && (
               <StyledBox>
                 <StyledIcon name="group" width={14} height={14} />
-                <Text>{shared.length}</Text>
+                <Text>{invited.length}</Text>
               </StyledBox>
             )}
           </Box>

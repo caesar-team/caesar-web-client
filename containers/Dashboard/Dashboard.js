@@ -301,7 +301,7 @@ class DashboardContainer extends Component {
         listId,
         lastUpdated,
         favorite: false,
-        shared: [],
+        invited: [],
         tags: [],
         owner: true,
         secret: item,
@@ -361,7 +361,7 @@ class DashboardContainer extends Component {
         );
 
         const invitedMembers = members.filter(({ id }) =>
-          workInProgressItem.shared.includes(id),
+          workInProgressItem.invited.includes(id),
         );
 
         const invitePromises = invitedMembers.map(async member => {
@@ -543,7 +543,7 @@ class DashboardContainer extends Component {
 
       const data = {
         ...workInProgressItem,
-        shared: memberIds,
+        invited: memberIds,
       };
 
       this.setState(prevState => ({
@@ -694,7 +694,7 @@ class DashboardContainer extends Component {
         {isVisibleInviteModal && (
           <InviteModal
             members={members}
-            shared={workInProgressItem.shared}
+            invited={workInProgressItem.invited}
             onClickInvite={this.handleInviteMembers}
             onCancel={this.handleCloseModal}
           />

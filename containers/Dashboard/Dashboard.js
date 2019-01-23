@@ -676,6 +676,7 @@ class DashboardContainer extends Component {
                 isTrashItem={isTrashItem}
                 item={workInProgressItem}
                 allLists={allLists}
+                user={user}
                 members={this.normalize(members)}
                 onClickCloseItem={this.handleClickCloseItem}
                 onClickInvite={this.handleClickInvite}

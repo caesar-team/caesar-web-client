@@ -54,7 +54,7 @@ class CodeInput extends Component {
   }
 
   render() {
-    const { disabled } = this.props;
+    const { disabled, errors, onCompleteWithErrors } = this.props;
 
     return (
       <Wrapper>
@@ -64,8 +64,10 @@ class CodeInput extends Component {
             key={i}
             index={i}
             onBackspace={() => this.onBackspace(i)}
+            resetFormOnBackspace={onCompleteWithErrors}
             onChange={v => this.onItemChange(v, i)}
             disabled={disabled}
+            errors={errors}
           />
         ))}
       </Wrapper>

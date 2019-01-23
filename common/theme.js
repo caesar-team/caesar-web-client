@@ -13,6 +13,7 @@ const theme = {
   lightBlue: '#f5f6f7',
   lightBlueUploader: '#f5f9ff',
   red: '#ff3355',
+  lightRed: 'rgba(255, 51, 85, 0.1)',
 };
 
 export default theme;

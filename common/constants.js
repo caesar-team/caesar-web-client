@@ -62,6 +62,7 @@ export const ITEM_TYPES = {
 };
 
 export const KEY_CODES = {
+  BACKSPACE: 8,
   TAB: 9,
   ENTER: 13,
   ESC: 27,

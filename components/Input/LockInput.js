@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { Component } from 'react';
 import styled from 'styled-components';
+import { KEY_CODES } from 'common/constants';
 import Input from './Input';
 import { Icon } from '../Icon';
 
@@ -50,25 +51,40 @@ const StyledInput = styled(Input)`
   }
 `;
 
-const LockInput = ({ error, onClick, ...props }) => {
-  const isError = !!error;
+class LockInput extends Component {
+  onKeyDown = e => {
+    const { isError, onBackspace } = this.props;
 
-  return (
-    <Wrapper>
-      <InnerWrapper isError={isError}>
-        <IconWrapper isError={isError}>
-          <StyledIcon name="lock" width={20} height={24} isError={isError} />
-        </IconWrapper>
-        <StyledInput {...props} isError={isError} type="password" />
-        <StyledArrowIcon
-          name="arrow-next"
-          width={16}
-          height={16}
-          onClick={onClick}
-        />
-      </InnerWrapper>
-    </Wrapper>
-  );
-};
+    if (isError && e.keyCode === KEY_CODES.BACKSPACE) {
+      onBackspace();
+    }
+  };
+
+  render() {
+    const { isError, onClick, onBackspace, ...props } = this.props;
+
+    return (
+      <Wrapper>
+        <InnerWrapper isError={isError}>
+          <IconWrapper isError={isError}>
+            <StyledIcon name="lock" width={20} height={24} isError={isError} />
+          </IconWrapper>
+          <StyledInput
+            {...props}
+            isError={isError}
+            onKeyDown={this.onKeyDown}
+            type="password"
+          />
+          <StyledArrowIcon
+            name="arrow-next"
+            width={16}
+            height={16}
+            onClick={onClick}
+          />
+        </InnerWrapper>
+      </Wrapper>
+    );
+  }
+}
 
 export default LockInput;

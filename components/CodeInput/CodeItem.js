@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import styled from 'styled-components';
+import { KEY_CODES } from 'common/constants';
 
 const StyledInput = styled.input`
   width: 40px;
@@ -29,11 +30,17 @@ export class CodeItem extends Component {
       resetFormOnBackspace = Function.prototype,
     } = this.props;
 
-    if (e.keyCode === 8 && (!this.state.value || !this.state.value.length)) {
+    if (
+      e.keyCode === KEY_CODES.BACKSPACE &&
+      (!this.state.value || !this.state.value.length)
+    ) {
       onBackspace();
     }
 
-    if (e.keyCode === 8 && Object.keys(this.props.errors).length !== 0) {
+    if (
+      e.keyCode === KEY_CODES.BACKSPACE &&
+      Object.keys(this.props.errors).length !== 0
+    ) {
       resetFormOnBackspace();
     }
   };

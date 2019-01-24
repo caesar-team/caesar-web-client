@@ -4,7 +4,10 @@ import { Formik, FastField } from 'formik';
 import { match } from 'common/utils/match';
 import { checkError } from 'common/utils/formikUtils';
 import {
+  WrapperAlignTop,
+  AuthWrapper,
   AuthLayout,
+  BackButtonWrapper,
   BackButton,
   Button,
   MasterPasswordInput,
@@ -19,7 +22,7 @@ import {
 } from './constants';
 import { passwordSchema, createConfirmPasswordSchema } from './schema';
 
-const InnerWrapper = styled.div`
+const InnerWrapper = styled(WrapperAlignTop)`
   max-width: 400px;
   width: 100%;
 `;
@@ -85,26 +88,35 @@ class MasterPassword extends Component {
           dirty,
         }) => (
           <form onSubmit={handleSubmit}>
-            <AuthTitle>Master Password</AuthTitle>
-            <AuthDescription>Create master password for Caesar</AuthDescription>
-            <FastField
-              name="password"
-              render={({ field }) => (
-                <MasterPasswordInput
-                  {...field}
-                  autoFocus
-                  withIndicator
-                  rules={REGEXP_TEXT_MATCH}
-                  error={dirty ? checkError(touched, errors, 'password') : null}
-                />
-              )}
-            />
-            <StyledButton htmlType="submit" disabled={isSubmitting || !isValid}>
-              Continue
-            </StyledButton>
-            <BottomWrapper>
-              or <Link to="/logout">log out</Link>
-            </BottomWrapper>
+            <AuthWrapper>
+              <AuthTitle>Master Password</AuthTitle>
+              <AuthDescription>
+                Create master password for Caesar
+              </AuthDescription>
+              <FastField
+                name="password"
+                render={({ field }) => (
+                  <MasterPasswordInput
+                    {...field}
+                    autoFocus
+                    withIndicator
+                    rules={REGEXP_TEXT_MATCH}
+                    error={
+                      dirty ? checkError(touched, errors, 'password') : null
+                    }
+                  />
+                )}
+              />
+              <StyledButton
+                htmlType="submit"
+                disabled={isSubmitting || !isValid}
+              >
+                Continue
+              </StyledButton>
+              <BottomWrapper>
+                or <Link to="/logout">log out</Link>
+              </BottomWrapper>
+            </AuthWrapper>
           </form>
         )}
       />
@@ -122,26 +134,31 @@ class MasterPassword extends Component {
         onSubmit={this.handleSubmitConfirmPassword}
         render={({ errors, touched, handleSubmit, isSubmitting, isValid }) => (
           <form onSubmit={handleSubmit}>
-            <AuthTitle>Сonfirmation</AuthTitle>
-            <AuthDescription>Confirm your master password</AuthDescription>
-            <FastField
-              name="confirmPassword"
-              render={({ field }) => (
-                <MasterPasswordInput
-                  {...field}
-                  autoFocus
-                  error={checkError(touched, errors, 'confirmPassword')}
-                />
-              )}
-            />
-            <StyledButton htmlType="submit" disabled={isSubmitting || !isValid}>
-              Confirm
-            </StyledButton>
-            <BottomWrapper>
+            <BackButtonWrapper>
               <BackButton onClick={this.handleClickReturn}>
                 Back to the previous step
               </BackButton>
-            </BottomWrapper>
+            </BackButtonWrapper>
+            <AuthWrapper>
+              <AuthTitle>Сonfirmation</AuthTitle>
+              <AuthDescription>Confirm your master password</AuthDescription>
+              <FastField
+                name="confirmPassword"
+                render={({ field }) => (
+                  <MasterPasswordInput
+                    {...field}
+                    autoFocus
+                    error={checkError(touched, errors, 'confirmPassword')}
+                  />
+                )}
+              />
+              <StyledButton
+                htmlType="submit"
+                disabled={isSubmitting || !isValid}
+              >
+                Confirm
+              </StyledButton>
+            </AuthWrapper>
           </form>
         )}
       />

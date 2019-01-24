@@ -14,6 +14,7 @@ spec:
     metadata:
       labels:
         app: caesarapp-web-app
+        CICD_GIT_COMMIT: ${CICD_GIT_COMMIT}
         workload.user.cattle.io/workloadselector: deployment-default-caesarapp-web-app
       namespace: default
     spec:

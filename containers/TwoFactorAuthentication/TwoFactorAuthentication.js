@@ -3,9 +3,12 @@ import styled from 'styled-components';
 import Router from 'next/router';
 import { Formik } from 'formik';
 import {
+  WrapperAlignTop,
+  AuthWrapper,
   AuthDescription,
   AuthLayout,
   AuthTitle,
+  BackButtonWrapper,
   BackButton,
   Button,
   CodeInput,
@@ -27,32 +30,18 @@ const InnerWrapper = styled.div`
   text-align: center;
 `;
 
-const BottomWrapper = styled.div`
-  margin-top: 45px;
-  text-align: center;
-  font-size: 14px;
-  letter-spacing: 0.4px;
-  color: ${({ theme }) => theme.black};
-`;
-
 const QrCodeImage = styled.img`
   display: inline-block;
   width: 200px;
   height: 200px;
   vertical-align: top;
-  margin-bottom: 30px;
+  margin-bottom: 40px;
 `;
 
 const QrCodeKeyWrapper = styled.div`
+  margin-top: -10px;
   margin-bottom: 40px;
   text-align: center;
-`;
-
-const QrCodeKeyTitle = styled.span`
-  padding-right: 10px;
-  padding-bottom: 4px;
-  font-size: 18px;
-  color: ${({ theme }) => theme.gray};
 `;
 
 const QrCodeKey = styled.span`
@@ -62,6 +51,7 @@ const QrCodeKey = styled.span`
 
 const NextButton = styled(Button)`
   width: 100%;
+  height: 60px;
   font-size: 18px;
 `;
 
@@ -72,7 +62,7 @@ const Form = styled.form`
 `;
 
 const Error = styled.div`
-  padding-top: 6px;
+  padding-top: 10px;
   text-align: center;
   font-size: 14px;
   letter-spacing: 0.4px;
@@ -145,20 +135,22 @@ class TwoFactorAuthentication extends Component {
     const { qr, code } = this.props;
 
     return (
-      <div>
-        <AuthTitle>Two Factor Authentication</AuthTitle>
-        <AuthDescription>
-          Scan the QR code above or manually enter in the application.
-        </AuthDescription>
-        <InnerWrapper>
-          <QrCodeImage src={qr} />
-          <QrCodeKeyWrapper>
-            <QrCodeKeyTitle>Key:</QrCodeKeyTitle>
-            <QrCodeKey>{code}</QrCodeKey>
-          </QrCodeKeyWrapper>
-          <NextButton onClick={this.handleClickNext}>Next</NextButton>
-        </InnerWrapper>
-      </div>
+      <WrapperAlignTop>
+        <AuthWrapper>
+          <AuthTitle>Two Factor Authentication</AuthTitle>
+          <AuthDescription>Scan the QR code above</AuthDescription>
+          <InnerWrapper>
+            <QrCodeImage src={qr} />
+            <AuthDescription>
+              or manually enter the key in the application:
+            </AuthDescription>
+            <QrCodeKeyWrapper>
+              <QrCodeKey>{code}</QrCodeKey>
+            </QrCodeKeyWrapper>
+            <NextButton onClick={this.handleClickNext}>Next</NextButton>
+          </InnerWrapper>
+        </AuthWrapper>
+      </WrapperAlignTop>
     );
   };
 
@@ -170,42 +162,47 @@ class TwoFactorAuthentication extends Component {
       : this.handleTwoFactorAuthenticationCreate;
 
     return (
-      <div>
-        <AuthTitle>Two Factor Authentication</AuthTitle>
-        <AuthDescription>
-          Enter the 6-digit code that you can find in the mobile application.
-        </AuthDescription>
-        <Formik
-          key="codeForm"
-          initialValues={{ code }}
-          isInitialValid={codeSchema.isValidSync({ code })}
-          validationSchema={codeSchema}
-          onSubmit={action}
-          render={({
-            errors,
-            handleSubmit,
-            isSubmitting,
-            setFieldValue,
-            submitForm,
-          }) => (
-            <Form ref={this.form} onSubmit={handleSubmit}>
-              <CodeInput
-                onChange={value => setFieldValue('code', value, false)}
-                onComplete={submitForm}
-                length={6}
-                focus
-                disabled={isSubmitting}
-              />
-              {errors.code && <Error>{errors.code}</Error>}
-            </Form>
-          )}
-        />
-        <BottomWrapper>
+      <WrapperAlignTop>
+        <BackButtonWrapper>
           <BackButton onClick={this.handleClickReturn}>
             Back to the previous step
           </BackButton>
-        </BottomWrapper>
-      </div>
+        </BackButtonWrapper>
+        <AuthWrapper>
+          <AuthTitle>Two Factor Authentication</AuthTitle>
+          <AuthDescription>
+            Enter the 6-digit code that you can find in the mobile application.
+          </AuthDescription>
+          <Formik
+            key="codeForm"
+            initialValues={{ code }}
+            isInitialValid={codeSchema.isValidSync({ code })}
+            validationSchema={codeSchema}
+            onSubmit={action}
+            render={({
+              errors,
+              handleSubmit,
+              isSubmitting,
+              setFieldValue,
+              submitForm,
+              resetForm,
+            }) => (
+              <Form ref={this.form} onSubmit={handleSubmit}>
+                <CodeInput
+                  onChange={value => setFieldValue('code', value, false)}
+                  onComplete={submitForm}
+                  onCompleteWithErrors={resetForm}
+                  length={6}
+                  focus
+                  disabled={isSubmitting}
+                  errors={errors}
+                />
+                {errors.code && <Error>{errors.code}</Error>}
+              </Form>
+            )}
+          />
+        </AuthWrapper>
+      </WrapperAlignTop>
     );
   };
 

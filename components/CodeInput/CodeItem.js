@@ -9,7 +9,9 @@ const StyledInput = styled.input`
   text-align: center;
   border-radius: 3px;
   border: none;
-  background: ${({ theme }) => theme.lightBlue};
+  outline: none;
+  background: ${({ errors, theme }) =>
+    Object.keys(errors).length === 0 ? theme.lightBlue : theme.lightRed};
 
   &:last-child {
     margin-right: 0;
@@ -22,8 +24,17 @@ export class CodeItem extends Component {
   };
 
   onKeyDown = e => {
+    const {
+      onBackspace,
+      resetFormOnBackspace = Function.prototype,
+    } = this.props;
+
     if (e.keyCode === 8 && (!this.state.value || !this.state.value.length)) {
-      this.props.onBackspace();
+      onBackspace();
+    }
+
+    if (e.keyCode === 8 && Object.keys(this.props.errors).length !== 0) {
+      resetFormOnBackspace();
     }
   };
 
@@ -44,7 +55,7 @@ export class CodeItem extends Component {
   };
 
   render() {
-    const { createRef, disabled } = this.props;
+    const { createRef, disabled, errors } = this.props;
     const { value } = this.state;
 
     return (
@@ -57,6 +68,7 @@ export class CodeItem extends Component {
         onBlur={this.onBlur}
         value={value}
         disabled={disabled}
+        errors={errors}
       />
     );
   }

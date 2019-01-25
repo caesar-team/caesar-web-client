@@ -61,6 +61,7 @@ callApi.interceptors.response.use(
           processNotAuth(error.response.data['2fa']);
           break;
         default:
+          console.log(error.response.data);
           break;
       }
     }

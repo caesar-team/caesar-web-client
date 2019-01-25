@@ -1,3 +1,5 @@
+import { ITEM_CREDENTIALS_TYPE, ITEM_DOCUMENT_TYPE } from './constants';
+
 // eslint-disable-next-line
 self.window = self;
 
@@ -16,7 +18,9 @@ window.onmessage = async message => {
       await privateKeyObj.decrypt(data.password);
 
       tree.createTree({ id: 'root', children: data.list }).walk(node => {
-        if (['credentials'].includes(node.model.type)) {
+        if (
+          [ITEM_CREDENTIALS_TYPE, ITEM_DOCUMENT_TYPE].includes(node.model.type)
+        ) {
           openpgp.message.readArmored(node.model.secret).then(secret => {
             const options = {
               message: secret,

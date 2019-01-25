@@ -6,13 +6,11 @@ import { ITEM_WORKFLOW_EDIT_MODE } from 'common/constants';
 import {
   Uploader,
   Input,
-  PasswordInput,
   Button,
   Select,
   TextArea,
   File,
   Icon,
-  FormInput,
 } from 'components';
 import { schema } from './schema';
 
@@ -61,17 +59,6 @@ const TitleInput = styled(Input)`
     &:focus {
       background-color: ${({ theme }) => theme.white};
     }
-  }
-`;
-
-const FormPasswordInput = styled(PasswordInput)`
-  ${Input.InputField} {
-    padding: 5px 15px;
-    color: ${({ theme }) => theme.black};
-  }
-
-  ${Input.PostFix} {
-    right: 0;
   }
 `;
 
@@ -156,7 +143,7 @@ const renderAttachments = ({ attachments = [] }, setFieldValue) =>
     </FileRow>
   ));
 
-const CredentialsForm = ({
+const DocumentForm = ({
   item: { secret, listId, type },
   allLists,
   mode,
@@ -179,7 +166,7 @@ const CredentialsForm = ({
 
   return (
     <Formik
-      key="credentialsForm"
+      key="documentForm"
       initialValues={createInitialValues(secret, listId, type)}
       onSubmit={action}
       isInitialValid={schema.isValidSync(
@@ -215,45 +202,6 @@ const CredentialsForm = ({
               />
             )}
           />
-          <Row>
-            <FastField
-              name="login"
-              render={({ field }) => (
-                <FormInput
-                  {...field}
-                  label="Login"
-                  withBorder
-                  error={checkError(touched, errors, 'login')}
-                />
-              )}
-            />
-          </Row>
-          <Row>
-            <FastField
-              name="pass"
-              render={({ field }) => (
-                <FormPasswordInput
-                  {...field}
-                  withBorder
-                  label="Password"
-                  error={checkError(touched, errors, 'pass')}
-                />
-              )}
-            />
-          </Row>
-          <Row>
-            <FastField
-              name="website"
-              render={({ field }) => (
-                <FormInput
-                  {...field}
-                  withBorder
-                  label="Website"
-                  error={checkError(touched, errors, 'website')}
-                />
-              )}
-            />
-          </Row>
           <Row>
             <AdditionalLabel>List</AdditionalLabel>
             <Select
@@ -300,4 +248,4 @@ const CredentialsForm = ({
   );
 };
 
-export default CredentialsForm;
+export default DocumentForm;

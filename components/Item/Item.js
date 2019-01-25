@@ -1,9 +1,13 @@
 import React from 'react';
 import styled from 'styled-components';
-import { ITEM_REVIEW_MODE, ITEM_CREDENTIALS_TYPE } from 'common/constants';
+import {
+  ITEM_REVIEW_MODE,
+  ITEM_CREDENTIALS_TYPE,
+  ITEM_DOCUMENT_TYPE,
+} from 'common/constants';
 import { matchStrict } from 'common/utils/match';
 import EmptyItem from './EmptyItem';
-import { Credentials, CredentialsForm } from './Types';
+import { Credentials, CredentialsForm, DocumentForm, Document } from './Types';
 import { Scrollbar } from '../Scrollbar';
 
 const Wrapper = styled.div`
@@ -35,12 +39,22 @@ const Item = ({
   }
 
   const { mode, type } = item;
-
   const renderedItemForm = matchStrict(
     type,
     {
       [ITEM_CREDENTIALS_TYPE]: (
         <CredentialsForm
+          item={item}
+          allLists={allLists}
+          mode={mode}
+          onFinishCreateWorkflow={onFinishCreateWorkflow}
+          onFinishEditWorkflow={onFinishEditWorkflow}
+          onCancelWorkflow={onCancelWorkflow}
+          onClickMoveToTrash={onClickMoveToTrash}
+        />
+      ),
+      [ITEM_DOCUMENT_TYPE]: (
+        <DocumentForm
           item={item}
           allLists={allLists}
           mode={mode}
@@ -59,6 +73,21 @@ const Item = ({
     {
       [ITEM_CREDENTIALS_TYPE]: (
         <Credentials
+          isTrashItem={isTrashItem}
+          item={item}
+          user={user}
+          members={members}
+          allLists={allLists}
+          onClickCloseItem={onClickCloseItem}
+          onClickRemoveItem={onClickRemoveItem}
+          onClickEditItem={onClickEditItem}
+          onClickInvite={onClickInvite}
+          onClickRestoreItem={onClickRestoreItem}
+          onToggleFavorites={onToggleFavorites}
+        />
+      ),
+      [ITEM_DOCUMENT_TYPE]: (
+        <Document
           isTrashItem={isTrashItem}
           item={item}
           user={user}

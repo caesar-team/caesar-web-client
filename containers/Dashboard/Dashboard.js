@@ -29,7 +29,6 @@ import {
   ITEM_REVIEW_MODE,
   ITEM_WORKFLOW_CREATE_MODE,
   ITEM_WORKFLOW_EDIT_MODE,
-  ITEM_CREDENTIALS_TYPE,
 } from 'common/constants';
 import {
   postCreateItem,
@@ -151,11 +150,11 @@ class DashboardContainer extends Component {
     }));
   };
 
-  handleClickCreateItem = () => {
+  handleClickCreateItem = (name, value) => {
     this.setState(prevState => ({
       ...prevState,
       workInProgressItem: {
-        ...initialItemData(ITEM_CREDENTIALS_TYPE, prevState.selectedListId),
+        ...initialItemData(value, prevState.selectedListId),
         mode: ITEM_WORKFLOW_CREATE_MODE,
       },
     }));
@@ -269,7 +268,12 @@ class DashboardContainer extends Component {
     }
   };
 
-  handleFinishCreateWorkflow = async ({ listId, attachments, ...secret }) => {
+  handleFinishCreateWorkflow = async ({
+    listId,
+    attachments,
+    type,
+    ...secret
+  }) => {
     const { publicKey } = this.props;
 
     try {
@@ -288,7 +292,7 @@ class DashboardContainer extends Component {
 
       const data = {
         listId,
-        type: ITEM_CREDENTIALS_TYPE,
+        type,
         secret: encryptedItem,
       };
 
@@ -305,7 +309,7 @@ class DashboardContainer extends Component {
         tags: [],
         owner: true,
         secret: item,
-        type: ITEM_CREDENTIALS_TYPE,
+        type,
       };
 
       this.setState(prevState => ({

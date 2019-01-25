@@ -1,9 +1,10 @@
 import React from 'react';
 import styled from 'styled-components';
-import { FAVORITES_TYPE } from 'common/constants';
-import { Button, Scrollbar } from 'components';
+import { FAVORITES_TYPE, ITEM_TYPES } from 'common/constants';
+import { Icon, Scrollbar } from 'components';
 import Item from './Item';
 import EmptyList from './EmptyList';
+import { Dropdown } from '../Dropdown';
 
 const Wrapper = styled.div`
   position: relative;
@@ -31,6 +32,27 @@ const Title = styled.div`
   color: ${({ theme }) => theme.black};
 `;
 
+const CreateButton = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 3px;
+  outline: none;
+  cursor: pointer;
+  transition: all 0.2s;
+  color: ${({ theme }) => theme.emperor};
+  background-color: ${({ theme }) => theme.white};
+  border: 1px solid ${({ theme }) => theme.gallery};
+
+  &:hover {
+    color: ${({ theme }) => theme.white};
+    background-color: ${({ theme }) => theme.black};
+    border: 1px solid ${({ theme }) => theme.black};
+  }
+`;
+
 const List = ({
   title = '',
   activeItemId = null,
@@ -52,6 +74,11 @@ const List = ({
     );
   });
 
+  const itemTypesOptions = [
+    { label: 'Password', value: ITEM_TYPES.ITEM_CREDENTIALS_TYPE },
+    { label: 'Note', value: ITEM_TYPES.ITEM_DOCUMENT_TYPE },
+  ];
+
   const renderedList = () => {
     if (list.children.length === 0) {
       return <EmptyList />;
@@ -67,12 +94,11 @@ const List = ({
       <TitleWrapper>
         <Title>{title}</Title>
         {!isFavorite && (
-          <Button
-            color="white"
-            icon="plus"
-            onClick={onClickCreateItem}
-            isHoverBlackBackground
-          />
+          <Dropdown options={itemTypesOptions} onClick={onClickCreateItem}>
+            <CreateButton>
+              <Icon name="plus" width={14} height={14} isInButton />
+            </CreateButton>
+          </Dropdown>
         )}
       </TitleWrapper>
       {renderedList()}

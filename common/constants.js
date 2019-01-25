@@ -56,9 +56,11 @@ export const LIST_MODES = {
 // mb some types are not included here, don't have enough information
 export const ITEM_CREDENTIALS_TYPE = 'credentials';
 export const ITEM_CREDIT_CARD_TYPE = 'card';
+export const ITEM_DOCUMENT_TYPE = 'document';
 export const ITEM_TYPES = {
   ITEM_CREDENTIALS_TYPE,
   ITEM_CREDIT_CARD_TYPE,
+  ITEM_DOCUMENT_TYPE,
 };
 
 export const KEY_CODES = {

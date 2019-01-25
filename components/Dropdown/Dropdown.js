@@ -13,7 +13,7 @@ const Box = styled.div`
   z-index: 1;
   display: flex;
   flex-direction: column;
-  top: 60px;
+  top: 100%;
   right: 0;
   z-index: 100;
   border-radius: 3px;
@@ -21,8 +21,10 @@ const Box = styled.div`
   border: 1px solid ${({ theme }) => theme.gallery};
 `;
 
-const Option = styled.div`
+const Option = styled.button`
   padding: 10px 30px;
+  border: none;
+  background: none;
 `;
 
 const Button = styled.button`
@@ -37,13 +39,15 @@ class DropdownInner extends Component {
   };
 
   componentDidUpdate(prevProps, prevState) {
-    if (prevState.isOpen !== this.state.isOpen) {
-      this.props.onToggle(this.state.isOpen);
+    const { onToggle } = this.props;
+    if (prevState.isOpen !== this.state.isOpen && onToggle) {
+      onToggle(this.state.isOpen);
     }
   }
 
   handleClick = value => () => {
     const { name, onClick } = this.props;
+    this.handleToggle();
 
     if (onClick) onClick(name, value);
   };

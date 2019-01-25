@@ -72,3 +72,6 @@ export const KEY_CODES = {
   ARROW_RIGHT: 39,
   ARROW_DOWN: 40,
 };
+
+export const PERMISION_READ = 'read';
+export const PERMISION_WRITE = 'write';

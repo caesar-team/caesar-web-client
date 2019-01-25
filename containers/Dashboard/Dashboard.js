@@ -512,11 +512,15 @@ class DashboardContainer extends Component {
     });
   };
 
-  handleInviteMembers = async memberIds => {
+  handleInviteMembers = async invited => {
     const { members } = this.props;
     const { workInProgressItem } = this.state;
+    const membersObject = members.reduce((acc, member) => {
+      acc[member.id] = member;
+      return acc;
+    }, {});
 
-    const invitedMembers = members.filter(({ id }) => memberIds.includes(id));
+    const invitedMembers = members.filter(({ id }) => invitedIds.includes(id));
 
     const promises = invitedMembers.map(async member => {
       const options = {

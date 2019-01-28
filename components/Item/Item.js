@@ -1,10 +1,12 @@
-import React from 'react';
+import React, { Fragment } from 'react';
 import styled from 'styled-components';
 import {
   ITEM_REVIEW_MODE,
   ITEM_CREDENTIALS_TYPE,
   ITEM_DOCUMENT_TYPE,
+  PERMISION_WRITE,
 } from 'common/constants';
+import { Icon } from 'components';
 import { matchStrict } from 'common/utils/match';
 import EmptyItem from './EmptyItem';
 import { Credentials, CredentialsForm, DocumentForm, Document } from './Types';
@@ -15,6 +17,19 @@ const Wrapper = styled.div`
   flex-direction: column;
   padding: 20px 60px 0;
   height: calc(100vh - 70px);
+`;
+
+const Notify = styled.div`
+  display: flex;
+  align-items: center;
+  padding: 20px 26px;
+  color: ${({ theme }) => theme.white};
+  background-color: ${({ theme }) => theme.black};
+`;
+
+const NotifyText = styled.div`
+  padding-left: 20px;
+  color: ${({ theme }) => theme.white};
 `;
 
 const Item = ({
@@ -38,7 +53,7 @@ const Item = ({
     return <EmptyItem />;
   }
 
-  const { mode, type } = item;
+  const { mode, type, invited } = item;
   const renderedItemForm = matchStrict(
     type,
     {
@@ -68,11 +83,17 @@ const Item = ({
     null,
   );
 
+  const access = invited.reduce(
+    (acc, invite) => (invite.userId === user.id ? invite.access : null),
+    null,
+  );
+  const hasWriteAccess = access === PERMISION_WRITE;
   const renderedItem = matchStrict(
     type,
     {
       [ITEM_CREDENTIALS_TYPE]: (
         <Credentials
+          hasWriteAccess={hasWriteAccess}
           isTrashItem={isTrashItem}
           item={item}
           user={user}
@@ -88,6 +109,7 @@ const Item = ({
       ),
       [ITEM_DOCUMENT_TYPE]: (
         <Document
+          hasWriteAccess={hasWriteAccess}
           isTrashItem={isTrashItem}
           item={item}
           user={user}
@@ -106,11 +128,19 @@ const Item = ({
   );
 
   return (
-    <Wrapper>
-      <Scrollbar>
-        {mode === ITEM_REVIEW_MODE ? renderedItem : renderedItemForm}
-      </Scrollbar>
-    </Wrapper>
+    <Fragment>
+      {!hasWriteAccess && (
+        <Notify>
+          <Icon name="warning" width={14} height={14} isInButton />
+          <NotifyText>You can read only</NotifyText>
+        </Notify>
+      )}
+      <Wrapper>
+        <Scrollbar>
+          {mode === ITEM_REVIEW_MODE ? renderedItem : renderedItemForm}
+        </Scrollbar>
+      </Wrapper>
+    </Fragment>
   );
 };
 

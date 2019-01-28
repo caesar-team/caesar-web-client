@@ -1,6 +1,5 @@
 import React, { Fragment } from 'react';
 import styled from 'styled-components';
-import { PERMISION_WRITE } from 'common/constants';
 import { formatDate } from 'common/utils/dateFormatter';
 import { Icon } from 'components/Icon';
 import { Button } from 'components/Button';
@@ -98,6 +97,7 @@ const FavoriteButton = styled.button`
 `;
 
 export const ItemHeader = ({
+  hasWriteAccess,
   isTrashItem,
   user,
   members,
@@ -126,11 +126,6 @@ export const ItemHeader = ({
     return accumulator;
   }, []);
   const owner = user.id === ownerId ? user : members[ownerId];
-  const access = invited.reduce(
-    (acc, invite) => (invite.userId === user.id ? invite.access : null),
-    null,
-  );
-  const hasWriteAccess = access === PERMISION_WRITE;
 
   return (
     <Fragment>
@@ -187,7 +182,7 @@ export const ItemHeader = ({
             </InviteButton>
           )}
           <StyledAvatarsList avatars={avatars} />
-          {!isTrashItem && <ShareButton color="black">Share</ShareButton>}
+          {!isTrashItem && <ShareButton icon="share" color="black">Share</ShareButton>}
         </Row>
       </InviteRow>
     </Fragment>

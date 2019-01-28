@@ -1,5 +1,6 @@
 import React, { Fragment } from 'react';
 import styled from 'styled-components';
+import { PERMISION_WRITE } from 'common/constants';
 import { formatDate } from 'common/utils/dateFormatter';
 import { Icon } from 'components/Icon';
 import { Button } from 'components/Button';
@@ -125,30 +126,36 @@ export const ItemHeader = ({
     return accumulator;
   }, []);
   const owner = user.id === ownerId ? user : members[ownerId];
+  const access = invited.reduce(
+    (acc, invite) => (invite.userId === user.id ? invite.access : null),
+    null,
+  );
+  const hasWriteAccess = access === PERMISION_WRITE;
 
   return (
     <Fragment>
       <Row>
         <UpdatedDate>Last updated {formatDate(lastUpdated)}</UpdatedDate>
         <Row>
-          {isTrashItem ? (
-            <ButtonsWrapper>
-              <Button color="white" onClick={onClickRestoreItem}>
-                Restore
-              </Button>
-              <ItemButton
-                color="white"
-                icon="trash"
-                onClick={onClickRemoveItem}
-              >
-                Remove
-              </ItemButton>
-            </ButtonsWrapper>
-          ) : (
-            <EditButton color="white" icon="pencil" onClick={onClickEditItem}>
-              Edit
-            </EditButton>
-          )}
+          {hasWriteAccess &&
+            (isTrashItem ? (
+              <ButtonsWrapper>
+                <Button color="white" onClick={onClickRestoreItem}>
+                  Restore
+                </Button>
+                <ItemButton
+                  color="white"
+                  icon="trash"
+                  onClick={onClickRemoveItem}
+                >
+                  Remove
+                </ItemButton>
+              </ButtonsWrapper>
+            ) : (
+              <EditButton color="white" icon="pencil" onClick={onClickEditItem}>
+                Edit
+              </EditButton>
+            ))}
           <ItemButton color="white" icon="close" onClick={onClickCloseItem} />
         </Row>
       </Row>
@@ -180,8 +187,7 @@ export const ItemHeader = ({
             </InviteButton>
           )}
           <StyledAvatarsList avatars={avatars} />
-          {/* TODO: Uncomment to show share btn */}
-          {/* {!isTrashItem && <ShareButton color="black">Share</ShareButton>} */}
+          {!isTrashItem && <ShareButton color="black">Share</ShareButton>}
         </Row>
       </InviteRow>
     </Fragment>

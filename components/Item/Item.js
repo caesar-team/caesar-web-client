@@ -53,7 +53,7 @@ const Item = ({
     return <EmptyItem />;
   }
 
-  const { mode, type, invited } = item;
+  const { ownerId, mode, type, invited } = item;
   const renderedItemForm = matchStrict(
     type,
     {
@@ -82,12 +82,12 @@ const Item = ({
     },
     null,
   );
-
+  const isOwner = ownerId === user.id;
   const access = invited.reduce(
     (acc, invite) => (invite.userId === user.id ? invite.access : null),
     null,
   );
-  const hasWriteAccess = access === PERMISION_WRITE;
+  const hasWriteAccess = isOwner || access === PERMISION_WRITE;
   const renderedItem = matchStrict(
     type,
     {

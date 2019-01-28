@@ -10,6 +10,8 @@ import {
   Field,
   FieldValue,
   Attachments,
+  RemoveButton,
+  RemoveButtonWrapper,
 } from '../components';
 
 const StyledEyeIcon = styled(Icon)`
@@ -58,6 +60,8 @@ class Credentials extends Component {
 
     const {
       allLists,
+      onClickMoveToTrash,
+      isTrashItem,
       item: {
         listId,
         secret: { login, pass, website, note, attachments },
@@ -134,6 +138,17 @@ class Credentials extends Component {
           )}
         </FieldWrapper>
         {shouldShowAttachments && <Attachments attachments={attachments} />}
+        {!isTrashItem && (
+          <RemoveButtonWrapper>
+            <RemoveButton
+              color="white"
+              icon="trash"
+              onClick={onClickMoveToTrash}
+            >
+              Remove
+            </RemoveButton>
+          </RemoveButtonWrapper>
+        )}
       </Wrapper>
     );
   }

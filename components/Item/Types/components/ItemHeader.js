@@ -40,6 +40,10 @@ const OwnerStatus = styled.div`
 
 const StyledAvatarsList = styled(AvatarsList)`
   margin-right: 30px;
+
+  &:last-child {
+    margin-right: 0;
+  }
 `;
 
 const InviteButton = styled.button`
@@ -125,32 +129,34 @@ export const ItemHeader = ({
 
     return accumulator;
   }, []);
-  const owner = user.id === ownerId ? user : members[ownerId];
+  const isOwner = user.id === ownerId;
+  const owner = isOwner ? user : members[ownerId];
 
   return (
     <Fragment>
       <Row>
         <UpdatedDate>Last updated {formatDate(lastUpdated)}</UpdatedDate>
         <Row>
-          {hasWriteAccess &&
-            (isTrashItem ? (
-              <ButtonsWrapper>
-                <Button color="white" onClick={onClickRestoreItem}>
-                  Restore
-                </Button>
-                <ItemButton
-                  color="white"
-                  icon="trash"
-                  onClick={onClickRemoveItem}
-                >
-                  Remove
-                </ItemButton>
-              </ButtonsWrapper>
-            ) : (
+          {isTrashItem ? (
+            <ButtonsWrapper>
+              <Button color="white" onClick={onClickRestoreItem}>
+                Restore
+              </Button>
+              <ItemButton
+                color="white"
+                icon="trash"
+                onClick={onClickRemoveItem}
+              >
+                Remove
+              </ItemButton>
+            </ButtonsWrapper>
+          ) : (
+            hasWriteAccess && (
               <EditButton color="white" icon="pencil" onClick={onClickEditItem}>
                 Edit
               </EditButton>
-            ))}
+            )
+          )}
           <ItemButton color="white" icon="close" onClick={onClickCloseItem} />
         </Row>
       </Row>
@@ -176,13 +182,19 @@ export const ItemHeader = ({
           </Owner>
         </Row>
         <Row>
-          {!isTrashItem && (
-            <InviteButton onClick={onClickInvite}>
-              <Icon name="plus" width={14} height={14} isInButton />
-            </InviteButton>
-          )}
+          {!isTrashItem &&
+            isOwner && (
+              <InviteButton onClick={onClickInvite}>
+                <Icon name="plus" width={14} height={14} isInButton />
+              </InviteButton>
+            )}
           <StyledAvatarsList avatars={avatars} />
-          {!isTrashItem && <ShareButton icon="share" color="black">Share</ShareButton>}
+          {!isTrashItem &&
+            isOwner && (
+              <ShareButton icon="share" color="black">
+                Share
+              </ShareButton>
+            )}
         </Row>
       </InviteRow>
     </Fragment>

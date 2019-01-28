@@ -107,18 +107,6 @@ const StyledCloseIcon = styled(Icon)`
   cursor: pointer;
 `;
 
-const RemoveButtonWrapper = styled.div`
-  display: flex;
-  justify-content: flex-end;
-  margin-top: 50px;
-`;
-
-const StyledRemoveButton = styled(Button)`
-  padding-right: 15px;
-  padding-left: 15px;
-  text-transform: uppercase;
-`;
-
 const createInitialValues = (secret, listId, type) => ({
   ...secret,
   listId,
@@ -150,14 +138,12 @@ const DocumentForm = ({
   onFinishCreateWorkflow,
   onFinishEditWorkflow,
   onCancelWorkflow,
-  onClickMoveToTrash,
 }) => {
   const isEditMode = mode === ITEM_WORKFLOW_EDIT_MODE;
 
   const action = isEditMode ? onFinishEditWorkflow : onFinishCreateWorkflow;
 
   const buttonText = isEditMode ? 'Update' : 'Add';
-  const shouldShowRemoveButton = isEditMode;
 
   const preparedOptions = allLists.map(({ id, label }) => ({
     value: id,
@@ -231,17 +217,6 @@ const DocumentForm = ({
               {renderAttachments(values, setFieldValue)}
             </Attachments>
           </AttachmentsSection>
-          {shouldShowRemoveButton && (
-            <RemoveButtonWrapper>
-              <StyledRemoveButton
-                color="white"
-                icon="trash"
-                onClick={onClickMoveToTrash}
-              >
-                Remove
-              </StyledRemoveButton>
-            </RemoveButtonWrapper>
-          )}
         </Form>
       )}
     />

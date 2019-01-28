@@ -5,3 +5,5 @@ export { FieldWrapper } from './FieldWrapper';
 export { Field } from './Field';
 export { FieldValue } from './FieldValue';
 export { Attachments } from './Attachments';
+export { RemoveButton } from './RemoveButton';
+export { RemoveButtonWrapper } from './RemoveButtonWrapper';

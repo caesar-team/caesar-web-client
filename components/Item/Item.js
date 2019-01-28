@@ -65,7 +65,6 @@ const Item = ({
           onFinishCreateWorkflow={onFinishCreateWorkflow}
           onFinishEditWorkflow={onFinishEditWorkflow}
           onCancelWorkflow={onCancelWorkflow}
-          onClickMoveToTrash={onClickMoveToTrash}
         />
       ),
       [ITEM_DOCUMENT_TYPE]: (
@@ -76,7 +75,6 @@ const Item = ({
           onFinishCreateWorkflow={onFinishCreateWorkflow}
           onFinishEditWorkflow={onFinishEditWorkflow}
           onCancelWorkflow={onCancelWorkflow}
-          onClickMoveToTrash={onClickMoveToTrash}
         />
       ),
     },
@@ -105,6 +103,7 @@ const Item = ({
           onClickInvite={onClickInvite}
           onClickRestoreItem={onClickRestoreItem}
           onToggleFavorites={onToggleFavorites}
+          onClickMoveToTrash={onClickMoveToTrash}
         />
       ),
       [ITEM_DOCUMENT_TYPE]: (
@@ -121,6 +120,7 @@ const Item = ({
           onClickInvite={onClickInvite}
           onClickRestoreItem={onClickRestoreItem}
           onToggleFavorites={onToggleFavorites}
+          onClickMoveToTrash={onClickMoveToTrash}
         />
       ),
     },

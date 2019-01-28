@@ -7,11 +7,15 @@ import {
   FieldWrapper,
   Field,
   FieldValue,
+  RemoveButtonWrapper,
+  RemoveButton,
 } from '../components';
 
 export const Document = props => {
   const {
     allLists,
+    onClickMoveToTrash,
+    isTrashItem,
     item: {
       listId,
       secret: { note, attachments },
@@ -37,6 +41,13 @@ export const Document = props => {
         )}
       </FieldWrapper>
       {shouldShowAttachments && <Attachments attachments={attachments} />}
+      {!isTrashItem && (
+        <RemoveButtonWrapper>
+          <RemoveButton color="white" icon="trash" onClick={onClickMoveToTrash}>
+            Remove
+          </RemoveButton>
+        </RemoveButtonWrapper>
+      )}
     </Wrapper>
   );
 };

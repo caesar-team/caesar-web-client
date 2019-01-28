@@ -85,7 +85,10 @@ const Item = ({
     (acc, invite) => (invite.userId === user.id ? invite.access : null),
     null,
   );
-  const hasWriteAccess = isOwner || access === PERMISION_WRITE;
+  const isReviewMode = mode === ITEM_REVIEW_MODE;
+  const hasWriteAccess = access === PERMISION_WRITE;
+  const showReadOnlyNotify = !isOwner && !hasWriteAccess && isReviewMode;
+
   const renderedItem = matchStrict(
     type,
     {
@@ -129,7 +132,7 @@ const Item = ({
 
   return (
     <Fragment>
-      {!hasWriteAccess && (
+      {showReadOnlyNotify && (
         <Notify>
           <Icon name="warning" width={14} height={14} isInButton />
           <NotifyText>You can read only</NotifyText>

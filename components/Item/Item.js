@@ -53,7 +53,7 @@ const Item = ({
     return <EmptyItem />;
   }
 
-  const { ownerId, mode, type, invited } = item;
+  const { mode, type, invited } = item;
   const renderedItemForm = matchStrict(
     type,
     {
@@ -80,12 +80,13 @@ const Item = ({
     },
     null,
   );
-  const isOwner = ownerId === user.id;
   const access = invited.reduce(
     (acc, invite) => (invite.userId === user.id ? invite.access : null),
     null,
   );
-  const hasWriteAccess = isOwner || access === PERMISION_WRITE;
+  const hasWriteAccess = access === PERMISION_WRITE;
+  const showReadOnlyNotify = access && !hasWriteAccess;
+
   const renderedItem = matchStrict(
     type,
     {
@@ -129,7 +130,7 @@ const Item = ({
 
   return (
     <Fragment>
-      {!hasWriteAccess && (
+      {showReadOnlyNotify && (
         <Notify>
           <Icon name="warning" width={14} height={14} isInButton />
           <NotifyText>You can read only</NotifyText>

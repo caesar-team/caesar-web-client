@@ -274,7 +274,7 @@ class DashboardContainer extends Component {
     type,
     ...secret
   }) => {
-    const { publicKey } = this.props;
+    const { publicKey, user } = this.props;
 
     try {
       const item = {
@@ -307,7 +307,7 @@ class DashboardContainer extends Component {
         favorite: false,
         invited: [],
         tags: [],
-        owner: true,
+        ownerId: user.id,
         secret: item,
         type,
       };

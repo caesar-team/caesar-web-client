@@ -521,9 +521,7 @@ class DashboardContainer extends Component {
       return acc;
     }, {});
 
-    const invitedMembers = members.filter(({ userId }) =>
-      invitedIds.includes(userId),
-    );
+    const invitedMembers = members.filter(({ id }) => invitedIds.includes(id));
 
     const promises = invitedMembers.map(async member => {
       const options = {

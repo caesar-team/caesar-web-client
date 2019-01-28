@@ -44,7 +44,7 @@ export default class Checkbox extends Component {
     this.setState(prevState => {
       const { onChange } = this.props;
       const checked = !prevState.isChecked;
-
+      console.log(checked);
       if (onChange && typeof onChange === 'function') onChange(checked);
 
       return { isChecked: checked };

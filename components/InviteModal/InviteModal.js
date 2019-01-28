@@ -97,7 +97,7 @@ class InviteModal extends Component {
     this.setState(prevState => ({
       ...prevState,
       invitedUsers: prevState.invitedUsers.reduce((acc, item) => {
-        if (item.id === userId) {
+        if (item.userId === userId) {
           acc.push({
             ...item,
             access: value ? PERMISION_READ : PERMISION_WRITE,

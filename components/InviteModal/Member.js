@@ -1,12 +1,12 @@
-import React from 'react';
+import React, { Fragment } from 'react';
 import styled from 'styled-components';
 import { Icon } from '../Icon';
 import { Avatar } from '../Avatar';
+import { Checkbox } from '../Checkbox';
 
 const Wrapper = styled.div`
   display: flex;
   align-items: center;
-  justify-content: space-between;
   margin-bottom: 20px;
 
   &:last-child {
@@ -14,12 +14,14 @@ const Wrapper = styled.div`
   }
 `;
 
-const IconWrapper = styled.div`
+const IconWrapper = styled.button`
   display: flex;
   align-items: center;
   justify-content: center;
+  padding: 0;
   width: 30px;
   height: 30px;
+  margin-left: 20px;
   border: 1px solid ${({ theme }) => theme.black};
   border-radius: 50%;
 
@@ -30,13 +32,21 @@ const IconWrapper = styled.div`
 const MemberWrapper = styled.div`
   display: flex;
   align-items: center;
+  margin-right: auto;
+`;
+
+const MemberInfo = styled.div`
+  padding-left: 20px;
 `;
 
 const MemberName = styled.div`
-  font-size: 18px;
-  line-height: 36px;
-  color: #2e2f31;
-  margin-left: 20px;
+  font-size: 16px;
+  color: ${({ theme }) => theme.black};
+`;
+
+const MemberEmail = styled.div`
+  font-size: 14px;
+  color: ${({ theme }) => theme.gray};
 `;
 
 const StyledIcon = styled(Icon)`
@@ -47,29 +57,31 @@ const StyledIcon = styled(Icon)`
 
 const Member = ({
   name,
+  email,
   avatar,
   isInvited = false,
+  onClickPermissionChange = Function.prototype,
   onClickAdd = Function.prototype,
   onClickRemove = Function.prototype,
 }) => (
   <Wrapper>
     <MemberWrapper>
       <Avatar name={name} avatar={avatar} />
-      <MemberName>{name}</MemberName>
+      <MemberInfo>
+        <MemberName>{name}</MemberName>
+        <MemberEmail>{email}</MemberEmail>
+      </MemberInfo>
     </MemberWrapper>
     {isInvited ? (
-      <IconWrapper isFilled>
-        <StyledIcon
-          isFilled
-          name="ok"
-          width={14}
-          height={14}
-          onClick={onClickRemove}
-        />
-      </IconWrapper>
+      <Fragment>
+        <Checkbox onChange={onClickPermissionChange}>View only</Checkbox>
+        <IconWrapper isFilled onClick={onClickRemove}>
+          <StyledIcon isFilled name="ok" width={14} height={14} />
+        </IconWrapper>
+      </Fragment>
     ) : (
-      <IconWrapper>
-        <StyledIcon name="plus" width={14} height={14} onClick={onClickAdd} />
+      <IconWrapper onClick={onClickAdd}>
+        <StyledIcon name="plus" width={14} height={14} />
       </IconWrapper>
     )}
   </Wrapper>

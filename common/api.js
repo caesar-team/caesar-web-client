@@ -61,6 +61,7 @@ callApi.interceptors.response.use(
           processNotAuth(error.response.data['2fa']);
           break;
         default:
+          console.log(error.response.data);
           break;
       }
     }
@@ -120,7 +121,7 @@ export const updateShareItem = (itemId, data) =>
   callApi.patch(`/item/${itemId}/share`, data);
 
 export const postInviteItem = (itemId, data) =>
-  callApi.post(`/invite/${itemId}`, data);
+  callApi.post(`/item/${itemId}/invite`, data);
 
 // list
 export const postCreateList = data => callApi.post('/list', data);

@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import styled from 'styled-components';
 import memoize from 'memoize-one';
+import { PERMISION_WRITE, PERMISION_READ } from 'common/constants';
 import Member from './Member';
 import { Modal } from '../Modal';
 import { Input } from '../Input';
@@ -69,9 +70,9 @@ class InviteModal extends Component {
     event.preventDefault();
 
     const { onClickInvite = Function.prototype } = this.props;
-    const { invitedIds } = this.state;
+    const { invitedUsers } = this.state;
 
-    onClickInvite(invitedIds);
+    onClickInvite(invitedUsers);
   };
 
   handleChange = event => {
@@ -85,14 +86,35 @@ class InviteModal extends Component {
   handleClickAdd = userId => () => {
     this.setState(prevState => ({
       ...prevState,
-      invitedIds: [...prevState.invitedIds, userId],
+      invitedUsers: [
+        ...prevState.invitedUsers,
+        { userId, access: PERMISION_WRITE },
+      ],
+    }));
+  };
+
+  handlePermissionChange = userId => value => {
+    this.setState(prevState => ({
+      ...prevState,
+      invitedUsers: prevState.invitedUsers.reduce((acc, item) => {
+        if (item.userId === userId) {
+          acc.push({
+            ...item,
+            access: value ? PERMISION_READ : PERMISION_WRITE,
+          });
+        } else {
+          acc.push(item);
+        }
+
+        return acc;
+      }, []),
     }));
   };
 
   handleClickRemove = userId => () => {
     this.setState(prevState => ({
       ...prevState,
-      invitedIds: prevState.invitedIds.filter(id => id !== userId),
+      invitedUsers: prevState.invitedUsers.filter(user => user.id !== userId),
     }));
   };
 
@@ -101,21 +123,22 @@ class InviteModal extends Component {
 
     return {
       filterText: '',
-      invitedIds: invited,
+      invitedUsers: invited,
     };
   }
 
   renderMemberList() {
     const { members } = this.props;
-    const { filterText, invitedIds } = this.state;
-
+    const { filterText, invitedUsers } = this.state;
     const filteredMembers = this.filter(members, filterText);
+    const invitedIds = invitedUsers.map(user => user.userId);
 
     return filteredMembers.map(({ id, ...member }) => (
       <Member
         key={id}
         {...member}
         isInvited={invitedIds.includes(id)}
+        onClickPermissionChange={this.handlePermissionChange(id)}
         onClickAdd={this.handleClickAdd(id)}
         onClickRemove={this.handleClickRemove(id)}
       />
@@ -129,7 +152,7 @@ class InviteModal extends Component {
     return (
       <Modal
         isOpen
-        minWidth={420}
+        minWidth={560}
         onRequestClose={onCancel}
         shouldCloseOnEsc
         shouldCloseOnOverlayClick

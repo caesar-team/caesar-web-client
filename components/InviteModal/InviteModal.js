@@ -1,12 +1,12 @@
 import React, { Component } from 'react';
 import styled from 'styled-components';
 import memoize from 'memoize-one';
+import { PERMISION_WRITE, PERMISION_READ } from 'common/constants';
 import Member from './Member';
 import { Modal } from '../Modal';
 import { Input } from '../Input';
 import { Icon } from '../Icon';
 import { Button } from '../Button';
-import { PERMISION_WRITE, PERMISION_READ } from 'common/constants';
 
 const Title = styled.div`
   display: flex;
@@ -88,7 +88,7 @@ class InviteModal extends Component {
       ...prevState,
       invitedUsers: [
         ...prevState.invitedUsers,
-        { id: userId, access: PERMISION_WRITE },
+        { userId, access: PERMISION_WRITE },
       ],
     }));
   };
@@ -131,7 +131,7 @@ class InviteModal extends Component {
     const { members } = this.props;
     const { filterText, invitedUsers } = this.state;
     const filteredMembers = this.filter(members, filterText);
-    const invitedIds = invitedUsers.map(user => user.id);
+    const invitedIds = invitedUsers.map(user => user.userId);
 
     return filteredMembers.map(({ id, ...member }) => (
       <Member

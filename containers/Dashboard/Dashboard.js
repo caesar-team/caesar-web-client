@@ -515,12 +515,15 @@ class DashboardContainer extends Component {
   handleInviteMembers = async invited => {
     const { members } = this.props;
     const { workInProgressItem } = this.state;
-    const membersObject = members.reduce((acc, member) => {
-      acc[member.id] = member;
+    const invitedIds = invited.map(user => user.userId);
+    const accesses = invited.reduce((acc, user) => {
+      acc[user.userId] = user.access;
       return acc;
     }, {});
 
-    const invitedMembers = members.filter(({ id }) => invitedIds.includes(id));
+    const invitedMembers = members.filter(({ userId }) =>
+      invitedIds.includes(userId),
+    );
 
     const promises = invitedMembers.map(async member => {
       const options = {
@@ -538,6 +541,7 @@ class DashboardContainer extends Component {
     const invites = encrypted.map((encrypt, index) => ({
       userId: invitedMembers[index].id,
       secret: encrypt.data,
+      access: accesses[invitedMembers[index].id],
     }));
 
     try {
@@ -547,7 +551,7 @@ class DashboardContainer extends Component {
 
       const data = {
         ...workInProgressItem,
-        invited: memberIds,
+        invited,
       };
 
       this.setState(prevState => ({

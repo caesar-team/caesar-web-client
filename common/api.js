@@ -123,6 +123,12 @@ export const updateShareItem = (itemId, data) =>
 export const postInviteItem = (itemId, data) =>
   callApi.post(`/item/${itemId}/invite`, data);
 
+export const changeInviteAccess = (inviteId, data) =>
+  callApi.patch(`/invite/${inviteId}`, data);
+
+export const deleteInviteItem = (inviteId, data) =>
+  callApi.delete(`/invite/${inviteId}`, data);
+
 // list
 export const postCreateList = data => callApi.post('/list', data);
 

@@ -60,6 +60,7 @@ const Member = ({
   email,
   avatar,
   isInvited = false,
+  isReadOnly,
   onClickPermissionChange = Function.prototype,
   onClickAdd = Function.prototype,
   onClickRemove = Function.prototype,
@@ -74,7 +75,9 @@ const Member = ({
     </MemberWrapper>
     {isInvited ? (
       <Fragment>
-        <Checkbox onChange={onClickPermissionChange}>View only</Checkbox>
+        <Checkbox isChecked={isReadOnly} onChange={onClickPermissionChange}>
+          View only
+        </Checkbox>
         <IconWrapper isFilled onClick={onClickRemove}>
           <StyledIcon isFilled name="ok" width={14} height={14} />
         </IconWrapper>

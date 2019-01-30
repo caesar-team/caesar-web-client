@@ -36,7 +36,7 @@ const StyledInput = styled.input`
 
 export default class Checkbox extends Component {
   state = {
-    isChecked: false,
+    isChecked: this.props.isChecked,
     isFocused: false,
   };
 
@@ -44,7 +44,7 @@ export default class Checkbox extends Component {
     this.setState(prevState => {
       const { onChange } = this.props;
       const checked = !prevState.isChecked;
-      console.log(checked);
+
       if (onChange && typeof onChange === 'function') onChange(checked);
 
       return { isChecked: checked };

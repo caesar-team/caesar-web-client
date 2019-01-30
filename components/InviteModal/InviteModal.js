@@ -70,9 +70,9 @@ class InviteModal extends Component {
     event.preventDefault();
 
     const { onClickInvite = Function.prototype } = this.props;
-    const { invitedUsers } = this.state;
+    const { invited } = this.state;
 
-    onClickInvite(invitedUsers);
+    onClickInvite(invited);
   };
 
   handleChange = event => {
@@ -86,17 +86,14 @@ class InviteModal extends Component {
   handleClickAdd = userId => () => {
     this.setState(prevState => ({
       ...prevState,
-      invitedUsers: [
-        ...prevState.invitedUsers,
-        { userId, access: PERMISION_WRITE },
-      ],
+      invited: [...prevState.invited, { userId, access: PERMISION_WRITE }],
     }));
   };
 
   handlePermissionChange = userId => value => {
     this.setState(prevState => ({
       ...prevState,
-      invitedUsers: prevState.invitedUsers.reduce((acc, item) => {
+      invited: prevState.invited.reduce((acc, item) => {
         if (item.userId === userId) {
           acc.push({
             ...item,
@@ -114,7 +111,7 @@ class InviteModal extends Component {
   handleClickRemove = userId => () => {
     this.setState(prevState => ({
       ...prevState,
-      invitedUsers: prevState.invitedUsers.filter(user => user.id !== userId),
+      invited: prevState.invited.filter(invite => invite.userId !== userId),
     }));
   };
 
@@ -123,26 +120,34 @@ class InviteModal extends Component {
 
     return {
       filterText: '',
-      invitedUsers: invited,
+      invited,
     };
   }
 
   renderMemberList() {
     const { members } = this.props;
-    const { filterText, invitedUsers } = this.state;
+    const { filterText, invited } = this.state;
     const filteredMembers = this.filter(members, filterText);
-    const invitedIds = invitedUsers.map(user => user.userId);
+    const invitesByUserId = invited.reduce((acc, invite) => {
+      acc[invite.userId] = invite;
+      return acc;
+    }, {});
 
-    return filteredMembers.map(({ id, ...member }) => (
-      <Member
-        key={id}
-        {...member}
-        isInvited={invitedIds.includes(id)}
-        onClickPermissionChange={this.handlePermissionChange(id)}
-        onClickAdd={this.handleClickAdd(id)}
-        onClickRemove={this.handleClickRemove(id)}
-      />
-    ));
+    return filteredMembers.map(({ id, ...member }) => {
+      const isReadOnly =
+        invitesByUserId[id] && invitesByUserId[id].access === PERMISION_READ;
+      return (
+        <Member
+          key={id}
+          {...member}
+          isReadOnly={isReadOnly}
+          isInvited={Object.keys(invitesByUserId).includes(id)}
+          onClickPermissionChange={this.handlePermissionChange(id)}
+          onClickAdd={this.handleClickAdd(id)}
+          onClickRemove={this.handleClickRemove(id)}
+        />
+      );
+    });
   }
 
   render() {

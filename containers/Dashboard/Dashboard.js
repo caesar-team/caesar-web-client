@@ -37,6 +37,8 @@ import {
   updateItem,
   removeItem,
   toggleFavorite,
+  changeInviteAccess,
+  deleteInviteItem,
 } from 'common/api';
 import DecryptWorker from 'common/decrypt.worker';
 import { initialItemData } from './utils';
@@ -516,18 +518,15 @@ class DashboardContainer extends Component {
     });
   };
 
-  handleInviteMembers = async invited => {
+  inviteNewMembers = async (invitedUserIds, invitedByUserId) => {
     const { members } = this.props;
     const { workInProgressItem } = this.state;
-    const invitedIds = invited.map(user => user.userId);
-    const accesses = invited.reduce((acc, user) => {
-      acc[user.userId] = user.access;
-      return acc;
-    }, {});
+    const { invited } = workInProgressItem;
+    const newInvitedMembers = members.filter(({ id }) =>
+      invitedUserIds.includes(id),
+    );
 
-    const invitedMembers = members.filter(({ id }) => invitedIds.includes(id));
-
-    const promises = invitedMembers.map(async member => {
+    const encryptedPromises = newInvitedMembers.map(async member => {
       const options = {
         message: openpgp.message.fromText(
           JSON.stringify(workInProgressItem.secret),
@@ -538,22 +537,25 @@ class DashboardContainer extends Component {
       return openpgp.encrypt(options);
     });
 
-    const encrypted = await Promise.all(promises);
+    const encrypted = await Promise.all(encryptedPromises);
 
-    const invites = encrypted.map((encrypt, index) => ({
-      userId: invitedMembers[index].id,
+    const newInvites = encrypted.map((encrypt, index) => ({
+      userId: newInvitedMembers[index].id,
       secret: encrypt.data,
-      access: accesses[invitedMembers[index].id],
+      access: invitedByUserId[newInvitedMembers[index].id].access,
     }));
 
     try {
       await postInviteItem(workInProgressItem.id, {
-        invites,
+        invites: newInvites,
       });
 
       const data = {
         ...workInProgressItem,
-        invited,
+        invited: [
+          ...invited,
+          ...invitedUserIds.map(userId => invitedByUserId[userId]),
+        ],
       };
 
       this.setState(prevState => ({
@@ -564,6 +566,131 @@ class DashboardContainer extends Component {
       }));
     } catch (e) {
       console.log(e);
+    }
+  };
+
+  changeInviteAccesses = async (invitedUserIds, invitedByUserId) => {
+    const { workInProgressItem } = this.state;
+    const { invited } = workInProgressItem;
+    const promises = invitedUserIds.map(userId => async () => {
+      const url = invitedByUserId[userId].id;
+      const result = await changeInviteAccess(url, {
+        access: invitedByUserId[userId].access,
+      })
+        .then(() => ({ result: userId }))
+        .catch(e => ({ error: e }));
+      return result;
+    });
+
+    await Promise.all(promises.map(promise => promise())).then(results => {
+      const positiveResultsIds = results
+        .filter(result => typeof result.result !== 'undefined')
+        .map(result => result.result);
+      const updatedInvites = positiveResultsIds.reduce(
+        (acc, userId) =>
+          acc.map(
+            invite =>
+              invite.userId === userId
+                ? { ...invite, access: invitedByUserId[userId].access }
+                : invite,
+          ),
+        invited,
+      );
+      const data = {
+        ...workInProgressItem,
+        invited: updatedInvites,
+      };
+
+      this.setState(prevState => ({
+        ...prevState,
+        isVisibleInviteModal: false,
+        workInProgressItem: data,
+        list: updateNode(prevState.list, workInProgressItem.id, data),
+      }));
+    });
+  };
+
+  removeInvites = async removeInviteIds => {
+    const { workInProgressItem } = this.state;
+    const { invited } = workInProgressItem;
+    const promises = removeInviteIds.map(inviteId => async () => {
+      const result = await deleteInviteItem(inviteId)
+        .then(() => ({ result: inviteId }))
+        .catch(e => ({ error: e }));
+      return result;
+    });
+
+    await Promise.all(promises.map(promise => promise())).then(results => {
+      const positiveResultsIds = results
+        .filter(result => typeof result.result !== 'undefined')
+        .map(result => result.result);
+      const updatedInvites = positiveResultsIds.reduce(
+        (acc, inviteId) => acc.filter(invite => invite.id !== inviteId),
+        invited,
+      );
+      const data = {
+        ...workInProgressItem,
+        invited: updatedInvites,
+      };
+
+      this.setState(prevState => ({
+        ...prevState,
+        isVisibleInviteModal: false,
+        workInProgressItem: data,
+        list: updateNode(prevState.list, workInProgressItem.id, data),
+      }));
+    });
+  };
+
+  handleInviteMembers = async invited => {
+    const { workInProgressItem } = this.state;
+    const { invited: currentlyInvited } = workInProgressItem;
+    const currentlyInvitedByUserId = currentlyInvited.reduce((acc, invite) => {
+      acc[invite.userId] = invite;
+      return acc;
+    }, {});
+
+    const invitedByUserId = invited.reduce((acc, invite) => {
+      acc[invite.userId] = invite;
+      return acc;
+    }, {});
+
+    const invitedUserIds = invited.reduce(
+      (acc, invite) => {
+        if (Object.keys(currentlyInvitedByUserId).includes(invite.userId)) {
+          if (
+            currentlyInvitedByUserId[invite.userId].access !== invite.access
+          ) {
+            acc.accessChange.push(invite.userId);
+          }
+        } else {
+          acc.newInvites.push(invite.userId);
+        }
+        return acc;
+      },
+      {
+        newInvites: [],
+        accessChange: [],
+      },
+    );
+
+    invitedUserIds.removeInvites = Object.keys(currentlyInvitedByUserId)
+      .filter(userId => !Object.keys(invitedByUserId).includes(userId))
+      .map(userId => currentlyInvitedByUserId[userId].id);
+
+    if (invitedUserIds.newInvites.length) {
+      await this.inviteNewMembers(invitedUserIds.newInvites, invitedByUserId);
+    }
+
+    if (invitedUserIds.accessChange.length) {
+      await this.changeInviteAccesses(
+        invitedUserIds.accessChange,
+        invitedByUserId,
+      );
+    }
+
+    if (invitedUserIds.removeInvites.length) {
+      await this.removeInvites(invitedUserIds.removeInvites);
     }
   };
 

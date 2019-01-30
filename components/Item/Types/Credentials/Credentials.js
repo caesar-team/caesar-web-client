@@ -1,131 +1,23 @@
 import React, { Component } from 'react';
 import styled from 'styled-components';
-import { Avatar, AvatarsList, Button, File, Icon, Label } from 'components';
-import { downloadFile } from 'common/utils/file';
-import { formatDate } from 'common/utils/dateFormatter';
+import { Icon, Label } from 'components';
 import { copyToClipboard } from 'common/utils/clipboard';
-
-const Wrapper = styled.div`
-  display: flex;
-  flex-direction: column;
-`;
-
-const Row = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-`;
-
-const InviteRow = styled(Row)`
-  margin-top: 10px;
-`;
-
-const StyledButton = styled(Button)`
-  margin-left: 20px;
-`;
-
-const ButtonsWrapper = styled.div`
-  display: flex;
-  justify-content: space-between;
-`;
-
-const Title = styled.div`
-  padding: 4px 0;
-  font-size: 36px;
-  letter-spacing: 1px;
-  color: ${({ theme }) => theme.black};
-`;
-
-const UpdatedDate = styled.div`
-  font-size: 14px;
-  letter-spacing: 0.4px;
-  color: ${({ theme }) => theme.emperor};
-`;
-
-const Owner = styled.div`
-  display: flex;
-  flex-direction: column;
-  margin-left: 15px;
-`;
-
-const OwnerName = styled.div`
-  font-size: 16px;
-  letter-spacing: 0.5px;
-  color: ${({ theme }) => theme.black};
-`;
-
-const OwnerStatus = styled.div`
-  font-size: 14px;
-  letter-spacing: 0.4px;
-  color: ${({ theme }) => theme.gray};
-`;
-
-const StyledAvatarsList = styled(AvatarsList)`
-  margin-right: 30px;
-`;
-
-const InviteButton = styled.button`
-  width: 40px;
-  height: 40px;
-  margin-right: -10px;
-  color: ${({ theme }) => theme.emperor};
-  border: 1px dashed ${({ theme }) => theme.gallery};
-  border-radius: 50%;
-  outline: none;
-  cursor: pointer;
-  transition: all 0.2s;
-
-  &:hover {
-    color: ${({ theme }) => theme.black};
-    border-color: ${({ theme }) => theme.emperor};
-  }
-`;
-
-const ShareButton = styled(Button)`
-  text-transform: uppercase;
-`;
-
-const EditButton = styled(Button)`
-  padding-right: 13px;
-  padding-left: 13px;
-  text-transform: uppercase;
-`;
+import {
+  Wrapper,
+  Row,
+  ItemHeader,
+  FieldWrapper,
+  Field,
+  FieldValue,
+  Attachments,
+  RemoveButton,
+  RemoveButtonWrapper,
+} from '../components';
 
 const StyledEyeIcon = styled(Icon)`
   margin-right: 20px;
   cursor: pointer;
   fill: ${({ theme }) => theme.gray};
-`;
-
-const FieldWrapper = styled.div`
-  display: flex;
-  flex-direction: column;
-  margin-top: 55px;
-`;
-
-const Field = styled.div`
-  display: flex;
-  flex-direction: column;
-  width: 100%;
-  border-bottom: 1px solid ${({ theme }) => theme.gallery};
-  margin-bottom: 24px;
-  padding-bottom: 5px;
-
-  &:last-child {
-    margin-bottom: 0;
-  }
-`;
-
-const FieldValue = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  font-size: 18px;
-  letter-spacing: 0.6px;
-  color: ${({ theme }) => theme.black};
-  width: 100%;
-  padding: 0 15px;
-  margin-top: 12px;
 `;
 
 const StyledIcon = styled(Icon)`
@@ -141,73 +33,6 @@ const StyledWebsiteLink = styled.a`
 
   &:hover {
     color: ${({ theme }) => theme.emperor};
-  }
-`;
-
-const AttachmentsWrapper = styled.div`
-  display: flex;
-  flex-direction: column;
-  margin-top: 52px;
-`;
-
-const AttachmentsHeaderRow = styled(Row)`
-  align-items: flex-start;
-`;
-
-const Attachments = styled.div`
-  font-size: 18px;
-  font-weight: bold;
-  letter-spacing: 0.6px;
-  color: ${({ theme }) => theme.black};
-  margin-bottom: 24px;
-`;
-
-const StyledDownloadIcon = styled(Icon)`
-  margin-right: 10px;
-  vertical-align: baseline;
-  transition: all 0.2s;
-`;
-
-const DownloadAll = styled.div`
-  font-size: 14px;
-  letter-spacing: 0.4px;
-  color: ${({ theme }) => theme.black};
-  cursor: pointer;
-  transition: all 0.2s;
-
-  &:hover {
-    color: ${({ theme }) => theme.emperor};
-
-    svg {
-      fill: ${({ theme }) => theme.emperor};
-    }
-  }
-`;
-
-const StyledFile = styled(File)`
-  margin-bottom: 30px;
-  margin-right: auto;
-  padding-right: 10px;
-  cursor: pointer;
-  transition: all 0.2s;
-
-  &:last-child {
-    margin-bottom: 30px;
-  }
-`;
-
-const FavoriteButton = styled.button`
-  align-self: flex-start;
-  margin-top: 20px;
-  padding: 0;
-  cursor: pointer;
-  background: none;
-  border: none;
-  outline: none;
-  transition: 0.3s;
-
-  &:hover {
-    opacity: 0.75;
   }
 `;
 
@@ -230,64 +55,20 @@ class Credentials extends Component {
     copyToClipboard(secret[field]);
   };
 
-  handleClickDownloadFiles = () => {
-    const {
-      item: {
-        secret: { attachments },
-      },
-    } = this.props;
-
-    attachments.forEach(({ name, raw }) => downloadFile(raw, name));
-  };
-
-  handleClickDownloadFile = index => () => {
-    const {
-      item: {
-        secret: { attachments },
-      },
-    } = this.props;
-
-    const { raw, name } = attachments[index];
-
-    downloadFile(raw, name);
-  };
-
   render() {
     const { isPasswordVisible } = this.state;
 
     const {
-      isTrashItem,
       allLists,
-      user,
-      members,
-      onClickCloseItem,
-      onClickRemoveItem,
-      onClickEditItem,
-      onClickInvite,
-      onClickRestoreItem,
-      onToggleFavorites,
+      onClickMoveToTrash,
+      isTrashItem,
       item: {
-        id: itemId,
         listId,
-        lastUpdated,
-        invited,
-        favorite,
-        ownerId,
-        secret: { name, login, pass, website, note, attachments },
+        secret: { login, pass, website, note, attachments },
       },
     } = this.props;
 
     const pwd = isPasswordVisible ? pass : pass.replace(/./g, '*');
-    const avatars = invited.reduce((accumulator, item) => {
-      if (user.id === item.userId) {
-        accumulator.unshift(user);
-      } else {
-        accumulator.push(members[item.userId]);
-      }
-
-      return accumulator;
-    }, []);
-    const owner = user.id === ownerId ? user : members[ownerId];
     const listName = allLists.find(({ id }) => id === listId).label;
     const eyeIconName = isPasswordVisible ? 'eye-off' : 'eye-on';
 
@@ -295,76 +76,9 @@ class Credentials extends Component {
     const shouldShowNote = !!note;
     const shouldShowAttachments = attachments.length > 0;
 
-    const renderedAttachments = attachments.map((attachment, index) => (
-      <StyledFile
-        key={index}
-        onClick={this.handleClickDownloadFile(index)}
-        {...attachment}
-      />
-    ));
-
     return (
       <Wrapper>
-        <Row>
-          <UpdatedDate>Last updated {formatDate(lastUpdated)}</UpdatedDate>
-          <Row>
-            {isTrashItem ? (
-              <ButtonsWrapper>
-                <Button color="white" onClick={onClickRestoreItem}>
-                  Restore
-                </Button>
-                <StyledButton
-                  color="white"
-                  icon="trash"
-                  onClick={onClickRemoveItem}
-                >
-                  Remove
-                </StyledButton>
-              </ButtonsWrapper>
-            ) : (
-              <EditButton color="white" icon="pencil" onClick={onClickEditItem}>
-                Edit
-              </EditButton>
-            )}
-            <StyledButton
-              color="white"
-              icon="close"
-              onClick={onClickCloseItem}
-            />
-          </Row>
-        </Row>
-        <Row>
-          <Title>{name}</Title>
-          <FavoriteButton onClick={onToggleFavorites(itemId)}>
-            <Icon
-              name={favorite ? 'favorite-active' : 'favorite'}
-              width={20}
-              height={20}
-            />
-          </FavoriteButton>
-        </Row>
-        <InviteRow>
-          <Row>
-            <Avatar
-              name={owner ? owner.name : ''}
-              avatar={owner ? owner.avatar : ''}
-            />
-            <Owner>
-              <OwnerName>{owner ? owner.name : ''}</OwnerName>
-              <OwnerStatus>owner</OwnerStatus>
-            </Owner>
-          </Row>
-          <Row>
-            {!isTrashItem && (
-              <InviteButton onClick={onClickInvite}>
-                <Icon name="plus" width={14} height={14} isInButton />
-              </InviteButton>
-            )}
-            <StyledAvatarsList avatars={avatars} />
-            {/* TODO: Uncomment to show share btn */}
-            {/* {!isTrashItem && <ShareButton color="black">Share</ShareButton>} */}
-          </Row>
-        </InviteRow>
+        <ItemHeader {...this.props} />
         <FieldWrapper>
           <Field>
             <Label>Login</Label>
@@ -423,19 +137,17 @@ class Credentials extends Component {
             </Field>
           )}
         </FieldWrapper>
-        {shouldShowAttachments && (
-          <AttachmentsWrapper>
-            <AttachmentsHeaderRow>
-              <Attachments>Attachments</Attachments>
-              <Row>
-                <DownloadAll onClick={this.handleClickDownloadFiles}>
-                  <StyledDownloadIcon name="download" width={14} height={14} />
-                  Download {attachments.length} files
-                </DownloadAll>
-              </Row>
-            </AttachmentsHeaderRow>
-            {renderedAttachments}
-          </AttachmentsWrapper>
+        {shouldShowAttachments && <Attachments attachments={attachments} />}
+        {!isTrashItem && (
+          <RemoveButtonWrapper>
+            <RemoveButton
+              color="white"
+              icon="trash"
+              onClick={onClickMoveToTrash}
+            >
+              Remove
+            </RemoveButton>
+          </RemoveButtonWrapper>
         )}
       </Wrapper>
     );

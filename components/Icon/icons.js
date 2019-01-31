@@ -36,6 +36,7 @@ import 'static/images/svg/icon-ok.svg?sprite';
 import 'static/images/svg/icon-pencil.svg?sprite';
 import 'static/images/svg/icon-plus.svg?sprite';
 import 'static/images/svg/icon-search.svg?sprite';
+import 'static/images/svg/icon-securenote.svg?sprite';
 import 'static/images/svg/icon-share.svg?sprite';
 import 'static/images/svg/icon-trash.svg?sprite';
 import 'static/images/svg/icon-update.svg?sprite';

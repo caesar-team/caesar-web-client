@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { Component, cloneElement } from 'react';
 import styled from 'styled-components';
 import enhanceWithClickOutside from 'react-click-outside';
 
@@ -10,7 +10,6 @@ const Wrapper = styled.div`
 
 const Box = styled.div`
   position: absolute;
-  z-index: 1;
   display: flex;
   flex-direction: column;
   top: 100%;
@@ -65,13 +64,21 @@ class DropdownInner extends Component {
   }
 
   renderOptions() {
-    const { options } = this.props;
+    const { options, optionRender } = this.props;
 
-    return options.map(({ label, value }, index) => (
-      <Option key={index} onClick={this.handleClick(value)}>
-        {label}
-      </Option>
-    ));
+    return options.map(
+      ({ label, value }, index) =>
+        optionRender ? (
+          cloneElement(optionRender(value, label), {
+            key: index,
+            onClick: this.handleClick(value),
+          })
+        ) : (
+          <Option key={index} onClick={this.handleClick(value)}>
+            {label}
+          </Option>
+        ),
+    );
   }
 
   render() {

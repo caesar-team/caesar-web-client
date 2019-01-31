@@ -1,6 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
-import { FAVORITES_TYPE, ITEM_TYPES } from 'common/constants';
+import { FAVORITES_TYPE, ITEM_TYPES, TRASH_TYPE } from 'common/constants';
 import { Icon, Scrollbar } from 'components';
 import Item from './Item';
 import EmptyList from './EmptyList';
@@ -53,6 +53,36 @@ const CreateButton = styled.div`
   }
 `;
 
+const StyledIcon = styled(Icon)`
+  margin-right: 15px;
+`;
+
+const Option = styled.button`
+  display: flex;
+  align-items: center;
+  font-size: 16px;
+  letter-spacing: 0.5px;
+  padding: 10px 30px;
+  border: none;
+  background: none;
+  cursor: pointer;
+  white-space: nowrap;
+`;
+
+const { ITEM_CREDENTIALS_TYPE, ITEM_DOCUMENT_TYPE } = ITEM_TYPES;
+
+const iconsMap = {
+  [ITEM_CREDENTIALS_TYPE]: 'key',
+  [ITEM_DOCUMENT_TYPE]: 'securenote',
+};
+
+const renderOption = (value, label) => (
+  <Option key={value}>
+    <StyledIcon name={iconsMap[value]} width={16} height={16} />
+    {label}
+  </Option>
+);
+
 const List = ({
   title = '',
   activeItemId = null,
@@ -75,8 +105,8 @@ const List = ({
   });
 
   const itemTypesOptions = [
-    { label: 'Password', value: ITEM_TYPES.ITEM_CREDENTIALS_TYPE },
-    { label: 'Note', value: ITEM_TYPES.ITEM_DOCUMENT_TYPE },
+    { label: 'Password', value: ITEM_CREDENTIALS_TYPE },
+    { label: 'Secure note', value: ITEM_DOCUMENT_TYPE },
   ];
 
   const renderedList = () => {
@@ -88,13 +118,19 @@ const List = ({
   };
 
   const isFavorite = list.type === FAVORITES_TYPE;
+  const isTrash = list.type === TRASH_TYPE;
+  const shouldShowAdd = !isFavorite && !isTrash;
 
   return (
     <Wrapper>
       <TitleWrapper>
         <Title>{title}</Title>
-        {!isFavorite && (
-          <Dropdown options={itemTypesOptions} onClick={onClickCreateItem}>
+        {shouldShowAdd && (
+          <Dropdown
+            options={itemTypesOptions}
+            onClick={onClickCreateItem}
+            optionRender={renderOption}
+          >
             <CreateButton>
               <Icon name="plus" width={14} height={14} isInButton />
             </CreateButton>

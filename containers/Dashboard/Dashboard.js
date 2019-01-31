@@ -252,19 +252,11 @@ class DashboardContainer extends Component {
         itemId,
         trashNodeId,
       );
-      const nextWorkInProgressNode = findNode(newList, selectedListId).model;
-      const nextWorkInProgress =
-        nextWorkInProgressNode.children.length > 0
-          ? nextWorkInProgressNode.children[0]
-          : null;
 
       this.setState(prevState => ({
         ...prevState,
         isVisibleMoveToTrashModal: false,
-        workInProgressItem: {
-          ...nextWorkInProgress,
-          mode: ITEM_REVIEW_MODE,
-        },
+        workInProgressItem: null,
         list: newList,
       }));
     } catch (e) {

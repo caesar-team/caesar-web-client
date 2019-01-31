@@ -91,7 +91,7 @@ const Item = ({
     (acc, invite) => (invite.userId === user.id ? invite.access : acc),
     null,
   );
-  const hasWriteAccess = access === PERMISION_WRITE;
+  const hasWriteAccess = ownerId === user.id || access === PERMISION_WRITE;
   const showReadOnlyNotify = access && !hasWriteAccess;
 
   const renderUpdateNotify = () => {

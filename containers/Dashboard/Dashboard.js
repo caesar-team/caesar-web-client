@@ -39,6 +39,8 @@ import {
   toggleFavorite,
   changeInviteAccess,
   deleteInviteItem,
+  changeInviteItem,
+  acceptUpdateItem,
 } from 'common/api';
 import DecryptWorker from 'common/decrypt.worker';
 import { initialItemData } from './utils';
@@ -328,7 +330,7 @@ class DashboardContainer extends Component {
   };
 
   handleFinishEditWorkflow = async ({ listId, attachments, ...secret }) => {
-    const { publicKey, members } = this.props;
+    const { publicKey, members, user } = this.props;
     const { workInProgressItem } = this.state;
 
     try {
@@ -352,7 +354,6 @@ class DashboardContainer extends Component {
       }
 
       const promises = [];
-
       if (isSecretChanged) {
         const options = {
           message: openpgp.message.fromText(JSON.stringify(data)),
@@ -362,33 +363,42 @@ class DashboardContainer extends Component {
         const encrypted = await openpgp.encrypt(options);
         const encryptedItem = encrypted.data;
 
-        promises.push(
-          updateItem(workInProgressItem.id, { secret: encryptedItem }),
-        );
+        const { invited } = workInProgressItem;
 
-        const invitedMembers = members.filter(({ id }) =>
-          workInProgressItem.invited.includes(id),
-        );
+        if (invited.length === 1) {
+          promises.push(
+            updateItem(workInProgressItem.id, { secret: encryptedItem }),
+          );
+        } else {
+          const invitedMembersIds = workInProgressItem.invited.map(
+            invite => invite.userId,
+          );
+          const invitedMembers = members.filter(({ id }) =>
+            invitedMembersIds.includes(id),
+          );
+          invitedMembers.push({ id: user.id, publicKey });
+          const invitePromises = invitedMembers.map(async member => {
+            const opts = {
+              message: openpgp.message.fromText(JSON.stringify(data)),
+              publicKeys: (await openpgp.key.readArmored(member.publicKey))
+                .keys,
+            };
 
-        const invitePromises = invitedMembers.map(async member => {
-          const opts = {
-            message: openpgp.message.fromText(JSON.stringify(data)),
-            publicKeys: (await openpgp.key.readArmored(member.publicKey)).keys,
-          };
+            return openpgp.encrypt(opts);
+          });
 
-          return openpgp.encrypt(opts);
-        });
+          const encryptedData = await Promise.all(invitePromises);
 
-        const encryptedData = await Promise.all(invitePromises);
-
-        const invites = encryptedData.map((encrypt, index) => ({
-          userId: invitedMembers[index].id,
-          secret: encrypt.data,
-        }));
-
-        await postInviteItem(workInProgressItem.id, {
-          invites,
-        });
+          const invites = encryptedData.map((encrypt, index) => ({
+            userId: invitedMembers[index].id,
+            secret: encrypt.data,
+          }));
+          promises.push(
+            changeInviteItem(workInProgressItem.id, {
+              invites,
+            }),
+          );
+        }
       }
 
       if (isListIdChanged) {
@@ -458,6 +468,43 @@ class DashboardContainer extends Component {
           favorites: newFavorites,
         };
       });
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  handleAcceptUpdate = id => async () => {
+    try {
+      const { data } = await acceptUpdateItem(id);
+      const { secret } = data;
+      const { privateKey, password } = this.props;
+      const privateKeyObj = (await openpgp.key.readArmored(privateKey)).keys[0];
+
+      await privateKeyObj.decrypt(password);
+
+      const newSecret = await openpgp.message.readArmored(secret);
+
+      const options = {
+        message: newSecret,
+        privateKeys: [privateKeyObj],
+      };
+
+      const { data: decryptedTextItem } = await openpgp.decrypt(options);
+
+      const newItem = { ...data, secret: JSON.parse(decryptedTextItem) };
+
+      this.setState(prevState => ({
+        ...prevState,
+        workInProgressItem: {
+          ...prevState.workInProgressItem,
+          ...newItem,
+        },
+        list: updateNode(
+          prevState.list,
+          prevState.workInProgressItem.id,
+          newItem,
+        ),
+      }));
     } catch (error) {
       console.error(error);
     }
@@ -825,6 +872,7 @@ class DashboardContainer extends Component {
                 onClickRestoreItem={this.handleClickRestoreItem}
                 onClickRemoveItem={this.handleClickRemoveItem}
                 onToggleFavorites={this.handleToggleFavorites}
+                onClickAcceptUpdate={this.handleAcceptUpdate}
               />
             </RightColumnWrapper>
           </CenterWrapper>

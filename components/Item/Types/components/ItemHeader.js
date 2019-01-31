@@ -121,9 +121,9 @@ export const ItemHeader = ({
   },
 }) => {
   const avatars = invited.reduce((accumulator, item) => {
-    if (user.id === item.userId) {
+    if (user.id === item.userId && user.id !== ownerId) {
       accumulator.unshift(user);
-    } else {
+    } else if (ownerId !== item.userId) {
       accumulator.push(members[item.userId]);
     }
 

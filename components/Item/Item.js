@@ -6,7 +6,8 @@ import {
   ITEM_DOCUMENT_TYPE,
   PERMISION_WRITE,
 } from 'common/constants';
-import { Icon } from 'components';
+import { Button, Icon } from 'components';
+import { formatDate } from 'common/utils/dateFormatter';
 import { matchStrict } from 'common/utils/match';
 import EmptyItem from './EmptyItem';
 import { Credentials, CredentialsForm, DocumentForm, Document } from './Types';
@@ -22,7 +23,8 @@ const Wrapper = styled.div`
 const Notify = styled.div`
   display: flex;
   align-items: center;
-  padding: 20px 26px;
+  padding: ${({ withButton }) =>
+    withButton ? '10px 10px 10px 26px' : '20px 10px 20px 26px'};
   color: ${({ theme }) => theme.white};
   background-color: ${({ theme }) => theme.black};
 `;
@@ -30,6 +32,10 @@ const Notify = styled.div`
 const NotifyText = styled.div`
   padding-left: 20px;
   color: ${({ theme }) => theme.white};
+`;
+
+const NotifyButton = styled(Button)`
+  margin-left: auto;
 `;
 
 const Item = ({
@@ -48,12 +54,13 @@ const Item = ({
   onClickRestoreItem = Function.prototype,
   onClickMoveToTrash = Function.prototype,
   onToggleFavorites = Function.prototype,
+  onClickAcceptUpdate = Function.prototype,
 }) => {
   if (!item) {
     return <EmptyItem />;
   }
 
-  const { mode, type, invited } = item;
+  const { mode, type, invited, update, ownerId, id } = item;
   const renderedItemForm = matchStrict(
     type,
     {
@@ -81,11 +88,29 @@ const Item = ({
     null,
   );
   const access = invited.reduce(
-    (acc, invite) => (invite.userId === user.id ? invite.access : null),
+    (acc, invite) => (invite.userId === user.id ? invite.access : acc),
     null,
   );
   const hasWriteAccess = access === PERMISION_WRITE;
   const showReadOnlyNotify = access && !hasWriteAccess;
+
+  const renderUpdateNotify = () => {
+    const updateUserName =
+      update.userId === ownerId ? user.name : members[update.userId].name;
+    const updateDate = formatDate(update.createdAt);
+
+    return (
+      <Notify withButton>
+        <Icon name="warning" width={14} height={14} isInButton />
+        <NotifyText>
+          {`Password has been changed by ${updateUserName} at ${updateDate}`}
+        </NotifyText>
+        <NotifyButton color="white" onClick={onClickAcceptUpdate(id)}>
+          Accept
+        </NotifyButton>
+      </Notify>
+    );
+  };
 
   const renderedItem = matchStrict(
     type,
@@ -136,6 +161,7 @@ const Item = ({
           <NotifyText>You can read only</NotifyText>
         </Notify>
       )}
+      {update && renderUpdateNotify()}
       <Wrapper>
         <Scrollbar>
           {mode === ITEM_REVIEW_MODE ? renderedItem : renderedItemForm}

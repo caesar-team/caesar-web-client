@@ -23,7 +23,7 @@ export const Document = props => {
   } = props;
   const listName = allLists.find(({ id }) => id === listId).label;
   const shouldShowNote = !!note;
-  const shouldShowAttachments = attachments.length > 0;
+  const shouldShowAttachments = attachments && attachments.length > 0;
 
   return (
     <Wrapper>

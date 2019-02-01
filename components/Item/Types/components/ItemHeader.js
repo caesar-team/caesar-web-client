@@ -109,6 +109,7 @@ export const ItemHeader = ({
   onClickRemoveItem,
   onClickEditItem,
   onClickInvite,
+  onClickShare,
   onClickRestoreItem,
   onToggleFavorites,
   item: {
@@ -191,7 +192,7 @@ export const ItemHeader = ({
           <StyledAvatarsList avatars={avatars} />
           {!isTrashItem &&
             isOwner && (
-              <ShareButton icon="share" color="black">
+              <ShareButton icon="share" color="black" onClick={onClickShare}>
                 Share
               </ShareButton>
             )}

@@ -12,6 +12,7 @@ import 'static/images/svg/icon-arrow-left-big.svg?sprite';
 import 'static/images/svg/icon-arrow-left-small.svg?sprite';
 import 'static/images/svg/icon-arrow-right-big.svg?sprite';
 import 'static/images/svg/icon-arrow-right-small.svg?sprite';
+import 'static/images/svg/icon-at.svg?sprite';
 import 'static/images/svg/icon-check.svg?sprite';
 import 'static/images/svg/icon-clip.svg?sprite';
 import 'static/images/svg/icon-close.svg?sprite';

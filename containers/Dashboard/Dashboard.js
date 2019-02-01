@@ -8,6 +8,7 @@ import {
   Item,
   List,
   InviteModal,
+  ShareModal,
   ConfirmModal,
   MenuList,
   withNotification,
@@ -222,7 +223,7 @@ class DashboardContainer extends Component {
 
   handleMoveToTrash = async () => {
     const { notification } = this.props;
-    const { list, selectedListId, workInProgressItem } = this.state;
+    const { list, workInProgressItem } = this.state;
 
     const { mode, ...rest } = workInProgressItem;
     const {
@@ -557,6 +558,12 @@ class DashboardContainer extends Component {
     });
   };
 
+  handleClickShare = () => {
+    this.setState({
+      isVisibleShareModal: true,
+    });
+  };
+
   inviteNewMembers = async (invitedUserIds, invitedByUserId) => {
     const { members } = this.props;
     const { workInProgressItem } = this.state;
@@ -733,9 +740,15 @@ class DashboardContainer extends Component {
     }
   };
 
-  handleCloseModal = () => {
+  handleCloseInviteModal = () => {
     this.setState({
       isVisibleInviteModal: false,
+    });
+  };
+
+  handleCloseShareModal = () => {
+    this.setState({
+      isVisibleShareModal: false,
     });
   };
 
@@ -762,6 +775,7 @@ class DashboardContainer extends Component {
 
     return {
       isVisibleInviteModal: false,
+      isVisibleShareModal: false,
       isVisibleMoveToTrashModal: false,
       isVisibleRemoveModal: false,
       list: tree,
@@ -806,6 +820,7 @@ class DashboardContainer extends Component {
       selectedListId,
       workInProgressItem,
       isVisibleInviteModal,
+      isVisibleShareModal,
       isVisibleMoveToTrashModal,
       isVisibleRemoveModal,
     } = this.state;
@@ -856,6 +871,7 @@ class DashboardContainer extends Component {
                 members={this.normalize(members)}
                 onClickCloseItem={this.handleClickCloseItem}
                 onClickInvite={this.handleClickInvite}
+                onClickShare={this.handleClickShare}
                 onClickEditItem={this.handleClickEditItem}
                 onClickMoveToTrash={this.handleClickMoveToTrash}
                 onFinishCreateWorkflow={this.handleFinishCreateWorkflow}
@@ -874,8 +890,11 @@ class DashboardContainer extends Component {
             members={members}
             invited={workInProgressItem.invited}
             onClickInvite={this.handleInviteMembers}
-            onCancel={this.handleCloseModal}
+            onCancel={this.handleCloseInviteModal}
           />
+        )}
+        {isVisibleShareModal && (
+          <ShareModal onCancel={this.handleCloseShareModal} />
         )}
         <ConfirmModal
           isOpen={isVisibleMoveToTrashModal}

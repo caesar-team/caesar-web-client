@@ -44,3 +44,5 @@ export { BackButtonWrapper } from './BackButtonWrapper';
 export { BackButton } from './BackButton';
 export { CodeInput } from './CodeInput';
 export { Checkbox } from './Checkbox';
+export { ModalTitle } from './ModalTitle';
+export { ShareModal } from './ShareModal';

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { Component } from 'react';
 import styled, { withTheme } from 'styled-components';
 import {
   API_URL,
@@ -6,8 +6,9 @@ import {
   AUTH_ENDPOINT,
   REDIRECT_AUTH_ENDPOINT,
 } from 'common/constants';
-import { Icon, AuthTitle } from 'components';
-import AuthDescription from '../../components/AuthDescription/AuthDescription';
+import { isServer } from 'common/utils/isEnvironment';
+import { Icon, AuthTitle, AuthDescription } from 'components';
+import { getTrustedDeviceToken } from 'common/utils/token';
 
 const Wrapper = styled.div`
   display: flex;
@@ -49,6 +50,7 @@ const GoogleLogoWrapper = styled.div`
   background-color: rgba(255, 255, 255, 0.15);
   width: 70px;
   height: 100%;
+  color: ${({ theme }) => theme.white};
 `;
 
 const AuthText = styled.div`
@@ -59,23 +61,46 @@ const AuthText = styled.div`
   color: ${({ theme }) => theme.white};
 `;
 
-// TODO: Get endpoints configuration from the api server.
-const authEndpoint = `${API_URL}/${AUTH_ENDPOINT}?redirect_uri=${APP_URL}/${REDIRECT_AUTH_ENDPOINT}`;
+class AuthContainer extends Component {
+  state = {
+    url: '',
+  };
 
-const AuthContainer = ({ theme }) => (
-  <Wrapper>
-    <IconWrapper>
-      <Icon name="logo" height={45} />
-    </IconWrapper>
-    <AuthTitle>Nice to meet you!</AuthTitle>
-    <AuthDescription>Welcome to Caesar</AuthDescription>
-    <AuthWrapper href={authEndpoint}>
-      <GoogleLogoWrapper>
-        <Icon name="google" width={25} height={25} fill={theme.white} />
-      </GoogleLogoWrapper>
-      <AuthText>Sign in via Google</AuthText>
-    </AuthWrapper>
-  </Wrapper>
-);
+  async componentDidMount() {
+    if (isServer) return;
+    const url = await this.generateUrl();
+    if (this.state.url === '') {
+      this.setState({ url });
+    }
+  }
+
+  generateUrl = async () => {
+    const deviceToken = await getTrustedDeviceToken(true);
+    return `${API_URL}/${AUTH_ENDPOINT}?redirect_uri=${APP_URL}/${REDIRECT_AUTH_ENDPOINT}&fingerprint=${deviceToken}`;
+  };
+
+  render() {
+    const { url } = this.state;
+    const isLinkShown = url !== '';
+
+    return (
+      <Wrapper>
+        <IconWrapper>
+          <Icon name="logo" height={45} />
+        </IconWrapper>
+        <AuthTitle>Nice to meet you!</AuthTitle>
+        <AuthDescription>Welcome to Caesar</AuthDescription>
+        {isLinkShown && (
+          <AuthWrapper href={url}>
+            <GoogleLogoWrapper>
+              <Icon name="google" width={25} height={25} isInButton />
+            </GoogleLogoWrapper>
+            <AuthText>Sign in via Google</AuthText>
+          </AuthWrapper>
+        )}
+      </Wrapper>
+    );
+  }
+}
 
 export default withTheme(AuthContainer);

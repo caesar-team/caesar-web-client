@@ -41,7 +41,10 @@ export default class App extends NextApp {
   }
 
   async componentDidMount() {
-    if (this.props.router.route !== '/auth') {
+    if (
+      this.props.router.route !== '/auth' &&
+      this.props.router.route !== '/2fa'
+    ) {
       this.initOpenPGPWorker();
       await this.initWorkflow();
     }

@@ -86,9 +86,14 @@ class Input extends Component {
   };
 
   onBlur = () => {
-    this.setState({
-      isFocused: false,
-    });
+    const { name, onBlur } = this.props;
+
+    this.setState(
+      {
+        isFocused: false,
+      },
+      () => onBlur && onBlur(name, true),
+    );
   };
 
   render() {

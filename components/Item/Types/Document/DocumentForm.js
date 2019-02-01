@@ -165,6 +165,7 @@ const DocumentForm = ({
         touched,
         handleSubmit,
         setFieldValue,
+        setFieldTouched,
         isSubmitting,
         isValid,
       }) => (
@@ -182,6 +183,7 @@ const DocumentForm = ({
             render={({ field }) => (
               <TitleInput
                 {...field}
+                onBlur={setFieldTouched}
                 placeholder="Enter the title"
                 autoFocus
                 error={checkError(touched, errors, 'name')}

@@ -12,15 +12,16 @@ import {
   BackButton,
   Button,
   CodeInput,
+  Checkbox,
 } from 'components';
+import { checkTwoFactor, createTwoFactor } from 'common/api';
+import { setToken, getTrustedDeviceToken } from 'common/utils/token';
 import { match } from 'common/utils/match';
 import {
   STEP_CREATE_TWO_FACTOR_AUTHENTICATION,
   STEP_CONFIRM_TWO_FACTOR_AUTHENTICATION,
 } from './constants';
 import { codeSchema } from './schema';
-import { checkTwoFactor, createTwoFactor } from '../../common/api';
-import { setToken } from '../../common/utils/token';
 
 const InnerWrapper = styled.div`
   max-width: 400px;
@@ -69,6 +70,12 @@ const Error = styled.div`
   color: ${({ theme }) => theme.red};
 `;
 
+const CheckboxWrapper = styled.div`
+  display: flex;
+  justify-content: center;
+  padding-top: 20px;
+`;
+
 class TwoFactorAuthentication extends Component {
   state = this.prepareInitialState();
 
@@ -85,14 +92,17 @@ class TwoFactorAuthentication extends Component {
   };
 
   handleTwoFactorAuthenticationCreate = async (
-    { code },
+    { code, fpCheck },
     { setSubmitting, setErrors },
   ) => {
+    const post = { authCode: code, secret: this.props.code };
+
+    if (fpCheck) {
+      post.fingerprint = await getTrustedDeviceToken(true);
+    }
+
     try {
-      await createTwoFactor({
-        authCode: code,
-        secret: this.props.code,
-      });
+      await createTwoFactor(post);
       this.props.initialize(() => Router.replace('/'));
     } catch (error) {
       setErrors({ code: 'Wrong code' });
@@ -101,16 +111,19 @@ class TwoFactorAuthentication extends Component {
   };
 
   handleTwoFactorAuthenticationCheck = async (
-    { code },
+    { code, fpCheck },
     { setSubmitting, setErrors },
   ) => {
+    const post = { authCode: code };
+
+    if (fpCheck) {
+      post.fingerprint = await getTrustedDeviceToken(true);
+    }
+
     try {
       const {
         data: { token },
-      } = await checkTwoFactor({
-        authCode: code,
-        trusted: true,
-      });
+      } = await checkTwoFactor(post);
 
       setToken(token);
       this.props.initialize(() => Router.replace('/'));
@@ -119,6 +132,11 @@ class TwoFactorAuthentication extends Component {
       setSubmitting(false);
     }
   };
+
+  getInitialValues = () => ({
+    code: '',
+    fpCheck: false,
+  });
 
   prepareInitialState() {
     const { isCheck } = this.props;
@@ -177,7 +195,7 @@ class TwoFactorAuthentication extends Component {
           </AuthDescription>
           <Formik
             key="codeForm"
-            initialValues={{ code }}
+            initialValues={this.getInitialValues()}
             isInitialValid={codeSchema.isValidSync({ code })}
             validationSchema={codeSchema}
             onSubmit={action}
@@ -200,6 +218,13 @@ class TwoFactorAuthentication extends Component {
                   errors={errors}
                 />
                 {errors.code && <Error>{errors.code}</Error>}
+                <CheckboxWrapper>
+                  <Checkbox
+                    onChange={value => setFieldValue('fpCheck', value, false)}
+                  >
+                    Remember device
+                  </Checkbox>
+                </CheckboxWrapper>
               </Form>
             )}
           />

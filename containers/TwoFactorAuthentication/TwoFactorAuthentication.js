@@ -163,11 +163,13 @@ class TwoFactorAuthentication extends Component {
 
     return (
       <WrapperAlignTop>
-        <BackButtonWrapper>
-          <BackButton onClick={this.handleClickReturn}>
-            Back to the previous step
-          </BackButton>
-        </BackButtonWrapper>
+        {!isCheck && (
+          <BackButtonWrapper>
+            <BackButton onClick={this.handleClickReturn}>
+              Back to the previous step
+            </BackButton>
+          </BackButtonWrapper>
+        )}
         <AuthWrapper>
           <AuthTitle>Two Factor Authentication</AuthTitle>
           <AuthDescription>

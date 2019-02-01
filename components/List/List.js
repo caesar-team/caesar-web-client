@@ -10,8 +10,9 @@ const Wrapper = styled.div`
   position: relative;
   display: flex;
   flex-direction: column;
-  height: 100vh;
-  background-color: ${({ theme }) => theme.white};
+  height: calc(100vh - 70px);
+  background-color: ${({ isEmpty, theme }) =>
+    isEmpty ? theme.white : theme.lightBlue};
 `;
 
 const TitleWrapper = styled.div`
@@ -109,8 +110,9 @@ const List = ({
     { label: 'Secure note', value: ITEM_DOCUMENT_TYPE },
   ];
 
+  const isEmpty = list.children.length === 0;
   const renderedList = () => {
-    if (list.children.length === 0) {
+    if (isEmpty) {
       return <EmptyList />;
     }
 
@@ -122,7 +124,7 @@ const List = ({
   const shouldShowAdd = !isFavorite && !isTrash;
 
   return (
-    <Wrapper>
+    <Wrapper isEmpty={isEmpty}>
       <TitleWrapper>
         <Title>{title}</Title>
         {shouldShowAdd && (

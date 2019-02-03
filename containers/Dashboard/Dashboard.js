@@ -844,7 +844,7 @@ class DashboardContainer extends Component {
 
     return (
       <Fragment>
-        <Layout user={user}>
+        <Layout user={user} withSearch>
           <CenterWrapper>
             <Sidebar>
               <MenuList

@@ -21,7 +21,8 @@ const LeftWrapper = styled.div`
   width: 300px;
   flex-shrink: 0;
   padding-left: 60px;
-  border-right: 1px solid ${({ theme }) => theme.gallery};
+  ${({ withBorder, theme }) =>
+    withBorder && `border-right: 1px solid ${theme.gallery}`};
 `;
 
 const RightWrapper = styled.div`
@@ -109,12 +110,12 @@ export class Header extends Component {
   };
 
   render() {
-    const { user } = this.props;
+    const { user, withSearch } = this.props;
     const { isDropdownOpened } = this.state;
 
     return (
       <Wrapper>
-        <LeftWrapper>
+        <LeftWrapper withBorder={withSearch}>
           <Logo />
         </LeftWrapper>
         <RightWrapper>

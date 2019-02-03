@@ -44,6 +44,7 @@ const Item = ({
   allLists,
   user,
   members = {},
+  notification,
   onClickCloseItem = Function.prototype,
   onClickEditItem = Function.prototype,
   onClickInvite = Function.prototype,
@@ -118,6 +119,7 @@ const Item = ({
     {
       [ITEM_CREDENTIALS_TYPE]: (
         <Credentials
+          notification={notification}
           hasWriteAccess={hasWriteAccess}
           isTrashItem={isTrashItem}
           item={item}

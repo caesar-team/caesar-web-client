@@ -153,6 +153,7 @@ class ManageListContainer extends Component {
 
       notification.show({
         text: `The list «${label}» was removed.`,
+        icon: 'ok',
       });
 
       this.setState(prevState => ({

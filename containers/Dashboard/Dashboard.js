@@ -246,6 +246,7 @@ class DashboardContainer extends Component {
 
       notification.show({
         text: `The post «${name}» was moved to trash.`,
+        icon: 'ok',
       });
 
       const newList = replaceNode(
@@ -813,7 +814,7 @@ class DashboardContainer extends Component {
   }
 
   render() {
-    const { user, members } = this.props;
+    const { user, members, notification } = this.props;
     const {
       list,
       favorites,
@@ -864,6 +865,7 @@ class DashboardContainer extends Component {
             </MiddleColumnWrapper>
             <RightColumnWrapper>
               <Item
+                notification={notification}
                 isTrashItem={isTrashItem}
                 item={workInProgressItem}
                 allLists={allLists}

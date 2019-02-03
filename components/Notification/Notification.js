@@ -81,11 +81,11 @@ class Notification extends PureComponent {
   };
 
   render() {
-    const { text, actionText } = this.props;
+    const { text, actionText, icon } = this.props;
 
     return (
       <Wrapper>
-        <StyledIcon name="ok" width={20} height={20} />
+        {icon && <StyledIcon name={icon} width={20} height={20} />}
         <Text>{text}</Text>
         {actionText && (
           <ActionLink

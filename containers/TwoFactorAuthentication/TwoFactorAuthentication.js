@@ -36,12 +36,12 @@ const QrCodeImage = styled.img`
   width: 200px;
   height: 200px;
   vertical-align: top;
-  margin-bottom: 40px;
+  margin-bottom: 20px;
 `;
 
 const QrCodeKeyWrapper = styled.div`
   margin-top: -10px;
-  margin-bottom: 40px;
+  margin-bottom: 20px;
   text-align: center;
 `;
 

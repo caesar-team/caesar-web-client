@@ -9,7 +9,7 @@ export const schema = yup.object({
     .string()
     .matches(
       /(http(s)?:\/\/.)?(www\.)?[-a-zA-Z0-9@:%._+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_+.~#?&//=]*)/,
-      { excludeEmptyString: true },
+      { excludeEmptyString: true, message: 'Incorrect format for website' },
     ),
   note: yup.string(),
   attachments: yup.array(yup.mixed()),

@@ -167,11 +167,11 @@ const Item = ({
         </Notify>
       )}
       {update && renderUpdateNotify()}
-      <Wrapper>
-        <Scrollbar>
+      <Scrollbar>
+        <Wrapper>
           {mode === ITEM_REVIEW_MODE ? renderedItem : renderedItemForm}
-        </Scrollbar>
-      </Wrapper>
+        </Wrapper>
+      </Scrollbar>
     </Fragment>
   );
 };

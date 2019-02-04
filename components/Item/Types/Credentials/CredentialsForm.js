@@ -2,7 +2,7 @@ import React from 'react';
 import styled from 'styled-components';
 import { Formik, FastField } from 'formik';
 import { checkError } from 'common/utils/formikUtils';
-import { ITEM_WORKFLOW_EDIT_MODE } from 'common/constants';
+import { ITEM_WORKFLOW_EDIT_MODE, TRASH_TYPE } from 'common/constants';
 import {
   Uploader,
   Input,
@@ -158,10 +158,12 @@ const CredentialsForm = ({
 
   const buttonText = isEditMode ? 'Update' : 'Add';
 
-  const preparedOptions = allLists.map(({ id, label }) => ({
-    value: id,
-    label,
-  }));
+  const preparedOptions = allLists
+    .filter(({ type: listType }) => listType !== TRASH_TYPE)
+    .map(({ id, label }) => ({
+      value: id,
+      label,
+    }));
 
   return (
     <Formik
@@ -178,6 +180,7 @@ const CredentialsForm = ({
         touched,
         handleSubmit,
         setFieldValue,
+        setFieldTouched,
         isSubmitting,
         isValid,
       }) => (
@@ -195,6 +198,7 @@ const CredentialsForm = ({
             render={({ field }) => (
               <TitleInput
                 {...field}
+                onBlur={setFieldTouched}
                 placeholder="Enter the title"
                 autoFocus
                 error={checkError(touched, errors, 'name')}
@@ -207,6 +211,7 @@ const CredentialsForm = ({
               render={({ field }) => (
                 <FormInput
                   {...field}
+                  onBlur={setFieldTouched}
                   label="Login"
                   withBorder
                   error={checkError(touched, errors, 'login')}
@@ -220,6 +225,7 @@ const CredentialsForm = ({
               render={({ field }) => (
                 <FormPasswordInput
                   {...field}
+                  onBlur={setFieldTouched}
                   withBorder
                   label="Password"
                   error={checkError(touched, errors, 'pass')}
@@ -233,6 +239,7 @@ const CredentialsForm = ({
               render={({ field }) => (
                 <FormInput
                   {...field}
+                  onBlur={setFieldTouched}
                   withBorder
                   label="Website"
                   error={checkError(touched, errors, 'website')}

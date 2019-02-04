@@ -12,9 +12,8 @@ import {
   File,
   Icon,
 } from 'components';
+import { Form } from '../components';
 import { schema } from './schema';
-
-const Form = styled.form``;
 
 const Row = styled.div`
   position: relative;

@@ -53,7 +53,7 @@ const StyledFile = styled(File)`
   transition: all 0.2s;
 
   &:last-child {
-    margin-bottom: 30px;
+    margin-bottom: 0;
   }
 `;
 

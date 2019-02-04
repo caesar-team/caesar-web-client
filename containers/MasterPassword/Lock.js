@@ -1,8 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
 import { Formik, FastField } from 'formik';
-import { checkError } from 'common/utils/formikUtils';
-import { Icon, LockInput } from 'components';
+import { Head, Icon, LockInput } from 'components';
 import { passwordSchema } from './schema';
 
 const Wrapper = styled.div`
@@ -29,6 +28,7 @@ const StyledLogo = styled(Icon)`
 
 const Lock = ({ onSubmit }) => (
   <Wrapper>
+    <Head title="[LOCKED] Caesar" />
     <StyledLogo name="logo" width={210} height={45} />
     <Title>Enter your master password</Title>
     <Formik

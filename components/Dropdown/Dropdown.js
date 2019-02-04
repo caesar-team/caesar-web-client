@@ -12,12 +12,34 @@ const Box = styled.div`
   position: absolute;
   display: flex;
   flex-direction: column;
-  top: 100%;
+  top: calc(100% + 19px);
   right: 0;
   z-index: 100;
   border-radius: 3px;
   background-color: ${({ theme }) => theme.white};
   border: 1px solid ${({ theme }) => theme.gallery};
+
+  &::before {
+    position: absolute;
+    z-index: 1;
+    display: block;
+    width: 15px;
+    height: 15px;
+    right: 10px;
+    top: -7px;
+    content: '';
+    transform: rotate(45deg);
+    background-color: ${({ theme }) => theme.white};
+    border: 1px solid ${({ theme }) => theme.gallery};
+  }
+`;
+
+const OptionsList = styled.div`
+  position: relative;
+  z-index: 2;
+  background-color: ${({ theme }) => theme.white};
+  border-radius: 3px;
+  overflow: hidden;
 `;
 
 const Option = styled.button`
@@ -30,6 +52,7 @@ const Button = styled.button`
   border: none;
   background-color: transparent;
   outline: none;
+  padding: 0;
 `;
 
 class DropdownInner extends Component {
@@ -92,7 +115,11 @@ class DropdownInner extends Component {
         <Button type="button" className={className} onClick={this.handleToggle}>
           {children}
         </Button>
-        {isOpen && <Box>{renderedOptions}</Box>}
+        {isOpen && (
+          <Box>
+            <OptionsList>{renderedOptions}</OptionsList>
+          </Box>
+        )}
       </Wrapper>
     );
   }

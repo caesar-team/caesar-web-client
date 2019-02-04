@@ -14,9 +14,9 @@ const Main = styled.main`
   flex-grow: 1;
 `;
 
-const Layout = ({ children, user }) => (
+const Layout = ({ children, user, withSearch }) => (
   <LayoutWrapper>
-    <Header user={user} />
+    <Header user={user} withSearch={withSearch} />
     <Main>{children}</Main>
   </LayoutWrapper>
 );

@@ -49,10 +49,17 @@ class Credentials extends Component {
 
   handleCopy = field => () => {
     const {
+      notification,
       item: { secret },
     } = this.props;
 
     copyToClipboard(secret[field]);
+
+    const fieldText = field === 'login' ? 'Login' : 'Password';
+
+    notification.show({
+      text: `${fieldText} has copied.`,
+    });
   };
 
   render() {

@@ -26,6 +26,8 @@ const port = process.env.APP_PORT;
 const handle = app.getRequestHandler();
 
 const jwtParse = token => {
+  if (!token) return null;
+
   const base64Url = token.split('.')[1];
   const base64 = base64Url.replace('-', '+').replace('_', '/');
   try {

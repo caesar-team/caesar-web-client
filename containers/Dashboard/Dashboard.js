@@ -8,6 +8,7 @@ import {
   Item,
   List,
   InviteModal,
+  ShareModal,
   ConfirmModal,
   MenuList,
   withNotification,
@@ -222,7 +223,7 @@ class DashboardContainer extends Component {
 
   handleMoveToTrash = async () => {
     const { notification } = this.props;
-    const { list, selectedListId, workInProgressItem } = this.state;
+    const { list, workInProgressItem } = this.state;
 
     const { mode, ...rest } = workInProgressItem;
     const {
@@ -245,6 +246,7 @@ class DashboardContainer extends Component {
 
       notification.show({
         text: `The post «${name}» was moved to trash.`,
+        icon: 'ok',
       });
 
       const newList = replaceNode(
@@ -557,6 +559,12 @@ class DashboardContainer extends Component {
     });
   };
 
+  handleClickShare = () => {
+    this.setState({
+      isVisibleShareModal: true,
+    });
+  };
+
   inviteNewMembers = async (invitedUserIds, invitedByUserId) => {
     const { members } = this.props;
     const { workInProgressItem } = this.state;
@@ -733,9 +741,15 @@ class DashboardContainer extends Component {
     }
   };
 
-  handleCloseModal = () => {
+  handleCloseInviteModal = () => {
     this.setState({
       isVisibleInviteModal: false,
+    });
+  };
+
+  handleCloseShareModal = () => {
+    this.setState({
+      isVisibleShareModal: false,
     });
   };
 
@@ -762,6 +776,7 @@ class DashboardContainer extends Component {
 
     return {
       isVisibleInviteModal: false,
+      isVisibleShareModal: false,
       isVisibleMoveToTrashModal: false,
       isVisibleRemoveModal: false,
       list: tree,
@@ -799,13 +814,14 @@ class DashboardContainer extends Component {
   }
 
   render() {
-    const { user, members } = this.props;
+    const { user, members, notification } = this.props;
     const {
       list,
       favorites,
       selectedListId,
       workInProgressItem,
       isVisibleInviteModal,
+      isVisibleShareModal,
       isVisibleMoveToTrashModal,
       isVisibleRemoveModal,
     } = this.state;
@@ -829,7 +845,7 @@ class DashboardContainer extends Component {
 
     return (
       <Fragment>
-        <Layout user={user}>
+        <Layout user={user} withSearch>
           <CenterWrapper>
             <Sidebar>
               <MenuList
@@ -849,6 +865,7 @@ class DashboardContainer extends Component {
             </MiddleColumnWrapper>
             <RightColumnWrapper>
               <Item
+                notification={notification}
                 isTrashItem={isTrashItem}
                 item={workInProgressItem}
                 allLists={allLists}
@@ -856,6 +873,7 @@ class DashboardContainer extends Component {
                 members={this.normalize(members)}
                 onClickCloseItem={this.handleClickCloseItem}
                 onClickInvite={this.handleClickInvite}
+                onClickShare={this.handleClickShare}
                 onClickEditItem={this.handleClickEditItem}
                 onClickMoveToTrash={this.handleClickMoveToTrash}
                 onFinishCreateWorkflow={this.handleFinishCreateWorkflow}
@@ -874,8 +892,11 @@ class DashboardContainer extends Component {
             members={members}
             invited={workInProgressItem.invited}
             onClickInvite={this.handleInviteMembers}
-            onCancel={this.handleCloseModal}
+            onCancel={this.handleCloseInviteModal}
           />
+        )}
+        {isVisibleShareModal && (
+          <ShareModal onCancel={this.handleCloseShareModal} />
         )}
         <ConfirmModal
           isOpen={isVisibleMoveToTrashModal}

@@ -19,7 +19,8 @@ const TitleWrapper = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
-  min-height: 61px;
+  flex-shrink: 0;
+  height: 61px;
   padding: 10px 30px;
   background-color: ${({ theme }) => theme.white};
   border-bottom: 1px solid ${({ theme }) => theme.gallery};
@@ -60,6 +61,7 @@ const StyledIcon = styled(Icon)`
 
 const Option = styled.button`
   display: flex;
+  width: 100%;
   align-items: center;
   font-size: 16px;
   letter-spacing: 0.5px;
@@ -68,6 +70,10 @@ const Option = styled.button`
   background: none;
   cursor: pointer;
   white-space: nowrap;
+
+  &:hover {
+    background-color: ${({ theme }) => theme.snow};
+  }
 `;
 
 const { ITEM_CREDENTIALS_TYPE, ITEM_DOCUMENT_TYPE } = ITEM_TYPES;

@@ -44,9 +44,11 @@ const Item = ({
   allLists,
   user,
   members = {},
+  notification,
   onClickCloseItem = Function.prototype,
   onClickEditItem = Function.prototype,
   onClickInvite = Function.prototype,
+  onClickShare = Function.prototype,
   onFinishCreateWorkflow = Function.prototype,
   onFinishEditWorkflow = Function.prototype,
   onCancelWorkflow = Function.prototype,
@@ -117,6 +119,7 @@ const Item = ({
     {
       [ITEM_CREDENTIALS_TYPE]: (
         <Credentials
+          notification={notification}
           hasWriteAccess={hasWriteAccess}
           isTrashItem={isTrashItem}
           item={item}
@@ -127,6 +130,7 @@ const Item = ({
           onClickRemoveItem={onClickRemoveItem}
           onClickEditItem={onClickEditItem}
           onClickInvite={onClickInvite}
+          onClickShare={onClickShare}
           onClickRestoreItem={onClickRestoreItem}
           onToggleFavorites={onToggleFavorites}
           onClickMoveToTrash={onClickMoveToTrash}
@@ -144,6 +148,7 @@ const Item = ({
           onClickRemoveItem={onClickRemoveItem}
           onClickEditItem={onClickEditItem}
           onClickInvite={onClickInvite}
+          onClickShare={onClickShare}
           onClickRestoreItem={onClickRestoreItem}
           onToggleFavorites={onToggleFavorites}
           onClickMoveToTrash={onClickMoveToTrash}

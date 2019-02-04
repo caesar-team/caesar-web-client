@@ -63,6 +63,7 @@ app.prepare().then(() => {
   });
 
   server.get('*', (req, res) => {
+    res.status(404);
     handle(req, res);
   });
 

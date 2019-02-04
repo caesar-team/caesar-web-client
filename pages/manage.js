@@ -2,13 +2,13 @@ import React, { Fragment } from 'react';
 import { ManageListContainer } from '../containers';
 import { Head } from '../components';
 import { isServer } from '../common/utils/isEnvironment';
-import { getList, getUserSelf } from '../common/api';
+import { getList, getUsers, getUserSelf } from '../common/api';
 import { getToken } from '../common/utils/token';
 
-const Manage = ({ list, user }) => (
+const Manage = props => (
   <Fragment>
     <Head title="List Management" />
-    <ManageListContainer list={list} user={user} />
+    <ManageListContainer {...props} />
   </Fragment>
 );
 
@@ -18,8 +18,9 @@ Manage.getInitialProps = async ({ req }) => {
 
     const { data: list } = await getList(token);
     const { data: user } = await getUserSelf(token);
+    const { data: members } = await getUsers(token);
 
-    return { list, user };
+    return { list, user, members };
   } catch (e) {
     // TODO: figure out about request errors
     // console.log(e.response);

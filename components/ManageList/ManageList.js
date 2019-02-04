@@ -1,89 +1,91 @@
-import React, { Component } from 'react';
+import React, { Component, Fragment } from 'react';
 import styled from 'styled-components';
-import { Button, Table } from 'antd';
+import { Button } from 'components/Button';
+import { AvatarsList } from 'components/Avatar';
 import Link from 'next/link';
 import { Icon } from '../Icon';
+import { ListOptions } from './ListOptions';
 
-const Wrapper = styled.div`
+const getTableColAlignStyles = ({ align }) => {
+  switch (align) {
+    case 'left':
+      return 'justify-content: flex-start';
+    case 'center':
+      return 'justify-content: center';
+    case 'right':
+      return 'justify-content: flex-end';
+    default:
+      return 'justify-content: flex-start';
+  }
+};
+
+const Header = styled.div`
   display: flex;
-  flex-direction: column;
-  position: relative;
-  height: calc(100vh - 140px);
+  justify-content: space-between;
+  align-items: center;
+`;
+
+const Table = styled.div`
+  padding-top: 20px;
+`;
+
+const TableRow = styled.div`
+  display: flex;
+  align-items: center;
+  margin-bottom: 5px;
+  font-size: 18px;
+  line-height: 1.3;
+  color: ${({ theme }) => theme.black};
+  background-color: ${({ theme }) => theme.white};
+`;
+
+const TableHeader = styled(TableRow)`
+  margin-bottom: 20px;
+  color: ${({ theme }) => theme.gray};
+  background-color: ${({ theme }) => theme.lightBlue};
+  border-bottom: 1px solid ${({ theme }) => theme.gray};
+`;
+
+const TableCol = styled.div`
+  display: flex;
+  width: ${({ width }) => width || '100%'};
+  padding: 10px 15px;
+
+  ${getTableColAlignStyles};
 `;
 
 const TableName = styled.div`
-  font-size: 24px;
-  line-height: 30px;
-  color: #2e2f31;
-  margin-bottom: 20px;
+  font-size: 36px;
+  color: ${({ theme }) => theme.black};
 `;
 
-const StyledTable = styled(Table)`
-  .ant-table-thead,
-  .ant-table-tbody {
-    font-size: 18px;
-    color: #2e2f31;
-  }
-
-  .ant-table-tbody > tr {
-    height: 60px;
-  }
-
-  .ant-table-tbody > tr > td {
-    padding: 9px 16px 10px;
-  }
-
-  .ant-table-placeholder {
-    font-size: 18px;
-    color: #2e2f31;
-  }
+const ListNameLink = styled.a`
+  display: inline-block;
+  color: ${({ theme }) => theme.black};
+  margin-right: 10px;
+  border-bottom: 1px dashed transparent;
 `;
 
 const ListName = styled.div`
   display: flex;
   align-items: center;
+
+  &:hover {
+    ${ListNameLink} {
+      color: ${({ theme }) => theme.black};
+      border-color: ${({ theme }) => theme.black};
+    }
+  }
 `;
 
-const ListNameLink = styled.a`
-  color: #3d70ff;
-  margin-right: 10px;
-`;
-
-const MembersColumn = styled.div`
+const MembersCol = styled.div`
   display: flex;
   align-items: center;
 `;
 
 const StyledIcon = styled(Icon)`
   cursor: pointer;
-
-  > svg {
-    fill: #888b90;
-  }
-`;
-
-const EmptyBlock = styled.div`
-  width: 100px;
-`;
-
-const ButtonWrapper = styled.div`
-  position: absolute;
-  bottom: 30px;
-  left: 0;
-`;
-
-const StyledButton = styled(Button)`
-  width: 60px;
-  height: 60px;
-
-  > .anticon {
-    margin-top: 4px;
-
-    > svg {
-      width: 20px;
-      height: 20px;
-    }
-  }
+  fill: #888b90;
 `;
 
 class ManageList extends Component {
@@ -91,7 +93,7 @@ class ManageList extends Component {
     hoverRowIndex: null,
   };
 
-  handleMouseEnter = index => () => {
+  handleMouseEnter = index => {
     this.setState({
       hoverRowIndex: index,
     });
@@ -105,70 +107,76 @@ class ManageList extends Component {
 
   render() {
     const { hoverRowIndex } = this.state;
-
     const {
       list,
+      members,
       onClickCreateList = Function.prototype,
-      onClickEditList = Function.prototype,
       onClickRemoveList = Function.prototype,
     } = this.props;
-
-    const columns = [
-      {
-        title: 'Name',
-        dataIndex: 'label',
-        width: '30%',
-        render: (text, data, index) => (
-          <ListName
-            onMouseEnter={this.handleMouseEnter(index)}
-            onMouseLeave={this.handleMouseLeave}
-          >
-            <Link href={{ pathname: '/', query: { listId: data.id } }}>
-              <ListNameLink>{text}</ListNameLink>
-            </Link>
-            {index === hoverRowIndex && (
-              <StyledIcon type="edit" onClick={onClickEditList(data.id)} />
-            )}
-          </ListName>
-        ),
-      },
-      {
-        title: 'Elements',
-        dataIndex: 'count',
-        width: '30%',
-        key: 'count',
-      },
-      {
-        title: 'Members',
-        dataIndex: 'shared',
-        render(_, data, key) {
-          return (
-            <MembersColumn key={key}>
-              <EmptyBlock />
-              <StyledIcon
-                type="delete"
-                fill="#888b90"
-                onClick={onClickRemoveList(data.id)}
-              />
-            </MembersColumn>
-          );
-        },
-      },
-    ];
+    const generateAvatars = invitedIds =>
+      invitedIds.map(item => members[item.id]);
 
     return (
-      <Wrapper>
-        <TableName>Lists</TableName>
-        <StyledTable dataSource={list} columns={columns} rowKey="id" />
-        <ButtonWrapper>
-          <StyledButton
-            type="primary"
-            shape="circle"
-            icon="plus"
-            onClick={onClickCreateList}
-          />
-        </ButtonWrapper>
-      </Wrapper>
+      <Fragment>
+        <Header>
+          <TableName>Lists</TableName>
+          <Button onClick={onClickCreateList} icon="plus" color="black">
+            ADD LIST
+          </Button>
+        </Header>
+        <Table>
+          <TableHeader>
+            <TableCol align="left" width="33.33333%">
+              Name
+            </TableCol>
+            <TableCol align="center" width="33.33333%">
+              Elements
+            </TableCol>
+            <TableCol align="right" width="33.33333%">
+              Members
+            </TableCol>
+          </TableHeader>
+          {list.map((listItem, index) => (
+            <TableRow key={listItem.id}>
+              <TableCol align="left" width="33.33333%">
+                <ListName
+                  onMouseEnter={() => this.handleMouseEnter(index)}
+                  onMouseLeave={this.handleMouseLeave}
+                >
+                  <Link
+                    href={{
+                      pathname: '/',
+                      query: { listId: listItem.id },
+                    }}
+                  >
+                    <ListNameLink>{listItem.label}</ListNameLink>
+                  </Link>
+                  {index === hoverRowIndex && (
+                    <StyledIcon name="edit" width="14" height="14" />
+                  )}
+                </ListName>
+              </TableCol>
+              <TableCol align="center" width="33.33333%">
+                {listItem.count}
+              </TableCol>
+              <TableCol align="right" width="33.33333%">
+                <MembersCol>
+                  <AvatarsList
+                    isSmall
+                    visibleCount="4"
+                    avatars={generateAvatars(listItem.invited)}
+                  />
+                  <ListOptions
+                    index={index}
+                    listId={listItem.id}
+                    onClickRemoveList={onClickRemoveList}
+                  />
+                </MembersCol>
+              </TableCol>
+            </TableRow>
+          ))}
+        </Table>
+      </Fragment>
     );
   }
 }

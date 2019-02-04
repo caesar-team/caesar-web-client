@@ -1,71 +1,93 @@
-import React from 'react';
+import React, { Fragment } from 'react';
 import styled from 'styled-components';
-import { List } from 'antd';
 import { Icon } from '../Icon';
 import { Avatar } from '../Avatar';
+import { Checkbox } from '../Checkbox';
 
-const { Item } = List;
+const Wrapper = styled.div`
+  display: flex;
+  align-items: center;
+  margin-bottom: 20px;
 
-const StyledItem = styled(Item)`
-  padding-right: 20px;
-
-  .ant-list-item-content {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
+  &:last-child {
+    margin-bottom: 0;
   }
+`;
+
+const IconWrapper = styled.button`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  width: 30px;
+  height: 30px;
+  margin-left: 20px;
+  border: 1px solid ${({ theme }) => theme.black};
+  border-radius: 50%;
+
+  background-color: ${({ isFilled, theme }) =>
+    isFilled ? theme.black : theme.white};
 `;
 
 const MemberWrapper = styled.div`
   display: flex;
   align-items: center;
+  margin-right: auto;
+`;
+
+const MemberInfo = styled.div`
+  padding-left: 20px;
 `;
 
 const MemberName = styled.div`
-  font-size: 18px;
-  line-height: 36px;
-  color: #2e2f31;
-  margin-left: 20px;
+  font-size: 16px;
+  color: ${({ theme }) => theme.black};
+`;
+
+const MemberEmail = styled.div`
+  font-size: 14px;
+  color: ${({ theme }) => theme.gray};
 `;
 
 const StyledIcon = styled(Icon)`
   cursor: pointer;
-`;
 
-const StyledPlusIcon = styled(Icon)`
-  cursor: pointer;
-
-  > svg {
-    fill: #3d70ff;
-  }
+  fill: ${({ isFilled, theme }) => (isFilled ? theme.white : theme.black)};
 `;
 
 const Member = ({
-  id,
   name,
+  email,
   avatar,
   isInvited = false,
+  isReadOnly,
+  onClickPermissionChange = Function.prototype,
   onClickAdd = Function.prototype,
   onClickRemove = Function.prototype,
-}) => {
-  return (
-    <StyledItem key={id}>
-      <MemberWrapper>
-        <Avatar name={name} avatar={avatar} />
+}) => (
+  <Wrapper>
+    <MemberWrapper>
+      <Avatar name={name} avatar={avatar} />
+      <MemberInfo>
         <MemberName>{name}</MemberName>
-      </MemberWrapper>
-      {isInvited ? (
-        <StyledIcon type="check-circle" size={24} onClick={onClickRemove} />
-      ) : (
-        <StyledPlusIcon
-          type="plus-circle"
-          size={24}
-          theme="filled"
-          onClick={onClickAdd}
-        />
-      )}
-    </StyledItem>
-  );
-};
+        <MemberEmail>{email}</MemberEmail>
+      </MemberInfo>
+    </MemberWrapper>
+    {isInvited ? (
+      <Fragment>
+        <Checkbox isChecked={isReadOnly} onChange={onClickPermissionChange}>
+          View only
+        </Checkbox>
+        <IconWrapper isFilled onClick={onClickRemove}>
+          <StyledIcon isFilled name="ok" width={14} height={14} />
+        </IconWrapper>
+      </Fragment>
+    ) : (
+      <IconWrapper onClick={onClickAdd}>
+        <StyledIcon name="plus" width={14} height={14} />
+      </IconWrapper>
+    )}
+  </Wrapper>
+);
 
 export default Member;

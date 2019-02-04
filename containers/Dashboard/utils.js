@@ -1,7 +1,7 @@
 import { uuid4 } from 'common/utils/uuid4';
 import { match } from 'common/utils/match';
 import { base64toFile, fileToBase64 } from 'common/utils/file';
-import { POST_CREDENTIALS_TYPE } from 'common/constants';
+import { ITEM_CREDENTIALS_TYPE, ITEM_DOCUMENT_TYPE } from 'common/constants';
 
 export const prepareFiles = attachments =>
   attachments.map(({ name: attachmentName, raw }) => {
@@ -48,8 +48,8 @@ export const prepareAttachments = files => {
 
 export const initialCredentials = listId => ({
   listId,
-  type: POST_CREDENTIALS_TYPE,
-  shared: [],
+  type: ITEM_CREDENTIALS_TYPE,
+  invited: [],
   owner: true,
   secret: {
     name: '',
@@ -61,11 +61,24 @@ export const initialCredentials = listId => ({
   },
 });
 
-export const initialPostData = (type, listId) =>
+export const initialDocument = listId => ({
+  listId,
+  type: ITEM_DOCUMENT_TYPE,
+  invited: [],
+  owner: true,
+  secret: {
+    name: '',
+    note: '',
+    attachments: [],
+  },
+});
+
+export const initialItemData = (type, listId) =>
   match(
     type,
     {
-      [POST_CREDENTIALS_TYPE]: initialCredentials(listId),
+      [ITEM_CREDENTIALS_TYPE]: initialCredentials(listId),
+      [ITEM_DOCUMENT_TYPE]: initialDocument(listId),
     },
     {},
   );

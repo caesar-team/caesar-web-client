@@ -1,18 +1,38 @@
 import React from 'react';
 // eslint-disable-next-line
 import { default as NextApp, Container } from 'next/app';
+import { ThemeProvider, createGlobalStyle } from 'styled-components';
+import * as openpgp from 'openpgp';
+import globalStyles from 'common/styles/globalStyles';
 import { entryResolver } from 'common/utils/entryResolver';
 import { DEFAULT_IDLE_TIMEOUT } from 'common/constants';
-import { getPasswordStatus } from 'common/api';
-import { SessionChecker, Loader } from '../components';
-import { MasterPassword } from '../containers';
+import OpenPGPWorker from 'common/openpgp.worker';
+import { generateKeys, validateKeys } from 'common/utils/key';
+import { getKeys, postKeys } from 'common/api';
+import theme from 'common/theme';
+import { SessionChecker, Loader, NotificationProvider } from '../components';
+import { MasterPassword, Lock } from '../containers';
+
+const GlobalStyles = createGlobalStyle`${globalStyles}`;
 
 export default class App extends NextApp {
   state = this.prepareInitialState();
 
+  worker = null;
+
+  publicKey = null;
+
+  privateKey = null;
+
+  password = null;
+
+  static getDerivedStateFromProps(nextProps) {
+    if (nextProps.router.route === '/2fa') return { shouldShowLoader: false };
+    return null;
+  }
+
   static async getInitialProps({ Component, router, ctx }) {
     entryResolver({ router, ctx });
-
     return Component.getInitialProps
       ? {
           pageProps: await Component.getInitialProps(ctx),
@@ -21,50 +41,104 @@ export default class App extends NextApp {
   }
 
   async componentDidMount() {
-    if (this.props.router.route !== '/auth') {
-      const {
-        data: { created: isMasterPasswordCreated },
-      } = await getPasswordStatus();
-
-      const isSetPassword =
-        sessionStorage.getItem('isSetPassword') &&
-        sessionStorage.getItem('isSetPassword') === '1';
-
-      this.setState({
-        isFullWorkflow: !isMasterPasswordCreated,
-        shouldShowLoader: false,
-        shouldShowMasterPassword: !isSetPassword,
-      });
+    if (
+      this.props.router.route !== '/auth' &&
+      this.props.router.route !== '/2fa'
+    ) {
+      this.initOpenPGPWorker();
+      await this.initWorkflow();
     }
   }
 
-  handleSetMasterPassword = () => {
-    this.setState(
-      {
+  initOpenPGPWorker() {
+    openpgp.config.aead_protect = false;
+
+    this.worker = new OpenPGPWorker();
+
+    openpgp.initWorker({ workers: [this.worker] });
+  }
+
+  initWorkflow = async (callback = Function.prototype) => {
+    const {
+      data: { publicKey, encryptedPrivateKey },
+    } = await getKeys();
+
+    this.privateKey = null;
+    this.publicKey = publicKey;
+    this.encryptedPrivateKey = encryptedPrivateKey;
+
+    const isFullWorkflow = !publicKey || !encryptedPrivateKey;
+
+    this.setState({
+      isFullWorkflow,
+      shouldShowLoader: false,
+      shouldShowMasterPassword: true,
+    });
+    callback();
+  };
+
+  async generateKeys(password, { setSubmitting, setErrors }) {
+    const { publicKey, privateKey } = await generateKeys(password);
+
+    this.publicKey = publicKey;
+    this.privateKey = privateKey;
+    this.password = password;
+
+    try {
+      await postKeys({
+        publicKey,
+        encryptedPrivateKey: privateKey,
+      });
+
+      this.setState({
         shouldShowMasterPassword: false,
         isFullWorkflow: false,
-      },
-      () => {
-        sessionStorage.setItem('isSetPassword', '1');
-      },
-    );
+      });
+    } catch (error) {
+      setErrors({ password: 'Something wrong' });
+      setSubmitting(false);
+    }
+  }
+
+  async validateKeys(password, { setSubmitting, setErrors }) {
+    try {
+      await validateKeys(password, this.encryptedPrivateKey);
+
+      this.privateKey = this.encryptedPrivateKey;
+      this.password = password;
+
+      this.setState({
+        shouldShowMasterPassword: false,
+        isFullWorkflow: false,
+      });
+    } catch (error) {
+      setErrors({ password: 'Wrong password' });
+      setSubmitting(false);
+    }
+  }
+
+  handleSubmit = async ({ password }, FormikBag) => {
+    const { isFullWorkflow } = this.state;
+
+    // eslint-disable-next-line
+    (await isFullWorkflow)
+      ? this.generateKeys(password, FormikBag)
+      : this.validateKeys(password, FormikBag);
   };
 
   handleInactiveTimeout = () => {
-    this.setState(
-      {
-        shouldShowMasterPassword: true,
-      },
-      () => sessionStorage.setItem('isSetPassword', '0'),
-    );
+    this.setState({
+      shouldShowMasterPassword: true,
+    });
   };
 
   prepareInitialState() {
     const { router } = this.props;
 
     return {
+      isError: false,
       isFullWorkflow: true,
-      shouldShowLoader: router.route !== '/auth',
+      shouldShowLoader: router.route !== '/auth' && router.route !== '/2fa',
       shouldShowMasterPassword: false,
     };
   }
@@ -86,24 +160,39 @@ export default class App extends NextApp {
 
     if (shouldShowMasterPasswordWorkflow) {
       return (
-        <Container>
-          <MasterPassword
-            isFullWorkflow={isFullWorkflow}
-            onSetMasterPassword={this.handleSetMasterPassword}
-          />
-        </Container>
+        <ThemeProvider theme={theme}>
+          <Container>
+            <GlobalStyles />
+            {isFullWorkflow ? (
+              <MasterPassword onSubmit={this.handleSubmit} />
+            ) : (
+              <Lock onSubmit={this.handleSubmit} />
+            )}
+          </Container>
+        </ThemeProvider>
       );
     }
 
     return (
-      <Container>
-        <SessionChecker
-          timeout={DEFAULT_IDLE_TIMEOUT}
-          onFinishTimeout={this.handleInactiveTimeout}
-        >
-          <Component {...pageProps} />
-        </SessionChecker>
-      </Container>
+      <ThemeProvider theme={theme}>
+        <NotificationProvider>
+          <Container>
+            <GlobalStyles />
+            <SessionChecker
+              timeout={DEFAULT_IDLE_TIMEOUT}
+              onFinishTimeout={this.handleInactiveTimeout}
+            >
+              <Component
+                privateKey={this.privateKey}
+                publicKey={this.publicKey}
+                password={this.password}
+                initialize={this.initWorkflow}
+                {...pageProps}
+              />
+            </SessionChecker>
+          </Container>
+        </NotificationProvider>
+      </ThemeProvider>
     );
   }
 }

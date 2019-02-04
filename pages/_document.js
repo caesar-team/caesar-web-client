@@ -1,8 +1,13 @@
 import React from 'react';
 // eslint-disable-next-line
 import { default as NextDocument, Head, Main, NextScript } from 'next/document';
-import { ServerStyleSheet } from 'styled-components';
-import styles from 'common/styles/antd.overrides.less';
+import styled, { ServerStyleSheet } from 'styled-components';
+import { PORTAL_ID } from 'common/constants';
+import sprite from 'svg-sprite-loader/runtime/sprite.build';
+
+const Body = styled.body`
+  overflow-y: hidden;
+`;
 
 export default class Document extends NextDocument {
   static getInitialProps({ renderPage }) {
@@ -11,7 +16,9 @@ export default class Document extends NextDocument {
       sheet.collectStyles(<App {...props} />),
     );
     const styleTags = sheet.getStyleElement();
-    return { ...page, styleTags };
+    const spriteContent = sprite.stringify();
+
+    return { ...page, styleTags, spriteContent };
   }
 
   render() {
@@ -20,14 +27,9 @@ export default class Document extends NextDocument {
         <Head>
           <meta name="viewport" content="width=device-width, initial-scale=1" />
           {this.props.styleTags}
-          <style dangerouslySetInnerHTML={{ __html: styles }} />
-          <link
-            href="https://fonts.googleapis.com/css?family=Roboto:400"
-            rel="stylesheet"
-          />
           <link
             rel="apple-touch-icon"
-            sizes="76x76"
+            sizes="180x180"
             href="/static/images/favicon/apple-touch-icon.png"
           />
           <link
@@ -51,10 +53,12 @@ export default class Document extends NextDocument {
           <meta name="msapplication-TileColor" content="#da532c" />
           <meta name="theme-color" content="#ffffff" />
         </Head>
-        <body>
+        <Body>
+          <div dangerouslySetInnerHTML={{ __html: this.props.spriteContent }} />
+          <div id={PORTAL_ID} />
           <Main />
           <NextScript />
-        </body>
+        </Body>
       </html>
     );
   }

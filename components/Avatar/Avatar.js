@@ -1,36 +1,50 @@
 import React from 'react';
 import styled from 'styled-components';
-import { Avatar as AntdAvatar } from 'antd';
 import { API_URL } from 'common/constants';
 
-const StyledAvatar = styled(AntdAvatar)`
-  margin-left: -16px;
-  width: ${({ size }) => `${size}px`};
-  height: ${({ size }) => `${size}px`};
-  font-size: 15px;
-  border: 2px solid #fff;
-
-  &:first-child {
-    margin-left: 0;
-  }
-
-  .ant-avatar-string {
-    line-height: ${({ size }) => `${size}px`};
-  }
+const Wrapper = styled.div`
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: inline-block;
+  text-align: center;
+  background: ${({ theme }) => theme.gray};
+  color: ${({ theme }) => theme.white};
+  white-space: nowrap;
+  position: relative;
+  overflow: hidden;
+  vertical-align: middle;
+  width: ${({ isSmall }) => (isSmall ? '30px' : '40px')};
+  height: ${({ isSmall }) => (isSmall ? '30px' : '40px')};
+  line-height: 40px;
+  border-radius: 50%;
 `;
 
-const Avatar = ({ name, avatar, size = 40, children }) => {
+const Image = styled.img`
+  width: 100%;
+  height: 100%;
+  display: block;
+  vertical-align: middle;
+  border-style: none;
+`;
+
+const Avatar = ({ name, avatar, children, isSmall, ...props }) => {
   if (children) {
-    return <StyledAvatar>{children}</StyledAvatar>;
+    return <Wrapper {...props}>{children}</Wrapper>;
   }
 
   if (avatar) {
-    return <StyledAvatar size={size} src={`${API_URL}/${avatar}`} />;
+    return (
+      <Wrapper isSmall={isSmall} {...props}>
+        <Image src={`${API_URL}/${avatar}`} />
+      </Wrapper>
+    );
   }
 
   const personLetters = name ? name.slice(0, 2).toUpperCase() : '';
 
-  return <StyledAvatar size={size}>{personLetters}</StyledAvatar>;
+  return <Wrapper {...props}>{personLetters}</Wrapper>;
 };
 
 export default Avatar;

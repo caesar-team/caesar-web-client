@@ -5,22 +5,16 @@ import { getToken } from 'common/utils/token';
 import { DashboardContainer } from '../containers';
 import { Head } from '../components';
 
-const DashboardPage = ({ list, user, members, predefinedListId }) => (
+const DashboardPage = props => (
   <Fragment>
     <Head title="Dashboard" />
-    <DashboardContainer
-      list={list}
-      user={user}
-      members={members}
-      predefinedListId={predefinedListId}
-    />
+    <DashboardContainer {...props} />
   </Fragment>
 );
 
 DashboardPage.getInitialProps = async ({ req, query }) => {
   try {
     const token = isServer ? req.cookies.token : getToken();
-
     const { data: list } = await getList(token);
     const { data: user } = await getUserSelf(token);
     const { data: members } = await getUsers(token);

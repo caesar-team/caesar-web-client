@@ -5,6 +5,8 @@ import { Logo } from './Logo';
 const LayoutWrapper = styled.div`
   position: relative;
   min-height: 100vh;
+  height: 100%;
+  overflow-y: auto;
   padding: 20px;
   display: flex;
   align-items: center;

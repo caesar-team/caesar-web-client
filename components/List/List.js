@@ -73,6 +73,7 @@ const Option = styled.button`
 
   &:hover {
     background-color: ${({ theme }) => theme.snow};
+    color: ${({ theme }) => theme.gray};
   }
 `;
 

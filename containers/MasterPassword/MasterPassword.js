@@ -14,6 +14,7 @@ import {
   Link,
   AuthTitle,
   AuthDescription,
+  Head,
 } from 'components';
 import {
   REGEXP_TEXT_MATCH,
@@ -88,6 +89,7 @@ class MasterPassword extends Component {
           dirty,
         }) => (
           <form onSubmit={handleSubmit}>
+            <Head title="Create master password for Caesar" />
             <AuthWrapper>
               <AuthTitle>Master Password</AuthTitle>
               <AuthDescription>

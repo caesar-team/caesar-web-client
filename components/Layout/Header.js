@@ -48,7 +48,6 @@ const UserName = styled.div`
 
 const StyledDropdown = styled(Dropdown)`
   display: flex;
-  padding: 20px 0;
   color: ${({ theme }) => theme.black};
   flex-direction: row;
   align-items: center;

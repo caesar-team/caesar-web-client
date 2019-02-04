@@ -49,7 +49,7 @@ const StyledAvatarsList = styled(AvatarsList)`
 const InviteButton = styled.button`
   width: 40px;
   height: 40px;
-  margin-right: -10px;
+  ${({ hasInvited }) => hasInvited && 'margin-right: -10px'};
   color: ${({ theme }) => theme.emperor};
   border: 1px dashed ${({ theme }) => theme.gallery};
   border-radius: 50%;
@@ -130,6 +130,7 @@ export const ItemHeader = ({
 
     return accumulator;
   }, []);
+  const hasInvited = invited.length > 1;
   const isOwner = user.id === ownerId;
   const owner = isOwner ? user : members[ownerId];
 
@@ -185,13 +186,14 @@ export const ItemHeader = ({
         <Row>
           {!isTrashItem &&
             isOwner && (
-              <InviteButton onClick={onClickInvite}>
+              <InviteButton onClick={onClickInvite} hasInvited={hasInvited}>
                 <Icon name="plus" width={14} height={14} isInButton />
               </InviteButton>
             )}
           <StyledAvatarsList avatars={avatars} />
           {!isTrashItem &&
-            isOwner && (
+            isOwner &&
+            false && (
               <ShareButton icon="share" color="black" onClick={onClickShare}>
                 Share
               </ShareButton>

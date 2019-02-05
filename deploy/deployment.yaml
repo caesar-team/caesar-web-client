@@ -40,10 +40,10 @@ spec:
              key: API_HOST
              name: caesarapp-web-app
         - name: APP_HOST
-           valueFrom:
-             secretKeyRef:
-               key: APP_HOST
-               name: caesarapp-web-app
+          valueFrom:
+           secretKeyRef:
+             key: APP_HOST
+             name: caesarapp-web-app
         image: caesarteam/caesar-web-client:${CICD_GIT_BRANCH}
         imagePullPolicy: Always
         name: caesarapp-web-app

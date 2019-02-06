@@ -192,8 +192,7 @@ export const ItemHeader = ({
             )}
           <StyledAvatarsList avatars={avatars} />
           {!isTrashItem &&
-            isOwner &&
-            false && (
+            isOwner && (
               <ShareButton icon="share" color="black" onClick={onClickShare}>
                 Share
               </ShareButton>

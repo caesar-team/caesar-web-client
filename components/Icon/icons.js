@@ -31,6 +31,7 @@ import 'static/images/svg/icon-inbox.svg?sprite';
 import 'static/images/svg/icon-key.svg?sprite';
 import 'static/images/svg/icon-key-diagonal.svg?sprite';
 import 'static/images/svg/icon-logo.svg?sprite';
+import 'static/images/svg/icon-mail.svg?sprite';
 import 'static/images/svg/icon-lock.svg?sprite';
 import 'static/images/svg/icon-more.svg?sprite';
 import 'static/images/svg/icon-ok.svg?sprite';

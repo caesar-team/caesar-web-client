@@ -16,6 +16,7 @@
     "@zeit/next-workers": "^1.0.0",
     "atob": "^2.1.2",
     "axios": "^0.18.0",
+    "btoa": "^1.2.1",
     "cookie-parser": "^1.4.3",
     "deepmerge": "^2.2.1",
     "dotenv": "^6.1.0",

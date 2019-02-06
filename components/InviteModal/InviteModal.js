@@ -147,7 +147,7 @@ class InviteModal extends Component {
     return (
       <Modal
         isOpen
-        minWidth={560}
+        width={560}
         onRequestClose={onCancel}
         shouldCloseOnEsc
         shouldCloseOnOverlayClick

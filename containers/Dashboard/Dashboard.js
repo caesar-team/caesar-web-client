@@ -30,6 +30,7 @@ import {
   ITEM_REVIEW_MODE,
   ITEM_WORKFLOW_CREATE_MODE,
   ITEM_WORKFLOW_EDIT_MODE,
+  APP_URL,
 } from 'common/constants';
 import {
   postCreateItem,
@@ -42,8 +43,12 @@ import {
   deleteInviteItem,
   changeInviteItem,
   acceptUpdateItem,
+  postLink,
 } from 'common/api';
 import DecryptWorker from 'common/decrypt.worker';
+import { generatePassword } from 'common/utils/password';
+import { generateKeys } from 'common/utils/key';
+import { objectToBase64 } from 'common/utils/objectToBase64';
 import { initialItemData } from './utils';
 
 const MiddleColumnWrapper = styled.div`
@@ -504,6 +509,75 @@ class DashboardContainer extends Component {
     }
   };
 
+  handleActivateShareByLink = async isUseMasterPassword => {
+    const { publicKey: userPublicKey } = this.props;
+    const {
+      workInProgressItem: { secret, id: itemId },
+    } = this.state;
+    const password = generatePassword();
+    const { publicKey, privateKey } = await generateKeys(password);
+
+    try {
+      const options = {
+        message: openpgp.message.fromText(JSON.stringify(secret)),
+        publicKeys: (await openpgp.key.readArmored(publicKey)).keys,
+      };
+      const { data: encryptedItem } = await openpgp.encrypt(options);
+      const data = {
+        itemId,
+        publicKey,
+        encryptedPrivateKey: privateKey,
+        secret: encryptedItem,
+      };
+
+      const {
+        data: { userToken },
+      } = postLink(data);
+
+      const linkData = { userToken };
+
+      if (isUseMasterPassword) linkData.password = password;
+
+      const link = `${APP_URL}/shared/${objectToBase64(linkData)}`;
+
+      const userOptions = {
+        message: openpgp.message.fromText(JSON.stringify(link)),
+        publicKeys: (await openpgp.key.readArmored(userPublicKey)).keys,
+      };
+      const { data: encryptedLink } = await openpgp.encrypt(userOptions);
+
+      const {
+        data: { lastUpdated },
+      } = updateItem(itemId, { linkData: encryptedLink });
+
+      const linkString = isUseMasterPassword
+        ? `${link}\nMaster-password: ${password}`
+        : link;
+      const updatedData = {
+        lastUpdated,
+        link: {
+          id: userToken,
+          publicKey,
+          data: linkString,
+          isUseMasterPassword,
+        },
+      };
+
+      this.setState(prevState => ({
+        ...prevState,
+        workInProgressItem: {
+          ...prevState.workInProgressItem,
+          ...updatedData,
+        },
+        list: updateNode(prevState.list, prevState.workInProgressItem.id, {
+          ...updatedData,
+        }),
+      }));
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   handleClickCancelWorkflow = () => {
     this.setState(prevState => ({
       ...prevState,
@@ -896,7 +970,12 @@ class DashboardContainer extends Component {
           />
         )}
         {isVisibleShareModal && (
-          <ShareModal onCancel={this.handleCloseShareModal} />
+          <ShareModal
+            item={workInProgressItem}
+            onActivateSharedByLink={this.handleActivateShareByLink}
+            onCancel={this.handleCloseShareModal}
+            notification={notification}
+          />
         )}
         <ConfirmModal
           isOpen={isVisibleMoveToTrashModal}

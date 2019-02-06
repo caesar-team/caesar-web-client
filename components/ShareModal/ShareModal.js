@@ -2,7 +2,8 @@ import React, { Component } from 'react';
 import styled from 'styled-components';
 import TagsInput from 'react-tagsinput';
 import Toggle from 'react-toggle';
-import { Icon, Modal, ModalTitle, Button } from 'components';
+import { copyToClipboard } from 'common/utils/clipboard';
+import { Icon, Modal, ModalTitle, Button, Checkbox } from 'components';
 import 'common/styles/react-tagsinput.css';
 import 'common/styles/react-toggle.css';
 
@@ -88,30 +89,121 @@ const StyledButton = styled(Button)`
   text-transform: uppercase;
 `;
 
+const SharedLinkWrapper = styled.div`
+  max-width: 100%;
+  padding: 20px;
+  background-color: ${({ theme }) => theme.snow};
+  border-radius: 3px;
+`;
+
+const SharedLink = styled.div`
+  position: relative;
+  padding: 15px 20px;
+  background-color: ${({ theme }) => theme.white};
+  border: 1px solid ${({ theme }) => theme.gallery};
+  border-radius: 3px;
+  word-break: break-all;
+  white-space: pre-wrap;
+
+  &::before {
+    position: absolute;
+    z-index: 1;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(255, 255, 255, 0.75);
+    content: ${({ isLoading }) => isLoading && ''};
+  }
+`;
+
+const SharedLinkActions = styled.div`
+  display: flex;
+  align-items: center;
+  padding-top: 20px;
+`;
+
+const SharedLinkActionsButtons = styled.div`
+  display: flex;
+  margin-left: auto;
+`;
+
+const SharedLinkActionsButton = styled(Button)`
+  text-transform: uppercase;
+  margin-left: 20px;
+`;
+
 export class ShareModal extends Component {
   state = {
-    shareByLinkIsShown: false,
+    isLinkActivateLoading: false,
     tags: [],
   };
+
+  static getDerivedStateFromProps(nextProps, prevState) {
+    const {
+      item: { link },
+    } = nextProps;
+
+    if (prevState.isLinkActivateLoading && link) {
+      return {
+        isLinkActivateLoading: false,
+      };
+    }
+    return null;
+  }
 
   handleChange = tags => {
     this.setState({ tags });
   };
 
   handleShareByLinkChange = () => {
-    this.setState(prevState => ({
-      shareByLinkIsShown: !prevState.shareByLinkIsShown,
-    }));
+    const {
+      item: { link },
+      onActivateSharedByLink,
+    } = this.props;
+
+    if (!link) {
+      this.setState({
+        isLinkActivateLoading: true,
+      });
+      onActivateSharedByLink(false);
+    }
+  };
+
+  handleUseMasterPasswordChange = isUseMasterPassword => {
+    const { onActivateSharedByLink } = this.props;
+    this.setState({
+      isLinkActivateLoading: true,
+    });
+    onActivateSharedByLink(isUseMasterPassword);
+  };
+
+  handleCopySharedLink = () => {
+    const {
+      notification,
+      item: { link },
+    } = this.props;
+
+    copyToClipboard(link.data);
+
+    notification.show({
+      text: `Shared link has copied.`,
+    });
   };
 
   render() {
-    const { onCancel } = this.props;
-    const { tags, shareByLinkIsShown } = this.state;
+    const {
+      onCancel,
+      item: { link },
+    } = this.props;
+    const { tags, isLinkActivateLoading } = this.state;
+    const isUseMasterPassword = link ? link.isUseMasterPassword : false;
+    const switcherText = link ? 'Link access enabled' : 'Link access disabled';
 
     return (
       <Modal
         isOpen
-        minWidth={560}
+        width={640}
         onRequestClose={onCancel}
         shouldCloseOnEsc
         shouldCloseOnOverlayClick
@@ -126,16 +218,6 @@ export class ShareModal extends Component {
             onChange={this.handleChange}
             inputProps={{ placeholder: 'Enter email addresses…' }}
           />
-        </Row>
-        <Row>
-          <ToggleLabel>
-            <Toggle
-              defaultChecked={shareByLinkIsShown}
-              icons={false}
-              onChange={this.handleShareByLinkChange}
-            />
-            <ToggleLabelText>Enable access via link</ToggleLabelText>
-          </ToggleLabel>
         </Row>
         <SharedListTitle>Shared with </SharedListTitle>
         <SharedList>
@@ -168,11 +250,57 @@ export class ShareModal extends Component {
             </SharedItemRemove>
           </SharedItem>
         </SharedList>
+        <Row>
+          <ToggleLabel>
+            <Toggle
+              checked={!!link}
+              disabled={isLinkActivateLoading}
+              icons={false}
+              onChange={() => this.handleShareByLinkChange(false)}
+            />
+            <ToggleLabelText>{switcherText}</ToggleLabelText>
+          </ToggleLabel>
+        </Row>
+        {link && (
+          <Row>
+            <SharedLinkWrapper>
+              <SharedLink isLoading={isLinkActivateLoading}>
+                {link.data}
+              </SharedLink>
+              <SharedLinkActions>
+                <Checkbox
+                  isDisabled={isLinkActivateLoading}
+                  isChecked={isUseMasterPassword}
+                  onChange={value => this.handleUseMasterPasswordChange(value)}
+                >
+                  Use master password
+                </Checkbox>
+                <SharedLinkActionsButtons>
+                  <SharedLinkActionsButton
+                    disabled={isLinkActivateLoading}
+                    color="white"
+                    icon="mail"
+                  >
+                    Send email
+                  </SharedLinkActionsButton>
+                  <SharedLinkActionsButton
+                    disabled={isLinkActivateLoading}
+                    color="white"
+                    icon="copy"
+                    onClick={this.handleCopySharedLink}
+                  >
+                    Copy
+                  </SharedLinkActionsButton>
+                </SharedLinkActionsButtons>
+              </SharedLinkActions>
+            </SharedLinkWrapper>
+          </Row>
+        )}
         <ButtonsWrapper>
           <StyledButton color="white" onClick={onCancel}>
             Cancel
           </StyledButton>
-          <StyledButton color="black">Share</StyledButton>
+          <StyledButton color="black">Done</StyledButton>
         </ButtonsWrapper>
       </Modal>
     );

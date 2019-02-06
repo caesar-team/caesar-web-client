@@ -5,6 +5,9 @@ import { Icon } from '../Icon';
 const StyledLabel = styled.label`
   display: flex;
   align-items: center;
+  cursor: pointer;
+
+  pointer-events: ${({ isDisabled }) => isDisabled && 'none'};
 `;
 
 const Box = styled.span`
@@ -25,6 +28,7 @@ const Box = styled.span`
 
 const Text = styled.span`
   padding-left: 10px;
+  color: ${({ theme, isDisabled }) => isDisabled && theme.gray};
 `;
 
 const StyledInput = styled.input`
@@ -40,12 +44,22 @@ export default class Checkbox extends Component {
     isFocused: false,
   };
 
+  static getDerivedStateFromProps(nextProps, prevState) {
+    if (prevState.isChecked !== nextProps.isChecked)
+      return { isChecked: nextProps.isChecked };
+
+    return null;
+  }
+
   handleChangeToggle = () => {
     this.setState(prevState => {
       const { onChange } = this.props;
       const checked = !prevState.isChecked;
 
-      if (onChange && typeof onChange === 'function') onChange(checked);
+      if (onChange && typeof onChange === 'function') {
+        onChange(checked);
+        return {};
+      }
 
       return { isChecked: checked };
     });
@@ -57,21 +71,22 @@ export default class Checkbox extends Component {
 
   render() {
     const { isChecked, isFocused } = this.state;
-    const { children } = this.props;
+    const { children, isDisabled } = this.props;
 
     return (
-      <StyledLabel>
+      <StyledLabel isDisabled={isDisabled}>
         <Box isChecked={isChecked} isFocused={isFocused}>
           <Icon name="check" isInButton width={14} height={10} />
         </Box>
         <StyledInput
           type="checkbox"
           checked={isChecked}
+          disabled={isDisabled}
           onChange={this.handleChangeToggle}
           onFocus={this.handleFocusToggle}
           onBlur={this.handleFocusToggle}
         />
-        {children && <Text>{children}</Text>}
+        {children && <Text isDisabled={isDisabled}>{children}</Text>}
       </StyledLabel>
     );
   }

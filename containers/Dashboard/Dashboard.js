@@ -44,12 +44,14 @@ import {
   changeInviteItem,
   acceptUpdateItem,
   postLink,
+  deleteLink,
 } from 'common/api';
 import DecryptWorker from 'common/decrypt.worker';
 import { generatePassword } from 'common/utils/password';
 import { generateKeys } from 'common/utils/key';
 import { objectToBase64 } from 'common/utils/objectToBase64';
 import { initialItemData } from './utils';
+import { uuid4 } from '../../common/utils/uuid4';
 
 const MiddleColumnWrapper = styled.div`
   width: 400px;
@@ -530,11 +532,11 @@ class DashboardContainer extends Component {
         secret: encryptedItem,
       };
 
-      const {
-        data: { userToken },
-      } = postLink(data);
+      // const {
+      //   data: { userToken },
+      // } = postLink(data);
 
-      const linkData = { userToken };
+      const linkData = { userToken: uuid4() };
 
       if (isUseMasterPassword) linkData.password = password;
 
@@ -546,17 +548,17 @@ class DashboardContainer extends Component {
       };
       const { data: encryptedLink } = await openpgp.encrypt(userOptions);
 
-      const {
-        data: { lastUpdated },
-      } = updateItem(itemId, { linkData: encryptedLink });
+      // const {
+      //   data: { lastUpdated },
+      // } = updateItem(itemId, { linkData: encryptedLink });
 
       const linkString = isUseMasterPassword
         ? `${link}\nMaster-password: ${password}`
         : link;
       const updatedData = {
-        lastUpdated,
+        lastUpdated: '',
         link: {
-          id: userToken,
+          id: linkData.userToken,
           publicKey,
           data: linkString,
           isUseMasterPassword,
@@ -571,6 +573,30 @@ class DashboardContainer extends Component {
         },
         list: updateNode(prevState.list, prevState.workInProgressItem.id, {
           ...updatedData,
+        }),
+      }));
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  handleDeactivateShareByLink = async () => {
+    const {
+      workInProgressItem: {
+        link: { id },
+      },
+    } = this.state;
+
+    try {
+      //await deleteLink(id);
+      this.setState(prevState => ({
+        ...prevState,
+        workInProgressItem: {
+          ...prevState.workInProgressItem,
+          link: null,
+        },
+        list: updateNode(prevState.list, prevState.workInProgressItem.id, {
+          link: null,
         }),
       }));
     } catch (error) {
@@ -973,6 +999,7 @@ class DashboardContainer extends Component {
           <ShareModal
             item={workInProgressItem}
             onActivateSharedByLink={this.handleActivateShareByLink}
+            onDeactivateSharedByLink={this.handleDeactivateShareByLink}
             onCancel={this.handleCloseShareModal}
             notification={notification}
           />

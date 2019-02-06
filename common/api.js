@@ -146,3 +146,5 @@ export const removeList = listId => callApi.delete(`/list/${listId}`);
 export const toggleFavorite = id => callApi.post(`/item/${id}/favorite`);
 
 export const postLink = data => callApi.post('/link', data);
+
+export const deleteLink = id => callApi.delete(`/link/${id}`);

@@ -136,6 +136,7 @@ const SharedLinkActionsButton = styled(Button)`
 export class ShareModal extends Component {
   state = {
     isLinkActivateLoading: false,
+    hasLink: !!this.props.item.link,
     tags: [],
   };
 
@@ -143,12 +144,22 @@ export class ShareModal extends Component {
     const {
       item: { link },
     } = nextProps;
+    const { hasLink, isLinkActivateLoading } = prevState;
 
-    if (prevState.isLinkActivateLoading && link) {
+    if (isLinkActivateLoading && !hasLink && link) {
       return {
         isLinkActivateLoading: false,
+        hasLink: true,
       };
     }
+
+    if (isLinkActivateLoading && hasLink && !link) {
+      return {
+        isLinkActivateLoading: false,
+        hasLink: false,
+      };
+    }
+
     return null;
   }
 
@@ -160,13 +171,17 @@ export class ShareModal extends Component {
     const {
       item: { link },
       onActivateSharedByLink,
+      onDeactivateSharedByLink,
     } = this.props;
 
+    this.setState({
+      isLinkActivateLoading: true,
+    });
+
     if (!link) {
-      this.setState({
-        isLinkActivateLoading: true,
-      });
       onActivateSharedByLink(false);
+    } else {
+      onDeactivateSharedByLink();
     }
   };
 
@@ -197,6 +212,7 @@ export class ShareModal extends Component {
       item: { link },
     } = this.props;
     const { tags, isLinkActivateLoading } = this.state;
+    // TODO: implement check of isUseMasterPassword (may be by parse link.data)
     const isUseMasterPassword = link ? link.isUseMasterPassword : false;
     const switcherText = link ? 'Link access enabled' : 'Link access disabled';
 

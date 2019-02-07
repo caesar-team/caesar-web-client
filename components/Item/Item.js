@@ -4,7 +4,7 @@ import {
   ITEM_REVIEW_MODE,
   ITEM_CREDENTIALS_TYPE,
   ITEM_DOCUMENT_TYPE,
-  PERMISION_WRITE,
+  PERMISSION_WRITE,
 } from 'common/constants';
 import { Button, Icon } from 'components';
 import { formatDate } from 'common/utils/dateFormatter';
@@ -93,7 +93,7 @@ const Item = ({
     (acc, invite) => (invite.userId === user.id ? invite.access : acc),
     null,
   );
-  const hasWriteAccess = ownerId === user.id || access === PERMISION_WRITE;
+  const hasWriteAccess = ownerId === user.id || access === PERMISSION_WRITE;
   const showReadOnlyNotify = access && !hasWriteAccess;
 
   const renderUpdateNotify = () => {

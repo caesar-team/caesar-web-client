@@ -1,8 +1,9 @@
-import React, { Component } from 'react';
+import React, { Component, Fragment } from 'react';
 import styled from 'styled-components';
 import TagsInput from 'react-tagsinput';
 import Toggle from 'react-toggle';
-import { Icon, Modal, ModalTitle, Button } from 'components';
+import { Icon, Modal, ModalTitle, Button, Scrollbar } from 'components';
+import { formatDate } from 'common/utils/dateFormatter';
 import 'common/styles/react-tagsinput.css';
 import 'common/styles/react-toggle.css';
 
@@ -10,7 +11,7 @@ const ModalDescription = styled.div`
   padding-bottom: 20px;
   text-align: center;
   font-size: 14px;
-  color: ${({ theme }) => theme.emperor};
+  color: ${({ theme }) => theme.black};
 `;
 
 const Row = styled.div`
@@ -28,13 +29,34 @@ const ToggleLabelText = styled.span`
 `;
 
 const SharedListTitle = styled.div`
-  font-size: 18px;
-  color: ${({ theme }) => theme.emperor};
-  padding-bottom: 3px;
+  font-size: 14px;
+  font-weight: 600;
+  color: ${({ theme }) => theme.lightGray};
+  margin-top: 32px;
+  margin-bottom: 10px;
+  text-transform: uppercase;
+  display: flex;
+  width: 100%;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+
+  &:before,
+  &:after {
+    content: '';
+    border-top: 2px solid;
+    margin: 0 20px 0 0;
+    flex: 1 0 20px;
+  }
+
+  &:after {
+    margin: 0 0 0 20px;
+  }
 `;
 
 const SharedList = styled.div`
   margin-bottom: 30px;
+  height: 200px;
 `;
 
 const SharedItem = styled.div`
@@ -104,6 +126,48 @@ export class ShareModal extends Component {
     }));
   };
 
+  handleShare = () => {
+    const { onShare } = this.props;
+    const { tags } = this.state;
+
+    return onShare && onShare(tags);
+  };
+
+  renderMembers() {
+    const { shared, members, onRemove } = this.props;
+
+    if (!shared.length) {
+      return null;
+    }
+
+    console.log(shared, members);
+
+    const renderedMembers = shared.map(({ id, userId, lastUpdated }) => (
+      <SharedItem key={id}>
+        <SharedItemEmail>ajackson@gmail.com</SharedItemEmail>
+        <SharedItemDate>{formatDate(lastUpdated)}</SharedItemDate>
+        <SharedItemRemove>
+          <Icon
+            name="close"
+            width={14}
+            height={14}
+            isInButton
+            onClick={onRemove(id)}
+          />
+        </SharedItemRemove>
+      </SharedItem>
+    ));
+
+    return (
+      <Fragment>
+        <SharedListTitle>Shared ({shared.length})</SharedListTitle>
+        <SharedList>
+          <Scrollbar>{renderedMembers}</Scrollbar>
+        </SharedList>
+      </Fragment>
+    );
+  }
+
   render() {
     const { onCancel } = this.props;
     const { tags, shareByLinkIsShown } = this.state;
@@ -127,6 +191,7 @@ export class ShareModal extends Component {
             inputProps={{ placeholder: 'Enter email addresses…' }}
           />
         </Row>
+        {this.renderMembers()}
         <Row>
           <ToggleLabel>
             <Toggle
@@ -137,42 +202,13 @@ export class ShareModal extends Component {
             <ToggleLabelText>Enable access via link</ToggleLabelText>
           </ToggleLabel>
         </Row>
-        <SharedListTitle>Shared with </SharedListTitle>
-        <SharedList>
-          <SharedItem>
-            <SharedItemEmail>ajackson@gmail.com</SharedItemEmail>
-            <SharedItemDate>Nov 16, 2018 02:00 PM</SharedItemDate>
-            <SharedItemRemove>
-              <Icon name="close" width={14} height={14} isInButton />
-            </SharedItemRemove>
-          </SharedItem>
-          <SharedItem>
-            <SharedItemEmail>ajackson@gmail.com</SharedItemEmail>
-            <SharedItemDate>Nov 16, 2018 02:00 PM</SharedItemDate>
-            <SharedItemRemove>
-              <Icon name="close" width={14} height={14} isInButton />
-            </SharedItemRemove>
-          </SharedItem>
-          <SharedItem>
-            <SharedItemEmail>ajackson@gmail.com</SharedItemEmail>
-            <SharedItemDate>Nov 16, 2018 02:00 PM</SharedItemDate>
-            <SharedItemRemove>
-              <Icon name="close" width={14} height={14} isInButton />
-            </SharedItemRemove>
-          </SharedItem>
-          <SharedItem>
-            <SharedItemEmail>ajackson@gmail.com</SharedItemEmail>
-            <SharedItemDate>Nov 16, 2018 02:00 PM</SharedItemDate>
-            <SharedItemRemove>
-              <Icon name="close" width={14} height={14} isInButton />
-            </SharedItemRemove>
-          </SharedItem>
-        </SharedList>
         <ButtonsWrapper>
           <StyledButton color="white" onClick={onCancel}>
             Cancel
           </StyledButton>
-          <StyledButton color="black">Share</StyledButton>
+          <StyledButton color="black" onClick={this.handleShare}>
+            Done
+          </StyledButton>
         </ButtonsWrapper>
       </Modal>
     );

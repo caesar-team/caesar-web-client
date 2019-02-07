@@ -75,5 +75,8 @@ export const KEY_CODES = {
   ARROW_DOWN: 40,
 };
 
-export const PERMISION_READ = 'read';
-export const PERMISION_WRITE = 'write';
+export const PERMISSION_READ = 'read';
+export const PERMISSION_WRITE = 'write';
+
+export const DEFAULT_REQUESTS_LIMIT = 10;
+export const DEFAULT_SECONDS_LIMIT = 60 * 60;

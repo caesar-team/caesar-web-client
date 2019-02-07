@@ -21,6 +21,10 @@ import {
   updateNode,
   removeNode,
 } from 'common/utils/tree';
+import { generatePassword } from 'common/utils/password';
+import { generateKeys } from 'common/utils/key';
+import { generateSharingUrl } from 'common/utils/sharing';
+import { encryptText, encryptItemForMembers } from 'common/utils/cipherUtils';
 import {
   ROOT_TYPE,
   INBOX_TYPE,
@@ -30,6 +34,9 @@ import {
   ITEM_REVIEW_MODE,
   ITEM_WORKFLOW_CREATE_MODE,
   ITEM_WORKFLOW_EDIT_MODE,
+  DEFAULT_REQUESTS_LIMIT,
+  DEFAULT_SECONDS_LIMIT,
+  PERMISSION_READ,
 } from 'common/constants';
 import {
   postCreateItem,
@@ -42,6 +49,10 @@ import {
   deleteInviteItem,
   changeInviteItem,
   acceptUpdateItem,
+  getPublicKeyByEmail,
+  postNewUser,
+  postMessage,
+  postInvite,
 } from 'common/api';
 import DecryptWorker from 'common/decrypt.worker';
 import { initialItemData } from './utils';
@@ -741,6 +752,122 @@ class DashboardContainer extends Component {
     }
   };
 
+  createNewUser = async email => {
+    try {
+      const password = generatePassword();
+      const token = generatePassword();
+
+      const { publicKey, privateKey } = await generateKeys(password);
+      const {
+        data: { userId },
+      } = await postNewUser({
+        email,
+        publicKey,
+        encryptedPrivateKey: privateKey,
+      });
+
+      const message = await encryptText(password, token);
+
+      const {
+        data: { id },
+      } = await postMessage({
+        message,
+        secondsLimit: DEFAULT_SECONDS_LIMIT,
+        requestsLimit: DEFAULT_REQUESTS_LIMIT,
+      });
+
+      await postInvite({
+        email,
+        token,
+        url: generateSharingUrl(id),
+      });
+
+      return { userId, publicKey };
+    } catch (e) {
+      console.log(e || e.response);
+      return null;
+    }
+  };
+
+  shareResolver = async email => {
+    try {
+      const {
+        data: { userId, publicKey },
+      } = await getPublicKeyByEmail(email);
+      return { userId, publicKey };
+    } catch (e) {
+      const user = await this.createNewUser(email);
+      return user;
+    }
+  };
+
+  handleShare = async emails => {
+    const { workInProgressItem } = this.state;
+
+    const promises = await emails.map(this.shareResolver);
+    const response = await Promise.all(promises);
+
+    const itemInvitedUsers = workInProgressItem.invited.map(
+      ({ userId }) => userId,
+    );
+
+    const users = response.filter(
+      user => !!user && !itemInvitedUsers.includes(user.userId),
+    );
+    const keys = users.map(({ publicKey }) => publicKey);
+
+    const encryptedSecrets = await encryptItemForMembers(
+      workInProgressItem.secret,
+      keys,
+    );
+
+    const invites = encryptedSecrets.map((secret, idx) => ({
+      secret,
+      userId: users[idx].userId,
+      access: PERMISSION_READ,
+    }));
+
+    const {
+      data: { invited },
+    } = await postInviteItem(workInProgressItem.id, { invites });
+
+    const data = {
+      ...workInProgressItem,
+      invited: [...workInProgressItem.invited, ...invited],
+    };
+
+    this.setState(prevState => ({
+      ...prevState,
+      workInProgressItem: data,
+      isVisibleShareModal: false,
+      list: updateNode(prevState.list, workInProgressItem.id, data),
+    }));
+  };
+
+  handleRemoveShare = id => async () => {
+    const { workInProgressItem } = this.state;
+
+    try {
+      await deleteInviteItem(id);
+
+      const updatedInvites = workInProgressItem.invited.filter(
+        ({ id: invitedId }) => invitedId !== id,
+      );
+      const data = {
+        ...workInProgressItem,
+        invited: updatedInvites,
+      };
+
+      this.setState(prevState => ({
+        ...prevState,
+        workInProgressItem: data,
+        list: updateNode(prevState.list, workInProgressItem.id, data),
+      }));
+    } catch (e) {
+      console.log(e.response);
+    }
+  };
+
   handleCloseInviteModal = () => {
     this.setState({
       isVisibleInviteModal: false,
@@ -896,7 +1023,13 @@ class DashboardContainer extends Component {
           />
         )}
         {isVisibleShareModal && (
-          <ShareModal onCancel={this.handleCloseShareModal} />
+          <ShareModal
+            members={members}
+            shared={workInProgressItem.invited}
+            onShare={this.handleShare}
+            onCancel={this.handleCloseShareModal}
+            onRemove={this.handleRemoveShare}
+          />
         )}
         <ConfirmModal
           isOpen={isVisibleMoveToTrashModal}

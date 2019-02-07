@@ -144,3 +144,13 @@ export const updateList = (listId, data) =>
 export const removeList = listId => callApi.delete(`/list/${listId}`);
 
 export const toggleFavorite = id => callApi.post(`/item/${id}/favorite`);
+
+export const getPublicKeyByEmail = email => callApi.get(`/key/${email}`);
+
+export const postNewUser = data => callApi.post('/user', data);
+
+export const postMessage = data => callApi.post('/message', data);
+
+export const getMessage = messageId => callApi.get(`/message/${messageId}`);
+
+export const postInvite = data => callApi.post('/invitation', data);

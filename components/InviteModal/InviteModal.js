@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import styled from 'styled-components';
 import memoize from 'memoize-one';
-import { PERMISION_WRITE, PERMISION_READ } from 'common/constants';
+import { PERMISSION_WRITE, PERMISSION_READ } from 'common/constants';
 import Member from './Member';
 import { Modal } from '../Modal';
 import { Input } from '../Input';
@@ -76,7 +76,7 @@ class InviteModal extends Component {
   handleClickAdd = userId => () => {
     this.setState(prevState => ({
       ...prevState,
-      invited: [...prevState.invited, { userId, access: PERMISION_WRITE }],
+      invited: [...prevState.invited, { userId, access: PERMISSION_WRITE }],
     }));
   };
 
@@ -87,7 +87,7 @@ class InviteModal extends Component {
         if (item.userId === userId) {
           acc.push({
             ...item,
-            access: value ? PERMISION_READ : PERMISION_WRITE,
+            access: value ? PERMISSION_READ : PERMISSION_WRITE,
           });
         } else {
           acc.push(item);
@@ -125,7 +125,7 @@ class InviteModal extends Component {
 
     return filteredMembers.map(({ id, ...member }) => {
       const isReadOnly =
-        invitesByUserId[id] && invitesByUserId[id].access === PERMISION_READ;
+        invitesByUserId[id] && invitesByUserId[id].access === PERMISSION_READ;
       return (
         <Member
           key={id}

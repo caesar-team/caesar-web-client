@@ -23,8 +23,17 @@ import {
 } from 'common/utils/tree';
 import { generatePassword } from 'common/utils/password';
 import { generateKeys } from 'common/utils/key';
+import { createSrp } from 'common/utils/srp';
 import { generateSharingUrl } from 'common/utils/sharing';
-import { encryptText, encryptItemForMembers } from 'common/utils/cipherUtils';
+import { uuid4 } from 'common/utils/uuid4';
+import {
+  encryptText,
+  encryptItemForUser,
+  encryptItemForUsers,
+  generateUser,
+  objectToBase64,
+  base64ToObject,
+} from 'common/utils/cipherUtils';
 import {
   ROOT_TYPE,
   INBOX_TYPE,
@@ -34,9 +43,10 @@ import {
   ITEM_REVIEW_MODE,
   ITEM_WORKFLOW_CREATE_MODE,
   ITEM_WORKFLOW_EDIT_MODE,
-  DEFAULT_REQUESTS_LIMIT,
-  DEFAULT_SECONDS_LIMIT,
   PERMISSION_READ,
+  INVITE_TYPE,
+  SHARE_TYPE,
+  APP_URL,
 } from 'common/constants';
 import {
   postCreateItem,
@@ -53,6 +63,11 @@ import {
   postNewUser,
   postMessage,
   postInvite,
+  postLink,
+  deleteLink,
+  postShare,
+  postShares,
+  postRegistration,
 } from 'common/api';
 import DecryptWorker from 'common/decrypt.worker';
 import { initialItemData } from './utils';
@@ -80,9 +95,10 @@ const Sidebar = styled.aside`
   border-right: 1px solid ${({ theme }) => theme.gallery};
 `;
 
+const srp = createSrp();
+
 // TODO: add helper method for update and replace node after any changing
 // TODO: add helper method for construct workInProgressPost from parts
-
 const getListWithoutChildren = list => ({ ...list, children: [] });
 
 class DashboardContainer extends Component {
@@ -752,59 +768,213 @@ class DashboardContainer extends Component {
     }
   };
 
-  createNewUser = async email => {
-    try {
-      const password = generatePassword();
-      const token = generatePassword();
+  handleToggleSeparateLink = async isUseMasterPassword => {
+    const { workInProgressItem } = this.state;
 
-      const { publicKey, privateKey } = await generateKeys(password);
+    const { link } = workInProgressItem;
+    const linkObj = base64ToObject(link.encryption);
+
+    let newUrl = '';
+    let newLink = '';
+    let newEncryption = '';
+
+    if (isUseMasterPassword) {
+      const { masterPassword, ...linkData } = linkObj;
+
+      newEncryption = objectToBase64(linkData);
+      newUrl = generateSharingUrl(newEncryption);
+      newLink = `${newUrl}\nMaster password: ${masterPassword}`;
+    } else {
+      newEncryption = objectToBase64({
+        ...linkObj,
+        masterPassword: link.masterPassword,
+      });
+      newUrl = generateSharingUrl(newEncryption);
+      newLink = `${newUrl}`;
+    }
+
+    const updatedData = {
+      lastUpdated: '',
+      link: {
+        id: link.id,
+        url: newLink,
+        isUseMasterPassword,
+        masterPassword: linkObj.masterPassword || null,
+        encryption: newEncryption,
+      },
+    };
+
+    this.setState(prevState => ({
+      ...prevState,
+      workInProgressItem: {
+        ...prevState.workInProgressItem,
+        ...updatedData,
+      },
+      list: updateNode(prevState.list, prevState.workInProgressItem.id, {
+        ...updatedData,
+      }),
+    }));
+  };
+
+  handleActivateShareByLink = async () => {
+    const { workInProgressItem } = this.state;
+
+    const login = uuid4();
+    const {
+      userId,
+      password,
+      masterPassword,
+      publicKey,
+    } = await this.createUser(login, true);
+
+    const encryptedSecret = await encryptItemForUser(
+      workInProgressItem.secret,
+      publicKey,
+    );
+
+    const {
+      data: { id: shareId },
+    } = await postShare({
+      user: userId,
+      sharedItems: [{ item: workInProgressItem.id, secret: encryptedSecret }],
+    });
+
+    const encryption = objectToBase64({
+      login,
+      password,
+      masterPassword,
+    });
+
+    const link = generateSharingUrl(encryption);
+
+    const updatedData = {
+      lastUpdated: '',
+      link: {
+        id: shareId,
+        url: link,
+        encryption,
+        isUseMasterPassword: false,
+      },
+    };
+
+    this.setState(prevState => ({
+      ...prevState,
+      workInProgressItem: {
+        ...prevState.workInProgressItem,
+        ...updatedData,
+      },
+      list: updateNode(prevState.list, prevState.workInProgressItem.id, {
+        ...updatedData,
+      }),
+    }));
+  };
+
+  handleDeactivateShareByLink = async () => {
+    const {
+      workInProgressItem: {
+        link: { id },
+      },
+    } = this.state;
+
+    try {
+      // await deleteLink(id);
+      this.setState(prevState => ({
+        ...prevState,
+        workInProgressItem: {
+          ...prevState.workInProgressItem,
+          link: null,
+        },
+        list: updateNode(prevState.list, prevState.workInProgressItem.id, {
+          link: null,
+        }),
+      }));
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  createUser = async (emailOrLogin, isAnonymous) => {
+    try {
       const {
-        data: { userId },
-      } = await postNewUser({
-        email,
+        password,
+        masterPassword,
+        publicKey,
+        privateKey,
+      } = await generateUser(emailOrLogin);
+
+      const seed = srp.getRandomSeed();
+      const verifier = srp.generateV(
+        srp.generateX(seed, emailOrLogin, password),
+      );
+
+      const request = {
+        plainPassword: password,
         publicKey,
         encryptedPrivateKey: privateKey,
-      });
+        seed,
+        verifier,
+      };
 
-      const message = await encryptText(password, token);
+      if (isAnonymous) {
+        request.login = emailOrLogin;
+      } else {
+        request.email = emailOrLogin;
+      }
 
       const {
-        data: { id },
-      } = await postMessage({
-        message,
-        secondsLimit: DEFAULT_SECONDS_LIMIT,
-        requestsLimit: DEFAULT_REQUESTS_LIMIT,
-      });
+        data: { user: userId },
+      } = await postNewUser(request);
 
-      await postInvite({
-        email,
-        token,
-        url: generateSharingUrl(id),
-      });
-
-      return { userId, publicKey };
+      return {
+        userId,
+        password,
+        masterPassword,
+        publicKey,
+        privateKey,
+        login: emailOrLogin,
+      };
     } catch (e) {
       console.log(e || e.response);
       return null;
     }
   };
 
-  shareResolver = async email => {
+  userResolver = async email => {
     try {
       const {
         data: { userId, publicKey },
       } = await getPublicKeyByEmail(email);
-      return { userId, publicKey };
+
+      return { userId, publicKey, type: INVITE_TYPE };
     } catch (e) {
-      const user = await this.createNewUser(email);
-      return user;
+      const {
+        userId,
+        password,
+        masterPassword,
+        publicKey,
+        login,
+      } = await this.createUser(email, false);
+      return {
+        userId,
+        login,
+        password,
+        masterPassword,
+        publicKey,
+        type: SHARE_TYPE,
+      };
     }
   };
 
   handleShare = async emails => {
+    if (!emails.length) {
+      return this.setState({
+        isVisibleShareModal: false,
+      });
+    }
+
     const { workInProgressItem } = this.state;
 
-    const promises = await emails.map(this.shareResolver);
+    const promises = await emails.map(this.userResolver);
     const response = await Promise.all(promises);
 
     const itemInvitedUsers = workInProgressItem.invited.map(
@@ -814,11 +984,20 @@ class DashboardContainer extends Component {
     const users = response.filter(
       user => !!user && !itemInvitedUsers.includes(user.userId),
     );
-    const keys = users.map(({ publicKey }) => publicKey);
+    const invitedUsers = users.filter(({ type }) => type === INVITE_TYPE);
+    const sharedUsers = users.filter(({ type }) => type === SHARE_TYPE);
 
-    const encryptedSecrets = await encryptItemForMembers(
+    const invitedUserKeys = invitedUsers.map(({ publicKey }) => publicKey);
+    const sharedUserKeys = sharedUsers.map(({ publicKey }) => publicKey);
+
+    const sharedEncryptedSecrets = await encryptItemForUsers(
       workInProgressItem.secret,
-      keys,
+      sharedUserKeys,
+    );
+
+    const encryptedSecrets = await encryptItemForUsers(
+      workInProgressItem.secret,
+      [...invitedUserKeys, ...sharedUserKeys],
     );
 
     const invites = encryptedSecrets.map((secret, idx) => ({
@@ -827,14 +1006,36 @@ class DashboardContainer extends Component {
       access: PERMISSION_READ,
     }));
 
+    const shares = sharedEncryptedSecrets.map((secret, idx) => ({
+      user: sharedUsers[idx].userId,
+      sharedItems: [{ item: workInProgressItem.id, secret }],
+    }));
+
     const {
       data: { invited },
     } = await postInviteItem(workInProgressItem.id, { invites });
+
+    await postShares({ shares });
 
     const data = {
       ...workInProgressItem,
       invited: [...workInProgressItem.invited, ...invited],
     };
+
+    console.log(sharedUsers);
+    sharedUsers.map(
+      async ({ login, password, masterPassword }) =>
+        await postInvite({
+          email: login,
+          url: generateSharingUrl(
+            objectToBase64({
+              login,
+              password,
+              masterPassword,
+            }),
+          ),
+        }),
+    );
 
     this.setState(prevState => ({
       ...prevState,
@@ -867,6 +1068,8 @@ class DashboardContainer extends Component {
       console.log(e.response);
     }
   };
+
+  handleResendShare = () => {};
 
   handleCloseInviteModal = () => {
     this.setState({
@@ -1025,10 +1228,15 @@ class DashboardContainer extends Component {
         {isVisibleShareModal && (
           <ShareModal
             members={members}
-            shared={workInProgressItem.invited}
+            item={workInProgressItem}
+            onResend={this.handleResendShare}
             onShare={this.handleShare}
-            onCancel={this.handleCloseShareModal}
             onRemove={this.handleRemoveShare}
+            onActivateSharedByLink={this.handleActivateShareByLink}
+            onDeactivateSharedByLink={this.handleDeactivateShareByLink}
+            onToggleSeparateLink={this.handleToggleSeparateLink}
+            onCancel={this.handleCloseShareModal}
+            notification={notification}
           />
         )}
         <ConfirmModal

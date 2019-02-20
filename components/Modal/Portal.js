@@ -35,7 +35,7 @@ const ContentWrapper = styled.div`
   outline: none;
   padding: 30px 40px 40px;
 
-  ${({ minWidth }) => minWidth && `min-width: ${minWidth}px`};
+  ${({ width }) => width && `width: ${width}px`};
 `;
 
 class Portal extends Component {

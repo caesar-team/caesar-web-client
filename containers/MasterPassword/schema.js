@@ -22,3 +22,7 @@ export const createConfirmPasswordSchema = password =>
       )
       .required(),
   });
+
+export const checkPasswordSchema = yup.object({
+  checkPassword: yup.string().required(),
+});

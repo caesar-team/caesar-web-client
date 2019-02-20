@@ -3,7 +3,9 @@ import { isServer } from './isEnvironment';
 import { getToken } from './token';
 
 export function entryResolver({ router, ctx }) {
-  if (isServer && router.route !== '/auth') {
+  const needToken = isServer && !['/auth', '/share'].includes(router.route);
+
+  if (needToken) {
     const { req, res } = ctx;
     const token = req.cookies ? req.cookies.token : getToken();
 

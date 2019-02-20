@@ -22,12 +22,8 @@ spec:
       - env:
         - name: API_BASE_PATH
           value: api
-        - name: API_HOST
-          value: dev.caesar.team
         - name: API_PROTOCOL
           value: https
-        - name: APP_HOST
-          value: dev.caesar.team
         - name: APP_PORT
           value: "3000"
         - name: APP_PROTOCOL
@@ -38,6 +34,16 @@ spec:
           value: production
         - name: REDIRECT_AUTH_ENDPOINT
           value: check_auth
+        - name: API_HOST
+          valueFrom:
+           secretKeyRef:
+             key: API_HOST
+             name: caesarapp-web-app
+        - name: APP_HOST
+          valueFrom:
+           secretKeyRef:
+             key: APP_HOST
+             name: caesarapp-web-app
         image: caesarteam/caesar-web-client:${CICD_GIT_BRANCH}
         imagePullPolicy: Always
         name: caesarapp-web-app

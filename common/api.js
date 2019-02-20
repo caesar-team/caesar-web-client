@@ -1,5 +1,4 @@
 import axios from 'axios';
-import Router from 'next/router';
 import { API_URL, API_BASE_PATH } from './constants';
 import { getToken, removeToken } from './utils/token';
 import { isClient } from './utils/isEnvironment';
@@ -33,35 +32,16 @@ callApi.interceptors.request.use(config => {
     : config;
 });
 
-const processNotAuth = status => {
-  switch (status) {
-    case 'not_passed':
-      Router.push({
-        pathname: '/2fa',
-        query: { isCheck: true },
-      });
-      break;
-    case 'not_active':
-      Router.push({
-        pathname: '/2fa',
-      });
-      break;
-    default:
-      softExit();
-      break;
-  }
-};
-
 callApi.interceptors.response.use(
   config => config,
   error => {
     if (error.response) {
       switch (error.response.status) {
         case 401:
-          processNotAuth(error.response.data['2fa']);
+          softExit();
           break;
         default:
-          console.log(error.response.data);
+          // console.log(error.response.data);
           break;
       }
     }
@@ -87,17 +67,25 @@ export const getUsers = token =>
 
 export const postKeys = data => callApi.post('/keys', data);
 
-export const createTwoFactor = data => callApi.post('/2fa/activate', data);
-
-export const checkTwoFactor = data => callApi.post('/2fa', data);
-
 export const getKeys = () => callApi.get('/keys');
 
 export const getQrCode = () => callApi.get('/2fa');
 
+export const postActivateTwoFactor = data =>
+  callApi.post('/2fa/activate', data);
+
+export const postCheckTwoFactor = data => callApi.post('/2fa', data);
+
 // post
 export const getList = token =>
   callApi.get('/list', {
+    headers: {
+      Authorization: token ? `Bearer ${token}` : '',
+    },
+  });
+
+export const getUserBootstrap = token =>
+  callApi.get('/user/security/bootstrap', {
     headers: {
       Authorization: token ? `Bearer ${token}` : '',
     },
@@ -154,3 +142,20 @@ export const postMessage = data => callApi.post('/message', data);
 export const getMessage = messageId => callApi.get(`/message/${messageId}`);
 
 export const postInvite = data => callApi.post('/invitation', data);
+
+export const postLink = data => callApi.post('/link', data);
+
+export const deleteLink = id => callApi.delete(`/link/${id}`);
+
+export const postShare = data => callApi.post('/share', data);
+
+export const postShares = data => callApi.post('/shares', data);
+
+export const postLoginPrepare = data =>
+  callApi.post('/srp/login_prepare', data);
+
+export const postLogin = data => callApi.post('/srp/login', data);
+
+export const postRegistration = data => callApi.post('/srp/registration', data);
+
+export const getUserPermissions = () => callApi.get('/user/permissions');

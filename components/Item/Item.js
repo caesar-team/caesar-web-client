@@ -63,6 +63,7 @@ const Item = ({
   }
 
   const { mode, type, invited, update, ownerId, id } = item;
+
   const renderedItemForm = matchStrict(
     type,
     {

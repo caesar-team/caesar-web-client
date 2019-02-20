@@ -3,6 +3,7 @@ import styled from 'styled-components';
 import NextLink from 'next/link';
 
 const StyledAnchor = styled.a`
+  cursor: pointer;
   font-size: 18px;
   letter-spacing: 0.6px;
   color: ${({ theme }) => theme.black};
@@ -12,9 +13,9 @@ const StyledAnchor = styled.a`
   }
 `;
 
-const Link = ({ to, onClick, children, ...props }) => (
+const Link = ({ to, onClick, children, className, ...props }) => (
   <NextLink href={to} {...props}>
-    <StyledAnchor href={to} onClick={onClick}>
+    <StyledAnchor href={to} onClick={onClick} className={className}>
       {children}
     </StyledAnchor>
   </NextLink>

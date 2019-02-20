@@ -1,12 +1,25 @@
 import * as openpgp from 'openpgp';
-import { uuid4 } from './uuid4';
 import { LENGTH_KEY } from '../constants';
 
-export const generateKeys = async password => {
+export const reencryptPrivateKey = async (
+  oldPassword,
+  newPassword,
+  encryptedPrivateKey,
+) => {
+  const privateKeyObj = (await openpgp.key.readArmored(encryptedPrivateKey))
+    .keys[0];
+
+  await privateKeyObj.decrypt(oldPassword);
+  await privateKeyObj.encrypt(newPassword);
+
+  return privateKeyObj.armor();
+};
+
+export const generateKeys = async (masterPassword, user) => {
   const options = {
-    userIds: [{ name: uuid4() }],
+    userIds: [{ name: user }],
     numBits: LENGTH_KEY,
-    passphrase: password,
+    passphrase: masterPassword,
   };
 
   const { publicKeyArmored, privateKeyArmored } = await openpgp.generateKey(

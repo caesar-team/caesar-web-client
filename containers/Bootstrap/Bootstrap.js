@@ -1,30 +1,46 @@
 import React, { Component } from 'react';
+import * as openpgp from 'openpgp';
 import { DEFAULT_IDLE_TIMEOUT } from 'common/constants';
+import OpenPGPWorker from 'common/openpgp.worker';
 import { SessionChecker } from 'components/SessionChecker';
 import {
   TWO_FACTOR_CHECK,
-  TWO_FACTOR_CREATION,
+  TWO_FACTOR_CREATE,
   PASSWORD_CHANGE,
-  MASTER_PASSWORD_CHANGE,
+  MASTER_PASSWORD_CHECK_SHARED,
   MASTER_PASSWORD_CHECK,
-  MASTER_PASSWORD_CREATION,
+  MASTER_PASSWORD_CREATE,
   BOOTSTRAP_FINISH,
 } from './constants';
 import { TwoFactorStep, PasswordStep, MasterPasswordStep } from './Steps';
 
-const TWO_FACTOR_STEPS = [TWO_FACTOR_CHECK, TWO_FACTOR_CREATION];
+const TWO_FACTOR_STEPS = [TWO_FACTOR_CREATE, TWO_FACTOR_CHECK];
 const PASSWORD_STEPS = [PASSWORD_CHANGE];
 const MASTER_PASSWORD_STEPS = [
-  MASTER_PASSWORD_CHANGE,
-  MASTER_PASSWORD_CREATION,
+  MASTER_PASSWORD_CHECK_SHARED,
+  MASTER_PASSWORD_CREATE,
   MASTER_PASSWORD_CHECK,
 ];
+
+const bootstrapStates = bootstrap => ({
+  twoFactorAuthState: `TWO_FACTOR_${bootstrap.twoFactorAuthState}`,
+  passwordState: `PASSWORD_${bootstrap.passwordState}`,
+  masterPasswordState: `MASTER_PASSWORD_${bootstrap.masterPasswordState}`,
+});
 
 class Bootstrap extends Component {
   state = this.prepareInitialState();
 
+  worker = null;
+
+  componentDidMount() {
+    this.initOpenPGPWorker();
+  }
+
   handleFinishTwoFactor = () => {
-    const { passwordState, masterPasswordState } = this.props;
+    const { passwordState, masterPasswordState } = bootstrapStates(
+      this.props.bootstrap,
+    );
 
     this.setState({
       currentStep:
@@ -35,15 +51,22 @@ class Bootstrap extends Component {
   };
 
   handleFinishChangePassword = () => {
-    const { masterPasswordState } = this.props;
+    const { masterPasswordState } = bootstrapStates(this.props.bootstrap);
 
     this.setState({
       currentStep: masterPasswordState,
     });
   };
 
-  handleFinishMasterPassword = () => {
+  handleFinishMasterPassword = ({
+    publicKey,
+    encryptedPrivateKey,
+    masterPassword,
+  }) => {
     this.setState({
+      publicKey,
+      encryptedPrivateKey,
+      masterPassword,
       currentStep: BOOTSTRAP_FINISH,
     });
   };
@@ -54,12 +77,20 @@ class Bootstrap extends Component {
     });
   };
 
+  initOpenPGPWorker() {
+    openpgp.config.aead_protect = false;
+
+    this.worker = new OpenPGPWorker();
+
+    openpgp.initWorker({ workers: [this.worker] });
+  }
+
   currentStepResolver() {
     const {
       twoFactorAuthState,
-      passwordState = 'CHANGE',
+      passwordState,
       masterPasswordState,
-    } = this.props;
+    } = bootstrapStates(this.props.bootstrap);
 
     if (TWO_FACTOR_STEPS.includes(twoFactorAuthState)) {
       return twoFactorAuthState;
@@ -79,12 +110,28 @@ class Bootstrap extends Component {
   prepareInitialState() {
     return {
       currentStep: this.currentStepResolver(),
+      publicKey: null,
+      encryptedPrivateKey: null,
+      masterPassword: null,
     };
   }
 
   render() {
-    const { currentStep } = this.state;
-    const { children, sharedMasterPassword } = this.props;
+    const {
+      currentStep,
+      publicKey,
+      encryptedPrivateKey,
+      masterPassword,
+    } = this.state;
+    const {
+      sharedData,
+      component: PageComponent,
+      bootstrap,
+      ...props
+    } = this.props;
+
+    console.log('currentStep', currentStep);
+    console.log('sharedData', sharedData);
 
     if (TWO_FACTOR_STEPS.includes(currentStep)) {
       return (
@@ -96,25 +143,37 @@ class Bootstrap extends Component {
     }
 
     if (PASSWORD_STEPS.includes(currentStep)) {
-      return <PasswordStep onFinish={this.handleFinishChangePassword} />;
+      return (
+        <PasswordStep
+          email={sharedData.login}
+          onFinish={this.handleFinishChangePassword}
+        />
+      );
     }
 
     if (MASTER_PASSWORD_STEPS.includes(currentStep)) {
       return (
         <MasterPasswordStep
           initialStep={currentStep}
-          sharedMasterPassword={sharedMasterPassword}
+          sharedMasterPassword={sharedData.masterPassword}
           onFinish={this.handleFinishMasterPassword}
         />
       );
     }
 
+    // TODO: during refactoring change password field to masterPassword
+    // TODO: privateKey to encryptedPrivateKey
     return (
       <SessionChecker
         timeout={DEFAULT_IDLE_TIMEOUT}
         onFinishTimeout={this.handleInactiveTimeout}
       >
-        {children}
+        <PageComponent
+          publicKey={publicKey}
+          privateKey={encryptedPrivateKey}
+          password={masterPassword}
+          {...props}
+        />
       </SessionChecker>
     );
   }

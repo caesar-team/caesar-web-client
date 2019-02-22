@@ -78,7 +78,7 @@ const StyledButton = styled(Button)`
 const ButtonWrapper = styled.div`
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: center;
   margin-top: 30px;
   margin-bottom: 60px;
 `;

@@ -68,6 +68,9 @@ import {
   postShare,
   postShares,
   postRegistration,
+  getList,
+  getUserSelf,
+  getUsers,
 } from 'common/api';
 import DecryptWorker from 'common/decrypt.worker';
 import { initialItemData } from './utils';
@@ -108,19 +111,44 @@ class DashboardContainer extends Component {
     list.reduce((acc, item) => ({ ...acc, [item.id]: item }), {}),
   );
 
-  componentDidMount() {
+  async componentDidMount() {
     this.worker = new DecryptWorker();
 
     this.worker.addEventListener('message', this.handleWorkerMessage);
 
-    this.worker.postMessage({
-      event: 'toDecryptList',
-      data: {
-        list: this.props.list,
-        privateKey: this.props.privateKey,
-        password: this.props.password,
-      },
+    const { data: list } = await getList();
+    const { data: user } = await getUserSelf();
+    const { data: members } = await getUsers();
+
+    const root = {
+      type: ROOT_TYPE,
+      children: [
+        getListWithoutChildren(list[0]),
+        { ...list[1], children: list[1].children.map(getListWithoutChildren) },
+        getListWithoutChildren(list[2]),
+      ],
+    };
+    const tree = createTree(root);
+
+    this.setState({
+      list: tree,
+      members,
+      user,
+      selectedListId: list[0].id,
     });
+  }
+
+  componentDidUpdate(prevProps, prevState) {
+    if (!prevState.list && this.state.list) {
+      this.worker.postMessage({
+        event: 'toDecryptList',
+        data: {
+          list: this.state.list,
+          privateKey: this.props.privateKey,
+          password: this.props.password,
+        },
+      });
+    }
   }
 
   componentWillUnmount() {
@@ -299,7 +327,8 @@ class DashboardContainer extends Component {
     type,
     ...secret
   }) => {
-    const { publicKey, user } = this.props;
+    const { publicKey } = this.props;
+    const { user } = this.state;
 
     try {
       const item = {
@@ -1022,7 +1051,6 @@ class DashboardContainer extends Component {
       invited: [...workInProgressItem.invited, ...invited],
     };
 
-    console.log(sharedUsers);
     sharedUsers.map(
       async ({ login, password, masterPassword }) =>
         await postInvite({
@@ -1084,39 +1112,19 @@ class DashboardContainer extends Component {
   };
 
   prepareInitialState() {
-    const { list, predefinedListId } = this.props;
-
-    let selectedListId = null;
-
-    if (predefinedListId) {
-      selectedListId = predefinedListId;
-    } else if (list && list.length > 0) {
-      selectedListId = list[0].id;
-    }
-
-    const root = {
-      type: ROOT_TYPE,
-      children: [
-        getListWithoutChildren(list[0]),
-        { ...list[1], children: list[1].children.map(getListWithoutChildren) },
-        getListWithoutChildren(list[2]),
-      ],
-    };
-    const tree = createTree(root);
-
     return {
       isVisibleInviteModal: false,
       isVisibleShareModal: false,
       isVisibleMoveToTrashModal: false,
       isVisibleRemoveModal: false,
-      list: tree,
+      list: null,
       favorites: {
         id: FAVORITES_TYPE,
         label: FAVORITES_TYPE,
         type: FAVORITES_TYPE,
         children: [],
       },
-      selectedListId,
+      selectedListId: null,
       workInProgressItem: null,
     };
   }
@@ -1144,8 +1152,10 @@ class DashboardContainer extends Component {
   }
 
   render() {
-    const { user, members, notification } = this.props;
+    const { notification } = this.props;
     const {
+      members,
+      user,
       list,
       favorites,
       selectedListId,
@@ -1155,6 +1165,10 @@ class DashboardContainer extends Component {
       isVisibleMoveToTrashModal,
       isVisibleRemoveModal,
     } = this.state;
+
+    if (!list || !list.model || !list.model.children) {
+      return null;
+    }
 
     const {
       model: { children },

@@ -20,11 +20,15 @@ const StyledButton = styled(Button)`
   margin-top: 45px;
 `;
 
-const MasterPasswordConfirmForm = ({ password, onSubmit, onClickReturn }) => (
+const MasterPasswordConfirmForm = ({
+  masterPassword,
+  onSubmit,
+  onClickReturn,
+}) => (
   <Formik
     key="confirmPassword"
     initialValues={{ confirmPassword: '' }}
-    validationSchema={createConfirmPasswordSchema(password)}
+    validationSchema={createConfirmPasswordSchema(masterPassword)}
     onSubmit={onSubmit}
     render={({ errors, touched, handleSubmit, isSubmitting, isValid }) => (
       <form onSubmit={handleSubmit}>

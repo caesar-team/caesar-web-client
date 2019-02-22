@@ -139,8 +139,6 @@ export const postNewUser = data => callApi.post('/user', data);
 
 export const postMessage = data => callApi.post('/message', data);
 
-export const getMessage = messageId => callApi.get(`/message/${messageId}`);
-
 export const postInvite = data => callApi.post('/invitation', data);
 
 export const postLink = data => callApi.post('/link', data);
@@ -158,4 +156,9 @@ export const postLogin = data => callApi.post('/srp/login', data);
 
 export const postRegistration = data => callApi.post('/srp/registration', data);
 
+export const postChangePassword = data => callApi.patch('/srp/password', data);
+
 export const getUserPermissions = () => callApi.get('/user/permissions');
+
+export const postCheckShare = id =>
+  callApi.post(`/anonymous/share/${id}/check`);

@@ -2,8 +2,8 @@ import Router from 'next/router';
 import { isServer } from './isEnvironment';
 import { getToken } from './token';
 
-export function entryResolver({ router, ctx }) {
-  const needToken = isServer && !['/auth', '/share'].includes(router.route);
+export function entryResolver({ route, ctx }) {
+  const needToken = isServer && !['/auth', '/share'].includes(route);
 
   if (needToken) {
     const { req, res } = ctx;

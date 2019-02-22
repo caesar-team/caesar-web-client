@@ -17,33 +17,37 @@ window.onmessage = async message => {
         .keys[0];
       await privateKeyObj.decrypt(data.password);
 
-      tree.createTree({ id: 'root', children: data.list }).walk(node => {
-        if (
-          [ITEM_CREDENTIALS_TYPE, ITEM_DOCUMENT_TYPE].includes(node.model.type)
-        ) {
-          openpgp.message.readArmored(node.model.secret).then(secret => {
-            const options = {
-              message: secret,
-              privateKeys: [privateKeyObj],
-            };
+      tree
+        .createTree({ id: 'root', children: data.list.model.children })
+        .walk(node => {
+          if (
+            [ITEM_CREDENTIALS_TYPE, ITEM_DOCUMENT_TYPE].includes(
+              node.model.type,
+            )
+          ) {
+            openpgp.message.readArmored(node.model.secret).then(secret => {
+              const options = {
+                message: secret,
+                privateKeys: [privateKeyObj],
+              };
 
-            openpgp.decrypt(options).then(plaintext => {
-              window.postMessage({
-                event: 'fromDecryptList',
-                data: {
-                  node: {
-                    ...node,
-                    model: {
-                      ...node.model,
-                      secret: JSON.parse(plaintext.data),
+              openpgp.decrypt(options).then(plaintext => {
+                window.postMessage({
+                  event: 'fromDecryptList',
+                  data: {
+                    node: {
+                      ...node,
+                      model: {
+                        ...node.model,
+                        secret: JSON.parse(plaintext.data),
+                      },
                     },
                   },
-                },
+                });
               });
             });
-          });
-        }
-      });
+          }
+        });
       break;
     }
     default:

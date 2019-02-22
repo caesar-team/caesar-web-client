@@ -1,4 +1,4 @@
-import { Component } from 'react';
+import React, { Component } from 'react';
 import Router from 'next/router';
 import { Error } from 'components';
 import { base64ToObject } from 'common/utils/cipherUtils';
@@ -7,6 +7,9 @@ import { setToken } from 'common/utils/token';
 import { postLoginPrepare, postLogin, postCheckShare } from 'common/api';
 
 const srp = createSrp();
+
+const validateShare = (data, fields) =>
+  data && fields.every(field => !!data[field]);
 
 const createMatcher = ({ login, password, A, a, B, seed }) => {
   const S = srp.generateClientS(A, B, a, srp.generateX(seed, login, password));
@@ -29,21 +32,29 @@ class Sharing extends Component {
       redirectToAuth();
     }
 
+    const data = base64ToObject(encryption);
+
+    const shareIsValid = validateShare(data, [
+      'shareId',
+      'login',
+      'password',
+      'masterPassword',
+    ]);
+
+    if (!shareIsValid) {
+      return this.setState({
+        isValidShare: false,
+      });
+    }
+
     try {
-      const data = base64ToObject(this.props.encryption);
-
-      if (!data || !data.sharedId || !data.login || !data.password) {
-        // console.log('here');
-        throw new Error('Incorrect encryption');
-      }
-
-      await postCheckShare(data.sharedId);
+      await postCheckShare(data.shareId)
 
       const jwt = await this.loginResolver(data.login, data.password);
 
       setToken(jwt);
 
-      Router.push('/');
+      return Router.push('/');
     } catch (e) {
       console.log(e);
     }
@@ -107,7 +118,7 @@ class Sharing extends Component {
   }
 
   render() {
-    return this.state.isValidShare ? null : <Error statusCode={404} />;
+    return !this.state.isValidShare && <Error statusCode={404} />;
   }
 }
 

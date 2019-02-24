@@ -141,18 +141,23 @@ const EmailBox = styled(SharedItem)`
   background-color: ${({ theme }) => theme.lightBlue};
 `;
 
+const getAnonymousLink = shared =>
+  (shared.find(({ roles }) => roles.includes(ANONYMOUS_USER_ROLE)) || {}).link;
+
 export class ShareModal extends Component {
   state = this.prepareInitialState();
 
   handleShareByLinkChange = () => {
     const {
-      item: { link },
+      shared,
       onActivateSharedByLink,
       onDeactivateSharedByLink,
     } = this.props;
 
+    const link = getAnonymousLink(shared);
+
     if (!link) {
-      onActivateSharedByLink(false);
+      onActivateSharedByLink();
     } else {
       onDeactivateSharedByLink();
     }
@@ -161,13 +166,12 @@ export class ShareModal extends Component {
   handleToggleSeparateLink = isUseMasterPassword => {
     const { shared } = this.props;
 
-    const anonymousShare = shared.find(
-      ({ role }) => role === ANONYMOUS_USER_ROLE,
-    );
-
     this.setState({
       isUseMasterPassword,
-      linkText: this.generateLinkText(anonymousShare.link, isUseMasterPassword),
+      linkText: this.generateLinkText(
+        getAnonymousLink(shared),
+        isUseMasterPassword,
+      ),
     });
   };
 
@@ -220,16 +224,12 @@ export class ShareModal extends Component {
   prepareInitialState() {
     const { shared } = this.props;
 
-    const anonymousShare = shared.find(
-      ({ role }) => role === ANONYMOUS_USER_ROLE,
-    );
+    const link = getAnonymousLink(shared);
 
     return {
       emails: [],
       isUseMasterPassword: false,
-      linkText: anonymousShare
-        ? this.generateLinkText(anonymousShare.link, false)
-        : '',
+      linkText: link ? this.generateLinkText(link, false) : '',
     };
   }
 
@@ -253,11 +253,7 @@ export class ShareModal extends Component {
   }
 
   renderWaitingUsers() {
-    const {
-      item: { shared },
-      onRemove,
-      onResend,
-    } = this.props;
+    const { shared, onRemove, onResend } = this.props;
 
     if (!shared || !shared.length) {
       return null;
@@ -293,10 +289,7 @@ export class ShareModal extends Component {
   }
 
   renderSharedUsers() {
-    const {
-      item: { shared },
-      onRemove,
-    } = this.props;
+    const { shared, onRemove } = this.props;
 
     if (!shared || !shared.length) {
       return null;
@@ -336,13 +329,10 @@ export class ShareModal extends Component {
     const { isUseMasterPassword, linkText } = this.state;
     const { onCancel, shared } = this.props;
 
-    const anonymousShare = shared.find(
-      ({ role }) => role === ANONYMOUS_USER_ROLE,
-    );
+    const link = getAnonymousLink(shared);
+    const switcherText = link ? 'Link access enabled' : 'Link access disabled';
 
-    const switcherText = anonymousShare
-      ? 'Link access enabled'
-      : 'Link access disabled';
+    console.log(link);
 
     return (
       <Modal
@@ -365,14 +355,14 @@ export class ShareModal extends Component {
         <LinkRow>
           <ToggleLabel>
             <Toggle
-              checked={!!anonymousShare}
+              checked={!!link}
               icons={false}
-              onChange={() => this.handleShareByLinkChange(false)}
+              onChange={() => this.handleShareByLinkChange()}
             />
             <ToggleLabelText>{switcherText}</ToggleLabelText>
           </ToggleLabel>
         </LinkRow>
-        {anonymousShare && (
+        {link && (
           <Row>
             <SharedLinkWrapper>
               <SharedLink>{linkText}</SharedLink>

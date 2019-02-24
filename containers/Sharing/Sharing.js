@@ -17,11 +17,12 @@ const createMatcher = ({ email, password, A, a, B, seed }) => {
 class Sharing extends Component {
   async componentDidMount() {
     const { email, password } = this.props;
+
     const jwt = await this.loginResolver(email, password);
 
     setToken(jwt);
 
-    return Router.push('/');
+    Router.push('/');
   }
 
   async loginResolver(email, password) {

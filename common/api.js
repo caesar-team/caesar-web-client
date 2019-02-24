@@ -91,11 +91,7 @@ export const getUserBootstrap = token =>
     },
   });
 
-export const getItem = itemId => callApi.get(`/items/${itemId}`);
-
 export const postCreateItem = data => callApi.post('/item', data);
-
-export const getListItems = listId => callApi.get(`/item?listId=${listId}`);
 
 export const removeItem = itemId => callApi.delete(`/item/${itemId}`);
 
@@ -134,19 +130,13 @@ export const getPublicKeyByEmail = email => callApi.get(`/key/${email}`);
 
 export const postNewUser = data => callApi.post('/user', data);
 
-export const postMessage = data => callApi.post('/message', data);
-
-export const postInvite = data => callApi.post('/invitation', data);
-
-export const postLink = data => callApi.post('/link', data);
-
-export const deleteLink = id => callApi.delete(`/link/${id}`);
-
 export const postShare = data => callApi.post('/share', data);
 
 export const postShares = data => callApi.post('/shares', data);
 
 export const updateShares = data => callApi.patch('/shares', data);
+
+export const updateShare = (id, data) => callApi.patch(`/shares/${id}`, data);
 
 export const deleteShare = id => callApi.delete(`/shares/${id}`);
 
@@ -155,11 +145,6 @@ export const postLoginPrepare = data =>
 
 export const postLogin = data => callApi.post('/srp/login', data);
 
-export const postRegistration = data => callApi.post('/srp/registration', data);
-
 export const postChangePassword = data => callApi.patch('/srp/password', data);
 
-export const getUserPermissions = () => callApi.get('/user/permissions');
-
-export const postCheckShare = id =>
-  callApi.post(`/anonymous/share/${id}/check`);
+export const getCheckShare = id => callApi.get(`/anonymous/share/${id}/check`);

@@ -29,7 +29,6 @@ import {
   generateUser,
   generateAnonymousEmail,
   objectToBase64,
-  base64ToObject,
 } from 'common/utils/cipherUtils';
 import {
   ROOT_TYPE,
@@ -45,6 +44,7 @@ import {
   SHARE_TYPE,
   READ_ONLY_USER_ROLE,
   ANONYMOUS_USER_ROLE,
+  SHARED_WAITING_STATUS,
 } from 'common/constants';
 import {
   postCreateItem,
@@ -63,6 +63,7 @@ import {
   postShares,
   updateShares,
   deleteShare,
+  updateShare,
 } from 'common/api';
 import DecryptWorker from 'common/decrypt.worker';
 import { initialItemData } from './utils';
@@ -326,6 +327,7 @@ class DashboardContainer extends Component {
         lastUpdated,
         favorite: false,
         invited: [],
+        shared: [],
         tags: [],
         ownerId: user.id,
         secret: item,
@@ -763,54 +765,6 @@ class DashboardContainer extends Component {
     }
   };
 
-  handleToggleSeparateLink = async isUseMasterPassword => {
-    const { workInProgressItem } = this.state;
-
-    const { link } = workInProgressItem;
-    const linkObj = base64ToObject(link.encryption);
-
-    let newUrl = '';
-    let newLink = '';
-    let newEncryption = '';
-
-    if (isUseMasterPassword) {
-      const { masterPassword, ...linkData } = linkObj;
-
-      newEncryption = objectToBase64(linkData);
-      newUrl = generateSharingUrl(newEncryption);
-      newLink = `${newUrl}\nMaster password: ${masterPassword}`;
-    } else {
-      newEncryption = objectToBase64({
-        ...linkObj,
-        masterPassword: link.masterPassword,
-      });
-      newUrl = generateSharingUrl(newEncryption);
-      newLink = `${newUrl}`;
-    }
-
-    const updatedData = {
-      lastUpdated: '',
-      link: {
-        id: link.id,
-        url: newLink,
-        isUseMasterPassword,
-        masterPassword: linkObj.masterPassword || null,
-        encryption: newEncryption,
-      },
-    };
-
-    this.setState(prevState => ({
-      ...prevState,
-      workInProgressItem: {
-        ...prevState.workInProgressItem,
-        ...updatedData,
-      },
-      list: updateNode(prevState.list, prevState.workInProgressItem.id, {
-        ...updatedData,
-      }),
-    }));
-  };
-
   handleActivateShareByLink = async () => {
     const { workInProgressItem } = this.state;
 
@@ -835,33 +789,38 @@ class DashboardContainer extends Component {
       sharedItems: [{ item: workInProgressItem.id, secret: encryptedSecret }],
     });
 
-    const encryption = objectToBase64({
-      email,
-      password,
-      masterPassword,
+    const link = generateSharingUrl(
+      objectToBase64({
+        shareId,
+        email,
+        password,
+        masterPassword,
+      }),
+    );
+
+    await updateShare(shareId, {
+      link,
+      sharedItems: [{ item: workInProgressItem.id, secret: encryptedSecret }],
     });
 
-    const link = generateSharingUrl(encryption);
+    const shared = {
+      id: shareId,
+      userId,
+      email,
+      link,
+      status: SHARED_WAITING_STATUS,
+      roles: [ANONYMOUS_USER_ROLE],
+    };
 
-    const updatedData = {
-      lastUpdated: '',
-      link: {
-        id: shareId,
-        url: link,
-        encryption,
-        isUseMasterPassword: false,
-      },
+    const data = {
+      ...workInProgressItem,
+      shared: [...workInProgressItem.shared, shared],
     };
 
     this.setState(prevState => ({
       ...prevState,
-      workInProgressItem: {
-        ...prevState.workInProgressItem,
-        ...updatedData,
-      },
-      list: updateNode(prevState.list, prevState.workInProgressItem.id, {
-        ...updatedData,
-      }),
+      workInProgressItem: data,
+      list: updateNode(prevState.list, workInProgressItem.id, data),
     }));
   };
 
@@ -1019,25 +978,30 @@ class DashboardContainer extends Component {
       return {
         id: shareId,
         sharedItems: [
-          {
-            item: workInProgressItem.id,
-            secret,
-            link: generateSharingUrl(
-              base64ToObject({
-                shareId,
-                email,
-                password,
-                masterPassword,
-              }),
-            ),
-          },
+          { item: workInProgressItem.id, secret: sharedEncryptedSecrets[idx] },
         ],
+        link: generateSharingUrl(
+          objectToBase64({
+            shareId,
+            email,
+            password,
+            masterPassword,
+          }),
+        ),
       };
     });
 
-    const {
-      data: { shared },
-    } = await updateShares({ shares: updatedShares });
+    const { data: updatedShared } = await updateShares({
+      shares: updatedShares,
+    });
+
+    const shared = updatedShared.map(({ id }, idx) => {
+      const { link } = updatedShares[idx];
+      const { userId, email } = sharedUsers[idx];
+      const status = SHARED_WAITING_STATUS;
+
+      return { id, userId, email, link, status, role: [READ_ONLY_USER_ROLE] };
+    });
 
     const data = {
       ...workInProgressItem,
@@ -1183,6 +1147,7 @@ class DashboardContainer extends Component {
     const isTrashItem =
       workInProgressItem && workInProgressItem.listId === trashList.id;
 
+    console.log(workInProgressItem);
     return (
       <Fragment>
         <Layout user={user} withSearch>

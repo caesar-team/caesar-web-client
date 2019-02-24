@@ -3,9 +3,9 @@ import { Head } from 'components';
 import { Sharing } from 'containers';
 import { base64ToObject } from 'common/utils/cipherUtils';
 import { redirectTo } from 'common/utils/routerUtils';
-import { postCheckShare } from 'common/api';
+import { getCheckShare } from 'common/api';
 
-const validFields = ['shareId', 'login', 'password', 'masterPassword'];
+const validFields = ['shareId', 'email', 'password', 'masterPassword'];
 
 const validateShare = (data, fields) =>
   data && fields.every(field => !!data[field]);
@@ -25,7 +25,7 @@ SharePage.getInitialProps = async ({ query: { encryption = '' }, res }) => {
   }
 
   try {
-    await postCheckShare(shared.shareId);
+    await getCheckShare(shared.shareId);
 
     return { ...shared };
   } catch (e) {

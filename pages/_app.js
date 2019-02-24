@@ -5,7 +5,6 @@ import { ThemeProvider, createGlobalStyle } from 'styled-components';
 import globalStyles from 'common/styles/globalStyles';
 import { entryResolver } from 'common/utils/entryResolver';
 import { getToken } from 'common/utils/token';
-import { base64ToObject } from 'common/utils/cipherUtils';
 import { getUserBootstrap } from 'common/api';
 import theme from 'common/theme';
 import { NotificationProvider } from '../components';
@@ -14,49 +13,25 @@ import { Bootstrap } from '../containers';
 const GlobalStyles = createGlobalStyle`${globalStyles}`;
 
 export default class App extends NextApp {
-  state = {
-    sharedData: {},
-  };
-
   static async getInitialProps({ Component, router: { route }, ctx }) {
     entryResolver({ route, ctx });
-
-    let bootstrap = {};
-
-    const token = ctx.req.cookies ? ctx.req.cookies.token : getToken();
-
-    if (route !== '/share' && route !== '/auth') {
-      const { data } = await getUserBootstrap(token);
-
-      console.log('bootstrap', data);
-
-      bootstrap = data;
-    }
 
     const pageProps = Component.getInitialProps
       ? await Component.getInitialProps(ctx)
       : {};
 
+    if (route === '/share' || route === '/auth') {
+      return { pageProps };
+    }
+
+    const token =
+      ctx.req && ctx.req.cookies ? ctx.req.cookies.token : getToken();
+    const { data: bootstrap } = await getUserBootstrap(token);
+
     return { pageProps: { bootstrap, ...pageProps } };
   }
 
-  async componentDidMount() {
-    const {
-      router: { route },
-      pageProps,
-    } = this.props;
-
-    if (route === '/share' && pageProps.encryption) {
-      this.setState({
-        sharedData:
-          (pageProps.encryption && base64ToObject(pageProps.encryption)) || {},
-      });
-    }
-  }
-
   render() {
-    const { sharedData } = this.state;
-
     const {
       Component,
       pageProps: { bootstrap, ...props },
@@ -79,12 +54,7 @@ export default class App extends NextApp {
         <NotificationProvider>
           <Container>
             <GlobalStyles />
-            <Bootstrap
-              {...props}
-              bootstrap={bootstrap}
-              component={Component}
-              sharedData={sharedData}
-            />
+            <Bootstrap {...props} bootstrap={bootstrap} component={Component} />
           </Container>
         </NotificationProvider>
       </ThemeProvider>

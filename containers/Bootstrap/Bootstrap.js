@@ -1,5 +1,7 @@
 import React, { Component } from 'react';
 import * as openpgp from 'openpgp';
+import { withRouter } from 'next/router';
+import { base64ToObject } from 'common/utils/cipherUtils';
 import { DEFAULT_IDLE_TIMEOUT } from 'common/constants';
 import OpenPGPWorker from 'common/openpgp.worker';
 import { SessionChecker } from 'components/SessionChecker';
@@ -34,6 +36,7 @@ class Bootstrap extends Component {
   worker = null;
 
   componentDidMount() {
+    this.checkSharing();
     this.initOpenPGPWorker();
   }
 
@@ -63,6 +66,10 @@ class Bootstrap extends Component {
     encryptedPrivateKey,
     masterPassword,
   }) => {
+    const {
+      router: { route },
+    } = this.props;
+
     this.setState({
       publicKey,
       encryptedPrivateKey,
@@ -76,6 +83,18 @@ class Bootstrap extends Component {
       currentStep: MASTER_PASSWORD_CHECK,
     });
   };
+
+  checkSharing() {
+    const {
+      router: { route, query },
+    } = this.props;
+
+    if (route === '/share' && query && query.encryption) {
+      this.setState({
+        sharedData: base64ToObject(query.encryption) || {},
+      });
+    }
+  }
 
   initOpenPGPWorker() {
     openpgp.config.aead_protect = false;
@@ -113,25 +132,24 @@ class Bootstrap extends Component {
       publicKey: null,
       encryptedPrivateKey: null,
       masterPassword: null,
+      sharedData: {},
     };
   }
 
   render() {
     const {
+      component: PageComponent,
+      router,
+      bootstrap,
+      ...props
+    } = this.props;
+    const {
       currentStep,
       publicKey,
       encryptedPrivateKey,
       masterPassword,
-    } = this.state;
-    const {
       sharedData,
-      component: PageComponent,
-      bootstrap,
-      ...props
-    } = this.props;
-
-    console.log('currentStep', currentStep);
-    console.log('sharedData', sharedData);
+    } = this.state;
 
     if (TWO_FACTOR_STEPS.includes(currentStep)) {
       return (
@@ -145,7 +163,7 @@ class Bootstrap extends Component {
     if (PASSWORD_STEPS.includes(currentStep)) {
       return (
         <PasswordStep
-          email={sharedData.login}
+          email={sharedData.email}
           onFinish={this.handleFinishChangePassword}
         />
       );
@@ -161,22 +179,25 @@ class Bootstrap extends Component {
       );
     }
 
-    // TODO: during refactoring change password field to masterPassword
-    // TODO: privateKey to encryptedPrivateKey
+    // TODO: during refactoring to rename:
+    // TODO: - password to masterPassword
+    // TODO: - privateKey to encryptedPrivateKey
     return (
-      <SessionChecker
-        timeout={DEFAULT_IDLE_TIMEOUT}
-        onFinishTimeout={this.handleInactiveTimeout}
-      >
-        <PageComponent
-          publicKey={publicKey}
-          privateKey={encryptedPrivateKey}
-          password={masterPassword}
-          {...props}
-        />
-      </SessionChecker>
+      BOOTSTRAP_FINISH && (
+        <SessionChecker
+          timeout={DEFAULT_IDLE_TIMEOUT}
+          onFinishTimeout={this.handleInactiveTimeout}
+        >
+          <PageComponent
+            publicKey={publicKey}
+            privateKey={encryptedPrivateKey}
+            password={masterPassword}
+            {...props}
+          />
+        </SessionChecker>
+      )
     );
   }
 }
 
-export default Bootstrap;
+export default withRouter(Bootstrap);

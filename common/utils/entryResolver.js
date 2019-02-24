@@ -1,23 +1,14 @@
-import Router from 'next/router';
-import { isServer } from './isEnvironment';
+import { redirectTo } from './routerUtils';
 import { getToken } from './token';
 
-export function entryResolver({ route, ctx }) {
-  const needToken = isServer && !['/auth', '/share'].includes(route);
+export function entryResolver({ route, ctx: { req, res } }) {
+  const needToken = !['/auth', '/share'].includes(route);
 
   if (needToken) {
-    const { req, res } = ctx;
     const token = req.cookies ? req.cookies.token : getToken();
 
     if (!token) {
-      if (isServer) {
-        res.writeHead(302, {
-          Location: '/auth',
-        });
-        res.end();
-      } else {
-        Router.push('/auth');
-      }
+      redirectTo(res, '/auth', 302);
     }
   }
 }

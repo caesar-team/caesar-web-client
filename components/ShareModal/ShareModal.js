@@ -11,8 +11,15 @@ import {
   ShareInput,
   TextWithLines,
 } from 'components';
+import {
+  ANONYMOUS_USER_ROLE,
+  SHARED_ACCEPTED_STATUS,
+  SHARED_WAITING_STATUS,
+} from 'common/constants';
 import { formatDate } from 'common/utils/dateFormatter';
 import { copyToClipboard } from 'common/utils/clipboard';
+import { base64ToObject, objectToBase64 } from 'common/utils/cipherUtils';
+import { generateSharingUrl } from 'common/utils/sharing';
 import 'common/styles/react-toggle.css';
 
 const ModalDescription = styled.div`
@@ -24,6 +31,10 @@ const ModalDescription = styled.div`
 
 const Row = styled.div`
   margin-bottom: 20px;
+`;
+
+const LinkRow = styled.div`
+  margin-top: 20px;
 `;
 
 const ToggleLabel = styled.label`
@@ -131,9 +142,7 @@ const EmailBox = styled(SharedItem)`
 `;
 
 export class ShareModal extends Component {
-  state = {
-    emails: [],
-  };
+  state = this.prepareInitialState();
 
   handleShareByLinkChange = () => {
     const {
@@ -150,8 +159,16 @@ export class ShareModal extends Component {
   };
 
   handleToggleSeparateLink = isUseMasterPassword => {
-    const { onToggleSeparateLink } = this.props;
-    onToggleSeparateLink(isUseMasterPassword);
+    const { shared } = this.props;
+
+    const anonymousShare = shared.find(
+      ({ role }) => role === ANONYMOUS_USER_ROLE,
+    );
+
+    this.setState({
+      isUseMasterPassword,
+      linkText: this.generateLinkText(anonymousShare.link, isUseMasterPassword),
+    });
   };
 
   handleCopySharedLink = () => {
@@ -186,6 +203,36 @@ export class ShareModal extends Component {
     }));
   };
 
+  generateLinkText(link, isUseMasterPassword) {
+    const linkObj = base64ToObject(link);
+
+    if (!isUseMasterPassword) {
+      return link;
+    }
+
+    const { masterPassword, ...linkData } = linkObj;
+
+    return `${generateSharingUrl(
+      objectToBase64(linkData),
+    )}\nMaster password: ${masterPassword}`;
+  }
+
+  prepareInitialState() {
+    const { shared } = this.props;
+
+    const anonymousShare = shared.find(
+      ({ role }) => role === ANONYMOUS_USER_ROLE,
+    );
+
+    return {
+      emails: [],
+      isUseMasterPassword: false,
+      linkText: anonymousShare
+        ? this.generateLinkText(anonymousShare.link, false)
+        : '',
+    };
+  }
+
   renderEmails() {
     const { emails } = this.state;
 
@@ -207,16 +254,20 @@ export class ShareModal extends Component {
 
   renderWaitingUsers() {
     const {
-      item: { waiting },
+      item: { shared },
       onRemove,
       onResend,
     } = this.props;
 
-    if (!waiting || !waiting.length) {
+    if (!shared || !shared.length) {
       return null;
     }
 
-    const renderedUsers = waiting.map(({ id, email }) => (
+    const waitingList = shared.filter(
+      ({ status }) => status === SHARED_WAITING_STATUS,
+    );
+
+    const renderedUsers = waitingList.map(({ id, email }) => (
       <SharedItem key={id}>
         <SharedItemEmail>{email}</SharedItemEmail>
         <SharedItemRemove>
@@ -233,7 +284,7 @@ export class ShareModal extends Component {
 
     return (
       <Fragment>
-        <TextWithLines>Waiting ({waiting.length})</TextWithLines>
+        <TextWithLines>Waiting ({waitingList.length})</TextWithLines>
         <SharedList>
           <Scrollbar>{renderedUsers}</Scrollbar>
         </SharedList>
@@ -243,15 +294,19 @@ export class ShareModal extends Component {
 
   renderSharedUsers() {
     const {
-      item: { invited },
+      item: { shared },
       onRemove,
     } = this.props;
 
-    if (!invited.length) {
+    if (!shared || !shared.length) {
       return null;
     }
 
-    const renderedUsers = invited.map(({ id, email, lastUpdated }) => (
+    const acceptedList = shared.filter(
+      ({ status }) => status === SHARED_ACCEPTED_STATUS,
+    );
+
+    const renderedUsers = acceptedList.map(({ id, email, lastUpdated }) => (
       <SharedItem key={id}>
         <SharedItemEmail>{email}</SharedItemEmail>
         <SharedItemDate>{formatDate(lastUpdated)}</SharedItemDate>
@@ -269,7 +324,7 @@ export class ShareModal extends Component {
 
     return (
       <Fragment>
-        <TextWithLines>Shared ({invited.length})</TextWithLines>
+        <TextWithLines>Shared ({acceptedList.length})</TextWithLines>
         <SharedList>
           <Scrollbar>{renderedUsers}</Scrollbar>
         </SharedList>
@@ -278,12 +333,16 @@ export class ShareModal extends Component {
   }
 
   render() {
-    const {
-      onCancel,
-      item: { link },
-    } = this.props;
-    const isUseMasterPassword = link && link.isUseMasterPassword;
-    const switcherText = link ? 'Link access enabled' : 'Link access disabled';
+    const { isUseMasterPassword, linkText } = this.state;
+    const { onCancel, shared } = this.props;
+
+    const anonymousShare = shared.find(
+      ({ role }) => role === ANONYMOUS_USER_ROLE,
+    );
+
+    const switcherText = anonymousShare
+      ? 'Link access enabled'
+      : 'Link access disabled';
 
     return (
       <Modal
@@ -303,20 +362,20 @@ export class ShareModal extends Component {
         {this.renderEmails()}
         {this.renderWaitingUsers()}
         {this.renderSharedUsers()}
-        <Row>
+        <LinkRow>
           <ToggleLabel>
             <Toggle
-              checked={!!link}
+              checked={!!anonymousShare}
               icons={false}
               onChange={() => this.handleShareByLinkChange(false)}
             />
             <ToggleLabelText>{switcherText}</ToggleLabelText>
           </ToggleLabel>
-        </Row>
-        {link && (
+        </LinkRow>
+        {anonymousShare && (
           <Row>
             <SharedLinkWrapper>
-              <SharedLink>{link.url}</SharedLink>
+              <SharedLink>{linkText}</SharedLink>
               <SharedLinkActions>
                 <Checkbox
                   isChecked={isUseMasterPassword}
@@ -325,9 +384,9 @@ export class ShareModal extends Component {
                   Use master password
                 </Checkbox>
                 <SharedLinkActionsButtons>
-                  {/*<SharedLinkActionsButton color="white" icon="mail">*/}
-                    {/*Send email*/}
-                  {/*</SharedLinkActionsButton>*/}
+                  {/* <SharedLinkActionsButton color="white" icon="mail"> */}
+                  {/* Send email */}
+                  {/* </SharedLinkActionsButton> */}
                   <SharedLinkActionsButton
                     color="white"
                     icon="copy"

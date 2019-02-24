@@ -3,6 +3,7 @@ import btoa from 'btoa';
 import atob from 'atob';
 import { generateKeys } from 'common/utils/key';
 import { generatePassword } from 'common/utils/password';
+import { randomId } from 'common/utils/uuid4';
 
 export const encryptText = async (text, password) => {
   const { data: message } = await openpgp.encrypt({
@@ -50,6 +51,9 @@ export const generateUser = async email => {
 
 export const generateUsers = async emails =>
   Promise.all(emails.map(async email => await generateUser(email)));
+
+export const generateAnonymousEmail = () =>
+  `anonymous_${randomId()}@caesar.team`;
 
 export const objectToBase64 = object => {
   try {

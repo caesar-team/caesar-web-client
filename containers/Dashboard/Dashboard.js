@@ -21,16 +21,13 @@ import {
   updateNode,
   removeNode,
 } from 'common/utils/tree';
-import { generatePassword } from 'common/utils/password';
-import { generateKeys } from 'common/utils/key';
 import { createSrp } from 'common/utils/srp';
 import { generateSharingUrl } from 'common/utils/sharing';
-import { uuid4 } from 'common/utils/uuid4';
 import {
-  encryptText,
   encryptItemForUser,
   encryptItemForUsers,
   generateUser,
+  generateAnonymousEmail,
   objectToBase64,
   base64ToObject,
 } from 'common/utils/cipherUtils';
@@ -46,7 +43,8 @@ import {
   PERMISSION_READ,
   INVITE_TYPE,
   SHARE_TYPE,
-  APP_URL,
+  READ_ONLY_USER_ROLE,
+  ANONYMOUS_USER_ROLE,
 } from 'common/constants';
 import {
   postCreateItem,
@@ -61,16 +59,10 @@ import {
   acceptUpdateItem,
   getPublicKeyByEmail,
   postNewUser,
-  postMessage,
-  postInvite,
-  postLink,
-  deleteLink,
   postShare,
   postShares,
-  postRegistration,
-  getList,
-  getUserSelf,
-  getUsers,
+  updateShares,
+  deleteShare,
 } from 'common/api';
 import DecryptWorker from 'common/decrypt.worker';
 import { initialItemData } from './utils';
@@ -116,39 +108,14 @@ class DashboardContainer extends Component {
 
     this.worker.addEventListener('message', this.handleWorkerMessage);
 
-    const { data: list } = await getList();
-    const { data: user } = await getUserSelf();
-    const { data: members } = await getUsers();
-
-    const root = {
-      type: ROOT_TYPE,
-      children: [
-        getListWithoutChildren(list[0]),
-        { ...list[1], children: list[1].children.map(getListWithoutChildren) },
-        getListWithoutChildren(list[2]),
-      ],
-    };
-    const tree = createTree(root);
-
-    this.setState({
-      list: tree,
-      members,
-      user,
-      selectedListId: list[0].id,
+    this.worker.postMessage({
+      event: 'toDecryptList',
+      data: {
+        list: this.props.list,
+        privateKey: this.props.privateKey,
+        password: this.props.password,
+      },
     });
-  }
-
-  componentDidUpdate(prevProps, prevState) {
-    if (!prevState.list && this.state.list) {
-      this.worker.postMessage({
-        event: 'toDecryptList',
-        data: {
-          list: this.state.list,
-          privateKey: this.props.privateKey,
-          password: this.props.password,
-        },
-      });
-    }
   }
 
   componentWillUnmount() {
@@ -327,8 +294,7 @@ class DashboardContainer extends Component {
     type,
     ...secret
   }) => {
-    const { publicKey } = this.props;
-    const { user } = this.state;
+    const { publicKey, user } = this.props;
 
     try {
       const item = {
@@ -380,7 +346,7 @@ class DashboardContainer extends Component {
   };
 
   handleFinishEditWorkflow = async ({ listId, attachments, ...secret }) => {
-    const { publicKey, members, user } = this.props;
+    const { publicKey, user, members } = this.props;
     const { workInProgressItem } = this.state;
 
     try {
@@ -848,13 +814,14 @@ class DashboardContainer extends Component {
   handleActivateShareByLink = async () => {
     const { workInProgressItem } = this.state;
 
-    const login = uuid4();
+    const email = generateAnonymousEmail();
+
     const {
       userId,
       password,
       masterPassword,
       publicKey,
-    } = await this.createUser(login, true);
+    } = await this.createUser(email, ANONYMOUS_USER_ROLE);
 
     const encryptedSecret = await encryptItemForUser(
       workInProgressItem.secret,
@@ -869,7 +836,7 @@ class DashboardContainer extends Component {
     });
 
     const encryption = objectToBase64({
-      login,
+      email,
       password,
       masterPassword,
     });
@@ -900,21 +867,26 @@ class DashboardContainer extends Component {
 
   handleDeactivateShareByLink = async () => {
     const {
-      workInProgressItem: {
-        link: { id },
-      },
+      workInProgressItem: { shared },
     } = this.state;
 
+    const anonymousShare = shared.filter(
+      ({ role }) => role === ANONYMOUS_USER_ROLE,
+    );
+
+    const updatedShared = shared.filter(({ id }) => id !== anonymousShare.id);
+
     try {
-      // await deleteLink(id);
+      await deleteShare(anonymousShare.id);
+
       this.setState(prevState => ({
         ...prevState,
         workInProgressItem: {
           ...prevState.workInProgressItem,
-          link: null,
+          shared: updatedShared,
         },
         list: updateNode(prevState.list, prevState.workInProgressItem.id, {
-          link: null,
+          shared: updatedShared,
         }),
       }));
     } catch (error) {
@@ -922,37 +894,31 @@ class DashboardContainer extends Component {
     }
   };
 
-  createUser = async (emailOrLogin, isAnonymous) => {
+  createUser = async (email, role) => {
     try {
       const {
         password,
         masterPassword,
         publicKey,
         privateKey,
-      } = await generateUser(emailOrLogin);
+      } = await generateUser(email);
 
       const seed = srp.getRandomSeed();
-      const verifier = srp.generateV(
-        srp.generateX(seed, emailOrLogin, password),
-      );
+      const verifier = srp.generateV(srp.generateX(seed, email, password));
 
-      const request = {
+      const data = {
+        email,
         plainPassword: password,
         publicKey,
         encryptedPrivateKey: privateKey,
         seed,
         verifier,
+        roles: [role],
       };
-
-      if (isAnonymous) {
-        request.login = emailOrLogin;
-      } else {
-        request.email = emailOrLogin;
-      }
 
       const {
         data: { user: userId },
-      } = await postNewUser(request);
+      } = await postNewUser(data);
 
       return {
         userId,
@@ -960,7 +926,7 @@ class DashboardContainer extends Component {
         masterPassword,
         publicKey,
         privateKey,
-        login: emailOrLogin,
+        email,
       };
     } catch (e) {
       console.log(e || e.response);
@@ -981,11 +947,11 @@ class DashboardContainer extends Component {
         password,
         masterPassword,
         publicKey,
-        login,
-      } = await this.createUser(email, false);
+      } = await this.createUser(email, READ_ONLY_USER_ROLE);
+
       return {
         userId,
-        login,
+        email,
         password,
         masterPassword,
         publicKey,
@@ -1019,19 +985,19 @@ class DashboardContainer extends Component {
     const invitedUserKeys = invitedUsers.map(({ publicKey }) => publicKey);
     const sharedUserKeys = sharedUsers.map(({ publicKey }) => publicKey);
 
+    const invitedEncryptedSecrets = await encryptItemForUsers(
+      workInProgressItem.secret,
+      invitedUserKeys,
+    );
+
     const sharedEncryptedSecrets = await encryptItemForUsers(
       workInProgressItem.secret,
       sharedUserKeys,
     );
 
-    const encryptedSecrets = await encryptItemForUsers(
-      workInProgressItem.secret,
-      [...invitedUserKeys, ...sharedUserKeys],
-    );
-
-    const invites = encryptedSecrets.map((secret, idx) => ({
+    const invites = invitedEncryptedSecrets.map((secret, idx) => ({
       secret,
-      userId: users[idx].userId,
+      userId: invitedUsers[idx].userId,
       access: PERMISSION_READ,
     }));
 
@@ -1044,28 +1010,42 @@ class DashboardContainer extends Component {
       data: { invited },
     } = await postInviteItem(workInProgressItem.id, { invites });
 
-    await postShares({ shares });
+    const { data: newShares } = await postShares({ shares });
+
+    const updatedShares = sharedEncryptedSecrets.map((secret, idx) => {
+      const { email, password, masterPassword } = sharedUsers[idx];
+      const { id: shareId } = newShares[idx];
+
+      return {
+        id: shareId,
+        sharedItems: [
+          {
+            item: workInProgressItem.id,
+            secret,
+            link: generateSharingUrl(
+              base64ToObject({
+                shareId,
+                email,
+                password,
+                masterPassword,
+              }),
+            ),
+          },
+        ],
+      };
+    });
+
+    const {
+      data: { shared },
+    } = await updateShares({ shares: updatedShares });
 
     const data = {
       ...workInProgressItem,
       invited: [...workInProgressItem.invited, ...invited],
+      shared: [...workInProgressItem.shared, ...shared],
     };
 
-    sharedUsers.map(
-      async ({ login, password, masterPassword }) =>
-        await postInvite({
-          email: login,
-          url: generateSharingUrl(
-            objectToBase64({
-              login,
-              password,
-              masterPassword,
-            }),
-          ),
-        }),
-    );
-
-    this.setState(prevState => ({
+    return this.setState(prevState => ({
       ...prevState,
       workInProgressItem: data,
       isVisibleShareModal: false,
@@ -1077,14 +1057,15 @@ class DashboardContainer extends Component {
     const { workInProgressItem } = this.state;
 
     try {
-      await deleteInviteItem(id);
+      await deleteShare(id);
 
-      const updatedInvites = workInProgressItem.invited.filter(
-        ({ id: invitedId }) => invitedId !== id,
+      const updatedShares = workInProgressItem.shared.filter(
+        ({ id: shareId }) => shareId !== id,
       );
+
       const data = {
         ...workInProgressItem,
-        invited: updatedInvites,
+        shared: updatedShares,
       };
 
       this.setState(prevState => ({
@@ -1112,19 +1093,40 @@ class DashboardContainer extends Component {
   };
 
   prepareInitialState() {
+    const { list, predefinedListId } = this.props;
+
+    let selectedListId = null;
+
+    if (predefinedListId) {
+      selectedListId = predefinedListId;
+    } else if (list && list.length > 0) {
+      selectedListId = list[0].id;
+    }
+
+    const root = {
+      type: ROOT_TYPE,
+      children: [
+        getListWithoutChildren(list[0]),
+        { ...list[1], children: list[1].children.map(getListWithoutChildren) },
+        getListWithoutChildren(list[2]),
+      ],
+    };
+
+    const tree = createTree(root);
+
     return {
       isVisibleInviteModal: false,
       isVisibleShareModal: false,
       isVisibleMoveToTrashModal: false,
       isVisibleRemoveModal: false,
-      list: null,
+      list: tree,
       favorites: {
         id: FAVORITES_TYPE,
         label: FAVORITES_TYPE,
         type: FAVORITES_TYPE,
         children: [],
       },
-      selectedListId: null,
+      selectedListId,
       workInProgressItem: null,
     };
   }
@@ -1152,10 +1154,8 @@ class DashboardContainer extends Component {
   }
 
   render() {
-    const { notification } = this.props;
+    const { notification, user, members } = this.props;
     const {
-      members,
-      user,
       list,
       favorites,
       selectedListId,
@@ -1165,10 +1165,6 @@ class DashboardContainer extends Component {
       isVisibleMoveToTrashModal,
       isVisibleRemoveModal,
     } = this.state;
-
-    if (!list || !list.model || !list.model.children) {
-      return null;
-    }
 
     const {
       model: { children },
@@ -1242,13 +1238,13 @@ class DashboardContainer extends Component {
         {isVisibleShareModal && (
           <ShareModal
             members={members}
-            item={workInProgressItem}
+            shared={workInProgressItem.shared}
             onResend={this.handleResendShare}
             onShare={this.handleShare}
             onRemove={this.handleRemoveShare}
             onActivateSharedByLink={this.handleActivateShareByLink}
             onDeactivateSharedByLink={this.handleDeactivateShareByLink}
-            onToggleSeparateLink={this.handleToggleSeparateLink}
+            // onToggleSeparateLink={this.handleToggleSeparateLink}
             onCancel={this.handleCloseShareModal}
             notification={notification}
           />

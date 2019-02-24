@@ -52,3 +52,4 @@ export { ModalTitle } from './ModalTitle';
 export { ShareModal } from './ShareModal';
 export { TextWithLines } from './TextWithLines';
 export { SettingsSidebar } from './SettingsSidebar';
+export { Tab, Tabs } from './Tabs';

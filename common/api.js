@@ -105,9 +105,6 @@ export const updateMoveItem = (itemId, data) =>
 export const updateItem = (itemId, data) =>
   callApi.patch(`/item/${itemId}`, data);
 
-export const updateShareItem = (itemId, data) =>
-  callApi.patch(`/item/${itemId}/share`, data);
-
 export const postInviteItem = (itemId, data) =>
   callApi.post(`/item/${itemId}/invite`, data);
 
@@ -148,6 +145,10 @@ export const deleteLink = id => callApi.delete(`/link/${id}`);
 export const postShare = data => callApi.post('/share', data);
 
 export const postShares = data => callApi.post('/shares', data);
+
+export const updateShares = data => callApi.patch('/shares', data);
+
+export const deleteShare = id => callApi.delete(`/shares/${id}`);
 
 export const postLoginPrepare = data =>
   callApi.post('/srp/login_prepare', data);

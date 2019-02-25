@@ -20,30 +20,18 @@ export default class App extends NextApp {
       ? await Component.getInitialProps(ctx)
       : {};
 
-    if (route === '/share' || route === '/auth') {
-      return { pageProps };
-    }
-
-    const token =
-      ctx.req && ctx.req.cookies ? ctx.req.cookies.token : getToken();
-    const { data: bootstrap } = await getUserBootstrap(token);
-
-    return { pageProps: { bootstrap, ...pageProps } };
+    return { pageProps };
   }
 
   render() {
-    const {
-      Component,
-      pageProps: { bootstrap, ...props },
-      router,
-    } = this.props;
+    const { Component, pageProps, router } = this.props;
 
     if (router.route === '/auth' || router.route === '/share') {
       return (
         <ThemeProvider theme={theme}>
           <Container>
             <GlobalStyles />
-            <Component {...props} />
+            <Component {...pageProps} />
           </Container>
         </ThemeProvider>
       );
@@ -54,7 +42,7 @@ export default class App extends NextApp {
         <NotificationProvider>
           <Container>
             <GlobalStyles />
-            <Bootstrap {...props} bootstrap={bootstrap} component={Component} />
+            <Bootstrap {...pageProps} component={Component} />
           </Container>
         </NotificationProvider>
       </ThemeProvider>

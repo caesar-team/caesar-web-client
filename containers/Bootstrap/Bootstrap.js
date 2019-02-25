@@ -1,6 +1,8 @@
 import React, { Component } from 'react';
 import * as openpgp from 'openpgp';
 import { withRouter } from 'next/router';
+import Cookies from 'js-cookie';
+import { getUserBootstrap } from 'common/api';
 import { base64ToObject } from 'common/utils/cipherUtils';
 import { DEFAULT_IDLE_TIMEOUT } from 'common/constants';
 import OpenPGPWorker from 'common/openpgp.worker';
@@ -35,15 +37,28 @@ class Bootstrap extends Component {
 
   worker = null;
 
-  componentDidMount() {
-    this.checkSharing();
+  bootstrap = null;
+
+  sharedData = null;
+
+  async componentDidMount() {
     this.initOpenPGPWorker();
+
+    const { data: bootstrap } = await getUserBootstrap();
+
+    this.bootstrap = bootstrapStates(bootstrap);
+    this.sharedData = base64ToObject(Cookies.get('share', { path: '/' })) || {};
+
+    // TODO: during refactoring to remove and change on redux
+    Cookies.remove('share', { path: '/' });
+
+    this.setState({
+      currentStep: this.currentStepResolver(bootstrap),
+    });
   }
 
   handleFinishTwoFactor = () => {
-    const { passwordState, masterPasswordState } = bootstrapStates(
-      this.props.bootstrap,
-    );
+    const { passwordState, masterPasswordState } = this.bootstrap;
 
     this.setState({
       currentStep:
@@ -54,7 +69,7 @@ class Bootstrap extends Component {
   };
 
   handleFinishChangePassword = () => {
-    const { masterPasswordState } = bootstrapStates(this.props.bootstrap);
+    const { masterPasswordState } = this.bootstrap;
 
     this.setState({
       currentStep: masterPasswordState,
@@ -66,10 +81,6 @@ class Bootstrap extends Component {
     encryptedPrivateKey,
     masterPassword,
   }) => {
-    const {
-      router: { route },
-    } = this.props;
-
     this.setState({
       publicKey,
       encryptedPrivateKey,
@@ -84,18 +95,6 @@ class Bootstrap extends Component {
     });
   };
 
-  checkSharing() {
-    const {
-      router: { route, query },
-    } = this.props;
-
-    if (route === '/share' && query && query.encryption) {
-      this.setState({
-        sharedData: base64ToObject(query.encryption) || {},
-      });
-    }
-  }
-
   initOpenPGPWorker() {
     openpgp.config.aead_protect = false;
 
@@ -104,12 +103,12 @@ class Bootstrap extends Component {
     openpgp.initWorker({ workers: [this.worker] });
   }
 
-  currentStepResolver() {
+  currentStepResolver(bootstrap) {
     const {
       twoFactorAuthState,
       passwordState,
       masterPasswordState,
-    } = bootstrapStates(this.props.bootstrap);
+    } = bootstrapStates(bootstrap);
 
     if (TWO_FACTOR_STEPS.includes(twoFactorAuthState)) {
       return twoFactorAuthState;
@@ -128,7 +127,8 @@ class Bootstrap extends Component {
 
   prepareInitialState() {
     return {
-      currentStep: this.currentStepResolver(),
+      bootstrap: null,
+      currentStep: null,
       publicKey: null,
       encryptedPrivateKey: null,
       masterPassword: null,
@@ -137,18 +137,12 @@ class Bootstrap extends Component {
   }
 
   render() {
-    const {
-      component: PageComponent,
-      router,
-      bootstrap,
-      ...props
-    } = this.props;
+    const { component: PageComponent, router, ...props } = this.props;
     const {
       currentStep,
       publicKey,
       encryptedPrivateKey,
       masterPassword,
-      sharedData,
     } = this.state;
 
     if (TWO_FACTOR_STEPS.includes(currentStep)) {
@@ -163,7 +157,7 @@ class Bootstrap extends Component {
     if (PASSWORD_STEPS.includes(currentStep)) {
       return (
         <PasswordStep
-          email={sharedData.email}
+          email={this.sharedData.email}
           onFinish={this.handleFinishChangePassword}
         />
       );
@@ -173,7 +167,7 @@ class Bootstrap extends Component {
       return (
         <MasterPasswordStep
           initialStep={currentStep}
-          sharedMasterPassword={sharedData.masterPassword}
+          sharedMasterPassword={this.sharedData.masterPassword}
           onFinish={this.handleFinishMasterPassword}
         />
       );
@@ -183,7 +177,7 @@ class Bootstrap extends Component {
     // TODO: - password to masterPassword
     // TODO: - privateKey to encryptedPrivateKey
     return (
-      BOOTSTRAP_FINISH && (
+      currentStep === BOOTSTRAP_FINISH && (
         <SessionChecker
           timeout={DEFAULT_IDLE_TIMEOUT}
           onFinishTimeout={this.handleInactiveTimeout}

@@ -1,5 +1,6 @@
 import { Component } from 'react';
-import Router from 'next/router';
+import Cookies from 'js-cookie';
+import { base64ToObject } from 'common/utils/cipherUtils';
 import { Error } from 'components';
 import { createSrp } from 'common/utils/srp';
 import { setToken } from 'common/utils/token';
@@ -16,13 +17,16 @@ const createMatcher = ({ email, password, A, a, B, seed }) => {
 
 class Sharing extends Component {
   async componentDidMount() {
-    const { email, password } = this.props;
+    const { encryption } = this.props;
 
+    const { email, password } = base64ToObject(encryption);
     const jwt = await this.loginResolver(email, password);
 
+    // TODO: during refactoring to remove this and to save store
+    Cookies.set('share', encryption, { path: '/' });
     setToken(jwt);
 
-    Router.push('/');
+    document.location.pathname = '/';
   }
 
   async loginResolver(email, password) {

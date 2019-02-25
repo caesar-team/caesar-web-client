@@ -5,7 +5,7 @@ export function entryResolver({ route, ctx: { req, res } }) {
   const needToken = !['/auth', '/share'].includes(route);
 
   if (needToken) {
-    const token = req.cookies ? req.cookies.token : getToken();
+    const token = req && req.cookies ? req.cookies.token : getToken();
 
     if (!token) {
       redirectTo(res, '/auth', 302);

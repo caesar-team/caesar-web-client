@@ -29,7 +29,6 @@ const StyledTab = styled.li`
 `;
 
 const Tab = ({ title, component, disabled, isActive, onClick }) => {
-  console.log(isActive);
   const handleClick = () => {
     if (disabled) return;
 

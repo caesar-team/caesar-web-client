@@ -1,8 +1,7 @@
 import React, { Fragment } from 'react';
-import { Head } from 'components';
+import { Error, Head } from 'components';
 import { Sharing } from 'containers';
 import { base64ToObject } from 'common/utils/cipherUtils';
-import { redirectTo } from 'common/utils/routerUtils';
 import { getCheckShare } from 'common/api';
 
 const validFields = ['shareId', 'email', 'password', 'masterPassword'];
@@ -10,26 +9,26 @@ const validFields = ['shareId', 'email', 'password', 'masterPassword'];
 const validateShare = (data, fields) =>
   data && fields.every(field => !!data[field]);
 
-const SharePage = props => (
+const SharePage = ({ statusCode, ...props }) => (
   <Fragment>
     <Head title="Sharing" />
-    <Sharing {...props} />
+    {statusCode ? <Error statusCode={statusCode} /> : <Sharing {...props} />}
   </Fragment>
 );
 
-SharePage.getInitialProps = async ({ query: { encryption = '' }, res }) => {
+SharePage.getInitialProps = async ({ query: { encryption = '' } }) => {
   const shared = base64ToObject(encryption);
 
   if (!shared || !validateShare(shared, validFields)) {
-    return redirectTo(res, '', 404);
+    return { statusCode: 404 };
   }
 
   try {
     await getCheckShare(shared.shareId);
 
-    return { ...shared };
+    return { encryption };
   } catch (e) {
-    return redirectTo(res, '', 404);
+    return { statusCode: 404 };
   }
 };
 

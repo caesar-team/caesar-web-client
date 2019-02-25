@@ -3,19 +3,14 @@ import styled from 'styled-components';
 import { joinChildren } from 'common/utils/reactUtils';
 import { Icon } from 'components';
 
-const Wrapper = styled.div`
-  border-bottom: 2px dotted
-    ${({ theme }) => theme.stark};
-  padding-bottom: 32px;
-`;
+const Wrapper = styled.div``;
 
 const StepsRow = styled.div`
   display: flex;
-  justify-content: space-between;
-  width: 900px;
+  align-items: center;
+  width: 100%;
   margin: 0 auto;
   position: relative;
-  z-index: 11;
 `;
 
 const StepBox = styled.div`
@@ -23,30 +18,17 @@ const StepBox = styled.div`
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  ${({ isDisabledNavigation }) =>
-  !isDisabledNavigation && 'cursor: pointer'};
-`;
-
-const IconWrapper = styled.div`
-  width: 60px;
-  height: 60px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
+  ${({ isDisabledNavigation }) => !isDisabledNavigation && 'cursor: pointer'};
 `;
 
 const SeparatorIconWrapper = styled.div`
-  margin-top: 20px;
+  margin: 0 20px;
 `;
 
 const StepDescription = styled.span`
   font-size: 14px;
-  font-weight: 500;
-  line-height: 1.5;
-  letter-spacing: 0.6px;
-  color: ${({ isActive, theme }) =>
-  isActive ? theme.baratheon : theme.greyjoy};
-  margin-top: 16px;
+  font-weight: 600;
+  letter-spacing: 0.4px;
 `;
 
 const getStepIndex = (steps, stepName) => {
@@ -78,10 +60,7 @@ const NavigationPanel = ({
     }
   };
 
-  const renderStep = (
-    { name, text, icon: IconComponent, activeIcon: ActiveIconComponent },
-    index,
-  ) => {
+  const renderStep = ({ name, text, icon, activeIcon }, index) => {
     const isActive = name === currentStep;
     const number = index / 2 + 1;
 
@@ -91,9 +70,6 @@ const NavigationPanel = ({
         isDisabledNavigation={isDisabledNavigation}
         onClick={handleClick(name)}
       >
-        <IconWrapper>
-          <StyledIcon as={isActive ? ActiveIconComponent : IconComponent} />
-        </IconWrapper>
         <StepDescription isActive={isActive}>
           {number}. {text}
         </StepDescription>
@@ -106,7 +82,7 @@ const NavigationPanel = ({
 
     return (
       <SeparatorIconWrapper key={index}>
-        <Icon name="arrow-right" />
+        <Icon name="arrow-next" width={18} height={10} />
       </SeparatorIconWrapper>
     );
   };

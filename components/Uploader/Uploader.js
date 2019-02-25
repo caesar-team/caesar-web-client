@@ -48,6 +48,7 @@ const Uploader = ({
   multiple,
   accept,
   onChange,
+  extText = '.rar .zip .doc .docx .pdf .jpg...',
   files: previousFiles,
 }) => {
   const handleDrop = async acceptedFiles => {
@@ -74,7 +75,7 @@ const Uploader = ({
           <Text>
             Drag and drop your file here or <Link>upload</Link>.
           </Text>
-          <ExtText>.rar .zip .doc .docx .pdf .jpg...</ExtText>
+          <ExtText>{extText}</ExtText>
         </Container>
       )}
     </Dropzone>

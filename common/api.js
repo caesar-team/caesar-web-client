@@ -84,12 +84,7 @@ export const getList = token =>
     },
   });
 
-export const getUserBootstrap = token =>
-  callApi.get('/user/security/bootstrap', {
-    headers: {
-      Authorization: token ? `Bearer ${token}` : '',
-    },
-  });
+export const getUserBootstrap = () => callApi.get('/user/security/bootstrap');
 
 export const postCreateItem = data => callApi.post('/item', data);
 

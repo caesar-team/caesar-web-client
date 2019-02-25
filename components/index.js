@@ -1,3 +1,5 @@
+import DataTable from './DataTable/DataTable';
+
 export { AbilityProvider, Can } from './Ability';
 export { Avatar, AvatarsList } from './Avatar';
 export { Badge } from './Badge';
@@ -54,3 +56,5 @@ export { TextWithLines } from './TextWithLines';
 export { SettingsSidebar } from './SettingsSidebar';
 export { Tab, Tabs } from './Tabs';
 export { NavigationPanel } from './NavigationPanel';
+export { DataTable } from './DataTable';
+export { ProgressBar } from './ProgressBar';

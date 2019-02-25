@@ -15,6 +15,7 @@ import {
   ANONYMOUS_USER_ROLE,
   SHARED_ACCEPTED_STATUS,
   SHARED_WAITING_STATUS,
+  APP_URL,
 } from 'common/constants';
 import { formatDate } from 'common/utils/dateFormatter';
 import { copyToClipboard } from 'common/utils/clipboard';
@@ -141,6 +142,7 @@ const EmailBox = styled(SharedItem)`
   background-color: ${({ theme }) => theme.lightBlue};
 `;
 
+const getEncryption = link => link.replace(`${APP_URL}/share/`, '');
 const getAnonymousLink = shared =>
   (shared.find(({ roles }) => roles.includes(ANONYMOUS_USER_ROLE)) || {}).link;
 
@@ -163,25 +165,19 @@ export class ShareModal extends Component {
     }
   };
 
-  handleToggleSeparateLink = isUseMasterPassword => {
-    const { shared } = this.props;
-
-    this.setState({
-      isUseMasterPassword,
-      linkText: this.generateLinkText(
-        getAnonymousLink(shared),
-        isUseMasterPassword,
-      ),
-    });
+  handleToggleSeparateLink = () => {
+    this.setState(prevState => ({
+      isUseMasterPassword: !prevState.isUseMasterPassword,
+    }));
   };
 
   handleCopySharedLink = () => {
-    const {
-      notification,
-      item: { link },
-    } = this.props;
+    const { isUseMasterPassword } = this.state;
+    const { notification, shared } = this.props;
 
-    copyToClipboard(link.url);
+    copyToClipboard(
+      this.generateLinkText(getAnonymousLink(shared), isUseMasterPassword),
+    );
 
     notification.show({
       text: `Shared link has copied.`,
@@ -208,7 +204,7 @@ export class ShareModal extends Component {
   };
 
   generateLinkText(link, isUseMasterPassword) {
-    const linkObj = base64ToObject(link);
+    const linkObj = base64ToObject(getEncryption(link));
 
     if (!isUseMasterPassword) {
       return link;
@@ -222,14 +218,9 @@ export class ShareModal extends Component {
   }
 
   prepareInitialState() {
-    const { shared } = this.props;
-
-    const link = getAnonymousLink(shared);
-
     return {
       emails: [],
       isUseMasterPassword: false,
-      linkText: link ? this.generateLinkText(link, false) : '',
     };
   }
 
@@ -255,13 +246,15 @@ export class ShareModal extends Component {
   renderWaitingUsers() {
     const { shared, onRemove, onResend } = this.props;
 
-    if (!shared || !shared.length) {
+    const waitingList = shared.filter(
+      ({ roles, status }) =>
+        status === SHARED_WAITING_STATUS &&
+        !roles.includes(ANONYMOUS_USER_ROLE),
+    );
+
+    if (!waitingList.length) {
       return null;
     }
-
-    const waitingList = shared.filter(
-      ({ status }) => status === SHARED_WAITING_STATUS,
-    );
 
     const renderedUsers = waitingList.map(({ id, email }) => (
       <SharedItem key={id}>
@@ -291,13 +284,15 @@ export class ShareModal extends Component {
   renderSharedUsers() {
     const { shared, onRemove } = this.props;
 
-    if (!shared || !shared.length) {
+    const acceptedList = shared.filter(
+      ({ status, roles }) =>
+        status === SHARED_ACCEPTED_STATUS &&
+        !roles.includes(ANONYMOUS_USER_ROLE),
+    );
+
+    if (!acceptedList.length) {
       return null;
     }
-
-    const acceptedList = shared.filter(
-      ({ status }) => status === SHARED_ACCEPTED_STATUS,
-    );
 
     const renderedUsers = acceptedList.map(({ id, email, lastUpdated }) => (
       <SharedItem key={id}>
@@ -326,13 +321,14 @@ export class ShareModal extends Component {
   }
 
   render() {
-    const { isUseMasterPassword, linkText } = this.state;
+    const { isUseMasterPassword } = this.state;
     const { onCancel, shared } = this.props;
 
     const link = getAnonymousLink(shared);
     const switcherText = link ? 'Link access enabled' : 'Link access disabled';
-
-    console.log(link);
+    const linkText = link
+      ? this.generateLinkText(link, isUseMasterPassword)
+      : '';
 
     return (
       <Modal
@@ -357,7 +353,7 @@ export class ShareModal extends Component {
             <Toggle
               checked={!!link}
               icons={false}
-              onChange={() => this.handleShareByLinkChange()}
+              onChange={this.handleShareByLinkChange}
             />
             <ToggleLabelText>{switcherText}</ToggleLabelText>
           </ToggleLabel>
@@ -368,7 +364,7 @@ export class ShareModal extends Component {
               <SharedLink>{linkText}</SharedLink>
               <SharedLinkActions>
                 <Checkbox
-                  isChecked={isUseMasterPassword}
+                  checked={isUseMasterPassword}
                   onChange={this.handleToggleSeparateLink}
                 >
                   Use master password

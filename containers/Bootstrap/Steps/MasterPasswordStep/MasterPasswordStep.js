@@ -154,10 +154,8 @@ class MasterPasswordStep extends Component {
   };
 
   prepareInitialState() {
-    const { initialStep } = this.props;
-
     return {
-      step: initialStep,
+      step: null,
       publicKey: null,
       encryptedPrivateKey: null,
       masterPassword: null,

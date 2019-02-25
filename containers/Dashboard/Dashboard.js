@@ -64,6 +64,9 @@ import {
   updateShares,
   deleteShare,
   updateShare,
+  getList,
+  getUserSelf,
+  getUsers,
 } from 'common/api';
 import DecryptWorker from 'common/decrypt.worker';
 import { initialItemData } from './utils';
@@ -107,15 +110,35 @@ class DashboardContainer extends Component {
   async componentDidMount() {
     this.worker = new DecryptWorker();
 
+    const { data: list } = await getList();
+    const { data: user } = await getUserSelf();
+    const { data: members } = await getUsers();
+
     this.worker.addEventListener('message', this.handleWorkerMessage);
 
     this.worker.postMessage({
       event: 'toDecryptList',
       data: {
-        list: this.props.list,
+        list,
         privateKey: this.props.privateKey,
         password: this.props.password,
       },
+    });
+
+    const root = {
+      type: ROOT_TYPE,
+      children: [
+        getListWithoutChildren(list[0]),
+        { ...list[1], children: list[1].children.map(getListWithoutChildren) },
+        getListWithoutChildren(list[2]),
+      ],
+    };
+
+    this.setState({
+      user,
+      members,
+      list: createTree(root),
+      selectedListId: list[0].id,
     });
   }
 
@@ -295,7 +318,8 @@ class DashboardContainer extends Component {
     type,
     ...secret
   }) => {
-    const { publicKey, user } = this.props;
+    const { publicKey } = this.props;
+    const { user } = this.state;
 
     try {
       const item = {
@@ -348,8 +372,8 @@ class DashboardContainer extends Component {
   };
 
   handleFinishEditWorkflow = async ({ listId, attachments, ...secret }) => {
-    const { publicKey, user, members } = this.props;
-    const { workInProgressItem } = this.state;
+    const { publicKey } = this.props;
+    const { workInProgressItem, user, members } = this.state;
 
     try {
       const data = {
@@ -829,8 +853,8 @@ class DashboardContainer extends Component {
       workInProgressItem: { shared },
     } = this.state;
 
-    const anonymousShare = shared.filter(
-      ({ role }) => role === ANONYMOUS_USER_ROLE,
+    const anonymousShare = shared.find(({ roles }) =>
+      roles.includes(ANONYMOUS_USER_ROLE),
     );
 
     const updatedShared = shared.filter(({ id }) => id !== anonymousShare.id);
@@ -1000,7 +1024,7 @@ class DashboardContainer extends Component {
       const { userId, email } = sharedUsers[idx];
       const status = SHARED_WAITING_STATUS;
 
-      return { id, userId, email, link, status, role: [READ_ONLY_USER_ROLE] };
+      return { id, userId, email, link, status, roles: [READ_ONLY_USER_ROLE] };
     });
 
     const data = {
@@ -1057,40 +1081,19 @@ class DashboardContainer extends Component {
   };
 
   prepareInitialState() {
-    const { list, predefinedListId } = this.props;
-
-    let selectedListId = null;
-
-    if (predefinedListId) {
-      selectedListId = predefinedListId;
-    } else if (list && list.length > 0) {
-      selectedListId = list[0].id;
-    }
-
-    const root = {
-      type: ROOT_TYPE,
-      children: [
-        getListWithoutChildren(list[0]),
-        { ...list[1], children: list[1].children.map(getListWithoutChildren) },
-        getListWithoutChildren(list[2]),
-      ],
-    };
-
-    const tree = createTree(root);
-
     return {
       isVisibleInviteModal: false,
       isVisibleShareModal: false,
       isVisibleMoveToTrashModal: false,
       isVisibleRemoveModal: false,
-      list: tree,
+      list: null,
       favorites: {
         id: FAVORITES_TYPE,
         label: FAVORITES_TYPE,
         type: FAVORITES_TYPE,
         children: [],
       },
-      selectedListId,
+      selectedListId: null,
       workInProgressItem: null,
     };
   }
@@ -1118,8 +1121,10 @@ class DashboardContainer extends Component {
   }
 
   render() {
-    const { notification, user, members } = this.props;
+    const { notification } = this.props;
     const {
+      user,
+      members,
       list,
       favorites,
       selectedListId,
@@ -1129,6 +1134,10 @@ class DashboardContainer extends Component {
       isVisibleMoveToTrashModal,
       isVisibleRemoveModal,
     } = this.state;
+
+    if (!list) {
+      return null;
+    }
 
     const {
       model: { children },

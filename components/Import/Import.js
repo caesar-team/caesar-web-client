@@ -1,12 +1,10 @@
 import React, { Component } from 'react';
 import styled from 'styled-components';
+import { matchStrict } from 'common/utils/match';
 import { Tabs, Tab } from 'components';
-import OnePasswordImg from 'static/images/1password.png';
-import OnePasswordImg2x from 'static/images/1password@2x.png';
-import LastPassImg from 'static/images/lastpass.png';
-import LastPassImg2x from 'static/images/lastpass@2x.png';
-import FileCSVImg from 'static/images/csv.png';
-import FileCSVImg2x from 'static/images/csv@2x.png';
+import { NavigationPanel } from '../NavigationPanel';
+import { TABS, STEPS, FILE_STEP, DATA_STEP, IMPORTING_STEP } from './constants';
+import { FileStep, DataStep, ImportingStep } from './Steps';
 
 const Wrapper = styled.div`
   display: flex;
@@ -47,31 +45,54 @@ const TabDescription = styled.div`
   color: ${({ theme }) => theme.gray};
 `;
 
-const TABS = [
-  {
-    name: 'onepassword',
-    title: '1Password',
-    description: '*.1pif files',
-    icon: OnePasswordImg,
-    icon2: OnePasswordImg2x,
-  },
-  {
-    name: 'lastpassword',
-    title: 'LastPass',
-    description: 'Export script',
-    icon: LastPassImg,
-    icon2: LastPassImg2x,
-  },
-  {
-    name: 'csv',
-    title: 'CSV',
-    description: '*.csv files',
-    icon: FileCSVImg,
-    icon2: FileCSVImg2x,
-  },
-];
+const Title = styled.div`
+  font-size: 36px;
+  letter-spacing: 1px;
+  color: #000000;
+  margin-bottom: 30px;
+`;
+
+const Description = styled.div`
+  font-size: 18px;
+  letter-spacing: 0.6px;
+  color: #000000;
+  margin-bottom: 25px;
+`;
+
+const StyledNavigationPanel = styled(NavigationPanel)`
+  margin-top: 25px;
+`;
 
 class Import extends Component {
+  state = this.prepareInitialState();
+
+  handleChangeStep = step => {
+    this.setState({
+      currentStep: step,
+    });
+  };
+
+  prepareInitialState() {
+    return {
+      currentStep: DATA_STEP,
+    };
+  }
+
+  renderTabContent() {
+    const { currentStep } = this.state;
+
+    console.log(currentStep);
+    return matchStrict(
+      currentStep,
+      {
+        FILE_STEP: <FileStep />,
+        DATA_STEP: <DataStep />,
+        IMPORTING_STEP: <ImportingStep />,
+      },
+      null,
+    );
+  }
+
   renderTabs() {
     return TABS.map(({ name, title, description, icon, icon2 }) => {
       const component = (
@@ -83,16 +104,26 @@ class Import extends Component {
           </TabText>
         </TabWrapper>
       );
-      return <Tab key={name} component={component} />;
+
+      return (
+        <Tab key={name} component={component}>
+          {this.renderTabContent()}
+        </Tab>
+      );
     });
   }
 
   render() {
+    const { currentStep } = this.state;
+
     const renderedTabs = this.renderTabs();
 
     return (
       <Wrapper>
+        <Title>Settings / Import</Title>
+        <Description>Select file type to import:</Description>
         <Tabs>{renderedTabs}</Tabs>
+        <StyledNavigationPanel steps={STEPS} currentStep={currentStep} />
       </Wrapper>
     );
   }

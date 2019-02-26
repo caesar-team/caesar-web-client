@@ -137,6 +137,7 @@ class Input extends Component {
 }
 
 Input.InputField = InputField;
+Input.Prefix = Prefix;
 Input.PostFix = PostFix;
 
 export default Input;

@@ -7,14 +7,14 @@ import {
   ConfirmModal,
   withNotification,
 } from 'components';
-import { postCreateList, updateList, removeList } from 'common/api';
 import {
-  createTree,
-  removeNode,
-  addNode,
-  findNode,
-  updateNode,
-} from 'common/utils/tree';
+  postCreateList,
+  removeList,
+  getList,
+  getUsers,
+  getUserSelf,
+} from 'common/api';
+import { createTree, removeNode, addNode, findNode } from 'common/utils/tree';
 import {
   LIST_WORKFLOW_EDIT_MODE,
   LIST_WORKFLOW_CREATE_MODE,
@@ -31,6 +31,18 @@ const ManageListWrapper = styled.div`
 
 class ManageListContainer extends Component {
   state = this.prepareInitialState();
+
+  async componentDidMount() {
+    const { data: list } = await getList();
+    const { data: user } = await getUserSelf();
+    const { data: members } = await getUsers();
+
+    this.setState({
+      list: createTree(list[1]),
+      user,
+      members: memberAdapter(members),
+    });
+  }
 
   handleClickCreateList = () => {
     this.setState({
@@ -93,49 +105,6 @@ class ManageListContainer extends Component {
     }
   };
 
-  handleUpdateList = async ({ label }) => {
-    const {
-      props: { form },
-    } = this.formRef;
-    const {
-      workInProgressList: { id: listId },
-    } = this.state;
-
-    try {
-      await updateList(listId, {
-        label,
-      });
-
-      form.resetFields();
-
-      this.setState(prevState => ({
-        isVisibleModal: false,
-        workInProgressList: null,
-        list: updateNode(prevState.list, listId, {
-          id: listId,
-          label,
-          type: LIST_TYPE,
-          children: [],
-        }),
-      }));
-    } catch (e) {
-      const {
-        response: {
-          data: { errors },
-        },
-      } = e;
-
-      if (errors && errors.label) {
-        form.setFields({
-          label: {
-            value: label,
-            errors: errors.label.map(errorText => new Error(errorText)),
-          },
-        });
-      }
-    }
-  };
-
   handleClickRemovePost = listId => () => {
     this.setState({
       removingListId: listId,
@@ -179,14 +148,12 @@ class ManageListContainer extends Component {
   };
 
   prepareInitialState() {
-    const { list, members } = this.props;
-
     return {
       removingListId: null,
       isVisibleModal: false,
       workInProgressList: null,
-      list: createTree(list[1]),
-      members: memberAdapter(members),
+      list: null,
+      members: null,
     };
   }
 

@@ -12,8 +12,6 @@ const DEFAULT_EVENTS = [
 ];
 
 class SessionChecker extends Component {
-  idle = false;
-
   componentDidMount() {
     if (!isClient) {
       return;
@@ -44,7 +42,7 @@ class SessionChecker extends Component {
     });
   }
 
-  handleEvent = event => {
+  handleEvent = () => {
     // TODO: supposed to will added check on changing cursor position
     // TODO: and other cases
     this.resetTimeout();

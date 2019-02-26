@@ -46,6 +46,7 @@ class PasswordInput extends PureComponent {
 }
 
 PasswordInput.InputField = Input.InputField;
+PasswordInput.Prefix = Input.Prefix;
 PasswordInput.PostFix = Input.PostFix;
 
 export default PasswordInput;

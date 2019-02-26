@@ -45,10 +45,12 @@ const StyledIcon = styled(Icon)`
 
 const Uploader = ({
   name,
-  multiple,
+  multiple = false,
   accept,
   onChange,
-  files: previousFiles,
+  extText = '.rar .zip .doc .docx .pdf .jpg...',
+  files: previousFiles = [],
+  ...props
 }) => {
   const handleDrop = async acceptedFiles => {
     const previews = await filesToBase64(acceptedFiles);
@@ -61,7 +63,12 @@ const Uploader = ({
   };
 
   return (
-    <Dropzone multiple={multiple} accept={accept} onDrop={handleDrop}>
+    <Dropzone
+      multiple={multiple}
+      accept={accept}
+      onDrop={handleDrop}
+      {...props}
+    >
       {({ getRootProps, getInputProps, isDragActive }) => (
         <Container {...getRootProps()} isDragActive={isDragActive}>
           <input {...getInputProps()} />
@@ -74,7 +81,7 @@ const Uploader = ({
           <Text>
             Drag and drop your file here or <Link>upload</Link>.
           </Text>
-          <ExtText>.rar .zip .doc .docx .pdf .jpg...</ExtText>
+          <ExtText>{extText}</ExtText>
         </Container>
       )}
     </Dropzone>

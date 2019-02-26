@@ -1,6 +1,6 @@
 import React, { Fragment } from 'react';
 import styled from 'styled-components';
-import { formatDate } from 'common/utils/dateFormatter';
+import { formatDate } from 'common/utils/dateUtils';
 import { Icon } from 'components/Icon';
 import { Button } from 'components/Button';
 import { Avatar, AvatarsList } from 'components/Avatar';
@@ -122,6 +122,10 @@ export const ItemHeader = ({
   },
 }) => {
   const avatars = invited.reduce((accumulator, item) => {
+    if (!members[item.userId]) {
+      return accumulator;
+    }
+
     if (user.id === item.userId && user.id !== ownerId) {
       accumulator.unshift(user);
     } else if (ownerId !== item.userId) {
@@ -192,8 +196,7 @@ export const ItemHeader = ({
             )}
           <StyledAvatarsList avatars={avatars} />
           {!isTrashItem &&
-            isOwner &&
-            false && (
+            isOwner && (
               <ShareButton icon="share" color="black" onClick={onClickShare}>
                 Share
               </ShareButton>

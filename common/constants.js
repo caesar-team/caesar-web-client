@@ -75,5 +75,18 @@ export const KEY_CODES = {
   ARROW_DOWN: 40,
 };
 
-export const PERMISION_READ = 'read';
-export const PERMISION_WRITE = 'write';
+export const PERMISSION_READ = 'read';
+export const PERMISSION_WRITE = 'write';
+
+export const DEFAULT_REQUESTS_LIMIT = 10;
+export const DEFAULT_SECONDS_LIMIT = 60 * 60;
+
+export const INVITE_TYPE = 'INVITE';
+export const SHARE_TYPE = 'SHARE';
+
+export const USER_ROLE = 'ROLE_USER';
+export const READ_ONLY_USER_ROLE = 'ROLE_READ_ONLY_USER';
+export const ANONYMOUS_USER_ROLE = 'ROLE_ANONYMOUS_USER';
+
+export const SHARED_ACCEPTED_STATUS = 'ACCEPTED';
+export const SHARED_WAITING_STATUS = 'WAITING';

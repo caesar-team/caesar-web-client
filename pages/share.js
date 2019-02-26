@@ -4,7 +4,7 @@ import { Sharing } from 'containers';
 import { base64ToObject } from 'common/utils/cipherUtils';
 import { getCheckShare } from 'common/api';
 
-const validFields = ['shareId', 'email', 'password'];
+const validFields = ['shareId', 'email', 'password', 'isAnonymous'];
 
 const validateShare = (data, fields) =>
   data && fields.every(field => !!data[field]);

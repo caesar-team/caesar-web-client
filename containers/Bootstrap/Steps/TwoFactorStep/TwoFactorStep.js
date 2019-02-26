@@ -7,9 +7,14 @@ import {
 } from 'common/api';
 import { getTrustedDeviceToken, setToken } from 'common/utils/token';
 import { matchStrict } from 'common/utils/match';
-import { TWO_FACTOR_CREATE, TWO_FACTOR_CHECK } from '../../constants';
+import {
+  TWO_FACTOR_CREATE,
+  TWO_FACTOR_CHECK,
+  TWO_FACTOR_BACKUPS,
+} from '../../constants';
 import TwoFactorCreateForm from './TwoFactorCreateForm';
 import TwoFactorCheckForm from './TwoFactorCheckForm';
+import TwoFactorBackupForm from './TwoFactorBackupForm';
 
 class TwoFactorStep extends Component {
   state = this.prepareInitialState();
@@ -78,7 +83,7 @@ class TwoFactorStep extends Component {
     const { initialStep } = this.props;
 
     return {
-      step: initialStep,
+      step: TWO_FACTOR_BACKUPS,
       code: '',
       qr: '',
     };

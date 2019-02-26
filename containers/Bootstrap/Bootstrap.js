@@ -46,8 +46,6 @@ class Bootstrap extends Component {
 
     const { data: bootstrap } = await getUserBootstrap();
 
-    console.log(bootstrap);
-
     this.bootstrap = bootstrapStates(bootstrap);
     this.sharedData = base64ToObject(Cookies.get('share', { path: '/' })) || {};
 
@@ -165,7 +163,6 @@ class Bootstrap extends Component {
       );
     }
 
-    console.log(this.sharedData);
     if (MASTER_PASSWORD_STEPS.includes(currentStep)) {
       return (
         <MasterPasswordStep

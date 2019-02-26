@@ -13,7 +13,7 @@ const StyledAnchor = styled.a`
   }
 `;
 
-const Link = ({ to, onClick, children, className, ...props }) => (
+const Link = ({ to, onClick, children, isActive, className, ...props }) => (
   <NextLink href={to} {...props}>
     <StyledAnchor href={to} onClick={onClick} className={className}>
       {children}

@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import styled from 'styled-components';
 import { matchStrict } from 'common/utils/match';
 import { Tabs, Tab } from 'components';
-import { parseBase64 } from 'common/utils/file';
+import { parseFile } from 'common/utils/importUtils';
 import { NavigationPanel } from '../NavigationPanel';
 import {
   TABS,
@@ -84,9 +84,7 @@ class Import extends Component {
     });
   };
 
-  handleOnload = ({ files }, FormikBag) => {
-    console.log('handleOnload', files, FormikBag);
-  };
+  handleOnload = ({ files }, FormikBag) => {};
 
   prepareInitialState() {
     return {

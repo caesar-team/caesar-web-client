@@ -1199,7 +1199,6 @@ class DashboardContainer extends Component {
     const isTrashItem =
       workInProgressItem && workInProgressItem.listId === trashList.id;
 
-    console.log(workInProgressItem);
     return (
       <Fragment>
         <Layout user={user} withSearch>

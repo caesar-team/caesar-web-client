@@ -165,6 +165,7 @@ class Bootstrap extends Component {
         <MasterPasswordStep
           initialStep={currentStep}
           sharedMasterPassword={this.sharedData.masterPassword}
+          isAnonymous={this.sharedData.isAnonymous}
           onFinish={this.handleFinishMasterPassword}
         />
       );

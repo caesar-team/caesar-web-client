@@ -28,7 +28,7 @@ class MasterPasswordStep extends Component {
   state = this.prepareInitialState();
 
   async componentDidMount() {
-    const { initialStep, sharedMasterPassword } = this.props;
+    const { initialStep, sharedMasterPassword, isAnonymous } = this.props;
 
     const state = {
       step: initialStep,
@@ -50,11 +50,15 @@ class MasterPasswordStep extends Component {
       try {
         await validateKeys(sharedMasterPassword, state.encryptedPrivateKey);
 
-        return this.onFinishMasterPassword(
-          state.publicKey,
-          state.encryptedPrivateKey,
-          sharedMasterPassword,
-        );
+        if (isAnonymous) {
+          return this.onFinishMasterPassword(
+            state.publicKey,
+            state.encryptedPrivateKey,
+            sharedMasterPassword,
+          );
+        }
+
+        state.step = MASTER_PASSWORD_CREATE;
       } catch (e) {
         state.step = MASTER_PASSWORD_CHECK_SHARED;
       }
@@ -82,15 +86,21 @@ class MasterPasswordStep extends Component {
     { password },
     { setSubmitting, setErrors },
   ) => {
+    const { isAnonymous } = this.props;
     const { publicKey, encryptedPrivateKey } = this.state;
 
     try {
       await validateKeys(password, encryptedPrivateKey);
 
-      this.onFinishMasterPassword(publicKey, encryptedPrivateKey, password);
+      return isAnonymous
+        ? this.onFinishMasterPassword(publicKey, encryptedPrivateKey, password)
+        : this.setState({
+            step: MASTER_PASSWORD_CREATE,
+            sharedMasterPassword: password,
+          });
     } catch (e) {
       setErrors({ password: 'Wrong password' });
-      setSubmitting(false);
+      return setSubmitting(false);
     }
   };
 

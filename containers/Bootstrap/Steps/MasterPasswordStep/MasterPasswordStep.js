@@ -68,7 +68,10 @@ class MasterPasswordStep extends Component {
     try {
       await validateKeys(password, encryptedPrivateKey);
 
-      this.setState({ step: MASTER_PASSWORD_CREATE });
+      this.setState({
+        step: MASTER_PASSWORD_CREATE,
+        sharedMasterPassword: password,
+      });
     } catch (e) {
       setErrors({ password: 'Wrong password' });
       setSubmitting(false);
@@ -103,7 +106,9 @@ class MasterPasswordStep extends Component {
     { confirmPassword },
     { setSubmitting, setErrors },
   ) => {
-    const { initialStep, sharedMasterPassword, onFinish } = this.props;
+    const { initialStep, onFinish } = this.props;
+    const { sharedMasterPassword } = this.state;
+
     const {
       masterPassword,
       publicKey: currentPublicKey,
@@ -142,6 +147,7 @@ class MasterPasswordStep extends Component {
 
       onFinish({ publicKey, encryptedPrivateKey, masterPassword });
     } catch (error) {
+      console.log(error);
       setErrors({ confirmPassword: 'Something wrong' });
       setSubmitting(false);
     }
@@ -159,6 +165,7 @@ class MasterPasswordStep extends Component {
       publicKey: null,
       encryptedPrivateKey: null,
       masterPassword: null,
+      sharedMasterPassword: this.props.sharedMasterPassword,
     };
   }
 

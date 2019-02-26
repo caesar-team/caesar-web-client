@@ -2,9 +2,21 @@ import React, { Component } from 'react';
 import styled from 'styled-components';
 import { matchStrict } from 'common/utils/match';
 import { Tabs, Tab } from 'components';
+import { parseBase64 } from 'common/utils/file';
 import { NavigationPanel } from '../NavigationPanel';
-import { TABS, STEPS, FILE_STEP, DATA_STEP, IMPORTING_STEP } from './constants';
-import { FileStep, DataStep, ImportingStep } from './Steps';
+import {
+  TABS,
+  STEPS,
+  FILE_TYPE_MAP,
+  FILE_STEP,
+  FIELDS_STEP,
+  DATA_STEP,
+  IMPORTING_STEP,
+  ONEPASSWORD_TYPE,
+  LASTPASS_TYPE,
+  CSV_TYPE,
+} from './constants';
+import { FileStep, FieldsStep, DataStep, ImportingStep } from './Steps';
 
 const Wrapper = styled.div`
   display: flex;
@@ -66,26 +78,36 @@ const StyledNavigationPanel = styled(NavigationPanel)`
 class Import extends Component {
   state = this.prepareInitialState();
 
-  handleChangeStep = step => {
+  handleChangeTab = (name, tabName) => {
     this.setState({
-      currentStep: step,
+      currentTab: tabName,
     });
+  };
+
+  handleOnload = ({ files }, FormikBag) => {
+    console.log('handleOnload', files, FormikBag);
   };
 
   prepareInitialState() {
     return {
-      currentStep: DATA_STEP,
+      currentStep: FILE_STEP,
+      currentTab: ONEPASSWORD_TYPE,
+      data: [],
     };
   }
 
   renderTabContent() {
-    const { currentStep } = this.state;
+    const { currentStep, currentTab } = this.state;
 
-    console.log(currentStep);
     return matchStrict(
       currentStep,
       {
-        FILE_STEP: <FileStep />,
+        FILE_STEP: (
+          <FileStep
+            type={FILE_TYPE_MAP[currentTab].type}
+            onSubmit={this.handleOnload}
+          />
+        ),
         DATA_STEP: <DataStep />,
         IMPORTING_STEP: <ImportingStep />,
       },
@@ -94,36 +116,57 @@ class Import extends Component {
   }
 
   renderTabs() {
-    return TABS.map(({ name, title, description, icon, icon2 }) => {
-      const component = (
-        <TabWrapper>
-          <Image src={icon} srcSet={`${icon} 1x, ${icon2} 2x`} />
-          <TabText>
-            <TabName>{title}</TabName>
-            <TabDescription>{description}</TabDescription>
-          </TabText>
-        </TabWrapper>
-      );
+    const { currentTab } = this.state;
 
-      return (
-        <Tab key={name} component={component}>
-          {this.renderTabContent()}
-        </Tab>
-      );
-    });
+    const renderedTabs = TABS.map(
+      ({ name, title, description, icon, icon2 }) => {
+        const component = (
+          <TabWrapper>
+            <Image src={icon} srcSet={`${icon} 1x, ${icon2} 2x`} />
+            <TabText>
+              <TabName>{title}</TabName>
+              <TabDescription>{description}</TabDescription>
+            </TabText>
+          </TabWrapper>
+        );
+
+        return (
+          <Tab key={name} name={name} component={component}>
+            {this.renderTabContent()}
+          </Tab>
+        );
+      },
+    );
+
+    return (
+      <Tabs
+        name="import"
+        activeTabName={currentTab}
+        onChange={this.handleChangeTab}
+      >
+        {renderedTabs}
+      </Tabs>
+    );
+  }
+
+  renderNavigationPanel() {
+    const { currentStep, currentTab } = this.state;
+
+    const steps =
+      currentTab === CSV_TYPE
+        ? STEPS
+        : STEPS.filter(({ name }) => name !== FIELDS_STEP);
+
+    return <StyledNavigationPanel steps={steps} currentStep={currentStep} />;
   }
 
   render() {
-    const { currentStep } = this.state;
-
-    const renderedTabs = this.renderTabs();
-
     return (
       <Wrapper>
         <Title>Settings / Import</Title>
         <Description>Select file type to import:</Description>
-        <Tabs>{renderedTabs}</Tabs>
-        <StyledNavigationPanel steps={STEPS} currentStep={currentStep} />
+        {this.renderTabs()}
+        {this.renderNavigationPanel()}
       </Wrapper>
     );
   }

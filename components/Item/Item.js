@@ -7,7 +7,7 @@ import {
   PERMISSION_WRITE,
 } from 'common/constants';
 import { Button, Icon } from 'components';
-import { formatDate } from 'common/utils/dateFormatter';
+import { formatDate } from 'common/utils/dateUtils';
 import { matchStrict } from 'common/utils/match';
 import EmptyItem from './EmptyItem';
 import { Credentials, CredentialsForm, DocumentForm, Document } from './Types';

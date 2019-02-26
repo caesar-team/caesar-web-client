@@ -23,12 +23,18 @@ const StepBox = styled.div`
 
 const SeparatorIconWrapper = styled.div`
   margin: 0 20px;
+  line-height: 10px;
 `;
 
 const StepDescription = styled.span`
   font-size: 14px;
   font-weight: 600;
   letter-spacing: 0.4px;
+  color: ${({ isActive, theme }) => (isActive ? theme.black : theme.gray)};
+`;
+
+const StyledIcon = styled(Icon)`
+  fill: ${({ isActive, theme }) => (isActive ? theme.black : theme.gray)};
 `;
 
 const getStepIndex = (steps, stepName) => {
@@ -60,7 +66,7 @@ const NavigationPanel = ({
     }
   };
 
-  const renderStep = ({ name, text, icon, activeIcon }, index) => {
+  const renderStep = ({ name, text }, index) => {
     const isActive = name === currentStep;
     const number = index / 2 + 1;
 
@@ -82,7 +88,12 @@ const NavigationPanel = ({
 
     return (
       <SeparatorIconWrapper key={index}>
-        <Icon name="arrow-next" width={18} height={10} />
+        <StyledIcon
+          name="arrow-next"
+          isActive={isActive}
+          width={18}
+          height={10}
+        />
       </SeparatorIconWrapper>
     );
   };

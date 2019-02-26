@@ -6,7 +6,6 @@ import {
   Modal,
   ModalTitle,
   Button,
-  Scrollbar,
   Checkbox,
   ShareInput,
   TextWithLines,
@@ -17,7 +16,7 @@ import {
   SHARED_WAITING_STATUS,
   APP_URL,
 } from 'common/constants';
-import { formatDate } from 'common/utils/dateFormatter';
+import { formatDate, dateDiffNow } from 'common/utils/dateUtils';
 import { copyToClipboard } from 'common/utils/clipboard';
 import { base64ToObject, objectToBase64 } from 'common/utils/cipherUtils';
 import { generateSharingUrl } from 'common/utils/sharing';
@@ -50,7 +49,6 @@ const ToggleLabelText = styled.span`
 
 const SharedList = styled.div`
   margin-bottom: 30px;
-  height: 200px;
 `;
 
 const SharedItem = styled.div`
@@ -122,6 +120,10 @@ const SharedLink = styled.div`
   white-space: pre-wrap;
 `;
 
+const StyledIcon = styled(Icon)`
+  fill: ${({ theme }) => theme.gray};
+`;
+
 const SharedLinkActions = styled.div`
   display: flex;
   align-items: center;
@@ -140,6 +142,20 @@ const SharedLinkActionsButton = styled(Button)`
 
 const EmailBox = styled(SharedItem)`
   background-color: ${({ theme }) => theme.lightBlue};
+`;
+
+const LeftTime = styled.div`
+  font-size: 14px;
+  letter-spacing: 0.4px;
+  color: ${({ theme }) => theme.gray};
+  margin: 0 20px 0 10px;
+`;
+
+const ResendLink = styled.a`
+  font-size: 14px;
+  letter-spacing: 0.4px;
+  text-decoration: underline;
+  cursor: pointer;
 `;
 
 const getEncryption = link => link.replace(`${APP_URL}/share/`, '');
@@ -256,9 +272,12 @@ export class ShareModal extends Component {
       return null;
     }
 
-    const renderedUsers = waitingList.map(({ id, email }) => (
+    const renderedUsers = waitingList.map(({ id, email, left = 0 }) => (
       <SharedItem key={id}>
         <SharedItemEmail>{email}</SharedItemEmail>
+        <StyledIcon name="history" width={16} height={14} />
+        <LeftTime>Left: {left} h</LeftTime>
+        <ResendLink onClick={onResend(id)}>Resend</ResendLink>
         <SharedItemRemove>
           <Icon
             name="close"
@@ -274,9 +293,7 @@ export class ShareModal extends Component {
     return (
       <Fragment>
         <TextWithLines>Waiting ({waitingList.length})</TextWithLines>
-        <SharedList>
-          <Scrollbar>{renderedUsers}</Scrollbar>
-        </SharedList>
+        <SharedList>{renderedUsers}</SharedList>
       </Fragment>
     );
   }
@@ -294,28 +311,28 @@ export class ShareModal extends Component {
       return null;
     }
 
-    const renderedUsers = acceptedList.map(({ id, email, lastUpdated }) => (
-      <SharedItem key={id}>
-        <SharedItemEmail>{email}</SharedItemEmail>
-        <SharedItemDate>{formatDate(lastUpdated)}</SharedItemDate>
-        <SharedItemRemove>
-          <Icon
-            name="close"
-            width={14}
-            height={14}
-            isInButton
-            onClick={onRemove(id)}
-          />
-        </SharedItemRemove>
-      </SharedItem>
-    ));
+    const renderedUsers = acceptedList.map(
+      ({ id, email, createdAt, updatedAt }) => (
+        <SharedItem key={id}>
+          <SharedItemEmail>{email}</SharedItemEmail>
+          <SharedItemDate>{formatDate(createdAt || updatedAt)}</SharedItemDate>
+          <SharedItemRemove>
+            <Icon
+              name="close"
+              width={14}
+              height={14}
+              isInButton
+              onClick={onRemove(id)}
+            />
+          </SharedItemRemove>
+        </SharedItem>
+      ),
+    );
 
     return (
       <Fragment>
         <TextWithLines>Shared ({acceptedList.length})</TextWithLines>
-        <SharedList>
-          <Scrollbar>{renderedUsers}</Scrollbar>
-        </SharedList>
+        <SharedList>{renderedUsers}</SharedList>
       </Fragment>
     );
   }

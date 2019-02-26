@@ -50,14 +50,12 @@ const MasterPasswordSharedForm = ({ onSubmit }) => (
           <AuthTitle>Enter Master Password</AuthTitle>
           <AuthDescription>Enter your master password</AuthDescription>
           <FastField
-            name="checkPassword"
+            name="password"
             render={({ field }) => (
               <MasterPasswordInput
                 {...field}
                 autoFocus
-                error={
-                  dirty ? checkError(touched, errors, 'checkPassword') : null
-                }
+                error={dirty ? checkError(touched, errors, 'password') : null}
               />
             )}
           />

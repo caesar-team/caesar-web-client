@@ -21,7 +21,8 @@ const StyledTab = styled.li`
   margin-right: 10px;
   cursor: pointer;
   border-radius: 3px;
-  background: ${({ isActive, theme }) => isActive ? theme.white : 'transparent'};
+  background: ${({ isActive, theme }) =>
+    isActive ? theme.white : 'transparent'};
 
   &:not(:first-child) {
     border-left: none;

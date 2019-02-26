@@ -989,43 +989,62 @@ class DashboardContainer extends Component {
       sharedItems: [{ item: workInProgressItem.id, secret }],
     }));
 
-    const {
-      data: { invited },
-    } = await postInviteItem(workInProgressItem.id, { invites });
+    let invited = [];
+    let shared = [];
 
-    const { data: newShares } = await postShares({ shares });
+    if (invites.length) {
+      const { data } = await postInviteItem(workInProgressItem.id, { invites });
 
-    const updatedShares = sharedEncryptedSecrets.map((secret, idx) => {
-      const { email, password, masterPassword } = sharedUsers[idx];
-      const { id: shareId } = newShares[idx];
+      invited = data;
+    }
 
-      return {
-        id: shareId,
-        sharedItems: [
-          { item: workInProgressItem.id, secret: sharedEncryptedSecrets[idx] },
-        ],
-        link: generateSharingUrl(
-          objectToBase64({
-            shareId,
-            email,
-            password,
-            masterPassword,
-          }),
-        ),
-      };
-    });
+    if (shares.length) {
+      const { data: newShares } = await postShares({ shares });
 
-    const { data: updatedShared } = await updateShares({
-      shares: updatedShares,
-    });
+      const updatedShares = sharedEncryptedSecrets.map((secret, idx) => {
+        const { email, password, masterPassword } = sharedUsers[idx];
+        const { id: shareId } = newShares[idx];
 
-    const shared = updatedShared.map(({ id }, idx) => {
-      const { link } = updatedShares[idx];
-      const { userId, email } = sharedUsers[idx];
-      const status = SHARED_WAITING_STATUS;
+        return {
+          id: shareId,
+          sharedItems: [
+            {
+              item: workInProgressItem.id,
+              secret: sharedEncryptedSecrets[idx],
+            },
+          ],
+          link: generateSharingUrl(
+            objectToBase64({
+              shareId,
+              email,
+              password,
+              masterPassword,
+            }),
+          ),
+        };
+      });
 
-      return { id, userId, email, link, status, roles: [READ_ONLY_USER_ROLE] };
-    });
+      const { data: updatedShared } = await updateShares({
+        shares: updatedShares,
+      });
+
+      shared = updatedShared.map(({ id, updatedAt, createdAt }, idx) => {
+        const { link } = updatedShares[idx];
+        const { userId, email } = sharedUsers[idx];
+        const status = SHARED_WAITING_STATUS;
+
+        return {
+          id,
+          userId,
+          email,
+          link,
+          status,
+          updatedAt,
+          createdAt,
+          roles: [READ_ONLY_USER_ROLE],
+        };
+      });
+    }
 
     const data = {
       ...workInProgressItem,
@@ -1066,7 +1085,31 @@ class DashboardContainer extends Component {
     }
   };
 
-  handleResendShare = () => {};
+  handleResendShare = shareId => async () => {
+    const { workInProgressItem } = this.state;
+
+    const share = workInProgressItem.shared.find(({ id }) => id === shareId);
+
+    const { data } = await updateShare(shareId, { link: share.link });
+
+    const shared = workInProgressItem.shared.map(
+      shareItem =>
+        shareItem.id === shareId
+          ? { ...shareItem, updatedAt: data.updatedAt }
+          : shareItem,
+    );
+
+    const updatedData = {
+      ...workInProgressItem,
+      shared,
+    };
+
+    this.setState(prevState => ({
+      ...prevState,
+      workInProgressItem: updatedData,
+      list: updateNode(prevState.list, workInProgressItem.id, updatedData),
+    }));
+  };
 
   handleCloseInviteModal = () => {
     this.setState({
@@ -1218,7 +1261,6 @@ class DashboardContainer extends Component {
             onRemove={this.handleRemoveShare}
             onActivateSharedByLink={this.handleActivateShareByLink}
             onDeactivateSharedByLink={this.handleDeactivateShareByLink}
-            // onToggleSeparateLink={this.handleToggleSeparateLink}
             onCancel={this.handleCloseShareModal}
             notification={notification}
           />

@@ -18,43 +18,35 @@ const PanelWrapper = styled.div`
 `;
 
 export class Tabs extends Component {
-  state = {
-    activeTabIndex: 0,
-  };
-
   handleTabClick = tabIndex => () => {
     const { name = '', children, onChange } = this.props;
+    const tab = Children.toArray(children)[tabIndex];
 
-    this.setState(
-      {
-        activeTabIndex: tabIndex,
-      },
-      () => {
-        if (onChange) {
-          const child = Children.toArray(children)[tabIndex];
-          onChange(name, child.props.value);
-        }
-      },
-    );
+    if (onChange) {
+      onChange(name, tab.props.name);
+    }
   };
 
   renderTabs() {
+    const { activeTabName } = this.props;
+
     return Children.map(this.props.children, (child, index) =>
       cloneElement(child, {
         onClick: this.handleTabClick(index),
         tabIndex: index,
-        isActive: index === this.state.activeTabIndex,
+        isActive: child.props.name === activeTabName,
       }),
     );
   }
 
   renderActiveTabContent() {
-    const { activeTabIndex } = this.state;
+    const { activeTabName } = this.props;
 
     const children = Children.toArray(this.props.children);
+    const tab = children.find(child => child.props.name === activeTabName);
 
-    if (children[activeTabIndex]) {
-      return children[activeTabIndex].props.children;
+    if (tab) {
+      return tab.props.children;
     }
 
     return null;

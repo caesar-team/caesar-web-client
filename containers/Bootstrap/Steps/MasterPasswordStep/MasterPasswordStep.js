@@ -28,7 +28,7 @@ class MasterPasswordStep extends Component {
   state = this.prepareInitialState();
 
   async componentDidMount() {
-    const { initialStep, sharedMasterPassword } = this.props;
+    const { initialStep, sharedMasterPassword, isAnonymous } = this.props;
 
     const state = {
       step: initialStep,
@@ -50,31 +50,57 @@ class MasterPasswordStep extends Component {
       try {
         await validateKeys(sharedMasterPassword, state.encryptedPrivateKey);
 
+        if (isAnonymous) {
+          return this.onFinishMasterPassword(
+            state.publicKey,
+            state.encryptedPrivateKey,
+            sharedMasterPassword,
+          );
+        }
+
         state.step = MASTER_PASSWORD_CREATE;
       } catch (e) {
         state.step = MASTER_PASSWORD_CHECK_SHARED;
       }
     }
 
-    this.setState(state);
+    return this.setState(state);
+  }
+
+  async onFinishMasterPassword(publicKey, encryptedPrivateKey, masterPassword) {
+    const { onFinish } = this.props;
+
+    await postKeys({
+      publicKey,
+      encryptedPrivateKey,
+    });
+
+    onFinish({
+      publicKey,
+      encryptedPrivateKey,
+      masterPassword,
+    });
   }
 
   handleSubmitSharedPassword = async (
     { password },
     { setSubmitting, setErrors },
   ) => {
-    const { encryptedPrivateKey } = this.state;
+    const { isAnonymous } = this.props;
+    const { publicKey, encryptedPrivateKey } = this.state;
 
     try {
       await validateKeys(password, encryptedPrivateKey);
 
-      this.setState({
-        step: MASTER_PASSWORD_CREATE,
-        sharedMasterPassword: password,
-      });
+      return isAnonymous
+        ? this.onFinishMasterPassword(publicKey, encryptedPrivateKey, password)
+        : this.setState({
+            step: MASTER_PASSWORD_CREATE,
+            sharedMasterPassword: password,
+          });
     } catch (e) {
       setErrors({ password: 'Wrong password' });
-      setSubmitting(false);
+      return setSubmitting(false);
     }
   };
 
@@ -106,7 +132,7 @@ class MasterPasswordStep extends Component {
     { confirmPassword },
     { setSubmitting, setErrors },
   ) => {
-    const { initialStep, onFinish } = this.props;
+    const { initialStep } = this.props;
     const { sharedMasterPassword } = this.state;
 
     const {
@@ -140,16 +166,14 @@ class MasterPasswordStep extends Component {
         encryptedPrivateKey = data.privateKey;
       }
 
-      await postKeys({
+      return this.onFinishMasterPassword(
         publicKey,
         encryptedPrivateKey,
-      });
-
-      onFinish({ publicKey, encryptedPrivateKey, masterPassword });
+        masterPassword,
+      );
     } catch (error) {
-      console.log(error);
       setErrors({ confirmPassword: 'Something wrong' });
-      setSubmitting(false);
+      return setSubmitting(false);
     }
   };
 

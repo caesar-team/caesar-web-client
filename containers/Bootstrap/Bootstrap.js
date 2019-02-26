@@ -49,9 +49,6 @@ class Bootstrap extends Component {
     this.bootstrap = bootstrapStates(bootstrap);
     this.sharedData = base64ToObject(Cookies.get('share', { path: '/' })) || {};
 
-    console.log(this.bootstrap);
-    console.log(this.sharedData);
-
     this.setState({
       currentStep: this.currentStepResolver(bootstrap),
     });

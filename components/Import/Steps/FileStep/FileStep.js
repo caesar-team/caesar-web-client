@@ -20,7 +20,7 @@ const Title = styled.div`
 const FileStep = ({ type, onSubmit }) => (
   <Formik
     key="fileStep"
-    initialValues={{ files: [] }}
+    initialValues={{ file: null }}
     onSubmit={onSubmit}
     validationSchema={schema}
     render={({ values, errors, setFieldValue, handleSubmit, submitForm }) => (
@@ -30,10 +30,10 @@ const FileStep = ({ type, onSubmit }) => (
           <Uploader
             name="file"
             accept="text/csv"
-            files={values.files}
+            files={values.file}
             extText={`*.csv file for ${type}`}
-            onChange={(name, files) => {
-              setFieldValue('files', files);
+            onChange={(name, file) => {
+              setFieldValue('file', file);
               submitForm();
             }}
           />

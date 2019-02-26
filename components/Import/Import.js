@@ -84,11 +84,13 @@ class Import extends Component {
     });
   };
 
-  handleOnload = ({ files }, FormikBag) => {};
+  handleOnload = ({ file }, FormikBag) => {
+    parseFile(file.raw);
+  };
 
   prepareInitialState() {
     return {
-      currentStep: FILE_STEP,
+      currentStep: FIELDS_STEP,
       currentTab: ONEPASSWORD_TYPE,
       data: [],
     };
@@ -106,6 +108,7 @@ class Import extends Component {
             onSubmit={this.handleOnload}
           />
         ),
+        FIELDS_STEP: <FieldsStep />,
         DATA_STEP: <DataStep />,
         IMPORTING_STEP: <ImportingStep />,
       },

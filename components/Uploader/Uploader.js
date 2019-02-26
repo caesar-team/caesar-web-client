@@ -59,7 +59,7 @@ const Uploader = ({
       raw: previews[index],
     }));
 
-    onChange(name, [...previousFiles, ...files]);
+    onChange(name, multiple ? [...previousFiles, ...files] : files[0]);
   };
 
   return (

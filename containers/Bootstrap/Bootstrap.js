@@ -52,9 +52,6 @@ class Bootstrap extends Component {
     console.log(this.bootstrap);
     console.log(this.sharedData);
 
-    // TODO: during refactoring to remove and change on redux
-    Cookies.remove('share', { path: '/' });
-
     this.setState({
       currentStep: this.currentStepResolver(bootstrap),
     });
@@ -171,7 +168,6 @@ class Bootstrap extends Component {
         <MasterPasswordStep
           initialStep={currentStep}
           sharedMasterPassword={this.sharedData.masterPassword}
-          isAnonymous={this.sharedData.isAnonymous}
           onFinish={this.handleFinishMasterPassword}
         />
       );

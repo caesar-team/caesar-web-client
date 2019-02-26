@@ -819,7 +819,6 @@ class DashboardContainer extends Component {
         email,
         password,
         masterPassword,
-        isAnonymous: true,
       }),
     );
 
@@ -1020,7 +1019,6 @@ class DashboardContainer extends Component {
               email,
               password,
               masterPassword,
-              isAnonymous: false,
             }),
           ),
         };

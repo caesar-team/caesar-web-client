@@ -1,9 +1,9 @@
 import React, { Component } from 'react';
-import { AuthLayout } from 'components';
 import {
+  getQrCode,
+  getBackupCodes,
   postActivateTwoFactor,
   postCheckTwoFactor,
-  getQrCode,
 } from 'common/api';
 import { getTrustedDeviceToken, setToken } from 'common/utils/token';
 import { matchStrict } from 'common/utils/match';
@@ -27,9 +27,12 @@ class TwoFactorStep extends Component {
         data: { qr, code },
       } = await getQrCode();
 
+      const { data: codes } = await getBackupCodes();
+
       this.setState({
         qr,
         code,
+        codes,
       });
     }
   }
@@ -72,11 +75,22 @@ class TwoFactorStep extends Component {
         setToken(token);
       }
 
-      onFinish();
+      // eslint-disable-next-line
+      isCreateFlow
+        ? this.setState({
+            step: TWO_FACTOR_BACKUPS,
+          })
+        : onFinish();
     } catch (error) {
       setErrors({ code: 'Wrong code' });
       setSubmitting(false);
     }
+  };
+
+  handleClickSaveBackups = () => {
+    const { onFinish } = this.props;
+
+    onFinish();
   };
 
   prepareInitialState() {
@@ -84,18 +98,19 @@ class TwoFactorStep extends Component {
 
     return {
       step: initialStep,
-      code: '',
       qr: '',
+      code: '',
+      codes: [],
     };
   }
 
   render() {
-    const { qr, code, step } = this.state;
+    const { qr, code, codes, step } = this.state;
     const { initialStep } = this.props;
 
     const allowReturn = initialStep === TWO_FACTOR_CREATE;
 
-    const renderedStep = matchStrict(
+    return matchStrict(
       step,
       {
         [TWO_FACTOR_CREATE]: (
@@ -112,11 +127,15 @@ class TwoFactorStep extends Component {
             onSubmit={this.handleSubmit}
           />
         ),
+        [TWO_FACTOR_BACKUPS]: (
+          <TwoFactorBackupForm
+            codes={codes}
+            onSubmit={this.handleClickSaveBackups}
+          />
+        ),
       },
       null,
     );
-
-    return <AuthLayout>{renderedStep}</AuthLayout>;
   }
 }
 

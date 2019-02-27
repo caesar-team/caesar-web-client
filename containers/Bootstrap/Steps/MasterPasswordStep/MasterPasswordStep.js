@@ -8,7 +8,7 @@ import {
   generateKeys,
   reencryptPrivateKey,
 } from 'common/utils/key';
-import { AuthLayout, WrapperAlignTop } from 'components';
+import { WrapperAlignTop, BootstrapWrapper } from 'components';
 import {
   MASTER_PASSWORD_CHECK,
   MASTER_PASSWORD_CREATE,
@@ -198,9 +198,9 @@ class MasterPasswordStep extends Component {
     return step === MASTER_PASSWORD_CHECK ? (
       <MasterPasswordCheckForm onSubmit={this.handleSubmitCheckPassword} />
     ) : (
-      <AuthLayout>
+      <BootstrapWrapper>
         <InnerWrapper>{renderedStep}</InnerWrapper>
-      </AuthLayout>
+      </BootstrapWrapper>
     );
   }
 }

@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import {
   AuthDescription,
-  AuthLayout,
   AuthTitle,
   AuthWrapper,
   Head,
@@ -49,16 +48,14 @@ class PasswordStep extends Component {
 
   render() {
     return (
-      <AuthLayout>
-        <InnerWrapper>
-          <Head title="Enter password which you received" />
-          <AuthWrapper>
-            <AuthTitle>Change Password</AuthTitle>
-            <AuthDescription>Enter and confirm new password</AuthDescription>
-            <PasswordForm onSubmit={this.handleSubmit} />
-          </AuthWrapper>
-        </InnerWrapper>
-      </AuthLayout>
+      <InnerWrapper>
+        <Head title="Enter password which you received" />
+        <AuthWrapper>
+          <AuthTitle>Change Password</AuthTitle>
+          <AuthDescription>Enter and confirm new password</AuthDescription>
+          <PasswordForm onSubmit={this.handleSubmit} />
+        </AuthWrapper>
+      </InnerWrapper>
     );
   }
 }

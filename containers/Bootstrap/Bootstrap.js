@@ -156,10 +156,12 @@ class Bootstrap extends Component {
 
     if (PASSWORD_STEPS.includes(currentStep)) {
       return (
-        <PasswordStep
-          email={this.sharedData.email}
-          onFinish={this.handleFinishChangePassword}
-        />
+        <BootstrapWrapper>
+          <PasswordStep
+            email={this.sharedData.email}
+            onFinish={this.handleFinishChangePassword}
+          />
+        </BootstrapWrapper>
       );
     }
 

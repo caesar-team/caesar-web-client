@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import {
   getQrCode,
+  getBackupCodes,
   postActivateTwoFactor,
   postCheckTwoFactor,
 } from 'common/api';
@@ -26,9 +27,12 @@ class TwoFactorStep extends Component {
         data: { qr, code },
       } = await getQrCode();
 
+      const { data: codes } = await getBackupCodes();
+
       this.setState({
         qr,
         code,
+        codes,
       });
     }
   }
@@ -94,38 +98,17 @@ class TwoFactorStep extends Component {
 
     return {
       step: initialStep,
-      code: '',
       qr: '',
+      code: '',
+      codes: [],
     };
   }
 
   render() {
-    const { qr, code, step } = this.state;
+    const { qr, code, codes, step } = this.state;
     const { initialStep } = this.props;
 
     const allowReturn = initialStep === TWO_FACTOR_CREATE;
-
-    const CODES = [
-      '534684',
-      '987984',
-      '123123',
-      '123123',
-      '123123',
-      '123123',
-      '123123',
-      '123123',
-      '123123',
-      '123123',
-      '123123',
-      '123123',
-      '123123',
-      '123123',
-      '123123',
-      '123123',
-      '123123',
-      '123123',
-      '123123',
-    ];
 
     return matchStrict(
       step,
@@ -146,7 +129,7 @@ class TwoFactorStep extends Component {
         ),
         [TWO_FACTOR_BACKUPS]: (
           <TwoFactorBackupForm
-            codes={CODES}
+            codes={codes}
             onSubmit={this.handleClickSaveBackups}
           />
         ),

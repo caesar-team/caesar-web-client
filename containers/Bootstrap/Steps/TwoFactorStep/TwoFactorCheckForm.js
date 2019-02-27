@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React from 'react';
 import styled from 'styled-components';
 import { Formik, FastField } from 'formik';
 import {
@@ -34,70 +34,65 @@ const CheckboxWrapper = styled.div`
   padding-top: 20px;
 `;
 
-class TwoFactorCheckForm extends Component {
-  render() {
-    const { allowReturn, onClickReturn, onSubmit } = this.props;
-
-    return (
-      <WrapperAlignTop>
-        {allowReturn && (
-          <BackButtonWrapper>
-            <BackButton onClick={onClickReturn}>
-              Back to the previous step
-            </BackButton>
-          </BackButtonWrapper>
-        )}
-        <AuthWrapper>
-          <AuthTitle>Two Factor Authentication</AuthTitle>
-          <AuthDescription>
-            Enter the 6-digit code that you can find in the mobile application.
-          </AuthDescription>
-          <Formik
-            key="codeForm"
-            initialValues={initialValues}
-            validationSchema={codeSchema}
-            onSubmit={onSubmit}
-            render={({
-              errors,
-              handleSubmit,
-              isSubmitting,
-              setFieldValue,
-              submitForm,
-              resetForm,
-            }) => (
-              <Form onSubmit={handleSubmit}>
-                <FastField
-                  name="code"
-                  render={() => (
-                    <CodeInput
-                      onChange={value => setFieldValue('code', value, false)}
-                      onComplete={submitForm}
-                      onCompleteWithErrors={resetForm}
-                      length={6}
-                      focus
-                      disabled={isSubmitting}
-                      errors={errors}
-                    />
-                  )}
+const TwoFactorCheckForm = ({ allowReturn, onClickReturn, onSubmit }) => (
+  <WrapperAlignTop>
+    {allowReturn && (
+      <BackButtonWrapper>
+        <BackButton onClick={onClickReturn}>
+          Back to the previous step
+        </BackButton>
+      </BackButtonWrapper>
+    )}
+    <AuthWrapper>
+      <AuthTitle>Two Factor Authentication</AuthTitle>
+      <AuthDescription>
+        Enter the 6-digit code that you can find in the mobile application or
+        from backup codes
+      </AuthDescription>
+      <Formik
+        key="codeForm"
+        initialValues={initialValues}
+        validationSchema={codeSchema}
+        onSubmit={onSubmit}
+        render={({
+          errors,
+          handleSubmit,
+          isSubmitting,
+          setFieldValue,
+          submitForm,
+          resetForm,
+        }) => (
+          <Form onSubmit={handleSubmit}>
+            <FastField
+              name="code"
+              render={() => (
+                <CodeInput
+                  onChange={value => setFieldValue('code', value, false)}
+                  onComplete={submitForm}
+                  onCompleteWithErrors={resetForm}
+                  length={6}
+                  focus
+                  disabled={isSubmitting}
+                  errors={errors}
                 />
-                {errors.code && <Error>{errors.code}</Error>}
-                <CheckboxWrapper>
-                  <FastField
-                    name="fpCheck"
-                    render={({ field }) => (
-                      <Checkbox {...field} checked={field.value}>
-                        Remember device
-                      </Checkbox>
-                    )}
-                  />
-                </CheckboxWrapper>
-              </Form>
-            )}
-          />
-        </AuthWrapper>
-      </WrapperAlignTop>
-    );
-  }
-}
+              )}
+            />
+            {errors.code && <Error>{errors.code}</Error>}
+            <CheckboxWrapper>
+              <FastField
+                name="fpCheck"
+                render={({ field }) => (
+                  <Checkbox {...field} checked={field.value}>
+                    Remember device
+                  </Checkbox>
+                )}
+              />
+            </CheckboxWrapper>
+          </Form>
+        )}
+      />
+    </AuthWrapper>
+  </WrapperAlignTop>
+);
 
 export default TwoFactorCheckForm;

@@ -71,6 +71,8 @@ export const getKeys = () => callApi.get('/keys');
 
 export const getQrCode = () => callApi.get('/2fa');
 
+export const getBackupCodes = () => callApi.get('/auth/2fa/backups');
+
 export const postActivateTwoFactor = data =>
   callApi.post('/2fa/activate', data);
 

@@ -54,4 +54,6 @@ class Checkbox extends Component {
   }
 }
 
+Checkbox.Text = Text;
+
 export default Checkbox;

@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import * as openpgp from 'openpgp';
 import { withRouter } from 'next/router';
 import Cookies from 'js-cookie';
+import { BootstrapWrapper } from 'components';
 import { getUserBootstrap } from 'common/api';
 import { base64ToObject } from 'common/utils/cipherUtils';
 import { DEFAULT_IDLE_TIMEOUT } from 'common/constants';
@@ -144,19 +145,23 @@ class Bootstrap extends Component {
 
     if (TWO_FACTOR_STEPS.includes(currentStep)) {
       return (
-        <TwoFactorStep
-          initialStep={currentStep}
-          onFinish={this.handleFinishTwoFactor}
-        />
+        <BootstrapWrapper>
+          <TwoFactorStep
+            initialStep={currentStep}
+            onFinish={this.handleFinishTwoFactor}
+          />
+        </BootstrapWrapper>
       );
     }
 
     if (PASSWORD_STEPS.includes(currentStep)) {
       return (
-        <PasswordStep
-          email={this.sharedData.email}
-          onFinish={this.handleFinishChangePassword}
-        />
+        <BootstrapWrapper>
+          <PasswordStep
+            email={this.sharedData.email}
+            onFinish={this.handleFinishChangePassword}
+          />
+        </BootstrapWrapper>
       );
     }
 

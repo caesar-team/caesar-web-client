@@ -102,7 +102,7 @@ class SelectInner extends Component {
   }
 
   render() {
-    const { value, options, placeholder } = this.props;
+    const { value, options, placeholder, ...props } = this.props;
     const { isOpened } = this.state;
 
     const iconName = isOpened ? 'arrow-up-big' : 'arrow-down-big';
@@ -112,7 +112,7 @@ class SelectInner extends Component {
 
     return (
       <Wrapper>
-        <SelectedOption onClick={this.handleClickToggle}>
+        <SelectedOption onClick={this.handleClickToggle} {...props}>
           <ValueText>{selectedLabel}</ValueText>
           <Icon name={iconName} width={16} height={16} />
         </SelectedOption>

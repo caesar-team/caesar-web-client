@@ -11,7 +11,6 @@ import {
   TWO_FACTOR_CHECK,
   TWO_FACTOR_CREATE,
   PASSWORD_CHANGE,
-  MASTER_PASSWORD_CHECK_SHARED,
   MASTER_PASSWORD_CHECK,
   MASTER_PASSWORD_CREATE,
   BOOTSTRAP_FINISH,
@@ -20,11 +19,7 @@ import { TwoFactorStep, PasswordStep, MasterPasswordStep } from './Steps';
 
 const TWO_FACTOR_STEPS = [TWO_FACTOR_CREATE, TWO_FACTOR_CHECK];
 const PASSWORD_STEPS = [PASSWORD_CHANGE];
-const MASTER_PASSWORD_STEPS = [
-  MASTER_PASSWORD_CHECK_SHARED,
-  MASTER_PASSWORD_CREATE,
-  MASTER_PASSWORD_CHECK,
-];
+const MASTER_PASSWORD_STEPS = [MASTER_PASSWORD_CREATE, MASTER_PASSWORD_CHECK];
 
 const bootstrapStates = bootstrap => ({
   twoFactorAuthState: `TWO_FACTOR_${bootstrap.twoFactorAuthState}`,
@@ -165,7 +160,6 @@ class Bootstrap extends Component {
         <MasterPasswordStep
           initialStep={currentStep}
           sharedMasterPassword={this.sharedData.masterPassword}
-          isAnonymous={this.sharedData.isAnonymous}
           onFinish={this.handleFinishMasterPassword}
         />
       );

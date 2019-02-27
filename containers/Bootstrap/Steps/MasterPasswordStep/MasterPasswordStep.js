@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import styled from 'styled-components';
+import Cookies from 'js-cookie';
 import { getKeys, postKeys } from 'common/api';
 import { matchStrict } from 'common/utils/match';
 import {
@@ -9,12 +10,10 @@ import {
 } from 'common/utils/key';
 import { AuthLayout, WrapperAlignTop } from 'components';
 import {
-  MASTER_PASSWORD_CHECK_SHARED,
   MASTER_PASSWORD_CHECK,
   MASTER_PASSWORD_CREATE,
   MASTER_PASSWORD_CONFIRM,
 } from '../../constants';
-import MasterPasswordSharedForm from './MasterPasswordSharedForm';
 import MasterPasswordCheckForm from './MasterPasswordCheckForm';
 import MasterPasswordCreateForm from './MasterPasswordCreateForm';
 import MasterPasswordConfirmForm from './MasterPasswordConfirmForm';
@@ -28,7 +27,7 @@ class MasterPasswordStep extends Component {
   state = this.prepareInitialState();
 
   async componentDidMount() {
-    const { initialStep, sharedMasterPassword, isAnonymous } = this.props;
+    const { initialStep, sharedMasterPassword } = this.props;
 
     const state = {
       step: initialStep,
@@ -37,30 +36,41 @@ class MasterPasswordStep extends Component {
       masterPassword: null,
     };
 
-    if (initialStep !== MASTER_PASSWORD_CREATE) {
+    if (initialStep === MASTER_PASSWORD_CREATE) {
+      // it's readonly situation
+      if (sharedMasterPassword) {
+        const {
+          data: { publicKey, encryptedPrivateKey },
+        } = await getKeys();
+
+        Cookies.remove('share', { path: '/' });
+
+        state.publicKey = publicKey;
+        state.encryptedPrivateKey = encryptedPrivateKey;
+      }
+    }
+
+    if (initialStep === MASTER_PASSWORD_CHECK) {
       const {
         data: { publicKey, encryptedPrivateKey },
       } = await getKeys();
 
       state.publicKey = publicKey;
       state.encryptedPrivateKey = encryptedPrivateKey;
-    }
 
-    if (initialStep === MASTER_PASSWORD_CHECK_SHARED && sharedMasterPassword) {
-      try {
-        await validateKeys(sharedMasterPassword, state.encryptedPrivateKey);
+      // it's anonymous situation
+      if (sharedMasterPassword) {
+        try {
+          await validateKeys(sharedMasterPassword, state.encryptedPrivateKey);
 
-        if (isAnonymous) {
           return this.onFinishMasterPassword(
             state.publicKey,
             state.encryptedPrivateKey,
             sharedMasterPassword,
           );
+        } catch (e) {
+          state.step = MASTER_PASSWORD_CHECK;
         }
-
-        state.step = MASTER_PASSWORD_CREATE;
-      } catch (e) {
-        state.step = MASTER_PASSWORD_CHECK_SHARED;
       }
     }
 
@@ -81,28 +91,6 @@ class MasterPasswordStep extends Component {
       masterPassword,
     });
   }
-
-  handleSubmitSharedPassword = async (
-    { password },
-    { setSubmitting, setErrors },
-  ) => {
-    const { isAnonymous } = this.props;
-    const { publicKey, encryptedPrivateKey } = this.state;
-
-    try {
-      await validateKeys(password, encryptedPrivateKey);
-
-      return isAnonymous
-        ? this.onFinishMasterPassword(publicKey, encryptedPrivateKey, password)
-        : this.setState({
-            step: MASTER_PASSWORD_CREATE,
-            sharedMasterPassword: password,
-          });
-    } catch (e) {
-      setErrors({ password: 'Wrong password' });
-      return setSubmitting(false);
-    }
-  };
 
   handleSubmitCheckPassword = async (
     { password },
@@ -132,8 +120,7 @@ class MasterPasswordStep extends Component {
     { confirmPassword },
     { setSubmitting, setErrors },
   ) => {
-    const { initialStep } = this.props;
-    const { sharedMasterPassword } = this.state;
+    const { sharedMasterPassword } = this.props;
 
     const {
       masterPassword,
@@ -145,14 +132,7 @@ class MasterPasswordStep extends Component {
     let encryptedPrivateKey = currentEncryptedPrivateKey;
 
     try {
-      if (initialStep === MASTER_PASSWORD_CHECK_SHARED) {
-        if (!currentEncryptedPrivateKey || !sharedMasterPassword) {
-          throw new Error(`
-            Master Password step: incorrect behaviour, because for reencryption 
-            private key requires shared master password and private key
-          `);
-        }
-
+      if (sharedMasterPassword) {
         encryptedPrivateKey = await reencryptPrivateKey(
           sharedMasterPassword,
           masterPassword,
@@ -199,11 +179,6 @@ class MasterPasswordStep extends Component {
     const renderedStep = matchStrict(
       step,
       {
-        [MASTER_PASSWORD_CHECK_SHARED]: (
-          <MasterPasswordSharedForm
-            onSubmit={this.handleSubmitSharedPassword}
-          />
-        ),
         [MASTER_PASSWORD_CREATE]: (
           <MasterPasswordCreateForm
             onSubmit={this.handleSubmitCreatePassword}

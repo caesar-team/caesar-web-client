@@ -32,6 +32,7 @@ app.prepare().then(() => {
   server.use(express.static('static'));
   server.get('/logout', (req, res) => {
     res.clearCookie('token');
+    res.clearCookie('share');
     res.redirect('/auth');
   });
 

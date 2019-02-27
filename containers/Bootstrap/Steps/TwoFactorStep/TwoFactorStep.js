@@ -83,7 +83,7 @@ class TwoFactorStep extends Component {
     const { initialStep } = this.props;
 
     return {
-      step: TWO_FACTOR_BACKUPS,
+      step: initialStep,
       code: '',
       qr: '',
     };

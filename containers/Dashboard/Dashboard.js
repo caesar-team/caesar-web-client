@@ -241,14 +241,9 @@ class DashboardContainer extends Component {
   };
 
   handleRemoveItem = async () => {
-    const { workInProgressItem, selectedListId, list } = this.state;
+    const { workInProgressItem, list } = this.state;
 
     const newList = removeNode(list, workInProgressItem.id);
-    const nextWorkInProgressNode = findNode(newList, selectedListId).model;
-    const nextWorkInProgress =
-      nextWorkInProgressNode.children.length > 0
-        ? nextWorkInProgressNode.children[0]
-        : null;
 
     try {
       await removeItem(workInProgressItem.id);
@@ -256,10 +251,7 @@ class DashboardContainer extends Component {
       this.setState(prevState => ({
         ...prevState,
         isVisibleRemoveModal: false,
-        workInProgressItem: {
-          ...nextWorkInProgress,
-          mode: ITEM_REVIEW_MODE,
-        },
+        workInProgressItem: null,
         list: newList,
       }));
     } catch (e) {
@@ -353,7 +345,7 @@ class DashboardContainer extends Component {
         invited: [],
         shared: [],
         tags: [],
-        ownerId: user.id,
+        owner: user,
         secret: item,
         type,
       };
@@ -373,7 +365,7 @@ class DashboardContainer extends Component {
 
   handleFinishEditWorkflow = async ({ listId, attachments, ...secret }) => {
     const { publicKey } = this.props;
-    const { workInProgressItem, user, members } = this.state;
+    const { workInProgressItem, members } = this.state;
 
     try {
       const data = {
@@ -396,6 +388,7 @@ class DashboardContainer extends Component {
       }
 
       const promises = [];
+
       if (isSecretChanged) {
         const options = {
           message: openpgp.message.fromText(JSON.stringify(data)),
@@ -405,39 +398,51 @@ class DashboardContainer extends Component {
         const encrypted = await openpgp.encrypt(options);
         const encryptedItem = encrypted.data;
 
-        const { invited } = workInProgressItem;
+        const { invited, shared } = workInProgressItem;
 
-        if (invited.length === 1) {
-          promises.push(
-            updateItem(workInProgressItem.id, { secret: encryptedItem }),
-          );
-        } else {
-          const invitedMembersIds = workInProgressItem.invited.map(
-            invite => invite.userId,
-          );
-          const invitedMembers = members.filter(({ id }) =>
-            invitedMembersIds.includes(id),
-          );
-          invitedMembers.push({ id: user.id, publicKey });
-          const invitePromises = invitedMembers.map(async member => {
-            const opts = {
-              message: openpgp.message.fromText(JSON.stringify(data)),
-              publicKeys: (await openpgp.key.readArmored(member.publicKey))
-                .keys,
-            };
+        promises.push(
+          updateItem(workInProgressItem.id, { secret: encryptedItem }),
+        );
 
-            return openpgp.encrypt(opts);
-          });
+        const invitedMembersIds = invited.map(({ userId }) => userId);
+        const invitedMemberKeys = members
+          .filter(({ id }) => invitedMembersIds.includes(id))
+          .map(member => member.publicKey);
 
-          const encryptedData = await Promise.all(invitePromises);
+        const sharedUserKeys = shared.map(member => member.publicKey);
 
-          const invites = encryptedData.map((encrypt, index) => ({
-            userId: invitedMembers[index].id,
-            secret: encrypt.data,
-          }));
+        const invitedEncryptedSecrets = await encryptItemForUsers(
+          workInProgressItem.secret,
+          invitedMemberKeys,
+        );
+
+        const sharedEncryptedSecrets = await encryptItemForUsers(
+          workInProgressItem.secret,
+          sharedUserKeys,
+        );
+
+        const invites = invitedEncryptedSecrets.map((encrypt, index) => ({
+          userId: invitedMembersIds[index].id,
+          secret: encrypt.data,
+        }));
+
+        const shares = sharedEncryptedSecrets.map((encrypt, idx) => ({
+          id: shared[idx].id,
+          sharedItems: [{ item: workInProgressItem.id, secret: encrypt }],
+        }));
+
+        if (invites.length) {
           promises.push(
             changeInviteItem(workInProgressItem.id, {
               invites,
+            }),
+          );
+        }
+
+        if (shares.length) {
+          promises.push(
+            updateShares(workInProgressItem.id, {
+              shares,
             }),
           );
         }
@@ -614,8 +619,7 @@ class DashboardContainer extends Component {
   };
 
   inviteNewMembers = async (invitedUserIds, invitedByUserId) => {
-    const { members } = this.props;
-    const { workInProgressItem } = this.state;
+    const { workInProgressItem, members } = this.state;
     const { invited } = workInProgressItem;
     const newInvitedMembers = members.filter(({ id }) =>
       invitedUserIds.includes(id),
@@ -1253,7 +1257,6 @@ class DashboardContainer extends Component {
         )}
         {isVisibleShareModal && (
           <ShareModal
-            members={members}
             shared={workInProgressItem.shared}
             onResend={this.handleResendShare}
             onShare={this.handleShare}

@@ -77,7 +77,7 @@ const Item = ({
   favorite,
   onClickItem = Function.prototype,
 }) => {
-  const shouldShowMembers = invited.length > 1;
+  const shouldShowMembers = !!invited.length;
   const shouldShowAttachments = attachments && attachments.length > 0;
 
   return (
@@ -99,7 +99,7 @@ const Item = ({
             {shouldShowMembers && (
               <StyledBox>
                 <StyledIcon name="group" width={14} height={14} />
-                <Text>{invited.length - 1}</Text>
+                <Text>{invited.length}</Text>
               </StyledBox>
             )}
           </Box>

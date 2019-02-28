@@ -2,7 +2,7 @@ import * as openpgp from 'openpgp';
 import btoa from 'btoa';
 import atob from 'atob';
 import { generateKeys } from 'common/utils/key';
-import { generatePassword } from 'common/utils/password';
+import { generator } from 'common/utils/password';
 import { randomId } from 'common/utils/uuid4';
 
 export const encryptText = async (text, password) => {
@@ -41,8 +41,8 @@ export const encryptItemForUsers = async (secret, keys) =>
   Promise.all(keys.map(async key => await encryptItemForUser(secret, key)));
 
 export const generateUser = async email => {
-  const masterPassword = generatePassword();
-  const password = generatePassword();
+  const masterPassword = generator();
+  const password = generator();
 
   const keys = await generateKeys(masterPassword, email);
 

@@ -1,17 +1,11 @@
 import React, { Component } from 'react';
-import {
-  AuthDescription,
-  AuthTitle,
-  AuthWrapper,
-  Head,
-  WrapperAlignTop,
-} from 'components';
+import { AuthDescription, AuthTitle, Head } from 'components';
 import styled from 'styled-components';
 import { postChangePassword } from 'common/api';
 import { createSrp } from 'common/utils/srp';
 import PasswordForm from './PasswordForm';
 
-const InnerWrapper = styled(WrapperAlignTop)`
+const Wrapper = styled.div`
   max-width: 400px;
   width: 100%;
 `;
@@ -48,14 +42,12 @@ class PasswordStep extends Component {
 
   render() {
     return (
-      <InnerWrapper>
+      <Wrapper>
         <Head title="Enter password which you received" />
-        <AuthWrapper>
-          <AuthTitle>Change Password</AuthTitle>
-          <AuthDescription>Enter and confirm new password</AuthDescription>
-          <PasswordForm onSubmit={this.handleSubmit} />
-        </AuthWrapper>
-      </InnerWrapper>
+        <AuthTitle>Change Password</AuthTitle>
+        <AuthDescription>Enter and confirm new password</AuthDescription>
+        <PasswordForm onSubmit={this.handleSubmit} />
+      </Wrapper>
     );
   }
 }

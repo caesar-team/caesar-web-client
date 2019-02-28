@@ -8,7 +8,7 @@ import {
   generateKeys,
   reencryptPrivateKey,
 } from 'common/utils/key';
-import { WrapperAlignTop, BootstrapWrapper } from 'components';
+import { BootstrapWrapper } from 'components';
 import {
   MASTER_PASSWORD_CHECK,
   MASTER_PASSWORD_CREATE,
@@ -18,7 +18,7 @@ import MasterPasswordCheckForm from './MasterPasswordCheckForm';
 import MasterPasswordCreateForm from './MasterPasswordCreateForm';
 import MasterPasswordConfirmForm from './MasterPasswordConfirmForm';
 
-const InnerWrapper = styled(WrapperAlignTop)`
+const Wrapper = styled.div`
   max-width: 400px;
   width: 100%;
 `;
@@ -199,7 +199,7 @@ class MasterPasswordStep extends Component {
       <MasterPasswordCheckForm onSubmit={this.handleSubmitCheckPassword} />
     ) : (
       <BootstrapWrapper>
-        <InnerWrapper>{renderedStep}</InnerWrapper>
+        <Wrapper>{renderedStep}</Wrapper>
       </BootstrapWrapper>
     );
   }

@@ -5,6 +5,7 @@ import BgRightImg2x from 'static/images/bg-right@2x.jpg';
 import BgLeftImg from 'static/images/bg-left.jpg';
 import BgLeftImg2x from 'static/images/bg-left@2x.jpg';
 import { AuthLayout } from '../Layout';
+import { Icon } from '../Icon';
 
 const BgRightImage = styled.img`
   position: absolute;
@@ -19,6 +20,37 @@ const BgLeftImage = styled.img`
   object-fit: contain;
 `;
 
+const InnerWrapper = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  max-width: 600px;
+  width: 100%;
+`;
+
+const BottomWrapper = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: absolute;
+  bottom: 30px;
+`;
+
+const FourXXIText = styled.div`
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  color: ${({ theme }) => theme.black};
+  margin-left: 10px;
+`;
+
+const FourXXILink = styled.a`
+  text-decoration: underline;
+  font-weight: 600;
+  color: ${({ theme }) => theme.black};
+`;
+
 const BootstrapWrapper = ({ children }) => (
   <AuthLayout>
     <BgRightImage
@@ -29,7 +61,16 @@ const BootstrapWrapper = ({ children }) => (
       src={BgRightImg}
       srcSet={`${BgLeftImg} 1x, ${BgLeftImg2x} 2x`}
     />
-    {children}
+    <InnerWrapper>
+      {children}
+      <BottomWrapper>
+        <Icon name="logo-4xxi" width={20} height={20} />
+        <FourXXIText>
+          Created and supported by{' '}
+          <FourXXILink href="https://4xxi.com/en">4xxi team</FourXXILink>
+        </FourXXIText>
+      </BottomWrapper>
+    </InnerWrapper>
   </AuthLayout>
 );
 

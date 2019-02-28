@@ -1,5 +1,6 @@
 import React, { Component, Fragment } from 'react';
 import styled, { withTheme } from 'styled-components';
+import Router from 'next/router';
 import {
   API_URL,
   APP_URL,
@@ -150,7 +151,7 @@ class AuthContainer extends Component {
 
       const {
         data: { secondMatcher, jwt },
-      } = await postLogin({ email, M1 });
+      } = await postLogin({ email, matcher: M1 });
 
       const clientM2 = srp.generateM2(A, M1, S);
 
@@ -159,6 +160,8 @@ class AuthContainer extends Component {
       }
 
       setToken(jwt);
+
+      Router.push('/');
     } catch (e) {
       setErrors({ email: 'Wrong email', password: 'Wrong password' });
       setSubmitting(false);

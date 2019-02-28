@@ -8,9 +8,9 @@ import {
 import { getTrustedDeviceToken, setToken } from 'common/utils/token';
 import { matchStrict } from 'common/utils/match';
 import {
-  TWO_FACTOR_BACKUPS,
-  TWO_FACTOR_CHECK,
   TWO_FACTOR_CREATE,
+  TWO_FACTOR_CHECK,
+  TWO_FACTOR_BACKUPS,
 } from '../../constants';
 import TwoFactorCreateForm from './TwoFactorCreateForm';
 import TwoFactorCheckForm from './TwoFactorCheckForm';

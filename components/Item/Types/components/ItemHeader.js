@@ -152,7 +152,7 @@ export const ItemHeader = ({
                 icon="trash"
                 onClick={onClickRemoveItem}
               >
-                REMOTE
+                REMOVE
               </ItemButton>
             </ButtonsWrapper>
           ) : (

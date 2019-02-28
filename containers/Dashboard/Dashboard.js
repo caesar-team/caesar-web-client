@@ -363,7 +363,12 @@ class DashboardContainer extends Component {
     }
   };
 
-  handleFinishEditWorkflow = async ({ listId, attachments, ...secret }) => {
+  handleFinishEditWorkflow = async ({
+    listId,
+    attachments,
+    type,
+    ...secret
+  }) => {
     const { publicKey } = this.props;
     const { workInProgressItem, members } = this.state;
 
@@ -422,8 +427,8 @@ class DashboardContainer extends Component {
         );
 
         const invites = invitedEncryptedSecrets.map((encrypt, index) => ({
-          userId: invitedMembersIds[index].id,
-          secret: encrypt.data,
+          userId: invitedMembersIds[index],
+          secret: encrypt,
         }));
 
         const shares = sharedEncryptedSecrets.map((encrypt, idx) => ({
@@ -452,11 +457,7 @@ class DashboardContainer extends Component {
         promises.push(updateMoveItem(workInProgressItem.id, { listId }));
       }
 
-      const [
-        {
-          data: { lastUpdated },
-        },
-      ] = await Promise.all(promises);
+      await Promise.all(promises);
 
       this.setState(prevState => ({
         ...prevState,
@@ -464,14 +465,12 @@ class DashboardContainer extends Component {
         workInProgressItem: {
           ...prevState.workInProgressItem,
           listId,
-          lastUpdated,
           mode: ITEM_REVIEW_MODE,
           secret: data,
         },
         list: replaceNode(
           updateNode(prevState.list, workInProgressItem.id, {
             listId,
-            lastUpdated,
             secret: data,
           }),
           workInProgressItem.id,
@@ -1011,12 +1010,12 @@ class DashboardContainer extends Component {
 
         return {
           id: shareId,
-          sharedItems: [
-            {
-              item: workInProgressItem.id,
-              secret: sharedEncryptedSecrets[idx],
-            },
-          ],
+          // sharedItems: [
+          //   {
+          //     item: workInProgressItem.id,
+          //     secret: sharedEncryptedSecrets[idx],
+          //   },
+          // ],
           link: generateSharingUrl(
             objectToBase64({
               shareId,

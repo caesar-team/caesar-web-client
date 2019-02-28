@@ -62,7 +62,6 @@ const Item = ({
     return <EmptyItem />;
   }
 
-  console.log(item);
   const { mode, type, invited, update, owner, id } = item;
 
   const renderedItemForm = matchStrict(

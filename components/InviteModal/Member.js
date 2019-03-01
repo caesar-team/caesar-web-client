@@ -75,7 +75,7 @@ const Member = ({
     </MemberWrapper>
     {isInvited ? (
       <Fragment>
-        <Checkbox checked={isReadOnly} onChange={onClickPermissionChange}>
+        <Checkbox checked={!!isReadOnly} onChange={onClickPermissionChange}>
           View only
         </Checkbox>
         <IconWrapper isFilled onClick={onClickRemove}>

@@ -80,14 +80,16 @@ class InviteModal extends Component {
     }));
   };
 
-  handlePermissionChange = userId => value => {
+  handlePermissionChange = userId => event => {
+    const { checked } = event.currentTarget;
+
     this.setState(prevState => ({
       ...prevState,
       invited: prevState.invited.reduce((acc, item) => {
         if (item.userId === userId) {
           acc.push({
             ...item,
-            access: value ? PERMISSION_READ : PERMISSION_WRITE,
+            access: checked ? PERMISSION_READ : PERMISSION_WRITE,
           });
         } else {
           acc.push(item);
@@ -126,7 +128,7 @@ class InviteModal extends Component {
     return filteredMembers.map(({ id, ...member }) => {
       const isReadOnly =
         invitesByUserId[id] && invitesByUserId[id].access === PERMISSION_READ;
-      console.log(isReadOnly);
+
       return (
         <Member
           key={id}

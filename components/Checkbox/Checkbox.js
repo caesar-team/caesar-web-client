@@ -40,17 +40,17 @@ const StyledInput = styled.input`
 
 class Checkbox extends Component {
   render() {
-    const { isDisabled, children, value, ...props } = this.props;
+    const { isDisabled, children, checked, ...props } = this.props;
 
     return (
       <StyledLabel isDisabled={isDisabled}>
-        <Box isChecked={!!value}>
+        <Box isChecked={checked}>
           <Icon name="check" isInButton width={14} height={10} />
         </Box>
         <StyledInput
           type="checkbox"
           disabled={isDisabled}
-          value={value}
+          checked={checked}
           {...props}
         />
         {children && <Text isDisabled={isDisabled}>{children}</Text>}

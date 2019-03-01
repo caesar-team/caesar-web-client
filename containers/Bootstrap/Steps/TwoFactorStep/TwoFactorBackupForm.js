@@ -123,7 +123,7 @@ const TwoFactorBackupForm = ({ codes, onSubmit }) => (
           <FastField
             name="agreeCheck"
             render={({ field }) => (
-              <StyledCheckbox {...field}>
+              <StyledCheckbox {...field} checked={field.value}>
                 I have printed or saved these codes
               </StyledCheckbox>
             )}

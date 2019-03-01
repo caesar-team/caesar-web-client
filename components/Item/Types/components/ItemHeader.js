@@ -117,7 +117,7 @@ export const ItemHeader = ({
     lastUpdated,
     invited,
     favorite,
-    ownerId,
+    owner,
     secret: { name },
   },
 }) => {
@@ -126,17 +126,16 @@ export const ItemHeader = ({
       return accumulator;
     }
 
-    if (user.id === item.userId && user.id !== ownerId) {
+    if (user.id === item.userId && user.id !== owner.id) {
       accumulator.unshift(user);
-    } else if (ownerId !== item.userId) {
+    } else if (owner.id !== item.userId) {
       accumulator.push(members[item.userId]);
     }
 
     return accumulator;
   }, []);
-  const hasInvited = invited.length > 1;
-  const isOwner = user.id === ownerId;
-  const owner = isOwner ? user : members[ownerId];
+  const hasInvited = invited.length > 0;
+  const isOwner = user.id === owner.id;
 
   return (
     <Fragment>
@@ -146,20 +145,20 @@ export const ItemHeader = ({
           {isTrashItem ? (
             <ButtonsWrapper>
               <Button color="white" onClick={onClickRestoreItem}>
-                Restore
+                RESTORE
               </Button>
               <ItemButton
                 color="white"
                 icon="trash"
                 onClick={onClickRemoveItem}
               >
-                Remove
+                REMOVE
               </ItemButton>
             </ButtonsWrapper>
           ) : (
             hasWriteAccess && (
               <EditButton color="white" icon="pencil" onClick={onClickEditItem}>
-                Edit
+                EDIT
               </EditButton>
             )
           )}

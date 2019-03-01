@@ -62,7 +62,7 @@ const Item = ({
     return <EmptyItem />;
   }
 
-  const { mode, type, invited, update, ownerId, id } = item;
+  const { mode, type, invited, update, owner, id } = item;
 
   const renderedItemForm = matchStrict(
     type,
@@ -94,12 +94,12 @@ const Item = ({
     (acc, invite) => (invite.userId === user.id ? invite.access : acc),
     null,
   );
-  const hasWriteAccess = ownerId === user.id || access === PERMISSION_WRITE;
+  const hasWriteAccess = owner.id === user.id || access === PERMISSION_WRITE;
   const showReadOnlyNotify = access && !hasWriteAccess;
 
   const renderUpdateNotify = () => {
     const updateUserName =
-      update.userId === ownerId ? user.name : members[update.userId].name;
+      update.userId === owner.id ? user.name : members[update.userId].name;
     const updateDate = formatDate(update.createdAt);
 
     return (

@@ -184,8 +184,6 @@ class ManageListContainer extends Component {
 
     const postList = this.preparePostList();
 
-    console.log(list);
-    console.log(members);
     return (
       <Fragment>
         <Layout user={user}>

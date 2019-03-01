@@ -87,7 +87,7 @@ const TwoFactorCheckForm = ({ allowReturn, onClickReturn, onSubmit }) => (
             <FastField
               name="fpCheck"
               render={({ field }) => (
-                <Checkbox {...field} checked={field.value}>
+                <Checkbox {...field}>
                   Remember device
                 </Checkbox>
               )}

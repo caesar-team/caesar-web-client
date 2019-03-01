@@ -370,7 +370,7 @@ class DashboardContainer extends Component {
     ...secret
   }) => {
     const { publicKey } = this.props;
-    const { workInProgressItem, members } = this.state;
+    const { workInProgressItem, members, user } = this.state;
 
     try {
       const data = {
@@ -405,48 +405,54 @@ class DashboardContainer extends Component {
 
         const { invited, shared } = workInProgressItem;
 
-        promises.push(
-          updateItem(workInProgressItem.id, { secret: encryptedItem }),
-        );
-
-        const invitedMembersIds = invited.map(({ userId }) => userId);
-        const invitedMemberKeys = members
-          .filter(({ id }) => invitedMembersIds.includes(id))
-          .map(member => member.publicKey);
-
-        const sharedUserKeys = shared.map(member => member.publicKey);
-
-        const invitedEncryptedSecrets = await encryptItemForUsers(
-          workInProgressItem.secret,
-          invitedMemberKeys,
-        );
-
-        const sharedEncryptedSecrets = await encryptItemForUsers(
-          workInProgressItem.secret,
-          sharedUserKeys,
-        );
-
-        const invites = invitedEncryptedSecrets.map((encrypt, index) => ({
-          userId: invitedMembersIds[index],
-          secret: encrypt,
-        }));
-
-        const shares = sharedEncryptedSecrets.map((encrypt, idx) => ({
-          id: shared[idx].id,
-          sharedItems: [{ item: workInProgressItem.id, secret: encrypt }],
-        }));
-
-        if (invites.length) {
+        if (!invited.length) {
           promises.push(
-            changeInviteItem(workInProgressItem.id, {
-              invites,
-            }),
+            updateItem(workInProgressItem.id, { secret: encryptedItem }),
           );
+        } else {
+          const invitedMembersIds = invited.map(({ userId }) => userId);
+          const invitedMemberKeys = members
+            .filter(({ id }) => invitedMembersIds.includes(id))
+            .map(member => member.publicKey);
+
+          const invitedEncryptedSecrets = await encryptItemForUsers(
+            data,
+            invitedMemberKeys,
+          );
+
+          const invites = invitedEncryptedSecrets.map((encrypt, index) => ({
+            userId: invitedMembersIds[index],
+            secret: encrypt,
+          }));
+
+          if (invites.length) {
+            promises.push(
+              changeInviteItem(workInProgressItem.id, {
+                invites: [
+                  ...invites,
+                  { userId: user.id, secret: encryptedItem },
+                ],
+              }),
+            );
+          }
         }
 
-        if (shares.length) {
+        if (shared.length) {
+          const sharedUserKeys = shared.map(member => member.publicKey);
+
+          const sharedEncryptedSecrets = await encryptItemForUsers(
+            data,
+            sharedUserKeys,
+          );
+
+          const shares = sharedEncryptedSecrets.map((encrypt, idx) => ({
+            id: shared[idx].id,
+            sharedItems: [{ item: workInProgressItem.id, secret: encrypt }],
+            link: shared[idx].link,
+          }));
+
           promises.push(
-            updateShares(workInProgressItem.id, {
+            updateShares({
               shares,
             }),
           );
@@ -827,7 +833,6 @@ class DashboardContainer extends Component {
 
     await updateShare(shareId, {
       link,
-      sharedItems: [{ item: workInProgressItem.id, secret: encryptedSecret }],
     });
 
     const shared = {
@@ -1010,12 +1015,6 @@ class DashboardContainer extends Component {
 
         return {
           id: shareId,
-          // sharedItems: [
-          //   {
-          //     item: workInProgressItem.id,
-          //     secret: sharedEncryptedSecrets[idx],
-          //   },
-          // ],
           link: generateSharingUrl(
             objectToBase64({
               shareId,

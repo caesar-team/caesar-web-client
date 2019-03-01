@@ -126,6 +126,7 @@ class InviteModal extends Component {
     return filteredMembers.map(({ id, ...member }) => {
       const isReadOnly =
         invitesByUserId[id] && invitesByUserId[id].access === PERMISSION_READ;
+      console.log(isReadOnly);
       return (
         <Member
           key={id}

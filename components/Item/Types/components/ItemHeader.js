@@ -1,6 +1,6 @@
 import React, { Fragment } from 'react';
 import styled from 'styled-components';
-import { formatDate } from 'common/utils/dateFormatter';
+import { formatDate } from 'common/utils/dateUtils';
 import { Icon } from 'components/Icon';
 import { Button } from 'components/Button';
 import { Avatar, AvatarsList } from 'components/Avatar';
@@ -117,22 +117,25 @@ export const ItemHeader = ({
     lastUpdated,
     invited,
     favorite,
-    ownerId,
+    owner,
     secret: { name },
   },
 }) => {
   const avatars = invited.reduce((accumulator, item) => {
-    if (user.id === item.userId && user.id !== ownerId) {
+    if (!members[item.userId]) {
+      return accumulator;
+    }
+
+    if (user.id === item.userId && user.id !== owner.id) {
       accumulator.unshift(user);
-    } else if (ownerId !== item.userId) {
+    } else if (owner.id !== item.userId) {
       accumulator.push(members[item.userId]);
     }
 
     return accumulator;
   }, []);
-  const hasInvited = invited.length > 1;
-  const isOwner = user.id === ownerId;
-  const owner = isOwner ? user : members[ownerId];
+  const hasInvited = invited.length > 0;
+  const isOwner = user.id === owner.id;
 
   return (
     <Fragment>
@@ -142,20 +145,20 @@ export const ItemHeader = ({
           {isTrashItem ? (
             <ButtonsWrapper>
               <Button color="white" onClick={onClickRestoreItem}>
-                Restore
+                RESTORE
               </Button>
               <ItemButton
                 color="white"
                 icon="trash"
                 onClick={onClickRemoveItem}
               >
-                Remove
+                REMOVE
               </ItemButton>
             </ButtonsWrapper>
           ) : (
             hasWriteAccess && (
               <EditButton color="white" icon="pencil" onClick={onClickEditItem}>
-                Edit
+                EDIT
               </EditButton>
             )
           )}
@@ -192,8 +195,7 @@ export const ItemHeader = ({
             )}
           <StyledAvatarsList avatars={avatars} />
           {!isTrashItem &&
-            isOwner &&
-            false && (
+            isOwner && (
               <ShareButton icon="share" color="black" onClick={onClickShare}>
                 Share
               </ShareButton>

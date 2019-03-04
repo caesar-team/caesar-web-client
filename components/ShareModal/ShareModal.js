@@ -1,20 +1,40 @@
-import React, { Component } from 'react';
+import React, { Component, Fragment } from 'react';
 import styled from 'styled-components';
-import TagsInput from 'react-tagsinput';
 import Toggle from 'react-toggle';
-import { Icon, Modal, ModalTitle, Button } from 'components';
-import 'common/styles/react-tagsinput.css';
+import {
+  Icon,
+  Modal,
+  ModalTitle,
+  Button,
+  Checkbox,
+  ShareInput,
+  TextWithLines,
+} from 'components';
+import {
+  ANONYMOUS_USER_ROLE,
+  SHARED_ACCEPTED_STATUS,
+  SHARED_WAITING_STATUS,
+  APP_URL,
+} from 'common/constants';
+import { formatDate, dateDiffNow } from 'common/utils/dateUtils';
+import { copyToClipboard } from 'common/utils/clipboard';
+import { base64ToObject, objectToBase64 } from 'common/utils/cipherUtils';
+import { generateSharingUrl } from 'common/utils/sharing';
 import 'common/styles/react-toggle.css';
 
 const ModalDescription = styled.div`
   padding-bottom: 20px;
   text-align: center;
   font-size: 14px;
-  color: ${({ theme }) => theme.emperor};
+  color: ${({ theme }) => theme.black};
 `;
 
 const Row = styled.div`
   margin-bottom: 20px;
+`;
+
+const LinkRow = styled.div`
+  margin-top: 20px;
 `;
 
 const ToggleLabel = styled.label`
@@ -25,12 +45,6 @@ const ToggleLabel = styled.label`
 const ToggleLabelText = styled.span`
   padding-left: 10px;
   font-size: 14px;
-`;
-
-const SharedListTitle = styled.div`
-  font-size: 18px;
-  color: ${({ theme }) => theme.emperor};
-  padding-bottom: 3px;
 `;
 
 const SharedList = styled.div`
@@ -49,6 +63,7 @@ const SharedItem = styled.div`
     margin-bottom: 0;
   }
 `;
+
 const SharedItemEmail = styled.div`
   margin-right: auto;
   font-size: 16px;
@@ -88,30 +103,254 @@ const StyledButton = styled(Button)`
   text-transform: uppercase;
 `;
 
-export class ShareModal extends Component {
-  state = {
-    shareByLinkIsShown: false,
-    tags: [],
-  };
+const SharedLinkWrapper = styled.div`
+  max-width: 100%;
+  padding: 20px;
+  background-color: ${({ theme }) => theme.snow};
+  border-radius: 3px;
+`;
 
-  handleChange = tags => {
-    this.setState({ tags });
-  };
+const SharedLink = styled.div`
+  position: relative;
+  padding: 15px 20px;
+  background-color: ${({ theme }) => theme.white};
+  border: 1px solid ${({ theme }) => theme.gallery};
+  border-radius: 3px;
+  word-break: break-all;
+  white-space: pre-wrap;
+`;
+
+const StyledIcon = styled(Icon)`
+  fill: ${({ theme }) => theme.gray};
+`;
+
+const SharedLinkActions = styled.div`
+  display: flex;
+  align-items: center;
+  padding-top: 20px;
+`;
+
+const SharedLinkActionsButtons = styled.div`
+  display: flex;
+  margin-left: auto;
+`;
+
+const SharedLinkActionsButton = styled(Button)`
+  text-transform: uppercase;
+  margin-left: 20px;
+`;
+
+const EmailBox = styled(SharedItem)`
+  background-color: ${({ theme }) => theme.lightBlue};
+`;
+
+const LeftTime = styled.div`
+  font-size: 14px;
+  letter-spacing: 0.4px;
+  color: ${({ theme }) => theme.gray};
+  margin: 0 20px 0 10px;
+`;
+
+const ResendLink = styled.a`
+  font-size: 14px;
+  letter-spacing: 0.4px;
+  text-decoration: underline;
+  cursor: pointer;
+`;
+
+const getEncryption = link => link.replace(`${APP_URL}/share/`, '');
+const getAnonymousLink = shared =>
+  (shared.find(({ roles }) => roles.includes(ANONYMOUS_USER_ROLE)) || {}).link;
+
+export class ShareModal extends Component {
+  state = this.prepareInitialState();
 
   handleShareByLinkChange = () => {
+    const {
+      shared,
+      onActivateSharedByLink,
+      onDeactivateSharedByLink,
+    } = this.props;
+
+    const link = getAnonymousLink(shared);
+
+    if (!link) {
+      onActivateSharedByLink();
+    } else {
+      onDeactivateSharedByLink();
+    }
+  };
+
+  handleToggleSeparateLink = () => {
     this.setState(prevState => ({
-      shareByLinkIsShown: !prevState.shareByLinkIsShown,
+      isUseMasterPassword: !prevState.isUseMasterPassword,
     }));
   };
 
+  handleCopySharedLink = () => {
+    const { isUseMasterPassword } = this.state;
+    const { notification, shared } = this.props;
+
+    copyToClipboard(
+      this.generateLinkText(getAnonymousLink(shared), isUseMasterPassword),
+    );
+
+    notification.show({
+      text: `Shared link has copied.`,
+    });
+  };
+
+  handleShare = () => {
+    const { onShare } = this.props;
+    const { emails } = this.state;
+
+    return onShare && onShare(emails);
+  };
+
+  handleAddEmail = email => {
+    this.setState(prevState => ({
+      emails: [...prevState.emails, email],
+    }));
+  };
+
+  handleRemoveEmail = email => () => {
+    this.setState(prevState => ({
+      emails: prevState.emails.filter(oldEmail => oldEmail !== email),
+    }));
+  };
+
+  generateLinkText(link, isUseMasterPassword) {
+    const linkObj = base64ToObject(getEncryption(link));
+
+    if (!isUseMasterPassword) {
+      return link;
+    }
+
+    const { masterPassword, ...linkData } = linkObj;
+
+    return `${generateSharingUrl(
+      objectToBase64(linkData),
+    )}\nMaster password: ${masterPassword}`;
+  }
+
+  prepareInitialState() {
+    return {
+      emails: [],
+      isUseMasterPassword: false,
+    };
+  }
+
+  renderEmails() {
+    const { emails } = this.state;
+
+    return emails.map((email, index) => (
+      <EmailBox key={index}>
+        <SharedItemEmail>{email}</SharedItemEmail>
+        <SharedItemRemove>
+          <Icon
+            name="close"
+            width={14}
+            height={14}
+            isInButton
+            onClick={this.handleRemoveEmail(email)}
+          />
+        </SharedItemRemove>
+      </EmailBox>
+    ));
+  }
+
+  renderWaitingUsers() {
+    const { shared, onRemove, onResend } = this.props;
+
+    const waitingList = shared.filter(
+      ({ roles, status }) =>
+        status === SHARED_WAITING_STATUS &&
+        !roles.includes(ANONYMOUS_USER_ROLE),
+    );
+
+    if (!waitingList.length) {
+      return null;
+    }
+
+    const renderedUsers = waitingList.map(({ id, email, left = 0 }) => (
+      <SharedItem key={id}>
+        <SharedItemEmail>{email}</SharedItemEmail>
+        <StyledIcon name="history" width={16} height={14} />
+        <LeftTime>Left: {left} h</LeftTime>
+        <ResendLink onClick={onResend(id)}>Resend</ResendLink>
+        <SharedItemRemove>
+          <Icon
+            name="close"
+            width={14}
+            height={14}
+            isInButton
+            onClick={onRemove(id)}
+          />
+        </SharedItemRemove>
+      </SharedItem>
+    ));
+
+    return (
+      <Fragment>
+        <TextWithLines>Waiting ({waitingList.length})</TextWithLines>
+        <SharedList>{renderedUsers}</SharedList>
+      </Fragment>
+    );
+  }
+
+  renderSharedUsers() {
+    const { shared, onRemove } = this.props;
+
+    const acceptedList = shared.filter(
+      ({ status, roles }) =>
+        status === SHARED_ACCEPTED_STATUS &&
+        !roles.includes(ANONYMOUS_USER_ROLE),
+    );
+
+    if (!acceptedList.length) {
+      return null;
+    }
+
+    const renderedUsers = acceptedList.map(
+      ({ id, email, createdAt, updatedAt }) => (
+        <SharedItem key={id}>
+          <SharedItemEmail>{email}</SharedItemEmail>
+          <SharedItemDate>{formatDate(createdAt || updatedAt)}</SharedItemDate>
+          <SharedItemRemove>
+            <Icon
+              name="close"
+              width={14}
+              height={14}
+              isInButton
+              onClick={onRemove(id)}
+            />
+          </SharedItemRemove>
+        </SharedItem>
+      ),
+    );
+
+    return (
+      <Fragment>
+        <TextWithLines>Shared ({acceptedList.length})</TextWithLines>
+        <SharedList>{renderedUsers}</SharedList>
+      </Fragment>
+    );
+  }
+
   render() {
-    const { onCancel } = this.props;
-    const { tags, shareByLinkIsShown } = this.state;
+    const { isUseMasterPassword } = this.state;
+    const { onCancel, shared } = this.props;
+
+    const link = getAnonymousLink(shared);
+    const switcherText = link ? 'Link access enabled' : 'Link access disabled';
+    const linkText = link
+      ? this.generateLinkText(link, isUseMasterPassword)
+      : '';
 
     return (
       <Modal
         isOpen
-        minWidth={560}
+        width={640}
         onRequestClose={onCancel}
         shouldCloseOnEsc
         shouldCloseOnOverlayClick
@@ -121,58 +360,55 @@ export class ShareModal extends Component {
           Share item will be available in read mode
         </ModalDescription>
         <Row>
-          <TagsInput
-            value={tags}
-            onChange={this.handleChange}
-            inputProps={{ placeholder: 'Enter email addresses…' }}
-          />
+          <ShareInput onChange={this.handleAddEmail} />
         </Row>
-        <Row>
+        {this.renderEmails()}
+        {this.renderWaitingUsers()}
+        {this.renderSharedUsers()}
+        <LinkRow>
           <ToggleLabel>
             <Toggle
-              defaultChecked={shareByLinkIsShown}
+              checked={!!link}
               icons={false}
               onChange={this.handleShareByLinkChange}
             />
-            <ToggleLabelText>Enable access via link</ToggleLabelText>
+            <ToggleLabelText>{switcherText}</ToggleLabelText>
           </ToggleLabel>
-        </Row>
-        <SharedListTitle>Shared with </SharedListTitle>
-        <SharedList>
-          <SharedItem>
-            <SharedItemEmail>ajackson@gmail.com</SharedItemEmail>
-            <SharedItemDate>Nov 16, 2018 02:00 PM</SharedItemDate>
-            <SharedItemRemove>
-              <Icon name="close" width={14} height={14} isInButton />
-            </SharedItemRemove>
-          </SharedItem>
-          <SharedItem>
-            <SharedItemEmail>ajackson@gmail.com</SharedItemEmail>
-            <SharedItemDate>Nov 16, 2018 02:00 PM</SharedItemDate>
-            <SharedItemRemove>
-              <Icon name="close" width={14} height={14} isInButton />
-            </SharedItemRemove>
-          </SharedItem>
-          <SharedItem>
-            <SharedItemEmail>ajackson@gmail.com</SharedItemEmail>
-            <SharedItemDate>Nov 16, 2018 02:00 PM</SharedItemDate>
-            <SharedItemRemove>
-              <Icon name="close" width={14} height={14} isInButton />
-            </SharedItemRemove>
-          </SharedItem>
-          <SharedItem>
-            <SharedItemEmail>ajackson@gmail.com</SharedItemEmail>
-            <SharedItemDate>Nov 16, 2018 02:00 PM</SharedItemDate>
-            <SharedItemRemove>
-              <Icon name="close" width={14} height={14} isInButton />
-            </SharedItemRemove>
-          </SharedItem>
-        </SharedList>
+        </LinkRow>
+        {link && (
+          <Row>
+            <SharedLinkWrapper>
+              <SharedLink>{linkText}</SharedLink>
+              <SharedLinkActions>
+                <Checkbox
+                  checked={isUseMasterPassword}
+                  onChange={this.handleToggleSeparateLink}
+                >
+                  Use master password
+                </Checkbox>
+                <SharedLinkActionsButtons>
+                  {/* <SharedLinkActionsButton color="white" icon="mail"> */}
+                  {/* Send email */}
+                  {/* </SharedLinkActionsButton> */}
+                  <SharedLinkActionsButton
+                    color="white"
+                    icon="copy"
+                    onClick={this.handleCopySharedLink}
+                  >
+                    Copy
+                  </SharedLinkActionsButton>
+                </SharedLinkActionsButtons>
+              </SharedLinkActions>
+            </SharedLinkWrapper>
+          </Row>
+        )}
         <ButtonsWrapper>
           <StyledButton color="white" onClick={onCancel}>
             Cancel
           </StyledButton>
-          <StyledButton color="black">Share</StyledButton>
+          <StyledButton color="black" onClick={this.handleShare}>
+            Done
+          </StyledButton>
         </ButtonsWrapper>
       </Modal>
     );

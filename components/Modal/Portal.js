@@ -35,7 +35,7 @@ const ContentWrapper = styled.div`
   outline: none;
   padding: 30px 40px 40px;
 
-  ${({ minWidth }) => minWidth && `min-width: ${minWidth}px`};
+  ${({ width }) => width && `width: ${width}px`};
 `;
 
 class Portal extends Component {
@@ -46,8 +46,6 @@ class Portal extends Component {
   };
 
   shouldClose = null;
-
-  overlayRef = createRef();
 
   contentRef = createRef();
 
@@ -76,10 +74,6 @@ class Portal extends Component {
   componentWillUnmount() {
     this.afterClose();
   }
-
-  setOverlayRef = ref => {
-    this.overlayRef = ref;
-  };
 
   setContentRef = ref => {
     this.contentRef = ref;
@@ -197,7 +191,6 @@ class Portal extends Component {
 
     return (
       <Overlay
-        ref={this.setOverlayRef}
         onClick={this.handleClickOverlay}
         onMouseDown={this.handleMouseDownOverlay}
       >

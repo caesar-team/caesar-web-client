@@ -18,24 +18,11 @@ const express = require('express');
 const next = require('next');
 const cookieParser = require('cookie-parser');
 const helmet = require('helmet');
-const atob = require('atob');
 
 const dev = process.env.NODE_ENV !== 'production';
 const app = next({ dev });
 const port = process.env.APP_PORT;
 const handle = app.getRequestHandler();
-
-const jwtParse = token => {
-  if (!token) return null;
-
-  const base64Url = token.split('.')[1];
-  const base64 = base64Url.replace('-', '+').replace('_', '/');
-  try {
-    return JSON.parse(atob(base64));
-  } catch (ex) {
-    return null;
-  }
-};
 
 app.prepare().then(() => {
   const server = express();
@@ -45,19 +32,23 @@ app.prepare().then(() => {
   server.use(express.static('static'));
   server.get('/logout', (req, res) => {
     res.clearCookie('token');
+    res.clearCookie('share');
     res.redirect('/auth');
   });
 
   server.get('/check_auth', (req, res) => {
     const token = req.query && req.query.jwt;
-    const parsedToken = jwtParse(token);
+
     if (token) {
-      const path = parsedToken['2fa'] ? '/2fa?isCheck=true' : '/';
       res.cookie('token', token, { path: '/' });
-      res.redirect(path);
+      res.redirect('/');
     } else {
       res.redirect('/auth');
     }
+  });
+
+  server.get('/share/:encryption', (req, res) => {
+    app.render(req, res, '/share', { encryption: req.params.encryption });
   });
 
   server.get('/', (req, res) => {

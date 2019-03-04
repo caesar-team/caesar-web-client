@@ -21,6 +21,15 @@ import {
   updateNode,
   removeNode,
 } from 'common/utils/tree';
+import { createSrp } from 'common/utils/srp';
+import { generateSharingUrl } from 'common/utils/sharing';
+import {
+  encryptItemForUser,
+  encryptItemForUsers,
+  generateUser,
+  generateAnonymousEmail,
+  objectToBase64,
+} from 'common/utils/cipherUtils';
 import {
   ROOT_TYPE,
   INBOX_TYPE,
@@ -30,6 +39,12 @@ import {
   ITEM_REVIEW_MODE,
   ITEM_WORKFLOW_CREATE_MODE,
   ITEM_WORKFLOW_EDIT_MODE,
+  PERMISSION_READ,
+  INVITE_TYPE,
+  SHARE_TYPE,
+  READ_ONLY_USER_ROLE,
+  ANONYMOUS_USER_ROLE,
+  SHARED_WAITING_STATUS,
 } from 'common/constants';
 import {
   postCreateItem,
@@ -42,6 +57,16 @@ import {
   deleteInviteItem,
   changeInviteItem,
   acceptUpdateItem,
+  getPublicKeyByEmail,
+  postNewUser,
+  postShare,
+  postShares,
+  updateShares,
+  deleteShare,
+  updateShare,
+  getList,
+  getUserSelf,
+  getUsers,
 } from 'common/api';
 import DecryptWorker from 'common/decrypt.worker';
 import { initialItemData } from './utils';
@@ -69,9 +94,10 @@ const Sidebar = styled.aside`
   border-right: 1px solid ${({ theme }) => theme.gallery};
 `;
 
+const srp = createSrp();
+
 // TODO: add helper method for update and replace node after any changing
 // TODO: add helper method for construct workInProgressPost from parts
-
 const getListWithoutChildren = list => ({ ...list, children: [] });
 
 class DashboardContainer extends Component {
@@ -81,18 +107,38 @@ class DashboardContainer extends Component {
     list.reduce((acc, item) => ({ ...acc, [item.id]: item }), {}),
   );
 
-  componentDidMount() {
+  async componentDidMount() {
     this.worker = new DecryptWorker();
+
+    const { data: list } = await getList();
+    const { data: user } = await getUserSelf();
+    const { data: members } = await getUsers();
 
     this.worker.addEventListener('message', this.handleWorkerMessage);
 
     this.worker.postMessage({
       event: 'toDecryptList',
       data: {
-        list: this.props.list,
+        list,
         privateKey: this.props.privateKey,
         password: this.props.password,
       },
+    });
+
+    const root = {
+      type: ROOT_TYPE,
+      children: [
+        getListWithoutChildren(list[0]),
+        { ...list[1], children: list[1].children.map(getListWithoutChildren) },
+        getListWithoutChildren(list[2]),
+      ],
+    };
+
+    this.setState({
+      user,
+      members,
+      list: createTree(root),
+      selectedListId: list[0].id,
     });
   }
 
@@ -195,14 +241,9 @@ class DashboardContainer extends Component {
   };
 
   handleRemoveItem = async () => {
-    const { workInProgressItem, selectedListId, list } = this.state;
+    const { workInProgressItem, list } = this.state;
 
     const newList = removeNode(list, workInProgressItem.id);
-    const nextWorkInProgressNode = findNode(newList, selectedListId).model;
-    const nextWorkInProgress =
-      nextWorkInProgressNode.children.length > 0
-        ? nextWorkInProgressNode.children[0]
-        : null;
 
     try {
       await removeItem(workInProgressItem.id);
@@ -210,10 +251,7 @@ class DashboardContainer extends Component {
       this.setState(prevState => ({
         ...prevState,
         isVisibleRemoveModal: false,
-        workInProgressItem: {
-          ...nextWorkInProgress,
-          mode: ITEM_REVIEW_MODE,
-        },
+        workInProgressItem: null,
         list: newList,
       }));
     } catch (e) {
@@ -272,7 +310,8 @@ class DashboardContainer extends Component {
     type,
     ...secret
   }) => {
-    const { publicKey, user } = this.props;
+    const { publicKey } = this.props;
+    const { user } = this.state;
 
     try {
       const item = {
@@ -304,8 +343,9 @@ class DashboardContainer extends Component {
         lastUpdated,
         favorite: false,
         invited: [],
+        shared: [],
         tags: [],
-        ownerId: user.id,
+        owner: user,
         secret: item,
         type,
       };
@@ -323,9 +363,14 @@ class DashboardContainer extends Component {
     }
   };
 
-  handleFinishEditWorkflow = async ({ listId, attachments, ...secret }) => {
-    const { publicKey, members, user } = this.props;
-    const { workInProgressItem } = this.state;
+  handleFinishEditWorkflow = async ({
+    listId,
+    attachments,
+    type,
+    ...secret
+  }) => {
+    const { publicKey } = this.props;
+    const { workInProgressItem, members, user } = this.state;
 
     try {
       const data = {
@@ -348,6 +393,7 @@ class DashboardContainer extends Component {
       }
 
       const promises = [];
+
       if (isSecretChanged) {
         const options = {
           message: openpgp.message.fromText(JSON.stringify(data)),
@@ -357,39 +403,57 @@ class DashboardContainer extends Component {
         const encrypted = await openpgp.encrypt(options);
         const encryptedItem = encrypted.data;
 
-        const { invited } = workInProgressItem;
+        const { invited, shared } = workInProgressItem;
 
-        if (invited.length === 1) {
+        if (!invited.length) {
           promises.push(
             updateItem(workInProgressItem.id, { secret: encryptedItem }),
           );
         } else {
-          const invitedMembersIds = workInProgressItem.invited.map(
-            invite => invite.userId,
+          const invitedMembersIds = invited.map(({ userId }) => userId);
+          const invitedMemberKeys = members
+            .filter(({ id }) => invitedMembersIds.includes(id))
+            .map(member => member.publicKey);
+
+          const invitedEncryptedSecrets = await encryptItemForUsers(
+            data,
+            invitedMemberKeys,
           );
-          const invitedMembers = members.filter(({ id }) =>
-            invitedMembersIds.includes(id),
-          );
-          invitedMembers.push({ id: user.id, publicKey });
-          const invitePromises = invitedMembers.map(async member => {
-            const opts = {
-              message: openpgp.message.fromText(JSON.stringify(data)),
-              publicKeys: (await openpgp.key.readArmored(member.publicKey))
-                .keys,
-            };
 
-            return openpgp.encrypt(opts);
-          });
-
-          const encryptedData = await Promise.all(invitePromises);
-
-          const invites = encryptedData.map((encrypt, index) => ({
-            userId: invitedMembers[index].id,
-            secret: encrypt.data,
+          const invites = invitedEncryptedSecrets.map((encrypt, index) => ({
+            userId: invitedMembersIds[index],
+            secret: encrypt,
           }));
+
+          if (invites.length) {
+            promises.push(
+              changeInviteItem(workInProgressItem.id, {
+                invites: [
+                  ...invites,
+                  { userId: user.id, secret: encryptedItem },
+                ],
+              }),
+            );
+          }
+        }
+
+        if (shared.length) {
+          const sharedUserKeys = shared.map(member => member.publicKey);
+
+          const sharedEncryptedSecrets = await encryptItemForUsers(
+            data,
+            sharedUserKeys,
+          );
+
+          const shares = sharedEncryptedSecrets.map((encrypt, idx) => ({
+            id: shared[idx].id,
+            sharedItems: [{ item: workInProgressItem.id, secret: encrypt }],
+            link: shared[idx].link,
+          }));
+
           promises.push(
-            changeInviteItem(workInProgressItem.id, {
-              invites,
+            updateShares({
+              shares,
             }),
           );
         }
@@ -399,11 +463,7 @@ class DashboardContainer extends Component {
         promises.push(updateMoveItem(workInProgressItem.id, { listId }));
       }
 
-      const [
-        {
-          data: { lastUpdated },
-        },
-      ] = await Promise.all(promises);
+      await Promise.all(promises);
 
       this.setState(prevState => ({
         ...prevState,
@@ -411,14 +471,12 @@ class DashboardContainer extends Component {
         workInProgressItem: {
           ...prevState.workInProgressItem,
           listId,
-          lastUpdated,
           mode: ITEM_REVIEW_MODE,
           secret: data,
         },
         list: replaceNode(
           updateNode(prevState.list, workInProgressItem.id, {
             listId,
-            lastUpdated,
             secret: data,
           }),
           workInProgressItem.id,
@@ -566,8 +624,7 @@ class DashboardContainer extends Component {
   };
 
   inviteNewMembers = async (invitedUserIds, invitedByUserId) => {
-    const { members } = this.props;
-    const { workInProgressItem } = this.state;
+    const { workInProgressItem, members } = this.state;
     const { invited } = workInProgressItem;
     const newInvitedMembers = members.filter(({ id }) =>
       invitedUserIds.includes(id),
@@ -741,6 +798,321 @@ class DashboardContainer extends Component {
     }
   };
 
+  handleActivateShareByLink = async () => {
+    const { workInProgressItem } = this.state;
+
+    const email = generateAnonymousEmail();
+
+    const {
+      userId,
+      password,
+      masterPassword,
+      publicKey,
+    } = await this.createUser(email, ANONYMOUS_USER_ROLE);
+
+    const encryptedSecret = await encryptItemForUser(
+      workInProgressItem.secret,
+      publicKey,
+    );
+
+    const {
+      data: { id: shareId },
+    } = await postShare({
+      user: userId,
+      sharedItems: [{ item: workInProgressItem.id, secret: encryptedSecret }],
+    });
+
+    const link = generateSharingUrl(
+      objectToBase64({
+        shareId,
+        email,
+        password,
+        masterPassword,
+      }),
+    );
+
+    await updateShare(shareId, {
+      link,
+    });
+
+    const shared = {
+      id: shareId,
+      userId,
+      email,
+      link,
+      status: SHARED_WAITING_STATUS,
+      roles: [ANONYMOUS_USER_ROLE],
+    };
+
+    const data = {
+      ...workInProgressItem,
+      shared: [...workInProgressItem.shared, shared],
+    };
+
+    this.setState(prevState => ({
+      ...prevState,
+      workInProgressItem: data,
+      list: updateNode(prevState.list, workInProgressItem.id, data),
+    }));
+  };
+
+  handleDeactivateShareByLink = async () => {
+    const {
+      workInProgressItem: { shared },
+    } = this.state;
+
+    const anonymousShare = shared.find(({ roles }) =>
+      roles.includes(ANONYMOUS_USER_ROLE),
+    );
+
+    const updatedShared = shared.filter(({ id }) => id !== anonymousShare.id);
+
+    try {
+      await deleteShare(anonymousShare.id);
+
+      this.setState(prevState => ({
+        ...prevState,
+        workInProgressItem: {
+          ...prevState.workInProgressItem,
+          shared: updatedShared,
+        },
+        list: updateNode(prevState.list, prevState.workInProgressItem.id, {
+          shared: updatedShared,
+        }),
+      }));
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  createUser = async (email, role) => {
+    try {
+      const {
+        password,
+        masterPassword,
+        publicKey,
+        privateKey,
+      } = await generateUser(email);
+
+      const seed = srp.getRandomSeed();
+      const verifier = srp.generateV(srp.generateX(seed, email, password));
+
+      const data = {
+        email,
+        plainPassword: password,
+        publicKey,
+        encryptedPrivateKey: privateKey,
+        seed,
+        verifier,
+        roles: [role],
+      };
+
+      const {
+        data: { user: userId },
+      } = await postNewUser(data);
+
+      return {
+        userId,
+        password,
+        masterPassword,
+        publicKey,
+        privateKey,
+        email,
+      };
+    } catch (e) {
+      console.log(e || e.response);
+      return null;
+    }
+  };
+
+  userResolver = async email => {
+    try {
+      const {
+        data: { userId, publicKey },
+      } = await getPublicKeyByEmail(email);
+
+      return { userId, publicKey, type: INVITE_TYPE };
+    } catch (e) {
+      const {
+        userId,
+        password,
+        masterPassword,
+        publicKey,
+      } = await this.createUser(email, READ_ONLY_USER_ROLE);
+
+      return {
+        userId,
+        email,
+        password,
+        masterPassword,
+        publicKey,
+        type: SHARE_TYPE,
+      };
+    }
+  };
+
+  handleShare = async emails => {
+    if (!emails.length) {
+      return this.setState({
+        isVisibleShareModal: false,
+      });
+    }
+
+    const { workInProgressItem } = this.state;
+
+    const promises = await emails.map(this.userResolver);
+    const response = await Promise.all(promises);
+
+    const itemInvitedUsers = workInProgressItem.invited.map(
+      ({ userId }) => userId,
+    );
+
+    const users = response.filter(
+      user => !!user && !itemInvitedUsers.includes(user.userId),
+    );
+    const invitedUsers = users.filter(({ type }) => type === INVITE_TYPE);
+    const sharedUsers = users.filter(({ type }) => type === SHARE_TYPE);
+
+    const invitedUserKeys = invitedUsers.map(({ publicKey }) => publicKey);
+    const sharedUserKeys = sharedUsers.map(({ publicKey }) => publicKey);
+
+    const invitedEncryptedSecrets = await encryptItemForUsers(
+      workInProgressItem.secret,
+      invitedUserKeys,
+    );
+
+    const sharedEncryptedSecrets = await encryptItemForUsers(
+      workInProgressItem.secret,
+      sharedUserKeys,
+    );
+
+    const invites = invitedEncryptedSecrets.map((secret, idx) => ({
+      secret,
+      userId: invitedUsers[idx].userId,
+      access: PERMISSION_READ,
+    }));
+
+    const shares = sharedEncryptedSecrets.map((secret, idx) => ({
+      user: sharedUsers[idx].userId,
+      sharedItems: [{ item: workInProgressItem.id, secret }],
+    }));
+
+    let invited = [];
+    let shared = [];
+
+    if (invites.length) {
+      const { data } = await postInviteItem(workInProgressItem.id, { invites });
+
+      invited = data;
+    }
+
+    if (shares.length) {
+      const { data: newShares } = await postShares({ shares });
+
+      const updatedShares = sharedEncryptedSecrets.map((secret, idx) => {
+        const { email, password, masterPassword } = sharedUsers[idx];
+        const { id: shareId } = newShares[idx];
+
+        return {
+          id: shareId,
+          link: generateSharingUrl(
+            objectToBase64({
+              shareId,
+              email,
+              password,
+              masterPassword,
+            }),
+          ),
+        };
+      });
+
+      const { data: updatedShared } = await updateShares({
+        shares: updatedShares,
+      });
+
+      shared = updatedShared.map(({ id, updatedAt, createdAt }, idx) => {
+        const { link } = updatedShares[idx];
+        const { userId, email } = sharedUsers[idx];
+        const status = SHARED_WAITING_STATUS;
+
+        return {
+          id,
+          userId,
+          email,
+          link,
+          status,
+          updatedAt,
+          createdAt,
+          roles: [READ_ONLY_USER_ROLE],
+        };
+      });
+    }
+
+    const data = {
+      ...workInProgressItem,
+      invited: [...workInProgressItem.invited, ...invited],
+      shared: [...workInProgressItem.shared, ...shared],
+    };
+
+    return this.setState(prevState => ({
+      ...prevState,
+      workInProgressItem: data,
+      isVisibleShareModal: false,
+      list: updateNode(prevState.list, workInProgressItem.id, data),
+    }));
+  };
+
+  handleRemoveShare = id => async () => {
+    const { workInProgressItem } = this.state;
+
+    try {
+      await deleteShare(id);
+
+      const updatedShares = workInProgressItem.shared.filter(
+        ({ id: shareId }) => shareId !== id,
+      );
+
+      const data = {
+        ...workInProgressItem,
+        shared: updatedShares,
+      };
+
+      this.setState(prevState => ({
+        ...prevState,
+        workInProgressItem: data,
+        list: updateNode(prevState.list, workInProgressItem.id, data),
+      }));
+    } catch (e) {
+      console.log(e.response);
+    }
+  };
+
+  handleResendShare = shareId => async () => {
+    const { workInProgressItem } = this.state;
+
+    const share = workInProgressItem.shared.find(({ id }) => id === shareId);
+
+    const { data } = await updateShare(shareId, { link: share.link });
+
+    const shared = workInProgressItem.shared.map(
+      shareItem =>
+        shareItem.id === shareId
+          ? { ...shareItem, updatedAt: data.updatedAt }
+          : shareItem,
+    );
+
+    const updatedData = {
+      ...workInProgressItem,
+      shared,
+    };
+
+    this.setState(prevState => ({
+      ...prevState,
+      workInProgressItem: updatedData,
+      list: updateNode(prevState.list, workInProgressItem.id, updatedData),
+    }));
+  };
+
   handleCloseInviteModal = () => {
     this.setState({
       isVisibleInviteModal: false,
@@ -754,39 +1126,19 @@ class DashboardContainer extends Component {
   };
 
   prepareInitialState() {
-    const { list, predefinedListId } = this.props;
-
-    let selectedListId = null;
-
-    if (predefinedListId) {
-      selectedListId = predefinedListId;
-    } else if (list && list.length > 0) {
-      selectedListId = list[0].id;
-    }
-
-    const root = {
-      type: ROOT_TYPE,
-      children: [
-        getListWithoutChildren(list[0]),
-        { ...list[1], children: list[1].children.map(getListWithoutChildren) },
-        getListWithoutChildren(list[2]),
-      ],
-    };
-    const tree = createTree(root);
-
     return {
       isVisibleInviteModal: false,
       isVisibleShareModal: false,
       isVisibleMoveToTrashModal: false,
       isVisibleRemoveModal: false,
-      list: tree,
+      list: null,
       favorites: {
         id: FAVORITES_TYPE,
         label: FAVORITES_TYPE,
         type: FAVORITES_TYPE,
         children: [],
       },
-      selectedListId,
+      selectedListId: null,
       workInProgressItem: null,
     };
   }
@@ -814,8 +1166,10 @@ class DashboardContainer extends Component {
   }
 
   render() {
-    const { user, members, notification } = this.props;
+    const { notification } = this.props;
     const {
+      user,
+      members,
       list,
       favorites,
       selectedListId,
@@ -825,6 +1179,10 @@ class DashboardContainer extends Component {
       isVisibleMoveToTrashModal,
       isVisibleRemoveModal,
     } = this.state;
+
+    if (!list) {
+      return null;
+    }
 
     const {
       model: { children },
@@ -896,7 +1254,16 @@ class DashboardContainer extends Component {
           />
         )}
         {isVisibleShareModal && (
-          <ShareModal onCancel={this.handleCloseShareModal} />
+          <ShareModal
+            shared={workInProgressItem.shared}
+            onResend={this.handleResendShare}
+            onShare={this.handleShare}
+            onRemove={this.handleRemoveShare}
+            onActivateSharedByLink={this.handleActivateShareByLink}
+            onDeactivateSharedByLink={this.handleDeactivateShareByLink}
+            onCancel={this.handleCloseShareModal}
+            notification={notification}
+          />
         )}
         <ConfirmModal
           isOpen={isVisibleMoveToTrashModal}

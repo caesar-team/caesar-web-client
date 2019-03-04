@@ -4,10 +4,10 @@ import {
   ITEM_REVIEW_MODE,
   ITEM_CREDENTIALS_TYPE,
   ITEM_DOCUMENT_TYPE,
-  PERMISION_WRITE,
+  PERMISSION_WRITE,
 } from 'common/constants';
 import { Button, Icon } from 'components';
-import { formatDate } from 'common/utils/dateFormatter';
+import { formatDate } from 'common/utils/dateUtils';
 import { matchStrict } from 'common/utils/match';
 import EmptyItem from './EmptyItem';
 import { Credentials, CredentialsForm, DocumentForm, Document } from './Types';
@@ -62,7 +62,8 @@ const Item = ({
     return <EmptyItem />;
   }
 
-  const { mode, type, invited, update, ownerId, id } = item;
+  const { mode, type, invited, update, owner, id } = item;
+
   const renderedItemForm = matchStrict(
     type,
     {
@@ -93,12 +94,12 @@ const Item = ({
     (acc, invite) => (invite.userId === user.id ? invite.access : acc),
     null,
   );
-  const hasWriteAccess = ownerId === user.id || access === PERMISION_WRITE;
+  const hasWriteAccess = owner.id === user.id || access === PERMISSION_WRITE;
   const showReadOnlyNotify = access && !hasWriteAccess;
 
   const renderUpdateNotify = () => {
     const updateUserName =
-      update.userId === ownerId ? user.name : members[update.userId].name;
+      update.userId === owner.id ? user.name : members[update.userId].name;
     const updateDate = formatDate(update.createdAt);
 
     return (

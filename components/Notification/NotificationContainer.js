@@ -3,6 +3,7 @@ import styled from 'styled-components';
 
 const Wrapper = styled.div`
   position: fixed;
+  z-index: 999;
 
   ${({ position }) =>
     position === 'top-center' &&

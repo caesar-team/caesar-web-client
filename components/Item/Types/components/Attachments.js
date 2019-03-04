@@ -1,9 +1,9 @@
 import React from 'react';
 import styled from 'styled-components';
+import { downloadFile, downloadAsZip } from 'common/utils/file';
 import { Icon } from 'components/Icon';
 import { Row } from './Row';
 import { File } from '../../../File';
-import { downloadFile } from '../../../../common/utils/file';
 
 const AttachmentsWrapper = styled.div`
   display: flex;
@@ -73,7 +73,7 @@ export const Attachments = ({ attachments }) => {
   ));
 
   const handleClickDownloadFiles = () => {
-    attachments.forEach(({ name, raw }) => downloadFile(raw, name));
+    downloadAsZip(attachments);
   };
 
   return (

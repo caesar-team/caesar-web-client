@@ -1,7 +1,6 @@
 import React, { Component, Fragment } from 'react';
 import Router from 'next/router';
 import styled, { withTheme } from 'styled-components';
-import Router from 'next/router';
 import {
   API_URL,
   APP_URL,

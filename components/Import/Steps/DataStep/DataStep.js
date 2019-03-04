@@ -78,6 +78,12 @@ const DATA = [
   },
 ];
 
+const getColumns = headings => Object.keys(headings).map(heading => ({
+  name: heading,
+  selector: heading,
+  sortable: true,
+}));
+
 class DataStep extends Component {
   state = this.prepareInitialState();
 
@@ -94,13 +100,13 @@ class DataStep extends Component {
   prepareInitialState() {
     return {
       searchPattern: '',
-      data: DATA,
+      data: this.props.data,
     };
   }
 
   render() {
     const { data } = this.state;
-    const { onSubmit } = this.props;
+    const { headings, onSubmit } = this.props;
 
     return (
       <Formik
@@ -125,7 +131,7 @@ class DataStep extends Component {
             />
             <DataTable
               noHeader
-              columns={COLUMNS}
+              columns={getColumns(headings)}
               data={data}
               selectableRows
               selectableRowsComponent={Checkbox}

@@ -75,6 +75,15 @@ const StyledNavigationPanel = styled(NavigationPanel)`
   margin-top: 25px;
 `;
 
+const normalizeData = (rows, { title, login, password, website, note }) =>
+  rows.map(row => ({
+    title: row[title],
+    login: row[login],
+    password: row[password],
+    website: row[website],
+    note: row[note],
+  }));
+
 class Import extends Component {
   state = this.prepareInitialState();
 
@@ -84,20 +93,41 @@ class Import extends Component {
     });
   };
 
-  handleOnload = ({ file }, FormikBag) => {
-    parseFile(file.raw);
+  handleOnload = ({ file }) => {
+    const data = parseFile(file.raw);
+
+    this.setState({
+      data,
+      currentStep: FIELDS_STEP,
+    });
+  };
+
+  handleSelectFields = fields => {
+    this.setState({
+      matchings: fields,
+      currentStep: DATA_STEP,
+    });
+  };
+
+  handleSelectRows = values => {
+    console.log(values);
   };
 
   prepareInitialState() {
     return {
-      currentStep: FIELDS_STEP,
+      currentStep: FILE_STEP,
       currentTab: ONEPASSWORD_TYPE,
-      data: [],
+      data: {
+        headings: [],
+        rows: [],
+      },
+      matchings: {},
+      selectedRows: [],
     };
   }
 
   renderTabContent() {
-    const { currentStep, currentTab } = this.state;
+    const { currentStep, currentTab, data, matchings } = this.state;
 
     return matchStrict(
       currentStep,
@@ -108,8 +138,19 @@ class Import extends Component {
             onSubmit={this.handleOnload}
           />
         ),
-        FIELDS_STEP: <FieldsStep />,
-        DATA_STEP: <DataStep />,
+        FIELDS_STEP: (
+          <FieldsStep
+            headings={data.headings}
+            onSubmit={this.handleSelectFields}
+          />
+        ),
+        DATA_STEP: (
+          <DataStep
+            data={normalizeData(data.rows, matchings)}
+            headings={matchings}
+            onSubmit={this.handleSelectRows}
+          />
+        ),
         IMPORTING_STEP: <ImportingStep />,
       },
       null,

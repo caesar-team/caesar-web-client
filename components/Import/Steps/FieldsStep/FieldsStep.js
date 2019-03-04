@@ -117,9 +117,13 @@ const StyledButton = styled(Button)`
   margin-right: 20px;
 `;
 
-const OPTIONS = [{ value: 1, label: 'one' }, { value: 2, label: 'two' }];
+const getOptions = headings =>
+  headings.map((heading, index) => ({
+    value: index,
+    label: heading,
+  }));
 
-const FieldsStep = ({ options = OPTIONS, onSubmit }) => (
+const FieldsStep = ({ headings, onSubmit }) => (
   <Formik
     key="fieldsStep"
     initialValues={initialValues}
@@ -149,31 +153,31 @@ const FieldsStep = ({ options = OPTIONS, onSubmit }) => (
               <StyledSelect
                 name="title"
                 value={values.title}
-                options={options}
+                options={getOptions(headings)}
                 onChange={setFieldValue}
               />
               <StyledSelect
                 name="login"
                 value={values.login}
-                options={options}
+                options={getOptions(headings)}
                 onChange={setFieldValue}
               />
               <StyledSelect
                 name="password"
                 value={values.password}
-                options={options}
+                options={getOptions(headings)}
                 onChange={setFieldValue}
               />
               <StyledSelect
                 name="website"
                 value={values.website}
-                options={options}
+                options={getOptions(headings)}
                 onChange={setFieldValue}
               />
               <StyledSelect
                 name="note"
                 value={values.note}
-                options={options}
+                options={getOptions(headings)}
                 onChange={setFieldValue}
               />
             </Column>

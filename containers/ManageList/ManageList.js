@@ -169,13 +169,19 @@ class ManageListContainer extends Component {
   }
 
   render() {
-    const { user } = this.props;
     const {
+      list,
+      user,
       isVisibleModal,
       workInProgressList,
       members,
       removingListId,
     } = this.state;
+
+    if (!list) {
+      return null;
+    }
+
     const postList = this.preparePostList();
 
     return (

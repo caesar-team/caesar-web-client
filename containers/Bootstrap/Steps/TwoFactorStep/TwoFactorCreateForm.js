@@ -1,14 +1,8 @@
-import React, { Component } from 'react';
+import React from 'react';
 import styled from 'styled-components';
-import {
-  WrapperAlignTop,
-  AuthWrapper,
-  AuthTitle,
-  AuthDescription,
-  Button,
-} from 'components';
+import { AuthTitle, AuthDescription, Button } from 'components';
 
-const InnerWrapper = styled.div`
+const Wrapper = styled.div`
   max-width: 400px;
   width: 100%;
   margin-right: auto;
@@ -41,29 +35,19 @@ const NextButton = styled(Button)`
   font-size: 18px;
 `;
 
-class TwoFactorCreateForm extends Component {
-  render() {
-    const { qr, code, onClickNext } = this.props;
-
-    return (
-      <WrapperAlignTop>
-        <AuthWrapper>
-          <AuthTitle>Two Factor Authentication</AuthTitle>
-          <AuthDescription>Scan the QR code above</AuthDescription>
-          <InnerWrapper>
-            <QrCodeImage src={qr} />
-            <AuthDescription>
-              or manually enter the key in the application:
-            </AuthDescription>
-            <QrCodeKeyWrapper>
-              <QrCodeKey>{code}</QrCodeKey>
-            </QrCodeKeyWrapper>
-            <NextButton onClick={onClickNext}>Next</NextButton>
-          </InnerWrapper>
-        </AuthWrapper>
-      </WrapperAlignTop>
-    );
-  }
-}
+const TwoFactorCreateForm = ({ qr, code, onClickNext }) => (
+  <Wrapper>
+    <AuthTitle>Two Factor Authentication</AuthTitle>
+    <AuthDescription>Scan the QR code above</AuthDescription>
+    <QrCodeImage src={qr} />
+    <AuthDescription>
+      or manually enter the key in the application:
+    </AuthDescription>
+    <QrCodeKeyWrapper>
+      <QrCodeKey>{code}</QrCodeKey>
+    </QrCodeKeyWrapper>
+    <NextButton onClick={onClickNext}>Next</NextButton>
+  </Wrapper>
+);
 
 export default TwoFactorCreateForm;

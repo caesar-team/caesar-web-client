@@ -1,6 +1,7 @@
 import React, { Component, Fragment } from 'react';
 import Router from 'next/router';
 import styled, { withTheme } from 'styled-components';
+import Router from 'next/router';
 import {
   API_URL,
   APP_URL,
@@ -109,6 +110,28 @@ const StyledButton = styled(Button)`
   height: 60px;
 `;
 
+const BottomWrapper = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: absolute;
+  bottom: 30px;
+`;
+
+const FourXXIText = styled.div`
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  color: ${({ theme }) => theme.black};
+  margin-left: 10px;
+`;
+
+const FourXXILink = styled.a`
+  text-decoration: underline;
+  font-weight: 600;
+  color: ${({ theme }) => theme.black};
+`;
+
 const srp = createSrp();
 
 const createMatcher = ({ email, password, A, a, B, seed }) => {
@@ -204,6 +227,13 @@ class AuthContainer extends Component {
             </Fragment>
           )}
         </InnerWrapper>
+        <BottomWrapper>
+          <Icon name="logo-4xxi" width={20} height={20} />
+          <FourXXIText>
+            Created and supported by{' '}
+            <FourXXILink href="https://4xxi.com/en">4xxi team</FourXXILink>
+          </FourXXIText>
+        </BottomWrapper>
       </Wrapper>
     );
   }

@@ -116,6 +116,8 @@ class ManageList extends Component {
     const generateAvatars = invitedIds =>
       invitedIds.map(item => members[item.id]);
 
+    console.log(list);
+    console.log(members);
     return (
       <Fragment>
         <Header>

@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import * as openpgp from 'openpgp';
 import { withRouter } from 'next/router';
 import Cookies from 'js-cookie';
+import { BootstrapWrapper } from 'components';
 import { getUserBootstrap } from 'common/api';
 import { base64ToObject } from 'common/utils/cipherUtils';
 import { DEFAULT_IDLE_TIMEOUT } from 'common/constants';
@@ -11,7 +12,6 @@ import {
   TWO_FACTOR_CHECK,
   TWO_FACTOR_CREATE,
   PASSWORD_CHANGE,
-  MASTER_PASSWORD_CHECK_SHARED,
   MASTER_PASSWORD_CHECK,
   MASTER_PASSWORD_CREATE,
   BOOTSTRAP_FINISH,
@@ -20,11 +20,7 @@ import { TwoFactorStep, PasswordStep, MasterPasswordStep } from './Steps';
 
 const TWO_FACTOR_STEPS = [TWO_FACTOR_CREATE, TWO_FACTOR_CHECK];
 const PASSWORD_STEPS = [PASSWORD_CHANGE];
-const MASTER_PASSWORD_STEPS = [
-  MASTER_PASSWORD_CHECK_SHARED,
-  MASTER_PASSWORD_CREATE,
-  MASTER_PASSWORD_CHECK,
-];
+const MASTER_PASSWORD_STEPS = [MASTER_PASSWORD_CREATE, MASTER_PASSWORD_CHECK];
 
 const bootstrapStates = bootstrap => ({
   twoFactorAuthState: `TWO_FACTOR_${bootstrap.twoFactorAuthState}`,
@@ -48,9 +44,6 @@ class Bootstrap extends Component {
 
     this.bootstrap = bootstrapStates(bootstrap);
     this.sharedData = base64ToObject(Cookies.get('share', { path: '/' })) || {};
-
-    // TODO: during refactoring to remove and change on redux
-    Cookies.remove('share', { path: '/' });
 
     this.setState({
       currentStep: this.currentStepResolver(bootstrap),
@@ -147,19 +140,23 @@ class Bootstrap extends Component {
 
     if (TWO_FACTOR_STEPS.includes(currentStep)) {
       return (
-        <TwoFactorStep
-          initialStep={currentStep}
-          onFinish={this.handleFinishTwoFactor}
-        />
+        <BootstrapWrapper>
+          <TwoFactorStep
+            initialStep={currentStep}
+            onFinish={this.handleFinishTwoFactor}
+          />
+        </BootstrapWrapper>
       );
     }
 
     if (PASSWORD_STEPS.includes(currentStep)) {
       return (
-        <PasswordStep
-          email={this.sharedData.email}
-          onFinish={this.handleFinishChangePassword}
-        />
+        <BootstrapWrapper>
+          <PasswordStep
+            email={this.sharedData.email}
+            onFinish={this.handleFinishChangePassword}
+          />
+        </BootstrapWrapper>
       );
     }
 

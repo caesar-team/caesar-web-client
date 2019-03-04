@@ -1,4 +1,5 @@
 import axios from 'axios';
+import Cookies from 'js-cookie';
 import { API_URL, API_BASE_PATH } from './constants';
 import { getToken, removeToken } from './utils/token';
 import { isClient } from './utils/isEnvironment';
@@ -6,7 +7,7 @@ import { isClient } from './utils/isEnvironment';
 const softExit = () => {
   if (isClient) {
     removeToken();
-    sessionStorage.setItem('isSetPassword', '0');
+    Cookies.remove('share', { path: '/' });
 
     if (window.location.pathname !== '/auth') {
       window.location.href = '/auth';
@@ -71,6 +72,8 @@ export const getKeys = () => callApi.get('/keys');
 
 export const getQrCode = () => callApi.get('/2fa');
 
+export const getBackupCodes = () => callApi.get('/auth/2fa/backups');
+
 export const postActivateTwoFactor = data =>
   callApi.post('/2fa/activate', data);
 
@@ -113,9 +116,6 @@ export const deleteInviteItem = (inviteId, data) =>
 
 // list
 export const postCreateList = data => callApi.post('/list', data);
-
-export const updateList = (listId, data) =>
-  callApi.patch(`list/${listId}`, data);
 
 export const removeList = listId => callApi.delete(`/list/${listId}`);
 

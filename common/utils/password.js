@@ -54,11 +54,9 @@ function split(number, delimiter) {
     );
   }
 
-  return chunks.concat(number - chunks.reduce((acc, value) => acc + value, 0));
-}
-
-function position(start, end) {
-  return start + Math.floor(Math.random() * (end - start));
+  return shuffle(
+    chunks.concat(number - chunks.reduce((acc, value) => acc + value, 0)),
+  );
 }
 
 function pick(object, keys) {
@@ -78,13 +76,12 @@ export function generator(length = DEFAULT_LENGTH, options = {}) {
   return shuffle(
     split(length, delimiter).reduce((accumulator, number, index) => {
       const chars = symbols[index];
-      return [
-        ...accumulator,
-        ...Array.from(
-          { length: number },
-          (_, key) => chars[position(key, chars.length)],
-        ),
-      ];
+      const variants = Array.from(
+        { length: number },
+        () => chars[random(0, chars.length - 1)],
+      );
+
+      return [...accumulator, ...variants];
     }, []),
   ).join('');
 }

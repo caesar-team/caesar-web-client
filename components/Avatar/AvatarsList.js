@@ -23,7 +23,7 @@ const AvatarsList = ({
   visibleCount = DEFAULT_VISIBLE_AVATARS_COUNT,
   ...props
 }) => {
-  const visibleAvatars = avatars.slice(0, visibleCount);
+  const visibleAvatars = avatars.length ? avatars.slice(0, visibleCount) : [];
   const invisibleCount = avatars.length - visibleAvatars.length;
   const shouldShowLast = invisibleCount > 0;
 

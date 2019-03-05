@@ -111,13 +111,12 @@ class ManageList extends Component {
       list,
       members,
       onClickCreateList = Function.prototype,
+      onClickEditList = Function.prototype,
       onClickRemoveList = Function.prototype,
     } = this.props;
     const generateAvatars = invitedIds =>
       invitedIds.map(item => members[item.id]);
 
-    console.log(list);
-    console.log(members);
     return (
       <Fragment>
         <Header>
@@ -171,6 +170,7 @@ class ManageList extends Component {
                   <ListOptions
                     index={index}
                     listId={listItem.id}
+                    onClickEditList={onClickEditList}
                     onClickRemoveList={onClickRemoveList}
                   />
                 </MembersCol>

@@ -3,6 +3,7 @@ import styled from 'styled-components';
 import { Formik, FastField } from 'formik';
 import { Modal, FormInput, Button, Label } from 'components';
 import { checkError } from 'common/utils/formikUtils';
+import { LIST_WORKFLOW_CREATE_MODE } from 'common/constants';
 import { schema } from './schema';
 
 const FormTitle = styled.div`
@@ -27,8 +28,10 @@ class ListFormModal extends Component {
     const {
       list,
       onCancel = Function.prototype,
-      onCreate = Function.prototype,
+      onSubmit = Function.prototype,
     } = this.props;
+
+    const isCreateMode = list.mode === LIST_WORKFLOW_CREATE_MODE;
 
     return (
       <Modal
@@ -38,11 +41,11 @@ class ListFormModal extends Component {
         width="560"
         onRequestClose={onCancel}
       >
-        <FormTitle>Add list </FormTitle>
+        <FormTitle>{isCreateMode ? 'Add list' : 'Edit list'}</FormTitle>
         <Formik
           key="editListForm"
           initialValues={this.createInitialValue(list)}
-          onSubmit={onCreate}
+          onSubmit={onSubmit}
           isInitialValid={schema.isValidSync(this.createInitialValue(list))}
           validationSchema={schema}
           render={({
@@ -69,7 +72,7 @@ class ListFormModal extends Component {
                   color="black"
                   onClick={handleSubmit}
                 >
-                  CREATE
+                  {isCreateMode ? 'CREATE' : 'UPDATE'}
                 </Button>
               </ButtonWrapper>
             </form>

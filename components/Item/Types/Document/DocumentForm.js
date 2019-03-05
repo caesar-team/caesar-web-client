@@ -132,7 +132,7 @@ const renderAttachments = ({ attachments = [] }, setFieldValue) =>
 
 const DocumentForm = ({
   item: { secret, listId, type },
-  allLists,
+  allLists = [],
   mode,
   onFinishCreateWorkflow,
   onFinishEditWorkflow,

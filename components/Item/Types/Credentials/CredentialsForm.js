@@ -145,7 +145,7 @@ const renderAttachments = ({ attachments = [] }, setFieldValue) =>
 
 const CredentialsForm = ({
   item: { secret, listId, type },
-  allLists,
+  allLists = [],
   mode,
   onFinishCreateWorkflow,
   onFinishEditWorkflow,

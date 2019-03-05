@@ -192,14 +192,9 @@ class Import extends Component {
   }
 
   renderNavigationPanel() {
-    const { currentStep, currentTab } = this.state;
+    const { currentStep } = this.state;
 
-    const steps =
-      currentTab === CSV_TYPE
-        ? STEPS
-        : STEPS.filter(({ name }) => name !== FIELDS_STEP);
-
-    return <StyledNavigationPanel steps={steps} currentStep={currentStep} />;
+    return <StyledNavigationPanel steps={STEPS} currentStep={currentStep} />;
   }
 
   render() {

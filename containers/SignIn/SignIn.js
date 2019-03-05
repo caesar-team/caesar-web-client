@@ -1,6 +1,6 @@
 import React, { Component, Fragment } from 'react';
-import Router from 'next/router';
 import styled, { withTheme } from 'styled-components';
+import Router, { withRouter } from 'next/router';
 import {
   API_URL,
   APP_URL,
@@ -15,14 +15,13 @@ import {
   Button,
   TextWithLines,
 } from 'components';
-import { postLoginPrepare, postLogin } from 'common/api';
-import { createSrp } from 'common/utils/srp';
+import { login } from 'common/utils/authUtils';
 import { getTrustedDeviceToken, setToken } from 'common/utils/token';
 import BgRightImg from 'static/images/bg-right.jpg';
 import BgRightImg2x from 'static/images/bg-right@2x.jpg';
 import BgLeftImg from 'static/images/bg-left.jpg';
 import BgLeftImg2x from 'static/images/bg-left@2x.jpg';
-import AuthForm from './AuthForm';
+import SignInForm from './SignInForm';
 
 const Wrapper = styled.div`
   display: flex;
@@ -131,16 +130,7 @@ const FourXXILink = styled.a`
   color: ${({ theme }) => theme.black};
 `;
 
-const srp = createSrp();
-
-const createMatcher = ({ email, password, A, a, B, seed }) => {
-  const S = srp.generateClientS(A, B, a, srp.generateX(seed, email, password));
-  const M1 = srp.generateM1(A, B, S);
-
-  return { S, M1 };
-};
-
-class AuthContainer extends Component {
+class SignInContainer extends Component {
   state = {
     googleAuthUrl: '',
   };
@@ -161,25 +151,8 @@ class AuthContainer extends Component {
   };
 
   handleSubmit = async ({ email, password }, { setSubmitting, setErrors }) => {
-    const a = srp.getRandomSeed();
-    const A = srp.generateA(a);
-
     try {
-      const {
-        data: { publicEphemeralValue: B, seed },
-      } = await postLoginPrepare({ email, publicEphemeralValue: A });
-
-      const { S, M1 } = createMatcher({ email, password, A, a, B, seed });
-
-      const {
-        data: { secondMatcher, jwt },
-      } = await postLogin({ email, matcher: M1 });
-
-      const clientM2 = srp.generateM2(A, M1, S);
-
-      if (clientM2 !== secondMatcher) {
-        throw new Error('mismatch');
-      }
+      const jwt = await login(email, password);
 
       setToken(jwt);
 
@@ -191,6 +164,7 @@ class AuthContainer extends Component {
   };
 
   render() {
+    const { router } = this.props;
     const { googleAuthUrl } = this.state;
     const isLinkShown = googleAuthUrl !== '';
 
@@ -200,7 +174,9 @@ class AuthContainer extends Component {
           <IconWrapper>
             <Icon name="logo-new" height={40} width={142} />
           </IconWrapper>
-          <StyledButton disabled>Sign Up</StyledButton>
+          <StyledButton onClick={() => router.push('/signup')}>
+            Sign Up
+          </StyledButton>
         </TopWrapper>
         <BgRightImage
           src={BgRightImg}
@@ -213,7 +189,7 @@ class AuthContainer extends Component {
         <InnerWrapper>
           <AuthTitle>Nice to meet you!</AuthTitle>
           <AuthDescription>Welcome to Caesar</AuthDescription>
-          <AuthForm onSubmit={this.handleSubmit} />
+          <SignInForm onSubmit={this.handleSubmit} />
           {isLinkShown && (
             <Fragment>
               <TextWithLines width={1}>OR</TextWithLines>
@@ -238,4 +214,4 @@ class AuthContainer extends Component {
   }
 }
 
-export default withTheme(AuthContainer);
+export default withTheme(withRouter(SignInContainer));

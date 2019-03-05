@@ -1,88 +1,81 @@
-import { Component } from 'react';
-import Cookies from 'js-cookie';
-import { base64ToObject } from 'common/utils/cipherUtils';
-import { Error } from 'components';
-import { createSrp } from 'common/utils/srp';
-import { setToken } from 'common/utils/token';
-import { postLoginPrepare, postLogin } from 'common/api';
+import React, { Component } from 'react';
+import styled from 'styled-components';
+import { getList } from 'common/api';
+import { matchStrict } from 'common/utils/match';
+import { Layout, Credentials, Document, withNotification } from 'components';
+import {
+  ITEM_CREDENTIALS_TYPE,
+  ITEM_DOCUMENT_TYPE,
+  ITEM_REVIEW_MODE,
+} from 'common/constants';
+import { getPrivateKeyObj, decryptItem } from 'common/utils/cipherUtils';
 
-const srp = createSrp();
+const Wrapper = styled.div`
+  width: 100%;
+  max-width: 800px;
+  margin: 0 auto;
+`;
 
-const createMatcher = ({ email, password, A, a, B, seed }) => {
-  const S = srp.generateClientS(A, B, a, srp.generateX(seed, email, password));
-  const M1 = srp.generateM1(A, B, S);
+const getInboxItem = list => {
+  if (!list || !list[0] || !list[0].children || !list[0].children[0]) {
+    return null;
+  }
 
-  return { S, M1 };
+  return list[0].children[0];
 };
 
 class Sharing extends Component {
+  state = this.prepareInitialState();
+
   async componentDidMount() {
-    const { encryption } = this.props;
+    const { privateKey, password } = this.props;
 
-    const { email, password } = base64ToObject(encryption);
-    const jwt = await this.loginResolver(email, password);
+    const { data: list } = await getList();
 
-    // TODO: during refactoring to remove this and to save store
-    Cookies.set('share', encryption, { path: '/' });
-    setToken(jwt);
+    const item = getInboxItem(list);
 
-    document.location.pathname = '/';
+    const privateKeyObj = await getPrivateKeyObj(privateKey, password);
+    const decryptedSecret = await decryptItem(item.secret, privateKeyObj);
+
+    this.setState({
+      item: { ...item, secret: decryptedSecret, mode: ITEM_REVIEW_MODE },
+    });
   }
 
-  async loginResolver(email, password) {
-    const a = srp.getRandomSeed();
-    const A = srp.generateA(a);
-
-    const { B, seed } = await this.srpPrepareLogin(email, A);
-
-    const { S, M1 } = createMatcher({ email, password, A, a, B, seed });
-
-    const { serverM2, jwt } = await this.srpLogin(email, M1);
-
-    const clientM2 = srp.generateM2(A, M1, S);
-
-    if (clientM2 !== serverM2) {
-      throw new Error('mismatch');
-    }
-
-    return jwt;
-  }
-
-  async srpPrepareLogin(email, A) {
-    try {
-      const {
-        data: { publicEphemeralValue, seed },
-      } = await postLoginPrepare({
-        email,
-        publicEphemeralValue: A,
-      });
-
-      return { B: publicEphemeralValue, seed };
-    } catch (e) {
-      console.log(e.response);
-      throw new Error(e);
-    }
-  }
-
-  async srpLogin(email, matcher) {
-    try {
-      const {
-        data: { secondMatcher, jwt },
-      } = await postLogin({
-        email,
-        matcher,
-      });
-
-      return { serverM2: secondMatcher, jwt };
-    } catch (e) {
-      console.log(e.response);
-      throw new Error(e);
-    }
+  prepareInitialState() {
+    return {
+      item: null,
+      user: null,
+    };
   }
 
   render() {
-    return null;
+    const { notification } = this.props;
+    const { item } = this.state;
+
+    if (!item) {
+      return null;
+    }
+
+    const renderedItem = matchStrict(
+      item.type,
+      {
+        [ITEM_CREDENTIALS_TYPE]: (
+          <Credentials isSharedItem item={item} notification={notification} />
+        ),
+        [ITEM_DOCUMENT_TYPE]: (
+          <Document isSharedItem item={item} notification={notification} />
+        ),
+      },
+      null,
+    );
+
+    return (
+      <Layout>
+        <Wrapper>{renderedItem}</Wrapper>
+      </Layout>
+    );
   }
 }
 
-export default Sharing;
+export default withNotification(Sharing);

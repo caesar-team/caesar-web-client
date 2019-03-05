@@ -17,23 +17,23 @@ export function removeToken() {
 const generateFingerPrint = () => {
   let token = '';
   if (window.requestIdleCallback) {
-    return new Promise(reslove =>
+    return new Promise(resolve =>
       requestIdleCallback(() => {
         Fingerprint2.get(components => {
           const values = components.map(component => component.value);
           token = Fingerprint2.x64hash128(values.join(''), 99);
-          reslove(token);
+          resolve(token);
         });
       }),
     );
   }
 
-  return new Promise(reslove =>
+  return new Promise(resolve =>
     setTimeout(() => {
       Fingerprint2.get(components => {
         const values = components.map(component => component.value);
         token = Fingerprint2.x64hash128(values.join(''), 99);
-        reslove(token);
+        resolve(token);
       });
     }, 500),
   );

@@ -1,5 +1,4 @@
 import axios from 'axios';
-import Cookies from 'js-cookie';
 import { API_URL, API_BASE_PATH } from './constants';
 import { getToken, removeToken } from './utils/token';
 import { isClient } from './utils/isEnvironment';
@@ -7,10 +6,9 @@ import { isClient } from './utils/isEnvironment';
 const softExit = () => {
   if (isClient) {
     removeToken();
-    Cookies.remove('share', { path: '/' });
 
-    if (window.location.pathname !== '/auth') {
-      window.location.href = '/auth';
+    if (window.location.pathname !== '/signin') {
+      window.location.href = '/signin';
     }
   }
 };
@@ -139,6 +137,8 @@ export const postLoginPrepare = data =>
   callApi.post('/srp/login_prepare', data);
 
 export const postLogin = data => callApi.post('/srp/login', data);
+
+export const postRegistration = data => callApi.post('/srp/registration', data);
 
 export const postChangePassword = data => callApi.patch('/srp/password', data);
 

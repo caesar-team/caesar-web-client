@@ -58,6 +58,7 @@ class ListFormModal extends Component {
                 name="label"
                 render={({ field }) => (
                   <FormInput
+                    withBorder
                     {...field}
                     error={checkError(touched, errors, 'label')}
                   />

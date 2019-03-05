@@ -56,12 +56,6 @@ const StyledButton = styled(Button)`
   margin-right: 20px;
 `;
 
-const COLUMNS = [
-  { name: 'Title', selector: 'name', sortable: true },
-  { name: 'Website', selector: 'website', sortable: true },
-  { name: 'Login', selector: 'login', sortable: true },
-];
-
 const DATA = [
   { name: 'Behance', website: 'becance.com', login: 'dspiridonov@4xxi.com' },
   {
@@ -78,11 +72,12 @@ const DATA = [
   },
 ];
 
-const getColumns = headings => Object.keys(headings).map(heading => ({
-  name: heading,
-  selector: heading,
-  sortable: true,
-}));
+const getColumns = headings =>
+  Object.keys(headings).map(heading => ({
+    name: heading,
+    selector: heading,
+    sortable: true,
+  }));
 
 class DataStep extends Component {
   state = this.prepareInitialState();
@@ -93,20 +88,22 @@ class DataStep extends Component {
     console.log(event.target.value);
   };
 
-  handleChange = data => {
-    console.log(data);
+  handleChange = ({ selectedRows }) => {
+    this.setState({
+      selectedRows,
+    });
   };
 
   prepareInitialState() {
     return {
       searchPattern: '',
-      data: this.props.data,
+      selectedRows: [],
     };
   }
 
   render() {
-    const { data } = this.state;
-    const { headings, onSubmit } = this.props;
+    const { selectedRows } = this.state;
+    const { headings, data, onSubmit } = this.props;
 
     return (
       <Formik
@@ -139,7 +136,7 @@ class DataStep extends Component {
             />
             <BottomWrapper>
               <SelectedItems>
-                Selected items: {data.length} / {DATA.length}
+                Selected items: {selectedRows.length} / {data.length}
               </SelectedItems>
               <ButtonsWrapper>
                 <StyledButton>CANCEL</StyledButton>

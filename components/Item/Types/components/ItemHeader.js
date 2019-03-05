@@ -6,6 +6,11 @@ import { Button } from 'components/Button';
 import { Avatar, AvatarsList } from 'components/Avatar';
 import { Row } from './Row';
 
+const StyledRow = styled(Row)`
+  margin-top: 10px;
+  margin-bottom: 35px;
+`;
+
 const ItemButton = styled(Button)`
   margin-left: 20px;
 `;
@@ -103,6 +108,7 @@ const FavoriteButton = styled.button`
 export const ItemHeader = ({
   hasWriteAccess,
   isTrashItem,
+  isSharedItem,
   user,
   members,
   onClickCloseItem,
@@ -121,6 +127,19 @@ export const ItemHeader = ({
     secret: { name },
   },
 }) => {
+  if (isSharedItem) {
+    return (
+      <Fragment>
+        <StyledRow>
+          <UpdatedDate>Last updated {formatDate(lastUpdated)}</UpdatedDate>
+        </StyledRow>
+        <Row>
+          <Title>{name}</Title>
+        </Row>
+      </Fragment>
+    );
+  }
+
   const avatars = invited.reduce((accumulator, item) => {
     if (!members[item.userId]) {
       return accumulator;
@@ -134,6 +153,7 @@ export const ItemHeader = ({
 
     return accumulator;
   }, []);
+
   const hasInvited = invited.length > 0;
   const isOwner = user.id === owner.id;
 

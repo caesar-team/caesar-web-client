@@ -15,7 +15,7 @@ const LogoLink = styled.a`
 export const Logo = () => (
   <Link href="/" passHref>
     <LogoLink>
-      <Icon name="logo" width={116} height={25} />
+      <Icon name="logo-new" width={106} height={30} />
     </LogoLink>
   </Link>
 );

@@ -117,19 +117,23 @@ export class Header extends Component {
         <LeftWrapper withBorder={withSearch}>
           <Logo />
         </LeftWrapper>
-        <RightWrapper>
-          <UserSection>
-            <Avatar {...user} name={user.email} />
-            <StyledDropdown overlay={Options} onToggle={this.toggleDropdown}>
-              <UserName>{user.email}</UserName>
-              <StyledIcon
-                name={isDropdownOpened ? 'arrow-up-small' : 'arrow-down-small'}
-                width={10}
-                height={16}
-              />
-            </StyledDropdown>
-          </UserSection>
-        </RightWrapper>
+        {!!user && (
+          <RightWrapper>
+            <UserSection>
+              <Avatar {...user} name={user.email} />
+              <StyledDropdown overlay={Options} onToggle={this.toggleDropdown}>
+                <UserName>{user.email}</UserName>
+                <StyledIcon
+                  name={
+                    isDropdownOpened ? 'arrow-up-small' : 'arrow-down-small'
+                  }
+                  width={10}
+                  height={16}
+                />
+              </StyledDropdown>
+            </UserSection>
+          </RightWrapper>
+        )}
       </Wrapper>
     );
   }

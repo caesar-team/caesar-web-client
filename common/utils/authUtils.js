@@ -1,6 +1,7 @@
+import { postLogin, postLoginPrepare, postRegistration } from 'common/api';
 import { createSrp } from './srp';
 
-async function prepareLoginSRP(email, A, prepareLoginEndpoint) {
+async function loginFirstPhase(email, A, prepareLoginEndpoint) {
   try {
     const {
       data: { publicEphemeralValue, seed },
@@ -16,7 +17,7 @@ async function prepareLoginSRP(email, A, prepareLoginEndpoint) {
   }
 }
 
-async function loginSRP(email, matcher, loginEndpoint) {
+async function loginSecondPhase(email, matcher, loginEndpoint) {
   try {
     const {
       data: { secondMatcher, jwt },
@@ -35,19 +36,19 @@ async function loginSRP(email, matcher, loginEndpoint) {
 export async function login(
   email,
   password,
-  { prepareLoginEndpoint, loginEndpoint },
+  { prepareLoginEndpoint = postLoginPrepare, loginEndpoint = postLogin } = {},
 ) {
   const srp = createSrp();
 
   const a = srp.getRandomSeed();
   const A = srp.generateA(a);
 
-  const { B, seed } = await prepareLoginSRP(email, A, prepareLoginEndpoint);
+  const { B, seed } = await loginFirstPhase(email, A, prepareLoginEndpoint);
 
   const S = srp.generateClientS(A, B, a, srp.generateX(seed, email, password));
   const M1 = srp.generateM1(A, B, S);
 
-  const { serverM2, jwt } = await loginSRP(email, M1, loginEndpoint);
+  const { serverM2, jwt } = await loginSecondPhase(email, M1, loginEndpoint);
 
   const clientM2 = srp.generateM2(A, M1, S);
 
@@ -56,4 +57,17 @@ export async function login(
   }
 
   return jwt;
+}
+
+export async function registration(
+  email,
+  password,
+  { registrationEndpoint = postRegistration } = {},
+) {
+  const srp = createSrp();
+
+  const seed = srp.getRandomSeed();
+  const verifier = srp.generateV(srp.generateX(seed, email, password));
+
+  return await registrationEndpoint({ email, seed, verifier });
 }

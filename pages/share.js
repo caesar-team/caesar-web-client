@@ -2,8 +2,8 @@ import React, { Fragment } from 'react';
 import { Error, Head } from 'components';
 import { Bootstrap, Sharing } from 'containers';
 import { base64ToObject } from 'common/utils/cipherUtils';
-import { login } from 'common/utils/loginUtils';
-import { getCheckShare, postLoginPrepare, postLogin } from 'common/api';
+import { login } from 'common/utils/authUtils';
+import { getCheckShare } from 'common/api';
 
 const validFields = ['shareId', 'email', 'password'];
 
@@ -36,10 +36,7 @@ SharePage.getInitialProps = async ({
     await getCheckShare(shared.shareId);
 
     if (!req || !req.cookies || !req.cookies.token) {
-      const jwt = await login(shared.email, shared.password, {
-        prepareLoginEndpoint: postLoginPrepare,
-        loginEndpoint: postLogin,
-      });
+      const jwt = await login(shared.email, shared.password);
 
       res.cookie('token', jwt, { path: '/' });
     }

@@ -1,10 +1,10 @@
 import React, { Fragment } from 'react';
-import { AuthContainer } from '../containers';
+import { SignInContainer } from '../containers';
 import { Head } from '../components';
 
 export default () => (
   <Fragment>
-    <Head title="Auth" />
-    <AuthContainer />
+    <Head title="Sign In" />
+    <SignInContainer />
   </Fragment>
 );

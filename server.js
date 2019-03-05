@@ -33,7 +33,7 @@ app.prepare().then(() => {
   server.get('/logout', (req, res) => {
     res.clearCookie('token');
     res.clearCookie('share');
-    res.redirect('/auth');
+    res.redirect('/signin');
   });
 
   server.get('/check_auth', (req, res) => {
@@ -43,7 +43,7 @@ app.prepare().then(() => {
       res.cookie('token', token, { path: '/' });
       res.redirect('/');
     } else {
-      res.redirect('/auth');
+      res.redirect('/signin');
     }
   });
 

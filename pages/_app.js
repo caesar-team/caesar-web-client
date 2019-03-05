@@ -28,7 +28,7 @@ export default class App extends NextApp {
       router: { route },
     } = this.props;
 
-    if (route === '/auth') {
+    if (route === '/signin' || route === '/signup') {
       return (
         <ThemeProvider theme={theme}>
           <Container>

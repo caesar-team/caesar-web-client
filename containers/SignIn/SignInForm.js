@@ -99,7 +99,7 @@ const PasswordInputPrefix = (
   </Prefix>
 );
 
-const AuthForm = ({ onSubmit }) => (
+const SignInForm = ({ onSubmit }) => (
   <Formik
     key="documentForm"
     onSubmit={onSubmit}
@@ -157,4 +157,4 @@ const AuthForm = ({ onSubmit }) => (
   />
 );
 
-export default AuthForm;
+export default SignInForm;

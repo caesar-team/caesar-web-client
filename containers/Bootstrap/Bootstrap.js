@@ -1,10 +1,8 @@
 import React, { Component } from 'react';
 import * as openpgp from 'openpgp';
 import { withRouter } from 'next/router';
-import Cookies from 'js-cookie';
 import { BootstrapWrapper } from 'components';
 import { getUserBootstrap } from 'common/api';
-import { base64ToObject } from 'common/utils/cipherUtils';
 import { DEFAULT_IDLE_TIMEOUT } from 'common/constants';
 import OpenPGPWorker from 'common/openpgp.worker';
 import { SessionChecker } from 'components/SessionChecker';
@@ -35,15 +33,12 @@ class Bootstrap extends Component {
 
   bootstrap = null;
 
-  sharedData = null;
-
   async componentDidMount() {
     this.initOpenPGPWorker();
 
     const { data: bootstrap } = await getUserBootstrap();
 
     this.bootstrap = bootstrapStates(bootstrap);
-    this.sharedData = base64ToObject(Cookies.get('share', { path: '/' })) || {};
 
     this.setState({
       currentStep: this.currentStepResolver(bootstrap),
@@ -120,17 +115,20 @@ class Bootstrap extends Component {
 
   prepareInitialState() {
     return {
-      bootstrap: null,
       currentStep: null,
       publicKey: null,
       encryptedPrivateKey: null,
       masterPassword: null,
-      sharedData: {},
     };
   }
 
   render() {
-    const { component: PageComponent, router, ...props } = this.props;
+    const {
+      component: PageComponent,
+      router,
+      shared = {},
+      ...props
+    } = this.props;
     const {
       currentStep,
       publicKey,
@@ -153,7 +151,7 @@ class Bootstrap extends Component {
       return (
         <BootstrapWrapper>
           <PasswordStep
-            email={this.sharedData.email}
+            email={shared.email}
             onFinish={this.handleFinishChangePassword}
           />
         </BootstrapWrapper>
@@ -164,7 +162,7 @@ class Bootstrap extends Component {
       return (
         <MasterPasswordStep
           initialStep={currentStep}
-          sharedMasterPassword={this.sharedData.masterPassword}
+          sharedMasterPassword={shared.masterPassword}
           onFinish={this.handleFinishMasterPassword}
         />
       );

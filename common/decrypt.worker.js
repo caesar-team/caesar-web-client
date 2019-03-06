@@ -1,46 +1,42 @@
-import { ITEM_CREDENTIALS_TYPE, ITEM_DOCUMENT_TYPE } from './constants';
-
 // eslint-disable-next-line
 self.window = self;
 
-const openpgp = require('openpgp');
-const tree = require('../common/utils/tree');
+const tree = require('./utils/tree');
+const { decryptItem, getPrivateKeyObj } = require('./utils/cipherUtils');
+const { ITEM_CREDENTIALS_TYPE, ITEM_DOCUMENT_TYPE } = require('./constants');
 
 window.onmessage = async message => {
   const {
-    data: { event, data },
+    data: {
+      event,
+      data: { privateKey, password, list },
+    },
   } = message;
 
   switch (event) {
     case 'toDecryptList': {
-      const privateKeyObj = (await openpgp.key.readArmored(data.privateKey))
-        .keys[0];
-      await privateKeyObj.decrypt(data.password);
+      const privateKeyObj = await getPrivateKeyObj(privateKey, password);
 
-      tree.createTree({ id: 'root', children: data.list }).walk(node => {
+      tree.createTree({ id: 'root', children: list }).walk(async node => {
         if (
           [ITEM_CREDENTIALS_TYPE, ITEM_DOCUMENT_TYPE].includes(node.model.type)
         ) {
-          openpgp.message.readArmored(node.model.secret).then(secret => {
-            const options = {
-              message: secret,
-              privateKeys: [privateKeyObj],
-            };
+          const decryptedSecret = await decryptItem(
+            node.model.secret,
+            privateKeyObj,
+          );
 
-            openpgp.decrypt(options).then(plaintext => {
-              window.postMessage({
-                event: 'fromDecryptList',
-                data: {
-                  node: {
-                    ...node,
-                    model: {
-                      ...node.model,
-                      secret: JSON.parse(plaintext.data),
-                    },
-                  },
+          window.postMessage({
+            event: 'fromDecryptList',
+            data: {
+              node: {
+                ...node,
+                model: {
+                  ...node.model,
+                  secret: decryptedSecret,
                 },
-              });
-            });
+              },
+            },
           });
         }
       });

@@ -1,5 +1,4 @@
 import axios from 'axios';
-import Cookies from 'js-cookie';
 import { API_URL, API_BASE_PATH } from './constants';
 import { getToken, removeToken } from './utils/token';
 import { isClient } from './utils/isEnvironment';
@@ -7,7 +6,6 @@ import { isClient } from './utils/isEnvironment';
 const softExit = () => {
   if (isClient) {
     removeToken();
-    Cookies.remove('share', { path: '/' });
 
     if (window.location.pathname !== '/auth') {
       window.location.href = '/auth';

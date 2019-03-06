@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
 import styled from 'styled-components';
-import Cookies from 'js-cookie';
 import { getKeys, postKeys } from 'common/api';
 import { matchStrict } from 'common/utils/match';
 import {
@@ -42,8 +41,6 @@ class MasterPasswordStep extends Component {
         const {
           data: { publicKey, encryptedPrivateKey },
         } = await getKeys();
-
-        Cookies.remove('share', { path: '/' });
 
         state.publicKey = publicKey;
         state.encryptedPrivateKey = encryptedPrivateKey;

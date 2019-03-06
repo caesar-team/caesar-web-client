@@ -117,6 +117,9 @@ export const deleteInviteItem = (inviteId, data) =>
 // list
 export const postCreateList = data => callApi.post('/list', data);
 
+export const patchList = (listId, data) =>
+  callApi.patch(`/list/${listId}`, data);
+
 export const removeList = listId => callApi.delete(`/list/${listId}`);
 
 export const toggleFavorite = id => callApi.post(`/item/${id}/favorite`);

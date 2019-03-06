@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import styled from 'styled-components';
 import { withRouter } from 'next/router';
-import { Layout, SettingsSidebar, Import } from 'components';
+import { SettingsLayout, SettingsSidebar, Import } from 'components';
 
 const MainWrapper = styled.div`
   display: flex;
@@ -12,12 +12,12 @@ class SettingsImport extends Component {
     const { user } = this.props;
 
     return (
-      <Layout withSearch user={user}>
+      <SettingsLayout user={user}>
         <MainWrapper>
           <SettingsSidebar />
           <Import />
         </MainWrapper>
-      </Layout>
+      </SettingsLayout>
     );
   }
 }

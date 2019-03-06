@@ -2,6 +2,7 @@ import React from 'react';
 import styled from 'styled-components';
 import LayoutConstructor from './LayoutConstructor';
 import Footer from './Footer';
+import { Icon } from '../Icon';
 
 const LayoutConstructorStyled = styled(LayoutConstructor)`
   ${LayoutConstructor.TopWrapper} {
@@ -10,12 +11,17 @@ const LayoutConstructorStyled = styled(LayoutConstructor)`
   }
 
   ${LayoutConstructor.MainWrapper} {
-    max-width: 400px;
+    max-width: 530px;
   }
 `;
 
-const AuthLayout = props => (
-  <LayoutConstructorStyled withImages footerComponent={Footer} {...props} />
+const BootstrapLayout = props => (
+  <LayoutConstructorStyled
+    withImages
+    headerComponent={<Icon name="logo-new" width={142} height={40} />}
+    footerComponent={Footer}
+    {...props}
+  />
 );
 
-export default AuthLayout;
+export default BootstrapLayout;

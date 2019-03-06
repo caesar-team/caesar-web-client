@@ -1,20 +1,18 @@
 import React, { Component } from 'react';
-import styled from 'styled-components';
 import { getList } from 'common/api';
 import { matchStrict } from 'common/utils/match';
-import { Layout, Credentials, Document, withNotification } from 'components';
+import {
+  SharingLayout,
+  Credentials,
+  Document,
+  withNotification,
+} from 'components';
 import {
   ITEM_CREDENTIALS_TYPE,
   ITEM_DOCUMENT_TYPE,
   ITEM_REVIEW_MODE,
 } from 'common/constants';
 import { getPrivateKeyObj, decryptItem } from 'common/utils/cipherUtils';
-
-const Wrapper = styled.div`
-  width: 100%;
-  max-width: 800px;
-  margin: 0 auto;
-`;
 
 const getInboxItem = list => {
   if (!list || !list[0] || !list[0].children || !list[0].children[0]) {
@@ -70,11 +68,7 @@ class Sharing extends Component {
       null,
     );
 
-    return (
-      <Layout>
-        <Wrapper>{renderedItem}</Wrapper>
-      </Layout>
-    );
+    return <SharingLayout>{renderedItem}</SharingLayout>;
   }
 }
 

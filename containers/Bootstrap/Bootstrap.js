@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import * as openpgp from 'openpgp';
 import { withRouter } from 'next/router';
-import { BootstrapWrapper } from 'components';
+import { BootstrapLayout } from 'components';
 import { getUserBootstrap } from 'common/api';
 import { DEFAULT_IDLE_TIMEOUT } from 'common/constants';
 import OpenPGPWorker from 'common/openpgp.worker';
@@ -138,23 +138,23 @@ class Bootstrap extends Component {
 
     if (TWO_FACTOR_STEPS.includes(currentStep)) {
       return (
-        <BootstrapWrapper>
+        <BootstrapLayout>
           <TwoFactorStep
             initialStep={currentStep}
             onFinish={this.handleFinishTwoFactor}
           />
-        </BootstrapWrapper>
+        </BootstrapLayout>
       );
     }
 
     if (PASSWORD_STEPS.includes(currentStep)) {
       return (
-        <BootstrapWrapper>
+        <BootstrapLayout>
           <PasswordStep
             email={shared.email}
             onFinish={this.handleFinishChangePassword}
           />
-        </BootstrapWrapper>
+        </BootstrapLayout>
       );
     }
 

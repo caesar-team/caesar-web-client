@@ -9,12 +9,19 @@ import {
 } from 'components';
 import {
   postCreateList,
+  patchList,
   removeList,
   getList,
   getUsers,
   getUserSelf,
 } from 'common/api';
-import { createTree, removeNode, addNode, findNode } from 'common/utils/tree';
+import {
+  createTree,
+  removeNode,
+  addNode,
+  findNode,
+  updateNode,
+} from 'common/utils/tree';
 import {
   LIST_WORKFLOW_EDIT_MODE,
   LIST_WORKFLOW_CREATE_MODE,
@@ -87,6 +94,37 @@ class ManageListContainer extends Component {
         workInProgressList: null,
         list: addNode(prevState.list, listsNodeId, {
           id: listId,
+          label,
+          type: LIST_TYPE,
+          children: [],
+        }),
+      }));
+    } catch (e) {
+      const {
+        response: {
+          data: { errors },
+        },
+      } = e;
+
+      if (errors && errors.label) {
+        console.log(errors.label);
+      }
+    }
+  };
+
+  handleEditList = async ({ label }) => {
+    const { workInProgressList } = this.state;
+
+    try {
+      await patchList(workInProgressList.id, {
+        label,
+      });
+
+      this.setState(prevState => ({
+        isVisibleModal: false,
+        workInProgressList: null,
+        list: updateNode(prevState.list, workInProgressList.id, {
+          id: workInProgressList.id,
           label,
           type: LIST_TYPE,
           children: [],
@@ -200,7 +238,11 @@ class ManageListContainer extends Component {
         {isVisibleModal && (
           <ListFormModal
             list={workInProgressList}
-            onCreate={this.handleCreateList}
+            onSubmit={
+              workInProgressList.mode === LIST_WORKFLOW_CREATE_MODE
+                ? this.handleCreateList
+                : this.handleEditList
+            }
             onCancel={this.handleCancel}
           />
         )}

@@ -803,57 +803,61 @@ class DashboardContainer extends Component {
 
     const email = generateAnonymousEmail();
 
-    const {
-      userId,
-      password,
-      masterPassword,
-      publicKey,
-    } = await this.createUser(email, ANONYMOUS_USER_ROLE);
-
-    const encryptedSecret = await encryptItemForUser(
-      workInProgressItem.secret,
-      publicKey,
-    );
-
-    const {
-      data: { id: shareId },
-    } = await postShare({
-      user: userId,
-      sharedItems: [{ item: workInProgressItem.id, secret: encryptedSecret }],
-    });
-
-    const link = generateSharingUrl(
-      objectToBase64({
-        shareId,
-        email,
+    try {
+      const {
+        userId,
         password,
         masterPassword,
-      }),
-    );
+        publicKey,
+      } = await this.createUser(email, ANONYMOUS_USER_ROLE);
 
-    await updateShare(shareId, {
-      link,
-    });
+      const encryptedSecret = await encryptItemForUser(
+        workInProgressItem.secret,
+        publicKey,
+      );
 
-    const shared = {
-      id: shareId,
-      userId,
-      email,
-      link,
-      status: SHARED_WAITING_STATUS,
-      roles: [ANONYMOUS_USER_ROLE],
-    };
+      const {
+        data: { id: shareId },
+      } = await postShare({
+        user: userId,
+        sharedItems: [{ item: workInProgressItem.id, secret: encryptedSecret }],
+      });
 
-    const data = {
-      ...workInProgressItem,
-      shared: [...workInProgressItem.shared, shared],
-    };
+      const link = generateSharingUrl(
+        objectToBase64({
+          shareId,
+          email,
+          password,
+          masterPassword,
+        }),
+      );
 
-    this.setState(prevState => ({
-      ...prevState,
-      workInProgressItem: data,
-      list: updateNode(prevState.list, workInProgressItem.id, data),
-    }));
+      await updateShare(shareId, {
+        link,
+      });
+
+      const shared = {
+        id: shareId,
+        userId,
+        email,
+        link,
+        status: SHARED_WAITING_STATUS,
+        roles: [ANONYMOUS_USER_ROLE],
+      };
+
+      const data = {
+        ...workInProgressItem,
+        shared: [...workInProgressItem.shared, shared],
+      };
+
+      this.setState(prevState => ({
+        ...prevState,
+        workInProgressItem: data,
+        list: updateNode(prevState.list, workInProgressItem.id, data),
+      }));
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   handleDeactivateShareByLink = async () => {

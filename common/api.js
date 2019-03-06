@@ -7,6 +7,7 @@ const softExit = () => {
   if (isClient) {
     removeToken();
 
+    // TODO: change via Router
     if (window.location.pathname !== '/signin') {
       window.location.href = '/signin';
     }

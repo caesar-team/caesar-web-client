@@ -1,7 +1,7 @@
 import React, { Component, Fragment } from 'react';
 import styled from 'styled-components';
 import {
-  Layout,
+  DashboardLayout,
   ManageList,
   ListFormModal,
   ConfirmModal,
@@ -224,7 +224,7 @@ class ManageListContainer extends Component {
 
     return (
       <Fragment>
-        <Layout user={user}>
+        <DashboardLayout user={user}>
           <ManageListWrapper>
             <ManageList
               list={postList}
@@ -234,7 +234,7 @@ class ManageListContainer extends Component {
               onClickRemoveList={this.handleClickRemovePost}
             />
           </ManageListWrapper>
-        </Layout>
+        </DashboardLayout>
         {isVisibleModal && (
           <ListFormModal
             list={workInProgressList}

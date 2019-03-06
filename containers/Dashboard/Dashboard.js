@@ -12,6 +12,7 @@ import {
   ConfirmModal,
   MenuList,
   withNotification,
+  DashboardLayout,
 } from 'components';
 import {
   createTree,
@@ -1207,7 +1208,7 @@ class DashboardContainer extends Component {
 
     return (
       <Fragment>
-        <Layout user={user} withSearch>
+        <DashboardLayout user={user} withSearch>
           <CenterWrapper>
             <Sidebar>
               <MenuList
@@ -1248,7 +1249,7 @@ class DashboardContainer extends Component {
               />
             </RightColumnWrapper>
           </CenterWrapper>
-        </Layout>
+        </DashboardLayout>
         {isVisibleInviteModal && (
           <InviteModal
             members={members}

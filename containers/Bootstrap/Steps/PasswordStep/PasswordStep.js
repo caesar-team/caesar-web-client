@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
-import { AuthDescription, AuthTitle, Head } from 'components';
 import styled from 'styled-components';
+import { AuthDescription, AuthTitle, Head } from 'components';
 import { postChangePassword } from 'common/api';
 import { createSrp } from 'common/utils/srp';
 import PasswordForm from './PasswordForm';
@@ -8,6 +8,7 @@ import PasswordForm from './PasswordForm';
 const Wrapper = styled.div`
   max-width: 400px;
   width: 100%;
+  margin: 0 auto;
 `;
 
 const srp = createSrp();

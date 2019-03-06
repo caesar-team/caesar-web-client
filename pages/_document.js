@@ -5,9 +5,7 @@ import styled, { ServerStyleSheet } from 'styled-components';
 import { PORTAL_ID } from 'common/constants';
 import sprite from 'svg-sprite-loader/runtime/sprite.build';
 
-const Body = styled.body`
-  overflow-y: hidden;
-`;
+const Body = styled.body``;
 
 export default class Document extends NextDocument {
   static getInitialProps({ renderPage }) {

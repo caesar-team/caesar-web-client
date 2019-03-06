@@ -109,7 +109,7 @@ export class Header extends Component {
   };
 
   render() {
-    const { user, withSearch } = this.props;
+    const { user, withSearch = false } = this.props;
     const { isDropdownOpened } = this.state;
 
     return (

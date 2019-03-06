@@ -151,7 +151,7 @@ class Bootstrap extends Component {
       return (
         <BootstrapWrapper>
           <PasswordStep
-            email={shared.email}
+            email={shared.e}
             onFinish={this.handleFinishChangePassword}
           />
         </BootstrapWrapper>
@@ -162,7 +162,7 @@ class Bootstrap extends Component {
       return (
         <MasterPasswordStep
           initialStep={currentStep}
-          sharedMasterPassword={shared.masterPassword}
+          sharedMasterPassword={shared.mp}
           onFinish={this.handleFinishMasterPassword}
         />
       );

@@ -24,8 +24,7 @@ const IconWrapper = styled.div`
   display: flex;
 `;
 
-const GoogleAuthLink = styled.a`
-  position: relative;
+const AuthWrapper = styled.a`
   display: flex;
   justify-content: center;
   align-items: center;
@@ -130,12 +129,12 @@ class SignInContainer extends Component {
         {isLinkShown && (
           <Fragment>
             <TextWithLines width={1}>OR</TextWithLines>
-            <GoogleAuthLink href={googleAuthUrl}>
+            <AuthWrapper href={googleAuthUrl}>
               <GoogleLogoWrapper>
                 <Icon name="google" width={20} height={20} isInButton />
               </GoogleLogoWrapper>
               <GoogleAuthText>Log in with Google</GoogleAuthText>
-            </GoogleAuthLink>
+            </AuthWrapper>
           </Fragment>
         )}
       </AuthLayout>

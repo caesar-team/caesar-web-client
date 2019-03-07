@@ -205,23 +205,18 @@ class ManageListContainer extends Component {
     }
   };
 
-  handleChangeSort = async (listId, sourceIndex, destinationIndex) => {
-    try {
-      await patchListSort(listId, { sort: destinationIndex });
-
-      this.setState(prevState => ({
+  handleChangeSort = (listId, sourceIndex, destinationIndex) => {
+    this.setState(
+      prevState => ({
         list: {
           ...prevState.list,
-          children: reorder(
-            prevState.list.children,
-            sourceIndex,
-            destinationIndex,
+          children: fixSort(
+            reorder(prevState.list.children, sourceIndex, destinationIndex),
           ),
         },
-      }));
-    } catch (e) {
-      console.log(e);
-    }
+      }),
+      () => patchListSort(listId, { sort: destinationIndex }),
+    );
   };
 
   handleCancel = () => {

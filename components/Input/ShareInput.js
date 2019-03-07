@@ -31,26 +31,31 @@ class ShareInput extends Component {
     });
   };
 
-  handleKeyDown = event => {
-    const { onChange } = this.props;
+  handleBlur = () => {
+    this.clearAndSendValue();
+  };
 
+  handleKeyDown = event => {
     if (event.defaultPrevented) {
       return;
     }
 
     if (event.keyCode === KEY_CODES.ENTER) {
-      const {
-        target: { value },
-      } = event;
+      this.clearAndSendValue();
+    }
+  };
 
-      if (value) {
-        this.setState(
-          {
-            value: '',
-          },
-          () => onChange(value),
-        );
-      }
+  clearAndSendValue = () => {
+    const { onChange } = this.props;
+    const { value } = this.state;
+
+    if (value && value.length > 0) {
+      this.setState(
+        {
+          value: '',
+        },
+        () => onChange(value),
+      );
     }
   };
 
@@ -64,6 +69,7 @@ class ShareInput extends Component {
         placeholder="Enter email addresses"
         prefix={<StyledIcon name="at" width={18} height={18} />}
         onChange={this.handleChange}
+        onBlur={this.handleBlur}
         onKeyDown={this.handleKeyDown}
       />
     );

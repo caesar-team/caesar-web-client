@@ -1,19 +1,25 @@
 import React from 'react';
 import styled from 'styled-components';
-import { AuthLayout as ErrorLayout } from 'components';
+import { ErrorLayout } from 'components';
 import ErrorImg from 'static/images/error.jpg';
 import ErrorImg2x from 'static/images/error@2x.jpg';
 
 const Image = styled.img`
-  padding-top: 45px;
-  padding-left: 15px;
   object-fit: contain;
 `;
 
 const TextWrapper = styled.div`
   position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  margin: auto auto;
+  z-index: 11;
   display: flex;
   flex-direction: column;
+  align-items: center;
+  justify-content: center;
 `;
 
 const StatusCode = styled.div`

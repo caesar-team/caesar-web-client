@@ -58,6 +58,8 @@ class MenuList extends Component {
     const { isVisibleList } = this.state;
     const { selectedListId, onClick } = this.props;
 
+    const sortedChildren = children.sort((a, b) => a.sort > b.sort);
+
     switch (type) {
       case INBOX_TYPE:
       case FAVORITES_TYPE:
@@ -82,7 +84,7 @@ class MenuList extends Component {
             </MenuItem>
             {isVisibleList && (
               <div>
-                {children.map(child => {
+                {sortedChildren.map(child => {
                   const isActive = child.id === selectedListId;
 
                   return (

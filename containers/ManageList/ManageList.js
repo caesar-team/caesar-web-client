@@ -14,14 +14,8 @@ import {
   getList,
   getUsers,
   getUserSelf,
+  patchListSort,
 } from 'common/api';
-import {
-  createTree,
-  removeNode,
-  addNode,
-  findNode,
-  updateNode,
-} from 'common/utils/tree';
 import {
   LIST_WORKFLOW_EDIT_MODE,
   LIST_WORKFLOW_CREATE_MODE,
@@ -36,6 +30,29 @@ const ManageListWrapper = styled.div`
   margin: 0 auto;
 `;
 
+const reorder = (list, startIndex, endIndex) => {
+  const result = Array.from(list);
+  const [removed] = result.splice(startIndex, 1);
+  result.splice(endIndex, 0, removed);
+
+  return result;
+};
+
+const fixSort = lists => lists.map((list, index) => ({ ...list, sort: index }));
+
+const update = (list, listId, data) => {
+  const index = list.findIndex(({ id }) => id === listId);
+
+  return [
+    ...list.slice(0, index),
+    {
+      ...list[listId],
+      ...data,
+    },
+    ...list.slice(index + 1),
+  ];
+};
+
 class ManageListContainer extends Component {
   state = this.prepareInitialState();
 
@@ -45,7 +62,7 @@ class ManageListContainer extends Component {
     const { data: members } = await getUsers();
 
     this.setState({
-      list: createTree(list[1]),
+      list: list[1],
       user,
       members: memberAdapter(members),
     });
@@ -64,7 +81,7 @@ class ManageListContainer extends Component {
   handleClickEditList = listId => () => {
     const { list } = this.state;
 
-    const { label } = findNode(list, listId).model;
+    const { label } = list.children.find(({ id }) => id === listId);
 
     this.setState({
       isVisibleModal: true,
@@ -79,7 +96,7 @@ class ManageListContainer extends Component {
   handleCreateList = async ({ label }) => {
     const { list } = this.state;
 
-    const listsNodeId = list.model.id;
+    const listsNodeId = list.id;
 
     try {
       const {
@@ -92,12 +109,19 @@ class ManageListContainer extends Component {
       this.setState(prevState => ({
         isVisibleModal: false,
         workInProgressList: null,
-        list: addNode(prevState.list, listsNodeId, {
-          id: listId,
-          label,
-          type: LIST_TYPE,
-          children: [],
-        }),
+        list: {
+          ...prevState.list,
+          children: [
+            ...prevState.list.children,
+            {
+              id: listId,
+              label,
+              sort: prevState.list.children.length,
+              type: LIST_TYPE,
+              children: [],
+            },
+          ],
+        },
       }));
     } catch (e) {
       const {
@@ -123,12 +147,15 @@ class ManageListContainer extends Component {
       this.setState(prevState => ({
         isVisibleModal: false,
         workInProgressList: null,
-        list: updateNode(prevState.list, workInProgressList.id, {
-          id: workInProgressList.id,
-          label,
-          type: LIST_TYPE,
-          children: [],
-        }),
+        list: {
+          ...prevState.list,
+          children: update(prevState.list.children, workInProgressList.id, {
+            id: workInProgressList.id,
+            label,
+            type: LIST_TYPE,
+            children: [],
+          }),
+        },
       }));
     } catch (e) {
       const {
@@ -153,7 +180,7 @@ class ManageListContainer extends Component {
     const { notification } = this.props;
     const { list, removingListId } = this.state;
 
-    const { label } = findNode(list, removingListId).model;
+    const { label } = list.children.find(({ id }) => id === removingListId);
 
     try {
       await removeList(removingListId);
@@ -165,11 +192,35 @@ class ManageListContainer extends Component {
 
       this.setState(prevState => ({
         ...prevState,
-        removeListId: null,
-        list: removeNode(prevState.list, removingListId),
+        removingListId: null,
+        list: {
+          ...prevState.list,
+          children: fixSort(
+            prevState.list.children.filter(({ id }) => id !== removingListId),
+          ),
+        },
       }));
     } catch (e) {
       //
+    }
+  };
+
+  handleChangeSort = async (listId, sourceIndex, destinationIndex) => {
+    try {
+      await patchListSort(listId, { sort: destinationIndex });
+
+      this.setState(prevState => ({
+        list: {
+          ...prevState.list,
+          children: reorder(
+            prevState.list.children,
+            sourceIndex,
+            destinationIndex,
+          ),
+        },
+      }));
+    } catch (e) {
+      console.log(e);
     }
   };
 
@@ -198,12 +249,15 @@ class ManageListContainer extends Component {
   preparePostList() {
     const { list } = this.state;
 
-    return list.model.children.map(({ id, label, children }) => ({
-      id,
-      label,
-      count: children.length,
-      invited: children.reduce((acc, post) => [...acc, ...post.invited], []),
-    }));
+    return list.children
+      .map(({ id, label, sort, children }) => ({
+        id,
+        label,
+        sort,
+        count: children.length,
+        invited: children.reduce((acc, post) => [...acc, ...post.invited], []),
+      }))
+      .sort((a, b) => a.sort > b.sort);
   }
 
   render() {
@@ -229,6 +283,7 @@ class ManageListContainer extends Component {
             <ManageList
               list={postList}
               members={members}
+              onChangeSort={this.handleChangeSort}
               onClickCreateList={this.handleClickCreateList}
               onClickEditList={this.handleClickEditList}
               onClickRemoveList={this.handleClickRemovePost}

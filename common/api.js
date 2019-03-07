@@ -86,6 +86,9 @@ export const getList = token =>
     },
   });
 
+export const patchListSort = (listId, data) =>
+  callApi.patch(`/list/${listId}/sort`, data);
+
 export const getUserBootstrap = () => callApi.get('/user/security/bootstrap');
 
 export const postCreateItem = data => callApi.post('/item', data);

@@ -14,6 +14,7 @@ import {
   getList,
   getUsers,
   getUserSelf,
+  patchListSort,
 } from 'common/api';
 import {
   LIST_WORKFLOW_EDIT_MODE,
@@ -204,17 +205,23 @@ class ManageListContainer extends Component {
     }
   };
 
-  handleChangeSort = (listId, sourceIndex, destinationIndex) => {
-    this.setState(prevState => ({
-      list: {
-        ...prevState.list,
-        children: reorder(
-          prevState.list.children,
-          sourceIndex,
-          destinationIndex,
-        ),
-      },
-    }));
+  handleChangeSort = async (listId, sourceIndex, destinationIndex) => {
+    try {
+      await patchListSort(listId, { sort: destinationIndex });
+
+      this.setState(prevState => ({
+        list: {
+          ...prevState.list,
+          children: reorder(
+            prevState.list.children,
+            sourceIndex,
+            destinationIndex,
+          ),
+        },
+      }));
+    } catch (e) {
+      console.log(e);
+    }
   };
 
   handleCancel = () => {

@@ -5,7 +5,7 @@ import { base64ToObject } from 'common/utils/cipherUtils';
 import { login } from 'common/utils/authUtils';
 import { getCheckShare } from 'common/api';
 
-const validFields = ['shareId', 'email', 'password'];
+const validFields = ['e', 'p'];
 
 const validateShare = (data, fields) =>
   data && fields.every(field => !!data[field]);
@@ -24,7 +24,7 @@ const SharePage = ({ statusCode, shared }) => (
 SharePage.getInitialProps = async ({
   req,
   res,
-  query: { encryption = '' },
+  query: { encryption = '', shareId = '' },
 }) => {
   const shared = base64ToObject(encryption);
 
@@ -33,10 +33,10 @@ SharePage.getInitialProps = async ({
   }
 
   try {
-    await getCheckShare(shared.shareId);
+    await getCheckShare(shareId);
 
     if (!req || !req.cookies || !req.cookies.token) {
-      const jwt = await login(shared.email, shared.password);
+      const jwt = await login(shared.e, shared.p);
 
       res.cookie('token', jwt, { path: '/' });
     }

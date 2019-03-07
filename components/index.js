@@ -42,6 +42,7 @@ export {
   AuthLayout,
   BootstrapLayout,
   DashboardLayout,
+  ErrorLayout,
   SettingsLayout,
   SharingLayout,
 } from './Layout';

@@ -825,11 +825,11 @@ class DashboardContainer extends Component {
       });
 
       const link = generateSharingUrl(
+        shareId,
         objectToBase64({
-          shareId,
-          email,
-          password,
-          masterPassword,
+          e: email,
+          p: password,
+          mp: masterPassword,
         }),
       );
 
@@ -1022,10 +1022,9 @@ class DashboardContainer extends Component {
           id: shareId,
           link: generateSharingUrl(
             objectToBase64({
-              shareId,
-              email,
-              password,
-              masterPassword,
+              e: email,
+              p: password,
+              mp: masterPassword,
             }),
           ),
         };

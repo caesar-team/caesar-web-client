@@ -83,13 +83,9 @@ class DataStep extends Component {
 
   handleSearch = event => {
     event.preventDefault();
-
-    console.log(event.target.value);
   };
 
-  handleChange = data => {
-    console.log(data);
-  };
+  handleChange = data => {};
 
   prepareInitialState() {
     return {

@@ -1021,6 +1021,7 @@ class DashboardContainer extends Component {
         return {
           id: shareId,
           link: generateSharingUrl(
+            shareId,
             objectToBase64({
               e: email,
               p: password,

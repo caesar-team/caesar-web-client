@@ -58,7 +58,7 @@ class MenuList extends Component {
     const { isVisibleList } = this.state;
     const { selectedListId, onClick } = this.props;
 
-    const sortedChildren = children.sort((a, b) => a.sort > b.sort);
+    const sortedChildren = children.sort((a, b) => a.sort - b.sort);
 
     switch (type) {
       case INBOX_TYPE:

@@ -111,16 +111,16 @@ class ManageListContainer extends Component {
         workInProgressList: null,
         list: {
           ...prevState.list,
-          children: [
-            ...prevState.list.children,
+          children: fixSort([
             {
               id: listId,
               label,
-              sort: prevState.list.children.length,
+              sort: 0,
               type: LIST_TYPE,
               children: [],
             },
-          ],
+            ...prevState.list.children,
+          ]),
         },
       }));
     } catch (e) {
@@ -252,7 +252,7 @@ class ManageListContainer extends Component {
         count: children.length,
         invited: children.reduce((acc, post) => [...acc, ...post.invited], []),
       }))
-      .sort((a, b) => a.sort > b.sort);
+      .sort((a, b) => a.sort - b.sort);
   }
 
   render() {

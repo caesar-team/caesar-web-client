@@ -168,6 +168,19 @@ class Bootstrap extends Component {
       );
     }
 
+    // if user is using sharing url and master password is included inside share
+    // url we don't turn on LockScreen via SessionChecker(onFinishTimeout)
+    if (currentStep === BOOTSTRAP_FINISH && shared.mp) {
+      return (
+        <PageComponent
+          publicKey={publicKey}
+          privateKey={encryptedPrivateKey}
+          password={masterPassword}
+          {...props}
+        />
+      );
+    }
+
     // TODO: during refactoring to rename:
     // TODO: - password to masterPassword
     // TODO: - privateKey to encryptedPrivateKey

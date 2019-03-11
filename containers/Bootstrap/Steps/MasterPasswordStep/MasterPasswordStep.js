@@ -7,7 +7,7 @@ import {
   generateKeys,
   reencryptPrivateKey,
 } from 'common/utils/key';
-import { BootstrapWrapper } from 'components';
+import { BootstrapLayout } from 'components';
 import {
   MASTER_PASSWORD_CHECK,
   MASTER_PASSWORD_CREATE,
@@ -20,6 +20,7 @@ import MasterPasswordConfirmForm from './MasterPasswordConfirmForm';
 const Wrapper = styled.div`
   max-width: 400px;
   width: 100%;
+  margin: 0 auto;
 `;
 
 class MasterPasswordStep extends Component {
@@ -195,9 +196,9 @@ class MasterPasswordStep extends Component {
     return step === MASTER_PASSWORD_CHECK ? (
       <MasterPasswordCheckForm onSubmit={this.handleSubmitCheckPassword} />
     ) : (
-      <BootstrapWrapper>
+      <BootstrapLayout>
         <Wrapper>{renderedStep}</Wrapper>
-      </BootstrapWrapper>
+      </BootstrapLayout>
     );
   }
 }

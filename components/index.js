@@ -38,8 +38,14 @@ export { SessionChecker } from './SessionChecker';
 export { Uploader } from './Uploader';
 export { FormInput } from './FormInput';
 export { Modal } from './Modal';
-export { Layout } from './Layout';
-export { AuthLayout } from './Layout';
+export {
+  AuthLayout,
+  BootstrapLayout,
+  DashboardLayout,
+  ErrorLayout,
+  SettingsLayout,
+  SharingLayout,
+} from './Layout';
 export { WrapperAlignTop } from './WrapperAlignTop';
 export { AuthWrapper } from './AuthWrapper';
 export { AuthTitle } from './AuthTitle';
@@ -55,4 +61,3 @@ export { SettingsSidebar } from './SettingsSidebar';
 export { Tab, Tabs } from './Tabs';
 export { NavigationPanel } from './NavigationPanel';
 export { DataTable } from './DataTable';
-export { BootstrapWrapper } from './BootstrapWrapper';

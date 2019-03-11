@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import * as openpgp from 'openpgp';
 import { withRouter } from 'next/router';
-import { BootstrapWrapper } from 'components';
+import { BootstrapLayout } from 'components';
 import { getUserBootstrap } from 'common/api';
 import { DEFAULT_IDLE_TIMEOUT } from 'common/constants';
 import OpenPGPWorker from 'common/openpgp.worker';
@@ -138,23 +138,23 @@ class Bootstrap extends Component {
 
     if (TWO_FACTOR_STEPS.includes(currentStep)) {
       return (
-        <BootstrapWrapper>
+        <BootstrapLayout>
           <TwoFactorStep
             initialStep={currentStep}
             onFinish={this.handleFinishTwoFactor}
           />
-        </BootstrapWrapper>
+        </BootstrapLayout>
       );
     }
 
     if (PASSWORD_STEPS.includes(currentStep)) {
       return (
-        <BootstrapWrapper>
+        <BootstrapLayout>
           <PasswordStep
-            email={shared.email}
+            email={shared.e}
             onFinish={this.handleFinishChangePassword}
           />
-        </BootstrapWrapper>
+        </BootstrapLayout>
       );
     }
 
@@ -162,8 +162,21 @@ class Bootstrap extends Component {
       return (
         <MasterPasswordStep
           initialStep={currentStep}
-          sharedMasterPassword={shared.masterPassword}
+          sharedMasterPassword={shared.mp}
           onFinish={this.handleFinishMasterPassword}
+        />
+      );
+    }
+
+    // if user is using sharing url and master password is included inside share
+    // url we don't turn on LockScreen via SessionChecker(onFinishTimeout)
+    if (currentStep === BOOTSTRAP_FINISH && shared.mp) {
+      return (
+        <PageComponent
+          publicKey={publicKey}
+          privateKey={encryptedPrivateKey}
+          password={masterPassword}
+          {...props}
         />
       );
     }

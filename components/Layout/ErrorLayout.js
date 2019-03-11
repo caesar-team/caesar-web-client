@@ -1,7 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
 import LayoutConstructor from './LayoutConstructor';
-import Footer from './Footer';
 
 const LayoutConstructorStyled = styled(LayoutConstructor)`
   ${LayoutConstructor.TopWrapper} {
@@ -10,12 +9,13 @@ const LayoutConstructorStyled = styled(LayoutConstructor)`
   }
 
   ${LayoutConstructor.MainWrapper} {
-    max-width: 400px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
   }
 `;
 
-const AuthLayout = props => (
-  <LayoutConstructorStyled withImages footerComponent={Footer} {...props} />
-);
+const ErrorLayout = props => <LayoutConstructorStyled {...props} />;
 
-export default AuthLayout;
+export default ErrorLayout;

@@ -8,12 +8,17 @@ const Image = styled.img`
   padding-top: 45px;
   padding-left: 15px;
   object-fit: contain;
+  width: 100%;
+  max-width: 580px;
 `;
 
 const StyledIcon = styled(Icon)`
   position: absolute;
-  top: 380px;
-  left: 240px;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  margin: auto auto;
   fill: ${({ theme }) => theme.emperor};
 `;
 

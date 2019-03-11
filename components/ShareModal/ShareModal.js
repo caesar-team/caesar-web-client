@@ -14,9 +14,8 @@ import {
   ANONYMOUS_USER_ROLE,
   SHARED_ACCEPTED_STATUS,
   SHARED_WAITING_STATUS,
-  APP_URL,
 } from 'common/constants';
-import { formatDate, dateDiffNow } from 'common/utils/dateUtils';
+import { formatDate } from 'common/utils/dateUtils';
 import { copyToClipboard } from 'common/utils/clipboard';
 import { base64ToObject, objectToBase64 } from 'common/utils/cipherUtils';
 import { generateSharingUrl } from 'common/utils/sharing';
@@ -158,7 +157,9 @@ const ResendLink = styled.a`
   cursor: pointer;
 `;
 
-const getEncryption = link => link.replace(`${APP_URL}/share/`, '');
+const getEncryption = link => link.match(/\/(\w+)$/)[1];
+const getShareId = link => link.match(/share\/(.+)\//)[1];
+
 const getAnonymousLink = shared =>
   (shared.find(({ roles }) => roles.includes(ANONYMOUS_USER_ROLE)) || {}).link;
 
@@ -226,11 +227,12 @@ export class ShareModal extends Component {
       return link;
     }
 
-    const { masterPassword, ...linkData } = linkObj;
+    const { mp, ...linkData } = linkObj;
 
     return `${generateSharingUrl(
+      getShareId(link),
       objectToBase64(linkData),
-    )}\nMaster password: ${masterPassword}`;
+    )}\nMaster password: ${mp}`;
   }
 
   prepareInitialState() {

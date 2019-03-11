@@ -7,6 +7,7 @@ const softExit = () => {
   if (isClient) {
     removeToken();
 
+    // TODO: change via Router
     if (window.location.pathname !== '/signin') {
       window.location.href = '/signin';
     }
@@ -85,6 +86,9 @@ export const getList = token =>
     },
   });
 
+export const patchListSort = (listId, data) =>
+  callApi.patch(`/list/${listId}/sort`, data);
+
 export const getUserBootstrap = () => callApi.get('/user/security/bootstrap');
 
 export const postCreateItem = data => callApi.post('/item', data);
@@ -114,6 +118,9 @@ export const deleteInviteItem = (inviteId, data) =>
 
 // list
 export const postCreateList = data => callApi.post('/list', data);
+
+export const patchList = (listId, data) =>
+  callApi.patch(`/list/${listId}`, data);
 
 export const removeList = listId => callApi.delete(`/list/${listId}`);
 

@@ -1,25 +1,13 @@
-import React, { Component } from 'react';
-import styled from 'styled-components';
-import { withRouter } from 'next/router';
+import React, { Fragment } from 'react';
 import { SettingsLayout, SettingsSidebar, Import } from 'components';
 
-const MainWrapper = styled.div`
-  display: flex;
-`;
+const SettingsImport = ({ user }) => (
+  <SettingsLayout user={user}>
+    <Fragment>
+      <SettingsSidebar />
+      <Import />
+    </Fragment>
+  </SettingsLayout>
+);
 
-class SettingsImport extends Component {
-  render() {
-    const { user } = this.props;
-
-    return (
-      <SettingsLayout user={user}>
-        <MainWrapper>
-          <SettingsSidebar />
-          <Import />
-        </MainWrapper>
-      </SettingsLayout>
-    );
-  }
-}
-
-export default withRouter(SettingsImport);
+export default SettingsImport;

@@ -60,14 +60,14 @@ const TabDescription = styled.div`
 const Title = styled.div`
   font-size: 36px;
   letter-spacing: 1px;
-  color: #000000;
+  color: ${({ theme }) => theme.black};
   margin-bottom: 30px;
 `;
 
 const Description = styled.div`
   font-size: 18px;
   letter-spacing: 0.6px;
-  color: #000000;
+  color: ${({ theme }) => theme.black};
   margin-bottom: 25px;
 `;
 
@@ -75,14 +75,21 @@ const StyledNavigationPanel = styled(NavigationPanel)`
   margin-top: 25px;
 `;
 
+const requiredFields = ['title', 'login', 'password'];
+
+const checkRequiredFields = (obj, required) =>
+  Object.keys(obj).every(key => required.includes(key) && !!obj[key]);
+
 const normalizeData = (rows, { title, login, password, website, note }) =>
-  rows.map(row => ({
-    title: row[title],
-    login: row[login],
-    password: row[password],
-    website: row[website],
-    note: row[note],
-  }));
+  rows
+    .map(row => ({
+      title: row[title],
+      login: row[login],
+      password: row[password],
+      website: row[website],
+      note: row[note],
+    }))
+    .filter(row => checkRequiredFields(row, requiredFields));
 
 class Import extends Component {
   state = this.prepareInitialState();

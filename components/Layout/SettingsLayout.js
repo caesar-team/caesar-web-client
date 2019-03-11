@@ -5,6 +5,10 @@ import { Header } from './Header';
 
 const LayoutConstructorStyled = styled(LayoutConstructor)`
   padding: 0;
+
+  ${LayoutConstructor.MainWrapper} {
+    display: flex;
+  }
 `;
 
 const SettingsLayout = ({ user, ...props }) => (

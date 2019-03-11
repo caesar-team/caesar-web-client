@@ -8,8 +8,24 @@ export function parseFile(base64str) {
 
   const [headings, ...rest] = data;
 
+  const emptyIndexes = headings.reduce((acc, item, index) => {
+    if (!item) {
+      return [...acc, index];
+    }
+
+    return acc;
+  }, []);
+
   return {
-    headings,
-    rows: rest,
+    headings: headings.filter(item => item !== ''),
+    rows: rest.map(row =>
+      row.reduce((acc, item, index) => {
+        if (emptyIndexes.includes(index)) {
+          return acc;
+        }
+
+        return [...acc, item];
+      }, []),
+    ),
   };
 }

@@ -119,7 +119,7 @@ const StyledButton = styled(Button)`
 
 const getOptions = headings =>
   headings.map((heading, index) => ({
-    value: index,
+    value: `${index}`,
     label: heading,
   }));
 

@@ -86,15 +86,11 @@ class DataStep extends Component {
     event.preventDefault();
   };
 
-<<<<<<< HEAD
   handleChange = ({ selectedRows }) => {
     this.setState({
       selectedRows,
     });
   };
-=======
-  handleChange = data => {};
->>>>>>> develop
 
   prepareInitialState() {
     return {

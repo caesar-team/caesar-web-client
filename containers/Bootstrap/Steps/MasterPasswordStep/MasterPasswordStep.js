@@ -78,11 +78,13 @@ class MasterPasswordStep extends Component {
   async onFinishMasterPassword(publicKey, encryptedPrivateKey, masterPassword) {
     const { onFinish } = this.props;
 
+    // TODO: generate new pair of keys
     await postKeys({
       publicKey,
       encryptedPrivateKey,
     });
 
+    // TODO: pass new and old pair of keys
     onFinish({
       publicKey,
       encryptedPrivateKey,

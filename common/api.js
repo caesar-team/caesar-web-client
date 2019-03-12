@@ -150,3 +150,5 @@ export const postRegistration = data => callApi.post('/srp/registration', data);
 export const postChangePassword = data => callApi.patch('/srp/password', data);
 
 export const getCheckShare = id => callApi.get(`/anonymous/share/${id}/check`);
+
+export const getSharedItems = () => callApi.get('/list/shared');

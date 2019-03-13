@@ -4,7 +4,6 @@ import deepequal from 'fast-deep-equal';
 import memoize from 'memoize-one';
 import * as openpgp from 'openpgp';
 import {
-  Layout,
   Item,
   List,
   InviteModal,
@@ -43,9 +42,11 @@ import {
   PERMISSION_READ,
   INVITE_TYPE,
   SHARE_TYPE,
+  USER_ROLE,
   READ_ONLY_USER_ROLE,
   ANONYMOUS_USER_ROLE,
   SHARED_WAITING_STATUS,
+  PERMISSION_WRITE,
 } from 'common/constants';
 import {
   postCreateItem,
@@ -663,11 +664,21 @@ class DashboardContainer extends Component {
         ],
       };
 
+      const newMembers = Object.values(invitedByUserId)
+        .filter(({ isNew }) => !!isNew)
+        .map(({ userId, isNew, email, ...rest }) => ({
+          id: userId,
+          name: email,
+          email,
+          ...rest,
+        }));
+
       this.setState(prevState => ({
         ...prevState,
         isVisibleInviteModal: false,
         workInProgressItem: data,
         list: updateNode(prevState.list, workInProgressItem.id, data),
+        members: [...prevState.members, ...newMembers],
       }));
     } catch (e) {
       console.log(e);
@@ -747,9 +758,18 @@ class DashboardContainer extends Component {
     });
   };
 
-  handleInviteMembers = async invited => {
+  handleInviteMembers = async (invited, newInvites) => {
     const { workInProgressItem } = this.state;
     const { invited: currentlyInvited } = workInProgressItem;
+
+    let newInvited = [];
+
+    if (newInvites && newInvites.length > 0) {
+      newInvited = await Promise.all(
+        newInvites.map(email => this.createUser(email, USER_ROLE)),
+      );
+    }
+
     const currentlyInvitedByUserId = currentlyInvited.reduce((acc, invite) => {
       acc[invite.userId] = invite;
       return acc;
@@ -757,6 +777,11 @@ class DashboardContainer extends Component {
 
     const invitedByUserId = invited.reduce((acc, invite) => {
       acc[invite.userId] = invite;
+      return acc;
+    }, {});
+
+    const newInvitedByUserId = newInvited.reduce((acc, invite) => {
+      acc[invite.userId] = { ...invite, access: PERMISSION_WRITE, isNew: true };
       return acc;
     }, {});
 
@@ -774,7 +799,7 @@ class DashboardContainer extends Component {
         return acc;
       },
       {
-        newInvites: [],
+        newInvites: newInvited.map(({ userId }) => userId),
         accessChange: [],
       },
     );
@@ -784,7 +809,10 @@ class DashboardContainer extends Component {
       .map(userId => currentlyInvitedByUserId[userId].id);
 
     if (invitedUserIds.newInvites.length) {
-      await this.inviteNewMembers(invitedUserIds.newInvites, invitedByUserId);
+      await this.inviteNewMembers(invitedUserIds.newInvites, {
+        ...invitedByUserId,
+        ...newInvitedByUserId,
+      });
     }
 
     if (invitedUserIds.accessChange.length) {

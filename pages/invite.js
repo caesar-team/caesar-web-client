@@ -1,30 +1,29 @@
 import React, { Fragment } from 'react';
 import { Error, Head } from 'components';
-import { Bootstrap, Sharing } from 'containers';
+import { Bootstrap, Invite } from 'containers';
 import { base64ToObject } from 'common/utils/cipherUtils';
 import { login } from 'common/utils/authUtils';
-import { getCheckShare } from 'common/api';
 
-const validFields = ['e', 'p'];
+const validFields = ['e', 'p', 'mp'];
 
 const validateFields = (data, fields) =>
   data && fields.every(field => !!data[field]);
 
-const SharePage = ({ statusCode, shared }) => (
+const InvitePage = ({ statusCode, shared }) => (
   <Fragment>
     <Head title="Sharing" />
     {statusCode ? (
       <Error statusCode={statusCode} />
     ) : (
-      <Bootstrap component={Sharing} shared={shared} />
+      <Bootstrap component={Invite} shared={shared} />
     )}
   </Fragment>
 );
 
-SharePage.getInitialProps = async ({
+InvitePage.getInitialProps = async ({
   req,
   res,
-  query: { encryption = '', shareId = '' },
+  query: { encryption = '' },
 }) => {
   const shared = base64ToObject(encryption);
 
@@ -33,8 +32,6 @@ SharePage.getInitialProps = async ({
   }
 
   try {
-    await getCheckShare(shareId);
-
     if (!req || !req.cookies || !req.cookies.token) {
       const jwt = await login(shared.e, shared.p);
 
@@ -47,4 +44,4 @@ SharePage.getInitialProps = async ({
   }
 };
 
-export default SharePage;
+export default InvitePage;

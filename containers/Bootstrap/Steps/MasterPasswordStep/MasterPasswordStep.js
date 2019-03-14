@@ -37,7 +37,7 @@ class MasterPasswordStep extends Component {
     };
 
     if (initialStep === MASTER_PASSWORD_CREATE) {
-      // it's readonly situation
+      // it's readonly situation and new invited user
       if (sharedMasterPassword) {
         const {
           data: { publicKey, encryptedPrivateKey },

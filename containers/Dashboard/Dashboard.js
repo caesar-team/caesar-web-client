@@ -22,7 +22,7 @@ import {
   removeNode,
 } from 'common/utils/tree';
 import { createSrp } from 'common/utils/srp';
-import { generateSharingUrl } from 'common/utils/sharing';
+import { generateSharingUrl, generateInviteUrl } from 'common/utils/sharing';
 import {
   encryptItemForUser,
   encryptItemForUsers,
@@ -69,6 +69,7 @@ import {
   getList,
   getUserSelf,
   getUsers,
+  postInvitation,
 } from 'common/api';
 import DecryptWorker from 'common/decrypt.worker';
 import { initialItemData } from './utils';
@@ -672,6 +673,23 @@ class DashboardContainer extends Component {
           email,
           ...rest,
         }));
+
+      if (newMembers.length > 0) {
+        await Promise.all(
+          newMembers.map(async ({ email, password, masterPassword }) => {
+            await postInvitation({
+              email,
+              url: generateInviteUrl(
+                objectToBase64({
+                  e: email,
+                  p: password,
+                  mp: masterPassword,
+                }),
+              ),
+            });
+          }),
+        );
+      }
 
       this.setState(prevState => ({
         ...prevState,

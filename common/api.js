@@ -151,6 +151,6 @@ export const postChangePassword = data => callApi.patch('/srp/password', data);
 
 export const getCheckShare = id => callApi.get(`/anonymous/share/${id}/check`);
 
-export const getSharedItems = () => callApi.get('/list/shared');
+export const getMaskedItems = () => callApi.get('/item_mask');
 
 export const postInvitation = data => callApi.post('/invitation', data);

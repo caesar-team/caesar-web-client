@@ -72,18 +72,17 @@ class Bootstrap extends Component {
     });
   };
 
-  handleFinishMasterPassword = ({
-    publicKey,
-    encryptedPrivateKey,
-    masterPassword,
-  }) => {
+  handleFinishMasterPassword = ({ oldKeyPair, currentKeyPair, masterPassword }) => {
+    const { sharedItemsState } = this.bootstrap;
+
     this.setState({
-      publicKey,
-      encryptedPrivateKey,
+      oldKeyPair,
+      currentKeyPair,
       masterPassword,
-      currentStep: BOOTSTRAP_FINISH,
-      // TODO: next step equals SHARED_ITEMS_CHECK
-      // TODO: also is available for moving on next step
+      currentStep:
+        sharedItemsState === SHARED_ITEMS_CHECK
+          ? SHARED_ITEMS_CHECK
+          : BOOTSTRAP_FINISH,
     });
   };
 
@@ -137,9 +136,15 @@ class Bootstrap extends Component {
   prepareInitialState() {
     return {
       currentStep: null,
-      publicKey: null,
-      encryptedPrivateKey: null,
       masterPassword: null,
+      oldKeyPair: {
+        publicKey: null,
+        encryptedPrivateKey: null,
+      },
+      currentKeyPair: {
+        publicKey: null,
+        encryptedPrivateKey: null,
+      },
     };
   }
 
@@ -150,12 +155,7 @@ class Bootstrap extends Component {
       shared = {},
       ...props
     } = this.props;
-    const {
-      currentStep,
-      publicKey,
-      encryptedPrivateKey,
-      masterPassword,
-    } = this.state;
+    const { currentStep, oldKeyPair, currentKeyPair, masterPassword } = this.state;
 
     if (TWO_FACTOR_STEPS.includes(currentStep)) {
       return (
@@ -190,10 +190,15 @@ class Bootstrap extends Component {
     }
 
     if (SHARED_ITEMS_STEPS.includes(currentStep)) {
-      // TODO: pass old and new pair of keys as props
       return (
         <BootstrapLayout>
-          <SharedItemsStep onFinish={this.handleFinishSharedItems} />
+          <SharedItemsStep
+            oldKeyPair={oldKeyPair}
+            currentKeyPair={currentKeyPair}
+            oldMasterPassword={shared.mp}
+            currentMasterPassword={masterPassword}
+            onFinish={this.handleFinishSharedItems}
+          />
         </BootstrapLayout>
       );
     }
@@ -203,8 +208,8 @@ class Bootstrap extends Component {
     if (currentStep === BOOTSTRAP_FINISH && shared.mp) {
       return (
         <PageComponent
-          publicKey={publicKey}
-          privateKey={encryptedPrivateKey}
+          publicKey={currentKeyPair.publicKey}
+          privateKey={currentKeyPair.encryptedPrivateKey}
           password={masterPassword}
           {...props}
         />
@@ -221,8 +226,8 @@ class Bootstrap extends Component {
           onFinishTimeout={this.handleInactiveTimeout}
         >
           <PageComponent
-            publicKey={publicKey}
-            privateKey={encryptedPrivateKey}
+            publicKey={currentKeyPair.publicKey}
+            privateKey={currentKeyPair.encryptedPrivateKey}
             password={masterPassword}
             {...props}
           />

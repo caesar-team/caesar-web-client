@@ -8,7 +8,12 @@ import {
   Button,
   Scrollbar,
 } from 'components';
-import { getSharedItems } from 'common/api';
+import {
+  encryptItem,
+  decryptItem,
+  getPrivateKeyObj,
+} from 'common/utils/cipherUtils';
+import { getMaskedItems } from 'common/api';
 
 const Wrapper = styled.div``;
 
@@ -71,12 +76,31 @@ class SharedItemsStep extends Component {
   items = null;
 
   async componentDidMount() {
+    const { oldKeyPair, oldMasterPassword } = this.props;
+    const privateKeyObj = getPrivateKeyObj(
+      oldKeyPair.encryptedPrivateKey,
+      oldMasterPassword,
+    );
+
     try {
-      // const { data } = await getSharedItems();
+      const {
+        data,
+      } = await getMaskedItems();
+
+      console.log(data);
+
+      const encryptedItems = await Promise.all(
+        data.map(
+          async ({ secret }) => await decryptItem(secret, privateKeyObj),
+        ),
+      );
 
       this.setState({
-        items: DATA,
-        selectedIds: DATA.map(({ id }) => id),
+        items: data.map((item, index) => ({
+          ...item,
+          secret: encryptedItems[index],
+        })),
+        selectedIds: data.map(({ id }) => id),
       });
     } catch (e) {
       console.log(e.response.data);
@@ -92,10 +116,17 @@ class SharedItemsStep extends Component {
   };
 
   handleAccept = () => {
-    const { onFinish = Function.prototype } = this.props;
+    const {
+      currentKeyPair,
+      currentMasterPassword,
+      onFinish = Function.prototype,
+    } = this.props;
+    const { selectedIds, items } = this.state;
 
-    // TODO: take selected rows and encrypt via new keys
+    const selectedItems = items.filter(({ id }) => selectedIds.includes(id));
 
+    // TODO: convert masks to items
+    // TODO: create new secrets and update them
     onFinish();
   };
 

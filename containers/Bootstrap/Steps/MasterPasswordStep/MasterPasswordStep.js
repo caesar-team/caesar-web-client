@@ -61,11 +61,13 @@ class MasterPasswordStep extends Component {
         try {
           await validateKeys(sharedMasterPassword, state.encryptedPrivateKey);
 
-          return this.onFinishMasterPassword(
-            state.publicKey,
-            state.encryptedPrivateKey,
-            sharedMasterPassword,
-          );
+          return this.onFinishMasterPassword({
+            currentKeyPair: {
+              publicKey: state.publicKey,
+              encryptedPrivateKey: state.encryptedPrivateKey,
+            },
+            masterPassword: sharedMasterPassword,
+          });
         } catch (e) {
           state.step = MASTER_PASSWORD_CHECK;
         }
@@ -75,19 +77,17 @@ class MasterPasswordStep extends Component {
     return this.setState(state);
   }
 
-  async onFinishMasterPassword(publicKey, encryptedPrivateKey, masterPassword) {
+  async onFinishMasterPassword({ oldKeyPair, currentKeyPair, masterPassword }) {
     const { onFinish } = this.props;
 
-    // TODO: generate new pair of keys
     await postKeys({
-      publicKey,
-      encryptedPrivateKey,
+      publicKey: currentKeyPair.publicKey,
+      encryptedPrivateKey: currentKeyPair.encryptedPrivateKey,
     });
 
-    // TODO: pass new and old pair of keys
     onFinish({
-      publicKey,
-      encryptedPrivateKey,
+      oldKeyPair,
+      currentKeyPair,
       masterPassword,
     });
   }
@@ -102,7 +102,10 @@ class MasterPasswordStep extends Component {
     try {
       await validateKeys(password, encryptedPrivateKey);
 
-      onFinish({ publicKey, encryptedPrivateKey, masterPassword: password });
+      onFinish({
+        currentKeyPair: { publicKey, encryptedPrivateKey },
+        masterPassword: password,
+      });
     } catch (error) {
       setErrors({ password: 'Wrong password' });
       setSubmitting(false);
@@ -146,11 +149,17 @@ class MasterPasswordStep extends Component {
         encryptedPrivateKey = data.privateKey;
       }
 
-      return this.onFinishMasterPassword(
-        publicKey,
-        encryptedPrivateKey,
+      return this.onFinishMasterPassword({
+        oldKeyPair: {
+          publicKey: currentPublicKey,
+          encryptedPrivateKey: currentEncryptedPrivateKey,
+        },
+        currentKeyPair: {
+          publicKey,
+          encryptedPrivateKey,
+        },
         masterPassword,
-      );
+      });
     } catch (error) {
       setErrors({ confirmPassword: 'Something wrong' });
       return setSubmitting(false);

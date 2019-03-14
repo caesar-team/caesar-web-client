@@ -24,7 +24,7 @@ import {
 import { createSrp } from 'common/utils/srp';
 import { generateSharingUrl, generateInviteUrl } from 'common/utils/sharing';
 import {
-  encryptItemForUser,
+  encryptItem,
   encryptItemForUsers,
   generateUser,
   generateAnonymousEmail,
@@ -858,7 +858,7 @@ class DashboardContainer extends Component {
         publicKey,
       } = await this.createUser(email, ANONYMOUS_USER_ROLE);
 
-      const encryptedSecret = await encryptItemForUser(
+      const encryptedSecret = await encryptItem(
         workInProgressItem.secret,
         publicKey,
       );

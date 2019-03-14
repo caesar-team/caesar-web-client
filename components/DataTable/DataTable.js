@@ -11,7 +11,7 @@ const THEME = {
   },
   cells: {
     fontSize: '16px',
-    letterSpacing: '0.5px',
+    letterSpacing: '0.6px',
   },
   rows: {
     fontSize: '16px',

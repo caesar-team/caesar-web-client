@@ -45,7 +45,7 @@
     "react-beautiful-dnd": "^10.0.4",
     "react-click-outside": "^3.0.1",
     "react-custom-scrollbars": "^4.2.1",
-    "react-data-table-component": "^1.4.3",
+    "react-data-table-component": "^1.4.5",
     "react-dom": "^16.8.3",
     "react-dropzone": "^8.0.3",
     "react-scrolllock": "^4.0.1",

@@ -26,12 +26,16 @@ const ValueText = styled.div`
 
 const Box = styled.div`
   position: absolute;
-  display: flex;
-  flex-direction: column;
-  border: 1px solid ${({ theme }) => theme.gallery};
-  border-radius: 3px;
   z-index: 11;
   top: 48px;
+`;
+
+const OptionsList = styled.div`
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  border: 1px solid ${({ theme }) => theme.gallery};
+  border-radius: 3px;
   width: 100%;
 `;
 
@@ -41,13 +45,15 @@ const Option = styled.div`
   font-size: 16px;
   letter-spacing: 0.5px;
   font-weight: ${({ isActive }) => (isActive ? 'bold' : 'normal')};
-  color: ${({ theme }) => theme.emperor};
+  color: ${({ theme, isDisabled }) =>
+    isDisabled ? theme.lightGray : theme.emperor};
   background-color: ${({ theme, isActive }) =>
     isActive ? theme.snow : theme.white};
-  cursor: pointer;
+  cursor: ${({ isDisabled }) => (isDisabled ? 'default' : 'pointer')};
 
   &:hover {
-    color: ${({ theme }) => theme.black};
+    color: ${({ theme, isDisabled }) =>
+      isDisabled ? theme.lightGray : theme.black};
   }
 `;
 
@@ -86,14 +92,17 @@ class SelectInner extends Component {
   renderOptions() {
     const { value, options } = this.props;
 
-    return options.map(({ value: optionValue, label }) => {
+    return options.map(({ value: optionValue, label, isDisabled = false }) => {
       const isActive = value === optionValue;
 
       return (
         <Option
           key={optionValue}
           isActive={isActive}
-          onClick={this.handleClick(optionValue)}
+          isDisabled={isDisabled}
+          onClick={
+            isDisabled ? Function.prototype : this.handleClick(optionValue)
+          }
         >
           {label}
         </Option>
@@ -116,10 +125,17 @@ class SelectInner extends Component {
           <ValueText>{selectedLabel}</ValueText>
           <Icon name={iconName} width={16} height={16} />
         </SelectedOption>
-        {isOpened && <Box>{this.renderOptions()}</Box>}
+        {isOpened && (
+          <Box>
+            <OptionsList>{this.renderOptions()}</OptionsList>
+          </Box>
+        )}
       </Wrapper>
     );
   }
 }
+
+SelectInner.ValueText = ValueText;
+SelectInner.SelectedOption = SelectedOption;
 
 export const Select = enhanceWithClickOutside(SelectInner);

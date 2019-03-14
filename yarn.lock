@@ -5843,9 +5843,9 @@ react-custom-scrollbars@^4.2.1:
     prop-types "^15.5.10"
     raf "^3.1.0"
 
-react-data-table-component@^1.4.3:
-  version "1.4.3"
-  resolved "https://registry.yarnpkg.com/react-data-table-component/-/react-data-table-component-1.4.3.tgz#6ce37bfd1d3bae2e687aff1690762a7834d7ee49"
+react-data-table-component@^1.4.5:
+  version "1.4.5"
+  resolved "https://registry.yarnpkg.com/react-data-table-component/-/react-data-table-component-1.4.5.tgz#4507977647c477ba0c87239583d626dff5552e87"
   dependencies:
     lodash "^4.17.11"
     memoize-one "^5.0.0"

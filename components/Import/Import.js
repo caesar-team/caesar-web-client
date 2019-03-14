@@ -3,6 +3,7 @@ import styled from 'styled-components';
 import { matchStrict } from 'common/utils/match';
 import { Tabs, Tab } from 'components';
 import { parseFile } from 'common/utils/importUtils';
+import { ITEM_CREDENTIALS_TYPE, ITEM_DOCUMENT_TYPE } from 'common/constants';
 import { NavigationPanel } from '../NavigationPanel';
 import {
   TABS,
@@ -75,21 +76,17 @@ const StyledNavigationPanel = styled(NavigationPanel)`
   margin-top: 25px;
 `;
 
-const requiredFields = ['title', 'login', 'password'];
-
-const checkRequiredFields = (obj, required) =>
-  Object.keys(obj).every(key => required.includes(key) && !!obj[key]);
-
 const normalizeData = (rows, { title, login, password, website, note }) =>
-  rows
-    .map(row => ({
-      title: row[title],
-      login: row[login],
-      password: row[password],
-      website: row[website],
-      note: row[note],
-    }))
-    .filter(row => checkRequiredFields(row, requiredFields));
+  rows.map((row, index) => ({
+    index,
+    title: row[title],
+    login: row[login],
+    password: row[password],
+    website: row[website],
+    note: row[note],
+    type:
+      row[password] && row[login] ? ITEM_CREDENTIALS_TYPE : ITEM_DOCUMENT_TYPE,
+  }));
 
 class Import extends Component {
   state = this.prepareInitialState();

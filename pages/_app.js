@@ -39,7 +39,7 @@ export default class App extends NextApp {
       );
     }
 
-    if (route === '/share') {
+    if (route === '/share' || route === '/invite') {
       return (
         <ThemeProvider theme={theme}>
           <NotificationProvider>

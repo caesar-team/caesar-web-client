@@ -54,6 +54,12 @@ app.prepare().then(() => {
     });
   });
 
+  server.get('/invite/:encryption', (req, res) => {
+    app.render(req, res, '/invite', {
+      encryption: req.params.encryption,
+    });
+  });
+
   server.get('/', (req, res) => {
     app.render(req, res, '/');
   });

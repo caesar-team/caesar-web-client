@@ -8,6 +8,7 @@ import { Input } from '../Input';
 import { Icon } from '../Icon';
 import { Button } from '../Button';
 import { ModalTitle } from '../ModalTitle';
+import { Scrollbar } from '../Scrollbar';
 
 const StyledInput = styled(Input)`
   ${Input.InputField} {
@@ -275,7 +276,9 @@ class InviteModal extends Component {
         <ListWrapper>
           <ListTitle>Team members</ListTitle>
           <MembersWrapper>
-            {this.renderMemberList(filteredMembers)}
+            <Scrollbar autoHeight autoHeightMax={400}>
+              {this.renderMemberList(filteredMembers)}
+            </Scrollbar>
           </MembersWrapper>
         </ListWrapper>
         <ButtonsWrapper>

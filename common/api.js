@@ -153,4 +153,10 @@ export const getCheckShare = id => callApi.get(`/anonymous/share/${id}/check`);
 
 export const getMaskedItems = () => callApi.get('/item_mask');
 
+export const postItemMask = id => callApi.post(`/item_mask/${id}`);
+
+export const postItemMasks = data => callApi.post('/item_mask', data);
+
+export const deleteItemMasks = data => callApi.delete('/item_mask', data);
+
 export const postInvitation = data => callApi.post('/invitation', data);

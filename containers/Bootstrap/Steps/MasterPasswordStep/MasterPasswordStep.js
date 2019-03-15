@@ -17,6 +17,10 @@ import MasterPasswordCheckForm from './MasterPasswordCheckForm';
 import MasterPasswordCreateForm from './MasterPasswordCreateForm';
 import MasterPasswordConfirmForm from './MasterPasswordConfirmForm';
 
+const isSameKeyPair = (oldKeyPair, currentKeyPair) =>
+  oldKeyPair.publicKey === currentKeyPair.publicKey &&
+  oldKeyPair.encryptedPrivateKey === currentKeyPair.encryptedPrivateKey;
+
 const Wrapper = styled.div`
   max-width: 400px;
   width: 100%;
@@ -80,10 +84,12 @@ class MasterPasswordStep extends Component {
   async onFinishMasterPassword({ oldKeyPair, currentKeyPair, masterPassword }) {
     const { onFinish } = this.props;
 
-    await postKeys({
-      publicKey: currentKeyPair.publicKey,
-      encryptedPrivateKey: currentKeyPair.encryptedPrivateKey,
-    });
+    if (oldKeyPair && !isSameKeyPair(oldKeyPair, currentKeyPair)) {
+      await postKeys({
+        publicKey: currentKeyPair.publicKey,
+        encryptedPrivateKey: currentKeyPair.encryptedPrivateKey,
+      });
+    }
 
     onFinish({
       oldKeyPair,

@@ -72,7 +72,11 @@ class Bootstrap extends Component {
     });
   };
 
-  handleFinishMasterPassword = ({ oldKeyPair, currentKeyPair, masterPassword }) => {
+  handleFinishMasterPassword = ({
+    oldKeyPair,
+    currentKeyPair,
+    masterPassword,
+  }) => {
     const { sharedItemsState } = this.bootstrap;
 
     this.setState({
@@ -155,7 +159,12 @@ class Bootstrap extends Component {
       shared = {},
       ...props
     } = this.props;
-    const { currentStep, oldKeyPair, currentKeyPair, masterPassword } = this.state;
+    const {
+      currentStep,
+      oldKeyPair,
+      currentKeyPair,
+      masterPassword,
+    } = this.state;
 
     if (TWO_FACTOR_STEPS.includes(currentStep)) {
       return (
@@ -196,7 +205,6 @@ class Bootstrap extends Component {
             oldKeyPair={oldKeyPair}
             currentKeyPair={currentKeyPair}
             oldMasterPassword={shared.mp}
-            currentMasterPassword={masterPassword}
             onFinish={this.handleFinishSharedItems}
           />
         </BootstrapLayout>

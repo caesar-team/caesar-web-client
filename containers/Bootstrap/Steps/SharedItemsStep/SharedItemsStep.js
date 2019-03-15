@@ -13,7 +13,7 @@ import {
   decryptItem,
   getPrivateKeyObj,
 } from 'common/utils/cipherUtils';
-import { getMaskedItems } from 'common/api';
+import { getMaskedItems, postItemMasks, deleteItemMasks } from 'common/api';
 
 const Wrapper = styled.div``;
 
@@ -47,28 +47,9 @@ const ItemName = styled.div`
 const ButtonWrapper = styled.div`
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: center;
   margin-top: 30px;
 `;
-
-const DATA = [
-  { id: 1, secret: 'asdasdasdasdasd' },
-  { id: 2, secret: 'zxczxczxczxczxc' },
-  { id: 3, secret: 'dfgdfgdfgdfgdfgdfg' },
-  { id: 4, secret: '234234234234234234' },
-  { id: 5, secret: 'berberberberberb' },
-  { id: 6, secret: 'berberberberberb' },
-  { id: 7, secret: 'berberberberberb' },
-  { id: 8, secret: 'berberberberberb' },
-  { id: 9, secret: 'berberberberberb' },
-  { id: 10, secret: 'berberberberberb' },
-  { id: 11, secret: 'berberberberberb' },
-  { id: 12, secret: 'berberberberberb' },
-  { id: 13, secret: 'berberberberberb' },
-  { id: 14, secret: 'berberberberberb' },
-  { id: 15, secret: 'berberberberberb' },
-  { id: 16, secret: 'berberberberberb' },
-];
 
 class SharedItemsStep extends Component {
   state = this.prepareInitialState();
@@ -77,33 +58,32 @@ class SharedItemsStep extends Component {
 
   async componentDidMount() {
     const { oldKeyPair, oldMasterPassword } = this.props;
-    const privateKeyObj = getPrivateKeyObj(
+    const privateKeyObj = await getPrivateKeyObj(
       oldKeyPair.encryptedPrivateKey,
       oldMasterPassword,
     );
 
     try {
       const {
-        data,
+        data: { masks },
       } = await getMaskedItems();
 
-      console.log(data);
-
       const encryptedItems = await Promise.all(
-        data.map(
+        masks.map(
+          // eslint-disable-next-line
           async ({ secret }) => await decryptItem(secret, privateKeyObj),
         ),
       );
 
       this.setState({
-        items: data.map((item, index) => ({
+        items: masks.map((item, index) => ({
           ...item,
           secret: encryptedItems[index],
         })),
-        selectedIds: data.map(({ id }) => id),
+        selectedIds: masks.map(({ id }) => id),
       });
     } catch (e) {
-      console.log(e.response.data);
+      console.log(e);
     }
   }
 
@@ -115,25 +95,40 @@ class SharedItemsStep extends Component {
     }));
   };
 
-  handleAccept = () => {
-    const {
-      currentKeyPair,
-      currentMasterPassword,
-      onFinish = Function.prototype,
-    } = this.props;
-    const { selectedIds, items } = this.state;
+  handleAccept = async () => {
+    const { currentKeyPair, onFinish = Function.prototype } = this.props;
+    const { items, selectedIds } = this.state;
 
-    const selectedItems = items.filter(({ id }) => selectedIds.includes(id));
+    const acceptedItems = items.filter(({ id }) => selectedIds.includes(id));
+    const rejectedItems = items.filter(({ id }) => !selectedIds.includes(id));
 
-    // TODO: convert masks to items
-    // TODO: create new secrets and update them
-    onFinish();
-  };
+    let itemIds = [];
 
-  handleReject = () => {
-    const { onFinish = Function.prototype } = this.props;
+    try {
+      if (acceptedItems.length > 0) {
+        const ids = acceptedItems.map(({ id }) => ({ itemMask: id }));
+        const { data } = await postItemMasks({ masks: ids });
 
-    onFinish();
+        itemIds = data.map(({ id }) => id);
+      }
+
+      if (rejectedItems.length > 0) {
+        const ids = rejectedItems.map(({ id }) => ({ itemMask: id }));
+        await deleteItemMasks({ masks: ids });
+      }
+
+      const decryptedAcceptedItems = await Promise.all(
+        acceptedItems.map(async ({ secret }, index) => ({
+          id: itemIds[index],
+          secret: await encryptItem(secret, currentKeyPair.publicKey),
+        })),
+      );
+
+      // TODO: update items secrets
+      onFinish();
+    } catch (e) {
+      console.log(e);
+    }
   };
 
   prepareInitialState() {
@@ -146,13 +141,13 @@ class SharedItemsStep extends Component {
   renderItems() {
     const { selectedIds, items } = this.state;
 
-    const renderedItems = items.map(({ id, secret }) => {
+    const renderedItems = items.map(({ id, secret: { name } }) => {
       const isActive = selectedIds.includes(id);
 
       return (
         <ItemRow key={id}>
           <Checkbox checked={isActive} onChange={this.handleSelectRow(id)} />
-          <ItemName>{secret}</ItemName>
+          <ItemName>{name}</ItemName>
         </ItemRow>
       );
     });
@@ -176,7 +171,6 @@ class SharedItemsStep extends Component {
         </AuthDescription>
         {renderedItems}
         <ButtonWrapper>
-          <Button onClick={this.handleReject}>REJECT</Button>
           <Button onClick={this.handleAccept}>ACCEPT</Button>
         </ButtonWrapper>
       </Wrapper>

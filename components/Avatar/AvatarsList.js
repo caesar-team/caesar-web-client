@@ -15,6 +15,10 @@ const StyledAvatar = styled(Avatar)`
   }
 `;
 
+const AvatarNumberStyled = styled(Avatar)`
+  border: 1px solid ${({ theme }) => theme.white};
+`;
+
 const DEFAULT_VISIBLE_AVATARS_COUNT = 3;
 
 const AvatarsList = ({
@@ -33,9 +37,9 @@ const AvatarsList = ({
     ))
     .concat(
       shouldShowLast ? (
-        <Avatar isSmall={isSmall} key={visibleAvatars.length}>
+        <AvatarNumberStyled isSmall={isSmall} key={visibleAvatars.length}>
           +{invisibleCount}
-        </Avatar>
+        </AvatarNumberStyled>
       ) : null,
     );
 

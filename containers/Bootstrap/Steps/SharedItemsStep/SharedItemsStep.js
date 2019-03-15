@@ -13,7 +13,12 @@ import {
   decryptItem,
   getPrivateKeyObj,
 } from 'common/utils/cipherUtils';
-import { getMaskedItems, postItemMasks, deleteItemMasks } from 'common/api';
+import {
+  getMaskedItems,
+  postItemMasks,
+  deleteItemMasks,
+  patchItemBatch,
+} from 'common/api';
 
 const Wrapper = styled.div``;
 
@@ -49,6 +54,11 @@ const ButtonWrapper = styled.div`
   align-items: center;
   justify-content: center;
   margin-top: 30px;
+`;
+
+const ButtonStyled = styled(Button)`
+  height: 60px;
+  font-size: 18px;
 `;
 
 class SharedItemsStep extends Component {
@@ -118,13 +128,15 @@ class SharedItemsStep extends Component {
       }
 
       const decryptedAcceptedItems = await Promise.all(
-        acceptedItems.map(async ({ secret }, index) => ({
+        acceptedItems.map(async ({ secret, recipient }, index) => ({
           id: itemIds[index],
+          userId: recipient.id,
           secret: await encryptItem(secret, currentKeyPair.publicKey),
         })),
       );
 
-      // TODO: update items secrets
+      await patchItemBatch({ collectionItems: decryptedAcceptedItems });
+
       onFinish();
     } catch (e) {
       console.log(e);
@@ -171,7 +183,7 @@ class SharedItemsStep extends Component {
         </AuthDescription>
         {renderedItems}
         <ButtonWrapper>
-          <Button onClick={this.handleAccept}>ACCEPT</Button>
+          <ButtonStyled onClick={this.handleAccept}>ACCEPT</ButtonStyled>
         </ButtonWrapper>
       </Wrapper>
     );

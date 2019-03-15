@@ -160,3 +160,5 @@ export const postItemMasks = data => callApi.post('/item_mask', data);
 export const deleteItemMasks = data => callApi.delete('/item_mask', data);
 
 export const postInvitation = data => callApi.post('/invitation', data);
+
+export const patchItemBatch = data => callApi.put('/item/batch', data);

@@ -102,7 +102,7 @@ export const updateItem = (itemId, data) =>
   callApi.patch(`/item/${itemId}`, data);
 
 export const postInviteItem = (itemId, data) =>
-  callApi.post(`/item/${itemId}/invite`, data);
+  callApi.post(`/item/${itemId}/child_item`, data);
 
 export const changeInviteItem = (itemId, data) =>
   callApi.put(`/item/${itemId}/invite`, data);

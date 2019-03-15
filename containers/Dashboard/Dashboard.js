@@ -665,7 +665,7 @@ class DashboardContainer extends Component {
 
     try {
       await postInviteItem(workInProgressItem.id, {
-        invites: newInvites,
+        items: newInvites,
       });
 
       const data = {

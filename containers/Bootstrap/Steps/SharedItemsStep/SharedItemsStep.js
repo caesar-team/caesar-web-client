@@ -129,9 +129,13 @@ class SharedItemsStep extends Component {
 
       const decryptedAcceptedItems = await Promise.all(
         acceptedItems.map(async ({ secret, recipient }, index) => ({
-          id: itemIds[index],
-          userId: recipient.id,
-          secret: await encryptItem(secret, currentKeyPair.publicKey),
+          originalItem: itemIds[index],
+          items: [
+            {
+              userId: recipient.id,
+              secret: await encryptItem(secret, currentKeyPair.publicKey),
+            },
+          ],
         })),
       );
 

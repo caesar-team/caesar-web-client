@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import styled from 'styled-components';
 import memoize from 'memoize-one';
-import { Checkbox, DataTable } from 'components';
 import {
   ITEM_DOCUMENT_TYPE,
   ITEM_CREDENTIALS_TYPE,
@@ -11,6 +10,8 @@ import { Input } from '../../../Input';
 import { Icon } from '../../../Icon';
 import { Button } from '../../../Button';
 import { Select } from '../../../Select';
+import { Checkbox } from '../../../Checkbox';
+import { DataTable } from '../../../DataTable';
 
 const Wrapper = styled.div`
   width: calc(100vw - 480px);
@@ -65,10 +66,10 @@ const StyledButton = styled(Button)`
 const StyledSelect = styled(Select)`
   padding: 0;
   border-bottom: 0;
+  margin: 0 20px;
 
   ${Select.ValueText} {
     font-size: 16px;
-    margin-right: 20px;
     color: rgba(0, 0, 0, 0.87);
   }
 `;
@@ -99,55 +100,76 @@ const capitalize = string => {
 
 const SEARCH_FIELDS = ['title'];
 
-const CellEditableComponent = ({
-  index,
-  fieldName,
-  editableIndex,
-  editableFieldName,
-  onChange,
-  onKeyEnter,
-  onClick,
-  ...props
-}) => {
-  const value = props[fieldName];
-  const isEditMode = index === editableIndex && fieldName === editableFieldName;
+// const CellEditableComponent = ({
+//   index,
+//   fieldName,
+//   editableIndex,
+//   editableFieldName,
+//   onChange,
+//   onKeyEnter,
+//   onClick,
+//   ...props
+// }) => {
+//   const value = props[fieldName];
+//   const isEditMode = index === editableIndex && fieldName === editableFieldName;
+//
+//   if (isEditMode) {
+//     return (
+//       <EditableInput value={value} onChange={onChange} onKeyDown={onKeyEnter} />
+//     );
+//   }
+//
+//   return <Cell onClick={onClick(index, fieldName)}>{value}</Cell>;
+// };
 
-  if (isEditMode) {
-    return (
-      <EditableInput value={value} onChange={onChange} onKeyDown={onKeyEnter} />
-    );
-  }
+// const CellTypeComponent = ({ onSelect, index, type, login, password }) => {
+//   const isCredentialsDisabled = !login || !password;
+//   const isDocumentDisabled = false;
+//
+//   const options = [
+//     {
+//       value: ITEM_CREDENTIALS_TYPE,
+//       label: 'Password',
+//       isDisabled: isCredentialsDisabled,
+//     },
+//     {
+//       value: ITEM_DOCUMENT_TYPE,
+//       label: 'Secure Note',
+//       isDisabled: isDocumentDisabled,
+//     },
+//   ];
+//
+//   return (
+//     <StyledSelect
+//       key={index}
+//       name="type"
+//       options={options}
+//       value={type}
+//       onChange={onSelect(index)}
+//     />
+//   );
+// };
 
-  return <Cell onClick={onClick(index, fieldName)}>{value}</Cell>;
-};
+const options = [
+  {
+    value: ITEM_CREDENTIALS_TYPE,
+    label: 'Password',
+    isDisabled: false,
+  },
+  {
+    value: ITEM_DOCUMENT_TYPE,
+    label: 'Secure Note',
+    isDisabled: false,
+  },
+];
 
-const CellTypeComponent = ({ onSelect, index, type, login, password }) => {
-  const isCredentialsDisabled = !login || !password;
-  const isDocumentDisabled = false;
-
-  const options = [
-    {
-      value: ITEM_CREDENTIALS_TYPE,
-      label: 'Password',
-      isDisabled: isCredentialsDisabled,
-    },
-    {
-      value: ITEM_DOCUMENT_TYPE,
-      label: 'Secure Note',
-      isDisabled: isDocumentDisabled,
-    },
-  ];
-
-  return (
-    <StyledSelect
-      key={index}
-      name="type"
-      options={options}
-      value={type}
-      onChange={onSelect(index)}
-    />
+const normalize = array =>
+  array.reduce(
+    (accumulator, curr, index) => ({ ...accumulator, [index]: curr }),
+    {},
   );
-};
+
+const denormalize = object => Object.values(object);
 
 class DataStep extends Component {
   state = this.prepareInitialState();
@@ -158,37 +180,7 @@ class DataStep extends Component {
     ),
   );
 
-  getColumns() {
-    const columns = Object.keys(this.props.headings).map(heading => ({
-      name: capitalize(heading),
-      selector: heading,
-      sortable: true,
-      ignoreRowClick: true,
-      cell: props => (
-        <CellEditableComponent
-          fieldName={heading}
-          editableIndex={this.state.editableIndex}
-          editableFieldName={this.state.editableFieldName}
-          onChange={this.handleChangeField}
-          onKeyEnter={this.handleFinishEdit}
-          onClick={this.handleClickEditable}
-          {...props}
-        />
-      ),
-    }));
-
-    return [
-      ...columns,
-      {
-        cell: props => (
-          <CellTypeComponent onSelect={this.handleSelectType} {...props} />
-        ),
-        name: 'Type',
-        ignoreRowClick: true,
-        allowOverflow: true,
-      },
-    ];
-  }
+  getColumns() {}
 
   handleSearch = event => {
     event.preventDefault();
@@ -199,12 +191,6 @@ class DataStep extends Component {
 
     this.setState({
       filterText: value,
-    });
-  };
-
-  handleUpdateTable = ({ selectedRows }) => {
-    this.setState({
-      selectedRows,
     });
   };
 
@@ -259,10 +245,44 @@ class DataStep extends Component {
     onSubmit(selectedRows);
   };
 
+  handleSelectAll = event => {
+    const { checked } = event.currentTarget;
+    const { data } = this.state;
+
+    this.setState({
+      selectedRows: checked ? normalize(data) : [],
+    });
+  };
+
+  handleSelectRow = rowIndex => event => {
+    const { checked } = event.currentTarget;
+    const { data, selectedRows } = this.state;
+
+    let updatedData = null;
+
+    if (checked) {
+      const row = data.find((_, index) => index === rowIndex);
+
+      updatedData = { ...selectedRows, [rowIndex]: row };
+    } else {
+      const { [rowIndex]: row, ...rest } = selectedRows;
+
+      updatedData = rest;
+    }
+
+    this.setState({
+      selectedRows: updatedData,
+    });
+  };
+
+  handleChangeType = props => {
+    console.log('handleChangeType', props);
+  };
+
   prepareInitialState() {
     return {
       filterText: '',
-      selectedRows: [],
+      selectedRows: normalize(this.props.data),
       data: this.props.data,
       editableIndex: null,
       editableFieldName: null,
@@ -281,12 +301,69 @@ class DataStep extends Component {
           onChange={this.handleSearch}
         />
         <DataTable
-          noHeader
-          columns={this.getColumns()}
-          data={this.filter(data, filterText)}
-          selectableRows
-          selectableRowsComponent={Checkbox}
-          onTableUpdate={this.handleUpdateTable}
+          data={data}
+          showPagination={false}
+          defaultPageSize={data.length}
+          columns={[
+            {
+              id: 'checkbox',
+              accessor: '',
+              width: 60,
+              sortable: false,
+              Cell: ({ original }) => (
+                <Checkbox
+                  checked={!!selectedRows[original.index]}
+                  onChange={this.handleSelectRow(original.index.toString())}
+                />
+              ),
+              Header: props => (
+                <Checkbox
+                  checked={
+                    props.data.length === denormalize(selectedRows).length
+                  }
+                  onChange={this.handleSelectAll}
+                />
+              ),
+            },
+            {
+              Header: 'Title',
+              id: 'title',
+              accessor: 'title',
+            },
+            {
+              Header: 'Login',
+              accessor: 'login',
+            },
+            {
+              Header: 'Password',
+              accessor: 'password',
+            },
+            {
+              Header: 'Website',
+              accessor: 'website',
+            },
+            {
+              Header: 'Note',
+              accessor: 'note',
+            },
+            {
+              id: 'type',
+              accessor: 'type',
+              sortable: false,
+              width: 160,
+              Cell: props => (
+                // console.log(props);
+
+                <StyledSelect
+                  name="type"
+                  options={options}
+                  value={ITEM_CREDENTIALS_TYPE}
+                  onChange={this.handleChangeType}
+                />
+              ),
+              Header: 'Type',
+            },
+          ]}
         />
         <BottomWrapper>
           <SelectedItems>

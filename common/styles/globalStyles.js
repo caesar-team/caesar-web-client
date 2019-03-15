@@ -1,6 +1,8 @@
 import { normalize } from 'polished';
 import fonts from './fonts';
 
+import './react-table.css';
+
 export default `
   ${normalize()};
   ${fonts};

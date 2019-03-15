@@ -1,21 +1,15 @@
 import React, { Component } from 'react';
 import styled from 'styled-components';
 import { matchStrict } from 'common/utils/match';
-import { Tabs, Tab } from 'components';
 import { parseFile } from 'common/utils/importUtils';
 import { ITEM_CREDENTIALS_TYPE, ITEM_DOCUMENT_TYPE } from 'common/constants';
 import { NavigationPanel } from '../NavigationPanel';
 import {
-  TABS,
   STEPS,
   FILE_TYPE_MAP,
   FILE_STEP,
   FIELDS_STEP,
   DATA_STEP,
-  IMPORTING_STEP,
-  ONEPASSWORD_TYPE,
-  LASTPASS_TYPE,
-  CSV_TYPE,
 } from './constants';
 import { FileStep, FieldsStep, DataStep, ImportingStep } from './Steps';
 
@@ -25,37 +19,6 @@ const Wrapper = styled.div`
   background: ${({ theme }) => theme.lightBlue};
   width: 100%;
   padding: 60px;
-`;
-
-const Image = styled.img`
-  object-fit: contain;
-  margin-right: 20px;
-  width: 50px;
-  height: 50px;
-`;
-
-const TabWrapper = styled.div`
-  display: flex;
-  padding: 30px;
-  align-items: center;
-  border: 1px solid #eaeaea;
-  border-bottom: 0;
-`;
-
-const TabText = styled.div`
-  display: flex;
-  flex-direction: column;
-`;
-
-const TabName = styled.div`
-  font-size: 18px;
-  letter-spacing: 0.6px;
-`;
-
-const TabDescription = styled.div`
-  font-size: 14px;
-  letter-spacing: 0.4px;
-  color: ${({ theme }) => theme.gray};
 `;
 
 const Title = styled.div`
@@ -70,6 +33,13 @@ const Description = styled.div`
   letter-spacing: 0.6px;
   color: ${({ theme }) => theme.black};
   margin-bottom: 25px;
+`;
+
+const StepWrapper = styled.div`
+  display: flex;
+  flex-direction: column;
+  background: ${({ theme }) => theme.white};
+  padding: 30px;
 `;
 
 const StyledNavigationPanel = styled(NavigationPanel)`
@@ -90,12 +60,6 @@ const normalizeData = (rows, { title, login, password, website, note }) =>
 
 class Import extends Component {
   state = this.prepareInitialState();
-
-  handleChangeTab = (name, tabName) => {
-    this.setState({
-      currentTab: tabName,
-    });
-  };
 
   handleOnload = ({ file }) => {
     const data = parseFile(file.raw);
@@ -120,7 +84,6 @@ class Import extends Component {
   prepareInitialState() {
     return {
       currentStep: FILE_STEP,
-      currentTab: ONEPASSWORD_TYPE,
       data: {
         headings: [],
         rows: [],
@@ -130,18 +93,13 @@ class Import extends Component {
     };
   }
 
-  renderTabContent() {
-    const { currentStep, currentTab, data, matchings } = this.state;
+  renderStep() {
+    const { currentStep, data, matchings } = this.state;
 
     return matchStrict(
       currentStep,
       {
-        FILE_STEP: (
-          <FileStep
-            type={FILE_TYPE_MAP[currentTab].type}
-            onSubmit={this.handleOnload}
-          />
-        ),
+        FILE_STEP: <FileStep onSubmit={this.handleOnload} />,
         FIELDS_STEP: (
           <FieldsStep
             headings={data.headings}
@@ -161,40 +119,6 @@ class Import extends Component {
     );
   }
 
-  renderTabs() {
-    const { currentTab } = this.state;
-
-    const renderedTabs = TABS.map(
-      ({ name, title, description, icon, icon2 }) => {
-        const component = (
-          <TabWrapper>
-            <Image src={icon} srcSet={`${icon} 1x, ${icon2} 2x`} />
-            <TabText>
-              <TabName>{title}</TabName>
-              <TabDescription>{description}</TabDescription>
-            </TabText>
-          </TabWrapper>
-        );
-
-        return (
-          <Tab key={name} name={name} component={component}>
-            {this.renderTabContent()}
-          </Tab>
-        );
-      },
-    );
-
-    return (
-      <Tabs
-        name="import"
-        activeTabName={currentTab}
-        onChange={this.handleChangeTab}
-      >
-        {renderedTabs}
-      </Tabs>
-    );
-  }
-
   renderNavigationPanel() {
     const { currentStep } = this.state;
 
@@ -206,7 +130,7 @@ class Import extends Component {
       <Wrapper>
         <Title>Settings / Import</Title>
         <Description>Select file type to import:</Description>
-        {this.renderTabs()}
+        <StepWrapper>{this.renderStep()}</StepWrapper>
         {this.renderNavigationPanel()}
       </Wrapper>
     );

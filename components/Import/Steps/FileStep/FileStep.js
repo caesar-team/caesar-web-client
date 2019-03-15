@@ -17,7 +17,7 @@ const Title = styled.div`
   margin-bottom: 25px;
 `;
 
-const FileStep = ({ type, onSubmit }) => (
+const FileStep = ({ onSubmit }) => (
   <Formik
     key="fileStep"
     initialValues={{ file: null }}
@@ -26,12 +26,12 @@ const FileStep = ({ type, onSubmit }) => (
     render={({ values, errors, setFieldValue, handleSubmit, submitForm }) => (
       <Wrapper>
         <Form onSubmit={handleSubmit}>
-          <Title>Upload your {type} file</Title>
+          <Title>Upload your CSV file</Title>
           <Uploader
             name="file"
             accept="text/csv"
             files={values.file}
-            extText={`*.csv file for ${type}`}
+            extText="*.csv file"
             onChange={(name, file) => {
               setFieldValue('file', file);
               submitForm();

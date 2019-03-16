@@ -4,13 +4,7 @@ import { matchStrict } from 'common/utils/match';
 import { parseFile } from 'common/utils/importUtils';
 import { ITEM_CREDENTIALS_TYPE, ITEM_DOCUMENT_TYPE } from 'common/constants';
 import { NavigationPanel } from '../NavigationPanel';
-import {
-  STEPS,
-  FILE_TYPE_MAP,
-  FILE_STEP,
-  FIELDS_STEP,
-  DATA_STEP,
-} from './constants';
+import { STEPS, FILE_STEP, FIELDS_STEP, DATA_STEP } from './constants';
 import { FileStep, FieldsStep, DataStep, ImportingStep } from './Steps';
 
 const Wrapper = styled.div`
@@ -77,8 +71,13 @@ class Import extends Component {
     });
   };
 
-  handleSelectRows = values => {
-    console.log(values);
+  handleFinishDataStep = values => {
+    const omittedFields = ['index'];
+    const cleared = values.map(row =>
+      row.filter(value => !!value && !omittedFields.includes(value)),
+    );
+
+    console.log(cleared);
   };
 
   prepareInitialState() {
@@ -110,7 +109,7 @@ class Import extends Component {
           <DataStep
             data={normalizeData(data.rows, matchings)}
             headings={matchings}
-            onSubmit={this.handleSelectRows}
+            onSubmit={this.handleFinishDataStep}
           />
         ),
         IMPORTING_STEP: <ImportingStep />,

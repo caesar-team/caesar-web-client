@@ -13,6 +13,8 @@
 .ReactTable .rt-td {
   padding: 0 !important;
   border-right: 0 !important;
+  display: flex;
+  align-items: center;
 }
 
 .ReactTable .rt-td:last-child {
@@ -25,12 +27,14 @@
   font-size: 16px;
   letter-spacing: 0.5px;
   color: #000000;
+  display: flex;
+  align-items: center;
 }
 
 .ReactTable .rt-tbody .rt-td:first-child {
   display: flex;
-  justify-content: center;
   align-items: center;
+  justify-content: center;
 }
 
 .rt-resizable-header-content {
@@ -44,4 +48,8 @@
 .ReactTable .rt-thead.-header {
   box-shadow: none !important;
   border-bottom: 1px solid #eaeaea;
+}
+
+[contenteditable]:focus {
+  outline: 0 solid transparent;
 }

@@ -1,11 +1,7 @@
 import React, { Component } from 'react';
 import styled from 'styled-components';
 import memoize from 'memoize-one';
-import {
-  ITEM_DOCUMENT_TYPE,
-  ITEM_CREDENTIALS_TYPE,
-  KEY_CODES,
-} from 'common/constants';
+import { ITEM_DOCUMENT_TYPE, ITEM_CREDENTIALS_TYPE } from 'common/constants';
 import { Input } from '../../../Input';
 import { Icon } from '../../../Icon';
 import { Button } from '../../../Button';
@@ -70,6 +66,7 @@ const StyledSelect = styled(Select)`
 
   ${Select.ValueText} {
     font-size: 16px;
+    margin-right: 20px;
     color: rgba(0, 0, 0, 0.87);
   }
 `;
@@ -83,85 +80,12 @@ const Cell = styled.div`
   min-width: 100px;
 `;
 
-const EditableInput = styled(Input)`
-  border: 1px solid ${({ theme }) => theme.gallery};
-
-  ${Input.InputField} {
-    font-size: 16px;
-    padding: 6px 0;
-    background: ${({ theme }) => theme.snow};
-  }
-`;
-
 const capitalize = string => {
   if (typeof string !== 'string') return '';
   return string.charAt(0).toUpperCase() + string.slice(1);
 };
 
 const SEARCH_FIELDS = ['title'];
-
-// const CellEditableComponent = ({
-//   index,
-//   fieldName,
-//   editableIndex,
-//   editableFieldName,
-//   onChange,
-//   onKeyEnter,
-//   onClick,
-//   ...props
-// }) => {
-//   const value = props[fieldName];
-//   const isEditMode = index === editableIndex && fieldName === editableFieldName;
-//
-//   if (isEditMode) {
-//     return (
-//       <EditableInput value={value} onChange={onChange} onKeyDown={onKeyEnter} />
-//     );
-//   }
-//
-//   return <Cell onClick={onClick(index, fieldName)}>{value}</Cell>;
-// };
-
-// const CellTypeComponent = ({ onSelect, index, type, login, password }) => {
-//   const isCredentialsDisabled = !login || !password;
-//   const isDocumentDisabled = false;
-//
-//   const options = [
-//     {
-//       value: ITEM_CREDENTIALS_TYPE,
-//       label: 'Password',
-//       isDisabled: isCredentialsDisabled,
-//     },
-//     {
-//       value: ITEM_DOCUMENT_TYPE,
-//       label: 'Secure Note',
-//       isDisabled: isDocumentDisabled,
-//     },
-//   ];
-//
-//   return (
-//     <StyledSelect
-//       key={index}
-//       name="type"
-//       options={options}
-//       value={type}
-//       onChange={onSelect(index)}
-//     />
-//   );
-// };
-
-const options = [
-  {
-    value: ITEM_CREDENTIALS_TYPE,
-    label: 'Password',
-    isDisabled: false,
-  },
-  {
-    value: ITEM_DOCUMENT_TYPE,
-    label: 'Secure Note',
-    isDisabled: false,
-  },
-];
 
 const normalize = array =>
   array.reduce(
@@ -180,7 +104,85 @@ class DataStep extends Component {
     ),
   );
 
-  getColumns() {}
+  getColumns() {
+    const { data, selectedRows } = this.state;
+    const { headings } = this.props;
+
+    const columns = Object.keys(headings);
+
+    const firstColumn = {
+      id: 'checkbox',
+      accessor: '',
+      width: 60,
+      sortable: false,
+      Cell: ({ original }) => (
+        <Checkbox
+          checked={!!selectedRows[original.index]}
+          onChange={this.handleSelectRow(original.index.toString())}
+        />
+      ),
+      Header: props => (
+        <Checkbox
+          checked={props.data.length === denormalize(selectedRows).length}
+          onChange={this.handleSelectAll}
+        />
+      ),
+    };
+
+    const lastColumn = {
+      id: 'type',
+      accessor: 'type',
+      sortable: false,
+      width: 180,
+      Cell: cellInfo => {
+        const {
+          original: { login, password },
+        } = cellInfo;
+        const isCredentialsDisabled = !login || !password;
+        const isDocumentDisabled = false;
+
+        const options = [
+          {
+            value: ITEM_CREDENTIALS_TYPE,
+            label: 'Password',
+            isDisabled: isCredentialsDisabled,
+          },
+          {
+            value: ITEM_DOCUMENT_TYPE,
+            label: 'Secure Note',
+            isDisabled: isDocumentDisabled,
+          },
+        ];
+
+        return (
+          <StyledSelect
+            name="type"
+            options={options}
+            value={data[cellInfo.index][cellInfo.column.id]}
+            onChange={this.handleChangeType(cellInfo.index)}
+          />
+        );
+      },
+      Header: 'Type',
+    };
+
+    const restColumns = columns.map(id => ({
+      id,
+      accessor: id,
+      Header: capitalize(id),
+      Cell: cellInfo => (
+        <Cell
+          contentEditable
+          onBlur={this.handleBlurField(cellInfo.index, cellInfo.column.id)}
+          dangerouslySetInnerHTML={{
+            __html: data[cellInfo.index][cellInfo.column.id],
+          }}
+        />
+      ),
+    }));
+
+    return [firstColumn, ...restColumns, lastColumn];
+  }
 
   handleSearch = event => {
     event.preventDefault();
@@ -194,55 +196,11 @@ class DataStep extends Component {
     });
   };
 
-  handleSelectType = index => (name, value) => {
-    this.setState(prevState => ({
-      data: prevState.data.map(
-        (row, rowIndex) => (rowIndex === index ? { ...row, type: value } : row),
-      ),
-    }));
-  };
-
-  handleClickEditable = (index, fieldName) => () => {
-    this.setState({
-      editableIndex: index,
-      editableFieldName: fieldName,
-    });
-  };
-
-  handleChangeField = event => {
-    const {
-      target: { value },
-    } = event;
-
-    const { editableIndex, editableFieldName } = this.state;
-
-    this.setState(prevState => ({
-      data: prevState.data.map(
-        (row, rowIndex) =>
-          rowIndex === editableIndex
-            ? { ...row, [editableFieldName]: value }
-            : row,
-      ),
-      selectedRows: prevState.selectedRows.filter(
-        (_, index) => index !== editableIndex,
-      ),
-    }));
-  };
-
-  handleFinishEdit = event => {
-    if (event.keyCode === KEY_CODES.ENTER) {
-      this.setState({
-        editableIndex: null,
-        editableFieldName: null,
-      });
-    }
-  };
-
   handleSubmit = () => {
     const { onSubmit } = this.props;
     const { selectedRows } = this.state;
 
-    onSubmit(selectedRows);
+    onSubmit(denormalize(selectedRows));
   };
 
   handleSelectAll = event => {
@@ -275,8 +233,34 @@ class DataStep extends Component {
     });
   };
 
-  handleChangeType = props => {
-    console.log('handleChangeType', props);
+  handleChangeField = (index, columnId, value) => {
+    this.setState(prevState => ({
+      data: prevState.data.map(
+        (row, rowIndex) =>
+          rowIndex === index ? { ...row, [columnId]: value } : row,
+      ),
+      selectedRows: {
+        ...prevState.selectedRows,
+        [index]: {
+          ...prevState.selectedRows[index],
+          [columnId]: value,
+        },
+      },
+    }));
+  };
+
+  handleBlurField = (index, columnId) => event => {
+    const {
+      target: { innerText, textContent },
+    } = event;
+
+    const value = innerText || textContent;
+
+    this.handleChangeField(index, columnId, value);
+  };
+
+  handleChangeType = index => (_, value) => {
+    this.handleChangeField(index, 'type', value);
   };
 
   prepareInitialState() {
@@ -284,13 +268,13 @@ class DataStep extends Component {
       filterText: '',
       selectedRows: normalize(this.props.data),
       data: this.props.data,
-      editableIndex: null,
-      editableFieldName: null,
     };
   }
 
   render() {
     const { data, selectedRows, filterText } = this.state;
+
+    const selectedRowsLength = denormalize(selectedRows).length;
 
     return (
       <Wrapper>
@@ -301,77 +285,18 @@ class DataStep extends Component {
           onChange={this.handleSearch}
         />
         <DataTable
-          data={data}
+          data={this.filter(data, filterText)}
           showPagination={false}
           defaultPageSize={data.length}
-          columns={[
-            {
-              id: 'checkbox',
-              accessor: '',
-              width: 60,
-              sortable: false,
-              Cell: ({ original }) => (
-                <Checkbox
-                  checked={!!selectedRows[original.index]}
-                  onChange={this.handleSelectRow(original.index.toString())}
-                />
-              ),
-              Header: props => (
-                <Checkbox
-                  checked={
-                    props.data.length === denormalize(selectedRows).length
-                  }
-                  onChange={this.handleSelectAll}
-                />
-              ),
-            },
-            {
-              Header: 'Title',
-              id: 'title',
-              accessor: 'title',
-            },
-            {
-              Header: 'Login',
-              accessor: 'login',
-            },
-            {
-              Header: 'Password',
-              accessor: 'password',
-            },
-            {
-              Header: 'Website',
-              accessor: 'website',
-            },
-            {
-              Header: 'Note',
-              accessor: 'note',
-            },
-            {
-              id: 'type',
-              accessor: 'type',
-              sortable: false,
-              width: 160,
-              Cell: props => (
-                // console.log(props);
-
-                <StyledSelect
-                  name="type"
-                  options={options}
-                  value={ITEM_CREDENTIALS_TYPE}
-                  onChange={this.handleChangeType}
-                />
-              ),
-              Header: 'Type',
-            },
-          ]}
+          columns={this.getColumns()}
         />
         <BottomWrapper>
           <SelectedItems>
-            Selected items: {selectedRows.length} / {data.length}
+            Selected items: {selectedRowsLength} / {data.length}
           </SelectedItems>
           <ButtonsWrapper>
             <StyledButton>CANCEL</StyledButton>
-            <Button onClick={this.handleSubmit} disabled={!selectedRows.length}>
+            <Button onClick={this.handleSubmit} disabled={!selectedRowsLength}>
               IMPORT
             </Button>
           </ButtonsWrapper>

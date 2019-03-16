@@ -24,7 +24,7 @@ import {
 import { createSrp } from 'common/utils/srp';
 import { generateSharingUrl, generateInviteUrl } from 'common/utils/sharing';
 import {
-  encryptItemForUser,
+  encryptItem,
   encryptItemForUsers,
   generateUser,
   generateAnonymousEmail,
@@ -627,13 +627,24 @@ class DashboardContainer extends Component {
   };
 
   inviteNewMembers = async (invitedUserIds, invitedByUserId) => {
+    console.log(invitedUserIds, invitedByUserId);
     const { workInProgressItem, members } = this.state;
     const { invited } = workInProgressItem;
     const newInvitedMembers = members.filter(({ id }) =>
       invitedUserIds.includes(id),
     );
+    const newMembers = Object.values(invitedByUserId)
+      .filter(({ isNew }) => !!isNew)
+      .map(({ userId, isNew, email, ...rest }) => ({
+        id: userId,
+        name: email,
+        email,
+        ...rest,
+      }));
 
-    const encryptedPromises = newInvitedMembers.map(async member => {
+    const allMembers = [...newInvitedMembers, ...newMembers];
+
+    const encryptedPromises = allMembers.map(async member => {
       const options = {
         message: openpgp.message.fromText(
           JSON.stringify(workInProgressItem.secret),
@@ -647,14 +658,14 @@ class DashboardContainer extends Component {
     const encrypted = await Promise.all(encryptedPromises);
 
     const newInvites = encrypted.map((encrypt, index) => ({
-      userId: newInvitedMembers[index].id,
+      userId: allMembers[index].id,
       secret: encrypt.data,
-      access: invitedByUserId[newInvitedMembers[index].id].access,
+      access: invitedByUserId[allMembers[index].id].access,
     }));
 
     try {
       await postInviteItem(workInProgressItem.id, {
-        invites: newInvites,
+        items: newInvites,
       });
 
       const data = {
@@ -664,15 +675,6 @@ class DashboardContainer extends Component {
           ...invitedUserIds.map(userId => invitedByUserId[userId]),
         ],
       };
-
-      const newMembers = Object.values(invitedByUserId)
-        .filter(({ isNew }) => !!isNew)
-        .map(({ userId, isNew, email, ...rest }) => ({
-          id: userId,
-          name: email,
-          email,
-          ...rest,
-        }));
 
       if (newMembers.length > 0) {
         await Promise.all(
@@ -858,7 +860,7 @@ class DashboardContainer extends Component {
         publicKey,
       } = await this.createUser(email, ANONYMOUS_USER_ROLE);
 
-      const encryptedSecret = await encryptItemForUser(
+      const encryptedSecret = await encryptItem(
         workInProgressItem.secret,
         publicKey,
       );

@@ -193,16 +193,8 @@ class ManageList extends Component {
   }
 
   render() {
-    const { onClickCreateList = Function.prototype } = this.props;
-
     return (
       <Fragment>
-        <Header>
-          <TableName>Lists</TableName>
-          <Button onClick={onClickCreateList} icon="plus" color="black">
-            ADD LIST
-          </Button>
-        </Header>
         <Table>
           <TableHeader>
             <TableCol align="left" width="33.33333%">

@@ -1,11 +1,11 @@
-import React, { Component, Fragment } from 'react';
+import React, { Component } from 'react';
 import styled from 'styled-components';
 import {
-  DashboardLayout,
   ManageList,
   ListFormModal,
   ConfirmModal,
   withNotification,
+  Button,
 } from 'components';
 import {
   postCreateList,
@@ -23,11 +23,39 @@ import {
 } from 'common/constants';
 import { initialListData, memberAdapter } from './utils';
 
-const ManageListWrapper = styled.div`
+const Wrapper = styled.div`
+  display: flex;
+  flex-direction: column;
+  background: ${({ theme }) => theme.lightBlue};
   width: 100%;
-  max-width: 1060px;
-  padding: 30px 20px 0;
-  margin: 0 auto;
+  padding: 60px;
+`;
+
+const TopWrapper = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 30px;
+`;
+
+const Title = styled.div`
+  font-size: 36px;
+  letter-spacing: 1px;
+  color: ${({ theme }) => theme.black};
+`;
+
+const Description = styled.div`
+  font-size: 18px;
+  letter-spacing: 0.6px;
+  color: ${({ theme }) => theme.black};
+  margin-bottom: 25px;
+`;
+
+const ManageListWrapper = styled.div`
+  display: flex;
+  flex-direction: column;
+  background: ${({ theme }) => theme.white};
+  padding: 30px;
 `;
 
 const reorder = (list, startIndex, endIndex) => {
@@ -258,7 +286,6 @@ class ManageListContainer extends Component {
   render() {
     const {
       list,
-      user,
       isVisibleModal,
       workInProgressList,
       members,
@@ -272,19 +299,27 @@ class ManageListContainer extends Component {
     const postList = this.preparePostList();
 
     return (
-      <Fragment>
-        <DashboardLayout user={user}>
-          <ManageListWrapper>
-            <ManageList
-              list={postList}
-              members={members}
-              onChangeSort={this.handleChangeSort}
-              onClickCreateList={this.handleClickCreateList}
-              onClickEditList={this.handleClickEditList}
-              onClickRemoveList={this.handleClickRemovePost}
-            />
-          </ManageListWrapper>
-        </DashboardLayout>
+      <Wrapper>
+        <TopWrapper>
+          <Title>Lists</Title>
+          <Button
+            onClick={this.handleClickCreateList}
+            icon="plus"
+            color="black"
+          >
+            ADD LIST
+          </Button>
+        </TopWrapper>
+        <Description>Manage your lists</Description>
+        <ManageListWrapper>
+          <ManageList
+            list={postList}
+            members={members}
+            onChangeSort={this.handleChangeSort}
+            onClickEditList={this.handleClickEditList}
+            onClickRemoveList={this.handleClickRemovePost}
+          />
+        </ManageListWrapper>
         {isVisibleModal && (
           <ListFormModal
             list={workInProgressList}
@@ -302,7 +337,7 @@ class ManageListContainer extends Component {
           onClickOk={this.handleRemoveList}
           onClickCancel={this.handleCloseConfirmModal}
         />
-      </Fragment>
+      </Wrapper>
     );
   }
 }

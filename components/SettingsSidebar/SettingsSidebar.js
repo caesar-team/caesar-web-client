@@ -26,9 +26,9 @@ const StyledLink = styled(Link)`
 `;
 
 const LINKS = [
-  { link: '/settings/profile', name: 'Profile' },
+  { link: '/settings/manage', name: 'Manage List' },
   { link: '/settings/import', name: 'Import' },
-  { link: '/settings/password', name: 'Change password' },
+  { link: '/logout', name: 'Logout' },
 ];
 
 const SettingsSidebar = ({ router: { route } }) => {

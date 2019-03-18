@@ -1,10 +1,9 @@
 import React from 'react';
 import styled from 'styled-components';
 import { Formik } from 'formik';
+import { Select, Button } from 'components';
 import { schema } from './schema';
 import { defaultValues } from './constants';
-import { Select } from '../../../Select';
-import { Button } from '../../../Button';
 
 const Wrapper = styled.div`
   width: 100%;

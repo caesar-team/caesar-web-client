@@ -6,12 +6,7 @@ import {
   ITEM_CREDENTIALS_TYPE,
   KEY_CODES,
 } from 'common/constants';
-import { Input } from '../../../Input';
-import { Icon } from '../../../Icon';
-import { Button } from '../../../Button';
-import { Select } from '../../../Select';
-import { Checkbox } from '../../../Checkbox';
-import { DataTable } from '../../../DataTable';
+import { Input, Icon, Button, Select, Checkbox, DataTable } from 'components';
 
 const Wrapper = styled.div`
   width: calc(100vw - 480px);

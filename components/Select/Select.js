@@ -19,19 +19,32 @@ const SelectedOption = styled.div`
 `;
 
 const ValueText = styled.div`
+  display: flex;
+  align-items: center;
   font-size: 18px;
   letter-spacing: 0.6px;
   color: ${({ theme }) => theme.black};
+  position: relative;
+  width: 100%;
+`;
+
+const IconCloseStyled = styled(Icon)`
+  position: absolute;
+  right: 20px;
 `;
 
 const Box = styled.div`
   position: absolute;
-  display: flex;
-  flex-direction: column;
-  border: 1px solid ${({ theme }) => theme.gallery};
-  border-radius: 3px;
   z-index: 11;
   top: 48px;
+`;
+
+const OptionsList = styled.div`
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  border: 1px solid ${({ theme }) => theme.gallery};
+  border-radius: 3px;
   width: 100%;
 `;
 
@@ -41,13 +54,15 @@ const Option = styled.div`
   font-size: 16px;
   letter-spacing: 0.5px;
   font-weight: ${({ isActive }) => (isActive ? 'bold' : 'normal')};
-  color: ${({ theme }) => theme.emperor};
+  color: ${({ theme, isDisabled }) =>
+    isDisabled ? theme.lightGray : theme.emperor};
   background-color: ${({ theme, isActive }) =>
     isActive ? theme.snow : theme.white};
-  cursor: pointer;
+  cursor: ${({ isDisabled }) => (isDisabled ? 'default' : 'pointer')};
 
   &:hover {
-    color: ${({ theme }) => theme.black};
+    color: ${({ theme, isDisabled }) =>
+      isDisabled ? theme.lightGray : theme.black};
   }
 `;
 
@@ -63,17 +78,26 @@ class SelectInner extends Component {
   };
 
   handleClick = value => () => {
-    const { name, onChange } = this.props;
+    const { name, onChange = Function.prototype } = this.props;
 
     this.setState(
       {
         isOpened: false,
       },
-      () => {
-        if (onChange) {
-          onChange(name, value);
-        }
+      () => onChange(name, value),
+    );
+  };
+
+  handleClickCancel = event => {
+    event.stopPropagation();
+
+    const { name, onChange = Function.prototype } = this.props;
+
+    this.setState(
+      {
+        isOpened: false,
       },
+      () => onChange(name, null),
     );
   };
 
@@ -86,14 +110,17 @@ class SelectInner extends Component {
   renderOptions() {
     const { value, options } = this.props;
 
-    return options.map(({ value: optionValue, label }) => {
+    return options.map(({ value: optionValue, label, isDisabled = false }) => {
       const isActive = value === optionValue;
 
       return (
         <Option
           key={optionValue}
           isActive={isActive}
-          onClick={this.handleClick(optionValue)}
+          isDisabled={isDisabled}
+          onClick={
+            isDisabled ? Function.prototype : this.handleClick(optionValue)
+          }
         >
           {label}
         </Option>
@@ -102,7 +129,7 @@ class SelectInner extends Component {
   }
 
   render() {
-    const { value, options, placeholder } = this.props;
+    const { value, options, placeholder, isCancellable, ...props } = this.props;
     const { isOpened } = this.state;
 
     const iconName = isOpened ? 'arrow-up-big' : 'arrow-down-big';
@@ -112,14 +139,32 @@ class SelectInner extends Component {
 
     return (
       <Wrapper>
-        <SelectedOption onClick={this.handleClickToggle}>
-          <ValueText>{selectedLabel}</ValueText>
+        <SelectedOption onClick={this.handleClickToggle} {...props}>
+          <ValueText>
+            {selectedLabel}
+            {isCancellable &&
+              selectedLabel && (
+                <IconCloseStyled
+                  name="close"
+                  width={12}
+                  height={12}
+                  onClick={this.handleClickCancel}
+                />
+              )}
+          </ValueText>
           <Icon name={iconName} width={16} height={16} />
         </SelectedOption>
-        {isOpened && <Box>{this.renderOptions()}</Box>}
+        {isOpened && (
+          <Box>
+            <OptionsList>{this.renderOptions()}</OptionsList>
+          </Box>
+        )}
       </Wrapper>
     );
   }
 }
+
+SelectInner.ValueText = ValueText;
+SelectInner.SelectedOption = SelectedOption;
 
 export const Select = enhanceWithClickOutside(SelectInner);

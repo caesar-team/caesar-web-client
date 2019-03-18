@@ -72,7 +72,7 @@ class Credentials extends Component {
       isSharedItem = false,
       item: {
         listId,
-        secret: { login, pass, website, note, attachments },
+        secret: { login, pass, website, note, attachments = [] },
       },
     } = this.props;
 

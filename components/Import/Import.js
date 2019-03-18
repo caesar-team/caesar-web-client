@@ -1,22 +1,20 @@
 import React, { Component } from 'react';
 import styled from 'styled-components';
+import { withRouter } from 'next/router';
 import { matchStrict } from 'common/utils/match';
-import { Tabs, Tab } from 'components';
 import { parseFile } from 'common/utils/importUtils';
+import { encryptItem } from 'common/utils/cipherUtils';
+import { getKeys, postCreateItem, getList } from 'common/api';
+import { ITEM_CREDENTIALS_TYPE, ITEM_DOCUMENT_TYPE } from 'common/constants';
 import { NavigationPanel } from '../NavigationPanel';
+import { FileStep, FieldsStep, DataStep, ImportingStep } from './Steps';
 import {
-  TABS,
   STEPS,
-  FILE_TYPE_MAP,
   FILE_STEP,
   FIELDS_STEP,
   DATA_STEP,
   IMPORTING_STEP,
-  ONEPASSWORD_TYPE,
-  LASTPASS_TYPE,
-  CSV_TYPE,
 } from './constants';
-import { FileStep, FieldsStep, DataStep, ImportingStep } from './Steps';
 
 const Wrapper = styled.div`
   display: flex;
@@ -26,148 +24,219 @@ const Wrapper = styled.div`
   padding: 60px;
 `;
 
-const Image = styled.img`
-  object-fit: contain;
-  margin-right: 20px;
-  width: 50px;
-  height: 50px;
-`;
-
-const TabWrapper = styled.div`
-  display: flex;
-  padding: 30px;
-  align-items: center;
-  border: 1px solid #eaeaea;
-  border-bottom: 0;
-`;
-
-const TabText = styled.div`
-  display: flex;
-  flex-direction: column;
-`;
-
-const TabName = styled.div`
-  font-size: 18px;
-  letter-spacing: 0.6px;
-`;
-
-const TabDescription = styled.div`
-  font-size: 14px;
-  letter-spacing: 0.4px;
-  color: ${({ theme }) => theme.gray};
-`;
-
 const Title = styled.div`
   font-size: 36px;
   letter-spacing: 1px;
-  color: #000000;
+  color: ${({ theme }) => theme.black};
   margin-bottom: 30px;
 `;
 
 const Description = styled.div`
   font-size: 18px;
   letter-spacing: 0.6px;
-  color: #000000;
+  color: ${({ theme }) => theme.black};
   margin-bottom: 25px;
+`;
+
+const StepWrapper = styled.div`
+  display: flex;
+  flex-direction: column;
+  background: ${({ theme }) => theme.white};
+  padding: 30px;
 `;
 
 const StyledNavigationPanel = styled(NavigationPanel)`
   margin-top: 25px;
 `;
 
+const normalizeData = (rows, { name, login, pass, website, note }) =>
+  rows.map((row, index) => ({
+    index,
+    name: row[name],
+    login: row[login],
+    pass: row[pass],
+    website: row[website],
+    note: row[note],
+    type: row[pass] && row[login] ? ITEM_CREDENTIALS_TYPE : ITEM_DOCUMENT_TYPE,
+  }));
+
+const pick = (object, keys) =>
+  keys.reduce((accumulator, key) => {
+    if (object[key]) {
+      return { ...accumulator, [key]: object[key] };
+    }
+
+    return accumulator;
+  }, {});
+
+const DOCUMENT_TYPE_FIELDS = ['name', 'note'];
+const CREDENTIALS_TYPE_FIELDS = ['name', 'login', 'pass', 'website', 'note'];
+
 class Import extends Component {
   state = this.prepareInitialState();
 
-  handleChangeTab = (name, tabName) => {
+  async componentDidMount() {
+    try {
+      const { data: list } = await getList();
+      const {
+        data: { publicKey },
+      } = await getKeys();
+
+      this.inboxListId = list[0].id;
+      this.publicKey = publicKey;
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  handleOnload = ({ file }) => {
+    const data = parseFile(file.raw);
+
     this.setState({
-      currentTab: tabName,
+      data,
+      currentStep: FIELDS_STEP,
     });
   };
 
-  handleOnload = ({ files }, FormikBag) => {};
+  handleSelectFields = fields => {
+    this.setState({
+      matchings: fields,
+      currentStep: DATA_STEP,
+    });
+  };
+
+  handleFinishDataStep = async values => {
+    const omittedFields = ['index'];
+    const cleared = values.map(row => {
+      const keys = Object.keys(row);
+
+      return keys
+        .filter(key => !!row[key] && !omittedFields.includes(key))
+        .reduce(
+          (accumulator, key) => ({ ...accumulator, [key]: row[key] }),
+          {},
+        );
+    });
+
+    this.setState(
+      {
+        currentStep: IMPORTING_STEP,
+      },
+      () => {
+        this.importing(cleared);
+      },
+    );
+  };
+
+  handleClickStep = step => {
+    this.setState({
+      currentStep: step,
+    });
+  };
+
+  handleClickToDashboard = () => {
+    this.props.router.push('/');
+  };
+
+  async importing(data) {
+    const prepared = await Promise.all(
+      data.map(async ({ type, ...secret }, index) => {
+        const encryptedSecret = await encryptItem(
+          pick(
+            secret,
+            type === ITEM_CREDENTIALS_TYPE
+              ? CREDENTIALS_TYPE_FIELDS
+              : DOCUMENT_TYPE_FIELDS,
+          ),
+          this.publicKey,
+        );
+
+        const item = {
+          type,
+          listId: this.inboxListId,
+          secret: encryptedSecret,
+        };
+
+        this.setState({
+          progress: Math.round((index / data.length) * 100) / 100,
+        });
+
+        return item;
+      }),
+    );
+
+    try {
+      // TODO: change this to batch post request
+      await Promise.all(prepared.map(postCreateItem));
+
+      this.setState({
+        progress: 1,
+      });
+    } catch (error) {
+      console.log(error);
+    }
+  }
 
   prepareInitialState() {
     return {
       currentStep: FILE_STEP,
-      currentTab: ONEPASSWORD_TYPE,
-      data: [],
+      data: {
+        headings: [],
+        rows: [],
+      },
+      matchings: {},
+      progress: 0,
     };
   }
 
-  renderTabContent() {
-    const { currentStep, currentTab } = this.state;
+  renderStep() {
+    const { currentStep, data, matchings, progress } = this.state;
 
     return matchStrict(
       currentStep,
       {
-        FILE_STEP: (
-          <FileStep
-            type={FILE_TYPE_MAP[currentTab].type}
-            onSubmit={this.handleOnload}
+        FILE_STEP: <FileStep onSubmit={this.handleOnload} />,
+        FIELDS_STEP: (
+          <FieldsStep
+            initialValues={matchings}
+            headings={data.headings}
+            onSubmit={this.handleSelectFields}
           />
         ),
-        DATA_STEP: <DataStep />,
-        IMPORTING_STEP: <ImportingStep />,
+        DATA_STEP: (
+          <DataStep
+            data={normalizeData(data.rows, matchings)}
+            headings={matchings}
+            onSubmit={this.handleFinishDataStep}
+          />
+        ),
+        IMPORTING_STEP: (
+          <ImportingStep
+            progress={progress}
+            onClickToDashboard={this.handleClickToDashboard}
+          />
+        ),
       },
       null,
     );
   }
 
-  renderTabs() {
-    const { currentTab } = this.state;
-
-    const renderedTabs = TABS.map(
-      ({ name, title, description, icon, icon2 }) => {
-        const component = (
-          <TabWrapper>
-            <Image src={icon} srcSet={`${icon} 1x, ${icon2} 2x`} />
-            <TabText>
-              <TabName>{title}</TabName>
-              <TabDescription>{description}</TabDescription>
-            </TabText>
-          </TabWrapper>
-        );
-
-        return (
-          <Tab key={name} name={name} component={component}>
-            {this.renderTabContent()}
-          </Tab>
-        );
-      },
-    );
-
-    return (
-      <Tabs
-        name="import"
-        activeTabName={currentTab}
-        onChange={this.handleChangeTab}
-      >
-        {renderedTabs}
-      </Tabs>
-    );
-  }
-
-  renderNavigationPanel() {
-    const { currentStep, currentTab } = this.state;
-
-    const steps =
-      currentTab === CSV_TYPE
-        ? STEPS
-        : STEPS.filter(({ name }) => name !== FIELDS_STEP);
-
-    return <StyledNavigationPanel steps={steps} currentStep={currentStep} />;
-  }
-
   render() {
+    const { currentStep } = this.state;
+
     return (
       <Wrapper>
         <Title>Settings / Import</Title>
         <Description>Select file type to import:</Description>
-        {this.renderTabs()}
-        {this.renderNavigationPanel()}
+        <StepWrapper>{this.renderStep()}</StepWrapper>
+        <StyledNavigationPanel
+          steps={STEPS}
+          currentStep={currentStep}
+          onClickStep={this.handleClickStep}
+        />
       </Wrapper>
     );
   }
 }
 
-export default Import;
+export default withRouter(Import);

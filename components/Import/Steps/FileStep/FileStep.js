@@ -1,8 +1,8 @@
 import React from 'react';
 import styled from 'styled-components';
-import { Formik, FastField } from 'formik';
+import { Formik } from 'formik';
 import { Uploader } from '../../../Uploader';
-import { schema } from './schema';
+import { createSchema } from './schema';
 
 const Wrapper = styled.div`
   width: 100%;
@@ -17,23 +17,28 @@ const Title = styled.div`
   margin-bottom: 25px;
 `;
 
-const FileStep = ({ type, onSubmit }) => (
+const initialValues = {
+  file: {},
+};
+
+const FileStep = ({ onSubmit }) => (
   <Formik
     key="fileStep"
-    initialValues={{ files: [] }}
+    initialValues={initialValues}
     onSubmit={onSubmit}
-    validationSchema={schema}
+    validationSchema={createSchema('csv')}
     render={({ values, errors, setFieldValue, handleSubmit, submitForm }) => (
       <Wrapper>
         <Form onSubmit={handleSubmit}>
-          <Title>Upload your {type} file</Title>
+          <Title>Upload your CSV file</Title>
           <Uploader
             name="file"
             accept="text/csv"
-            files={values.files}
-            extText={`*.csv file for ${type}`}
-            onChange={(name, files) => {
-              setFieldValue('files', files);
+            files={values.file}
+            extText="*.csv file"
+            error={errors.file ? errors.file.name || errors.file.raw : null}
+            onChange={(name, file) => {
+              setFieldValue('file', file);
               submitForm();
             }}
           />

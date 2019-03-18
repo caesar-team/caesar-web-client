@@ -266,9 +266,10 @@ const CredentialsForm = ({
           <AttachmentsSection>
             <Attachment>Attachments</Attachment>
             <Uploader
+              multiple
+              asPreview
               name="attachments"
               files={values.attachments}
-              multiple
               onChange={setFieldValue}
             />
             <Attachments>

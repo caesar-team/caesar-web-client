@@ -19,7 +19,7 @@ export const Document = props => {
     isSharedItem,
     item: {
       listId,
-      secret: { note, attachments },
+      secret: { note, attachments = [] },
     },
   } = props;
   const shouldShowNote = !!note;

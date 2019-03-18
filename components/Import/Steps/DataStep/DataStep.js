@@ -1,13 +1,20 @@
 import React, { Component } from 'react';
 import styled from 'styled-components';
-import { Formik, FastField } from 'formik';
-import { Checkbox, DataTable } from 'components';
+import memoize from 'memoize-one';
+import {
+  ITEM_DOCUMENT_TYPE,
+  ITEM_CREDENTIALS_TYPE,
+  KEY_CODES,
+} from 'common/constants';
 import { Input } from '../../../Input';
 import { Icon } from '../../../Icon';
 import { Button } from '../../../Button';
+import { Select } from '../../../Select';
+import { Checkbox } from '../../../Checkbox';
+import { DataTable } from '../../../DataTable';
 
 const Wrapper = styled.div`
-  width: 100%;
+  width: calc(100vw - 480px);
 `;
 
 const Title = styled.div`
@@ -17,7 +24,7 @@ const Title = styled.div`
   margin-bottom: 20px;
 `;
 
-const StyledInput = styled(Input)`
+const SearchInput = styled(Input)`
   border: 1px solid ${({ theme }) => theme.gallery};
   margin-bottom: 10px;
 
@@ -56,89 +63,262 @@ const StyledButton = styled(Button)`
   margin-right: 20px;
 `;
 
-const COLUMNS = [
-  { name: 'Title', selector: 'name', sortable: true },
-  { name: 'Website', selector: 'website', sortable: true },
-  { name: 'Login', selector: 'login', sortable: true },
-];
+const StyledSelect = styled(Select)`
+  padding: 0;
+  border-bottom: 0;
+  margin: 0 20px;
 
-const DATA = [
-  { name: 'Behance', website: 'becance.com', login: 'dspiridonov@4xxi.com' },
-  {
-    name: 'Avacode Profile',
-    website: 'avacode.io',
-    login: 'dspiridonov@4xxi.com',
-  },
-  { name: 'Medium', website: 'medium.com', login: 'dspiridonov@4xxi.com' },
-  { name: 'Dribble', website: 'dribble.com', login: 'dspiridonov@4xxi.com' },
-  {
-    name: 'Pinterest',
-    website: 'pinterest.com',
-    login: 'dspiridonov@4xxi.com',
-  },
-];
+  ${Select.ValueText} {
+    font-size: 16px;
+    margin-right: 20px;
+    color: rgba(0, 0, 0, 0.87);
+  }
+`;
+
+const Cell = styled.div`
+  display: flex;
+  align-items: center;
+  height: 40px;
+  line-height: 40px;
+  cursor: text;
+  width: 100%;
+  min-width: 100px;
+`;
+
+const capitalize = string => {
+  if (typeof string !== 'string') return '';
+  return string.charAt(0).toUpperCase() + string.slice(1);
+};
+
+const SEARCH_FIELDS = ['name'];
+
+const normalize = array =>
+  array.reduce(
+    (accumulator, curr, index) => ({ ...accumulator, [index]: curr }),
+    {},
+  );
+
+const denormalize = object => Object.values(object);
 
 class DataStep extends Component {
   state = this.prepareInitialState();
 
+  filter = memoize((data, pattern) =>
+    data.filter(row =>
+      SEARCH_FIELDS.some(field => row[field].toLowerCase().includes(pattern)),
+    ),
+  );
+
+  getColumns() {
+    const { data, selectedRows } = this.state;
+    const { headings } = this.props;
+
+    const columns = Object.keys(headings);
+
+    const firstColumn = {
+      id: 'checkbox',
+      accessor: '',
+      width: 60,
+      sortable: false,
+      Cell: ({ original }) => (
+        <Checkbox
+          checked={!!selectedRows[original.index]}
+          onChange={this.handleSelectRow(original.index.toString())}
+        />
+      ),
+      Header: props => (
+        <Checkbox
+          checked={props.data.length === denormalize(selectedRows).length}
+          onChange={this.handleSelectAll}
+        />
+      ),
+    };
+
+    const lastColumn = {
+      id: 'type',
+      accessor: 'type',
+      sortable: false,
+      width: 180,
+      Cell: cellInfo => {
+        const {
+          original: { login, pass },
+        } = cellInfo;
+        const isCredentialsDisabled = !login || !pass;
+        const isDocumentDisabled = false;
+
+        const options = [
+          {
+            value: ITEM_CREDENTIALS_TYPE,
+            label: 'Password',
+            isDisabled: isCredentialsDisabled,
+          },
+          {
+            value: ITEM_DOCUMENT_TYPE,
+            label: 'Secure Note',
+            isDisabled: isDocumentDisabled,
+          },
+        ];
+
+        return (
+          <StyledSelect
+            name="type"
+            options={options}
+            value={data[cellInfo.index][cellInfo.column.id]}
+            onChange={this.handleChangeType(cellInfo.index)}
+          />
+        );
+      },
+      Header: 'Type',
+    };
+
+    const restColumns = columns.map(id => ({
+      id,
+      accessor: id,
+      Header: capitalize(id),
+      Cell: cellInfo => (
+        <Cell
+          contentEditable
+          onBlur={this.handleBlurField(cellInfo.index, cellInfo.column.id)}
+          onKeyDown={this.handleKeyDown(cellInfo.index, cellInfo.column.id)}
+          dangerouslySetInnerHTML={{
+            __html: data[cellInfo.index][cellInfo.column.id],
+          }}
+        />
+      ),
+    }));
+
+    return [firstColumn, ...restColumns, lastColumn];
+  }
+
   handleSearch = event => {
     event.preventDefault();
+
+    const {
+      target: { value },
+    } = event;
+
+    this.setState({
+      filterText: value,
+    });
   };
 
-  handleChange = data => {};
+  handleSubmit = () => {
+    const { onSubmit } = this.props;
+    const { selectedRows } = this.state;
+
+    onSubmit(denormalize(selectedRows));
+  };
+
+  handleSelectAll = event => {
+    const { checked } = event.currentTarget;
+    const { data } = this.state;
+
+    this.setState({
+      selectedRows: checked ? normalize(data) : [],
+    });
+  };
+
+  handleSelectRow = rowIndex => event => {
+    const { checked } = event.currentTarget;
+    const { data, selectedRows } = this.state;
+
+    let updatedData = null;
+
+    if (checked) {
+      const row = data.find((_, index) => index === rowIndex);
+
+      updatedData = { ...selectedRows, [rowIndex]: row };
+    } else {
+      const { [rowIndex]: row, ...rest } = selectedRows;
+
+      updatedData = rest;
+    }
+
+    this.setState({
+      selectedRows: updatedData,
+    });
+  };
+
+  handleChangeField = (index, columnId, value) => {
+    this.setState(prevState => ({
+      data: prevState.data.map(
+        (row, rowIndex) =>
+          rowIndex === index ? { ...row, [columnId]: value } : row,
+      ),
+      selectedRows: prevState.selectedRows[index]
+        ? {
+            ...prevState.selectedRows,
+            [index]: {
+              ...prevState.selectedRows[index],
+              [columnId]: value,
+            },
+          }
+        : prevState.selectedRows,
+    }));
+  };
+
+  handleBlurField = (index, columnId) => event => {
+    event.preventDefault();
+    event.stopPropagation();
+
+    const {
+      target: { innerText, textContent },
+    } = event;
+
+    const value = innerText || textContent;
+
+    this.handleChangeField(index, columnId, value);
+  };
+
+  handleKeyDown = (index, columnId) => event => {
+    if (event.keyCode === KEY_CODES.ENTER) {
+      this.handleBlurField(index, columnId)(event);
+    }
+  };
+
+  handleChangeType = index => (_, value) => {
+    this.handleChangeField(index, 'type', value);
+  };
 
   prepareInitialState() {
     return {
-      searchPattern: '',
-      data: DATA,
+      filterText: '',
+      selectedRows: normalize(this.props.data),
+      data: this.props.data,
     };
   }
 
   render() {
-    const { data } = this.state;
-    const { onSubmit } = this.props;
+    const { data, selectedRows, filterText } = this.state;
+
+    const selectedRowsLength = denormalize(selectedRows).length;
 
     return (
-      <Formik
-        key="dataStep"
-        onSubmit={onSubmit}
-        render={({
-          values,
-          errors,
-          touched,
-          handleSubmit,
-          setFieldValue,
-          setFieldTouched,
-          isSubmitting,
-          isValid,
-        }) => (
-          <Wrapper>
-            <Title>Select items to import 1Password data into Caesar </Title>
-            <StyledInput
-              prefix={<StyledIcon name="search" width={18} height={18} />}
-              placeholder="Search"
-              onChange={this.handleSearch}
-            />
-            <DataTable
-              noHeader
-              columns={COLUMNS}
-              data={data}
-              selectableRows
-              selectableRowsComponent={Checkbox}
-              onTableUpdate={this.handleChange}
-            />
-            <BottomWrapper>
-              <SelectedItems>
-                Selected items: {data.length} / {DATA.length}
-              </SelectedItems>
-              <ButtonsWrapper>
-                <StyledButton>CANCEL</StyledButton>
-                <Button>IMPORT</Button>
-              </ButtonsWrapper>
-            </BottomWrapper>
-          </Wrapper>
-        )}
-      />
+      <Wrapper>
+        <Title>Select items to import data into Caesar</Title>
+        <SearchInput
+          prefix={<StyledIcon name="search" width={18} height={18} />}
+          placeholder="Search"
+          onChange={this.handleSearch}
+        />
+        <DataTable
+          data={this.filter(data, filterText)}
+          showPagination={false}
+          defaultPageSize={data.length}
+          columns={this.getColumns()}
+        />
+        <BottomWrapper>
+          <SelectedItems>
+            Selected items: {selectedRowsLength} / {data.length}
+          </SelectedItems>
+          <ButtonsWrapper>
+            <StyledButton>CANCEL</StyledButton>
+            <Button onClick={this.handleSubmit} disabled={!selectedRowsLength}>
+              IMPORT
+            </Button>
+          </ButtonsWrapper>
+        </BottomWrapper>
+      </Wrapper>
     );
   }
 }

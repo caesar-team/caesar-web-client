@@ -17,6 +17,10 @@ import MasterPasswordCheckForm from './MasterPasswordCheckForm';
 import MasterPasswordCreateForm from './MasterPasswordCreateForm';
 import MasterPasswordConfirmForm from './MasterPasswordConfirmForm';
 
+const isSameKeyPair = (oldKeyPair, currentKeyPair) =>
+  oldKeyPair.publicKey === currentKeyPair.publicKey &&
+  oldKeyPair.encryptedPrivateKey === currentKeyPair.encryptedPrivateKey;
+
 const Wrapper = styled.div`
   max-width: 400px;
   width: 100%;
@@ -37,7 +41,7 @@ class MasterPasswordStep extends Component {
     };
 
     if (initialStep === MASTER_PASSWORD_CREATE) {
-      // it's readonly situation
+      // it's readonly situation and new invited user
       if (sharedMasterPassword) {
         const {
           data: { publicKey, encryptedPrivateKey },
@@ -61,11 +65,13 @@ class MasterPasswordStep extends Component {
         try {
           await validateKeys(sharedMasterPassword, state.encryptedPrivateKey);
 
-          return this.onFinishMasterPassword(
-            state.publicKey,
-            state.encryptedPrivateKey,
-            sharedMasterPassword,
-          );
+          return this.onFinishMasterPassword({
+            currentKeyPair: {
+              publicKey: state.publicKey,
+              encryptedPrivateKey: state.encryptedPrivateKey,
+            },
+            masterPassword: sharedMasterPassword,
+          });
         } catch (e) {
           state.step = MASTER_PASSWORD_CHECK;
         }
@@ -75,17 +81,19 @@ class MasterPasswordStep extends Component {
     return this.setState(state);
   }
 
-  async onFinishMasterPassword(publicKey, encryptedPrivateKey, masterPassword) {
+  async onFinishMasterPassword({ oldKeyPair, currentKeyPair, masterPassword }) {
     const { onFinish } = this.props;
 
-    await postKeys({
-      publicKey,
-      encryptedPrivateKey,
-    });
+    if (oldKeyPair && !isSameKeyPair(oldKeyPair, currentKeyPair)) {
+      await postKeys({
+        publicKey: currentKeyPair.publicKey,
+        encryptedPrivateKey: currentKeyPair.encryptedPrivateKey,
+      });
+    }
 
     onFinish({
-      publicKey,
-      encryptedPrivateKey,
+      oldKeyPair,
+      currentKeyPair,
       masterPassword,
     });
   }
@@ -100,7 +108,10 @@ class MasterPasswordStep extends Component {
     try {
       await validateKeys(password, encryptedPrivateKey);
 
-      onFinish({ publicKey, encryptedPrivateKey, masterPassword: password });
+      onFinish({
+        currentKeyPair: { publicKey, encryptedPrivateKey },
+        masterPassword: password,
+      });
     } catch (error) {
       setErrors({ password: 'Wrong password' });
       setSubmitting(false);
@@ -144,11 +155,17 @@ class MasterPasswordStep extends Component {
         encryptedPrivateKey = data.privateKey;
       }
 
-      return this.onFinishMasterPassword(
-        publicKey,
-        encryptedPrivateKey,
+      return this.onFinishMasterPassword({
+        oldKeyPair: {
+          publicKey: currentPublicKey,
+          encryptedPrivateKey: currentEncryptedPrivateKey,
+        },
+        currentKeyPair: {
+          publicKey,
+          encryptedPrivateKey,
+        },
         masterPassword,
-      );
+      });
     } catch (error) {
       setErrors({ confirmPassword: 'Something wrong' });
       return setSubmitting(false);

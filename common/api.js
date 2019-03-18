@@ -102,7 +102,7 @@ export const updateItem = (itemId, data) =>
   callApi.patch(`/item/${itemId}`, data);
 
 export const postInviteItem = (itemId, data) =>
-  callApi.post(`/item/${itemId}/invite`, data);
+  callApi.post(`/item/${itemId}/child_item`, data);
 
 export const changeInviteItem = (itemId, data) =>
   callApi.put(`/item/${itemId}/invite`, data);
@@ -151,4 +151,14 @@ export const postChangePassword = data => callApi.patch('/srp/password', data);
 
 export const getCheckShare = id => callApi.get(`/anonymous/share/${id}/check`);
 
+export const getMaskedItems = () => callApi.get('/item_mask');
+
+export const postItemMask = id => callApi.post(`/item_mask/${id}`);
+
+export const postItemMasks = data => callApi.post('/item_mask', data);
+
+export const deleteItemMasks = data => callApi.delete('/item_mask', data);
+
 export const postInvitation = data => callApi.post('/invitation', data);
+
+export const patchItemBatch = data => callApi.put('/item/batch', data);

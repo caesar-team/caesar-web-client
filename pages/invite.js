@@ -11,7 +11,7 @@ const validateFields = (data, fields) =>
 
 const InvitePage = ({ statusCode, shared }) => (
   <Fragment>
-    <Head title="Sharing" />
+    <Head title="Invite" />
     {statusCode ? (
       <Error statusCode={statusCode} />
     ) : (

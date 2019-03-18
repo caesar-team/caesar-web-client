@@ -1,7 +1,11 @@
 import React, { Component } from 'react';
 import styled from 'styled-components';
 import memoize from 'memoize-one';
-import { ITEM_DOCUMENT_TYPE, ITEM_CREDENTIALS_TYPE } from 'common/constants';
+import {
+  ITEM_DOCUMENT_TYPE,
+  ITEM_CREDENTIALS_TYPE,
+  KEY_CODES,
+} from 'common/constants';
 import { Input } from '../../../Input';
 import { Icon } from '../../../Icon';
 import { Button } from '../../../Button';
@@ -75,8 +79,9 @@ const Cell = styled.div`
   display: flex;
   align-items: center;
   height: 40px;
+  line-height: 40px;
   cursor: text;
-  max-width: 100%;
+  width: 100%;
   min-width: 100px;
 `;
 
@@ -85,7 +90,7 @@ const capitalize = string => {
   return string.charAt(0).toUpperCase() + string.slice(1);
 };
 
-const SEARCH_FIELDS = ['title'];
+const SEARCH_FIELDS = ['name'];
 
 const normalize = array =>
   array.reduce(
@@ -136,9 +141,9 @@ class DataStep extends Component {
       width: 180,
       Cell: cellInfo => {
         const {
-          original: { login, password },
+          original: { login, pass },
         } = cellInfo;
-        const isCredentialsDisabled = !login || !password;
+        const isCredentialsDisabled = !login || !pass;
         const isDocumentDisabled = false;
 
         const options = [
@@ -174,6 +179,7 @@ class DataStep extends Component {
         <Cell
           contentEditable
           onBlur={this.handleBlurField(cellInfo.index, cellInfo.column.id)}
+          onKeyDown={this.handleKeyDown(cellInfo.index, cellInfo.column.id)}
           dangerouslySetInnerHTML={{
             __html: data[cellInfo.index][cellInfo.column.id],
           }}
@@ -239,17 +245,22 @@ class DataStep extends Component {
         (row, rowIndex) =>
           rowIndex === index ? { ...row, [columnId]: value } : row,
       ),
-      selectedRows: {
-        ...prevState.selectedRows,
-        [index]: {
-          ...prevState.selectedRows[index],
-          [columnId]: value,
-        },
-      },
+      selectedRows: prevState.selectedRows[index]
+        ? {
+            ...prevState.selectedRows,
+            [index]: {
+              ...prevState.selectedRows[index],
+              [columnId]: value,
+            },
+          }
+        : prevState.selectedRows,
     }));
   };
 
   handleBlurField = (index, columnId) => event => {
+    event.preventDefault();
+    event.stopPropagation();
+
     const {
       target: { innerText, textContent },
     } = event;
@@ -257,6 +268,12 @@ class DataStep extends Component {
     const value = innerText || textContent;
 
     this.handleChangeField(index, columnId, value);
+  };
+
+  handleKeyDown = (index, columnId) => event => {
+    if (event.keyCode === KEY_CODES.ENTER) {
+      this.handleBlurField(index, columnId)(event);
+    }
   };
 
   handleChangeType = index => (_, value) => {
@@ -278,7 +295,7 @@ class DataStep extends Component {
 
     return (
       <Wrapper>
-        <Title>Select items to import data into Caesar </Title>
+        <Title>Select items to import data into Caesar</Title>
         <SearchInput
           prefix={<StyledIcon name="search" width={18} height={18} />}
           placeholder="Search"

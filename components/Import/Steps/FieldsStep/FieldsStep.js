@@ -2,7 +2,7 @@ import React from 'react';
 import styled from 'styled-components';
 import { Formik } from 'formik';
 import { schema } from './schema';
-import { initialValues } from './constants';
+import { defaultValues } from './constants';
 import { Select } from '../../../Select';
 import { Button } from '../../../Button';
 
@@ -123,10 +123,11 @@ const getOptions = headings =>
     label: heading,
   }));
 
-const FieldsStep = ({ headings, onSubmit }) => (
+const FieldsStep = ({ headings, initialValues, onSubmit }) => (
   <Formik
     key="fieldsStep"
-    initialValues={initialValues}
+    initialValues={{ ...defaultValues, ...initialValues }}
+    isInitialValid={schema.isValidSync({ ...defaultValues, ...initialValues })}
     onSubmit={onSubmit}
     validationSchema={schema}
     render={({
@@ -142,40 +143,45 @@ const FieldsStep = ({ headings, onSubmit }) => (
           <TwoColumnsWrapper>
             <Column>
               <Label>Caesar fields</Label>
-              <Box isRequired>Title</Box>
-              <Box isRequired>Login</Box>
-              <Box isRequired>Password</Box>
+              <Box isRequired>Name</Box>
+              <Box>Login</Box>
+              <Box>Password</Box>
               <Box>Website</Box>
               <Box>Note</Box>
             </Column>
             <Column>
               <Label>CSV Fields</Label>
               <StyledSelect
-                name="title"
-                value={values.title}
+                name="name"
+                isCancellable
+                value={values.name}
                 options={getOptions(headings)}
                 onChange={setFieldValue}
               />
               <StyledSelect
                 name="login"
+                isCancellable
                 value={values.login}
                 options={getOptions(headings)}
                 onChange={setFieldValue}
               />
               <StyledSelect
-                name="password"
-                value={values.password}
+                name="pass"
+                isCancellable
+                value={values.pass}
                 options={getOptions(headings)}
                 onChange={setFieldValue}
               />
               <StyledSelect
                 name="website"
+                isCancellable
                 value={values.website}
                 options={getOptions(headings)}
                 onChange={setFieldValue}
               />
               <StyledSelect
                 name="note"
+                isCancellable
                 value={values.note}
                 options={getOptions(headings)}
                 onChange={setFieldValue}

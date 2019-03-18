@@ -19,9 +19,18 @@ const SelectedOption = styled.div`
 `;
 
 const ValueText = styled.div`
+  display: flex;
+  align-items: center;
   font-size: 18px;
   letter-spacing: 0.6px;
   color: ${({ theme }) => theme.black};
+  position: relative;
+  width: 100%;
+`;
+
+const IconCloseStyled = styled(Icon)`
+  position: absolute;
+  right: 20px;
 `;
 
 const Box = styled.div`
@@ -69,17 +78,26 @@ class SelectInner extends Component {
   };
 
   handleClick = value => () => {
-    const { name, onChange } = this.props;
+    const { name, onChange = Function.prototype } = this.props;
 
     this.setState(
       {
         isOpened: false,
       },
-      () => {
-        if (onChange) {
-          onChange(name, value);
-        }
+      () => onChange(name, value),
+    );
+  };
+
+  handleClickCancel = event => {
+    event.stopPropagation();
+
+    const { name, onChange = Function.prototype } = this.props;
+
+    this.setState(
+      {
+        isOpened: false,
       },
+      () => onChange(name, null),
     );
   };
 
@@ -111,7 +129,7 @@ class SelectInner extends Component {
   }
 
   render() {
-    const { value, options, placeholder, ...props } = this.props;
+    const { value, options, placeholder, isCancellable, ...props } = this.props;
     const { isOpened } = this.state;
 
     const iconName = isOpened ? 'arrow-up-big' : 'arrow-down-big';
@@ -122,7 +140,18 @@ class SelectInner extends Component {
     return (
       <Wrapper>
         <SelectedOption onClick={this.handleClickToggle} {...props}>
-          <ValueText>{selectedLabel}</ValueText>
+          <ValueText>
+            {selectedLabel}
+            {isCancellable &&
+              selectedLabel && (
+                <IconCloseStyled
+                  name="close"
+                  width={12}
+                  height={12}
+                  onClick={this.handleClickCancel}
+                />
+              )}
+          </ValueText>
           <Icon name={iconName} width={16} height={16} />
         </SelectedOption>
         {isOpened && (

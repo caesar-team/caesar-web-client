@@ -1,7 +1,7 @@
-export const initialValues = {
-  title: null,
+export const defaultValues = {
+  name: null,
   login: null,
-  password: null,
+  pass: null,
   website: null,
   note: null,
 };

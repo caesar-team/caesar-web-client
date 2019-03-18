@@ -41,6 +41,14 @@ const StyledIcon = styled(Icon)`
   fill: ${({ theme, isDragActive }) =>
     isDragActive ? theme.blue : theme.gray};
   transition: all 0.2s;
+  margin-bottom: 10px;
+`;
+
+const Error = styled.div`
+  margin-top: 8px;
+  font-size: 14px;
+  letter-spacing: 0.4px;
+  color: ${({ theme }) => theme.red};
 `;
 
 const Uploader = ({
@@ -49,6 +57,7 @@ const Uploader = ({
   accept,
   onChange,
   extText = '.rar .zip .doc .docx .pdf .jpg...',
+  error,
   files: previousFiles = [],
   ...props
 }) => {
@@ -82,6 +91,7 @@ const Uploader = ({
             Drag and drop your file here or <Link>upload</Link>.
           </Text>
           <ExtText>{extText}</ExtText>
+          {error && <Error>{error}</Error>}
         </Container>
       )}
     </Dropzone>

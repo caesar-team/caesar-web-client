@@ -403,12 +403,16 @@ class DashboardContainer extends Component {
 
         const { invited, shared } = workInProgressItem;
 
-        if (!invited.length) {
+        const filteredInvited = invited.filter(
+          ({ userId }) => userId !== user.id,
+        );
+
+        if (!filteredInvited.length) {
           promises.push(
             updateItem(workInProgressItem.id, { secret: encryptedItem }),
           );
         } else {
-          const invitedMembersIds = invited.map(({ userId }) => userId);
+          const invitedMembersIds = filteredInvited.map(({ userId }) => userId);
           const invitedMemberKeys = members
             .filter(({ id }) => invitedMembersIds.includes(id))
             .map(member => member.publicKey);

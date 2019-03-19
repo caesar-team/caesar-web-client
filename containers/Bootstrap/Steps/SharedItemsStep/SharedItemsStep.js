@@ -108,8 +108,8 @@ class SharedItemsStep extends Component {
 
     try {
       if (acceptedItems.length > 0) {
-        const ids = acceptedItems.map(({ id }) => ({ itemMask: id }));
-        const { data } = await patchItemBatch({ masks: ids });
+        const ids = acceptedItems.map(({ id }) => ({ id }));
+        const { data } = await patchItemBatch({ items: ids });
 
         itemIds = data.map(({ id }) => id);
       }

@@ -10,11 +10,6 @@ import {
   ShareInput,
   TextWithLines,
 } from 'components';
-import {
-  ANONYMOUS_USER_ROLE,
-  SHARED_ACCEPTED_STATUS,
-  SHARED_WAITING_STATUS,
-} from 'common/constants';
 import { formatDate } from 'common/utils/dateUtils';
 import { copyToClipboard } from 'common/utils/clipboard';
 import { base64ToObject, objectToBase64 } from 'common/utils/cipherUtils';
@@ -157,11 +152,11 @@ const ResendLink = styled.a`
   cursor: pointer;
 `;
 
-const getEncryption = link => link.match(/\/(\w+)$/)[1];
+const getEncryption = link => link.match(/\/([\w|+-]+)$/)[1];
 const getShareId = link => link.match(/share\/(.+)\//)[1];
 
 const getAnonymousLink = shared =>
-  (shared.find(({ roles }) => roles.includes(ANONYMOUS_USER_ROLE)) || {}).link;
+  (shared.find(({ link }) => !!link) || {}).link;
 
 export class ShareModal extends Component {
   state = this.prepareInitialState();
@@ -221,7 +216,11 @@ export class ShareModal extends Component {
   };
 
   generateLinkText(link, isUseMasterPassword) {
+    console.log(link);
+    console.log(getEncryption(link));
     const linkObj = base64ToObject(getEncryption(link));
+
+    console.log(linkObj);
 
     if (!isUseMasterPassword) {
       return link;
@@ -262,12 +261,10 @@ export class ShareModal extends Component {
   }
 
   renderWaitingUsers() {
-    const { shared, onRemove, onResend } = this.props;
+    const { shared, onRemove, onResend = Function.prototype } = this.props;
 
     const waitingList = shared.filter(
-      ({ roles, status }) =>
-        status === SHARED_WAITING_STATUS &&
-        !roles.includes(ANONYMOUS_USER_ROLE),
+      ({ link, isAccepted }) => !isAccepted && !link,
     );
 
     if (!waitingList.length) {
@@ -304,9 +301,7 @@ export class ShareModal extends Component {
     const { shared, onRemove } = this.props;
 
     const acceptedList = shared.filter(
-      ({ status, roles }) =>
-        status === SHARED_ACCEPTED_STATUS &&
-        !roles.includes(ANONYMOUS_USER_ROLE),
+      ({ isAccepted, link }) => isAccepted && !link,
     );
 
     if (!acceptedList.length) {

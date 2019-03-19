@@ -45,7 +45,6 @@ import {
   USER_ROLE,
   READ_ONLY_USER_ROLE,
   ANONYMOUS_USER_ROLE,
-  SHARED_WAITING_STATUS,
   PERMISSION_WRITE,
 } from 'common/constants';
 import {
@@ -65,6 +64,7 @@ import {
   patchItemBatch,
   patchChildAccess,
   patchChildItem,
+  removeChildItem,
 } from 'common/api';
 import DecryptWorker from 'common/decrypt.worker';
 import { initialItemData } from './utils';
@@ -754,7 +754,7 @@ class DashboardContainer extends Component {
     const { workInProgressItem } = this.state;
     const { invited } = workInProgressItem;
     const promises = removeInviteIds.map(inviteId => async () => {
-      const result = await removeItem(inviteId)
+      const result = await removeChildItem(inviteId)
         .then(() => ({ result: inviteId }))
         .catch(e => ({ error: e }));
       return result;
@@ -902,7 +902,7 @@ class DashboardContainer extends Component {
         userId,
         email,
         link,
-        status: SHARED_WAITING_STATUS,
+        isAccepted: false,
         roles: [ANONYMOUS_USER_ROLE],
       };
 
@@ -926,14 +926,11 @@ class DashboardContainer extends Component {
       workInProgressItem: { shared },
     } = this.state;
 
-    const anonymousShare = shared.find(({ roles }) =>
-      roles.includes(ANONYMOUS_USER_ROLE),
-    );
-
+    const anonymousShare = shared.find(({ link }) => !!link);
     const updatedShared = shared.filter(({ id }) => id !== anonymousShare.id);
 
     try {
-      await removeItem(anonymousShare.id);
+      await removeChildItem(anonymousShare.id);
 
       this.setState(prevState => ({
         ...prevState,
@@ -1069,16 +1066,18 @@ class DashboardContainer extends Component {
     let shared = [];
 
     if (invitedChildItems.length) {
-      const { data: items } = await postCreateChildItem(workInProgressItem.id, {
+      const {
+        data: { items },
+      } = await postCreateChildItem(workInProgressItem.id, {
         items: invitedChildItems,
       });
 
-      const invitations = sharedEncryptedSecrets.map((secret, idx) => {
+      const invitations = invitedEncryptedSecrets.map((secret, idx) => {
         const { email, password, masterPassword } = sharedUsers[idx];
 
         return {
           email,
-          link: generateInviteUrl(
+          url: generateInviteUrl(
             objectToBase64({
               e: email,
               p: password,
@@ -1102,7 +1101,9 @@ class DashboardContainer extends Component {
     }
 
     if (sharedChildItems.length) {
-      const { data: items } = postCreateChildItem(workInProgressItem.id, {
+      const {
+        data: { items },
+      } = await postCreateChildItem(workInProgressItem.id, {
         items: sharedChildItems,
       });
 
@@ -1112,7 +1113,7 @@ class DashboardContainer extends Component {
 
         return {
           email,
-          link: generateSharingUrl(
+          url: generateSharingUrl(
             childItemId,
             objectToBase64({
               e: email,
@@ -1133,7 +1134,7 @@ class DashboardContainer extends Component {
         createdAt,
         userId: sharedUsers[idx].userId,
         email: sharedUsers[idx].email,
-        status: SHARED_WAITING_STATUS,
+        isAccepted: false,
         roles: [READ_ONLY_USER_ROLE],
       }));
     }
@@ -1156,7 +1157,7 @@ class DashboardContainer extends Component {
     const { workInProgressItem } = this.state;
 
     try {
-      await removeItem(id);
+      await removeChildItem(id);
 
       const updatedShares = workInProgressItem.shared.filter(
         ({ id: shareId }) => shareId !== id,

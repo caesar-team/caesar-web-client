@@ -113,6 +113,9 @@ export const patchChildItem = (childItemId, data) =>
 export const acceptUpdateItem = itemId =>
   callApi.post(`/item/${itemId}/accept_update`);
 
+export const removeChildItem = childItemId =>
+  callApi.delete(`/child_item/${childItemId}`);
+
 // list
 export const postCreateList = data => callApi.post('/list', data);
 

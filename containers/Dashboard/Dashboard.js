@@ -793,7 +793,31 @@ class DashboardContainer extends Component {
 
     if (newInvites && newInvites.length > 0) {
       newInvited = await Promise.all(
-        newInvites.map(email => this.createUser(email, USER_ROLE)),
+        newInvites.map(async email => {
+          try {
+            const {
+              data: { userId, publicKey },
+            } = await getPublicKeyByEmail(email);
+
+            return { email, userId, publicKey, isNew: false };
+          } catch (e) {
+            const {
+              userId,
+              password,
+              masterPassword,
+              publicKey,
+            } = await this.createUser(email, USER_ROLE);
+
+            return {
+              userId,
+              email,
+              password,
+              masterPassword,
+              publicKey,
+              isNew: true,
+            };
+          }
+        }),
       );
     }
 
@@ -808,7 +832,7 @@ class DashboardContainer extends Component {
     }, {});
 
     const newInvitedByUserId = newInvited.reduce((acc, invite) => {
-      acc[invite.userId] = { ...invite, access: PERMISSION_WRITE, isNew: true };
+      acc[invite.userId] = { ...invite, access: PERMISSION_WRITE };
       return acc;
     }, {});
 
@@ -1077,25 +1101,6 @@ class DashboardContainer extends Component {
         items: invitedChildItems,
       });
 
-      const invitations = invitedEncryptedSecrets.map((secret, idx) => {
-        const { email, password, masterPassword } = invitedUsers[idx];
-
-        return {
-          email,
-          url: generateInviteUrl(
-            objectToBase64({
-              e: email,
-              p: password,
-              mp: masterPassword,
-            }),
-          ),
-        };
-      });
-
-      await Promise.all(
-        invitations.map(async invitation => postInvitation(invitation)),
-      );
-
       invited = items.map(({ id, lastUpdatedAt }, idx) => ({
         id,
         updatedAt: lastUpdatedAt,
@@ -1183,30 +1188,6 @@ class DashboardContainer extends Component {
       console.log(e.response);
     }
   };
-
-  // handleResendShare = shareId => async () => {
-  //   const { workInProgressItem } = this.state;
-  //
-  //   await removeItem(shareId);
-  //
-  //   const shared = workInProgressItem.shared.map(
-  //     shareItem =>
-  //       shareItem.id === shareId
-  //         ? { ...shareItem, updatedAt: data.updatedAt }
-  //         : shareItem,
-  //   );
-  //
-  //   const updatedData = {
-  //     ...workInProgressItem,
-  //     shared,
-  //   };
-  //
-  //   this.setState(prevState => ({
-  //     ...prevState,
-  //     workInProgressItem: updatedData,
-  //     list: updateNode(prevState.list, workInProgressItem.id, updatedData),
-  //   }));
-  // };
 
   handleCloseInviteModal = () => {
     this.setState({
@@ -1351,7 +1332,6 @@ class DashboardContainer extends Component {
         {isVisibleShareModal && (
           <ShareModal
             shared={workInProgressItem.shared}
-            // onResend={this.handleResendShare}
             onShare={this.handleShare}
             onRemove={this.handleRemoveShare}
             onActivateSharedByLink={this.handleActivateShareByLink}

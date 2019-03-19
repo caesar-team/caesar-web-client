@@ -257,7 +257,7 @@ export class ShareModal extends Component {
   }
 
   renderWaitingUsers() {
-    const { shared, onRemove, onResend = Function.prototype } = this.props;
+    const { shared, onRemove } = this.props;
 
     const waitingList = shared.filter(
       ({ link, isAccepted }) => !isAccepted && !link,
@@ -272,7 +272,6 @@ export class ShareModal extends Component {
         <SharedItemEmail>{email}</SharedItemEmail>
         <StyledIcon name="history" width={16} height={14} />
         <LeftTime>Left: {left} h</LeftTime>
-        <ResendLink onClick={onResend(id)}>Resend</ResendLink>
         <SharedItemRemove>
           <Icon
             name="close"

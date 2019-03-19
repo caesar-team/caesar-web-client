@@ -107,6 +107,9 @@ export const postCreateChildItem = (itemId, data) =>
 export const patchChildAccess = (childItemId, data) =>
   callApi.patch(`/child_item/${childItemId}/access`, data);
 
+export const patchChildItem = (childItemId, data) =>
+  callApi.patch(`/child_item/${childItemId}`, data);
+
 export const acceptUpdateItem = itemId =>
   callApi.post(`/item/${itemId}/accept_update`);
 

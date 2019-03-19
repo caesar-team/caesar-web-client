@@ -64,6 +64,7 @@ import {
   postInvitation,
   patchItemBatch,
   patchChildAccess,
+  patchChildItem,
 } from 'common/api';
 import DecryptWorker from 'common/decrypt.worker';
 import { initialItemData } from './utils';
@@ -869,7 +870,7 @@ class DashboardContainer extends Component {
       );
 
       const {
-        data: { id: shareId },
+        data: { items },
       } = await postCreateChildItem(workInProgressItem.id, {
         items: [
           {
@@ -881,8 +882,10 @@ class DashboardContainer extends Component {
         ],
       });
 
+      const sharedChildItemId = items[0].id;
+
       const link = generateSharingUrl(
-        shareId,
+        sharedChildItemId,
         objectToBase64({
           e: email,
           p: password,
@@ -890,12 +893,12 @@ class DashboardContainer extends Component {
         }),
       );
 
-      await updateItem(shareId, {
-        link,
+      await patchChildItem(workInProgressItem.id, {
+        items: [{ userId, link, secret: encryptedSecret }],
       });
 
       const shared = {
-        id: shareId,
+        id: sharedChildItemId,
         userId,
         email,
         link,
@@ -1066,7 +1069,7 @@ class DashboardContainer extends Component {
     let shared = [];
 
     if (invitedChildItems.length) {
-      const { data } = await postCreateChildItem(workInProgressItem.id, {
+      const { data: items } = await postCreateChildItem(workInProgressItem.id, {
         items: invitedChildItems,
       });
 
@@ -1089,7 +1092,7 @@ class DashboardContainer extends Component {
         invitations.map(async invitation => postInvitation(invitation)),
       );
 
-      invited = data.map(({ id, lastUpdatedAt }, idx) => ({
+      invited = items.map(({ id, lastUpdatedAt }, idx) => ({
         id,
         updatedAt: lastUpdatedAt,
         userId: invitedUsers[idx].userId,
@@ -1099,16 +1102,13 @@ class DashboardContainer extends Component {
     }
 
     if (sharedChildItems.length) {
-      const { data: sharedChildItemIds } = postCreateChildItem(
-        workInProgressItem.id,
-        {
-          items: sharedChildItems,
-        },
-      );
+      const { data: items } = postCreateChildItem(workInProgressItem.id, {
+        items: sharedChildItems,
+      });
 
       const invitations = sharedEncryptedSecrets.map((secret, idx) => {
         const { email, password, masterPassword } = sharedUsers[idx];
-        const { id: childItemId } = sharedChildItemIds[idx];
+        const { id: childItemId } = items[idx];
 
         return {
           email,
@@ -1127,7 +1127,7 @@ class DashboardContainer extends Component {
         invitations.map(async invitation => postInvitation(invitation)),
       );
 
-      shared = sharedChildItemIds.map(({ id, updatedAt, createdAt }, idx) => ({
+      shared = items.map(({ id, updatedAt, createdAt }, idx) => ({
         id,
         updatedAt,
         createdAt,

@@ -101,20 +101,14 @@ export const updateMoveItem = (itemId, data) =>
 export const updateItem = (itemId, data) =>
   callApi.patch(`/item/${itemId}`, data);
 
-export const postInviteItem = (itemId, data) =>
+export const postCreateChildItem = (itemId, data) =>
   callApi.post(`/item/${itemId}/child_item`, data);
 
-export const changeInviteItem = (itemId, data) =>
-  callApi.put(`/item/${itemId}/invite`, data);
+export const patchChildAccess = (childItemId, data) =>
+  callApi.patch(`/child_item/${childItemId}/access`, data);
 
 export const acceptUpdateItem = itemId =>
   callApi.post(`/item/${itemId}/accept_update`);
-
-export const changeInviteAccess = (inviteId, data) =>
-  callApi.patch(`/invite/${inviteId}`, data);
-
-export const deleteInviteItem = (inviteId, data) =>
-  callApi.delete(`/invite/${inviteId}`, data);
 
 // list
 export const postCreateList = data => callApi.post('/list', data);
@@ -130,16 +124,6 @@ export const getPublicKeyByEmail = email => callApi.get(`/key/${email}`);
 
 export const postNewUser = data => callApi.post('/user', data);
 
-export const postShare = data => callApi.post('/share', data);
-
-export const postShares = data => callApi.post('/shares', data);
-
-export const updateShares = data => callApi.patch('/shares', data);
-
-export const updateShare = (id, data) => callApi.patch(`/shares/${id}`, data);
-
-export const deleteShare = id => callApi.delete(`/shares/${id}`);
-
 export const postLoginPrepare = data =>
   callApi.post('/srp/login_prepare', data);
 
@@ -151,14 +135,10 @@ export const postChangePassword = data => callApi.patch('/srp/password', data);
 
 export const getCheckShare = id => callApi.get(`/anonymous/share/${id}/check`);
 
-export const getMaskedItems = () => callApi.get('/item_mask');
-
-export const postItemMask = id => callApi.post(`/item_mask/${id}`);
-
-export const postItemMasks = data => callApi.post('/item_mask', data);
-
-export const deleteItemMasks = data => callApi.delete('/item_mask', data);
-
 export const postInvitation = data => callApi.post('/invitation', data);
 
 export const patchItemBatch = data => callApi.put('/item/batch', data);
+
+export const getOfferedItems = () => callApi.get('/offered_item');
+
+export const patchAcceptItem = data => callApi.patch('/accept_item', data);

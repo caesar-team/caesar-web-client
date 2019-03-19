@@ -13,12 +13,7 @@ import {
   decryptItem,
   getPrivateKeyObj,
 } from 'common/utils/cipherUtils';
-import {
-  getMaskedItems,
-  postItemMasks,
-  deleteItemMasks,
-  patchItemBatch,
-} from 'common/api';
+import { getOfferedItems, patchAcceptItem, patchItemBatch } from 'common/api';
 
 const Wrapper = styled.div``;
 
@@ -74,23 +69,21 @@ class SharedItemsStep extends Component {
     );
 
     try {
-      const {
-        data: { masks },
-      } = await getMaskedItems();
+      const { data } = await getOfferedItems();
 
       const encryptedItems = await Promise.all(
-        masks.map(
+        data.map(
           // eslint-disable-next-line
           async ({ secret }) => await decryptItem(secret, privateKeyObj),
         ),
       );
 
       this.setState({
-        items: masks.map((item, index) => ({
+        items: data.map((item, index) => ({
           ...item,
           secret: encryptedItems[index],
         })),
-        selectedIds: masks.map(({ id }) => id),
+        selectedIds: data.map(({ id }) => id),
       });
     } catch (e) {
       console.log(e);
@@ -110,21 +103,15 @@ class SharedItemsStep extends Component {
     const { items, selectedIds } = this.state;
 
     const acceptedItems = items.filter(({ id }) => selectedIds.includes(id));
-    const rejectedItems = items.filter(({ id }) => !selectedIds.includes(id));
 
     let itemIds = [];
 
     try {
       if (acceptedItems.length > 0) {
         const ids = acceptedItems.map(({ id }) => ({ itemMask: id }));
-        const { data } = await postItemMasks({ masks: ids });
+        const { data } = await patchItemBatch({ masks: ids });
 
         itemIds = data.map(({ id }) => id);
-      }
-
-      if (rejectedItems.length > 0) {
-        const ids = rejectedItems.map(({ id }) => ({ itemMask: id }));
-        await deleteItemMasks({ masks: ids });
       }
 
       const decryptedAcceptedItems = await Promise.all(

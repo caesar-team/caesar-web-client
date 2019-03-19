@@ -216,11 +216,7 @@ export class ShareModal extends Component {
   };
 
   generateLinkText(link, isUseMasterPassword) {
-    console.log(link);
-    console.log(getEncryption(link));
     const linkObj = base64ToObject(getEncryption(link));
-
-    console.log(linkObj);
 
     if (!isUseMasterPassword) {
       return link;

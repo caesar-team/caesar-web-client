@@ -205,6 +205,7 @@ class Bootstrap extends Component {
             oldKeyPair={oldKeyPair}
             currentKeyPair={currentKeyPair}
             oldMasterPassword={shared.mp}
+            currentMasterPassword={masterPassword}
             onFinish={this.handleFinishSharedItems}
           />
         </BootstrapLayout>

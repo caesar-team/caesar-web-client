@@ -143,7 +143,8 @@ export const getCheckShare = id => callApi.get(`/anonymous/share/${id}/check`);
 
 export const postInvitation = data => callApi.post('/invitation', data);
 
-export const patchItemBatch = data => callApi.put('/item/batch', data);
+export const patchChildItemBatch = data =>
+  callApi.patch('/child_item/batch', data);
 
 export const getOfferedItems = () => callApi.get('/offered_item');
 

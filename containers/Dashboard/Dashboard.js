@@ -61,7 +61,7 @@ import {
   getUsers,
   postCreateChildItem,
   postInvitation,
-  patchItemBatch,
+  patchChildItemBatch,
   patchChildAccess,
   patchChildItem,
   removeChildItem,
@@ -368,7 +368,7 @@ class DashboardContainer extends Component {
     ...secret
   }) => {
     const { publicKey } = this.props;
-    const { workInProgressItem, members } = this.state;
+    const { workInProgressItem, members, user } = this.state;
 
     try {
       const data = {
@@ -426,11 +426,14 @@ class DashboardContainer extends Component {
           );
 
           if (invitedChildItems.length) {
-            await patchItemBatch({
+            await patchChildItemBatch({
               collectionItems: [
                 {
                   originalItem: workInProgressItem.id,
-                  items: invitedChildItems,
+                  items: [
+                    ...invitedChildItems,
+                    { userId: user.id, secret: encryptedItem },
+                  ],
                 },
               ],
             });
@@ -438,6 +441,7 @@ class DashboardContainer extends Component {
         }
 
         if (shared.length) {
+          const sharedMembersIds = shared.map(({ userId }) => userId);
           const sharedUserKeys = shared.map(member => member.publicKey);
 
           const sharedEncryptedSecrets = await encryptItemForUsers(
@@ -447,14 +451,13 @@ class DashboardContainer extends Component {
 
           const sharedChildItems = sharedEncryptedSecrets.map(
             (encrypt, idx) => ({
-              id: shared[idx].id,
-              sharedItems: [{ item: workInProgressItem.id, secret: encrypt }],
-              link: shared[idx].link,
+              userId: sharedMembersIds[idx],
+              secret: encrypt,
             }),
           );
 
           if (sharedChildItems.length) {
-            await patchItemBatch({
+            await patchChildItemBatch({
               collectionItems: [
                 {
                   originalItem: workInProgressItem.id,
@@ -902,6 +905,7 @@ class DashboardContainer extends Component {
         userId,
         email,
         link,
+        publicKey,
         isAccepted: false,
         roles: [ANONYMOUS_USER_ROLE],
       };
@@ -993,7 +997,7 @@ class DashboardContainer extends Component {
         data: { userId, publicKey },
       } = await getPublicKeyByEmail(email);
 
-      return { userId, publicKey, type: INVITE_TYPE };
+      return { email, userId, publicKey, type: INVITE_TYPE };
     } catch (e) {
       const {
         userId,
@@ -1032,6 +1036,7 @@ class DashboardContainer extends Component {
     const users = response.filter(
       user => !!user && !itemInvitedUsers.includes(user.userId),
     );
+
     const invitedUsers = users.filter(({ type }) => type === INVITE_TYPE);
     const sharedUsers = users.filter(({ type }) => type === SHARE_TYPE);
 
@@ -1073,7 +1078,7 @@ class DashboardContainer extends Component {
       });
 
       const invitations = invitedEncryptedSecrets.map((secret, idx) => {
-        const { email, password, masterPassword } = sharedUsers[idx];
+        const { email, password, masterPassword } = invitedUsers[idx];
 
         return {
           email,
@@ -1132,6 +1137,7 @@ class DashboardContainer extends Component {
         id,
         updatedAt,
         createdAt,
+        publicKey: sharedUsers[idx].publicKey,
         userId: sharedUsers[idx].userId,
         email: sharedUsers[idx].email,
         isAccepted: false,

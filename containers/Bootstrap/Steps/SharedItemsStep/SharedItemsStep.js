@@ -13,7 +13,12 @@ import {
   decryptItem,
   getPrivateKeyObj,
 } from 'common/utils/cipherUtils';
-import { getOfferedItems, patchAcceptItem, patchItemBatch } from 'common/api';
+import {
+  getOfferedItems,
+  patchAcceptItem,
+  patchChildItemBatch,
+  getUserSelf,
+} from 'common/api';
 
 const Wrapper = styled.div``;
 
@@ -62,28 +67,36 @@ class SharedItemsStep extends Component {
   items = null;
 
   async componentDidMount() {
-    const { oldKeyPair, oldMasterPassword } = this.props;
-    const privateKeyObj = await getPrivateKeyObj(
-      oldKeyPair.encryptedPrivateKey,
+    const {
+      oldKeyPair = {},
+      currentKeyPair,
       oldMasterPassword,
+      currentMasterPassword,
+    } = this.props;
+
+    const privateKeyObj = await getPrivateKeyObj(
+      oldKeyPair.encryptedPrivateKey || currentKeyPair.encryptedPrivateKey,
+      oldMasterPassword || currentMasterPassword,
     );
 
     try {
-      const { data } = await getOfferedItems();
+      const { data: items } = await getOfferedItems();
+      const { data: user } = await getUserSelf();
 
-      const encryptedItems = await Promise.all(
-        data.map(
+      const decryptedItems = await Promise.all(
+        items.map(
           // eslint-disable-next-line
           async ({ secret }) => await decryptItem(secret, privateKeyObj),
         ),
       );
 
       this.setState({
-        items: data.map((item, index) => ({
+        items: items.map((item, index) => ({
           ...item,
-          secret: encryptedItems[index],
+          secret: decryptedItems[index],
         })),
-        selectedIds: data.map(({ id }) => id),
+        selectedIds: items.map(({ id }) => id),
+        user,
       });
     } catch (e) {
       console.log(e);
@@ -99,34 +112,36 @@ class SharedItemsStep extends Component {
   };
 
   handleAccept = async () => {
-    const { currentKeyPair, onFinish = Function.prototype } = this.props;
-    const { items, selectedIds } = this.state;
+    const {
+      oldKeyPair,
+      currentKeyPair,
+      onFinish = Function.prototype,
+    } = this.props;
+    const { items, selectedIds, user } = this.state;
 
     const acceptedItems = items.filter(({ id }) => selectedIds.includes(id));
-
-    let itemIds = [];
+    const ids = acceptedItems.map(({ id }) => ({ id }));
 
     try {
       if (acceptedItems.length > 0) {
-        const ids = acceptedItems.map(({ id }) => ({ id }));
-        const { data } = await patchItemBatch({ items: ids });
-
-        itemIds = data.map(({ id }) => id);
+        await patchAcceptItem({ items: ids });
       }
 
-      const decryptedAcceptedItems = await Promise.all(
-        acceptedItems.map(async ({ secret, recipient }, index) => ({
-          originalItem: itemIds[index],
-          items: [
-            {
-              userId: recipient.id,
-              secret: await encryptItem(secret, currentKeyPair.publicKey),
-            },
-          ],
-        })),
-      );
+      if (oldKeyPair) {
+        const decryptedAcceptedItems = await Promise.all(
+          acceptedItems.map(async ({ secret, originalItemId }) => ({
+            originalItem: originalItemId,
+            items: [
+              {
+                userId: user.id,
+                secret: await encryptItem(secret, currentKeyPair.publicKey),
+              },
+            ],
+          })),
+        );
 
-      await patchItemBatch({ collectionItems: decryptedAcceptedItems });
+        await patchChildItemBatch({ collectionItems: decryptedAcceptedItems });
+      }
 
       onFinish();
     } catch (e) {

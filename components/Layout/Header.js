@@ -84,14 +84,9 @@ const StyledIcon = styled(Icon)`
 
 const Options = (
   <Fragment>
-    <Option key="lists">
-      <Link href="/manage">
-        <Anchor>Lists manage</Anchor>
-      </Link>
-    </Option>
-    <Option key="logout">
-      <Link href="/logout">
-        <Anchor href="/logout">Log out</Anchor>
+    <Option key="settings">
+      <Link href="/settings">
+        <Anchor>Settings</Anchor>
       </Link>
     </Option>
   </Fragment>

@@ -1,23 +1,23 @@
 import React, { Fragment } from 'react';
+import { ManageListContainer } from 'containers';
 import { Head, SettingsLayout, SettingsSidebar } from 'components';
-import { Import } from 'containers';
 import { isServer } from 'common/utils/isEnvironment';
 import { getToken } from 'common/utils/token';
 import { getUserSelf } from 'common/api';
 
-const SettingsImportPage = ({ user }) => (
+const SettingsManageList = ({ user }) => (
   <Fragment>
-    <Head title="Import" />
+    <Head title="List Management" />
     <SettingsLayout user={user}>
       <Fragment>
         <SettingsSidebar />
-        <Import />
+        <ManageListContainer />
       </Fragment>
     </SettingsLayout>
   </Fragment>
 );
 
-SettingsImportPage.getInitialProps = async ({ req }) => {
+SettingsManageList.getInitialProps = async ({ req }) => {
   try {
     const token = isServer ? req.cookies.token : getToken();
     const { data: user } = await getUserSelf(token);
@@ -33,4 +33,4 @@ SettingsImportPage.getInitialProps = async ({ req }) => {
   return {};
 };
 
-export default SettingsImportPage;
+export default SettingsManageList;

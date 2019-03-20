@@ -1,9 +1,6 @@
 import React from 'react';
-import { Router } from 'next/router';
 import styled from 'styled-components';
-import { ProgressBar } from '../../../ProgressBar';
-import { Icon } from '../../../Icon';
-import { Button } from '../../../Button';
+import { ProgressBar, Icon, Button } from 'components';
 
 const Wrapper = styled.div``;
 

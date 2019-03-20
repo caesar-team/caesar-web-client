@@ -1,7 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
 import { Formik } from 'formik';
-import { Uploader } from '../../../Uploader';
+import { Uploader } from 'components';
 import { createSchema } from './schema';
 
 const Wrapper = styled.div`

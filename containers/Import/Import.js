@@ -6,7 +6,7 @@ import { parseFile } from 'common/utils/importUtils';
 import { encryptItem } from 'common/utils/cipherUtils';
 import { getKeys, postCreateItem, getList } from 'common/api';
 import { ITEM_CREDENTIALS_TYPE, ITEM_DOCUMENT_TYPE } from 'common/constants';
-import { NavigationPanel } from '../NavigationPanel';
+import { NavigationPanel } from 'components';
 import { FileStep, FieldsStep, DataStep, ImportingStep } from './Steps';
 import {
   STEPS,

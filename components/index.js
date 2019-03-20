@@ -9,7 +9,6 @@ export { Error } from './Error';
 export { File } from './File';
 export { Head } from './Head';
 export { Icon } from './Icon';
-export { Import } from './Import';
 export {
   LockInput,
   Input,
@@ -61,3 +60,4 @@ export { SettingsSidebar } from './SettingsSidebar';
 export { Tab, Tabs } from './Tabs';
 export { NavigationPanel } from './NavigationPanel';
 export { DataTable } from './DataTable';
+export { ProgressBar } from './ProgressBar';

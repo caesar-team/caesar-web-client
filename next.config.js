@@ -37,6 +37,7 @@ module.exports = withPlugins(
       AUTH_ENDPOINT: process.env.AUTH_ENDPOINT,
       REDIRECT_AUTH_ENDPOINT: process.env.REDIRECT_AUTH_ENDPOINT,
       MAX_UPLOADING_FILE_SIZE: process.env.MAX_UPLOADING_FILE_SIZE,
+      MAX_UPLOADING_FILE_SIZES: process.env.MAX_UPLOADING_FILE_SIZES,
       LENGTH_KEY: process.env.LENGTH_KEY,
     },
     webpack: (config, { dev }) => {

@@ -1066,19 +1066,11 @@ class DashboardContainer extends Component {
     );
 
     const invitedUsers = users.filter(({ type }) => type === INVITE_TYPE);
-    const sharedUsers = users.filter(({ type }) => type === SHARE_TYPE);
-
     const invitedUserKeys = invitedUsers.map(({ publicKey }) => publicKey);
-    const sharedUserKeys = sharedUsers.map(({ publicKey }) => publicKey);
 
     const invitedEncryptedSecrets = await encryptItemForUsers(
       workInProgressItem.secret,
       invitedUserKeys,
-    );
-
-    const sharedEncryptedSecrets = await encryptItemForUsers(
-      workInProgressItem.secret,
-      sharedUserKeys,
     );
 
     const invitedChildItems = invitedEncryptedSecrets.map((secret, idx) => ({
@@ -1088,15 +1080,7 @@ class DashboardContainer extends Component {
       cause: INVITE_TYPE,
     }));
 
-    const sharedChildItems = sharedEncryptedSecrets.map((secret, idx) => ({
-      secret,
-      userId: sharedUsers[idx].userId,
-      access: PERMISSION_READ,
-      cause: SHARE_TYPE,
-    }));
-
     let invited = [];
-    let shared = [];
 
     if (invitedChildItems.length) {
       const {
@@ -1110,25 +1094,15 @@ class DashboardContainer extends Component {
         updatedAt: lastUpdatedAt,
         userId: invitedUsers[idx].userId,
         email: invitedUsers[idx].email,
-        roles: [READ_ONLY_USER_ROLE],
+        access: PERMISSION_READ,
       }));
-    }
 
-    if (sharedChildItems.length) {
-      const {
-        data: { items },
-      } = await postCreateChildItem(workInProgressItem.id, {
-        items: sharedChildItems,
-      });
-
-      const invitations = sharedEncryptedSecrets.map((secret, idx) => {
-        const { email, password, masterPassword } = sharedUsers[idx];
-        const { id: childItemId } = items[idx];
+      const invitations = invitedEncryptedSecrets.map((secret, idx) => {
+        const { email, password, masterPassword } = invitedUsers[idx];
 
         return {
           email,
-          url: generateSharingUrl(
-            childItemId,
+          url: generateInviteUrl(
             objectToBase64({
               e: email,
               p: password,
@@ -1141,23 +1115,11 @@ class DashboardContainer extends Component {
       await Promise.all(
         invitations.map(async invitation => postInvitation(invitation)),
       );
-
-      shared = items.map(({ id, updatedAt, createdAt }, idx) => ({
-        id,
-        updatedAt,
-        createdAt,
-        publicKey: sharedUsers[idx].publicKey,
-        userId: sharedUsers[idx].userId,
-        email: sharedUsers[idx].email,
-        isAccepted: false,
-        roles: [READ_ONLY_USER_ROLE],
-      }));
     }
 
     const data = {
       ...workInProgressItem,
       invited: [...workInProgressItem.invited, ...invited],
-      shared: [...workInProgressItem.shared, ...shared],
     };
 
     return this.setState(prevState => ({

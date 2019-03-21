@@ -1,7 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
 import { Formik, FastField } from 'formik';
-import { Input, PasswordInput, Button, Icon } from 'components';
+import { PasswordInput, Button, Icon } from 'components';
 import { checkError } from 'common/utils/formikUtils';
 import { schema } from './schema';
 
@@ -17,22 +17,6 @@ const Row = styled.div`
 
   &:last-child {
     margin-bottom: 0;
-  }
-`;
-
-const StyledEmailInput = styled(Input)`
-  display: flex;
-  border: 1px solid ${({ theme }) => theme.lightGray};
-
-  ${Input.InputField} {
-    line-height: 20px;
-  }
-
-  ${Input.Prefix} {
-    position: relative;
-    transform: inherit;
-    left: inherit;
-    top: inherit;
   }
 `;
 
@@ -83,23 +67,17 @@ const ButtonWrapper = styled.div`
   margin-bottom: 60px;
 `;
 
-const EmailInputPrefix = (
-  <Prefix>
-    <Icon name="email" width={18} height={18} />
-  </Prefix>
-);
-
 const PasswordInputPrefix = (
   <Prefix>
     <Icon name="key-diagonal" width={18} height={18} />
   </Prefix>
 );
 
-const SignUpForm = ({ onSubmit }) => (
+const ResetPasswordForm = ({ onSubmit }) => (
   <Formik
     key="documentForm"
     onSubmit={onSubmit}
-    initialValues={{ email: '', password: '', confirmPassword: '' }}
+    initialValues={{ password: '', confirmPassword: '' }}
     validationSchema={schema}
     render={({
       errors,
@@ -110,22 +88,6 @@ const SignUpForm = ({ onSubmit }) => (
       isValid,
     }) => (
       <Form onSubmit={handleSubmit}>
-        <Row>
-          <FastField
-            name="email"
-            render={({ field }) => (
-              <StyledEmailInput
-                {...field}
-                onBlur={setFieldTouched}
-                placeholder="Email"
-                prefix={EmailInputPrefix}
-              />
-            )}
-          />
-          {checkError(touched, errors, 'email') && (
-            <Error>{errors.email}</Error>
-          )}
-        </Row>
         <Row>
           <FastField
             name="password"
@@ -160,7 +122,7 @@ const SignUpForm = ({ onSubmit }) => (
         </Row>
         <ButtonWrapper>
           <StyledButton htmlType="submit" disabled={isSubmitting || !isValid}>
-            Sign Up
+            Reset
           </StyledButton>
         </ButtonWrapper>
       </Form>
@@ -168,4 +130,4 @@ const SignUpForm = ({ onSubmit }) => (
   />
 );
 
-export default SignUpForm;
+export default ResetPasswordForm;

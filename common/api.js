@@ -149,3 +149,6 @@ export const patchChildItemBatch = data =>
 export const getOfferedItems = () => callApi.get('/offered_item');
 
 export const patchAcceptItem = data => callApi.patch('/accept_item', data);
+
+export const patchResetPassword = (token, data) =>
+  callApi.patch(`/srp/reset/${token}`, data);

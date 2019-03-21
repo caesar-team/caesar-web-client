@@ -47,6 +47,13 @@ app.prepare().then(() => {
     }
   });
 
+  server.get('/resetting/:email/:token', (req, res) => {
+    app.render(req, res, '/resetting', {
+      email: req.params.email,
+      token: req.params.token,
+    });
+  });
+
   server.get('/share/:shareId/:encryption', (req, res) => {
     app.render(req, res, '/share', {
       shareId: req.params.shareId,

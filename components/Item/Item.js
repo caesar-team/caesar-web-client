@@ -106,7 +106,7 @@ const Item = ({
       <Notify withButton>
         <Icon name="warning" width={14} height={14} isInButton />
         <NotifyText>
-          {`Password has been changed by ${updateUserName} at ${updateDate}`}
+          {`Item has been changed by ${updateUserName} at ${updateDate}`}
         </NotifyText>
         <NotifyButton color="white" onClick={onClickAcceptUpdate(id)}>
           Accept

@@ -1,4 +1,9 @@
-import { postLogin, postLoginPrepare, postRegistration } from 'common/api';
+import {
+  postLogin,
+  postLoginPrepare,
+  postRegistration,
+  patchResetPassword,
+} from 'common/api';
 import { createSrp } from './srp';
 
 async function loginFirstPhase(email, A, prepareLoginEndpoint) {
@@ -70,4 +75,18 @@ export async function registration(
   const verifier = srp.generateV(srp.generateX(seed, email, password));
 
   return await registrationEndpoint({ email, seed, verifier });
+}
+
+export async function changePassword(
+  token,
+  email,
+  password,
+  { changePasswordEndpoint = patchResetPassword } = {},
+) {
+  const srp = createSrp();
+
+  const seed = srp.getRandomSeed();
+  const verifier = srp.generateV(srp.generateX(seed, email, password));
+
+  return await changePasswordEndpoint(token, { seed, verifier });
 }

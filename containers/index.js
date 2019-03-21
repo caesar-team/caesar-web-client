@@ -6,3 +6,4 @@ export { Invite } from './Invite';
 export { Import } from './Import';
 export { SignInContainer } from './SignIn';
 export { SignUpContainer } from './SignUp';
+export { ResetPasswordContainer } from './ResetPassword';

@@ -5,8 +5,8 @@ metadata:
   namespace: default
 spec:
   replicas: 1
-  minReadySeconds: 60
-  progressDeadlineSeconds: 90
+  minReadySeconds: 360
+  progressDeadlineSeconds: 600
   revisionHistoryLimit: 10
   selector:
     matchLabels:
@@ -36,8 +36,6 @@ spec:
           value: "https"
         - name: AUTH_ENDPOINT
           value: "connect/google"
-        - name: NODE_ENV
-          value: "production"
         - name: REDIRECT_AUTH_ENDPOINT
           value: "check_auth"
         - name: API_HOST

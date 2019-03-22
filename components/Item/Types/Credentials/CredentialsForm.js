@@ -105,6 +105,8 @@ const Attachments = styled.div`
 
 const FileRow = styled.div`
   display: flex;
+  align-items: center;
+  justify-content: space-between;
   position: relative;
   margin-bottom: 30px;
 
@@ -113,10 +115,15 @@ const FileRow = styled.div`
   }
 `;
 
-const StyledCloseIcon = styled(Icon)`
-  fill: ${({ theme }) => theme.gray};
-  margin-left: 10px;
-  cursor: pointer;
+const Error = styled.div`
+  text-align: center;
+  font-size: 14px;
+  letter-spacing: 0.4px;
+  color: ${({ theme }) => theme.red};
+`;
+
+const ErrorStyled = styled(Error)`
+  margin: 20px 0;
 `;
 
 const createInitialValues = (secret, listId, type) => ({
@@ -125,21 +132,26 @@ const createInitialValues = (secret, listId, type) => ({
   type,
 });
 
-const renderAttachments = ({ attachments = [] }, setFieldValue) =>
+const checkAttachmentsError = (errors, index) =>
+  errors[index] && errors[index].raw;
+
+const renderAttachments = (attachments = [], errors = [], setFieldValue) =>
   attachments.map((attachment, index) => (
     <FileRow key={index}>
-      <File key={index} {...attachment} />
-      <StyledCloseIcon
-        name="close"
-        width={10}
-        height={10}
+      <File
+        key={index}
+        status={checkAttachmentsError(errors, index) ? 'error' : 'uploaded'}
         onClick={() =>
           setFieldValue(
             'attachments',
             attachments.filter((_, fileIndex) => index !== fileIndex),
           )
         }
+        {...attachment}
       />
+      {checkAttachmentsError(errors, index) && (
+        <Error>{errors[index].raw}</Error>
+      )}
     </FileRow>
   ));
 
@@ -272,8 +284,17 @@ const CredentialsForm = ({
               files={values.attachments}
               onChange={setFieldValue}
             />
+            {errors &&
+              errors.attachments &&
+              typeof errors.attachments === 'string' && (
+                <ErrorStyled>{errors.attachments}</ErrorStyled>
+              )}
             <Attachments>
-              {renderAttachments(values, setFieldValue)}
+              {renderAttachments(
+                values.attachments,
+                errors.attachments,
+                setFieldValue,
+              )}
             </Attachments>
           </AttachmentsSection>
         </Form>

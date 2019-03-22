@@ -1,5 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
+import { Icon } from '../Icon';
 
 const FileExt = styled.div`
   position: relative;
@@ -32,6 +33,22 @@ const FileExt = styled.div`
   }
 `;
 
+const ErrorStatus = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 3px solid ${({ theme }) => theme.red};
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+
+  &:after {
+    content: '!';
+    position: absolute;
+    color: ${({ theme }) => theme.red};
+  }
+`;
+
 const Details = styled.div`
   display: flex;
   flex-direction: column;
@@ -53,7 +70,7 @@ const FileSize = styled.div`
   color: ${({ theme }) => theme.gray};
 `;
 
-const Wrapper = styled.div`
+const UploadedWrapper = styled.div`
   display: flex;
 
   &:hover {
@@ -75,6 +92,16 @@ const Wrapper = styled.div`
   }
 `;
 
+const ErrorWrapper = styled.div`
+  display: flex;
+`;
+
+const StyledCloseIcon = styled(Icon)`
+  fill: ${({ theme }) => theme.gray};
+  margin-left: 10px;
+  cursor: pointer;
+`;
+
 const units = ['bytes', 'KB', 'MB'];
 
 const formatBytes = x => {
@@ -86,19 +113,40 @@ const formatBytes = x => {
   return `${n.toFixed(n < 10 && l > 0 ? 1 : 0)} ${units[l]}`;
 };
 
-const File = ({ name, raw, ...props }) => {
+const UPLOADED_STATUS = 'uploaded';
+const ERROR_STATUS = 'error';
+
+const File = ({ status = UPLOADED_STATUS, name, raw, onClick, ...props }) => {
   const ext = name.split('.').pop();
   const filename = name.replace(/\.[^/.]+$/, '');
   const size = formatBytes(Math.round((raw.length * 3) / 4));
 
+  if (status === ERROR_STATUS) {
+    return (
+      <ErrorWrapper>
+        <ErrorStatus />
+        <Details>
+          <FileName>{filename}</FileName>
+          <FileSize>{size}</FileSize>
+        </Details>
+        <StyledCloseIcon
+          name="close"
+          width={10}
+          height={10}
+          onClick={onClick}
+        />
+      </ErrorWrapper>
+    );
+  }
+
   return (
-    <Wrapper {...props}>
+    <UploadedWrapper {...props}>
       <FileExt>{ext}</FileExt>
       <Details>
         <FileName>{filename}</FileName>
         <FileSize>{size}</FileSize>
       </Details>
-    </Wrapper>
+    </UploadedWrapper>
   );
 };
 

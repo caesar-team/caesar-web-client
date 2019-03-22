@@ -882,6 +882,10 @@ class DashboardContainer extends Component {
     }
   };
 
+  handleChangePermission = async (userId) => {
+
+  };
+
   handleActivateShareByLink = async () => {
     const { workInProgressItem } = this.state;
 
@@ -1025,14 +1029,14 @@ class DashboardContainer extends Component {
         data: { userId, publicKey },
       } = await getPublicKeyByEmail(email);
 
-      return { email, userId, publicKey, type: INVITE_TYPE };
+      return { email, userId, publicKey, type: INVITE_TYPE, isNew: false };
     } catch (e) {
       const {
         userId,
         password,
         masterPassword,
         publicKey,
-      } = await this.createUser(email, READ_ONLY_USER_ROLE);
+      } = await this.createUser(email, USER_ROLE);
 
       return {
         userId,
@@ -1040,7 +1044,8 @@ class DashboardContainer extends Component {
         password,
         masterPassword,
         publicKey,
-        type: SHARE_TYPE,
+        type: INVITE_TYPE,
+        isNew: true,
       };
     }
   };
@@ -1097,10 +1102,9 @@ class DashboardContainer extends Component {
         access: PERMISSION_READ,
       }));
 
-      const invitations = invitedEncryptedSecrets.map((secret, idx) => {
-        const { email, password, masterPassword } = invitedUsers[idx];
-
-        return {
+      const invitations = invitedUsers
+        .filter(({ isNew }) => !!isNew)
+        .map(({ email, password, masterPassword }) => ({
           email,
           url: generateInviteUrl(
             objectToBase64({
@@ -1109,8 +1113,7 @@ class DashboardContainer extends Component {
               mp: masterPassword,
             }),
           ),
-        };
-      });
+        }));
 
       await Promise.all(
         invitations.map(async invitation => postInvitation(invitation)),
@@ -1292,6 +1295,7 @@ class DashboardContainer extends Component {
             members={members}
             invited={workInProgressItem.invited}
             onClickInvite={this.handleInviteMembers}
+            onChangePermission={this.handleChangePermission}
             onCancel={this.handleCloseInviteModal}
           />
         )}

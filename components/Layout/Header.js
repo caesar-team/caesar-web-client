@@ -89,6 +89,11 @@ const Options = (
         <Anchor>Settings</Anchor>
       </Link>
     </Option>
+    <Option key="logout">
+      <Link href="/logout">
+        <Anchor>Logout</Anchor>
+      </Link>
+    </Option>
   </Fragment>
 );
 

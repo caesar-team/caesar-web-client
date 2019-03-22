@@ -154,24 +154,30 @@ class InviteModal extends Component {
     }));
   };
 
-  handlePermissionChange = userId => event => {
+  handleChangePermission = userId => event => {
     const { checked } = event.currentTarget;
+    const { onChangePermission } = this.props;
 
-    this.setState(prevState => ({
-      ...prevState,
-      invited: prevState.invited.reduce((acc, item) => {
-        if (item.userId === userId) {
-          acc.push({
-            ...item,
-            access: checked ? PERMISSION_READ : PERMISSION_WRITE,
-          });
-        } else {
-          acc.push(item);
-        }
+    this.setState(
+      prevState => ({
+        ...prevState,
+        invited: prevState.invited.reduce((acc, item) => {
+          if (item.userId === userId) {
+            acc.push({
+              ...item,
+              access: checked ? PERMISSION_READ : PERMISSION_WRITE,
+            });
+          } else {
+            acc.push(item);
+          }
 
-        return acc;
-      }, []),
-    }));
+          return acc;
+        }, []),
+      }),
+      () => {
+        onChangePermission(userId);
+      },
+    );
   };
 
   handleClickRemove = userId => () => {
@@ -227,7 +233,7 @@ class InviteModal extends Component {
           {...member}
           isReadOnly={isReadOnly}
           isInvited={Object.keys(invitesByUserId).includes(id)}
-          onClickPermissionChange={this.handlePermissionChange(id)}
+          onClickPermissionChange={this.handleChangePermission(id)}
           onClickAdd={this.handleClickAdd(id)}
           onClickRemove={this.handleClickRemove(id)}
         />

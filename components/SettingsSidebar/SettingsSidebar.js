@@ -28,7 +28,6 @@ const StyledLink = styled(Link)`
 const LINKS = [
   { link: '/settings/manage', name: 'Manage List' },
   { link: '/settings/import', name: 'Import' },
-  { link: '/logout', name: 'Logout' },
 ];
 
 const SettingsSidebar = ({ router: { route } }) => {

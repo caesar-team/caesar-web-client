@@ -3,15 +3,7 @@ import styled from 'styled-components';
 import { Formik, FastField } from 'formik';
 import { checkError } from 'common/utils/formikUtils';
 import { ITEM_WORKFLOW_EDIT_MODE, TRASH_TYPE } from 'common/constants';
-import {
-  Uploader,
-  Input,
-  Button,
-  Select,
-  TextArea,
-  File,
-  Icon,
-} from 'components';
+import { Uploader, Input, Button, Select, TextArea, File } from 'components';
 import { Form } from '../components';
 import { schema } from './schema';
 
@@ -93,6 +85,8 @@ const Attachments = styled.div`
 const FileRow = styled.div`
   display: flex;
   position: relative;
+  align-items: center;
+  justify-content: space-between;
   margin-bottom: 30px;
 
   &:last-child {
@@ -100,10 +94,11 @@ const FileRow = styled.div`
   }
 `;
 
-const StyledCloseIcon = styled(Icon)`
-  fill: ${({ theme }) => theme.gray};
-  margin-left: 10px;
-  cursor: pointer;
+const Error = styled.div`
+  text-align: center;
+  font-size: 14px;
+  letter-spacing: 0.4px;
+  color: ${({ theme }) => theme.red};
 `;
 
 const createInitialValues = (secret, listId, type) => ({
@@ -112,21 +107,26 @@ const createInitialValues = (secret, listId, type) => ({
   type,
 });
 
-const renderAttachments = ({ attachments = [] }, setFieldValue) =>
+const checkAttachmentsError = (errors, index) =>
+  errors[index] && errors[index].raw;
+
+const renderAttachments = (attachments = [], errors = [], setFieldValue) =>
   attachments.map((attachment, index) => (
     <FileRow key={index}>
-      <File key={index} {...attachment} />
-      <StyledCloseIcon
-        name="close"
-        width={10}
-        height={10}
+      <File
+        key={index}
+        status={checkAttachmentsError(errors, index) ? 'error' : 'uploaded'}
         onClick={() =>
           setFieldValue(
             'attachments',
             attachments.filter((_, fileIndex) => index !== fileIndex),
           )
         }
+        {...attachment}
       />
+      {checkAttachmentsError(errors, index) && (
+        <Error>{errors[index].raw}</Error>
+      )}
     </FileRow>
   ));
 
@@ -217,7 +217,11 @@ const DocumentForm = ({
               onChange={setFieldValue}
             />
             <Attachments>
-              {renderAttachments(values, setFieldValue)}
+              {renderAttachments(
+                values.attachments,
+                errors.attachments,
+                setFieldValue,
+              )}
             </Attachments>
           </AttachmentsSection>
         </Form>

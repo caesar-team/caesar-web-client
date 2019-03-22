@@ -1036,7 +1036,7 @@ class DashboardContainer extends Component {
         password,
         masterPassword,
         publicKey,
-      } = await this.createUser(email, READ_ONLY_USER_ROLE);
+      } = await this.createUser(email, USER_ROLE);
 
       return {
         userId,

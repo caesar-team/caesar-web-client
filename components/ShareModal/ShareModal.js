@@ -355,8 +355,8 @@ export class ShareModal extends Component {
           <ShareInput onChange={this.handleAddEmail} />
         </Row>
         {this.renderEmails()}
-        {this.renderWaitingUsers()}
-        {this.renderSharedUsers()}
+        {/*{this.renderWaitingUsers()}*/}
+        {/*{this.renderSharedUsers()}*/}
         <LinkRow>
           <ToggleLabel>
             <Toggle

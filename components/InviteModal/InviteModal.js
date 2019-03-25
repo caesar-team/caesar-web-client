@@ -6,7 +6,6 @@ import Member from './Member';
 import { Modal } from '../Modal';
 import { Input } from '../Input';
 import { Icon } from '../Icon';
-import { Button } from '../Button';
 import { ModalTitle } from '../ModalTitle';
 import { Scrollbar } from '../Scrollbar';
 
@@ -17,41 +16,6 @@ const StyledInput = styled(Input)`
     border-radius: 3px;
     padding: 15px 20px 15px 54px;
     font-size: 16px;
-  }
-`;
-
-const EmailBox = styled.div`
-  display: flex;
-  align-items: center;
-  height: 50px;
-  padding: 0 15px;
-  background-color: ${({ theme }) => theme.lightBlue};
-  margin-bottom: 5px;
-
-  &:last-child {
-    margin-bottom: 0;
-  }
-`;
-
-const SharedItemEmail = styled.div`
-  margin-right: auto;
-  font-size: 16px;
-  color: ${({ theme }) => theme.black};
-  overflow: hidden;
-  text-overflow: ellipsis;
-`;
-
-const SharedItemRemove = styled.button`
-  border: none;
-  background: none;
-  padding: 4px;
-  margin-left: 20px;
-  color: ${({ theme }) => theme.gray};
-  cursor: pointer;
-  transition: 0.25s;
-
-  &:hover {
-    color: ${({ theme }) => theme.black};
   }
 `;
 
@@ -98,15 +62,10 @@ const MembersWrapper = styled.div`
   margin-top: 15px;
 `;
 
-const ButtonsWrapper = styled.div`
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  padding: 30px 0 0;
-`;
-
 class InviteModal extends Component {
-  state = this.prepareInitialState();
+  state = {
+    filterText: '',
+  };
 
   filter = memoize((list, filterText) =>
     list.filter(
@@ -114,15 +73,6 @@ class InviteModal extends Component {
         name.includes(filterText) || email.includes(filterText),
     ),
   );
-
-  handleSubmit = event => {
-    event.preventDefault();
-
-    const { onClickInvite = Function.prototype } = this.props;
-    const { invited, newInvites } = this.state;
-
-    onClickInvite(invited, newInvites);
-  };
 
   handleChange = event => {
     event.preventDefault();
@@ -133,91 +83,38 @@ class InviteModal extends Component {
   };
 
   handleClickAdd = userId => () => {
-    this.setState(prevState => ({
-      ...prevState,
-      invited: [...prevState.invited, { userId, access: PERMISSION_WRITE }],
-    }));
+    const { onClickInvite } = this.props;
+
+    onClickInvite(userId);
   };
 
   handleClickAddNewInvite = () => {
-    this.setState(prevState => ({
-      newInvites: [...prevState.newInvites, prevState.filterText],
-      filterText: '',
-    }));
-  };
+    const { onClickAddNewMember } = this.props;
+    const { filterText } = this.state;
 
-  handleRemoveInvite = email => () => {
-    this.setState(prevState => ({
-      newInvites: prevState.newInvites.filter(
-        inviteEmail => inviteEmail !== email,
-      ),
-    }));
+    this.setState(
+      {
+        filterText: '',
+      },
+      () => onClickAddNewMember(filterText),
+    );
   };
 
   handleChangePermission = userId => event => {
     const { checked } = event.currentTarget;
     const { onChangePermission } = this.props;
 
-    this.setState(
-      prevState => ({
-        ...prevState,
-        invited: prevState.invited.reduce((acc, item) => {
-          if (item.userId === userId) {
-            acc.push({
-              ...item,
-              access: checked ? PERMISSION_READ : PERMISSION_WRITE,
-            });
-          } else {
-            acc.push(item);
-          }
-
-          return acc;
-        }, []),
-      }),
-      () => {
-        onChangePermission(userId);
-      },
-    );
+    onChangePermission(userId, checked ? PERMISSION_READ : PERMISSION_WRITE);
   };
 
   handleClickRemove = userId => () => {
-    this.setState(prevState => ({
-      ...prevState,
-      invited: prevState.invited.filter(invite => invite.userId !== userId),
-    }));
+    const { onRemoveInvite } = this.props;
+
+    onRemoveInvite(userId);
   };
 
-  prepareInitialState() {
-    const { invited } = this.props;
-
-    return {
-      filterText: '',
-      invited,
-      newInvites: [],
-    };
-  }
-
-  renderNewInvites() {
-    const { newInvites } = this.state;
-
-    return newInvites.map((email, index) => (
-      <EmailBox key={index}>
-        <SharedItemEmail>{email}</SharedItemEmail>
-        <SharedItemRemove>
-          <Icon
-            name="close"
-            width={14}
-            height={14}
-            isInButton
-            onClick={this.handleRemoveInvite(email)}
-          />
-        </SharedItemRemove>
-      </EmailBox>
-    ));
-  }
-
   renderMemberList(filteredMembers) {
-    const { invited } = this.state;
+    const { invited } = this.props;
     const invitesByUserId = invited.reduce((acc, invite) => {
       acc[invite.userId] = invite;
       return acc;
@@ -242,11 +139,10 @@ class InviteModal extends Component {
   }
 
   render() {
-    const { filterText, newInvites } = this.state;
+    const { filterText } = this.state;
     const { members, onCancel } = this.props;
 
     const filteredMembers = this.filter(members, filterText);
-    const shouldShowNewInvites = newInvites.length > 0;
     const shouldShowAddInviteOption =
       !filteredMembers.length && !!filterText && filterText.includes('@');
 
@@ -273,12 +169,6 @@ class InviteModal extends Component {
             </AddInvite>
           </AddInviteBox>
         )}
-        {shouldShowNewInvites && (
-          <ListWrapper>
-            <ListTitle>New Invites</ListTitle>
-            {this.renderNewInvites()}
-          </ListWrapper>
-        )}
         <ListWrapper>
           <ListTitle>Team members</ListTitle>
           <MembersWrapper>
@@ -287,9 +177,6 @@ class InviteModal extends Component {
             </Scrollbar>
           </MembersWrapper>
         </ListWrapper>
-        <ButtonsWrapper>
-          <Button onClick={this.handleSubmit}>INVITE</Button>
-        </ButtonsWrapper>
       </Modal>
     );
   }

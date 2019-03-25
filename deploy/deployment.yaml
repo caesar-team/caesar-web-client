@@ -4,12 +4,18 @@ metadata:
   name: caesarapp-web-app
   namespace: default
 spec:
-  minReadySeconds: 120
+  replicas: 1
+  minReadySeconds: 360
   progressDeadlineSeconds: 600
   revisionHistoryLimit: 10
   selector:
     matchLabels:
       workload.user.cattle.io/workloadselector: deployment-default-caesarapp-web-app
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+    type: RollingUpdate
   template:
     metadata:
       labels:
@@ -21,29 +27,25 @@ spec:
       containers:
       - env:
         - name: API_BASE_PATH
-          value: api
+          value: "api"
         - name: API_PROTOCOL
-          value: https
+          value: "https"
         - name: APP_PORT
           value: "3000"
         - name: APP_PROTOCOL
-          value: https
+          value: "https"
         - name: AUTH_ENDPOINT
-          value: connect/google
-        - name: NODE_ENV
-          value: production
+          value: "connect/google"
         - name: REDIRECT_AUTH_ENDPOINT
-          value: check_auth
+          value: "check_auth"
         - name: API_HOST
-          valueFrom:
-           secretKeyRef:
-             key: API_HOST
-             name: caesarapp-web-app
+          value: "demo.caesar.team"
         - name: APP_HOST
-          valueFrom:
-           secretKeyRef:
-             key: APP_HOST
-             name: caesarapp-web-app
+          value: "demo.caesar.team"
+        - name: MAX_UPLOADING_FILE_SIZE
+          value: "256KB"
+        - name: TOTAL_MAX_UPLOADING_FILES_SIZES
+          value: "5M"
         image: caesarteam/caesar-web-client:${CICD_GIT_BRANCH}
         imagePullPolicy: Always
         name: caesarapp-web-app

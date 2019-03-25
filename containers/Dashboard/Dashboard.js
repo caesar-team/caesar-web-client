@@ -637,253 +637,195 @@ class DashboardContainer extends Component {
     });
   };
 
-  inviteNewMembers = async (invitedUserIds, invitedByUserId) => {
+  handleInviteMember = async userId => {
+    console.log('handleInviteMember', userId);
     const { workInProgressItem, members } = this.state;
-    const { invited } = workInProgressItem;
-    const newInvitedMembers = members.filter(({ id }) =>
-      invitedUserIds.includes(id),
-    );
-    const newMembers = Object.values(invitedByUserId)
-      .filter(({ isNew }) => !!isNew)
-      .map(({ userId, isNew, email, ...rest }) => ({
-        id: userId,
-        name: email,
-        email,
-        ...rest,
-      }));
+    console.log(workInProgressItem.invited);
+    const user = members.find(({ id }) => id === userId);
 
-    const allMembers = [...newInvitedMembers, ...newMembers];
+    const options = {
+      message: openpgp.message.fromText(
+        JSON.stringify(workInProgressItem.secret),
+      ),
+      publicKeys: (await openpgp.key.readArmored(user.publicKey)).keys,
+    };
 
-    const encryptedPromises = allMembers.map(async member => {
-      const options = {
-        message: openpgp.message.fromText(
-          JSON.stringify(workInProgressItem.secret),
-        ),
-        publicKeys: (await openpgp.key.readArmored(member.publicKey)).keys,
-      };
-
-      return openpgp.encrypt(options);
-    });
-
-    const encrypted = await Promise.all(encryptedPromises);
-
-    const invitedChildItems = encrypted.map((encrypt, index) => ({
-      userId: allMembers[index].id,
-      secret: encrypt.data,
-      access: invitedByUserId[allMembers[index].id].access,
-      cause: INVITE_TYPE,
-    }));
+    const encryptedSecret = await openpgp.encrypt(options);
 
     try {
-      await postCreateChildItem(workInProgressItem.id, {
-        items: invitedChildItems,
+      const {
+        data: { items },
+      } = await postCreateChildItem(workInProgressItem.id, {
+        items: [
+          {
+            userId: user.id,
+            secret: encryptedSecret.data,
+            cause: INVITE_TYPE,
+            access: PERMISSION_WRITE,
+          },
+        ],
       });
 
-      const data = {
-        ...workInProgressItem,
-        invited: [
-          ...invited,
-          ...invitedUserIds.map(userId => invitedByUserId[userId]),
-        ],
-      };
-
-      if (newMembers.length > 0) {
-        await Promise.all(
-          newMembers.map(async ({ email, password, masterPassword }) => {
-            await postInvitation({
-              email,
-              url: generateInviteUrl(
-                objectToBase64({
-                  e: email,
-                  p: password,
-                  mp: masterPassword,
-                }),
-              ),
-            });
-          }),
-        );
-      }
+      const item = items[0];
 
       this.setState(prevState => ({
         ...prevState,
-        isVisibleInviteModal: false,
-        workInProgressItem: data,
-        list: updateNode(prevState.list, workInProgressItem.id, data),
-        members: [...prevState.members, ...newMembers],
+        workInProgressItem: {
+          ...prevState.workInProgressItem,
+          invited: [
+            ...prevState.workInProgressItem.invited,
+            { ...user, id: item.id, userId: user.id, access: PERMISSION_WRITE },
+          ],
+        },
+        list: updateNode(prevState.list, workInProgressItem.id, {
+          ...prevState.workInProgressItem,
+          invited: [
+            ...prevState.workInProgressItem.invited,
+            { ...user, id: item.id, userId: user.id, access: PERMISSION_WRITE },
+          ],
+        }),
       }));
     } catch (e) {
       console.log(e);
     }
   };
 
-  changeInviteAccesses = async (invitedUserIds, invitedByUserId) => {
+  handleAddNewMember = async email => {
     const { workInProgressItem } = this.state;
-    const { invited } = workInProgressItem;
-    const promises = invitedUserIds.map(userId => async () => {
-      const url = invitedByUserId[userId].id;
-      const result = await patchChildAccess(url, {
-        access: invitedByUserId[userId].access,
-      })
-        .then(() => ({ result: userId }))
-        .catch(e => ({ error: e }));
-      return result;
-    });
 
-    await Promise.all(promises.map(promise => promise())).then(results => {
-      const positiveResultsIds = results
-        .filter(result => typeof result.result !== 'undefined')
-        .map(result => result.result);
-      const updatedInvites = positiveResultsIds.reduce(
-        (acc, userId) =>
-          acc.map(
-            invite =>
-              invite.userId === userId
-                ? { ...invite, access: invitedByUserId[userId].access }
-                : invite,
-          ),
-        invited,
-      );
-      const data = {
-        ...workInProgressItem,
-        invited: updatedInvites,
+    let user = null;
+
+    try {
+      const {
+        data: { userId, publicKey },
+      } = await getPublicKeyByEmail(email);
+
+      user = { email, userId, publicKey, isNew: false };
+    } catch (e) {
+      const {
+        userId,
+        password,
+        masterPassword,
+        publicKey,
+      } = await this.createUser(email, USER_ROLE);
+
+      user = {
+        userId,
+        email,
+        password,
+        masterPassword,
+        publicKey,
+        isNew: true,
       };
-
-      this.setState(prevState => ({
-        ...prevState,
-        isVisibleInviteModal: false,
-        workInProgressItem: data,
-        list: updateNode(prevState.list, workInProgressItem.id, data),
-      }));
-    });
-  };
-
-  removeInvites = async removeInviteIds => {
-    const { workInProgressItem } = this.state;
-    const { invited } = workInProgressItem;
-    const promises = removeInviteIds.map(inviteId => async () => {
-      const result = await removeChildItem(inviteId)
-        .then(() => ({ result: inviteId }))
-        .catch(e => ({ error: e }));
-      return result;
-    });
-
-    await Promise.all(promises.map(promise => promise())).then(results => {
-      const positiveResultsIds = results
-        .filter(result => typeof result.result !== 'undefined')
-        .map(result => result.result);
-      const updatedInvites = positiveResultsIds.reduce(
-        (acc, inviteId) => acc.filter(invite => invite.id !== inviteId),
-        invited,
-      );
-      const data = {
-        ...workInProgressItem,
-        invited: updatedInvites,
-      };
-
-      this.setState(prevState => ({
-        ...prevState,
-        isVisibleInviteModal: false,
-        workInProgressItem: data,
-        list: updateNode(prevState.list, workInProgressItem.id, data),
-      }));
-    });
-  };
-
-  handleInviteMembers = async (invited, newInvites) => {
-    const { workInProgressItem } = this.state;
-    const { invited: currentlyInvited } = workInProgressItem;
-
-    let newInvited = [];
-
-    if (newInvites && newInvites.length > 0) {
-      newInvited = await Promise.all(
-        newInvites.map(async email => {
-          try {
-            const {
-              data: { userId, publicKey },
-            } = await getPublicKeyByEmail(email);
-
-            return { email, userId, publicKey, isNew: false };
-          } catch (e) {
-            const {
-              userId,
-              password,
-              masterPassword,
-              publicKey,
-            } = await this.createUser(email, USER_ROLE);
-
-            return {
-              userId,
-              email,
-              password,
-              masterPassword,
-              publicKey,
-              isNew: true,
-            };
-          }
-        }),
-      );
     }
 
-    const currentlyInvitedByUserId = currentlyInvited.reduce((acc, invite) => {
-      acc[invite.userId] = invite;
-      return acc;
-    }, {});
+    const options = {
+      message: openpgp.message.fromText(
+        JSON.stringify(workInProgressItem.secret),
+      ),
+      publicKeys: (await openpgp.key.readArmored(user.publicKey)).keys,
+    };
 
-    const invitedByUserId = invited.reduce((acc, invite) => {
-      acc[invite.userId] = invite;
-      return acc;
-    }, {});
+    const encryptedSecret = await openpgp.encrypt(options);
 
-    const newInvitedByUserId = newInvited.reduce((acc, invite) => {
-      acc[invite.userId] = { ...invite, access: PERMISSION_WRITE };
-      return acc;
-    }, {});
+    try {
+      const {
+        data: { items },
+      } = await postCreateChildItem(workInProgressItem.id, {
+        items: [
+          {
+            userId: user.userId,
+            secret: encryptedSecret.data,
+            cause: INVITE_TYPE,
+            access: PERMISSION_READ,
+          },
+        ],
+      });
 
-    const invitedUserIds = invited.reduce(
-      (acc, invite) => {
-        if (Object.keys(currentlyInvitedByUserId).includes(invite.userId)) {
-          if (
-            currentlyInvitedByUserId[invite.userId].access !== invite.access
-          ) {
-            acc.accessChange.push(invite.userId);
-          }
-        } else {
-          acc.newInvites.push(invite.userId);
-        }
-        return acc;
-      },
-      {
-        newInvites: newInvited.map(({ userId }) => userId),
-        accessChange: [],
-      },
+      await postInvitation({
+        email,
+        url: generateInviteUrl(
+          objectToBase64({
+            e: email,
+            p: user.password,
+            mp: user.masterPassword,
+          }),
+        ),
+      });
+
+      this.setState(prevState => ({
+        ...prevState,
+        workInProgressItem: {
+          ...prevState.workInProgressItem,
+          invited: [
+            ...prevState.workInProgressItem.invited,
+            { id: items[0].id, ...user, access: PERMISSION_READ },
+          ],
+        },
+        list: updateNode(prevState.list, workInProgressItem.id, {
+          ...prevState.workInProgressItem,
+          invited: [
+            ...prevState.workInProgressItem.invited,
+            { id: items[0].id, ...user, access: PERMISSION_READ },
+          ],
+        }),
+        members: [
+          ...prevState.members,
+          { ...user, name: user.email, id: user.userId },
+        ],
+      }));
+    } catch (e) {
+      console.log(e);
+    }
+  };
+
+  handleChangePermission = async (userId, permission) => {
+    const { workInProgressItem } = this.state;
+
+    const childItem = workInProgressItem.invited.find(
+      invite => invite.userId === userId,
     );
 
-    invitedUserIds.removeInvites = Object.keys(currentlyInvitedByUserId)
-      .filter(userId => !Object.keys(invitedByUserId).includes(userId))
-      .map(userId => currentlyInvitedByUserId[userId].id);
+    await patchChildAccess(childItem.id, {
+      access: permission,
+    });
 
-    if (invitedUserIds.newInvites.length) {
-      await this.inviteNewMembers(invitedUserIds.newInvites, {
-        ...invitedByUserId,
-        ...newInvitedByUserId,
-      });
-    }
-
-    if (invitedUserIds.accessChange.length) {
-      await this.changeInviteAccesses(
-        invitedUserIds.accessChange,
-        invitedByUserId,
-      );
-    }
-
-    if (invitedUserIds.removeInvites.length) {
-      await this.removeInvites(invitedUserIds.removeInvites);
-    }
+    this.setState(prevState => ({
+      ...prevState,
+      workInProgressItem: {
+        ...prevState.workInProgressItem,
+        invited: prevState.workInProgressItem.invited.map(
+          invite =>
+            invite.userId === userId
+              ? { ...invite, access: permission }
+              : invite,
+        ),
+      },
+    }));
   };
 
-  handleChangePermission = async (userId) => {
+  handleRemoveInvite = async userId => {
+    const { workInProgressItem } = this.state;
 
+    const childItem = workInProgressItem.invited.find(
+      invite => invite.userId === userId,
+    );
+
+    try {
+      await removeChildItem(childItem.id);
+
+      this.setState(prevState => ({
+        ...prevState,
+        workInProgressItem: {
+          ...prevState.workInProgressItem,
+          invited: prevState.workInProgressItem.invited.filter(
+            invite => invite.userId !== userId,
+          ),
+        },
+      }));
+    } catch (e) {
+      console.log(e);
+    }
   };
 
   handleActivateShareByLink = async () => {
@@ -1036,7 +978,7 @@ class DashboardContainer extends Component {
         password,
         masterPassword,
         publicKey,
-      } = await this.createUser(email, READ_ONLY_USER_ROLE);
+      } = await this.createUser(email, USER_ROLE);
 
       return {
         userId,
@@ -1294,8 +1236,10 @@ class DashboardContainer extends Component {
           <InviteModal
             members={members}
             invited={workInProgressItem.invited}
-            onClickInvite={this.handleInviteMembers}
+            onClickInvite={this.handleInviteMember}
+            onClickAddNewMember={this.handleAddNewMember}
             onChangePermission={this.handleChangePermission}
+            onRemoveInvite={this.handleRemoveInvite}
             onCancel={this.handleCloseInviteModal}
           />
         )}

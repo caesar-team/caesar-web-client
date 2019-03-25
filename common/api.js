@@ -2,7 +2,7 @@ import axios from 'axios';
 import { API_URI, API_BASE_PATH } from './constants';
 import { getToken, removeToken } from './utils/token';
 import { isClient } from './utils/isEnvironment';
-console.log(API_URI, API_BASE_PATH);
+
 const softExit = () => {
   if (isClient) {
     removeToken();

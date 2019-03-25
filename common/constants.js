@@ -2,8 +2,6 @@ import getConfig from 'next/config';
 
 const { publicRuntimeConfig = {} } = getConfig() || {};
 
-console.log('getConfig()', getConfig());
-
 export const {
   API_URI,
   API_BASE_PATH,

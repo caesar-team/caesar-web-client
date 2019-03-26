@@ -12,14 +12,9 @@ stages:
   - applyYamlConfig:
       path: ./deploy/deployment.yaml
 branch:
-  include:
-  - develop
-  - master
+  include: [ develop, master ]
 notification:
   recipients:
-  - recipient: '#caesarapp-notify'
-    notifier: c-5lcml:n-fdnnp
-  condition:
-  - Success
-  - Changed
-  - Failed
+  - recipient: "#caesarapp-notify"
+    notifier: "slack"
+  condition: [ Success, Changed, Failed ]

@@ -1,6 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
-import { API_URL } from 'common/constants';
+import { API_URI } from 'common/constants';
 
 const Wrapper = styled.div`
   box-sizing: border-box;
@@ -37,7 +37,7 @@ const Avatar = ({ name, avatar, children, isSmall, ...props }) => {
   if (avatar) {
     return (
       <Wrapper isSmall={isSmall} {...props}>
-        <Image src={`${API_URL}/${avatar}`} />
+        <Image src={`${API_URI}/${avatar}`} />
       </Wrapper>
     );
   }

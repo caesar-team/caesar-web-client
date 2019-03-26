@@ -2,8 +2,8 @@ import React, { Component, Fragment } from 'react';
 import styled, { withTheme } from 'styled-components';
 import Router, { withRouter } from 'next/router';
 import {
-  API_URL,
-  APP_URL,
+  API_URI,
+  APP_URI,
   AUTH_ENDPOINT,
   REDIRECT_AUTH_ENDPOINT,
 } from 'common/constants';
@@ -147,7 +147,7 @@ class SignInContainer extends Component {
 
   generateGoogleAuthUrl = async () => {
     const deviceToken = await getTrustedDeviceToken(true);
-    return `${API_URL}/${AUTH_ENDPOINT}?redirect_uri=${APP_URL}/${REDIRECT_AUTH_ENDPOINT}&fingerprint=${deviceToken}`;
+    return `${API_URI}/${AUTH_ENDPOINT}?redirect_uri=${APP_URI}/${REDIRECT_AUTH_ENDPOINT}&fingerprint=${deviceToken}`;
   };
 
   handleSubmit = async ({ email, password }, { setSubmitting, setErrors }) => {

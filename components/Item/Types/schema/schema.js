@@ -12,10 +12,8 @@ const SIZE_NAME_RATE_MAP = {
 };
 
 const convertSizeNameToNumber = sizeName =>
-  sizeName.replace(
-    /(\d+)(B|KB|M)/,
-    (match, size, type) =>
-      size && type ? Number(size) * SIZE_NAME_RATE_MAP[type] : 0,
+  sizeName.replace(/(\d+)(B|KB|M)/, (match, size, type) =>
+    size && type ? Number(size) * SIZE_NAME_RATE_MAP[type] : 0,
   );
 
 const MAX_UPLOADING_FILE_SIZE_NUMBER = convertSizeNameToNumber(

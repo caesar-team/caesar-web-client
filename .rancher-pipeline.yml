@@ -11,6 +11,15 @@ stages:
   steps:
   - applyYamlConfig:
       path: ./deploy/deployment.yaml
-# branch conditions for the pipeline
 branch:
-  include: [develop, master]
+  include:
+  - develop
+  - master
+notification:
+  recipients:
+  - recipient: '#caesarapp-notify'
+    notifier: c-5lcml:n-fdnnp
+  condition:
+  - Success
+  - Changed
+  - Failed

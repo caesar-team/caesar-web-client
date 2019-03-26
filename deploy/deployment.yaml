@@ -35,6 +35,6 @@ spec:
               containerPort: 3000
           env:
             - name: API_URI
-              value: "http://loc.caesar.team"
+              value: "https://demo.caesar.team"
             - name: APP_URI
-              value: "http://loc.caesar.team"
+              value: "https://demo.caesar.team"

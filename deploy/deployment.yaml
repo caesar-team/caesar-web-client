@@ -7,9 +7,9 @@ spec:
     app:  caesarapp-web-app
   type:  NodePort
   ports:
-  - name:  http
-    port:  3000
-    targetPort:  3000
+    - name:  http
+      port:  3000
+      targetPort:  3000
 
 ---
 apiVersion: apps/v1
@@ -25,11 +25,11 @@ spec:
     metadata:
       labels:
         app: caesarapp-web-app
-        CICD_GIT_COMMIT: CICD_GIT_COMMIT
+        CICD_GIT_COMMIT: ${CICD_GIT_COMMIT}
     spec:
       containers:
         - name: caesarapp-web-app
-          image: "caesarteam/caesar-web-client:develop"
+          image: "caesarteam/caesar-web-client:${CICD_GIT_BRANCH}"
           ports:
             - name: http
               containerPort: 3000

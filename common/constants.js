@@ -1,18 +1,11 @@
 import getConfig from 'next/config';
 
-let publicRuntimeConfig = {};
-
-const config = getConfig();
-
-if (config) {
-  // eslint-disable-next-line
-  publicRuntimeConfig = config.publicRuntimeConfig;
-}
+const { publicRuntimeConfig = {} } = getConfig() || {};
 
 export const {
-  API_URL,
+  API_URI,
   API_BASE_PATH,
-  APP_URL,
+  APP_URI,
   AUTH_ENDPOINT,
   REDIRECT_AUTH_ENDPOINT,
   MAX_UPLOADING_FILE_SIZE,

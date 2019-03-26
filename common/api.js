@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { API_URL, API_BASE_PATH } from './constants';
+import { API_URI, API_BASE_PATH } from './constants';
 import { getToken, removeToken } from './utils/token';
 import { isClient } from './utils/isEnvironment';
 
@@ -15,7 +15,7 @@ const softExit = () => {
 };
 
 const callApi = axios.create({
-  baseURL: `${API_URL}/${API_BASE_PATH}`,
+  baseURL: `${API_URI}/${API_BASE_PATH}`,
 });
 
 callApi.interceptors.request.use(config => {

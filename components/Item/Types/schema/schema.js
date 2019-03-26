@@ -16,20 +16,14 @@ const convertSizeNameToNumber = sizeName =>
     size && type ? Number(size) * SIZE_NAME_RATE_MAP[type] : 0,
   );
 
-const MAX_UPLOADING_FILE_SIZE_NUMBER = convertSizeNameToNumber(
-  MAX_UPLOADING_FILE_SIZE,
-);
-const TOTAL_MAX_UPLOADING_FILES_SIZES_NUMBER = convertSizeNameToNumber(
-  TOTAL_MAX_UPLOADING_FILES_SIZES,
-);
-
 const checkFileSize = raw =>
-  raw.length * BASE_64_LENGTH_BYTE_RATE <= MAX_UPLOADING_FILE_SIZE_NUMBER;
+  raw.length * BASE_64_LENGTH_BYTE_RATE <=
+  convertSizeNameToNumber(MAX_UPLOADING_FILE_SIZE);
 
 const checkAllFileSizes = files =>
   files.reduce((acc, { raw }) => acc + raw.length, 0) *
     BASE_64_LENGTH_BYTE_RATE <=
-  TOTAL_MAX_UPLOADING_FILES_SIZES_NUMBER;
+  convertSizeNameToNumber(TOTAL_MAX_UPLOADING_FILES_SIZES);
 
 export const attachmentsSchema = yup
   .array(

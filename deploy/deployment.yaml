@@ -2,6 +2,7 @@
 apiVersion: v1
 metadata:
   name:  caesarapp-web-app
+  namespace: default
 spec:
   selector:
     app:  caesarapp-web-app
@@ -16,6 +17,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: caesarapp-web-app
+  namespace: default
 spec:
   replicas: 1
   selector:

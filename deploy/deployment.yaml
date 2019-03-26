@@ -1,58 +1,40 @@
-﻿apiVersion: apps/v1beta2
+﻿kind: Service
+apiVersion: v1
+metadata:
+  name:  caesarapp-web-app
+spec:
+  selector:
+    app:  caesarapp-web-app
+  type:  NodePort
+  ports:
+  - name:  http
+    port:  3000
+    targetPort:  3000
+
+---
+apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: caesarapp-web-app
-  namespace: default
 spec:
   replicas: 1
-  minReadySeconds: 360
-  progressDeadlineSeconds: 600
-  revisionHistoryLimit: 10
   selector:
     matchLabels:
-      workload.user.cattle.io/workloadselector: deployment-default-caesarapp-web-app
-  strategy:
-    rollingUpdate:
-      maxSurge: 1
-      maxUnavailable: 0
-    type: RollingUpdate
+      app: caesarapp-web-app
   template:
     metadata:
       labels:
         app: caesarapp-web-app
-        CICD_GIT_COMMIT: ${CICD_GIT_COMMIT}
-        workload.user.cattle.io/workloadselector: deployment-default-caesarapp-web-app
-      namespace: default
+        CICD_GIT_COMMIT: CICD_GIT_COMMIT
     spec:
       containers:
-      - env:
-        - name: API_BASE_PATH
-          value: "api"
-        - name: API_PROTOCOL
-          value: "https"
-        - name: APP_PORT
-          value: "3000"
-        - name: APP_PROTOCOL
-          value: "https"
-        - name: AUTH_ENDPOINT
-          value: "connect/google"
-        - name: REDIRECT_AUTH_ENDPOINT
-          value: "check_auth"
-        - name: API_HOST
-          value: "demo.caesar.team"
-        - name: APP_HOST
-          value: "demo.caesar.team"
-        - name: MAX_UPLOADING_FILE_SIZE
-          value: "256KB"
-        - name: TOTAL_MAX_UPLOADING_FILES_SIZES
-          value: "5M"
-        image: caesarteam/caesar-web-client:${CICD_GIT_BRANCH}
-        imagePullPolicy: Always
-        name: caesarapp-web-app
-        ports:
-        - containerPort: 3000
-          name: 3000tcp00
-          protocol: TCP
-      imagePullSecrets:
-      - name: dockerhub
-      restartPolicy: Always
+        - name: caesarapp-web-app
+          image: "caesarteam/caesar-web-client:develop"
+          ports:
+            - name: http
+              containerPort: 3000
+          env:
+            - name: API_URI
+              value: "http://loc.caesar.team"
+            - name: APP_URI
+              value: "http://loc.caesar.team"

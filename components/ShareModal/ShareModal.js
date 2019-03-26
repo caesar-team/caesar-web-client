@@ -369,7 +369,6 @@ export class ShareModal extends Component {
           <ToggleLabel>
             <Toggle
               checked={!!link}
-              icons={false}
               isLoading={isLoading}
               onChange={this.handleShareByLinkChange}
             />

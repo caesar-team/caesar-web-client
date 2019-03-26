@@ -80,7 +80,7 @@ const StyledLoader = styled(CircleLoader)`
 `;
 
 const Toggle = props => {
-  const { onChange, checked, disabled, name, value, isLoading } = props;
+  const { onChange, checked, disabled, name, isLoading } = props;
 
   return (
     <GlobalContainer>
@@ -88,7 +88,6 @@ const Toggle = props => {
         <Input
           type="checkbox"
           name={name}
-          value={value}
           checked={checked}
           disabled={disabled || isLoading}
         />

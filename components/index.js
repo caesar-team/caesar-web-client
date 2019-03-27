@@ -23,7 +23,7 @@ export { Label } from './Label';
 export { Link } from './Link';
 export { List } from './List';
 export { ListFormModal } from './ListFormModal';
-export { Loader } from './Loader';
+export { Loader, CircleLoader } from './Loader';
 export { ManageList } from './ManageList';
 export { MenuList } from './MenuList';
 export {
@@ -61,3 +61,4 @@ export { Tab, Tabs } from './Tabs';
 export { NavigationPanel } from './NavigationPanel';
 export { DataTable } from './DataTable';
 export { ProgressBar } from './ProgressBar';
+export { Toggle } from './Toggle';

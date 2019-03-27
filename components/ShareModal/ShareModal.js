@@ -1,6 +1,5 @@
 import React, { Component, Fragment } from 'react';
 import styled from 'styled-components';
-import Toggle from 'react-toggle';
 import {
   Icon,
   Modal,
@@ -9,12 +8,12 @@ import {
   Checkbox,
   ShareInput,
   TextWithLines,
+  Toggle,
 } from 'components';
 import { formatDate } from 'common/utils/dateUtils';
 import { copyToClipboard } from 'common/utils/clipboard';
 import { base64ToObject, objectToBase64 } from 'common/utils/cipherUtils';
 import { generateSharingUrl } from 'common/utils/sharing';
-import 'common/styles/react-toggle.css';
 
 const ModalDescription = styled.div`
   padding-bottom: 20px;
@@ -145,13 +144,6 @@ const LeftTime = styled.div`
   margin: 0 20px 0 10px;
 `;
 
-const ResendLink = styled.a`
-  font-size: 14px;
-  letter-spacing: 0.4px;
-  text-decoration: underline;
-  cursor: pointer;
-`;
-
 const getEncryption = link => link.match(/\/([\w|+-]+)$/)[1];
 const getShareId = link => link.match(/share\/(.+)\//)[1];
 
@@ -160,6 +152,16 @@ const getAnonymousLink = shared =>
 
 export class ShareModal extends Component {
   state = this.prepareInitialState();
+
+  static getDerivedStateFromProps(nextProps, prevState) {
+    if (prevState.isLoading && !!getAnonymousLink(nextProps.shared)) {
+      return {
+        isLoading: false,
+      };
+    }
+
+    return null;
+  }
 
   handleShareByLinkChange = () => {
     const {
@@ -171,7 +173,12 @@ export class ShareModal extends Component {
     const link = getAnonymousLink(shared);
 
     if (!link) {
-      onActivateSharedByLink();
+      this.setState(
+        {
+          isLoading: true,
+        },
+        onActivateSharedByLink,
+      );
     } else {
       onDeactivateSharedByLink();
     }
@@ -234,6 +241,7 @@ export class ShareModal extends Component {
     return {
       emails: [],
       isUseMasterPassword: false,
+      isLoading: false,
     };
   }
 
@@ -330,7 +338,7 @@ export class ShareModal extends Component {
   }
 
   render() {
-    const { isUseMasterPassword } = this.state;
+    const { isUseMasterPassword, isLoading } = this.state;
     const { onCancel, shared } = this.props;
 
     const link = getAnonymousLink(shared);
@@ -355,13 +363,13 @@ export class ShareModal extends Component {
           <ShareInput onChange={this.handleAddEmail} />
         </Row>
         {this.renderEmails()}
-        {/*{this.renderWaitingUsers()}*/}
-        {/*{this.renderSharedUsers()}*/}
+        {/* {this.renderWaitingUsers()} */}
+        {/* {this.renderSharedUsers()} */}
         <LinkRow>
           <ToggleLabel>
             <Toggle
               checked={!!link}
-              icons={false}
+              isLoading={isLoading}
               onChange={this.handleShareByLinkChange}
             />
             <ToggleLabelText>{switcherText}</ToggleLabelText>

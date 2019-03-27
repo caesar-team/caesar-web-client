@@ -1,17 +1,11 @@
-import getConfig from 'next/config';
-
-const { publicRuntimeConfig = {} } = getConfig() || {};
-
-export const {
-  API_URI,
-  API_BASE_PATH,
-  APP_URI,
-  AUTH_ENDPOINT,
-  REDIRECT_AUTH_ENDPOINT,
-  MAX_UPLOADING_FILE_SIZE,
-  TOTAL_MAX_UPLOADING_FILES_SIZES,
-  LENGTH_KEY,
-} = publicRuntimeConfig;
+export const API_URI = process.env.API_URI;
+export const API_BASE_PATH = process.env.API_BASE_PATH;
+export const APP_URI = process.env.APP_URI;
+export const AUTH_ENDPOINT = process.env.AUTH_ENDPOINT;
+export const REDIRECT_AUTH_ENDPOINT = process.env.REDIRECT_AUTH_ENDPOINT;
+export const MAX_UPLOADING_FILE_SIZE = process.env.MAX_UPLOADING_FILE_SIZE;
+export const TOTAL_MAX_UPLOADING_FILES_SIZES = process.env.TOTAL_MAX_UPLOADING_FILES_SIZES;
+export const LENGTH_KEY = process.env.LENGTH_KEY;
 
 export const PORTAL_ID = 'portal';
 export const DEFAULT_IDLE_TIMEOUT = 5 * 60 * 1000;

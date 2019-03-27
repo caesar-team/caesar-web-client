@@ -5,8 +5,11 @@ services:
     build:
       dockerfile: ./Dockerfile
       context: ./
-    environment: 
-      - API_URI
-      - APP_URI 
+      args:
+        API_URI: "http://loc.caesar.team"
+        APP_URI: "http://loc.caesar.team"
+    environment:
+      API_URI: "http://loc.caesar.team"
+      APP_URI: "http://loc.caesar.team"
     ports:
       - "3000:3000"

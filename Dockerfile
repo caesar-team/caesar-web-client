@@ -29,6 +29,8 @@ ENV NODE_ENV=production
 FROM dependencies AS build
 COPY . .
 # Setup environment variables
+ARG API_URI
+ARG APP_URI
 ENV NODE_ENV=production
 RUN yarn build
 

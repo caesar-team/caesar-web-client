@@ -207,19 +207,17 @@ export const ItemHeader = ({
           </Owner>
         </Row>
         <Row>
-          {!isTrashItem &&
-            isOwner && (
-              <InviteButton onClick={onClickInvite} hasInvited={hasInvited}>
-                <Icon name="plus" width={14} height={14} isInButton />
-              </InviteButton>
-            )}
+          {!isTrashItem && isOwner && (
+            <InviteButton onClick={onClickInvite} hasInvited={hasInvited}>
+              <Icon name="plus" width={14} height={14} isInButton />
+            </InviteButton>
+          )}
           <StyledAvatarsList avatars={avatars} />
-          {!isTrashItem &&
-            isOwner && (
-              <ShareButton icon="share" color="black" onClick={onClickShare}>
-                Share
-              </ShareButton>
-            )}
+          {!isTrashItem && isOwner && (
+            <ShareButton icon="share" color="black" onClick={onClickShare}>
+              Share
+            </ShareButton>
+          )}
         </Row>
       </InviteRow>
     </Fragment>

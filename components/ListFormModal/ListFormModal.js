@@ -61,6 +61,7 @@ class ListFormModal extends Component {
                 name="label"
                 render={({ field }) => (
                   <FormInput
+                    autoFocus
                     withBorder
                     {...field}
                     error={checkError(touched, errors, 'label')}

@@ -116,7 +116,14 @@ const formatBytes = x => {
 const UPLOADED_STATUS = 'uploaded';
 const ERROR_STATUS = 'error';
 
-const File = ({ status = UPLOADED_STATUS, name, raw, onClick, ...props }) => {
+const File = ({
+  status = UPLOADED_STATUS,
+  name,
+  raw,
+  onClickRemove,
+  onClickDownload,
+  ...props
+}) => {
   const ext = name.split('.').pop();
   const filename = name.replace(/\.[^/.]+$/, '');
   const size = formatBytes(Math.round((raw.length * 3) / 4));
@@ -133,7 +140,7 @@ const File = ({ status = UPLOADED_STATUS, name, raw, onClick, ...props }) => {
           name="close"
           width={10}
           height={10}
-          onClick={onClick}
+          onClick={onClickRemove}
         />
       </ErrorWrapper>
     );
@@ -141,11 +148,19 @@ const File = ({ status = UPLOADED_STATUS, name, raw, onClick, ...props }) => {
 
   return (
     <UploadedWrapper {...props}>
-      <FileExt>{ext}</FileExt>
+      <FileExt onClick={onClickDownload}>{ext}</FileExt>
       <Details>
         <FileName>{filename}</FileName>
         <FileSize>{size}</FileSize>
       </Details>
+      {onClickRemove && (
+        <StyledCloseIcon
+          name="close"
+          width={10}
+          height={10}
+          onClick={onClickRemove}
+        />
+      )}
     </UploadedWrapper>
   );
 };

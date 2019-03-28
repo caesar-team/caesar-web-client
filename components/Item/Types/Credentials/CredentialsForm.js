@@ -141,7 +141,7 @@ const renderAttachments = (attachments = [], errors = [], setFieldValue) =>
       <File
         key={index}
         status={checkAttachmentsError(errors, index) ? 'error' : 'uploaded'}
-        onClick={() =>
+        onClickRemove={() =>
           setFieldValue(
             'attachments',
             attachments.filter((_, fileIndex) => index !== fileIndex),

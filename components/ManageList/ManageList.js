@@ -1,7 +1,6 @@
 import React, { Component, Fragment } from 'react';
 import styled from 'styled-components';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
-import { Button } from 'components/Button';
 import { AvatarsList } from 'components/Avatar';
 import Link from 'next/link';
 import { Icon } from '../Icon';
@@ -19,12 +18,6 @@ const getTableColAlignStyles = ({ align }) => {
       return 'justify-content: flex-start';
   }
 };
-
-const Header = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-`;
 
 const Table = styled.div`
   padding-top: 20px;
@@ -53,11 +46,6 @@ const TableCol = styled.div`
   padding: 10px 15px;
 
   ${getTableColAlignStyles};
-`;
-
-const TableName = styled.div`
-  font-size: 36px;
-  color: ${({ theme }) => theme.black};
 `;
 
 const ListNameLink = styled.a`
@@ -183,8 +171,12 @@ class ManageList extends Component {
       <DragDropContext onDragEnd={this.handleDragEnd}>
         <Droppable droppableId="droppable" type="lists" key={list.length}>
           {listProvided => (
-            <ListWrapper ref={listProvided.innerRef}>
+            <ListWrapper
+              ref={listProvided.innerRef}
+              {...listProvided.droppableProps}
+            >
               {renderedItems}
+              {listProvided.placeholder}
             </ListWrapper>
           )}
         </Droppable>

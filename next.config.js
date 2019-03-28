@@ -21,14 +21,12 @@ const withCSS = require('@zeit/next-css');
 if (typeof require !== 'undefined') {
   require.extensions['.css'] = file => {};
 }
-const env = {
+const publicRuntimeConfig = {
   IS_PROD: process.env.NODE_ENV === 'production',
   API_URI: `${process.env.API_URI}`,
   APP_URI: `${process.env.APP_URI}${
     process.env.NODE_ENV === 'development'
-      ? process.env.APP_PORT
-        ? `:${process.env.APP_PORT||'3000'}`
-        : ''
+      ? `:${process.env.APP_PORT || '3000'}`
       : ''
   }`,
   API_BASE_PATH: process.env.API_BASE_PATH || 'api',
@@ -42,7 +40,7 @@ const env = {
 module.exports = withPlugins(
   [withWorkers, withFonts, withOptimizedImages, withCSS],
   {
-    env,
+    publicRuntimeConfig,
     webpack: (config, { dev }) => {
       config.output.globalObject = 'this';
 

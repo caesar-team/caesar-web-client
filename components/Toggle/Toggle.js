@@ -79,13 +79,12 @@ const StyledLoader = styled(CircleLoader)`
   left: 2px;
 `;
 
-const Toggle = props => {
-  const { onChange, checked, disabled, name, isLoading } = props;
-
+const Toggle = ({ onChange, checked, disabled, name, isLoading, ...props }) => {
   return (
     <GlobalContainer>
       <InputContainer onChange={onChange}>
         <Input
+          {...props}
           type="checkbox"
           name={name}
           checked={checked}

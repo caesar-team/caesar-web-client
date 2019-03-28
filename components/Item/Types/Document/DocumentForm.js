@@ -118,9 +118,10 @@ const renderAttachments = (attachments = [], errors = [], setFieldValue) =>
   attachments.map((attachment, index) => (
     <FileRow key={index}>
       <File
+        isClosable
         key={index}
         status={checkAttachmentsError(errors, index) ? 'error' : 'uploaded'}
-        onClick={() =>
+        onClickRemove={() =>
           setFieldValue(
             'attachments',
             attachments.filter((_, fileIndex) => index !== fileIndex),

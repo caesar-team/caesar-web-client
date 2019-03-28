@@ -638,9 +638,7 @@ class DashboardContainer extends Component {
   };
 
   handleInviteMember = async userId => {
-    console.log('handleInviteMember', userId);
     const { workInProgressItem, members } = this.state;
-    console.log(workInProgressItem.invited);
     const user = members.find(({ id }) => id === userId);
 
     const options = {
@@ -1072,6 +1070,14 @@ class DashboardContainer extends Component {
       workInProgressItem: data,
       isVisibleShareModal: false,
       list: updateNode(prevState.list, workInProgressItem.id, data),
+      members: [
+        ...prevState.members,
+        ...invited.map(({ id, ...user }) => ({
+          id: user.userId,
+          name: user.email,
+          ...user,
+        })),
+      ],
     }));
   };
 

@@ -307,7 +307,7 @@ class DashboardContainer extends Component {
     attachments,
     type,
     ...secret
-  }) => {
+  }, { setSubmitting }) => {
     const { publicKey } = this.props;
     const { user } = this.state;
 
@@ -358,15 +358,15 @@ class DashboardContainer extends Component {
       }));
     } catch (e) {
       console.log(e);
+    } finally {
+      setSubmitting(false);
     }
   };
 
-  handleFinishEditWorkflow = async ({
-    listId,
-    attachments,
-    type,
-    ...secret
-  }) => {
+  handleFinishEditWorkflow = async (
+    { listId, attachments, type, ...secret },
+    { setSubmitting },
+  ) => {
     const { publicKey } = this.props;
     const { workInProgressItem, members, user } = this.state;
 
@@ -498,7 +498,9 @@ class DashboardContainer extends Component {
         ),
       }));
     } catch (e) {
-      console.log(e);
+      console.log(e.response);
+    } finally {
+      setSubmitting(false);
     }
   };
 
@@ -792,11 +794,8 @@ class DashboardContainer extends Component {
       ...prevState,
       workInProgressItem: {
         ...prevState.workInProgressItem,
-        invited: prevState.workInProgressItem.invited.map(
-          invite =>
-            invite.userId === userId
-              ? { ...invite, access: permission }
-              : invite,
+        invited: prevState.workInProgressItem.invited.map(invite =>
+          invite.userId === userId ? { ...invite, access: permission } : invite,
         ),
       },
     }));
@@ -999,86 +998,90 @@ class DashboardContainer extends Component {
 
     const { workInProgressItem } = this.state;
 
-    const promises = await emails.map(this.userResolver);
-    const response = await Promise.all(promises);
+    try {
+      const promises = await emails.map(this.userResolver);
+      const response = await Promise.all(promises);
 
-    const itemInvitedUsers = workInProgressItem.invited.map(
-      ({ userId }) => userId,
-    );
+      const itemInvitedUsers = workInProgressItem.invited.map(
+        ({ userId }) => userId,
+      );
 
-    const users = response.filter(
-      user => !!user && !itemInvitedUsers.includes(user.userId),
-    );
+      const users = response.filter(
+        user => !!user && !itemInvitedUsers.includes(user.userId),
+      );
 
-    const invitedUsers = users.filter(({ type }) => type === INVITE_TYPE);
-    const invitedUserKeys = invitedUsers.map(({ publicKey }) => publicKey);
+      const invitedUsers = users.filter(({ type }) => type === INVITE_TYPE);
+      const invitedUserKeys = invitedUsers.map(({ publicKey }) => publicKey);
 
-    const invitedEncryptedSecrets = await encryptItemForUsers(
-      workInProgressItem.secret,
-      invitedUserKeys,
-    );
+      const invitedEncryptedSecrets = await encryptItemForUsers(
+        workInProgressItem.secret,
+        invitedUserKeys,
+      );
 
-    const invitedChildItems = invitedEncryptedSecrets.map((secret, idx) => ({
-      secret,
-      userId: invitedUsers[idx].userId,
-      access: PERMISSION_READ,
-      cause: INVITE_TYPE,
-    }));
-
-    let invited = [];
-
-    if (invitedChildItems.length) {
-      const {
-        data: { items },
-      } = await postCreateChildItem(workInProgressItem.id, {
-        items: invitedChildItems,
-      });
-
-      invited = items.map(({ id, lastUpdatedAt }, idx) => ({
-        id,
-        updatedAt: lastUpdatedAt,
+      const invitedChildItems = invitedEncryptedSecrets.map((secret, idx) => ({
+        secret,
         userId: invitedUsers[idx].userId,
-        email: invitedUsers[idx].email,
         access: PERMISSION_READ,
+        cause: INVITE_TYPE,
       }));
 
-      const invitations = invitedUsers
-        .filter(({ isNew }) => !!isNew)
-        .map(({ email, password, masterPassword }) => ({
-          email,
-          url: generateInviteUrl(
-            objectToBase64({
-              e: email,
-              p: password,
-              mp: masterPassword,
-            }),
-          ),
+      let invited = [];
+
+      if (invitedChildItems.length) {
+        const {
+          data: { items },
+        } = await postCreateChildItem(workInProgressItem.id, {
+          items: invitedChildItems,
+        });
+
+        invited = items.map(({ id, lastUpdatedAt }, idx) => ({
+          id,
+          updatedAt: lastUpdatedAt,
+          userId: invitedUsers[idx].userId,
+          email: invitedUsers[idx].email,
+          access: PERMISSION_READ,
         }));
 
-      await Promise.all(
-        invitations.map(async invitation => postInvitation(invitation)),
-      );
+        const invitations = invitedUsers
+          .filter(({ isNew }) => !!isNew)
+          .map(({ email, password, masterPassword }) => ({
+            email,
+            url: generateInviteUrl(
+              objectToBase64({
+                e: email,
+                p: password,
+                mp: masterPassword,
+              }),
+            ),
+          }));
+
+        await Promise.all(
+          invitations.map(async invitation => postInvitation(invitation)),
+        );
+      }
+
+      const data = {
+        ...workInProgressItem,
+        invited: [...workInProgressItem.invited, ...invited],
+      };
+
+      return this.setState(prevState => ({
+        ...prevState,
+        workInProgressItem: data,
+        isVisibleShareModal: false,
+        list: updateNode(prevState.list, workInProgressItem.id, data),
+        members: [
+          ...prevState.members,
+          ...invited.map(({ id, ...user }) => ({
+            id: user.userId,
+            name: user.email,
+            ...user,
+          })),
+        ],
+      }));
+    } catch (e) {
+      console.log(e.response);
     }
-
-    const data = {
-      ...workInProgressItem,
-      invited: [...workInProgressItem.invited, ...invited],
-    };
-
-    return this.setState(prevState => ({
-      ...prevState,
-      workInProgressItem: data,
-      isVisibleShareModal: false,
-      list: updateNode(prevState.list, workInProgressItem.id, data),
-      members: [
-        ...prevState.members,
-        ...invited.map(({ id, ...user }) => ({
-          id: user.userId,
-          name: user.email,
-          ...user,
-        })),
-      ],
-    }));
   };
 
   handleRemoveShare = id => async () => {

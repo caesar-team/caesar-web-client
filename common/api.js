@@ -69,14 +69,14 @@ export const postKeys = data => callApi.post('/keys', data);
 
 export const getKeys = () => callApi.get('/keys');
 
-export const getQrCode = () => callApi.get('/2fa');
+export const getQrCode = () => callApi.get('/auth/2fa');
 
 export const getBackupCodes = () => callApi.get('/auth/2fa/backups');
 
 export const postActivateTwoFactor = data =>
-  callApi.post('/2fa/activate', data);
+  callApi.post('/auth/2fa/activate', data);
 
-export const postCheckTwoFactor = data => callApi.post('/2fa', data);
+export const postCheckTwoFactor = data => callApi.post('/auth/2fa', data);
 
 // post
 export const getList = token =>
@@ -131,13 +131,15 @@ export const getPublicKeyByEmail = email => callApi.get(`/key/${email}`);
 export const postNewUser = data => callApi.post('/user', data);
 
 export const postLoginPrepare = data =>
-  callApi.post('/srp/login_prepare', data);
+  callApi.post('/auth/srpp/login_prepare', data);
 
-export const postLogin = data => callApi.post('/srp/login', data);
+export const postLogin = data => callApi.post('/auth/srpp/login', data);
 
-export const postRegistration = data => callApi.post('/srp/registration', data);
+export const postRegistration = data =>
+  callApi.post('/auth/srpp/registration', data);
 
-export const postChangePassword = data => callApi.patch('/srp/password', data);
+export const postChangePassword = data =>
+  callApi.patch('/auth/srpp/password', data);
 
 export const getCheckShare = id => callApi.get(`/anonymous/share/${id}/check`);
 
@@ -151,4 +153,4 @@ export const getOfferedItems = () => callApi.get('/offered_item');
 export const patchAcceptItem = data => callApi.patch('/accept_item', data);
 
 export const patchResetPassword = (token, data) =>
-  callApi.patch(`/srp/reset/${token}`, data);
+  callApi.patch(`/auth/srpp/reset/${token}`, data);

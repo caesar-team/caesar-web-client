@@ -90,7 +90,11 @@ class Credentials extends Component {
 
     return (
       <Wrapper>
-        <ItemHeader isSharedItem={isSharedItem} {...this.props} />
+        <ItemHeader
+          isSharedItem={isSharedItem}
+          allLists={allLists}
+          {...this.props}
+        />
         <FieldWrapper>
           <Field>
             <Label>Login</Label>

@@ -41,6 +41,7 @@ FROM base AS release
 COPY --from=dependencies /var/app/node_modules ./node_modules
 COPY --from=build /var/app/.next ./.next
 COPY ./server.js ./server.js
+COPY ./next.config.js ./next.config.js
 
 # Setup environment variables
 ENV NODE_ENV=production

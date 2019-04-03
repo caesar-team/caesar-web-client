@@ -16,6 +16,7 @@ export const Document = props => {
     allLists = [],
     onClickMoveToTrash,
     isTrashItem,
+    isReadOnly,
     isSharedItem,
     item: {
       listId,
@@ -30,7 +31,7 @@ export const Document = props => {
 
   return (
     <Wrapper>
-      <ItemHeader {...props} />
+      <ItemHeader isReadOnly={isReadOnly} allLists={allLists} {...props} />
       <FieldWrapper>
         {listName && (
           <Field>

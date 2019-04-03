@@ -69,6 +69,7 @@ class Credentials extends Component {
       allLists = [],
       onClickMoveToTrash,
       isTrashItem,
+      isReadOnly,
       isSharedItem = false,
       item: {
         listId,
@@ -92,6 +93,7 @@ class Credentials extends Component {
       <Wrapper>
         <ItemHeader
           isSharedItem={isSharedItem}
+          isReadOnly={isReadOnly}
           allLists={allLists}
           {...this.props}
         />

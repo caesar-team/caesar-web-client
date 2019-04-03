@@ -363,6 +363,28 @@ class DashboardContainer extends Component {
     }
   };
 
+  handleClickMoveItem = async (_, listId) => {
+    const { workInProgressItem } = this.state;
+
+    await updateMoveItem(workInProgressItem.id, { listId });
+
+    this.setState(prevState => ({
+      ...prevState,
+      selectedListId: listId,
+      workInProgressItem: {
+        ...prevState.workInProgressItem,
+        listId,
+      },
+      list: replaceNode(
+        updateNode(prevState.list, workInProgressItem.id, {
+          listId,
+        }),
+        workInProgressItem.id,
+        listId,
+      ),
+    }));
+  };
+
   handleFinishEditWorkflow = async (
     { listId, attachments, type, ...secret },
     { setSubmitting },
@@ -1225,6 +1247,7 @@ class DashboardContainer extends Component {
                 allLists={allLists}
                 user={user}
                 members={this.normalize(members)}
+                onClickMoveItem={this.handleClickMoveItem}
                 onClickCloseItem={this.handleClickCloseItem}
                 onClickInvite={this.handleClickInvite}
                 onClickShare={this.handleClickShare}

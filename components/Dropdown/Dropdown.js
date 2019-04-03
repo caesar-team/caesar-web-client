@@ -46,6 +46,7 @@ const Option = styled.button`
   padding: 10px 30px;
   border: none;
   background: none;
+  cursor: pointer;
 `;
 
 const Button = styled.button`
@@ -89,18 +90,17 @@ class DropdownInner extends Component {
   renderOptions() {
     const { options, optionRender } = this.props;
 
-    return options.map(
-      ({ label, value }, index) =>
-        optionRender ? (
-          cloneElement(optionRender(value, label), {
-            key: index,
-            onClick: this.handleClick(value),
-          })
-        ) : (
-          <Option key={index} onClick={this.handleClick(value)}>
-            {label}
-          </Option>
-        ),
+    return options.map(({ label, value }, index) =>
+      optionRender ? (
+        cloneElement(optionRender(value, label), {
+          key: index,
+          onClick: this.handleClick(value),
+        })
+      ) : (
+        <Option key={index} onClick={this.handleClick(value)}>
+          {label}
+        </Option>
+      ),
     );
   }
 

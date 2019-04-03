@@ -1,10 +1,13 @@
-import React, { Fragment } from 'react';
+import React, { Component, Fragment } from 'react';
 import styled from 'styled-components';
 import { formatDate } from 'common/utils/dateUtils';
 import { Icon } from 'components/Icon';
 import { Button } from 'components/Button';
 import { Avatar, AvatarsList } from 'components/Avatar';
+import { Dropdown } from 'components/Dropdown';
+import Link from 'next/link';
 import { Row } from './Row';
+import { TRASH_TYPE } from '../../../../common/constants';
 
 const StyledRow = styled(Row)`
   margin-top: 10px;
@@ -105,7 +108,42 @@ const FavoriteButton = styled.button`
   }
 `;
 
+const StyledDropdown = styled(Dropdown)`
+  width: 100%;
+`;
+
+const Option = styled.div`
+  width: 106px;
+  padding: 3px;
+  cursor: pointer;
+`;
+
+const MoveTo = styled.a`
+  cursor: pointer;
+  height: 40px;
+  font-size: 14px;
+  letter-spacing: 0.4px;
+  border-radius: 3px;
+  outline: none;
+  padding: 10px 20px;
+  transition: all 0.2s;
+  border: 1px solid ${({ theme }) => theme.gallery};
+
+  &:hover {
+    border: 1px solid ${({ theme }) => theme.black};
+  }
+`;
+
+const Options = (
+  <Fragment>
+    <Option>smth</Option>
+    <Option>smth 1</Option>
+  </Fragment>
+);
+
 export const ItemHeader = ({
+  allLists,
+  isReadOnly,
   hasWriteAccess,
   isTrashItem,
   isSharedItem,
@@ -117,9 +155,11 @@ export const ItemHeader = ({
   onClickInvite,
   onClickShare,
   onClickRestoreItem,
+  onClickMoveItem,
   onToggleFavorites,
   item: {
     id: itemId,
+    listId,
     lastUpdated,
     invited,
     favorite,
@@ -157,11 +197,20 @@ export const ItemHeader = ({
   const hasInvited = invited.length > 0;
   const isOwner = user.id === owner.id;
 
+  const options = allLists
+    .filter(({ id, type }) => type !== TRASH_TYPE && id !== listId)
+    .map(({ label, id }) => ({ value: id, label }));
+
   return (
     <Fragment>
       <Row>
         <UpdatedDate>Last updated {formatDate(lastUpdated)}</UpdatedDate>
         <Row>
+          {isReadOnly && (
+            <StyledDropdown options={options} onClick={onClickMoveItem}>
+              <MoveTo>MOVE TO</MoveTo>
+            </StyledDropdown>
+          )}
           {isTrashItem ? (
             <ButtonsWrapper>
               <Button color="white" onClick={onClickRestoreItem}>

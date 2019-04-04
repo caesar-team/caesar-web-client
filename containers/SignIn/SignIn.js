@@ -13,7 +13,7 @@ import {
   AuthTitle,
   AuthDescription,
   Button,
-  TextWithLines,
+  TextWithLines, AuthLayout,
 } from 'components';
 import { login } from 'common/utils/authUtils';
 import { getTrustedDeviceToken, setToken } from 'common/utils/token';
@@ -22,6 +22,7 @@ import BgRightImg2x from 'static/images/bg-right@2x.jpg';
 import BgLeftImg from 'static/images/bg-left.jpg';
 import BgLeftImg2x from 'static/images/bg-left@2x.jpg';
 import SignInForm from './SignInForm';
+import SignUpForm from '../SignUp/SignUpForm';
 
 const Wrapper = styled.div`
   display: flex;
@@ -38,6 +39,8 @@ const InnerWrapper = styled.div`
   flex-direction: column;
   align-items: center;
   justify-content: center;
+  flex: 1;
+  min-height: calc(100vh - 240px);
 `;
 
 const TopWrapper = styled.div`
@@ -45,7 +48,6 @@ const TopWrapper = styled.div`
   align-items: center;
   justify-content: space-between;
   width: 100%;
-  margin-bottom: 100px;
 `;
 
 const BgRightImage = styled.img`
@@ -112,8 +114,7 @@ const BottomWrapper = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
-  position: absolute;
-  bottom: 30px;
+  margin-top: 40px;
 `;
 
 const FourXXIText = styled.div`
@@ -163,53 +164,44 @@ class SignInContainer extends Component {
     }
   };
 
-  render() {
+  renderHeader() {
     const { router } = this.props;
+
+    return (
+      <Fragment>
+        <IconWrapper>
+          <Icon name="logo-new" height={40} width={142} />
+        </IconWrapper>
+        <StyledButton onClick={() => router.push('/signup')}>
+          Sign Up
+        </StyledButton>
+      </Fragment>
+    );
+  }
+
+  render() {
     const { googleAuthUrl } = this.state;
     const isLinkShown = googleAuthUrl !== '';
 
+    const renderedHeader = this.renderHeader();
+
     return (
-      <Wrapper>
-        <TopWrapper>
-          <IconWrapper>
-            <Icon name="logo-new" height={40} width={142} />
-          </IconWrapper>
-          <StyledButton onClick={() => router.push('/signup')}>
-            Sign Up
-          </StyledButton>
-        </TopWrapper>
-        <BgRightImage
-          src={BgRightImg}
-          srcSet={`${BgRightImg} 1x, ${BgRightImg2x} 2x`}
-        />
-        <BgLeftImage
-          src={BgRightImg}
-          srcSet={`${BgLeftImg} 1x, ${BgLeftImg2x} 2x`}
-        />
-        <InnerWrapper>
-          <AuthTitle>Nice to meet you!</AuthTitle>
-          <AuthDescription>Welcome to Caesar</AuthDescription>
-          <SignInForm onSubmit={this.handleSubmit} />
-          {isLinkShown && (
-            <Fragment>
-              <TextWithLines width={1}>OR</TextWithLines>
-              <AuthWrapper href={googleAuthUrl}>
-                <GoogleLogoWrapper>
-                  <Icon name="google" width={20} height={20} isInButton />
-                </GoogleLogoWrapper>
-                <GoogleAuthText>Log in with Google</GoogleAuthText>
-              </AuthWrapper>
-            </Fragment>
-          )}
-        </InnerWrapper>
-        <BottomWrapper>
-          <Icon name="logo-4xxi" width={20} height={20} />
-          <FourXXIText>
-            Created and supported by{' '}
-            <FourXXILink href="https://4xxi.com/en">4xxi team</FourXXILink>
-          </FourXXIText>
-        </BottomWrapper>
-      </Wrapper>
+      <AuthLayout headerComponent={renderedHeader}>
+        <AuthTitle>Nice to meet you!</AuthTitle>
+        <AuthDescription>Welcome to Caesar</AuthDescription>
+        <SignInForm onSubmit={this.handleSubmit} />
+        {isLinkShown && (
+          <Fragment>
+            <TextWithLines width={1}>OR</TextWithLines>
+            <AuthWrapper href={googleAuthUrl}>
+              <GoogleLogoWrapper>
+                <Icon name="google" width={20} height={20} isInButton />
+              </GoogleLogoWrapper>
+              <GoogleAuthText>Log in with Google</GoogleAuthText>
+            </AuthWrapper>
+          </Fragment>
+        )}
+      </AuthLayout>
     );
   }
 }

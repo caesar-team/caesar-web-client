@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { Component, Fragment } from 'react';
 import {
   getQrCode,
   getBackupCodes,
@@ -7,6 +7,7 @@ import {
 } from 'common/api';
 import { getTrustedDeviceToken, setToken } from 'common/utils/token';
 import { matchStrict } from 'common/utils/match';
+import { Head } from 'components';
 import {
   TWO_FACTOR_CREATE,
   TWO_FACTOR_CHECK,
@@ -110,7 +111,7 @@ class TwoFactorStep extends Component {
 
     const allowReturn = initialStep === TWO_FACTOR_CREATE;
 
-    return matchStrict(
+    const renderedStep = matchStrict(
       step,
       {
         [TWO_FACTOR_CREATE]: (
@@ -135,6 +136,13 @@ class TwoFactorStep extends Component {
         ),
       },
       null,
+    );
+
+    return (
+      <Fragment>
+        <Head title="Two-Factor" />
+        {renderedStep}
+      </Fragment>
     );
   }
 }

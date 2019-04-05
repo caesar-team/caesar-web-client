@@ -44,7 +44,7 @@ class PasswordStep extends Component {
   render() {
     return (
       <Wrapper>
-        <Head title="Enter password which you received" />
+        <Head title="Password" />
         <AuthTitle>Change Password</AuthTitle>
         <AuthDescription>Enter and confirm new password</AuthDescription>
         <PasswordForm onSubmit={this.handleSubmit} />

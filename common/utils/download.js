@@ -1,8 +1,10 @@
 export function downloadElement(elementId) {
   const a = document.body.appendChild(document.createElement('a'));
 
-  a.download = 'export.html';
-  a.href = `data:text/html,${document.getElementById(elementId).innerHTML}`;
+  a.download = 'export.txt';
+  a.href = `data:text/plain;charset=utf-8,${
+    document.getElementById(elementId).innerText
+  }`;
 
   a.click();
 }

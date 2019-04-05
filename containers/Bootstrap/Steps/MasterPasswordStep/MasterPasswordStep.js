@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { Component, Fragment } from 'react';
 import styled from 'styled-components';
 import { getKeys, postKeys } from 'common/api';
 import { matchStrict } from 'common/utils/match';
@@ -7,7 +7,7 @@ import {
   generateKeys,
   reencryptPrivateKey,
 } from 'common/utils/key';
-import { BootstrapLayout } from 'components';
+import { BootstrapLayout, Head } from 'components';
 import {
   MASTER_PASSWORD_CHECK,
   MASTER_PASSWORD_CREATE,
@@ -210,12 +210,17 @@ class MasterPasswordStep extends Component {
       null,
     );
 
-    return step === MASTER_PASSWORD_CHECK ? (
-      <MasterPasswordCheckForm onSubmit={this.handleSubmitCheckPassword} />
-    ) : (
-      <BootstrapLayout>
-        <Wrapper>{renderedStep}</Wrapper>
-      </BootstrapLayout>
+    return (
+      <Fragment>
+        <Head title="Master Password" />
+        {step === MASTER_PASSWORD_CHECK ? (
+          <MasterPasswordCheckForm onSubmit={this.handleSubmitCheckPassword} />
+        ) : (
+          <BootstrapLayout>
+            <Wrapper>{renderedStep}</Wrapper>
+          </BootstrapLayout>
+        )}
+      </Fragment>
     );
   }
 }

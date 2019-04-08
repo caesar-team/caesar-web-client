@@ -20,6 +20,7 @@ export const MAX_SIZE_RANDOM_BUFFER = 60000;
 export const ROOT_TYPE = 'root';
 export const INBOX_TYPE = 'inbox';
 export const LIST_TYPE = 'list';
+export const DEFAULT_LIST_TYPE = 'default';
 export const TRASH_TYPE = 'trash';
 export const FAVORITES_TYPE = 'favorites';
 export const LIST_TYPES = {

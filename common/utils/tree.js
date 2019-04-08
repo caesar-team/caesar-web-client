@@ -68,9 +68,8 @@ export const replaceNode = (root, replacedNodeId, toNodeId) => {
 };
 
 export const findNode = (root, fnOrNodeId) =>
-  root.first(
-    node =>
-      typeof fnOrNodeId === 'function'
-        ? fnOrNodeId(node)
-        : node.model.id === fnOrNodeId,
+  root.first(node =>
+    typeof fnOrNodeId === 'function'
+      ? fnOrNodeId(node)
+      : node.model.id === fnOrNodeId,
   );

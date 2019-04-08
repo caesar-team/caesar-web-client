@@ -2,6 +2,7 @@ import React from 'react';
 import styled from 'styled-components';
 import { Formik, FastField } from 'formik';
 import { checkError } from 'common/utils/formikUtils';
+import { upperFirst } from 'common/utils/string';
 import { ITEM_WORKFLOW_EDIT_MODE, TRASH_TYPE } from 'common/constants';
 import {
   Uploader,
@@ -11,7 +12,6 @@ import {
   Select,
   TextArea,
   File,
-  Icon,
   FormInput,
 } from 'components';
 import { Form } from '../components';
@@ -173,7 +173,7 @@ const CredentialsForm = ({
     .filter(({ type: listType }) => listType !== TRASH_TYPE)
     .map(({ id, label }) => ({
       value: id,
-      label,
+      label: upperFirst(label),
     }));
 
   return (

@@ -3,6 +3,7 @@ import styled from 'styled-components';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import { AvatarsList } from 'components/Avatar';
 import Link from 'next/link';
+import { DEFAULT_LIST_TYPE } from 'common/constants';
 import { Icon } from '../Icon';
 import { ListOptions } from './ListOptions';
 
@@ -116,9 +117,13 @@ class ManageList extends Component {
     } = this.props;
 
     const generateAvatars = invitedIds =>
-      invitedIds.map(item => members[item.id]);
+      invitedIds.map(item => members[item.userId]);
 
-    const renderedItems = list.map((listItem, index) => (
+    const filteredList = list.filter(
+      ({ label }) => label !== DEFAULT_LIST_TYPE,
+    );
+
+    const renderedItems = filteredList.map((listItem, index) => (
       <Draggable key={listItem.id} draggableId={listItem.id} index={index}>
         {provided => (
           <TableRow

@@ -34,6 +34,7 @@ import {
   ROOT_TYPE,
   INBOX_TYPE,
   LIST_TYPE,
+  DEFAULT_LIST_TYPE,
   TRASH_TYPE,
   FAVORITES_TYPE,
   ITEM_REVIEW_MODE,
@@ -43,7 +44,6 @@ import {
   INVITE_TYPE,
   SHARE_TYPE,
   USER_ROLE,
-  READ_ONLY_USER_ROLE,
   ANONYMOUS_USER_ROLE,
   PERMISSION_WRITE,
 } from 'common/constants';
@@ -200,10 +200,23 @@ class DashboardContainer extends Component {
   };
 
   handleClickCreateItem = (name, value) => {
+    const { list, selectedListId } = this.state;
+
+    const listNode = findNode(list, selectedListId).model;
+    const defaultListNode = findNode(
+      list,
+      node => node.model.label === DEFAULT_LIST_TYPE,
+    );
+
     this.setState(prevState => ({
       ...prevState,
       workInProgressItem: {
-        ...initialItemData(value, prevState.selectedListId),
+        ...initialItemData(
+          value,
+          listNode.type === INBOX_TYPE
+            ? defaultListNode.model.id
+            : selectedListId,
+        ),
         mode: ITEM_WORKFLOW_CREATE_MODE,
       },
     }));
@@ -302,12 +315,10 @@ class DashboardContainer extends Component {
     }
   };
 
-  handleFinishCreateWorkflow = async ({
-    listId,
-    attachments,
-    type,
-    ...secret
-  }, { setSubmitting }) => {
+  handleFinishCreateWorkflow = async (
+    { listId, attachments, type, ...secret },
+    { setSubmitting },
+  ) => {
     const { publicKey } = this.props;
     const { user } = this.state;
 

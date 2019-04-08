@@ -4,6 +4,7 @@ import { Formik, FastField } from 'formik';
 import { checkError } from 'common/utils/formikUtils';
 import { ITEM_WORKFLOW_EDIT_MODE, TRASH_TYPE } from 'common/constants';
 import { Uploader, Input, Button, Select, TextArea, File } from 'components';
+import { upperFirst } from 'common/utils/string';
 import { Form } from '../components';
 import { schema } from './schema';
 
@@ -153,7 +154,7 @@ const DocumentForm = ({
     .filter(({ type: listType }) => listType !== TRASH_TYPE)
     .map(({ id, label }) => ({
       value: id,
-      label,
+      label: upperFirst(label),
     }));
 
   return (
@@ -222,10 +223,10 @@ const DocumentForm = ({
               onChange={setFieldValue}
             />
             {errors &&
-            errors.attachments &&
-            typeof errors.attachments === 'string' && (
-              <ErrorStyled>{errors.attachments}</ErrorStyled>
-            )}
+              errors.attachments &&
+              typeof errors.attachments === 'string' && (
+                <ErrorStyled>{errors.attachments}</ErrorStyled>
+              )}
             <Attachments>
               {renderAttachments(
                 values.attachments,

@@ -134,7 +134,7 @@ class SelectInner extends Component {
 
     const iconName = isOpened ? 'arrow-up-big' : 'arrow-down-big';
     const selectedLabel = value
-      ? options.find(({ value: optionValue }) => optionValue === value).label
+      ? (options.find(({ value: optionValue }) => optionValue === value) || {}).label
       : placeholder;
 
     return (
@@ -142,15 +142,14 @@ class SelectInner extends Component {
         <SelectedOption onClick={this.handleClickToggle} {...props}>
           <ValueText>
             {selectedLabel}
-            {isCancellable &&
-              selectedLabel && (
-                <IconCloseStyled
-                  name="close"
-                  width={12}
-                  height={12}
-                  onClick={this.handleClickCancel}
-                />
-              )}
+            {isCancellable && selectedLabel && (
+              <IconCloseStyled
+                name="close"
+                width={12}
+                height={12}
+                onClick={this.handleClickCancel}
+              />
+            )}
           </ValueText>
           <Icon name={iconName} width={16} height={16} />
         </SelectedOption>

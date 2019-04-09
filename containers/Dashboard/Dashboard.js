@@ -108,6 +108,8 @@ class DashboardContainer extends Component {
   async componentDidMount() {
     this.worker = new DecryptWorker();
 
+    this.props.fetchNodesRequest();
+
     const { data: list } = await getList();
     const { data: user } = await getUserSelf();
     const { data: members } = await getUsers();

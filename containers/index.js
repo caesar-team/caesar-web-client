@@ -1,4 +1,4 @@
-export { Bootstrap } from './Bootstrap';
+export { default as Bootstrap } from './Bootstrap';
 export { default as DashboardContainer } from './Dashboard';
 export { ManageListContainer } from './ManageList';
 export { Sharing } from './Sharing';

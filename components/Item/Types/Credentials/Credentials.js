@@ -13,6 +13,7 @@ import {
   RemoveButton,
   RemoveButtonWrapper,
 } from '../components';
+import { TRASH_TYPE } from '../../../../common/constants';
 
 const StyledEyeIcon = styled(Icon)`
   margin-right: 20px;

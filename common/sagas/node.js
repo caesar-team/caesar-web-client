@@ -1,47 +1,135 @@
-import { take, put, call, takeLatest } from 'redux-saga/effects';
-import { eventChannel, END } from 'redux-saga';
-import threadify from 'common/utils/thread';
+import { take, put, call, takeLatest, select, all } from 'redux-saga/effects';
+import { eventChannel } from 'redux-saga';
+import deepequal from 'fast-deep-equal';
 import {
   FETCH_NODES_REQUEST,
+  REMOVE_ITEM_REQUEST,
+  MOVE_ITEM_REQUEST,
+  CREATE_ITEM_REQUEST,
+  EDIT_ITEM_REQUEST,
+  ACCEPT_ITEM_UPDATE_REQUEST,
+  TOGGLE_ITEM_TO_FAVORITE_REQUEST,
+  CHANGE_ITEM_PERMISSION_REQUEST,
+  INVITE_MEMBER_REQUEST,
+  INVITE_NEW_MEMBER_REQUEST,
+  REMOVE_INVITE_REQUEST,
+  SHARE_ITEM_REQUEST,
+  REMOVE_SHARE_REQUEST,
+  CREATE_ANONYMOUS_LINK_REQUEST,
+  REMOVE_ANONYMOUS_LINK_REQUEST,
   fetchNodesSuccess,
   fetchNodesFailure,
-  addNode,
-} from 'common/actions/nodes';
-import { normalizeNodes } from 'common/normalizers/nodes';
-import { getList } from 'common/api';
+  removeItemSuccess,
+  removeItemFailure,
+  moveItemSuccess,
+  moveItemFailure,
+  createItemSuccess,
+  createItemFailure,
+  editItemSuccess,
+  editItemFailure,
+  acceptItemUpdateSuccess,
+  acceptItemUpdateFailure,
+  toggleItemToFavoriteSuccess,
+  toggleItemToFavoriteFailure,
+  changeItemPermissionSuccess,
+  changeItemPermissionFailure,
+  inviteMemberSuccess,
+  inviteMemberFailure,
+  inviteNewMemberSuccess,
+  inviteNewMemberFailure,
+  removeInviteMemberSuccess,
+  removeInviteMemberFailure,
+  shareItemSuccess,
+  removeShareSuccess,
+  removeShareFailure,
+  createAnonymousLinkSuccess,
+  createAnonymousLinkFailure,
+  removeAnonymousLinkSuccess,
+  removeAnonymousLinkFailure,
+  addItem,
+  setWorkInProgressItem,
+  shareItemFailure,
+} from 'common/actions/node';
+import { normalizeNodes } from 'common/normalizers/node';
+import {
+  keyPairSelector,
+  masterPasswordSelector,
+  userDataSelector,
+} from 'common/selectors/user';
+import { memberListSelector } from 'common/selectors/member';
+import {
+  workInProgressItemSelector,
+  favoritesSelector,
+} from 'common/selectors/node';
+import {
+  getList,
+  removeItem,
+  updateMoveItem,
+  postCreateItem,
+  updateItem,
+  patchChildItemBatch,
+  acceptUpdateItem,
+  toggleFavorite,
+  patchChildAccess,
+  postCreateChildItem,
+  postInvitation,
+  removeChildItem,
+  patchChildItem,
+} from 'common/api';
+import DecryptWorker from 'common/decryption.worker.js';
+import {
+  encryptItem,
+  encryptItemForUsers,
+  getPrivateKeyObj,
+  decryptItem,
+  objectToBase64,
+  generateAnonymousEmail,
+} from 'common/utils/cipherUtils';
+import {
+  ANONYMOUS_USER_ROLE,
+  INVITE_TYPE,
+  ITEM_REVIEW_MODE,
+  PERMISSION_READ,
+  PERMISSION_WRITE,
+  SHARE_TYPE,
+  USER_ROLE,
+} from 'common/constants';
+import { generateInviteUrl, generateSharingUrl } from 'common/utils/sharing';
+import { createMemberSaga, getOrCreateMemberSaga } from './member';
 
 function createWebWorkerChannel(data) {
-  const decryptJob = threadify(function decryption(nodes) {
-    const thread = this;
+  const worker = new DecryptWorker();
 
-    nodes.map(node => {
-      console.log('iterate in worker', node);
-      thread.emit(node);
-    });
-
-    return thread.return();
-  });
+  worker.postMessage({ event: 'decryptItems', data });
 
   return eventChannel(emitter => {
-    const job = decryptJob(data);
+    worker.onmessage = ({ data: { event, item } }) => {
+      if (event === 'emitDecryptedItem') {
+        emitter(item);
+      }
+    };
 
-    job.emit = node => emitter(node);
-    job.terminated = () => emitter(END);
-
-    return () => job.terminate();
+    return () => worker.terminate();
   });
 }
 
-export function* decryptSaga(data) {
-  const channel = yield call(createWebWorkerChannel, data);
+export function* decryptSaga(items) {
+  const keyPair = yield select(keyPairSelector);
+  const masterPassword = yield select(masterPasswordSelector);
+
+  const channel = yield call(createWebWorkerChannel, {
+    items,
+    privateKey: keyPair.privateKey,
+    masterPassword,
+  });
 
   while (channel) {
     try {
-      const payload = yield take(channel);
+      const item = yield take(channel);
 
-      yield put(addNode(payload));
-    } catch (e) {
-      console.log(e);
+      yield put(addItem(item));
+    } catch (error) {
+      console.log(error);
     }
   }
 }
@@ -50,18 +138,544 @@ export function* fetchNodesSaga() {
   try {
     const { data } = yield call(getList);
 
-    const nodes = normalizeNodes(data);
+    const { listsById, itemsById } = normalizeNodes(data);
 
-    yield put(fetchNodesSuccess());
+    yield put(fetchNodesSuccess(listsById));
 
-    yield call(decryptSaga, Object.values(nodes.entities.nodesById));
-  } catch (e) {
-    console.log(e);
+    yield call(decryptSaga, Object.values(itemsById));
+  } catch (error) {
+    console.log(error);
 
     yield put(fetchNodesFailure());
   }
 }
 
+export function* removeItemSaga({ payload: { itemId, listId } }) {
+  try {
+    yield call(removeItem, itemId);
+    yield put(removeItemSuccess(itemId, listId));
+  } catch (error) {
+    console.log(error);
+
+    yield put(removeItemFailure());
+  }
+}
+
+export function* moveItemSaga({ payload: { listId } }) {
+  try {
+    const workInProgressItem = yield select(workInProgressItemSelector);
+
+    yield call(updateMoveItem, workInProgressItem.id, { listId });
+    yield put(
+      moveItemSuccess(workInProgressItem.id, workInProgressItem.listId, listId),
+    );
+  } catch (error) {
+    console.log(error);
+
+    yield put(moveItemFailure());
+  }
+}
+
+export function* createItemSaga({
+  payload: { item },
+  meta: { setSubmitting },
+}) {
+  try {
+    const { listId, attachments, type, ...secret } = item;
+
+    const keyPair = yield select(keyPairSelector);
+    const user = yield select(userDataSelector);
+
+    const encryptedItem = yield call(
+      encryptItem,
+      { attachments, ...secret },
+      keyPair.publicKey,
+    );
+
+    const {
+      data: { id: itemId, lastUpdated },
+    } = yield call(postCreateItem, {
+      listId,
+      type,
+      secret: encryptedItem,
+    });
+
+    const newItem = {
+      id: itemId,
+      listId,
+      lastUpdated,
+      favorite: false,
+      invited: [],
+      shared: [],
+      tags: [],
+      owner: user,
+      secret: { attachments, ...secret },
+      type,
+    };
+
+    yield put(createItemSuccess(newItem));
+    yield put(setWorkInProgressItem(newItem, ITEM_REVIEW_MODE));
+  } catch (error) {
+    console.log(error);
+
+    yield put(createItemFailure());
+  } finally {
+    setSubmitting(false);
+  }
+}
+
+export function* editItemSaga({ payload: { item }, meta: { setSubmitting } }) {
+  try {
+    const { listId, attachments, type, ...secret } = item;
+
+    const keyPair = yield select(keyPairSelector);
+    const workInProgressItem = yield select(workInProgressItemSelector);
+    const members = yield select(memberListSelector);
+    const user = yield select(userDataSelector);
+
+    const editedItemSecret = {
+      attachments,
+      ...secret,
+    };
+
+    const editedItem = {
+      ...workInProgressItem,
+      listId,
+      secret: editedItemSecret,
+    };
+
+    const isSecretChanged = !deepequal(
+      workInProgressItem.secret,
+      editedItemSecret,
+    );
+    const isListIdChanged = listId !== workInProgressItem.listId;
+
+    if (isListIdChanged) {
+      yield call(moveItemSaga, { payload: { listId } });
+    }
+
+    if (isSecretChanged) {
+      const encryptedItemSecret = yield call(
+        encryptItem,
+        editedItemSecret,
+        keyPair.publicKey,
+      );
+      const { invited, shared } = workInProgressItem;
+
+      console.log('invited', invited);
+
+      const filteredInvited = invited.filter(
+        ({ userId }) => userId !== user.id,
+      );
+
+      console.log('filteredInvited', filteredInvited);
+
+      if (!filteredInvited.length) {
+        yield call(updateItem, workInProgressItem.id, {
+          secret: encryptedItemSecret,
+        });
+      } else {
+        const invitedMembersIds = filteredInvited.map(({ userId }) => userId);
+        const invitedMemberKeys = members
+          .filter(({ id }) => invitedMembersIds.includes(id))
+          .map(member => member.publicKey);
+
+        const invitedEncryptedSecrets = yield call(
+          encryptItemForUsers,
+          editedItemSecret,
+          invitedMemberKeys,
+        );
+
+        const invitedChildItems = invitedEncryptedSecrets.map(
+          (encrypt, index) => ({
+            userId: invitedMembersIds[index],
+            secret: encrypt,
+          }),
+        );
+
+        if (invitedChildItems.length) {
+          yield call(patchChildItemBatch, {
+            collectionItems: [
+              {
+                originalItem: workInProgressItem.id,
+                items: [
+                  ...invitedChildItems,
+                  { userId: user.id, secret: encryptedItemSecret },
+                ],
+              },
+            ],
+          });
+        }
+      }
+
+      if (shared.length) {
+        const sharedMembersIds = shared.map(({ userId }) => userId);
+        const sharedUserKeys = shared.map(member => member.publicKey);
+
+        const sharedEncryptedSecrets = yield call(
+          encryptItemForUsers,
+          editedItemSecret,
+          sharedUserKeys,
+        );
+
+        const sharedChildItems = sharedEncryptedSecrets.map((encrypt, idx) => ({
+          userId: sharedMembersIds[idx],
+          secret: encrypt,
+        }));
+
+        if (sharedChildItems.length) {
+          yield call(patchChildItemBatch, {
+            collectionItems: [
+              {
+                originalItem: workInProgressItem.id,
+                items: sharedChildItems,
+              },
+            ],
+          });
+        }
+      }
+
+      yield put(editItemSuccess(editedItem));
+    }
+
+    yield put(setWorkInProgressItem(editedItem, ITEM_REVIEW_MODE));
+  } catch (error) {
+    console.log(error);
+
+    yield put(editItemFailure());
+  } finally {
+    setSubmitting(false);
+  }
+}
+
+export function* acceptItemSaga({ payload: { id } }) {
+  try {
+    const workInProgressItem = yield select(workInProgressItemSelector);
+    const keyPair = yield select(keyPairSelector);
+    const masterPassword = yield select(masterPasswordSelector);
+
+    const {
+      data: { secret, ...itemData },
+    } = yield call(acceptUpdateItem, id);
+
+    console.log('secret', secret);
+    console.log('itemData', itemData);
+
+    const privateKeyObj = yield call(
+      getPrivateKeyObj,
+      keyPair.privateKey,
+      masterPassword,
+    );
+
+    console.log('privateKeyObj', privateKeyObj);
+    const decryptedItemSecret = yield decryptItem(secret, privateKeyObj);
+
+    console.log('decryptedItemSecret', decryptedItemSecret);
+    const newItem = { ...itemData, secret: decryptedItemSecret };
+
+    yield put(acceptItemUpdateSuccess(newItem));
+    yield put(
+      setWorkInProgressItem(
+        { ...workInProgressItem, ...newItem },
+        ITEM_REVIEW_MODE,
+      ),
+    );
+  } catch (error) {
+    console.error(error);
+    yield put(acceptItemUpdateFailure(error));
+  }
+}
+
+export function* toggleItemToFavoriteSaga({ payload: { itemId } }) {
+  try {
+    const favoritesList = yield select(favoritesSelector);
+    const { data } = yield call(toggleFavorite, itemId);
+
+    yield put(
+      toggleItemToFavoriteSuccess(itemId, favoritesList.id, data.favorite),
+    );
+  } catch (error) {
+    console.log(error);
+    yield put(toggleItemToFavoriteFailure());
+  }
+}
+
+export function* changeItemPermissionSaga({ payload: { userId, permission } }) {
+  try {
+    const workInProgressItem = yield select(workInProgressItemSelector);
+
+    const childItem = workInProgressItem.invited.find(
+      invite => invite.userId === userId,
+    );
+
+    yield call(patchChildAccess, childItem.id, { access: permission });
+    yield put(
+      changeItemPermissionSuccess(workInProgressItem.id, userId, permission),
+    );
+  } catch (error) {
+    yield put(changeItemPermissionFailure());
+  }
+}
+
+export function* inviteMemberSaga({ payload: { userId } }) {
+  try {
+    const workInProgressItem = yield select(workInProgressItemSelector);
+    const members = yield select(memberListSelector);
+
+    const member = members.find(({ id }) => id === userId);
+
+    const encryptedItemSecret = yield call(
+      encryptItem,
+      workInProgressItem.secret,
+      member.publicKey,
+    );
+
+    const {
+      data: { items },
+    } = yield call(postCreateChildItem, workInProgressItem.id, {
+      items: [
+        {
+          userId: member.id,
+          secret: encryptedItemSecret,
+          cause: INVITE_TYPE,
+          access: PERMISSION_WRITE,
+        },
+      ],
+    });
+
+    yield put(inviteMemberSuccess(workInProgressItem.id, items[0].id, member));
+  } catch (error) {
+    console.log(error);
+    yield put(inviteMemberFailure());
+  }
+}
+
+export function* inviteNewMemberSaga({ payload: { email } }) {
+  try {
+    const { id, masterPassword, password } = yield call(createMemberSaga, {
+      payload: {
+        email,
+        role: USER_ROLE,
+      },
+    });
+
+    yield call(inviteMemberSaga, { payload: { userId: id } });
+
+    yield call(postInvitation, {
+      email,
+      url: generateInviteUrl(
+        objectToBase64({
+          e: email,
+          p: password,
+          mp: masterPassword,
+        }),
+      ),
+    });
+  } catch (error) {
+    console.log(error);
+    yield put(inviteNewMemberFailure());
+  }
+}
+
+export function* removeInviteMemberSaga({ payload: { userId } }) {
+  try {
+    const workInProgressItem = yield select(workInProgressItemSelector);
+
+    const childItem = workInProgressItem.invited.find(
+      invite => invite.userId === userId,
+    );
+
+    yield call(removeChildItem, childItem.id);
+
+    yield put(removeInviteMemberSuccess(workInProgressItem.id, userId));
+  } catch (error) {
+    console.log(error);
+    yield put(removeInviteMemberFailure());
+  }
+}
+
+export function* shareItemSaga({ payload: { emails } }) {
+  try {
+    const workInProgressItem = yield select(workInProgressItemSelector);
+
+    const itemInvitedUsers = workInProgressItem.invited.map(
+      ({ userId }) => userId,
+    );
+
+    const response = yield all([
+      ...emails.map(email =>
+        call(getOrCreateMemberSaga, { payload: { email, role: USER_ROLE } }),
+      ),
+    ]);
+
+    const users = response.filter(
+      user => !!user && !itemInvitedUsers.includes(user.userId),
+    );
+
+    const userKeys = users.map(({ publicKey }) => publicKey);
+
+    const invitedEncryptedSecrets = yield call(
+      encryptItemForUsers,
+      workInProgressItem.secret,
+      userKeys,
+    );
+
+    const invitedChildItems = invitedEncryptedSecrets.map((secret, idx) => ({
+      secret,
+      userId: users[idx].userId,
+      access: PERMISSION_READ,
+      cause: INVITE_TYPE,
+    }));
+
+    let invited = [];
+
+    if (invitedChildItems.length) {
+      const {
+        data: { items },
+      } = yield call(postCreateChildItem, workInProgressItem.id, {
+        items: invitedChildItems,
+      });
+
+      invited = items.map(({ id, lastUpdatedAt }, idx) => ({
+        id,
+        updatedAt: lastUpdatedAt,
+        userId: users[idx].userId,
+        email: users[idx].email,
+        access: PERMISSION_READ,
+      }));
+
+      const invitations = users
+        .filter(({ isNew }) => !!isNew)
+        .map(({ email, password, masterPassword }) => ({
+          email,
+          url: generateInviteUrl(
+            objectToBase64({
+              e: email,
+              p: password,
+              mp: masterPassword,
+            }),
+          ),
+        }));
+
+      yield all([...invitations.map(invitation => postInvitation(invitation))]);
+    }
+
+    yield put(shareItemSuccess(workInProgressItem.id, invited));
+  } catch (error) {
+    console.log(error);
+    yield put(shareItemFailure());
+  }
+}
+
+export function* removeShareSaga({ payload: { shareId } }) {
+  try {
+    const workInProgressItem = yield select(workInProgressItemSelector);
+
+    yield call(removeChildItem, shareId);
+
+    yield put(removeShareSuccess(workInProgressItem.id, shareId));
+  } catch (error) {
+    console.log(error);
+    yield put(removeShareFailure());
+  }
+}
+
+export function* createAnonymousLinkSaga() {
+  try {
+    const workInProgressItem = yield select(workInProgressItemSelector);
+
+    const email = generateAnonymousEmail();
+
+    const {
+      id: userId,
+      name,
+      password,
+      masterPassword,
+      publicKey,
+    } = yield call(createMemberSaga, {
+      payload: {
+        email,
+        role: ANONYMOUS_USER_ROLE,
+      },
+    });
+
+    const encryptedSecret = yield call(
+      encryptItem,
+      workInProgressItem.secret,
+      publicKey,
+    );
+
+    const {
+      data: { items },
+    } = yield call(postCreateChildItem, workInProgressItem.id, {
+      items: [
+        {
+          userId,
+          secret: encryptedSecret,
+          cause: SHARE_TYPE,
+          access: PERMISSION_READ,
+        },
+      ],
+    });
+
+    const link = generateSharingUrl(
+      items[0].id,
+      objectToBase64({
+        e: email,
+        p: password,
+        mp: masterPassword,
+      }),
+    );
+
+    yield call(patchChildItem, workInProgressItem.id, {
+      items: [{ userId, link, secret: encryptedSecret }],
+    });
+
+    yield put(
+      createAnonymousLinkSuccess(workInProgressItem.id, {
+        id: items[0].id,
+        userId,
+        email,
+        name,
+        link,
+        publicKey,
+        isAccepted: false,
+        roles: [ANONYMOUS_USER_ROLE],
+      }),
+    );
+  } catch (error) {
+    console.log(error);
+    yield put(createAnonymousLinkFailure());
+  }
+}
+
+export function* removeAnonymousLinkSaga() {
+  try {
+    const workInProgressItem = yield select(workInProgressItemSelector);
+
+    yield call(removeChildItem, workInProgressItem.shared[0].id);
+
+    yield put(removeAnonymousLinkSuccess(workInProgressItem.id));
+  } catch (error) {
+    console.log(error);
+    yield put(removeAnonymousLinkFailure());
+  }
+}
+
 export function* nodeSagas() {
   yield takeLatest(FETCH_NODES_REQUEST, fetchNodesSaga);
+  yield takeLatest(REMOVE_ITEM_REQUEST, removeItemSaga);
+  yield takeLatest(MOVE_ITEM_REQUEST, moveItemSaga);
+  yield takeLatest(CREATE_ITEM_REQUEST, createItemSaga);
+  yield takeLatest(EDIT_ITEM_REQUEST, editItemSaga);
+  yield takeLatest(ACCEPT_ITEM_UPDATE_REQUEST, acceptItemSaga);
+  yield takeLatest(TOGGLE_ITEM_TO_FAVORITE_REQUEST, toggleItemToFavoriteSaga);
+  yield takeLatest(CHANGE_ITEM_PERMISSION_REQUEST, changeItemPermissionSaga);
+  yield takeLatest(INVITE_MEMBER_REQUEST, inviteMemberSaga);
+  yield takeLatest(INVITE_NEW_MEMBER_REQUEST, inviteNewMemberSaga);
+  yield takeLatest(REMOVE_INVITE_REQUEST, removeInviteMemberSaga);
+  yield takeLatest(SHARE_ITEM_REQUEST, shareItemSaga);
+  yield takeLatest(REMOVE_SHARE_REQUEST, removeShareSaga);
+  yield takeLatest(CREATE_ANONYMOUS_LINK_REQUEST, createAnonymousLinkSaga);
+  yield takeLatest(REMOVE_ANONYMOUS_LINK_REQUEST, removeAnonymousLinkSaga);
 }

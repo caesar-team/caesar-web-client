@@ -6,6 +6,7 @@ import {
   TRASH_TYPE,
   FAVORITES_TYPE,
 } from 'common/constants';
+import { match } from 'common/utils/match';
 import Icon from '../Icon/Icon';
 import Badge from '../Badge/Badge';
 
@@ -54,65 +55,71 @@ class MenuList extends Component {
     }));
   };
 
-  renderTypes = ({ id, type, label, children }) => {
+  renderLists() {
+    const { lists, workInProgressList, onClick } = this.props;
     const { isVisibleList } = this.state;
-    const { selectedListId, onClick } = this.props;
 
-    const sortedChildren = children.sort((a, b) => a.sort - b.sort);
+    const keys = Object.keys(lists);
 
-    switch (type) {
-      case INBOX_TYPE:
-      case FAVORITES_TYPE:
-      case TRASH_TYPE: {
-        const isActive = id === selectedListId;
+    return keys.map(key => {
+      switch (key) {
+        case INBOX_TYPE:
+        case FAVORITES_TYPE:
+        case TRASH_TYPE: {
+          const { id, label, children } = lists[key];
+          const isActive = workInProgressList && workInProgressList.id === id;
 
-        return (
-          <MenuItem key={id} isActive={isActive} onClick={onClick(id)}>
-            {label}
-            {children.length > 0 && <Badge count={children.length} />}
-          </MenuItem>
-        );
-      }
-      case LIST_TYPE: {
-        const iconName = isVisibleList ? 'arrow-up-big' : 'arrow-down-big';
-
-        return (
-          <div key={id}>
-            <MenuItem key={id} onClick={this.handleToggle}>
+          return (
+            <MenuItem key={id} isActive={isActive} onClick={onClick(id)}>
               {label}
-              <StyledIcon name={iconName} width={14} height={14} />
+              {children.length > 0 && <Badge count={children.length} />}
             </MenuItem>
-            {isVisibleList && (
-              <div>
-                {sortedChildren.map(child => {
-                  const isActive = child.id === selectedListId;
+          );
+        }
+        case LIST_TYPE: {
+          const innerLists = lists[key];
+          const sortedChildren = innerLists.sort((a, b) => a.sort - b.sort);
+          const iconName = isVisibleList ? 'arrow-up-big' : 'arrow-down-big';
 
-                  return (
-                    <MenuItem
-                      key={child.id}
-                      isNested
-                      isActive={isActive}
-                      onClick={onClick(child.id)}
-                    >
-                      {child.label}
-                      {child.children.length > 0 && (
-                        <Badge count={child.children.length} />
-                      )}
-                    </MenuItem>
-                  );
-                })}
-              </div>
-            )}
-          </div>
-        );
+          return (
+            <div key="lists">
+              <MenuItem key="lists" onClick={this.handleToggle}>
+                Lists
+                <StyledIcon name={iconName} width={14} height={14} />
+              </MenuItem>
+              {isVisibleList && (
+                <div>
+                  {sortedChildren.map(child => {
+                    const isActive =
+                      workInProgressList && workInProgressList.id === child.id;
+
+                    return (
+                      <MenuItem
+                        key={child.id}
+                        isNested
+                        isActive={isActive}
+                        onClick={onClick(child.id)}
+                      >
+                        {child.label}
+                        {child.children.length > 0 && (
+                          <Badge count={child.children.length} />
+                        )}
+                      </MenuItem>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+          );
+        }
       }
-      default:
-        return null;
-    }
-  };
+    });
+  }
 
   render() {
-    return <Menu>{this.props.list.map(this.renderTypes)}</Menu>;
+    const renderedList = this.renderLists();
+
+    return <Menu>{renderedList}</Menu>;
   }
 }
 

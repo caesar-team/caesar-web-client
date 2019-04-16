@@ -79,6 +79,8 @@ class Bootstrap extends Component {
   }) => {
     const { sharedItemsState } = this.bootstrap;
 
+    this.props.setMasterPassword(masterPassword);
+
     this.setState({
       oldKeyPair,
       currentKeyPair,

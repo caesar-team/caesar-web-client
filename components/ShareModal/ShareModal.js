@@ -1,6 +1,5 @@
 import React, { Component, Fragment } from 'react';
 import styled from 'styled-components';
-import Toggle from 'react-toggle';
 import {
   Icon,
   Modal,
@@ -9,18 +8,12 @@ import {
   Checkbox,
   ShareInput,
   TextWithLines,
+  Toggle,
 } from 'components';
-import {
-  ANONYMOUS_USER_ROLE,
-  SHARED_ACCEPTED_STATUS,
-  SHARED_WAITING_STATUS,
-  APP_URL,
-} from 'common/constants';
-import { formatDate, dateDiffNow } from 'common/utils/dateUtils';
+import { formatDate } from 'common/utils/dateUtils';
 import { copyToClipboard } from 'common/utils/clipboard';
 import { base64ToObject, objectToBase64 } from 'common/utils/cipherUtils';
 import { generateSharingUrl } from 'common/utils/sharing';
-import 'common/styles/react-toggle.css';
 
 const ModalDescription = styled.div`
   padding-bottom: 20px;
@@ -151,19 +144,24 @@ const LeftTime = styled.div`
   margin: 0 20px 0 10px;
 `;
 
-const ResendLink = styled.a`
-  font-size: 14px;
-  letter-spacing: 0.4px;
-  text-decoration: underline;
-  cursor: pointer;
-`;
+const getEncryption = link => link.match(/\/([\w|+-]+)$/)[1];
+const getShareId = link => link.match(/share\/(.+)\//)[1];
 
-const getEncryption = link => link.replace(`${APP_URL}/share/`, '');
 const getAnonymousLink = shared =>
-  (shared.find(({ roles }) => roles.includes(ANONYMOUS_USER_ROLE)) || {}).link;
+  (shared.find(({ link }) => !!link) || {}).link;
 
 export class ShareModal extends Component {
   state = this.prepareInitialState();
+
+  static getDerivedStateFromProps(nextProps, prevState) {
+    if (prevState.isLoading && !!getAnonymousLink(nextProps.shared)) {
+      return {
+        isLoading: false,
+      };
+    }
+
+    return null;
+  }
 
   handleShareByLinkChange = () => {
     const {
@@ -175,7 +173,12 @@ export class ShareModal extends Component {
     const link = getAnonymousLink(shared);
 
     if (!link) {
-      onActivateSharedByLink();
+      this.setState(
+        {
+          isLoading: true,
+        },
+        onActivateSharedByLink,
+      );
     } else {
       onDeactivateSharedByLink();
     }
@@ -226,17 +229,19 @@ export class ShareModal extends Component {
       return link;
     }
 
-    const { masterPassword, ...linkData } = linkObj;
+    const { mp, ...linkData } = linkObj;
 
     return `${generateSharingUrl(
+      getShareId(link),
       objectToBase64(linkData),
-    )}\nMaster password: ${masterPassword}`;
+    )}\nMaster password: ${mp}`;
   }
 
   prepareInitialState() {
     return {
       emails: [],
       isUseMasterPassword: false,
+      isLoading: false,
     };
   }
 
@@ -260,12 +265,10 @@ export class ShareModal extends Component {
   }
 
   renderWaitingUsers() {
-    const { shared, onRemove, onResend } = this.props;
+    const { shared, onRemove } = this.props;
 
     const waitingList = shared.filter(
-      ({ roles, status }) =>
-        status === SHARED_WAITING_STATUS &&
-        !roles.includes(ANONYMOUS_USER_ROLE),
+      ({ link, isAccepted }) => !isAccepted && !link,
     );
 
     if (!waitingList.length) {
@@ -277,7 +280,6 @@ export class ShareModal extends Component {
         <SharedItemEmail>{email}</SharedItemEmail>
         <StyledIcon name="history" width={16} height={14} />
         <LeftTime>Left: {left} h</LeftTime>
-        <ResendLink onClick={onResend(id)}>Resend</ResendLink>
         <SharedItemRemove>
           <Icon
             name="close"
@@ -302,9 +304,7 @@ export class ShareModal extends Component {
     const { shared, onRemove } = this.props;
 
     const acceptedList = shared.filter(
-      ({ status, roles }) =>
-        status === SHARED_ACCEPTED_STATUS &&
-        !roles.includes(ANONYMOUS_USER_ROLE),
+      ({ isAccepted, link }) => isAccepted && !link,
     );
 
     if (!acceptedList.length) {
@@ -338,7 +338,7 @@ export class ShareModal extends Component {
   }
 
   render() {
-    const { isUseMasterPassword } = this.state;
+    const { isUseMasterPassword, isLoading } = this.state;
     const { onCancel, shared } = this.props;
 
     const link = getAnonymousLink(shared);
@@ -363,13 +363,13 @@ export class ShareModal extends Component {
           <ShareInput onChange={this.handleAddEmail} />
         </Row>
         {this.renderEmails()}
-        {this.renderWaitingUsers()}
-        {this.renderSharedUsers()}
+        {/* {this.renderWaitingUsers()} */}
+        {/* {this.renderSharedUsers()} */}
         <LinkRow>
           <ToggleLabel>
             <Toggle
               checked={!!link}
-              icons={false}
+              isLoading={isLoading}
               onChange={this.handleShareByLinkChange}
             />
             <ToggleLabelText>{switcherText}</ToggleLabelText>

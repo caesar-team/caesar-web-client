@@ -1,30 +1,36 @@
 import React, { Fragment } from 'react';
 import styled from 'styled-components';
 import { Icon } from 'components';
-import EmptyImg from 'static/images/empty.png';
-import EmptyImg2x from 'static/images/empty@2x.png';
+import EmptyLeftImg from 'static/images/empty-left.png';
+import EmptyRightImg from 'static/images/empty-right.png';
 
-const Image = styled.img`
-  padding-top: 45px;
-  padding-left: 15px;
-  object-fit: contain;
+const ImageLeft = styled.img`
+  position: absolute;
+  top: 0;
+  left: 0;
+`;
+
+const ImageRight = styled.img`
+  position: absolute;
+  bottom: 0;
+  right: 0;
 `;
 
 const StyledIcon = styled(Icon)`
   position: absolute;
-  top: 380px;
-  left: 240px;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  margin: auto auto;
   fill: ${({ theme }) => theme.emperor};
 `;
 
-const EmptyItem = props => (
+const EmptyItem = () => (
   <Fragment>
-    <Image
-      src={EmptyImg}
-      srcSet={`${EmptyImg} 1x, ${EmptyImg2x} 2x`}
-      {...props}
-    />
+    <ImageLeft src={EmptyLeftImg} />
     <StyledIcon name="logo" width={205} height={46} />
+    <ImageRight src={EmptyRightImg} />
   </Fragment>
 );
 

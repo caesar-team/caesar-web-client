@@ -1,6 +1,5 @@
-import React, { Component } from 'react';
+import React, { Component, Fragment } from 'react';
 import styled from 'styled-components';
-import Cookies from 'js-cookie';
 import { getKeys, postKeys } from 'common/api';
 import { matchStrict } from 'common/utils/match';
 import {
@@ -8,7 +7,7 @@ import {
   generateKeys,
   reencryptPrivateKey,
 } from 'common/utils/key';
-import { BootstrapWrapper } from 'components';
+import { BootstrapLayout, Head } from 'components';
 import {
   MASTER_PASSWORD_CHECK,
   MASTER_PASSWORD_CREATE,
@@ -18,9 +17,14 @@ import MasterPasswordCheckForm from './MasterPasswordCheckForm';
 import MasterPasswordCreateForm from './MasterPasswordCreateForm';
 import MasterPasswordConfirmForm from './MasterPasswordConfirmForm';
 
+const isSameKeyPair = (oldKeyPair, currentKeyPair) =>
+  oldKeyPair.publicKey === currentKeyPair.publicKey &&
+  oldKeyPair.encryptedPrivateKey === currentKeyPair.encryptedPrivateKey;
+
 const Wrapper = styled.div`
   max-width: 400px;
   width: 100%;
+  margin: 0 auto;
 `;
 
 class MasterPasswordStep extends Component {
@@ -37,13 +41,11 @@ class MasterPasswordStep extends Component {
     };
 
     if (initialStep === MASTER_PASSWORD_CREATE) {
-      // it's readonly situation
+      // it's readonly situation and new invited user
       if (sharedMasterPassword) {
         const {
           data: { publicKey, encryptedPrivateKey },
         } = await getKeys();
-
-        Cookies.remove('share', { path: '/' });
 
         state.publicKey = publicKey;
         state.encryptedPrivateKey = encryptedPrivateKey;
@@ -63,11 +65,13 @@ class MasterPasswordStep extends Component {
         try {
           await validateKeys(sharedMasterPassword, state.encryptedPrivateKey);
 
-          return this.onFinishMasterPassword(
-            state.publicKey,
-            state.encryptedPrivateKey,
-            sharedMasterPassword,
-          );
+          return this.onFinishMasterPassword({
+            currentKeyPair: {
+              publicKey: state.publicKey,
+              encryptedPrivateKey: state.encryptedPrivateKey,
+            },
+            masterPassword: sharedMasterPassword,
+          });
         } catch (e) {
           state.step = MASTER_PASSWORD_CHECK;
         }
@@ -77,17 +81,19 @@ class MasterPasswordStep extends Component {
     return this.setState(state);
   }
 
-  async onFinishMasterPassword(publicKey, encryptedPrivateKey, masterPassword) {
+  async onFinishMasterPassword({ oldKeyPair, currentKeyPair, masterPassword }) {
     const { onFinish } = this.props;
 
-    await postKeys({
-      publicKey,
-      encryptedPrivateKey,
-    });
+    if (oldKeyPair && !isSameKeyPair(oldKeyPair, currentKeyPair)) {
+      await postKeys({
+        publicKey: currentKeyPair.publicKey,
+        encryptedPrivateKey: currentKeyPair.encryptedPrivateKey,
+      });
+    }
 
     onFinish({
-      publicKey,
-      encryptedPrivateKey,
+      oldKeyPair,
+      currentKeyPair,
       masterPassword,
     });
   }
@@ -102,7 +108,10 @@ class MasterPasswordStep extends Component {
     try {
       await validateKeys(password, encryptedPrivateKey);
 
-      onFinish({ publicKey, encryptedPrivateKey, masterPassword: password });
+      onFinish({
+        currentKeyPair: { publicKey, encryptedPrivateKey },
+        masterPassword: password,
+      });
     } catch (error) {
       setErrors({ password: 'Wrong password' });
       setSubmitting(false);
@@ -146,11 +155,17 @@ class MasterPasswordStep extends Component {
         encryptedPrivateKey = data.privateKey;
       }
 
-      return this.onFinishMasterPassword(
-        publicKey,
-        encryptedPrivateKey,
+      return this.onFinishMasterPassword({
+        oldKeyPair: {
+          publicKey: currentPublicKey,
+          encryptedPrivateKey: currentEncryptedPrivateKey,
+        },
+        currentKeyPair: {
+          publicKey,
+          encryptedPrivateKey,
+        },
         masterPassword,
-      );
+      });
     } catch (error) {
       setErrors({ confirmPassword: 'Something wrong' });
       return setSubmitting(false);
@@ -195,12 +210,17 @@ class MasterPasswordStep extends Component {
       null,
     );
 
-    return step === MASTER_PASSWORD_CHECK ? (
-      <MasterPasswordCheckForm onSubmit={this.handleSubmitCheckPassword} />
-    ) : (
-      <BootstrapWrapper>
-        <Wrapper>{renderedStep}</Wrapper>
-      </BootstrapWrapper>
+    return (
+      <Fragment>
+        <Head title="Master Password" />
+        {step === MASTER_PASSWORD_CHECK ? (
+          <MasterPasswordCheckForm onSubmit={this.handleSubmitCheckPassword} />
+        ) : (
+          <BootstrapLayout>
+            <Wrapper>{renderedStep}</Wrapper>
+          </BootstrapLayout>
+        )}
+      </Fragment>
     );
   }
 }

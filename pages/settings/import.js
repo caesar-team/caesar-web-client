@@ -1,14 +1,19 @@
 import React, { Fragment } from 'react';
-import { Head } from 'components';
-import { SettingsImport } from 'containers';
-import { isServer } from '../../common/utils/isEnvironment';
-import { getToken } from '../../common/utils/token';
-import { getUserSelf } from '../../common/api';
+import { Head, SettingsLayout, SettingsSidebar } from 'components';
+import { Import } from 'containers';
+import { isServer } from 'common/utils/isEnvironment';
+import { getToken } from 'common/utils/token';
+import { getUserSelf } from 'common/api';
 
-const SettingsImportPage = props => (
+const SettingsImportPage = ({ user }) => (
   <Fragment>
     <Head title="Import" />
-    <SettingsImport {...props} />
+    <SettingsLayout user={user}>
+      <Fragment>
+        <SettingsSidebar />
+        <Import />
+      </Fragment>
+    </SettingsLayout>
   </Fragment>
 );
 

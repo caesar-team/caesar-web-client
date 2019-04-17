@@ -6,8 +6,8 @@ import Member from './Member';
 import { Modal } from '../Modal';
 import { Input } from '../Input';
 import { Icon } from '../Icon';
-import { Button } from '../Button';
 import { ModalTitle } from '../ModalTitle';
+import { Scrollbar } from '../Scrollbar';
 
 const StyledInput = styled(Input)`
   ${Input.InputField} {
@@ -35,6 +35,26 @@ const ListTitle = styled.div`
   color: ${({ theme }) => theme.emperor};
 `;
 
+const AddInviteBox = styled.div`
+  cursor: pointer;
+  box-shadow: 0 11px 23px 0 rgba(0, 0, 0, 0.1);
+`;
+
+const AddInvite = styled.div`
+  display: flex;
+  align-items: center;
+  padding: 10px;
+`;
+
+const InvitedEmail = styled.div`
+  font-weight: bold;
+  margin-left: 3px;
+`;
+
+const StyledIconInvite = styled(Icon)`
+  margin-right: 20px;
+`;
+
 const MembersWrapper = styled.div`
   display: flex;
   flex-direction: column;
@@ -42,28 +62,17 @@ const MembersWrapper = styled.div`
   margin-top: 15px;
 `;
 
-const ButtonsWrapper = styled.div`
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  padding: 30px 0 0;
-`;
-
 class InviteModal extends Component {
-  state = this.prepareInitialState();
+  state = {
+    filterText: '',
+  };
 
   filter = memoize((list, filterText) =>
-    list.filter(({ name }) => name.includes(filterText)),
+    list.filter(
+      ({ email, name }) =>
+        name.includes(filterText) || email.includes(filterText),
+    ),
   );
-
-  handleSubmit = event => {
-    event.preventDefault();
-
-    const { onClickInvite = Function.prototype } = this.props;
-    const { invited } = this.state;
-
-    onClickInvite(invited);
-  };
 
   handleChange = event => {
     event.preventDefault();
@@ -74,52 +83,38 @@ class InviteModal extends Component {
   };
 
   handleClickAdd = userId => () => {
-    this.setState(prevState => ({
-      ...prevState,
-      invited: [...prevState.invited, { userId, access: PERMISSION_WRITE }],
-    }));
+    const { onClickInvite } = this.props;
+
+    onClickInvite(userId);
   };
 
-  handlePermissionChange = userId => event => {
+  handleClickAddNewInvite = () => {
+    const { onClickAddNewMember } = this.props;
+    const { filterText } = this.state;
+
+    this.setState(
+      {
+        filterText: '',
+      },
+      () => onClickAddNewMember(filterText),
+    );
+  };
+
+  handleChangePermission = userId => event => {
     const { checked } = event.currentTarget;
+    const { onChangePermission } = this.props;
 
-    this.setState(prevState => ({
-      ...prevState,
-      invited: prevState.invited.reduce((acc, item) => {
-        if (item.userId === userId) {
-          acc.push({
-            ...item,
-            access: checked ? PERMISSION_READ : PERMISSION_WRITE,
-          });
-        } else {
-          acc.push(item);
-        }
-
-        return acc;
-      }, []),
-    }));
+    onChangePermission(userId, checked ? PERMISSION_READ : PERMISSION_WRITE);
   };
 
   handleClickRemove = userId => () => {
-    this.setState(prevState => ({
-      ...prevState,
-      invited: prevState.invited.filter(invite => invite.userId !== userId),
-    }));
+    const { onRemoveInvite } = this.props;
+
+    onRemoveInvite(userId);
   };
 
-  prepareInitialState() {
+  renderMemberList(filteredMembers) {
     const { invited } = this.props;
-
-    return {
-      filterText: '',
-      invited,
-    };
-  }
-
-  renderMemberList() {
-    const { members } = this.props;
-    const { filterText, invited } = this.state;
-    const filteredMembers = this.filter(members, filterText);
     const invitesByUserId = invited.reduce((acc, invite) => {
       acc[invite.userId] = invite;
       return acc;
@@ -135,7 +130,7 @@ class InviteModal extends Component {
           {...member}
           isReadOnly={isReadOnly}
           isInvited={Object.keys(invitesByUserId).includes(id)}
-          onClickPermissionChange={this.handlePermissionChange(id)}
+          onClickPermissionChange={this.handleChangePermission(id)}
           onClickAdd={this.handleClickAdd(id)}
           onClickRemove={this.handleClickRemove(id)}
         />
@@ -145,7 +140,11 @@ class InviteModal extends Component {
 
   render() {
     const { filterText } = this.state;
-    const { onCancel } = this.props;
+    const { members, onCancel } = this.props;
+
+    const filteredMembers = this.filter(members, filterText);
+    const shouldShowAddInviteOption =
+      !filteredMembers.length && !!filterText && filterText.includes('@');
 
     return (
       <Modal
@@ -162,13 +161,22 @@ class InviteModal extends Component {
           onChange={this.handleChange}
           prefix={<StyledIcon name="search" width={20} height={20} />}
         />
+        {shouldShowAddInviteOption && (
+          <AddInviteBox onClick={this.handleClickAddNewInvite}>
+            <AddInvite>
+              <StyledIconInvite name="plus" width={16} height={16} />
+              Invite <InvitedEmail>{filterText}</InvitedEmail>
+            </AddInvite>
+          </AddInviteBox>
+        )}
         <ListWrapper>
           <ListTitle>Team members</ListTitle>
-          <MembersWrapper>{this.renderMemberList()}</MembersWrapper>
+          <MembersWrapper>
+            <Scrollbar autoHeight autoHeightMax={400}>
+              {this.renderMemberList(filteredMembers)}
+            </Scrollbar>
+          </MembersWrapper>
         </ListWrapper>
-        <ButtonsWrapper>
-          <Button onClick={this.handleSubmit}>INVITE</Button>
-        </ButtonsWrapper>
       </Modal>
     );
   }

@@ -66,26 +66,37 @@ class Credentials extends Component {
     const { isPasswordVisible } = this.state;
 
     const {
-      allLists,
+      allLists = [],
       onClickMoveToTrash,
       isTrashItem,
+      isReadOnly,
+      isSharedItem = false,
       item: {
         listId,
-        secret: { login, pass, website, note, attachments },
+        secret: { login, pass, website, note, attachments = [] },
       },
     } = this.props;
 
     const pwd = isPasswordVisible ? pass : pass.replace(/./g, '*');
-    const listName = allLists.find(({ id }) => id === listId).label;
     const eyeIconName = isPasswordVisible ? 'eye-off' : 'eye-on';
+    const listName =
+      allLists.length > 0
+        ? allLists.find(({ id }) => id === listId).label
+        : null;
 
     const shouldShowWebsite = !!website;
     const shouldShowNote = !!note;
     const shouldShowAttachments = attachments.length > 0;
+    const shouldShowRemove = !isTrashItem && !isSharedItem;
 
     return (
       <Wrapper>
-        <ItemHeader {...this.props} />
+        <ItemHeader
+          isSharedItem={isSharedItem}
+          isReadOnly={isReadOnly}
+          allLists={allLists}
+          {...this.props}
+        />
         <FieldWrapper>
           <Field>
             <Label>Login</Label>
@@ -133,10 +144,12 @@ class Credentials extends Component {
               </FieldValue>
             </Field>
           )}
-          <Field>
-            <Label>List</Label>
-            <FieldValue>{listName}</FieldValue>
-          </Field>
+          {listName && (
+            <Field>
+              <Label>List</Label>
+              <FieldValue>{listName}</FieldValue>
+            </Field>
+          )}
           {shouldShowNote && (
             <Field>
               <Label>Note</Label>
@@ -145,7 +158,7 @@ class Credentials extends Component {
           )}
         </FieldWrapper>
         {shouldShowAttachments && <Attachments attachments={attachments} />}
-        {!isTrashItem && (
+        {shouldShowRemove && (
           <RemoveButtonWrapper>
             <RemoveButton
               color="white"

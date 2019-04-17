@@ -84,14 +84,14 @@ const StyledIcon = styled(Icon)`
 
 const Options = (
   <Fragment>
-    <Option key="lists">
-      <Link href="/manage">
-        <Anchor>Lists manage</Anchor>
+    <Option key="settings">
+      <Link href="/settings">
+        <Anchor>Settings</Anchor>
       </Link>
     </Option>
     <Option key="logout">
       <Link href="/logout">
-        <Anchor href="/logout">Log out</Anchor>
+        <Anchor>Logout</Anchor>
       </Link>
     </Option>
   </Fragment>
@@ -109,7 +109,7 @@ export class Header extends Component {
   };
 
   render() {
-    const { user, withSearch } = this.props;
+    const { user, withSearch = false } = this.props;
     const { isDropdownOpened } = this.state;
 
     return (
@@ -117,19 +117,23 @@ export class Header extends Component {
         <LeftWrapper withBorder={withSearch}>
           <Logo />
         </LeftWrapper>
-        <RightWrapper>
-          <UserSection>
-            <Avatar {...user} name={user.email} />
-            <StyledDropdown overlay={Options} onToggle={this.toggleDropdown}>
-              <UserName>{user.email}</UserName>
-              <StyledIcon
-                name={isDropdownOpened ? 'arrow-up-small' : 'arrow-down-small'}
-                width={10}
-                height={16}
-              />
-            </StyledDropdown>
-          </UserSection>
-        </RightWrapper>
+        {!!user && (
+          <RightWrapper>
+            <UserSection>
+              <Avatar {...user} name={user.email} />
+              <StyledDropdown overlay={Options} onToggle={this.toggleDropdown}>
+                <UserName>{user.email}</UserName>
+                <StyledIcon
+                  name={
+                    isDropdownOpened ? 'arrow-up-small' : 'arrow-down-small'
+                  }
+                  width={10}
+                  height={16}
+                />
+              </StyledDropdown>
+            </UserSection>
+          </RightWrapper>
+        )}
       </Wrapper>
     );
   }

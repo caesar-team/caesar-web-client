@@ -10,9 +10,8 @@ if (require('fs').existsSync(envFile)) {
   });
 }
 
-if (!process.env.APP_HOST || !process.env.APP_PORT) {
-  throw new Error('You must specify environment variables!');
-}
+const APP_URI = process.env.APP_URI || 'http://localhost';
+const APP_PORT = process.env.APP_PORT || 3000;
 
 const express = require('express');
 const next = require('next');
@@ -21,7 +20,6 @@ const helmet = require('helmet');
 
 const dev = process.env.NODE_ENV !== 'production';
 const app = next({ dev });
-const port = process.env.APP_PORT;
 const handle = app.getRequestHandler();
 
 app.prepare().then(() => {
@@ -30,10 +28,11 @@ app.prepare().then(() => {
   server.use(helmet());
   server.use(cookieParser());
   server.use(express.static('static'));
+
   server.get('/logout', (req, res) => {
     res.clearCookie('token');
     res.clearCookie('share');
-    res.redirect('/auth');
+    res.redirect('/signin');
   });
 
   server.get('/check_auth', (req, res) => {
@@ -43,12 +42,28 @@ app.prepare().then(() => {
       res.cookie('token', token, { path: '/' });
       res.redirect('/');
     } else {
-      res.redirect('/auth');
+      res.redirect('/signin');
     }
   });
 
-  server.get('/share/:encryption', (req, res) => {
-    app.render(req, res, '/share', { encryption: req.params.encryption });
+  server.get('/resetting/:email/:token', (req, res) => {
+    app.render(req, res, '/resetting', {
+      email: req.params.email,
+      token: req.params.token,
+    });
+  });
+
+  server.get('/share/:shareId/:encryption', (req, res) => {
+    app.render(req, res, '/share', {
+      shareId: req.params.shareId,
+      encryption: req.params.encryption,
+    });
+  });
+
+  server.get('/invite/:encryption', (req, res) => {
+    app.render(req, res, '/invite', {
+      encryption: req.params.encryption,
+    });
   });
 
   server.get('/', (req, res) => {
@@ -59,22 +74,21 @@ app.prepare().then(() => {
     handle(req, res);
   });
 
-  const instance = server.listen(port, error => {
+  const instance = server.listen(APP_PORT, error => {
     if (error) {
       throw error;
     }
 
-    console.log(
-      `> Ready on ${process.env.APP_PROTOCOL}://${process.env.APP_HOST}:${
-        process.env.APP_PORT
-      }`,
-    );
+    // eslint-disable-next-line no-console
+    console.log(`> Ready on ${APP_URI}:${APP_PORT}`);
   });
 
   process.on('SIGINT', () => {
+    // eslint-disable-next-line no-console
     console.info('SIGINT signal received.');
     instance.close(err => {
       if (err) {
+        // eslint-disable-next-line no-console
         console.error(err);
         process.exit(1);
       }

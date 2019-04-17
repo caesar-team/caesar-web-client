@@ -1,22 +1,21 @@
 import axios from 'axios';
-import Cookies from 'js-cookie';
-import { API_URL, API_BASE_PATH } from './constants';
+import { API_URI, API_BASE_PATH } from './constants';
 import { getToken, removeToken } from './utils/token';
 import { isClient } from './utils/isEnvironment';
 
 const softExit = () => {
   if (isClient) {
     removeToken();
-    Cookies.remove('share', { path: '/' });
 
-    if (window.location.pathname !== '/auth') {
-      window.location.href = '/auth';
+    // TODO: change via Router
+    if (window.location.pathname !== '/signin') {
+      window.location.href = '/signin';
     }
   }
 };
 
 const callApi = axios.create({
-  baseURL: `${API_URL}/${API_BASE_PATH}`,
+  baseURL: `${API_URI}/${API_BASE_PATH}`,
 });
 
 callApi.interceptors.request.use(config => {
@@ -70,14 +69,14 @@ export const postKeys = data => callApi.post('/keys', data);
 
 export const getKeys = () => callApi.get('/keys');
 
-export const getQrCode = () => callApi.get('/2fa');
+export const getQrCode = () => callApi.get('/auth/2fa');
 
 export const getBackupCodes = () => callApi.get('/auth/2fa/backups');
 
 export const postActivateTwoFactor = data =>
-  callApi.post('/2fa/activate', data);
+  callApi.post('/auth/2fa/activate', data);
 
-export const postCheckTwoFactor = data => callApi.post('/2fa', data);
+export const postCheckTwoFactor = data => callApi.post('/auth/2fa', data);
 
 // post
 export const getList = token =>
@@ -86,6 +85,9 @@ export const getList = token =>
       Authorization: token ? `Bearer ${token}` : '',
     },
   });
+
+export const patchListSort = (listId, data) =>
+  callApi.patch(`/list/${listId}/sort`, data);
 
 export const getUserBootstrap = () => callApi.get('/user/security/bootstrap');
 
@@ -99,23 +101,26 @@ export const updateMoveItem = (itemId, data) =>
 export const updateItem = (itemId, data) =>
   callApi.patch(`/item/${itemId}`, data);
 
-export const postInviteItem = (itemId, data) =>
-  callApi.post(`/item/${itemId}/invite`, data);
+export const postCreateChildItem = (itemId, data) =>
+  callApi.post(`/item/${itemId}/child_item`, data);
 
-export const changeInviteItem = (itemId, data) =>
-  callApi.put(`/item/${itemId}/invite`, data);
+export const patchChildAccess = (childItemId, data) =>
+  callApi.patch(`/child_item/${childItemId}/access`, data);
+
+export const patchChildItem = (childItemId, data) =>
+  callApi.patch(`/child_item/${childItemId}`, data);
 
 export const acceptUpdateItem = itemId =>
   callApi.post(`/item/${itemId}/accept_update`);
 
-export const changeInviteAccess = (inviteId, data) =>
-  callApi.patch(`/invite/${inviteId}`, data);
-
-export const deleteInviteItem = (inviteId, data) =>
-  callApi.delete(`/invite/${inviteId}`, data);
+export const removeChildItem = childItemId =>
+  callApi.delete(`/child_item/${childItemId}`);
 
 // list
 export const postCreateList = data => callApi.post('/list', data);
+
+export const patchList = (listId, data) =>
+  callApi.patch(`/list/${listId}`, data);
 
 export const removeList = listId => callApi.delete(`/list/${listId}`);
 
@@ -125,21 +130,27 @@ export const getPublicKeyByEmail = email => callApi.get(`/key/${email}`);
 
 export const postNewUser = data => callApi.post('/user', data);
 
-export const postShare = data => callApi.post('/share', data);
-
-export const postShares = data => callApi.post('/shares', data);
-
-export const updateShares = data => callApi.patch('/shares', data);
-
-export const updateShare = (id, data) => callApi.patch(`/shares/${id}`, data);
-
-export const deleteShare = id => callApi.delete(`/shares/${id}`);
-
 export const postLoginPrepare = data =>
-  callApi.post('/srp/login_prepare', data);
+  callApi.post('/auth/srpp/login_prepare', data);
 
-export const postLogin = data => callApi.post('/srp/login', data);
+export const postLogin = data => callApi.post('/auth/srpp/login', data);
 
-export const postChangePassword = data => callApi.patch('/srp/password', data);
+export const postRegistration = data =>
+  callApi.post('/auth/srpp/registration', data);
+
+export const postChangePassword = data =>
+  callApi.patch('/auth/srpp/password', data);
 
 export const getCheckShare = id => callApi.get(`/anonymous/share/${id}/check`);
+
+export const postInvitation = data => callApi.post('/invitation', data);
+
+export const patchChildItemBatch = data =>
+  callApi.patch('/child_item/batch', data);
+
+export const getOfferedItems = () => callApi.get('/offered_item');
+
+export const patchAcceptItem = data => callApi.patch('/accept_item', data);
+
+export const patchResetPassword = (token, data) =>
+  callApi.patch(`/auth/srpp/reset/${token}`, data);

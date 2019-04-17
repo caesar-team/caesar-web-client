@@ -67,7 +67,7 @@ export const Attachments = ({ attachments }) => {
   const renderedAttachments = attachments.map((attachment, index) => (
     <StyledFile
       key={index}
-      onClick={handleClickDownloadFile(index)}
+      onClickDownload={handleClickDownloadFile(index)}
       {...attachment}
     />
   ));

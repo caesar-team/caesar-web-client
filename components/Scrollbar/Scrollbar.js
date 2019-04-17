@@ -1,8 +1,9 @@
 import React from 'react';
 import { Scrollbars } from 'react-custom-scrollbars';
 
-const Scrollbar = ({ children, className }) => (
+const Scrollbar = ({ children, className, style, ...restProps }) => (
   <Scrollbars
+    style={style}
     className={className}
     renderTrackHorizontal={props => (
       <div {...props} style={{ display: 'none' }} />
@@ -16,6 +17,7 @@ const Scrollbar = ({ children, className }) => (
     renderThumbVertical={props => (
       <div {...props} style={{ display: 'none' }} />
     )}
+    {...restProps}
   >
     {children}
   </Scrollbars>

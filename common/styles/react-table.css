@@ -1,0 +1,55 @@
+.ReactTable .rt-thead .rt-th {
+  padding: 0 !important;
+  background: #fbf9f9;
+  border-right: 0 !important;
+}
+
+.ReactTable .rt-thead .rt-th:first-child {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.ReactTable .rt-td {
+  padding: 0 !important;
+  border-right: 0 !important;
+  display: flex;
+  align-items: center;
+}
+
+.ReactTable .rt-td:last-child {
+  overflow: inherit !important;
+}
+
+.ReactTable .rt-tbody .rt-td {
+  padding: 9px 1px !important;
+  border-right: 0;
+  font-size: 16px;
+  letter-spacing: 0.5px;
+  color: #000000;
+  display: flex;
+  align-items: center;
+}
+
+.ReactTable .rt-tbody .rt-td:first-child {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.rt-resizable-header-content {
+  font-size: 14px;
+  line-height: 20px;
+  letter-spacing: 0.4px;
+  color: #888888;
+  padding: 10px 0;
+}
+
+.ReactTable .rt-thead.-header {
+  box-shadow: none !important;
+  border-bottom: 1px solid #eaeaea;
+}
+
+[contenteditable]:focus {
+  outline: 1px solid #eaeaea;
+}

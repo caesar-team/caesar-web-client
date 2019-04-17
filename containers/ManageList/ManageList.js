@@ -1,20 +1,21 @@
-import React, { Component, Fragment } from 'react';
+import React, { Component } from 'react';
 import styled from 'styled-components';
 import {
-  Layout,
   ManageList,
   ListFormModal,
   ConfirmModal,
   withNotification,
+  Button,
 } from 'components';
 import {
   postCreateList,
+  patchList,
   removeList,
   getList,
   getUsers,
   getUserSelf,
+  patchListSort,
 } from 'common/api';
-import { createTree, removeNode, addNode, findNode } from 'common/utils/tree';
 import {
   LIST_WORKFLOW_EDIT_MODE,
   LIST_WORKFLOW_CREATE_MODE,
@@ -22,12 +23,63 @@ import {
 } from 'common/constants';
 import { initialListData, memberAdapter } from './utils';
 
-const ManageListWrapper = styled.div`
+const Wrapper = styled.div`
+  display: flex;
+  flex-direction: column;
+  background: ${({ theme }) => theme.lightBlue};
   width: 100%;
-  max-width: 1060px;
-  padding: 30px 20px 0;
-  margin: 0 auto;
+  padding: 60px;
 `;
+
+const TopWrapper = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 30px;
+`;
+
+const Title = styled.div`
+  font-size: 36px;
+  letter-spacing: 1px;
+  color: ${({ theme }) => theme.black};
+`;
+
+const Description = styled.div`
+  font-size: 18px;
+  letter-spacing: 0.6px;
+  color: ${({ theme }) => theme.black};
+  margin-bottom: 25px;
+`;
+
+const ManageListWrapper = styled.div`
+  display: flex;
+  flex-direction: column;
+  background: ${({ theme }) => theme.white};
+  padding: 30px;
+`;
+
+const reorder = (list, startIndex, endIndex) => {
+  const result = Array.from(list);
+  const [removed] = result.splice(startIndex, 1);
+  result.splice(endIndex, 0, removed);
+
+  return result;
+};
+
+const fixSort = lists => lists.map((list, index) => ({ ...list, sort: index }));
+
+const update = (list, listId, data) => {
+  const index = list.findIndex(({ id }) => id === listId);
+
+  return [
+    ...list.slice(0, index),
+    {
+      ...list[listId],
+      ...data,
+    },
+    ...list.slice(index + 1),
+  ];
+};
 
 class ManageListContainer extends Component {
   state = this.prepareInitialState();
@@ -38,7 +90,7 @@ class ManageListContainer extends Component {
     const { data: members } = await getUsers();
 
     this.setState({
-      list: createTree(list[1]),
+      list: list[1],
       user,
       members: memberAdapter(members),
     });
@@ -57,7 +109,7 @@ class ManageListContainer extends Component {
   handleClickEditList = listId => () => {
     const { list } = this.state;
 
-    const { label } = findNode(list, listId).model;
+    const { label } = list.children.find(({ id }) => id === listId);
 
     this.setState({
       isVisibleModal: true,
@@ -72,7 +124,7 @@ class ManageListContainer extends Component {
   handleCreateList = async ({ label }) => {
     const { list } = this.state;
 
-    const listsNodeId = list.model.id;
+    const listsNodeId = list.id;
 
     try {
       const {
@@ -85,12 +137,53 @@ class ManageListContainer extends Component {
       this.setState(prevState => ({
         isVisibleModal: false,
         workInProgressList: null,
-        list: addNode(prevState.list, listsNodeId, {
-          id: listId,
-          label,
-          type: LIST_TYPE,
-          children: [],
-        }),
+        list: {
+          ...prevState.list,
+          children: fixSort([
+            {
+              id: listId,
+              label,
+              sort: 0,
+              type: LIST_TYPE,
+              children: [],
+            },
+            ...prevState.list.children,
+          ]),
+        },
+      }));
+    } catch (e) {
+      const {
+        response: {
+          data: { errors },
+        },
+      } = e;
+
+      if (errors && errors.label) {
+        console.log(errors.label);
+      }
+    }
+  };
+
+  handleEditList = async ({ label }) => {
+    const { workInProgressList } = this.state;
+
+    try {
+      await patchList(workInProgressList.id, {
+        label,
+      });
+
+      this.setState(prevState => ({
+        isVisibleModal: false,
+        workInProgressList: null,
+        list: {
+          ...prevState.list,
+          children: update(prevState.list.children, workInProgressList.id, {
+            id: workInProgressList.id,
+            label,
+            type: LIST_TYPE,
+            children: [],
+          }),
+        },
       }));
     } catch (e) {
       const {
@@ -115,7 +208,7 @@ class ManageListContainer extends Component {
     const { notification } = this.props;
     const { list, removingListId } = this.state;
 
-    const { label } = findNode(list, removingListId).model;
+    const { label } = list.children.find(({ id }) => id === removingListId);
 
     try {
       await removeList(removingListId);
@@ -127,12 +220,31 @@ class ManageListContainer extends Component {
 
       this.setState(prevState => ({
         ...prevState,
-        removeListId: null,
-        list: removeNode(prevState.list, removingListId),
+        removingListId: null,
+        list: {
+          ...prevState.list,
+          children: fixSort(
+            prevState.list.children.filter(({ id }) => id !== removingListId),
+          ),
+        },
       }));
     } catch (e) {
       //
     }
+  };
+
+  handleChangeSort = (listId, sourceIndex, destinationIndex) => {
+    this.setState(
+      prevState => ({
+        list: {
+          ...prevState.list,
+          children: fixSort(
+            reorder(prevState.list.children, sourceIndex, destinationIndex),
+          ),
+        },
+      }),
+      () => patchListSort(listId, { sort: destinationIndex }),
+    );
   };
 
   handleCancel = () => {
@@ -160,18 +272,20 @@ class ManageListContainer extends Component {
   preparePostList() {
     const { list } = this.state;
 
-    return list.model.children.map(({ id, label, children }) => ({
-      id,
-      label,
-      count: children.length,
-      invited: children.reduce((acc, post) => [...acc, ...post.invited], []),
-    }));
+    return list.children
+      .map(({ id, label, sort, children }) => ({
+        id,
+        label,
+        sort,
+        count: children.length,
+        invited: children.reduce((acc, post) => [...acc, ...post.invited], []),
+      }))
+      .sort((a, b) => a.sort - b.sort);
   }
 
   render() {
     const {
       list,
-      user,
       isVisibleModal,
       workInProgressList,
       members,
@@ -185,22 +299,35 @@ class ManageListContainer extends Component {
     const postList = this.preparePostList();
 
     return (
-      <Fragment>
-        <Layout user={user}>
-          <ManageListWrapper>
-            <ManageList
-              list={postList}
-              members={members}
-              onClickCreateList={this.handleClickCreateList}
-              onClickEditList={this.handleClickEditList}
-              onClickRemoveList={this.handleClickRemovePost}
-            />
-          </ManageListWrapper>
-        </Layout>
+      <Wrapper>
+        <TopWrapper>
+          <Title>Lists</Title>
+          <Button
+            onClick={this.handleClickCreateList}
+            icon="plus"
+            color="black"
+          >
+            ADD LIST
+          </Button>
+        </TopWrapper>
+        <Description>Manage your lists</Description>
+        <ManageListWrapper>
+          <ManageList
+            list={postList}
+            members={members}
+            onChangeSort={this.handleChangeSort}
+            onClickEditList={this.handleClickEditList}
+            onClickRemoveList={this.handleClickRemovePost}
+          />
+        </ManageListWrapper>
         {isVisibleModal && (
           <ListFormModal
             list={workInProgressList}
-            onCreate={this.handleCreateList}
+            onSubmit={
+              workInProgressList.mode === LIST_WORKFLOW_CREATE_MODE
+                ? this.handleCreateList
+                : this.handleEditList
+            }
             onCancel={this.handleCancel}
           />
         )}
@@ -210,7 +337,7 @@ class ManageListContainer extends Component {
           onClickOk={this.handleRemoveList}
           onClickCancel={this.handleCloseConfirmModal}
         />
-      </Fragment>
+      </Wrapper>
     );
   }
 }

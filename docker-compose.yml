@@ -1,0 +1,15 @@
+version: '3'
+
+services:
+  web:
+    build:
+      dockerfile: ./Dockerfile
+      context: ./
+      args:
+        API_URI: "http://loc.caesar.team"
+        APP_URI: "http://loc.caesar.team"
+    environment:
+      API_URI: "http://loc.caesar.team"
+      APP_URI: "http://loc.caesar.team"
+    ports:
+      - "3000:3000"

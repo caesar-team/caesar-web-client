@@ -1,21 +1,15 @@
 import getConfig from 'next/config';
 
-let publicRuntimeConfig = {};
-
-const config = getConfig();
-
-if (config) {
-  // eslint-disable-next-line
-  publicRuntimeConfig = config.publicRuntimeConfig;
-}
+const { publicRuntimeConfig = {} } = getConfig() || {};
 
 export const {
-  API_URL,
+  API_URI,
   API_BASE_PATH,
-  APP_URL,
+  APP_URI,
   AUTH_ENDPOINT,
   REDIRECT_AUTH_ENDPOINT,
   MAX_UPLOADING_FILE_SIZE,
+  TOTAL_MAX_UPLOADING_FILES_SIZES,
   LENGTH_KEY,
 } = publicRuntimeConfig;
 
@@ -26,6 +20,7 @@ export const MAX_SIZE_RANDOM_BUFFER = 60000;
 export const ROOT_TYPE = 'root';
 export const INBOX_TYPE = 'inbox';
 export const LIST_TYPE = 'list';
+export const DEFAULT_LIST_TYPE = 'default';
 export const TRASH_TYPE = 'trash';
 export const FAVORITES_TYPE = 'favorites';
 export const LIST_TYPES = {
@@ -81,12 +76,9 @@ export const PERMISSION_WRITE = 'write';
 export const DEFAULT_REQUESTS_LIMIT = 10;
 export const DEFAULT_SECONDS_LIMIT = 60 * 60;
 
-export const INVITE_TYPE = 'INVITE';
-export const SHARE_TYPE = 'SHARE';
+export const INVITE_TYPE = 'invite';
+export const SHARE_TYPE = 'share';
 
 export const USER_ROLE = 'ROLE_USER';
 export const READ_ONLY_USER_ROLE = 'ROLE_READ_ONLY_USER';
 export const ANONYMOUS_USER_ROLE = 'ROLE_ANONYMOUS_USER';
-
-export const SHARED_ACCEPTED_STATUS = 'ACCEPTED';
-export const SHARED_WAITING_STATUS = 'WAITING';

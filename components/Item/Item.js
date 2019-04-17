@@ -45,6 +45,7 @@ const Item = ({
   user,
   members = {},
   notification,
+  onClickMoveItem = Function.prototype,
   onClickCloseItem = Function.prototype,
   onClickEditItem = Function.prototype,
   onClickInvite = Function.prototype,
@@ -95,7 +96,7 @@ const Item = ({
     null,
   );
   const hasWriteAccess = owner.id === user.id || access === PERMISSION_WRITE;
-  const showReadOnlyNotify = access && !hasWriteAccess;
+  const isReadOnly = access && !hasWriteAccess;
 
   const renderUpdateNotify = () => {
     const updateUserName =
@@ -106,7 +107,7 @@ const Item = ({
       <Notify withButton>
         <Icon name="warning" width={14} height={14} isInButton />
         <NotifyText>
-          {`Password has been changed by ${updateUserName} at ${updateDate}`}
+          {`Item has been changed by ${updateUserName} at ${updateDate}`}
         </NotifyText>
         <NotifyButton color="white" onClick={onClickAcceptUpdate(id)}>
           Accept
@@ -123,10 +124,12 @@ const Item = ({
           notification={notification}
           hasWriteAccess={hasWriteAccess}
           isTrashItem={isTrashItem}
+          isReadOnly={isReadOnly}
           item={item}
           user={user}
           members={members}
           allLists={allLists}
+          onClickMoveItem={onClickMoveItem}
           onClickCloseItem={onClickCloseItem}
           onClickRemoveItem={onClickRemoveItem}
           onClickEditItem={onClickEditItem}
@@ -141,10 +144,12 @@ const Item = ({
         <Document
           hasWriteAccess={hasWriteAccess}
           isTrashItem={isTrashItem}
+          isReadOnly={isReadOnly}
           item={item}
           user={user}
           members={members}
           allLists={allLists}
+          onClickMoveItem={onClickMoveItem}
           onClickCloseItem={onClickCloseItem}
           onClickRemoveItem={onClickRemoveItem}
           onClickEditItem={onClickEditItem}
@@ -161,7 +166,7 @@ const Item = ({
 
   return (
     <Fragment>
-      {showReadOnlyNotify && (
+      {isReadOnly && (
         <Notify>
           <Icon name="warning" width={14} height={14} isInButton />
           <NotifyText>You can read only</NotifyText>

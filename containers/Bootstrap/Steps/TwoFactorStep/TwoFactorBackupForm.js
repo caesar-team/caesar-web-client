@@ -129,7 +129,7 @@ const TwoFactorBackupForm = ({ codes, onSubmit }) => (
             )}
           />
           <NextButton htmlType="submit" disabled={isSubmitting || !isValid}>
-            Start work
+            Continue
           </NextButton>
         </Form>
       )}

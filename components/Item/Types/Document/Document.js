@@ -13,26 +13,32 @@ import {
 
 export const Document = props => {
   const {
-    allLists,
+    allLists = [],
     onClickMoveToTrash,
     isTrashItem,
+    isReadOnly,
+    isSharedItem,
     item: {
       listId,
-      secret: { note, attachments },
+      secret: { note, attachments = [] },
     },
   } = props;
-  const listName = allLists.find(({ id }) => id === listId).label;
   const shouldShowNote = !!note;
   const shouldShowAttachments = attachments && attachments.length > 0;
+  const shouldShowRemove = !isSharedItem && !isTrashItem;
+  const listName =
+    allLists.length > 0 ? allLists.find(({ id }) => id === listId).label : null;
 
   return (
     <Wrapper>
-      <ItemHeader {...props} />
+      <ItemHeader isReadOnly={isReadOnly} allLists={allLists} {...props} />
       <FieldWrapper>
-        <Field>
-          <Label>List</Label>
-          <FieldValue>{listName}</FieldValue>
-        </Field>
+        {listName && (
+          <Field>
+            <Label>List</Label>
+            <FieldValue>{listName}</FieldValue>
+          </Field>
+        )}
         {shouldShowNote && (
           <Field>
             <Label>Note</Label>
@@ -41,7 +47,7 @@ export const Document = props => {
         )}
       </FieldWrapper>
       {shouldShowAttachments && <Attachments attachments={attachments} />}
-      {!isTrashItem && (
+      {shouldShowRemove && (
         <RemoveButtonWrapper>
           <RemoveButton color="white" icon="trash" onClick={onClickMoveToTrash}>
             Remove

@@ -2,6 +2,7 @@ import React from 'react';
 import styled from 'styled-components';
 import { Formik, FastField } from 'formik';
 import { checkError } from 'common/utils/formikUtils';
+import { upperFirst } from 'common/utils/string';
 import { ITEM_WORKFLOW_EDIT_MODE, TRASH_TYPE } from 'common/constants';
 import {
   Uploader,
@@ -11,7 +12,6 @@ import {
   Select,
   TextArea,
   File,
-  Icon,
   FormInput,
 } from 'components';
 import { Form } from '../components';
@@ -105,6 +105,8 @@ const Attachments = styled.div`
 
 const FileRow = styled.div`
   display: flex;
+  align-items: center;
+  justify-content: space-between;
   position: relative;
   margin-bottom: 30px;
 
@@ -113,10 +115,15 @@ const FileRow = styled.div`
   }
 `;
 
-const StyledCloseIcon = styled(Icon)`
-  fill: ${({ theme }) => theme.gray};
-  margin-left: 10px;
-  cursor: pointer;
+const Error = styled.div`
+  text-align: center;
+  font-size: 14px;
+  letter-spacing: 0.4px;
+  color: ${({ theme }) => theme.red};
+`;
+
+const ErrorStyled = styled(Error)`
+  margin: 20px 0;
 `;
 
 const createInitialValues = (secret, listId, type) => ({
@@ -125,27 +132,32 @@ const createInitialValues = (secret, listId, type) => ({
   type,
 });
 
-const renderAttachments = ({ attachments = [] }, setFieldValue) =>
+const checkAttachmentsError = (errors, index) =>
+  errors[index] && errors[index].raw;
+
+const renderAttachments = (attachments = [], errors = [], setFieldValue) =>
   attachments.map((attachment, index) => (
     <FileRow key={index}>
-      <File key={index} {...attachment} />
-      <StyledCloseIcon
-        name="close"
-        width={10}
-        height={10}
-        onClick={() =>
+      <File
+        key={index}
+        status={checkAttachmentsError(errors, index) ? 'error' : 'uploaded'}
+        onClickRemove={() =>
           setFieldValue(
             'attachments',
             attachments.filter((_, fileIndex) => index !== fileIndex),
           )
         }
+        {...attachment}
       />
+      {checkAttachmentsError(errors, index) && (
+        <Error>{errors[index].raw}</Error>
+      )}
     </FileRow>
   ));
 
 const CredentialsForm = ({
   item: { secret, listId, type },
-  allLists,
+  allLists = [],
   mode,
   onFinishCreateWorkflow,
   onFinishEditWorkflow,
@@ -161,7 +173,7 @@ const CredentialsForm = ({
     .filter(({ type: listType }) => listType !== TRASH_TYPE)
     .map(({ id, label }) => ({
       value: id,
-      label,
+      label: upperFirst(label),
     }));
 
   return (
@@ -266,13 +278,23 @@ const CredentialsForm = ({
           <AttachmentsSection>
             <Attachment>Attachments</Attachment>
             <Uploader
+              multiple
+              asPreview
               name="attachments"
               files={values.attachments}
-              multiple
               onChange={setFieldValue}
             />
+            {errors &&
+              errors.attachments &&
+              typeof errors.attachments === 'string' && (
+                <ErrorStyled>{errors.attachments}</ErrorStyled>
+              )}
             <Attachments>
-              {renderAttachments(values, setFieldValue)}
+              {renderAttachments(
+                values.attachments,
+                errors.attachments,
+                setFieldValue,
+              )}
             </Attachments>
           </AttachmentsSection>
         </Form>

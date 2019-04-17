@@ -1,56 +1,42 @@
-﻿apiVersion: apps/v1beta2
+﻿kind: Service
+apiVersion: v1
+metadata:
+  name:  caesarapp-web-app
+  namespace: default
+spec:
+  selector:
+    app:  caesarapp-web-app
+  type:  NodePort
+  ports:
+    - name:  http
+      port:  3000
+      targetPort:  3000
+
+---
+apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: caesarapp-web-app
   namespace: default
 spec:
-  minReadySeconds: 120
-  progressDeadlineSeconds: 600
-  revisionHistoryLimit: 10
+  replicas: 1
   selector:
     matchLabels:
-      workload.user.cattle.io/workloadselector: deployment-default-caesarapp-web-app
+      app: caesarapp-web-app
   template:
     metadata:
       labels:
         app: caesarapp-web-app
         CICD_GIT_COMMIT: ${CICD_GIT_COMMIT}
-        workload.user.cattle.io/workloadselector: deployment-default-caesarapp-web-app
-      namespace: default
     spec:
       containers:
-      - env:
-        - name: API_BASE_PATH
-          value: api
-        - name: API_PROTOCOL
-          value: https
-        - name: APP_PORT
-          value: "3000"
-        - name: APP_PROTOCOL
-          value: https
-        - name: AUTH_ENDPOINT
-          value: connect/google
-        - name: NODE_ENV
-          value: production
-        - name: REDIRECT_AUTH_ENDPOINT
-          value: check_auth
-        - name: API_HOST
-          valueFrom:
-           secretKeyRef:
-             key: API_HOST
-             name: caesarapp-web-app
-        - name: APP_HOST
-          valueFrom:
-           secretKeyRef:
-             key: APP_HOST
-             name: caesarapp-web-app
-        image: caesarteam/caesar-web-client:${CICD_GIT_BRANCH}
-        imagePullPolicy: Always
-        name: caesarapp-web-app
-        ports:
-        - containerPort: 3000
-          name: 3000tcp00
-          protocol: TCP
-      imagePullSecrets:
-      - name: dockerhub
-      restartPolicy: Always
+        - name: caesarapp-web-app
+          image: "caesarteam/caesar-web-client:${CICD_GIT_BRANCH}"
+          ports:
+            - name: http
+              containerPort: 3000
+          env:
+            - name: API_URI
+              value: "https://demo.caesar.team"
+            - name: APP_URI
+              value: "https://demo.caesar.team"

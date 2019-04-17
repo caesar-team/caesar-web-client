@@ -4,8 +4,6 @@ import { default as NextApp, Container } from 'next/app';
 import { ThemeProvider, createGlobalStyle } from 'styled-components';
 import globalStyles from 'common/styles/globalStyles';
 import { entryResolver } from 'common/utils/entryResolver';
-import { getToken } from 'common/utils/token';
-import { getUserBootstrap } from 'common/api';
 import theme from 'common/theme';
 import { NotificationProvider } from '../components';
 import { Bootstrap } from '../containers';
@@ -24,15 +22,32 @@ export default class App extends NextApp {
   }
 
   render() {
-    const { Component, pageProps, router } = this.props;
+    const {
+      Component,
+      pageProps,
+      router: { route },
+    } = this.props;
 
-    if (router.route === '/auth' || router.route === '/share') {
+    if (route === '/signin' || route === '/signup' || route === '/resetting') {
       return (
         <ThemeProvider theme={theme}>
           <Container>
             <GlobalStyles />
             <Component {...pageProps} />
           </Container>
+        </ThemeProvider>
+      );
+    }
+
+    if (route === '/share' || route === '/invite') {
+      return (
+        <ThemeProvider theme={theme}>
+          <NotificationProvider>
+            <Container>
+              <GlobalStyles />
+              <Component {...pageProps} />
+            </Container>
+          </NotificationProvider>
         </ThemeProvider>
       );
     }

@@ -45,6 +45,10 @@ const ListOptionsButton = styled.button`
   }
 `;
 
+const StyledButton = styled(Button)`
+  width: 100%;
+`;
+
 class ListOptionsInner extends Component {
   state = {
     isMenuShown: false,
@@ -62,7 +66,7 @@ class ListOptionsInner extends Component {
 
   render() {
     const { isMenuShown } = this.state;
-    const { onClickRemoveList, listId } = this.props;
+    const { onClickRemoveList, onClickEditList, listId } = this.props;
 
     return (
       <ListOptionsWrapper>
@@ -73,9 +77,12 @@ class ListOptionsInner extends Component {
         </ListOptionsButton>
         {isMenuShown && (
           <ListOptionsMenu>
-            <Button color="white" onClick={onClickRemoveList(listId)}>
+            <StyledButton color="white" onClick={onClickEditList(listId)}>
+              Edit
+            </StyledButton>
+            <StyledButton color="white" onClick={onClickRemoveList(listId)}>
               Remove
-            </Button>
+            </StyledButton>
           </ListOptionsMenu>
         )}
       </ListOptionsWrapper>

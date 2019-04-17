@@ -8,6 +8,7 @@ import {
   BackButton,
   CodeInput,
   Checkbox,
+  Button,
 } from 'components';
 import { codeSchema } from './schema';
 import { initialValues } from './constants';
@@ -40,6 +41,14 @@ const CheckboxWrapper = styled.div`
   padding-top: 20px;
 `;
 
+const NextButton = styled(Button)`
+  height: 60px;
+  font-size: 18px;
+  margin-top: 60px;
+`;
+
+const CODE_LENGTH = 6;
+
 const TwoFactorCheckForm = ({ allowReturn, onClickReturn, onSubmit }) => (
   <Wrapper>
     {allowReturn && (
@@ -64,18 +73,16 @@ const TwoFactorCheckForm = ({ allowReturn, onClickReturn, onSubmit }) => (
         handleSubmit,
         isSubmitting,
         setFieldValue,
-        submitForm,
         resetForm,
+        values,
       }) => (
         <Form onSubmit={handleSubmit}>
           <FastField
             name="code"
             render={() => (
               <CodeInput
-                onChange={value => setFieldValue('code', value, false)}
-                onComplete={submitForm}
-                onCompleteWithErrors={resetForm}
-                length={6}
+                onChange={value => setFieldValue('code', value, true)}
+                length={CODE_LENGTH}
                 focus
                 disabled={isSubmitting}
                 errors={errors}
@@ -93,6 +100,12 @@ const TwoFactorCheckForm = ({ allowReturn, onClickReturn, onSubmit }) => (
               )}
             />
           </CheckboxWrapper>
+          <NextButton
+            htmlType="submit"
+            disabled={isSubmitting || values.code.length !== CODE_LENGTH}
+          >
+            Continue
+          </NextButton>
         </Form>
       )}
     />

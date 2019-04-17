@@ -20,8 +20,8 @@ const Line = styled.div`
   width: ${({ value }) => `calc(100% * ${value})`};
 `;
 
-const ProgressBar = ({ value }) => (
-  <Progress>
+const ProgressBar = ({ value, ...props }) => (
+  <Progress {...props}>
     <Line value={value} />
   </Progress>
 );

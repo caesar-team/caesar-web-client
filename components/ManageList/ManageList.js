@@ -172,6 +172,8 @@ class ManageList extends Component {
       </Draggable>
     ));
 
+    console.log(list);
+    console.log(members);
     return (
       <DragDropContext onDragEnd={this.handleDragEnd}>
         <Droppable droppableId="droppable" type="lists" key={list.length}>

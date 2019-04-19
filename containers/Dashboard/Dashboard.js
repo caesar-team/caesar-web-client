@@ -426,13 +426,7 @@ class DashboardContainer extends Component {
       const promises = [];
 
       if (isSecretChanged) {
-        const options = {
-          message: openpgp.message.fromText(JSON.stringify(data)),
-          publicKeys: (await openpgp.key.readArmored(publicKey)).keys,
-        };
-
-        const encrypted = await openpgp.encrypt(options);
-        const encryptedItem = encrypted.data;
+        const encryptedItem = await encryptItem(data, publicKey);
 
         const { invited, shared } = workInProgressItem;
 
@@ -441,9 +435,24 @@ class DashboardContainer extends Component {
         );
 
         if (!filteredInvited.length) {
-          promises.push(
-            updateItem(workInProgressItem.id, { secret: encryptedItem }),
-          );
+          const requestData = {
+            item: {
+              secret: encryptedItem,
+            },
+          };
+
+          if (workInProgressItem.originalItemId) {
+            const encryptedOriginalItemSecret = await encryptItem(
+              data,
+              workInProgressItem.owner.publicKey,
+            );
+
+            requestData.originalItem = {
+              secret: encryptedOriginalItemSecret,
+            };
+          }
+
+          promises.push(updateItem(workInProgressItem.id, requestData));
         } else {
           const invitedMembersIds = filteredInvited.map(({ userId }) => userId);
           const invitedMemberKeys = members

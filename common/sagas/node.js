@@ -17,6 +17,10 @@ import {
   REMOVE_SHARE_REQUEST,
   CREATE_ANONYMOUS_LINK_REQUEST,
   REMOVE_ANONYMOUS_LINK_REQUEST,
+  CREATE_LIST_REQUEST,
+  EDIT_LIST_REQUEST,
+  REMOVE_LIST_REQUEST,
+  SORT_LIST_REQUEST,
   fetchNodesSuccess,
   fetchNodesFailure,
   removeItemSuccess,
@@ -35,7 +39,6 @@ import {
   changeItemPermissionFailure,
   inviteMemberSuccess,
   inviteMemberFailure,
-  inviteNewMemberSuccess,
   inviteNewMemberFailure,
   removeInviteMemberSuccess,
   removeInviteMemberFailure,
@@ -46,6 +49,14 @@ import {
   createAnonymousLinkFailure,
   removeAnonymousLinkSuccess,
   removeAnonymousLinkFailure,
+  createListSuccess,
+  createListFailure,
+  editListSuccess,
+  editListFailure,
+  removeListSuccess,
+  removeListFailure,
+  sortListSuccess,
+  sortListFailure,
   addItem,
   setWorkInProgressItem,
   shareItemFailure,
@@ -60,6 +71,8 @@ import { memberListSelector } from 'common/selectors/member';
 import {
   workInProgressItemSelector,
   favoritesSelector,
+  parentListSelector,
+  sortedCustomizableListsSelector,
 } from 'common/selectors/node';
 import {
   getList,
@@ -75,6 +88,10 @@ import {
   postInvitation,
   removeChildItem,
   patchChildItem,
+  removeList,
+  postCreateList,
+  patchListSort,
+  patchList,
 } from 'common/api';
 import DecryptWorker from 'common/decryption.worker.js';
 import {
@@ -89,6 +106,7 @@ import {
   ANONYMOUS_USER_ROLE,
   INVITE_TYPE,
   ITEM_REVIEW_MODE,
+  LIST_TYPE,
   PERMISSION_READ,
   PERMISSION_WRITE,
   SHARE_TYPE,
@@ -96,6 +114,16 @@ import {
 } from 'common/constants';
 import { generateInviteUrl, generateSharingUrl } from 'common/utils/sharing';
 import { createMemberSaga, getOrCreateMemberSaga } from './member';
+
+const reorder = (list, startIndex, endIndex) => {
+  const result = Array.from(list);
+  const [removed] = result.splice(startIndex, 1);
+  result.splice(endIndex, 0, removed);
+
+  return result;
+};
+
+const fixSort = lists => lists.map((list, index) => ({ ...list, sort: index }));
 
 function createWebWorkerChannel(data) {
   const worker = new DecryptWorker();
@@ -262,18 +290,30 @@ export function* editItemSaga({ payload: { item }, meta: { setSubmitting } }) {
       );
       const { invited, shared } = workInProgressItem;
 
-      console.log('invited', invited);
-
       const filteredInvited = invited.filter(
         ({ userId }) => userId !== user.id,
       );
 
-      console.log('filteredInvited', filteredInvited);
-
       if (!filteredInvited.length) {
-        yield call(updateItem, workInProgressItem.id, {
-          secret: encryptedItemSecret,
-        });
+        const requestData = {
+          item: {
+            secret: encryptedItemSecret,
+          },
+        };
+
+        if (workInProgressItem.originalItemId) {
+          const encryptedOriginalItemSecret = call(
+            encryptItem,
+            editedItemSecret,
+            workInProgressItem.owner.publicKey,
+          );
+
+          requestData.originalItem = {
+            secret: encryptedOriginalItemSecret,
+          };
+        }
+
+        yield call(updateItem, workInProgressItem.id, requestData);
       } else {
         const invitedMembersIds = filteredInvited.map(({ userId }) => userId);
         const invitedMemberKeys = members
@@ -358,19 +398,14 @@ export function* acceptItemSaga({ payload: { id } }) {
       data: { secret, ...itemData },
     } = yield call(acceptUpdateItem, id);
 
-    console.log('secret', secret);
-    console.log('itemData', itemData);
-
     const privateKeyObj = yield call(
       getPrivateKeyObj,
       keyPair.privateKey,
       masterPassword,
     );
 
-    console.log('privateKeyObj', privateKeyObj);
     const decryptedItemSecret = yield decryptItem(secret, privateKeyObj);
 
-    console.log('decryptedItemSecret', decryptedItemSecret);
     const newItem = { ...itemData, secret: decryptedItemSecret };
 
     yield put(acceptItemUpdateSuccess(newItem));
@@ -662,6 +697,78 @@ export function* removeAnonymousLinkSaga() {
   }
 }
 
+export function* createListSaga({ payload: { list } }) {
+  try {
+    const parentList = yield select(parentListSelector);
+
+    const {
+      data: { id: listId },
+    } = yield call(postCreateList, {
+      label: list.label,
+      parentId: parentList.id,
+    });
+
+    yield put(
+      createListSuccess(listId, {
+        id: listId,
+        type: LIST_TYPE,
+        children: [],
+        sort: 0,
+        parentId: parentList.id,
+        ...list,
+      }),
+    );
+  } catch (error) {
+    console.log(error);
+    yield put(createListFailure());
+  }
+}
+
+export function* editListSaga({ payload: { list } }) {
+  try {
+    yield call(patchList, list.id, { label: list.label });
+
+    yield put(editListSuccess(list));
+  } catch (error) {
+    console.log(error);
+    yield put(editListFailure());
+  }
+}
+
+export function* removeListSaga({ payload: { listId } }) {
+  try {
+    yield call(removeList, listId);
+
+    yield put(removeListSuccess(listId));
+  } catch (error) {
+    console.log(error);
+    yield put(removeListFailure());
+  }
+}
+
+export function* sortListSaga({
+  payload: { listId, sourceIndex, destinationIndex },
+}) {
+  try {
+    const sortedCustomizableLists = yield select(
+      sortedCustomizableListsSelector,
+    );
+
+    yield put(
+      sortListSuccess(
+        fixSort(
+          reorder(sortedCustomizableLists, sourceIndex, destinationIndex),
+        ).reduce((acc, list) => ({ ...acc, [list.id]: list }), {}),
+      ),
+    );
+
+    yield call(patchListSort, listId, { sort: destinationIndex });
+  } catch (error) {
+    console.log(error);
+    yield put(sortListFailure());
+  }
+}
+
 export function* nodeSagas() {
   yield takeLatest(FETCH_NODES_REQUEST, fetchNodesSaga);
   yield takeLatest(REMOVE_ITEM_REQUEST, removeItemSaga);
@@ -678,4 +785,8 @@ export function* nodeSagas() {
   yield takeLatest(REMOVE_SHARE_REQUEST, removeShareSaga);
   yield takeLatest(CREATE_ANONYMOUS_LINK_REQUEST, createAnonymousLinkSaga);
   yield takeLatest(REMOVE_ANONYMOUS_LINK_REQUEST, removeAnonymousLinkSaga);
+  yield takeLatest(CREATE_LIST_REQUEST, createListSaga);
+  yield takeLatest(EDIT_LIST_REQUEST, editListSaga);
+  yield takeLatest(REMOVE_LIST_REQUEST, removeListSaga);
+  yield takeLatest(SORT_LIST_REQUEST, sortListSaga);
 }

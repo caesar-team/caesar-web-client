@@ -76,6 +76,22 @@ export const REMOVE_ANONYMOUS_LINK_SUCCESS =
 export const REMOVE_ANONYMOUS_LINK_FAILURE =
   '@nodes/REMOVE_ANONYMOUS_LINK_FAILURE';
 
+export const CREATE_LIST_REQUEST = '@nodes/CREATE_LIST_REQUEST';
+export const CREATE_LIST_SUCCESS = '@nodes/CREATE_LIST_SUCCESS';
+export const CREATE_LIST_FAILURE = '@nodes/CREATE_LIST_FAILURE';
+
+export const EDIT_LIST_REQUEST = '@nodes/EDIT_LIST_REQUEST';
+export const EDIT_LIST_SUCCESS = '@nodes/EDIT_LIST_SUCCESS';
+export const EDIT_LIST_FAILURE = '@nodes/EDIT_LIST_FAILURE';
+
+export const REMOVE_LIST_REQUEST = '@nodes/REMOVE_LIST_REQUEST';
+export const REMOVE_LIST_SUCCESS = '@nodes/REMOVE_LIST_SUCCESS';
+export const REMOVE_LIST_FAILURE = '@nodes/REMOVE_LIST_FAILURE';
+
+export const SORT_LIST_REQUEST = '@nodes/SORT_LIST_REQUEST';
+export const SORT_LIST_SUCCESS = '@nodes/SORT_LIST_SUCCESS';
+export const SORT_LIST_FAILURE = '@nodes/SORT_LIST_FAILURE';
+
 export const fetchNodesRequest = () => ({
   type: FETCH_NODES_REQUEST,
 });
@@ -382,4 +398,79 @@ export const removeAnonymousLinkSuccess = itemId => ({
 
 export const removeAnonymousLinkFailure = () => ({
   type: REMOVE_ANONYMOUS_LINK_FAILURE,
+});
+
+export const createListRequest = list => ({
+  type: CREATE_LIST_REQUEST,
+  payload: {
+    list,
+  },
+});
+
+export const createListSuccess = (listId, list) => ({
+  type: CREATE_LIST_SUCCESS,
+  payload: {
+    listId,
+    list,
+  },
+});
+
+export const createListFailure = () => ({
+  type: CREATE_LIST_FAILURE,
+});
+
+export const editListRequest = list => ({
+  type: EDIT_LIST_REQUEST,
+  payload: {
+    list,
+  },
+});
+
+export const editListSuccess = list => ({
+  type: EDIT_LIST_SUCCESS,
+  payload: {
+    list,
+  },
+});
+
+export const editListFailure = () => ({
+  type: EDIT_LIST_FAILURE,
+});
+
+export const removeListRequest = listId => ({
+  type: REMOVE_LIST_REQUEST,
+  payload: {
+    listId,
+  },
+});
+
+export const removeListSuccess = listId => ({
+  type: REMOVE_LIST_SUCCESS,
+  payload: {
+    listId,
+  },
+});
+
+export const removeListFailure = () => ({
+  type: REMOVE_LIST_FAILURE,
+});
+
+export const sortListRequest = (listId, sourceIndex, destinationIndex) => ({
+  type: SORT_LIST_REQUEST,
+  payload: {
+    listId,
+    sourceIndex,
+    destinationIndex,
+  },
+});
+
+export const sortListSuccess = resortedListsById => ({
+  type: SORT_LIST_SUCCESS,
+  payload: {
+    resortedListsById
+  },
+});
+
+export const sortListFailure = () => ({
+  type: SORT_LIST_FAILURE,
 });

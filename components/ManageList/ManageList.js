@@ -104,13 +104,20 @@ class ManageList extends Component {
       return;
     }
 
+    if (
+      destination.droppableId === source.droppableId &&
+      destination.index === source.index
+    ) {
+      return;
+    }
+
     onChangeSort(draggableId, source.index, destination.index);
   };
 
   renderItems() {
     const { hoverRowIndex } = this.state;
     const {
-      list,
+      lists,
       members,
       onClickEditList = Function.prototype,
       onClickRemoveList = Function.prototype,
@@ -119,7 +126,7 @@ class ManageList extends Component {
     const generateAvatars = invitedIds =>
       invitedIds.map(item => members[item.userId]);
 
-    const filteredList = list.filter(
+    const filteredList = lists.filter(
       ({ label }) => label !== DEFAULT_LIST_TYPE,
     );
 
@@ -174,7 +181,7 @@ class ManageList extends Component {
 
     return (
       <DragDropContext onDragEnd={this.handleDragEnd}>
-        <Droppable droppableId="droppable" type="lists" key={list.length}>
+        <Droppable droppableId="droppable" type="lists" key={lists.length}>
           {listProvided => (
             <ListWrapper
               ref={listProvided.innerRef}

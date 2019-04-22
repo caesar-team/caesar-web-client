@@ -45,6 +45,18 @@ import {
   REMOVE_ANONYMOUS_LINK_REQUEST,
   REMOVE_ANONYMOUS_LINK_SUCCESS,
   REMOVE_ANONYMOUS_LINK_FAILURE,
+  CREATE_LIST_REQUEST,
+  CREATE_LIST_SUCCESS,
+  CREATE_LIST_FAILURE,
+  EDIT_LIST_REQUEST,
+  EDIT_LIST_SUCCESS,
+  EDIT_LIST_FAILURE,
+  REMOVE_LIST_REQUEST,
+  REMOVE_LIST_SUCCESS,
+  REMOVE_LIST_FAILURE,
+  SORT_LIST_REQUEST,
+  SORT_LIST_SUCCESS,
+  SORT_LIST_FAILURE,
 } from 'common/actions/node';
 import { PERMISSION_WRITE } from '../constants';
 
@@ -431,6 +443,65 @@ export default createReducer(initialState, {
     };
   },
   [REMOVE_ANONYMOUS_LINK_FAILURE](state) {
+    return state;
+  },
+  [CREATE_LIST_REQUEST](state) {
+    return state;
+  },
+  [CREATE_LIST_SUCCESS](state, { payload }) {
+    return {
+      ...state,
+      listsById: {
+        ...state.listsById,
+        [payload.listId]: payload.list,
+      },
+    };
+  },
+  [CREATE_LIST_FAILURE](state) {
+    return state;
+  },
+  [EDIT_LIST_REQUEST](state) {
+    return state;
+  },
+  [EDIT_LIST_SUCCESS](state, { payload }) {
+    return {
+      ...state,
+      listsById: {
+        ...state.listsById,
+        [payload.list.id]: payload.list,
+      },
+    };
+  },
+  [EDIT_LIST_FAILURE](state) {
+    return state;
+  },
+  [REMOVE_LIST_REQUEST](state) {
+    return state;
+  },
+  [REMOVE_LIST_SUCCESS](state, { payload }) {
+    const { [payload.listId]: item, ...rest } = state.listsById;
+
+    return {
+      ...state,
+      listsById: rest,
+    };
+  },
+  [REMOVE_LIST_FAILURE](state) {
+    return state;
+  },
+  [SORT_LIST_REQUEST](state) {
+    return state;
+  },
+  [SORT_LIST_SUCCESS](state, { payload }) {
+    return {
+      ...state,
+      listsById: {
+        ...state.listsById,
+        ...payload.resortedListsById,
+      },
+    };
+  },
+  [SORT_LIST_FAILURE](state) {
     return state;
   },
 });

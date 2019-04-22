@@ -68,6 +68,40 @@ export const selectableListsSelector = createSelector(
   ],
 );
 
+export const customizableListsSelector = createSelector(
+  listsSelector,
+  lists =>
+    lists.filter(
+      list =>
+        list.type === LIST_TYPE && list.parentId && list.label !== 'default',
+    ),
+);
+
+export const sortedCustomizableListsSelector = createSelector(
+  customizableListsSelector,
+  lists => lists.sort((a, b) => a.sort - b.sort),
+);
+
+export const extendedSortedCustomizableListsSelector = createSelector(
+  sortedCustomizableListsSelector,
+  itemsByIdSelector,
+  (lists, itemsById) =>
+    lists.map(({ children, ...data }) => ({
+      ...data,
+      count: children.length,
+      invited: children.reduce(
+        (acc, item) =>
+          itemsById[item.id] ? [...acc, ...itemsById[item.id].invited] : acc,
+        [],
+      ),
+    })),
+);
+
+export const parentListSelector = createSelector(
+  listsSelector,
+  lists => lists.find(({ type, parentId }) => type === LIST_TYPE && !parentId),
+);
+
 const inboxSelector = createSelector(
   listsSelector,
   lists => lists.find(({ type }) => type === INBOX_TYPE) || {},

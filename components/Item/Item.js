@@ -34,8 +34,14 @@ const NotifyText = styled.div`
   color: ${({ theme }) => theme.white};
 `;
 
-const NotifyButton = styled(Button)`
+const NotifyButtonsWrapper = styled.div`
+  display: flex;
+  justify-content: space-between;
   margin-left: auto;
+`;
+
+const NotifyButton = styled(Button)`
+  margin-left: 20px;
 `;
 
 const Item = ({
@@ -58,6 +64,7 @@ const Item = ({
   onClickMoveToTrash = Function.prototype,
   onToggleFavorites = Function.prototype,
   onClickAcceptUpdate = Function.prototype,
+  onClickReject = Function.prototype,
 }) => {
   if (!item) {
     return <EmptyItem />;
@@ -109,9 +116,14 @@ const Item = ({
         <NotifyText>
           {`Item has been changed by ${updateUserName} at ${updateDate}`}
         </NotifyText>
-        <NotifyButton color="white" onClick={onClickAcceptUpdate(id)}>
-          Accept
-        </NotifyButton>
+        <NotifyButtonsWrapper>
+          <Button color="white" onClick={onClickReject(id)}>
+            Reject
+          </Button>
+          <NotifyButton color="white" onClick={onClickAcceptUpdate(id)}>
+            Accept
+          </NotifyButton>
+        </NotifyButtonsWrapper>
       </Notify>
     );
   };

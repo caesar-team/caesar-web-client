@@ -55,6 +55,7 @@ import {
   removeItem,
   toggleFavorite,
   acceptUpdateItem,
+  rejectUpdateItem,
   getPublicKeyByEmail,
   postNewUser,
   getUserSelf,
@@ -285,6 +286,7 @@ class DashboardContainer extends Component {
       const data = {
         ...rest,
         listId: trashNodeId,
+        previousListId: workInProgressItem.listId,
         secret: {
           ...rest.secret,
           attachments,
@@ -620,6 +622,22 @@ class DashboardContainer extends Component {
     }
   };
 
+  handleRejectUpdate = id => async () => {
+    await rejectUpdateItem(id);
+
+    this.setState(prevState => ({
+      ...prevState,
+      workInProgressItem: {
+        ...prevState.workInProgressItem,
+        update: null,
+      },
+      list: updateNode(prevState.list, prevState.workInProgressItem.id, {
+        ...prevState.workInProgressItem,
+        update: null,
+      }),
+    }));
+  };
+
   handleClickCancelWorkflow = () => {
     this.setState(prevState => ({
       ...prevState,
@@ -631,27 +649,27 @@ class DashboardContainer extends Component {
   };
 
   handleClickRestoreItem = async () => {
-    const { list, workInProgressItem } = this.state;
+    const { workInProgressItem } = this.state;
 
-    const inboxNodeId = list.model.children[0].id;
+    const toListId = workInProgressItem.previousListId;
 
-    await updateMoveItem(workInProgressItem.id, { listId: inboxNodeId });
+    await updateMoveItem(workInProgressItem.id, { listId: toListId });
 
     this.setState(prevState => ({
       ...prevState,
-      selectedListId: inboxNodeId,
+      selectedListId: toListId,
       workInProgressItem: {
         ...prevState.workInProgressItem,
         mode: ITEM_REVIEW_MODE,
-        listId: inboxNodeId,
+        listId: toListId,
       },
       list: replaceNode(
         updateNode(prevState.list, workInProgressItem.id, {
           secret: workInProgressItem.secret,
-          listId: inboxNodeId,
+          listId: toListId,
         }),
         workInProgressItem.id,
-        inboxNodeId,
+        toListId,
       ),
     }));
   };
@@ -1280,6 +1298,7 @@ class DashboardContainer extends Component {
                 onClickRemoveItem={this.handleClickRemoveItem}
                 onToggleFavorites={this.handleToggleFavorites}
                 onClickAcceptUpdate={this.handleAcceptUpdate}
+                onClickReject={this.handleRejectUpdate}
               />
             </RightColumnWrapper>
           </CenterWrapper>

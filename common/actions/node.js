@@ -28,6 +28,10 @@ export const ACCEPT_ITEM_UPDATE_REQUEST = '@nodes/ACCEPT_ITEM_UPDATE_REQUEST';
 export const ACCEPT_ITEM_UPDATE_SUCCESS = '@nodes/ACCEPT_ITEM_UPDATE_SUCCESS';
 export const ACCEPT_ITEM_UPDATE_FAILURE = '@nodes/ACCEPT_ITEM_UPDATE_FAILURE';
 
+export const REJECT_ITEM_UPDATE_REQUEST = '@nodes/REJECT_ITEM_UPDATE_REQUEST';
+export const REJECT_ITEM_UPDATE_SUCCESS = '@nodes/REJECT_ITEM_UPDATE_SUCCESS';
+export const REJECT_ITEM_UPDATE_FAILURE = '@nodes/REJECT_ITEM_UPDATE_FAILURE';
+
 export const TOGGLE_ITEM_TO_FAVORITE_REQUEST =
   '@nodes/TOGGLE_ITEM_TO_FAVORITE_REQUEST';
 export const TOGGLE_ITEM_TO_FAVORITE_SUCCESS =
@@ -226,7 +230,25 @@ export const acceptItemUpdateSuccess = item => ({
 });
 
 export const acceptItemUpdateFailure = () => ({
-  type: ACCEPT_ITEM_UPDATE_FAILURE,
+  type: REJECT_ITEM_UPDATE_FAILURE,
+});
+
+export const rejectItemUpdateRequest = id => ({
+  type: ACCEPT_ITEM_UPDATE_REQUEST,
+  payload: {
+    id,
+  },
+});
+
+export const rejectItemUpdateSuccess = itemId => ({
+  type: REJECT_ITEM_UPDATE_SUCCESS,
+  payload: {
+    itemId,
+  },
+});
+
+export const rejectItemUpdateFailure = () => ({
+  type: REJECT_ITEM_UPDATE_FAILURE,
 });
 
 export const toggleItemToFavoriteRequest = itemId => ({
@@ -467,7 +489,7 @@ export const sortListRequest = (listId, sourceIndex, destinationIndex) => ({
 export const sortListSuccess = resortedListsById => ({
   type: SORT_LIST_SUCCESS,
   payload: {
-    resortedListsById
+    resortedListsById,
   },
 });
 

@@ -115,6 +115,10 @@ class DashboardContainer extends Component {
     this.props.acceptItemUpdateRequest(id);
   };
 
+  handleRejectUpdate = id => async () => {
+    this.props.rejectItemUpdateRequest(id);
+  };
+
   handleClickCancelWorkflow = () => {
     const { workInProgressItem } = this.props;
 
@@ -129,7 +133,7 @@ class DashboardContainer extends Component {
   };
 
   handleClickRestoreItem = async () => {
-    this.props.moveItemRequest(this.props.listsByType.inbox.id);
+    this.props.moveItemRequest(this.props.workInProgressItem.previousListId);
     this.props.setWorkInProgressItem(null);
   };
 
@@ -262,6 +266,7 @@ class DashboardContainer extends Component {
                 onClickRemoveItem={this.handleToggleModal('removeItem')}
                 onToggleFavorites={this.handleToggleFavorites}
                 onClickAcceptUpdate={this.handleAcceptUpdate}
+                onClickRejectUpdate={this.handleRejectUpdate}
               />
             </RightColumnWrapper>
           </CenterWrapper>

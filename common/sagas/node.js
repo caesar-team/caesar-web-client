@@ -8,6 +8,7 @@ import {
   CREATE_ITEM_REQUEST,
   EDIT_ITEM_REQUEST,
   ACCEPT_ITEM_UPDATE_REQUEST,
+  REJECT_ITEM_UPDATE_REQUEST,
   TOGGLE_ITEM_TO_FAVORITE_REQUEST,
   CHANGE_ITEM_PERMISSION_REQUEST,
   INVITE_MEMBER_REQUEST,
@@ -33,6 +34,8 @@ import {
   editItemFailure,
   acceptItemUpdateSuccess,
   acceptItemUpdateFailure,
+  rejectItemUpdateSuccess,
+  rejectItemUpdateFailure,
   toggleItemToFavoriteSuccess,
   toggleItemToFavoriteFailure,
   changeItemPermissionSuccess,
@@ -82,6 +85,7 @@ import {
   updateItem,
   patchChildItemBatch,
   acceptUpdateItem,
+  rejectUpdateItem,
   toggleFavorite,
   patchChildAccess,
   postCreateChildItem,
@@ -418,6 +422,17 @@ export function* acceptItemSaga({ payload: { id } }) {
   } catch (error) {
     console.error(error);
     yield put(acceptItemUpdateFailure(error));
+  }
+}
+
+export function* rejectItemSaga({ payload: { id } }) {
+  try {
+    yield call(rejectUpdateItem, id);
+
+    yield put(rejectItemUpdateSuccess(id));
+  } catch (error) {
+    console.log(error);
+    yield put(rejectItemUpdateFailure(error));
   }
 }
 
@@ -776,6 +791,7 @@ export function* nodeSagas() {
   yield takeLatest(CREATE_ITEM_REQUEST, createItemSaga);
   yield takeLatest(EDIT_ITEM_REQUEST, editItemSaga);
   yield takeLatest(ACCEPT_ITEM_UPDATE_REQUEST, acceptItemSaga);
+  yield takeLatest(REJECT_ITEM_UPDATE_REQUEST, rejectItemSaga);
   yield takeLatest(TOGGLE_ITEM_TO_FAVORITE_REQUEST, toggleItemToFavoriteSaga);
   yield takeLatest(CHANGE_ITEM_PERMISSION_REQUEST, changeItemPermissionSaga);
   yield takeLatest(INVITE_MEMBER_REQUEST, inviteMemberSaga);

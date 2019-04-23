@@ -21,6 +21,9 @@ import {
   ACCEPT_ITEM_UPDATE_REQUEST,
   ACCEPT_ITEM_UPDATE_SUCCESS,
   ACCEPT_ITEM_UPDATE_FAILURE,
+  REJECT_ITEM_UPDATE_REQUEST,
+  REJECT_ITEM_UPDATE_SUCCESS,
+  REJECT_ITEM_UPDATE_FAILURE,
   TOGGLE_ITEM_TO_FAVORITE_REQUEST,
   TOGGLE_ITEM_TO_FAVORITE_SUCCESS,
   TOGGLE_ITEM_TO_FAVORITE_FAILURE,
@@ -142,6 +145,7 @@ export default createReducer(initialState, {
         [payload.itemId]: {
           ...state.itemsById[payload.itemId],
           listId: payload.newListId,
+          previousListId: payload.oldListId,
         },
       },
       listsById: {
@@ -218,6 +222,24 @@ export default createReducer(initialState, {
     };
   },
   [ACCEPT_ITEM_UPDATE_FAILURE](state) {
+    return state;
+  },
+  [REJECT_ITEM_UPDATE_REQUEST](state) {
+    return state;
+  },
+  [REJECT_ITEM_UPDATE_SUCCESS](state, { payload }) {
+    return {
+      ...state,
+      itemsById: {
+        ...state.itemsById,
+        [payload.itemId]: {
+          ...state.itemsById[payload.itemId],
+          update: null,
+        },
+      },
+    };
+  },
+  [REJECT_ITEM_UPDATE_FAILURE](state) {
     return state;
   },
   [TOGGLE_ITEM_TO_FAVORITE_REQUEST](state) {

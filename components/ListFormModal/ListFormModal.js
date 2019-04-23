@@ -22,16 +22,17 @@ const ButtonWrapper = styled.div`
 `;
 
 class ListFormModal extends Component {
-  createInitialValue = list => ({ label: list.label });
+  createInitialValue = list => ({ label: list ? list.label : '' });
 
   render() {
     const {
       list,
+      mode,
       onCancel = Function.prototype,
       onSubmit = Function.prototype,
     } = this.props;
 
-    const isCreateMode = list.mode === LIST_WORKFLOW_CREATE_MODE;
+    const isCreateMode = mode === LIST_WORKFLOW_CREATE_MODE;
 
     return (
       <Modal

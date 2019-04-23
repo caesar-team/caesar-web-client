@@ -35,8 +35,8 @@ spec:
           ports:
             - name: http
               containerPort: 3000
-          env:
-            - name: API_URI
-              value: ${API_URI}
-            - name: APP_URI
-              value: ${APP_URI}
+          envFrom:
+            - configMapRef:
+                name: caesarapp-config
+            - secretRef:
+                name: caesarapp-secret

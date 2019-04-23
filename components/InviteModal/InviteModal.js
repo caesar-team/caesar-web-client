@@ -67,11 +67,8 @@ class InviteModal extends Component {
     filterText: '',
   };
 
-  filter = memoize((list, filterText) =>
-    list.filter(
-      ({ email, name }) =>
-        name.includes(filterText) || email.includes(filterText),
-    ),
+  filter = memoize((members, filterText) =>
+    Object.values(members).filter(({ email }) => email.includes(filterText)),
   );
 
   handleChange = event => {

@@ -161,7 +161,7 @@ class Portal extends Component {
   };
 
   requestClose = event =>
-    this.props.onRequestClose && this.props.onRequestClose(event);
+    this.props.onRequestClose && this.props.onRequestClose();
 
   afterClose = () => {
     const { bodyOpenClassName } = this.props;

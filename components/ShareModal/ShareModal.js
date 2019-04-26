@@ -1,4 +1,4 @@
-import React, { Component, Fragment } from 'react';
+import React, { Component } from 'react';
 import styled from 'styled-components';
 import {
   Icon,
@@ -7,10 +7,8 @@ import {
   Button,
   Checkbox,
   ShareInput,
-  TextWithLines,
   Toggle,
 } from 'components';
-import { formatDate } from 'common/utils/dateUtils';
 import { copyToClipboard } from 'common/utils/clipboard';
 import { base64ToObject, objectToBase64 } from 'common/utils/cipherUtils';
 import { generateSharingUrl } from 'common/utils/sharing';
@@ -40,10 +38,6 @@ const ToggleLabelText = styled.span`
   font-size: 14px;
 `;
 
-const SharedList = styled.div`
-  margin-bottom: 30px;
-`;
-
 const SharedItem = styled.div`
   display: flex;
   align-items: center;
@@ -63,13 +57,6 @@ const SharedItemEmail = styled.div`
   color: ${({ theme }) => theme.black};
   overflow: hidden;
   text-overflow: ellipsis;
-`;
-
-const SharedItemDate = styled.div`
-  flex-shrink: 0;
-  font-size: 14px;
-  color: ${({ theme }) => theme.gray};
-  padding-left: 20px;
 `;
 
 const SharedItemRemove = styled.button`
@@ -113,10 +100,6 @@ const SharedLink = styled.div`
   white-space: pre-wrap;
 `;
 
-const StyledIcon = styled(Icon)`
-  fill: ${({ theme }) => theme.gray};
-`;
-
 const SharedLinkActions = styled.div`
   display: flex;
   align-items: center;
@@ -135,13 +118,6 @@ const SharedLinkActionsButton = styled(Button)`
 
 const EmailBox = styled(SharedItem)`
   background-color: ${({ theme }) => theme.lightBlue};
-`;
-
-const LeftTime = styled.div`
-  font-size: 14px;
-  letter-spacing: 0.4px;
-  color: ${({ theme }) => theme.gray};
-  margin: 0 20px 0 10px;
 `;
 
 const getEncryption = link => link.match(/\/([\w|+-]+)$/)[1];
@@ -262,79 +238,6 @@ export class ShareModal extends Component {
         </SharedItemRemove>
       </EmailBox>
     ));
-  }
-
-  renderWaitingUsers() {
-    const { shared, onRemove } = this.props;
-
-    const waitingList = shared.filter(
-      ({ link, isAccepted }) => !isAccepted && !link,
-    );
-
-    if (!waitingList.length) {
-      return null;
-    }
-
-    const renderedUsers = waitingList.map(({ id, email, left = 0 }) => (
-      <SharedItem key={id}>
-        <SharedItemEmail>{email}</SharedItemEmail>
-        <StyledIcon name="history" width={16} height={14} />
-        <LeftTime>Left: {left} h</LeftTime>
-        <SharedItemRemove>
-          <Icon
-            name="close"
-            width={14}
-            height={14}
-            isInButton
-            onClick={onRemove(id)}
-          />
-        </SharedItemRemove>
-      </SharedItem>
-    ));
-
-    return (
-      <Fragment>
-        <TextWithLines>Waiting ({waitingList.length})</TextWithLines>
-        <SharedList>{renderedUsers}</SharedList>
-      </Fragment>
-    );
-  }
-
-  renderSharedUsers() {
-    const { shared, onRemove } = this.props;
-
-    const acceptedList = shared.filter(
-      ({ isAccepted, link }) => isAccepted && !link,
-    );
-
-    if (!acceptedList.length) {
-      return null;
-    }
-
-    const renderedUsers = acceptedList.map(
-      ({ id, email, createdAt, updatedAt }) => (
-        <SharedItem key={id}>
-          <SharedItemEmail>{email}</SharedItemEmail>
-          <SharedItemDate>{formatDate(createdAt || updatedAt)}</SharedItemDate>
-          <SharedItemRemove>
-            <Icon
-              name="close"
-              width={14}
-              height={14}
-              isInButton
-              onClick={onRemove(id)}
-            />
-          </SharedItemRemove>
-        </SharedItem>
-      ),
-    );
-
-    return (
-      <Fragment>
-        <TextWithLines>Shared ({acceptedList.length})</TextWithLines>
-        <SharedList>{renderedUsers}</SharedList>
-      </Fragment>
-    );
   }
 
   render() {

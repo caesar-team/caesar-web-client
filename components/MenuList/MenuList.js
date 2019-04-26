@@ -44,6 +44,8 @@ const StyledIcon = styled(Icon)`
   transition: all 0.2s;
 `;
 
+const SECURE_MESSAGE_MODE = 'SECURE_MESSAGE_MODE';
+
 class MenuList extends Component {
   state = {
     isVisibleList: false,
@@ -56,7 +58,7 @@ class MenuList extends Component {
   };
 
   renderLists() {
-    const { lists, workInProgressList, onClick } = this.props;
+    const { mode, lists, workInProgressList, onClick } = this.props;
     const { isVisibleList } = this.state;
 
     const keys = Object.keys(lists);
@@ -67,7 +69,10 @@ class MenuList extends Component {
         case FAVORITES_TYPE:
         case TRASH_TYPE: {
           const { id, label, children } = lists[key];
-          const isActive = workInProgressList && workInProgressList.id === id;
+          const isActive =
+            mode !== SECURE_MESSAGE_MODE &&
+            workInProgressList &&
+            workInProgressList.id === id;
 
           return (
             <MenuItem key={id} isActive={isActive} onClick={onClick(id)}>
@@ -91,7 +96,9 @@ class MenuList extends Component {
                 <div>
                   {sortedChildren.map(child => {
                     const isActive =
-                      workInProgressList && workInProgressList.id === child.id;
+                      mode !== SECURE_MESSAGE_MODE &&
+                      workInProgressList &&
+                      workInProgressList.id === child.id;
 
                     return (
                       <MenuItem
@@ -117,9 +124,21 @@ class MenuList extends Component {
   }
 
   render() {
+    const { mode, onClickSecureMessage } = this.props;
     const renderedList = this.renderLists();
 
-    return <Menu>{renderedList}</Menu>;
+    return (
+      <Menu>
+        {renderedList}
+        <MenuItem
+          key="secure"
+          isActive={mode === SECURE_MESSAGE_MODE}
+          onClick={onClickSecureMessage}
+        >
+          Secure Message
+        </MenuItem>
+      </Menu>
+    );
   }
 }
 

@@ -66,6 +66,12 @@ app.prepare().then(() => {
     });
   });
 
+  server.get('/message/:messageId', (req, res) => {
+    app.render(req, res, '/message', {
+      messageId: req.params.messageId,
+    });
+  });
+
   server.get('/', (req, res) => {
     app.render(req, res, '/');
   });

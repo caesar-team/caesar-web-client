@@ -7,3 +7,4 @@ export { Import } from './Import';
 export { SignInContainer } from './SignIn';
 export { SignUpContainer } from './SignUp';
 export { ResetPasswordContainer } from './ResetPassword';
+export { SecureMessageContainer } from './SecureMessage';

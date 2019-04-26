@@ -33,13 +33,15 @@ class Application extends NextApp {
       store,
     } = this.props;
 
-    if (route === '/signin' || route === '/signup' || route === '/resetting') {
+    if (['/signin', '/signup', '/resetting', '/message'].includes(route)) {
       return (
         <ThemeProvider theme={theme}>
-          <Container>
-            <GlobalStyles />
-            <Component {...pageProps} />
-          </Container>
+          <NotificationProvider>
+            <Container>
+              <GlobalStyles />
+              <Component {...pageProps} />
+            </Container>
+          </NotificationProvider>
         </ThemeProvider>
       );
     }

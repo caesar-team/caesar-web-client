@@ -157,3 +157,7 @@ export const patchAcceptItem = data => callApi.patch('/accept_item', data);
 
 export const patchResetPassword = (token, data) =>
   callApi.patch(`/auth/srpp/reset/${token}`, data);
+
+export const postSecureMessage = data => callApi.post('/message', data);
+
+export const getSecureMessage = id => callApi.get(`/message/${id}`);

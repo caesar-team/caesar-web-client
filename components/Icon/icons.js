@@ -34,6 +34,7 @@ import 'static/images/svg/icon-key-diagonal.svg?sprite';
 import 'static/images/svg/icon-logo.svg?sprite';
 import 'static/images/svg/icon-logo-4xxi.svg?sprite';
 import 'static/images/svg/icon-logo-new.svg?sprite';
+import 'static/images/svg/icon-logo-secure-message.svg?sprite';
 import 'static/images/svg/icon-mail.svg?sprite';
 import 'static/images/svg/icon-lock.svg?sprite';
 import 'static/images/svg/icon-more.svg?sprite';

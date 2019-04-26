@@ -8,6 +8,7 @@ export function entryResolver({ route, ctx: { req, res } }) {
     '/share',
     '/invite',
     '/resetting',
+    '/message',
   ].includes(route);
 
   if (needToken) {

@@ -9,6 +9,7 @@ import {
   MenuList,
   withNotification,
   DashboardLayout,
+  SecureMessage,
 } from 'components';
 import {
   ITEM_REVIEW_MODE,
@@ -41,6 +42,9 @@ const Sidebar = styled.aside`
   border-right: 1px solid ${({ theme }) => theme.gallery};
 `;
 
+const SECURE_MESSAGE_MODE = 'SECURE_MESSAGE_MODE';
+const LIST_ITEM_MODE = 'LIST_ITEM_MODE';
+
 class DashboardContainer extends Component {
   state = this.prepareInitialState();
 
@@ -54,6 +58,16 @@ class DashboardContainer extends Component {
   handleClickMenuItem = id => () => {
     this.props.setWorkInProgressListId(id);
     this.props.setWorkInProgressItem(null);
+
+    this.setState({
+      mode: LIST_ITEM_MODE,
+    });
+  };
+
+  handleClickSecureMessage = () => {
+    this.setState({
+      mode: SECURE_MESSAGE_MODE,
+    });
   };
 
   handleClickItem = itemId => () => {
@@ -192,6 +206,7 @@ class DashboardContainer extends Component {
 
   prepareInitialState() {
     return {
+      mode: LIST_ITEM_MODE,
       modals: {
         invite: false,
         share: false,
@@ -214,13 +229,13 @@ class DashboardContainer extends Component {
       isLoading,
     } = this.props;
 
-    const { modals } = this.state;
+    const { mode, modals } = this.state;
 
     if (isLoading) {
       return null;
     }
 
-    // console.log('workInProgressItem', workInProgressItem);
+    const isSecureMessageMode = mode === SECURE_MESSAGE_MODE;
 
     const isTrashItem =
       workInProgressItem && workInProgressItem.listId === listsByType.trash.id;
@@ -231,44 +246,52 @@ class DashboardContainer extends Component {
           <CenterWrapper>
             <Sidebar>
               <MenuList
+                mode={mode}
                 workInProgressList={workInProgressList}
                 lists={listsByType}
                 onClick={this.handleClickMenuItem}
+                onClickSecureMessage={this.handleClickSecureMessage}
               />
             </Sidebar>
-            <MiddleColumnWrapper>
-              <List
-                workInProgressList={workInProgressList}
-                workInProgressItem={workInProgressItem}
-                items={visibleListItems}
-                onClickItem={this.handleClickItem}
-                onClickCreateItem={this.handleClickCreateItem}
-              />
-            </MiddleColumnWrapper>
-            <RightColumnWrapper>
-              <Item
-                isTrashItem={isTrashItem}
-                notification={notification}
-                item={workInProgressItem}
-                allLists={lists}
-                user={user}
-                members={members}
-                onClickMoveItem={this.handleClickMoveItem}
-                onClickCloseItem={this.handleClickCloseItem}
-                onClickInvite={this.handleToggleModal('invite')}
-                onClickShare={this.handleToggleModal('share')}
-                onClickEditItem={this.handleClickEditItem}
-                onClickMoveToTrash={this.handleToggleModal('moveToTrash')}
-                onFinishCreateWorkflow={this.handleFinishCreateWorkflow}
-                onFinishEditWorkflow={this.handleFinishEditWorkflow}
-                onCancelWorkflow={this.handleClickCancelWorkflow}
-                onClickRestoreItem={this.handleClickRestoreItem}
-                onClickRemoveItem={this.handleToggleModal('removeItem')}
-                onToggleFavorites={this.handleToggleFavorites}
-                onClickAcceptUpdate={this.handleAcceptUpdate}
-                onClickRejectUpdate={this.handleRejectUpdate}
-              />
-            </RightColumnWrapper>
+            {isSecureMessageMode ? (
+              <SecureMessage />
+            ) : (
+              <Fragment>
+                <MiddleColumnWrapper>
+                  <List
+                    workInProgressList={workInProgressList}
+                    workInProgressItem={workInProgressItem}
+                    items={visibleListItems}
+                    onClickItem={this.handleClickItem}
+                    onClickCreateItem={this.handleClickCreateItem}
+                  />
+                </MiddleColumnWrapper>
+                <RightColumnWrapper>
+                  <Item
+                    isTrashItem={isTrashItem}
+                    notification={notification}
+                    item={workInProgressItem}
+                    allLists={lists}
+                    user={user}
+                    members={members}
+                    onClickMoveItem={this.handleClickMoveItem}
+                    onClickCloseItem={this.handleClickCloseItem}
+                    onClickInvite={this.handleToggleModal('invite')}
+                    onClickShare={this.handleToggleModal('share')}
+                    onClickEditItem={this.handleClickEditItem}
+                    onClickMoveToTrash={this.handleToggleModal('moveToTrash')}
+                    onFinishCreateWorkflow={this.handleFinishCreateWorkflow}
+                    onFinishEditWorkflow={this.handleFinishEditWorkflow}
+                    onCancelWorkflow={this.handleClickCancelWorkflow}
+                    onClickRestoreItem={this.handleClickRestoreItem}
+                    onClickRemoveItem={this.handleToggleModal('removeItem')}
+                    onToggleFavorites={this.handleToggleFavorites}
+                    onClickAcceptUpdate={this.handleAcceptUpdate}
+                    onClickRejectUpdate={this.handleRejectUpdate}
+                  />
+                </RightColumnWrapper>
+              </Fragment>
+            )}
           </CenterWrapper>
         </DashboardLayout>
         {modals.invite && (

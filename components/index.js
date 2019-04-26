@@ -32,6 +32,7 @@ export {
   withNotification,
 } from './Notification';
 export { Scrollbar } from './Scrollbar';
+export { SecureMessage } from './SecureMessage';
 export { Select } from './Select';
 export { SessionChecker } from './SessionChecker';
 export { Uploader } from './Uploader';

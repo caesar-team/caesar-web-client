@@ -30,13 +30,14 @@ const LayoutConstructorStyled = styled(LayoutConstructor)`
 const Header = () => (
   <Fragment>
     <Icon name="logo-new" width={106} height={30} />
-    <Link onClick={() => Router.push('/logout')}>Logout</Link>
+    <Link href="/logout" onClick={() => Router.push('/logout')}>
+      Logout
+    </Link>
   </Fragment>
 );
 
 const SharingLayout = props => (
   <LayoutConstructorStyled
-    withImages
     headerComponent={<Header />}
     footerComponent={Footer}
     {...props}

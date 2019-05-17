@@ -62,6 +62,7 @@ import {
   sortListFailure,
   addItem,
   setWorkInProgressItem,
+  setWorkInProgressListId,
   shareItemFailure,
 } from 'common/actions/node';
 import { normalizeNodes } from 'common/normalizers/node';
@@ -72,6 +73,7 @@ import {
 } from 'common/selectors/user';
 import { memberListSelector } from 'common/selectors/member';
 import {
+  defaultListSelector,
   workInProgressItemSelector,
   favoritesSelector,
   parentListSelector,
@@ -173,6 +175,10 @@ export function* fetchNodesSaga() {
     const { listsById, itemsById } = normalizeNodes(data);
 
     yield put(fetchNodesSuccess(listsById));
+
+    const defaultList = yield select(defaultListSelector);
+
+    yield put(setWorkInProgressListId(defaultList.id));
 
     yield call(decryptSaga, Object.values(itemsById));
   } catch (error) {

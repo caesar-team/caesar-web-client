@@ -168,6 +168,10 @@ class Bootstrap extends Component {
       masterPassword,
     } = this.state;
 
+    if (!currentStep) {
+      return null;
+    }
+
     if (TWO_FACTOR_STEPS.includes(currentStep)) {
       return (
         <BootstrapLayout>

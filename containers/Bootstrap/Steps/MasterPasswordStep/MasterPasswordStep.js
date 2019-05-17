@@ -191,6 +191,10 @@ class MasterPasswordStep extends Component {
   render() {
     const { step, masterPassword } = this.state;
 
+    if (!step) {
+      return null;
+    }
+
     const renderedStep = matchStrict(
       step,
       {

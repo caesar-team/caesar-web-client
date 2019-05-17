@@ -98,14 +98,14 @@ class DashboardContainer extends Component {
     );
     this.props.setWorkInProgressItem(null);
 
-    this.handleToggleModal('removeItem')(false);
+    this.handleToggleModal('removeItem')();
   };
 
   handleMoveToTrash = () => {
     this.props.moveItemRequest(this.props.listsByType.trash.id);
     this.props.setWorkInProgressItem(null);
 
-    this.handleToggleModal('moveToTrash')(false);
+    this.handleToggleModal('moveToTrash')();
   };
 
   handleFinishCreateWorkflow = (data, { setSubmitting }) => {
@@ -184,22 +184,19 @@ class DashboardContainer extends Component {
       this.props.shareItemRequest(emails);
     }
 
-    this.handleToggleModal('share')(false);
+    this.handleToggleModal('share')();
   };
 
   handleRemoveShare = shareId => () => {
     this.props.removeShareRequest(shareId);
   };
 
-  handleToggleModal = modal => toggleValue => {
+  handleToggleModal = modal => () => {
     this.setState(prevState => ({
       ...prevState,
       modals: {
         ...prevState.modals,
-        [modal]:
-          typeof toggleValue === 'undefined'
-            ? !prevState.modals[modal]
-            : toggleValue,
+        [modal]: !prevState.modals[modal],
       },
     }));
   };

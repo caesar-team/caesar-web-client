@@ -36,15 +36,14 @@ app.prepare().then(() => {
   });
 
   server.get('/check_auth', (req, res) => {
-    res.redirect('/');
-    // const token = req.query && req.query.jwt;
-    //
-    // if (token) {
-    //   res.cookie('token', token, { path: '/' });
-    //   res.redirect('/');
-    // } else {
-    //   res.redirect('/signin');
-    // }
+    const token = req.query && req.query.jwt;
+
+    if (token) {
+      res.cookie('token', token, { path: '/' });
+      res.redirect('/');
+    } else {
+      res.redirect('/signin');
+    }
   });
 
   server.get('/resetting/:email/:token', (req, res) => {

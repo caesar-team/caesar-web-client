@@ -104,7 +104,7 @@ let rpprb = t; // used in randProbPrimeRounds() (which also uses "primes")
 // //////////////////////////////////////////////////////////////////////////////////////
 
 // return array of all primes less than integer n
-function findPrimes(n) {
+export function findPrimes(n) {
   let i;
   let s;
   let p;
@@ -132,7 +132,7 @@ function findPrimes(n) {
 
 // does a single round of Miller-Rabin base b consider x to be a possible prime?
 // x is a bigInt, and b is an integer, with b<x
-function millerRabinInt(x, b) {
+export function millerRabinInt(x, b) {
   if (mr_x1.length != x.length) {
     mr_x1 = dup(x);
     mr_r = dup(x);
@@ -145,7 +145,7 @@ function millerRabinInt(x, b) {
 
 // does a single round of Miller-Rabin base b consider x to be a possible prime?
 // x and b are bigInts with b<x
-function millerRabin(x, b) {
+export function millerRabin(x, b) {
   let i;
   let j;
   let k;
@@ -195,7 +195,7 @@ function millerRabin(x, b) {
 }
 
 // returns how many bits long the bigInt is, not counting leading zeros.
-function bitSize(x) {
+export function bitSize(x) {
   let j;
   let z;
   let w;
@@ -206,21 +206,21 @@ function bitSize(x) {
 }
 
 // return a copy of x with at least n elements, adding leading zeros if needed
-function expand(x, n) {
+export function expand(x, n) {
   const ans = int2bigInt(0, (x.length > n ? x.length : n) * bpe, 0);
   copy_(ans, x);
   return ans;
 }
 
 // return a k-bit true random prime using Maurer's algorithm.
-function randTruePrime(k) {
+export function randTruePrime(k) {
   const ans = int2bigInt(0, k, 0);
   randTruePrime_(ans, k);
   return trim(ans, 1);
 }
 
 // return a k-bit random probable prime with probability of error < 2^-80
-function randProbPrime(k) {
+export function randProbPrime(k) {
   if (k >= 600) return randProbPrimeRounds(k, 2); // numbers from HAC table 4.3
   if (k >= 550) return randProbPrimeRounds(k, 4);
   if (k >= 500) return randProbPrimeRounds(k, 5);
@@ -283,49 +283,49 @@ function randProbPrimeRounds(k, n) {
 }
 
 // return a new bigInt equal to (x mod n) for bigInts x and n.
-function mod(x, n) {
+export function mod(x, n) {
   const ans = dup(x);
   mod_(ans, n);
   return trim(ans, 1);
 }
 
 // return (x+n) where x is a bigInt and n is an integer.
-function addInt(x, n) {
+export function addInt(x, n) {
   const ans = expand(x, x.length + 1);
   addInt_(ans, n);
   return trim(ans, 1);
 }
 
 // return x*y for bigInts x and y. This is faster when y<x.
-function mult(x, y) {
+export function mult(x, y) {
   const ans = expand(x, x.length + y.length);
   mult_(ans, y);
   return trim(ans, 1);
 }
 
 // return (x**y mod n) where x,y,n are bigInts and ** is exponentiation.  0**0=1. Faster for odd n.
-function powMod(x, y, n) {
+export function powMod(x, y, n) {
   const ans = expand(x, n.length);
   powMod_(ans, trim(y, 2), trim(n, 2), 0); // this should work without the trim, but doesn't
   return trim(ans, 1);
 }
 
 // return (x-y) for bigInts x and y.  Negative answers will be 2s complement
-function sub(x, y) {
+export function sub(x, y) {
   const ans = expand(x, x.length > y.length ? x.length + 1 : y.length + 1);
   sub_(ans, y);
   return trim(ans, 1);
 }
 
 // return (x+y) for bigInts x and y.
-function add(x, y) {
+export function add(x, y) {
   const ans = expand(x, x.length > y.length ? x.length + 1 : y.length + 1);
   add_(ans, y);
   return trim(ans, 1);
 }
 
 // return (x**(-1) mod n) for bigInts x and n.  If no inverse exists, it returns null
-function inverseMod(x, n) {
+export function inverseMod(x, n) {
   const ans = expand(x, n.length);
   let s;
   s = inverseMod_(ans, n);
@@ -333,7 +333,7 @@ function inverseMod(x, n) {
 }
 
 // return (x*y mod n) for bigInts x,y,n.  For greater speed, let y<x.
-function multMod(x, y, n) {
+export function multMod(x, y, n) {
   const ans = expand(x, n.length);
   multMod_(ans, y, n);
   return trim(ans, 1);
@@ -341,7 +341,7 @@ function multMod(x, y, n) {
 
 // generate a k-bit true random prime using Maurer's algorithm,
 // and put it into ans.  The bigInt ans must be large enough to hold it.
-function randTruePrime_(ans, k) {
+export function randTruePrime_(ans, k) {
   let c;
   let m;
   let pm;
@@ -487,7 +487,7 @@ function randTruePrime_(ans, k) {
 }
 
 // Return an n-bit random BigInt (n>=1).  If s=1, then the most significant of those n bits is set to 1.
-function randBigInt(n, s) {
+export function randBigInt(n, s) {
   let a;
   let b;
   a = Math.floor((n - 1) / bpe) + 2; // # array elements to hold the BigInt with a leading 0 element
@@ -498,7 +498,7 @@ function randBigInt(n, s) {
 
 // Set b to an n-bit random BigInt.  If s=1, then the most significant of those n bits is set to 1.
 // Array b must be big enough to hold the result. Must have n>=1
-function randBigInt_(b, n, s) {
+export function randBigInt_(b, n, s) {
   let i;
   let a;
   for (i = 0; i < b.length; i++) b[i] = 0;
@@ -511,7 +511,7 @@ function randBigInt_(b, n, s) {
 }
 
 // Return the greatest common divisor of bigInts x and y (each with same number of elements).
-function GCD(x, y) {
+export function GCD(x, y) {
   let xc;
   let yc;
   xc = dup(x);
@@ -522,7 +522,7 @@ function GCD(x, y) {
 
 // set x to the greatest common divisor of bigInts x and y (each with same number of elements).
 // y is destroyed.
-function GCD_(x, y) {
+export function GCD_(x, y) {
   let i;
   let xp;
   let yp;
@@ -596,7 +596,7 @@ function GCD_(x, y) {
 // do x=x**(-1) mod n, for bigInts x and n.
 // If no inverse exists, it sets x to zero and returns 0, else it returns 1.
 // The x array must be at least as large as the n array.
-function inverseMod_(x, n) {
+export function inverseMod_(x, n) {
   const k = 1 + 2 * Math.max(x.length, n.length);
 
   if (!(x[0] & 1) && !(n[0] & 1)) {
@@ -681,7 +681,7 @@ function inverseMod_(x, n) {
 }
 
 // return x**(-1) mod n, for integers x and n.  Return 0 if there is no inverse
-function inverseModInt(x, n) {
+export function inverseModInt(x, n) {
   let a = 1;
 
   let b = 0;
@@ -708,7 +708,7 @@ function inverseModInt_(x, n) {
 // Given positive bigInts x and y, change the bigints v, a, and b to positive bigInts such that:
 //     v = GCD_(x,y) = a*x-b*y
 // The bigInts v, a, b, must have exactly as many elements as the larger of x and y.
-function eGCD_(x, y, v, a, b) {
+export function eGCD_(x, y, v, a, b) {
   let g = 0;
   const k = Math.max(x.length, y.length);
   if (eg_u.length != k) {
@@ -788,14 +788,14 @@ function eGCD_(x, y, v, a, b) {
 }
 
 // is bigInt x negative?
-function negative(x) {
+export function negative(x) {
   return (x[x.length - 1] >> (bpe - 1)) & 1;
 }
 
 // is (x << (shift*bpe)) > y?
 // x and y are nonnegative bigInts
 // shift is a nonnegative integer
-function greaterShift(x, y, shift) {
+export function greaterShift(x, y, shift) {
   let i;
   const kx = x.length;
   const ky = y.length;
@@ -809,7 +809,7 @@ function greaterShift(x, y, shift) {
 }
 
 // is x > y? (x and y both nonnegative)
-function greater(x, y) {
+export function greater(x, y) {
   let i;
   const k = x.length < y.length ? x.length : y.length;
 
@@ -828,7 +828,7 @@ function greater(x, y) {
 // y must be nonzero.
 // q and r must be arrays that are exactly the same length as x. (Or q can have more).
 // Must have x.length >= y.length >= 2.
-function divide_(x, y, q, r) {
+export function divide_(x, y, q, r) {
   let kx;
   let ky;
   let i;
@@ -898,7 +898,7 @@ function divide_(x, y, q, r) {
 }
 
 // do carries and borrows so each element of the bigInt x fits in bpe bits.
-function carry_(x) {
+export function carry_(x) {
   let i;
   let k;
   let c;
@@ -918,7 +918,7 @@ function carry_(x) {
 }
 
 // return x mod n for bigInt x and integer n.
-function modInt(x, n) {
+export function modInt(x, n) {
   let i;
   let c = 0;
   for (i = x.length - 1; i >= 0; i--) c = (c * radix + x[i]) % n;
@@ -929,7 +929,7 @@ function modInt(x, n) {
 // the returned array stores the bigInt in bpe-bit chunks, little endian (buff[0] is least significant word)
 // Pad the array with leading zeros so that it has at least minSize elements.
 // There will always be at least one leading 0 element.
-function int2bigInt(t, bits, minSize) {
+export function int2bigInt(t, bits, minSize) {
   let i;
   let k;
   k = Math.ceil(bits / bpe) + 1;
@@ -943,7 +943,7 @@ function int2bigInt(t, bits, minSize) {
 // Pad the array with leading zeros so that it has at least minSize elements.
 // If base=-1, then it reads in a space-separated list of array elements in decimal.
 // The array will always have at least one leading zero, unless base=-1.
-function str2bigInt(s, b, minSize) {
+export function str2bigInt(s, b, minSize) {
   let d;
   let i;
   let j;
@@ -1007,7 +1007,7 @@ function str2bigInt(s, b, minSize) {
 
 // is bigint x equal to integer y?
 // y must have less than bpe bits
-function equalsInt(x, y) {
+export function equalsInt(x, y) {
   let i;
   if (x[0] != y) return 0;
   for (i = 1; i < x.length; i++) if (x[i]) return 0;
@@ -1016,7 +1016,7 @@ function equalsInt(x, y) {
 
 // are bigints x and y equal?
 // this works even if x and y are different lengths and have arbitrarily many leading zeros
-function equals(x, y) {
+export function equals(x, y) {
   let i;
   const k = x.length < y.length ? x.length : y.length;
   for (i = 0; i < k; i++) if (x[i] != y[i]) return 0;
@@ -1029,7 +1029,7 @@ function equals(x, y) {
 }
 
 // is the bigInt x equal to zero?
-function isZero(x) {
+export function isZero(x) {
   let i;
   for (i = 0; i < x.length; i++) if (x[i]) return 0;
   return 1;
@@ -1037,7 +1037,7 @@ function isZero(x) {
 
 // convert a bigInt into a string in a given base, from base 2 up to base 95.
 // Base -1 prints the contents of the array representing the number.
-function bigInt2str(x, b) {
+export function bigInt2str(x, b) {
   let i;
   let t;
   let base;
@@ -1070,7 +1070,7 @@ function bigInt2str(x, b) {
 }
 
 // returns a duplicate of bigInt x
-function dup(x) {
+export function dup(x) {
   let i;
   const buff = new Array(x.length);
   copy_(buff, x);
@@ -1078,7 +1078,7 @@ function dup(x) {
 }
 
 // do x=y on bigInts x and y.  x must be an array at least as big as y (not counting the leading zeros in y).
-function copy_(x, y) {
+export function copy_(x, y) {
   let i;
   const k = x.length < y.length ? x.length : y.length;
   for (i = 0; i < k; i++) x[i] = y[i];
@@ -1086,7 +1086,7 @@ function copy_(x, y) {
 }
 
 // do x=y on bigInt x and integer y.
-function copyInt_(x, n) {
+export function copyInt_(x, n) {
   let i;
   let c;
   for (c = n, i = 0; i < x.length; i++) {
@@ -1097,7 +1097,7 @@ function copyInt_(x, n) {
 
 // do x=x+n where x is a bigInt and n is an integer.
 // x must be large enough to hold the result.
-function addInt_(x, n) {
+export function addInt_(x, n) {
   let i;
   let k;
   let c;
@@ -1119,7 +1119,7 @@ function addInt_(x, n) {
 }
 
 // right shift bigInt x by n bits.  0 <= n < bpe.
-function rightShift_(x, n) {
+export function rightShift_(x, n) {
   let i;
   const k = Math.floor(n / bpe);
   if (k) {
@@ -1139,7 +1139,7 @@ function rightShift_(x, n) {
 }
 
 // do x=floor(|x|/2)*sgn(x) for bigInt x in 2's complement
-function halve_(x) {
+export function halve_(x) {
   let i;
   for (i = 0; i < x.length - 1; i++) {
     x[i] = mask & ((x[i + 1] << (bpe - 1)) | (x[i] >> 1));
@@ -1148,7 +1148,7 @@ function halve_(x) {
 }
 
 // left shift bigInt x by n bits.
-function leftShift_(x, n) {
+export function leftShift_(x, n) {
   let i;
   const k = Math.floor(n / bpe);
   if (k) {
@@ -1170,7 +1170,7 @@ function leftShift_(x, n) {
 
 // do x=x*n where x is a bigInt and n is an integer.
 // x must be large enough to hold the result.
-function multInt_(x, n) {
+export function multInt_(x, n) {
   let i;
   let k;
   let c;
@@ -1191,7 +1191,7 @@ function multInt_(x, n) {
 }
 
 // do x=floor(x/n) for bigInt x and integer n, and return the remainder
-function divInt_(x, n) {
+export function divInt_(x, n) {
   let i;
   let r = 0;
   let s;
@@ -1205,7 +1205,7 @@ function divInt_(x, n) {
 
 // do the linear combination x=a*x+b*y for bigInts x and y, and integers a and b.
 // x must be large enough to hold the answer.
-function linComb_(x, y, a, b) {
+export function linComb_(x, y, a, b) {
   let i;
   let c;
   let k;
@@ -1226,7 +1226,7 @@ function linComb_(x, y, a, b) {
 
 // do the linear combination x=a*x+b*(y<<(ys*bpe)) for bigInts x and y, and integers a, b and ys.
 // x must be large enough to hold the answer.
-function linCombShift_(x, y, b, ys) {
+export function linCombShift_(x, y, b, ys) {
   let i;
   let c;
   let k;
@@ -1247,7 +1247,7 @@ function linCombShift_(x, y, b, ys) {
 
 // do x=x+(y<<(ys*bpe)) for bigInts x and y, and integer ys.
 // x must be large enough to hold the answer.
-function addShift_(x, y, ys) {
+export function addShift_(x, y, ys) {
   let i;
   let c;
   let k;
@@ -1268,7 +1268,7 @@ function addShift_(x, y, ys) {
 
 // do x=x-(y<<(ys*bpe)) for bigInts x and y, and integer ys.
 // x must be large enough to hold the answer.
-function subShift_(x, y, ys) {
+export function subShift_(x, y, ys) {
   let i;
   let c;
   let k;
@@ -1290,7 +1290,7 @@ function subShift_(x, y, ys) {
 // do x=x-y for bigInts x and y.
 // x must be large enough to hold the answer.
 // negative answers will be 2s complement
-function sub_(x, y) {
+export function sub_(x, y) {
   let i;
   let c;
   let k;
@@ -1310,7 +1310,7 @@ function sub_(x, y) {
 
 // do x=x+y for bigInts x and y.
 // x must be large enough to hold the answer.
-function add_(x, y) {
+export function add_(x, y) {
   let i;
   let c;
   let k;
@@ -1329,7 +1329,7 @@ function add_(x, y) {
 }
 
 // do x=x*y for bigInts x and y.  This is faster when y<x.
-function mult_(x, y) {
+export function mult_(x, y) {
   let i;
   if (ss.length != 2 * x.length) ss = new Array(2 * x.length);
   copyInt_(ss, 0);
@@ -1338,7 +1338,7 @@ function mult_(x, y) {
 }
 
 // do x=x mod n for bigInts x and n.
-function mod_(x, n) {
+export function mod_(x, n) {
   if (s4.length != x.length) s4 = dup(x);
   else copy_(s4, x);
   if (s5.length != x.length) s5 = dup(x);
@@ -1347,7 +1347,7 @@ function mod_(x, n) {
 
 // do x=x*y mod n for bigInts x,y,n.
 // for greater speed, let y<x.
-function multMod_(x, y, n) {
+export function multMod_(x, y, n) {
   let i;
   if (s0.length != 2 * x.length) s0 = new Array(2 * x.length);
   copyInt_(s0, 0);
@@ -1357,7 +1357,7 @@ function multMod_(x, y, n) {
 }
 
 // do x=x*x mod n for bigInts x,n.
-function squareMod_(x, n) {
+export function squareMod_(x, n) {
   let i;
   let j;
   let d;
@@ -1385,7 +1385,7 @@ function squareMod_(x, n) {
 }
 
 // return x with exactly k leading zero elements
-function trim(x, k) {
+export function trim(x, k) {
   let i;
   let y;
   for (i = x.length; i > 0 && !x[i - 1]; i--);
@@ -1396,7 +1396,7 @@ function trim(x, k) {
 
 // do x=x**y mod n, where x,y,n are bigInts and ** is exponentiation.  0**0=1.
 // this is faster when n is odd.  x usually needs to have as many elements as n.
-function powMod_(x, y, n) {
+export function powMod_(x, y, n) {
   let k1;
   let k2;
   let kn;
@@ -1461,7 +1461,7 @@ function powMod_(x, y, n) {
 //  x,y < n
 //  n is odd
 //  np = -(n^(-1)) mod radix
-function mont_(x, y, n, np) {
+export function mont_(x, y, n, np) {
   let i;
   let j;
   let c;
@@ -1556,63 +1556,3 @@ function mont_(x, y, n, np) {
   if (!greater(n, sa)) sub_(sa, n);
   copy_(x, sa);
 }
-
-module.exports = {
-  add,
-  addInt,
-  bigInt2str,
-  bitSize,
-  dup,
-  equals,
-  equalsInt,
-  expand,
-  findPrimes,
-  GCD,
-  greater,
-  greaterShift,
-  int2bigInt,
-  inverseMod,
-  inverseModInt,
-  isZero,
-  millerRabin,
-  millerRabinInt,
-  mod,
-  modInt,
-  mult,
-  multMod,
-  negative,
-  powMod,
-  randBigInt,
-  randTruePrime,
-  randProbPrime,
-  str2bigInt,
-  sub,
-  trim,
-  addInt_,
-  add_,
-  copy_,
-  copyInt_,
-  GCD_,
-  inverseMod_,
-  mod_,
-  mult_,
-  multMod_,
-  powMod_,
-  randBigInt_,
-  randTruePrime_,
-  sub_,
-  addShift_,
-  carry_,
-  divide_,
-  divInt_,
-  eGCD_,
-  halve_,
-  leftShift_,
-  linComb_,
-  linCombShift_,
-  mont_,
-  multInt_,
-  rightShift_,
-  squareMod_,
-  subShift_,
-};

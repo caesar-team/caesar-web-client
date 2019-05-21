@@ -49,6 +49,11 @@ export const listsSelector = createSelector(
   node => Object.values(node.listsById) || [],
 );
 
+export const userListsSelector = createSelector(
+  listsSelector,
+  lists => lists.filter(list => list.type === LIST_TYPE && list.parentId)
+)
+
 export const itemsSelector = createSelector(
   nodeSelector,
   node => Object.values(node.itemsById) || [],

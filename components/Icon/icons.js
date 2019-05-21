@@ -18,6 +18,7 @@ import 'static/images/svg/icon-clip.svg?sprite';
 import 'static/images/svg/icon-close.svg?sprite';
 import 'static/images/svg/icon-copy.svg?sprite';
 import 'static/images/svg/icon-credit-card.svg?sprite';
+import 'static/images/svg/icon-dice.svg?sprite';
 import 'static/images/svg/icon-download.svg?sprite';
 import 'static/images/svg/icon-edit.svg?sprite';
 import 'static/images/svg/icon-email.svg?sprite';

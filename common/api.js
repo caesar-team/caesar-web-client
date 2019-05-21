@@ -1,5 +1,4 @@
 import axios from 'axios';
-import { API_URI, API_BASE_PATH } from './constants';
 import { getToken, removeToken } from './utils/token';
 import { isClient } from './utils/isEnvironment';
 
@@ -15,22 +14,21 @@ const softExit = () => {
 };
 
 const callApi = axios.create({
-  baseURL: `${API_URI}/${API_BASE_PATH}`,
+  baseURL: 'http://loc.caesar.team/api',
+  withCredentials: true,
 });
 
-callApi.interceptors.request.use(config => {
-  const token = getToken();
-
-  return token
-    ? {
-        ...config,
-        headers: {
-          ...config.headers,
-          Authorization: `Bearer ${getToken()}`,
-        },
-      }
-    : config;
-});
+// callApi.interceptors.request.use(config => {
+//   // const token = getToken();
+//
+//   return {
+//     ...config,
+//     headers: {
+//       ...config.headers,
+//       Authorization: `Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJpYXQiOjE1NTgwOTI0MjMsImV4cCI6MTU1ODE3ODgyMywicm9sZXMiOlsiUk9MRV9VU0VSIl0sInVzZXJuYW1lIjoiRG1pdHJpeSBTcGlyaWRvbm92In0.RCYul7JZflJ7k7s_lsRJudNWIJyo19lypmgQVWfqlthbQWXvUSFqA36iNRYrPI9e5xv7irwAtCrOeS2PK-dcH-QcwnVUrYHaJJHK4JUY_zq5OmGYBVjqaePWdR5bFh4k8VG0e2lkWI2M0adZlDVMife6WZZ3fONDlMuL1-ZWQsXmI-mPMegZepoeBWhkFfxofayhiPViR1n4FfUeAXVe8baPt_zmG8ALNi4WCKk92ec0tJER3K4gb4jdp-0AYQHvfNf6x7dd1bd1amstK4TsLUxHFlimm6DXkMRiJUcdZqd9WRzERxM6Dq4c8TpIJnO51U8A9_0jycs1iUUlNZ8jzt_SjBT2ymAvGVsUl6PSOIly1E3K8tKPRG4maEOrJeNwXrUBgRHDhTrQNzaOLCShcQ23BQHiPvmAF42loILgHMRsuFWgZW6pK5UbNqYTJET4uEavHj4K2m-2zff6zErjR90hyToT6gfJwyyycE6LtMHcdUViqOB7sT94YkX0W5bGDaJwqF5eJWCfhv_0w-V8knyrsvHpQUNkX9gaaLSOJG3e2Hnl6reB873UYKf8fjWC9Kw1NH8LWq0UYPyvjt90Pm6AHnU_PSiucuXSoC9jbbJ5bay3FTbteB4Q4gVSxdw6dLW_AOsNYSHGNVxyMb2N5cMMtY-nmNRryduKhzEpzc4`
+//     },
+//   }
+// });
 
 callApi.interceptors.response.use(
   config => config,

@@ -63,3 +63,5 @@ export { NavigationPanel } from './NavigationPanel';
 export { DataTable } from './DataTable';
 export { ProgressBar } from './ProgressBar';
 export { Toggle } from './Toggle';
+export { RangeInput } from './RangeInput';
+export { PasswordIndicator } from './PasswordIndicator';

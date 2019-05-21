@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="16" height="16" viewBox="0 0 16 16">
+    <defs>
+        <path id="a" d="M15.58 2.961L8.244.078a.665.665 0 0 0-.488 0L.42 2.961A.669.669 0 0 0 0 3.58v8.708c0 .287.185.544.459.631l7.336 3.017c.01.003.098.032.205.032.114 0 .195-.029.205-.032l7.336-3.017a.664.664 0 0 0 .459-.63V3.578a.679.679 0 0 0-.42-.618zm-8.243 11.43l-6.01-2.585V4.493l6.01 2.314v7.583zM8 5.626l-5.379-2.11L8 1.408l5.379 2.11L8 5.626zm6.673 6.18L8.667 14.39V6.807l6-2.31.003 7.31h.003z"/>
+        <path id="c" d="M6.452.26a.727.727 0 1 1 0 1.457h-.224a.727.727 0 1 1 0-1.457h.224zm2.384 6.53a.839.839 0 1 1-.839.839c0-.462.374-.839.839-.839zm2.367-1.174a.839.839 0 1 1-.839.839c0-.462.374-.839.84-.839zm-8.387.878a.839.839 0 1 1 0-1.678.839.839 0 0 1 0 1.678zM2.283 7.58a.839.839 0 1 1-1.678 0 .839.839 0 0 1 1.678 0zm1.36-.144a.839.839 0 1 1 0 1.678.839.839 0 0 1 0-1.678z"/>
+    </defs>
+    <g fill="none" fill-rule="evenodd">
+        <g>
+            <mask id="b" fill="#fff">
+                <use xlink:href="#a"/>
+            </mask>
+            <use fill="#000" fill-rule="nonzero" xlink:href="#a"/>
+            <g fill="#505050" fill-rule="nonzero" mask="url(#b)">
+                <path d="M0 0h16v16H0z"/>
+            </g>
+        </g>
+        <g transform="translate(1.6 2.4)">
+            <mask id="d" fill="#fff">
+                <use xlink:href="#c"/>
+            </mask>
+            <use fill="#000" fill-rule="nonzero" xlink:href="#c"/>
+            <g fill="#505050" fill-rule="nonzero" mask="url(#d)">
+                <path d="M-1.6-2.4h16v16h-16z"/>
+            </g>
+        </g>
+    </g>
+</svg>

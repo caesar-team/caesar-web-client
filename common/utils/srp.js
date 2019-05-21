@@ -1,5 +1,13 @@
 import sha256 from 'js-sha256';
-import BigInt from './bigint';
+import {
+  str2bigInt,
+  powMod,
+  sub,
+  add,
+  mult,
+  randBigInt,
+  bigInt2str,
+} from './bigint';
 
 const srp = function() {
   this.n_base64 =
@@ -19,20 +27,20 @@ srp.prototype.generateX = function(s, username, password) {
 };
 
 srp.prototype.generateV = function(x) {
-  const g = BigInt.str2bigInt(this.g, 10);
+  const g = str2bigInt(this.g, 10);
   const n = this.base2BigInt(this.n_base64);
   var x = this.base2BigInt(x);
-  const v = this.bigIntToBase(BigInt.powMod(g, x, n));
+  const v = this.bigIntToBase(powMod(g, x, n));
 
   return v;
 };
 
 srp.prototype.generateA = function(a) {
-  const g = BigInt.str2bigInt(this.g, 10);
+  const g = str2bigInt(this.g, 10);
   const n = this.base2BigInt(this.n_base64);
   var a = this.base2BigInt(a);
 
-  const A = this.bigIntToBase(BigInt.powMod(g, a, n));
+  const A = this.bigIntToBase(powMod(g, a, n));
 
   return A;
 };
@@ -42,16 +50,12 @@ srp.prototype.generateClientS = function(A, B, a, x) {
   var B = this.base2BigInt(B);
   var a = this.base2BigInt(a);
   const k = this.base2BigInt(this.k);
-  const g = BigInt.str2bigInt(this.g, 10);
+  const g = str2bigInt(this.g, 10);
   const n = this.base2BigInt(this.n_base64);
   var x = this.base2BigInt(x);
 
   const S = this.bigIntToBase(
-    BigInt.powMod(
-      BigInt.sub(B, BigInt.mult(k, BigInt.powMod(g, x, n))),
-      BigInt.add(a, BigInt.mult(u, x)),
-      n,
-    ),
+    powMod(sub(B, mult(k, powMod(g, x, n))), add(a, mult(u, x)), n),
   );
 
   return S;
@@ -62,11 +66,9 @@ srp.prototype.generateB = function(b, v) {
   var v = this.base2BigInt(v);
   var b = this.base2BigInt(b);
   const k = this.base2BigInt(this.k);
-  const g = BigInt.str2bigInt(this.g, 10);
+  const g = str2bigInt(this.g, 10);
 
-  const B = this.bigIntToBase(
-    BigInt.add(BigInt.mult(k, v), BigInt.powMod(g, b, n)),
-  );
+  const B = this.bigIntToBase(add(mult(k, v), powMod(g, b, n)));
 
   return B;
 };
@@ -78,9 +80,7 @@ srp.prototype.generateServerS = function(A, B, b, v) {
   var v = this.base2BigInt(v);
   var b = this.base2BigInt(b);
 
-  const S = this.bigIntToBase(
-    BigInt.powMod(BigInt.mult(A, BigInt.powMod(v, u, n)), b, n),
-  );
+  const S = this.bigIntToBase(powMod(mult(A, powMod(v, u, n)), b, n));
 
   return S;
 };
@@ -88,7 +88,7 @@ srp.prototype.generateServerS = function(A, B, b, v) {
 srp.prototype.getRandomSeed = function(length) {
   length = length || this.rand_length;
 
-  return this.bigIntToBase(BigInt.randBigInt(length * 4));
+  return this.bigIntToBase(randBigInt(length * 4));
 };
 
 srp.prototype.generateU = function(A, B) {
@@ -117,15 +117,15 @@ srp.prototype.hash = function(value) {
 };
 
 srp.prototype.base2BigInt = function(value, base = 16) {
-  return BigInt.str2bigInt(value, base);
+  return str2bigInt(value, base);
 };
 
 srp.prototype.bigIntToStr = function(value) {
-  return BigInt.bigInt2str(value, 10);
+  return bigInt2str(value, 10);
 };
 
 srp.prototype.bigIntToBase = function(value, base = 16) {
-  return BigInt.bigInt2str(value, base).toLowerCase();
+  return bigInt2str(value, base).toLowerCase();
 };
 
 export function createSrp() {

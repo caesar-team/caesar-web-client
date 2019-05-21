@@ -4,7 +4,7 @@ import { composeWithDevTools } from 'redux-devtools-extension';
 import { rootReducer } from './reducers';
 import { rootSaga } from './sagas';
 
-export function configureStore(preloadedState) {
+export function configureWebStore(preloadedState) {
   const composeEnhancers = composeWithDevTools({});
   const sagaMiddleware = createSagaMiddleware();
 
@@ -18,4 +18,19 @@ export function configureStore(preloadedState) {
     ...store,
     sagaTask: sagaMiddleware.run(rootSaga),
   };
+}
+
+export function configureExtensionStore(preloadedState) {
+  const composeEnhancers = composeWithDevTools({});
+  const sagaMiddleware = createSagaMiddleware();
+
+  const store = createStore(
+    rootReducer,
+    preloadedState,
+    composeEnhancers(applyMiddleware(sagaMiddleware)),
+  );
+
+  sagaMiddleware.run(rootSaga);
+
+  return store;
 }

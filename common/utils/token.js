@@ -2,12 +2,18 @@ import Cookies from 'js-cookie';
 import Fingerprint2 from 'fingerprintjs2';
 import { isServer } from './isEnvironment';
 
-export function setToken(token) {
-  return Cookies.set('token', token, { path: '/' });
+export function setToken(token, path = '/') {
+  return Cookies.set('token', token, { path });
 }
 
 export function getToken() {
-  return Cookies.get('token', { path: '/' });
+  return (
+    Cookies.get('token', { path: '/' }) ||
+    chrome.cookies.get(
+      { url: 'http://loc.caesar.team:3000', name: 'token' },
+      cookie => cookie.value,
+    )
+  );
 }
 
 export function removeToken() {

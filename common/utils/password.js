@@ -68,6 +68,7 @@ function pick(object, keys) {
 
 export function generator(length = DEFAULT_LENGTH, options = {}) {
   const opts = { ...DEFAULT_OPTIONS, ...options };
+  console.log('options', length, options);
   const keys = Object.keys(opts).filter(key => !!opts[key]);
 
   const delimiter = keys.length;

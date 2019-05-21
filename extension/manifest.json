@@ -1,0 +1,38 @@
+{
+  "manifest_version": 2,
+  "name": "caesar.team extension",
+  "short_name": "Keep tabs history",
+  "version": "1.2.0",
+  "description": "",
+  "browser_action": {
+    "default_popup": "pages/popup.html"
+  },
+  "author": "4xxi team",
+  "icons": {
+    "32": "images/icon-active_32.png",
+    "64": "images/icon-active_64.png",
+    "128": "images/icon-active_128.png"
+  },
+  "background": {
+    "scripts": ["pages/background.js"]
+  },
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["pages/popup.js", "pages/background.js"],
+      "run_at": "document_end",
+      "exclude_matches": ["https://www.youtube.com/*"]
+    }
+  ],
+  "permissions": [
+    "cookies",
+    "tabs",
+    "activeTab",
+    "http://*/*",
+    "https://*/*",
+    "storage",
+    "alarms"
+  ],
+  "minimum_chrome_version": "60",
+  "content_security_policy": "script-src 'self' 'unsafe-eval'; object-src 'self'"
+}

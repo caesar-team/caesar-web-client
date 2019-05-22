@@ -33,6 +33,7 @@ class Lists extends Component {
 
       return (
         <ListOption
+          key={list.id}
           list={list}
           items={visibleListItems}
           workInProgressItem={workInProgressItem}

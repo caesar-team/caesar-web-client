@@ -1,4 +1,5 @@
 const path = require('path');
+const Dotenv = require('dotenv-webpack');
 const CopyPlugin = require('copy-webpack-plugin');
 const HtmlPlugin = require('html-webpack-plugin');
 const ExtractTextPlugin = require('extract-text-webpack-plugin');
@@ -7,7 +8,6 @@ const ChromeExtensionReloader = require('webpack-chrome-extension-reloader');
 require('babel-core/register');
 require('babel-polyfill');
 
-const BUILD_DIR = '../build';
 const PAGES_PATH = './extension/pages';
 
 module.exports = {
@@ -15,7 +15,6 @@ module.exports = {
   entry: {
     background: `${PAGES_PATH}/background`,
     popup: `${PAGES_PATH}/popup`,
-    // index: ['babel-polyfill', `${PAGES_PATH}/content`],
   },
   output: {
     path: path.resolve('build/pages'),
@@ -55,6 +54,9 @@ module.exports = {
     ],
   },
   plugins: [
+    new Dotenv({
+      path: 'extension/.env.development',
+    }),
     new ChromeExtensionReloader({
       port: 9090,
       reloadPage: true,

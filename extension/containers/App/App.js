@@ -1,16 +1,20 @@
 import React, { Component } from 'react';
 import styled from 'styled-components';
 import * as openpgp from 'openpgp';
+import { DEFAULT_IDLE_TIMEOUT } from '@caesar-utils/constants';
 import OpenPGPWorker from '@caesar-utils/openpgp.worker';
 import { validateKeys } from '@caesar-utils/utils/key';
 import { match } from '@caesar-utils/utils/match';
+import { SessionChecker } from '@caesar-ui';
 import { Dashboard, MasterPassword } from 'containers';
+import { Login } from 'components';
 
 const Wrapper = styled.div`
   width: 576px;
   height: 373px;
 `;
 
+const LOGIN_STEP = 'LOGIN_STEP';
 const MASTER_PASSWORD_STEP = 'MASTER_PASSWORD_STEP';
 const DASHBOARD_STEP = 'DASHBOARD_STEP';
 
@@ -18,9 +22,13 @@ class App extends Component {
   state = this.prepareInitialState();
 
   componentDidMount() {
-    this.initOpenPGPWorker();
+    const { token } = this.props;
 
-    this.props.fetchKeyPairRequest();
+    if (token) {
+      this.initOpenPGPWorker();
+
+      this.props.fetchKeyPairRequest();
+    }
   }
 
   handleSubmitMasterPassword = async (
@@ -45,6 +53,12 @@ class App extends Component {
     }
   };
 
+  handleInactiveTimeout = () => {
+    this.setState({
+      currentStep: MASTER_PASSWORD_STEP,
+    });
+  };
+
   initOpenPGPWorker() {
     openpgp.config.aead_protect = false;
 
@@ -55,7 +69,7 @@ class App extends Component {
 
   prepareInitialState() {
     return {
-      currentStep: MASTER_PASSWORD_STEP,
+      currentStep: this.props.token ? MASTER_PASSWORD_STEP : LOGIN_STEP,
     };
   }
 
@@ -66,6 +80,7 @@ class App extends Component {
     const renderedStep = match(
       currentStep,
       {
+        [LOGIN_STEP]: <Login />,
         [MASTER_PASSWORD_STEP]: (
           <MasterPassword onSubmit={this.handleSubmitMasterPassword} />
         ),
@@ -74,7 +89,16 @@ class App extends Component {
       null,
     );
 
-    return <Wrapper>{renderedStep}</Wrapper>;
+    return (
+      <Wrapper>
+        <SessionChecker
+          timeout={DEFAULT_IDLE_TIMEOUT}
+          onFinishTimeout={this.handleInactiveTimeout}
+        >
+          {renderedStep}
+        </SessionChecker>
+      </Wrapper>
+    );
   }
 }
 

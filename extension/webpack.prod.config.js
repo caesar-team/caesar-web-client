@@ -1,4 +1,5 @@
 const path = require('path');
+const Dotenv = require('dotenv-webpack');
 const CopyPlugin = require('copy-webpack-plugin');
 const HtmlPlugin = require('html-webpack-plugin');
 const ExtractTextPlugin = require('extract-text-webpack-plugin');
@@ -9,7 +10,7 @@ require('babel-polyfill');
 const PAGES_PATH = './extension/pages';
 
 module.exports = {
-  mode: 'production',
+  mode: 'development',
   entry: {
     background: `${PAGES_PATH}/background`,
     popup: `${PAGES_PATH}/popup`,
@@ -52,6 +53,9 @@ module.exports = {
     ],
   },
   plugins: [
+    new Dotenv({
+      path: 'extension/.env.production',
+    }),
     new ExtractTextPlugin({
       filename: '[name].[contenthash].css',
     }),
@@ -60,10 +64,12 @@ module.exports = {
         from: 'extension',
         to: path.resolve('build'),
         ignore: [
-          './extension/pages/**/*',
-          './extension/webpack.*.config.js',
-          './extension/popup.html',
-          './extension/.babelrc',
+          'pages/**/*',
+          'webpack.*.config.js',
+          'popup.html',
+          '.babelrc',
+          'containers/**/*',
+          'components/**/*',
         ],
       },
     ]),

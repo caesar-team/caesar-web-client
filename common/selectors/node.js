@@ -54,6 +54,11 @@ export const userListsSelector = createSelector(
   lists => lists.filter(list => list.type === LIST_TYPE && list.parentId)
 )
 
+export const defaultListSelector = createSelector(
+  listsSelector,
+  lists => lists.find(({ label }) => label === 'default') || {},
+);
+
 export const itemsSelector = createSelector(
   nodeSelector,
   node => Object.values(node.itemsById) || [],
@@ -107,7 +112,7 @@ export const parentListSelector = createSelector(
   lists => lists.find(({ type, parentId }) => type === LIST_TYPE && !parentId),
 );
 
-const inboxSelector = createSelector(
+export const inboxSelector = createSelector(
   listsSelector,
   lists => lists.find(({ type }) => type === INBOX_TYPE) || {},
 );

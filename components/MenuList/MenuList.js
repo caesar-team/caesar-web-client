@@ -48,7 +48,7 @@ const SECURE_MESSAGE_MODE = 'SECURE_MESSAGE_MODE';
 
 class MenuList extends Component {
   state = {
-    isVisibleList: false,
+    isVisibleList: true,
   };
 
   handleToggle = () => {

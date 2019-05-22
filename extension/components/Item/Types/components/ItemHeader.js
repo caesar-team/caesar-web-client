@@ -1,12 +1,9 @@
 import React, { Fragment } from 'react';
 import styled from 'styled-components';
-import { formatDate } from '../../../../../common/utils/dateUtils';
-import { upperFirst } from '../../../../../common/utils/string';
-import { Icon } from '../../../../../components/Icon';
-import { Button } from '../../../../../components/Button';
-import { Avatar, AvatarsList } from '../../../../../components/Avatar';
-import { Dropdown } from '../../../../../components/Dropdown';
-import { TRASH_TYPE } from '../../../../../common/constants';
+import { formatDate } from '@caesar-utils/utils/dateUtils';
+import { upperFirst } from '@caesar-utils//utils/string';
+import { Icon, Button, Avatar, AvatarsList, Dropdown } from '@caesar-ui';
+import { TRASH_TYPE } from '@caesar-utils/constants';
 import { Row } from './Row';
 
 const StyledRow = styled(Row)`

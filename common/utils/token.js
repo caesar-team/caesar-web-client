@@ -7,13 +7,7 @@ export function setToken(token, path = '/') {
 }
 
 export function getToken() {
-  return (
-    Cookies.get('token', { path: '/' }) ||
-    chrome.cookies.get(
-      { url: 'http://loc.caesar.team:3000', name: 'token' },
-      cookie => cookie.value,
-    )
-  );
+  return Cookies.get('token', { path: '/' });
 }
 
 export function removeToken() {

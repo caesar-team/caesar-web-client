@@ -151,8 +151,6 @@ export function* decryptSaga(items) {
   const keyPair = yield select(keyPairSelector);
   const masterPassword = yield select(masterPasswordSelector);
 
-  console.log('saga', keyPair, masterPassword);
-
   const channel = yield call(createWebWorkerChannel, {
     items,
     privateKey: keyPair.privateKey,

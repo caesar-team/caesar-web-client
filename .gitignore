@@ -6,4 +6,4 @@ yarn-error.log
 /node_modules
 /extension/.env.development
 /extension/.env.production
-build
+/build

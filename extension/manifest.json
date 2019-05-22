@@ -19,7 +19,8 @@
   "content_scripts": [
     {
       "matches": ["<all_urls>"],
-      "js": ["pages/popup.js", "pages/background.js"]
+      "js": ["pages/popup.js", "pages/background.js"],
+      "run_at": "document_end"
     }
   ],
   "permissions": [

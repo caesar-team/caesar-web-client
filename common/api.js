@@ -1,6 +1,6 @@
 import axios from 'axios';
+import { removeToken } from './utils/token';
 import { API_URI, API_BASE_PATH } from './constants';
-import { getToken, removeToken } from './utils/token';
 import { isClient } from './utils/isEnvironment';
 
 const softExit = () => {
@@ -15,21 +15,9 @@ const softExit = () => {
 };
 
 const callApi = axios.create({
-  baseURL: `${API_URI}/${API_BASE_PATH}`,
-});
-
-callApi.interceptors.request.use(config => {
-  const token = getToken();
-
-  return token
-    ? {
-        ...config,
-        headers: {
-          ...config.headers,
-          Authorization: `Bearer ${getToken()}`,
-        },
-      }
-    : config;
+  baseURL: `${API_URI || process.env.API_URI}/${API_BASE_PATH ||
+    process.env.API_BASE_PATH}`,
+  withCredentials: true,
 });
 
 callApi.interceptors.response.use(
@@ -38,7 +26,7 @@ callApi.interceptors.response.use(
     if (error.response) {
       switch (error.response.status) {
         case 401:
-          softExit();
+          if (!process.env.IS_EXTENSION) softExit();
           break;
         default:
           // console.log(error.response.data);

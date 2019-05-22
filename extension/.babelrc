@@ -1,0 +1,28 @@
+{
+  "presets": [
+    ["@babel/env", {
+      "targets": {
+        "browsers": "last 2 Chrome versions",
+        "node": "current"
+      }
+    }],
+    "@babel/react"
+  ],
+  "plugins": [
+    [
+      "module-resolver",
+      {
+        "root": ["../"],
+        "alias": {
+          "@caesar-utils": "./common",
+          "@caesar-ui": "./components",
+          "components": "./extension/components",
+          "containers": "./extension/containers",
+          "utils": "./extension/utils"
+        }
+      }
+    ],
+    "@babel/plugin-proposal-class-properties",
+    "babel-plugin-styled-components"
+  ]
+}

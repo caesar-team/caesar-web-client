@@ -2,8 +2,8 @@ import Cookies from 'js-cookie';
 import Fingerprint2 from 'fingerprintjs2';
 import { isServer } from './isEnvironment';
 
-export function setToken(token) {
-  return Cookies.set('token', token, { path: '/' });
+export function setToken(token, path = '/') {
+  return Cookies.set('token', token, { path });
 }
 
 export function getToken() {

@@ -8,7 +8,7 @@ import theme from 'common/theme';
 import { Provider } from 'react-redux';
 import withRedux from 'next-redux-wrapper';
 import withReduxSaga from 'next-redux-saga';
-import { configureStore } from 'common/root/store';
+import { configureWebStore } from 'common/root/store';
 import { Bootstrap } from '../containers';
 import { NotificationProvider } from '../components';
 
@@ -76,4 +76,4 @@ class Application extends NextApp {
   }
 }
 
-export default withRedux(configureStore)(withReduxSaga(Application));
+export default withRedux(configureWebStore)(withReduxSaga(Application));

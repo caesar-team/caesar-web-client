@@ -558,11 +558,11 @@ export function* shareItemSaga({ payload: { emails } }) {
       ({ userId }) => userId,
     );
 
-    const response = yield all([
-      ...emails.map(email =>
+    const response = yield all(
+      emails.map(email =>
         call(getOrCreateMemberSaga, { payload: { email, role: USER_ROLE } }),
       ),
-    ]);
+    );
 
     const users = response.filter(
       user => !!user && !itemInvitedUsers.includes(user.userId),

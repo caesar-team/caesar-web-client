@@ -1,13 +1,12 @@
 import React, { Component } from 'react';
 import styled from 'styled-components';
 import {
-  Icon,
   Modal,
   ModalTitle,
   Button,
   Checkbox,
-  ShareInput,
   Toggle,
+  TagsInput,
 } from 'components';
 import { copyToClipboard } from 'common/utils/clipboard';
 import { base64ToObject, objectToBase64 } from 'common/utils/cipherUtils';
@@ -36,41 +35,6 @@ const ToggleLabel = styled.label`
 const ToggleLabelText = styled.span`
   padding-left: 10px;
   font-size: 14px;
-`;
-
-const SharedItem = styled.div`
-  display: flex;
-  align-items: center;
-  height: 50px;
-  padding: 0 15px;
-  background-color: ${({ theme }) => theme.snow};
-  margin-bottom: 5px;
-
-  &:last-child {
-    margin-bottom: 0;
-  }
-`;
-
-const SharedItemEmail = styled.div`
-  margin-right: auto;
-  font-size: 16px;
-  color: ${({ theme }) => theme.black};
-  overflow: hidden;
-  text-overflow: ellipsis;
-`;
-
-const SharedItemRemove = styled.button`
-  border: none;
-  background: none;
-  padding: 4px;
-  margin-left: 20px;
-  color: ${({ theme }) => theme.gray};
-  cursor: pointer;
-  transition: 0.25s;
-
-  &:hover {
-    color: ${({ theme }) => theme.black};
-  }
 `;
 
 const ButtonsWrapper = styled.div`
@@ -116,9 +80,7 @@ const SharedLinkActionsButton = styled(Button)`
   margin-left: 20px;
 `;
 
-const EmailBox = styled(SharedItem)`
-  background-color: ${({ theme }) => theme.lightBlue};
-`;
+const EMAIL_REGEX = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
 
 const getEncryption = link => link.match(/\/([\w|+-]+)$/)[1];
 const getShareId = link => link.match(/share\/(.+)\//)[1];
@@ -186,10 +148,8 @@ export class ShareModal extends Component {
     return onShare && onShare(emails);
   };
 
-  handleAddEmail = email => {
-    this.setState(prevState => ({
-      emails: [...prevState.emails, email],
-    }));
+  handleAddEmail = emails => {
+    this.setState({ emails });
   };
 
   handleRemoveEmail = email => () => {
@@ -221,25 +181,6 @@ export class ShareModal extends Component {
     };
   }
 
-  renderEmails() {
-    const { emails } = this.state;
-
-    return emails.map((email, index) => (
-      <EmailBox key={index}>
-        <SharedItemEmail>{email}</SharedItemEmail>
-        <SharedItemRemove>
-          <Icon
-            name="close"
-            width={14}
-            height={14}
-            isInButton
-            onClick={this.handleRemoveEmail(email)}
-          />
-        </SharedItemRemove>
-      </EmailBox>
-    ));
-  }
-
   render() {
     const { isUseMasterPassword, isLoading } = this.state;
     const { onCancel, shared } = this.props;
@@ -263,11 +204,13 @@ export class ShareModal extends Component {
           Share item will be available in read mode
         </ModalDescription>
         <Row>
-          <ShareInput onChange={this.handleAddEmail} />
+          <TagsInput
+            value={this.state.emails}
+            validationRegex={EMAIL_REGEX}
+            inputProps={{ placeholder: 'Type email and press enter or tab' }}
+            onChange={this.handleAddEmail}
+          />
         </Row>
-        {this.renderEmails()}
-        {/* {this.renderWaitingUsers()} */}
-        {/* {this.renderSharedUsers()} */}
         <LinkRow>
           <ToggleLabel>
             <Toggle

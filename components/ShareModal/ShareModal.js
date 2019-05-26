@@ -11,6 +11,7 @@ import {
 import { copyToClipboard } from 'common/utils/clipboard';
 import { base64ToObject, objectToBase64 } from 'common/utils/cipherUtils';
 import { generateSharingUrl } from 'common/utils/sharing';
+import { KEY_CODES } from 'common/constants';
 
 const ModalDescription = styled.div`
   padding-bottom: 20px;
@@ -207,7 +208,8 @@ export class ShareModal extends Component {
           <TagsInput
             value={this.state.emails}
             validationRegex={EMAIL_REGEX}
-            inputProps={{ placeholder: 'Type email and press enter or tab' }}
+            inputProps={{ placeholder: 'Type email and press enter or tab or space' }}
+            addKeys={[KEY_CODES.TAB, KEY_CODES.SPACE, KEY_CODES.ENTER]}
             onChange={this.handleAddEmail}
           />
         </Row>

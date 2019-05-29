@@ -32,8 +32,13 @@ const AvatarsList = ({
   const shouldShowLast = invisibleCount > 0;
 
   const renderedAvatars = visibleAvatars
-    .map(({ name, avatar }, index) => (
-      <StyledAvatar isSmall={isSmall} key={index} name={name} avatar={avatar} />
+    .map(({ name, email, avatar }, index) => (
+      <StyledAvatar
+        isSmall={isSmall}
+        key={index}
+        name={name || email}
+        avatar={avatar}
+      />
     ))
     .concat(
       shouldShowLast ? (

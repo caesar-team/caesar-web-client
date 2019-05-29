@@ -208,9 +208,7 @@ export class ShareModal extends Component {
           <TagsInput
             value={this.state.emails}
             validationRegex={EMAIL_REGEX}
-            inputProps={{
-              placeholder: '',
-            }}
+            inputProps={{ placeholder: '' }}
             addKeys={[KEY_CODES.TAB, KEY_CODES.SPACE, KEY_CODES.ENTER]}
             onChange={this.handleAddEmail}
           />
@@ -239,9 +237,6 @@ export class ShareModal extends Component {
                       Use master password
                     </Checkbox>
                     <SharedLinkActionsButtons>
-                      {/* <SharedLinkActionsButton color="white" icon="mail"> */}
-                      {/* Send email */}
-                      {/* </SharedLinkActionsButton> */}
                       <SharedLinkActionsButton
                         color="white"
                         icon="copy"

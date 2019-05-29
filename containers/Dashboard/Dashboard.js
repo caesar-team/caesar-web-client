@@ -79,7 +79,7 @@ class DashboardContainer extends Component {
   handleClickItem = itemId => event => {
     const { workInProgressItemIds } = this.props;
 
-    if (event.ctrlKey) {
+    if (event.ctrlKey || event.metaKey) {
       const ids = workInProgressItemIds.includes(itemId)
         ? workInProgressItemIds.filter(id => id !== itemId)
         : [...workInProgressItemIds, itemId];

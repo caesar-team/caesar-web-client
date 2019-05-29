@@ -209,7 +209,7 @@ export class ShareModal extends Component {
             addOnPaste
             value={this.state.emails}
             validationRegex={EMAIL_REGEX}
-            inputProps={{ placeholder: '' }}
+            inputProps={{ placeholder: 'Type email and press space or tab' }}
             addKeys={[KEY_CODES.TAB, KEY_CODES.SPACE, KEY_CODES.ENTER]}
             onChange={this.handleAddEmail}
           />

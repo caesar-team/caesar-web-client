@@ -124,7 +124,7 @@ class DashboardContainer extends Component {
       this.props.setWorkInProgressItem(null);
     }
 
-    this.handleToggleModal('removeItem')();
+    this.handleCloseModal('removeItem')();
   };
 
   handleMoveToTrash = () => {
@@ -138,7 +138,7 @@ class DashboardContainer extends Component {
       this.props.setWorkInProgressItem(null);
     }
 
-    this.handleToggleModal('moveToTrash')();
+    this.handleCloseModal('moveToTrash')();
   };
 
   handleFinishCreateWorkflow = (data, { setSubmitting }) => {
@@ -224,26 +224,36 @@ class DashboardContainer extends Component {
       }
     }
 
-    this.handleToggleModal('share')();
+    this.handleCloseModal('share')();
   };
 
   handleRemoveShare = shareId => () => {
     this.props.removeShareRequest(shareId);
   };
 
-  handleToggleModal = modal => () => {
+  handleClickMoveItems = (_, listId) => {
+    this.props.moveItems(listId);
+    this.props.resetWorkInProgressItemIds();
+  };
+
+  handleOpenModal = modal => () => {
     this.setState(prevState => ({
       ...prevState,
       modals: {
         ...prevState.modals,
-        [modal]: !prevState.modals[modal],
+        [modal]: true,
       },
     }));
   };
 
-  handleClickMoveItems = (_, listId) => {
-    this.props.moveItems(listId);
-    this.props.resetWorkInProgressItemIds();
+  handleCloseModal = modal => () => {
+    this.setState(prevState => ({
+      ...prevState,
+      modals: {
+        ...prevState.modals,
+        [modal]: false,
+      },
+    }));
   };
 
   prepareInitialState() {
@@ -323,9 +333,9 @@ class DashboardContainer extends Component {
                       workInProgressItemIds={workInProgressItemIds}
                       allLists={lists}
                       onClickMove={this.handleClickMoveItems}
-                      onClickMoveToTrash={this.handleToggleModal('moveToTrash')}
-                      onClickRemove={this.handleToggleModal('removeItem')}
-                      onClickShare={this.handleToggleModal('share')}
+                      onClickMoveToTrash={this.handleOpenModal('moveToTrash')}
+                      onClickRemove={this.handleOpenModal('removeItem')}
+                      onClickShare={this.handleOpenModal('share')}
                     />
                   ) : (
                     <Item
@@ -337,15 +347,15 @@ class DashboardContainer extends Component {
                       members={members}
                       onClickMoveItem={this.handleClickMoveItem}
                       onClickCloseItem={this.handleClickCloseItem}
-                      onClickInvite={this.handleToggleModal('invite')}
-                      onClickShare={this.handleToggleModal('share')}
+                      onClickInvite={this.handleOpenModal('invite')}
+                      onClickShare={this.handleOpenModal('share')}
                       onClickEditItem={this.handleClickEditItem}
-                      onClickMoveToTrash={this.handleToggleModal('moveToTrash')}
+                      onClickMoveToTrash={this.handleOpenModal('moveToTrash')}
                       onFinishCreateWorkflow={this.handleFinishCreateWorkflow}
                       onFinishEditWorkflow={this.handleFinishEditWorkflow}
                       onCancelWorkflow={this.handleClickCancelWorkflow}
                       onClickRestoreItem={this.handleClickRestoreItem}
-                      onClickRemoveItem={this.handleToggleModal('removeItem')}
+                      onClickRemoveItem={this.handleOpenModal('removeItem')}
                       onToggleFavorites={this.handleToggleFavorites}
                       onClickAcceptUpdate={this.handleAcceptUpdate}
                       onClickRejectUpdate={this.handleRejectUpdate}
@@ -364,7 +374,7 @@ class DashboardContainer extends Component {
             onClickAddNewMember={this.handleAddNewMember}
             onChangePermission={this.handleChangePermission}
             onRemoveInvite={this.handleRemoveInvite}
-            onCancel={this.handleToggleModal('invite')}
+            onCancel={this.handleCloseModal('invite')}
           />
         )}
         {modals.share && (
@@ -375,7 +385,7 @@ class DashboardContainer extends Component {
             onRemove={this.handleRemoveShare}
             onActivateSharedByLink={this.handleActivateShareByLink}
             onDeactivateSharedByLink={this.handleDeactivateShareByLink}
-            onCancel={this.handleToggleModal('share')}
+            onCancel={this.handleCloseModal('share')}
             notification={notification}
           />
         )}
@@ -383,13 +393,13 @@ class DashboardContainer extends Component {
           isOpen={modals.moveToTrash}
           description="Are you sure you want to move the item(-s) to trash?"
           onClickOk={this.handleMoveToTrash}
-          onClickCancel={this.handleToggleModal('moveToTrash')}
+          onClickCancel={this.handleCloseModal('moveToTrash')}
         />
         <ConfirmModal
           isOpen={modals.removeItem}
           description="Are you sure you want to delete the item(-s)?"
           onClickOk={this.handleRemoveItem}
-          onClickCancel={this.handleToggleModal('removeItem')}
+          onClickCancel={this.handleCloseModal('removeItem')}
         />
       </Fragment>
     );

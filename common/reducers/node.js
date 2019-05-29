@@ -6,6 +6,8 @@ import {
   ADD_ITEM,
   SET_WORK_IN_PROGRESS_ITEM,
   SET_WORK_IN_PROGRESS_LIST_ID,
+  SET_WORK_IN_PROGRESS_ITEM_IDS,
+  RESET_WORK_IN_PROGRESS_ITEM_IDS,
   REMOVE_ITEM_REQUEST,
   REMOVE_ITEM_SUCCESS,
   REMOVE_ITEM_FAILURE,
@@ -60,6 +62,7 @@ import {
   SORT_LIST_REQUEST,
   SORT_LIST_SUCCESS,
   SORT_LIST_FAILURE,
+  RESET_STORE,
 } from 'common/actions/node';
 import { PERMISSION_WRITE } from '../constants';
 
@@ -69,6 +72,7 @@ const initialState = {
   listsById: {},
   itemsById: {},
   workInProgressItem: null,
+  workInProgressItemIds: [],
   workInProgressListId: null,
 };
 
@@ -108,6 +112,18 @@ export default createReducer(initialState, {
     return {
       ...state,
       workInProgressListId: payload.listId,
+    };
+  },
+  [SET_WORK_IN_PROGRESS_ITEM_IDS](state, { payload }) {
+    return {
+      ...state,
+      workInProgressItemIds: payload.itemIds,
+    };
+  },
+  [RESET_WORK_IN_PROGRESS_ITEM_IDS](state) {
+    return {
+      ...state,
+      workInProgressItemIds: [],
     };
   },
   [REMOVE_ITEM_REQUEST](state) {
@@ -525,5 +541,8 @@ export default createReducer(initialState, {
   },
   [SORT_LIST_FAILURE](state) {
     return state;
+  },
+  [RESET_STORE]() {
+    return initialState;
   },
 });

@@ -206,6 +206,7 @@ export class ShareModal extends Component {
         </ModalDescription>
         <Row>
           <TagsInput
+            addOnPaste
             value={this.state.emails}
             validationRegex={EMAIL_REGEX}
             inputProps={{ placeholder: '' }}

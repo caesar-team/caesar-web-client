@@ -122,6 +122,7 @@ class Input extends Component {
         {prefix && <Prefix>{prefix}</Prefix>}
         <InputField
           {...props}
+          autoComplete="off"
           onFocus={this.onFocus}
           onBlur={this.onBlur}
           isFocused={isFocused}

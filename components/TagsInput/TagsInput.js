@@ -10,7 +10,7 @@ function autosizingRenderInput({ addTag, ...props }) {
   const { onChange, value, ...other } = props;
 
   return (
-    <AutosizeInput type="text" onChange={onChange} value={value} {...other} />
+    <AutosizeInput type="text" autoComplete="off" onChange={onChange} value={value} {...other} />
   );
 }
 

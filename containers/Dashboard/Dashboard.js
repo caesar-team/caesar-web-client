@@ -2,6 +2,7 @@ import React, { Component, Fragment } from 'react';
 import styled from 'styled-components';
 import {
   Item,
+  MultiItem,
   List,
   InviteModal,
   ShareModal,
@@ -55,9 +56,14 @@ class DashboardContainer extends Component {
     this.props.fetchMembersRequest();
   }
 
+  componentWillUnmount() {
+    this.props.resetStore();
+  }
+
   handleClickMenuItem = id => () => {
     this.props.setWorkInProgressListId(id);
     this.props.setWorkInProgressItem(null);
+    this.props.resetWorkInProgressItemIds();
 
     this.setState({
       mode: LIST_ITEM_MODE,
@@ -70,14 +76,27 @@ class DashboardContainer extends Component {
     });
   };
 
-  handleClickItem = itemId => () => {
-    this.props.setWorkInProgressItem(
-      this.props.itemsById[itemId],
-      ITEM_REVIEW_MODE,
-    );
+  handleClickItem = itemId => event => {
+    const { workInProgressItemIds } = this.props;
+
+    if (event.ctrlKey) {
+      const ids = workInProgressItemIds.includes(itemId)
+        ? workInProgressItemIds.filter(id => id !== itemId)
+        : [...workInProgressItemIds, itemId];
+
+      this.props.setWorkInProgressItem(null);
+      this.props.setWorkInProgressItemIds(ids);
+    } else {
+      this.props.resetWorkInProgressItemIds();
+      this.props.setWorkInProgressItem(
+        this.props.itemsById[itemId],
+        ITEM_REVIEW_MODE,
+      );
+    }
   };
 
   handleClickCreateItem = (name, type) => {
+    this.props.resetWorkInProgressItemIds();
     this.props.setWorkInProgressItem(
       initialItemData(type, this.props.workInProgressList.id),
       ITEM_WORKFLOW_CREATE_MODE,
@@ -92,18 +111,32 @@ class DashboardContainer extends Component {
   };
 
   handleRemoveItem = () => {
-    this.props.removeItemRequest(
-      this.props.workInProgressItem.id,
-      this.props.workInProgressItem.listId,
-    );
-    this.props.setWorkInProgressItem(null);
+    const { workInProgressItemIds } = this.props;
+
+    if (workInProgressItemIds.length > 0) {
+      this.props.removeItems();
+      this.props.resetWorkInProgressItemIds();
+    } else {
+      this.props.removeItemRequest(
+        this.props.workInProgressItem.id,
+        this.props.workInProgressItem.listId,
+      );
+      this.props.setWorkInProgressItem(null);
+    }
 
     this.handleToggleModal('removeItem')();
   };
 
   handleMoveToTrash = () => {
-    this.props.moveItemRequest(this.props.listsByType.trash.id);
-    this.props.setWorkInProgressItem(null);
+    const { workInProgressItemIds } = this.props;
+
+    if (workInProgressItemIds.length > 0) {
+      this.props.moveItems(this.props.listsByType.trash.id);
+      this.props.resetWorkInProgressItemIds();
+    } else {
+      this.props.moveItemRequest(this.props.listsByType.trash.id);
+      this.props.setWorkInProgressItem(null);
+    }
 
     this.handleToggleModal('moveToTrash')();
   };
@@ -180,8 +213,15 @@ class DashboardContainer extends Component {
   };
 
   handleShare = emails => {
+    const { workInProgressItem, workInProgressItemIds } = this.props;
+
     if (emails.length > 0) {
-      this.props.shareItemRequest(emails);
+      if (workInProgressItemIds && workInProgressItemIds.length > 0) {
+        this.props.shareItems(emails);
+        this.props.resetWorkInProgressItemIds();
+      } else {
+        this.props.shareItemRequest(workInProgressItem, emails);
+      }
     }
 
     this.handleToggleModal('share')();
@@ -201,6 +241,11 @@ class DashboardContainer extends Component {
     }));
   };
 
+  handleClickMoveItems = (_, listId) => {
+    this.props.moveItems(listId);
+    this.props.resetWorkInProgressItemIds();
+  };
+
   prepareInitialState() {
     return {
       mode: LIST_ITEM_MODE,
@@ -217,6 +262,7 @@ class DashboardContainer extends Component {
     const {
       notification,
       workInProgressItem,
+      workInProgressItemIds,
       workInProgressList,
       members,
       user,
@@ -224,6 +270,7 @@ class DashboardContainer extends Component {
       listsByType,
       visibleListItems,
       isLoading,
+      trashList,
     } = this.props;
 
     const { mode, modals } = this.state;
@@ -232,8 +279,12 @@ class DashboardContainer extends Component {
       return null;
     }
 
+    const isMultiItem =
+      workInProgressItemIds && workInProgressItemIds.length > 0;
     const isSecureMessageMode = mode === SECURE_MESSAGE_MODE;
 
+    const isTrashList =
+      workInProgressList && workInProgressList.id === trashList.id;
     const isTrashItem =
       workInProgressItem && workInProgressItem.listId === listsByType.trash.id;
 
@@ -256,36 +307,50 @@ class DashboardContainer extends Component {
               <Fragment>
                 <MiddleColumnWrapper>
                   <List
+                    isMultiItem={isMultiItem}
                     workInProgressList={workInProgressList}
                     workInProgressItem={workInProgressItem}
+                    workInProgressItemIds={workInProgressItemIds}
                     items={visibleListItems}
                     onClickItem={this.handleClickItem}
                     onClickCreateItem={this.handleClickCreateItem}
                   />
                 </MiddleColumnWrapper>
                 <RightColumnWrapper>
-                  <Item
-                    isTrashItem={isTrashItem}
-                    notification={notification}
-                    item={workInProgressItem}
-                    allLists={lists}
-                    user={user}
-                    members={members}
-                    onClickMoveItem={this.handleClickMoveItem}
-                    onClickCloseItem={this.handleClickCloseItem}
-                    onClickInvite={this.handleToggleModal('invite')}
-                    onClickShare={this.handleToggleModal('share')}
-                    onClickEditItem={this.handleClickEditItem}
-                    onClickMoveToTrash={this.handleToggleModal('moveToTrash')}
-                    onFinishCreateWorkflow={this.handleFinishCreateWorkflow}
-                    onFinishEditWorkflow={this.handleFinishEditWorkflow}
-                    onCancelWorkflow={this.handleClickCancelWorkflow}
-                    onClickRestoreItem={this.handleClickRestoreItem}
-                    onClickRemoveItem={this.handleToggleModal('removeItem')}
-                    onToggleFavorites={this.handleToggleFavorites}
-                    onClickAcceptUpdate={this.handleAcceptUpdate}
-                    onClickRejectUpdate={this.handleRejectUpdate}
-                  />
+                  {isMultiItem ? (
+                    <MultiItem
+                      isTrashItems={isTrashList}
+                      workInProgressItemIds={workInProgressItemIds}
+                      allLists={lists}
+                      onClickMove={this.handleClickMoveItems}
+                      onClickMoveToTrash={this.handleToggleModal('moveToTrash')}
+                      onClickRemove={this.handleToggleModal('removeItem')}
+                      onClickShare={this.handleToggleModal('share')}
+                    />
+                  ) : (
+                    <Item
+                      isTrashItem={isTrashItem}
+                      notification={notification}
+                      item={workInProgressItem}
+                      allLists={lists}
+                      user={user}
+                      members={members}
+                      onClickMoveItem={this.handleClickMoveItem}
+                      onClickCloseItem={this.handleClickCloseItem}
+                      onClickInvite={this.handleToggleModal('invite')}
+                      onClickShare={this.handleToggleModal('share')}
+                      onClickEditItem={this.handleClickEditItem}
+                      onClickMoveToTrash={this.handleToggleModal('moveToTrash')}
+                      onFinishCreateWorkflow={this.handleFinishCreateWorkflow}
+                      onFinishEditWorkflow={this.handleFinishEditWorkflow}
+                      onCancelWorkflow={this.handleClickCancelWorkflow}
+                      onClickRestoreItem={this.handleClickRestoreItem}
+                      onClickRemoveItem={this.handleToggleModal('removeItem')}
+                      onToggleFavorites={this.handleToggleFavorites}
+                      onClickAcceptUpdate={this.handleAcceptUpdate}
+                      onClickRejectUpdate={this.handleRejectUpdate}
+                    />
+                  )}
                 </RightColumnWrapper>
               </Fragment>
             )}
@@ -304,7 +369,8 @@ class DashboardContainer extends Component {
         )}
         {modals.share && (
           <ShareModal
-            shared={workInProgressItem.shared}
+            withAnonymousLink={!isMultiItem}
+            shared={(workInProgressItem && workInProgressItem.shared) || []}
             onShare={this.handleShare}
             onRemove={this.handleRemoveShare}
             onActivateSharedByLink={this.handleActivateShareByLink}
@@ -315,13 +381,13 @@ class DashboardContainer extends Component {
         )}
         <ConfirmModal
           isOpen={modals.moveToTrash}
-          description="Are you sure you want to move the post to trash?"
+          description="Are you sure you want to move the item(-s) to trash?"
           onClickOk={this.handleMoveToTrash}
           onClickCancel={this.handleToggleModal('moveToTrash')}
         />
         <ConfirmModal
           isOpen={modals.removeItem}
-          description="Are you sure you want to delete the post?"
+          description="Are you sure you want to delete the item(-s)?"
           onClickOk={this.handleRemoveItem}
           onClickCancel={this.handleToggleModal('removeItem')}
         />

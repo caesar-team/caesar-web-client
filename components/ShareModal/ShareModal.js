@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { Component, Fragment } from 'react';
 import styled from 'styled-components';
 import {
   Modal,
@@ -131,7 +131,7 @@ export class ShareModal extends Component {
 
   handleCopySharedLink = () => {
     const { isUseMasterPassword } = this.state;
-    const { notification, shared } = this.props;
+    const { notification, shared = [] } = this.props;
 
     copyToClipboard(
       this.generateLinkText(getAnonymousLink(shared), isUseMasterPassword),
@@ -184,9 +184,9 @@ export class ShareModal extends Component {
 
   render() {
     const { isUseMasterPassword, isLoading } = this.state;
-    const { onCancel, shared } = this.props;
+    const { onCancel, shared = [], withAnonymousLink } = this.props;
 
-    const link = getAnonymousLink(shared);
+    const link = withAnonymousLink ? getAnonymousLink(shared) : '';
     const switcherText = link ? 'Link access enabled' : 'Link access disabled';
     const linkText = link
       ? this.generateLinkText(link, isUseMasterPassword)
@@ -208,47 +208,53 @@ export class ShareModal extends Component {
           <TagsInput
             value={this.state.emails}
             validationRegex={EMAIL_REGEX}
-            inputProps={{ placeholder: 'Type email and press enter or tab or space' }}
+            inputProps={{
+              placeholder: '',
+            }}
             addKeys={[KEY_CODES.TAB, KEY_CODES.SPACE, KEY_CODES.ENTER]}
             onChange={this.handleAddEmail}
           />
         </Row>
-        <LinkRow>
-          <ToggleLabel>
-            <Toggle
-              value={!!link}
-              isLoading={isLoading}
-              onChange={this.handleShareByLinkChange}
-            />
-            <ToggleLabelText>{switcherText}</ToggleLabelText>
-          </ToggleLabel>
-        </LinkRow>
-        {link && (
-          <Row>
-            <SharedLinkWrapper>
-              <SharedLink>{linkText}</SharedLink>
-              <SharedLinkActions>
-                <Checkbox
-                  checked={isUseMasterPassword}
-                  onChange={this.handleToggleSeparateLink}
-                >
-                  Use master password
-                </Checkbox>
-                <SharedLinkActionsButtons>
-                  {/* <SharedLinkActionsButton color="white" icon="mail"> */}
-                  {/* Send email */}
-                  {/* </SharedLinkActionsButton> */}
-                  <SharedLinkActionsButton
-                    color="white"
-                    icon="copy"
-                    onClick={this.handleCopySharedLink}
-                  >
-                    Copy
-                  </SharedLinkActionsButton>
-                </SharedLinkActionsButtons>
-              </SharedLinkActions>
-            </SharedLinkWrapper>
-          </Row>
+        {withAnonymousLink && (
+          <Fragment>
+            <LinkRow>
+              <ToggleLabel>
+                <Toggle
+                  value={!!link}
+                  isLoading={isLoading}
+                  onChange={this.handleShareByLinkChange}
+                />
+                <ToggleLabelText>{switcherText}</ToggleLabelText>
+              </ToggleLabel>
+            </LinkRow>
+            {link && (
+              <Row>
+                <SharedLinkWrapper>
+                  <SharedLink>{linkText}</SharedLink>
+                  <SharedLinkActions>
+                    <Checkbox
+                      checked={isUseMasterPassword}
+                      onChange={this.handleToggleSeparateLink}
+                    >
+                      Use master password
+                    </Checkbox>
+                    <SharedLinkActionsButtons>
+                      {/* <SharedLinkActionsButton color="white" icon="mail"> */}
+                      {/* Send email */}
+                      {/* </SharedLinkActionsButton> */}
+                      <SharedLinkActionsButton
+                        color="white"
+                        icon="copy"
+                        onClick={this.handleCopySharedLink}
+                      >
+                        Copy
+                      </SharedLinkActionsButton>
+                    </SharedLinkActionsButtons>
+                  </SharedLinkActions>
+                </SharedLinkWrapper>
+              </Row>
+            )}
+          </Fragment>
         )}
         <ButtonsWrapper>
           <StyledButton color="white" onClick={onCancel}>

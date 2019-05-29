@@ -5,6 +5,7 @@ import {
   FETCH_NODES_REQUEST,
   REMOVE_ITEM_REQUEST,
   MOVE_ITEM_REQUEST,
+  MOVE_ITEMS,
   CREATE_ITEM_REQUEST,
   EDIT_ITEM_REQUEST,
   ACCEPT_ITEM_UPDATE_REQUEST,
@@ -14,7 +15,9 @@ import {
   INVITE_MEMBER_REQUEST,
   INVITE_NEW_MEMBER_REQUEST,
   REMOVE_INVITE_REQUEST,
+  REMOVE_ITEMS,
   SHARE_ITEM_REQUEST,
+  SHARE_ITEMS,
   REMOVE_SHARE_REQUEST,
   CREATE_ANONYMOUS_LINK_REQUEST,
   REMOVE_ANONYMOUS_LINK_REQUEST,
@@ -75,9 +78,11 @@ import { memberListSelector } from 'common/selectors/member';
 import {
   defaultListSelector,
   workInProgressItemSelector,
+  workInProgressItemIdsSelector,
   favoritesSelector,
   parentListSelector,
   sortedCustomizableListsSelector,
+  itemsByIdSelector,
 } from 'common/selectors/node';
 import {
   getList,
@@ -550,13 +555,9 @@ export function* removeInviteMemberSaga({ payload: { userId } }) {
   }
 }
 
-export function* shareItemSaga({ payload: { emails } }) {
+export function* shareItemSaga({ payload: { item, emails } }) {
   try {
-    const workInProgressItem = yield select(workInProgressItemSelector);
-
-    const itemInvitedUsers = workInProgressItem.invited.map(
-      ({ userId }) => userId,
-    );
+    const itemInvitedUsers = item.invited.map(({ userId }) => userId);
 
     const response = yield all(
       emails.map(email =>
@@ -572,7 +573,7 @@ export function* shareItemSaga({ payload: { emails } }) {
 
     const invitedEncryptedSecrets = yield call(
       encryptItemForUsers,
-      workInProgressItem.secret,
+      item.secret,
       userKeys,
     );
 
@@ -588,7 +589,7 @@ export function* shareItemSaga({ payload: { emails } }) {
     if (invitedChildItems.length) {
       const {
         data: { items },
-      } = yield call(postCreateChildItem, workInProgressItem.id, {
+      } = yield call(postCreateChildItem, item.id, {
         items: invitedChildItems,
       });
 
@@ -616,7 +617,7 @@ export function* shareItemSaga({ payload: { emails } }) {
       yield all([...invitations.map(invitation => postInvitation(invitation))]);
     }
 
-    yield put(shareItemSuccess(workInProgressItem.id, invited));
+    yield put(shareItemSuccess(item.id, invited));
   } catch (error) {
     console.log(error);
     yield put(shareItemFailure());
@@ -790,6 +791,118 @@ export function* sortListSaga({
   }
 }
 
+export function* moveItemsSaga({ payload: { listId } }) {
+  try {
+    const workInProgressItemIds = yield select(workInProgressItemIdsSelector);
+    const itemsById = yield select(itemsByIdSelector);
+
+    const items = workInProgressItemIds.map(itemId => itemsById[itemId]);
+    const movingItems = items.filter(item => item.listId !== listId);
+
+    if (movingItems.length > 0) {
+      yield all(
+        movingItems.map(item => call(updateMoveItem, item.id, { listId })),
+      );
+      yield all(
+        movingItems.map(item =>
+          put(moveItemSuccess(item.id, item.listId, listId)),
+        ),
+      );
+    }
+  } catch (error) {
+    console.log(error);
+  }
+}
+
+export function* removeItemsSaga() {
+  try {
+    const workInProgressItemIds = yield select(workInProgressItemIdsSelector);
+    const itemsById = yield select(itemsByIdSelector);
+
+    const items = workInProgressItemIds.map(itemId => itemsById[itemId]);
+
+    yield all(items.map(item => call(removeItem, item.id)));
+    yield all(items.map(item => put(removeItemSuccess(item.id, item.listId))));
+  } catch (error) {
+    console.log(error);
+  }
+}
+
+export function* shareItemsSaga({ payload: { emails } }) {
+  try {
+    const workInProgressItemIds = yield select(workInProgressItemIdsSelector);
+    const itemsById = yield select(itemsByIdSelector);
+
+    const sharedItems = workInProgressItemIds.map(itemId => itemsById[itemId]);
+
+    for (const item of sharedItems) {
+      const response = yield all(
+        emails.map(email =>
+          call(getOrCreateMemberSaga, { payload: { email, role: USER_ROLE } }),
+        ),
+      );
+
+      const itemInvitedUsers = item.invited.map(({ userId }) => userId);
+
+      const users = response.filter(
+        user => !!user && !itemInvitedUsers.includes(user.userId),
+      );
+
+      const userKeys = users.map(({ publicKey }) => publicKey);
+
+      const invitedEncryptedSecrets = yield call(
+        encryptItemForUsers,
+        item.secret,
+        userKeys,
+      );
+
+      const invitedChildItems = invitedEncryptedSecrets.map((secret, idx) => ({
+        secret,
+        userId: users[idx].userId,
+        access: PERMISSION_READ,
+        cause: INVITE_TYPE,
+      }));
+
+      let invited = [];
+
+      if (invitedChildItems.length) {
+        const {
+          data: { items },
+        } = yield call(postCreateChildItem, item.id, {
+          items: invitedChildItems,
+        });
+
+        invited = items.map(({ id, lastUpdatedAt }, idx) => ({
+          id,
+          updatedAt: lastUpdatedAt,
+          userId: users[idx].userId,
+          email: users[idx].email,
+          access: PERMISSION_READ,
+        }));
+
+        const invitations = users
+          .filter(({ isNew }) => !!isNew)
+          .map(({ email, password, masterPassword }) => ({
+            email,
+            url: generateInviteUrl(
+              objectToBase64({
+                e: email,
+                p: password,
+                mp: masterPassword,
+              }),
+            ),
+          }));
+
+        yield all(invitations.map(invitation => postInvitation(invitation)));
+      }
+
+      yield put(shareItemSuccess(item.id, invited));
+    }
+  } catch (error) {
+    console.log(error);
+  }
+}
+
 export function* nodeSagas() {
   yield takeLatest(FETCH_NODES_REQUEST, fetchNodesSaga);
   yield takeLatest(REMOVE_ITEM_REQUEST, removeItemSaga);
@@ -811,4 +924,7 @@ export function* nodeSagas() {
   yield takeLatest(EDIT_LIST_REQUEST, editListSaga);
   yield takeLatest(REMOVE_LIST_REQUEST, removeListSaga);
   yield takeLatest(SORT_LIST_REQUEST, sortListSaga);
+  yield takeLatest(MOVE_ITEMS, moveItemsSaga);
+  yield takeLatest(REMOVE_ITEMS, removeItemsSaga);
+  yield takeLatest(SHARE_ITEMS, shareItemsSaga);
 }

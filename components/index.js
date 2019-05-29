@@ -18,7 +18,7 @@ export {
   ShareInput,
 } from './Input';
 export { InviteModal } from './InviteModal';
-export { Item, Credentials, Document } from './Item';
+export { Item, MultiItem, Credentials, Document } from './Item';
 export { Label } from './Label';
 export { Link } from './Link';
 export { List } from './List';

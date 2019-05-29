@@ -38,6 +38,11 @@ export const workInProgressListIdSelector = createSelector(
   node => node.workInProgressListId,
 );
 
+export const workInProgressItemIdsSelector = createSelector(
+  nodeSelector,
+  node => node.workInProgressItemIds,
+);
+
 export const workInProgressListSelector = createSelector(
   listsByIdSelector,
   workInProgressListIdSelector,
@@ -67,6 +72,11 @@ export const itemsSelector = createSelector(
 export const favoriteItemsSelector = createSelector(
   itemsSelector,
   items => items.filter(({ favorite }) => !!favorite),
+);
+
+export const trashListSelector = createSelector(
+  listsSelector,
+  lists => lists.find(list => list.type === TRASH_TYPE),
 );
 
 export const selectableListsSelector = createSelector(

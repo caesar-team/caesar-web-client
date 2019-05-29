@@ -5,8 +5,13 @@ export const FETCH_NODES_FAILURE = '@nodes/FETCH_NODES_FAILURE';
 export const ADD_ITEM = '@nodes/ADD_ITEM';
 
 export const SET_WORK_IN_PROGRESS_ITEM = '@nodes/SET_WORK_IN_PROGRESS_ITEM';
+export const SET_WORK_IN_PROGRESS_ITEM_IDS =
+  '@nodes/SET_WORK_IN_PROGRESS_ITEM_IDS';
 export const SET_WORK_IN_PROGRESS_LIST_ID =
   '@nodes/SET_WORK_IN_PROGRESS_LIST_ID';
+
+export const RESET_WORK_IN_PROGRESS_ITEM_IDS =
+  '@nodes/RESET_WORK_IN_PROGRESS_ITEM_IDS';
 
 export const REMOVE_ITEM_REQUEST = '@nodes/REMOVE_ITEM_REQUEST';
 export const REMOVE_ITEM_SUCCESS = '@nodes/REMOVE_ITEM_SUCCESS';
@@ -15,6 +20,10 @@ export const REMOVE_ITEM_FAILURE = '@nodes/REMOVE_ITEM_FAILURE';
 export const MOVE_ITEM_REQUEST = '@nodes/MOVE_ITEM_REQUEST';
 export const MOVE_ITEM_SUCCESS = '@nodes/MOVE_ITEM_SUCCESS';
 export const MOVE_ITEM_FAILURE = '@nodes/MOVE_ITEM_FAILURE';
+
+export const MOVE_ITEMS = '@nodes/MOVE_ITEMS';
+export const REMOVE_ITEMS = '@nodes/REMOVE_ITEMS';
+export const SHARE_ITEMS = '@nodes/SHARE_ITEMS';
 
 export const CREATE_ITEM_REQUEST = '@nodes/CREATE_ITEM_REQUEST';
 export const CREATE_ITEM_SUCCESS = '@nodes/CREATE_ITEM_SUCCESS';
@@ -96,6 +105,8 @@ export const SORT_LIST_REQUEST = '@nodes/SORT_LIST_REQUEST';
 export const SORT_LIST_SUCCESS = '@nodes/SORT_LIST_SUCCESS';
 export const SORT_LIST_FAILURE = '@nodes/SORT_LIST_FAILURE';
 
+export const RESET_STORE = '@nodes/RESET_STORE';
+
 export const fetchNodesRequest = () => ({
   type: FETCH_NODES_REQUEST,
 });
@@ -126,10 +137,39 @@ export const setWorkInProgressItem = (item, mode) => ({
   },
 });
 
+export const setWorkInProgressItemIds = itemIds => ({
+  type: SET_WORK_IN_PROGRESS_ITEM_IDS,
+  payload: {
+    itemIds,
+  },
+});
+
 export const setWorkInProgressListId = listId => ({
   type: SET_WORK_IN_PROGRESS_LIST_ID,
   payload: {
     listId,
+  },
+});
+
+export const resetWorkInProgressItemIds = () => ({
+  type: RESET_WORK_IN_PROGRESS_ITEM_IDS,
+});
+
+export const moveItems = listId => ({
+  type: MOVE_ITEMS,
+  payload: {
+    listId,
+  },
+});
+
+export const removeItems = () => ({
+  type: REMOVE_ITEMS,
+});
+
+export const shareItems = emails => ({
+  type: SHARE_ITEMS,
+  payload: {
+    emails,
   },
 });
 
@@ -353,9 +393,10 @@ export const inviteNewMemberFailure = () => ({
   type: INVITE_NEW_MEMBER_FAILURE,
 });
 
-export const shareItemRequest = emails => ({
+export const shareItemRequest = (item, emails) => ({
   type: SHARE_ITEM_REQUEST,
   payload: {
+    item,
     emails,
   },
 });
@@ -495,4 +536,8 @@ export const sortListSuccess = resortedListsById => ({
 
 export const sortListFailure = () => ({
   type: SORT_LIST_FAILURE,
+});
+
+export const resetStore = () => ({
+  type: RESET_STORE,
 });

@@ -404,10 +404,12 @@ export default createReducer(initialState, {
           ],
         },
       },
-      workInProgressItem: {
-        ...state.workInProgressItem,
-        invited: [...state.workInProgressItem.invited, ...payload.invited],
-      },
+      workInProgressItem: state.workInProgressItem
+        ? {
+            ...state.workInProgressItem,
+            invited: [...state.workInProgressItem.invited, ...payload.invited],
+          }
+        : null,
     };
   },
   [SHARE_ITEM_FAILURE](state) {

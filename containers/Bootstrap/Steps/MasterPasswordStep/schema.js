@@ -15,10 +15,8 @@ export const createConfirmPasswordSchema = password =>
   yup.object({
     confirmPassword: yup
       .string()
-      .test(
-        'rules',
-        'Wrong password',
-        value => (password ? value === password : checkIsPasswordValid(value)),
+      .test('rules', 'Wrong password', value =>
+        password ? value === password : checkIsPasswordValid(value),
       )
       .required(),
   });

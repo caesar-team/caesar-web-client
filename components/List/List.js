@@ -1,6 +1,11 @@
 import React from 'react';
 import styled from 'styled-components';
-import { FAVORITES_TYPE, ITEM_TYPES, TRASH_TYPE } from 'common/constants';
+import {
+  FAVORITES_TYPE,
+  ITEM_TYPES,
+  LIST_TYPE,
+  TRASH_TYPE,
+} from 'common/constants';
 import { Icon, Scrollbar } from 'components';
 import Item from './Item';
 import EmptyList from './EmptyList';
@@ -92,19 +97,28 @@ const renderOption = (value, label) => (
 );
 
 const List = ({
-  title = '',
-  activeItemId = null,
-  list,
+  isMultiItem = false,
+  workInProgressList,
+  workInProgressItem,
+  workInProgressItemIds,
+  items = [],
   onClickItem = Function.prototype,
   onClickCreateItem = Function.prototype,
 }) => {
-  const renderedItems = list.children.map(({ id, ...props }) => {
-    const isActive = id === activeItemId;
+  if (!workInProgressList && !workInProgressItemIds.length) {
+    return null;
+  }
+
+  const renderedItems = items.map(({ id, ...props }) => {
+    const isActive = isMultiItem
+      ? workInProgressItemIds.includes(id)
+      : workInProgressItem && workInProgressItem.id === id;
 
     return (
       <Item
         key={id}
         id={id}
+        isMultiItem={isMultiItem}
         isActive={isActive}
         onClickItem={onClickItem}
         {...props}
@@ -117,7 +131,7 @@ const List = ({
     { label: 'Secure note', value: ITEM_DOCUMENT_TYPE },
   ];
 
-  const isEmpty = list.children.length === 0;
+  const isEmpty = items.length === 0;
   const renderedList = () => {
     if (isEmpty) {
       return <EmptyList />;
@@ -126,14 +140,12 @@ const List = ({
     return <Scrollbar>{renderedItems}</Scrollbar>;
   };
 
-  const isFavorite = list.type === FAVORITES_TYPE;
-  const isTrash = list.type === TRASH_TYPE;
-  const shouldShowAdd = !isFavorite && !isTrash;
+  const shouldShowAdd = workInProgressList.type === LIST_TYPE;
 
   return (
     <Wrapper isEmpty={isEmpty}>
       <TitleWrapper>
-        <Title>{title}</Title>
+        <Title>{workInProgressList.label}</Title>
         {shouldShowAdd && (
           <Dropdown
             options={itemTypesOptions}

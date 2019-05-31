@@ -79,6 +79,8 @@ class Bootstrap extends Component {
   }) => {
     const { sharedItemsState } = this.bootstrap;
 
+    this.props.setMasterPassword(masterPassword);
+
     this.setState({
       oldKeyPair,
       currentKeyPair,
@@ -165,6 +167,10 @@ class Bootstrap extends Component {
       currentKeyPair,
       masterPassword,
     } = this.state;
+
+    if (!currentStep) {
+      return null;
+    }
 
     if (TWO_FACTOR_STEPS.includes(currentStep)) {
       return (

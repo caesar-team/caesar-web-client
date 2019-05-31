@@ -1,6 +1,6 @@
 import axios from 'axios';
+import { removeToken } from './utils/token';
 import { API_URI, API_BASE_PATH } from './constants';
-import { getToken, removeToken } from './utils/token';
 import { isClient } from './utils/isEnvironment';
 
 const softExit = () => {
@@ -15,21 +15,9 @@ const softExit = () => {
 };
 
 const callApi = axios.create({
-  baseURL: `${API_URI}/${API_BASE_PATH}`,
-});
-
-callApi.interceptors.request.use(config => {
-  const token = getToken();
-
-  return token
-    ? {
-        ...config,
-        headers: {
-          ...config.headers,
-          Authorization: `Bearer ${getToken()}`,
-        },
-      }
-    : config;
+  baseURL: `${API_URI || process.env.API_URI}/${API_BASE_PATH ||
+    process.env.API_BASE_PATH}`,
+  withCredentials: true,
 });
 
 callApi.interceptors.response.use(
@@ -38,7 +26,7 @@ callApi.interceptors.response.use(
     if (error.response) {
       switch (error.response.status) {
         case 401:
-          softExit();
+          if (!process.env.IS_EXTENSION) softExit();
           break;
         default:
           // console.log(error.response.data);
@@ -113,6 +101,9 @@ export const patchChildItem = (childItemId, data) =>
 export const acceptUpdateItem = itemId =>
   callApi.post(`/item/${itemId}/accept_update`);
 
+export const rejectUpdateItem = itemId =>
+  callApi.post(`/item/${itemId}/decline_update`);
+
 export const removeChildItem = childItemId =>
   callApi.delete(`/child_item/${childItemId}`);
 
@@ -154,3 +145,7 @@ export const patchAcceptItem = data => callApi.patch('/accept_item', data);
 
 export const patchResetPassword = (token, data) =>
   callApi.patch(`/auth/srpp/reset/${token}`, data);
+
+export const postSecureMessage = data => callApi.post('/message', data);
+
+export const getSecureMessage = id => callApi.get(`/message/${id}`);

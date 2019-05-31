@@ -6,7 +6,7 @@ import EmptyRightImg from 'static/images/empty-right.png';
 
 const ImageLeft = styled.img`
   position: absolute;
-  top: 0;
+  top: 60px;
   left: 0;
 `;
 

@@ -66,4 +66,6 @@ const TextArea = ({
   );
 };
 
+TextArea.TextAreaField = TextAreaField;
+
 export default TextArea;

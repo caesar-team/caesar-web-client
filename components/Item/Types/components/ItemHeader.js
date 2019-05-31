@@ -1,13 +1,13 @@
-import React, { Component, Fragment } from 'react';
+import React, { Fragment } from 'react';
 import styled from 'styled-components';
 import { formatDate } from 'common/utils/dateUtils';
+import { upperFirst } from 'common/utils/string';
 import { Icon } from 'components/Icon';
 import { Button } from 'components/Button';
 import { Avatar, AvatarsList } from 'components/Avatar';
 import { Dropdown } from 'components/Dropdown';
-import Link from 'next/link';
+import { TRASH_TYPE } from 'common/constants';
 import { Row } from './Row';
-import { TRASH_TYPE } from '../../../../common/constants';
 
 const StyledRow = styled(Row)`
   margin-top: 10px;
@@ -112,12 +112,6 @@ const StyledDropdown = styled(Dropdown)`
   width: 100%;
 `;
 
-const Option = styled.div`
-  width: 106px;
-  padding: 3px;
-  cursor: pointer;
-`;
-
 const MoveTo = styled.a`
   cursor: pointer;
   height: 40px;
@@ -133,13 +127,6 @@ const MoveTo = styled.a`
     border: 1px solid ${({ theme }) => theme.black};
   }
 `;
-
-const Options = (
-  <Fragment>
-    <Option>smth</Option>
-    <Option>smth 1</Option>
-  </Fragment>
-);
 
 export const ItemHeader = ({
   allLists,
@@ -199,7 +186,7 @@ export const ItemHeader = ({
 
   const options = allLists
     .filter(({ id, type }) => type !== TRASH_TYPE && id !== listId)
-    .map(({ label, id }) => ({ value: id, label }));
+    .map(({ label, id }) => ({ value: id, label: upperFirst(label) }));
 
   return (
     <Fragment>

@@ -18,7 +18,7 @@ export {
   ShareInput,
 } from './Input';
 export { InviteModal } from './InviteModal';
-export { Item, Credentials, Document } from './Item';
+export { Item, MultiItem, Credentials, Document } from './Item';
 export { Label } from './Label';
 export { Link } from './Link';
 export { List } from './List';
@@ -32,6 +32,7 @@ export {
   withNotification,
 } from './Notification';
 export { Scrollbar } from './Scrollbar';
+export { SecureMessage } from './SecureMessage';
 export { Select } from './Select';
 export { SessionChecker } from './SessionChecker';
 export { Uploader } from './Uploader';
@@ -62,3 +63,6 @@ export { NavigationPanel } from './NavigationPanel';
 export { DataTable } from './DataTable';
 export { ProgressBar } from './ProgressBar';
 export { Toggle } from './Toggle';
+export { RangeInput } from './RangeInput';
+export { PasswordIndicator } from './PasswordIndicator';
+export { TagsInput } from './TagsInput';

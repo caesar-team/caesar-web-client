@@ -5,12 +5,16 @@ import { ThemeProvider, createGlobalStyle } from 'styled-components';
 import globalStyles from 'common/styles/globalStyles';
 import { entryResolver } from 'common/utils/entryResolver';
 import theme from 'common/theme';
-import { NotificationProvider } from '../components';
+import { Provider } from 'react-redux';
+import withRedux from 'next-redux-wrapper';
+import withReduxSaga from 'next-redux-saga';
+import { configureWebStore } from 'common/root/store';
 import { Bootstrap } from '../containers';
+import { NotificationProvider } from '../components';
 
 const GlobalStyles = createGlobalStyle`${globalStyles}`;
 
-export default class App extends NextApp {
+class Application extends NextApp {
   static async getInitialProps({ Component, router: { route }, ctx }) {
     entryResolver({ route, ctx });
 
@@ -26,20 +30,10 @@ export default class App extends NextApp {
       Component,
       pageProps,
       router: { route },
+      store,
     } = this.props;
 
-    if (route === '/signin' || route === '/signup' || route === '/resetting') {
-      return (
-        <ThemeProvider theme={theme}>
-          <Container>
-            <GlobalStyles />
-            <Component {...pageProps} />
-          </Container>
-        </ThemeProvider>
-      );
-    }
-
-    if (route === '/share' || route === '/invite') {
+    if (['/signin', '/signup', '/resetting', '/message'].includes(route)) {
       return (
         <ThemeProvider theme={theme}>
           <NotificationProvider>
@@ -52,15 +46,34 @@ export default class App extends NextApp {
       );
     }
 
+    if (route === '/share' || route === '/invite') {
+      return (
+        <ThemeProvider theme={theme}>
+          <NotificationProvider>
+            <Container>
+              <GlobalStyles />
+              <Provider store={store}>
+                <Component {...pageProps} />
+              </Provider>
+            </Container>
+          </NotificationProvider>
+        </ThemeProvider>
+      );
+    }
+
     return (
       <ThemeProvider theme={theme}>
         <NotificationProvider>
           <Container>
             <GlobalStyles />
-            <Bootstrap {...pageProps} component={Component} />
+            <Provider store={store}>
+              <Bootstrap {...pageProps} component={Component} />
+            </Provider>
           </Container>
         </NotificationProvider>
       </ThemeProvider>
     );
   }
 }
+
+export default withRedux(configureWebStore)(withReduxSaga(Application));

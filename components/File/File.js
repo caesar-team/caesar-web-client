@@ -85,10 +85,6 @@ const UploadedWrapper = styled.div`
         background: ${({ theme }) => theme.black};
       }
     }
-
-    ${FileName} {
-      color: ${({ theme }) => theme.emperor};
-    }
   }
 `;
 
@@ -164,5 +160,8 @@ const File = ({
     </UploadedWrapper>
   );
 };
+
+File.FileName = FileName;
+File.FileExt = FileExt;
 
 export default File;

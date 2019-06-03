@@ -77,21 +77,12 @@ class DashboardContainer extends Component {
   };
 
   handleClickItem = itemId => event => {
-    const { workInProgressItemIds } = this.props;
-
-    if (event.ctrlKey || event.metaKey) {
-      const ids = workInProgressItemIds.includes(itemId)
-        ? workInProgressItemIds.filter(id => id !== itemId)
-        : [...workInProgressItemIds, itemId];
-
-      this.props.setWorkInProgressItem(null);
-      this.props.setWorkInProgressItemIds(ids);
+    if ((event.ctrlKey || event.metaKey) && event.shiftKey) {
+      this.handleCtrlShiftSelectionItemBehaviour(itemId);
+    } else if (event.ctrlKey || event.metaKey) {
+      this.handleCtrlSelectionItemBehaviour(itemId);
     } else {
-      this.props.resetWorkInProgressItemIds();
-      this.props.setWorkInProgressItem(
-        this.props.itemsById[itemId],
-        ITEM_REVIEW_MODE,
-      );
+      this.handleDefaultSelectionItemBehaviour(itemId);
     }
   };
 
@@ -256,8 +247,58 @@ class DashboardContainer extends Component {
     }));
   };
 
+  handleCtrlShiftSelectionItemBehaviour(itemId) {
+    const { visibleListItems } = this.props;
+    const { startCtrlShiftSelectionItemId } = this.state;
+
+    if (!startCtrlShiftSelectionItemId) {
+      this.setState({
+        startCtrlShiftSelectionItemId: itemId,
+      });
+
+      this.props.setWorkInProgressItem(null);
+      this.props.setWorkInProgressItemIds([itemId]);
+    } else {
+      this.setState({
+        startCtrlShiftSelectionItemId: null,
+      });
+
+      const startIndex = visibleListItems.findIndex(
+        ({ id }) => id === startCtrlShiftSelectionItemId,
+      );
+      const endIndex = visibleListItems.findIndex(({ id }) => id === itemId);
+
+      const slicedItems = visibleListItems.slice(
+        Math.min(startIndex, endIndex),
+        Math.max(startIndex, endIndex) + 1,
+      );
+
+      this.props.setWorkInProgressItemIds(slicedItems.map(({ id }) => id));
+    }
+  }
+
+  handleCtrlSelectionItemBehaviour(itemId) {
+    const { workInProgressItemIds } = this.props;
+
+    const ids = workInProgressItemIds.includes(itemId)
+      ? workInProgressItemIds.filter(id => id !== itemId)
+      : [...workInProgressItemIds, itemId];
+
+    this.props.setWorkInProgressItem(null);
+    this.props.setWorkInProgressItemIds(ids);
+  }
+
+  handleDefaultSelectionItemBehaviour(itemId) {
+    this.props.resetWorkInProgressItemIds();
+    this.props.setWorkInProgressItem(
+      this.props.itemsById[itemId],
+      ITEM_REVIEW_MODE,
+    );
+  }
+
   prepareInitialState() {
     return {
+      startCtrlShiftSelectionItemId: null,
       mode: LIST_ITEM_MODE,
       modals: {
         invite: false,

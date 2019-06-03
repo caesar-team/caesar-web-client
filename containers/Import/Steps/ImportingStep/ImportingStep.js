@@ -41,7 +41,9 @@ const TwoItemsWrapper = styled.div`
 `;
 
 const renderText = progress =>
-  progress < 1 ? `Waiting... ${progress * 100}%` : 'Done!';
+  progress < 1
+    ? `Waiting... ${parseFloat(progress * 100).toFixed(2)}%`
+    : 'Done!';
 
 const ImportingStep = ({ progress, onClickToDashboard }) => (
   <Wrapper>

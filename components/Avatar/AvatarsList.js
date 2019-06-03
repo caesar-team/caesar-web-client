@@ -36,7 +36,8 @@ const AvatarsList = ({
       <StyledAvatar
         isSmall={isSmall}
         key={index}
-        name={name || email}
+        name={name}
+        email={email}
         avatar={avatar}
       />
     ))

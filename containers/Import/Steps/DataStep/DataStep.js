@@ -80,6 +80,12 @@ const Cell = styled.div`
   min-width: 100px;
 `;
 
+const StaticWrapper = styled.div`
+  > div {
+    position: static;
+  }
+`;
+
 const capitalize = string => {
   if (typeof string !== 'string') return '';
   return string.charAt(0).toUpperCase() + string.slice(1);
@@ -155,12 +161,14 @@ class DataStep extends Component {
         ];
 
         return (
-          <StyledSelect
-            name="type"
-            options={options}
-            value={data[cellInfo.index][cellInfo.column.id]}
-            onChange={this.handleChangeType(cellInfo.index)}
-          />
+          <StaticWrapper>
+            <StyledSelect
+              name="type"
+              options={options}
+              value={data[cellInfo.index][cellInfo.column.id]}
+              onChange={this.handleChangeType(cellInfo.index)}
+            />
+          </StaticWrapper>
         );
       },
       Header: 'Type',
@@ -236,9 +244,8 @@ class DataStep extends Component {
 
   handleChangeField = (index, columnId, value) => {
     this.setState(prevState => ({
-      data: prevState.data.map(
-        (row, rowIndex) =>
-          rowIndex === index ? { ...row, [columnId]: value } : row,
+      data: prevState.data.map((row, rowIndex) =>
+        rowIndex === index ? { ...row, [columnId]: value } : row,
       ),
       selectedRows: prevState.selectedRows[index]
         ? {
@@ -284,6 +291,7 @@ class DataStep extends Component {
   }
 
   render() {
+    const { onCancel } = this.props;
     const { data, selectedRows, filterText } = this.state;
 
     const selectedRowsLength = denormalize(selectedRows).length;
@@ -307,7 +315,7 @@ class DataStep extends Component {
             Selected items: {selectedRowsLength} / {data.length}
           </SelectedItems>
           <ButtonsWrapper>
-            <StyledButton>CANCEL</StyledButton>
+            <StyledButton onClick={onCancel}>CANCEL</StyledButton>
             <Button onClick={this.handleSubmit} disabled={!selectedRowsLength}>
               IMPORT
             </Button>

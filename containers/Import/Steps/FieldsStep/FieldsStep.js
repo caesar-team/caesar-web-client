@@ -122,7 +122,7 @@ const getOptions = headings =>
     label: heading,
   }));
 
-const FieldsStep = ({ headings, initialValues, onSubmit }) => (
+const FieldsStep = ({ headings, initialValues, onSubmit, onCancel }) => (
   <Formik
     key="fieldsStep"
     initialValues={{ ...defaultValues, ...initialValues }}
@@ -190,7 +190,9 @@ const FieldsStep = ({ headings, initialValues, onSubmit }) => (
           <BottomWrapper>
             <RequiredText>Required fields</RequiredText>
             <ButtonsWrapper>
-              <StyledButton color="white">CANCEL</StyledButton>
+              <StyledButton color="white" onClick={onCancel}>
+                CANCEL
+              </StyledButton>
               <Button htmlType="submit" disabled={isSubmitting || !isValid}>
                 SUBMIT
               </Button>

@@ -138,6 +138,10 @@ class Import extends Component {
     this.props.router.push('/');
   };
 
+  handleCancelFlow = () => {
+    this.setState(this.prepareInitialState());
+  };
+
   async importing(data) {
     const prepared = await Promise.all(
       data.map(async ({ type, ...secret }, index) => {
@@ -201,6 +205,7 @@ class Import extends Component {
             initialValues={matchings}
             headings={data.headings}
             onSubmit={this.handleSelectFields}
+            onCancel={this.handleCancelFlow}
           />
         ),
         DATA_STEP: (
@@ -208,6 +213,7 @@ class Import extends Component {
             data={normalizeData(data.rows, matchings)}
             headings={matchings}
             onSubmit={this.handleFinishDataStep}
+            onCancel={this.handleCancelFlow}
           />
         ),
         IMPORTING_STEP: (

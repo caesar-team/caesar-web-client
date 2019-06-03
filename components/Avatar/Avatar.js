@@ -1,5 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
+import Gravatar from 'react-gravatar';
 import { API_URI } from 'common/constants';
 
 const Wrapper = styled.div`
@@ -29,7 +30,7 @@ const Image = styled.img`
   border-style: none;
 `;
 
-const Avatar = ({ name, avatar, children, isSmall, ...props }) => {
+const Avatar = ({ name, email, avatar, children, isSmall, ...props }) => {
   if (children) {
     return <Wrapper {...props}>{children}</Wrapper>;
   }
@@ -38,6 +39,14 @@ const Avatar = ({ name, avatar, children, isSmall, ...props }) => {
     return (
       <Wrapper isSmall={isSmall} {...props}>
         <Image src={`${API_URI}/${avatar}`} />
+      </Wrapper>
+    );
+  }
+
+  if (email) {
+    return (
+      <Wrapper isSmall={isSmall}>
+        <Gravatar email={email} size={isSmall ? 30 : 40} />
       </Wrapper>
     );
   }

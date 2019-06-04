@@ -11,6 +11,7 @@ import {
   withNotification,
   DashboardLayout,
   SecureMessage,
+  TextLoader,
 } from 'components';
 import {
   ITEM_REVIEW_MODE,
@@ -327,7 +328,7 @@ class DashboardContainer extends Component {
     const { mode, modals } = this.state;
 
     if (isLoading) {
-      return null;
+      return <TextLoader />;
     }
 
     const isMultiItem =

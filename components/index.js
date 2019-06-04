@@ -23,7 +23,7 @@ export { Label } from './Label';
 export { Link } from './Link';
 export { List } from './List';
 export { ListFormModal } from './ListFormModal';
-export { Loader, CircleLoader } from './Loader';
+export { Loader, CircleLoader, TextLoader } from './Loader';
 export { ManageList } from './ManageList';
 export { MenuList } from './MenuList';
 export {

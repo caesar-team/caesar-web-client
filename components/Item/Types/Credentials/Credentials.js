@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import styled from 'styled-components';
+import copy from 'copy-text-to-clipboard';
 import { Icon, Label } from 'components';
-import { copyToClipboard } from 'common/utils/clipboard';
 import {
   Wrapper,
   Row,
@@ -13,7 +13,6 @@ import {
   RemoveButton,
   RemoveButtonWrapper,
 } from '../components';
-import { TRASH_TYPE } from '../../../../common/constants';
 
 const StyledEyeIcon = styled(Icon)`
   margin-right: 20px;
@@ -54,7 +53,7 @@ class Credentials extends Component {
       item: { secret },
     } = this.props;
 
-    copyToClipboard(secret[field]);
+    copy(secret[field]);
 
     const fieldText = field === 'login' ? 'Login' : 'Password';
 

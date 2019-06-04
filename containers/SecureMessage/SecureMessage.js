@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import styled from 'styled-components';
+import copy from 'copy-text-to-clipboard';
 import {
   Icon,
   LockInput,
@@ -11,7 +12,6 @@ import {
 import { FastField, Formik } from 'formik';
 import { decryptByPassword } from 'common/utils/cipherUtils';
 import { downloadAsZip, downloadFile } from 'common/utils/file';
-import { copyToClipboard } from 'common/utils/clipboard';
 import { schema } from './schema';
 
 const Wrapper = styled.div`
@@ -123,7 +123,7 @@ class SecureMessageContainer extends Component {
     const { notification } = this.props;
     const { decryptedMessage } = this.state;
 
-    copyToClipboard(decryptedMessage.text);
+    copy(decryptedMessage.text);
 
     notification.show({
       text: `Text has copied.`,

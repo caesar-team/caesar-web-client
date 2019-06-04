@@ -4,11 +4,13 @@ import Gravatar from 'react-gravatar';
 import { API_URI } from 'common/constants';
 
 const Wrapper = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
   box-sizing: border-box;
   margin: 0;
   padding: 0;
   list-style: none;
-  display: inline-block;
   text-align: center;
   background: ${({ theme }) => theme.gray};
   color: ${({ theme }) => theme.white};
@@ -18,7 +20,6 @@ const Wrapper = styled.div`
   vertical-align: middle;
   width: ${({ isSmall }) => (isSmall ? '30px' : '40px')};
   height: ${({ isSmall }) => (isSmall ? '30px' : '40px')};
-  line-height: 40px;
   border-radius: 50%;
 `;
 
@@ -32,7 +33,11 @@ const Image = styled.img`
 
 const Avatar = ({ name, email, avatar, children, isSmall, ...props }) => {
   if (children) {
-    return <Wrapper {...props}>{children}</Wrapper>;
+    return (
+      <Wrapper isSmall={isSmall} {...props}>
+        {children}
+      </Wrapper>
+    );
   }
 
   if (avatar) {
@@ -53,7 +58,7 @@ const Avatar = ({ name, email, avatar, children, isSmall, ...props }) => {
 
   const personLetters = name ? name.slice(0, 2).toUpperCase() : '';
 
-  return <Wrapper {...props}>{personLetters}</Wrapper>;
+  return <Wrapper isSmall={isSmall} {...props}>{personLetters}</Wrapper>;
 };
 
 export default Avatar;

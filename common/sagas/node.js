@@ -880,6 +880,8 @@ export function* shareItemsSaga({ payload: { emails } }) {
           access: PERMISSION_READ,
         }));
 
+        console.log('invited', invited);
+
         const invitations = users
           .filter(({ isNew }) => !!isNew)
           .map(({ email, password, masterPassword }) => ({

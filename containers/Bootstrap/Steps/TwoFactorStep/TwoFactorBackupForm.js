@@ -1,8 +1,8 @@
 import React from 'react';
 import styled from 'styled-components';
 import { FastField, Formik } from 'formik';
+import copy from 'copy-text-to-clipboard';
 import { Button, Checkbox } from 'components';
-import { copyToClipboard } from 'common/utils/clipboard';
 import { downloadElement } from 'common/utils/download';
 import { printElement } from 'common/utils/print';
 import { backupInitialValues } from './constants';
@@ -98,11 +98,7 @@ const TwoFactorBackupForm = ({ codes, onSubmit }) => (
             ))}
           </Codes>
           <ButtonsWrapper>
-            <StyledButton
-              color="white"
-              icon="copy"
-              onClick={() => copyToClipboard(codes)}
-            >
+            <StyledButton color="white" icon="copy" onClick={() => copy(codes)}>
               COPY
             </StyledButton>
             <StyledButton

@@ -1,5 +1,6 @@
 import React, { Component, Fragment } from 'react';
 import styled from 'styled-components';
+import copy from 'copy-text-to-clipboard';
 import {
   Modal,
   ModalTitle,
@@ -8,7 +9,6 @@ import {
   Toggle,
   TagsInput,
 } from 'components';
-import { copyToClipboard } from 'common/utils/clipboard';
 import { base64ToObject, objectToBase64 } from 'common/utils/cipherUtils';
 import { generateSharingUrl } from 'common/utils/sharing';
 import { KEY_CODES } from 'common/constants';
@@ -133,9 +133,7 @@ export class ShareModal extends Component {
     const { isUseMasterPassword } = this.state;
     const { notification, shared = [] } = this.props;
 
-    copyToClipboard(
-      this.generateLinkText(getAnonymousLink(shared), isUseMasterPassword),
-    );
+    copy(this.generateLinkText(getAnonymousLink(shared), isUseMasterPassword));
 
     notification.show({
       text: `Shared link has copied.`,

@@ -1,7 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
+import copy from 'copy-text-to-clipboard';
 import { APP_URI } from 'common/constants';
-import { copyToClipboard } from 'common/utils/clipboard';
 import { Button, withNotification } from 'components';
 
 const Wrapper = styled.div`
@@ -49,7 +49,8 @@ const SecureMessageLink = ({
   onClickReturn,
 }) => {
   const handleClickCopy = () => {
-    copyToClipboard(getLinkText(link, password));
+    copy(getLinkText(link, password));
+
     notification.show({
       text: 'Link has copied.',
     });

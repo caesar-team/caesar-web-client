@@ -40,6 +40,10 @@ export default `
     box-sizing: border-box;
   }
 
+  div {
+    user-select: none;
+  }
+
   .modal-is-opened {
     overflow: hidden;
   }

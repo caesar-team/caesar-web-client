@@ -15,15 +15,19 @@ window.onmessage = async message => {
     case 'decryptItems': {
       const privateKeyObj = await getPrivateKeyObj(privateKey, masterPassword);
 
-      items.forEach(async item => {
+      for (let index = 0; index < items.length; index++) {
+        const item = items[index];
+        // eslint-disable-next-line
+        const secret = await decryptItem(item.secret, privateKeyObj);
+
         window.postMessage({
           event: 'emitDecryptedItem',
           item: {
             ...item,
-            secret: await decryptItem(item.secret, privateKeyObj),
+            secret,
           },
         });
-      });
+      }
       break;
     }
     default:

@@ -1,8 +1,8 @@
 import React, { Fragment } from 'react';
 import styled from 'styled-components';
 import { Icon } from 'components';
-import EmptyLeftImg from 'static/images/empty-left.png';
-import EmptyRightImg from 'static/images/empty-right.png';
+import EmptyLeftImg from 'public/images/empty-left.png';
+import EmptyRightImg from 'public/images/empty-right.png';
 
 const ImageLeft = styled.img`
   position: absolute;

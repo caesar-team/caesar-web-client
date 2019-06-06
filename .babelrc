@@ -10,7 +10,7 @@
           "components": "./components",
           "containers": "./containers",
           "pages": "./pages",
-          "static": "./static"
+          "public": "./public"
         }
       }
     ],

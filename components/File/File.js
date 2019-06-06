@@ -78,7 +78,7 @@ const UploadedWrapper = styled.div`
       background: ${({ theme }) => theme.black};
       color: ${({ theme }) => theme.white};
       font-size: 0;
-      background: url(/static/images/svg/icon-download-white.svg) no-repeat
+      background: url(/public/images/svg/icon-download-white.svg) no-repeat
         center ${({ theme }) => theme.black};
 
       &:before {

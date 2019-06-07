@@ -56,8 +56,8 @@ export const listsSelector = createSelector(
 
 export const userListsSelector = createSelector(
   listsSelector,
-  lists => lists.filter(list => list.type === LIST_TYPE && list.parentId)
-)
+  lists => lists.filter(list => list.type === LIST_TYPE && list.parentId),
+);
 
 export const defaultListSelector = createSelector(
   listsSelector,

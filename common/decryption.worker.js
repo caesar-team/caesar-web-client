@@ -21,7 +21,6 @@ window.onmessage = async message => {
         try {
           const secret = await decryptItem(item.secret, privateKeyObj);
 
-          console.log('worker', `decryptItems_${listId}`, item.id);
           window.postMessage({
             event: `emitDecryptedItem_${listId}`,
             item: {

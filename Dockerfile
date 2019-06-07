@@ -8,7 +8,7 @@ WORKDIR /var/app
 # Copy project file
 COPY package.json .
 COPY yarn.lock .
-COPY ./static .
+COPY static .
 #
 # ---- Dependencies ----
 FROM base AS dependencies

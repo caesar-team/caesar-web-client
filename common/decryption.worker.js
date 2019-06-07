@@ -11,8 +11,6 @@ window.onmessage = async message => {
     },
   } = message;
 
-  console.log('decryptworker', listId);
-
   switch (event) {
     case `decryptItems_${listId}`: {
       const privateKeyObj = await getPrivateKeyObj(privateKey, masterPassword);
@@ -20,15 +18,20 @@ window.onmessage = async message => {
       for (let index = 0; index < items.length; index++) {
         const item = items[index];
         // eslint-disable-next-line
-        const secret = await decryptItem(item.secret, privateKeyObj);
+        try {
+          const secret = await decryptItem(item.secret, privateKeyObj);
 
-        window.postMessage({
-          event: `emitDecryptedItem_${listId}`,
-          item: {
-            ...item,
-            secret,
-          },
-        });
+          console.log('worker', `decryptItems_${listId}`, item.id);
+          window.postMessage({
+            event: `emitDecryptedItem_${listId}`,
+            item: {
+              ...item,
+              secret,
+            },
+          });
+        } catch (e) {
+          console.log(e, item, listId);
+        }
       }
       break;
     }

@@ -83,6 +83,7 @@ import {
   parentListSelector,
   sortedCustomizableListsSelector,
   itemsByIdSelector,
+  selectableListsSelector,
 } from 'common/selectors/node';
 import {
   getList,
@@ -153,7 +154,6 @@ function createWebWorkerChannel(data) {
 }
 
 export function* decryptSaga({ listId, items }) {
-  console.log(`decryptSaga_${listId}`);
   const keyPair = yield select(keyPairSelector);
   const masterPassword = yield select(masterPasswordSelector);
 
@@ -187,18 +187,14 @@ export function* fetchNodesSaga() {
 
     yield put(setWorkInProgressListId(defaultList.id));
 
-    console.log('listsById', listsById);
-    const lists = Object.values(listsById).map(({ id, children }) => ({
+    const selectableLists = yield select(selectableListsSelector);
+
+    const lists = selectableLists.map(({ id, children }) => ({
       listId: id,
       items: children.map(({ id: itemId }) => itemsById[itemId]),
     }));
 
-    for (let index = 0; index < lists.length; index++) {
-      const list = lists[index];
-      yield call(decryptSaga, list);
-    }
-
-    // yield all(lists.map(list => call(decryptSaga, list)));
+    yield all(lists.map(list => call(decryptSaga, list)));
   } catch (error) {
     console.log(error);
 

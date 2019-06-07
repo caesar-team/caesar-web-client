@@ -65,6 +65,7 @@
     "redux-saga": "^1.0.2",
     "reselect": "^4.0.0",
     "reselector": "^0.13.0-15",
+    "serve-favicon": "^2.5.0",
     "styled-components": "^4.2.0",
     "threads": "^0.12.1",
     "webext-redux": "^2.0.2",

@@ -28,23 +28,11 @@ export default class Document extends NextDocument {
           <link
             rel="apple-touch-icon"
             sizes="180x180"
-            href="/static/images/favicon/apple-touch-icon.png"
-          />
-          <link
-            rel="icon"
-            type="image/png"
-            sizes="32x32"
-            href="/static/images/favicon/favicon-32x32.png"
-          />
-          <link
-            rel="icon"
-            type="image/png"
-            sizes="16x16"
-            href="/static/images/favicon/favicon-16x16.png"
+            href="/public/images/favicon/apple-touch-icon.png"
           />
           <link
             rel="mask-icon"
-            href="/static/images/favicon/safari-pinned-tab.svg"
+            href="/public/images/favicon/safari-pinned-tab.svg"
             color="#5bbad5"
           />
           <meta name="msapplication-TileColor" content="#da532c" />

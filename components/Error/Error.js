@@ -1,8 +1,8 @@
 import React from 'react';
 import styled from 'styled-components';
 import { ErrorLayout } from 'components';
-import ErrorImg from 'static/images/error.jpg';
-import ErrorImg2x from 'static/images/error@2x.jpg';
+import ErrorImg from 'public/images/error.jpg';
+import ErrorImg2x from 'public/images/error@2x.jpg';
 
 const Image = styled.img`
   object-fit: contain;

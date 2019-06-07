@@ -1,7 +1,7 @@
 import React, { Fragment } from 'react';
 import styled from 'styled-components';
-import EmptyImg from 'static/images/empty-list.png';
-import EmptyImg2x from 'static/images/empty-list@2x.png';
+import EmptyImg from 'public/images/empty-list.png';
+import EmptyImg2x from 'public/images/empty-list@2x.png';
 
 const Image = styled.img`
   margin-top: 15px;

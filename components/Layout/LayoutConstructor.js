@@ -1,9 +1,9 @@
 import React, { Fragment } from 'react';
 import styled from 'styled-components';
-import BgRightImg from 'static/images/bg-right.jpg';
-import BgRightImg2x from 'static/images/bg-right@2x.jpg';
-import BgLeftImg from 'static/images/bg-left.jpg';
-import BgLeftImg2x from 'static/images/bg-left@2x.jpg';
+import BgRightImg from 'public/images/bg-right.jpg';
+import BgRightImg2x from 'public/images/bg-right@2x.jpg';
+import BgLeftImg from 'public/images/bg-left.jpg';
+import BgLeftImg2x from 'public/images/bg-left@2x.jpg';
 
 const Wrapper = styled.div`
   display: flex;

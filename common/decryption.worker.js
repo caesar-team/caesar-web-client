@@ -7,12 +7,14 @@ window.onmessage = async message => {
   const {
     data: {
       event,
-      data: { items, privateKey, masterPassword },
+      data: { listId, items, privateKey, masterPassword },
     },
   } = message;
 
+  console.log('decryptworker', listId);
+
   switch (event) {
-    case 'decryptItems': {
+    case `decryptItems_${listId}`: {
       const privateKeyObj = await getPrivateKeyObj(privateKey, masterPassword);
 
       for (let index = 0; index < items.length; index++) {
@@ -21,7 +23,7 @@ window.onmessage = async message => {
         const secret = await decryptItem(item.secret, privateKeyObj);
 
         window.postMessage({
-          event: 'emitDecryptedItem',
+          event: `emitDecryptedItem_${listId}`,
           item: {
             ...item,
             secret,

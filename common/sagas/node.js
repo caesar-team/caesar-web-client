@@ -139,11 +139,11 @@ const fixSort = lists => lists.map((list, index) => ({ ...list, sort: index }));
 function createWebWorkerChannel(data) {
   const worker = new DecryptWorker();
 
-  worker.postMessage({ event: 'decryptItems', data });
+  worker.postMessage({ event: `decryptItems_${data.listId}`, data });
 
   return eventChannel(emitter => {
     worker.onmessage = ({ data: { event, item } }) => {
-      if (event === 'emitDecryptedItem') {
+      if (event === `emitDecryptedItem_${data.listId}`) {
         emitter(item);
       }
     };
@@ -152,11 +152,13 @@ function createWebWorkerChannel(data) {
   });
 }
 
-export function* decryptSaga(items) {
+export function* decryptSaga({ listId, items }) {
+  console.log(`decryptSaga_${listId}`);
   const keyPair = yield select(keyPairSelector);
   const masterPassword = yield select(masterPasswordSelector);
 
   const channel = yield call(createWebWorkerChannel, {
+    listId,
     items,
     privateKey: keyPair.privateKey,
     masterPassword,
@@ -185,7 +187,18 @@ export function* fetchNodesSaga() {
 
     yield put(setWorkInProgressListId(defaultList.id));
 
-    yield call(decryptSaga, Object.values(itemsById));
+    console.log('listsById', listsById);
+    const lists = Object.values(listsById).map(({ id, children }) => ({
+      listId: id,
+      items: children.map(({ id: itemId }) => itemsById[itemId]),
+    }));
+
+    for (let index = 0; index < lists.length; index++) {
+      const list = lists[index];
+      yield call(decryptSaga, list);
+    }
+
+    // yield all(lists.map(list => call(decryptSaga, list)));
   } catch (error) {
     console.log(error);
 

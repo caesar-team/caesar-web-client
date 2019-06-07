@@ -8,7 +8,7 @@ WORKDIR /var/app
 # Copy project file
 COPY package.json .
 COPY yarn.lock .
-COPY static .
+COPY public .
 #
 # ---- Dependencies ----
 FROM base AS dependencies
@@ -42,7 +42,7 @@ COPY --from=dependencies /var/app/node_modules ./node_modules
 COPY --from=build /var/app/.next ./.next
 COPY ./server.js ./server.js
 COPY ./next.config.js ./next.config.js
-COPY ./static ./public
+COPY ./public ./public
 # Setup environment variables
 ENV NODE_ENV=production
 # expose port and define CMD

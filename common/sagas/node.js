@@ -83,6 +83,7 @@ import {
   parentListSelector,
   sortedCustomizableListsSelector,
   itemsByIdSelector,
+  selectableListsSelector,
 } from 'common/selectors/node';
 import {
   getList,
@@ -139,11 +140,11 @@ const fixSort = lists => lists.map((list, index) => ({ ...list, sort: index }));
 function createWebWorkerChannel(data) {
   const worker = new DecryptWorker();
 
-  worker.postMessage({ event: 'decryptItems', data });
+  worker.postMessage({ event: `decryptItems_${data.listId}`, data });
 
   return eventChannel(emitter => {
     worker.onmessage = ({ data: { event, item } }) => {
-      if (event === 'emitDecryptedItem') {
+      if (event === `emitDecryptedItem_${data.listId}`) {
         emitter(item);
       }
     };
@@ -152,11 +153,12 @@ function createWebWorkerChannel(data) {
   });
 }
 
-export function* decryptSaga(items) {
+export function* decryptSaga({ listId, items }) {
   const keyPair = yield select(keyPairSelector);
   const masterPassword = yield select(masterPasswordSelector);
 
   const channel = yield call(createWebWorkerChannel, {
+    listId,
     items,
     privateKey: keyPair.privateKey,
     masterPassword,
@@ -185,7 +187,14 @@ export function* fetchNodesSaga() {
 
     yield put(setWorkInProgressListId(defaultList.id));
 
-    yield call(decryptSaga, Object.values(itemsById));
+    const selectableLists = yield select(selectableListsSelector);
+
+    const lists = selectableLists.map(({ id, children }) => ({
+      listId: id,
+      items: children.map(({ id: itemId }) => itemsById[itemId]),
+    }));
+
+    yield all(lists.map(list => call(decryptSaga, list)));
   } catch (error) {
     console.log(error);
 
@@ -879,8 +888,6 @@ export function* shareItemsSaga({ payload: { emails } }) {
           email: users[idx].email,
           access: PERMISSION_READ,
         }));
-
-        console.log('invited', invited);
 
         const invitations = users
           .filter(({ isNew }) => !!isNew)

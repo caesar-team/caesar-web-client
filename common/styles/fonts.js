@@ -1,7 +1,7 @@
-import regularEotUrl from 'static/fonts/AvenirNext-Regular.eot';
-import regularTtfUrl from 'static/fonts/AvenirNext-Regular.ttf';
-import regularWoffUrl from 'static/fonts/AvenirNext-Regular.woff';
-import regularWoff2Url from 'static/fonts/AvenirNext-Regular.woff2';
+import regularEotUrl from 'public/fonts/AvenirNext-Regular.eot';
+import regularTtfUrl from 'public/fonts/AvenirNext-Regular.ttf';
+import regularWoffUrl from 'public/fonts/AvenirNext-Regular.woff';
+import regularWoff2Url from 'public/fonts/AvenirNext-Regular.woff2';
 
 export default `
   @font-face {

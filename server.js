@@ -13,7 +13,9 @@ if (require('fs').existsSync(envFile)) {
 const APP_URI = process.env.APP_URI || 'http://localhost';
 const APP_PORT = process.env.APP_PORT || 3000;
 
+const path = require('path');
 const express = require('express');
+const favicon = require('serve-favicon');
 const next = require('next');
 const cookieParser = require('cookie-parser');
 const helmet = require('helmet');
@@ -27,7 +29,10 @@ app.prepare().then(() => {
 
   server.use(helmet());
   server.use(cookieParser());
-  server.use(express.static('static'));
+  server.use(
+    favicon(path.join(__dirname, 'public/images/favicon', 'favicon.ico')),
+  );
+  server.use(express.static('public'));
 
   server.get('/logout', (req, res) => {
     res.clearCookie('token');

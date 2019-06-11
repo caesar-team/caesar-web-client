@@ -58,7 +58,11 @@ const Avatar = ({ name, email, avatar, children, isSmall, ...props }) => {
 
   const personLetters = name ? name.slice(0, 2).toUpperCase() : '';
 
-  return <Wrapper isSmall={isSmall} {...props}>{personLetters}</Wrapper>;
+  return (
+    <Wrapper isSmall={isSmall} {...props}>
+      {personLetters}
+    </Wrapper>
+  );
 };
 
 export default Avatar;

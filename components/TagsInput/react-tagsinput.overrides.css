@@ -4,9 +4,7 @@
   background-color: #fff;
   border: 1px solid #eaeaea;
   overflow: hidden;
-  padding-left: 50px;
-  padding-top: 9px;
-  padding-bottom: 5px;
+  padding: 8px 20px;
   transition: none;
 }
 
@@ -16,9 +14,7 @@
   left: 16px;
   width: 18px;
   height: 18px;
-  margin-top: -9px;
   content: '';
-  background: url('/static/images/icon-at.svg');
 }
 
 .react-tagsinput--focused {
@@ -33,6 +29,7 @@
   vertical-align: middle;
   font-size: 16px;
   padding: 3px 10px 2px;
+  margin-bottom: 0;
 }
 
 .react-tagsinput-remove {

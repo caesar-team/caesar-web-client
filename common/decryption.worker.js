@@ -7,26 +7,30 @@ window.onmessage = async message => {
   const {
     data: {
       event,
-      data: { items, privateKey, masterPassword },
+      data: { listId, items, privateKey, masterPassword },
     },
   } = message;
 
   switch (event) {
-    case 'decryptItems': {
+    case `decryptItems_${listId}`: {
       const privateKeyObj = await getPrivateKeyObj(privateKey, masterPassword);
 
       for (let index = 0; index < items.length; index++) {
         const item = items[index];
         // eslint-disable-next-line
-        const secret = await decryptItem(item.secret, privateKeyObj);
+        try {
+          const secret = await decryptItem(item.secret, privateKeyObj);
 
-        window.postMessage({
-          event: 'emitDecryptedItem',
-          item: {
-            ...item,
-            secret,
-          },
-        });
+          window.postMessage({
+            event: `emitDecryptedItem_${listId}`,
+            item: {
+              ...item,
+              secret,
+            },
+          });
+        } catch (e) {
+          console.log(e, item, listId);
+        }
       }
       break;
     }

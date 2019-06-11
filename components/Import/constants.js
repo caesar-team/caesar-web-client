@@ -1,9 +1,9 @@
-import OnePasswordImg from 'static/images/1password.png';
-import OnePasswordImg2x from 'static/images/1password@2x.png';
-import LastPassImg from 'static/images/lastpass.png';
-import LastPassImg2x from 'static/images/lastpass@2x.png';
-import FileCSVImg from 'static/images/csv.png';
-import FileCSVImg2x from 'static/images/csv@2x.png';
+import OnePasswordImg from 'public/images/1password.png';
+import OnePasswordImg2x from 'public/images/1password@2x.png';
+import LastPassImg from 'public/images/lastpass.png';
+import LastPassImg2x from 'public/images/lastpass@2x.png';
+import FileCSVImg from 'public/images/csv.png';
+import FileCSVImg2x from 'public/images/csv@2x.png';
 
 export const ONEPASSWORD_TYPE = 'ONEPASSWORD_TYPE';
 export const LASTPASS_TYPE = 'LASTPASS_TYPE';

@@ -21,7 +21,7 @@ export { InviteModal } from './InviteModal';
 export { Item, MultiItem, Credentials, Document } from './Item';
 export { Label } from './Label';
 export { Link } from './Link';
-export { List } from './List';
+export { List, SearchList } from './List';
 export { ListFormModal } from './ListFormModal';
 export { Loader, CircleLoader, TextLoader } from './Loader';
 export { ManageList } from './ManageList';

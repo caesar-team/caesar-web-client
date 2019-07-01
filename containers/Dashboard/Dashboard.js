@@ -1,9 +1,12 @@
 import React, { Component, Fragment } from 'react';
 import styled from 'styled-components';
+import memoize from 'memoize-one';
+import debounce from 'debounce';
 import {
   Item,
   MultiItem,
   List,
+  SearchList,
   InviteModal,
   ShareModal,
   ConfirmModal,
@@ -17,6 +20,9 @@ import {
   ITEM_REVIEW_MODE,
   ITEM_WORKFLOW_CREATE_MODE,
   ITEM_WORKFLOW_EDIT_MODE,
+  DASHBOARD_DEFAULT_MODE,
+  DASHBOARD_SEARCH_MODE,
+  DASHBOARD_SECURE_MESSAGE_MODE,
 } from 'common/constants';
 import { initialItemData } from './utils';
 
@@ -44,11 +50,18 @@ const Sidebar = styled.aside`
   border-right: 1px solid ${({ theme }) => theme.gallery};
 `;
 
-const SECURE_MESSAGE_MODE = 'SECURE_MESSAGE_MODE';
-const LIST_ITEM_MODE = 'LIST_ITEM_MODE';
+const SECRET_SEARCH_FIELDS = ['name', 'note', 'website'];
 
 class DashboardContainer extends Component {
   state = this.prepareInitialState();
+
+  filter = memoize((data, pattern) =>
+    data.filter(({ secret }) =>
+      SECRET_SEARCH_FIELDS.some(
+        field => secret[field] && secret[field].toLowerCase().includes(pattern),
+      ),
+    ),
+  );
 
   componentDidMount() {
     this.props.fetchUserSelfRequest();
@@ -67,13 +80,15 @@ class DashboardContainer extends Component {
     this.props.resetWorkInProgressItemIds();
 
     this.setState({
-      mode: LIST_ITEM_MODE,
+      mode: DASHBOARD_DEFAULT_MODE,
+      searchedText: '',
     });
   };
 
   handleClickSecureMessage = () => {
     this.setState({
-      mode: SECURE_MESSAGE_MODE,
+      mode: DASHBOARD_SECURE_MESSAGE_MODE,
+      searchedText: '',
     });
   };
 
@@ -248,6 +263,25 @@ class DashboardContainer extends Component {
     }));
   };
 
+  handleSearch = event => {
+    event.preventDefault();
+
+    this.setState({
+      searchedText: event.target.value,
+      mode: event.target.value ? DASHBOARD_SEARCH_MODE : DASHBOARD_DEFAULT_MODE,
+    });
+  };
+
+  // eslint-disable-next-line react/sort-comp
+  debouncedOnSearch = debounce(this.handleSearch, 250);
+
+  handleClickResetSearch = () => {
+    this.setState({
+      searchedText: '',
+      mode: DASHBOARD_DEFAULT_MODE,
+    });
+  };
+
   handleCtrlShiftSelectionItemBehaviour(itemId) {
     const { visibleListItems } = this.props;
     const { startCtrlShiftSelectionItemId } = this.state;
@@ -300,7 +334,8 @@ class DashboardContainer extends Component {
   prepareInitialState() {
     return {
       startCtrlShiftSelectionItemId: null,
-      mode: LIST_ITEM_MODE,
+      mode: DASHBOARD_DEFAULT_MODE,
+      searchedText: '',
       modals: {
         invite: false,
         share: false,
@@ -321,11 +356,12 @@ class DashboardContainer extends Component {
       lists,
       listsByType,
       visibleListItems,
+      itemsById,
       isLoading,
       trashList,
     } = this.props;
 
-    const { mode, modals } = this.state;
+    const { mode, modals, searchedText } = this.state;
 
     if (isLoading) {
       return <TextLoader />;
@@ -333,7 +369,7 @@ class DashboardContainer extends Component {
 
     const isMultiItem =
       workInProgressItemIds && workInProgressItemIds.length > 0;
-    const isSecureMessageMode = mode === SECURE_MESSAGE_MODE;
+    const isSecureMessageMode = mode === DASHBOARD_SECURE_MESSAGE_MODE;
 
     const isTrashList =
       workInProgressList && workInProgressList.id === trashList.id;
@@ -342,7 +378,13 @@ class DashboardContainer extends Component {
 
     return (
       <Fragment>
-        <DashboardLayout user={user} withSearch>
+        <DashboardLayout
+          withSearch
+          user={user}
+          searchedText={searchedText}
+          onSearch={this.handleSearch}
+          onClickReset={this.handleClickResetSearch}
+        >
           <CenterWrapper>
             <Sidebar>
               <MenuList
@@ -358,15 +400,26 @@ class DashboardContainer extends Component {
             ) : (
               <Fragment>
                 <MiddleColumnWrapper>
-                  <List
-                    isMultiItem={isMultiItem}
-                    workInProgressList={workInProgressList}
-                    workInProgressItem={workInProgressItem}
-                    workInProgressItemIds={workInProgressItemIds}
-                    items={visibleListItems}
-                    onClickItem={this.handleClickItem}
-                    onClickCreateItem={this.handleClickCreateItem}
-                  />
+                  {mode === DASHBOARD_DEFAULT_MODE ? (
+                    <List
+                      isMultiItem={isMultiItem}
+                      workInProgressList={workInProgressList}
+                      workInProgressItem={workInProgressItem}
+                      workInProgressItemIds={workInProgressItemIds}
+                      items={visibleListItems}
+                      onClickItem={this.handleClickItem}
+                      onClickCreateItem={this.handleClickCreateItem}
+                    />
+                  ) : (
+                    <SearchList
+                      items={this.filter(
+                        Object.values(itemsById),
+                        searchedText,
+                      )}
+                      workInProgressItem={workInProgressItem}
+                      onClickItem={this.handleClickItem}
+                    />
+                  )}
                 </MiddleColumnWrapper>
                 <RightColumnWrapper>
                   {isMultiItem ? (

@@ -4,3 +4,4 @@ export { default as PasswordInput } from './PasswordInput';
 export { default as MasterPasswordInput } from './MasterPasswordInput';
 export { default as TextArea } from './TextArea';
 export { default as ShareInput } from './ShareInput';
+export { default as SearchInput } from './SearchInput';

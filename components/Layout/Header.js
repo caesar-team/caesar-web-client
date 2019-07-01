@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { Icon } from '../Icon';
 import { Avatar } from '../Avatar';
 import { Dropdown } from '../Dropdown';
+import { SearchInput } from '../Input';
 import { Logo } from './Logo';
 
 const Wrapper = styled.header`
@@ -109,7 +110,13 @@ export class Header extends Component {
   };
 
   render() {
-    const { user, withSearch = false } = this.props;
+    const {
+      user,
+      withSearch = false,
+      searchedText,
+      onSearch,
+      onClickReset,
+    } = this.props;
     const { isDropdownOpened } = this.state;
 
     return (
@@ -119,6 +126,11 @@ export class Header extends Component {
         </LeftWrapper>
         {!!user && (
           <RightWrapper>
+            <SearchInput
+              searchedText={searchedText}
+              onChange={onSearch}
+              onClickReset={onClickReset}
+            />
             <UserSection>
               <Avatar {...user} name={user.email} />
               <StyledDropdown overlay={Options} onToggle={this.toggleDropdown}>

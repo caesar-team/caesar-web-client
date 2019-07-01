@@ -30,6 +30,10 @@ export const LIST_TYPES = {
   TRASH_TYPE,
 };
 
+export const DASHBOARD_DEFAULT_MODE = 'DEFAULT_MODE';
+export const DASHBOARD_SEARCH_MODE = 'SEARCH_MODE';
+export const DASHBOARD_SECURE_MESSAGE_MODE = 'SECURE_MESSAGE_MODE';
+
 export const ITEM_REVIEW_MODE = 'review';
 export const ITEM_WORKFLOW_EDIT_MODE = 'edit';
 export const ITEM_WORKFLOW_CREATE_MODE = 'create';

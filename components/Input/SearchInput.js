@@ -6,6 +6,11 @@ import { Icon } from '../Icon';
 const InputStyled = styled(Input)`
   padding-left: 20px;
 
+  ${Input.InputField} {
+    border-bottom: none;
+    background-color: ${({ theme }) => theme.white};
+  }
+
   ${Input.Prefix} {
     left: 0;
   }
@@ -20,9 +25,7 @@ const SearchInput = ({
   onClickReset = Function.prototype,
   ...props
 }) => {
-  const SearchIconComponent = (
-    <Icon name="search" width={18} height={18} />
-  );
+  const SearchIconComponent = <Icon name="search" width={18} height={18} />;
 
   const CloseIconComponent = (
     <CloseIcon name="close" width={18} height={18} onClick={onClickReset} />

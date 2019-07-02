@@ -966,6 +966,10 @@
   version "0.7.3"
   resolved "https://registry.yarnpkg.com/@emotion/unitless/-/unitless-0.7.3.tgz#6310a047f12d21a1036fb031317219892440416f"
 
+"@mattiasbuelens/web-streams-polyfill@^0.3.1":
+  version "0.3.2"
+  resolved "https://registry.yarnpkg.com/@mattiasbuelens/web-streams-polyfill/-/web-streams-polyfill-0.3.2.tgz#d7d180e769ac38f30c4a8e1dd9bd4412affb7f42"
+
 "@mrmlnc/readdir-enhanced@^2.2.1":
   version "2.2.1"
   resolved "https://registry.yarnpkg.com/@mrmlnc/readdir-enhanced/-/readdir-enhanced-2.2.1.tgz#524af240d1a360527b730475ecfa1344aa540dde"
@@ -1522,6 +1526,12 @@ add-px-to-style@1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/add-px-to-style/-/add-px-to-style-1.0.0.tgz#d0c135441fa8014a8137904531096f67f28f263a"
 
+address-rfc2822@^2.0.3:
+  version "2.0.4"
+  resolved "https://registry.yarnpkg.com/address-rfc2822/-/address-rfc2822-2.0.4.tgz#2dbd3b8d6c2de1e957c1a8549dc012d40bbc3431"
+  dependencies:
+    email-addresses "^3.0.0"
+
 agent-base@4, agent-base@^4.1.0, agent-base@^4.2.0, agent-base@~4.2.1:
   version "4.2.1"
   resolved "https://registry.yarnpkg.com/agent-base/-/agent-base-4.2.1.tgz#d89e5999f797875674c07d87f260fc41e83e8ca9"
@@ -1688,6 +1698,10 @@ arrify@^1.0.0, arrify@^1.0.1:
 asap@~2.0.3:
   version "2.0.6"
   resolved "https://registry.yarnpkg.com/asap/-/asap-2.0.6.tgz#e50347611d7e690943208bbdafebcbc2fb866d46"
+
+"asmcrypto.js@github:openpgpjs/asmcrypto#6e4e407b9b8ae317925a9e677cc7b4de3e447e83":
+  version "2.3.0"
+  resolved "https://codeload.github.com/openpgpjs/asmcrypto/tar.gz/6e4e407b9b8ae317925a9e677cc7b4de3e447e83"
 
 asn1.js@^4.0.0:
   version "4.10.1"
@@ -2557,7 +2571,7 @@ bluebird@^3.5.0, bluebird@^3.5.3:
   version "3.5.3"
   resolved "https://registry.yarnpkg.com/bluebird/-/bluebird-3.5.3.tgz#7d01c6f9616c9a51ab0f8c549a79dfe6ec33efa7"
 
-bn.js@^4.0.0, bn.js@^4.1.0, bn.js@^4.1.1, bn.js@^4.4.0:
+bn.js@^4.0.0, bn.js@^4.1.0, bn.js@^4.1.1, bn.js@^4.11.8, bn.js@^4.4.0:
   version "4.11.8"
   resolved "https://registry.yarnpkg.com/bn.js/-/bn.js-4.11.8.tgz#2cde09eb5ee341f484746bb0309b3253b1b1442f"
 
@@ -2690,6 +2704,13 @@ buffer@^4.3.0:
     base64-js "^1.0.2"
     ieee754 "^1.1.4"
     isarray "^1.0.0"
+
+buffer@^5.0.8:
+  version "5.2.1"
+  resolved "https://registry.yarnpkg.com/buffer/-/buffer-5.2.1.tgz#dd57fa0f109ac59c602479044dca7b8b3d0b71d6"
+  dependencies:
+    base64-js "^1.0.2"
+    ieee754 "^1.1.4"
 
 builtin-status-codes@^3.0.0:
   version "3.0.0"
@@ -2981,6 +3002,12 @@ commander@2.9.0:
 commander@^2.11.0, commander@^2.19.0, commander@~2.19.0:
   version "2.19.0"
   resolved "https://registry.yarnpkg.com/commander/-/commander-2.19.0.tgz#f6198aa84e5b83c46054b94ddedbfed5ee9ff12a"
+
+commander@~2.8.1:
+  version "2.8.1"
+  resolved "https://registry.yarnpkg.com/commander/-/commander-2.8.1.tgz#06be367febfda0c330aa1e2a072d3dc9762425d4"
+  dependencies:
+    graceful-readlink ">= 1.0.0"
 
 commondir@^1.0.1:
   version "1.0.1"
@@ -3653,6 +3680,22 @@ elliptic@^6.0.0:
     inherits "^2.0.1"
     minimalistic-assert "^1.0.0"
     minimalistic-crypto-utils "^1.0.0"
+
+"elliptic@github:openpgpjs/elliptic#ad81845f693effa5b4b6d07db2e82112de222f48":
+  version "6.4.0"
+  resolved "https://codeload.github.com/openpgpjs/elliptic/tar.gz/ad81845f693effa5b4b6d07db2e82112de222f48"
+  dependencies:
+    bn.js "^4.4.0"
+    brorand "^1.0.1"
+    hash.js "^1.0.0"
+    hmac-drbg "^1.0.0"
+    inherits "^2.0.1"
+    minimalistic-assert "^1.0.0"
+    minimalistic-crypto-utils "^1.0.0"
+
+email-addresses@^3.0.0:
+  version "3.0.3"
+  resolved "https://registry.yarnpkg.com/email-addresses/-/email-addresses-3.0.3.tgz#fc3c6952f68da24239914e982c8a7783bc2ed96d"
 
 emitter-listener@^1.1.1:
   version "1.1.2"
@@ -4635,7 +4678,7 @@ hash-base@^3.0.0:
     inherits "^2.0.1"
     safe-buffer "^5.0.1"
 
-hash.js@^1.0.0, hash.js@^1.0.3:
+hash.js@^1.0.0, hash.js@^1.0.3, hash.js@^1.1.3:
   version "1.1.7"
   resolved "https://registry.yarnpkg.com/hash.js/-/hash.js-1.1.7.tgz#0babca538e8d4ee4a0f8988d68866537a003cf42"
   dependencies:
@@ -6192,13 +6235,23 @@ onetime@^2.0.0:
   dependencies:
     mimic-fn "^1.0.0"
 
-openpgp@^4.5.5:
-  version "4.5.5"
-  resolved "https://registry.yarnpkg.com/openpgp/-/openpgp-4.5.5.tgz#8b6341ebf76ff86b9998f9430ca241a833982131"
+openpgp@4.4.10:
+  version "4.4.10"
+  resolved "https://registry.yarnpkg.com/openpgp/-/openpgp-4.4.10.tgz#b093821d3dc178cd19907e09e06b791b6d189f60"
   dependencies:
+    "@mattiasbuelens/web-streams-polyfill" "^0.3.1"
+    address-rfc2822 "^2.0.3"
+    asmcrypto.js "github:openpgpjs/asmcrypto#6e4e407b9b8ae317925a9e677cc7b4de3e447e83"
     asn1.js "^5.0.0"
+    bn.js "^4.11.8"
+    buffer "^5.0.8"
+    elliptic "github:openpgpjs/elliptic#ad81845f693effa5b4b6d07db2e82112de222f48"
+    hash.js "^1.1.3"
     node-fetch "^2.1.2"
     node-localstorage "~1.3.0"
+    pako "^1.0.6"
+    seek-bzip "github:openpgpjs/seek-bzip#3aca608ffedc055a1da1d898ecb244804ef32209"
+    web-stream-tools "github:openpgpjs/web-stream-tools#84a497715c9df271a673f8616318264ab42ab3cc"
 
 optionator@^0.8.1, optionator@^0.8.2:
   version "0.8.2"
@@ -6317,7 +6370,7 @@ pako@^0.2.5:
   version "0.2.9"
   resolved "https://registry.yarnpkg.com/pako/-/pako-0.2.9.tgz#f3f7522f4ef782348da8161bad9ecfd51bf83a75"
 
-pako@~1.0.2, pako@~1.0.5:
+pako@^1.0.6, pako@~1.0.2, pako@~1.0.5:
   version "1.0.10"
   resolved "https://registry.yarnpkg.com/pako/-/pako-1.0.10.tgz#4328badb5086a426aa90f541977d4955da5c9732"
 
@@ -7572,6 +7625,12 @@ schema-utils@^1.0.0:
     ajv-errors "^1.0.0"
     ajv-keywords "^3.1.0"
 
+"seek-bzip@github:openpgpjs/seek-bzip#3aca608ffedc055a1da1d898ecb244804ef32209":
+  version "1.0.5-git"
+  resolved "https://codeload.github.com/openpgpjs/seek-bzip/tar.gz/3aca608ffedc055a1da1d898ecb244804ef32209"
+  dependencies:
+    commander "~2.8.1"
+
 "semver@2 || 3 || 4 || 5", semver@^5.3.0, semver@^5.4.1, semver@^5.5, semver@^5.5.0, semver@^5.5.1, semver@^5.6.0:
   version "5.7.0"
   resolved "https://registry.yarnpkg.com/semver/-/semver-5.7.0.tgz#790a7cf6fea5459bac96110b29b60412dc8ff96b"
@@ -8653,6 +8712,10 @@ watchpack@^1.5.0:
 web-namespaces@^1.1.2:
   version "1.1.2"
   resolved "https://registry.yarnpkg.com/web-namespaces/-/web-namespaces-1.1.2.tgz#c8dc267ab639505276bae19e129dbd6ae72b22b4"
+
+"web-stream-tools@github:openpgpjs/web-stream-tools#84a497715c9df271a673f8616318264ab42ab3cc":
+  version "0.0.1"
+  resolved "https://codeload.github.com/openpgpjs/web-stream-tools/tar.gz/84a497715c9df271a673f8616318264ab42ab3cc"
 
 webext-redux@^2.0.2:
   version "2.0.2"

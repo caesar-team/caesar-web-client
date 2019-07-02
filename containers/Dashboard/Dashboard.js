@@ -27,6 +27,8 @@ import {
 import { initialItemData } from './utils';
 
 const MiddleColumnWrapper = styled.div`
+  display: flex;
+  flex-direction: column;
   width: 400px;
   flex-shrink: 0;
   background: ${({ theme }) => theme.lightBlue};
@@ -334,6 +336,15 @@ class DashboardContainer extends Component {
     );
   }
 
+  handleSelectAllListItems = event => {
+    const { checked } = event.currentTarget;
+    const { visibleListItems } = this.props;
+
+    this.props.setWorkInProgressItemIds(
+      checked ? visibleListItems.map(({ id }) => id) : [],
+    );
+  };
+
   prepareInitialState() {
     return {
       startCtrlShiftSelectionItemId: null,
@@ -379,6 +390,9 @@ class DashboardContainer extends Component {
     const isTrashItem =
       workInProgressItem && workInProgressItem.listId === listsByType.trash.id;
 
+    const areAllItemsSelected =
+      visibleListItems.length === workInProgressItemIds.length;
+
     return (
       <Fragment>
         <DashboardLayout
@@ -403,6 +417,19 @@ class DashboardContainer extends Component {
             ) : (
               <Fragment>
                 <MiddleColumnWrapper>
+                  {isMultiItem && (
+                    <MultiItem
+                      isTrashItems={isTrashList}
+                      workInProgressItemIds={workInProgressItemIds}
+                      allLists={lists}
+                      areAllItemsSelected={areAllItemsSelected}
+                      onClickMove={this.handleClickMoveItems}
+                      onClickMoveToTrash={this.handleOpenModal('moveToTrash')}
+                      onClickRemove={this.handleOpenModal('removeItem')}
+                      onClickShare={this.handleOpenModal('share')}
+                      onSelectAll={this.handleSelectAllListItems}
+                    />
+                  )}
                   {mode === DASHBOARD_DEFAULT_MODE ? (
                     <List
                       isMultiItem={isMultiItem}
@@ -425,40 +452,28 @@ class DashboardContainer extends Component {
                   )}
                 </MiddleColumnWrapper>
                 <RightColumnWrapper>
-                  {isMultiItem ? (
-                    <MultiItem
-                      isTrashItems={isTrashList}
-                      workInProgressItemIds={workInProgressItemIds}
-                      allLists={lists}
-                      onClickMove={this.handleClickMoveItems}
-                      onClickMoveToTrash={this.handleOpenModal('moveToTrash')}
-                      onClickRemove={this.handleOpenModal('removeItem')}
-                      onClickShare={this.handleOpenModal('share')}
-                    />
-                  ) : (
-                    <Item
-                      isTrashItem={isTrashItem}
-                      notification={notification}
-                      item={workInProgressItem}
-                      allLists={lists}
-                      user={user}
-                      members={members}
-                      onClickMoveItem={this.handleClickMoveItem}
-                      onClickCloseItem={this.handleClickCloseItem}
-                      onClickInvite={this.handleOpenModal('invite')}
-                      onClickShare={this.handleOpenModal('share')}
-                      onClickEditItem={this.handleClickEditItem}
-                      onClickMoveToTrash={this.handleOpenModal('moveToTrash')}
-                      onFinishCreateWorkflow={this.handleFinishCreateWorkflow}
-                      onFinishEditWorkflow={this.handleFinishEditWorkflow}
-                      onCancelWorkflow={this.handleClickCancelWorkflow}
-                      onClickRestoreItem={this.handleClickRestoreItem}
-                      onClickRemoveItem={this.handleOpenModal('removeItem')}
-                      onToggleFavorites={this.handleToggleFavorites}
-                      onClickAcceptUpdate={this.handleAcceptUpdate}
-                      onClickRejectUpdate={this.handleRejectUpdate}
-                    />
-                  )}
+                  <Item
+                    isTrashItem={isTrashItem}
+                    notification={notification}
+                    item={workInProgressItem}
+                    allLists={lists}
+                    user={user}
+                    members={members}
+                    onClickMoveItem={this.handleClickMoveItem}
+                    onClickCloseItem={this.handleClickCloseItem}
+                    onClickInvite={this.handleOpenModal('invite')}
+                    onClickShare={this.handleOpenModal('share')}
+                    onClickEditItem={this.handleClickEditItem}
+                    onClickMoveToTrash={this.handleOpenModal('moveToTrash')}
+                    onFinishCreateWorkflow={this.handleFinishCreateWorkflow}
+                    onFinishEditWorkflow={this.handleFinishEditWorkflow}
+                    onCancelWorkflow={this.handleClickCancelWorkflow}
+                    onClickRestoreItem={this.handleClickRestoreItem}
+                    onClickRemoveItem={this.handleOpenModal('removeItem')}
+                    onToggleFavorites={this.handleToggleFavorites}
+                    onClickAcceptUpdate={this.handleAcceptUpdate}
+                    onClickRejectUpdate={this.handleRejectUpdate}
+                  />
                 </RightColumnWrapper>
               </Fragment>
             )}

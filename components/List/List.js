@@ -1,12 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
-import {
-  FAVORITES_TYPE,
-  ITEM_TYPES,
-  LIST_TYPE,
-  TRASH_TYPE,
-} from 'common/constants';
-import { Icon, MultiItem, Scrollbar } from 'components';
+import { ITEM_TYPES, LIST_TYPE } from 'common/constants';
+import { Icon, Scrollbar } from 'components';
 import Item from './Item';
 import EmptyList from './EmptyList';
 import { Dropdown } from '../Dropdown';

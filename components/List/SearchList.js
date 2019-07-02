@@ -33,11 +33,14 @@ const Title = styled.div`
 const SearchList = ({
   isMultiItem = false,
   workInProgressItem,
+  workInProgressItemIds,
   items = [],
   onClickItem = Function.prototype,
 }) => {
   const renderedItems = items.map(({ id, ...props }) => {
-    const isActive = workInProgressItem && workInProgressItem.id === id;
+    const isActive = isMultiItem
+      ? workInProgressItemIds.includes(id)
+      : workInProgressItem && workInProgressItem.id === id;
 
     return (
       <Item
@@ -60,9 +63,11 @@ const SearchList = ({
     return <Scrollbar>{renderedItems}</Scrollbar>;
   };
 
+  const shouldShowTitle = !isEmpty || !isMultiItem;
+
   return (
     <Wrapper isEmpty={isEmpty}>
-      {!isEmpty && (
+      {shouldShowTitle && (
         <TitleWrapper>
           <Title>Search results ({items.length} elements):</Title>
         </TitleWrapper>

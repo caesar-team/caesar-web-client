@@ -36,6 +36,12 @@ const StyledWebsiteLink = styled.a`
   }
 `;
 
+const FixedSizeField = styled.div`
+  display: flex;
+  width: calc(100% - 80px);
+  overflow: hidden;
+`;
+
 class Credentials extends Component {
   state = {
     isPasswordVisible: false,
@@ -102,7 +108,7 @@ class Credentials extends Component {
             <Label>Login</Label>
             <Row>
               <FieldValue>
-                {login}
+                <FixedSizeField>{login}</FixedSizeField>
                 <StyledIcon
                   name="copy"
                   width={19}
@@ -116,7 +122,7 @@ class Credentials extends Component {
             <Label>Password</Label>
             <Row>
               <FieldValue>
-                {pwd}
+                <FixedSizeField>{pwd}</FixedSizeField>
                 <Row>
                   <StyledEyeIcon
                     name={eyeIconName}

@@ -54,7 +54,14 @@ export function* createMemberSaga({ payload: { email, role } }) {
 
     if (role !== ANONYMOUS_USER_ROLE) {
       yield put(
-        createMemberSuccess({ id: userId, email, publicKey, roles: [role] }),
+        createMemberSuccess({
+          id: userId,
+          email,
+          name: email,
+          avatar: null,
+          publicKey,
+          roles: [role],
+        }),
       );
     }
 

@@ -11,6 +11,8 @@ stages:
   steps:
   - applyYamlConfig:
       path: ./deploy/deployment.yaml
+    env:
+      CICD_NAMESPACE: dev-caesar-team  
 branch:
   include: [ develop, master ]
 notification:

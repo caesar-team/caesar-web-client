@@ -3,7 +3,7 @@ apiVersion: apps/v1beta2
 kind: Deployment
 metadata:
   name: caesar-web-client
-  namespace: ${CICD_NAMESPACE}
+  namespace: dev-caesar-team
   labels:
     app.kubernetes.io/name: caesar
 spec:

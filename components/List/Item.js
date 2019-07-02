@@ -2,6 +2,7 @@ import React from 'react';
 import styled, { css } from 'styled-components';
 import { formatDate } from 'common/utils/dateUtils';
 import { Icon } from '../Icon';
+import { Checkbox } from '../Checkbox';
 
 const ItemType = styled.div`
   display: flex;
@@ -65,6 +66,19 @@ const FavoriteIcon = styled(Icon)`
   right: 8px;
 `;
 
+const CheckboxStyled = styled(Checkbox)`
+  ${Checkbox.Box} {
+    background-color: ${({ theme }) => theme.emperor};
+    border: 1px solid ${({ theme }) => theme.emperor};
+
+    ${({ checked }) => `
+      > svg {
+        display: ${checked ? 'block' : 'none'};
+      }
+    `}
+  }
+`;
+
 const Row = styled.div`
   position: relative;
   display: flex;
@@ -78,19 +92,7 @@ const Row = styled.div`
     isActive &&
     isMultiItem &&
     css`
-      background: ${({ theme }) => theme.black};
-
-      ${Title}, ${IconText} {
-        color: ${({ theme }) => theme.white};
-      }
-
-      ${Text} {
-        color: ${({ theme }) => theme.gray};
-      }
-
-      ${StyledIcon} {
-        fill: ${({ theme }) => theme.white};
-      }
+      background: ${({ theme }) => theme.gallery};
     `}
 `;
 
@@ -115,7 +117,11 @@ const Item = ({
       isMultiItem={isMultiItem}
     >
       <ItemType>
-        <Icon name="key" width={20} height={20} fill="#fff" />
+        {isMultiItem ? (
+          <CheckboxStyled checked={isActive} onChange={Function.prototype} />
+        ) : (
+          <Icon name="key" width={20} height={20} fill="#fff" />
+        )}
       </ItemType>
       <Details>
         <Title>{name}</Title>

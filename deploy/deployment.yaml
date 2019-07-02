@@ -21,7 +21,7 @@ spec:
     metadata:
       labels:
         app: caesar-web-client
-        CICD_GIT_COMMIT: ${CICD_GIT_COMMIT}
+        CICD_GIT_COMMIT: "${CICD_GIT_COMMIT}"
     spec:
       containers:
       - name: caesar-web-client

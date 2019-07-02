@@ -12,9 +12,14 @@ stages:
   - applyYamlConfig:
       path: ./deploy/deployment.yaml
 branch:
-  include: [ develop, master ]
+  include:
+  - develop
+  - master
 notification:
   recipients:
-  - recipient: "#caesarapp-notify"
-    notifier: "slack"
-  condition: [ Success, Changed, Failed ]
+  - recipient: https://chat.caesar.software/hooks/ZpopzncGgv9sqNfiP/As383iWceBGa2PvjDb9oZLR2rFfySCPX6idGS978Q7o6dKpG
+    notifier: c-qzkvv:n-2bf45
+  condition:
+  - Success
+  - Changed
+  - Failed

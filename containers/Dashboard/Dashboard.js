@@ -63,9 +63,11 @@ class DashboardContainer extends Component {
   state = this.prepareInitialState();
 
   filter = memoize((data, pattern) =>
-    data.filter(({ secret }) =>
-      SECRET_SEARCH_FIELDS.some(searchFn(secret, pattern)),
-    ),
+    pattern
+      ? data.filter(({ secret }) =>
+          SECRET_SEARCH_FIELDS.some(searchFn(secret, pattern)),
+        )
+      : data,
   );
 
   componentDidMount() {
@@ -271,6 +273,8 @@ class DashboardContainer extends Component {
   handleSearch = event => {
     event.preventDefault();
 
+    this.props.resetWorkInProgressItemIds();
+
     this.setState({
       searchedText: event.target.value,
       mode: event.target.value ? DASHBOARD_SEARCH_MODE : DASHBOARD_DEFAULT_MODE,
@@ -281,6 +285,8 @@ class DashboardContainer extends Component {
   debouncedOnSearch = debounce(this.handleSearch, 250);
 
   handleClickResetSearch = () => {
+    this.props.resetWorkInProgressItemIds();
+
     this.setState({
       searchedText: '',
       mode: DASHBOARD_DEFAULT_MODE,
@@ -338,11 +344,22 @@ class DashboardContainer extends Component {
 
   handleSelectAllListItems = event => {
     const { checked } = event.currentTarget;
-    const { visibleListItems } = this.props;
+    const { visibleListItems, itemsById } = this.props;
+    const { searchedText, mode } = this.state;
 
-    this.props.setWorkInProgressItemIds(
-      checked ? visibleListItems.map(({ id }) => id) : [],
-    );
+    if (mode === DASHBOARD_SEARCH_MODE) {
+      this.props.setWorkInProgressItemIds(
+        checked
+          ? this.filter(Object.values(itemsById), searchedText).map(
+              ({ id }) => id,
+            )
+          : [],
+      );
+    } else {
+      this.props.setWorkInProgressItemIds(
+        checked ? visibleListItems.map(({ id }) => id) : [],
+      );
+    }
   };
 
   prepareInitialState() {
@@ -381,6 +398,8 @@ class DashboardContainer extends Component {
       return <TextLoader />;
     }
 
+    const searchedItems = this.filter(Object.values(itemsById), searchedText);
+
     const isMultiItem =
       workInProgressItemIds && workInProgressItemIds.length > 0;
     const isSecureMessageMode = mode === DASHBOARD_SECURE_MESSAGE_MODE;
@@ -391,7 +410,9 @@ class DashboardContainer extends Component {
       workInProgressItem && workInProgressItem.listId === listsByType.trash.id;
 
     const areAllItemsSelected =
-      visibleListItems.length === workInProgressItemIds.length;
+      mode === DASHBOARD_SEARCH_MODE
+        ? searchedItems.length === workInProgressItemIds.length
+        : visibleListItems.length === workInProgressItemIds.length;
 
     return (
       <Fragment>
@@ -442,11 +463,10 @@ class DashboardContainer extends Component {
                     />
                   ) : (
                     <SearchList
-                      items={this.filter(
-                        Object.values(itemsById),
-                        searchedText,
-                      )}
+                      isMultiItem={isMultiItem}
+                      items={searchedItems}
                       workInProgressItem={workInProgressItem}
+                      workInProgressItemIds={workInProgressItemIds}
                       onClickItem={this.handleClickItem}
                     />
                   )}

@@ -17,10 +17,8 @@ branch:
   - master
 notification:
   recipients:
-  - recipient: '#pipeline'
-    notifier: c-qzkvv:n-qqrqq
-  - recipient: ab@caesar.team
-    notifier: c-qzkvv:n-z4jfb
+  - recipient: '#test'
+    notifier: c-qzkvv:n-c64gg
   condition:
   - Success
   - Changed

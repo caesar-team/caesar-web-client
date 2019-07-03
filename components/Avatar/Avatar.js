@@ -50,7 +50,7 @@ const Avatar = ({ name, email, avatar, children, isSmall, ...props }) => {
 
   if (email) {
     return (
-      <Wrapper isSmall={isSmall}>
+      <Wrapper isSmall={isSmall} {...props}>
         <Gravatar email={email} size={isSmall ? 30 : 40} />
       </Wrapper>
     );

@@ -1,11 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
-import {
-  FAVORITES_TYPE,
-  ITEM_TYPES,
-  LIST_TYPE,
-  TRASH_TYPE,
-} from 'common/constants';
+import { ITEM_TYPES, LIST_TYPE } from 'common/constants';
 import { Icon, Scrollbar } from 'components';
 import Item from './Item';
 import EmptyList from './EmptyList';
@@ -144,20 +139,22 @@ const List = ({
 
   return (
     <Wrapper isEmpty={isEmpty}>
-      <TitleWrapper>
-        <Title>{workInProgressList.label}</Title>
-        {shouldShowAdd && (
-          <Dropdown
-            options={itemTypesOptions}
-            onClick={onClickCreateItem}
-            optionRender={renderOption}
-          >
-            <CreateButton>
-              <Icon name="plus" width={14} height={14} isInButton />
-            </CreateButton>
-          </Dropdown>
-        )}
-      </TitleWrapper>
+      {!isMultiItem && (
+        <TitleWrapper>
+          <Title>{workInProgressList.label}</Title>
+          {shouldShowAdd && (
+            <Dropdown
+              options={itemTypesOptions}
+              onClick={onClickCreateItem}
+              optionRender={renderOption}
+            >
+              <CreateButton>
+                <Icon name="plus" width={14} height={14} isInButton />
+              </CreateButton>
+            </Dropdown>
+          )}
+        </TitleWrapper>
+      )}
       {renderedList()}
     </Wrapper>
   );

@@ -1,9 +1,12 @@
 import React, { Component, Fragment } from 'react';
 import styled from 'styled-components';
+import memoize from 'memoize-one';
+import debounce from 'debounce';
 import {
   Item,
   MultiItem,
   List,
+  SearchList,
   InviteModal,
   ShareModal,
   ConfirmModal,
@@ -17,10 +20,15 @@ import {
   ITEM_REVIEW_MODE,
   ITEM_WORKFLOW_CREATE_MODE,
   ITEM_WORKFLOW_EDIT_MODE,
+  DASHBOARD_DEFAULT_MODE,
+  DASHBOARD_SEARCH_MODE,
+  DASHBOARD_SECURE_MESSAGE_MODE,
 } from 'common/constants';
 import { initialItemData } from './utils';
 
 const MiddleColumnWrapper = styled.div`
+  display: flex;
+  flex-direction: column;
   width: 400px;
   flex-shrink: 0;
   background: ${({ theme }) => theme.lightBlue};
@@ -44,11 +52,23 @@ const Sidebar = styled.aside`
   border-right: 1px solid ${({ theme }) => theme.gallery};
 `;
 
-const SECURE_MESSAGE_MODE = 'SECURE_MESSAGE_MODE';
-const LIST_ITEM_MODE = 'LIST_ITEM_MODE';
+const SECRET_SEARCH_FIELDS = ['name', 'note', 'website'];
+
+const searchFn = (obj, pattern) => fieldName =>
+  pattern &&
+  obj[fieldName] &&
+  obj[fieldName].toLowerCase().includes(pattern.toLowerCase());
 
 class DashboardContainer extends Component {
   state = this.prepareInitialState();
+
+  filter = memoize((data, pattern) =>
+    pattern
+      ? data.filter(({ secret }) =>
+          SECRET_SEARCH_FIELDS.some(searchFn(secret, pattern)),
+        )
+      : data,
+  );
 
   componentDidMount() {
     this.props.fetchUserSelfRequest();
@@ -67,13 +87,15 @@ class DashboardContainer extends Component {
     this.props.resetWorkInProgressItemIds();
 
     this.setState({
-      mode: LIST_ITEM_MODE,
+      mode: DASHBOARD_DEFAULT_MODE,
+      searchedText: '',
     });
   };
 
   handleClickSecureMessage = () => {
     this.setState({
-      mode: SECURE_MESSAGE_MODE,
+      mode: DASHBOARD_SECURE_MESSAGE_MODE,
+      searchedText: '',
     });
   };
 
@@ -248,6 +270,29 @@ class DashboardContainer extends Component {
     }));
   };
 
+  handleSearch = event => {
+    event.preventDefault();
+
+    this.props.resetWorkInProgressItemIds();
+
+    this.setState({
+      searchedText: event.target.value,
+      mode: event.target.value ? DASHBOARD_SEARCH_MODE : DASHBOARD_DEFAULT_MODE,
+    });
+  };
+
+  // eslint-disable-next-line react/sort-comp
+  debouncedOnSearch = debounce(this.handleSearch, 250);
+
+  handleClickResetSearch = () => {
+    this.props.resetWorkInProgressItemIds();
+
+    this.setState({
+      searchedText: '',
+      mode: DASHBOARD_DEFAULT_MODE,
+    });
+  };
+
   handleCtrlShiftSelectionItemBehaviour(itemId) {
     const { visibleListItems } = this.props;
     const { startCtrlShiftSelectionItemId } = this.state;
@@ -297,10 +342,31 @@ class DashboardContainer extends Component {
     );
   }
 
+  handleSelectAllListItems = event => {
+    const { checked } = event.currentTarget;
+    const { visibleListItems, itemsById } = this.props;
+    const { searchedText, mode } = this.state;
+
+    if (mode === DASHBOARD_SEARCH_MODE) {
+      this.props.setWorkInProgressItemIds(
+        checked
+          ? this.filter(Object.values(itemsById), searchedText).map(
+              ({ id }) => id,
+            )
+          : [],
+      );
+    } else {
+      this.props.setWorkInProgressItemIds(
+        checked ? visibleListItems.map(({ id }) => id) : [],
+      );
+    }
+  };
+
   prepareInitialState() {
     return {
       startCtrlShiftSelectionItemId: null,
-      mode: LIST_ITEM_MODE,
+      mode: DASHBOARD_DEFAULT_MODE,
+      searchedText: '',
       modals: {
         invite: false,
         share: false,
@@ -321,28 +387,42 @@ class DashboardContainer extends Component {
       lists,
       listsByType,
       visibleListItems,
+      itemsById,
       isLoading,
       trashList,
     } = this.props;
 
-    const { mode, modals } = this.state;
+    const { mode, modals, searchedText } = this.state;
 
     if (isLoading) {
       return <TextLoader />;
     }
 
+    const searchedItems = this.filter(Object.values(itemsById), searchedText);
+
     const isMultiItem =
       workInProgressItemIds && workInProgressItemIds.length > 0;
-    const isSecureMessageMode = mode === SECURE_MESSAGE_MODE;
+    const isSecureMessageMode = mode === DASHBOARD_SECURE_MESSAGE_MODE;
 
     const isTrashList =
       workInProgressList && workInProgressList.id === trashList.id;
     const isTrashItem =
       workInProgressItem && workInProgressItem.listId === listsByType.trash.id;
 
+    const areAllItemsSelected =
+      mode === DASHBOARD_SEARCH_MODE
+        ? searchedItems.length === workInProgressItemIds.length
+        : visibleListItems.length === workInProgressItemIds.length;
+
     return (
       <Fragment>
-        <DashboardLayout user={user} withSearch>
+        <DashboardLayout
+          withSearch
+          user={user}
+          searchedText={searchedText}
+          onSearch={this.handleSearch}
+          onClickReset={this.handleClickResetSearch}
+        >
           <CenterWrapper>
             <Sidebar>
               <MenuList
@@ -358,51 +438,62 @@ class DashboardContainer extends Component {
             ) : (
               <Fragment>
                 <MiddleColumnWrapper>
-                  <List
-                    isMultiItem={isMultiItem}
-                    workInProgressList={workInProgressList}
-                    workInProgressItem={workInProgressItem}
-                    workInProgressItemIds={workInProgressItemIds}
-                    items={visibleListItems}
-                    onClickItem={this.handleClickItem}
-                    onClickCreateItem={this.handleClickCreateItem}
-                  />
-                </MiddleColumnWrapper>
-                <RightColumnWrapper>
-                  {isMultiItem ? (
+                  {isMultiItem && (
                     <MultiItem
                       isTrashItems={isTrashList}
                       workInProgressItemIds={workInProgressItemIds}
                       allLists={lists}
+                      areAllItemsSelected={areAllItemsSelected}
                       onClickMove={this.handleClickMoveItems}
                       onClickMoveToTrash={this.handleOpenModal('moveToTrash')}
                       onClickRemove={this.handleOpenModal('removeItem')}
                       onClickShare={this.handleOpenModal('share')}
-                    />
-                  ) : (
-                    <Item
-                      isTrashItem={isTrashItem}
-                      notification={notification}
-                      item={workInProgressItem}
-                      allLists={lists}
-                      user={user}
-                      members={members}
-                      onClickMoveItem={this.handleClickMoveItem}
-                      onClickCloseItem={this.handleClickCloseItem}
-                      onClickInvite={this.handleOpenModal('invite')}
-                      onClickShare={this.handleOpenModal('share')}
-                      onClickEditItem={this.handleClickEditItem}
-                      onClickMoveToTrash={this.handleOpenModal('moveToTrash')}
-                      onFinishCreateWorkflow={this.handleFinishCreateWorkflow}
-                      onFinishEditWorkflow={this.handleFinishEditWorkflow}
-                      onCancelWorkflow={this.handleClickCancelWorkflow}
-                      onClickRestoreItem={this.handleClickRestoreItem}
-                      onClickRemoveItem={this.handleOpenModal('removeItem')}
-                      onToggleFavorites={this.handleToggleFavorites}
-                      onClickAcceptUpdate={this.handleAcceptUpdate}
-                      onClickRejectUpdate={this.handleRejectUpdate}
+                      onSelectAll={this.handleSelectAllListItems}
                     />
                   )}
+                  {mode === DASHBOARD_DEFAULT_MODE ? (
+                    <List
+                      isMultiItem={isMultiItem}
+                      workInProgressList={workInProgressList}
+                      workInProgressItem={workInProgressItem}
+                      workInProgressItemIds={workInProgressItemIds}
+                      items={visibleListItems}
+                      onClickItem={this.handleClickItem}
+                      onClickCreateItem={this.handleClickCreateItem}
+                    />
+                  ) : (
+                    <SearchList
+                      isMultiItem={isMultiItem}
+                      items={searchedItems}
+                      workInProgressItem={workInProgressItem}
+                      workInProgressItemIds={workInProgressItemIds}
+                      onClickItem={this.handleClickItem}
+                    />
+                  )}
+                </MiddleColumnWrapper>
+                <RightColumnWrapper>
+                  <Item
+                    isTrashItem={isTrashItem}
+                    notification={notification}
+                    item={workInProgressItem}
+                    allLists={lists}
+                    user={user}
+                    members={members}
+                    onClickMoveItem={this.handleClickMoveItem}
+                    onClickCloseItem={this.handleClickCloseItem}
+                    onClickInvite={this.handleOpenModal('invite')}
+                    onClickShare={this.handleOpenModal('share')}
+                    onClickEditItem={this.handleClickEditItem}
+                    onClickMoveToTrash={this.handleOpenModal('moveToTrash')}
+                    onFinishCreateWorkflow={this.handleFinishCreateWorkflow}
+                    onFinishEditWorkflow={this.handleFinishEditWorkflow}
+                    onCancelWorkflow={this.handleClickCancelWorkflow}
+                    onClickRestoreItem={this.handleClickRestoreItem}
+                    onClickRemoveItem={this.handleOpenModal('removeItem')}
+                    onToggleFavorites={this.handleToggleFavorites}
+                    onClickAcceptUpdate={this.handleAcceptUpdate}
+                    onClickRejectUpdate={this.handleRejectUpdate}
+                  />
                 </RightColumnWrapper>
               </Fragment>
             )}

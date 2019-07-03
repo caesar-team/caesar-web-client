@@ -9,9 +9,25 @@ const LayoutConstructorStyled = styled(LayoutConstructor)`
   overflow: hidden;
 `;
 
-const DashboardLayout = ({ user, withSearch, children, ...props }) => (
+const DashboardLayout = ({
+  user,
+  withSearch,
+  searchedText,
+  onSearch,
+  onClickReset,
+  children,
+  ...props
+}) => (
   <LayoutConstructorStyled
-    headerComponent={<Header user={user} withSearch={withSearch} />}
+    headerComponent={
+      <Header
+        user={user}
+        withSearch={withSearch}
+        searchedText={searchedText}
+        onSearch={onSearch}
+        onClickReset={onClickReset}
+      />
+    }
     {...props}
   >
     <ScrollLock>{children}</ScrollLock>

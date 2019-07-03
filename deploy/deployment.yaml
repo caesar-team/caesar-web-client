@@ -1,42 +1,40 @@
-﻿kind: Service
-apiVersion: v1
-metadata:
-  name:  caesarapp-web-app
-  namespace: default
-spec:
-  selector:
-    app:  caesarapp-web-app
-  type:  NodePort
-  ports:
-    - name:  http
-      port:  3000
-      targetPort:  3000
-
----
-apiVersion: apps/v1
+﻿---
+apiVersion: apps/v1beta2
 kind: Deployment
 metadata:
-  name: caesarapp-web-app
-  namespace: default
+  name: caesar-web-client
+  namespace: dev-caesar-team
+  labels:
+    app.kubernetes.io/name: caesar
 spec:
-  replicas: 1
   selector:
     matchLabels:
-      app: caesarapp-web-app
+      app: caesar-web-client
+  strategy:
+    rollingUpdate:
+      maxSurge: 0
+      maxUnavailable: 25%
+    type: RollingUpdate 
+  progressDeadlineSeconds: 600
+  replicas: 1
+  revisionHistoryLimit: 10
   template:
     metadata:
       labels:
-        app: caesarapp-web-app
-        CICD_GIT_COMMIT: ${CICD_GIT_COMMIT}
+        app: caesar-web-client
+        CICD_GIT_COMMIT: "${CICD_GIT_COMMIT}"
     spec:
       containers:
-        - name: caesarapp-web-app
-          image: "caesarteam/caesar-web-client:${CICD_GIT_BRANCH}"
-          ports:
-            - name: http
-              containerPort: 3000
-          envFrom:
-            - configMapRef:
-                name: caesarapp-config
-            - secretRef:
-                name: caesarapp-secret
+      - name: caesar-web-client
+        image: "caesarteam/caesar-web-client:${CICD_GIT_BRANCH}"
+        imagePullPolicy: Always
+        envFrom:
+        - configMapRef:
+            name: caesar-web-client-config
+        - configMapRef:
+            name: caesar-server-config    
+        ports:
+          - containerPort: 3000
+            name: http
+            protocol: TCP           
+      restartPolicy: Always

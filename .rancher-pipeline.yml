@@ -17,8 +17,8 @@ branch:
   - master
 notification:
   recipients:
-  - recipient: '#test'
-    notifier: c-qzkvv:n-c64gg
+  - recipient: '#pipeline'
+    notifier: c-qzkvv:n-qqrqq
   condition:
   - Success
   - Changed

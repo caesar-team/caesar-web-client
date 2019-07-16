@@ -4212,6 +4212,12 @@ figures@^2.0.0:
   dependencies:
     escape-string-regexp "^1.0.5"
 
+figures@^3.0.0:
+  version "3.0.0"
+  resolved "https://registry.yarnpkg.com/figures/-/figures-3.0.0.tgz#756275c964646163cc6f9197c7a0295dbfd04de9"
+  dependencies:
+    escape-string-regexp "^1.0.5"
+
 file-entry-cache@^5.0.1:
   version "5.0.1"
   resolved "https://registry.yarnpkg.com/file-entry-cache/-/file-entry-cache-5.0.1.tgz#ca0f6efa6dd3d561333fb14515065c2fafdf439c"
@@ -4933,7 +4939,7 @@ imagemin-svgo@7.0.0:
     is-svg "^3.0.0"
     svgo "^1.0.5"
 
-imagemin@^6.0.0:
+imagemin@^6.1.0:
   version "6.1.0"
   resolved "https://registry.yarnpkg.com/imagemin/-/imagemin-6.1.0.tgz#62508b465728fea36c03cdc07d915fe2d8cf9e13"
   dependencies:
@@ -5921,16 +5927,16 @@ next-fonts@^0.17.0:
     file-loader "^2.0.0"
     url-loader "^1.1.1"
 
-next-optimized-images@2.4.0:
-  version "2.4.0"
-  resolved "https://registry.yarnpkg.com/next-optimized-images/-/next-optimized-images-2.4.0.tgz#b485297e9d6e0836a102a7d22c3d3c9fb135a683"
+next-optimized-images@2.5.3:
+  version "2.5.3"
+  resolved "https://registry.yarnpkg.com/next-optimized-images/-/next-optimized-images-2.5.3.tgz#40b8f0f98917742e3262d5b4ffac68ee09cfee30"
   dependencies:
-    chalk "^2.4.1"
-    figures "^2.0.0"
+    chalk "^2.4.2"
+    figures "^3.0.0"
     file-loader "^3.0.1"
-    imagemin "^6.0.0"
+    imagemin "^6.1.0"
     img-loader "^3.0.1"
-    raw-loader "^1.0.0"
+    raw-loader "^2.0.0"
     url-loader "^1.1.2"
 
 next-redux-saga@^4.0.1:
@@ -7055,9 +7061,9 @@ raw-body@2.3.3, raw-body@^2.2.0:
     iconv-lite "0.4.23"
     unpipe "1.0.0"
 
-raw-loader@^1.0.0:
-  version "1.0.0"
-  resolved "https://registry.yarnpkg.com/raw-loader/-/raw-loader-1.0.0.tgz#3f9889e73dadbda9a424bce79809b4133ad46405"
+raw-loader@^2.0.0:
+  version "2.0.0"
+  resolved "https://registry.yarnpkg.com/raw-loader/-/raw-loader-2.0.0.tgz#e2813d9e1e3f80d1bbade5ad082e809679e20c26"
   dependencies:
     loader-utils "^1.1.0"
     schema-utils "^1.0.0"

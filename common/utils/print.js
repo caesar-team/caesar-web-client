@@ -8,3 +8,10 @@ export function printElement(elementId) {
 
   document.body.innerHTML = originalContents;
 }
+
+export function printData(data) {
+  const win = window.open();
+  win.document.write(data);
+  win.print();
+  win.close();
+}

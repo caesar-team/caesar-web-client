@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import styled from 'styled-components';
 import { KEY_CODES } from 'common/constants';
+import { pastFromClipboard } from 'common/utils/clipboard';
 
 const StyledInput = styled.input`
   width: 40px;
@@ -22,6 +23,24 @@ const StyledInput = styled.input`
 export class CodeItem extends Component {
   state = {
     value: '',
+  };
+
+  static getDerivedStateFromProps(nextProps) {
+    // The state without cache is a reasonable solution for this place.
+    return {
+      value: nextProps.value,
+    };
+  }
+
+  onPaste = e => {
+    // Stop the data being pasted into the element.
+    e.stopPropagation();
+    e.preventDefault();
+
+    const pastedData = pastFromClipboard(e);
+    if (pastedData != null && pastedData.length > 0) {
+      this.props.onPaste(pastedData);
+    }
   };
 
   onKeyDown = e => {
@@ -48,17 +67,12 @@ export class CodeItem extends Component {
   onChange = e => {
     const value = this.validate(e.target.value);
     if (this.state.value === value) return;
-    if (value.length < 2) {
-      this.setState({ value });
-      this.props.onChange(value);
-    }
+    this.setState({ value });
+    this.props.onChange(value);
   };
 
   validate = value => {
-    const numCode = value.charCodeAt(0);
-    const isInteger =
-      numCode >= '0'.charCodeAt(0) && numCode <= '9'.charCodeAt(0);
-    return isInteger ? value : '';
+    return /^[0-9]$/.test(value) ? value : '';
   };
 
   render() {
@@ -69,6 +83,7 @@ export class CodeItem extends Component {
       <StyledInput
         onChange={this.onChange}
         onKeyDown={this.onKeyDown}
+        onPaste={this.onPaste}
         maxLength="1"
         autoComplete="off"
         ref={createRef}

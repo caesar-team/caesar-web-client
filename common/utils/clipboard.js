@@ -7,3 +7,13 @@ export const copyToClipboard = str => {
   document.execCommand('copy');
   document.body.removeChild(el);
 };
+
+export const pastFromClipboard = e => {
+  // Get pasted data via clipboard API
+  const clipboardData = e.clipboardData || window.clipboardData;
+  const pastedData = clipboardData.getData('Text');
+  if (pastedData != null && pastedData.length > 0) {
+    return pastedData;
+  }
+  return null;
+};

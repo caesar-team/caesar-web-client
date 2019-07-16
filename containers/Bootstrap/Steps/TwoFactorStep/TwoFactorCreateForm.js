@@ -1,6 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
-import { AuthTitle, AuthDescription, Button } from 'components';
+import { AuthTitle, AuthDescription, Button, Link } from 'components';
 
 const Wrapper = styled.div`
   display: flex;
@@ -34,6 +34,14 @@ const NextButton = styled(Button)`
   max-width: 400px;
 `;
 
+const BottomWrapper = styled.div`
+  margin-top: 40px;
+  text-align: center;
+  font-size: 18px;
+  letter-spacing: 0.6px;
+  color: ${({ theme }) => theme.gray};
+`;
+
 const TwoFactorCreateForm = ({ qr, code, onClickNext }) => (
   <Wrapper>
     <AuthTitle>Two Factor Authentication</AuthTitle>
@@ -46,6 +54,9 @@ const TwoFactorCreateForm = ({ qr, code, onClickNext }) => (
       <QrCodeKey>{code}</QrCodeKey>
     </QrCodeKeyWrapper>
     <NextButton onClick={onClickNext}>Next</NextButton>
+    <BottomWrapper>
+      or <Link to="/logout">log out</Link>
+    </BottomWrapper>
   </Wrapper>
 );
 

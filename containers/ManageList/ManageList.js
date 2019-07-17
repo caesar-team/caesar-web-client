@@ -153,7 +153,7 @@ class ManageListContainer extends Component {
         </ManageListWrapper>
         {isVisibleModal && (
           <ListFormModal
-            list={workInProgressList}
+            list={mode === LIST_WORKFLOW_CREATE_MODE ? [] : workInProgressList}
             mode={mode}
             onSubmit={
               mode === LIST_WORKFLOW_CREATE_MODE

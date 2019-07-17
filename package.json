@@ -58,7 +58,7 @@
     "react-input-autosize": "^2.2.1",
     "react-redux": "^7.0.1",
     "react-scrolllock": "^4.0.1",
-    "react-table": "6.9.2",
+    "react-table": "6.10.0",
     "react-tagsinput": "^3.19.0",
     "redux": "^4.0.1",
     "redux-devtools-extension": "^2.13.8",

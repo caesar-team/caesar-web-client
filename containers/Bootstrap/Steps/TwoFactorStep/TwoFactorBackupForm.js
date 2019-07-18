@@ -2,9 +2,10 @@ import React from 'react';
 import styled from 'styled-components';
 import { FastField, Formik } from 'formik';
 import copy from 'copy-text-to-clipboard';
-import { Button, Checkbox } from 'components';
-import { downloadElement } from 'common/utils/download';
-import { printElement } from 'common/utils/print';
+import { formatNumbersByColumns } from 'common/utils/format';
+import { Button, Checkbox, Link } from 'components';
+import { downloadTextData } from 'common/utils/download';
+import { printData } from 'common/utils/print';
 import { backupInitialValues } from './constants';
 import { agreeSchema } from './schema';
 
@@ -98,20 +99,20 @@ const TwoFactorBackupForm = ({ codes, onSubmit }) => (
             ))}
           </Codes>
           <ButtonsWrapper>
-            <StyledButton color="white" icon="copy" onClick={() => copy(codes)}>
+            <StyledButton color="white" icon="copy" onClick={() => copy(formatNumbersByColumns(codes, 4))}>
               COPY
             </StyledButton>
             <StyledButton
               color="white"
               icon="download"
-              onClick={() => downloadElement('codes')}
+              onClick={() => downloadTextData(formatNumbersByColumns(codes, 4))}
             >
               DOWNLOAD
             </StyledButton>
             <StyledButton
               color="white"
               icon="print"
-              onClick={() => printElement('codes')}
+              onClick={() => printData(formatNumbersByColumns(codes, 4))}
             >
               PRINT
             </StyledButton>

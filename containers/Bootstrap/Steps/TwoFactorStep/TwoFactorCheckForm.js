@@ -8,7 +8,7 @@ import {
   BackButton,
   CodeInput,
   Checkbox,
-  Button,
+  Button, Link,
 } from 'components';
 import { codeSchema } from './schema';
 import { initialValues } from './constants';
@@ -45,6 +45,14 @@ const NextButton = styled(Button)`
   height: 60px;
   font-size: 18px;
   margin-top: 60px;
+`;
+
+const BottomWrapper = styled.div`
+  margin-top: 40px;
+  text-align: center;
+  font-size: 18px;
+  letter-spacing: 0.6px;
+  color: ${({ theme }) => theme.gray};
 `;
 
 const CODE_LENGTH = 6;
@@ -106,6 +114,9 @@ const TwoFactorCheckForm = ({ allowReturn, onClickReturn, onSubmit }) => (
           >
             Continue
           </NextButton>
+          <BottomWrapper>
+            or <Link to="/logout">log out</Link>
+          </BottomWrapper>
         </Form>
       )}
     />

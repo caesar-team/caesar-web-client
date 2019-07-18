@@ -19,8 +19,6 @@ notification:
   recipients:
   - recipient: '#pipeline'
     notifier: c-qzkvv:n-qqrqq
-  - recipient: ab@caesar.team
-    notifier: c-qzkvv:n-z4jfb
   condition:
   - Success
   - Changed

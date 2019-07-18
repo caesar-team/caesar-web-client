@@ -21,9 +21,11 @@ const checkFileSize = raw =>
   convertSizeNameToNumber(MAX_UPLOADING_FILE_SIZE);
 
 const checkAllFileSizes = files =>
-  files.reduce((acc, { raw }) => acc + raw.length, 0) *
-    BASE_64_LENGTH_BYTE_RATE <=
-  convertSizeNameToNumber(TOTAL_MAX_UPLOADING_FILES_SIZES);
+  files
+    ? files.reduce((acc, { raw }) => acc + raw.length, 0) *
+        BASE_64_LENGTH_BYTE_RATE <=
+      convertSizeNameToNumber(TOTAL_MAX_UPLOADING_FILES_SIZES)
+    : true;
 
 export const attachmentsSchema = yup
   .array(

@@ -5,6 +5,7 @@ import { CodeItem } from './CodeItem';
 const Wrapper = styled.div`
   display: flex;
 `;
+const isCodeValidated = (v, length) => v.match(`^[0-9]{${length}}$`) !== null;
 
 class CodeInput extends Component {
   values = this.generateValues();
@@ -17,6 +18,16 @@ class CodeInput extends Component {
 
   createElementsRefs = (ref, index) => {
     this.elements[index] = ref;
+  };
+
+  onPaste = v => {
+    const { length } = this.props;
+
+    if (!isCodeValidated(v, length)) {
+      return;
+    }
+
+    v.split('').map((ev, ei) => this.onItemChange(ev, ei)); // Simulate user input.
   };
 
   onItemChange = (value, index) => {
@@ -61,11 +72,13 @@ class CodeInput extends Component {
         {this.values.map((e, i) => (
           <CodeItem
             createRef={ref => this.createElementsRefs(ref, i)}
+            value={e}
             key={i}
             index={i}
             onBackspace={() => this.onBackspace(i)}
             resetFormOnBackspace={onCompleteWithErrors}
             onChange={v => this.onItemChange(v, i)}
+            onPaste={v => this.onPaste(v)}
             disabled={disabled}
             errors={errors}
           />

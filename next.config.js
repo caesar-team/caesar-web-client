@@ -44,10 +44,10 @@ module.exports = withPlugins(
     webpack: (config, { dev }) => {
       config.output.globalObject = 'this';
 
-      config.module.rules.push({
-        test: /\.worker\.js$/,
-        loader: 'babel-loader',
-      });
+      // config.module.rules.push({
+      //   test: /\.worker\.js$/,
+      //   loader: 'babel-loader',
+      // });
 
       return config;
     },

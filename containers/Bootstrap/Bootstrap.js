@@ -4,7 +4,7 @@ import { withRouter } from 'next/router';
 import { BootstrapLayout } from 'components';
 import { getUserBootstrap } from 'common/api';
 import { DEFAULT_IDLE_TIMEOUT } from 'common/constants';
-import OpenPGPWorker from 'common/openpgp.worker';
+import EncryptionWorker from 'common/encryption.worker';
 import { SessionChecker } from 'components/SessionChecker';
 import {
   TWO_FACTOR_CHECK,
@@ -42,7 +42,7 @@ class Bootstrap extends Component {
   bootstrap = null;
 
   async componentDidMount() {
-    this.initOpenPGPWorker();
+    this.initEncryptionWorker();
 
     const { data: bootstrap } = await getUserBootstrap();
 
@@ -104,10 +104,10 @@ class Bootstrap extends Component {
     });
   };
 
-  initOpenPGPWorker() {
+  initEncryptionWorker() {
     openpgp.config.aead_protect = false;
 
-    this.worker = new OpenPGPWorker();
+    this.worker = new EncryptionWorker();
 
     openpgp.initWorker({ workers: [this.worker] });
   }

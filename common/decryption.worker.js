@@ -2,6 +2,9 @@
 self.window = self;
 
 const { decryptItem, getPrivateKeyObj } = require('./utils/cipherUtils');
+const constants = require('../common/constants');
+
+const { API_URI } = constants;
 
 window.onmessage = async message => {
   const {
@@ -21,13 +24,16 @@ window.onmessage = async message => {
         try {
           const secret = await decryptItem(item.secret, privateKeyObj);
 
-          window.postMessage({
-            event: `emitDecryptedItem_${listId}`,
-            item: {
-              ...item,
-              secret,
+          window.postMessage(
+            {
+              event: `emitDecryptedItem_${listId}`,
+              item: {
+                ...item,
+                secret,
+              },
             },
-          });
+            API_URI,
+          );
         } catch (e) {
           console.log(e, item, listId);
         }

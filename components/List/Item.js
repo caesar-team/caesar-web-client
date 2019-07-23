@@ -3,6 +3,7 @@ import styled, { css } from 'styled-components';
 import { formatDate } from 'common/utils/dateUtils';
 import { Icon } from '../Icon';
 import { Checkbox } from '../Checkbox';
+import { ITEM_CREDENTIALS_TYPE, ITEM_ICON_TYPES } from '../../common/constants';
 
 const ItemType = styled.div`
   display: flex;
@@ -95,11 +96,17 @@ const Row = styled.div`
       background: ${({ theme }) => theme.gallery};
     `}
 `;
-
+const ItemTypeIcon = props => {
+  const { type } = props;
+  const icon = ITEM_ICON_TYPES[type] || ITEM_ICON_TYPES[ITEM_CREDENTIALS_TYPE];
+  return <Icon name={icon} width={20} height={20} fill="#fff" />;
+};
 const Item = ({
   id,
   lastUpdated,
   secret: { name, attachments },
+  type,
+  listId,
   invited,
   isMultiItem = false,
   isActive = false,
@@ -108,7 +115,6 @@ const Item = ({
 }) => {
   const shouldShowMembers = !!invited.length;
   const shouldShowAttachments = attachments && attachments.length > 0;
-
   return (
     <Row
       key={id}
@@ -120,7 +126,7 @@ const Item = ({
         {isMultiItem ? (
           <CheckboxStyled checked={isActive} onChange={Function.prototype} />
         ) : (
-          <Icon name="key" width={20} height={20} fill="#fff" />
+          <ItemTypeIcon type={type} />
         )}
       </ItemType>
       <Details>

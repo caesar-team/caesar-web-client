@@ -5,6 +5,7 @@ import { Icon, Scrollbar } from 'components';
 import Item from './Item';
 import EmptyList from './EmptyList';
 import { Dropdown } from '../Dropdown';
+import { ITEM_ICON_TYPES } from '../../common/constants';
 
 const Wrapper = styled.div`
   position: relative;
@@ -79,14 +80,9 @@ const Option = styled.button`
 
 const { ITEM_CREDENTIALS_TYPE, ITEM_DOCUMENT_TYPE } = ITEM_TYPES;
 
-const iconsMap = {
-  [ITEM_CREDENTIALS_TYPE]: 'key',
-  [ITEM_DOCUMENT_TYPE]: 'securenote',
-};
-
 const renderOption = (value, label) => (
   <Option key={value}>
-    <StyledIcon name={iconsMap[value]} width={16} height={16} />
+    <StyledIcon name={ITEM_ICON_TYPES[value]} width={16} height={16} />
     {label}
   </Option>
 );
@@ -104,15 +100,15 @@ const List = ({
     return null;
   }
 
-  const renderedItems = items.map(({ id, ...props }) => {
+  const renderedItems = items.map(({ id, type, ...props }) => {
     const isActive = isMultiItem
       ? workInProgressItemIds.includes(id)
       : workInProgressItem && workInProgressItem.id === id;
-
     return (
       <Item
         key={id}
         id={id}
+        type={type}
         isMultiItem={isMultiItem}
         isActive={isActive}
         onClickItem={onClickItem}

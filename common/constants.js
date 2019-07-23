@@ -62,6 +62,11 @@ export const ITEM_TYPES = {
   ITEM_DOCUMENT_TYPE,
 };
 
+export const ITEM_ICON_TYPES = {
+  [ITEM_CREDENTIALS_TYPE]: 'key',
+  [ITEM_DOCUMENT_TYPE]: 'securenote',
+};
+
 export const KEY_CODES = {
   BACKSPACE: 8,
   TAB: 9,

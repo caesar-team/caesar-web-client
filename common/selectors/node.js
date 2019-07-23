@@ -43,12 +43,6 @@ export const workInProgressItemIdsSelector = createSelector(
   node => node.workInProgressItemIds,
 );
 
-export const workInProgressListSelector = createSelector(
-  listsByIdSelector,
-  workInProgressListIdSelector,
-  (listsById, workInProgressListId) => listsById[workInProgressListId],
-);
-
 export const listsSelector = createSelector(
   nodeSelector,
   node => Object.values(node.listsById) || [],
@@ -61,12 +55,33 @@ export const userListsSelector = createSelector(
 
 export const defaultListSelector = createSelector(
   listsSelector,
-  lists => lists.find(({ label }) => label === 'default') || {},
+  lists =>
+    lists.find(({ label }) => label.toLocaleLowerCase() === 'default') || {},
+);
+
+export const favoriteListSelector = createSelector(
+  listsSelector,
+  lists =>
+    lists.find(({ label }) => label.toLocaleLowerCase() === 'favorites') || {},
+);
+
+export const workInProgressListSelector = createSelector(
+  listsByIdSelector,
+  workInProgressListIdSelector,
+  favoriteListSelector,
+  (listsById, workInProgressListId, favoriteList) => {
+    return listsById[workInProgressListId] || favoriteList;
+  },
 );
 
 export const itemsSelector = createSelector(
   nodeSelector,
   node => Object.values(node.itemsById) || [],
+);
+
+export const itemsInListsSelector = createSelector(
+  listsSelector,
+  lists => lists.find(list => list.type === TRASH_TYPE) || [],
 );
 
 export const favoriteItemsSelector = createSelector(

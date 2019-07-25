@@ -1,6 +1,7 @@
 import React, { memo, forwardRef } from 'react';
 import styled from 'styled-components';
 import equal from 'fast-deep-equal';
+import memoize from 'memoize-one';
 import { FixedSizeList, areEqual } from 'react-window';
 import AutoSizer from 'react-virtualized-auto-sizer';
 import { ITEM_TYPES, LIST_TYPE } from 'common/constants';
@@ -80,6 +81,8 @@ const Option = styled.button`
   }
 `;
 
+const ITEM_HEIGHT = 80;
+
 const { ITEM_CREDENTIALS_TYPE, ITEM_DOCUMENT_TYPE } = ITEM_TYPES;
 
 const iconsMap = {
@@ -92,6 +95,22 @@ const renderOption = (value, label) => (
     <StyledIcon name={iconsMap[value]} width={16} height={16} />
     {label}
   </Option>
+);
+
+const createItemData = memoize(
+  (
+    items,
+    isMultiItem,
+    workInProgressItemIds,
+    workInProgressItem,
+    onClickItem,
+  ) => ({
+    items,
+    isMultiItem,
+    workInProgressItemIds,
+    workInProgressItem,
+    onClickItem,
+  }),
 );
 
 const ItemComponent = memo(({ data, index, style }) => {
@@ -149,20 +168,22 @@ const List = ({
       return <EmptyList />;
     }
 
+    const itemData = createItemData({
+      items,
+      isMultiItem,
+      workInProgressItemIds,
+      workInProgressItem,
+      onClickItem,
+    });
+
     return (
       <AutoSizer>
         {({ height, width }) => (
           <FixedSizeList
             height={height}
             itemCount={items.length}
-            itemData={{
-              items,
-              isMultiItem,
-              workInProgressItemIds,
-              workInProgressItem,
-              onClickItem,
-            }}
-            itemSize={80}
+            itemData={itemData}
+            itemSize={ITEM_HEIGHT}
             width={width}
             outerElementType={ScrollbarVirtualList}
           >

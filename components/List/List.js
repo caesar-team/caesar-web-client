@@ -1,6 +1,8 @@
-import React, { memo } from 'react';
+import React, { memo, forwardRef } from 'react';
 import styled from 'styled-components';
 import equal from 'fast-deep-equal';
+import { FixedSizeList, areEqual } from 'react-window';
+import AutoSizer from 'react-virtualized-auto-sizer';
 import { ITEM_TYPES, LIST_TYPE } from 'common/constants';
 import { Icon, Scrollbar } from 'components';
 import Item from './Item';
@@ -92,6 +94,37 @@ const renderOption = (value, label) => (
   </Option>
 );
 
+const ItemComponent = memo(({ data, index, style }) => {
+  const {
+    items,
+    isMultiItem,
+    workInProgressItemIds,
+    workInProgressItem,
+    onClickItem,
+  } = data;
+  const item = items[index];
+
+  const isActive = isMultiItem
+    ? workInProgressItemIds.includes(item.id)
+    : workInProgressItem && workInProgressItem.id === item.id;
+
+  return (
+    <Item
+      style={style}
+      key={item.id}
+      id={item.id}
+      isMultiItem={isMultiItem}
+      isActive={isActive}
+      onClickItem={onClickItem}
+      {...item}
+    />
+  );
+}, areEqual);
+
+const ScrollbarVirtualList = forwardRef((props, ref) => (
+  <Scrollbar {...props} customRef={ref} />
+));
+
 const List = ({
   isMultiItem = false,
   workInProgressList,
@@ -101,27 +134,9 @@ const List = ({
   onClickItem = Function.prototype,
   onClickCreateItem = Function.prototype,
 }) => {
-  console.log('render List');
   if (!workInProgressList && !workInProgressItemIds.length) {
     return null;
   }
-
-  const renderedItems = items.map(({ id, ...props }) => {
-    const isActive = isMultiItem
-      ? workInProgressItemIds.includes(id)
-      : workInProgressItem && workInProgressItem.id === id;
-
-    return (
-      <Item
-        key={id}
-        id={id}
-        isMultiItem={isMultiItem}
-        isActive={isActive}
-        onClickItem={onClickItem}
-        {...props}
-      />
-    );
-  });
 
   const itemTypesOptions = [
     { label: 'Password', value: ITEM_CREDENTIALS_TYPE },
@@ -134,7 +149,28 @@ const List = ({
       return <EmptyList />;
     }
 
-    return <Scrollbar>{renderedItems}</Scrollbar>;
+    return (
+      <AutoSizer>
+        {({ height, width }) => (
+          <FixedSizeList
+            height={height}
+            itemCount={items.length}
+            itemData={{
+              items,
+              isMultiItem,
+              workInProgressItemIds,
+              workInProgressItem,
+              onClickItem,
+            }}
+            itemSize={80}
+            width={width}
+            outerElementType={ScrollbarVirtualList}
+          >
+            {ItemComponent}
+          </FixedSizeList>
+        )}
+      </AutoSizer>
+    );
   };
 
   const shouldShowAdd = workInProgressList.type === LIST_TYPE;

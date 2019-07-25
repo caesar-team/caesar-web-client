@@ -67,7 +67,6 @@ const Item = ({
   onClickAcceptUpdate = Function.prototype,
   onClickReject = Function.prototype,
 }) => {
-  console.log('render Item');
   if (!item) {
     return <EmptyItem />;
   }

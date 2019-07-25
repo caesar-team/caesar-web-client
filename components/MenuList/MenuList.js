@@ -128,7 +128,6 @@ class MenuList extends Component {
   }
 
   render() {
-    console.log('render MenuList');
     const { mode, onClickSecureMessage } = this.props;
     const renderedList = this.renderLists();
 

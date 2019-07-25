@@ -168,13 +168,13 @@ const List = ({
       return <EmptyList />;
     }
 
-    const itemData = createItemData({
+    const itemData = createItemData(
       items,
       isMultiItem,
       workInProgressItemIds,
       workInProgressItem,
       onClickItem,
-    });
+    );
 
     return (
       <AutoSizer>

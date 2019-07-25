@@ -71,7 +71,6 @@
     "styled-components": "^4.3.2",
     "threads": "^1.0.0-beta.2",
     "webext-redux": "^2.1.2",
-    "why-did-you-update": "0.1.1",
     "yup": "^0.27.0",
     "zxcvbn": "^4.4.2"
   },

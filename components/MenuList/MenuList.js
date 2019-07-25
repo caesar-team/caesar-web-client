@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { Component, PureComponent } from 'react';
 import styled from 'styled-components';
 import {
   LIST_TYPE,
@@ -6,7 +6,6 @@ import {
   TRASH_TYPE,
   FAVORITES_TYPE,
 } from 'common/constants';
-import { match } from 'common/utils/match';
 import Icon from '../Icon/Icon';
 import Badge from '../Badge/Badge';
 
@@ -51,6 +50,10 @@ class MenuList extends Component {
     isVisibleList: true,
   };
 
+  shouldComponentUpdate(nextProps) {
+    return nextProps.list.length !== this.props.list.length;
+  }
+
   handleToggle = () => {
     this.setState(prevState => ({
       isVisibleList: !prevState.isVisibleList,
@@ -58,9 +61,10 @@ class MenuList extends Component {
   };
 
   renderLists() {
-    const { mode, lists, workInProgressList, onClick } = this.props;
+    const { mode, inbox, favorites, trash, list, workInProgressList, onClick } = this.props;
     const { isVisibleList } = this.state;
 
+    const lists = { inbox, favorites, trash, list};
     const keys = Object.keys(lists);
 
     return keys.map(key => {
@@ -124,6 +128,7 @@ class MenuList extends Component {
   }
 
   render() {
+    console.log('render MenuList');
     const { mode, onClickSecureMessage } = this.props;
     const renderedList = this.renderLists();
 

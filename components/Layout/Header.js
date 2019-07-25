@@ -1,4 +1,4 @@
-import React, { Component, Fragment } from 'react';
+import React, { PureComponent, Fragment } from 'react';
 import styled from 'styled-components';
 import Link from 'next/link';
 import { Icon } from '../Icon';
@@ -98,7 +98,7 @@ const Options = (
   </Fragment>
 );
 
-export class Header extends Component {
+export class Header extends PureComponent {
   state = {
     isDropdownOpened: false,
   };

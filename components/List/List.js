@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { memo } from 'react';
 import styled from 'styled-components';
+import equal from 'fast-deep-equal';
 import { ITEM_TYPES, LIST_TYPE } from 'common/constants';
 import { Icon, Scrollbar } from 'components';
 import Item from './Item';
@@ -100,6 +101,7 @@ const List = ({
   onClickItem = Function.prototype,
   onClickCreateItem = Function.prototype,
 }) => {
+  console.log('render List');
   if (!workInProgressList && !workInProgressItemIds.length) {
     return null;
   }
@@ -160,4 +162,6 @@ const List = ({
   );
 };
 
-export default List;
+export default memo(List, (prevProps, nextProps) =>
+  equal(prevProps, nextProps),
+);

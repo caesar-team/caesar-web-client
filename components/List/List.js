@@ -1,12 +1,13 @@
-import React, { memo, forwardRef } from 'react';
+import React, { memo } from 'react';
 import styled from 'styled-components';
 import equal from 'fast-deep-equal';
 import memoize from 'memoize-one';
-import { FixedSizeList, areEqual } from 'react-window';
+import { FixedSizeList } from 'react-window';
 import AutoSizer from 'react-virtualized-auto-sizer';
 import { ITEM_TYPES, LIST_TYPE } from 'common/constants';
-import { Icon, Scrollbar } from 'components';
-import Item from './Item';
+import { Icon } from 'components';
+import FixedSizeItem from './FixedSizeItem';
+import ScrollbarVirtualList from './ScrollbarVirtualList';
 import EmptyList from './EmptyList';
 import { Dropdown } from '../Dropdown';
 
@@ -113,37 +114,6 @@ const createItemData = memoize(
   }),
 );
 
-const ItemComponent = memo(({ data, index, style }) => {
-  const {
-    items,
-    isMultiItem,
-    workInProgressItemIds,
-    workInProgressItem,
-    onClickItem,
-  } = data;
-  const item = items[index];
-
-  const isActive = isMultiItem
-    ? workInProgressItemIds.includes(item.id)
-    : workInProgressItem && workInProgressItem.id === item.id;
-
-  return (
-    <Item
-      style={style}
-      key={item.id}
-      id={item.id}
-      isMultiItem={isMultiItem}
-      isActive={isActive}
-      onClickItem={onClickItem}
-      {...item}
-    />
-  );
-}, areEqual);
-
-const ScrollbarVirtualList = forwardRef((props, ref) => (
-  <Scrollbar {...props} customRef={ref} />
-));
-
 const List = ({
   isMultiItem = false,
   workInProgressList,
@@ -187,7 +157,7 @@ const List = ({
             width={width}
             outerElementType={ScrollbarVirtualList}
           >
-            {ItemComponent}
+            {FixedSizeItem}
           </FixedSizeList>
         )}
       </AutoSizer>

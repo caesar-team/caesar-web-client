@@ -103,6 +103,11 @@ export const selectableListsSelector = createSelector(
   ],
 );
 
+export const selectableListsWithoutChildrenSelector = createSelector(
+  selectableListsSelector,
+  lists => lists.map(({ children, ...rest }) => rest),
+);
+
 export const customizableListsSelector = createSelector(
   listsSelector,
   lists =>

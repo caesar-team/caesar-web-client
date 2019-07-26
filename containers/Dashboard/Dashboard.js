@@ -428,7 +428,10 @@ class DashboardContainer extends Component {
               <MenuList
                 mode={mode}
                 workInProgressList={workInProgressList}
-                lists={listsByType}
+                inbox={listsByType.inbox}
+                favorites={listsByType.favorites}
+                list={listsByType.list}
+                trash={listsByType.trash}
                 onClick={this.handleClickMenuItem}
                 onClickSecureMessage={this.handleClickSecureMessage}
               />

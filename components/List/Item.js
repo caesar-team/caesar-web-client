@@ -106,11 +106,11 @@ const Item = ({
   lastUpdated,
   secret: { name, attachments },
   type,
-  listId,
   invited,
   isMultiItem = false,
   isActive = false,
   favorite,
+  style,
   onClickItem = Function.prototype,
 }) => {
   const shouldShowMembers = !!invited.length;
@@ -118,6 +118,7 @@ const Item = ({
   return (
     <Row
       key={id}
+      style={style}
       onClick={onClickItem(id)}
       isActive={isActive}
       isMultiItem={isMultiItem}

@@ -1,8 +1,13 @@
-import React from 'react';
+import React, { memo } from 'react';
 import styled from 'styled-components';
+import equal from 'fast-deep-equal';
+import memoize from 'memoize-one';
+import { FixedSizeList } from 'react-window';
+import AutoSizer from 'react-virtualized-auto-sizer';
 import { ITEM_TYPES, LIST_TYPE } from 'common/constants';
-import { Icon, Scrollbar } from 'components';
-import Item from './Item';
+import { Icon } from 'components';
+import FixedSizeItem from './FixedSizeItem';
+import ScrollbarVirtualList from './ScrollbarVirtualList';
 import EmptyList from './EmptyList';
 import { Dropdown } from '../Dropdown';
 
@@ -77,6 +82,8 @@ const Option = styled.button`
   }
 `;
 
+const ITEM_HEIGHT = 80;
+
 const { ITEM_CREDENTIALS_TYPE, ITEM_DOCUMENT_TYPE } = ITEM_TYPES;
 
 const iconsMap = {
@@ -89,6 +96,22 @@ const renderOption = (value, label) => (
     <StyledIcon name={iconsMap[value]} width={16} height={16} />
     {label}
   </Option>
+);
+
+const createItemData = memoize(
+  (
+    items,
+    isMultiItem,
+    workInProgressItemIds,
+    workInProgressItem,
+    onClickItem,
+  ) => ({
+    items,
+    isMultiItem,
+    workInProgressItemIds,
+    workInProgressItem,
+    onClickItem,
+  }),
 );
 
 const List = ({
@@ -104,23 +127,6 @@ const List = ({
     return null;
   }
 
-  const renderedItems = items.map(({ id, ...props }) => {
-    const isActive = isMultiItem
-      ? workInProgressItemIds.includes(id)
-      : workInProgressItem && workInProgressItem.id === id;
-
-    return (
-      <Item
-        key={id}
-        id={id}
-        isMultiItem={isMultiItem}
-        isActive={isActive}
-        onClickItem={onClickItem}
-        {...props}
-      />
-    );
-  });
-
   const itemTypesOptions = [
     { label: 'Password', value: ITEM_CREDENTIALS_TYPE },
     { label: 'Secure note', value: ITEM_DOCUMENT_TYPE },
@@ -132,7 +138,30 @@ const List = ({
       return <EmptyList />;
     }
 
-    return <Scrollbar>{renderedItems}</Scrollbar>;
+    const itemData = createItemData(
+      items,
+      isMultiItem,
+      workInProgressItemIds,
+      workInProgressItem,
+      onClickItem,
+    );
+
+    return (
+      <AutoSizer>
+        {({ height, width }) => (
+          <FixedSizeList
+            height={height}
+            itemCount={items.length}
+            itemData={itemData}
+            itemSize={ITEM_HEIGHT}
+            width={width}
+            outerElementType={ScrollbarVirtualList}
+          >
+            {FixedSizeItem}
+          </FixedSizeList>
+        )}
+      </AutoSizer>
+    );
   };
 
   const shouldShowAdd = workInProgressList.type === LIST_TYPE;
@@ -160,4 +189,6 @@ const List = ({
   );
 };
 
-export default List;
+export default memo(List, (prevProps, nextProps) =>
+  equal(prevProps, nextProps),
+);

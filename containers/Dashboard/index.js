@@ -29,7 +29,7 @@ import {
 import { fetchKeyPairRequest, fetchUserSelfRequest } from 'common/actions/user';
 import { fetchMembersRequest } from 'common/actions/member';
 import {
-  selectableListsSelector,
+  selectableListsWithoutChildrenSelector,
   itemsByIdSelector,
   workInProgressItemSelector,
   workInProgressItemIdsSelector,
@@ -44,7 +44,7 @@ import { byIdSelector } from 'common/selectors/member';
 import Dashboard from './Dashboard';
 
 const mapStateToProps = createStructuredSelector({
-  lists: selectableListsSelector,
+  lists: selectableListsWithoutChildrenSelector,
   listsByType: listsByTypeSelector,
   itemsById: itemsByIdSelector,
   workInProgressItem: workInProgressItemSelector,

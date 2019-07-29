@@ -125,10 +125,10 @@ class DashboardContainer extends Component {
   };
 
   handleRemoveItem = () => {
-    const { workInProgressItemIds } = this.props;
+    const { workInProgressItemIds, workInProgressList } = this.props;
 
     if (workInProgressItemIds.length > 0) {
-      this.props.removeItems();
+      this.props.removeItemsBatchRequest(workInProgressList.id);
       this.props.resetWorkInProgressItemIds();
     } else {
       this.props.removeItemRequest(
@@ -142,10 +142,13 @@ class DashboardContainer extends Component {
   };
 
   handleMoveToTrash = () => {
-    const { workInProgressItemIds } = this.props;
+    const { workInProgressItemIds, workInProgressList } = this.props;
 
     if (workInProgressItemIds.length > 0) {
-      this.props.moveItems(this.props.listsByType.trash.id);
+      this.props.moveItemsBatchRequest(
+        workInProgressList.id,
+        this.props.listsByType.trash.id,
+      );
       this.props.resetWorkInProgressItemIds();
     } else {
       this.props.moveItemRequest(this.props.listsByType.trash.id);
@@ -246,7 +249,9 @@ class DashboardContainer extends Component {
   };
 
   handleClickMoveItems = (_, listId) => {
-    this.props.moveItems(listId);
+    const { workInProgressList } = this.props;
+
+    this.props.moveItemsBatchRequest(workInProgressList.id, listId);
     this.props.resetWorkInProgressItemIds();
   };
 

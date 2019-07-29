@@ -17,17 +17,27 @@ export const REMOVE_ITEM_REQUEST = '@nodes/REMOVE_ITEM_REQUEST';
 export const REMOVE_ITEM_SUCCESS = '@nodes/REMOVE_ITEM_SUCCESS';
 export const REMOVE_ITEM_FAILURE = '@nodes/REMOVE_ITEM_FAILURE';
 
+export const REMOVE_ITEMS_BATCH_REQUEST = '@nodes/REMOVE_ITEMS_BATCH_REQUEST';
+export const REMOVE_ITEMS_BATCH_SUCCESS = '@nodes/REMOVE_ITEMS_BATCH_SUCCESS';
+export const REMOVE_ITEMS_BATCH_FAILURE = '@nodes/REMOVE_ITEMS_BATCH_FAILURE';
+
 export const MOVE_ITEM_REQUEST = '@nodes/MOVE_ITEM_REQUEST';
 export const MOVE_ITEM_SUCCESS = '@nodes/MOVE_ITEM_SUCCESS';
 export const MOVE_ITEM_FAILURE = '@nodes/MOVE_ITEM_FAILURE';
 
-export const MOVE_ITEMS = '@nodes/MOVE_ITEMS';
-export const REMOVE_ITEMS = '@nodes/REMOVE_ITEMS';
+export const MOVE_ITEMS_BATCH_REQUEST = '@nodes/MOVE_ITEMS_BATCH_REQUEST';
+export const MOVE_ITEMS_BATCH_SUCCESS = '@nodes/MOVE_ITEMS_BATCH_SUCCESS';
+export const MOVE_ITEMS_BATCH_FAILURE = '@nodes/MOVE_ITEMS_BATCH_FAILURE';
+
 export const SHARE_ITEMS = '@nodes/SHARE_ITEMS';
 
 export const CREATE_ITEM_REQUEST = '@nodes/CREATE_ITEM_REQUEST';
 export const CREATE_ITEM_SUCCESS = '@nodes/CREATE_ITEM_SUCCESS';
 export const CREATE_ITEM_FAILURE = '@nodes/CREATE_ITEM_FAILURE';
+
+export const CREATE_ITEMS_BATCH_REQUEST = '@nodes/CREATE_ITEMS_BATCH_REQUEST';
+export const CREATE_ITEMS_BATCH_SUCCESS = '@nodes/CREATE_ITEMS_BATCH_SUCCESS';
+export const CREATE_ITEMS_BATCH_FAILURE = '@nodes/CREATE_ITEMS_BATCH_FAILURE';
 
 export const EDIT_ITEM_REQUEST = '@nodes/EDIT_ITEM_REQUEST';
 export const EDIT_ITEM_SUCCESS = '@nodes/EDIT_ITEM_SUCCESS';
@@ -155,15 +165,25 @@ export const resetWorkInProgressItemIds = () => ({
   type: RESET_WORK_IN_PROGRESS_ITEM_IDS,
 });
 
-export const moveItems = listId => ({
-  type: MOVE_ITEMS,
+export const moveItemsBatchRequest = (oldListId, newListId) => ({
+  type: MOVE_ITEMS_BATCH_REQUEST,
   payload: {
-    listId,
+    oldListId,
+    newListId,
   },
 });
 
-export const removeItems = () => ({
-  type: REMOVE_ITEMS,
+export const moveItemsBatchSuccess = (itemIds, oldListId, newListId) => ({
+  type: MOVE_ITEMS_BATCH_SUCCESS,
+  payload: {
+    itemIds,
+    oldListId,
+    newListId,
+  },
+});
+
+export const moveItemsBatchFailure = () => ({
+  type: MOVE_ITEMS_BATCH_FAILURE,
 });
 
 export const shareItems = emails => ({
@@ -191,6 +211,25 @@ export const removeItemSuccess = (itemId, listId) => ({
 
 export const removeItemFailure = () => ({
   type: MOVE_ITEM_FAILURE,
+});
+
+export const removeItemsBatchRequest = listId => ({
+  type: REMOVE_ITEMS_BATCH_REQUEST,
+  payload: {
+    listId,
+  },
+});
+
+export const removeItemsBatchSuccess = (itemIds, listId) => ({
+  type: REMOVE_ITEMS_BATCH_SUCCESS,
+  payload: {
+    itemIds,
+    listId,
+  },
+});
+
+export const removeItemsBatchFailure = () => ({
+  type: REMOVE_ITEMS_BATCH_FAILURE,
 });
 
 export const moveItemRequest = listId => ({
@@ -232,6 +271,25 @@ export const createItemSuccess = item => ({
 
 export const createItemFailure = () => ({
   type: CREATE_ITEM_FAILURE,
+});
+
+export const createItemsBatchRequest = (listId, items) => ({
+  type: CREATE_ITEMS_BATCH_REQUEST,
+  payload: {
+    listId,
+    items,
+  },
+});
+
+export const createItemsBatchSuccess = items => ({
+  type: CREATE_ITEMS_BATCH_SUCCESS,
+  payload: {
+    items,
+  },
+});
+
+export const createItemsBatchFailure = () => ({
+  type: CREATE_ITEMS_BATCH_FAILURE,
 });
 
 export const editItemRequest = (item, setSubmitting) => ({

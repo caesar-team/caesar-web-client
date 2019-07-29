@@ -31,6 +31,12 @@ export const encryptItem = async (secret, key) => {
   return encrypted.data;
 };
 
+export const encryptItemsBatch = async (secrets, key) => {
+  return Promise.all(
+    secrets.map(async secret => await encryptItem(secret, key)),
+  );
+};
+
 export const encryptByPassword = async (secret, password) => {
   const encrypted = await openpgp.encrypt({
     message: openpgp.message.fromText(JSON.stringify(secret)),

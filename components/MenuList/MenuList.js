@@ -1,4 +1,5 @@
-import React, { Component, PureComponent } from 'react';
+import React, { Component } from 'react';
+import equal from 'fast-deep-equal';
 import styled from 'styled-components';
 import {
   LIST_TYPE,
@@ -51,7 +52,7 @@ class MenuList extends Component {
   };
 
   shouldComponentUpdate(nextProps) {
-    return nextProps.list.length !== this.props.list.length;
+    return !equal(nextProps, this.props);
   }
 
   handleToggle = () => {
@@ -61,10 +62,18 @@ class MenuList extends Component {
   };
 
   renderLists() {
-    const { mode, inbox, favorites, trash, list, workInProgressList, onClick } = this.props;
+    const {
+      mode,
+      inbox,
+      favorites,
+      trash,
+      list,
+      workInProgressList,
+      onClick,
+    } = this.props;
     const { isVisibleList } = this.state;
 
-    const lists = { inbox, favorites, trash, list};
+    const lists = { inbox, favorites, trash, list };
     const keys = Object.keys(lists);
 
     return keys.map(key => {

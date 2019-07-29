@@ -4,7 +4,7 @@ import { withRouter } from 'next/router';
 import { matchStrict } from 'common/utils/match';
 import { parseFile } from 'common/utils/importUtils';
 import { encryptItem } from 'common/utils/cipherUtils';
-import { getKeys, postCreateItem, getList } from 'common/api';
+import { getKeys, postCreateItemsBatch, getList } from 'common/api';
 import { ITEM_CREDENTIALS_TYPE, ITEM_DOCUMENT_TYPE } from 'common/constants';
 import { NavigationPanel } from 'components';
 import { FileStep, FieldsStep, DataStep, ImportingStep } from './Steps';
@@ -170,8 +170,7 @@ class Import extends Component {
     );
 
     try {
-      // TODO: change this to batch post request
-      await Promise.all(prepared.map(postCreateItem));
+      await postCreateItemsBatch({ items: prepared });
 
       this.setState({
         progress: 1,

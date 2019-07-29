@@ -4,9 +4,11 @@ import deepequal from 'fast-deep-equal';
 import {
   FETCH_NODES_REQUEST,
   REMOVE_ITEM_REQUEST,
+  REMOVE_ITEMS_BATCH_REQUEST,
   MOVE_ITEM_REQUEST,
-  MOVE_ITEMS,
+  MOVE_ITEMS_BATCH_REQUEST,
   CREATE_ITEM_REQUEST,
+  CREATE_ITEMS_BATCH_REQUEST,
   EDIT_ITEM_REQUEST,
   ACCEPT_ITEM_UPDATE_REQUEST,
   REJECT_ITEM_UPDATE_REQUEST,
@@ -15,7 +17,6 @@ import {
   INVITE_MEMBER_REQUEST,
   INVITE_NEW_MEMBER_REQUEST,
   REMOVE_INVITE_REQUEST,
-  REMOVE_ITEMS,
   SHARE_ITEM_REQUEST,
   SHARE_ITEMS,
   REMOVE_SHARE_REQUEST,
@@ -31,8 +32,12 @@ import {
   removeItemFailure,
   moveItemSuccess,
   moveItemFailure,
+  moveItemsBatchSuccess,
+  moveItemsBatchFailure,
   createItemSuccess,
   createItemFailure,
+  createItemsBatchSuccess,
+  createItemsBatchFailure,
   editItemSuccess,
   editItemFailure,
   acceptItemUpdateSuccess,
@@ -66,7 +71,7 @@ import {
   addItem,
   setWorkInProgressItem,
   setWorkInProgressListId,
-  shareItemFailure,
+  shareItemFailure, removeItemsBatchSuccess, removeItemsBatchFailure,
 } from 'common/actions/node';
 import { normalizeNodes } from 'common/normalizers/node';
 import {
@@ -88,8 +93,11 @@ import {
 import {
   getList,
   removeItem,
+  removeItemsBatch,
   updateMoveItem,
+  updateMoveItemsBatch,
   postCreateItem,
+  postCreateItemsBatch,
   updateItem,
   patchChildItemBatch,
   acceptUpdateItem,
@@ -108,6 +116,7 @@ import {
 import DecryptWorker from 'common/decryption.worker.js';
 import {
   encryptItem,
+  encryptItemsBatch,
   encryptItemForUsers,
   getPrivateKeyObj,
   decryptItem,
@@ -213,6 +222,18 @@ export function* removeItemSaga({ payload: { itemId, listId } }) {
   }
 }
 
+export function* removeItemsBatchSaga({ payload: { listId } }) {
+  try {
+    const workInProgressItemIds = yield select(workInProgressItemIdsSelector);
+
+    yield call(removeItemsBatch);
+    yield put(removeItemsBatchSuccess(workInProgressItemIds, listId));
+  } catch (error) {
+    console.log(error);
+    yield put(removeItemsBatchFailure());
+  }
+}
+
 export function* moveItemSaga({ payload: { listId } }) {
   try {
     const workInProgressItem = yield select(workInProgressItemSelector);
@@ -273,6 +294,53 @@ export function* createItemSaga({
     yield put(createItemFailure());
   } finally {
     setSubmitting(false);
+  }
+}
+
+export function* createItemsBatchSaga({ payload: { items, listId } }) {
+  try {
+    const keyPair = yield select(keyPairSelector);
+    const user = yield select(userDataSelector);
+
+    const preparedForEncryptingItems = items.map(
+      ({ attachments, type, ...secret }) => ({
+        attachments,
+        ...secret,
+      }),
+    );
+
+    const encryptedItems = yield call(
+      encryptItemsBatch,
+      preparedForEncryptingItems,
+      keyPair.publicKey,
+    );
+
+    const preparedForRequestItems = items.map(({ type }, index) => ({
+      type,
+      listId,
+      secret: encryptedItems[index],
+    }));
+
+    const { data } = yield call(postCreateItemsBatch, preparedForRequestItems);
+
+    const preparedForStoreItems = data.map((item, index) => ({
+      id: item.id,
+      listId,
+      lastUpdated: item.lastUpdated,
+      favorite: false,
+      invited: [],
+      shared: [],
+      tags: [],
+      owner: user,
+      secret: preparedForEncryptingItems[index],
+      type: items[index].type,
+    }));
+
+    yield put(createItemsBatchSuccess(preparedForStoreItems));
+  } catch (error) {
+    console.log(error);
+
+    yield put(createItemsBatchFailure());
   }
 }
 
@@ -800,40 +868,23 @@ export function* sortListSaga({
   }
 }
 
-export function* moveItemsSaga({ payload: { listId } }) {
+export function* moveItemsBatchSaga({ payload: { oldListId, newListId } }) {
   try {
     const workInProgressItemIds = yield select(workInProgressItemIdsSelector);
-    const itemsById = yield select(itemsByIdSelector);
 
-    const items = workInProgressItemIds.map(itemId => itemsById[itemId]);
-    const movingItems = items.filter(item => item.listId !== listId);
-
-    if (movingItems.length > 0) {
-      yield all(
-        movingItems.map(item => call(updateMoveItem, item.id, { listId })),
+    if (workInProgressItemIds.length > 0) {
+      yield call(
+        updateMoveItemsBatch,
+        { items: workInProgressItemIds },
+        newListId,
       );
-      yield all(
-        movingItems.map(item =>
-          put(moveItemSuccess(item.id, item.listId, listId)),
-        ),
+      yield put(
+        moveItemsBatchSuccess(workInProgressItemIds, oldListId, newListId),
       );
     }
   } catch (error) {
     console.log(error);
-  }
-}
-
-export function* removeItemsSaga() {
-  try {
-    const workInProgressItemIds = yield select(workInProgressItemIdsSelector);
-    const itemsById = yield select(itemsByIdSelector);
-
-    const items = workInProgressItemIds.map(itemId => itemsById[itemId]);
-
-    yield all(items.map(item => call(removeItem, item.id)));
-    yield all(items.map(item => put(removeItemSuccess(item.id, item.listId))));
-  } catch (error) {
-    console.log(error);
+    yield put(moveItemsBatchFailure());
   }
 }
 
@@ -915,8 +966,11 @@ export function* shareItemsSaga({ payload: { emails } }) {
 export function* nodeSagas() {
   yield takeLatest(FETCH_NODES_REQUEST, fetchNodesSaga);
   yield takeLatest(REMOVE_ITEM_REQUEST, removeItemSaga);
+  yield takeLatest(REMOVE_ITEMS_BATCH_REQUEST, removeItemsBatchSaga);
   yield takeLatest(MOVE_ITEM_REQUEST, moveItemSaga);
+  yield takeLatest(MOVE_ITEMS_BATCH_REQUEST, moveItemsBatchSaga);
   yield takeLatest(CREATE_ITEM_REQUEST, createItemSaga);
+  yield takeLatest(CREATE_ITEMS_BATCH_REQUEST, createItemsBatchSaga);
   yield takeLatest(EDIT_ITEM_REQUEST, editItemSaga);
   yield takeLatest(ACCEPT_ITEM_UPDATE_REQUEST, acceptItemSaga);
   yield takeLatest(REJECT_ITEM_UPDATE_REQUEST, rejectItemSaga);
@@ -933,7 +987,5 @@ export function* nodeSagas() {
   yield takeLatest(EDIT_LIST_REQUEST, editListSaga);
   yield takeLatest(REMOVE_LIST_REQUEST, removeListSaga);
   yield takeLatest(SORT_LIST_REQUEST, sortListSaga);
-  yield takeLatest(MOVE_ITEMS, moveItemsSaga);
-  yield takeLatest(REMOVE_ITEMS, removeItemsSaga);
   yield takeLatest(SHARE_ITEMS, shareItemsSaga);
 }

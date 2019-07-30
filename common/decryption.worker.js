@@ -6,36 +6,50 @@ const constants = require('../common/constants');
 
 const { API_URI } = constants;
 
+// TODO: move to env
+const WORKER_DECRYPTION_BUFFER_SIZE = 10;
+
 window.onmessage = async message => {
   const {
     data: {
       event,
-      data: { listId, items, privateKey, masterPassword },
+      data: { id, items, privateKey, masterPassword },
     },
   } = message;
 
-  switch (event) {
-    case `decryptItems_${listId}`: {
-      const privateKeyObj = await getPrivateKeyObj(privateKey, masterPassword);
+  let buffer = [];
 
-      for (let index = 0; index < items.length; index++) {
+  switch (event) {
+    case `decryptItems_${id}`: {
+      const privateKeyObj = await getPrivateKeyObj(privateKey, masterPassword);
+      const len = items.length;
+
+      for (let index = 0; index < len; index++) {
         const item = items[index];
+        const isLast = index === len - 1;
+
         // eslint-disable-next-line
         try {
           const secret = await decryptItem(item.secret, privateKeyObj);
 
-          window.postMessage(
-            {
-              event: `emitDecryptedItem_${listId}`,
-              item: {
-                ...item,
-                secret,
+          buffer.push({
+            ...item,
+            secret,
+          });
+
+          if (buffer.length === WORKER_DECRYPTION_BUFFER_SIZE || isLast) {
+            window.postMessage(
+              {
+                event: `emitDecryptedItems_${id}`,
+                items: buffer,
               },
-            },
-            API_URI,
-          );
+              API_URI,
+            );
+
+            buffer = [];
+          }
         } catch (e) {
-          console.log(e, item, listId);
+          console.log(e, item, id);
         }
       }
       break;

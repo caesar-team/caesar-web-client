@@ -69,9 +69,12 @@ import {
   sortListSuccess,
   sortListFailure,
   addItem,
+  addItems,
   setWorkInProgressItem,
   setWorkInProgressListId,
-  shareItemFailure, removeItemsBatchSuccess, removeItemsBatchFailure,
+  shareItemFailure,
+  removeItemsBatchSuccess,
+  removeItemsBatchFailure,
 } from 'common/actions/node';
 import { normalizeNodes } from 'common/normalizers/node';
 import {
@@ -134,6 +137,7 @@ import {
   USER_ROLE,
 } from 'common/constants';
 import { generateInviteUrl, generateSharingUrl } from 'common/utils/sharing';
+import { uuid4 } from 'common/utils/uuid4';
 import { createMemberSaga, getOrCreateMemberSaga } from './member';
 
 const reorder = (list, startIndex, endIndex) => {
@@ -146,15 +150,25 @@ const reorder = (list, startIndex, endIndex) => {
 
 const fixSort = lists => lists.map((list, index) => ({ ...list, sort: index }));
 
+const chunk = (input, size) => {
+  return input.reduce((arr, item, idx) => {
+    return idx % size === 0
+      ? [...arr, [item]]
+      : [...arr.slice(0, -1), [...arr.slice(-1)[0], item]];
+  }, []);
+};
+
 function createWebWorkerChannel(data) {
+  const id = uuid4();
   const worker = new DecryptWorker();
 
-  worker.postMessage({ event: `decryptItems_${data.listId}`, data });
+  worker.postMessage({ event: `decryptItems_${id}`, data: { id, ...data } });
 
   return eventChannel(emitter => {
-    worker.onmessage = ({ data: { event, item } }) => {
-      if (event === `emitDecryptedItem_${data.listId}`) {
-        emitter(item);
+    // eslint-disable-next-line
+    worker.onmessage = ({ data: { event, items } }) => {
+      if (event === `emitDecryptedItems_${id}`) {
+        emitter(items);
       }
     };
 
@@ -162,12 +176,11 @@ function createWebWorkerChannel(data) {
   });
 }
 
-export function* decryptSaga({ listId, items }) {
+export function* decryptionSaga(items) {
   const keyPair = yield select(keyPairSelector);
   const masterPassword = yield select(masterPasswordSelector);
 
   const channel = yield call(createWebWorkerChannel, {
-    listId,
     items,
     privateKey: keyPair.privateKey,
     masterPassword,
@@ -175,9 +188,9 @@ export function* decryptSaga({ listId, items }) {
 
   while (channel) {
     try {
-      const item = yield take(channel);
+      const decryptedItems = yield take(channel);
 
-      yield put(addItem(item));
+      yield put(addItems(decryptedItems));
     } catch (error) {
       console.log(error);
     }
@@ -196,14 +209,14 @@ export function* fetchNodesSaga() {
 
     yield put(setWorkInProgressListId(defaultList.id));
 
-    const selectableLists = yield select(selectableListsSelector);
+    const items = Object.values(itemsById);
+    const preparedItems = items.sort(
+      (a, b) => Number(b.favorite) - Number(a.favorite),
+    );
+    const poolSize = navigator.hardwareConcurrency + 1;
+    const chunks = chunk(preparedItems, Math.ceil(items.length / poolSize));
 
-    const lists = selectableLists.map(({ id, children }) => ({
-      listId: id,
-      items: children.map(({ id: itemId }) => itemsById[itemId]),
-    }));
-
-    yield all(lists.map(list => call(decryptSaga, list)));
+    yield all(chunks.map(chunkItems => call(decryptionSaga, chunkItems)));
   } catch (error) {
     console.log(error);
 

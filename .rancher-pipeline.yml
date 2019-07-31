@@ -10,8 +10,8 @@ stages:
     when:
       branch:
         include:
-          - develop
-          - master
+        - develop
+        - master
   - publishImageConfig:
       dockerfilePath: ./Dockerfile
       buildContext: .
@@ -21,32 +21,23 @@ stages:
     when:
       event:
         include:
-          - tag
+        - tag
+  when:
+    branch:
+      include:
+      - develop
+      - master
+    event:
+      include:
+      - tag
 - name: Deploy
   steps:
   - applyYamlConfig:
       path: ./deploy/deployment.yaml
-- name: Release webhook
-  steps:
-  - runScriptConfig:
-      image: caesarteam/alpine-curl
-      shellScript: 'curl -X POST -H "Content-Type: application/json" -d ''{"name":
-        "$CICD_GIT_REPO_NAME","tag": "$CICD_GIT_TAG"}'' $WEBHOOK_URL'
-    envFrom:
-    - sourceName: build-webhook
-      sourceKey: WEBHOOK_URL
-      targetKey: WEBHOOK_URL
-  when:
-    event:
-      include:
-      - tag
 branch:
   include:
   - develop
   - master
-event:
-  include:
-    - tag
 notification:
   recipients:
   - recipient: '#pipeline'

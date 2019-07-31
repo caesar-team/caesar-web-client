@@ -7,20 +7,11 @@ stages:
       tag: caesarteam/caesar-web-client:${CICD_GIT_BRANCH}
       pushRemote: true
       registry: index.docker.io
-- name: Deploy
-  steps:
-  - applyYamlConfig:
-      path: ./deploy/deployment.yaml
-- name: Release
-  steps:
-  - runScriptConfig:
-      image: caesarteam/alpine-curl
-      shellScript: 'curl -X POST -H "Content-Type: application/json" -d ''{"name":
-        "$CICD_GIT_REPO_NAME","tag": "$CICD_GIT_TAG"}'' $WEBHOOK_URL'
-    envFrom:
-    - sourceName: build-webhook
-      sourceKey: WEBHOOK_URL
-      targetKey: WEBHOOK_URL
+    when:
+      branch:
+        include:
+          - develop
+          - master
   - publishImageConfig:
       dockerfilePath: ./Dockerfile
       buildContext: .
@@ -30,7 +21,21 @@ stages:
     when:
       event:
         include:
-        - tag
+          - tag
+- name: Deploy
+  steps:
+  - applyYamlConfig:
+      path: ./deploy/deployment.yaml
+- name: Release webhook
+  steps:
+  - runScriptConfig:
+      image: caesarteam/alpine-curl
+      shellScript: 'curl -X POST -H "Content-Type: application/json" -d ''{"name":
+        "$CICD_GIT_REPO_NAME","tag": "$CICD_GIT_TAG"}'' $WEBHOOK_URL'
+    envFrom:
+    - sourceName: build-webhook
+      sourceKey: WEBHOOK_URL
+      targetKey: WEBHOOK_URL
   when:
     event:
       include:
@@ -39,6 +44,9 @@ branch:
   include:
   - develop
   - master
+event:
+  include:
+    - tag
 notification:
   recipients:
   - recipient: '#pipeline'

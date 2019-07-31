@@ -11,7 +11,7 @@ stages:
   steps:
   - applyYamlConfig:
       path: ./deploy/deployment.yaml
-- name: webhook
+- name: Release
   steps:
   - runScriptConfig:
       image: caesarteam/alpine-curl
@@ -21,6 +21,16 @@ stages:
     - sourceName: build-webhook
       sourceKey: WEBHOOK_URL
       targetKey: WEBHOOK_URL
+  - publishImageConfig:
+      dockerfilePath: ./Dockerfile
+      buildContext: .
+      tag: caesarteam/caesar-web-client:${CICD_GIT_TAG}
+      pushRemote: true
+      registry: index.docker.io
+    when:
+      event:
+        include:
+        - tag
   when:
     event:
       include:

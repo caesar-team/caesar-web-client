@@ -4,57 +4,42 @@ self.window = self;
 const { decryptItem, getPrivateKeyObj } = require('./utils/cipherUtils');
 const constants = require('../common/constants');
 
-const { API_URI } = constants;
+const { API_URI, WORKER_DECRYPTION_BUFFER_SIZE } = constants;
 
-// TODO: move to env
-const WORKER_DECRYPTION_BUFFER_SIZE = 10;
+const postMessage = (event, items) =>
+  window.postMessage({ event, items }, API_URI);
 
 window.onmessage = async message => {
   const {
-    data: {
-      event,
-      data: { id, items, privateKey, masterPassword },
-    },
+    data: { event, data },
   } = message;
+
+  const { events, items, privateKey, masterPassword } = data;
+
+  const privateKeyObj = await getPrivateKeyObj(privateKey, masterPassword);
+  const len = items.length;
 
   let buffer = [];
 
-  switch (event) {
-    case `decryptItems_${id}`: {
-      const privateKeyObj = await getPrivateKeyObj(privateKey, masterPassword);
-      const len = items.length;
+  if (event === events.eventToWorker) {
+    for (let index = 0; index < len; index++) {
+      const item = items[index];
+      const isLast = index === len - 1;
 
-      for (let index = 0; index < len; index++) {
-        const item = items[index];
-        const isLast = index === len - 1;
-
+      try {
         // eslint-disable-next-line
-        try {
-          const secret = await decryptItem(item.secret, privateKeyObj);
+        const secret = await decryptItem(item.secret, privateKeyObj);
 
-          buffer.push({
-            ...item,
-            secret,
-          });
+        buffer.push({ id: item.id, secret });
 
-          if (buffer.length === WORKER_DECRYPTION_BUFFER_SIZE || isLast) {
-            window.postMessage(
-              {
-                event: `emitDecryptedItems_${id}`,
-                items: buffer,
-              },
-              API_URI,
-            );
+        if (buffer.length === WORKER_DECRYPTION_BUFFER_SIZE || isLast) {
+          postMessage(events.eventFromWorker, buffer);
 
-            buffer = [];
-          }
-        } catch (e) {
-          console.log(e, item, id);
+          buffer = [];
         }
+      } catch (e) {
+        console.log(e, item);
       }
-      break;
     }
-    default:
-      break;
   }
 };

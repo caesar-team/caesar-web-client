@@ -68,7 +68,6 @@ import {
   removeListFailure,
   sortListSuccess,
   sortListFailure,
-  addItem,
   addItems,
   setWorkInProgressItem,
   setWorkInProgressListId,
@@ -84,14 +83,13 @@ import {
 } from 'common/selectors/user';
 import { memberListSelector } from 'common/selectors/member';
 import {
-  defaultListSelector,
+  favoriteListSelector,
   workInProgressItemSelector,
   workInProgressItemIdsSelector,
   favoritesSelector,
   parentListSelector,
   sortedCustomizableListsSelector,
   itemsByIdSelector,
-  selectableListsSelector,
 } from 'common/selectors/node';
 import {
   getList,
@@ -158,16 +156,30 @@ const chunk = (input, size) => {
   }, []);
 };
 
-function createWebWorkerChannel(data) {
-  const id = uuid4();
-  const worker = new DecryptWorker();
+const objectToArray = obj => Object.values(obj);
 
-  worker.postMessage({ event: `decryptItems_${id}`, data: { id, ...data } });
+const arrayToObject = arr =>
+  arr.reduce((accumulator, item) => ({ ...accumulator, [item.id]: item }), {});
+
+const getWorkerEvents = workerId => ({
+  eventToWorker: `decryptItems_${workerId}`,
+  eventFromWorker: `emitDecryptedItems_${workerId}`,
+});
+
+function createWebWorkerChannel(data) {
+  const workerId = uuid4();
+  const worker = new DecryptWorker();
+  const workerEvents = getWorkerEvents(workerId);
+
+  worker.postMessage({
+    event: workerEvents.eventToWorker,
+    data: { events: workerEvents, ...data },
+  });
 
   return eventChannel(emitter => {
     // eslint-disable-next-line
     worker.onmessage = ({ data: { event, items } }) => {
-      if (event === `emitDecryptedItems_${id}`) {
+      if (event === workerEvents.eventFromWorker) {
         emitter(items);
       }
     };
@@ -176,12 +188,12 @@ function createWebWorkerChannel(data) {
   });
 }
 
-export function* decryptionSaga(items) {
+export function* decryptionSaga(itemsById) {
   const keyPair = yield select(keyPairSelector);
   const masterPassword = yield select(masterPasswordSelector);
 
   const channel = yield call(createWebWorkerChannel, {
-    items,
+    items: objectToArray(itemsById).map(({ id, secret }) => ({ id, secret })),
     privateKey: keyPair.privateKey,
     masterPassword,
   });
@@ -190,7 +202,12 @@ export function* decryptionSaga(items) {
     try {
       const decryptedItems = yield take(channel);
 
-      yield put(addItems(decryptedItems));
+      const preparedItems = decryptedItems.map(({ id, secret }) => ({
+        ...itemsById[id],
+        secret,
+      }));
+
+      yield put(addItems(preparedItems));
     } catch (error) {
       console.log(error);
     }
@@ -205,18 +222,20 @@ export function* fetchNodesSaga() {
 
     yield put(fetchNodesSuccess(listsById));
 
-    const defaultList = yield select(defaultListSelector);
+    const favoriteList = yield select(favoriteListSelector);
 
-    yield put(setWorkInProgressListId(defaultList.id));
+    yield put(setWorkInProgressListId(favoriteList.id));
 
-    const items = Object.values(itemsById);
+    const items = objectToArray(itemsById);
     const preparedItems = items.sort(
       (a, b) => Number(b.favorite) - Number(a.favorite),
     );
     const poolSize = navigator.hardwareConcurrency + 1;
     const chunks = chunk(preparedItems, Math.ceil(items.length / poolSize));
 
-    yield all(chunks.map(chunkItems => call(decryptionSaga, chunkItems)));
+    yield all(
+      chunks.map(chunkItems => call(decryptionSaga, arrayToObject(chunkItems))),
+    );
   } catch (error) {
     console.log(error);
 

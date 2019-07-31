@@ -399,7 +399,7 @@ class DashboardContainer extends Component {
 
     const { mode, modals, searchedText } = this.state;
 
-    if (isLoading) {
+    if (isLoading || !visibleListItems.length) {
       return <TextLoader />;
     }
 

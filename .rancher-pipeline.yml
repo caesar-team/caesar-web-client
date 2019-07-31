@@ -11,6 +11,20 @@ stages:
   steps:
   - applyYamlConfig:
       path: ./deploy/deployment.yaml
+- name: webhook
+  steps:
+  - runScriptConfig:
+      image: caesarteam/alpine-curl
+      shellScript: 'curl -X POST -H "Content-Type: application/json" -d ''{"name":
+        "$CICD_GIT_REPO_NAME","tag": "$CICD_GIT_TAG"}'' $WEBHOOK_URL'
+    envFrom:
+    - sourceName: build-webhook
+      sourceKey: WEBHOOK_URL
+      targetKey: WEBHOOK_URL
+  when:
+    event:
+      include:
+      - tag
 branch:
   include:
   - develop

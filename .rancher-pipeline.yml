@@ -11,7 +11,6 @@ stages:
       branch:
         include:
         - develop
-        - master
         - hotfix/*
   - publishImageConfig:
       dockerfilePath: ./Dockerfile
@@ -27,11 +26,11 @@ stages:
   steps:
   - applyYamlConfig:
       path: ./deploy/deployment.yaml
-triggerWebhookTag: true
-branch:
-  include:
-  - develop
-  - master
+    when:
+      branch:
+        include:
+        - develop
+        - hotfix/*  
 notification:
   recipients:
   - recipient: '#pipeline'

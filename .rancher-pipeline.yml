@@ -7,10 +7,27 @@ stages:
       tag: caesarteam/caesar-web-client:${CICD_GIT_BRANCH}
       pushRemote: true
       registry: index.docker.io
+    when:
+      branch:
+        include:
+        - develop
+        - master
+        - hotfix/*
+  - publishImageConfig:
+      dockerfilePath: ./Dockerfile
+      buildContext: .
+      tag: caesarteam/caesar-web-client:${CICD_GIT_TAG}
+      pushRemote: true
+      registry: index.docker.io
+    when:
+      event:
+        include:
+        - tag
 - name: Deploy
   steps:
   - applyYamlConfig:
       path: ./deploy/deployment.yaml
+triggerWebhookTag: true
 branch:
   include:
   - develop

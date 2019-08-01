@@ -68,10 +68,12 @@ import {
   removeListFailure,
   sortListSuccess,
   sortListFailure,
-  addItem,
+  addItems,
   setWorkInProgressItem,
   setWorkInProgressListId,
-  shareItemFailure, removeItemsBatchSuccess, removeItemsBatchFailure,
+  shareItemFailure,
+  removeItemsBatchSuccess,
+  removeItemsBatchFailure,
 } from 'common/actions/node';
 import { normalizeNodes } from 'common/normalizers/node';
 import {
@@ -81,14 +83,13 @@ import {
 } from 'common/selectors/user';
 import { memberListSelector } from 'common/selectors/member';
 import {
-  defaultListSelector,
+  favoriteListSelector,
   workInProgressItemSelector,
   workInProgressItemIdsSelector,
   favoritesSelector,
   parentListSelector,
   sortedCustomizableListsSelector,
   itemsByIdSelector,
-  selectableListsSelector,
 } from 'common/selectors/node';
 import {
   getList,
@@ -134,6 +135,8 @@ import {
   USER_ROLE,
 } from 'common/constants';
 import { generateInviteUrl, generateSharingUrl } from 'common/utils/sharing';
+import { uuid4 } from 'common/utils/uuid4';
+import { getWorkersCount } from 'common/utils/worker';
 import { createMemberSaga, getOrCreateMemberSaga } from './member';
 
 const reorder = (list, startIndex, endIndex) => {
@@ -146,15 +149,39 @@ const reorder = (list, startIndex, endIndex) => {
 
 const fixSort = lists => lists.map((list, index) => ({ ...list, sort: index }));
 
-function createWebWorkerChannel(data) {
-  const worker = new DecryptWorker();
+const chunk = (input, size) => {
+  return input.reduce((arr, item, idx) => {
+    return idx % size === 0
+      ? [...arr, [item]]
+      : [...arr.slice(0, -1), [...arr.slice(-1)[0], item]];
+  }, []);
+};
 
-  worker.postMessage({ event: `decryptItems_${data.listId}`, data });
+const objectToArray = obj => Object.values(obj);
+
+const arrayToObject = arr =>
+  arr.reduce((accumulator, item) => ({ ...accumulator, [item.id]: item }), {});
+
+const getWorkerEvents = workerId => ({
+  eventToWorker: `decryptItems_${workerId}`,
+  eventFromWorker: `emitDecryptedItems_${workerId}`,
+});
+
+function createWebWorkerChannel(data) {
+  const workerId = uuid4();
+  const worker = new DecryptWorker();
+  const workerEvents = getWorkerEvents(workerId);
+
+  worker.postMessage({
+    event: workerEvents.eventToWorker,
+    data: { events: workerEvents, ...data },
+  });
 
   return eventChannel(emitter => {
-    worker.onmessage = ({ data: { event, item } }) => {
-      if (event === `emitDecryptedItem_${data.listId}`) {
-        emitter(item);
+    // eslint-disable-next-line
+    worker.onmessage = ({ data: { event, items } }) => {
+      if (event === workerEvents.eventFromWorker) {
+        emitter(items);
       }
     };
 
@@ -162,22 +189,26 @@ function createWebWorkerChannel(data) {
   });
 }
 
-export function* decryptSaga({ listId, items }) {
+export function* decryptionSaga(itemsById) {
   const keyPair = yield select(keyPairSelector);
   const masterPassword = yield select(masterPasswordSelector);
 
   const channel = yield call(createWebWorkerChannel, {
-    listId,
-    items,
+    items: objectToArray(itemsById).map(({ id, secret }) => ({ id, secret })),
     privateKey: keyPair.privateKey,
     masterPassword,
   });
 
   while (channel) {
     try {
-      const item = yield take(channel);
+      const decryptedItems = yield take(channel);
 
-      yield put(addItem(item));
+      const preparedItems = decryptedItems.map(({ id, secret }) => ({
+        ...itemsById[id],
+        secret,
+      }));
+
+      yield put(addItems(preparedItems));
     } catch (error) {
       console.log(error);
     }
@@ -192,18 +223,20 @@ export function* fetchNodesSaga() {
 
     yield put(fetchNodesSuccess(listsById));
 
-    const defaultList = yield select(defaultListSelector);
+    const favoriteList = yield select(favoriteListSelector);
 
-    yield put(setWorkInProgressListId(defaultList.id));
+    yield put(setWorkInProgressListId(favoriteList.id));
 
-    const selectableLists = yield select(selectableListsSelector);
+    const items = objectToArray(itemsById);
+    const preparedItems = items.sort(
+      (a, b) => Number(b.favorite) - Number(a.favorite),
+    );
+    const poolSize = getWorkersCount();
+    const chunks = chunk(preparedItems, Math.ceil(items.length / poolSize));
 
-    const lists = selectableLists.map(({ id, children }) => ({
-      listId: id,
-      items: children.map(({ id: itemId }) => itemsById[itemId]),
-    }));
-
-    yield all(lists.map(list => call(decryptSaga, list)));
+    yield all(
+      chunks.map(chunkItems => call(decryptionSaga, arrayToObject(chunkItems))),
+    );
   } catch (error) {
     console.log(error);
 

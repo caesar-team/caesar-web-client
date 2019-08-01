@@ -41,13 +41,8 @@ module.exports = withPlugins(
   [withWorkers, withFonts, withOptimizedImages, withCSS],
   {
     publicRuntimeConfig,
-    webpack: (config, { dev }) => {
+    webpack: (config) => {
       config.output.globalObject = 'this';
-
-      // config.module.rules.push({
-      //   test: /\.worker\.js$/,
-      //   loader: 'babel-loader',
-      // });
 
       return config;
     },

@@ -15,6 +15,7 @@ import {
   DashboardLayout,
   SecureMessage,
   TextLoader,
+  FullScreenLoader,
 } from 'components';
 import {
   ITEM_REVIEW_MODE,
@@ -393,14 +394,14 @@ class DashboardContainer extends Component {
       listsByType,
       visibleListItems,
       itemsById,
-      isLoading,
+      shouldShowLoader,
       trashList,
     } = this.props;
 
     const { mode, modals, searchedText } = this.state;
 
-    if (isLoading) {
-      return <TextLoader />;
+    if (shouldShowLoader) {
+      return <FullScreenLoader />;
     }
 
     const searchedItems = this.filter(Object.values(itemsById), searchedText);

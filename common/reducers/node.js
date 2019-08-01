@@ -4,6 +4,7 @@ import {
   FETCH_NODES_SUCCESS,
   FETCH_NODES_FAILURE,
   ADD_ITEM,
+  ADD_ITEMS,
   SET_WORK_IN_PROGRESS_ITEM,
   SET_WORK_IN_PROGRESS_LIST_ID,
   SET_WORK_IN_PROGRESS_ITEM_IDS,
@@ -101,6 +102,18 @@ export default createReducer(initialState, {
     return {
       ...state,
       itemsById: { ...state.itemsById, [payload.item.id]: payload.item },
+    };
+  },
+  [ADD_ITEMS](state, { payload }) {
+    return {
+      ...state,
+      itemsById: {
+        ...state.itemsById,
+        ...payload.items.reduce(
+          (accumulator, item) => ({ ...accumulator, [item.id]: item }),
+          {},
+        ),
+      },
     };
   },
   [SET_WORK_IN_PROGRESS_ITEM](state, { payload }) {

@@ -33,8 +33,8 @@ stages:
         - hotfix/*
 notification:
   recipients:
-  - recipient: https://chat.caesar.software/hooks/ZpopzncGgv9sqNfiP/As383iWceBGa2PvjDb9oZLR2rFfySCPX6idGS978Q7o6dKpG
-    notifier: c-qzkvv:n-2bf45
+  - recipient: '#pipeline'
+    notifier: c-qzkvv:n-qqrqq
   condition:
   - Success
   - Changed

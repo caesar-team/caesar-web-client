@@ -186,3 +186,9 @@ export const visibleListItemsSelector = createSelector(
         )
       : [],
 );
+
+export const shouldShowLoaderSelector = createSelector(
+  isLoadingSelector,
+  itemsSelector,
+  (isLoading, items) => isLoading || !items.length,
+);

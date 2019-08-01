@@ -394,13 +394,13 @@ class DashboardContainer extends Component {
       listsByType,
       visibleListItems,
       itemsById,
-      isLoading,
+      shouldShowLoader,
       trashList,
     } = this.props;
 
     const { mode, modals, searchedText } = this.state;
 
-    if (isLoading || !visibleListItems.length) {
+    if (shouldShowLoader) {
       return <FullScreenLoader />;
     }
 

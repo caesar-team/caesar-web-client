@@ -30,11 +30,11 @@ stages:
       branch:
         include:
         - develop
-        - hotfix/*  
+        - hotfix/*
 notification:
   recipients:
-  - recipient: '#pipeline'
-    notifier: c-qzkvv:n-qqrqq
+  - recipient: https://chat.caesar.software/hooks/ZpopzncGgv9sqNfiP/As383iWceBGa2PvjDb9oZLR2rFfySCPX6idGS978Q7o6dKpG
+    notifier: c-qzkvv:n-2bf45
   condition:
   - Success
   - Changed

@@ -182,10 +182,10 @@ export const visibleListItemsSelector = createSelector(
   itemsByIdSelector,
   workInProgressListIdSelector,
   (listsById, itemsById, workInProgressListId) =>
-    listsById && workInProgressListId
+    listsById && workInProgressListId && listsById[workInProgressListId]
       ? listsById[workInProgressListId].children.reduce(
           (accumulator, item) =>
-            itemsById[item.id]
+            itemsById[item.id] && typeof itemsById[item.id].secret !== 'string'
               ? accumulator.concat(itemsById[item.id])
               : accumulator,
           [],

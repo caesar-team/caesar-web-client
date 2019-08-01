@@ -136,6 +136,7 @@ import {
 } from 'common/constants';
 import { generateInviteUrl, generateSharingUrl } from 'common/utils/sharing';
 import { uuid4 } from 'common/utils/uuid4';
+import { getWorkersCount } from 'common/utils/worker';
 import { createMemberSaga, getOrCreateMemberSaga } from './member';
 
 const reorder = (list, startIndex, endIndex) => {
@@ -230,7 +231,7 @@ export function* fetchNodesSaga() {
     const preparedItems = items.sort(
       (a, b) => Number(b.favorite) - Number(a.favorite),
     );
-    const poolSize = navigator.hardwareConcurrency + 1;
+    const poolSize = getWorkersCount();
     const chunks = chunk(preparedItems, Math.ceil(items.length / poolSize));
 
     yield all(

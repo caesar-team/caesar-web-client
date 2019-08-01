@@ -32,7 +32,7 @@ app.prepare().then(() => {
   server.use(
     favicon(path.join(__dirname, 'public/images/favicon', 'favicon.ico')),
   );
-  server.use(express.static('public'));
+  server.use('/public', express.static('public'));
 
   server.get('/logout', (req, res) => {
     res.clearCookie('token');

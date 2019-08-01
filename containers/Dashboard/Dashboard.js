@@ -74,7 +74,9 @@ class DashboardContainer extends Component {
   componentDidMount() {
     this.props.fetchUserSelfRequest();
     this.props.fetchKeyPairRequest();
-    this.props.fetchNodesRequest();
+
+    // withItemsDecryption = true
+    this.props.fetchNodesRequest(true);
     this.props.fetchMembersRequest();
   }
 

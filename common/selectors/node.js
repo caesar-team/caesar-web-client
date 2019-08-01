@@ -129,11 +129,17 @@ export const extendedSortedCustomizableListsSelector = createSelector(
     lists.map(({ children, ...data }) => ({
       ...data,
       count: children.length,
-      invited: children.reduce(
-        (acc, item) =>
-          itemsById[item.id] ? [...acc, ...itemsById[item.id].invited] : acc,
-        [],
-      ),
+      invited: [
+        ...new Set(
+          children.reduce(
+            (acc, item) =>
+              itemsById[item.id]
+                ? [...acc, ...itemsById[item.id].invited]
+                : acc,
+            [],
+          ),
+        ),
+      ],
     })),
 );
 

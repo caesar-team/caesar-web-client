@@ -118,8 +118,11 @@ export const SORT_LIST_FAILURE = '@nodes/SORT_LIST_FAILURE';
 
 export const RESET_STORE = '@nodes/RESET_STORE';
 
-export const fetchNodesRequest = () => ({
+export const fetchNodesRequest = withItemsDecryption => ({
   type: FETCH_NODES_REQUEST,
+  payload: {
+    withItemsDecryption,
+  },
 });
 
 export const fetchNodesSuccess = listsById => ({

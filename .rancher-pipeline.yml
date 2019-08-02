@@ -36,7 +36,7 @@ stages:
   - runScriptConfig:
       image: caesarteam/alpine-curl
       shellScript: 'curl -v -X POST -H "Content-Type: application/json" -d ''{"name":
-        "caesarteam/caesar-web-client","tag": "${CICD_GIT_TAG}"}'' ${WEBHOOK_URL}'
+        "caesarteam/caesar-web-client","tag": "${!CICD_GIT_TAG}"}'' ${WEBHOOK_URL}'
     envFrom:
     - sourceName: build-webhook
       sourceKey: WEBHOOK_URL

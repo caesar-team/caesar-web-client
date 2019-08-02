@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import styled from 'styled-components';
 import * as openpgp from 'openpgp';
 import { DEFAULT_IDLE_TIMEOUT } from '@caesar-utils/constants';
-import OpenPGPWorker from '@caesar-utils/openpgp.worker';
+import OpenPGPWorker from '@caesar-utils/encryption.worker';
 import { validateKeys } from '@caesar-utils/utils/key';
 import { match } from '@caesar-utils/utils/match';
 import { SessionChecker } from '@caesar-ui';

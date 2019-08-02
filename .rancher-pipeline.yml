@@ -31,6 +31,20 @@ stages:
         include:
         - develop
         - hotfix/*
+- name: Webhook
+  steps:
+  - runScriptConfig:
+      image: caesarteam/alpine-curl
+      shellScript: 'curl -v -X POST -H "Content-Type: application/json" -d ''{"name":
+        "caesarteam/caesar-web-client","tag": "${CICD_GIT_TAG}"}'' ${WEBHOOK_URL}'
+    envFrom:
+    - sourceName: build-webhook
+      sourceKey: WEBHOOK_URL
+      targetKey: WEBHOOK_URL
+  when:
+    event:
+      include:
+      - tag
 notification:
   recipients:
   - recipient: '#pipeline'

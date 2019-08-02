@@ -3,8 +3,8 @@ import {
   FETCH_NODES_REQUEST,
   FETCH_NODES_SUCCESS,
   FETCH_NODES_FAILURE,
-  ADD_ITEM,
   ADD_ITEMS,
+  FINISH_IS_LOADING,
   SET_WORK_IN_PROGRESS_ITEM,
   SET_WORK_IN_PROGRESS_LIST_ID,
   SET_WORK_IN_PROGRESS_ITEM_IDS,
@@ -90,7 +90,6 @@ export default createReducer(initialState, {
   [FETCH_NODES_SUCCESS](state, { payload }) {
     return {
       ...state,
-      isLoading: false,
       isError: false,
       listsById: payload.listsById,
     };
@@ -98,15 +97,10 @@ export default createReducer(initialState, {
   [FETCH_NODES_FAILURE](state) {
     return { ...state, isLoading: false, isError: true };
   },
-  [ADD_ITEM](state, { payload }) {
-    return {
-      ...state,
-      itemsById: { ...state.itemsById, [payload.item.id]: payload.item },
-    };
-  },
   [ADD_ITEMS](state, { payload }) {
     return {
       ...state,
+      isLoading: false,
       itemsById: {
         ...state.itemsById,
         ...payload.items.reduce(
@@ -114,6 +108,12 @@ export default createReducer(initialState, {
           {},
         ),
       },
+    };
+  },
+  [FINISH_IS_LOADING](state) {
+    return {
+      ...state,
+      isLoading: false,
     };
   },
   [SET_WORK_IN_PROGRESS_ITEM](state, { payload }) {

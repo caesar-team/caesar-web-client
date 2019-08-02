@@ -3,7 +3,7 @@ import { createStructuredSelector } from 'reselect';
 import {
   extendedSortedCustomizableListsSelector,
   workInProgressListSelector,
-  shouldShowLoaderSelector,
+  isLoadingSelector,
 } from 'common/selectors/node';
 import { userDataSelector } from 'common/selectors/user';
 import { byIdSelector } from 'common/selectors/member';
@@ -24,7 +24,7 @@ const mapStateToProps = createStructuredSelector({
   members: byIdSelector,
   user: userDataSelector,
   workInProgressList: workInProgressListSelector,
-  shouldShowLoader: shouldShowLoaderSelector,
+  isLoading: isLoadingSelector,
 });
 
 const mapDispatchToProps = {

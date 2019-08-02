@@ -69,6 +69,7 @@ import {
   sortListSuccess,
   sortListFailure,
   addItems,
+  finishIsLoading,
   setWorkInProgressItem,
   setWorkInProgressListId,
   shareItemFailure,
@@ -229,17 +230,22 @@ export function* fetchNodesSaga({ payload: { withItemsDecryption } }) {
 
     if (withItemsDecryption) {
       const items = objectToArray(itemsById);
-      const preparedItems = items.sort(
-        (a, b) => Number(b.favorite) - Number(a.favorite),
-      );
-      const poolSize = getWorkersCount();
-      const chunks = chunk(preparedItems, Math.ceil(items.length / poolSize));
 
-      yield all(
-        chunks.map(chunkItems =>
-          call(decryptionSaga, arrayToObject(chunkItems)),
-        ),
-      );
+      if (items.length) {
+        const preparedItems = items.sort(
+          (a, b) => Number(b.favorite) - Number(a.favorite),
+        );
+        const poolSize = getWorkersCount();
+        const chunks = chunk(preparedItems, Math.ceil(items.length / poolSize));
+
+        yield all(
+          chunks.map(chunkItems =>
+            call(decryptionSaga, arrayToObject(chunkItems)),
+          ),
+        );
+      } else {
+        yield put(finishIsLoading());
+      }
     } else {
       yield put(addItems(Object.values(itemsById)));
     }

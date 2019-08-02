@@ -36,7 +36,7 @@ import {
   workInProgressListSelector,
   visibleListItemsSelector,
   listsByTypeSelector,
-  shouldShowLoaderSelector,
+  isLoadingSelector,
   trashListSelector,
 } from 'common/selectors/node';
 import { keyPairSelector, userDataSelector } from 'common/selectors/user';
@@ -55,7 +55,7 @@ const mapStateToProps = createStructuredSelector({
   keyPair: keyPairSelector,
   members: byIdSelector,
   user: userDataSelector,
-  shouldShowLoader: shouldShowLoaderSelector,
+  isLoading: isLoadingSelector,
 });
 
 const mapDispatchToProps = {

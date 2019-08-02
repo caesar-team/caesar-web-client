@@ -129,10 +129,10 @@ class ManageListContainer extends Component {
   }
 
   render() {
-    const { lists, members, workInProgressList, shouldShowLoader } = this.props;
+    const { lists, members, workInProgressList, isLoading } = this.props;
     const { isVisibleModal, removingListId, mode } = this.state;
 
-    if (shouldShowLoader) {
+    if (isLoading) {
       return (
         <Wrapper>
           <TextLoader />

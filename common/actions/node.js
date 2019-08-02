@@ -2,8 +2,8 @@ export const FETCH_NODES_REQUEST = '@nodes/FETCH_NODES_REQUEST';
 export const FETCH_NODES_SUCCESS = '@nodes/FETCH_NODES_SUCCESS';
 export const FETCH_NODES_FAILURE = '@nodes/FETCH_NODES_FAILURE';
 
-export const ADD_ITEM = '@nodes/ADD_ITEM';
 export const ADD_ITEMS = '@nodes/ADD_ITEMS';
+export const FINISH_IS_LOADING = '@nodes/FINISH_IS_LOADING';
 
 export const SET_WORK_IN_PROGRESS_ITEM = '@nodes/SET_WORK_IN_PROGRESS_ITEM';
 export const SET_WORK_IN_PROGRESS_ITEM_IDS =
@@ -136,18 +136,15 @@ export const fetchNodesFailure = () => ({
   type: FETCH_NODES_FAILURE,
 });
 
-export const addItem = item => ({
-  type: ADD_ITEM,
-  payload: {
-    item,
-  },
-});
-
 export const addItems = items => ({
   type: ADD_ITEMS,
   payload: {
     items,
   },
+});
+
+export const finishIsLoading = () => ({
+  type: FINISH_IS_LOADING,
 });
 
 export const setWorkInProgressItem = (item, mode) => ({

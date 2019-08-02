@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import styled from 'styled-components';
-import { ManageList, ListFormModal, ConfirmModal, Button } from 'components';
+import { ManageList, ListFormModal, ConfirmModal, Button, FullScreenLoader, TextLoader } from 'components';
 import {
   LIST_WORKFLOW_EDIT_MODE,
   LIST_WORKFLOW_CREATE_MODE,
@@ -12,6 +12,7 @@ const Wrapper = styled.div`
   background: ${({ theme }) => theme.lightBlue};
   width: 100%;
   padding: 60px;
+  position: relative;
 `;
 
 const TopWrapper = styled.div`
@@ -48,7 +49,9 @@ class ManageListContainer extends Component {
     this.props.fetchUserSelfRequest();
     this.props.fetchKeyPairRequest();
     this.props.fetchMembersRequest();
-    this.props.fetchNodesRequest();
+
+    // withItemsDecryption = false
+    this.props.fetchNodesRequest(false);
   }
 
   handleClickCreateList = () => {
@@ -126,8 +129,16 @@ class ManageListContainer extends Component {
   }
 
   render() {
-    const { lists, members, workInProgressList } = this.props;
+    const { lists, members, workInProgressList, isLoading } = this.props;
     const { isVisibleModal, removingListId, mode } = this.state;
+
+    if (isLoading) {
+      return (
+        <Wrapper>
+          <TextLoader />
+        </Wrapper>
+      );
+    }
 
     return (
       <Wrapper>

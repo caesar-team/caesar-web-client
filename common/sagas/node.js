@@ -69,6 +69,7 @@ import {
   sortListSuccess,
   sortListFailure,
   addItems,
+  finishIsLoading,
   setWorkInProgressItem,
   setWorkInProgressListId,
   shareItemFailure,
@@ -215,7 +216,7 @@ export function* decryptionSaga(itemsById) {
   }
 }
 
-export function* fetchNodesSaga() {
+export function* fetchNodesSaga({ payload: { withItemsDecryption } }) {
   try {
     const { data } = yield call(getList);
 
@@ -227,16 +228,27 @@ export function* fetchNodesSaga() {
 
     yield put(setWorkInProgressListId(favoriteList.id));
 
-    const items = objectToArray(itemsById);
-    const preparedItems = items.sort(
-      (a, b) => Number(b.favorite) - Number(a.favorite),
-    );
-    const poolSize = getWorkersCount();
-    const chunks = chunk(preparedItems, Math.ceil(items.length / poolSize));
+    if (withItemsDecryption) {
+      const items = objectToArray(itemsById);
 
-    yield all(
-      chunks.map(chunkItems => call(decryptionSaga, arrayToObject(chunkItems))),
-    );
+      if (items.length) {
+        const preparedItems = items.sort(
+          (a, b) => Number(b.favorite) - Number(a.favorite),
+        );
+        const poolSize = getWorkersCount();
+        const chunks = chunk(preparedItems, Math.ceil(items.length / poolSize));
+
+        yield all(
+          chunks.map(chunkItems =>
+            call(decryptionSaga, arrayToObject(chunkItems)),
+          ),
+        );
+      } else {
+        yield put(finishIsLoading());
+      }
+    } else {
+      yield put(addItems(Object.values(itemsById)));
+    }
   } catch (error) {
     console.log(error);
 

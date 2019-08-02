@@ -129,11 +129,17 @@ export const extendedSortedCustomizableListsSelector = createSelector(
     lists.map(({ children, ...data }) => ({
       ...data,
       count: children.length,
-      invited: children.reduce(
-        (acc, item) =>
-          itemsById[item.id] ? [...acc, ...itemsById[item.id].invited] : acc,
-        [],
-      ),
+      invited: [
+        ...new Set(
+          children.reduce(
+            (acc, item) =>
+              itemsById[item.id]
+                ? [...acc, ...itemsById[item.id].invited]
+                : acc,
+            [],
+          ),
+        ),
+      ],
     })),
 );
 
@@ -176,19 +182,13 @@ export const visibleListItemsSelector = createSelector(
   itemsByIdSelector,
   workInProgressListIdSelector,
   (listsById, itemsById, workInProgressListId) =>
-    listsById && workInProgressListId
+    listsById && workInProgressListId && listsById[workInProgressListId]
       ? listsById[workInProgressListId].children.reduce(
           (accumulator, item) =>
-            itemsById[item.id]
+            itemsById[item.id] && typeof itemsById[item.id].secret !== 'string'
               ? accumulator.concat(itemsById[item.id])
               : accumulator,
           [],
         )
       : [],
-);
-
-export const shouldShowLoaderSelector = createSelector(
-  isLoadingSelector,
-  itemsSelector,
-  (isLoading, items) => isLoading || !items.length,
 );

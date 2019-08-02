@@ -74,7 +74,9 @@ class DashboardContainer extends Component {
   componentDidMount() {
     this.props.fetchUserSelfRequest();
     this.props.fetchKeyPairRequest();
-    this.props.fetchNodesRequest();
+
+    // withItemsDecryption = true
+    this.props.fetchNodesRequest(true);
     this.props.fetchMembersRequest();
   }
 
@@ -394,13 +396,13 @@ class DashboardContainer extends Component {
       listsByType,
       visibleListItems,
       itemsById,
-      shouldShowLoader,
+      isLoading,
       trashList,
     } = this.props;
 
     const { mode, modals, searchedText } = this.state;
 
-    if (shouldShowLoader) {
+    if (isLoading) {
       return <FullScreenLoader />;
     }
 

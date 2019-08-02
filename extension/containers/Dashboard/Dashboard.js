@@ -1,8 +1,8 @@
 import React, { Component } from 'react';
 import styled from 'styled-components';
-import { Icon, Scrollbar } from '@caesar-ui';
 import { ITEM_REVIEW_MODE } from '@caesar-utils/constants';
-import { Lists, ListOption, Item, PasswordGenerator } from 'components';
+import { Lists, ListOption, Item, PasswordGenerator, Loader } from 'components';
+import { Icon, Scrollbar } from '@caesar-ui';
 
 const Wrapper = styled.div`
   display: flex;
@@ -56,7 +56,7 @@ class Dashboard extends Component {
   state = this.prepareInitialState();
 
   componentDidMount() {
-    this.props.fetchNodesRequest();
+    this.props.fetchNodesRequest(true);
   }
 
   handleChangeMode = () => {
@@ -146,7 +146,7 @@ class Dashboard extends Component {
     } = this.props;
 
     if (isLoading) {
-      return null;
+      return <Loader />;
     }
 
     const renderedFavorites = this.renderFavorites();

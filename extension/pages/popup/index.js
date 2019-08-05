@@ -7,6 +7,7 @@ import theme from '@caesar-utils/theme';
 import { configureExtensionStore } from '@caesar-utils/root/store';
 import globalStyles from '@caesar-utils/styles/globalStyles';
 import { App } from 'containers';
+import { NotificationProvider } from '@caesar-ui';
 
 function run(token) {
   const GlobalStyles = createGlobalStyle`${globalStyles}`;
@@ -18,17 +19,20 @@ function run(token) {
   if (root) {
     ReactDOM.render(
       <ThemeProvider theme={theme}>
-        <Fragment>
-          <GlobalStyles />
-          <div dangerouslySetInnerHTML={{ __html: spriteContent }} />
-          <Provider store={store}>
-            <App token={token} />
-          </Provider>
-        </Fragment>
+        <NotificationProvider>
+          <Fragment>
+            <GlobalStyles />
+            <div dangerouslySetInnerHTML={{ __html: spriteContent }} />
+            <Provider store={store}>
+              <App token={token} />
+            </Provider>
+          </Fragment>
+        </NotificationProvider>
       </ThemeProvider>,
       root,
     );
   }
 }
 
-chrome.cookies && chrome.cookies.get({ url: process.env.APP_URI, name: 'token' }, run);
+chrome.cookies &&
+  chrome.cookies.get({ url: process.env.APP_URI, name: 'token' }, run);

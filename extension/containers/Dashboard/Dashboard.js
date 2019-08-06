@@ -97,6 +97,7 @@ class Dashboard extends Component {
   }
 
   renderFavorites() {
+    const { mode } = this.state;
     const {
       workInProgressList,
       favoritesList,
@@ -105,7 +106,9 @@ class Dashboard extends Component {
     } = this.props;
 
     const isActive =
-      workInProgressList && favoritesList.id === workInProgressList.id;
+      mode !== PASSWORD_GENERATOR_MODE &&
+      workInProgressList &&
+      favoritesList.id === workInProgressList.id;
 
     return (
       <ListOption

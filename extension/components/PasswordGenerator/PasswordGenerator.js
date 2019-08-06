@@ -8,6 +8,7 @@ import {
   RangeInput,
   Icon,
   Button,
+  withNotification,
 } from '@caesar-ui';
 
 const Wrapper = styled.div`
@@ -95,15 +96,17 @@ const RangeInputStyled = styled(RangeInput)`
 
 const DEFAULT_LENGTH = 16;
 
-function copyTextToClipboard(text) {
-  const copyFrom = document.createElement('textarea');
+function copyTextToClipboard(text, notification) {
+  document.oncopy = event => {
+    event.clipboardData.setData('text', text);
+    event.preventDefault();
+  };
 
-  copyFrom.textContent = text;
-  document.body.appendChild(copyFrom);
-  copyFrom.select();
-  document.execCommand('copy');
-  copyFrom.blur();
-  document.body.removeChild(copyFrom);
+  document.execCommand('copy', false, null);
+
+  notification.show({
+    text: `Password has copied.`,
+  });
 }
 
 class PasswordGenerator extends Component {
@@ -156,7 +159,9 @@ class PasswordGenerator extends Component {
   };
 
   handleClickCopy = () => {
-    copyTextToClipboard(this.state.password);
+    const { notification } = this.props;
+
+    copyTextToClipboard(this.state.password, notification);
   };
 
   prepareInitialState() {
@@ -226,4 +231,4 @@ class PasswordGenerator extends Component {
   }
 }
 
-export default PasswordGenerator;
+export default withNotification(PasswordGenerator);

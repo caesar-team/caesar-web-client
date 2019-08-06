@@ -271,7 +271,10 @@ export function* removeItemsBatchSaga({ payload: { listId } }) {
   try {
     const workInProgressItemIds = yield select(workInProgressItemIdsSelector);
 
-    yield call(removeItemsBatch);
+    yield call(
+      removeItemsBatch,
+      workInProgressItemIds.map(id => `items[]=${id}`).join('&'),
+    );
     yield put(removeItemsBatchSuccess(workInProgressItemIds, listId));
   } catch (error) {
     console.log(error);

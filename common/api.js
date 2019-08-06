@@ -85,7 +85,7 @@ export const postCreateItemsBatch = data => callApi.post('/item/batch', data);
 
 export const removeItem = itemId => callApi.delete(`/item/${itemId}`);
 
-export const removeItemsBatch = data => callApi.delete('/item/batch', data);
+export const removeItemsBatch = query => callApi.delete(`/item/batch?${query}`);
 
 export const updateMoveItem = (itemId, data) =>
   callApi.patch(`/item/${itemId}/move`, data);

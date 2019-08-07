@@ -9,12 +9,12 @@ import {
   SearchList,
   InviteModal,
   ShareModal,
+  MoveModal,
   ConfirmModal,
   MenuList,
   withNotification,
   DashboardLayout,
   SecureMessage,
-  TextLoader,
   FullScreenLoader,
 } from 'components';
 import {
@@ -251,11 +251,13 @@ class DashboardContainer extends Component {
     this.props.removeShareRequest(shareId);
   };
 
-  handleClickMoveItems = (_, listId) => {
+  handleClickMoveItems = listId => {
     const { workInProgressList } = this.props;
 
     this.props.moveItemsBatchRequest(workInProgressList.id, listId);
     this.props.resetWorkInProgressItemIds();
+
+    this.handleCloseModal('move')();
   };
 
   handleOpenModal = modal => () => {
@@ -331,7 +333,7 @@ class DashboardContainer extends Component {
     }
   }
 
-  handleCtrlSelectionItemBehaviour(itemId) {
+  handleCtrlSelectionItemBehaviour = itemId => {
     const { workInProgressItemIds } = this.props;
 
     const ids = workInProgressItemIds.includes(itemId)
@@ -340,7 +342,7 @@ class DashboardContainer extends Component {
 
     this.props.setWorkInProgressItem(null);
     this.props.setWorkInProgressItemIds(ids);
-  }
+  };
 
   handleDefaultSelectionItemBehaviour(itemId) {
     this.props.resetWorkInProgressItemIds();
@@ -395,6 +397,7 @@ class DashboardContainer extends Component {
       lists,
       listsByType,
       visibleListItems,
+      workInProgressItems,
       itemsById,
       isLoading,
       trashList,
@@ -453,9 +456,8 @@ class DashboardContainer extends Component {
                     <MultiItem
                       isTrashItems={isTrashList}
                       workInProgressItemIds={workInProgressItemIds}
-                      allLists={lists}
                       areAllItemsSelected={areAllItemsSelected}
-                      onClickMove={this.handleClickMoveItems}
+                      onClickMove={this.handleOpenModal('move')}
                       onClickMoveToTrash={this.handleOpenModal('moveToTrash')}
                       onClickRemove={this.handleOpenModal('removeItem')}
                       onClickShare={this.handleOpenModal('share')}
@@ -531,6 +533,15 @@ class DashboardContainer extends Component {
             onDeactivateSharedByLink={this.handleDeactivateShareByLink}
             onCancel={this.handleCloseModal('share')}
             notification={notification}
+          />
+        )}
+        {modals.move && (
+          <MoveModal
+            lists={lists}
+            items={workInProgressItems}
+            onMove={this.handleClickMoveItems}
+            onCancel={this.handleCloseModal('move')}
+            onRemove={this.handleCtrlSelectionItemBehaviour}
           />
         )}
         <ConfirmModal

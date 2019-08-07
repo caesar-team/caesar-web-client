@@ -37,6 +37,7 @@ const Box = styled.div`
   position: absolute;
   z-index: 11;
   top: ${({ top }) => `${top}px`};
+  width: 100%;
 `;
 
 const OptionsList = styled.div`

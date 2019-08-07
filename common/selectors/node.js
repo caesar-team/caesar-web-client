@@ -192,3 +192,10 @@ export const visibleListItemsSelector = createSelector(
         )
       : [],
 );
+
+export const workInProgressItemsSelector = createSelector(
+  itemsByIdSelector,
+  workInProgressItemIdsSelector,
+  (itemsById, workInProgressItemIds) =>
+    workInProgressItemIds.map(itemId => itemsById[itemId]),
+);

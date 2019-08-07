@@ -37,6 +37,7 @@ const Box = styled.div`
   position: absolute;
   z-index: 11;
   top: 48px;
+  width: 100%;
 `;
 
 const OptionsList = styled.div`
@@ -134,7 +135,8 @@ class SelectInner extends Component {
 
     const iconName = isOpened ? 'arrow-up-big' : 'arrow-down-big';
     const selectedLabel = value
-      ? (options.find(({ value: optionValue }) => optionValue === value) || {}).label
+      ? (options.find(({ value: optionValue }) => optionValue === value) || {})
+          .label
       : placeholder;
 
     return (

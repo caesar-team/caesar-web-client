@@ -81,12 +81,6 @@ const Cell = styled.div`
   min-width: 100px;
 `;
 
-const StaticWrapper = styled.div`
-  > div {
-    position: static;
-  }
-`;
-
 const SelectListWrapper = styled.div`
   display: flex;
   align-items: center;
@@ -174,14 +168,12 @@ class DataStep extends Component {
         ];
 
         return (
-          <StaticWrapper>
-            <StyledSelect
-              name="type"
-              options={options}
-              value={data[cellInfo.index][cellInfo.column.id]}
-              onChange={this.handleChangeType(cellInfo.index)}
-            />
-          </StaticWrapper>
+          <StyledSelect
+            name="type"
+            options={options}
+            value={data[cellInfo.index][cellInfo.column.id]}
+            onChange={this.handleChangeType(cellInfo.index)}
+          />
         );
       },
       Header: 'Type',

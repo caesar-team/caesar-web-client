@@ -237,7 +237,7 @@ class DashboardContainer extends Component {
 
     if (emails.length > 0) {
       if (workInProgressItemIds && workInProgressItemIds.length > 0) {
-        this.props.shareItems(emails);
+        this.props.shareItemBatchRequest(workInProgressItemIds, emails);
         this.props.resetWorkInProgressItemIds();
       } else {
         this.props.shareItemRequest(workInProgressItem, emails);

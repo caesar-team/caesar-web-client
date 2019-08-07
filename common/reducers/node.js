@@ -48,6 +48,9 @@ import {
   SHARE_ITEM_REQUEST,
   SHARE_ITEM_SUCCESS,
   SHARE_ITEM_FAILURE,
+  SHARE_ITEM_BATCH_REQUEST,
+  SHARE_ITEM_BATCH_SUCCESS,
+  SHARE_ITEM_BATCH_FAILURE,
   REMOVE_SHARE_REQUEST,
   REMOVE_SHARE_SUCCESS,
   REMOVE_SHARE_FAILURE,
@@ -502,6 +505,33 @@ export default createReducer(initialState, {
     };
   },
   [SHARE_ITEM_FAILURE](state) {
+    return state;
+  },
+  [SHARE_ITEM_BATCH_REQUEST](state) {
+    return state;
+  },
+  [SHARE_ITEM_BATCH_SUCCESS](state, { payload }) {
+    return {
+      ...state,
+      itemsById: {
+        ...state.itemsById,
+        [payload.itemId]: {
+          ...state.itemsById[payload.itemId],
+          invited: [
+            ...state.itemsById[payload.itemId].invited,
+            ...payload.invited,
+          ],
+        },
+      },
+      workInProgressItem: state.workInProgressItem
+        ? {
+            ...state.workInProgressItem,
+            invited: [...state.workInProgressItem.invited, ...payload.invited],
+          }
+        : null,
+    };
+  },
+  [SHARE_ITEM_BATCH_FAILURE](state) {
     return state;
   },
   [REMOVE_SHARE_REQUEST](state) {

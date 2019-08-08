@@ -2,6 +2,7 @@ import React, { PureComponent } from 'react';
 import styled from 'styled-components';
 import Input from './Input';
 import { Icon } from '../Icon';
+import { LongClickBehaviour } from '../LongClickBehaviour';
 
 const StyledIcon = styled(Icon)`
   cursor: pointer;
@@ -12,10 +13,10 @@ class PasswordInput extends PureComponent {
     visible: false,
   };
 
-  handleChangeVisible = () => {
-    this.setState(prevState => ({
-      visible: !prevState.visible,
-    }));
+  handleToggleVisible = visible => () => {
+    this.setState({
+      visible,
+    });
   };
 
   render() {
@@ -32,12 +33,17 @@ class PasswordInput extends PureComponent {
         type={type}
         postfix={
           value && (
-            <StyledIcon
-              name={iconName}
-              width={18}
-              height={18}
-              onClick={this.handleChangeVisible}
-            />
+            <LongClickBehaviour
+              onLongClickStart={this.handleToggleVisible(true)}
+              onLongClickEnd={this.handleToggleVisible(false)}
+            >
+              <StyledIcon
+                name={iconName}
+                width={18}
+                height={18}
+                onClick={this.handleChangeVisible}
+              />
+            </LongClickBehaviour>
           )
         }
       />

@@ -68,3 +68,4 @@ export { Toggle } from './Toggle';
 export { RangeInput } from './RangeInput';
 export { PasswordIndicator } from './PasswordIndicator';
 export { TagsInput } from './TagsInput';
+export { LongClickBehaviour } from './LongClickBehaviour';

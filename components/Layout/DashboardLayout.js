@@ -2,7 +2,7 @@ import React from 'react';
 import styled from 'styled-components';
 import ScrollLock from 'react-scrolllock';
 import LayoutConstructor from './LayoutConstructor';
-import { Header } from './Header';
+import { PrimaryHeader } from './PrimaryHeader';
 
 const LayoutConstructorStyled = styled(LayoutConstructor)`
   padding: 0;
@@ -20,7 +20,7 @@ const DashboardLayout = ({
 }) => (
   <LayoutConstructorStyled
     headerComponent={
-      <Header
+      <PrimaryHeader
         user={user}
         withSearch={withSearch}
         searchedText={searchedText}

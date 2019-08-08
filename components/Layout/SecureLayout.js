@@ -1,10 +1,8 @@
-import React, { Fragment } from 'react';
+import React from 'react';
 import styled from 'styled-components';
-import { withRouter } from 'next/router';
 import LayoutConstructor from './LayoutConstructor';
 import Footer from './Footer';
-import { Icon } from '../Icon';
-import { Button } from '../Button';
+import SecondaryHeader from './SecondaryHeader';
 
 const LayoutConstructorStyled = styled(LayoutConstructor)`
   ${LayoutConstructor.TopWrapper} {
@@ -19,34 +17,12 @@ const LayoutConstructorStyled = styled(LayoutConstructor)`
   }
 `;
 
-const IconWrapper = styled.div`
-  display: flex;
-`;
-
-const StyledButton = styled(Button)`
-  font-size: 18px;
-  letter-spacing: 0.6px;
-  padding: 18px 30px;
-  height: 60px;
-`;
-
-const renderHeaderComponent = props => (
-  <Fragment>
-    <IconWrapper>
-      <Icon name="logo-new" height={40} width={142} />
-    </IconWrapper>
-    <StyledButton onClick={() => props.router.push('/signin')}>
-      Sign In
-    </StyledButton>
-  </Fragment>
-);
-
 const SecureLayout = props => (
   <LayoutConstructorStyled
-    headerComponent={renderHeaderComponent(props)}
+    headerComponent={<SecondaryHeader />}
     footerComponent={Footer}
     {...props}
   />
 );
 
-export default withRouter(SecureLayout);
+export default SecureLayout;

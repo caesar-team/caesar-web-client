@@ -9,6 +9,7 @@ export function entryResolver({ route, ctx: { req, res } }) {
     '/invite',
     '/resetting',
     '/message',
+    '/secure',
   ].includes(route);
 
   if (needToken) {

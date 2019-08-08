@@ -14,6 +14,15 @@ import { NotificationProvider } from '../components';
 
 const GlobalStyles = createGlobalStyle`${globalStyles}`;
 
+const isNotRequiredTokenRoutes = [
+  '/signin',
+  '/signup',
+  '/resetting',
+  '/message',
+  '/secure',
+];
+const isSharedRoutes = ['/share', 'invite'];
+
 class Application extends NextApp {
   static async getInitialProps({ Component, router: { route }, ctx }) {
     entryResolver({ route, ctx });
@@ -33,7 +42,7 @@ class Application extends NextApp {
       store,
     } = this.props;
 
-    if (['/signin', '/signup', '/resetting', '/message'].includes(route)) {
+    if (isNotRequiredTokenRoutes.includes(route)) {
       return (
         <ThemeProvider theme={theme}>
           <NotificationProvider>
@@ -46,7 +55,7 @@ class Application extends NextApp {
       );
     }
 
-    if (route === '/share' || route === '/invite') {
+    if (isSharedRoutes.includes(route)) {
       return (
         <ThemeProvider theme={theme}>
           <NotificationProvider>

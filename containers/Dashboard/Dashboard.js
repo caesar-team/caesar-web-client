@@ -448,7 +448,7 @@ class DashboardContainer extends Component {
               />
             </Sidebar>
             {isSecureMessageMode ? (
-              <SecureMessage />
+              <SecureMessage withScroll />
             ) : (
               <Fragment>
                 <MiddleColumnWrapper>

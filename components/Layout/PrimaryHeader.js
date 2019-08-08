@@ -98,7 +98,7 @@ const Options = (
   </Fragment>
 );
 
-export class Header extends PureComponent {
+export class PrimaryHeader extends PureComponent {
   state = {
     isDropdownOpened: false,
   };

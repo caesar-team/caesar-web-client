@@ -37,12 +37,7 @@ class PasswordInput extends PureComponent {
               onLongClickStart={this.handleToggleVisible(true)}
               onLongClickEnd={this.handleToggleVisible(false)}
             >
-              <StyledIcon
-                name={iconName}
-                width={18}
-                height={18}
-                onClick={this.handleChangeVisible}
-              />
+              <StyledIcon name={iconName} width={18} height={18} />
             </LongClickBehaviour>
           )
         }

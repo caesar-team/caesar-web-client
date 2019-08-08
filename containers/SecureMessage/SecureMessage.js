@@ -109,9 +109,8 @@ class SecureMessageContainer extends Component {
         decryptedMessage,
       });
     } catch (error) {
-      console.log(error);
       setErrors({
-        password: 'Wrong password',
+        password: 'Sorry, but the password is wrong :(',
       });
     } finally {
       setSubmitting(false);
@@ -125,7 +124,7 @@ class SecureMessageContainer extends Component {
     copy(decryptedMessage.text);
 
     notification.show({
-      text: `Text has copied.`,
+      text: `The text has copied.`,
     });
   };
 

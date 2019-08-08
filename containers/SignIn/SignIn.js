@@ -124,7 +124,7 @@ class SignInContainer extends Component {
     return (
       <AuthLayout headerComponent={renderedHeader}>
         <AuthTitle>Nice to meet you!</AuthTitle>
-        <AuthDescription>Welcome to Caesar</AuthDescription>
+        <AuthDescription>Welcome to Caesar.Team!</AuthDescription>
         <SignInForm onSubmit={this.handleSubmit} />
         {isLinkShown && (
           <Fragment>

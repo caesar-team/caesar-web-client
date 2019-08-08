@@ -59,7 +59,7 @@ class SignUpContainer extends Component {
     return (
       <AuthLayout headerComponent={renderedHeader}>
         <AuthTitle>Nice to meet you!</AuthTitle>
-        <AuthDescription>Welcome to Caesar</AuthDescription>
+        <AuthDescription>Welcome to Caesar.Team!</AuthDescription>
         <SignUpForm onSubmit={this.handleSubmit} />
       </AuthLayout>
     );

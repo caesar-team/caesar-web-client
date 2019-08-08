@@ -48,7 +48,6 @@ const MessageWrapper = styled.div`
 const Message = styled.div`
   color: ${({ theme }) => theme.white};
   padding: 20px 0;
-  border-bottom: 1px solid ${({ theme }) => theme.emperor};
   max-height: 400px;
   height: 100%;
   user-select: none;
@@ -186,9 +185,11 @@ class SecureMessageContainer extends Component {
 
     return (
       <MessageWrapper>
-        <Message>
-          <Scrollbar autoHeight>{decryptedMessage.text}</Scrollbar>
-        </Message>
+        <Scrollbar autoHeight>
+          <Message
+            dangerouslySetInnerHTML={{ __html: decryptedMessage.text }}
+          />
+        </Scrollbar>
         {shouldShowAttachments && (
           <Attachments>
             <Scrollbar autoHeight>{renderedAttachments}</Scrollbar>

@@ -33,8 +33,7 @@ const ButtonsWrapper = styled.div`
   justify-content: space-between;
 `;
 
-const getLinkText = (link, password) => `
-Follow the link and enter the password
+const getLinkText = (link, password) => `Follow the link and enter the password
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 URL: ${APP_URI}/message/${link}
 Password: ${password}

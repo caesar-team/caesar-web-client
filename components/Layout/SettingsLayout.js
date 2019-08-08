@@ -1,7 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
 import LayoutConstructor from './LayoutConstructor';
-import { Header } from './Header';
+import { PrimaryHeader } from './PrimaryHeader';
 
 const LayoutConstructorStyled = styled(LayoutConstructor)`
   padding: 0;
@@ -13,7 +13,7 @@ const LayoutConstructorStyled = styled(LayoutConstructor)`
 
 const SettingsLayout = ({ user, ...props }) => (
   <LayoutConstructorStyled
-    headerComponent={<Header user={user} />}
+    headerComponent={<PrimaryHeader user={user} />}
     {...props}
   />
 );

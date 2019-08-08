@@ -45,6 +45,7 @@ export {
   ErrorLayout,
   SettingsLayout,
   SharingLayout,
+  SecureLayout,
 } from './Layout';
 export { WrapperAlignTop } from './WrapperAlignTop';
 export { AuthWrapper } from './AuthWrapper';

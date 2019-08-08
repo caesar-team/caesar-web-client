@@ -1,4 +1,4 @@
-import React, { memo, Fragment } from 'react';
+import React, { Fragment } from 'react';
 import styled from 'styled-components';
 import BgRightImg from 'public/images/bg-right.jpg';
 import BgRightImg2x from 'public/images/bg-right@2x.jpg';

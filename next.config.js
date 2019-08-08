@@ -26,8 +26,8 @@ const publicRuntimeConfig = {
   API_URI: `${process.env.API_URI}`,
   APP_PORT: `${process.env.APP_PORT}`,
   APP_URI: `${process.env.APP_URI}${
-    process.env.APP_PORT !== '80'
-      ? `:${process.env.APP_PORT || '3000'}`
+    process.env.APP_PORT && process.env.APP_PORT !== '80'
+      ? `:${process.env.APP_PORT}`
       : ''
   }`,
   API_BASE_PATH: process.env.API_BASE_PATH || 'api',

@@ -141,6 +141,7 @@ class SelectInner extends Component {
       options,
       placeholder,
       isCancellable,
+      boxOffset = DEFAULT_TOP_OFFSET,
       boxDirection = BOX_DIRECTION_DOWN,
       ...props
     } = this.props;
@@ -154,7 +155,7 @@ class SelectInner extends Component {
 
     const topOffset =
       boxDirection === BOX_DIRECTION_DOWN
-        ? DEFAULT_TOP_OFFSET
+        ? boxOffset
         : (options.length + 1) * DEFAULT_OPTION_SIZE * -1;
 
     return (

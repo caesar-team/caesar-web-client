@@ -46,6 +46,8 @@ export {
   SettingsLayout,
   SharingLayout,
   SecureLayout,
+  PrimaryHeader,
+  SecondaryHeader,
 } from './Layout';
 export { WrapperAlignTop } from './WrapperAlignTop';
 export { AuthWrapper } from './AuthWrapper';

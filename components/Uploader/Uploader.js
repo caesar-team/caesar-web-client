@@ -75,7 +75,7 @@ const splitFilesToUniqAndDuplicates = files => {
 const getNotificationText = files =>
   files.length > 1
     ? `${files.map(({ name }) => name).join(', ')} have already added`
-    : `The ${files[0].name} has already added`;
+    : `The file with name ${files[0].name} has already added`;
 
 const Uploader = ({
   name,

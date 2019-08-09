@@ -12,10 +12,18 @@ const LogoLink = styled.a`
   }
 `;
 
-export const Logo = () => (
-  <Link href="/" passHref>
+const DEFAULT_LOGO_WIDTH = 106;
+const DEFAULT_LOGO_HEIGHT = 30;
+
+export const Logo = ({
+  href,
+  iconName = 'logo-new',
+  width = DEFAULT_LOGO_WIDTH,
+  height = DEFAULT_LOGO_HEIGHT,
+}) => (
+  <Link passHref href={href}>
     <LogoLink>
-      <Icon name="logo-new" width={106} height={30} />
+      <Icon name={iconName} width={width} height={height} />
     </LogoLink>
   </Link>
 );

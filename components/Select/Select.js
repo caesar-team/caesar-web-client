@@ -36,7 +36,8 @@ const IconCloseStyled = styled(Icon)`
 const Box = styled.div`
   position: absolute;
   z-index: 11;
-  top: 48px;
+  top: ${({ top }) => `${top}px`};
+  width: 100%;
 `;
 
 const OptionsList = styled.div`
@@ -65,6 +66,12 @@ const Option = styled.div`
       isDisabled ? theme.lightGray : theme.black};
   }
 `;
+
+const BOX_DIRECTION_DOWN = 'down';
+const BOX_DIRECTION_UP = 'up';
+
+const DEFAULT_TOP_OFFSET = 48;
+const DEFAULT_OPTION_SIZE = 36;
 
 class SelectInner extends Component {
   state = {
@@ -129,13 +136,27 @@ class SelectInner extends Component {
   }
 
   render() {
-    const { value, options, placeholder, isCancellable, ...props } = this.props;
+    const {
+      value,
+      options,
+      placeholder,
+      isCancellable,
+      boxOffset = DEFAULT_TOP_OFFSET,
+      boxDirection = BOX_DIRECTION_DOWN,
+      ...props
+    } = this.props;
     const { isOpened } = this.state;
 
     const iconName = isOpened ? 'arrow-up-big' : 'arrow-down-big';
     const selectedLabel = value
-      ? (options.find(({ value: optionValue }) => optionValue === value) || {}).label
+      ? (options.find(({ value: optionValue }) => optionValue === value) || {})
+          .label
       : placeholder;
+
+    const topOffset =
+      boxDirection === BOX_DIRECTION_DOWN
+        ? boxOffset
+        : (options.length + 1) * DEFAULT_OPTION_SIZE * -1;
 
     return (
       <Wrapper>
@@ -154,7 +175,7 @@ class SelectInner extends Component {
           <Icon name={iconName} width={16} height={16} />
         </SelectedOption>
         {isOpened && (
-          <Box>
+          <Box top={topOffset}>
             <OptionsList>{this.renderOptions()}</OptionsList>
           </Box>
         )}

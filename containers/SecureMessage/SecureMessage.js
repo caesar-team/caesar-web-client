@@ -48,7 +48,6 @@ const MessageWrapper = styled.div`
 const Message = styled.div`
   color: ${({ theme }) => theme.white};
   padding: 20px 0;
-  border-bottom: 1px solid ${({ theme }) => theme.emperor};
   max-height: 400px;
   height: 100%;
   user-select: none;
@@ -110,9 +109,8 @@ class SecureMessageContainer extends Component {
         decryptedMessage,
       });
     } catch (error) {
-      console.log(error);
       setErrors({
-        password: 'Wrong password',
+        password: 'Sorry, but the password is wrong :(',
       });
     } finally {
       setSubmitting(false);
@@ -126,7 +124,7 @@ class SecureMessageContainer extends Component {
     copy(decryptedMessage.text);
 
     notification.show({
-      text: `Text has copied.`,
+      text: `The text has copied.`,
     });
   };
 
@@ -173,7 +171,9 @@ class SecureMessageContainer extends Component {
   renderMessageStep() {
     const { decryptedMessage } = this.state;
 
+    const shouldShowText = !!decryptedMessage.text;
     const shouldShowAttachments = decryptedMessage.attachments.length > 0;
+
     const renderedAttachments = decryptedMessage.attachments.map(
       (attachment, index) => (
         <FileStyled
@@ -186,9 +186,13 @@ class SecureMessageContainer extends Component {
 
     return (
       <MessageWrapper>
-        <Message>
-          <Scrollbar autoHeight>{decryptedMessage.text}</Scrollbar>
-        </Message>
+        {shouldShowText && (
+          <Scrollbar autoHeight>
+            <Message
+              dangerouslySetInnerHTML={{ __html: decryptedMessage.text }}
+            />
+          </Scrollbar>
+        )}
         {shouldShowAttachments && (
           <Attachments>
             <Scrollbar autoHeight>{renderedAttachments}</Scrollbar>

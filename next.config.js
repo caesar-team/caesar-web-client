@@ -24,9 +24,10 @@ if (typeof require !== 'undefined') {
 const publicRuntimeConfig = {
   IS_PROD: process.env.NODE_ENV === 'production',
   API_URI: `${process.env.API_URI}`,
+  APP_PORT: `${process.env.APP_PORT}`,
   APP_URI: `${process.env.APP_URI}${
-    process.env.NODE_ENV === 'development'
-      ? `:${process.env.APP_PORT || '3000'}`
+    process.env.APP_PORT && process.env.APP_PORT !== '80'
+      ? `:${process.env.APP_PORT}`
       : ''
   }`,
   API_BASE_PATH: process.env.API_BASE_PATH || 'api',

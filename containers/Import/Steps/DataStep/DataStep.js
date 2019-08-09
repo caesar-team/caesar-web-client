@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import styled from 'styled-components';
 import memoize from 'memoize-one';
+import { upperFirst } from 'common/utils/string';
 import {
   ITEM_DOCUMENT_TYPE,
   ITEM_CREDENTIALS_TYPE,
@@ -9,7 +10,7 @@ import {
 import { Input, Icon, Button, Select, Checkbox, DataTable } from 'components';
 
 const Wrapper = styled.div`
-  width: calc(100vw - 480px);
+  width: calc(100vw - 495px);
 `;
 
 const Title = styled.div`
@@ -80,10 +81,16 @@ const Cell = styled.div`
   min-width: 100px;
 `;
 
-const StaticWrapper = styled.div`
-  > div {
-    position: static;
-  }
+const SelectListWrapper = styled.div`
+  display: flex;
+  align-items: center;
+  margin: 30px 0;
+`;
+
+const MoveToText = styled.div`
+  font-size: 14px;
+  letter-spacing: 0.4px;
+  margin-right: 20px;
 `;
 
 const capitalize = string => {
@@ -161,14 +168,12 @@ class DataStep extends Component {
         ];
 
         return (
-          <StaticWrapper>
-            <StyledSelect
-              name="type"
-              options={options}
-              value={data[cellInfo.index][cellInfo.column.id]}
-              onChange={this.handleChangeType(cellInfo.index)}
-            />
-          </StaticWrapper>
+          <StyledSelect
+            name="type"
+            options={options}
+            value={data[cellInfo.index][cellInfo.column.id]}
+            onChange={this.handleChangeType(cellInfo.index)}
+          />
         );
       },
       Header: 'Type',
@@ -207,9 +212,9 @@ class DataStep extends Component {
 
   handleSubmit = () => {
     const { onSubmit } = this.props;
-    const { selectedRows } = this.state;
+    const { selectedRows, listId } = this.state;
 
-    onSubmit(denormalize(selectedRows));
+    onSubmit(listId, denormalize(selectedRows));
   };
 
   handleSelectAll = event => {
@@ -282,8 +287,15 @@ class DataStep extends Component {
     this.handleChangeField(index, 'type', value);
   };
 
+  handleChangeListId = (_, value) => {
+    this.setState({
+      listId: value,
+    });
+  };
+
   prepareInitialState() {
     return {
+      listId: this.props.lists[0].id,
       filterText: '',
       selectedRows: normalize(this.props.data),
       data: this.props.data,
@@ -291,10 +303,15 @@ class DataStep extends Component {
   }
 
   render() {
-    const { onCancel } = this.props;
-    const { data, selectedRows, filterText } = this.state;
+    const { lists, onCancel } = this.props;
+    const { data, selectedRows, filterText, listId } = this.state;
 
     const selectedRowsLength = denormalize(selectedRows).length;
+
+    const options = lists.map(({ label, id }) => ({
+      value: id,
+      label: upperFirst(label),
+    }));
 
     return (
       <Wrapper>
@@ -310,6 +327,15 @@ class DataStep extends Component {
           defaultPageSize={data.length}
           columns={this.getColumns()}
         />
+        <SelectListWrapper>
+          <MoveToText>Move to list:</MoveToText>
+          <StyledSelect
+            boxDirection="up"
+            options={options}
+            value={listId}
+            onChange={this.handleChangeListId}
+          />
+        </SelectListWrapper>
         <BottomWrapper>
           <SelectedItems>
             Selected items: {selectedRowsLength} / {data.length}

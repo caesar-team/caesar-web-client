@@ -98,7 +98,7 @@ const Options = (
   </Fragment>
 );
 
-export class Header extends PureComponent {
+class PrimaryHeader extends PureComponent {
   state = {
     isDropdownOpened: false,
   };
@@ -122,7 +122,7 @@ export class Header extends PureComponent {
     return (
       <Wrapper>
         <LeftWrapper withBorder={withSearch}>
-          <Logo />
+          <Logo href="/" />
         </LeftWrapper>
         {!!user && (
           <RightWrapper>
@@ -150,3 +150,5 @@ export class Header extends PureComponent {
     );
   }
 }
+
+export default PrimaryHeader;

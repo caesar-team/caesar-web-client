@@ -1,7 +1,15 @@
 import React, { Component } from 'react';
 import styled from 'styled-components';
 import { Formik, FastField } from 'formik';
-import { Checkbox, TextArea, Uploader, PasswordInput, File, Button } from 'components';
+import {
+  Checkbox,
+  TextArea,
+  Uploader,
+  PasswordInput,
+  File,
+  Button,
+  withNotification,
+} from 'components';
 import { Select } from 'components/Select';
 import { checkError } from 'common/utils/formikUtils';
 import {
@@ -89,10 +97,16 @@ const SelectRow = styled.div`
 
 const StyledSelect = styled(Select)`
   margin-top: 10px;
-  padding-left: 0;
+  border: 1px solid ${({ theme }) => theme.gallery};
+  border-radius: 3px;
+  padding: 18px 20px;
+  height: 60px;
 
   ${Select.ValueText} {
     padding: 0;
+    font-size: 18px;
+    font-weight: 600;
+    letter-spacing: 0.6px;
   }
 `;
 
@@ -142,7 +156,7 @@ class SecureMessageForm extends Component {
   };
 
   render() {
-    const { onSubmit } = this.props;
+    const { onSubmit, notification } = this.props;
     const { isCustomPassword } = this.state;
 
     return (
@@ -182,6 +196,7 @@ class SecureMessageForm extends Component {
                 asPreview
                 name="attachments"
                 files={values.attachments}
+                notification={notification}
                 onChange={setFieldValue}
               />
               <Attachments>
@@ -196,6 +211,7 @@ class SecureMessageForm extends Component {
               <Column>
                 <Label>Numbers of Attempts</Label>
                 <StyledSelect
+                  boxOffset={60}
                   name="requestsLimit"
                   placeholder="Select option"
                   value={values.requestsLimit}
@@ -206,6 +222,7 @@ class SecureMessageForm extends Component {
               <ColumnStyled>
                 <Label>Data expires after</Label>
                 <StyledSelect
+                  boxOffset={60}
                   name="secondsLimit"
                   placeholder="Select option"
                   value={values.secondsLimit}
@@ -252,4 +269,4 @@ class SecureMessageForm extends Component {
   }
 }
 
-export default SecureMessageForm;
+export default withNotification(SecureMessageForm);

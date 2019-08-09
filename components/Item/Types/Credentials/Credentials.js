@@ -47,9 +47,9 @@ class Credentials extends Component {
     isPasswordVisible: false,
   };
 
-  handleTogglePasswordVisibility = () => {
-    this.setState(prevState => ({
-      isPasswordVisible: !prevState.isPasswordVisible,
+  handleTogglePasswordVisibility = visible => {
+    this.setState(() => ({
+      isPasswordVisible: visible,
     }));
   };
 
@@ -64,7 +64,7 @@ class Credentials extends Component {
     const fieldText = field === 'login' ? 'Login' : 'Password';
 
     notification.show({
-      text: `${fieldText} has copied.`,
+      text: `The ${fieldText} has copied.`,
     });
   };
 
@@ -128,7 +128,15 @@ class Credentials extends Component {
                     name={eyeIconName}
                     width={20}
                     height={20}
-                    onClick={this.handleTogglePasswordVisibility}
+                    onMouseDown={() => {
+                      return this.handleTogglePasswordVisibility(true);
+                    }}
+                    onMouseUp={() => {
+                      return this.handleTogglePasswordVisibility(false);
+                    }}
+                    onMouseOver={() => {
+                      return this.handleTogglePasswordVisibility(false);
+                    }}
                   />
                   <StyledIcon
                     name="copy"

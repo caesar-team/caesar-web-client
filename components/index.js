@@ -21,7 +21,7 @@ export { InviteModal } from './InviteModal';
 export { Item, MultiItem, Credentials, Document } from './Item';
 export { Label } from './Label';
 export { Link } from './Link';
-export { List, SearchList } from './List';
+export { List, SearchList, ListItem } from './List';
 export { ListFormModal } from './ListFormModal';
 export { Loader, CircleLoader, TextLoader, FullScreenLoader } from './Loader';
 export { ManageList } from './ManageList';
@@ -45,6 +45,9 @@ export {
   ErrorLayout,
   SettingsLayout,
   SharingLayout,
+  SecureLayout,
+  PrimaryHeader,
+  SecondaryHeader,
 } from './Layout';
 export { WrapperAlignTop } from './WrapperAlignTop';
 export { AuthWrapper } from './AuthWrapper';
@@ -56,6 +59,7 @@ export { CodeInput } from './CodeInput';
 export { Checkbox } from './Checkbox';
 export { ModalTitle } from './ModalTitle';
 export { ShareModal } from './ShareModal';
+export { MoveModal } from './MoveModal';
 export { TextWithLines } from './TextWithLines';
 export { SettingsSidebar } from './SettingsSidebar';
 export { Tab, Tabs } from './Tabs';

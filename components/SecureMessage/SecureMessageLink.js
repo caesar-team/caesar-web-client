@@ -3,6 +3,7 @@ import styled from 'styled-components';
 import copy from 'copy-text-to-clipboard';
 import { APP_URI } from 'common/constants';
 import { Button, withNotification } from 'components';
+import ReadOnlyContentEditable from '../Common/ContentEditable';
 
 const Wrapper = styled.div`
   display: flex;
@@ -32,36 +33,61 @@ const ButtonsWrapper = styled.div`
   display: flex;
   justify-content: space-between;
 `;
+const stripHtml = html => {
+  const tmp = document.createElement('DIV');
+  tmp.innerHTML = html;
+  return tmp.textContent || tmp.innerText || '';
+};
 
-const getLinkText = (link, password) => `
-Follow the link and enter the password
+const getLinkText = (link, password) => `Please, follow the link and enter the password
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-URL: ${APP_URI}/message/${link}
-Password: ${password}
+URL: <strong>${APP_URI}/message/${link}</strong>
+Password: <strong>${password}</strong>
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Securely created with https://caesarapp.4xxi.com
-`;
+Securely created with ${APP_URI}`;
 
 const SecureMessageLink = ({
   notification,
-  link = '4cc372f3-0a84-4d64-8f09-f14cb8d9ca22',
-  password = 'yXzLy&73-',
+  link = '',
+  password = '',
   onClickReturn,
 }) => {
-  const handleClickCopy = () => {
-    copy(getLinkText(link, password));
+  const handleClickCopy = (data, notify) => {
+    copy(stripHtml(data));
 
     notification.show({
-      text: 'Link has copied.',
+      text: notify,
     });
+    return false;
   };
 
   return (
     <Wrapper>
       <Text>Use the temporary encrypted link below to retrieve the secret</Text>
-      <Link>{getLinkText(link, password)}</Link>
+      <Link>
+        <ReadOnlyContentEditable html={getLinkText(link, password)} />
+      </Link>
       <ButtonsWrapper>
-        <Button onClick={handleClickCopy}>Copy All</Button>
+        <Button
+          onClick={() =>
+            handleClickCopy(
+              getLinkText(link, password),
+              'The link and password have copied!',
+            )
+          }
+        >
+          Copy All
+        </Button>
+        <Button
+          onClick={() =>
+            handleClickCopy(
+              `${APP_URI}/message/${link}`,
+              'The link have copied!',
+            )
+          }
+        >
+          Copy The Link
+        </Button>
         <Button onClick={onClickReturn}>Create New Secure Message</Button>
       </ButtonsWrapper>
     </Wrapper>

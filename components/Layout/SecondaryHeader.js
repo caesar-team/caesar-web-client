@@ -1,12 +1,8 @@
 import React, { Fragment } from 'react';
 import styled from 'styled-components';
 import { withRouter } from 'next/router';
-import { Icon } from '../Icon';
+import { Logo } from './Logo';
 import { Button } from '../Button';
-
-const IconWrapper = styled.div`
-  display: flex;
-`;
 
 const StyledButton = styled(Button)`
   font-size: 18px;
@@ -15,13 +11,15 @@ const StyledButton = styled(Button)`
   height: 60px;
 `;
 
-const SecondaryHeader = props => (
+const SecondaryHeader = ({
+  router,
+  buttonText = 'Sign In',
+  url = '/signin',
+}) => (
   <Fragment>
-    <IconWrapper>
-      <Icon name="logo-new" height={40} width={142} />
-    </IconWrapper>
-    <StyledButton onClick={() => props.router.push('/signin')}>
-      Sign In
+    <Logo href={url} width={142} height={40} />
+    <StyledButton onClick={() => router.push(url)}>
+      {buttonText}
     </StyledButton>
   </Fragment>
 );

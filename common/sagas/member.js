@@ -111,7 +111,7 @@ export function* createMemberBatchSaga({ payload: { emails, role } }) {
       const member = members[index];
 
       return {
-        id: userId,
+        userId,
         email: member.email,
         name: member.email,
         avatar: null,

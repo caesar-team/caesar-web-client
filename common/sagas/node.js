@@ -777,6 +777,8 @@ export function* shareItemBatchSaga({ payload: { items, emails } }) {
         user => !!user && !itemInvitedUsers.includes(user.userId),
       );
 
+      console.log('users', users);
+
       const userKeys = users.map(({ publicKey }) => publicKey);
 
       const invitedEncryptedSecrets = yield call(
@@ -796,6 +798,8 @@ export function* shareItemBatchSaga({ payload: { items, emails } }) {
         originalItem: item.id,
         items: invitedChildItems,
       });
+
+      console.log('data', data);
 
       invitations.push(
         ...users

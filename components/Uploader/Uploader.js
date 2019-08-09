@@ -51,6 +51,32 @@ const Error = styled.div`
   color: ${({ theme }) => theme.red};
 `;
 
+const splitFilesToUniqAndDuplicates = files => {
+  const uniqFiles = [];
+  const duplicatedFiles = [];
+
+  const map = new Map();
+
+  // eslint-disable-next-line
+  for (const file of files) {
+    const checkLabel = `${file.name}_${file.raw.length}`;
+
+    if (!map.has(checkLabel)) {
+      map.set(checkLabel, true);
+      uniqFiles.push(file);
+    } else {
+      duplicatedFiles.push(file);
+    }
+  }
+
+  return { uniqFiles, duplicatedFiles };
+};
+
+const getNotificationText = files =>
+  files.length > 1
+    ? `${files.map(({ name }) => name).join(', ')} have already added`
+    : `The ${files[0].name} has already added`;
+
 const Uploader = ({
   name,
   multiple = false,
@@ -59,6 +85,7 @@ const Uploader = ({
   extText = '.rar .zip .doc .docx .pdf .jpg...',
   error,
   files: previousFiles = [],
+  notification,
   ...props
 }) => {
   const handleDrop = async acceptedFiles => {
@@ -68,7 +95,18 @@ const Uploader = ({
       raw: previews[index],
     }));
 
-    onChange(name, multiple ? [...previousFiles, ...files] : files[0]);
+    const preparedFiles = splitFilesToUniqAndDuplicates([
+      ...previousFiles,
+      ...files,
+    ]);
+
+    if (preparedFiles.duplicatedFiles.length && notification) {
+      notification.show({
+        text: getNotificationText(preparedFiles.duplicatedFiles),
+      });
+    }
+
+    onChange(name, multiple ? preparedFiles.uniqFiles : files[0]);
   };
 
   return (

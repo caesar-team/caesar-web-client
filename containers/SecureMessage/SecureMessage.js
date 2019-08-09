@@ -172,7 +172,9 @@ class SecureMessageContainer extends Component {
   renderMessageStep() {
     const { decryptedMessage } = this.state;
 
+    const shouldShowText = !!decryptedMessage.text;
     const shouldShowAttachments = decryptedMessage.attachments.length > 0;
+
     const renderedAttachments = decryptedMessage.attachments.map(
       (attachment, index) => (
         <FileStyled
@@ -185,11 +187,13 @@ class SecureMessageContainer extends Component {
 
     return (
       <MessageWrapper>
-        <Scrollbar autoHeight>
-          <Message
-            dangerouslySetInnerHTML={{ __html: decryptedMessage.text }}
-          />
-        </Scrollbar>
+        {shouldShowText && (
+          <Scrollbar autoHeight>
+            <Message
+              dangerouslySetInnerHTML={{ __html: decryptedMessage.text }}
+            />
+          </Scrollbar>
+        )}
         {shouldShowAttachments && (
           <Attachments>
             <Scrollbar autoHeight>{renderedAttachments}</Scrollbar>

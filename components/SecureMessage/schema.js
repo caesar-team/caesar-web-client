@@ -9,7 +9,13 @@ export const attachmentsSchema = yup.array(
 );
 
 export const schema = yup.object({
-  text: yup.string().required(errorMessages.required),
+  text: yup
+    .string()
+    .when('attachments', (attachments, textSchema) =>
+      attachments && attachments.length
+        ? textSchema
+        : textSchema.required(errorMessages.required),
+    ),
   password: yup.string(),
   requestsLimit: yup.number().required(),
   secondsLimit: yup.number().required(),

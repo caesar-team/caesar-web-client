@@ -14,6 +14,7 @@ import {
   File,
   FormInput,
 } from 'components';
+import { withNotification } from '../../../Notification';
 import { Form } from '../components';
 import { schema } from './schema';
 
@@ -159,6 +160,7 @@ const CredentialsForm = ({
   item: { secret, listId, type },
   allLists = [],
   mode,
+  notification,
   onFinishCreateWorkflow,
   onFinishEditWorkflow,
   onCancelWorkflow,
@@ -280,6 +282,7 @@ const CredentialsForm = ({
             <Uploader
               multiple
               asPreview
+              notification={notification}
               name="attachments"
               files={values.attachments}
               onChange={setFieldValue}
@@ -303,4 +306,4 @@ const CredentialsForm = ({
   );
 };
 
-export default CredentialsForm;
+export default withNotification(CredentialsForm);

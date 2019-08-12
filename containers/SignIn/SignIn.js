@@ -12,17 +12,13 @@ import {
   Icon,
   AuthTitle,
   AuthDescription,
-  Button,
   TextWithLines,
   AuthLayout,
+  SecondaryHeader,
 } from 'components';
 import { login } from 'common/utils/authUtils';
 import { getTrustedDeviceToken, setToken } from 'common/utils/token';
 import SignInForm from './SignInForm';
-
-const IconWrapper = styled.div`
-  display: flex;
-`;
 
 const AuthWrapper = styled.a`
   display: flex;
@@ -60,12 +56,7 @@ const GoogleAuthText = styled.div`
   color: ${({ theme }) => theme.white};
 `;
 
-const StyledButton = styled(Button)`
-  font-size: 18px;
-  letter-spacing: 0.6px;
-  padding: 18px 30px;
-  height: 60px;
-`;
+const headerComponent = <SecondaryHeader buttonText="Sign Up" url="/signup" />;
 
 class SignInContainer extends Component {
   state = {
@@ -100,29 +91,12 @@ class SignInContainer extends Component {
     }
   };
 
-  renderHeader() {
-    const { router } = this.props;
-
-    return (
-      <Fragment>
-        <IconWrapper>
-          <Icon name="logo-new" height={40} width={142} />
-        </IconWrapper>
-        <StyledButton onClick={() => router.push('/signup')}>
-          Sign Up
-        </StyledButton>
-      </Fragment>
-    );
-  }
-
   render() {
     const { googleAuthUrl } = this.state;
     const isLinkShown = googleAuthUrl !== '';
 
-    const renderedHeader = this.renderHeader();
-
     return (
-      <AuthLayout headerComponent={renderedHeader}>
+      <AuthLayout headerComponent={headerComponent}>
         <AuthTitle>Nice to meet you!</AuthTitle>
         <AuthDescription>Welcome to Caesar.Team!</AuthDescription>
         <SignInForm onSubmit={this.handleSubmit} />

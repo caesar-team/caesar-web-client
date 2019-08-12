@@ -1,24 +1,24 @@
 import React, { Component } from 'react';
 
-class LongClickBehaviour extends Component {
+class HoldClickBehaviour extends Component {
   timer = null;
 
   handleButtonPress = () => {
-    const { delay = 250, onLongClickStart } = this.props;
+    const { delay = 250, onHoldStart } = this.props;
 
-    this.timer = setTimeout(onLongClickStart, delay);
+    this.timer = setTimeout(onHoldStart, delay);
   };
 
   handleButtonRelease = () => {
-    const { onLongClickEnd } = this.props;
+    const { onHoldEnd } = this.props;
 
     clearTimeout(this.timer);
 
-    onLongClickEnd();
+    onHoldEnd();
   };
 
   render() {
-    const { onLongClickStart, onLongClickEnd, ...props } = this.props;
+    const { onHoldStart, onHoldEnd, ...props } = this.props;
 
     return (
       <div
@@ -34,4 +34,4 @@ class LongClickBehaviour extends Component {
   }
 }
 
-export default LongClickBehaviour;
+export default HoldClickBehaviour;

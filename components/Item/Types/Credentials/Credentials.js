@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import styled from 'styled-components';
 import copy from 'copy-text-to-clipboard';
-import { Icon, Label, LongClickBehaviour } from 'components';
+import { Icon, Label, HoldClickBehaviour } from 'components';
 import {
   Wrapper,
   Row,
@@ -124,12 +124,12 @@ class Credentials extends Component {
               <FieldValue>
                 <FixedSizeField>{pwd}</FixedSizeField>
                 <Row>
-                  <LongClickBehaviour
-                    onLongClickStart={this.handleToggleVisibility(true)}
-                    onLongClickEnd={this.handleToggleVisibility(false)}
+                  <HoldClickBehaviour
+                    onHoldStart={this.handleToggleVisibility(true)}
+                    onHoldEnd={this.handleToggleVisibility(false)}
                   >
                     <StyledEyeIcon name={eyeIconName} width={20} height={20} />
-                  </LongClickBehaviour>
+                  </HoldClickBehaviour>
                   <StyledIcon
                     name="copy"
                     width={19}

@@ -64,7 +64,7 @@ class Credentials extends Component {
     const fieldText = field === 'login' ? 'Login' : 'Password';
 
     notification.show({
-      text: `${fieldText} has copied.`,
+      text: `The ${fieldText} has copied.`,
     });
   };
 

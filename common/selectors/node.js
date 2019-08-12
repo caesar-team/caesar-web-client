@@ -199,3 +199,8 @@ export const workInProgressItemsSelector = createSelector(
   (itemsById, workInProgressItemIds) =>
     workInProgressItemIds.map(itemId => itemsById[itemId]),
 );
+
+export const shouldLoadNodesSelector = createSelector(
+  extendedSortedCustomizableListsSelector,
+  lists => !lists.length,
+);

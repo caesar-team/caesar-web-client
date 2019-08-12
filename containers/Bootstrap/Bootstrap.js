@@ -100,6 +100,8 @@ class Bootstrap extends Component {
   };
 
   handleInactiveTimeout = () => {
+    this.props.resetStore();
+
     this.setState({
       currentStep: MASTER_PASSWORD_CHECK,
     });

@@ -482,10 +482,9 @@ export const shareItemBatchRequest = (items, emails) => ({
   },
 });
 
-export const shareItemBatchSuccess = (itemId, invited) => ({
+export const shareItemBatchSuccess = invited => ({
   type: SHARE_ITEM_BATCH_SUCCESS,
   payload: {
-    itemId,
     invited,
   },
 });

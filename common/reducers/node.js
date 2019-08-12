@@ -515,20 +515,20 @@ export default createReducer(initialState, {
       ...state,
       itemsById: {
         ...state.itemsById,
-        [payload.itemId]: {
-          ...state.itemsById[payload.itemId],
-          invited: [
-            ...state.itemsById[payload.itemId].invited,
-            ...payload.invited,
-          ],
-        },
+        ...payload.invited.reduce(
+          (accumulator, invite) => ({
+            ...accumulator,
+            [invite.itemId]: {
+              ...state.itemsById[invite.itemId],
+              invited: [
+                ...state.itemsById[invite.itemId].invited,
+                ...invite.invited,
+              ],
+            },
+          }),
+          {},
+        ),
       },
-      workInProgressItem: state.workInProgressItem
-        ? {
-            ...state.workInProgressItem,
-            invited: [...state.workInProgressItem.invited, ...payload.invited],
-          }
-        : null,
     };
   },
   [SHARE_ITEM_BATCH_FAILURE](state) {

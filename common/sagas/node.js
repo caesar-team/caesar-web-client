@@ -767,6 +767,11 @@ export function* shareItemBatchSaga({ payload: { items, emails } }) {
       payload: { emails, role: USER_ROLE },
     });
 
+    const membersObj = members.reduce((accumulator, member) => ({
+      ...accumulator,
+      [member.userId]: member,
+    }));
+
     const data = [];
     const invitations = [];
 
@@ -776,8 +781,6 @@ export function* shareItemBatchSaga({ payload: { items, emails } }) {
       const users = members.filter(
         user => !!user && !itemInvitedUsers.includes(user.userId),
       );
-
-      console.log('users', users);
 
       const userKeys = users.map(({ publicKey }) => publicKey);
 
@@ -799,8 +802,6 @@ export function* shareItemBatchSaga({ payload: { items, emails } }) {
         items: invitedChildItems,
       });
 
-      console.log('data', data);
-
       invitations.push(
         ...users
           .filter(({ isNew }) => !!isNew)
@@ -817,22 +818,32 @@ export function* shareItemBatchSaga({ payload: { items, emails } }) {
       );
     }
 
-    const childItems = yield call(postCreateChildItemBatch, {
+    const {
+      data: { shares },
+    } = yield call(postCreateChildItemBatch, {
       originalItems: data,
     });
 
     yield call(postInvitationBatch, { messages: invitations });
 
-    console.log('childItems', childItems);
-    // const invited = childItems.map(({ id, lastUpdatedAt }, idx) => ({
-    //   id,
-    //   updatedAt: lastUpdatedAt,
-    //   userId: users[idx].userId,
-    //   email: users[idx].email,
-    //   access: PERMISSION_READ,
-    // }));
-    //
-    // yield put(shareItemBatchSuccess(childItems));
+    const invited = shares.reduce(
+      (accumulator, { originalItem, items: childItems }) => [
+        ...accumulator,
+        {
+          itemId: originalItem,
+          invited: childItems.map(({ id, userId, lastUpdatedAt }) => ({
+            id,
+            updatedAt: lastUpdatedAt,
+            userId,
+            email: membersObj[userId].email,
+            access: PERMISSION_READ,
+          })),
+        },
+      ],
+      [],
+    );
+
+    yield put(shareItemBatchSuccess(invited));
   } catch (error) {
     console.log(error);
     yield put(shareItemBatchFailure());

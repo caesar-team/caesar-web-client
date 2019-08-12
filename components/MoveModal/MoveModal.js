@@ -60,12 +60,13 @@ const ListItemStyled = styled(ListItem)`
   }
 `;
 
-const getOptions = memoize(lists =>
+const getOptions = memoize((lists, activeListId) =>
   lists
     .filter(({ type }) => type !== TRASH_TYPE)
     .map(({ label, id }) => ({
       value: id,
       label: upperFirst(label),
+      isDisabled: id === activeListId,
     })),
 );
 
@@ -125,7 +126,7 @@ class MoveModal extends Component {
         <SelectWrapper>
           <SelectStyled
             placeholder="Choose a list where to move…"
-            options={getOptions(lists)}
+            options={getOptions(lists, listId)}
             value={listId}
             onChange={this.handleChangeListId}
           />

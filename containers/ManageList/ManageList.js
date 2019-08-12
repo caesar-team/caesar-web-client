@@ -50,7 +50,6 @@ class ManageListContainer extends Component {
     this.props.fetchKeyPairRequest();
     this.props.fetchMembersRequest();
 
-    console.log(this.props.shouldLoadNodes);
     if (this.props.shouldLoadNodes) {
       // withItemsDecryption = false
       this.props.fetchNodesRequest(false);
@@ -134,8 +133,6 @@ class ManageListContainer extends Component {
   render() {
     const { lists, members, workInProgressList, isLoading } = this.props;
     const { isVisibleModal, removingListId, mode } = this.state;
-
-    console.log(this.props);
 
     if (isLoading) {
       return (

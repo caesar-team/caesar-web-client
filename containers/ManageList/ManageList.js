@@ -1,6 +1,12 @@
 import React, { Component } from 'react';
 import styled from 'styled-components';
-import { ManageList, ListFormModal, ConfirmModal, Button, FullScreenLoader, TextLoader } from 'components';
+import {
+  ManageList,
+  ListFormModal,
+  ConfirmModal,
+  Button,
+  TextLoader,
+} from 'components';
 import {
   LIST_WORKFLOW_EDIT_MODE,
   LIST_WORKFLOW_CREATE_MODE,
@@ -50,8 +56,10 @@ class ManageListContainer extends Component {
     this.props.fetchKeyPairRequest();
     this.props.fetchMembersRequest();
 
-    // withItemsDecryption = false
-    this.props.fetchNodesRequest(false);
+    if (this.props.shouldLoadNodes) {
+      // withItemsDecryption = false
+      this.props.fetchNodesRequest(false);
+    }
   }
 
   handleClickCreateList = () => {

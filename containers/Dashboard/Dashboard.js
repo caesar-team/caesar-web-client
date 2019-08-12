@@ -75,13 +75,13 @@ class DashboardContainer extends Component {
     this.props.fetchUserSelfRequest();
     this.props.fetchKeyPairRequest();
 
+    // TODO: added checkpoint for situation when
+    // TODO: 1) we dont have items and we need to load and decrypt them
+    // TODO: 2) we have not decrypted items and we need just to decrypt them
+    // TODO: 3) we have encrypted items we need to do nothing
     // withItemsDecryption = true
     this.props.fetchNodesRequest(true);
     this.props.fetchMembersRequest();
-  }
-
-  componentWillUnmount() {
-    this.props.resetStore();
   }
 
   handleClickMenuItem = id => () => {

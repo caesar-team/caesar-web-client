@@ -6,6 +6,7 @@ import { getUserBootstrap } from 'common/api';
 import { DEFAULT_IDLE_TIMEOUT } from 'common/constants';
 import EncryptionWorker from 'common/encryption.worker';
 import { SessionChecker } from 'components/SessionChecker';
+import { FullScreenLoader } from 'components/Loader';
 import {
   TWO_FACTOR_CHECK,
   TWO_FACTOR_CREATE,
@@ -169,7 +170,7 @@ class Bootstrap extends Component {
     } = this.state;
 
     if (!currentStep) {
-      return null;
+      return <FullScreenLoader />;
     }
 
     if (TWO_FACTOR_STEPS.includes(currentStep)) {

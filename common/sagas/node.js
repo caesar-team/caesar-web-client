@@ -830,10 +830,10 @@ export function* shareItemBatchSaga({ payload: { items, emails } }) {
     yield call(postInvitationBatch, { messages: invitations });
 
     const invited = shares.reduce(
-      (accumulator, { originalItem, items: childItems }) => [
+      (accumulator, { originalItemId, items: childItems }) => [
         ...accumulator,
         {
-          itemId: originalItem,
+          itemId: originalItemId,
           invited: childItems.map(({ id, userId, lastUpdated }) => ({
             id,
             updatedAt: lastUpdated,

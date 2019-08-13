@@ -6,6 +6,13 @@ export const CREATE_MEMBER_REQUEST = '@members/CREATE_MEMBER_REQUEST';
 export const CREATE_MEMBER_SUCCESS = '@members/CREATE_MEMBER_SUCCESS';
 export const CREATE_MEMBER_FAILURE = '@members/CREATE_MEMBER_FAILURE';
 
+export const CREATE_MEMBER_BATCH_REQUEST =
+  '@members/CREATE_MEMBER_BATCH_REQUEST';
+export const CREATE_MEMBER_BATCH_SUCCESS =
+  '@members/CREATE_MEMBER_BATCH_SUCCESS';
+export const CREATE_MEMBER_BATCH_FAILURE =
+  '@members/CREATE_MEMBER_BATCH_FAILURE';
+
 export const fetchMembersRequest = () => ({
   type: FETCH_MEMBERS_REQUEST,
 });
@@ -38,4 +45,23 @@ export const createMemberSuccess = member => ({
 
 export const createMemberFailure = () => ({
   type: CREATE_MEMBER_FAILURE,
+});
+
+export const createMemberBatchRequest = (email, role) => ({
+  type: CREATE_MEMBER_BATCH_REQUEST,
+  payload: {
+    email,
+    role,
+  },
+});
+
+export const createMemberBatchSuccess = members => ({
+  type: CREATE_MEMBER_BATCH_SUCCESS,
+  payload: {
+    members,
+  },
+});
+
+export const createMemberBatchFailure = () => ({
+  type: CREATE_MEMBER_BATCH_FAILURE,
 });

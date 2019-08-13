@@ -6,6 +6,9 @@ import {
   CREATE_MEMBER_REQUEST,
   CREATE_MEMBER_SUCCESS,
   CREATE_MEMBER_FAILURE,
+  CREATE_MEMBER_BATCH_REQUEST,
+  CREATE_MEMBER_BATCH_SUCCESS,
+  CREATE_MEMBER_BATCH_FAILURE,
 } from 'common/actions/member';
 
 const initialState = {
@@ -42,6 +45,24 @@ export default createReducer(initialState, {
     };
   },
   [CREATE_MEMBER_FAILURE](state) {
+    return state;
+  },
+  [CREATE_MEMBER_BATCH_REQUEST](state) {
+    return state;
+  },
+  [CREATE_MEMBER_BATCH_SUCCESS](state, { payload }) {
+    return {
+      ...state,
+      byId: {
+        ...state.byId,
+        ...payload.members.reduce(
+          (accumulator, member) => ({ ...accumulator, [member.id]: member }),
+          {},
+        ),
+      },
+    };
+  },
+  [CREATE_MEMBER_BATCH_FAILURE](state) {
     return state;
   },
 });

@@ -4,6 +4,9 @@ import atob from 'atob';
 import { generateKeys } from 'common/utils/key';
 import { generator } from 'common/utils/password';
 import { randomId } from 'common/utils/uuid4';
+import { createSrp } from './srp';
+
+const srp = createSrp();
 
 export const getPrivateKeyObj = async (privateKey, password) => {
   const privateKeyObj = (await openpgp.key.readArmored(privateKey)).keys[0];
@@ -68,6 +71,9 @@ export const generateUser = async email => {
   return { email, password, masterPassword, ...keys };
 };
 
+export const generateUsers = async emails =>
+  Promise.all(emails.map(async email => await generateUser(email)));
+
 export const generateAnonymousEmail = () =>
   `anonymous_${randomId()}@caesar.team`;
 
@@ -89,4 +95,14 @@ export const base64ToObject = b64 => {
   } catch (ex) {
     return null;
   }
+};
+
+export const generateSeedAndVerifier = (email, password) => {
+  const seed = srp.getRandomSeed();
+  const verifier = srp.generateV(srp.generateX(seed, email, password));
+
+  return {
+    seed,
+    verifier,
+  };
 };

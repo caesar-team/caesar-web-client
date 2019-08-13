@@ -99,6 +99,9 @@ export const updateItem = (itemId, data) =>
 export const postCreateChildItem = (itemId, data) =>
   callApi.post(`/item/${itemId}/child_item`, data);
 
+export const postCreateChildItemBatch = data =>
+  callApi.post('item/batch/share', data);
+
 export const patchChildAccess = (childItemId, data) =>
   callApi.patch(`/child_item/${childItemId}/access`, data);
 
@@ -126,7 +129,12 @@ export const toggleFavorite = id => callApi.post(`/item/${id}/favorite`);
 
 export const getPublicKeyByEmail = email => callApi.get(`/key/${email}`);
 
+export const getPublicKeyByEmailBatch = data =>
+  callApi.post('/key/batch', data);
+
 export const postNewUser = data => callApi.post('/user', data);
+
+export const postNewUserBatch = data => callApi.post('/user/batch', data);
 
 export const postLoginPrepare = data =>
   callApi.post('/auth/srpp/login_prepare', data);
@@ -142,6 +150,8 @@ export const postChangePassword = data =>
 export const getCheckShare = id => callApi.get(`/anonymous/share/${id}/check`);
 
 export const postInvitation = data => callApi.post('/invitation', data);
+
+export const postInvitationBatch = data => callApi.post('/invitations', data);
 
 export const patchChildItemBatch = data =>
   callApi.patch('/child_item/batch', data);

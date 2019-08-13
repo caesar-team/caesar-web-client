@@ -18,7 +18,7 @@ import {
   INVITE_NEW_MEMBER_REQUEST,
   REMOVE_INVITE_REQUEST,
   SHARE_ITEM_REQUEST,
-  SHARE_ITEMS,
+  SHARE_ITEM_BATCH_REQUEST,
   REMOVE_SHARE_REQUEST,
   CREATE_ANONYMOUS_LINK_REQUEST,
   REMOVE_ANONYMOUS_LINK_REQUEST,
@@ -54,6 +54,9 @@ import {
   removeInviteMemberSuccess,
   removeInviteMemberFailure,
   shareItemSuccess,
+  shareItemFailure,
+  shareItemBatchSuccess,
+  shareItemBatchFailure,
   removeShareSuccess,
   removeShareFailure,
   createAnonymousLinkSuccess,
@@ -72,7 +75,6 @@ import {
   finishIsLoading,
   setWorkInProgressItem,
   setWorkInProgressListId,
-  shareItemFailure,
   removeItemsBatchSuccess,
   removeItemsBatchFailure,
 } from 'common/actions/node';
@@ -107,7 +109,9 @@ import {
   toggleFavorite,
   patchChildAccess,
   postCreateChildItem,
+  postCreateChildItemBatch,
   postInvitation,
+  postInvitationBatch,
   removeChildItem,
   patchChildItem,
   removeList,
@@ -138,7 +142,11 @@ import {
 import { generateInviteUrl, generateSharingUrl } from 'common/utils/sharing';
 import { uuid4 } from 'common/utils/uuid4';
 import { getWorkersCount } from 'common/utils/worker';
-import { createMemberSaga, getOrCreateMemberSaga } from './member';
+import {
+  createMemberSaga,
+  getOrCreateMemberSaga,
+  getOrCreateMemberBatchSaga,
+} from './member';
 
 const reorder = (list, startIndex, endIndex) => {
   const result = Array.from(list);
@@ -749,6 +757,102 @@ export function* shareItemSaga({ payload: { item, emails } }) {
   }
 }
 
+export function* shareItemBatchSaga({ payload: { items, emails } }) {
+  try {
+    const itemsById = yield select(itemsByIdSelector);
+
+    const sharedItems = items.map(itemId => itemsById[itemId]);
+
+    const members = yield call(getOrCreateMemberBatchSaga, {
+      payload: { emails, role: USER_ROLE },
+    });
+
+    const membersObj = members.reduce(
+      (accumulator, member) => ({
+        ...accumulator,
+        [member.userId]: member,
+      }),
+      {},
+    );
+
+    const data = [];
+    const invitations = [];
+
+    for (const item of sharedItems) {
+      const itemInvitedUsers = item.invited.map(({ userId }) => userId);
+
+      const users = members.filter(
+        user => !!user && !itemInvitedUsers.includes(user.userId),
+      );
+
+      const userKeys = users.map(({ publicKey }) => publicKey);
+
+      const invitedEncryptedSecrets = yield call(
+        encryptItemForUsers,
+        item.secret,
+        userKeys,
+      );
+
+      const invitedChildItems = invitedEncryptedSecrets.map((secret, idx) => ({
+        secret,
+        userId: users[idx].userId,
+        access: PERMISSION_READ,
+        cause: INVITE_TYPE,
+      }));
+
+      data.push({
+        originalItem: item.id,
+        items: invitedChildItems,
+      });
+
+      invitations.push(
+        ...users
+          .filter(({ isNew }) => !!isNew)
+          .map(({ email, password, masterPassword }) => ({
+            email,
+            url: generateInviteUrl(
+              objectToBase64({
+                e: email,
+                p: password,
+                mp: masterPassword,
+              }),
+            ),
+          })),
+      );
+    }
+
+    const {
+      data: { shares },
+    } = yield call(postCreateChildItemBatch, {
+      originalItems: data,
+    });
+
+    yield call(postInvitationBatch, { messages: invitations });
+
+    const invited = shares.reduce(
+      (accumulator, { originalItemId, items: childItems }) => [
+        ...accumulator,
+        {
+          itemId: originalItemId,
+          invited: childItems.map(({ id, userId, lastUpdated }) => ({
+            id,
+            updatedAt: lastUpdated,
+            userId,
+            email: membersObj[userId].email,
+            access: PERMISSION_READ,
+          })),
+        },
+      ],
+      [],
+    );
+
+    yield put(shareItemBatchSuccess(invited));
+  } catch (error) {
+    console.log(error);
+    yield put(shareItemBatchFailure());
+  }
+}
+
 export function* removeShareSaga({ payload: { shareId } }) {
   try {
     const workInProgressItem = yield select(workInProgressItemSelector);
@@ -936,81 +1040,6 @@ export function* moveItemsBatchSaga({ payload: { oldListId, newListId } }) {
   }
 }
 
-export function* shareItemsSaga({ payload: { emails } }) {
-  try {
-    const workInProgressItemIds = yield select(workInProgressItemIdsSelector);
-    const itemsById = yield select(itemsByIdSelector);
-
-    const sharedItems = workInProgressItemIds.map(itemId => itemsById[itemId]);
-
-    for (const item of sharedItems) {
-      const response = yield all(
-        emails.map(email =>
-          call(getOrCreateMemberSaga, { payload: { email, role: USER_ROLE } }),
-        ),
-      );
-
-      const itemInvitedUsers = item.invited.map(({ userId }) => userId);
-
-      const users = response.filter(
-        user => !!user && !itemInvitedUsers.includes(user.userId),
-      );
-
-      const userKeys = users.map(({ publicKey }) => publicKey);
-
-      const invitedEncryptedSecrets = yield call(
-        encryptItemForUsers,
-        item.secret,
-        userKeys,
-      );
-
-      const invitedChildItems = invitedEncryptedSecrets.map((secret, idx) => ({
-        secret,
-        userId: users[idx].userId,
-        access: PERMISSION_READ,
-        cause: INVITE_TYPE,
-      }));
-
-      let invited = [];
-
-      if (invitedChildItems.length) {
-        const {
-          data: { items },
-        } = yield call(postCreateChildItem, item.id, {
-          items: invitedChildItems,
-        });
-
-        invited = items.map(({ id, lastUpdatedAt }, idx) => ({
-          id,
-          updatedAt: lastUpdatedAt,
-          userId: users[idx].userId,
-          email: users[idx].email,
-          access: PERMISSION_READ,
-        }));
-
-        const invitations = users
-          .filter(({ isNew }) => !!isNew)
-          .map(({ email, password, masterPassword }) => ({
-            email,
-            url: generateInviteUrl(
-              objectToBase64({
-                e: email,
-                p: password,
-                mp: masterPassword,
-              }),
-            ),
-          }));
-
-        yield all(invitations.map(invitation => postInvitation(invitation)));
-      }
-
-      yield put(shareItemSuccess(item.id, invited));
-    }
-  } catch (error) {
-    console.log(error);
-  }
-}
-
 export function* nodeSagas() {
   yield takeLatest(FETCH_NODES_REQUEST, fetchNodesSaga);
   yield takeLatest(REMOVE_ITEM_REQUEST, removeItemSaga);
@@ -1019,6 +1048,8 @@ export function* nodeSagas() {
   yield takeLatest(MOVE_ITEMS_BATCH_REQUEST, moveItemsBatchSaga);
   yield takeLatest(CREATE_ITEM_REQUEST, createItemSaga);
   yield takeLatest(CREATE_ITEMS_BATCH_REQUEST, createItemsBatchSaga);
+  yield takeLatest(SHARE_ITEM_REQUEST, shareItemSaga);
+  yield takeLatest(SHARE_ITEM_BATCH_REQUEST, shareItemBatchSaga);
   yield takeLatest(EDIT_ITEM_REQUEST, editItemSaga);
   yield takeLatest(ACCEPT_ITEM_UPDATE_REQUEST, acceptItemSaga);
   yield takeLatest(REJECT_ITEM_UPDATE_REQUEST, rejectItemSaga);
@@ -1027,7 +1058,6 @@ export function* nodeSagas() {
   yield takeLatest(INVITE_MEMBER_REQUEST, inviteMemberSaga);
   yield takeLatest(INVITE_NEW_MEMBER_REQUEST, inviteNewMemberSaga);
   yield takeLatest(REMOVE_INVITE_REQUEST, removeInviteMemberSaga);
-  yield takeLatest(SHARE_ITEM_REQUEST, shareItemSaga);
   yield takeLatest(REMOVE_SHARE_REQUEST, removeShareSaga);
   yield takeLatest(CREATE_ANONYMOUS_LINK_REQUEST, createAnonymousLinkSaga);
   yield takeLatest(REMOVE_ANONYMOUS_LINK_REQUEST, removeAnonymousLinkSaga);
@@ -1035,5 +1065,4 @@ export function* nodeSagas() {
   yield takeLatest(EDIT_LIST_REQUEST, editListSaga);
   yield takeLatest(REMOVE_LIST_REQUEST, removeListSaga);
   yield takeLatest(SORT_LIST_REQUEST, sortListSaga);
-  yield takeLatest(SHARE_ITEMS, shareItemsSaga);
 }

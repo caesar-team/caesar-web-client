@@ -45,7 +45,7 @@ const BottomWrapper = styled.div`
 const TwoFactorCreateForm = ({ qr, code, onClickNext }) => (
   <Wrapper>
     <AuthTitle>Two Factor Authentication</AuthTitle>
-    <AuthDescription>Scan the QR code above</AuthDescription>
+    <AuthDescription>Scan the QR code in 2FA app</AuthDescription>
     <QrCodeImage src={qr} />
     <AuthDescription>
       or manually enter the key in the application:

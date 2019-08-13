@@ -69,4 +69,5 @@ export { ProgressBar } from './ProgressBar';
 export { Toggle } from './Toggle';
 export { RangeInput } from './RangeInput';
 export { PasswordIndicator } from './PasswordIndicator';
+export { PasswordGenerator } from './PasswordGenerator';
 export { TagsInput } from './TagsInput';

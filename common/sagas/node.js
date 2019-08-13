@@ -767,10 +767,13 @@ export function* shareItemBatchSaga({ payload: { items, emails } }) {
       payload: { emails, role: USER_ROLE },
     });
 
-    const membersObj = members.reduce((accumulator, member) => ({
-      ...accumulator,
-      [member.userId]: member,
-    }));
+    const membersObj = members.reduce(
+      (accumulator, member) => ({
+        ...accumulator,
+        [member.userId]: member,
+      }),
+      {},
+    );
 
     const data = [];
     const invitations = [];
@@ -831,9 +834,9 @@ export function* shareItemBatchSaga({ payload: { items, emails } }) {
         ...accumulator,
         {
           itemId: originalItem,
-          invited: childItems.map(({ id, userId, lastUpdatedAt }) => ({
+          invited: childItems.map(({ id, userId, lastUpdated }) => ({
             id,
-            updatedAt: lastUpdatedAt,
+            updatedAt: lastUpdated,
             userId,
             email: membersObj[userId].email,
             access: PERMISSION_READ,

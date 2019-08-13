@@ -31,8 +31,6 @@ const AvatarsList = ({
   const invisibleCount = avatars.length - visibleAvatars.length;
   const shouldShowLast = invisibleCount > 0;
 
-  console.log('avatars', avatars);
-
   const renderedAvatars = visibleAvatars
     .map(({ name, email, avatar }, index) => (
       <StyledAvatar

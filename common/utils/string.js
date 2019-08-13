@@ -9,3 +9,7 @@ export function truncate(str, length, ending = '...') {
 
   return str;
 }
+
+export function textSize(text) {
+  return new TextEncoder('utf-8').encode(text).length;
+}

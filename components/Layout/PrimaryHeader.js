@@ -1,4 +1,4 @@
-import React, { Component, Fragment } from 'react';
+import React, { PureComponent, Fragment } from 'react';
 import styled from 'styled-components';
 import Link from 'next/link';
 import { Icon } from '../Icon';
@@ -98,7 +98,7 @@ const Options = (
   </Fragment>
 );
 
-export class Header extends Component {
+class PrimaryHeader extends PureComponent {
   state = {
     isDropdownOpened: false,
   };
@@ -122,7 +122,7 @@ export class Header extends Component {
     return (
       <Wrapper>
         <LeftWrapper withBorder={withSearch}>
-          <Logo />
+          <Logo href="/" />
         </LeftWrapper>
         {!!user && (
           <RightWrapper>
@@ -150,3 +150,5 @@ export class Header extends Component {
     );
   }
 }
+
+export default PrimaryHeader;

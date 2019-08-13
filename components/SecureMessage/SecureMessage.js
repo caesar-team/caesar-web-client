@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { Component, Fragment } from 'react';
 import styled from 'styled-components';
 import { match } from 'common/utils/match';
 import { encryptByPassword } from 'common/utils/cipherUtils';
@@ -70,6 +70,7 @@ class SecureMessage extends Component {
   };
 
   render() {
+    const { withScroll = false, className } = this.props;
     const { step, password, link } = this.state;
 
     const renderedStep = match(
@@ -89,12 +90,14 @@ class SecureMessage extends Component {
       null,
     );
 
+    const ContentWrapperComponent = withScroll ? Scrollbar : Fragment;
+
     return (
-      <Wrapper>
-        <Scrollbar>
+      <Wrapper className={className}>
+        <ContentWrapperComponent>
           <Title>Caesar Secure Message</Title>
           {renderedStep}
-        </Scrollbar>
+        </ContentWrapperComponent>
       </Wrapper>
     );
   }

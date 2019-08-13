@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import styled from 'styled-components';
 import copy from 'copy-text-to-clipboard';
-import { Icon, Label } from 'components';
+import { Icon, Label, HoldClickBehaviour } from 'components';
 import {
   Wrapper,
   Row,
@@ -47,9 +47,9 @@ class Credentials extends Component {
     isPasswordVisible: false,
   };
 
-  handleTogglePasswordVisibility = () => {
-    this.setState(prevState => ({
-      isPasswordVisible: !prevState.isPasswordVisible,
+  handleToggleVisibility = visible => () => {
+    this.setState(() => ({
+      isPasswordVisible: visible,
     }));
   };
 
@@ -64,7 +64,7 @@ class Credentials extends Component {
     const fieldText = field === 'login' ? 'Login' : 'Password';
 
     notification.show({
-      text: `${fieldText} has copied.`,
+      text: `The ${fieldText} has copied.`,
     });
   };
 
@@ -124,12 +124,12 @@ class Credentials extends Component {
               <FieldValue>
                 <FixedSizeField>{pwd}</FixedSizeField>
                 <Row>
-                  <StyledEyeIcon
-                    name={eyeIconName}
-                    width={20}
-                    height={20}
-                    onClick={this.handleTogglePasswordVisibility}
-                  />
+                  <HoldClickBehaviour
+                    onHoldStart={this.handleToggleVisibility(true)}
+                    onHoldEnd={this.handleToggleVisibility(false)}
+                  >
+                    <StyledEyeIcon name={eyeIconName} width={20} height={20} />
+                  </HoldClickBehaviour>
                   <StyledIcon
                     name="copy"
                     width={19}

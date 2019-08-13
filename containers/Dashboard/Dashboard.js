@@ -9,12 +9,13 @@ import {
   SearchList,
   InviteModal,
   ShareModal,
+  MoveModal,
   ConfirmModal,
   MenuList,
   withNotification,
   DashboardLayout,
   SecureMessage,
-  TextLoader,
+  FullScreenLoader,
 } from 'components';
 import {
   ITEM_REVIEW_MODE,
@@ -73,12 +74,14 @@ class DashboardContainer extends Component {
   componentDidMount() {
     this.props.fetchUserSelfRequest();
     this.props.fetchKeyPairRequest();
-    this.props.fetchNodesRequest();
-    this.props.fetchMembersRequest();
-  }
 
-  componentWillUnmount() {
-    this.props.resetStore();
+    // TODO: added checkpoint for situation when
+    // TODO: 1) we dont have items and we need to load and decrypt them
+    // TODO: 2) we have not decrypted items and we need just to decrypt them
+    // TODO: 3) we have encrypted items we need to do nothing
+    // withItemsDecryption = true
+    this.props.fetchNodesRequest(true);
+    this.props.fetchMembersRequest();
   }
 
   handleClickMenuItem = id => () => {
@@ -125,10 +128,10 @@ class DashboardContainer extends Component {
   };
 
   handleRemoveItem = () => {
-    const { workInProgressItemIds } = this.props;
+    const { workInProgressItemIds, workInProgressList } = this.props;
 
     if (workInProgressItemIds.length > 0) {
-      this.props.removeItems();
+      this.props.removeItemsBatchRequest(workInProgressList.id);
       this.props.resetWorkInProgressItemIds();
     } else {
       this.props.removeItemRequest(
@@ -142,10 +145,13 @@ class DashboardContainer extends Component {
   };
 
   handleMoveToTrash = () => {
-    const { workInProgressItemIds } = this.props;
+    const { workInProgressItemIds, workInProgressList } = this.props;
 
     if (workInProgressItemIds.length > 0) {
-      this.props.moveItems(this.props.listsByType.trash.id);
+      this.props.moveItemsBatchRequest(
+        workInProgressList.id,
+        this.props.listsByType.trash.id,
+      );
       this.props.resetWorkInProgressItemIds();
     } else {
       this.props.moveItemRequest(this.props.listsByType.trash.id);
@@ -245,9 +251,13 @@ class DashboardContainer extends Component {
     this.props.removeShareRequest(shareId);
   };
 
-  handleClickMoveItems = (_, listId) => {
-    this.props.moveItems(listId);
+  handleClickMoveItems = listId => {
+    const { workInProgressList } = this.props;
+
+    this.props.moveItemsBatchRequest(workInProgressList.id, listId);
     this.props.resetWorkInProgressItemIds();
+
+    this.handleCloseModal('move')();
   };
 
   handleOpenModal = modal => () => {
@@ -323,7 +333,7 @@ class DashboardContainer extends Component {
     }
   }
 
-  handleCtrlSelectionItemBehaviour(itemId) {
+  handleCtrlSelectionItemBehaviour = itemId => {
     const { workInProgressItemIds } = this.props;
 
     const ids = workInProgressItemIds.includes(itemId)
@@ -332,7 +342,7 @@ class DashboardContainer extends Component {
 
     this.props.setWorkInProgressItem(null);
     this.props.setWorkInProgressItemIds(ids);
-  }
+  };
 
   handleDefaultSelectionItemBehaviour(itemId) {
     this.props.resetWorkInProgressItemIds();
@@ -387,6 +397,7 @@ class DashboardContainer extends Component {
       lists,
       listsByType,
       visibleListItems,
+      workInProgressItems,
       itemsById,
       isLoading,
       trashList,
@@ -395,7 +406,7 @@ class DashboardContainer extends Component {
     const { mode, modals, searchedText } = this.state;
 
     if (isLoading) {
-      return <TextLoader />;
+      return <FullScreenLoader />;
     }
 
     const searchedItems = this.filter(Object.values(itemsById), searchedText);
@@ -428,13 +439,16 @@ class DashboardContainer extends Component {
               <MenuList
                 mode={mode}
                 workInProgressList={workInProgressList}
-                lists={listsByType}
+                inbox={listsByType.inbox}
+                favorites={listsByType.favorites}
+                list={listsByType.list}
+                trash={listsByType.trash}
                 onClick={this.handleClickMenuItem}
                 onClickSecureMessage={this.handleClickSecureMessage}
               />
             </Sidebar>
             {isSecureMessageMode ? (
-              <SecureMessage />
+              <SecureMessage withScroll />
             ) : (
               <Fragment>
                 <MiddleColumnWrapper>
@@ -442,9 +456,8 @@ class DashboardContainer extends Component {
                     <MultiItem
                       isTrashItems={isTrashList}
                       workInProgressItemIds={workInProgressItemIds}
-                      allLists={lists}
                       areAllItemsSelected={areAllItemsSelected}
-                      onClickMove={this.handleClickMoveItems}
+                      onClickMove={this.handleOpenModal('move')}
                       onClickMoveToTrash={this.handleOpenModal('moveToTrash')}
                       onClickRemove={this.handleOpenModal('removeItem')}
                       onClickShare={this.handleOpenModal('share')}
@@ -520,6 +533,15 @@ class DashboardContainer extends Component {
             onDeactivateSharedByLink={this.handleDeactivateShareByLink}
             onCancel={this.handleCloseModal('share')}
             notification={notification}
+          />
+        )}
+        {modals.move && (
+          <MoveModal
+            lists={lists}
+            items={workInProgressItems}
+            onMove={this.handleClickMoveItems}
+            onCancel={this.handleCloseModal('move')}
+            onRemove={this.handleCtrlSelectionItemBehaviour}
           />
         )}
         <ConfirmModal

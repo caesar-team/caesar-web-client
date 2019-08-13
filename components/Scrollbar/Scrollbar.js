@@ -1,7 +1,7 @@
 import React from 'react';
 import { Scrollbars } from 'react-custom-scrollbars';
 
-const Scrollbar = ({ children, className, style, ...restProps }) => (
+const Scrollbar = ({ children, className, style, customRef, ...restProps }) => (
   <Scrollbars
     style={style}
     className={className}
@@ -17,6 +17,7 @@ const Scrollbar = ({ children, className, style, ...restProps }) => (
     renderThumbVertical={props => (
       <div {...props} style={{ display: 'none' }} />
     )}
+    ref={customRef}
     {...restProps}
   >
     {children}

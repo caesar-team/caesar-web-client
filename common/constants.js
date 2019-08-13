@@ -16,6 +16,7 @@ export const {
 export const PORTAL_ID = 'portal';
 export const DEFAULT_IDLE_TIMEOUT = 5 * 60 * 1000;
 export const MAX_SIZE_RANDOM_BUFFER = 60000;
+export const WORKER_DECRYPTION_BUFFER_SIZE = 10;
 
 export const ROOT_TYPE = 'root';
 export const INBOX_TYPE = 'inbox';
@@ -60,6 +61,11 @@ export const ITEM_TYPES = {
   ITEM_CREDENTIALS_TYPE,
   ITEM_CREDIT_CARD_TYPE,
   ITEM_DOCUMENT_TYPE,
+};
+
+export const ITEM_ICON_TYPES = {
+  [ITEM_CREDENTIALS_TYPE]: 'key',
+  [ITEM_DOCUMENT_TYPE]: 'securenote',
 };
 
 export const KEY_CODES = {

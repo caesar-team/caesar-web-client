@@ -4,16 +4,19 @@ self.window = self;
 const openpgp = require('openpgp');
 const constants = require('../common/constants');
 
-const { MAX_SIZE_RANDOM_BUFFER } = constants;
+const { MAX_SIZE_RANDOM_BUFFER, API_URI } = constants;
 
 let randomQueue = [];
 
 function randomCallback() {
   if (!randomQueue.length) {
-    window.postMessage({
-      event: 'request-seed',
-      amount: MAX_SIZE_RANDOM_BUFFER,
-    });
+    window.postMessage(
+      {
+        event: 'request-seed',
+        amount: MAX_SIZE_RANDOM_BUFFER,
+      },
+      API_URI,
+    );
   }
 
   return new Promise(resolve => {

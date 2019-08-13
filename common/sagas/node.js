@@ -4,9 +4,11 @@ import deepequal from 'fast-deep-equal';
 import {
   FETCH_NODES_REQUEST,
   REMOVE_ITEM_REQUEST,
+  REMOVE_ITEMS_BATCH_REQUEST,
   MOVE_ITEM_REQUEST,
-  MOVE_ITEMS,
+  MOVE_ITEMS_BATCH_REQUEST,
   CREATE_ITEM_REQUEST,
+  CREATE_ITEMS_BATCH_REQUEST,
   EDIT_ITEM_REQUEST,
   ACCEPT_ITEM_UPDATE_REQUEST,
   REJECT_ITEM_UPDATE_REQUEST,
@@ -15,7 +17,6 @@ import {
   INVITE_MEMBER_REQUEST,
   INVITE_NEW_MEMBER_REQUEST,
   REMOVE_INVITE_REQUEST,
-  REMOVE_ITEMS,
   SHARE_ITEM_REQUEST,
   SHARE_ITEMS,
   REMOVE_SHARE_REQUEST,
@@ -31,8 +32,12 @@ import {
   removeItemFailure,
   moveItemSuccess,
   moveItemFailure,
+  moveItemsBatchSuccess,
+  moveItemsBatchFailure,
   createItemSuccess,
   createItemFailure,
+  createItemsBatchSuccess,
+  createItemsBatchFailure,
   editItemSuccess,
   editItemFailure,
   acceptItemUpdateSuccess,
@@ -63,10 +68,13 @@ import {
   removeListFailure,
   sortListSuccess,
   sortListFailure,
-  addItem,
+  addItems,
+  finishIsLoading,
   setWorkInProgressItem,
   setWorkInProgressListId,
   shareItemFailure,
+  removeItemsBatchSuccess,
+  removeItemsBatchFailure,
 } from 'common/actions/node';
 import { normalizeNodes } from 'common/normalizers/node';
 import {
@@ -76,20 +84,22 @@ import {
 } from 'common/selectors/user';
 import { memberListSelector } from 'common/selectors/member';
 import {
-  defaultListSelector,
+  favoriteListSelector,
   workInProgressItemSelector,
   workInProgressItemIdsSelector,
   favoritesSelector,
   parentListSelector,
   sortedCustomizableListsSelector,
   itemsByIdSelector,
-  selectableListsSelector,
 } from 'common/selectors/node';
 import {
   getList,
   removeItem,
+  removeItemsBatch,
   updateMoveItem,
+  updateMoveItemsBatch,
   postCreateItem,
+  postCreateItemsBatch,
   updateItem,
   patchChildItemBatch,
   acceptUpdateItem,
@@ -108,6 +118,7 @@ import {
 import DecryptWorker from 'common/decryption.worker.js';
 import {
   encryptItem,
+  encryptItemsBatch,
   encryptItemForUsers,
   getPrivateKeyObj,
   decryptItem,
@@ -125,6 +136,8 @@ import {
   USER_ROLE,
 } from 'common/constants';
 import { generateInviteUrl, generateSharingUrl } from 'common/utils/sharing';
+import { uuid4 } from 'common/utils/uuid4';
+import { getWorkersCount } from 'common/utils/worker';
 import { createMemberSaga, getOrCreateMemberSaga } from './member';
 
 const reorder = (list, startIndex, endIndex) => {
@@ -137,15 +150,39 @@ const reorder = (list, startIndex, endIndex) => {
 
 const fixSort = lists => lists.map((list, index) => ({ ...list, sort: index }));
 
-function createWebWorkerChannel(data) {
-  const worker = new DecryptWorker();
+const chunk = (input, size) => {
+  return input.reduce((arr, item, idx) => {
+    return idx % size === 0
+      ? [...arr, [item]]
+      : [...arr.slice(0, -1), [...arr.slice(-1)[0], item]];
+  }, []);
+};
 
-  worker.postMessage({ event: `decryptItems_${data.listId}`, data });
+const objectToArray = obj => Object.values(obj);
+
+const arrayToObject = arr =>
+  arr.reduce((accumulator, item) => ({ ...accumulator, [item.id]: item }), {});
+
+const getWorkerEvents = workerId => ({
+  eventToWorker: `decryptItems_${workerId}`,
+  eventFromWorker: `emitDecryptedItems_${workerId}`,
+});
+
+function createWebWorkerChannel(data) {
+  const workerId = uuid4();
+  const worker = new DecryptWorker();
+  const workerEvents = getWorkerEvents(workerId);
+
+  worker.postMessage({
+    event: workerEvents.eventToWorker,
+    data: { events: workerEvents, ...data },
+  });
 
   return eventChannel(emitter => {
-    worker.onmessage = ({ data: { event, item } }) => {
-      if (event === `emitDecryptedItem_${data.listId}`) {
-        emitter(item);
+    // eslint-disable-next-line
+    worker.onmessage = ({ data: { event, items } }) => {
+      if (event === workerEvents.eventFromWorker) {
+        emitter(items);
       }
     };
 
@@ -153,29 +190,33 @@ function createWebWorkerChannel(data) {
   });
 }
 
-export function* decryptSaga({ listId, items }) {
+export function* decryptionSaga(itemsById) {
   const keyPair = yield select(keyPairSelector);
   const masterPassword = yield select(masterPasswordSelector);
 
   const channel = yield call(createWebWorkerChannel, {
-    listId,
-    items,
+    items: objectToArray(itemsById).map(({ id, secret }) => ({ id, secret })),
     privateKey: keyPair.privateKey,
     masterPassword,
   });
 
   while (channel) {
     try {
-      const item = yield take(channel);
+      const decryptedItems = yield take(channel);
 
-      yield put(addItem(item));
+      const preparedItems = decryptedItems.map(({ id, secret }) => ({
+        ...itemsById[id],
+        secret,
+      }));
+
+      yield put(addItems(preparedItems));
     } catch (error) {
       console.log(error);
     }
   }
 }
 
-export function* fetchNodesSaga() {
+export function* fetchNodesSaga({ payload: { withItemsDecryption } }) {
   try {
     const { data } = yield call(getList);
 
@@ -183,18 +224,31 @@ export function* fetchNodesSaga() {
 
     yield put(fetchNodesSuccess(listsById));
 
-    const defaultList = yield select(defaultListSelector);
+    const favoriteList = yield select(favoriteListSelector);
 
-    yield put(setWorkInProgressListId(defaultList.id));
+    yield put(setWorkInProgressListId(favoriteList.id));
 
-    const selectableLists = yield select(selectableListsSelector);
+    if (withItemsDecryption) {
+      const items = objectToArray(itemsById);
 
-    const lists = selectableLists.map(({ id, children }) => ({
-      listId: id,
-      items: children.map(({ id: itemId }) => itemsById[itemId]),
-    }));
+      if (items.length) {
+        const preparedItems = items.sort(
+          (a, b) => Number(b.favorite) - Number(a.favorite),
+        );
+        const poolSize = getWorkersCount();
+        const chunks = chunk(preparedItems, Math.ceil(items.length / poolSize));
 
-    yield all(lists.map(list => call(decryptSaga, list)));
+        yield all(
+          chunks.map(chunkItems =>
+            call(decryptionSaga, arrayToObject(chunkItems)),
+          ),
+        );
+      } else {
+        yield put(finishIsLoading());
+      }
+    } else {
+      yield put(addItems(Object.values(itemsById)));
+    }
   } catch (error) {
     console.log(error);
 
@@ -210,6 +264,21 @@ export function* removeItemSaga({ payload: { itemId, listId } }) {
     console.log(error);
 
     yield put(removeItemFailure());
+  }
+}
+
+export function* removeItemsBatchSaga({ payload: { listId } }) {
+  try {
+    const workInProgressItemIds = yield select(workInProgressItemIdsSelector);
+
+    yield call(
+      removeItemsBatch,
+      workInProgressItemIds.map(id => `items[]=${id}`).join('&'),
+    );
+    yield put(removeItemsBatchSuccess(workInProgressItemIds, listId));
+  } catch (error) {
+    console.log(error);
+    yield put(removeItemsBatchFailure());
   }
 }
 
@@ -273,6 +342,53 @@ export function* createItemSaga({
     yield put(createItemFailure());
   } finally {
     setSubmitting(false);
+  }
+}
+
+export function* createItemsBatchSaga({ payload: { items, listId } }) {
+  try {
+    const keyPair = yield select(keyPairSelector);
+    const user = yield select(userDataSelector);
+
+    const preparedForEncryptingItems = items.map(
+      ({ attachments, type, ...secret }) => ({
+        attachments,
+        ...secret,
+      }),
+    );
+
+    const encryptedItems = yield call(
+      encryptItemsBatch,
+      preparedForEncryptingItems,
+      keyPair.publicKey,
+    );
+
+    const preparedForRequestItems = items.map(({ type }, index) => ({
+      type,
+      listId,
+      secret: encryptedItems[index],
+    }));
+
+    const { data } = yield call(postCreateItemsBatch, preparedForRequestItems);
+
+    const preparedForStoreItems = data.map((item, index) => ({
+      id: item.id,
+      listId,
+      lastUpdated: item.lastUpdated,
+      favorite: false,
+      invited: [],
+      shared: [],
+      tags: [],
+      owner: user,
+      secret: preparedForEncryptingItems[index],
+      type: items[index].type,
+    }));
+
+    yield put(createItemsBatchSuccess(preparedForStoreItems));
+  } catch (error) {
+    console.log(error);
+
+    yield put(createItemsBatchFailure());
   }
 }
 
@@ -800,40 +916,23 @@ export function* sortListSaga({
   }
 }
 
-export function* moveItemsSaga({ payload: { listId } }) {
+export function* moveItemsBatchSaga({ payload: { oldListId, newListId } }) {
   try {
     const workInProgressItemIds = yield select(workInProgressItemIdsSelector);
-    const itemsById = yield select(itemsByIdSelector);
 
-    const items = workInProgressItemIds.map(itemId => itemsById[itemId]);
-    const movingItems = items.filter(item => item.listId !== listId);
-
-    if (movingItems.length > 0) {
-      yield all(
-        movingItems.map(item => call(updateMoveItem, item.id, { listId })),
+    if (workInProgressItemIds.length > 0) {
+      yield call(
+        updateMoveItemsBatch,
+        { items: workInProgressItemIds },
+        newListId,
       );
-      yield all(
-        movingItems.map(item =>
-          put(moveItemSuccess(item.id, item.listId, listId)),
-        ),
+      yield put(
+        moveItemsBatchSuccess(workInProgressItemIds, oldListId, newListId),
       );
     }
   } catch (error) {
     console.log(error);
-  }
-}
-
-export function* removeItemsSaga() {
-  try {
-    const workInProgressItemIds = yield select(workInProgressItemIdsSelector);
-    const itemsById = yield select(itemsByIdSelector);
-
-    const items = workInProgressItemIds.map(itemId => itemsById[itemId]);
-
-    yield all(items.map(item => call(removeItem, item.id)));
-    yield all(items.map(item => put(removeItemSuccess(item.id, item.listId))));
-  } catch (error) {
-    console.log(error);
+    yield put(moveItemsBatchFailure());
   }
 }
 
@@ -915,8 +1014,11 @@ export function* shareItemsSaga({ payload: { emails } }) {
 export function* nodeSagas() {
   yield takeLatest(FETCH_NODES_REQUEST, fetchNodesSaga);
   yield takeLatest(REMOVE_ITEM_REQUEST, removeItemSaga);
+  yield takeLatest(REMOVE_ITEMS_BATCH_REQUEST, removeItemsBatchSaga);
   yield takeLatest(MOVE_ITEM_REQUEST, moveItemSaga);
+  yield takeLatest(MOVE_ITEMS_BATCH_REQUEST, moveItemsBatchSaga);
   yield takeLatest(CREATE_ITEM_REQUEST, createItemSaga);
+  yield takeLatest(CREATE_ITEMS_BATCH_REQUEST, createItemsBatchSaga);
   yield takeLatest(EDIT_ITEM_REQUEST, editItemSaga);
   yield takeLatest(ACCEPT_ITEM_UPDATE_REQUEST, acceptItemSaga);
   yield takeLatest(REJECT_ITEM_UPDATE_REQUEST, rejectItemSaga);
@@ -933,7 +1035,5 @@ export function* nodeSagas() {
   yield takeLatest(EDIT_LIST_REQUEST, editListSaga);
   yield takeLatest(REMOVE_LIST_REQUEST, removeListSaga);
   yield takeLatest(SORT_LIST_REQUEST, sortListSaga);
-  yield takeLatest(MOVE_ITEMS, moveItemsSaga);
-  yield takeLatest(REMOVE_ITEMS, removeItemsSaga);
   yield takeLatest(SHARE_ITEMS, shareItemsSaga);
 }

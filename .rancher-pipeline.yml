@@ -7,14 +7,46 @@ stages:
       tag: caesarteam/caesar-web-client:${CICD_GIT_BRANCH}
       pushRemote: true
       registry: index.docker.io
+    when:
+      branch:
+        include:
+        - develop
+        - hotfix/*
+  - publishImageConfig:
+      dockerfilePath: ./Dockerfile
+      buildContext: .
+      tag: caesarteam/caesar-web-client:${CICD_GIT_TAG}
+      pushRemote: true
+      registry: index.docker.io
+    when:
+      event:
+        include:
+        - tag
 - name: Deploy
   steps:
   - applyYamlConfig:
       path: ./deploy/deployment.yaml
-branch:
-  include:
-  - develop
-  - master
+    when:
+      branch:
+        include:
+        - develop
+        - hotfix/*
+- name: Webhook
+  steps:
+  - runScriptConfig:
+      image: caesarteam/alpine-curl
+      shellScript: 'curl -X POST -H "Content-Type: application/json" --header "Authorization: Basic ${!WEBHOOK_TOKEN}" -d ''{"name": "caesarteam/caesar-web-client","tag": "${!CICD_GIT_TAG}"}'' ${WEBHOOK_URL}'
+    envFrom:
+    - sourceName: build-webhook
+      sourceKey: WEBHOOK_URL
+      targetKey: WEBHOOK_URL
+    - sourceName: build-webhook
+      sourceKey: WEBHOOK_TOKEN
+      targetKey: WEBHOOK_TOKEN
+  when:
+    event:
+      include:
+      - tag
 notification:
   recipients:
   - recipient: '#pipeline'

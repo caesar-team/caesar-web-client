@@ -4,8 +4,13 @@ import { withRouter } from 'next/router';
 import { matchStrict } from 'common/utils/match';
 import { parseFile } from 'common/utils/importUtils';
 import { encryptItem } from 'common/utils/cipherUtils';
-import { getKeys, postCreateItem, getList } from 'common/api';
-import { ITEM_CREDENTIALS_TYPE, ITEM_DOCUMENT_TYPE } from 'common/constants';
+import { getKeys, postCreateItemsBatch, getList } from 'common/api';
+import {
+  ITEM_CREDENTIALS_TYPE,
+  ITEM_DOCUMENT_TYPE,
+  LIST_TYPE,
+  TRASH_TYPE,
+} from 'common/constants';
 import { NavigationPanel } from 'components';
 import { FileStep, FieldsStep, DataStep, ImportingStep } from './Steps';
 import {
@@ -69,6 +74,18 @@ const pick = (object, keys) =>
     return accumulator;
   }, {});
 
+const getSelectableLists = lists =>
+  lists
+    .reduce(
+      (accumulator, list) => [
+        ...accumulator,
+        list.type === LIST_TYPE ? list.children : list,
+      ],
+      [],
+    )
+    .flat()
+    .filter(list => list.type !== TRASH_TYPE);
+
 const DOCUMENT_TYPE_FIELDS = ['name', 'note'];
 const CREDENTIALS_TYPE_FIELDS = ['name', 'login', 'pass', 'website', 'note'];
 
@@ -82,7 +99,7 @@ class Import extends Component {
         data: { publicKey },
       } = await getKeys();
 
-      this.inboxListId = list[0].id;
+      this.lists = getSelectableLists(list);
       this.publicKey = publicKey;
     } catch (error) {
       console.log(error);
@@ -105,7 +122,7 @@ class Import extends Component {
     });
   };
 
-  handleFinishDataStep = async values => {
+  handleFinishDataStep = async (listId, values) => {
     const omittedFields = ['index'];
     const cleared = values.map(row => {
       const keys = Object.keys(row);
@@ -123,7 +140,7 @@ class Import extends Component {
         currentStep: IMPORTING_STEP,
       },
       () => {
-        this.importing(cleared);
+        this.importing(listId, cleared);
       },
     );
   };
@@ -142,7 +159,7 @@ class Import extends Component {
     this.setState(this.prepareInitialState());
   };
 
-  async importing(data) {
+  async importing(listId, data) {
     const prepared = await Promise.all(
       data.map(async ({ type, ...secret }, index) => {
         const encryptedSecret = await encryptItem(
@@ -157,7 +174,7 @@ class Import extends Component {
 
         const item = {
           type,
-          listId: this.inboxListId,
+          listId,
           secret: encryptedSecret,
         };
 
@@ -170,8 +187,7 @@ class Import extends Component {
     );
 
     try {
-      // TODO: change this to batch post request
-      await Promise.all(prepared.map(postCreateItem));
+      await postCreateItemsBatch({ items: prepared });
 
       this.setState({
         progress: 1,
@@ -210,6 +226,7 @@ class Import extends Component {
         ),
         DATA_STEP: (
           <DataStep
+            lists={this.lists}
             data={normalizeData(data.rows, matchings)}
             headings={matchings}
             onSubmit={this.handleFinishDataStep}

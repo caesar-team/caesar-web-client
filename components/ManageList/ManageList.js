@@ -123,8 +123,11 @@ class ManageList extends Component {
       onClickRemoveList = Function.prototype,
     } = this.props;
 
-    const generateAvatars = invitedIds =>
-      invitedIds.map(item => members[item.userId]);
+    const generateAvatars = invites => {
+      const invitedUserIds = [...new Set(invites.map(invite => invite.userId))];
+
+      return invitedUserIds.map(userId => members[userId]);
+    };
 
     const filteredList = lists.filter(
       ({ label }) => label !== DEFAULT_LIST_TYPE,

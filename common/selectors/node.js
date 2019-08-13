@@ -43,12 +43,6 @@ export const workInProgressItemIdsSelector = createSelector(
   node => node.workInProgressItemIds,
 );
 
-export const workInProgressListSelector = createSelector(
-  listsByIdSelector,
-  workInProgressListIdSelector,
-  (listsById, workInProgressListId) => listsById[workInProgressListId],
-);
-
 export const listsSelector = createSelector(
   nodeSelector,
   node => Object.values(node.listsById) || [],
@@ -61,12 +55,33 @@ export const userListsSelector = createSelector(
 
 export const defaultListSelector = createSelector(
   listsSelector,
-  lists => lists.find(({ label }) => label === 'default') || {},
+  lists =>
+    lists.find(({ label }) => label.toLocaleLowerCase() === 'default') || {},
+);
+
+export const favoriteListSelector = createSelector(
+  listsSelector,
+  lists =>
+    lists.find(({ label }) => label.toLocaleLowerCase() === 'favorites') || {},
+);
+
+export const workInProgressListSelector = createSelector(
+  listsByIdSelector,
+  workInProgressListIdSelector,
+  favoriteListSelector,
+  (listsById, workInProgressListId, favoriteList) => {
+    return listsById[workInProgressListId] || favoriteList;
+  },
 );
 
 export const itemsSelector = createSelector(
   nodeSelector,
   node => Object.values(node.itemsById) || [],
+);
+
+export const itemsInListsSelector = createSelector(
+  listsSelector,
+  lists => lists.find(list => list.type === TRASH_TYPE) || [],
 );
 
 export const favoriteItemsSelector = createSelector(
@@ -86,6 +101,11 @@ export const selectableListsSelector = createSelector(
     ...lists.filter(list => list.type === TRASH_TYPE),
     ...lists.filter(list => list.type === LIST_TYPE && list.parentId),
   ],
+);
+
+export const selectableListsWithoutChildrenSelector = createSelector(
+  selectableListsSelector,
+  lists => lists.map(({ children, ...rest }) => rest),
 );
 
 export const customizableListsSelector = createSelector(
@@ -109,11 +129,17 @@ export const extendedSortedCustomizableListsSelector = createSelector(
     lists.map(({ children, ...data }) => ({
       ...data,
       count: children.length,
-      invited: children.reduce(
-        (acc, item) =>
-          itemsById[item.id] ? [...acc, ...itemsById[item.id].invited] : acc,
-        [],
-      ),
+      invited: [
+        ...new Set(
+          children.reduce(
+            (acc, item) =>
+              itemsById[item.id]
+                ? [...acc, ...itemsById[item.id].invited]
+                : acc,
+            [],
+          ),
+        ),
+      ],
     })),
 );
 
@@ -156,13 +182,25 @@ export const visibleListItemsSelector = createSelector(
   itemsByIdSelector,
   workInProgressListIdSelector,
   (listsById, itemsById, workInProgressListId) =>
-    listsById && workInProgressListId
+    listsById && workInProgressListId && listsById[workInProgressListId]
       ? listsById[workInProgressListId].children.reduce(
           (accumulator, item) =>
-            itemsById[item.id]
+            itemsById[item.id] && typeof itemsById[item.id].secret !== 'string'
               ? accumulator.concat(itemsById[item.id])
               : accumulator,
           [],
         )
       : [],
+);
+
+export const workInProgressItemsSelector = createSelector(
+  itemsByIdSelector,
+  workInProgressItemIdsSelector,
+  (itemsById, workInProgressItemIds) =>
+    workInProgressItemIds.map(itemId => itemsById[itemId]),
+);
+
+export const shouldLoadNodesSelector = createSelector(
+  extendedSortedCustomizableListsSelector,
+  lists => !lists.length,
 );

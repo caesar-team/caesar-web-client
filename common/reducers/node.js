@@ -3,7 +3,8 @@ import {
   FETCH_NODES_REQUEST,
   FETCH_NODES_SUCCESS,
   FETCH_NODES_FAILURE,
-  ADD_ITEM,
+  ADD_ITEMS,
+  FINISH_IS_LOADING,
   SET_WORK_IN_PROGRESS_ITEM,
   SET_WORK_IN_PROGRESS_LIST_ID,
   SET_WORK_IN_PROGRESS_ITEM_IDS,
@@ -11,9 +12,15 @@ import {
   REMOVE_ITEM_REQUEST,
   REMOVE_ITEM_SUCCESS,
   REMOVE_ITEM_FAILURE,
+  REMOVE_ITEMS_BATCH_REQUEST,
+  REMOVE_ITEMS_BATCH_SUCCESS,
+  REMOVE_ITEMS_BATCH_FAILURE,
   MOVE_ITEM_REQUEST,
   MOVE_ITEM_SUCCESS,
   MOVE_ITEM_FAILURE,
+  MOVE_ITEMS_BATCH_REQUEST,
+  MOVE_ITEMS_BATCH_SUCCESS,
+  MOVE_ITEMS_BATCH_FAILURE,
   CREATE_ITEM_REQUEST,
   CREATE_ITEM_SUCCESS,
   CREATE_ITEM_FAILURE,
@@ -83,7 +90,6 @@ export default createReducer(initialState, {
   [FETCH_NODES_SUCCESS](state, { payload }) {
     return {
       ...state,
-      isLoading: false,
       isError: false,
       listsById: payload.listsById,
     };
@@ -91,10 +97,23 @@ export default createReducer(initialState, {
   [FETCH_NODES_FAILURE](state) {
     return { ...state, isLoading: false, isError: true };
   },
-  [ADD_ITEM](state, { payload }) {
+  [ADD_ITEMS](state, { payload }) {
     return {
       ...state,
-      itemsById: { ...state.itemsById, [payload.item.id]: payload.item },
+      isLoading: false,
+      itemsById: {
+        ...state.itemsById,
+        ...payload.items.reduce(
+          (accumulator, item) => ({ ...accumulator, [item.id]: item }),
+          {},
+        ),
+      },
+    };
+  },
+  [FINISH_IS_LOADING](state) {
+    return {
+      ...state,
+      isLoading: false,
     };
   },
   [SET_WORK_IN_PROGRESS_ITEM](state, { payload }) {
@@ -150,6 +169,34 @@ export default createReducer(initialState, {
   [REMOVE_ITEM_FAILURE](state) {
     return state;
   },
+  [REMOVE_ITEMS_BATCH_REQUEST](state) {
+    return state;
+  },
+  [REMOVE_ITEMS_BATCH_SUCCESS](state, { payload }) {
+    return {
+      ...state,
+      workInProgressItem: null,
+      itemsById: Object.keys(state.itemsById).reduce(
+        (accumulator, itemId) =>
+          payload.itemIds.includes(itemId)
+            ? accumulator
+            : { ...accumulator, [itemId]: state.itemsById[itemId] },
+        {},
+      ),
+      listsById: {
+        ...state.listsById,
+        [payload.listId]: {
+          ...state.listsById[payload.listId],
+          children: state.listsById[payload.listId].children.filter(
+            ({ id }) => !payload.itemIds.includes(id),
+          ),
+        },
+      },
+    };
+  },
+  [REMOVE_ITEMS_BATCH_FAILURE](state) {
+    return state;
+  },
   [MOVE_ITEM_REQUEST](state) {
     return state;
   },
@@ -183,6 +230,48 @@ export default createReducer(initialState, {
     };
   },
   [MOVE_ITEM_FAILURE](state) {
+    return state;
+  },
+  [MOVE_ITEMS_BATCH_REQUEST](state) {
+    return state;
+  },
+  [MOVE_ITEMS_BATCH_SUCCESS](state, { payload }) {
+    return {
+      ...state,
+      itemsById: {
+        ...state.itemsById,
+        ...payload.itemIds.reduce((accumulator, itemId) => {
+          return {
+            ...accumulator,
+            [itemId]: {
+              ...state.itemsById[itemId],
+              listId: payload.newListId,
+              previousListId: payload.oldListId,
+            },
+          };
+        }, {}),
+      },
+      listsById: {
+        ...state.listsById,
+        [payload.newListId]: {
+          ...state.listsById[payload.newListId],
+          children: [
+            ...state.listsById[payload.newListId].children,
+            ...payload.itemIds.map(itemId => ({
+              id: itemId,
+            })),
+          ],
+        },
+        [payload.oldListId]: {
+          ...state.listsById[payload.oldListId],
+          children: state.listsById[payload.oldListId].children.filter(
+            ({ id }) => !payload.itemIds.includes(id),
+          ),
+        },
+      },
+    };
+  },
+  [MOVE_ITEMS_BATCH_FAILURE](state) {
     return state;
   },
   [CREATE_ITEM_REQUEST](state) {

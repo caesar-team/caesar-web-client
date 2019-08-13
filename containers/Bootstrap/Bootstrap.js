@@ -4,8 +4,9 @@ import { withRouter } from 'next/router';
 import { BootstrapLayout } from 'components';
 import { getUserBootstrap } from 'common/api';
 import { DEFAULT_IDLE_TIMEOUT } from 'common/constants';
-import OpenPGPWorker from 'common/openpgp.worker';
+import EncryptionWorker from 'common/encryption.worker';
 import { SessionChecker } from 'components/SessionChecker';
+import { FullScreenLoader } from 'components/Loader';
 import {
   TWO_FACTOR_CHECK,
   TWO_FACTOR_CREATE,
@@ -42,7 +43,7 @@ class Bootstrap extends Component {
   bootstrap = null;
 
   async componentDidMount() {
-    this.initOpenPGPWorker();
+    this.initEncryptionWorker();
 
     const { data: bootstrap } = await getUserBootstrap();
 
@@ -99,15 +100,17 @@ class Bootstrap extends Component {
   };
 
   handleInactiveTimeout = () => {
+    this.props.resetStore();
+
     this.setState({
       currentStep: MASTER_PASSWORD_CHECK,
     });
   };
 
-  initOpenPGPWorker() {
+  initEncryptionWorker() {
     openpgp.config.aead_protect = false;
 
-    this.worker = new OpenPGPWorker();
+    this.worker = new EncryptionWorker();
 
     openpgp.initWorker({ workers: [this.worker] });
   }
@@ -169,7 +172,7 @@ class Bootstrap extends Component {
     } = this.state;
 
     if (!currentStep) {
-      return null;
+      return <FullScreenLoader />;
     }
 
     if (TWO_FACTOR_STEPS.includes(currentStep)) {

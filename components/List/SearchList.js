@@ -1,7 +1,10 @@
 import React from 'react';
 import styled from 'styled-components';
-import { Scrollbar } from 'components';
-import Item from './Item';
+import AutoSizer from 'react-virtualized-auto-sizer';
+import { FixedSizeList } from 'react-window';
+import memoize from 'memoize-one';
+import FixedSizeItem from './FixedSizeItem';
+import ScrollbarVirtualList from './ScrollbarVirtualList';
 import EmptyList from './EmptyList';
 
 const Wrapper = styled.div`
@@ -30,6 +33,24 @@ const Title = styled.div`
   color: ${({ theme }) => theme.black};
 `;
 
+const ITEM_HEIGHT = 80;
+
+const createItemData = memoize(
+  (
+    items,
+    isMultiItem,
+    workInProgressItemIds,
+    workInProgressItem,
+    onClickItem,
+  ) => ({
+    items,
+    isMultiItem,
+    workInProgressItemIds,
+    workInProgressItem,
+    onClickItem,
+  }),
+);
+
 const SearchList = ({
   isMultiItem = false,
   workInProgressItem,
@@ -37,30 +58,37 @@ const SearchList = ({
   items = [],
   onClickItem = Function.prototype,
 }) => {
-  const renderedItems = items.map(({ id, ...props }) => {
-    const isActive = isMultiItem
-      ? workInProgressItemIds.includes(id)
-      : workInProgressItem && workInProgressItem.id === id;
-
-    return (
-      <Item
-        key={id}
-        id={id}
-        isMultiItem={isMultiItem}
-        isActive={isActive}
-        onClickItem={onClickItem}
-        {...props}
-      />
-    );
-  });
-
   const isEmpty = items.length === 0;
+
   const renderedList = () => {
     if (isEmpty) {
       return <EmptyList />;
     }
 
-    return <Scrollbar>{renderedItems}</Scrollbar>;
+    const itemData = createItemData(
+      items,
+      isMultiItem,
+      workInProgressItemIds,
+      workInProgressItem,
+      onClickItem,
+    );
+
+    return (
+      <AutoSizer>
+        {({ height, width }) => (
+          <FixedSizeList
+            height={height}
+            itemCount={items.length}
+            itemData={itemData}
+            itemSize={ITEM_HEIGHT}
+            width={width}
+            outerElementType={ScrollbarVirtualList}
+          >
+            {FixedSizeItem}
+          </FixedSizeList>
+        )}
+      </AutoSizer>
+    );
   };
 
   const shouldShowTitle = !isEmpty || !isMultiItem;

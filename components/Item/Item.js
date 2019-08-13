@@ -1,4 +1,4 @@
-import React, { Fragment } from 'react';
+import React, { Fragment, memo } from 'react';
 import styled from 'styled-components';
 import {
   ITEM_REVIEW_MODE,
@@ -9,6 +9,7 @@ import {
 import { Button, Icon } from 'components';
 import { formatDate } from 'common/utils/dateUtils';
 import { matchStrict } from 'common/utils/match';
+import equal from 'fast-deep-equal';
 import EmptyItem from './EmptyItem';
 import { Credentials, CredentialsForm, DocumentForm, Document } from './Types';
 import { Scrollbar } from '../Scrollbar';
@@ -194,4 +195,11 @@ const Item = ({
   );
 };
 
-export default Item;
+export default memo(Item, (prevProps, nextProps) => {
+  return (
+    equal(prevProps.allLists, nextProps.allLists) &&
+    equal(prevProps.item, nextProps.item) &&
+    equal(prevProps.members, nextProps.members) &&
+    equal(prevProps.notification, nextProps.notification)
+  );
+});

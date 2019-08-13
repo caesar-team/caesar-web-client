@@ -1,6 +1,7 @@
 import React from 'react';
 import styled, { css } from 'styled-components';
 import { formatDate } from 'common/utils/dateUtils';
+import { ITEM_CREDENTIALS_TYPE, ITEM_ICON_TYPES } from 'common/constants';
 import { Icon } from '../Icon';
 import { Checkbox } from '../Checkbox';
 
@@ -66,6 +67,12 @@ const FavoriteIcon = styled(Icon)`
   right: 8px;
 `;
 
+const CloseIcon = styled(Icon)`
+  position: absolute;
+  top: 8px;
+  right: 8px;
+`;
+
 const CheckboxStyled = styled(Checkbox)`
   ${Checkbox.Box} {
     background-color: ${({ theme }) => theme.emperor};
@@ -95,32 +102,44 @@ const Row = styled.div`
       background: ${({ theme }) => theme.gallery};
     `}
 `;
-
+const ItemTypeIcon = props => {
+  const { type } = props;
+  const icon = ITEM_ICON_TYPES[type] || ITEM_ICON_TYPES[ITEM_CREDENTIALS_TYPE];
+  return <Icon name={icon} width={20} height={20} fill="#fff" />;
+};
 const Item = ({
   id,
   lastUpdated,
   secret: { name, attachments },
+  type,
   invited,
   isMultiItem = false,
   isActive = false,
+  isClosable = false,
   favorite,
+  style,
+  onClickClose = Function.prototype,
   onClickItem = Function.prototype,
+  ...props
 }) => {
   const shouldShowMembers = !!invited.length;
   const shouldShowAttachments = attachments && attachments.length > 0;
+  const shouldShowFavoriteIcon = favorite && !isClosable;
 
   return (
     <Row
       key={id}
+      style={style}
       onClick={onClickItem(id)}
       isActive={isActive}
       isMultiItem={isMultiItem}
+      {...props}
     >
       <ItemType>
         {isMultiItem ? (
           <CheckboxStyled checked={isActive} onChange={Function.prototype} />
         ) : (
-          <Icon name="key" width={20} height={20} fill="#fff" />
+          <ItemTypeIcon type={type} />
         )}
       </ItemType>
       <Details>
@@ -143,8 +162,11 @@ const Item = ({
           </Box>
         </Box>
       </Details>
-      {favorite && (
+      {shouldShowFavoriteIcon && (
         <FavoriteIcon name="favorite-active" width={14} height={14} />
+      )}
+      {isClosable && (
+        <CloseIcon name="close" width={14} height={14} onClick={onClickClose} />
       )}
     </Row>
   );

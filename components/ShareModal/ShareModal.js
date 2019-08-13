@@ -136,7 +136,7 @@ export class ShareModal extends Component {
     copy(this.generateLinkText(getAnonymousLink(shared), isUseMasterPassword));
 
     notification.show({
-      text: `Shared link has copied.`,
+      text: `The shared link has copied.`,
     });
   };
 

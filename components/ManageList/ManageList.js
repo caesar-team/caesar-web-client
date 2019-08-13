@@ -201,7 +201,7 @@ class ManageList extends Component {
 
   render() {
     return (
-      <>
+      <Fragment>
         <Table>
           <TableHeader>
             <TableCol align="left" width="33.33333%">
@@ -216,7 +216,7 @@ class ManageList extends Component {
           </TableHeader>
         </Table>
         {this.renderItems()}
-      </>
+      </Fragment>
     );
   }
 }

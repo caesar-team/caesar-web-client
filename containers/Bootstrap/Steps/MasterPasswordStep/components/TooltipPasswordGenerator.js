@@ -61,10 +61,9 @@ class TooltipPasswordGenerator extends Component {
     return (
       <Tooltip
         show={isVisible}
-        arrowAlign="center"
-        position="bottom center"
+        arrowAlign="top"
+        position="right center"
         textBoxWidth="300px"
-        padding="0px 30px 10px 30px"
       >
         <PasswordGenerator
           length={length}

@@ -17,7 +17,7 @@ const HelperText = styled(({ isActive, ...props }) => <div {...props} />)`
   color: ${({ theme, isActive }) => (isActive ? theme.emperor : theme.gallery)};
   margin-bottom: 16px;
 
-  &:last-child {
+  &:last-of-type {
     margin-bottom: 0;
   }
 

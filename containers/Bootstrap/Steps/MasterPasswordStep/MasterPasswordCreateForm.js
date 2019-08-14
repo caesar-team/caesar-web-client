@@ -1,4 +1,4 @@
-import React, { PureComponent, Fragment } from 'react';
+import React, { PureComponent } from 'react';
 import styled from 'styled-components';
 import { Formik, FastField } from 'formik';
 import zxcvbn from 'zxcvbn';
@@ -40,17 +40,6 @@ const TipText = styled.div`
   margin-top: 20px;
 `;
 
-const PasswordGeneratorWrapper = styled.div`
-  position: absolute;
-  right: 60px;
-  top: 18px;
-  height: 20px;
-`;
-
-const PasswordGeneratorTooltipWrapper = styled.div`
-  position: relative;
-`;
-
 const PasswordIndicatorStyled = styled(PasswordIndicator)`
   margin-top: 20px;
 `;
@@ -70,6 +59,10 @@ const StrengthIndicatorStyled = styled(StrengthIndicator)`
     letter-spacing: 0.4px;
     color: ${({ theme }) => theme.gray};
     margin-bottom: 8px;
+
+    &:last-of-type {
+      margin-bottom: 0;
+    }
   }
 `;
 
@@ -90,6 +83,10 @@ const BottomWrapper = styled.div`
 
 const DiceIcon = styled(Icon)`
   cursor: pointer;
+  position: absolute;
+  right: 60px;
+  top: 18px;
+  height: 20px;
 `;
 
 class MasterPasswordCreateForm extends PureComponent {
@@ -128,6 +125,7 @@ class MasterPasswordCreateForm extends PureComponent {
           isSubmitting,
           isValid,
           dirty,
+          values,
           setFieldValue,
         }) => (
           <Form onSubmit={handleSubmit}>
@@ -137,56 +135,45 @@ class MasterPasswordCreateForm extends PureComponent {
             <FieldWrapper>
               <FastField
                 name="password"
-                render={({ field, form: { isValid: isFieldValid } }) => (
-                  <Fragment>
-                    <MasterPasswordInput
-                      {...field}
-                      isAlwaysVisibleIcon
-                      placeholder="Type password…"
-                      autoFocus
-                      error={
-                        dirty ? checkError(touched, errors, 'password') : null
-                      }
-                    />
-                    {field.value && (
-                      <PasswordIndicatorStyled
-                        score={zxcvbn(field.value).score}
-                      />
-                    )}
-                    <Tooltip
-                      show={field.value && !isFieldValid}
-                      arrowAlign="bottom"
-                      position="right center"
-                      textBoxWidth="280px"
-                      moveUp="16px"
-                    >
-                      <StrengthIndicatorStyled
-                        text="Our recommendations for creating a good master password:"
-                        value={field.value}
-                        rules={REGEXP_TEXT_MATCH}
-                      />
-                    </Tooltip>
-                  </Fragment>
+                render={({ field }) => (
+                  <MasterPasswordInput
+                    {...field}
+                    isAlwaysVisibleIcon
+                    placeholder="Type password…"
+                    autoFocus
+                    error={
+                      dirty ? checkError(touched, errors, 'password') : null
+                    }
+                  />
                 )}
               />
-              <PasswordGeneratorWrapper>
-                <DiceIcon
-                  name="dice"
-                  width={20}
-                  height={20}
-                  onClick={this.handleToggleVisibility(true)}
+              <Tooltip
+                show={values.password && !isValid}
+                textBoxWidth="280px"
+                arrowAlign="top"
+                position="right center"
+              >
+                <StrengthIndicatorStyled
+                  text="Our recommendations for creating a good master password:"
+                  value={values.password}
+                  rules={REGEXP_TEXT_MATCH}
                 />
-                <PasswordGeneratorTooltipWrapper>
-                  <TooltipPasswordGenerator
-                    isVisible={isPasswordGeneratorTooltipVisible}
-                    onToggleVisibility={this.handleToggleVisibility(false)}
-                    onGeneratePassword={this.handleGeneratePassword(
-                      setFieldValue,
-                    )}
-                  />
-                </PasswordGeneratorTooltipWrapper>
-              </PasswordGeneratorWrapper>
+              </Tooltip>
+              <DiceIcon
+                name="dice"
+                width={20}
+                height={20}
+                onClick={this.handleToggleVisibility(true)}
+              />
+              <TooltipPasswordGenerator
+                isVisible={isPasswordGeneratorTooltipVisible}
+                onToggleVisibility={this.handleToggleVisibility(false)}
+                onGeneratePassword={this.handleGeneratePassword(setFieldValue)}
+              />
             </FieldWrapper>
+            {values.password && (
+              <PasswordIndicatorStyled score={zxcvbn(values.password).score} />
+            )}
             <TipText>
               Please copy & save the master password in a safe place. Relogin
               will not be possible without this password.

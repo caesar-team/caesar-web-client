@@ -23,7 +23,7 @@ class TwoFactorStep extends Component {
   async componentDidMount() {
     const { initialStep } = this.props;
 
-    if (initialStep === TWO_FACTOR_CREATE) {
+    if ([TWO_FACTOR_CREATE, TWO_FACTOR_CHECK].includes(initialStep)) {
       const {
         data: { qr, code },
       } = await getQrCode();

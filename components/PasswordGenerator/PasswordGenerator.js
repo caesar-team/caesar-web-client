@@ -1,6 +1,5 @@
-import React, { Component } from 'react';
+import React, { forwardRef } from 'react';
 import styled from 'styled-components';
-import { generator } from 'common/utils/password';
 import { Checkbox, RangeInput } from 'components';
 
 const Wrapper = styled.div`
@@ -40,111 +39,145 @@ const RangeInputStyled = styled(RangeInput)`
   margin: 10px 0 30px;
 `;
 
-const DEFAULT_LENGTH = 16;
 const MIN_LENGTH = 8;
 const MAX_LENGTH = 24;
 
-class PasswordGenerator extends Component {
-  state = this.prepareInitialState();
-
-  handleChangeOption = option => () => {
-    const {
-      options: { length, ...options },
-    } = this.state;
-
-    const nextOptions = {
-      ...options,
-      [option]: !options[option],
-    };
-
-    this.setState(
-      {
-        options: {
-          length,
-          ...nextOptions,
-        },
-      },
-      this.handleGenerate,
-    );
-  };
-
-  handleChangeLength = ({
-    target: {
-      value: { toValue },
+const PasswordGenerator = forwardRef(
+  (
+    {
+      length,
+      digits,
+      specials,
+      onChangeOption = Function.prototype,
+      className,
     },
-  }) => {
-    const {
-      options: { length, ...options },
-    } = this.state;
+    ref,
+  ) => (
+    <Wrapper className={className} ref={ref}>
+      <Options>
+        <CheckboxStyled checked={digits} onChange={onChangeOption('digits')}>
+          Use digits
+        </CheckboxStyled>
+        <CheckboxStyled
+          checked={specials}
+          onChange={onChangeOption('specials')}
+        >
+          Use special characters
+        </CheckboxStyled>
+      </Options>
+      <LengthText>Length</LengthText>
+      <RangeInputStyled
+        name="length"
+        min={MIN_LENGTH}
+        max={MAX_LENGTH}
+        defaultToValue={length}
+        onChange={onChangeOption('length')}
+      />
+    </Wrapper>
+  ),
+);
 
-    this.setState(
-      {
-        options: {
-          ...options,
-          length: toValue,
-        },
-      },
-      this.handleGenerate,
-    );
-  };
-
-  handleGenerate = () => {
-    const { onGeneratePassword } = this.props;
-    const {
-      options: { length, ...otherOptions },
-    } = this.state;
-
-    onGeneratePassword(generator(length, otherOptions));
-  };
-
-  prepareInitialState() {
-    const options = {
-      digits: true,
-      specials: true,
-    };
-
-    return {
-      password: generator(DEFAULT_LENGTH, options),
-      options: {
-        ...options,
-        length: DEFAULT_LENGTH,
-      },
-    };
-  }
-
-  render() {
-    const { className } = this.props;
-    const {
-      options: { digits, specials },
-    } = this.state;
-
-    return (
-      <Wrapper className={className}>
-        <Options>
-          <CheckboxStyled
-            checked={digits}
-            onChange={this.handleChangeOption('digits')}
-          >
-            Use digits
-          </CheckboxStyled>
-          <CheckboxStyled
-            checked={specials}
-            onChange={this.handleChangeOption('specials')}
-          >
-            Use special characters
-          </CheckboxStyled>
-        </Options>
-        <LengthText>Length</LengthText>
-        <RangeInputStyled
-          name="length"
-          min={MIN_LENGTH}
-          max={MAX_LENGTH}
-          defaultToValue={DEFAULT_LENGTH}
-          onChange={this.handleChangeLength}
-        />
-      </Wrapper>
-    );
-  }
-}
+// class PasswordGenerator extends Component {
+//   state = this.prepareInitialState();
+//
+//   handleChangeOption = option => () => {
+//     const {
+//       options: { length, ...options },
+//     } = this.state;
+//
+//     const nextOptions = {
+//       ...options,
+//       [option]: !options[option],
+//     };
+//
+//     this.setState(
+//       {
+//         options: {
+//           length,
+//           ...nextOptions,
+//         },
+//       },
+//       this.handleGenerate,
+//     );
+//   };
+//
+//   handleChangeLength = ({
+//     target: {
+//       value: { toValue },
+//     },
+//   }) => {
+//     const {
+//       options: { length, ...options },
+//     } = this.state;
+//
+//     this.setState(
+//       {
+//         options: {
+//           ...options,
+//           length: toValue,
+//         },
+//       },
+//       this.handleGenerate,
+//     );
+//   };
+//
+//   handleGenerate = () => {
+//     const { onGeneratePassword } = this.props;
+//     const {
+//       options: { length, ...otherOptions },
+//     } = this.state;
+//
+//     onGeneratePassword(generator(length, otherOptions));
+//   };
+//
+//   prepareInitialState() {
+//     const options = {
+//       digits: true,
+//       specials: true,
+//     };
+//
+//     return {
+//       password: generator(DEFAULT_LENGTH, options),
+//       options: {
+//         ...options,
+//         length: DEFAULT_LENGTH,
+//       },
+//     };
+//   }
+//
+//   render() {
+//     const { className } = this.props;
+//     const {
+//       options: { digits, specials },
+//     } = this.state;
+//
+//     return (
+//       <Wrapper className={className}>
+//         <Options>
+//           <CheckboxStyled
+//             checked={digits}
+//             onChange={this.handleChangeOption('digits')}
+//           >
+//             Use digits
+//           </CheckboxStyled>
+//           <CheckboxStyled
+//             checked={specials}
+//             onChange={this.handleChangeOption('specials')}
+//           >
+//             Use special characters
+//           </CheckboxStyled>
+//         </Options>
+//         <LengthText>Length</LengthText>
+//         <RangeInputStyled
+//           name="length"
+//           min={MIN_LENGTH}
+//           max={MAX_LENGTH}
+//           defaultToValue={DEFAULT_LENGTH}
+//           onChange={this.handleChangeLength}
+//         />
+//       </Wrapper>
+//     );
+//   }
+// }
 
 export default PasswordGenerator;

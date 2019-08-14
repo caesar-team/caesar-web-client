@@ -30,8 +30,6 @@ export const MOVE_ITEMS_BATCH_REQUEST = '@nodes/MOVE_ITEMS_BATCH_REQUEST';
 export const MOVE_ITEMS_BATCH_SUCCESS = '@nodes/MOVE_ITEMS_BATCH_SUCCESS';
 export const MOVE_ITEMS_BATCH_FAILURE = '@nodes/MOVE_ITEMS_BATCH_FAILURE';
 
-export const SHARE_ITEMS = '@nodes/SHARE_ITEMS';
-
 export const CREATE_ITEM_REQUEST = '@nodes/CREATE_ITEM_REQUEST';
 export const CREATE_ITEM_SUCCESS = '@nodes/CREATE_ITEM_SUCCESS';
 export const CREATE_ITEM_FAILURE = '@nodes/CREATE_ITEM_FAILURE';
@@ -81,6 +79,10 @@ export const INVITE_NEW_MEMBER_FAILURE = '@nodes/INVITE_NEW_MEMBER_FAILURE';
 export const SHARE_ITEM_REQUEST = '@nodes/SHARE_ITEM_REQUEST';
 export const SHARE_ITEM_SUCCESS = '@nodes/SHARE_ITEM_SUCCESS';
 export const SHARE_ITEM_FAILURE = '@nodes/SHARE_ITEM_FAILURE';
+
+export const SHARE_ITEM_BATCH_REQUEST = '@nodes/SHARE_ITEM_BATCH_REQUEST';
+export const SHARE_ITEM_BATCH_SUCCESS = '@nodes/SHARE_ITEM_BATCH_SUCCESS';
+export const SHARE_ITEM_BATCH_FAILURE = '@nodes/SHARE_ITEM_BATCH_FAILURE';
 
 export const REMOVE_SHARE_REQUEST = '@nodes/REMOVE_SHARE_REQUEST';
 export const REMOVE_SHARE_SUCCESS = '@nodes/REMOVE_SHARE_SUCCESS';
@@ -192,13 +194,6 @@ export const moveItemsBatchSuccess = (itemIds, oldListId, newListId) => ({
 
 export const moveItemsBatchFailure = () => ({
   type: MOVE_ITEMS_BATCH_FAILURE,
-});
-
-export const shareItems = emails => ({
-  type: SHARE_ITEMS,
-  payload: {
-    emails,
-  },
 });
 
 export const removeItemRequest = (itemId, listId) => ({
@@ -477,6 +472,25 @@ export const shareItemSuccess = (itemId, invited) => ({
 
 export const shareItemFailure = () => ({
   type: SHARE_ITEM_FAILURE,
+});
+
+export const shareItemBatchRequest = (items, emails) => ({
+  type: SHARE_ITEM_BATCH_REQUEST,
+  payload: {
+    items,
+    emails,
+  },
+});
+
+export const shareItemBatchSuccess = invited => ({
+  type: SHARE_ITEM_BATCH_SUCCESS,
+  payload: {
+    invited,
+  },
+});
+
+export const shareItemBatchFailure = () => ({
+  type: SHARE_ITEM_BATCH_FAILURE,
 });
 
 export const removeShareRequest = shareId => ({

@@ -73,3 +73,4 @@ export { PasswordIndicator } from './PasswordIndicator';
 export { PasswordGenerator } from './PasswordGenerator';
 export { TagsInput } from './TagsInput';
 export { Tooltip } from './Tooltip';
+export { HoldClickBehaviour } from './HoldClickBehaviour';

@@ -2,23 +2,24 @@ import React from 'react';
 import styled from 'styled-components';
 import LayoutConstructor from './LayoutConstructor';
 import Footer from './Footer';
-import { Icon } from '../Icon';
 
 const LayoutConstructorStyled = styled(LayoutConstructor)`
   ${LayoutConstructor.TopWrapper} {
-    justify-content: space-between;
+    display: grid;
+    grid-template-columns: 1fr repeat(3, auto) 1fr;
+    justify-items: center;
     margin-bottom: 100px;
   }
 
   ${LayoutConstructor.MainWrapper} {
-    max-width: 530px;
+    max-width: 610px;
   }
 `;
 
-const BootstrapLayout = props => (
+const BootstrapLayout = ({ headerComponent, ...props }) => (
   <LayoutConstructorStyled
     withImages
-    headerComponent={<Icon name="logo-new" width={142} height={40} />}
+    headerComponent={headerComponent}
     footerComponent={Footer}
     {...props}
   />

@@ -7,6 +7,7 @@ import {
   Checkbox,
   Button,
   Scrollbar,
+  BootstrapLayout,
 } from 'components';
 import {
   encryptItem,
@@ -19,8 +20,8 @@ import {
   patchChildItemBatch,
   getUserSelf,
 } from 'common/api';
-
-const Wrapper = styled.div``;
+import { SHARED_ITEMS_CHECK } from '../../constants';
+import { Header } from '../../components';
 
 const ScrollbarStyled = styled(Scrollbar)`
   min-height: 300px;
@@ -178,10 +179,16 @@ class SharedItemsStep extends Component {
   }
 
   render() {
+    const { navigationSteps } = this.props;
+
+    const headerComponent = (
+      <Header steps={navigationSteps} currentStep={SHARED_ITEMS_CHECK} />
+    );
+
     const renderedItems = this.renderItems();
 
     return (
-      <Wrapper>
+      <BootstrapLayout headerComponent={headerComponent}>
         <Head title="Shared Items" />
         <AuthTitle>Someone shared items for you:</AuthTitle>
         <AuthDescription>
@@ -191,7 +198,7 @@ class SharedItemsStep extends Component {
         <ButtonWrapper>
           <ButtonStyled onClick={this.handleAccept}>ACCEPT</ButtonStyled>
         </ButtonWrapper>
-      </Wrapper>
+      </BootstrapLayout>
     );
   }
 }

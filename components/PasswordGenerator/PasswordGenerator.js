@@ -36,7 +36,7 @@ const LengthText = styled.div`
 `;
 
 const RangeInputStyled = styled(RangeInput)`
-  width: 255px;
+  width: 100%;
   margin: 10px 0 30px;
 `;
 
@@ -51,17 +51,21 @@ class PasswordGenerator extends Component {
     const {
       options: { length, ...options },
     } = this.state;
+
     const nextOptions = {
       ...options,
       [option]: !options[option],
     };
 
-    this.setState({
-      options: {
-        length,
-        ...nextOptions,
+    this.setState(
+      {
+        options: {
+          length,
+          ...nextOptions,
+        },
       },
-    });
+      this.handleGenerate,
+    );
   };
 
   handleChangeLength = ({
@@ -73,12 +77,15 @@ class PasswordGenerator extends Component {
       options: { length, ...options },
     } = this.state;
 
-    this.setState({
-      options: {
-        ...options,
-        length: toValue,
+    this.setState(
+      {
+        options: {
+          ...options,
+          length: toValue,
+        },
       },
-    });
+      this.handleGenerate,
+    );
   };
 
   handleGenerate = () => {
@@ -106,12 +113,13 @@ class PasswordGenerator extends Component {
   }
 
   render() {
+    const { className } = this.props;
     const {
       options: { digits, specials },
     } = this.state;
 
     return (
-      <Wrapper>
+      <Wrapper className={className}>
         <Options>
           <CheckboxStyled
             checked={digits}

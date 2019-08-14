@@ -16,6 +16,7 @@ export {
   MasterPasswordInput,
   TextArea,
   ShareInput,
+  StrengthIndicator,
 } from './Input';
 export { InviteModal } from './InviteModal';
 export { Item, MultiItem, Credentials, Document } from './Item';
@@ -71,3 +72,4 @@ export { RangeInput } from './RangeInput';
 export { PasswordIndicator } from './PasswordIndicator';
 export { PasswordGenerator } from './PasswordGenerator';
 export { TagsInput } from './TagsInput';
+export { Tooltip } from './Tooltip';

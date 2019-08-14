@@ -1,4 +1,4 @@
-import React, { Component, Fragment } from 'react';
+import React, { Component } from 'react';
 import {
   getQrCode,
   getBackupCodes,
@@ -7,15 +7,15 @@ import {
 } from 'common/api';
 import { getTrustedDeviceToken, setToken } from 'common/utils/token';
 import { matchStrict } from 'common/utils/match';
-import { Head } from 'components';
+import { Head, BootstrapLayout } from 'components';
 import {
   TWO_FACTOR_CREATE,
-  TWO_FACTOR_CHECK,
   TWO_FACTOR_BACKUPS,
+  TWO_FACTOR_CHECK,
 } from '../../constants';
-import TwoFactorCreateForm from './TwoFactorCreateForm';
-import TwoFactorCheckForm from './TwoFactorCheckForm';
+import TwoFactorForm from './TwoFactorForm';
 import TwoFactorBackupForm from './TwoFactorBackupForm';
+import { Header } from '../../components';
 
 class TwoFactorStep extends Component {
   state = this.prepareInitialState();
@@ -37,18 +37,6 @@ class TwoFactorStep extends Component {
       });
     }
   }
-
-  handleClickReturn = () => {
-    this.setState({
-      step: TWO_FACTOR_CREATE,
-    });
-  };
-
-  handleClickNext = () => {
-    this.setState({
-      step: TWO_FACTOR_CHECK,
-    });
-  };
 
   handleSubmit = async ({ code, fpCheck }, { setSubmitting, setErrors }) => {
     const { initialStep, onFinish } = this.props;
@@ -106,27 +94,21 @@ class TwoFactorStep extends Component {
   }
 
   render() {
+    const { navigationSteps } = this.props;
     const { qr, code, codes, step } = this.state;
-    const { initialStep } = this.props;
 
-    const allowReturn = initialStep === TWO_FACTOR_CREATE;
+    const headerComponent = (
+      <Header steps={navigationSteps} currentStep={step} />
+    );
 
     const renderedStep = matchStrict(
       step,
       {
         [TWO_FACTOR_CREATE]: (
-          <TwoFactorCreateForm
-            qr={qr}
-            code={code}
-            onClickNext={this.handleClickNext}
-          />
+          <TwoFactorForm qr={qr} code={code} onSubmit={this.handleSubmit} />
         ),
         [TWO_FACTOR_CHECK]: (
-          <TwoFactorCheckForm
-            allowReturn={allowReturn}
-            onClickReturn={this.handleClickReturn}
-            onSubmit={this.handleSubmit}
-          />
+          <TwoFactorForm qr={qr} code={code} onSubmit={this.handleSubmit} />
         ),
         [TWO_FACTOR_BACKUPS]: (
           <TwoFactorBackupForm
@@ -139,10 +121,10 @@ class TwoFactorStep extends Component {
     );
 
     return (
-      <Fragment>
+      <BootstrapLayout headerComponent={headerComponent}>
         <Head title="Two-Factor" />
         {renderedStep}
-      </Fragment>
+      </BootstrapLayout>
     );
   }
 }

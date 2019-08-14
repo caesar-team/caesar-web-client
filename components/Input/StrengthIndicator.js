@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { forwardRef } from 'react';
 import styled from 'styled-components';
 
 const Wrapper = styled.div`
@@ -29,9 +29,11 @@ const HelperText = styled(({ isActive, ...props }) => <div {...props} />)`
     background: ${({ theme, isActive }) =>
       isActive ? theme.black : theme.gallery};
     display: inline-block;
-    margin-right: 20px;
+    margin-right: 10px;
   }
 `;
+
+const Text = styled.div``;
 
 const validate = (rules, value) =>
   rules.map(({ text, regexp }) => ({
@@ -40,24 +42,30 @@ const validate = (rules, value) =>
     isValid: regexp.test(value),
   }));
 
-const StrengthIndicator = ({ rules, value, ...props }) => {
-  const matches = validate(rules, value);
+const StrengthIndicator = forwardRef(
+  ({ text = '', rules, value, ...props }, ref) => {
+    const matches = validate(rules, value);
 
-  const renderedHelpers = rules.map(({ text }, index) => {
-    const { isValid } = matches[index];
+    const renderedHelpers = rules.map(({ text: ruleText }, index) => {
+      const { isValid } = matches[index];
+
+      return (
+        <HelperText key={index} isActive={isValid}>
+          {ruleText}
+        </HelperText>
+      );
+    });
 
     return (
-      <HelperText key={index} isActive={isValid}>
-        {text}
-      </HelperText>
+      <Wrapper {...props} ref={ref}>
+        {text && <Text>{text}</Text>}
+        <Helpers>{renderedHelpers}</Helpers>
+      </Wrapper>
     );
-  });
+  },
+);
 
-  return (
-    <Wrapper {...props}>
-      <Helpers>{renderedHelpers}</Helpers>
-    </Wrapper>
-  );
-};
+StrengthIndicator.Text = Text;
+StrengthIndicator.HelperText = HelperText;
 
 export default StrengthIndicator;

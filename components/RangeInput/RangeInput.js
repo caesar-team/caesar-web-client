@@ -49,11 +49,11 @@ const RangeValue = styled.div`
   white-space: nowrap;
 `;
 
-const RangeControl = styled.div.attrs({
-  style: ({ position }) => ({
-    left: `calc(${position}% - 8px)`,
-  }),
-})`
+const RangeControl = styled.div.attrs(props => ({
+  style: {
+    left: `calc(${props.position}% - 8px)`,
+  },
+}))`
   position: absolute;
   z-index: 15;
   top: 50%;

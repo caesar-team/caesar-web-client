@@ -1,9 +1,11 @@
 import React, { Component } from 'react';
 import styled from 'styled-components';
-import { AuthDescription, AuthTitle, Head } from 'components';
+import { AuthDescription, AuthTitle, Head, BootstrapLayout } from 'components';
 import { postChangePassword } from 'common/api';
 import { createSrp } from 'common/utils/srp';
+import { PASSWORD_CHANGE } from '../../constants';
 import PasswordForm from './PasswordForm';
+import { Header } from '../../components';
 
 const Wrapper = styled.div`
   max-width: 400px;
@@ -42,13 +44,19 @@ class PasswordStep extends Component {
   };
 
   render() {
+    const { navigationSteps } = this.props;
+
+    const headerComponent = (
+      <Header steps={navigationSteps} currentStep={PASSWORD_CHANGE} />
+    );
+
     return (
-      <Wrapper>
+      <BootstrapLayout headerComponent={headerComponent}>
         <Head title="Password" />
         <AuthTitle>Change Password</AuthTitle>
         <AuthDescription>Enter and confirm new password</AuthDescription>
         <PasswordForm onSubmit={this.handleSubmit} />
-      </Wrapper>
+      </BootstrapLayout>
     );
   }
 }

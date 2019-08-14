@@ -57,6 +57,7 @@
     "react-dropzone": "^10.1.5",
     "react-gravatar": "^2.6.3",
     "react-input-autosize": "^2.2.1",
+    "react-power-tooltip": "^1.0.2",
     "react-redux": "^7.1.0",
     "react-scrolllock": "^4.0.1",
     "react-table": "6.10.0",

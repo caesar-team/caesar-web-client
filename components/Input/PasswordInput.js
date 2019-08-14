@@ -20,10 +20,12 @@ class PasswordInput extends PureComponent {
 
   render() {
     const { visible } = this.state;
-    const { value, ...props } = this.props;
+    const { value, isAlwaysVisibleIcon = false, ...props } = this.props;
 
     const type = visible ? 'text' : 'password';
     const iconName = visible ? 'eye-off' : 'eye-on';
+
+    const shouldShowIcon = isAlwaysVisibleIcon || value;
 
     return (
       <Input
@@ -31,7 +33,7 @@ class PasswordInput extends PureComponent {
         value={value}
         type={type}
         postfix={
-          value && (
+          shouldShowIcon && (
             <StyledIcon
               name={iconName}
               width={18}

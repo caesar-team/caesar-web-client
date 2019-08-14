@@ -1,13 +1,15 @@
 import * as yup from 'yup';
-import { REGEXP_TEXT_MATCH } from '../../constants';
+import zxcvbn from 'zxcvbn';
+
+const GOOD_PASSWORD_SCORE = 3;
 
 const checkIsPasswordValid = value =>
-  REGEXP_TEXT_MATCH.every(({ regexp }) => regexp.test(value));
+  zxcvbn(value).score >= GOOD_PASSWORD_SCORE;
 
 export const passwordSchema = yup.object().shape({
   password: yup
     .string()
-    .test('rules', 'Too simple password', checkIsPasswordValid)
+    .test('zxcvbn', 'Too simple password', checkIsPasswordValid)
     .required(),
 });
 
@@ -15,7 +17,7 @@ export const createConfirmPasswordSchema = password =>
   yup.object({
     confirmPassword: yup
       .string()
-      .test('rules', 'Wrong password', value =>
+      .test('zxcvbn', 'Wrong password', value =>
         password ? value === password : checkIsPasswordValid(value),
       )
       .required(),

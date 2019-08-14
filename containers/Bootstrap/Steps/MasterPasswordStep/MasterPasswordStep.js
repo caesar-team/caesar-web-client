@@ -13,6 +13,7 @@ import {
   MASTER_PASSWORD_CREATE,
   MASTER_PASSWORD_CONFIRM,
 } from '../../constants';
+import { Header } from '../../components';
 import MasterPasswordCheckForm from './MasterPasswordCheckForm';
 import MasterPasswordCreateForm from './MasterPasswordCreateForm';
 import MasterPasswordConfirmForm from './MasterPasswordConfirmForm';
@@ -26,6 +27,8 @@ const Wrapper = styled.div`
   width: 100%;
   margin: 0 auto;
 `;
+
+const waitIdle = () => new Promise(requestIdleCallback);
 
 class MasterPasswordStep extends Component {
   state = this.prepareInitialState();
@@ -137,6 +140,9 @@ class MasterPasswordStep extends Component {
       encryptedPrivateKey: currentEncryptedPrivateKey,
     } = this.state;
 
+    // otherwise, formik doesn't have time to set isSubmitting flag
+    await waitIdle();
+
     let publicKey = currentPublicKey;
     let encryptedPrivateKey = currentEncryptedPrivateKey;
 
@@ -189,11 +195,16 @@ class MasterPasswordStep extends Component {
   }
 
   render() {
+    const { navigationSteps } = this.props;
     const { step, masterPassword } = this.state;
 
     if (!step) {
       return null;
     }
+
+    const headerComponent = (
+      <Header steps={navigationSteps} currentStep={step} />
+    );
 
     const renderedStep = matchStrict(
       step,
@@ -220,7 +231,7 @@ class MasterPasswordStep extends Component {
         {step === MASTER_PASSWORD_CHECK ? (
           <MasterPasswordCheckForm onSubmit={this.handleSubmitCheckPassword} />
         ) : (
-          <BootstrapLayout>
+          <BootstrapLayout headerComponent={headerComponent}>
             <Wrapper>{renderedStep}</Wrapper>
           </BootstrapLayout>
         )}

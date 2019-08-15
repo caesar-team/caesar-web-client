@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { Component, Fragment } from 'react';
 import styled from 'styled-components';
 import {
   Head,
@@ -7,7 +7,6 @@ import {
   Checkbox,
   Button,
   Scrollbar,
-  BootstrapLayout,
 } from 'components';
 import {
   encryptItem,
@@ -20,8 +19,8 @@ import {
   patchChildItemBatch,
   getUserSelf,
 } from 'common/api';
+import { NavigationPanelStyled } from '../../components';
 import { SHARED_ITEMS_CHECK } from '../../constants';
-import { Header } from '../../components';
 
 const ScrollbarStyled = styled(Scrollbar)`
   min-height: 300px;
@@ -181,15 +180,15 @@ class SharedItemsStep extends Component {
   render() {
     const { navigationSteps } = this.props;
 
-    const headerComponent = (
-      <Header steps={navigationSteps} currentStep={SHARED_ITEMS_CHECK} />
-    );
-
     const renderedItems = this.renderItems();
 
     return (
-      <BootstrapLayout headerComponent={headerComponent}>
+      <Fragment>
         <Head title="Shared Items" />
+        <NavigationPanelStyled
+          currentStep={SHARED_ITEMS_CHECK}
+          steps={navigationSteps}
+        />
         <AuthTitle>Someone shared items for you:</AuthTitle>
         <AuthDescription>
           You can accept or reject next shared items
@@ -198,7 +197,7 @@ class SharedItemsStep extends Component {
         <ButtonWrapper>
           <ButtonStyled onClick={this.handleAccept}>ACCEPT</ButtonStyled>
         </ButtonWrapper>
-      </BootstrapLayout>
+      </Fragment>
     );
   }
 }

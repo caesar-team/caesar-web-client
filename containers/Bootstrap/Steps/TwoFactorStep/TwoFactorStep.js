@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { Component, Fragment } from 'react';
 import {
   getQrCode,
   getBackupCodes,
@@ -7,15 +7,16 @@ import {
 } from 'common/api';
 import { getTrustedDeviceToken, setToken } from 'common/utils/token';
 import { matchStrict } from 'common/utils/match';
-import { Head, BootstrapLayout } from 'components';
+import { Head } from 'components';
+import { NavigationPanelStyled } from '../../components';
 import {
   TWO_FACTOR_CREATE,
   TWO_FACTOR_BACKUPS,
   TWO_FACTOR_CHECK,
 } from '../../constants';
 import TwoFactorForm from './TwoFactorForm';
+import TwoFactorCheckForm from './TwoFactorCheckForm';
 import TwoFactorBackupForm from './TwoFactorBackupForm';
-import { Header } from '../../components';
 
 class TwoFactorStep extends Component {
   state = this.prepareInitialState();
@@ -23,7 +24,7 @@ class TwoFactorStep extends Component {
   async componentDidMount() {
     const { initialStep } = this.props;
 
-    if ([TWO_FACTOR_CREATE, TWO_FACTOR_CHECK].includes(initialStep)) {
+    if (initialStep === TWO_FACTOR_CREATE) {
       const {
         data: { qr, code },
       } = await getQrCode();
@@ -97,19 +98,13 @@ class TwoFactorStep extends Component {
     const { navigationSteps } = this.props;
     const { qr, code, codes, step } = this.state;
 
-    const headerComponent = (
-      <Header steps={navigationSteps} currentStep={step} />
-    );
-
     const renderedStep = matchStrict(
       step,
       {
         [TWO_FACTOR_CREATE]: (
           <TwoFactorForm qr={qr} code={code} onSubmit={this.handleSubmit} />
         ),
-        [TWO_FACTOR_CHECK]: (
-          <TwoFactorForm qr={qr} code={code} onSubmit={this.handleSubmit} />
-        ),
+        [TWO_FACTOR_CHECK]: <TwoFactorCheckForm onSubmit={this.handleSubmit} />,
         [TWO_FACTOR_BACKUPS]: (
           <TwoFactorBackupForm
             codes={codes}
@@ -121,10 +116,11 @@ class TwoFactorStep extends Component {
     );
 
     return (
-      <BootstrapLayout headerComponent={headerComponent}>
+      <Fragment>
         <Head title="Two-Factor" />
+        <NavigationPanelStyled currentStep={step} steps={navigationSteps} />
         {renderedStep}
-      </BootstrapLayout>
+      </Fragment>
     );
   }
 }

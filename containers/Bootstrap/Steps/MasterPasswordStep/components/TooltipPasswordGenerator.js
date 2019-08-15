@@ -8,6 +8,12 @@ const DEFAULT_LENGTH = 16;
 class TooltipPasswordGenerator extends Component {
   state = this.prepareInitialState();
 
+  componentDidUpdate(prevProps) {
+    if (!prevProps.isVisible && this.props.isVisible) {
+      this.onGeneratePasswordCallback();
+    }
+  }
+
   // eslint-disable-next-line
   handleClickOutside() {
     const { onToggleVisibility = Function.prototype } = this.props;
@@ -25,7 +31,7 @@ class TooltipPasswordGenerator extends Component {
     return !value;
   }
 
-  handleGeneratePassword = () => {
+  onGeneratePasswordCallback = () => {
     const { onGeneratePassword } = this.props;
     const { length, digits, specials } = this.state;
 
@@ -42,7 +48,7 @@ class TooltipPasswordGenerator extends Component {
       {
         [optionType]: value,
       },
-      this.handleGeneratePassword,
+      this.onGeneratePasswordCallback,
     );
   };
 

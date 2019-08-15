@@ -8,6 +8,7 @@ const Wrapper = styled.div``;
 const StepsRow = styled.div`
   display: flex;
   align-items: center;
+  justify-content: center;
   width: 100%;
   margin: 0 auto;
   position: relative;

@@ -5,7 +5,11 @@ import { Icon } from 'components';
 const Wrapper = styled.div`
   display: flex;
   align-items: center;
-  cursor: pointer;
+  cursor: ${({ disabled }) => (disabled ? 'default' : 'pointer')};
+
+  & > * {
+    ${({ disabled }) => disabled && `opacity: 0.2`}
+  }
 `;
 
 const LinkText = styled.div`
@@ -15,8 +19,17 @@ const LinkText = styled.div`
   margin-left: 20px;
 `;
 
-const BackLink = ({ children, onClick = Function.prototype, ...props }) => (
-  <Wrapper {...props} onClick={onClick}>
+const BackLink = ({
+  children,
+  disabled,
+  onClick = Function.prototype,
+  ...props
+}) => (
+  <Wrapper
+    {...props}
+    disabled={disabled}
+    onClick={disabled ? Function.prototype : onClick}
+  >
     <Icon name="arrow-back" width={16} height={16} />
     <LinkText>{children}</LinkText>
   </Wrapper>

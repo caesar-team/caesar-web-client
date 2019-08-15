@@ -1,5 +1,6 @@
 import React, { Component, Fragment } from 'react';
 import styled from 'styled-components';
+import copy from 'copy-text-to-clipboard';
 import { getKeys, postKeys } from 'common/api';
 import { matchStrict } from 'common/utils/match';
 import {
@@ -7,13 +8,13 @@ import {
   generateKeys,
   reencryptPrivateKey,
 } from 'common/utils/key';
-import { BootstrapLayout, Head } from 'components';
+import { Head } from 'components';
+import { NavigationPanelStyled } from '../../components';
 import {
   MASTER_PASSWORD_CHECK,
   MASTER_PASSWORD_CREATE,
   MASTER_PASSWORD_CONFIRM,
 } from '../../constants';
-import { Header } from '../../components';
 import MasterPasswordCheckForm from './MasterPasswordCheckForm';
 import MasterPasswordCreateForm from './MasterPasswordCreateForm';
 import MasterPasswordConfirmForm from './MasterPasswordConfirmForm';
@@ -40,7 +41,7 @@ class MasterPasswordStep extends Component {
       step: initialStep,
       publicKey: null,
       encryptedPrivateKey: null,
-      masterPassword: null,
+      masterPassword: '',
     };
 
     if (initialStep === MASTER_PASSWORD_CREATE) {
@@ -122,10 +123,13 @@ class MasterPasswordStep extends Component {
   };
 
   handleSubmitCreatePassword = ({ password }) => {
-    this.setState({
-      masterPassword: password,
-      step: MASTER_PASSWORD_CONFIRM,
-    });
+    this.setState(
+      {
+        masterPassword: password,
+        step: MASTER_PASSWORD_CONFIRM,
+      },
+      () => copy(password),
+    );
   };
 
   handleSubmitConfirmPassword = async (
@@ -189,7 +193,7 @@ class MasterPasswordStep extends Component {
       step: null,
       publicKey: null,
       encryptedPrivateKey: null,
-      masterPassword: null,
+      masterPassword: '',
       sharedMasterPassword: this.props.sharedMasterPassword,
     };
   }
@@ -202,15 +206,16 @@ class MasterPasswordStep extends Component {
       return null;
     }
 
-    const headerComponent = (
-      <Header steps={navigationSteps} currentStep={step} />
-    );
+    const initialValues = {
+      password: masterPassword,
+    };
 
     const renderedStep = matchStrict(
       step,
       {
         [MASTER_PASSWORD_CREATE]: (
           <MasterPasswordCreateForm
+            initialValues={initialValues}
             onSubmit={this.handleSubmitCreatePassword}
           />
         ),
@@ -231,9 +236,10 @@ class MasterPasswordStep extends Component {
         {step === MASTER_PASSWORD_CHECK ? (
           <MasterPasswordCheckForm onSubmit={this.handleSubmitCheckPassword} />
         ) : (
-          <BootstrapLayout headerComponent={headerComponent}>
+          <Fragment>
+            <NavigationPanelStyled currentStep={step} steps={navigationSteps} />
             <Wrapper>{renderedStep}</Wrapper>
-          </BootstrapLayout>
+          </Fragment>
         )}
       </Fragment>
     );

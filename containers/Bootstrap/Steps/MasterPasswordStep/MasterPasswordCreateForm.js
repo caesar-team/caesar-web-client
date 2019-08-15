@@ -17,7 +17,6 @@ import {
 } from 'components';
 import { passwordSchema } from './schema';
 import { REGEXP_TEXT_MATCH } from '../../constants';
-import { initialMasterPasswordValues } from './constants';
 import { TooltipPasswordGenerator } from './components';
 
 const Form = styled.form`
@@ -108,14 +107,14 @@ class MasterPasswordCreateForm extends PureComponent {
   }
 
   render() {
-    const { onSubmit } = this.props;
+    const { initialValues, onSubmit } = this.props;
     const { isPasswordGeneratorTooltipVisible } = this.state;
 
     return (
       <Formik
         key="password"
-        initialValues={initialMasterPasswordValues}
-        isInitialValid={passwordSchema.isValidSync(initialMasterPasswordValues)}
+        initialValues={initialValues}
+        isInitialValid={passwordSchema.isValidSync(initialValues)}
         validationSchema={passwordSchema}
         onSubmit={onSubmit}
         render={({
@@ -167,7 +166,10 @@ class MasterPasswordCreateForm extends PureComponent {
               />
               <TooltipPasswordGenerator
                 isVisible={isPasswordGeneratorTooltipVisible}
-                onToggleVisibility={this.handleToggleVisibility(false)}
+                onToggleVisibility={this.handleToggleVisibility(
+                  false,
+                  setFieldValue,
+                )}
                 onGeneratePassword={this.handleGeneratePassword(setFieldValue)}
               />
             </FieldWrapper>
@@ -179,11 +181,8 @@ class MasterPasswordCreateForm extends PureComponent {
               will not be possible without this password.
             </TipText>
             <StyledButton htmlType="submit" disabled={isSubmitting || !isValid}>
-              Continue
+              Copy Password & Continue
             </StyledButton>
-            <BottomWrapper>
-              or <Link to="/logout">log out</Link>
-            </BottomWrapper>
           </Form>
         )}
       />

@@ -1,25 +1,23 @@
 import React from 'react';
 import styled from 'styled-components';
 import LayoutConstructor from './LayoutConstructor';
+import BootstrapHeader from './BootstrapHeader';
 import Footer from './Footer';
 
 const LayoutConstructorStyled = styled(LayoutConstructor)`
-  ${LayoutConstructor.TopWrapper} {
-    display: grid;
-    grid-template-columns: 1fr repeat(3, auto) 1fr;
-    justify-items: center;
-    margin-bottom: 100px;
-  }
+  padding: 0 0 30px 0;
 
   ${LayoutConstructor.MainWrapper} {
+    padding: 0 60px;
     max-width: 610px;
+    position: relative;
   }
 `;
 
-const BootstrapLayout = ({ headerComponent, ...props }) => (
+const BootstrapLayout = ({ user, ...props }) => (
   <LayoutConstructorStyled
     withImages
-    headerComponent={headerComponent}
+    headerComponent={<BootstrapHeader user={user} />}
     footerComponent={Footer}
     {...props}
   />

@@ -1,11 +1,12 @@
 import React, { Component } from 'react';
 import * as openpgp from 'openpgp';
 import { withRouter } from 'next/router';
-import { getUserBootstrap } from 'common/api';
+import { getUserBootstrap, getUserSelf } from 'common/api';
 import { DEFAULT_IDLE_TIMEOUT } from 'common/constants';
 import EncryptionWorker from 'common/encryption.worker';
 import { SessionChecker } from 'components/SessionChecker';
 import { FullScreenLoader } from 'components/Loader';
+import { BootstrapLayout } from 'components/Layout';
 import { getBootstrapStates, getNavigationPanelSteps } from './utils';
 import {
   TWO_FACTOR_CHECK,
@@ -39,9 +40,11 @@ class Bootstrap extends Component {
     this.initEncryptionWorker();
 
     const { data: bootstrap } = await getUserBootstrap();
+    const { data: user } = await getUserSelf();
 
     this.bootstrap = getBootstrapStates(bootstrap);
     this.navigationPanelSteps = getNavigationPanelSteps(this.bootstrap);
+    this.user = user;
 
     this.setState({
       currentStep: this.currentStepResolver(bootstrap),
@@ -171,21 +174,25 @@ class Bootstrap extends Component {
 
     if (TWO_FACTOR_STEPS.includes(currentStep)) {
       return (
-        <TwoFactorStep
-          initialStep={currentStep}
-          navigationSteps={this.navigationPanelSteps}
-          onFinish={this.handleFinishTwoFactor}
-        />
+        <BootstrapLayout user={this.user}>
+          <TwoFactorStep
+            initialStep={currentStep}
+            navigationSteps={this.navigationPanelSteps}
+            onFinish={this.handleFinishTwoFactor}
+          />
+        </BootstrapLayout>
       );
     }
 
     if (PASSWORD_STEPS.includes(currentStep)) {
       return (
-        <PasswordStep
-          email={shared.e}
-          navigationSteps={this.navigationPanelSteps}
-          onFinish={this.handleFinishChangePassword}
-        />
+        <BootstrapLayout user={this.user}>
+          <PasswordStep
+            email={shared.e}
+            navigationSteps={this.navigationPanelSteps}
+            onFinish={this.handleFinishChangePassword}
+          />
+        </BootstrapLayout>
       );
     }
 
@@ -202,14 +209,16 @@ class Bootstrap extends Component {
 
     if (SHARED_ITEMS_STEPS.includes(currentStep)) {
       return (
-        <SharedItemsStep
-          navigationSteps={this.navigationPanelSteps}
-          oldKeyPair={oldKeyPair}
-          currentKeyPair={currentKeyPair}
-          oldMasterPassword={shared.mp}
-          currentMasterPassword={masterPassword}
-          onFinish={this.handleFinishSharedItems}
-        />
+        <BootstrapLayout user={this.user}>
+          <SharedItemsStep
+            navigationSteps={this.navigationPanelSteps}
+            oldKeyPair={oldKeyPair}
+            currentKeyPair={currentKeyPair}
+            oldMasterPassword={shared.mp}
+            currentMasterPassword={masterPassword}
+            onFinish={this.handleFinishSharedItems}
+          />
+        </BootstrapLayout>
       );
     }
 

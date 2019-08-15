@@ -43,9 +43,7 @@ const MasterPasswordConfirmForm = ({
     render={({ errors, touched, handleSubmit, isSubmitting, isValid }) => (
       <Form onSubmit={handleSubmit}>
         <AuthTitle>Сonfirmation</AuthTitle>
-        <AuthDescription>
-          Confirm your master password
-        </AuthDescription>
+        <AuthDescription>Confirm your master password</AuthDescription>
         <FastField
           name="confirmPassword"
           render={({ field }) => (
@@ -59,7 +57,9 @@ const MasterPasswordConfirmForm = ({
           )}
         />
         <ButtonsWrapper>
-          <BackLink onClick={onClickReturn}>Change password</BackLink>
+          <BackLink disabled={isSubmitting} onClick={onClickReturn}>
+            Change password
+          </BackLink>
           <StyledButton htmlType="submit" disabled={isSubmitting || !isValid}>
             Confirm
           </StyledButton>

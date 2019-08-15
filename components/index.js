@@ -16,6 +16,7 @@ export {
   MasterPasswordInput,
   TextArea,
   ShareInput,
+  StrengthIndicator,
 } from './Input';
 export { InviteModal } from './InviteModal';
 export { Item, MultiItem, Credentials, Document } from './Item';
@@ -69,5 +70,7 @@ export { ProgressBar } from './ProgressBar';
 export { Toggle } from './Toggle';
 export { RangeInput } from './RangeInput';
 export { PasswordIndicator } from './PasswordIndicator';
+export { PasswordGenerator } from './PasswordGenerator';
 export { TagsInput } from './TagsInput';
+export { Tooltip } from './Tooltip';
 export { HoldClickBehaviour } from './HoldClickBehaviour';

@@ -1,12 +1,13 @@
 import React, { Component } from 'react';
 import * as openpgp from 'openpgp';
 import { withRouter } from 'next/router';
-import { BootstrapLayout } from 'components';
-import { getUserBootstrap } from 'common/api';
+import { getUserBootstrap, getUserSelf } from 'common/api';
 import { DEFAULT_IDLE_TIMEOUT } from 'common/constants';
 import EncryptionWorker from 'common/encryption.worker';
 import { SessionChecker } from 'components/SessionChecker';
 import { FullScreenLoader } from 'components/Loader';
+import { BootstrapLayout } from 'components/Layout';
+import { getBootstrapStates, getNavigationPanelSteps } from './utils';
 import {
   TWO_FACTOR_CHECK,
   TWO_FACTOR_CREATE,
@@ -28,13 +29,6 @@ const PASSWORD_STEPS = [PASSWORD_CHANGE];
 const MASTER_PASSWORD_STEPS = [MASTER_PASSWORD_CREATE, MASTER_PASSWORD_CHECK];
 const SHARED_ITEMS_STEPS = [SHARED_ITEMS_CHECK];
 
-const bootstrapStates = bootstrap => ({
-  twoFactorAuthState: `TWO_FACTOR_${bootstrap.twoFactorAuthState}`,
-  passwordState: `PASSWORD_${bootstrap.passwordState}`,
-  masterPasswordState: `MASTER_PASSWORD_${bootstrap.masterPasswordState}`,
-  sharedItemsState: `SHARED_ITEMS_${bootstrap.sharedItemsState}`,
-});
-
 class Bootstrap extends Component {
   state = this.prepareInitialState();
 
@@ -46,8 +40,11 @@ class Bootstrap extends Component {
     this.initEncryptionWorker();
 
     const { data: bootstrap } = await getUserBootstrap();
+    const { data: user } = await getUserSelf();
 
-    this.bootstrap = bootstrapStates(bootstrap);
+    this.bootstrap = getBootstrapStates(bootstrap);
+    this.navigationPanelSteps = getNavigationPanelSteps(this.bootstrap);
+    this.user = user;
 
     this.setState({
       currentStep: this.currentStepResolver(bootstrap),
@@ -121,7 +118,7 @@ class Bootstrap extends Component {
       passwordState,
       masterPasswordState,
       sharedItemsState,
-    } = bootstrapStates(bootstrap);
+    } = getBootstrapStates(bootstrap);
 
     if (TWO_FACTOR_STEPS.includes(twoFactorAuthState)) {
       return twoFactorAuthState;
@@ -177,9 +174,10 @@ class Bootstrap extends Component {
 
     if (TWO_FACTOR_STEPS.includes(currentStep)) {
       return (
-        <BootstrapLayout>
+        <BootstrapLayout user={this.user}>
           <TwoFactorStep
             initialStep={currentStep}
+            navigationSteps={this.navigationPanelSteps}
             onFinish={this.handleFinishTwoFactor}
           />
         </BootstrapLayout>
@@ -188,9 +186,10 @@ class Bootstrap extends Component {
 
     if (PASSWORD_STEPS.includes(currentStep)) {
       return (
-        <BootstrapLayout>
+        <BootstrapLayout user={this.user}>
           <PasswordStep
             email={shared.e}
+            navigationSteps={this.navigationPanelSteps}
             onFinish={this.handleFinishChangePassword}
           />
         </BootstrapLayout>
@@ -201,6 +200,7 @@ class Bootstrap extends Component {
       return (
         <MasterPasswordStep
           initialStep={currentStep}
+          navigationSteps={this.navigationPanelSteps}
           sharedMasterPassword={shared.mp}
           onFinish={this.handleFinishMasterPassword}
         />
@@ -209,8 +209,9 @@ class Bootstrap extends Component {
 
     if (SHARED_ITEMS_STEPS.includes(currentStep)) {
       return (
-        <BootstrapLayout>
+        <BootstrapLayout user={this.user}>
           <SharedItemsStep
+            navigationSteps={this.navigationPanelSteps}
             oldKeyPair={oldKeyPair}
             currentKeyPair={currentKeyPair}
             oldMasterPassword={shared.mp}

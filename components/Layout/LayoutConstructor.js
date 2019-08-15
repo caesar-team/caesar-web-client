@@ -32,6 +32,7 @@ const MainWrapper = styled.div`
 const BgRightImage = styled.img`
   position: absolute;
   right: 60px;
+  top: 180px;
   object-fit: contain;
 `;
 

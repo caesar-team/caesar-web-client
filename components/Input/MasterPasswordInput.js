@@ -1,7 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
 import PasswordInput from './PasswordInput';
-import StrengthIndicator from './StrengthIndicator';
 import { Icon } from '../Icon';
 
 const Wrapper = styled.div`
@@ -25,6 +24,7 @@ const IconWrapper = styled.div`
   justify-content: center;
   height: 100%;
   width: 60px;
+  min-width: 60px;
   border-right: 1px solid
     ${({ theme, isError }) => (isError ? theme.red : theme.gallery)};
 `;
@@ -36,10 +36,6 @@ const StyledPasswordInput = styled(PasswordInput)`
   }
 `;
 
-const StyledStrengthIndicator = styled(StrengthIndicator)`
-  margin-top: 40px;
-`;
-
 const Error = styled.div`
   position: absolute;
   top: 68px;
@@ -48,7 +44,7 @@ const Error = styled.div`
   color: ${({ theme }) => theme.red};
 `;
 
-const MasterPasswordInput = ({ withIndicator = false, error, ...props }) => {
+const MasterPasswordInput = ({ error, ...props }) => {
   const isError = !!error;
 
   return (
@@ -60,9 +56,6 @@ const MasterPasswordInput = ({ withIndicator = false, error, ...props }) => {
         <StyledPasswordInput {...props} />
       </InnerWrapper>
       {isError && <Error>{error}</Error>}
-      {withIndicator && (
-        <StyledStrengthIndicator value={props.value} rules={props.rules} />
-      )}
     </Wrapper>
   );
 };

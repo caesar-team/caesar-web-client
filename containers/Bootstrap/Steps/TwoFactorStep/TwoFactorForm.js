@@ -1,29 +1,81 @@
 import React from 'react';
 import styled from 'styled-components';
-import { Formik, FastField } from 'formik';
 import {
   AuthTitle,
   AuthDescription,
-  CodeInput,
-  Checkbox,
   Button,
   TextWithLines,
+  CodeInput,
+  Checkbox,
 } from 'components';
-import MobileImg from 'public/images/mobile.png';
-import { codeSchema } from './schema';
+import { FastField, Formik } from 'formik';
 import {
   initialValues,
   CODE_LENGTH,
   AUTHY_LINK,
   GOOGLE_AUTHENTICATOR_LINK,
 } from './constants';
+import { codeSchema } from './schema';
 
 const Wrapper = styled.div`
-  max-width: 400px;
-  width: 100%;
-  margin-right: auto;
-  margin-left: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+`;
+
+const QrCodeWrapper = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 50px;
+`;
+
+const QrCodeImage = styled.img`
+  width: 200px;
+  height: 200px;
+  object-fit: cover;
+`;
+
+const QrCodeImageWrapper = styled.div`
+  display: flex;
+  width: 200px;
+  height: 200px;
+  margin-right: 60px;
+`;
+
+const QrCodeKeyWrapper = styled.div`
+  margin-top: 20px;
   text-align: center;
+`;
+
+const QrCodeAndApplicationDescription = styled.div`
+  display: flex;
+  flex-direction: column;
+`;
+
+const QrCodeDescription = styled.div`
+  font-size: 14px;
+  line-height: 1.5;
+  letter-spacing: 0.47px;
+`;
+
+const QrCodeKey = styled.span`
+  font-size: 36px;
+  letter-spacing: 1px;
+  text-align: center;
+`;
+
+const NextButton = styled(Button)`
+  width: 100%;
+  height: 60px;
+  font-size: 18px;
+  max-width: 400px;
+`;
+
+const ApplicationLink = styled.a`
+  font-size: 14px;
+  letter-spacing: 0.6px;
+  color: ${({ theme }) => theme.black};
 `;
 
 const Form = styled.form`
@@ -41,73 +93,39 @@ const Error = styled.div`
   color: ${({ theme }) => theme.red};
 `;
 
-const TipWrapper = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 50px;
-`;
-
-const MobileImage = styled.img`
-  width: 90px;
-  height: 175px;
-  object-fit: cover;
-`;
-
-const ImageWrapper = styled.div`
-  display: flex;
-  width: 90px;
-  height: 175px;
-  margin-right: 60px;
-`;
-
-const ApplicationDescription = styled.div`
-  display: flex;
-  flex-direction: column;
-  font-size: 14px;
-  line-height: 1.5;
-  letter-spacing: 0.47px;
-`;
-
-const ApplicationLink = styled.a`
-  font-size: 14px;
-  letter-spacing: 0.6px;
-  color: ${({ theme }) => theme.black};
-  display: contents;
-`;
-
 const CheckboxWrapper = styled.div`
   display: flex;
   justify-content: center;
-  padding-top: 20px;
+  margin-top: 30px;
+  margin-bottom: 30px;
 `;
 
-const NextButton = styled(Button)`
-  height: 60px;
-  font-size: 18px;
-  margin-top: 60px;
-`;
-
-const TwoFactorCheckForm = ({ onSubmit }) => (
+const TwoFactorForm = ({ qr, code, onSubmit }) => (
   <Wrapper>
     <AuthTitle>Two Factor Authentication</AuthTitle>
-    <AuthDescription>Enter the code</AuthDescription>
-    <TipWrapper>
-      <ImageWrapper>
-        <MobileImage src={MobileImg} />
-      </ImageWrapper>
-      <ApplicationDescription>
-        Please open{' '}
-        <ApplicationLink target="_blank" href={AUTHY_LINK}>
-          Authy
-        </ApplicationLink>{' '}
-        or{' '}
-        <ApplicationLink target="_blank" href={GOOGLE_AUTHENTICATOR_LINK}>
-          Google Authenticator
-        </ApplicationLink>{' '}
-        app on your phone device and enter the code in the field below.
-      </ApplicationDescription>
-    </TipWrapper>
+    <AuthDescription>Scan the QR code in 2FA app</AuthDescription>
+    <QrCodeWrapper>
+      <QrCodeImageWrapper>
+        <QrCodeImage src={qr} />
+      </QrCodeImageWrapper>
+      <QrCodeAndApplicationDescription>
+        <QrCodeDescription>
+          You can use{' '}
+          <ApplicationLink target="_blank" href={AUTHY_LINK}>
+            Authy
+          </ApplicationLink>
+          ,{' '}
+          <ApplicationLink target="_blank" href={GOOGLE_AUTHENTICATOR_LINK}>
+            Google Authenticator
+          </ApplicationLink>{' '}
+          or other similar app. If you haven’t QR-scan you can enter the key in
+          the application:
+        </QrCodeDescription>
+        <QrCodeKeyWrapper>
+          <QrCodeKey>{code}</QrCodeKey>
+        </QrCodeKeyWrapper>
+      </QrCodeAndApplicationDescription>
+    </QrCodeWrapper>
     <TextWithLines>Enter the 6-digit code from the app</TextWithLines>
     <Formik
       key="codeForm"
@@ -157,4 +175,4 @@ const TwoFactorCheckForm = ({ onSubmit }) => (
   </Wrapper>
 );
 
-export default TwoFactorCheckForm;
+export default TwoFactorForm;

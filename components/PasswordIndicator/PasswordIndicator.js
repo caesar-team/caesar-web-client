@@ -33,6 +33,8 @@ const ScoreName = styled.div`
   letter-spacing: 0.3px;
   color: ${({ theme }) => theme.black};
   margin-left: 16px;
+  width: 80px;
+  text-align: right;
 `;
 
 /*

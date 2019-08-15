@@ -3,6 +3,8 @@ import styled from 'styled-components';
 import { AuthDescription, AuthTitle, Head } from 'components';
 import { postChangePassword } from 'common/api';
 import { createSrp } from 'common/utils/srp';
+import { NavigationPanelStyled } from '../../components';
+import { PASSWORD_CHANGE } from '../../constants';
 import PasswordForm from './PasswordForm';
 
 const Wrapper = styled.div`
@@ -42,9 +44,15 @@ class PasswordStep extends Component {
   };
 
   render() {
+    const { navigationSteps } = this.props;
+
     return (
       <Wrapper>
         <Head title="Password" />
+        <NavigationPanelStyled
+          currentStep={PASSWORD_CHANGE}
+          steps={navigationSteps}
+        />
         <AuthTitle>Change Password</AuthTitle>
         <AuthDescription>Enter and confirm new password</AuthDescription>
         <PasswordForm onSubmit={this.handleSubmit} />

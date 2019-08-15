@@ -1,24 +1,23 @@
 import React from 'react';
 import styled from 'styled-components';
 import LayoutConstructor from './LayoutConstructor';
+import BootstrapHeader from './BootstrapHeader';
 import Footer from './Footer';
-import { Icon } from '../Icon';
 
 const LayoutConstructorStyled = styled(LayoutConstructor)`
-  ${LayoutConstructor.TopWrapper} {
-    justify-content: space-between;
-    margin-bottom: 100px;
-  }
+  padding: 0 0 30px 0;
 
   ${LayoutConstructor.MainWrapper} {
-    max-width: 530px;
+    padding: 0 60px;
+    max-width: 610px;
+    position: relative;
   }
 `;
 
-const BootstrapLayout = props => (
+const BootstrapLayout = ({ user, ...props }) => (
   <LayoutConstructorStyled
     withImages
-    headerComponent={<Icon name="logo-new" width={142} height={40} />}
+    headerComponent={<BootstrapHeader user={user} />}
     footerComponent={Footer}
     {...props}
   />

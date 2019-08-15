@@ -1,5 +1,6 @@
 import React, { Component, Fragment } from 'react';
 import styled from 'styled-components';
+import copy from 'copy-text-to-clipboard';
 import { getKeys, postKeys } from 'common/api';
 import { matchStrict } from 'common/utils/match';
 import {
@@ -7,7 +8,8 @@ import {
   generateKeys,
   reencryptPrivateKey,
 } from 'common/utils/key';
-import { BootstrapLayout, Head } from 'components';
+import { Head } from 'components';
+import { NavigationPanelStyled } from '../../components';
 import {
   MASTER_PASSWORD_CHECK,
   MASTER_PASSWORD_CREATE,
@@ -27,6 +29,8 @@ const Wrapper = styled.div`
   margin: 0 auto;
 `;
 
+const waitIdle = () => new Promise(requestIdleCallback);
+
 class MasterPasswordStep extends Component {
   state = this.prepareInitialState();
 
@@ -37,7 +41,7 @@ class MasterPasswordStep extends Component {
       step: initialStep,
       publicKey: null,
       encryptedPrivateKey: null,
-      masterPassword: null,
+      masterPassword: '',
     };
 
     if (initialStep === MASTER_PASSWORD_CREATE) {
@@ -119,10 +123,13 @@ class MasterPasswordStep extends Component {
   };
 
   handleSubmitCreatePassword = ({ password }) => {
-    this.setState({
-      masterPassword: password,
-      step: MASTER_PASSWORD_CONFIRM,
-    });
+    this.setState(
+      {
+        masterPassword: password,
+        step: MASTER_PASSWORD_CONFIRM,
+      },
+      () => copy(password),
+    );
   };
 
   handleSubmitConfirmPassword = async (
@@ -136,6 +143,9 @@ class MasterPasswordStep extends Component {
       publicKey: currentPublicKey,
       encryptedPrivateKey: currentEncryptedPrivateKey,
     } = this.state;
+
+    // otherwise, formik doesn't have time to set isSubmitting flag
+    await waitIdle();
 
     let publicKey = currentPublicKey;
     let encryptedPrivateKey = currentEncryptedPrivateKey;
@@ -183,23 +193,29 @@ class MasterPasswordStep extends Component {
       step: null,
       publicKey: null,
       encryptedPrivateKey: null,
-      masterPassword: null,
+      masterPassword: '',
       sharedMasterPassword: this.props.sharedMasterPassword,
     };
   }
 
   render() {
+    const { navigationSteps } = this.props;
     const { step, masterPassword } = this.state;
 
     if (!step) {
       return null;
     }
 
+    const initialValues = {
+      password: masterPassword,
+    };
+
     const renderedStep = matchStrict(
       step,
       {
         [MASTER_PASSWORD_CREATE]: (
           <MasterPasswordCreateForm
+            initialValues={initialValues}
             onSubmit={this.handleSubmitCreatePassword}
           />
         ),
@@ -220,9 +236,10 @@ class MasterPasswordStep extends Component {
         {step === MASTER_PASSWORD_CHECK ? (
           <MasterPasswordCheckForm onSubmit={this.handleSubmitCheckPassword} />
         ) : (
-          <BootstrapLayout>
+          <Fragment>
+            <NavigationPanelStyled currentStep={step} steps={navigationSteps} />
             <Wrapper>{renderedStep}</Wrapper>
-          </BootstrapLayout>
+          </Fragment>
         )}
       </Fragment>
     );

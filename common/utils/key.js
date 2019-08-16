@@ -15,9 +15,9 @@ export const reencryptPrivateKey = async (
   return privateKeyObj.armor();
 };
 
-export const generateKeys = async (masterPassword, user) => {
+export const generateKeys = async (masterPassword, emails) => {
   const options = {
-    userIds: [{ name: user }],
+    userIds: emails.map(email => ({ email, name: email })),
     numBits: LENGTH_KEY,
     passphrase: masterPassword,
   };

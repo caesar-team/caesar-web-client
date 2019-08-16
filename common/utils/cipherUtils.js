@@ -66,13 +66,24 @@ export const generateUser = async email => {
   const masterPassword = generator();
   const password = generator();
 
-  const keys = await generateKeys(masterPassword, email);
+  const keys = await generateKeys(masterPassword, [email]);
 
   return { email, password, masterPassword, ...keys };
 };
 
-export const generateUsers = async emails =>
-  Promise.all(emails.map(async email => await generateUser(email)));
+export const generateUsersBatch = async emails => {
+  const masterPassword = generator();
+  const password = generator();
+
+  const keys = await generateKeys(masterPassword, emails);
+
+  return emails.map(email => ({
+    email,
+    password,
+    masterPassword,
+    ...keys,
+  }));
+};
 
 export const generateAnonymousEmail = () =>
   `anonymous_${randomId()}@caesar.team`;

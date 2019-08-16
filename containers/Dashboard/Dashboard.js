@@ -24,6 +24,7 @@ import {
   DASHBOARD_DEFAULT_MODE,
   DASHBOARD_SEARCH_MODE,
   DASHBOARD_SECURE_MESSAGE_MODE,
+  ITEM_CREDENTIALS_TYPE,
 } from 'common/constants';
 import { initialItemData } from './utils';
 
@@ -60,6 +61,9 @@ const searchFn = (obj, pattern) => fieldName =>
   obj[fieldName] &&
   obj[fieldName].toLowerCase().includes(pattern.toLowerCase());
 
+const getItemTypeText = item =>
+  item.type === ITEM_CREDENTIALS_TYPE ? 'credential' : 'note';
+
 class DashboardContainer extends Component {
   state = this.prepareInitialState();
 
@@ -84,6 +88,7 @@ class DashboardContainer extends Component {
     this.props.fetchMembersRequest();
   }
 
+  // eslint-disable-next-line
   handleClickMenuItem = id => () => {
     this.props.setWorkInProgressListId(id);
     this.props.setWorkInProgressItem(null);
@@ -145,7 +150,11 @@ class DashboardContainer extends Component {
   };
 
   handleMoveToTrash = () => {
-    const { workInProgressItemIds, workInProgressList } = this.props;
+    const {
+      workInProgressItemIds,
+      workInProgressItem,
+      workInProgressList,
+    } = this.props;
 
     if (workInProgressItemIds.length > 0) {
       this.props.moveItemsBatchRequest(
@@ -153,9 +162,17 @@ class DashboardContainer extends Component {
         this.props.listsByType.trash.id,
       );
       this.props.resetWorkInProgressItemIds();
+
+      this.props.notification.show({
+        text: `The items have removed`,
+      });
     } else {
       this.props.moveItemRequest(this.props.listsByType.trash.id);
       this.props.setWorkInProgressItem(null);
+
+      this.props.notification.show({
+        text: `The ${getItemTypeText(workInProgressItem)} has removed`,
+      });
     }
 
     this.handleCloseModal('moveToTrash')();
@@ -168,10 +185,18 @@ class DashboardContainer extends Component {
   handleClickMoveItem = (_, listId) => {
     this.props.moveItemRequest(listId);
     this.props.setWorkInProgressItem(null);
+
+    this.props.notification.show({
+      text: `The ${getItemTypeText(this.props.workInProgressItem)} has moved.`,
+    });
   };
 
   handleFinishEditWorkflow = (data, { setSubmitting }) => {
     this.props.editItemRequest(data, setSubmitting);
+
+    this.props.notification.show({
+      text: `The ${getItemTypeText(data)} has updated`,
+    });
   };
 
   handleToggleFavorites = id => () => {
@@ -256,6 +281,10 @@ class DashboardContainer extends Component {
 
     this.props.moveItemsBatchRequest(workInProgressList.id, listId);
     this.props.resetWorkInProgressItemIds();
+
+    this.props.notification.show({
+      text: 'The items have moved.',
+    });
 
     this.handleCloseModal('move')();
   };
@@ -539,6 +568,7 @@ class DashboardContainer extends Component {
           <MoveModal
             lists={lists}
             items={workInProgressItems}
+            workInProgressListId={workInProgressList.id}
             onMove={this.handleClickMoveItems}
             onCancel={this.handleCloseModal('move')}
             onRemove={this.handleCtrlSelectionItemBehaviour}

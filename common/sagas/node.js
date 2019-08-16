@@ -142,11 +142,7 @@ import {
 import { generateInviteUrl, generateSharingUrl } from 'common/utils/sharing';
 import { uuid4 } from 'common/utils/uuid4';
 import { getWorkersCount } from 'common/utils/worker';
-import {
-  createMemberSaga,
-  getOrCreateMemberSaga,
-  getOrCreateMemberBatchSaga,
-} from './member';
+import { createMemberSaga, getOrCreateMemberBatchSaga } from './member';
 
 const reorder = (list, startIndex, endIndex) => {
   const result = Array.from(list);
@@ -692,11 +688,12 @@ export function* shareItemSaga({ payload: { item, emails } }) {
   try {
     const itemInvitedUsers = item.invited.map(({ userId }) => userId);
 
-    const response = yield all(
-      emails.map(email =>
-        call(getOrCreateMemberSaga, { payload: { email, role: USER_ROLE } }),
-      ),
-    );
+    const response = yield call(getOrCreateMemberBatchSaga, {
+      payload: {
+        emails,
+        role: USER_ROLE,
+      },
+    });
 
     const users = response.filter(
       user => !!user && !itemInvitedUsers.includes(user.userId),

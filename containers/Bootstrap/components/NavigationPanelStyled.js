@@ -1,12 +1,12 @@
 import styled from 'styled-components';
 import { NavigationPanel } from 'components';
 
+// hack to ignore parent width container
 const NavigationPanelStyled = styled(NavigationPanel)`
-  margin: auto;
   position: absolute;
+  width: calc(100vw - 122px);
+  margin-left: calc(50% - 50vw);
   top: 0;
-  left: 0;
-  right: 0;
 `;
 
 export default NavigationPanelStyled;

@@ -8,7 +8,7 @@ import {
   generateKeys,
   reencryptPrivateKey,
 } from 'common/utils/key';
-import { Head } from 'components';
+import { Head, BootstrapLayout } from 'components';
 import { NavigationPanelStyled } from '../../components';
 import {
   MASTER_PASSWORD_CHECK,
@@ -199,7 +199,7 @@ class MasterPasswordStep extends Component {
   }
 
   render() {
-    const { navigationSteps } = this.props;
+    const { navigationSteps, user } = this.props;
     const { step, masterPassword } = this.state;
 
     if (!step) {
@@ -236,10 +236,10 @@ class MasterPasswordStep extends Component {
         {step === MASTER_PASSWORD_CHECK ? (
           <MasterPasswordCheckForm onSubmit={this.handleSubmitCheckPassword} />
         ) : (
-          <Fragment>
+          <BootstrapLayout user={user}>
             <NavigationPanelStyled currentStep={step} steps={navigationSteps} />
             <Wrapper>{renderedStep}</Wrapper>
-          </Fragment>
+          </BootstrapLayout>
         )}
       </Fragment>
     );

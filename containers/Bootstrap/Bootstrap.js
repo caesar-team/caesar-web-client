@@ -201,6 +201,7 @@ class Bootstrap extends Component {
         <MasterPasswordStep
           initialStep={currentStep}
           navigationSteps={this.navigationPanelSteps}
+          user={this.user}
           sharedMasterPassword={shared.mp}
           onFinish={this.handleFinishMasterPassword}
         />

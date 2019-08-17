@@ -32,6 +32,11 @@ export {
   NotificationProvider,
   withNotification,
 } from './Notification';
+export {
+  OfflineDetectionProvider,
+  OfflineNotification,
+  withOfflineDetection,
+} from './Offline';
 export { Scrollbar } from './Scrollbar';
 export { SecureMessage } from './SecureMessage';
 export { Select } from './Select';

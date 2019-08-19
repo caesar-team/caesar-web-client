@@ -1,21 +1,23 @@
 import { connect } from 'react-redux';
 import { createStructuredSelector } from 'reselect';
+import { extendedSortedCustomizableListsSelector } from 'common/selectors/list';
 import {
-  extendedSortedCustomizableListsSelector,
   workInProgressListSelector,
   isLoadingSelector,
   shouldLoadNodesSelector,
-} from 'common/selectors/node';
+} from 'common/selectors/workflow';
 import { userDataSelector } from 'common/selectors/user';
 import { byIdSelector } from 'common/selectors/member';
 import {
-  fetchNodesRequest,
   createListRequest,
   editListRequest,
   removeListRequest,
   sortListRequest,
+} from 'common/actions/list';
+import {
+  fetchNodesRequest,
   setWorkInProgressListId,
-} from 'common/actions/node';
+} from 'common/actions/workflow';
 import { fetchMembersRequest } from 'common/actions/member';
 import { fetchUserSelfRequest, fetchKeyPairRequest } from 'common/actions/user';
 import ManageList from './ManageList';

@@ -217,7 +217,7 @@ class DashboardContainer extends Component {
   };
 
   handleChangePermission = (userId, permission) => {
-    this.props.changeItemPermissionRequest(userId, permission);
+    this.props.changeChildItemPermissionRequest(userId, permission);
   };
 
   handleRemoveInvite = userId => {
@@ -424,6 +424,8 @@ class DashboardContainer extends Component {
       mode === DASHBOARD_SEARCH_MODE
         ? searchedItems.length === workInProgressItemIds.length
         : visibleListItems.length === workInProgressItemIds.length;
+
+    console.log('workInProgressItem', workInProgressItem);
 
     return (
       <Fragment>

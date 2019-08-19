@@ -1,51 +1,27 @@
 import { createSelector } from 'reselect';
 import {
-  INBOX_TYPE,
-  TRASH_TYPE,
   FAVORITES_TYPE,
+  INBOX_TYPE,
   LIST_TYPE,
+  TRASH_TYPE,
 } from 'common/constants';
+import { itemsByIdSelector, itemsSelector } from './item';
 
 export const entitiesSelector = state => state.entities;
 
-export const nodeSelector = createSelector(
+export const listEntitySelector = createSelector(
   entitiesSelector,
-  entities => entities.node,
-);
-
-export const isLoadingSelector = createSelector(
-  nodeSelector,
-  node => node.isLoading,
+  entities => entities.list,
 );
 
 export const listsByIdSelector = createSelector(
-  nodeSelector,
-  node => node.listsById,
-);
-
-export const itemsByIdSelector = createSelector(
-  nodeSelector,
-  node => node.itemsById,
-);
-
-export const workInProgressItemSelector = createSelector(
-  nodeSelector,
-  node => node.workInProgressItem,
-);
-
-export const workInProgressListIdSelector = createSelector(
-  nodeSelector,
-  node => node.workInProgressListId,
-);
-
-export const workInProgressItemIdsSelector = createSelector(
-  nodeSelector,
-  node => node.workInProgressItemIds,
+  listEntitySelector,
+  listEntity => listEntity.byId,
 );
 
 export const listsSelector = createSelector(
-  nodeSelector,
-  node => Object.values(node.listsById) || [],
+  listsByIdSelector,
+  listsById => Object.values(listsById) || [],
 );
 
 export const userListsSelector = createSelector(
@@ -63,20 +39,6 @@ export const favoriteListSelector = createSelector(
   listsSelector,
   lists =>
     lists.find(({ label }) => label.toLocaleLowerCase() === 'favorites') || {},
-);
-
-export const workInProgressListSelector = createSelector(
-  listsByIdSelector,
-  workInProgressListIdSelector,
-  favoriteListSelector,
-  (listsById, workInProgressListId, favoriteList) => {
-    return listsById[workInProgressListId] || favoriteList;
-  },
-);
-
-export const itemsSelector = createSelector(
-  nodeSelector,
-  node => Object.values(node.itemsById) || [],
 );
 
 export const itemsInListsSelector = createSelector(
@@ -177,30 +139,3 @@ export const listsByTypeSelector = createSelector(
   (inbox, list, favorites, trash) => ({ inbox, list, favorites, trash }),
 );
 
-export const visibleListItemsSelector = createSelector(
-  listsByIdSelector,
-  itemsByIdSelector,
-  workInProgressListIdSelector,
-  (listsById, itemsById, workInProgressListId) =>
-    listsById && workInProgressListId && listsById[workInProgressListId]
-      ? listsById[workInProgressListId].children.reduce(
-          (accumulator, item) =>
-            itemsById[item.id] && typeof itemsById[item.id].secret !== 'string'
-              ? accumulator.concat(itemsById[item.id])
-              : accumulator,
-          [],
-        )
-      : [],
-);
-
-export const workInProgressItemsSelector = createSelector(
-  itemsByIdSelector,
-  workInProgressItemIdsSelector,
-  (itemsById, workInProgressItemIds) =>
-    workInProgressItemIds.map(itemId => itemsById[itemId]),
-);
-
-export const shouldLoadNodesSelector = createSelector(
-  extendedSortedCustomizableListsSelector,
-  lists => !lists.length,
-);

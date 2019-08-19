@@ -1,10 +1,22 @@
 import { combineReducers } from 'redux';
-import { nodeReducer, memberReducer, userReducer } from '../reducers';
+import {
+  memberReducer,
+  userReducer,
+  workflowReducer,
+  listReducer,
+  itemReducer,
+  childItemReducer,
+} from '../reducers';
+
+const entitiesReducer = combineReducers({
+  member: memberReducer,
+  list: listReducer,
+  item: itemReducer,
+  childItem: childItemReducer,
+});
 
 export const rootReducer = combineReducers({
-  entities: combineReducers({
-    node: nodeReducer,
-    member: memberReducer,
-  }),
+  entities: entitiesReducer,
   user: userReducer,
+  workflow: workflowReducer,
 });

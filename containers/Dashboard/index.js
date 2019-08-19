@@ -2,10 +2,12 @@ import { connect } from 'react-redux';
 import { createStructuredSelector } from 'reselect';
 import {
   fetchNodesRequest,
-  setWorkInProgressListId,
   setWorkInProgressItem,
   setWorkInProgressItemIds,
+  setWorkInProgressListId,
   resetWorkInProgressItemIds,
+} from 'common/actions/workflow';
+import {
   moveItemRequest,
   moveItemsBatchRequest,
   createItemRequest,
@@ -14,32 +16,35 @@ import {
   removeItemsBatchRequest,
   acceptItemUpdateRequest,
   rejectItemUpdateRequest,
-  changeItemPermissionRequest,
+  toggleItemToFavoriteRequest,
+  createAnonymousLinkRequest,
+  removeAnonymousLinkRequest,
+} from 'common/actions/item';
+import {
   inviteMemberRequest,
   inviteNewMemberRequest,
   removeInviteMemberRequest,
   shareItemRequest,
   shareItemBatchRequest,
   removeShareRequest,
-  createAnonymousLinkRequest,
-  removeAnonymousLinkRequest,
-  toggleItemToFavoriteRequest,
-  resetStore,
-} from 'common/actions/node';
+  changeChildItemPermissionRequest,
+} from 'common/actions/childItem';
 import { fetchKeyPairRequest, fetchUserSelfRequest } from 'common/actions/user';
 import { fetchMembersRequest } from 'common/actions/member';
 import {
-  selectableListsWithoutChildrenSelector,
-  itemsByIdSelector,
+  isLoadingSelector,
   workInProgressItemSelector,
   workInProgressItemIdsSelector,
   workInProgressItemsSelector,
   workInProgressListSelector,
   visibleListItemsSelector,
+} from 'common/selectors/workflow';
+import {
+  selectableListsWithoutChildrenSelector,
   listsByTypeSelector,
-  isLoadingSelector,
   trashListSelector,
-} from 'common/selectors/node';
+} from 'common/selectors/list';
+import { itemsByIdSelector } from 'common/selectors/item';
 import { keyPairSelector, userDataSelector } from 'common/selectors/user';
 import { byIdSelector } from 'common/selectors/member';
 import Dashboard from './Dashboard';
@@ -73,7 +78,7 @@ const mapDispatchToProps = {
   removeItemsBatchRequest,
   acceptItemUpdateRequest,
   rejectItemUpdateRequest,
-  changeItemPermissionRequest,
+  changeChildItemPermissionRequest,
   inviteMemberRequest,
   inviteNewMemberRequest,
   removeInviteMemberRequest,
@@ -87,7 +92,6 @@ const mapDispatchToProps = {
   setWorkInProgressItem,
   setWorkInProgressItemIds,
   resetWorkInProgressItemIds,
-  resetStore,
 };
 
 export default connect(

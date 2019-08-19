@@ -1,6 +1,6 @@
 import React, { Fragment } from 'react';
 import { Head, SettingsLayout, SettingsSidebar } from 'components';
-import { Import } from 'containers';
+import { ImportContainer } from 'containers';
 import { isServer } from 'common/utils/isEnvironment';
 import { getToken } from 'common/utils/token';
 import { getUserSelf } from 'common/api';
@@ -11,7 +11,7 @@ const SettingsImportPage = ({ user }) => (
     <SettingsLayout user={user}>
       <Fragment>
         <SettingsSidebar />
-        <Import />
+        <ImportContainer />
       </Fragment>
     </SettingsLayout>
   </Fragment>

@@ -34,7 +34,7 @@ export function* fetchKeyPairSaga() {
   }
 }
 
-export function* userSagas() {
+export default function* userSagas() {
   yield takeLatest(FETCH_USER_SELF_REQUEST, fetchUserSelfSaga);
   yield takeLatest(FETCH_KEY_PAIR_REQUEST, fetchKeyPairSaga);
 }

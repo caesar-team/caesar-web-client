@@ -136,7 +136,7 @@ class MasterPasswordStep extends Component {
     { confirmPassword },
     { setSubmitting, setErrors },
   ) => {
-    const { sharedMasterPassword } = this.props;
+    const { sharedMasterPassword, user } = this.props;
 
     const {
       masterPassword,
@@ -158,7 +158,7 @@ class MasterPasswordStep extends Component {
           currentEncryptedPrivateKey,
         );
       } else {
-        const data = await generateKeys(confirmPassword);
+        const data = await generateKeys(confirmPassword, [user.email]);
 
         // eslint-disable-next-line
         publicKey = data.publicKey;
@@ -177,6 +177,7 @@ class MasterPasswordStep extends Component {
         masterPassword,
       });
     } catch (error) {
+      console.log('error', error);
       setErrors({ confirmPassword: 'Something wrong' });
       return setSubmitting(false);
     }

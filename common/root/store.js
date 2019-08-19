@@ -14,9 +14,27 @@ export function configureWebStore(preloadedState) {
     composeEnhancers(applyMiddleware(sagaMiddleware)),
   );
 
+  let sagaTask = sagaMiddleware.run(rootSaga);
+
+  if (module.hot) {
+    module.hot.accept('../reducers', () =>
+      store.replaceReducer(require('../reducers')),
+    );
+
+    module.hot.accept('./sagas', () => {
+      const getNewSagas = require('./sagas');
+      sagaTask.cancel();
+      sagaTask.done.then(() => {
+        sagaTask = sagaMiddleware.run(function* replacedSaga() {
+          yield getNewSagas();
+        });
+      });
+    });
+  }
+
   return {
     ...store,
-    sagaTask: sagaMiddleware.run(rootSaga),
+    sagaTask,
   };
 }
 

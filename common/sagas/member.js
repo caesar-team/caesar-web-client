@@ -16,7 +16,7 @@ import {
   getPublicKeyByEmailBatch,
   postNewUserBatch,
 } from 'common/api';
-import { normalizeMembers } from 'common/normalizers/member';
+import { convertMembersToEntity } from 'common/normalizers/normalizers';
 import {
   generateUser,
   generateUsersBatch,
@@ -34,7 +34,7 @@ export function* fetchMembersSaga() {
   try {
     const { data } = yield call(getUsers);
 
-    yield put(fetchMembersSuccess(normalizeMembers(data)));
+    yield put(fetchMembersSuccess(convertMembersToEntity(data)));
   } catch (e) {
     yield put(fetchMembersFailure());
   }
@@ -165,7 +165,7 @@ export function* getOrCreateMemberBatchSaga({ payload: { emails, role } }) {
   }
 }
 
-export function* memberSagas() {
+export default function* memberSagas() {
   yield takeLatest(FETCH_MEMBERS_REQUEST, fetchMembersSaga);
   yield takeLatest(CREATE_MEMBER_REQUEST, createMemberSaga);
   yield takeLatest(CREATE_MEMBER_BATCH_REQUEST, createMemberBatchSaga);

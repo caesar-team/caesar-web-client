@@ -125,7 +125,6 @@ const List = ({
   onClickItem = Function.prototype,
   onClickCreateItem = Function.prototype,
 }) => {
-  console.log(isOnline);
   if (!workInProgressList && !workInProgressItemIds.length) {
     return null;
   }

@@ -49,7 +49,12 @@ export const Document = props => {
       {shouldShowAttachments && <Attachments attachments={attachments} />}
       {shouldShowRemove && (
         <RemoveButtonWrapper>
-          <RemoveButton color="white" icon="trash" onClick={onClickMoveToTrash}>
+          <RemoveButton
+            withOfflineCheck
+            color="white"
+            icon="trash"
+            onClick={onClickMoveToTrash}
+          >
             Remove
           </RemoveButton>
         </RemoveButtonWrapper>

@@ -3,7 +3,7 @@ import OfflineDetectionConsumer from './OfflineDetectionConsumer';
 
 const withOfflineDetection = Component => props => (
   <OfflineDetectionConsumer>
-    {context => <Component notification={context} {...props} />}
+    {context => <Component {...context} {...props} />}
   </OfflineDetectionConsumer>
 );
 

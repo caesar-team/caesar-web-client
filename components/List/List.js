@@ -10,6 +10,7 @@ import FixedSizeItem from './FixedSizeItem';
 import ScrollbarVirtualList from './ScrollbarVirtualList';
 import EmptyList from './EmptyList';
 import { Dropdown } from '../Dropdown';
+import { withOfflineDetection } from '../Offline';
 import { ITEM_ICON_TYPES } from '../../common/constants';
 
 const Wrapper = styled.div`
@@ -48,17 +49,21 @@ const CreateButton = styled.div`
   height: 40px;
   border-radius: 3px;
   outline: none;
-  cursor: pointer;
+  cursor: ${({ disabled }) => (disabled ? 'not-allowed' : 'pointer')};
   transition: all 0.2s;
   color: ${({ theme }) => theme.emperor};
   background-color: ${({ theme }) => theme.white};
   border: 1px solid ${({ theme }) => theme.gallery};
 
+  ${({ disabled }) =>
+    !disabled &&
+    `
   &:hover {
     color: ${({ theme }) => theme.white};
     background-color: ${({ theme }) => theme.black};
     border: 1px solid ${({ theme }) => theme.black};
   }
+  `}
 `;
 
 const StyledIcon = styled(Icon)`
@@ -116,9 +121,11 @@ const List = ({
   workInProgressItem,
   workInProgressItemIds,
   items = [],
+  isOnline,
   onClickItem = Function.prototype,
   onClickCreateItem = Function.prototype,
 }) => {
+  console.log(isOnline);
   if (!workInProgressList && !workInProgressItemIds.length) {
     return null;
   }
@@ -173,8 +180,14 @@ const List = ({
               onClick={onClickCreateItem}
               optionRender={renderOption}
             >
-              <CreateButton>
-                <Icon name="plus" width={14} height={14} isInButton />
+              <CreateButton disabled={!isOnline}>
+                <Icon
+                  isInButton
+                  withOfflineCheck
+                  name="plus"
+                  width={14}
+                  height={14}
+                />
               </CreateButton>
             </Dropdown>
           )}
@@ -185,6 +198,6 @@ const List = ({
   );
 };
 
-export default memo(List, (prevProps, nextProps) =>
-  equal(prevProps, nextProps),
+export default withOfflineDetection(
+  memo(List, (prevProps, nextProps) => equal(prevProps, nextProps)),
 );

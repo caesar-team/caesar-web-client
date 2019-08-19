@@ -9,6 +9,7 @@ import {
   File,
   Button,
   withNotification,
+  withOfflineDetection,
 } from 'components';
 import { Select } from 'components/Select';
 import { checkError } from 'common/utils/formikUtils';
@@ -156,7 +157,7 @@ class SecureMessageForm extends Component {
   };
 
   render() {
-    const { onSubmit, notification } = this.props;
+    const { onSubmit, notification, isOnline } = this.props;
     const { isCustomPassword } = this.state;
 
     return (
@@ -257,7 +258,7 @@ class SecureMessageForm extends Component {
             <ButtonWrapper>
               <StyledButton
                 htmlType="submit"
-                disabled={isSubmitting || !isValid}
+                disabled={isSubmitting || !isValid || !isOnline}
               >
                 Create Secure Message
               </StyledButton>
@@ -269,4 +270,4 @@ class SecureMessageForm extends Component {
   }
 }
 
-export default withNotification(SecureMessageForm);
+export default withOfflineDetection(withNotification(SecureMessageForm));

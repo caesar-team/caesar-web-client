@@ -167,6 +167,7 @@ class Credentials extends Component {
         {shouldShowRemove && (
           <RemoveButtonWrapper>
             <RemoveButton
+              withOfflineCheck
               color="white"
               icon="trash"
               onClick={onClickMoveToTrash}

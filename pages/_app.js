@@ -10,7 +10,7 @@ import withRedux from 'next-redux-wrapper';
 import withReduxSaga from 'next-redux-saga';
 import { configureWebStore } from 'common/root/store';
 import { Bootstrap } from '../containers';
-import { NotificationProvider } from '../components';
+import { NotificationProvider, OfflineDetectionProvider } from '../components';
 
 const GlobalStyles = createGlobalStyle`${globalStyles}`;
 
@@ -73,12 +73,14 @@ class Application extends NextApp {
     return (
       <ThemeProvider theme={theme}>
         <NotificationProvider>
-          <Container>
-            <GlobalStyles />
-            <Provider store={store}>
-              <Bootstrap {...pageProps} component={Component} />
-            </Provider>
-          </Container>
+          <OfflineDetectionProvider>
+            <Container>
+              <GlobalStyles />
+              <Provider store={store}>
+                <Bootstrap {...pageProps} component={Component} />
+              </Provider>
+            </Container>
+          </OfflineDetectionProvider>
         </NotificationProvider>
       </ThemeProvider>
     );

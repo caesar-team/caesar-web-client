@@ -1,23 +1,55 @@
 import React from 'react';
 import styled from 'styled-components';
+import { withOfflineDetection } from '../Offline';
 import './icons';
 
 const Svg = styled.svg`
   display: inline-block;
   vertical-align: middle;
   fill: ${({ isInButton }) => (isInButton ? 'currentColor' : '')};
+
+  & > * {
+    ${({ disabled }) => disabled && `opacity: 0.5`}
+  }
 `;
 
-const Icon = ({ name, isInButton, ...props }) => {
+const getIconDisabledStatus = (withOfflineCheck, isOnline, disabled) =>
+  (withOfflineCheck && !isOnline) || disabled;
+
+const Icon = ({
+  name,
+  isInButton,
+  withOfflineCheck = false,
+  isOnline,
+  disabled,
+  onClick = Function.prototype,
+  onMouseEnter = Function.prototype,
+  onMouseLeave = Function.prototype,
+  ...props
+}) => {
   if (!name) {
     return null;
   }
 
+  const isDisabled = getIconDisabledStatus(
+    withOfflineCheck,
+    isOnline,
+    disabled,
+  );
+
+  const events = isDisabled
+    ? {}
+    : {
+        onClick,
+        onMouseEnter,
+        onMouseLeave,
+      };
+
   return (
-    <Svg isInButton={isInButton} {...props}>
+    <Svg isInButton={isInButton} disabled={isDisabled} {...props} {...events}>
       <use xlinkHref={`#icon-${name}--sprite`} />
     </Svg>
   );
 };
 
-export default Icon;
+export default withOfflineDetection(Icon);

@@ -5,6 +5,7 @@ import { upperFirst } from 'common/utils/string';
 import { Icon } from 'components/Icon';
 import { Button } from 'components/Button';
 import { Avatar, AvatarsList } from 'components/Avatar';
+import { withOfflineDetection } from 'components/Offline';
 import { Dropdown } from 'components/Dropdown';
 import { TRASH_TYPE } from 'common/constants';
 import { Row } from './Row';
@@ -62,13 +63,17 @@ const InviteButton = styled.button`
   border: 1px dashed ${({ theme }) => theme.gallery};
   border-radius: 50%;
   outline: none;
-  cursor: pointer;
+  cursor: ${({ disabled }) => (disabled ? 'not-allowed' : 'pointer')};
   transition: all 0.2s;
 
-  &:hover {
-    color: ${({ theme }) => theme.black};
-    border-color: ${({ theme }) => theme.emperor};
-  }
+  ${({ disabled }) =>
+    !disabled &&
+    `
+      &:hover {
+        color: ${({ theme }) => theme.black};
+        border-color: ${({ theme }) => theme.emperor};
+      }
+  `}
 `;
 
 const ShareButton = styled(Button)`
@@ -97,15 +102,19 @@ const FavoriteButton = styled.button`
   align-self: flex-start;
   margin-top: 20px;
   padding: 0;
-  cursor: pointer;
+  cursor: ${({ disabled }) => (disabled ? 'not-allowed' : 'pointer')};
   background: none;
   border: none;
   outline: none;
   transition: 0.3s;
 
-  &:hover {
-    opacity: 0.75;
-  }
+  ${({ disabled }) =>
+    !disabled &&
+    `
+      &:hover {
+        opacity: 0.75;
+      }
+  `}
 `;
 
 const StyledDropdown = styled(Dropdown)`
@@ -128,12 +137,13 @@ const MoveTo = styled.a`
   }
 `;
 
-export const ItemHeader = ({
+const ItemHeader = ({
   allLists,
   isReadOnly,
   hasWriteAccess,
   isTrashItem,
   isSharedItem,
+  isOnline,
   user,
   members,
   onClickCloseItem,
@@ -200,7 +210,11 @@ export const ItemHeader = ({
           )}
           {isTrashItem ? (
             <ButtonsWrapper>
-              <Button color="white" onClick={onClickRestoreItem}>
+              <Button
+                withOfflineCheck
+                color="white"
+                onClick={onClickRestoreItem}
+              >
                 RESTORE
               </Button>
               <ItemButton
@@ -213,7 +227,12 @@ export const ItemHeader = ({
             </ButtonsWrapper>
           ) : (
             hasWriteAccess && (
-              <EditButton color="white" icon="pencil" onClick={onClickEditItem}>
+              <EditButton
+                withOfflineCheck
+                color="white"
+                icon="pencil"
+                onClick={onClickEditItem}
+              >
                 EDIT
               </EditButton>
             )
@@ -223,8 +242,12 @@ export const ItemHeader = ({
       </Row>
       <Row>
         <Title>{name}</Title>
-        <FavoriteButton onClick={onToggleFavorites(itemId)}>
+        <FavoriteButton
+          disabled={!isOnline}
+          onClick={onToggleFavorites(itemId)}
+        >
           <Icon
+            withOfflineCheck
             name={favorite ? 'favorite-active' : 'favorite'}
             width={20}
             height={20}
@@ -244,13 +267,28 @@ export const ItemHeader = ({
         </Row>
         <Row>
           {!isTrashItem && isOwner && (
-            <InviteButton onClick={onClickInvite} hasInvited={hasInvited}>
-              <Icon name="plus" width={14} height={14} isInButton />
+            <InviteButton
+              disabled={!isOnline}
+              onClick={onClickInvite}
+              hasInvited={hasInvited}
+            >
+              <Icon
+                isInButton
+                withOfflineCheck
+                name="plus"
+                width={14}
+                height={14}
+              />
             </InviteButton>
           )}
           <StyledAvatarsList avatars={avatars} />
           {!isTrashItem && isOwner && (
-            <ShareButton icon="share" color="black" onClick={onClickShare}>
+            <ShareButton
+              withOfflineCheck
+              icon="share"
+              color="black"
+              onClick={onClickShare}
+            >
               Share
             </ShareButton>
           )}
@@ -259,3 +297,5 @@ export const ItemHeader = ({
     </Fragment>
   );
 };
+
+export default withOfflineDetection(ItemHeader);

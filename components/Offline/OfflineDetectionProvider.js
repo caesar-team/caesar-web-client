@@ -1,4 +1,5 @@
 import React, { PureComponent, createContext } from 'react';
+import { isClient } from 'common/utils/isEnvironment';
 
 const { Consumer, Provider } = createContext({});
 
@@ -21,7 +22,7 @@ class OfflineDetectionProvider extends PureComponent {
 
   prepareInitialState() {
     return {
-      isOnline: navigator.onLine,
+      isOnline: isClient ? navigator.onLine : true,
     };
   }
 

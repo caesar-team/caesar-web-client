@@ -60,9 +60,9 @@ const ListItemStyled = styled(ListItem)`
   }
 `;
 
-const getOptions = memoize((lists, activeListId) =>
+const getOptions = memoize((lists, removedListId, activeListId) =>
   lists
-    .filter(({ type }) => type !== TRASH_TYPE)
+    .filter(({ id, type }) => type !== TRASH_TYPE && id !== removedListId)
     .map(({ label, id }) => ({
       value: id,
       label: upperFirst(label),
@@ -107,7 +107,7 @@ class MoveModal extends Component {
   }
 
   render() {
-    const { lists, items, onCancel } = this.props;
+    const { lists, items, workInProgressListId, onCancel } = this.props;
     const { activeListId } = this.state;
 
     const isButtonDisabled = !items.length || !activeListId;
@@ -126,7 +126,7 @@ class MoveModal extends Component {
         <SelectWrapper>
           <SelectStyled
             placeholder="Choose a list where to move…"
-            options={getOptions(lists, activeListId)}
+            options={getOptions(lists, workInProgressListId, activeListId)}
             value={activeListId}
             onChange={this.handleChangeListId}
           />

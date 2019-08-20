@@ -97,17 +97,20 @@ class InviteModal extends Component {
     );
   };
 
-  handleChangePermission = userId => event => {
+  handleChangePermission = childItemId => event => {
     const { checked } = event.currentTarget;
     const { onChangePermission } = this.props;
 
-    onChangePermission(userId, checked ? PERMISSION_READ : PERMISSION_WRITE);
+    onChangePermission(
+      childItemId,
+      checked ? PERMISSION_READ : PERMISSION_WRITE,
+    );
   };
 
-  handleClickRemove = userId => () => {
+  handleClickRemove = childItemId => () => {
     const { onRemoveInvite } = this.props;
 
-    onRemoveInvite(userId);
+    onRemoveInvite(childItemId);
   };
 
   renderMemberList(filteredMembers) {
@@ -118,6 +121,8 @@ class InviteModal extends Component {
     }, {});
 
     return filteredMembers.map(({ id, ...member }) => {
+      const childItem = invitesByUserId[id];
+      const childItemId = childItem ? childItem.id : null;
       const isReadOnly =
         invitesByUserId[id] && invitesByUserId[id].access === PERMISSION_READ;
 
@@ -127,9 +132,9 @@ class InviteModal extends Component {
           {...member}
           isReadOnly={isReadOnly}
           isInvited={Object.keys(invitesByUserId).includes(id)}
-          onClickPermissionChange={this.handleChangePermission(id)}
+          onClickPermissionChange={this.handleChangePermission(childItemId)}
           onClickAdd={this.handleClickAdd(id)}
-          onClickRemove={this.handleClickRemove(id)}
+          onClickRemove={this.handleClickRemove(childItemId)}
         />
       );
     });

@@ -81,7 +81,7 @@ export function* removeListSaga({ payload: { listId } }) {
     yield call(removeList, listId);
 
     const listsById = yield select(listsByIdSelector);
-    const listItemIds = listsById[listId].children.map(({ id }) => id);
+    const listItemIds = listsById[listId].children;
 
     yield put(removeListSuccess(listId));
     yield put(removeItemsBatch(listItemIds));

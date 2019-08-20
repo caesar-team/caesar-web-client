@@ -101,8 +101,6 @@ export function* fetchNodesSaga({ payload: { withItemsDecryption } }) {
       data,
     );
 
-    console.log(listsById, itemsById, childItemsById);
-
     yield put(addListsBatch(listsById));
     yield put(addChildItemsBatch(childItemsById));
 

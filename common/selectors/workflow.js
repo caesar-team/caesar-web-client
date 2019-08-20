@@ -24,6 +24,15 @@ export const workInProgressItemSelector = createSelector(
   workflow => workflow.workInProgressItem,
 );
 
+export const workInProgressItemChildItemsSelector = createSelector(
+  workInProgressItemSelector,
+  childItemsByIdSelector,
+  (workInProgressItem, childItemsById) =>
+    workInProgressItem && Object.values(childItemsById).length
+      ? workInProgressItem.invited.map(id => childItemsById[id])
+      : [],
+);
+
 export const workInProgressListIdSelector = createSelector(
   workflowSelector,
   workflow => workflow.workInProgressListId,
@@ -62,9 +71,9 @@ export const visibleListItemsSelector = createSelector(
   (listsById, itemsById, workInProgressListId) =>
     listsById && workInProgressListId && listsById[workInProgressListId]
       ? listsById[workInProgressListId].children.reduce(
-          (accumulator, item) =>
-            itemsById[item.id] && typeof itemsById[item.id].secret !== 'string'
-              ? accumulator.concat(itemsById[item.id])
+          (accumulator, itemId) =>
+            itemsById[itemId] && typeof itemsById[itemId].secret !== 'string'
+              ? accumulator.concat(itemsById[itemId])
               : accumulator,
           [],
         )

@@ -81,6 +81,7 @@ class Credentials extends Component {
         listId,
         secret: { login, pass, website, note, attachments = [] },
       },
+      childItems,
     } = this.props;
 
     const pwd = isPasswordVisible ? pass : pass.replace(/./g, '*');
@@ -101,6 +102,7 @@ class Credentials extends Component {
           isSharedItem={isSharedItem}
           isReadOnly={isReadOnly}
           allLists={allLists}
+          childItems={childItems}
           {...this.props}
         />
         <FieldWrapper>

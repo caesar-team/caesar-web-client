@@ -106,7 +106,7 @@ export default createReducer(initialState, {
           ...state.byId[payload.item.listId],
           children: [
             ...state.byId[payload.item.listId].children,
-            { id: payload.item.id },
+            payload.item.id,
           ],
         },
       },
@@ -121,7 +121,7 @@ export default createReducer(initialState, {
           ...state.byId[payload.listId],
           children: [
             ...state.byId[payload.listId].children,
-            ...payload.itemIds.map(itemId => ({ id: itemId })),
+            ...payload.itemIds,
           ],
         },
       },
@@ -134,15 +134,12 @@ export default createReducer(initialState, {
         ...state.byId,
         [payload.newListId]: {
           ...state.byId[payload.newListId],
-          children: [
-            ...state.byId[payload.newListId].children,
-            { id: payload.itemId },
-          ],
+          children: [...state.byId[payload.newListId].children, payload.itemId],
         },
         [payload.oldListId]: {
           ...state.byId[payload.oldListId],
           children: state.byId[payload.oldListId].children.filter(
-            ({ id }) => id !== payload.itemId,
+            id => id !== payload.itemId,
           ),
         },
       },
@@ -157,15 +154,13 @@ export default createReducer(initialState, {
           ...state.byId[payload.newListId],
           children: [
             ...state.byId[payload.newListId].children,
-            ...payload.itemIds.map(itemId => ({
-              id: itemId,
-            })),
+            ...payload.itemIds,
           ],
         },
         [payload.oldListId]: {
           ...state.byId[payload.oldListId],
           children: state.byId[payload.oldListId].children.filter(
-            ({ id }) => !payload.itemIds.includes(id),
+            id => !payload.itemIds.includes(id),
           ),
         },
       },
@@ -179,7 +174,7 @@ export default createReducer(initialState, {
         [payload.listId]: {
           ...state.byId[payload.listId],
           children: state.byId[payload.listId].children.filter(
-            ({ id }) => id !== payload.itemId,
+            id => id !== payload.itemId,
           ),
         },
       },
@@ -193,7 +188,7 @@ export default createReducer(initialState, {
         [payload.listId]: {
           ...state.byId[payload.listId],
           children: state.byId[payload.listId].children.filter(
-            ({ id }) => !payload.itemIds.includes(id),
+            id => !payload.itemIds.includes(id),
           ),
         },
       },
@@ -207,12 +202,9 @@ export default createReducer(initialState, {
         [payload.favoritesListId]: {
           ...state.byId[payload.favoritesListId],
           children: payload.isFavorite
-            ? [
-                ...state.byId[payload.favoritesListId].children,
-                { id: payload.itemId },
-              ]
+            ? [...state.byId[payload.favoritesListId].children, payload.itemId]
             : state.byId[payload.favoritesListId].children.filter(
-                child => child.id !== payload.itemId,
+                id => id !== payload.itemId,
               ),
         },
       },

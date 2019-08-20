@@ -48,6 +48,7 @@ const NotifyButton = styled(Button)`
 const Item = ({
   isTrashItem = false,
   item,
+  childItems,
   allLists,
   user,
   members = {},
@@ -139,6 +140,7 @@ const Item = ({
           isTrashItem={isTrashItem}
           isReadOnly={isReadOnly}
           item={item}
+          childItems={childItems}
           user={user}
           members={members}
           allLists={allLists}
@@ -159,6 +161,7 @@ const Item = ({
           isTrashItem={isTrashItem}
           isReadOnly={isReadOnly}
           item={item}
+          childItems={childItems}
           user={user}
           members={members}
           allLists={allLists}

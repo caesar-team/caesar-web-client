@@ -12,13 +12,11 @@ import {
   SHARE_ITEM_BATCH_FAILURE,
   SHARE_ITEM_BATCH_REQUEST,
   SHARE_ITEM_BATCH_SUCCESS,
-  SHARE_ITEM_FAILURE,
-  SHARE_ITEM_REQUEST,
-  SHARE_ITEM_SUCCESS,
   CHANGE_CHILD_ITEM_PERMISSION_REQUEST,
   CHANGE_CHILD_ITEM_PERMISSION_SUCCESS,
   CHANGE_CHILD_ITEM_PERMISSION_FAILURE,
   ADD_CHILD_ITEMS_BATCH,
+  REMOVE_CHILD_ITEMS_BATCH,
   RESET_STORE,
 } from 'common/actions/childItem';
 
@@ -67,51 +65,18 @@ export default createReducer(initialState, {
   [REMOVE_INVITE_FAILURE](state) {
     return state;
   },
-  [SHARE_ITEM_REQUEST](state) {
-    return state;
-  },
-  [SHARE_ITEM_SUCCESS](state, { payload }) {
-    return {
-      ...state,
-      itemsById: {
-        ...state.itemsById,
-        [payload.itemId]: {
-          ...state.itemsById[payload.itemId],
-          invited: [
-            ...state.itemsById[payload.itemId].invited,
-            ...payload.invited,
-          ],
-        },
-      },
-      workInProgressItem: state.workInProgressItem
-        ? {
-            ...state.workInProgressItem,
-            invited: [...state.workInProgressItem.invited, ...payload.invited],
-          }
-        : null,
-    };
-  },
-  [SHARE_ITEM_FAILURE](state) {
-    return state;
-  },
   [SHARE_ITEM_BATCH_REQUEST](state) {
     return state;
   },
   [SHARE_ITEM_BATCH_SUCCESS](state, { payload }) {
     return {
       ...state,
-      itemsById: {
-        ...state.itemsById,
+      byId: {
+        ...state.byId,
         ...payload.invited.reduce(
-          (accumulator, invite) => ({
+          (accumulator, childItem) => ({
             ...accumulator,
-            [invite.itemId]: {
-              ...state.itemsById[invite.itemId],
-              invited: [
-                ...state.itemsById[invite.itemId].invited,
-                ...invite.invited,
-              ],
-            },
+            [childItem.id]: childItem,
           }),
           {},
         ),
@@ -135,12 +100,6 @@ export default createReducer(initialState, {
             invite => invite.id !== payload.shareId,
           ),
         },
-      },
-      workInProgressItem: {
-        ...state.workInProgressItem,
-        invited: state.workInProgressItem.invited.filter(
-          invite => invite.id !== payload.shareId,
-        ),
       },
     };
   },
@@ -172,6 +131,18 @@ export default createReducer(initialState, {
         ...state.byId,
         ...payload.childItemsById,
       },
+    };
+  },
+  [REMOVE_CHILD_ITEMS_BATCH](state, { payload }) {
+    return {
+      ...state,
+      byId: Object.keys(state.byId).reduce(
+        (accumulator, itemId) =>
+          payload.childItemIds.includes(itemId)
+            ? accumulator
+            : { ...accumulator, [itemId]: state.byId[itemId] },
+        {},
+      ),
     };
   },
   [RESET_STORE]() {

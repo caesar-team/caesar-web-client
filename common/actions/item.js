@@ -318,11 +318,10 @@ export const addChildItemToItem = (itemId, childItemId) => ({
   },
 });
 
-export const addChildItemsBatchToItem = (itemIds, childItemIds) => ({
+export const addChildItemsBatchToItem = itemIdsWithChildItemIdsSet => ({
   type: ADD_CHILD_ITEMS_BATCH_TO_ITEM,
   payload: {
-    itemIds,
-    childItemIds,
+    itemIdsWithChildItemIdsSet,
   },
 });
 

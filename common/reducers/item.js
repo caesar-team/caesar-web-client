@@ -290,10 +290,7 @@ export default createReducer(initialState, {
         ...state.byId,
         [payload.itemId]: {
           ...state.byId[payload.itemId],
-          invited: [
-            ...state.byId[payload.itemId].invited,
-            { id: payload.childItemId },
-          ],
+          invited: [...state.byId[payload.itemId].invited, payload.childItemId],
         },
       },
     };
@@ -303,17 +300,12 @@ export default createReducer(initialState, {
       ...state,
       byId: {
         ...state.byId,
-        ...payload.itemIds.reduce(
-          (accumulator, itemId) => ({
+        ...payload.itemIdsWithChildItemIdsSet.reduce(
+          (accumulator, { itemId, childItemIds }) => ({
             ...accumulator,
             [itemId]: {
               ...state.byId[itemId],
-              invited: [
-                ...state.byId[itemId].invited,
-                ...payload.childItemIds.map(childItemId => ({
-                  id: childItemId,
-                })),
-              ],
+              invited: [...state.byId[itemId].invited, ...childItemIds],
             },
           }),
           {},
@@ -329,7 +321,7 @@ export default createReducer(initialState, {
         [payload.itemId]: {
           ...state.byId[payload.itemId],
           invited: state.byId[payload.itemId].invited.filter(
-            ({ id }) => payload.childItemId !== id,
+            id => payload.childItemId !== id,
           ),
         },
       },
@@ -346,7 +338,7 @@ export default createReducer(initialState, {
             [itemId]: {
               ...state.byId[itemId],
               invited: state.byId[payload.itemId].invited.filter(
-                ({ id }) => !payload.childItemIds.includes(id),
+                id => !payload.childItemIds.includes(id),
               ),
             },
           }),

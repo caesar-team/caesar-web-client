@@ -10,10 +10,6 @@ export const INVITE_NEW_MEMBER_REQUEST = '@childItem/INVITE_NEW_MEMBER_REQUEST';
 export const INVITE_NEW_MEMBER_SUCCESS = '@childItem/INVITE_NEW_MEMBER_SUCCESS';
 export const INVITE_NEW_MEMBER_FAILURE = '@childItem/INVITE_NEW_MEMBER_FAILURE';
 
-export const SHARE_ITEM_REQUEST = '@childItem/SHARE_ITEM_REQUEST';
-export const SHARE_ITEM_SUCCESS = '@childItem/SHARE_ITEM_SUCCESS';
-export const SHARE_ITEM_FAILURE = '@childItem/SHARE_ITEM_FAILURE';
-
 export const SHARE_ITEM_BATCH_REQUEST = '@childItem/SHARE_ITEM_BATCH_REQUEST';
 export const SHARE_ITEM_BATCH_SUCCESS = '@childItem/SHARE_ITEM_BATCH_SUCCESS';
 export const SHARE_ITEM_BATCH_FAILURE = '@childItem/SHARE_ITEM_BATCH_FAILURE';
@@ -30,6 +26,7 @@ export const CHANGE_CHILD_ITEM_PERMISSION_FAILURE =
   '@childItem/CHANGE_CHILD_ITEM_PERMISSION_FAILURE';
 
 export const ADD_CHILD_ITEMS_BATCH = '@childItem/ADD_CHILD_ITEMS_BATCH';
+export const REMOVE_CHILD_ITEMS_BATCH = '@childItem/REMOVE_CHILD_ITEMS_BATCH';
 export const RESET_STORE = '@childItem/RESET_STORE';
 
 export const inviteMemberRequest = userId => ({
@@ -52,10 +49,10 @@ export const inviteMemberFailure = () => ({
   type: INVITE_MEMBER_FAILURE,
 });
 
-export const removeInviteMemberRequest = userId => ({
+export const removeInviteMemberRequest = childItemId => ({
   type: REMOVE_INVITE_REQUEST,
   payload: {
-    userId,
+    childItemId,
   },
 });
 
@@ -86,26 +83,6 @@ export const inviteNewMemberSuccess = member => ({
 
 export const inviteNewMemberFailure = () => ({
   type: INVITE_NEW_MEMBER_FAILURE,
-});
-
-export const shareItemRequest = (item, emails) => ({
-  type: SHARE_ITEM_REQUEST,
-  payload: {
-    item,
-    emails,
-  },
-});
-
-export const shareItemSuccess = (itemId, invited) => ({
-  type: SHARE_ITEM_SUCCESS,
-  payload: {
-    itemId,
-    invited,
-  },
-});
-
-export const shareItemFailure = () => ({
-  type: SHARE_ITEM_FAILURE,
 });
 
 export const shareItemBatchRequest = (items, emails) => ({
@@ -146,10 +123,10 @@ export const removeShareFailure = () => ({
   type: REMOVE_SHARE_FAILURE,
 });
 
-export const changeChildItemPermissionRequest = (userId, permission) => ({
+export const changeChildItemPermissionRequest = (childItemId, permission) => ({
   type: CHANGE_CHILD_ITEM_PERMISSION_REQUEST,
   payload: {
-    userId,
+    childItemId,
     permission,
   },
 });
@@ -166,11 +143,17 @@ export const changeChildItemPermissionFailure = () => ({
   type: CHANGE_CHILD_ITEM_PERMISSION_FAILURE,
 });
 
-export const addChildItemsBatch = (itemId, childItemsById) => ({
+export const addChildItemsBatch = childItemsById => ({
   type: ADD_CHILD_ITEMS_BATCH,
   payload: {
-    itemId,
     childItemsById,
+  },
+});
+
+export const removeChildItemsBatch = childItemsIds => ({
+  type: REMOVE_CHILD_ITEMS_BATCH,
+  payload: {
+    childItemsIds,
   },
 });
 

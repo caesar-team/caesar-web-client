@@ -47,12 +47,14 @@ import {
   removeItemsBatchFromList,
   toggleItemToFavoriteList,
 } from 'common/actions/list';
+import { removeChildItemsBatch } from 'common/actions/childItem';
 import { setWorkInProgressItem } from 'common/actions/workflow';
 import {
   workInProgressItemSelector,
   workInProgressItemIdsSelector,
 } from 'common/selectors/workflow';
 import { favoritesSelector } from 'common/selectors/list';
+import { itemSelector } from 'common/selectors/item';
 import {
   acceptUpdateItem,
   patchChildItem,
@@ -95,9 +97,19 @@ import { createMemberSaga } from './member';
 
 export function* removeItemSaga({ payload: { itemId, listId } }) {
   try {
+    const item = yield select(itemSelector, { itemId });
+
     yield call(removeItem, itemId);
+
     yield put(removeItemFromList(itemId, listId));
     yield put(removeItemSuccess(itemId, listId));
+    yield put(removeChildItemsBatch(item.invited));
+
+    if (item.favorite) {
+      const favoriteList = yield select(favoritesSelector);
+      yield put(removeItemFromList(itemId, favoriteList.id));
+    }
+
     yield put(setWorkInProgressItem(null));
   } catch (error) {
     console.log(error);

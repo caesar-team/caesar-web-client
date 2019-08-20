@@ -84,6 +84,7 @@ class DashboardContainer extends Component {
     this.props.fetchMembersRequest();
   }
 
+  // eslint-disable-next-line
   handleClickMenuItem = id => () => {
     this.props.setWorkInProgressListId(id);
     this.props.setWorkInProgressItem(null);
@@ -216,12 +217,12 @@ class DashboardContainer extends Component {
     this.props.inviteNewMemberRequest(email);
   };
 
-  handleChangePermission = (userId, permission) => {
-    this.props.changeChildItemPermissionRequest(userId, permission);
+  handleChangePermission = (childItemId, permission) => {
+    this.props.changeChildItemPermissionRequest(childItemId, permission);
   };
 
-  handleRemoveInvite = userId => {
-    this.props.removeInviteMemberRequest(userId);
+  handleRemoveInvite = childItemId => {
+    this.props.removeInviteMemberRequest(childItemId);
   };
 
   handleActivateShareByLink = () => {
@@ -240,7 +241,7 @@ class DashboardContainer extends Component {
         this.props.shareItemBatchRequest(workInProgressItemIds, emails);
         this.props.resetWorkInProgressItemIds();
       } else {
-        this.props.shareItemRequest(workInProgressItem, emails);
+        this.props.shareItemBatchRequest([workInProgressItem.id], emails);
       }
     }
 
@@ -390,6 +391,7 @@ class DashboardContainer extends Component {
     const {
       notification,
       workInProgressItem,
+      workInProgressItemChildItems,
       workInProgressItemIds,
       workInProgressList,
       members,
@@ -424,8 +426,6 @@ class DashboardContainer extends Component {
       mode === DASHBOARD_SEARCH_MODE
         ? searchedItems.length === workInProgressItemIds.length
         : visibleListItems.length === workInProgressItemIds.length;
-
-    console.log('workInProgressItem', workInProgressItem);
 
     return (
       <Fragment>
@@ -491,6 +491,7 @@ class DashboardContainer extends Component {
                     isTrashItem={isTrashItem}
                     notification={notification}
                     item={workInProgressItem}
+                    childItems={workInProgressItemChildItems}
                     allLists={lists}
                     user={user}
                     members={members}
@@ -517,7 +518,7 @@ class DashboardContainer extends Component {
         {modals.invite && (
           <InviteModal
             members={members}
-            invited={workInProgressItem.invited}
+            invited={workInProgressItemChildItems}
             onClickInvite={this.handleInviteMember}
             onClickAddNewMember={this.handleAddNewMember}
             onChangePermission={this.handleChangePermission}

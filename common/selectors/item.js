@@ -16,3 +16,11 @@ export const itemsSelector = createSelector(
   itemsByIdSelector,
   itemsById => Object.values(itemsById) || [],
 );
+
+const itemIdPropSelector = (_, props) => props.itemId;
+
+export const itemSelector = createSelector(
+  itemsByIdSelector,
+  itemIdPropSelector,
+  (itemsById, itemId) => itemsById[itemId],
+);

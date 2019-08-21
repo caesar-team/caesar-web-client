@@ -46,7 +46,7 @@ import {
 } from 'common/selectors/list';
 import { itemsByIdSelector } from 'common/selectors/item';
 import { keyPairSelector, userDataSelector } from 'common/selectors/user';
-import { byIdSelector } from 'common/selectors/member';
+import { membersByIdSelector } from 'common/selectors/member';
 import Dashboard from './Dashboard';
 
 const mapStateToProps = createStructuredSelector({
@@ -61,7 +61,7 @@ const mapStateToProps = createStructuredSelector({
   workInProgressItems: workInProgressItemsSelector,
   trashList: trashListSelector,
   keyPair: keyPairSelector,
-  members: byIdSelector,
+  members: membersByIdSelector,
   user: userDataSelector,
   isLoading: isLoadingSelector,
 });

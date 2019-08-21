@@ -22,7 +22,7 @@ export const convertNodesToEntities = nodes => {
     childItemsById: normalized.entities.childItemsById || {},
   };
 
-  console.log('entites', entities);
+  console.log('entities', entities);
 
   const favoritesList = getFavoritesList(entities.itemsById);
 

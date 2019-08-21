@@ -1,7 +1,12 @@
+export const FETCH_NODES_REQUEST = '@workflow/FETCH_NODES_REQUEST';
+export const FETCH_NODES_SUCCESS = '@workflow/FETCH_NODES_SUCCESS';
+export const FETCH_NODES_FAILURE = '@workflow/FETCH_NODES_FAILURE';
+
 export const FINISH_IS_LOADING = '@workflow/FINISH_IS_LOADING';
-export const RESET_STORE = '@workflow/RESET_STORE';
 
 export const SET_WORK_IN_PROGRESS_ITEM = '@workflow/SET_WORK_IN_PROGRESS_ITEM';
+export const UPDATE_WORK_IN_PROGRESS_ITEM =
+  '@workflow/UPDATE_WORK_IN_PROGRESS_ITEM';
 export const SET_WORK_IN_PROGRESS_ITEM_IDS =
   '@workflow/SET_WORK_IN_PROGRESS_ITEM_IDS';
 export const SET_WORK_IN_PROGRESS_LIST_ID =
@@ -9,10 +14,7 @@ export const SET_WORK_IN_PROGRESS_LIST_ID =
 
 export const RESET_WORK_IN_PROGRESS_ITEM_IDS =
   '@workflow/RESET_WORK_IN_PROGRESS_ITEM_IDS';
-
-export const FETCH_NODES_REQUEST = '@workflow/FETCH_NODES_REQUEST';
-export const FETCH_NODES_SUCCESS = '@workflow/FETCH_NODES_SUCCESS';
-export const FETCH_NODES_FAILURE = '@workflow/FETCH_NODES_FAILURE';
+export const RESET_STORE = '@workflow/RESET_STORE';
 
 export const fetchNodesRequest = withItemsDecryption => ({
   type: FETCH_NODES_REQUEST,
@@ -41,6 +43,13 @@ export const setWorkInProgressItem = (item, mode) => ({
   payload: {
     item,
     mode,
+  },
+});
+
+export const updateWorkInProgressItem = itemId => ({
+  type: UPDATE_WORK_IN_PROGRESS_ITEM,
+  payload: {
+    itemId,
   },
 });
 

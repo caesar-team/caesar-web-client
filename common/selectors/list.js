@@ -5,7 +5,7 @@ import {
   LIST_TYPE,
   TRASH_TYPE,
 } from 'common/constants';
-import { itemsByIdSelector, itemsSelector } from './item';
+import { itemsByIdSelector } from './item';
 
 export const entitiesSelector = state => state.entities;
 
@@ -24,31 +24,10 @@ export const listsSelector = createSelector(
   listsById => Object.values(listsById) || [],
 );
 
-export const userListsSelector = createSelector(
-  listsSelector,
-  lists => lists.filter(list => list.type === LIST_TYPE && list.parentId),
-);
-
-export const defaultListSelector = createSelector(
-  listsSelector,
-  lists =>
-    lists.find(({ label }) => label.toLocaleLowerCase() === 'default') || {},
-);
-
 export const favoriteListSelector = createSelector(
   listsSelector,
   lists =>
     lists.find(({ label }) => label.toLocaleLowerCase() === 'favorites') || {},
-);
-
-export const itemsInListsSelector = createSelector(
-  listsSelector,
-  lists => lists.find(list => list.type === TRASH_TYPE) || [],
-);
-
-export const favoriteItemsSelector = createSelector(
-  itemsSelector,
-  items => items.filter(({ favorite }) => !!favorite),
 );
 
 export const trashListSelector = createSelector(
@@ -115,12 +94,6 @@ export const inboxSelector = createSelector(
   lists => lists.find(({ type }) => type === INBOX_TYPE) || {},
 );
 
-const listSelector = createSelector(
-  listsSelector,
-  lists =>
-    lists.filter(({ type, parentId }) => type === LIST_TYPE && parentId) || [],
-);
-
 const trashSelector = createSelector(
   listsSelector,
   lists => lists.find(({ type }) => type === TRASH_TYPE) || {},
@@ -131,11 +104,31 @@ export const favoritesSelector = createSelector(
   lists => lists.find(({ type }) => type === FAVORITES_TYPE) || {},
 );
 
-export const listsByTypeSelector = createSelector(
-  inboxSelector,
-  listSelector,
-  favoritesSelector,
-  trashSelector,
-  (inbox, list, favorites, trash) => ({ inbox, list, favorites, trash }),
+const nestedListsSelector = createSelector(
+  listsSelector,
+  lists =>
+    lists.filter(
+      ({ type }) => ![INBOX_TYPE, FAVORITES_TYPE, TRASH_TYPE].includes(type),
+    ),
 );
 
+export const listsByTypeSelector = createSelector(
+  inboxSelector,
+  nestedListsSelector,
+  favoritesSelector,
+  trashSelector,
+  (inbox, lists, favorites, trash) => ({
+    inbox,
+    list: lists,
+    favorites,
+    trash,
+  }),
+);
+
+const listIdPropSelector = (_, props) => props.listId;
+
+export const listSelector = createSelector(
+  listsByIdSelector,
+  listIdPropSelector,
+  (listsById, listId) => listsById[listId],
+);

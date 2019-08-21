@@ -4,6 +4,7 @@ import {
   INVITE_NEW_MEMBER_REQUEST,
   REMOVE_INVITE_REQUEST,
   REMOVE_SHARE_REQUEST,
+  UPDATE_CHILD_ITEM_BATCH_REQUEST,
   SHARE_ITEM_BATCH_REQUEST,
   CHANGE_CHILD_ITEM_PERMISSION_REQUEST,
   inviteMemberSuccess,
@@ -15,6 +16,7 @@ import {
   shareItemBatchFailure,
   removeShareSuccess,
   removeShareFailure,
+  updateChildItemsBatchFailure,
   changeChildItemPermissionSuccess,
   changeChildItemPermissionFailure,
 } from 'common/actions/childItem';
@@ -22,11 +24,15 @@ import {
   addChildItemToItem,
   addChildItemsBatchToItem,
   removeChildItemFromItem,
-  removeChildItemsBatchFromItem,
 } from 'common/actions/item';
-import { memberListSelector } from 'common/selectors/member';
+import { updateWorkInProgressItem } from 'common/actions/workflow';
+import {
+  memberListSelector,
+  membersByIdSelector,
+} from 'common/selectors/member';
 import { workInProgressItemSelector } from 'common/selectors/workflow';
 import { itemsByIdSelector } from 'common/selectors/item';
+import { childItemsBatchSelector } from 'common/selectors/childItem';
 import {
   postCreateChildItem,
   postCreateChildItemBatch,
@@ -34,6 +40,7 @@ import {
   postInvitationBatch,
   deleteChildItem,
   patchChildAccess,
+  patchChildItemBatch,
 } from 'common/api';
 import {
   encryptItem,
@@ -48,7 +55,6 @@ import {
 } from 'common/constants';
 import { generateInviteUrl } from 'common/utils/sharing';
 import { createMemberSaga, getOrCreateMemberBatchSaga } from './member';
-import { setWorkInProgressItem } from '../actions/workflow';
 
 export function* inviteMemberSaga({ payload: { userId } }) {
   try {
@@ -59,7 +65,7 @@ export function* inviteMemberSaga({ payload: { userId } }) {
 
     const encryptedItemSecret = yield call(
       encryptItem,
-      workInProgressItem.secret,
+      workInProgressItem.data,
       member.publicKey,
     );
 
@@ -80,15 +86,7 @@ export function* inviteMemberSaga({ payload: { userId } }) {
 
     yield put(inviteMemberSuccess(workInProgressItem.id, childItemId, member));
     yield put(addChildItemToItem(workInProgressItem.id, childItemId));
-    yield put(
-      setWorkInProgressItem(
-        {
-          ...workInProgressItem,
-          invited: [...workInProgressItem.invited, childItemId],
-        },
-        workInProgressItem.mode,
-      ),
-    );
+    yield put(updateWorkInProgressItem());
   } catch (error) {
     console.log(error);
     yield put(inviteMemberFailure());
@@ -130,15 +128,7 @@ export function* removeInviteMemberSaga({ payload: { childItemId } }) {
 
     yield put(removeInviteMemberSuccess(childItemId));
     yield put(removeChildItemFromItem(workInProgressItem.id, childItemId));
-    yield put(
-      setWorkInProgressItem(
-        {
-          ...workInProgressItem,
-          invited: workInProgressItem.invited.filter(id => id !== childItemId),
-        },
-        workInProgressItem.mode,
-      ),
-    );
+    yield put(updateWorkInProgressItem());
   } catch (error) {
     console.log(error);
     yield put(removeInviteMemberFailure());
@@ -178,7 +168,7 @@ export function* shareItemBatchSaga({ payload: { items, emails } }) {
 
       const invitedEncryptedSecrets = yield call(
         encryptItemForUsers,
-        item.secret,
+        item.data,
         userKeys,
       );
 
@@ -247,6 +237,7 @@ export function* shareItemBatchSaga({ payload: { items, emails } }) {
     );
 
     yield put(addChildItemsBatchToItem(sets));
+    yield put(updateWorkInProgressItem());
   } catch (error) {
     console.log(error);
     yield put(shareItemBatchFailure());
@@ -259,11 +250,51 @@ export function* removeShareSaga({ payload: { shareId } }) {
 
     yield call(deleteChildItem, shareId);
 
-    yield put(removeShareSuccess(workInProgressItem.id, shareId));
     yield put(removeChildItemFromItem(workInProgressItem.id, shareId));
+    yield put(removeShareSuccess(workInProgressItem.id, shareId));
+    yield put(updateWorkInProgressItem());
   } catch (error) {
     console.log(error);
     yield put(removeShareFailure());
+  }
+}
+
+export function* updateChildItemsBatchSaga({
+  payload: {
+    originalItem: { id, data, invited: childItemIds, secret, owner },
+  },
+}) {
+  try {
+    const childItems = yield select(childItemsBatchSelector, { childItemIds });
+    const members = yield select(membersByIdSelector);
+
+    const userIds = childItems.map(({ userId }) => userId);
+    const memberKeys = userIds.map(userId => members[userId].publicKey);
+
+    const childItemEncryptedSecrets = yield call(
+      encryptItemForUsers,
+      data,
+      memberKeys,
+    );
+
+    const childItemsForRequest = childItemEncryptedSecrets.map(
+      (encryptedSecret, index) => ({
+        userId: userIds[index],
+        secret: encryptedSecret,
+      }),
+    );
+
+    yield call(patchChildItemBatch, {
+      collectionItems: [
+        {
+          originalItem: id,
+          items: [...childItemsForRequest, { userId: owner.id, secret }],
+        },
+      ],
+    });
+  } catch (error) {
+    console.log(error);
+    yield put(updateChildItemsBatchFailure());
   }
 }
 
@@ -271,23 +302,10 @@ export function* changeChildItemPermissionSaga({
   payload: { childItemId, permission },
 }) {
   try {
-    const workInProgressItem = yield select(workInProgressItemSelector);
-
     yield call(patchChildAccess, childItemId, { access: permission });
+
     yield put(changeChildItemPermissionSuccess(childItemId, permission));
-    yield put(
-      setWorkInProgressItem(
-        {
-          ...workInProgressItem,
-          invited: workInProgressItem.invited.map(invite =>
-            invite.id === childItemId
-              ? { ...invite, access: permission }
-              : invite,
-          ),
-        },
-        workInProgressItem.mode,
-      ),
-    );
+    yield put(updateWorkInProgressItem());
   } catch (error) {
     yield put(changeChildItemPermissionFailure());
   }
@@ -299,6 +317,7 @@ export default function* childItemSagas() {
   yield takeLatest(REMOVE_INVITE_REQUEST, removeInviteMemberSaga);
   yield takeLatest(SHARE_ITEM_BATCH_REQUEST, shareItemBatchSaga);
   yield takeLatest(REMOVE_SHARE_REQUEST, removeShareSaga);
+  yield takeLatest(UPDATE_CHILD_ITEM_BATCH_REQUEST, updateChildItemsBatchSaga);
   yield takeLatest(
     CHANGE_CHILD_ITEM_PERMISSION_REQUEST,
     changeChildItemPermissionSaga,

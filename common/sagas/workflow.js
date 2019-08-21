@@ -2,10 +2,12 @@ import { take, put, call, takeLatest, select, all } from 'redux-saga/effects';
 import { eventChannel } from 'redux-saga';
 import {
   FETCH_NODES_REQUEST,
+  UPDATE_WORK_IN_PROGRESS_ITEM,
   fetchNodesFailure,
   fetchNodesSuccess,
   finishIsLoading,
   setWorkInProgressListId,
+  setWorkInProgressItem,
 } from 'common/actions/workflow';
 import { addListsBatch } from 'common/actions/list';
 import { addItemsBatch } from 'common/actions/item';
@@ -17,6 +19,8 @@ import { uuid4 } from 'common/utils/uuid4';
 import DecryptWorker from 'common/decryption.worker';
 import { keyPairSelector, masterPasswordSelector } from 'common/selectors/user';
 import { getList } from 'common/api';
+import { itemSelector } from '../selectors/item';
+import { workInProgressItemSelector } from '../selectors/workflow';
 
 const chunk = (input, size) => {
   return input.reduce((arr, item, idx) => {
@@ -73,11 +77,11 @@ export function* decryptionSaga(itemsById) {
       const decryptedItems = yield take(channel);
 
       const preparedItems = decryptedItems.reduce(
-        (accumulator, { id, secret }) => ({
+        (accumulator, { id, data }) => ({
           ...accumulator,
           [id]: {
             ...itemsById[id],
-            secret,
+            data,
           },
         }),
         {},
@@ -138,6 +142,27 @@ export function* fetchNodesSaga({ payload: { withItemsDecryption } }) {
   }
 }
 
+export function* updateWorkInProgressItemSaga({ payload: { itemId } }) {
+  let id = null;
+
+  if (!itemId) {
+    const workInProgressItem = yield select(workInProgressItemSelector);
+
+    if (workInProgressItem) {
+      id = workInProgressItem.id;
+    }
+  } else {
+    id = itemId;
+  }
+
+  if (id) {
+    const item = yield select(itemSelector, { id });
+
+    yield put(setWorkInProgressItem(item));
+  }
+}
+
 export default function* workflowSagas() {
   yield takeLatest(FETCH_NODES_REQUEST, fetchNodesSaga);
+  yield takeLatest(UPDATE_WORK_IN_PROGRESS_ITEM, updateWorkInProgressItemSaga);
 }

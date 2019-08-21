@@ -65,8 +65,8 @@ class DashboardContainer extends Component {
 
   filter = memoize((data, pattern) =>
     pattern
-      ? data.filter(({ secret }) =>
-          SECRET_SEARCH_FIELDS.some(searchFn(secret, pattern)),
+      ? data.filter(({ data }) =>
+          SECRET_SEARCH_FIELDS.some(searchFn(data, pattern)),
         )
       : data,
   );

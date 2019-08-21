@@ -20,7 +20,7 @@ export const Document = props => {
     isSharedItem,
     item: {
       listId,
-      secret: { note, attachments = [] },
+      data: { note, attachments = [] },
     },
     childItems,
   } = props;

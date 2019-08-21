@@ -15,10 +15,11 @@ import {
 } from 'common/actions/list';
 import { removeItemsBatch } from 'common/actions/item';
 import {
-  listsByIdSelector,
+  listSelector,
   parentListSelector,
   sortedCustomizableListsSelector,
 } from 'common/selectors/list';
+import { itemsBatchSelector } from 'common/selectors/item';
 import {
   removeList,
   postCreateList,
@@ -27,6 +28,7 @@ import {
 } from 'common/api';
 
 import { LIST_TYPE } from 'common/constants';
+import { removeChildItemsBatch } from '../actions/childItem';
 
 const reorder = (list, startIndex, endIndex) => {
   const result = Array.from(list);
@@ -80,11 +82,19 @@ export function* removeListSaga({ payload: { listId } }) {
   try {
     yield call(removeList, listId);
 
-    const listsById = yield select(listsByIdSelector);
-    const listItemIds = listsById[listId].children;
+    const list = yield select(listSelector, { listId });
+    const listItemIds = list.children;
+    const listItems = yield select(itemsBatchSelector, {
+      itemIds: listItemIds,
+    });
+    const childItemIds = listItems.reduce(
+      (accumulator, item) => [...accumulator, ...item.invited],
+      [],
+    );
 
-    yield put(removeListSuccess(listId));
+    yield put(removeChildItemsBatch(childItemIds));
     yield put(removeItemsBatch(listItemIds));
+    yield put(removeListSuccess(listId));
   } catch (error) {
     console.log(error);
     yield put(removeListFailure());

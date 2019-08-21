@@ -150,7 +150,7 @@ export const ItemHeader = ({
     lastUpdated,
     favorite,
     owner,
-    secret: { name },
+    data: { name },
   },
   childItems,
 }) => {

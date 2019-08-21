@@ -20,7 +20,7 @@ export const getFavoritesList = itemsById => {
   const favoriteListId = uuid4();
   const favorites = Object.values(itemsById)
     .filter(({ favorite }) => favorite)
-    .map(({ id }) => ({ id }));
+    .map(({ id }) => id);
 
   return {
     id: favoriteListId,

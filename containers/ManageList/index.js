@@ -7,7 +7,7 @@ import {
   shouldLoadNodesSelector,
 } from 'common/selectors/workflow';
 import { userDataSelector } from 'common/selectors/user';
-import { byIdSelector } from 'common/selectors/member';
+import { membersByIdSelector } from 'common/selectors/member';
 import {
   createListRequest,
   editListRequest,
@@ -24,7 +24,7 @@ import ManageList from './ManageList';
 
 const mapStateToProps = createStructuredSelector({
   lists: extendedSortedCustomizableListsSelector,
-  members: byIdSelector,
+  members: membersByIdSelector,
   user: userDataSelector,
   workInProgressList: workInProgressListSelector,
   isLoading: isLoadingSelector,

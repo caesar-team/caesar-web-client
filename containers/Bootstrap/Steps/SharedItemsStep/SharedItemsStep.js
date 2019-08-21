@@ -86,7 +86,7 @@ class SharedItemsStep extends Component {
       const decryptedItems = await Promise.all(
         items.map(
           // eslint-disable-next-line
-          async ({ secret }) => await decryptItem(secret, privateKeyObj),
+          async ({ data }) => await decryptItem(secret, privateKeyObj),
         ),
       );
 

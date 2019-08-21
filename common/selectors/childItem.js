@@ -1,4 +1,5 @@
 import { createSelector } from 'reselect';
+import { itemsByIdSelector } from './item';
 
 export const entitiesSelector = state => state.entities;
 
@@ -15,4 +16,13 @@ export const childItemsByIdSelector = createSelector(
 export const childItemsSelector = createSelector(
   childItemEntitySelector,
   childItemsById => Object.values(childItemsById) || [],
+);
+
+const childItemIdsPropSelector = (_, props) => props.childItemsIds;
+
+export const childItemsBatchSelector = createSelector(
+  childItemsByIdSelector,
+  childItemIdsPropSelector,
+  (childItemsById, childItemsIds) =>
+    childItemsIds.map(childItemId => childItemsById[childItemId]),
 );

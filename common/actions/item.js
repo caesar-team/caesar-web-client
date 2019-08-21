@@ -26,6 +26,10 @@ export const EDIT_ITEM_REQUEST = '@item/EDIT_ITEM_REQUEST';
 export const EDIT_ITEM_SUCCESS = '@item/EDIT_ITEM_SUCCESS';
 export const EDIT_ITEM_FAILURE = '@item/EDIT_ITEM_FAILURE';
 
+export const UPDATE_ITEM_REQUEST = '@item/UPDATE_ITEM_REQUEST';
+export const UPDATE_ITEM_SUCCESS = '@item/UPDATE_ITEM_SUCCESS';
+export const UPDATE_ITEM_FAILURE = '@item/UPDATE_ITEM_FAILURE';
+
 export const ACCEPT_ITEM_UPDATE_REQUEST = '@item/ACCEPT_ITEM_UPDATE_REQUEST';
 export const ACCEPT_ITEM_UPDATE_SUCCESS = '@item/ACCEPT_ITEM_UPDATE_SUCCESS';
 export const ACCEPT_ITEM_UPDATE_FAILURE = '@item/ACCEPT_ITEM_UPDATE_FAILURE';
@@ -203,6 +207,18 @@ export const editItemSuccess = item => ({
 
 export const editItemFailure = () => ({
   type: EDIT_ITEM_FAILURE,
+});
+
+export const updateItemRequest = () => ({
+  type: UPDATE_ITEM_REQUEST,
+});
+
+export const updateItemSuccess = () => ({
+  type: UPDATE_ITEM_SUCCESS,
+});
+
+export const updateItemFailure = () => ({
+  type: UPDATE_ITEM_FAILURE,
 });
 
 export const acceptItemUpdateRequest = id => ({

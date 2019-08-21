@@ -20,7 +20,6 @@ import {
   createItemFailure,
   createItemsBatchSuccess,
   createItemsBatchFailure,
-  editItemSuccess,
   editItemFailure,
   updateItemSuccess,
   updateItemFailure,
@@ -50,9 +49,8 @@ import {
   removeItemsBatchFromList,
   toggleItemToFavoriteList,
 } from 'common/actions/list';
-import {
-  removeChildItemsBatch,
-} from 'common/actions/childItem';
+import { removeChildItemsBatch } from 'common/actions/childItem';
+import { updateChildItemsBatchSaga } from 'common/sagas/childItem';
 import {
   setWorkInProgressItem,
   updateWorkInProgressItem,
@@ -66,7 +64,6 @@ import { itemSelector } from 'common/selectors/item';
 import {
   acceptUpdateItem,
   patchChildItem,
-  patchChildItemBatch,
   postCreateChildItem,
   postCreateItem,
   postCreateItemsBatch,
@@ -82,7 +79,6 @@ import {
 import {
   decryptItem,
   encryptItem,
-  encryptItemForUsers,
   encryptItemsBatch,
   generateAnonymousEmail,
   getPrivateKeyObj,
@@ -90,10 +86,10 @@ import {
 } from 'common/utils/cipherUtils';
 import {
   ANONYMOUS_USER_ROLE,
+  ITEM_REVIEW_MODE,
   PERMISSION_READ,
   SHARE_TYPE,
 } from 'common/constants';
-import { memberListSelector } from 'common/selectors/member';
 import {
   keyPairSelector,
   masterPasswordSelector,
@@ -222,7 +218,7 @@ export function* createItemSaga({
 
     yield put(createItemSuccess(newItem));
     yield put(addItemToList(newItem));
-    yield put(updateWorkInProgressItem(itemId));
+    yield put(updateWorkInProgressItem(itemId, ITEM_REVIEW_MODE));
   } catch (error) {
     console.log(error);
     yield put(createItemFailure());
@@ -280,14 +276,33 @@ export function* createItemsBatchSaga({ payload: { items, listId } }) {
   }
 }
 
+export function* updateItemSaga({ payload: { item } }) {
+  try {
+    const keyPair = yield select(keyPairSelector);
+
+    const encryptedItemSecret = yield call(
+      encryptItem,
+      item.data,
+      keyPair.publicKey,
+    );
+
+    yield call(updateItem, item.id, { item: { secret: encryptedItemSecret } });
+
+    yield put(updateItemSuccess({ ...item, secret: encryptedItemSecret }));
+  } catch (error) {
+    console.log(error);
+    yield put(updateItemFailure());
+  }
+}
+
 export function* editItemSaga({ payload: { item }, meta: { setSubmitting } }) {
   try {
     const { listId, attachments, type, ...data } = item;
 
-    console.log('item', item);
-
-    const originalItem = yield select(itemSelector, { itemId: item.id });
     const workInProgressItem = yield select(workInProgressItemSelector);
+    const originalItem = yield select(itemSelector, {
+      itemId: workInProgressItem.id,
+    });
 
     const editedItemData = {
       attachments,
@@ -300,8 +315,6 @@ export function* editItemSaga({ payload: { item }, meta: { setSubmitting } }) {
       data: editedItemData,
     };
 
-    console.log(editedItem);
-
     const isDataChanged = !deepequal(workInProgressItem.data, editedItemData);
     const isListIdChanged = listId !== workInProgressItem.listId;
 
@@ -310,90 +323,21 @@ export function* editItemSaga({ payload: { item }, meta: { setSubmitting } }) {
     }
 
     if (isDataChanged) {
+      yield call(updateItemSaga, { payload: { item: editedItem } });
 
-      } else {
-        if (originalItem.invited.length) {
-          yield put(updateChildItemsBatchRequest(originalItem));
-        }
+      if (originalItem.invited.length) {
+        yield call(updateChildItemsBatchSaga, {
+          payload: { item: editedItem },
+        });
       }
-
-      if (shared) {
-        const sharedMembersIds = shared.userId;
-        const sharedUserKeys = shared.publicKey;
-
-        const sharedEncryptedSecrets = yield call(
-          encryptItemForUsers,
-          editedItemData,
-          sharedUserKeys,
-        );
-
-        const sharedChildItems = sharedEncryptedSecrets.map((encrypt, idx) => ({
-          userId: sharedMembersIds[idx],
-          secret: encrypt,
-        }));
-
-        if (sharedChildItems.length) {
-          yield call(patchChildItemBatch, {
-            collectionItems: [
-              {
-                originalItem: workInProgressItem.id,
-                items: sharedChildItems,
-              },
-            ],
-          });
-        }
-      }
-
-      yield put(editItemSuccess(editedItem));
     }
 
-    yield put(updateWorkInProgressItem(editedItem.id));
+    yield put(updateWorkInProgressItem(editedItem.id, ITEM_REVIEW_MODE));
   } catch (error) {
     console.log(error);
     yield put(editItemFailure());
   } finally {
     setSubmitting(false);
-  }
-}
-
-export function* updateItemSaga({ payload: { item } }) {
-  try {
-    const keyPair = yield select(keyPairSelector);
-
-    const encryptedItemSecret = yield call(
-      encryptItem,
-      editedItemData,
-      keyPair.publicKey,
-    );
-    const { invited, shared } = workInProgressItem;
-
-    const filteredInvited = invited.filter(
-      ({ userId }) => userId !== user.id,
-    );
-
-    if (!filteredInvited.length) {
-      const requestData = {
-        item: {
-          secret: encryptedItemSecret,
-        },
-      };
-
-      if (workInProgressItem.originalItemId) {
-        const encryptedOriginalItemSecret = call(
-          encryptItem,
-          editedItemData,
-          workInProgressItem.owner.publicKey,
-        );
-
-        requestData.originalItem = {
-          secret: encryptedOriginalItemSecret,
-        };
-      }
-
-      yield call(updateItem, workInProgressItem.id, requestData);
-  } catch (error) {
-    console.log(error);
-    yield put(updateItemFailure())
   }
 }
 
@@ -414,10 +358,15 @@ export function* acceptItemSaga({ payload: { id } }) {
 
     const decryptedItemSecret = yield decryptItem(secret, privateKeyObj);
 
-    const newItem = { ...itemData, data: decryptedItemSecret };
+    const newItem = {
+      ...itemData,
+      secret,
+      data: decryptedItemSecret,
+      invited: itemData.invited.map(({ id: childId }) => childId),
+    };
 
     yield put(acceptItemUpdateSuccess(newItem));
-    yield put(updateWorkInProgressItem(newItem.id));
+    yield put(updateWorkInProgressItem());
   } catch (error) {
     console.error(error);
     yield put(acceptItemUpdateFailure(error));
@@ -429,6 +378,7 @@ export function* rejectItemSaga({ payload: { id } }) {
     yield call(rejectUpdateItem, id);
 
     yield put(rejectItemUpdateSuccess(id));
+    yield put(updateWorkInProgressItem());
   } catch (error) {
     console.log(error);
     yield put(rejectItemUpdateFailure(error));

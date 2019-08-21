@@ -213,8 +213,11 @@ export const updateItemRequest = () => ({
   type: UPDATE_ITEM_REQUEST,
 });
 
-export const updateItemSuccess = () => ({
+export const updateItemSuccess = item => ({
   type: UPDATE_ITEM_SUCCESS,
+  payload: {
+    item,
+  },
 });
 
 export const updateItemFailure = () => ({
@@ -240,7 +243,7 @@ export const acceptItemUpdateFailure = () => ({
 });
 
 export const rejectItemUpdateRequest = id => ({
-  type: ACCEPT_ITEM_UPDATE_REQUEST,
+  type: REJECT_ITEM_UPDATE_REQUEST,
   payload: {
     id,
   },

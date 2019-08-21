@@ -1,10 +1,8 @@
 import { schema } from 'normalizr';
+import itemSchema from './item';
 
-const listSchema = new schema.Entity('listsById', undefined, {
-  processStrategy: (entity, parent) => ({
-    ...entity,
-    parentId: parent.id || null,
-  }),
+const listSchema = new schema.Entity('listsById', {
+  children: [itemSchema],
 });
 
 export default listSchema;

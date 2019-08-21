@@ -19,6 +19,7 @@ import { uuid4 } from 'common/utils/uuid4';
 import DecryptWorker from 'common/decryption.worker';
 import { keyPairSelector, masterPasswordSelector } from 'common/selectors/user';
 import { getList } from 'common/api';
+import { ITEM_REVIEW_MODE } from 'common/constants';
 import { itemSelector } from '../selectors/item';
 import { workInProgressItemSelector } from '../selectors/workflow';
 
@@ -142,7 +143,9 @@ export function* fetchNodesSaga({ payload: { withItemsDecryption } }) {
   }
 }
 
-export function* updateWorkInProgressItemSaga({ payload: { itemId } }) {
+export function* updateWorkInProgressItemSaga({
+  payload: { itemId, mode = ITEM_REVIEW_MODE },
+}) {
   let id = null;
 
   if (!itemId) {
@@ -156,9 +159,9 @@ export function* updateWorkInProgressItemSaga({ payload: { itemId } }) {
   }
 
   if (id) {
-    const item = yield select(itemSelector, { id });
+    const item = yield select(itemSelector, { itemId: id });
 
-    yield put(setWorkInProgressItem(item));
+    yield put(setWorkInProgressItem(item, mode));
   }
 }
 

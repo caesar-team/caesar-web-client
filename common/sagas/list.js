@@ -42,13 +42,10 @@ const fixSort = lists => lists.map((list, index) => ({ ...list, sort: index }));
 
 export function* createListSaga({ payload: { list } }) {
   try {
-    const parentList = yield select(parentListSelector);
-
     const {
       data: { id: listId },
     } = yield call(postCreateList, {
       label: list.label,
-      parentId: parentList.id,
     });
 
     yield put(
@@ -57,7 +54,7 @@ export function* createListSaga({ payload: { list } }) {
         type: LIST_TYPE,
         children: [],
         sort: 0,
-        parentId: parentList.id,
+        parentId: null,
         ...list,
       }),
     );

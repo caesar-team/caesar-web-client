@@ -18,7 +18,7 @@ export const childItemsSelector = createSelector(
   childItemsById => Object.values(childItemsById) || [],
 );
 
-const childItemIdsPropSelector = (_, props) => props.childItemsIds;
+const childItemIdsPropSelector = (_, props) => props.childItemIds;
 
 export const childItemsBatchSelector = createSelector(
   childItemsByIdSelector,

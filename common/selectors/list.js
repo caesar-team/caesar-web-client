@@ -6,6 +6,7 @@ import {
   TRASH_TYPE,
 } from 'common/constants';
 import { itemsByIdSelector } from './item';
+import { childItemsByIdSelector } from './childItem';
 
 export const entitiesSelector = state => state.entities;
 
@@ -40,7 +41,7 @@ export const selectableListsSelector = createSelector(
   lists => [
     ...lists.filter(list => list.type === INBOX_TYPE),
     ...lists.filter(list => list.type === TRASH_TYPE),
-    ...lists.filter(list => list.type === LIST_TYPE && list.parentId),
+    ...lists.filter(list => list.type === LIST_TYPE),
   ],
 );
 
@@ -52,10 +53,7 @@ export const selectableListsWithoutChildrenSelector = createSelector(
 export const customizableListsSelector = createSelector(
   listsSelector,
   lists =>
-    lists.filter(
-      list =>
-        list.type === LIST_TYPE && list.parentId && list.label !== 'default',
-    ),
+    lists.filter(list => list.type === LIST_TYPE && list.label !== 'default'),
 );
 
 export const sortedCustomizableListsSelector = createSelector(
@@ -66,17 +64,23 @@ export const sortedCustomizableListsSelector = createSelector(
 export const extendedSortedCustomizableListsSelector = createSelector(
   sortedCustomizableListsSelector,
   itemsByIdSelector,
-  (lists, itemsById) =>
+  childItemsByIdSelector,
+  (lists, itemsById, childItemsById) =>
     lists.map(({ children, ...data }) => ({
       ...data,
       count: children.length,
       invited: [
         ...new Set(
           children.reduce(
-            (acc, item) =>
-              itemsById[item.id]
-                ? [...acc, ...itemsById[item.id].invited]
-                : acc,
+            (accumulator, itemId) =>
+              itemsById[itemId]
+                ? [
+                    ...accumulator,
+                    ...itemsById[itemId].invited.map(
+                      childItemId => childItemsById[childItemId],
+                    ),
+                  ]
+                : accumulator,
             [],
           ),
         ),

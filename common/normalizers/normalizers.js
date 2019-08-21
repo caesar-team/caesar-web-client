@@ -1,28 +1,15 @@
 import { normalize } from 'normalizr';
-import { listSchema, itemSchema, memberSchema } from './schemas';
-import {
-  createUnionSchema,
-  removeSchemaPropFromLists,
-  removeParentList,
-  getFavoritesList,
-} from './utils';
-
-listSchema.define({
-  children: [createUnionSchema({ list: listSchema, item: itemSchema })],
-});
+import { listSchema, memberSchema } from './schemas';
+import { getFavoritesList } from './utils';
 
 export const convertNodesToEntities = nodes => {
   const normalized = normalize(nodes, [listSchema]);
 
   const entities = {
-    listsById: removeSchemaPropFromLists(
-      removeParentList(normalized.entities.listsById || {}),
-    ),
+    listsById: normalized.entities.listsById || {},
     itemsById: normalized.entities.itemsById || {},
     childItemsById: normalized.entities.childItemsById || {},
   };
-
-  console.log('entities', entities);
 
   const favoritesList = getFavoritesList(entities.itemsById);
 

@@ -115,9 +115,12 @@ class InviteModal extends Component {
 
   renderMemberList(filteredMembers) {
     const { invited } = this.props;
-    const invitesByUserId = invited.reduce((acc, invite) => {
-      acc[invite.userId] = invite;
-      return acc;
+    const invitesByUserId = invited.reduce((accumulator, invite) => {
+      if (!invite) {
+        return accumulator;
+      }
+
+      return { ...accumulator, [invite.userId]: invite };
     }, {});
 
     return filteredMembers.map(({ id, ...member }) => {

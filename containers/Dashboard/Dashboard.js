@@ -183,7 +183,7 @@ class DashboardContainer extends Component {
     this.props.acceptItemUpdateRequest(id);
   };
 
-  handleRejectUpdate = id => async () => {
+  handleRejectUpdate = id => () => {
     this.props.rejectItemUpdateRequest(id);
   };
 

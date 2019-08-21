@@ -21,6 +21,9 @@ import {
   EDIT_ITEM_REQUEST,
   EDIT_ITEM_SUCCESS,
   EDIT_ITEM_FAILURE,
+  UPDATE_ITEM_REQUEST,
+  UPDATE_ITEM_SUCCESS,
+  UPDATE_ITEM_FAILURE,
   ACCEPT_ITEM_UPDATE_REQUEST,
   ACCEPT_ITEM_UPDATE_SUCCESS,
   ACCEPT_ITEM_UPDATE_FAILURE,
@@ -173,6 +176,22 @@ export default createReducer(initialState, {
     };
   },
   [EDIT_ITEM_FAILURE](state) {
+    return state;
+  },
+  [UPDATE_ITEM_REQUEST](state) {
+    return state;
+  },
+  [UPDATE_ITEM_SUCCESS](state, { payload }) {
+    console.log(payload);
+    return {
+      ...state,
+      byId: {
+        ...state.byId,
+        [payload.item.id]: payload.item,
+      },
+    };
+  },
+  [UPDATE_ITEM_FAILURE](state) {
     return state;
   },
   [ACCEPT_ITEM_UPDATE_REQUEST](state) {

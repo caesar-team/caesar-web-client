@@ -261,7 +261,7 @@ export function* removeShareSaga({ payload: { shareId } }) {
 
 export function* updateChildItemsBatchSaga({
   payload: {
-    originalItem: { id, data, invited: childItemIds, secret, owner },
+    item: { id, data, invited: childItemIds },
   },
 }) {
   try {
@@ -288,7 +288,7 @@ export function* updateChildItemsBatchSaga({
       collectionItems: [
         {
           originalItem: id,
-          items: [...childItemsForRequest, { userId: owner.id, secret }],
+          items: childItemsForRequest,
         },
       ],
     });

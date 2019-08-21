@@ -110,7 +110,7 @@ export function* createMemberBatchSaga({ payload: { emails, role } }) {
       const member = members[index];
 
       return {
-        userId,
+        id: userId,
         email: member.email,
         name: member.email,
         avatar: null,
@@ -119,12 +119,18 @@ export function* createMemberBatchSaga({ payload: { emails, role } }) {
       };
     });
 
-    const returnedMembers = preparedMembersForStore.map((member, index) => ({
-      ...member,
-      masterPassword: generatedUsers[index].masterPassword,
-      password: generatedUsers[index].password,
-    }));
+    const returnedMembers = userIds.map((userId, index) => {
+      const member = members[index];
 
+      return {
+        ...member,
+        userId,
+        masterPassword: generatedUsers[index].masterPassword,
+        password: generatedUsers[index].password,
+      };
+    });
+
+    console.log('preparedMembersForStore', preparedMembersForStore);
     if (role !== ANONYMOUS_USER_ROLE) {
       yield put(createMemberBatchSuccess(preparedMembersForStore));
     }

@@ -46,10 +46,11 @@ export const setWorkInProgressItem = (item, mode) => ({
   },
 });
 
-export const updateWorkInProgressItem = itemId => ({
+export const updateWorkInProgressItem = (itemId, mode) => ({
   type: UPDATE_WORK_IN_PROGRESS_ITEM,
   payload: {
     itemId,
+    mode,
   },
 });
 

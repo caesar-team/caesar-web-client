@@ -6,7 +6,6 @@ import {
   FINISH_IS_LOADING,
   RESET_WORK_IN_PROGRESS_ITEM_IDS,
   SET_WORK_IN_PROGRESS_ITEM,
-  UPDATE_WORK_IN_PROGRESS_ITEM,
   SET_WORK_IN_PROGRESS_ITEM_IDS,
   SET_WORK_IN_PROGRESS_LIST_ID,
 } from 'common/actions/workflow';
@@ -14,6 +13,7 @@ import {
 const initialState = {
   isLoading: true,
   isError: false,
+  isRehydrated: false,
   workInProgressItem: null,
   workInProgressItemIds: [],
   workInProgressListId: null,

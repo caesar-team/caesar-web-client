@@ -97,3 +97,7 @@ export const SHARE_TYPE = 'share';
 export const USER_ROLE = 'ROLE_USER';
 export const READ_ONLY_USER_ROLE = 'ROLE_READ_ONLY_USER';
 export const ANONYMOUS_USER_ROLE = 'ROLE_ANONYMOUS_USER';
+
+export const LOADING = 'LOADING';
+export const SUCCESS = 'SUCCESS';
+export const FAILURE = 'FAILURE';

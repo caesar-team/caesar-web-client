@@ -24,12 +24,6 @@ const dev = process.env.NODE_ENV !== 'production';
 const app = next({ dev });
 const handle = app.getRequestHandler();
 
-const serviceWorker = application => (req, res) => {
-  const filePath = path.join(__dirname, '.next', 'service-worker.js');
-
-  application.serveStatic(req, res, filePath);
-};
-
 app.prepare().then(() => {
   const server = express();
 
@@ -43,8 +37,6 @@ app.prepare().then(() => {
     '/service-worker.js',
     express.static(path.join(__dirname, '.next', 'service-worker.js')),
   );
-
-  // server.get('/service-worker.js', serviceWorker(app));
 
   server.get('/logout', (req, res) => {
     res.clearCookie('token');

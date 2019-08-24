@@ -3,6 +3,7 @@ import { eventChannel } from 'redux-saga';
 import {
   FETCH_NODES_REQUEST,
   UPDATE_WORK_IN_PROGRESS_ITEM,
+  REHYDRATE_STORE,
   fetchNodesFailure,
   fetchNodesSuccess,
   finishIsLoading,
@@ -20,8 +21,9 @@ import DecryptWorker from 'common/decryption.worker';
 import { keyPairSelector, masterPasswordSelector } from 'common/selectors/user';
 import { getList } from 'common/api';
 import { ITEM_REVIEW_MODE } from 'common/constants';
-import { itemSelector } from '../selectors/item';
-import { workInProgressItemSelector } from '../selectors/workflow';
+import { itemsByIdSelector, itemSelector } from 'common/selectors/item';
+import { workInProgressItemSelector } from 'common/selectors/workflow';
+import { isOnlineSelector } from 'common/selectors/offline';
 
 const chunk = (input, size) => {
   return input.reduce((arr, item, idx) => {
@@ -63,7 +65,7 @@ function createWebWorkerChannel(data) {
   });
 }
 
-export function* decryptionSaga(itemsById) {
+export function* decryptionChunkItemsSaga(itemsById) {
   const keyPair = yield select(keyPairSelector);
   const masterPassword = yield select(masterPasswordSelector);
 
@@ -98,6 +100,26 @@ export function* decryptionSaga(itemsById) {
   }
 }
 
+function* decryptionItems({ payload: { itemsById } }) {
+  const items = objectToArray(itemsById);
+
+  if (items.length) {
+    const preparedItems = items.sort(
+      (a, b) => Number(b.favorite) - Number(a.favorite),
+    );
+    const poolSize = getWorkersCount();
+    const chunks = chunk(preparedItems, Math.ceil(items.length / poolSize));
+
+    yield all(
+      chunks.map(chunkItems =>
+        call(decryptionChunkItemsSaga, arrayToObject(chunkItems)),
+      ),
+    );
+  } else {
+    yield put(finishIsLoading());
+  }
+}
+
 export function* fetchNodesSaga({ payload: { withItemsDecryption } }) {
   try {
     const { data } = yield call(getList);
@@ -116,23 +138,7 @@ export function* fetchNodesSaga({ payload: { withItemsDecryption } }) {
     yield put(setWorkInProgressListId(favoriteList.id));
 
     if (withItemsDecryption) {
-      const items = objectToArray(itemsById);
-
-      if (items.length) {
-        const preparedItems = items.sort(
-          (a, b) => Number(b.favorite) - Number(a.favorite),
-        );
-        const poolSize = getWorkersCount();
-        const chunks = chunk(preparedItems, Math.ceil(items.length / poolSize));
-
-        yield all(
-          chunks.map(chunkItems =>
-            call(decryptionSaga, arrayToObject(chunkItems)),
-          ),
-        );
-      } else {
-        yield put(finishIsLoading());
-      }
+      yield call(decryptionItems, { payload: { itemsById } });
     } else {
       yield put(addItemsBatch(itemsById));
       yield put(finishIsLoading());
@@ -165,7 +171,21 @@ export function* updateWorkInProgressItemSaga({
   }
 }
 
+export function* rehydrateStoreSaga() {
+  try {
+    const isOnline = yield select(isOnlineSelector);
+
+    if (!isOnline) {
+      const itemsById = yield select(itemsByIdSelector);
+      yield call(decryptionItems, { payload: { itemsById } });
+    }
+  } catch (error) {
+    console.log(error);
+  }
+}
+
 export default function* workflowSagas() {
   yield takeLatest(FETCH_NODES_REQUEST, fetchNodesSaga);
   yield takeLatest(UPDATE_WORK_IN_PROGRESS_ITEM, updateWorkInProgressItemSaga);
+  yield takeLatest(REHYDRATE_STORE, rehydrateStoreSaga);
 }

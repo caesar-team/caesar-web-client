@@ -93,7 +93,7 @@ const ListOption = ({
           <Icon name="key" width={16} height={16} fill="#fff" />
         </ItemType>
         <ItemName key={item.id} isActive={isActiveItem}>
-          {truncate(item.secret.name, 20)}
+          {truncate(item.data.name, 20)}
         </ItemName>
       </Item>
     );

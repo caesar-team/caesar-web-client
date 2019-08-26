@@ -20,8 +20,9 @@ export const Document = props => {
     isSharedItem,
     item: {
       listId,
-      secret: { note, attachments = [] },
+      data: { note, attachments = [] },
     },
+    childItems,
   } = props;
   const shouldShowNote = !!note;
   const shouldShowAttachments = attachments && attachments.length > 0;
@@ -31,7 +32,12 @@ export const Document = props => {
 
   return (
     <Wrapper>
-      <ItemHeader isReadOnly={isReadOnly} allLists={allLists} {...props} />
+      <ItemHeader
+        isReadOnly={isReadOnly}
+        allLists={allLists}
+        childItems={childItems}
+        {...props}
+      />
       <FieldWrapper>
         {listName && (
           <Field>

@@ -114,7 +114,7 @@ export const acceptUpdateItem = itemId =>
 export const rejectUpdateItem = itemId =>
   callApi.post(`/item/${itemId}/decline_update`);
 
-export const removeChildItem = childItemId =>
+export const deleteChildItem = childItemId =>
   callApi.delete(`/child_item/${childItemId}`);
 
 // list

@@ -148,11 +148,11 @@ export const ItemHeader = ({
     id: itemId,
     listId,
     lastUpdated,
-    invited,
     favorite,
     owner,
-    secret: { name },
+    data: { name },
   },
+  childItems,
 }) => {
   if (isSharedItem) {
     return (
@@ -167,7 +167,7 @@ export const ItemHeader = ({
     );
   }
 
-  const avatars = invited.reduce((accumulator, item) => {
+  const avatars = childItems.reduce((accumulator, item) => {
     if (!members[item.userId]) {
       return accumulator;
     }
@@ -181,7 +181,7 @@ export const ItemHeader = ({
     return accumulator;
   }, []);
 
-  const hasInvited = invited.length > 0;
+  const hasInvited = childItems.length > 0;
   const isOwner = user.id === owner.id;
 
   const options = allLists

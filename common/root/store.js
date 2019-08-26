@@ -14,9 +14,11 @@ export function configureWebStore(preloadedState) {
     composeEnhancers(applyMiddleware(sagaMiddleware)),
   );
 
+  const sagaTask = sagaMiddleware.run(rootSaga);
+
   return {
     ...store,
-    sagaTask: sagaMiddleware.run(rootSaga),
+    sagaTask,
   };
 }
 

@@ -6,7 +6,7 @@ export const initialCredentials = listId => ({
   type: ITEM_CREDENTIALS_TYPE,
   invited: [],
   owner: true,
-  secret: {
+  data: {
     name: '',
     login: '',
     pass: '',
@@ -21,7 +21,7 @@ export const initialDocument = listId => ({
   type: ITEM_DOCUMENT_TYPE,
   invited: [],
   owner: true,
-  secret: {
+  data: {
     name: '',
     note: '',
     attachments: [],

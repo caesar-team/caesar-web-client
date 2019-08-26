@@ -37,10 +37,10 @@ class Credentials extends Component {
 
   handleCopy = field => () => {
     const {
-      item: { secret },
+      item: { data },
     } = this.props;
 
-    copyToClipboard(secret[field]);
+    copyToClipboard(data[field]);
   };
 
   render() {
@@ -48,7 +48,7 @@ class Credentials extends Component {
 
     const {
       item: {
-        secret: { name, login, pass, website, note },
+        data: { name, login, pass, website, note },
       },
     } = this.props;
 

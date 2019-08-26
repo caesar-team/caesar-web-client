@@ -3,22 +3,15 @@ import styled from 'styled-components';
 import { withRouter } from 'next/router';
 import { matchStrict } from 'common/utils/match';
 import { parseFile } from 'common/utils/importUtils';
-import { encryptItem } from 'common/utils/cipherUtils';
-import { getKeys, postCreateItemsBatch, getList } from 'common/api';
+import { ITEM_CREDENTIALS_TYPE, ITEM_DOCUMENT_TYPE } from 'common/constants';
+import { NavigationPanel, TextLoader } from 'components';
+import { DataStep, FieldsStep, FileStep, ImportingStep } from './Steps';
 import {
-  ITEM_CREDENTIALS_TYPE,
-  ITEM_DOCUMENT_TYPE,
-  LIST_TYPE,
-  TRASH_TYPE,
-} from 'common/constants';
-import { NavigationPanel } from 'components';
-import { FileStep, FieldsStep, DataStep, ImportingStep } from './Steps';
-import {
-  STEPS,
-  FILE_STEP,
-  FIELDS_STEP,
   DATA_STEP,
+  FIELDS_STEP,
+  FILE_STEP,
   IMPORTING_STEP,
+  STEPS,
 } from './constants';
 
 const Wrapper = styled.div`
@@ -74,36 +67,15 @@ const pick = (object, keys) =>
     return accumulator;
   }, {});
 
-const getSelectableLists = lists =>
-  lists
-    .reduce(
-      (accumulator, list) => [
-        ...accumulator,
-        list.type === LIST_TYPE ? list.children : list,
-      ],
-      [],
-    )
-    .flat()
-    .filter(list => list.type !== TRASH_TYPE);
-
 const DOCUMENT_TYPE_FIELDS = ['name', 'note'];
 const CREDENTIALS_TYPE_FIELDS = ['name', 'login', 'pass', 'website', 'note'];
 
 class Import extends Component {
   state = this.prepareInitialState();
 
-  async componentDidMount() {
-    try {
-      const { data: list } = await getList();
-      const {
-        data: { publicKey },
-      } = await getKeys();
-
-      this.lists = getSelectableLists(list);
-      this.publicKey = publicKey;
-    } catch (error) {
-      console.log(error);
-    }
+  componentDidMount() {
+    this.props.fetchKeyPairRequest();
+    this.props.fetchNodesRequest(false);
   }
 
   handleOnload = ({ file }) => {
@@ -122,7 +94,7 @@ class Import extends Component {
     });
   };
 
-  handleFinishDataStep = async (listId, values) => {
+  handleFinishDataStep = (listId, values) => {
     const omittedFields = ['index'];
     const cleared = values.map(row => {
       const keys = Object.keys(row);
@@ -159,42 +131,28 @@ class Import extends Component {
     this.setState(this.prepareInitialState());
   };
 
-  async importing(listId, data) {
-    const prepared = await Promise.all(
-      data.map(async ({ type, ...secret }, index) => {
-        const encryptedSecret = await encryptItem(
-          pick(
-            secret,
-            type === ITEM_CREDENTIALS_TYPE
-              ? CREDENTIALS_TYPE_FIELDS
-              : DOCUMENT_TYPE_FIELDS,
-          ),
-          this.publicKey,
-        );
+  // TODO: do progress bar in saga
+  importing(listId, data) {
+    const items = data.map(({ type, ...secret }) => {
+      const fields = pick(
+        secret,
+        type === ITEM_CREDENTIALS_TYPE
+          ? CREDENTIALS_TYPE_FIELDS
+          : DOCUMENT_TYPE_FIELDS,
+      );
 
-        const item = {
-          type,
-          listId,
-          secret: encryptedSecret,
-        };
+      return {
+        ...fields,
+        type,
+        attachments: [],
+      };
+    });
 
-        this.setState({
-          progress: Math.round((index / data.length) * 100) / 100,
-        });
+    this.props.createItemsBatchRequest(items, listId);
 
-        return item;
-      }),
-    );
-
-    try {
-      await postCreateItemsBatch({ items: prepared });
-
-      this.setState({
-        progress: 1,
-      });
-    } catch (error) {
-      console.log(error);
-    }
+    this.setState({
+      progress: 1,
+    });
   }
 
   prepareInitialState() {
@@ -210,6 +168,7 @@ class Import extends Component {
   }
 
   renderStep() {
+    const { lists } = this.props;
     const { currentStep, data, matchings, progress } = this.state;
 
     return matchStrict(
@@ -226,7 +185,7 @@ class Import extends Component {
         ),
         DATA_STEP: (
           <DataStep
-            lists={this.lists}
+            lists={lists}
             data={normalizeData(data.rows, matchings)}
             headings={matchings}
             onSubmit={this.handleFinishDataStep}
@@ -245,7 +204,16 @@ class Import extends Component {
   }
 
   render() {
+    const { isLoading } = this.props;
     const { currentStep } = this.state;
+
+    if (isLoading) {
+      return (
+        <Wrapper>
+          <TextLoader />
+        </Wrapper>
+      );
+    }
 
     return (
       <Wrapper>

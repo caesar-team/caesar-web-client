@@ -85,9 +85,9 @@ const EMAIL_REGEX = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))
 
 const getEncryption = link => link.match(/\/([\w|+-]+)$/)[1];
 const getShareId = link => link.match(/share\/(.+)\//)[1];
+const getAnonymousLink = shared => shared.link || null;
 
-const getAnonymousLink = shared =>
-  (shared.find(({ link }) => !!link) || {}).link;
+const waitIdle = () => new Promise(requestIdleCallback);
 
 export class ShareModal extends Component {
   state = this.prepareInitialState();
@@ -102,22 +102,23 @@ export class ShareModal extends Component {
     return null;
   }
 
-  handleShareByLinkChange = () => {
+  handleShareByLinkChange = async () => {
     const {
       shared,
       onActivateSharedByLink,
       onDeactivateSharedByLink,
     } = this.props;
 
+    this.setState({
+      isLoading: true,
+    });
+
+    await waitIdle();
+
     const link = getAnonymousLink(shared);
 
     if (!link) {
-      this.setState(
-        {
-          isLoading: true,
-        },
-        onActivateSharedByLink,
-      );
+      onActivateSharedByLink();
     } else {
       onDeactivateSharedByLink();
     }
@@ -149,12 +150,6 @@ export class ShareModal extends Component {
 
   handleAddEmail = emails => {
     this.setState({ emails });
-  };
-
-  handleRemoveEmail = email => () => {
-    this.setState(prevState => ({
-      emails: prevState.emails.filter(oldEmail => oldEmail !== email),
-    }));
   };
 
   generateLinkText(link, isUseMasterPassword) {

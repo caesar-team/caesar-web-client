@@ -28,9 +28,9 @@ window.onmessage = async message => {
 
       try {
         // eslint-disable-next-line
-        const secret = await decryptItem(item.secret, privateKeyObj);
+        const data = await decryptItem(item.secret, privateKeyObj);
 
-        buffer.push({ id: item.id, secret });
+        buffer.push({ id: item.id, data });
 
         if (buffer.length === WORKER_DECRYPTION_BUFFER_SIZE || isLast) {
           postMessage(events.eventFromWorker, buffer);

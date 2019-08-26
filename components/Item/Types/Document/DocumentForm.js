@@ -106,8 +106,8 @@ const ErrorStyled = styled(Error)`
   margin: 20px 0;
 `;
 
-const createInitialValues = (secret, listId, type) => ({
-  ...secret,
+const createInitialValues = (data, listId, type) => ({
+  ...data,
   listId,
   type,
 });
@@ -137,7 +137,7 @@ const renderAttachments = (attachments = [], errors = [], setFieldValue) =>
   ));
 
 const DocumentForm = ({
-  item: { secret, listId, type },
+  item: { data, listId, type },
   allLists = [],
   mode,
   onFinishCreateWorkflow,
@@ -160,10 +160,10 @@ const DocumentForm = ({
   return (
     <Formik
       key="documentForm"
-      initialValues={createInitialValues(secret, listId, type)}
+      initialValues={createInitialValues(data, listId, type)}
       onSubmit={action}
       isInitialValid={schema.isValidSync(
-        createInitialValues(secret, listId, type),
+        createInitialValues(data, listId, type),
       )}
       validationSchema={schema}
       render={({

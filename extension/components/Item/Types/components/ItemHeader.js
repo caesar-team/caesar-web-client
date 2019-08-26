@@ -148,7 +148,7 @@ export const ItemHeader = ({
     invited,
     favorite,
     owner,
-    secret: { name },
+    data: { name },
   },
 }) => {
   if (isSharedItem) {

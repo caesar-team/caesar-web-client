@@ -48,6 +48,7 @@ const NotifyButton = styled(Button)`
 const Item = ({
   isTrashItem = false,
   item,
+  childItems,
   allLists,
   user,
   members = {},
@@ -65,13 +66,13 @@ const Item = ({
   onClickMoveToTrash = Function.prototype,
   onToggleFavorites = Function.prototype,
   onClickAcceptUpdate = Function.prototype,
-  onClickReject = Function.prototype,
+  onClickRejectUpdate = Function.prototype,
 }) => {
   if (!item) {
     return <EmptyItem />;
   }
 
-  const { mode, type, invited, update, owner, id } = item;
+  const { mode, type, update, owner, id } = item;
 
   const renderedItemForm = matchStrict(
     type,
@@ -99,8 +100,8 @@ const Item = ({
     },
     null,
   );
-  const access = invited.reduce(
-    (acc, invite) => (invite.userId === user.id ? invite.access : acc),
+  const access = childItems.reduce(
+    (acc, childItem) => (childItem.userId === user.id ? childItem.access : acc),
     null,
   );
   const hasWriteAccess = owner.id === user.id || access === PERMISSION_WRITE;
@@ -118,7 +119,7 @@ const Item = ({
           {`Item has been changed by ${updateUserName} at ${updateDate}`}
         </NotifyText>
         <NotifyButtonsWrapper>
-          <Button color="white" onClick={onClickReject(id)}>
+          <Button color="white" onClick={onClickRejectUpdate(id)}>
             Reject
           </Button>
           <NotifyButton color="white" onClick={onClickAcceptUpdate(id)}>
@@ -139,6 +140,7 @@ const Item = ({
           isTrashItem={isTrashItem}
           isReadOnly={isReadOnly}
           item={item}
+          childItems={childItems}
           user={user}
           members={members}
           allLists={allLists}
@@ -159,6 +161,7 @@ const Item = ({
           isTrashItem={isTrashItem}
           isReadOnly={isReadOnly}
           item={item}
+          childItems={childItems}
           user={user}
           members={members}
           allLists={allLists}

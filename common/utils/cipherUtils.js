@@ -25,24 +25,24 @@ export const decryptItem = async (secretArmored, privateKeyObj) => {
   return JSON.parse(data);
 };
 
-export const encryptItem = async (secret, key) => {
+export const encryptItem = async (data, key) => {
   const encrypted = await openpgp.encrypt({
-    message: openpgp.message.fromText(JSON.stringify(secret)),
+    message: openpgp.message.fromText(JSON.stringify(data)),
     publicKeys: (await openpgp.key.readArmored(key)).keys,
   });
 
   return encrypted.data;
 };
 
-export const encryptItemsBatch = async (secrets, key) => {
+export const encryptItemsBatch = async (dataSet, key) => {
   return Promise.all(
-    secrets.map(async secret => await encryptItem(secret, key)),
+    dataSet.map(async data => await encryptItem(data, key)),
   );
 };
 
-export const encryptByPassword = async (secret, password) => {
+export const encryptByPassword = async (data, password) => {
   const encrypted = await openpgp.encrypt({
-    message: openpgp.message.fromText(JSON.stringify(secret)),
+    message: openpgp.message.fromText(JSON.stringify(data)),
     passwords: [password],
   });
 
@@ -59,8 +59,8 @@ export const decryptByPassword = async (secretArmored, password) => {
   return JSON.parse(data);
 };
 
-export const encryptItemForUsers = async (secret, keys) =>
-  Promise.all(keys.map(async key => await encryptItem(secret, key)));
+export const encryptItemForUsers = async (data, keys) =>
+  Promise.all(keys.map(async key => await encryptItem(data, key)));
 
 export const generateUser = async email => {
   const masterPassword = generator();

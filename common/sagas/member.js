@@ -16,7 +16,7 @@ import {
   getPublicKeyByEmailBatch,
   postNewUserBatch,
 } from 'common/api';
-import { normalizeMembers } from 'common/normalizers/member';
+import { convertMembersToEntity } from 'common/normalizers/normalizers';
 import {
   generateUser,
   generateUsersBatch,
@@ -34,7 +34,7 @@ export function* fetchMembersSaga() {
   try {
     const { data } = yield call(getUsers);
 
-    yield put(fetchMembersSuccess(normalizeMembers(data)));
+    yield put(fetchMembersSuccess(convertMembersToEntity(data)));
   } catch (e) {
     yield put(fetchMembersFailure());
   }
@@ -110,7 +110,7 @@ export function* createMemberBatchSaga({ payload: { emails, role } }) {
       const member = members[index];
 
       return {
-        userId,
+        id: userId,
         email: member.email,
         name: member.email,
         avatar: null,
@@ -119,12 +119,18 @@ export function* createMemberBatchSaga({ payload: { emails, role } }) {
       };
     });
 
-    const returnedMembers = preparedMembersForStore.map((member, index) => ({
-      ...member,
-      masterPassword: generatedUsers[index].masterPassword,
-      password: generatedUsers[index].password,
-    }));
+    const returnedMembers = userIds.map((userId, index) => {
+      const member = members[index];
 
+      return {
+        ...member,
+        userId,
+        masterPassword: generatedUsers[index].masterPassword,
+        password: generatedUsers[index].password,
+      };
+    });
+
+    console.log('preparedMembersForStore', preparedMembersForStore);
     if (role !== ANONYMOUS_USER_ROLE) {
       yield put(createMemberBatchSuccess(preparedMembersForStore));
     }
@@ -165,7 +171,7 @@ export function* getOrCreateMemberBatchSaga({ payload: { emails, role } }) {
   }
 }
 
-export function* memberSagas() {
+export default function* memberSagas() {
   yield takeLatest(FETCH_MEMBERS_REQUEST, fetchMembersSaga);
   yield takeLatest(CREATE_MEMBER_REQUEST, createMemberSaga);
   yield takeLatest(CREATE_MEMBER_BATCH_REQUEST, createMemberBatchSaga);

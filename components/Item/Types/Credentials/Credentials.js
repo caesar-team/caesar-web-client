@@ -56,10 +56,10 @@ class Credentials extends Component {
   handleCopy = field => () => {
     const {
       notification,
-      item: { secret },
+      item: { data },
     } = this.props;
 
-    copy(secret[field]);
+    copy(data[field]);
 
     const fieldText = field === 'login' ? 'Login' : 'Password';
 
@@ -79,8 +79,9 @@ class Credentials extends Component {
       isSharedItem = false,
       item: {
         listId,
-        secret: { login, pass, website, note, attachments = [] },
+        data: { login, pass, website, note, attachments = [] },
       },
+      childItems,
     } = this.props;
 
     const pwd = isPasswordVisible ? pass : pass.replace(/./g, '*');
@@ -101,6 +102,7 @@ class Credentials extends Component {
           isSharedItem={isSharedItem}
           isReadOnly={isReadOnly}
           allLists={allLists}
+          childItems={childItems}
           {...this.props}
         />
         <FieldWrapper>

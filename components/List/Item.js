@@ -110,7 +110,7 @@ const ItemTypeIcon = props => {
 const Item = ({
   id,
   lastUpdated,
-  secret: { name, attachments },
+  data: { name, attachments },
   type,
   invited,
   isMultiItem = false,

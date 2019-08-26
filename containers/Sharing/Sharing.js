@@ -33,10 +33,10 @@ class Sharing extends Component {
     const item = getInboxItem(list);
 
     const privateKeyObj = await getPrivateKeyObj(privateKey, password);
-    const decryptedSecret = await decryptItem(item.secret, privateKeyObj);
+    const decryptedSecret = await decryptItem(item.data, privateKeyObj);
 
     this.setState({
-      item: { ...item, secret: decryptedSecret, mode: ITEM_REVIEW_MODE },
+      item: { ...item, data: decryptedSecret, mode: ITEM_REVIEW_MODE },
     });
   }
 

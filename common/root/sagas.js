@@ -1,8 +1,22 @@
 import { all, fork } from 'redux-saga/effects';
-import { nodeSagas } from 'common/sagas/node';
-import { memberSagas } from 'common/sagas/member';
-import { userSagas } from 'common/sagas/user';
+import {
+  memberSagas,
+  userSagas,
+  workflowSagas,
+  listSagas,
+  itemSagas,
+  childItemSagas,
+} from 'common/sagas';
+
+const sagas = [
+  memberSagas,
+  userSagas,
+  workflowSagas,
+  listSagas,
+  itemSagas,
+  childItemSagas,
+];
 
 export function* rootSaga() {
-  yield all([nodeSagas, memberSagas, userSagas].map(saga => fork(saga)));
+  yield all(sagas.map(fork));
 }

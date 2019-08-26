@@ -94,7 +94,7 @@ class Import extends Component {
     });
   };
 
-  handleFinishDataStep = (listId, values) => {
+  handleFinishDataStep = (listId, values, setSubmitting) => {
     const omittedFields = ['index'];
     const cleared = values.map(row => {
       const keys = Object.keys(row);
@@ -112,7 +112,7 @@ class Import extends Component {
         currentStep: IMPORTING_STEP,
       },
       () => {
-        this.importing(listId, cleared);
+        this.importing(listId, cleared, setSubmitting);
       },
     );
   };
@@ -132,7 +132,7 @@ class Import extends Component {
   };
 
   // TODO: do progress bar in saga
-  importing(listId, data) {
+  importing(listId, data, setSubmitting) {
     const items = data.map(({ type, ...secret }) => {
       const fields = pick(
         secret,
@@ -148,7 +148,7 @@ class Import extends Component {
       };
     });
 
-    this.props.createItemsBatchRequest(items, listId);
+    this.props.createItemsBatchRequest(items, listId, setSubmitting);
 
     this.setState({
       progress: 1,

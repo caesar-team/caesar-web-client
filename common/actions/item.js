@@ -169,11 +169,14 @@ export const createItemFailure = () => ({
   type: CREATE_ITEM_FAILURE,
 });
 
-export const createItemsBatchRequest = (items, listId) => ({
+export const createItemsBatchRequest = (items, listId, setSubmitting) => ({
   type: CREATE_ITEMS_BATCH_REQUEST,
   payload: {
     items,
     listId,
+  },
+  meta: {
+    setSubmitting,
   },
 });
 

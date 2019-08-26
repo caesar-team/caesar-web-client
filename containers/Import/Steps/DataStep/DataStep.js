@@ -214,7 +214,9 @@ class DataStep extends Component {
     const { onSubmit } = this.props;
     const { selectedRows, listId } = this.state;
 
-    onSubmit(listId, denormalize(selectedRows));
+    this.setSubmitting(true);
+
+    onSubmit(listId, denormalize(selectedRows), this.setSubmitting);
   };
 
   handleSelectAll = event => {
@@ -293,18 +295,25 @@ class DataStep extends Component {
     });
   };
 
+  setSubmitting = isSubmitting => {
+    this.setState({
+      isSubmitting,
+    });
+  };
+
   prepareInitialState() {
     return {
       listId: this.props.lists[0].id,
       filterText: '',
       selectedRows: normalize(this.props.data),
       data: this.props.data,
+      isSubmitting: false,
     };
   }
 
   render() {
     const { lists, onCancel } = this.props;
-    const { data, selectedRows, filterText, listId } = this.state;
+    const { data, selectedRows, filterText, listId, isSubmitting } = this.state;
 
     const selectedRowsLength = denormalize(selectedRows).length;
 
@@ -312,6 +321,8 @@ class DataStep extends Component {
       value: id,
       label: upperFirst(label),
     }));
+
+    const isButtonDisabled = isSubmitting || !selectedRowsLength;
 
     return (
       <Wrapper>
@@ -342,7 +353,7 @@ class DataStep extends Component {
           </SelectedItems>
           <ButtonsWrapper>
             <StyledButton onClick={onCancel}>CANCEL</StyledButton>
-            <Button onClick={this.handleSubmit} disabled={!selectedRowsLength}>
+            <Button onClick={this.handleSubmit} disabled={isButtonDisabled}>
               IMPORT
             </Button>
           </ButtonsWrapper>

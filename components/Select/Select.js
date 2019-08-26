@@ -68,7 +68,6 @@ const Option = styled.div`
 `;
 
 const BOX_DIRECTION_DOWN = 'down';
-const BOX_DIRECTION_UP = 'up';
 
 const DEFAULT_TOP_OFFSET = 48;
 const DEFAULT_OPTION_SIZE = 36;

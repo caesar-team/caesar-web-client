@@ -2,6 +2,7 @@ import React, { Component, Fragment } from 'react';
 import styled from 'styled-components';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import { AvatarsList } from 'components/Avatar';
+import { withOfflineDetection } from 'components/Offline';
 import Link from 'next/link';
 import { DEFAULT_LIST_TYPE } from 'common/constants';
 import { Icon } from '../Icon';
@@ -117,6 +118,7 @@ class ManageList extends Component {
   renderItems() {
     const { hoverRowIndex } = this.state;
     const {
+      isOnline,
       lists,
       members,
       onClickEditList = Function.prototype,
@@ -169,12 +171,14 @@ class ManageList extends Component {
                   visibleCount="4"
                   avatars={generateAvatars(listItem.invited)}
                 />
-                <ListOptions
-                  index={index}
-                  listId={listItem.id}
-                  onClickEditList={onClickEditList}
-                  onClickRemoveList={onClickRemoveList}
-                />
+                {isOnline && (
+                  <ListOptions
+                    index={index}
+                    listId={listItem.id}
+                    onClickEditList={onClickEditList}
+                    onClickRemoveList={onClickRemoveList}
+                  />
+                )}
               </MembersCol>
             </TableCol>
           </TableRow>
@@ -221,4 +225,4 @@ class ManageList extends Component {
   }
 }
 
-export default ManageList;
+export default withOfflineDetection(ManageList);

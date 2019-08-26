@@ -13,7 +13,6 @@ import {
 const initialState = {
   isLoading: true,
   isError: false,
-  isRehydrated: false,
   workInProgressItem: null,
   workInProgressItemIds: [],
   workInProgressListId: null,

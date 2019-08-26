@@ -1,5 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
+import withOfflineDetection from '../Offline/withOfflineDetection';
 import Icon from '../Icon/Icon';
 
 const getButtonStyles = ({ color, theme }) => {
@@ -67,7 +68,7 @@ const StyledButton = styled.button`
   `};
 
   &[disabled] {
-    opacity: 0.2;
+    opacity: 0.5;
     cursor: not-allowed;
   }
 
@@ -85,16 +86,27 @@ const Text = styled.div`
   margin-left: ${({ withMargin }) => (withMargin ? '10px' : 0)};
 `;
 
+const getButtonDisabledStatus = (withOfflineCheck, isOnline, disabled) =>
+  (withOfflineCheck && !isOnline) || disabled;
+
 const Button = ({
   icon,
   color = 'black',
   htmlType = 'button',
   children,
+  disabled,
+  withOfflineCheck = false,
   isHoverBlackBackground,
+  isOnline,
   ...props
 }) => {
   const onlyIcon = !children;
   const withIcon = !!icon;
+  const isDisabled = getButtonDisabledStatus(
+    withOfflineCheck,
+    isOnline,
+    disabled,
+  );
 
   return (
     <StyledButton
@@ -102,6 +114,7 @@ const Button = ({
       type={htmlType}
       color={color}
       onlyIcon={onlyIcon}
+      disabled={isDisabled}
       {...props}
     >
       {icon && <Icon name={icon} width={14} height={14} isInButton />}
@@ -110,4 +123,4 @@ const Button = ({
   );
 };
 
-export default Button;
+export default withOfflineDetection(Button);

@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import styled from 'styled-components';
-import { Formik, FastField } from 'formik';
+import { Formik } from 'formik';
 import { Checkbox, DataTable } from 'components';
 import { Input } from '../../../Input';
 import { Icon } from '../../../Icon';
@@ -106,16 +106,7 @@ class DataStep extends Component {
       <Formik
         key="dataStep"
         onSubmit={onSubmit}
-        render={({
-          values,
-          errors,
-          touched,
-          handleSubmit,
-          setFieldValue,
-          setFieldTouched,
-          isSubmitting,
-          isValid,
-        }) => (
+        render={() => (
           <Wrapper>
             <Title>Select items to import 1Password data into Caesar </Title>
             <StyledInput
@@ -137,7 +128,7 @@ class DataStep extends Component {
               </SelectedItems>
               <ButtonsWrapper>
                 <StyledButton>CANCEL</StyledButton>
-                <Button>IMPORT</Button>
+                <Button withOfflineCheck>IMPORT</Button>
               </ButtonsWrapper>
             </BottomWrapper>
           </Wrapper>

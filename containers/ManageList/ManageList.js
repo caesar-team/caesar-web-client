@@ -158,6 +158,7 @@ class ManageListContainer extends Component {
         <TopWrapper>
           <Title>Lists</Title>
           <Button
+            withOfflineCheck
             onClick={this.handleClickCreateList}
             icon="plus"
             color="black"

@@ -62,6 +62,8 @@ const MembersWrapper = styled.div`
   margin-top: 15px;
 `;
 
+const waitIdle = () => new Promise(requestIdleCallback);
+
 class InviteModal extends Component {
   state = {
     filterText: '',
@@ -85,16 +87,17 @@ class InviteModal extends Component {
     onClickInvite(userId);
   };
 
-  handleClickAddNewInvite = () => {
+  handleClickAddNewInvite = async () => {
     const { onClickAddNewMember } = this.props;
     const { filterText } = this.state;
 
-    this.setState(
-      {
-        filterText: '',
-      },
-      () => onClickAddNewMember(filterText),
-    );
+    this.setState({
+      filterText: '',
+    });
+
+    await waitIdle();
+
+    onClickAddNewMember(filterText);
   };
 
   handleChangePermission = childItemId => event => {

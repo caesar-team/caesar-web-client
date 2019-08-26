@@ -2,12 +2,21 @@ import React, { Component } from 'react';
 import styled from 'styled-components';
 import memoize from 'memoize-one';
 import { upperFirst } from 'common/utils/string';
+import { waitIdle } from 'common/utils/utils';
 import {
   ITEM_DOCUMENT_TYPE,
   ITEM_CREDENTIALS_TYPE,
   KEY_CODES,
 } from 'common/constants';
-import { Input, Icon, Button, Select, Checkbox, DataTable } from 'components';
+import {
+  Input,
+  Icon,
+  Button,
+  Select,
+  Checkbox,
+  DataTable,
+  VirtualizedTableHOC,
+} from 'components';
 
 const Wrapper = styled.div`
   width: calc(100vw - 495px);
@@ -93,12 +102,14 @@ const MoveToText = styled.div`
   margin-right: 20px;
 `;
 
+const DataTableStyled = styled(DataTable)`
+  height: 400px;
+`;
+
 const capitalize = string => {
   if (typeof string !== 'string') return '';
   return string.charAt(0).toUpperCase() + string.slice(1);
 };
-
-const SEARCH_FIELDS = ['name'];
 
 const normalize = array =>
   array.reduce(
@@ -107,6 +118,10 @@ const normalize = array =>
   );
 
 const denormalize = object => Object.values(object);
+
+const SEARCH_FIELDS = ['name'];
+
+const VirtualizedTable = VirtualizedTableHOC(DataTableStyled);
 
 class DataStep extends Component {
   state = this.prepareInitialState();
@@ -210,11 +225,13 @@ class DataStep extends Component {
     });
   };
 
-  handleSubmit = () => {
+  handleSubmit = async () => {
     const { onSubmit } = this.props;
     const { selectedRows, listId } = this.state;
 
     this.setSubmitting(true);
+
+    await waitIdle();
 
     onSubmit(listId, denormalize(selectedRows), this.setSubmitting);
   };
@@ -332,7 +349,7 @@ class DataStep extends Component {
           placeholder="Search"
           onChange={this.handleSearch}
         />
-        <DataTable
+        <VirtualizedTable
           data={this.filter(data, filterText)}
           showPagination={false}
           defaultPageSize={data.length}
@@ -352,7 +369,9 @@ class DataStep extends Component {
             Selected items: {selectedRowsLength} / {data.length}
           </SelectedItems>
           <ButtonsWrapper>
-            <StyledButton onClick={onCancel}>CANCEL</StyledButton>
+            <StyledButton onClick={onCancel} disabled={isSubmitting}>
+              CANCEL
+            </StyledButton>
             <Button onClick={this.handleSubmit} disabled={isButtonDisabled}>
               IMPORT
             </Button>

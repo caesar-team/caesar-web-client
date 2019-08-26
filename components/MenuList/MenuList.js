@@ -1,5 +1,4 @@
-import React, { Component } from 'react';
-import equal from 'fast-deep-equal';
+import React, { PureComponent } from 'react';
 import styled from 'styled-components';
 import {
   LIST_TYPE,
@@ -46,14 +45,10 @@ const StyledIcon = styled(Icon)`
 
 const SECURE_MESSAGE_MODE = 'SECURE_MESSAGE_MODE';
 
-class MenuList extends Component {
+class MenuList extends PureComponent {
   state = {
     isVisibleList: true,
   };
-
-  shouldComponentUpdate(nextProps) {
-    return !equal(nextProps, this.props);
-  }
 
   handleToggle = () => {
     this.setState(prevState => ({
@@ -61,7 +56,7 @@ class MenuList extends Component {
     }));
   };
 
-  renderLists() {
+  renderList = key => {
     const {
       mode,
       inbox,
@@ -74,66 +69,74 @@ class MenuList extends Component {
     const { isVisibleList } = this.state;
 
     const lists = { inbox, favorites, trash, list };
+
+    switch (key) {
+      case INBOX_TYPE:
+      case FAVORITES_TYPE:
+      case TRASH_TYPE: {
+        const { id, label, children } = lists[key];
+        const isActive =
+          mode !== SECURE_MESSAGE_MODE &&
+          workInProgressList &&
+          workInProgressList.id === id;
+
+        return (
+          <MenuItem key={id} isActive={isActive} onClick={onClick(id)}>
+            {label}
+            {children.length > 0 && <Badge count={children.length} />}
+          </MenuItem>
+        );
+      }
+      case LIST_TYPE: {
+        const innerLists = lists[key];
+        const sortedChildren = innerLists.sort((a, b) => a.sort - b.sort);
+        const iconName = isVisibleList ? 'arrow-up-big' : 'arrow-down-big';
+
+        return (
+          <div key="lists">
+            <MenuItem key="lists" onClick={this.handleToggle}>
+              Lists
+              <StyledIcon name={iconName} width={14} height={14} />
+            </MenuItem>
+            {isVisibleList && (
+              <div>
+                {sortedChildren.map(child => {
+                  const isActive =
+                    mode !== SECURE_MESSAGE_MODE &&
+                    workInProgressList &&
+                    workInProgressList.id === child.id;
+
+                  return (
+                    <MenuItem
+                      key={child.id}
+                      isNested
+                      isActive={isActive}
+                      onClick={onClick(child.id)}
+                    >
+                      {child.label}
+                      {child.children.length > 0 && (
+                        <Badge count={child.children.length} />
+                      )}
+                    </MenuItem>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+        );
+      }
+      default:
+        return null;
+    }
+  };
+
+  renderLists() {
+    const { inbox, favorites, trash, list } = this.props;
+
+    const lists = { inbox, favorites, trash, list };
     const keys = Object.keys(lists);
 
-    return keys.map(key => {
-      switch (key) {
-        case INBOX_TYPE:
-        case FAVORITES_TYPE:
-        case TRASH_TYPE: {
-          const { id, label, children } = lists[key];
-          const isActive =
-            mode !== SECURE_MESSAGE_MODE &&
-            workInProgressList &&
-            workInProgressList.id === id;
-
-          return (
-            <MenuItem key={id} isActive={isActive} onClick={onClick(id)}>
-              {label}
-              {children.length > 0 && <Badge count={children.length} />}
-            </MenuItem>
-          );
-        }
-        case LIST_TYPE: {
-          const innerLists = lists[key];
-          const sortedChildren = innerLists.sort((a, b) => a.sort - b.sort);
-          const iconName = isVisibleList ? 'arrow-up-big' : 'arrow-down-big';
-
-          return (
-            <div key="lists">
-              <MenuItem key="lists" onClick={this.handleToggle}>
-                Lists
-                <StyledIcon name={iconName} width={14} height={14} />
-              </MenuItem>
-              {isVisibleList && (
-                <div>
-                  {sortedChildren.map(child => {
-                    const isActive =
-                      mode !== SECURE_MESSAGE_MODE &&
-                      workInProgressList &&
-                      workInProgressList.id === child.id;
-
-                    return (
-                      <MenuItem
-                        key={child.id}
-                        isNested
-                        isActive={isActive}
-                        onClick={onClick(child.id)}
-                      >
-                        {child.label}
-                        {child.children.length > 0 && (
-                          <Badge count={child.children.length} />
-                        )}
-                      </MenuItem>
-                    );
-                  })}
-                </div>
-              )}
-            </div>
-          );
-        }
-      }
-    });
+    return keys.map(this.renderList);
   }
 
   render() {

@@ -57,6 +57,7 @@ const Sidebar = styled.aside`
 const SECRET_SEARCH_FIELDS = ['name', 'note', 'website'];
 
 const searchFn = (obj, pattern) => fieldName =>
+  obj &&
   pattern &&
   obj[fieldName] &&
   obj[fieldName].toLowerCase().includes(pattern.toLowerCase());
@@ -69,8 +70,8 @@ class DashboardContainer extends Component {
 
   filter = memoize((data, pattern) =>
     pattern
-      ? data.filter(({ data }) =>
-          SECRET_SEARCH_FIELDS.some(searchFn(data, pattern)),
+      ? data.filter(({ data: itemsData }) =>
+          SECRET_SEARCH_FIELDS.some(searchFn(itemsData, pattern)),
         )
       : data,
   );

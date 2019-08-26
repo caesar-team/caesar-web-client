@@ -77,10 +77,7 @@ export const resetWorkInProgressItemIds = () => ({
 export const resetStore = () => ({
   type: RESET_STORE,
 });
-<<<<<<< HEAD
 
 export const rehydrateStore = () => ({
   type: REHYDRATE_STORE,
 });
-=======
->>>>>>> develop

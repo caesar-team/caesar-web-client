@@ -1,5 +1,4 @@
 import { createSelector } from 'reselect';
-import { itemsByIdSelector } from './item';
 
 export const entitiesSelector = state => state.entities;
 

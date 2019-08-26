@@ -16,6 +16,7 @@ const withWorkers = require('@zeit/next-workers');
 const withFonts = require('next-fonts');
 const withOptimizedImages = require('next-optimized-images');
 const withCSS = require('@zeit/next-css');
+const withOffline = require('next-offline');
 
 // fix: prevents error when .css files are required by node
 if (typeof require !== 'undefined') {
@@ -38,10 +39,31 @@ const publicRuntimeConfig = {
   LENGTH_KEY: process.env.LENGTH_KEY || 2048,
 };
 
+const workboxOptions = {
+  runtimeCaching: [
+    {
+      urlPattern: /^https?.*/,
+      handler: "NetworkFirst",
+      options: {
+        cacheName: "https-calls",
+        networkTimeoutSeconds: 15,
+        expiration: {
+          maxEntries: 150,
+          maxAgeSeconds: 30 * 24 * 60 * 60,
+        },
+        cacheableResponse: {
+          statuses: [0, 200],
+        }
+      }
+    }
+  ]
+};
+
 module.exports = withPlugins(
-  [withWorkers, withFonts, withOptimizedImages, withCSS],
+  [withOffline, withWorkers, withFonts, withOptimizedImages, withCSS],
   {
     publicRuntimeConfig,
+    workboxOpts: workboxOptions,
     webpack: (config) => {
       config.output.globalObject = 'this';
 

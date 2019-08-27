@@ -89,7 +89,7 @@ export function* decryptionChunkItemsSaga(itemsById) {
         {},
       );
 
-      yield put(addItemsBatch, preparedItems);
+      yield put(addItemsBatch(preparedItems));
 
       yield put(finishIsLoading());
     } catch (error) {

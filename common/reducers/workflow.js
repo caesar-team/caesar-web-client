@@ -8,6 +8,7 @@ import {
   SET_WORK_IN_PROGRESS_ITEM,
   SET_WORK_IN_PROGRESS_ITEM_IDS,
   SET_WORK_IN_PROGRESS_LIST_ID,
+  RESET_WORKFLOW_STORE,
 } from 'common/actions/workflow';
 
 const initialState = {
@@ -65,5 +66,8 @@ export default createReducer(initialState, {
       ...state,
       workInProgressItemIds: [],
     };
+  },
+  [RESET_WORKFLOW_STORE]() {
+    return initialState;
   },
 });

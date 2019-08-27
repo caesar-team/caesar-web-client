@@ -14,7 +14,7 @@ export const SET_WORK_IN_PROGRESS_LIST_ID =
 
 export const RESET_WORK_IN_PROGRESS_ITEM_IDS =
   '@workflow/RESET_WORK_IN_PROGRESS_ITEM_IDS';
-export const RESET_STORE = '@workflow/RESET_STORE';
+export const RESET_WORKFLOW_STORE = '@workflow/RESET_WORKFLOW_STORE';
 
 export const REHYDRATE_STORE = '@workflow/REHYDRATE_STORE';
 
@@ -74,8 +74,8 @@ export const resetWorkInProgressItemIds = () => ({
   type: RESET_WORK_IN_PROGRESS_ITEM_IDS,
 });
 
-export const resetStore = () => ({
-  type: RESET_STORE,
+export const resetWorkflowStore = () => ({
+  type: RESET_WORKFLOW_STORE,
 });
 
 export const rehydrateStore = () => ({

@@ -14,13 +14,13 @@ import { addListsBatch } from 'common/actions/list';
 import { addItemsBatch } from 'common/actions/item';
 import { addChildItemsBatch } from 'common/actions/childItem';
 import { convertNodesToEntities } from 'common/normalizers/normalizers';
-import { favoriteListSelector } from 'common/selectors/list';
 import { getWorkersCount } from 'common/utils/worker';
 import { uuid4 } from 'common/utils/uuid4';
 import DecryptWorker from 'common/decryption.worker';
-import { keyPairSelector, masterPasswordSelector } from 'common/selectors/user';
 import { getList } from 'common/api';
 import { ITEM_REVIEW_MODE } from 'common/constants';
+import { favoriteListSelector } from 'common/selectors/list';
+import { keyPairSelector, masterPasswordSelector } from 'common/selectors/user';
 import { itemsByIdSelector, itemSelector } from 'common/selectors/item';
 import { workInProgressItemSelector } from 'common/selectors/workflow';
 import { isOnlineSelector } from 'common/selectors/offline';
@@ -69,16 +69,15 @@ export function* decryptionChunkItemsSaga(itemsById) {
   const keyPair = yield select(keyPairSelector);
   const masterPassword = yield select(masterPasswordSelector);
 
-  const channel = yield call(createWebWorkerChannel, {
+  const webWorkerChannel = yield call(createWebWorkerChannel, {
     items: objectToArray(itemsById).map(({ id, secret }) => ({ id, secret })),
     privateKey: keyPair.privateKey,
     masterPassword,
   });
 
-  while (channel) {
+  while (webWorkerChannel) {
     try {
-      const decryptedItems = yield take(channel);
-
+      const decryptedItems = yield take(webWorkerChannel);
       const preparedItems = decryptedItems.reduce(
         (accumulator, { id, data }) => ({
           ...accumulator,
@@ -90,9 +89,8 @@ export function* decryptionChunkItemsSaga(itemsById) {
         {},
       );
 
-      yield put(addItemsBatch(preparedItems));
+      yield put(addItemsBatch, preparedItems);
 
-      // TODO: find better place
       yield put(finishIsLoading());
     } catch (error) {
       console.log(error);

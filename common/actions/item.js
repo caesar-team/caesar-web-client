@@ -68,6 +68,8 @@ export const REMOVE_CHILD_ITEM_FROM_ITEM = '@item/REMOVE_CHILD_ITEM_FROM_ITEM';
 export const REMOVE_CHILD_ITEMS_BATCH_FROM_ITEM =
   '@item/REMOVE_CHILD_ITEMS_BATCH_FROM_ITEM';
 
+export const REMOVE_ITEMS_DATA = '@item/REMOVE_ITEMS_DATA';
+
 export const removeItemRequest = (itemId, listId) => ({
   type: REMOVE_ITEM_REQUEST,
   payload: {
@@ -361,4 +363,8 @@ export const removeChildItemsBatchFromItem = (itemIds, childItemIds) => ({
     itemIds,
     childItemIds,
   },
+});
+
+export const removeItemsData = () => ({
+  type: REMOVE_ITEMS_DATA,
 });

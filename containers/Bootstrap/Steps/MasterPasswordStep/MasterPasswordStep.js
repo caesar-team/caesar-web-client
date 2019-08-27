@@ -8,6 +8,7 @@ import {
   generateKeys,
   reencryptPrivateKey,
 } from 'common/utils/key';
+import { waitIdle } from 'common/utils/utils';
 import { Head, BootstrapLayout } from 'components';
 import { NavigationPanelStyled } from '../../components';
 import {
@@ -28,8 +29,6 @@ const Wrapper = styled.div`
   width: 100%;
   margin: 0 auto;
 `;
-
-const waitIdle = () => new Promise(requestIdleCallback);
 
 class MasterPasswordStep extends Component {
   state = this.prepareInitialState();

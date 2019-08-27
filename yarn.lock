@@ -2325,6 +2325,13 @@ buffer@^4.3.0:
     ieee754 "^1.1.4"
     isarray "^1.0.0"
 
+buffer@^5.4.0:
+  version "5.4.0"
+  resolved "https://registry.yarnpkg.com/buffer/-/buffer-5.4.0.tgz#33294f5c1f26e08461e528b69fa06de3c45cbd8c"
+  dependencies:
+    base64-js "^1.0.2"
+    ieee754 "^1.1.4"
+
 builtin-status-codes@^3.0.0:
   version "3.0.0"
   resolved "https://registry.yarnpkg.com/builtin-status-codes/-/builtin-status-codes-3.0.0.tgz#85982878e21b98e1c66425e03d0174788f569ee8"
@@ -5758,6 +5765,12 @@ object-copy@^0.1.0:
 object-keys@^1.0.11, object-keys@^1.0.12:
   version "1.1.1"
   resolved "https://registry.yarnpkg.com/object-keys/-/object-keys-1.1.1.tgz#1c47f272df277f3b1daf061677d9c82e2322c60e"
+
+object-sizeof@^1.5.1:
+  version "1.5.1"
+  resolved "https://registry.yarnpkg.com/object-sizeof/-/object-sizeof-1.5.1.tgz#da2ed6ce9c7c0b0f7cf42e8b370f493ec41e0936"
+  dependencies:
+    buffer "^5.4.0"
 
 object-visit@^1.0.0:
   version "1.0.1"

@@ -7,7 +7,6 @@ export const REMOVE_INVITE_SUCCESS = '@childItem/REMOVE_INVITE_SUCCESS';
 export const REMOVE_INVITE_FAILURE = '@childItem/REMOVE_INVITE_FAILURE';
 
 export const INVITE_NEW_MEMBER_REQUEST = '@childItem/INVITE_NEW_MEMBER_REQUEST';
-export const INVITE_NEW_MEMBER_SUCCESS = '@childItem/INVITE_NEW_MEMBER_SUCCESS';
 export const INVITE_NEW_MEMBER_FAILURE = '@childItem/INVITE_NEW_MEMBER_FAILURE';
 
 export const SHARE_ITEM_BATCH_REQUEST = '@childItem/SHARE_ITEM_BATCH_REQUEST';
@@ -18,9 +17,10 @@ export const REMOVE_SHARE_REQUEST = '@childItem/REMOVE_SHARE_REQUEST';
 export const REMOVE_SHARE_SUCCESS = '@childItem/REMOVE_SHARE_SUCCESS';
 export const REMOVE_SHARE_FAILURE = '@childItem/REMOVE_SHARE_FAILURE';
 
-export const UPDATE_CHILD_ITEM_BATCH_REQUEST = '@childItem/UPDATE_CHILD_ITEM_BATCH_REQUEST';
-export const UPDATE_CHILD_ITEM_BATCH_SUCCESS = '@childItem/UPDATE_CHILD_ITEM_BATCH_SUCCESS';
-export const UPDATE_CHILD_ITEM_BATCH_FAILURE = '@childItem/UPDATE_CHILD_ITEM_BATCH_FAILURE';
+export const UPDATE_CHILD_ITEM_BATCH_REQUEST =
+  '@childItem/UPDATE_CHILD_ITEM_BATCH_REQUEST';
+export const UPDATE_CHILD_ITEM_BATCH_FAILURE =
+  '@childItem/UPDATE_CHILD_ITEM_BATCH_FAILURE';
 
 export const CHANGE_CHILD_ITEM_PERMISSION_REQUEST =
   '@childItem/CHANGE_CHILD_ITEM_PERMISSION_REQUEST';
@@ -78,13 +78,6 @@ export const inviteNewMemberRequest = email => ({
   },
 });
 
-export const inviteNewMemberSuccess = member => ({
-  type: INVITE_NEW_MEMBER_SUCCESS,
-  payload: {
-    member,
-  },
-});
-
 export const inviteNewMemberFailure = () => ({
   type: INVITE_NEW_MEMBER_FAILURE,
 });
@@ -127,17 +120,6 @@ export const removeShareFailure = () => ({
   type: REMOVE_SHARE_FAILURE,
 });
 
-export const updateChildItemsBatchRequest = originalItem => ({
-  type: UPDATE_CHILD_ITEM_BATCH_REQUEST,
-  payload: {
-    originalItem,
-  },
-});
-
-export const updateChildItemsBatchSuccess = () => ({
-  type: UPDATE_CHILD_ITEM_BATCH_SUCCESS,
-});
-
 export const updateChildItemsBatchFailure = () => ({
   type: UPDATE_CHILD_ITEM_BATCH_FAILURE,
 });
@@ -174,8 +156,4 @@ export const removeChildItemsBatch = childItemIds => ({
   payload: {
     childItemIds,
   },
-});
-
-export const resetStore = () => ({
-  type: RESET_STORE,
 });

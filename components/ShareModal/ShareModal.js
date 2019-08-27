@@ -11,6 +11,7 @@ import {
 } from 'components';
 import { base64ToObject, objectToBase64 } from 'common/utils/cipherUtils';
 import { generateSharingUrl } from 'common/utils/sharing';
+import { waitIdle } from 'common/utils/utils';
 import { KEY_CODES } from 'common/constants';
 
 const ModalDescription = styled.div`
@@ -86,8 +87,6 @@ const EMAIL_REGEX = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))
 const getEncryption = link => link.match(/\/([\w|+-]+)$/)[1];
 const getShareId = link => link.match(/share\/(.+)\//)[1];
 const getAnonymousLink = shared => shared.link || null;
-
-const waitIdle = () => new Promise(requestIdleCallback);
 
 export class ShareModal extends Component {
   state = this.prepareInitialState();

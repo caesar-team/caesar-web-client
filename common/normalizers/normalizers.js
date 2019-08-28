@@ -1,5 +1,5 @@
 import { normalize } from 'normalizr';
-import { listSchema, memberSchema } from './schemas';
+import { listSchema, memberSchema, teamSchema } from './schemas';
 import { getFavoritesList } from './utils';
 
 export const convertNodesToEntities = nodes => {
@@ -24,6 +24,12 @@ export const convertNodesToEntities = nodes => {
 
 export const convertMembersToEntity = members => {
   const normalized = normalize(members, [memberSchema]);
+
+  return normalized.entities.byId || {};
+};
+
+export const convertTeamsToEntity = teams => {
+  const normalized = normalize(teams, [teamSchema]);
 
   return normalized.entities.byId || {};
 };

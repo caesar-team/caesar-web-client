@@ -6,6 +6,7 @@ import {
   listSagas,
   itemSagas,
   childItemSagas,
+  teamSagas,
 } from 'common/sagas';
 
 const sagas = [
@@ -15,6 +16,7 @@ const sagas = [
   listSagas,
   itemSagas,
   childItemSagas,
+  teamSagas,
 ];
 
 export function* rootSaga() {

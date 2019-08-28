@@ -6,6 +6,7 @@ import {
   listReducer,
   itemReducer,
   childItemReducer,
+  teamReducer,
 } from '../reducers';
 
 const entitiesReducer = combineReducers({
@@ -13,6 +14,7 @@ const entitiesReducer = combineReducers({
   list: listReducer,
   item: itemReducer,
   childItem: childItemReducer,
+  team: teamReducer,
 });
 
 export const rootReducer = combineReducers({

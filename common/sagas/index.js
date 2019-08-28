@@ -4,3 +4,4 @@ export { default as childItemSagas } from './childItem';
 export { default as workflowSagas } from './workflow';
 export { default as userSagas } from './user';
 export { default as memberSagas } from './member';
+export { default as teamSagas } from './team';

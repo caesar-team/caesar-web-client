@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import styled from 'styled-components';
 import memoize from 'memoize-one';
 import { PERMISSION_WRITE, PERMISSION_READ } from 'common/constants';
+import { waitIdle } from 'common/utils/utils';
 import Member from './Member';
 import { Modal } from '../Modal';
 import { Input } from '../Input';
@@ -61,8 +62,6 @@ const MembersWrapper = styled.div`
   min-height: 400px;
   margin-top: 15px;
 `;
-
-const waitIdle = () => new Promise(requestIdleCallback);
 
 class InviteModal extends Component {
   state = {

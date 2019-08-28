@@ -45,6 +45,7 @@ import {
   ADD_CHILD_ITEMS_BATCH_TO_ITEM,
   REMOVE_CHILD_ITEM_FROM_ITEM,
   REMOVE_CHILD_ITEMS_BATCH_FROM_ITEM,
+  REMOVE_ITEMS_DATA,
 } from 'common/actions/item';
 
 const initialState = {
@@ -364,6 +365,21 @@ export default createReducer(initialState, {
           {},
         ),
       },
+    };
+  },
+  [REMOVE_ITEMS_DATA](state) {
+    return {
+      ...state,
+      byId: Object.keys(state.byId).reduce(
+        (accumulator, itemId) => ({
+          ...accumulator,
+          [itemId]: {
+            ...state.byId[itemId],
+            data: null,
+          },
+        }),
+        {},
+      ),
     };
   },
 });

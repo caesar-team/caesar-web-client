@@ -4,7 +4,7 @@ class HoldClickBehaviour extends Component {
   timer = null;
 
   handleButtonPress = () => {
-    const { delay = 250, onHoldStart } = this.props;
+    const { delay = 50, onHoldStart } = this.props;
 
     this.timer = setTimeout(onHoldStart, delay);
   };

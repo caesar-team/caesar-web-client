@@ -70,7 +70,7 @@ export { TextWithLines } from './TextWithLines';
 export { SettingsSidebar } from './SettingsSidebar';
 export { Tab, Tabs } from './Tabs';
 export { NavigationPanel } from './NavigationPanel';
-export { DataTable } from './DataTable';
+export { DataTable, VirtualizedTableHOC } from './DataTable';
 export { ProgressBar } from './ProgressBar';
 export { Toggle } from './Toggle';
 export { RangeInput } from './RangeInput';

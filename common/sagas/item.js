@@ -227,7 +227,10 @@ export function* createItemSaga({
   }
 }
 
-export function* createItemsBatchSaga({ payload: { items, listId } }) {
+export function* createItemsBatchSaga({
+  payload: { items, listId },
+  meta: { setSubmitting },
+}) {
   try {
     const keyPair = yield select(keyPairSelector);
     const user = yield select(userDataSelector);
@@ -273,6 +276,8 @@ export function* createItemsBatchSaga({ payload: { items, listId } }) {
   } catch (error) {
     console.log(error);
     yield put(createItemsBatchFailure());
+  } finally {
+    setSubmitting(false);
   }
 }
 

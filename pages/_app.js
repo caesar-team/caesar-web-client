@@ -1,6 +1,6 @@
 import React from 'react';
 // eslint-disable-next-line
-import { default as NextApp, Container } from 'next/app';
+import { default as NextApp } from 'next/app';
 import { ThemeProvider, createGlobalStyle } from 'styled-components';
 import globalStyles from 'common/styles/globalStyles';
 import { entryResolver } from 'common/utils/entryResolver';
@@ -50,10 +50,8 @@ class Application extends NextApp {
       return (
         <ThemeProvider theme={theme}>
           <NotificationProvider>
-            <Container>
-              <GlobalStyles />
-              <Component {...pageProps} />
-            </Container>
+            <GlobalStyles />
+            <Component {...pageProps} />
           </NotificationProvider>
         </ThemeProvider>
       );
@@ -63,13 +61,11 @@ class Application extends NextApp {
       return (
         <ThemeProvider theme={theme}>
           <NotificationProvider>
-            <Container>
-              <GlobalStyles />
-              <Provider store={store}>
-                <Component {...pageProps} />
-                <OfflineNotification />
-              </Provider>
-            </Container>
+            <GlobalStyles />
+            <Provider store={store}>
+              <Component {...pageProps} />
+              <OfflineNotification />
+            </Provider>
           </NotificationProvider>
         </ThemeProvider>
       );
@@ -79,13 +75,11 @@ class Application extends NextApp {
       <ThemeProvider theme={theme}>
         <NotificationProvider>
           <OfflineDetectionProvider>
-            <Container>
-              <GlobalStyles />
-              <Provider store={store}>
-                <Bootstrap {...pageProps} component={Component} />
-                <OfflineNotification />
-              </Provider>
-            </Container>
+            <GlobalStyles />
+            <Provider store={store}>
+              <Bootstrap {...pageProps} component={Component} />
+              <OfflineNotification />
+            </Provider>
           </OfflineDetectionProvider>
         </NotificationProvider>
       </ThemeProvider>

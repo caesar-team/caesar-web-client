@@ -102,6 +102,8 @@ class DashboardContainer extends Component {
   };
 
   handleClickSecureMessage = () => {
+    this.props.setWorkInProgressListId(null);
+
     this.setState({
       mode: DASHBOARD_SECURE_MESSAGE_MODE,
       searchedText: '',
@@ -469,12 +471,12 @@ class DashboardContainer extends Component {
             <Sidebar>
               <MenuList
                 mode={mode}
-                workInProgressList={workInProgressList}
+                activeListId={workInProgressList && workInProgressList.id}
                 inbox={listsByType.inbox}
                 favorites={listsByType.favorites}
                 list={listsByType.list}
                 trash={listsByType.trash}
-                onClick={this.handleClickMenuItem}
+                onClickMenuItem={this.handleClickMenuItem}
                 onClickSecureMessage={this.handleClickSecureMessage}
               />
             </Sidebar>

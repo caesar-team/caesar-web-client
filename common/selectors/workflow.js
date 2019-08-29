@@ -46,10 +46,7 @@ export const workInProgressItemIdsSelector = createSelector(
 export const workInProgressListSelector = createSelector(
   listsByIdSelector,
   workInProgressListIdSelector,
-  favoriteListSelector,
-  (listsById, workInProgressListId, favoriteList) => {
-    return listsById[workInProgressListId] || favoriteList;
-  },
+  (listsById, workInProgressListId) => listsById[workInProgressListId],
 );
 
 export const workInProgressItemsSelector = createSelector(

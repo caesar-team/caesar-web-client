@@ -13,6 +13,7 @@ import 'public/images/svg/icon-arrow-left-small.svg?sprite';
 import 'public/images/svg/icon-arrow-right-big.svg?sprite';
 import 'public/images/svg/icon-arrow-right-small.svg?sprite';
 import 'public/images/svg/icon-at.svg?sprite';
+import 'public/images/svg/icon-bitmap.svg?sprite';
 import 'public/images/svg/icon-check.svg?sprite';
 import 'public/images/svg/icon-clip.svg?sprite';
 import 'public/images/svg/icon-close.svg?sprite';

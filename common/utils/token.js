@@ -2,16 +2,16 @@ import Cookies from 'js-cookie';
 import Fingerprint2 from 'fingerprintjs2';
 import { isServer } from './isEnvironment';
 
-export function setToken(token, path = '/') {
-  return Cookies.set('token', token, { path });
+export function setCookieValue(name, value, path = '/') {
+  return Cookies.set(name, value, { path });
 }
 
-export function getToken() {
-  return Cookies.get('token', { path: '/' });
+export function getCookieValue(name, path = '/') {
+  return Cookies.get(name, { path });
 }
 
-export function removeToken() {
-  return Cookies.remove('token', { path: '/' });
+export function removeCookieValue(name, path = '/') {
+  return Cookies.remove(name, path);
 }
 
 const generateFingerPrint = () => {

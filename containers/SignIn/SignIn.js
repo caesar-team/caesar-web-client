@@ -17,7 +17,7 @@ import {
   SecondaryHeader,
 } from 'components';
 import { login } from 'common/utils/authUtils';
-import { getTrustedDeviceToken, setToken } from 'common/utils/token';
+import { getTrustedDeviceToken, setCookieValue } from 'common/utils/token';
 import SignInForm from './SignInForm';
 
 const AuthWrapper = styled.a`
@@ -82,7 +82,7 @@ class SignInContainer extends Component {
     try {
       const jwt = await login(email, password);
 
-      setToken(jwt);
+      setCookieValue('token', jwt);
 
       Router.push('/');
     } catch (e) {

@@ -1,11 +1,17 @@
-import { take, put, call, takeLatest, select, all } from 'redux-saga/effects';
+import {
+  take,
+  put,
+  call,
+  fork,
+  takeLatest,
+  select,
+  all,
+} from 'redux-saga/effects';
 import { eventChannel } from 'redux-saga';
 import {
-  FETCH_NODES_REQUEST,
+  INIT_PREPARATION_DATA_FLOW,
   UPDATE_WORK_IN_PROGRESS_ITEM,
   REHYDRATE_STORE,
-  fetchNodesFailure,
-  fetchNodesSuccess,
   finishIsLoading,
   setWorkInProgressListId,
   setWorkInProgressItem,
@@ -13,9 +19,12 @@ import {
 import { addListsBatch } from 'common/actions/list';
 import { addItemsBatch } from 'common/actions/item';
 import { addChildItemsBatch } from 'common/actions/childItem';
+import { fetchMembersSaga } from 'common/sagas/member';
 import { convertNodesToEntities } from 'common/normalizers/normalizers';
 import { getWorkersCount } from 'common/utils/worker';
 import { uuid4 } from 'common/utils/uuid4';
+import { chunk, objectToArray, arrayToObject } from 'common/utils/utils';
+import { sortItemsByFavorites, getMembersIds } from 'common/utils/workflow';
 import DecryptWorker from 'common/decryption.worker';
 import { getList } from 'common/api';
 import { ITEM_REVIEW_MODE } from 'common/constants';
@@ -24,19 +33,6 @@ import { keyPairSelector, masterPasswordSelector } from 'common/selectors/user';
 import { itemsByIdSelector, itemSelector } from 'common/selectors/item';
 import { workInProgressItemSelector } from 'common/selectors/workflow';
 import { isOnlineSelector } from 'common/selectors/offline';
-
-const chunk = (input, size) => {
-  return input.reduce((arr, item, idx) => {
-    return idx % size === 0
-      ? [...arr, [item]]
-      : [...arr.slice(0, -1), [...arr.slice(-1)[0], item]];
-  }, []);
-};
-
-const objectToArray = obj => Object.values(obj);
-
-const arrayToObject = arr =>
-  arr.reduce((accumulator, item) => ({ ...accumulator, [item.id]: item }), {});
 
 const getWorkerEvents = workerId => ({
   eventToWorker: `decryptItems_${workerId}`,
@@ -98,15 +94,10 @@ export function* decryptionChunkItemsSaga(itemsById) {
   }
 }
 
-function* decryptionItems({ payload: { itemsById } }) {
-  const items = objectToArray(itemsById);
-
+function* decryptionItems(items) {
   if (items.length) {
-    const preparedItems = items.sort(
-      (a, b) => Number(b.favorite) - Number(a.favorite),
-    );
     const poolSize = getWorkersCount();
-    const chunks = chunk(preparedItems, Math.ceil(items.length / poolSize));
+    const chunks = chunk(items, Math.ceil(items.length / poolSize));
 
     yield all(
       chunks.map(chunkItems =>
@@ -118,7 +109,7 @@ function* decryptionItems({ payload: { itemsById } }) {
   }
 }
 
-export function* fetchNodesSaga({ payload: { withItemsDecryption } }) {
+export function* initPersonalData({ payload: { withItemsDecryption } }) {
   try {
     const { data } = yield call(getList);
 
@@ -126,25 +117,43 @@ export function* fetchNodesSaga({ payload: { withItemsDecryption } }) {
       data,
     );
 
+    yield fork(fetchMembersSaga, {
+      payload: { memberIds: getMembersIds(itemsById, childItemsById) },
+    });
+
     yield put(addListsBatch(listsById));
     yield put(addChildItemsBatch(childItemsById));
 
-    yield put(fetchNodesSuccess(listsById));
-
-    const favoriteList = yield select(favoriteListSelector);
-
-    yield put(setWorkInProgressListId(favoriteList.id));
-
     if (withItemsDecryption) {
-      yield call(decryptionItems, { payload: { itemsById } });
+      yield fork(
+        decryptionItems,
+        sortItemsByFavorites(objectToArray(itemsById)),
+      );
     } else {
       yield put(addItemsBatch(itemsById));
       yield put(finishIsLoading());
     }
+
+    const favoriteList = yield select(favoriteListSelector);
+    yield put(setWorkInProgressListId(favoriteList.id));
   } catch (error) {
     console.log(error);
-    yield put(fetchNodesFailure());
   }
+}
+
+export function* initTeamData() {
+  try {
+    yield 'test';
+  } catch (error) {
+    console.log(error);
+  }
+}
+
+export function* initPreparationDataFlowSaga({
+  payload: { withItemsDecryption },
+}) {
+  yield fork(initPersonalData, { payload: { withItemsDecryption } });
+  yield fork(initTeamData);
 }
 
 export function* updateWorkInProgressItemSaga({
@@ -183,7 +192,7 @@ export function* rehydrateStoreSaga() {
 }
 
 export default function* workflowSagas() {
-  yield takeLatest(FETCH_NODES_REQUEST, fetchNodesSaga);
+  yield takeLatest(INIT_PREPARATION_DATA_FLOW, initPreparationDataFlowSaga);
   yield takeLatest(UPDATE_WORK_IN_PROGRESS_ITEM, updateWorkInProgressItemSaga);
   yield takeLatest(REHYDRATE_STORE, rehydrateStoreSaga);
 }

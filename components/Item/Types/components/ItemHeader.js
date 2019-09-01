@@ -145,6 +145,7 @@ const ItemHeader = ({
   isSharedItem,
   isOnline,
   user,
+  owner,
   members,
   onClickCloseItem,
   onClickRemoveItem,
@@ -159,7 +160,7 @@ const ItemHeader = ({
     listId,
     lastUpdated,
     favorite,
-    owner,
+    ownerId,
     data: { name },
   },
   childItems,
@@ -182,9 +183,9 @@ const ItemHeader = ({
       return accumulator;
     }
 
-    if (user.id === item.userId && user.id !== owner.id) {
+    if (user.id === item.userId && user.id !== ownerId) {
       accumulator.unshift(user);
-    } else if (owner.id !== item.userId) {
+    } else if (ownerId !== item.userId) {
       accumulator.push(members[item.userId]);
     }
 
@@ -192,7 +193,7 @@ const ItemHeader = ({
   }, []);
 
   const hasInvited = childItems.length > 0;
-  const isOwner = user.id === owner.id;
+  const isOwner = user.id === ownerId;
 
   const options = allLists
     .filter(({ id, type }) => type !== TRASH_TYPE && id !== listId)

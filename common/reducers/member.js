@@ -9,6 +9,10 @@ import {
   CREATE_MEMBER_BATCH_REQUEST,
   CREATE_MEMBER_BATCH_SUCCESS,
   CREATE_MEMBER_BATCH_FAILURE,
+  FETCH_TEAM_MEMBERS_REQUEST,
+  FETCH_TEAM_MEMBERS_SUCCESS,
+  FETCH_TEAM_MEMBERS_FAILURE,
+  ADD_MEMBERS_BATCH,
 } from 'common/actions/member';
 
 const initialState = {
@@ -26,7 +30,10 @@ export default createReducer(initialState, {
       ...state,
       isLoading: false,
       isError: false,
-      byId: payload.membersById,
+      byId: {
+        ...state.byId,
+        ...payload.membersById,
+      },
     };
   },
   [FETCH_MEMBERS_FAILURE](state) {
@@ -64,5 +71,29 @@ export default createReducer(initialState, {
   },
   [CREATE_MEMBER_BATCH_FAILURE](state) {
     return state;
+  },
+  [FETCH_TEAM_MEMBERS_REQUEST](state) {
+    return state;
+  },
+  [FETCH_TEAM_MEMBERS_SUCCESS](state, { payload }) {
+    return {
+      ...state,
+      byId: {
+        ...state.byId,
+        ...payload.membersById,
+      },
+    };
+  },
+  [FETCH_TEAM_MEMBERS_FAILURE](state) {
+    return state;
+  },
+  [ADD_MEMBERS_BATCH](state, { payload }) {
+    return {
+      ...state,
+      byId: {
+        ...state.byId,
+        ...payload.membersById,
+      },
+    };
   },
 });

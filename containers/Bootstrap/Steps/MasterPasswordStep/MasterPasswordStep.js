@@ -9,6 +9,7 @@ import {
   reencryptPrivateKey,
 } from 'common/utils/key';
 import { waitIdle } from 'common/utils/utils';
+import { setFaviconTag } from 'common/utils/domUtils';
 import { Head, BootstrapLayout } from 'components';
 import { NavigationPanelStyled } from '../../components';
 import {
@@ -82,6 +83,17 @@ class MasterPasswordStep extends Component {
     }
 
     return this.setState(state);
+  }
+
+  // TODO: mb best solution is creating Favicon component
+  componentDidUpdate() {
+    if (this.state.step === MASTER_PASSWORD_CHECK) {
+      setFaviconTag('/public/images/favicon/favicon-locked.ico');
+    }
+  }
+
+  componentWillUnmount() {
+    setFaviconTag('/public/images/favicon/favicon.ico');
   }
 
   async onFinishMasterPassword({ oldKeyPair, currentKeyPair, masterPassword }) {

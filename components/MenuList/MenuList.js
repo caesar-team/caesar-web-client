@@ -6,7 +6,7 @@ import { MenuItemWrapper, MenuItem } from './components';
 const Menu = styled.div`
   display: flex;
   flex-direction: column;
-  margin: 24px 30px 0 60px;
+  margin: 16px 30px 0 60px;
 `;
 
 const SECURE_MESSAGE_MODE = 'SECURE_MESSAGE_MODE';
@@ -27,7 +27,7 @@ class MenuList extends PureComponent {
 
   prepareInitialState() {
     return {
-      openedSectionNames: [],
+      openedSectionNames: ['personal', 'tools'],
     };
   }
 

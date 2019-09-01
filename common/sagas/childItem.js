@@ -211,12 +211,10 @@ export function* shareItemBatchSaga({ payload: { items, emails } }) {
     const invited = shares.reduce(
       (accumulator, { originalItemId, items: childItems }) => [
         ...accumulator,
-        ...childItems.map(({ id, userId, lastUpdated }) => ({
+        ...childItems.map(({ id, userId }) => ({
           id,
           originalItemId,
-          updatedAt: lastUpdated,
           userId,
-          email: membersObj[userId].email,
           access: PERMISSION_READ,
         })),
       ],

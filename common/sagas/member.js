@@ -3,15 +3,20 @@ import {
   FETCH_MEMBERS_REQUEST,
   CREATE_MEMBER_REQUEST,
   CREATE_MEMBER_BATCH_REQUEST,
+  FETCH_TEAM_MEMBERS_REQUEST,
   fetchMembersSuccess,
   fetchMembersFailure,
   createMemberSuccess,
   createMemberFailure,
   createMemberBatchSuccess,
   createMemberBatchFailure,
+  fetchTeamMembersSuccess,
+  fetchTeamMembersFailure,
 } from 'common/actions/member';
 import {
   getUsers,
+  getUsersByIds,
+  getTeamMembers,
   postNewUser,
   getPublicKeyByEmailBatch,
   postNewUserBatch,
@@ -30,9 +35,11 @@ const setIsNewFlag = (members, isNew) =>
     isNew,
   }));
 
-export function* fetchMembersSaga() {
+export function* fetchMembersSaga({ payload: { memberIds } }) {
   try {
-    const { data } = yield call(getUsers);
+    const action = memberIds && memberIds.length > 0 ? getUsersByIds : getUsers;
+
+    const { data } = yield call(action, memberIds);
 
     yield put(fetchMembersSuccess(convertMembersToEntity(data)));
   } catch (e) {
@@ -171,8 +178,19 @@ export function* getOrCreateMemberBatchSaga({ payload: { emails, role } }) {
   }
 }
 
+export function* fetchTeamMembersSaga({ payload: { teamId } }) {
+  try {
+    const { data } = yield call(getTeamMembers, teamId);
+
+    yield put(fetchMembersSuccess(convertMembersToEntity(data)));
+  } catch (e) {
+    yield put(fetchMembersFailure());
+  }
+}
+
 export default function* memberSagas() {
   yield takeLatest(FETCH_MEMBERS_REQUEST, fetchMembersSaga);
   yield takeLatest(CREATE_MEMBER_REQUEST, createMemberSaga);
   yield takeLatest(CREATE_MEMBER_BATCH_REQUEST, createMemberBatchSaga);
+  yield takeLatest(FETCH_TEAM_MEMBERS_REQUEST, fetchTeamMembersSaga);
 }

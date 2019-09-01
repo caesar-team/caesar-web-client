@@ -11,6 +11,7 @@ const LayoutConstructorStyled = styled(LayoutConstructor)`
 
 const DashboardLayout = ({
   user,
+  team,
   withSearch,
   searchedText,
   onSearch,
@@ -22,6 +23,7 @@ const DashboardLayout = ({
     headerComponent={
       <PrimaryHeader
         user={user}
+        team={team}
         withSearch={withSearch}
         searchedText={searchedText}
         onSearch={onSearch}

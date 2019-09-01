@@ -80,3 +80,5 @@ export { TagsInput } from './TagsInput';
 export { Tooltip } from './Tooltip';
 export { HoldClickBehaviour } from './HoldClickBehaviour';
 export { TeamCard } from './TeamCard';
+export { TeamModal } from './TeamModal';
+export { RadioGroup, Radio } from './Radio';

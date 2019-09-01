@@ -1,11 +1,11 @@
 import { createSelector } from 'reselect';
 import {
   listsByIdSelector,
-  favoriteListSelector,
   extendedSortedCustomizableListsSelector,
 } from './list';
 import { itemsByIdSelector } from './item';
 import { childItemsByIdSelector } from './childItem';
+import { membersByIdSelector } from './member';
 
 export const workflowSelector = state => state.workflow;
 
@@ -24,6 +24,15 @@ export const workInProgressItemSelector = createSelector(
   workflow => workflow.workInProgressItem,
 );
 
+export const workInProgressItemOwnerSelector = createSelector(
+  workInProgressItemSelector,
+  membersByIdSelector,
+  (workInProgressItem, membersById) =>
+    workInProgressItem && Object.values(membersById).length
+      ? membersById[workInProgressItem.ownerId]
+      : null,
+);
+
 export const workInProgressItemChildItemsSelector = createSelector(
   workInProgressItemSelector,
   childItemsByIdSelector,
@@ -31,6 +40,21 @@ export const workInProgressItemChildItemsSelector = createSelector(
     workInProgressItem && Object.values(childItemsById).length
       ? workInProgressItem.invited.map(id => childItemsById[id])
       : [],
+);
+
+const constructedWorkInProgressItem = createSelector(
+  workInProgressItemSelector,
+  workInProgressItemOwnerSelector,
+  workInProgressItemChildItemsSelector,
+  (
+    workInProgressItem,
+    workInProgressItemOwner,
+    workInProgressItemChildItems,
+  ) => ({
+    ...workInProgressItem,
+    owner: workInProgressItemOwner,
+    invited: workInProgressItemChildItems,
+  }),
 );
 
 export const workInProgressListIdSelector = createSelector(

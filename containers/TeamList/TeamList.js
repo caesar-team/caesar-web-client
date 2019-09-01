@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import styled from 'styled-components';
-import { Button, TeamCard } from 'components';
+import { Button, TeamCard, TextLoader } from 'components';
+import { fetchTeamsRequest } from '../../common/actions/team';
 
 const Wrapper = styled.div`
   display: flex;
@@ -42,7 +43,22 @@ const TeamCardStyled = styled(TeamCard)`
 `;
 
 class TeamListContainer extends Component {
+  componentDidMount() {
+    this.props.fetchUserTeamsRequest();
+    this.props.fetchTeamsRequest();
+  }
+
   render() {
+    const { isLoading } = this.props;
+
+    if (isLoading) {
+      return (
+        <Wrapper>
+          <TextLoader />
+        </Wrapper>
+      );
+    }
+
     return (
       <Wrapper>
         <TopWrapper>

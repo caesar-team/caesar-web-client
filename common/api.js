@@ -1,11 +1,11 @@
 import axios from 'axios';
-import { removeToken } from './utils/token';
+import { removeCookieValue } from './utils/token';
 import { API_URI, API_BASE_PATH } from './constants';
 import { isClient } from './utils/isEnvironment';
 
 const softExit = () => {
   if (isClient) {
-    removeToken();
+    removeCookieValue('token');
 
     // TODO: change via Router
     if (window.location.pathname !== '/signin') {
@@ -127,8 +127,6 @@ export const removeList = listId => callApi.delete(`/list/${listId}`);
 
 export const toggleFavorite = id => callApi.post(`/item/${id}/favorite`);
 
-export const getPublicKeyByEmail = email => callApi.get(`/key/${email}`);
-
 export const getPublicKeyByEmailBatch = data =>
   callApi.post('/key/batch', data);
 
@@ -166,3 +164,12 @@ export const patchResetPassword = (token, data) =>
 export const postSecureMessage = data => callApi.post('/message', data);
 
 export const getSecureMessage = id => callApi.get(`/message/${id}`);
+
+export const getUserTeams = () => callApi.get('/user/teams');
+
+export const getTeams = () => callApi.get('/teams');
+
+export const getUsersByIds = userIds =>
+  callApi.get(`/users?${userIds.map(userId => `ids[]=${userId}`).join('&')}`);
+
+export const getTeamMembers = teamId => callApi.get(`/teams/${teamId}/members`);

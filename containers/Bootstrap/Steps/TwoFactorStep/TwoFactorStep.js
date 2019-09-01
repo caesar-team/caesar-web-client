@@ -5,7 +5,7 @@ import {
   postActivateTwoFactor,
   postCheckTwoFactor,
 } from 'common/api';
-import { getTrustedDeviceToken, setToken } from 'common/utils/token';
+import { getTrustedDeviceToken, setCookieValue } from 'common/utils/token';
 import { matchStrict } from 'common/utils/match';
 import { Head } from 'components';
 import { NavigationPanelStyled } from '../../components';
@@ -62,7 +62,7 @@ class TwoFactorStep extends Component {
       } = await action(post);
 
       if (token) {
-        setToken(token);
+        setCookieValue('token', token);
       }
 
       // eslint-disable-next-line

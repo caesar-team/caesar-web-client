@@ -210,7 +210,7 @@ export function* createItemSaga({
       invited: [],
       shared: null,
       tags: [],
-      owner: user,
+      ownerId: user.id,
       secret: encryptedItem,
       data: { attachments, ...data },
       type,
@@ -266,7 +266,7 @@ export function* createItemsBatchSaga({
       invited: [],
       shared: null,
       tags: [],
-      owner: user,
+      owner: user.id,
       data: preparedForEncryptingItems[index],
       type: items[index].type,
     }));

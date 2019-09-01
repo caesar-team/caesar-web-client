@@ -1,6 +1,5 @@
-export const FETCH_NODES_REQUEST = '@workflow/FETCH_NODES_REQUEST';
-export const FETCH_NODES_SUCCESS = '@workflow/FETCH_NODES_SUCCESS';
-export const FETCH_NODES_FAILURE = '@workflow/FETCH_NODES_FAILURE';
+export const INIT_PREPARATION_DATA_FLOW =
+  '@workflow/INIT_PREPARATION_DATA_FLOW';
 
 export const FINISH_IS_LOADING = '@workflow/FINISH_IS_LOADING';
 
@@ -18,22 +17,11 @@ export const RESET_WORKFLOW_STORE = '@workflow/RESET_WORKFLOW_STORE';
 
 export const REHYDRATE_STORE = '@workflow/REHYDRATE_STORE';
 
-export const fetchNodesRequest = withItemsDecryption => ({
-  type: FETCH_NODES_REQUEST,
+export const initPreparationDataFlow = withItemsDecryption => ({
+  type: INIT_PREPARATION_DATA_FLOW,
   payload: {
     withItemsDecryption,
   },
-});
-
-export const fetchNodesSuccess = listsById => ({
-  type: FETCH_NODES_SUCCESS,
-  payload: {
-    listsById,
-  },
-});
-
-export const fetchNodesFailure = () => ({
-  type: FETCH_NODES_FAILURE,
 });
 
 export const finishIsLoading = () => ({

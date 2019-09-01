@@ -16,3 +16,11 @@ export const memberListSelector = createSelector(
   membersByIdSelector,
   byId => Object.values(byId) || [],
 );
+
+const memberIdsPropSelector = (_, props) => props.memberIds;
+
+export const membersBatchSelector = createSelector(
+  membersByIdSelector,
+  memberIdsPropSelector,
+  (membersById, memberIds) => memberIds.map(memberId => membersById[memberId]),
+);

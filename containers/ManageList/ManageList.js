@@ -56,7 +56,7 @@ class ManageListContainer extends Component {
     this.props.fetchUserSelfRequest();
     this.props.fetchKeyPairRequest();
     this.props.fetchMembersRequest();
-    this.props.fetchNodesRequest(false);
+    this.props.initPreparationDataFlow(false);
   }
 
   handleClickCreateList = () => {

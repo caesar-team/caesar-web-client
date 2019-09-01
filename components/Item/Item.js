@@ -48,6 +48,7 @@ const NotifyButton = styled(Button)`
 const Item = ({
   isTrashItem = false,
   item,
+  owner,
   childItems,
   allLists,
   user,
@@ -72,7 +73,7 @@ const Item = ({
     return <EmptyItem />;
   }
 
-  const { mode, type, update, owner, id } = item;
+  const { mode, type, update, ownerId, id } = item;
 
   const renderedItemForm = matchStrict(
     type,
@@ -104,12 +105,12 @@ const Item = ({
     (acc, childItem) => (childItem.userId === user.id ? childItem.access : acc),
     null,
   );
-  const hasWriteAccess = owner.id === user.id || access === PERMISSION_WRITE;
+  const hasWriteAccess = ownerId === user.id || access === PERMISSION_WRITE;
   const isReadOnly = access && !hasWriteAccess;
 
   const renderUpdateNotify = () => {
     const updateUserName =
-      update.userId === owner.id ? user.name : members[update.userId].name;
+      update.userId === ownerId ? user.name : members[update.userId].name;
     const updateDate = formatDate(update.createdAt);
 
     return (
@@ -140,6 +141,7 @@ const Item = ({
           isTrashItem={isTrashItem}
           isReadOnly={isReadOnly}
           item={item}
+          owner={owner}
           childItems={childItems}
           user={user}
           members={members}
@@ -161,6 +163,7 @@ const Item = ({
           isTrashItem={isTrashItem}
           isReadOnly={isReadOnly}
           item={item}
+          owner={owner}
           childItems={childItems}
           user={user}
           members={members}

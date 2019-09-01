@@ -101,3 +101,5 @@ export const ANONYMOUS_USER_ROLE = 'ROLE_ANONYMOUS_USER';
 export const LOADING = 'LOADING';
 export const SUCCESS = 'SUCCESS';
 export const FAILURE = 'FAILURE';
+
+export const DEFAULT_TEAM_TYPE = 'default';

@@ -1,14 +1,12 @@
 import React, { Fragment } from 'react';
 import { TeamListContainer } from 'containers';
 import { Head, SettingsLayout, SettingsSidebar } from 'components';
-import { isServer } from 'common/utils/isEnvironment';
-import { getToken } from 'common/utils/token';
-import { getUserSelf } from 'common/api';
+import { getUserWithTeam } from 'common/utils/entryResolver';
 
-const SettingsTeams = ({ user }) => (
+const SettingsTeams = ({ user, team }) => (
   <Fragment>
     <Head title="Teams" />
-    <SettingsLayout user={user}>
+    <SettingsLayout user={user} team={team}>
       <Fragment>
         <SettingsSidebar />
         <TeamListContainer />
@@ -19,11 +17,13 @@ const SettingsTeams = ({ user }) => (
 
 SettingsTeams.getInitialProps = async ({ req }) => {
   try {
-    const token = isServer ? req.cookies.token : getToken();
-    const { data: user } = await getUserSelf(token);
+    const { user, team } = await getUserWithTeam(req);
+
+    console.log('SettingsTeams', user, team);
 
     return {
       user,
+      team,
     };
   } catch (e) {
     // TODO: figure out about request errors

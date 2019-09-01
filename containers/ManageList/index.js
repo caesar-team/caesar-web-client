@@ -15,7 +15,7 @@ import {
   sortListRequest,
 } from 'common/actions/list';
 import {
-  fetchNodesRequest,
+  initPreparationDataFlow,
   setWorkInProgressListId,
 } from 'common/actions/workflow';
 import { fetchMembersRequest } from 'common/actions/member';
@@ -33,7 +33,7 @@ const mapStateToProps = createStructuredSelector({
 
 const mapDispatchToProps = {
   fetchKeyPairRequest,
-  fetchNodesRequest,
+  initPreparationDataFlow,
   fetchMembersRequest,
   fetchUserSelfRequest,
   createListRequest,

@@ -1,7 +1,7 @@
 import { connect } from 'react-redux';
 import { createStructuredSelector } from 'reselect';
 import {
-  fetchNodesRequest,
+  initPreparationDataFlow,
   setWorkInProgressItem,
   setWorkInProgressItemIds,
   setWorkInProgressListId,
@@ -28,11 +28,16 @@ import {
   removeShareRequest,
   changeChildItemPermissionRequest,
 } from 'common/actions/childItem';
-import { fetchKeyPairRequest, fetchUserSelfRequest } from 'common/actions/user';
-import { fetchMembersRequest } from 'common/actions/member';
+import {
+  fetchKeyPairRequest,
+  fetchUserSelfRequest,
+  fetchUserTeamsRequest,
+} from 'common/actions/user';
+import { fetchTeamsRequest } from 'common/actions/team';
 import {
   isLoadingSelector,
   workInProgressItemSelector,
+  workInProgressItemOwnerSelector,
   workInProgressItemChildItemsSelector,
   workInProgressItemIdsSelector,
   workInProgressItemsSelector,
@@ -45,7 +50,11 @@ import {
   trashListSelector,
 } from 'common/selectors/list';
 import { itemsByIdSelector } from 'common/selectors/item';
-import { keyPairSelector, userDataSelector } from 'common/selectors/user';
+import {
+  keyPairSelector,
+  userDataSelector,
+  currentTeamSelector,
+} from 'common/selectors/user';
 import { membersByIdSelector } from 'common/selectors/member';
 import Dashboard from './Dashboard';
 
@@ -54,6 +63,7 @@ const mapStateToProps = createStructuredSelector({
   listsByType: listsByTypeSelector,
   itemsById: itemsByIdSelector,
   workInProgressItem: workInProgressItemSelector,
+  workInProgressItemOwner: workInProgressItemOwnerSelector,
   workInProgressItemChildItems: workInProgressItemChildItemsSelector,
   workInProgressItemIds: workInProgressItemIdsSelector,
   workInProgressList: workInProgressListSelector,
@@ -63,14 +73,16 @@ const mapStateToProps = createStructuredSelector({
   keyPair: keyPairSelector,
   members: membersByIdSelector,
   user: userDataSelector,
+  team: currentTeamSelector,
   isLoading: isLoadingSelector,
 });
 
 const mapDispatchToProps = {
-  fetchNodesRequest,
+  initPreparationDataFlow,
   fetchKeyPairRequest,
-  fetchMembersRequest,
   fetchUserSelfRequest,
+  fetchUserTeamsRequest,
+  fetchTeamsRequest,
   moveItemRequest,
   moveItemsBatchRequest,
   createItemRequest,

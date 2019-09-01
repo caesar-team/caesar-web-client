@@ -10,12 +10,17 @@ export const REMOVE_TEAM_REQUEST = '@team/REMOVE_TEAM_REQUEST';
 export const REMOVE_TEAM_SUCCESS = '@team/REMOVE_TEAM_SUCCESS';
 export const REMOVE_TEAM_FAILURE = '@team/REMOVE_TEAM_FAILURE';
 
+export const ADD_TEAMS_BATCH = '@team/ADD_TEAMS_BATCH';
+
 export const fetchTeamsRequest = () => ({
   type: FETCH_TEAMS_REQUEST,
 });
 
-export const fetchTeamsSuccess = () => ({
+export const fetchTeamsSuccess = teamsById => ({
   type: FETCH_TEAMS_SUCCESS,
+  payload: {
+    teamsById,
+  },
 });
 
 export const fetchTeamsFailure = () => ({
@@ -44,4 +49,11 @@ export const removeTeamSuccess = () => ({
 
 export const removeTeamFailure = () => ({
   type: REMOVE_TEAM_FAILURE,
+});
+
+export const addTeamsBatch = teamsById => ({
+  type: ADD_TEAMS_BATCH,
+  payload: {
+    teamsById,
+  },
 });

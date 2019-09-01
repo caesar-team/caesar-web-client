@@ -9,6 +9,7 @@ import {
   REMOVE_TEAM_REQUEST,
   REMOVE_TEAM_SUCCESS,
   REMOVE_TEAM_FAILURE,
+  ADD_TEAMS_BATCH,
 } from 'common/actions/team';
 
 const initialState = {
@@ -26,7 +27,10 @@ export default createReducer(initialState, {
       ...state,
       isLoading: false,
       isError: false,
-      byId: payload.teamsById,
+      byId: {
+        ...state.byId,
+        ...payload.teamsById,
+      },
     };
   },
   [FETCH_TEAMS_FAILURE](state) {
@@ -49,5 +53,14 @@ export default createReducer(initialState, {
   },
   [REMOVE_TEAM_FAILURE](state) {
     return state;
+  },
+  [ADD_TEAMS_BATCH](state, { payload }) {
+    return {
+      ...state,
+      byId: {
+        ...state.byId,
+        ...payload.teamsById,
+      },
+    };
   },
 });

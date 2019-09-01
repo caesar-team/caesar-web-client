@@ -18,3 +18,16 @@ export const get = (obj, path, defaultValue) => {
 };
 
 export const waitIdle = () => new Promise(requestIdleCallback);
+
+export const chunk = (input, size) => {
+  return input.reduce((arr, item, idx) => {
+    return idx % size === 0
+      ? [...arr, [item]]
+      : [...arr.slice(0, -1), [...arr.slice(-1)[0], item]];
+  }, []);
+};
+
+export const objectToArray = obj => Object.values(obj);
+
+export const arrayToObject = arr =>
+  arr.reduce((accumulator, item) => ({ ...accumulator, [item.id]: item }), {});

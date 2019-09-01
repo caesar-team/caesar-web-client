@@ -79,14 +79,14 @@ class DashboardContainer extends Component {
   componentDidMount() {
     this.props.fetchUserSelfRequest();
     this.props.fetchKeyPairRequest();
+    this.props.fetchUserTeamsRequest();
 
     // TODO: added checkpoint for situation when
     // TODO: 1) we dont have items and we need to load and decrypt them
     // TODO: 2) we have not decrypted items and we need just to decrypt them
     // TODO: 3) we have encrypted items we need to do nothing
     // withItemsDecryption = true
-    this.props.fetchNodesRequest(true);
-    this.props.fetchMembersRequest();
+    this.props.initPreparationDataFlow(true);
   }
 
   // eslint-disable-next-line
@@ -422,11 +422,13 @@ class DashboardContainer extends Component {
     const {
       notification,
       workInProgressItem,
+      workInProgressItemOwner,
       workInProgressItemChildItems,
       workInProgressItemIds,
       workInProgressList,
       members,
       user,
+      team,
       lists,
       listsByType,
       visibleListItems,
@@ -463,6 +465,7 @@ class DashboardContainer extends Component {
         <DashboardLayout
           withSearch
           user={user}
+          team={team}
           searchedText={searchedText}
           onSearch={this.handleSearch}
           onClickReset={this.handleClickResetSearch}
@@ -522,6 +525,7 @@ class DashboardContainer extends Component {
                     isTrashItem={isTrashItem}
                     notification={notification}
                     item={workInProgressItem}
+                    owner={workInProgressItemOwner}
                     childItems={workInProgressItemChildItems}
                     allLists={lists}
                     user={user}

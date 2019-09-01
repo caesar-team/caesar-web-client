@@ -1,8 +1,8 @@
 import { createStore, applyMiddleware } from 'redux';
 import createSagaMiddleware from 'redux-saga';
+import offlineConfig from '@redux-offline/redux-offline/lib/defaults';
 import { composeWithDevTools } from 'redux-devtools-extension';
 import { createOffline } from '@redux-offline/redux-offline';
-import offlineConfig from '@redux-offline/redux-offline/lib/defaults';
 import { rehydrateStore } from 'common/actions/workflow';
 import { rootReducer } from './reducers';
 import { rootSaga } from './sagas';

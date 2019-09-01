@@ -2,7 +2,7 @@ import React, { Fragment } from 'react';
 import { Head, SettingsLayout, SettingsSidebar } from 'components';
 import { ImportContainer } from 'containers';
 import { isServer } from 'common/utils/isEnvironment';
-import { getToken } from 'common/utils/token';
+import { getCookieValue } from 'common/utils/token';
 import { getUserSelf } from 'common/api';
 
 const SettingsImportPage = ({ user }) => (
@@ -19,7 +19,7 @@ const SettingsImportPage = ({ user }) => (
 
 SettingsImportPage.getInitialProps = async ({ req }) => {
   try {
-    const token = isServer ? req.cookies.token : getToken();
+    const token = isServer ? req.cookies.token : getCookieValue('token');
     const { data: user } = await getUserSelf(token);
 
     return {

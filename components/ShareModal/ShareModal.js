@@ -8,11 +8,19 @@ import {
   Checkbox,
   Toggle,
   TagsInput,
+  Carousel,
 } from 'components';
 import { base64ToObject, objectToBase64 } from 'common/utils/cipherUtils';
 import { generateSharingUrl } from 'common/utils/sharing';
 import { waitIdle } from 'common/utils/utils';
 import { KEY_CODES } from 'common/constants';
+// TODO: remove icons
+import IconTeam1 from 'public/images/svg/icon-team-ava-1.svg';
+import IconTeam2 from 'public/images/svg/icon-team-ava-2.svg';
+import IconTeam3 from 'public/images/svg/icon-team-ava-3.svg';
+import IconTeam4 from 'public/images/svg/icon-team-ava-4.svg';
+import IconTeam5 from 'public/images/svg/icon-team-ava-5.svg';
+import { TeamTag } from '../TeamTag';
 
 const ModalDescription = styled.div`
   padding-bottom: 20px;
@@ -47,6 +55,19 @@ const ButtonsWrapper = styled.div`
 const StyledButton = styled(Button)`
   margin-left: 20px;
   text-transform: uppercase;
+`;
+
+const TeamsWrapper = styled.div`
+  display: flex;
+  flex-direction: column;
+`;
+
+const TeamTagStyled = styled(TeamTag)`
+  margin-right: 20px;
+
+  &:last-of-type {
+    margin-right: 0;
+  }
 `;
 
 const SharedLinkWrapper = styled.div`
@@ -206,6 +227,15 @@ export class ShareModal extends Component {
             onChange={this.handleAddEmail}
           />
         </Row>
+        <TeamsWrapper>
+          <Carousel itemSize="">
+            <TeamTagStyled name="bdss" icon={IconTeam1} />
+            <TeamTagStyled name="prvtrs" icon={IconTeam2} />
+            <TeamTagStyled name="fntstic" icon={IconTeam3} />
+            <TeamTagStyled name="gds" icon={IconTeam4} />
+            <TeamTagStyled name="bbies" icon={IconTeam5} />
+          </Carousel>
+        </TeamsWrapper>
         {withAnonymousLink && (
           <Fragment>
             <LinkRow>

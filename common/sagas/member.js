@@ -10,8 +10,6 @@ import {
   createMemberFailure,
   createMemberBatchSuccess,
   createMemberBatchFailure,
-  fetchTeamMembersSuccess,
-  fetchTeamMembersFailure,
 } from 'common/actions/member';
 import {
   getUsers,
@@ -27,7 +25,7 @@ import {
   generateUsersBatch,
   generateSeedAndVerifier,
 } from 'common/utils/cipherUtils';
-import { ANONYMOUS_USER_ROLE } from '../constants';
+import { ROLE_ANONYMOUS_USER } from 'common/constants';
 
 const setIsNewFlag = (members, isNew) =>
   members.map(member => ({
@@ -70,7 +68,7 @@ export function* createMemberSaga({ payload: { email, role } }) {
       data: { user: userId },
     } = yield call(postNewUser, data);
 
-    if (role !== ANONYMOUS_USER_ROLE) {
+    if (role !== ROLE_ANONYMOUS_USER) {
       yield put(
         createMemberSuccess({
           id: userId,
@@ -137,8 +135,7 @@ export function* createMemberBatchSaga({ payload: { emails, role } }) {
       };
     });
 
-    console.log('preparedMembersForStore', preparedMembersForStore);
-    if (role !== ANONYMOUS_USER_ROLE) {
+    if (role !== ROLE_ANONYMOUS_USER) {
       yield put(createMemberBatchSuccess(preparedMembersForStore));
     }
 

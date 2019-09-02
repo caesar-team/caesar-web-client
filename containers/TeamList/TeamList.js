@@ -1,7 +1,17 @@
 import React, { Component } from 'react';
 import styled from 'styled-components';
-import { Button, TeamCard, TextLoader } from 'components';
-import { fetchTeamsRequest } from '../../common/actions/team';
+import { Button, TeamCard, LogoLoader, NewTeamModal } from 'components';
+
+const LogoWrapper = styled.div`
+  display: flex;
+  flex-direction: column;
+  background: ${({ theme }) => theme.lightBlue};
+  width: 100%;
+  position: relative;
+  height: calc(100vh - 70px);
+  align-items: center;
+  justify-content: center;
+`;
 
 const Wrapper = styled.div`
   display: flex;
@@ -43,19 +53,44 @@ const TeamCardStyled = styled(TeamCard)`
 `;
 
 class TeamListContainer extends Component {
+  state = this.prepareInitialState();
+
   componentDidMount() {
-    this.props.fetchUserTeamsRequest();
     this.props.fetchTeamsRequest();
+  }
+
+  handleCreateSubmit = ({ name, icon }) => {
+    this.props.createTeamRequest(name, icon);
+  };
+
+  handleClickCreateTeam = () => {
+    this.setState({
+      isVisibleModal: true,
+    });
+  };
+
+  handleCancel = () => {
+    this.setState({
+      isVisibleModal: false,
+    });
+  };
+
+  prepareInitialState() {
+    return {
+      removingTeamId: null,
+      isVisibleModal: false,
+    };
   }
 
   render() {
     const { isLoading } = this.props;
+    const { isVisibleModal } = this.state;
 
     if (isLoading) {
       return (
-        <Wrapper>
-          <TextLoader />
-        </Wrapper>
+        <LogoWrapper>
+          <LogoLoader textColor="black" />
+        </LogoWrapper>
       );
     }
 
@@ -65,7 +100,7 @@ class TeamListContainer extends Component {
           <Title>Teams</Title>
           <Button
             withOfflineCheck
-            onClick={this.handleClickCreateList}
+            onClick={this.handleClickCreateTeam}
             icon="plus"
             color="black"
           >
@@ -78,6 +113,12 @@ class TeamListContainer extends Component {
           <TeamCardStyled />
           <TeamCardStyled />
         </TeamListWrapper>
+        {isVisibleModal && (
+          <NewTeamModal
+            onSubmit={this.handleCreateSubmit}
+            onCancel={this.handleCancel}
+          />
+        )}
       </Wrapper>
     );
   }

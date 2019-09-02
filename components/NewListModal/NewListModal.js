@@ -21,7 +21,7 @@ const ButtonWrapper = styled.div`
   justify-content: center;
 `;
 
-class ListFormModal extends Component {
+class NewListModal extends Component {
   createInitialValue = list => ({ label: list ? list.label : '' });
 
   render() {
@@ -86,4 +86,4 @@ class ListFormModal extends Component {
   }
 }
 
-export default ListFormModal;
+export default NewListModal;

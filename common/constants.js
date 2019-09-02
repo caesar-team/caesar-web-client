@@ -94,12 +94,78 @@ export const DEFAULT_SECONDS_LIMIT = 60 * 60;
 export const INVITE_TYPE = 'invite';
 export const SHARE_TYPE = 'share';
 
-export const USER_ROLE = 'ROLE_USER';
-export const READ_ONLY_USER_ROLE = 'ROLE_READ_ONLY_USER';
-export const ANONYMOUS_USER_ROLE = 'ROLE_ANONYMOUS_USER';
+export const USER_ROLE_MEMBER = 'member';
+export const USER_ROLE_ADMIN = 'admin';
+export const USER_ROLE_GUEST = 'guest';
+export const USER_ROLE_PRETENDER = 'pretender';
+
+export const COMMANDS_ROLES = {
+  USER_ROLE_MEMBER,
+  USER_ROLE_ADMIN,
+  USER_ROLE_GUEST,
+  USER_ROLE_PRETENDER,
+};
+
+export const ROLE_USER = 'ROLE_USER';
+export const ROLE_ADMIN = 'ROLE_ADMIN';
+export const ROLE_SUPER_ADMIN = 'ROLE_SUPER_ADMIN';
+export const ROLE_READ_ONLY_USER = 'ROLE_READ_ONLY_USER';
+export const ROLE_ANONYMOUS_USER = 'ROLE_ANONYMOUS_USER';
+
+export const DOMAIN_ROLES = {
+  ROLE_USER,
+  ROLE_ADMIN,
+  ROLE_SUPER_ADMIN,
+  ROLE_READ_ONLY_USER,
+  ROLE_ANONYMOUS_USER,
+};
 
 export const LOADING = 'LOADING';
 export const SUCCESS = 'SUCCESS';
 export const FAILURE = 'FAILURE';
 
 export const DEFAULT_TEAM_TYPE = 'default';
+
+export const ROUTES = {
+  SIGN_IN: '/signin',
+  SIGN_UP: '/signup',
+  RESETTING: '/resetting',
+  MESSAGE: '/message',
+  SECURE: '/secure',
+  SHARE: '/share',
+  INVITE: '/invite',
+  DASHBOARD: '/',
+  MANAGE: '/manage',
+  IMPORT: '/import',
+  TEAM: '/team',
+};
+
+export const SHARED_ROUTES = [ROUTES.SHARE, ROUTES.INVITE];
+
+// require bootstrap
+// TODO: figure out better naming
+export const LOCKED_ROUTES = [
+  ROUTES.DASHBOARD,
+  ROUTES.MANAGE,
+  ROUTES.IMPORT,
+  ROUTES.TEAM,
+];
+
+// don't require bootstrap routes
+// TODO: figure out better naming
+export const UNLOCKED_ROUTES = [
+  ROUTES.SIGN_IN,
+  ROUTES.SIGN_UP,
+  ROUTES.RESETTING,
+  ROUTES.MESSAGE,
+  ROUTES.SECURE,
+  ROUTES.SHARE,
+  ROUTES.INVITE,
+];
+
+export const CHILD_ITEM_ENTITY_TYPE = 'ChildItem';
+export const ITEM_ENTITY_TYPE = 'Item';
+export const LIST_ENTITY_TYPE = 'List';
+export const TEAM_ENTITY_TYPE = 'Team';
+export const MEMBER_ENTITY_TYPE = 'Member';
+export const USER_TYPE = 'User';

@@ -85,7 +85,7 @@ import {
   objectToBase64,
 } from 'common/utils/cipherUtils';
 import {
-  ANONYMOUS_USER_ROLE,
+  ROLE_ANONYMOUS_USER,
   ITEM_REVIEW_MODE,
   PERMISSION_READ,
   SHARE_TYPE,
@@ -424,7 +424,7 @@ export function* createAnonymousLinkSaga() {
     } = yield call(createMemberSaga, {
       payload: {
         email,
-        role: ANONYMOUS_USER_ROLE,
+        role: ROLE_ANONYMOUS_USER,
       },
     });
 
@@ -468,7 +468,7 @@ export function* createAnonymousLinkSaga() {
       link,
       publicKey,
       isAccepted: false,
-      roles: [ANONYMOUS_USER_ROLE],
+      roles: [ROLE_ANONYMOUS_USER],
     };
 
     yield put(createAnonymousLinkSuccess(workInProgressItem.id, share));

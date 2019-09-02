@@ -1,4 +1,5 @@
 import { schema } from 'normalizr';
+import { ITEM_ENTITY_TYPE } from 'common/constants';
 import childItemSchema from './childItem';
 
 const itemSchema = new schema.Entity(
@@ -10,6 +11,7 @@ const itemSchema = new schema.Entity(
     processStrategy: (entity, parent) => ({
       ...entity,
       listId: parent.id,
+      __type: ITEM_ENTITY_TYPE,
     }),
   },
 );

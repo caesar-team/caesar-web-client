@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import styled from 'styled-components';
 import {
   ManageList,
-  ListFormModal,
+  NewListModal,
   ConfirmModal,
   Button,
   TextLoader,
@@ -136,7 +136,7 @@ class ManageListContainer extends Component {
   prepareInitialState() {
     return {
       mode: null,
-      workInProgressListId: null,
+      removingListId: null,
       isVisibleModal: false,
     };
   }
@@ -177,7 +177,7 @@ class ManageListContainer extends Component {
           />
         </ManageListWrapper>
         {isVisibleModal && (
-          <ListFormModal
+          <NewListModal
             list={mode === LIST_WORKFLOW_CREATE_MODE ? [] : workInProgressList}
             mode={mode}
             onSubmit={

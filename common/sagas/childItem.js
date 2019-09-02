@@ -51,7 +51,7 @@ import {
   INVITE_TYPE,
   PERMISSION_READ,
   PERMISSION_WRITE,
-  USER_ROLE,
+  ROLE_USER,
 } from 'common/constants';
 import { generateInviteUrl } from 'common/utils/sharing';
 import { createMemberSaga, getOrCreateMemberBatchSaga } from './member';
@@ -98,7 +98,7 @@ export function* inviteNewMemberSaga({ payload: { email } }) {
     const { id, masterPassword, password } = yield call(createMemberSaga, {
       payload: {
         email,
-        role: USER_ROLE,
+        role: ROLE_USER,
       },
     });
 
@@ -142,16 +142,8 @@ export function* shareItemBatchSaga({ payload: { items, emails } }) {
     const sharedItems = items.map(itemId => itemsById[itemId]);
 
     const members = yield call(getOrCreateMemberBatchSaga, {
-      payload: { emails, role: USER_ROLE },
+      payload: { emails, role: ROLE_USER },
     });
-
-    const membersObj = members.reduce(
-      (accumulator, member) => ({
-        ...accumulator,
-        [member.userId]: member,
-      }),
-      {},
-    );
 
     const data = [];
     const invitations = [];

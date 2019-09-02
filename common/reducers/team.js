@@ -39,8 +39,14 @@ export default createReducer(initialState, {
   [CREATE_TEAM_REQUEST](state) {
     return state;
   },
-  [CREATE_TEAM_SUCCESS](state) {
-    return state;
+  [CREATE_TEAM_SUCCESS](state, { payload }) {
+    return {
+      ...state,
+      byId: {
+        ...state.byId,
+        [payload.team.id]: payload.team,
+      },
+    };
   },
   [CREATE_TEAM_FAILURE](state) {
     return state;

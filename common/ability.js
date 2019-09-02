@@ -1,8 +1,13 @@
 import { AbilityBuilder } from '@casl/ability';
 import {
-  USER_ROLE,
-  READ_ONLY_USER_ROLE,
-  ANONYMOUS_USER_ROLE,
+  COMMANDS_ROLES,
+  DOMAIN_ROLES,
+
+  CHILD_ITEM_ENTITY_TYPE,
+  ITEM_ENTITY_TYPE,
+  LIST_ENTITY_TYPE,
+  TEAM_ENTITY_TYPE,
+  MEMBER_ENTITY_TYPE,
 } from './constants';
 
 function subjectName(item) {
@@ -13,12 +18,14 @@ function subjectName(item) {
   return item.__type;
 }
 
-export const createAbility = ({ id: userId, roles }) => {
+export const createAbility = user => {
+  if (!user) {
+    return AbilityBuilder.define({ subjectName }, can => {});
+  }
+
+  const { id: userId, roles } = user;
+
   return AbilityBuilder.define({ subjectName }, can => {
-    if (roles.includes(USER_ROLE)) {
-      can('read', 'Item');
-      can(['create', 'update', 'delete'], 'Item', { ownerId: userId });
-      can('share', 'Item', { ownerId: userId });
-    }
+    // TODO: add rules
   });
 };

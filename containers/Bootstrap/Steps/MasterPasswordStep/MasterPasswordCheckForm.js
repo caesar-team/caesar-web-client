@@ -44,6 +44,7 @@ const MasterPasswordCheckForm = ({ onSubmit }) => (
               <LockInput
                 {...field}
                 autoFocus
+                maxLength={24}
                 onClick={submitForm}
                 onBackspace={resetForm}
                 isError={Object.keys(errors).length !== 0}

@@ -3,6 +3,11 @@ import { teamsByIdSelector } from 'common/selectors/team';
 
 export const userSelector = state => state.user;
 
+export const isLoadingSelector = createSelector(
+  userSelector,
+  user => user.isLoading,
+);
+
 export const keyPairSelector = createSelector(
   userSelector,
   user => user.keyPair,

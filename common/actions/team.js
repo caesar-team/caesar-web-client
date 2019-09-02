@@ -27,12 +27,19 @@ export const fetchTeamsFailure = () => ({
   type: FETCH_TEAMS_FAILURE,
 });
 
-export const createTeamRequest = () => ({
+export const createTeamRequest = (name, icon) => ({
   type: CREATE_TEAM_REQUEST,
+  payload: {
+    name,
+    icon,
+  },
 });
 
-export const createTeamSuccess = () => ({
+export const createTeamSuccess = team => ({
   type: CREATE_TEAM_SUCCESS,
+  payload: {
+    team,
+  },
 });
 
 export const createTeamFailure = () => ({

@@ -14,7 +14,9 @@ const TeamWrapper = styled.div`
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 40px;
+  margin-bottom: 20px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid ${({ theme }) => theme.lightBlue};
 `;
 
 const TeamDetails = styled.div`

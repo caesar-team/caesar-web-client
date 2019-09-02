@@ -173,3 +173,7 @@ export const getUsersByIds = userIds =>
   callApi.get(`/users?${userIds.map(userId => `ids[]=${userId}`).join('&')}`);
 
 export const getTeamMembers = teamId => callApi.get(`/teams/${teamId}/members`);
+
+export const postCreateTeam = data => callApi.post('/teams', data);
+
+export const deleteTeam = teamId => callApi.delete(`/teams/${teamId}`);

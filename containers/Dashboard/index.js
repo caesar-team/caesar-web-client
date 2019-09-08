@@ -19,7 +19,7 @@ import {
   toggleItemToFavoriteRequest,
   createAnonymousLinkRequest,
   removeAnonymousLinkRequest,
-} from 'common/actions/item';
+} from 'common/actions/entities/item';
 import {
   inviteMemberRequest,
   inviteNewMemberRequest,
@@ -27,13 +27,13 @@ import {
   shareItemBatchRequest,
   removeShareRequest,
   changeChildItemPermissionRequest,
-} from 'common/actions/childItem';
+} from 'common/actions/entities/childItem';
 import {
   fetchKeyPairRequest,
   fetchUserSelfRequest,
   fetchUserTeamsRequest,
 } from 'common/actions/user';
-import { fetchTeamsRequest } from 'common/actions/team';
+import { fetchTeamsRequest } from 'common/actions/entities/team';
 import {
   isLoadingSelector,
   workInProgressItemSelector,
@@ -48,18 +48,22 @@ import {
   selectableListsWithoutChildrenSelector,
   listsByTypeSelector,
   trashListSelector,
-} from 'common/selectors/list';
-import { itemsByIdSelector } from 'common/selectors/item';
+  currentTeamListsSelector,
+} from 'common/selectors/entities/list';
+import { itemsByIdSelector } from 'common/selectors/entities/item';
 import {
   keyPairSelector,
   userDataSelector,
   currentTeamSelector,
 } from 'common/selectors/user';
-import { membersByIdSelector } from 'common/selectors/member';
+import { membersByIdSelector } from 'common/selectors/entities/member';
+import { teamListSelector } from 'common/selectors/entities/team';
 import Dashboard from './Dashboard';
 
 const mapStateToProps = createStructuredSelector({
-  lists: selectableListsWithoutChildrenSelector,
+  personalLists: selectableListsWithoutChildrenSelector,
+  teamLists: currentTeamListsSelector,
+  teams: teamListSelector,
   listsByType: listsByTypeSelector,
   itemsById: itemsByIdSelector,
   workInProgressItem: workInProgressItemSelector,

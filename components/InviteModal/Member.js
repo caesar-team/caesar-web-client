@@ -73,20 +73,6 @@ const Member = ({
         <MemberEmail>{email}</MemberEmail>
       </MemberInfo>
     </MemberWrapper>
-    {isInvited ? (
-      <Fragment>
-        <Checkbox checked={!!isReadOnly} onChange={onClickPermissionChange}>
-          View only
-        </Checkbox>
-        <IconWrapper isFilled onClick={onClickRemove}>
-          <StyledIcon isFilled name="ok" width={14} height={14} />
-        </IconWrapper>
-      </Fragment>
-    ) : (
-      <IconWrapper onClick={onClickAdd}>
-        <StyledIcon name="plus" width={14} height={14} />
-      </IconWrapper>
-    )}
   </Wrapper>
 );
 

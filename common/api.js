@@ -67,7 +67,7 @@ export const postActivateTwoFactor = data =>
 export const postCheckTwoFactor = data => callApi.post('/auth/2fa', data);
 
 // post
-export const getList = token =>
+export const getLists = token =>
   callApi.get('/list', {
     headers: {
       Authorization: token ? `Bearer ${token}` : '',
@@ -177,3 +177,22 @@ export const getTeamMembers = teamId => callApi.get(`/teams/${teamId}/members`);
 export const postCreateTeam = data => callApi.post('/teams', data);
 
 export const deleteTeam = teamId => callApi.delete(`/teams/${teamId}`);
+
+export const getTeam = teamId => callApi.get(`/teams/${teamId}`);
+
+export const updateTeamMember = ({ teamId, userId, role }) =>
+  callApi.patch(`/teams/${teamId}/members/${userId}`, {
+    userRole: role,
+  });
+
+export const deleteTeamMember = ({ teamId, userId }) =>
+  callApi.delete(`/teams/${teamId}/members/${userId}`);
+
+export const postAddTeamMember = ({ teamId, userId, role }) =>
+  callApi.post(`/teams/${teamId}/members/${userId}`, {
+    userRole: role,
+  });
+
+export const getTeamLists = teamId => callApi.get(`/teams/${teamId}/lists`);
+
+export const getSearchUser = text => callApi.get(`/users/search/${text}`);

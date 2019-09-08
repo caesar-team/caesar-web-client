@@ -33,7 +33,7 @@ const LINKS = [
 
 const SettingsSidebar = ({ router: { route } }) => {
   const renderedLinks = LINKS.map(({ link, name }, index) => {
-    const isActive = route === link;
+    const isActive = route.startsWith(link);
 
     return (
       <StyledLink to={link} isActive={isActive} key={index}>

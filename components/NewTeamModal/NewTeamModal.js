@@ -144,12 +144,12 @@ const IMAGE_NAME_BASE64_MAP = {
 };
 
 class NewTeamModal extends Component {
-  createInitialValue = () => ({ name: '', icon: undefined });
+  createInitialValue = () => ({ title: '', icon: undefined });
 
-  handleSubmit = ({ name, icon }) => {
+  handleSubmit = ({ title, icon }) => {
     const { onSubmit } = this.props;
 
-    onSubmit({ name, icon: icon.raw });
+    onSubmit({ title, icon: icon.raw });
   };
 
   renderTeamAvatars({ icon }, setFieldValue) {
@@ -233,13 +233,13 @@ class NewTeamModal extends Component {
             <form onSubmit={handleSubmit}>
               <Label>Group name</Label>
               <FastField
-                name="name"
+                name="title"
                 render={({ field }) => (
                   <FormInput
                     autoFocus
                     withBorder
                     {...field}
-                    error={checkError(touched, errors, 'name')}
+                    error={checkError(touched, errors, 'title')}
                   />
                 )}
               />

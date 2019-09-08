@@ -55,7 +55,7 @@ const StyledAvatarsList = styled(AvatarsList)`
   }
 `;
 
-const InviteButton = styled.button`
+const ShareButton = styled.button`
   width: 40px;
   height: 40px;
   ${({ hasInvited }) => hasInvited && 'margin-right: -10px'};
@@ -66,18 +66,14 @@ const InviteButton = styled.button`
   cursor: ${({ disabled }) => (disabled ? 'not-allowed' : 'pointer')};
   transition: all 0.2s;
 
-  ${({ disabled }) =>
+  ${({ disabled, theme }) =>
     !disabled &&
     `
       &:hover {
-        color: ${({ theme }) => theme.black};
-        border-color: ${({ theme }) => theme.emperor};
+        color: ${theme.black};
+        border-color: ${theme.emperor};
       }
   `}
-`;
-
-const ShareButton = styled(Button)`
-  text-transform: uppercase;
 `;
 
 const EditButton = styled(Button)`
@@ -150,7 +146,6 @@ const ItemHeader = ({
   onClickCloseItem,
   onClickRemoveItem,
   onClickEditItem,
-  onClickInvite,
   onClickShare,
   onClickRestoreItem,
   onClickMoveItem,
@@ -268,9 +263,9 @@ const ItemHeader = ({
         </Row>
         <Row>
           {!isTrashItem && isOwner && (
-            <InviteButton
+            <ShareButton
               disabled={!isOnline}
-              onClick={onClickInvite}
+              onClick={onClickShare}
               hasInvited={hasInvited}
             >
               <Icon
@@ -280,19 +275,9 @@ const ItemHeader = ({
                 width={14}
                 height={14}
               />
-            </InviteButton>
-          )}
-          <StyledAvatarsList avatars={avatars} />
-          {!isTrashItem && isOwner && (
-            <ShareButton
-              withOfflineCheck
-              icon="share"
-              color="black"
-              onClick={onClickShare}
-            >
-              Share
             </ShareButton>
           )}
+          <StyledAvatarsList avatars={avatars} />
         </Row>
       </InviteRow>
     </Fragment>

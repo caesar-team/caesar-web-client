@@ -41,9 +41,13 @@ const Avatar = ({ name, email, avatar, children, isSmall, ...props }) => {
   }
 
   if (avatar) {
+    const avatarIcon = avatar.startsWith('data:')
+      ? avatar
+      : `${API_URI}/${avatar}`;
+
     return (
       <Wrapper isSmall={isSmall} {...props}>
-        <Image src={`${API_URI}/${avatar}`} />
+        <Image src={avatarIcon} />
       </Wrapper>
     );
   }

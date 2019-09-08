@@ -12,10 +12,9 @@ import {
   fetchUserTeamsFailure,
   setCurrentTeamId,
 } from 'common/actions/user';
-import { addTeamsBatch } from 'common/actions/team';
-import { addMembersBatch } from 'common/actions/member';
+import { addTeamsBatch } from 'common/actions/entities/team';
+import { addMembersBatch } from 'common/actions/entities/member';
 import { currentTeamIdSelector } from 'common/selectors/user';
-import { defaultTeamSelector } from 'common/selectors/team';
 import { convertTeamsToEntity } from 'common/normalizers/normalizers';
 import { getUserSelf, getKeys, getUserTeams } from 'common/api';
 import { setCookieValue } from 'common/utils/token';
@@ -52,18 +51,13 @@ export function* fetchUserTeamsSaga() {
   try {
     const { data } = yield call(getUserTeams);
 
-    yield put(fetchUserTeamsSuccess(data.map(({ id }) => id)));
-    yield put(addTeamsBatch(convertTeamsToEntity(data)));
+    if (data.length) {
+      yield put(fetchUserTeamsSuccess(data.map(({ id }) => id)));
+      // TODO: need fixes from BE
+      yield put(addTeamsBatch(convertTeamsToEntity(data)));
 
-    const currentTeamId = yield select(currentTeamIdSelector);
-
-    if (!currentTeamId) {
-      const defaultTeam = yield select(defaultTeamSelector);
-
-      yield put(setCurrentTeamId(defaultTeam.id));
-    } else {
-      // set again currentTeamId for teamId value in cookie, it's like continuation
-      yield put(setCurrentTeamId(currentTeamId));
+      const currentTeamId = yield select(currentTeamIdSelector);
+      put(setCurrentTeamId(currentTeamId || data[0].id));
     }
   } catch (error) {
     console.log('error', error);
@@ -71,7 +65,7 @@ export function* fetchUserTeamsSaga() {
   }
 }
 
-function* setCurrentTeamIdWatch({ payload: { teamId } }) {
+function* setCurrentTeamIdSaga({ payload: { teamId } }) {
   yield call(setCookieValue, 'teamId', teamId);
 }
 
@@ -79,5 +73,5 @@ export default function* userSagas() {
   yield takeLatest(FETCH_USER_SELF_REQUEST, fetchUserSelfSaga);
   yield takeLatest(FETCH_KEY_PAIR_REQUEST, fetchKeyPairSaga);
   yield takeLatest(FETCH_USER_TEAMS_REQUEST, fetchUserTeamsSaga);
-  yield takeLatest(SET_CURRENT_TEAM_ID, setCurrentTeamIdWatch);
+  yield takeLatest(SET_CURRENT_TEAM_ID, setCurrentTeamIdSaga);
 }

@@ -10,7 +10,7 @@ const Wrapper = styled.div`
 const ArrowIcon = styled(Icon)`
   width: 6px;
   height: 10px;
-  cursor: pointer;
+  cursor: ${({ disabled }) => (disabled ? 'default' : 'pointer')};
 `;
 
 const ArrowsWrapper = styled.div`
@@ -42,10 +42,12 @@ const InnerWrapper = styled.div`
 const LEFT_DIRECTION = 'left';
 const RIGHT_DIRECTION = 'right';
 
+const getWidth = element => (element.current ? element.current.offsetWidth : 0);
+
 const calculateWidth = elements =>
   elements.reduce(
     (accumulator, element) =>
-      element.current ? accumulator + element.current.offsetWidth : accumulator,
+      element.current ? accumulator + getWidth(element) : accumulator,
     0,
   );
 
@@ -54,6 +56,8 @@ const getOffsetOrEdge = (currentOffset, width) =>
 
 class Carousel extends Component {
   state = this.prepareInitialState();
+
+  wrapperRef = createRef();
 
   references = Array(Children.count(this.props.children))
     .fill(0)
@@ -91,24 +95,31 @@ class Carousel extends Component {
   }
 
   render() {
+    const { className } = this.props;
     const { currentShiftPx } = this.state;
 
-    const width = calculateWidth(this.references);
+    const wrapperWidth = getWidth(this.wrapperRef);
+    const referencesWidth = calculateWidth(this.references);
+
+    const isLeftArrowDisabled = currentShiftPx === 0;
+    const isRightArrowDisabled = referencesWidth <= wrapperWidth;
 
     return (
-      <Wrapper>
+      <Wrapper className={className}>
         <ArrowsWrapper>
           <ArrowIcon
             name="arrow-left-big"
+            disabled={isLeftArrowDisabled}
             onClick={this.handleClickShift(LEFT_DIRECTION)}
           />
           <ArrowIcon
             name="arrow-right-big"
+            disabled={isRightArrowDisabled}
             onClick={this.handleClickShift(RIGHT_DIRECTION)}
           />
         </ArrowsWrapper>
-        <OuterWrapper>
-          <InnerWrapper width={width} shift={currentShiftPx}>
+        <OuterWrapper ref={this.wrapperRef}>
+          <InnerWrapper width={referencesWidth} shift={currentShiftPx}>
             {this.renderChildren()}
           </InnerWrapper>
         </OuterWrapper>
@@ -116,5 +127,7 @@ class Carousel extends Component {
     );
   }
 }
+
+Carousel.ArrowsWrapper = ArrowsWrapper;
 
 export default Carousel;

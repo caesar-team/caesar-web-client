@@ -8,7 +8,6 @@ const Wrapper = styled.div`
   border-radius: 20px;
   border: 1px solid ${({ theme }) => theme.gallery};
   background-color: ${({ theme }) => theme.white};
-  width: 100%;
   cursor: pointer;
 
   &:hover {
@@ -28,6 +27,7 @@ const TeamIconWrapper = styled.div`
 const TeamIconImage = styled.img`
   width: 40px;
   height: 40px;
+  border-radius: 100%;
 `;
 
 const TeamName = styled.div`
@@ -41,7 +41,7 @@ const TeamTag = forwardRef(({ name, icon, ...props }, ref) => (
     <TeamIconWrapper>
       <TeamIconImage src={icon} />
     </TeamIconWrapper>
-    <TeamName>#{name}</TeamName>
+    <TeamName>{name}</TeamName>
   </Wrapper>
 ));
 

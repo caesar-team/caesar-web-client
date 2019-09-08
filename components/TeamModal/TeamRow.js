@@ -1,6 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
-import { Radio, Avatar } from 'components';
+import { Avatar } from 'components';
+import { Radio } from '../Radio';
 
 const AvatarStyled = styled(Avatar)`
   margin-left: 40px;

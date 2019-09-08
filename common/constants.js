@@ -33,7 +33,7 @@ export const LIST_TYPES = {
 
 export const DASHBOARD_DEFAULT_MODE = 'DEFAULT_MODE';
 export const DASHBOARD_SEARCH_MODE = 'SEARCH_MODE';
-export const DASHBOARD_SECURE_MESSAGE_MODE = 'SECURE_MESSAGE_MODE';
+export const DASHBOARD_TOOL_MODE = 'SECURE_MESSAGE_MODE';
 
 export const ITEM_REVIEW_MODE = 'review';
 export const ITEM_WORKFLOW_EDIT_MODE = 'edit';
@@ -94,28 +94,24 @@ export const DEFAULT_SECONDS_LIMIT = 60 * 60;
 export const INVITE_TYPE = 'invite';
 export const SHARE_TYPE = 'share';
 
-export const USER_ROLE_MEMBER = 'member';
 export const USER_ROLE_ADMIN = 'admin';
+export const USER_ROLE_MEMBER = 'member';
 export const USER_ROLE_GUEST = 'guest';
-export const USER_ROLE_PRETENDER = 'pretender';
 
 export const COMMANDS_ROLES = {
-  USER_ROLE_MEMBER,
   USER_ROLE_ADMIN,
+  USER_ROLE_MEMBER,
   USER_ROLE_GUEST,
-  USER_ROLE_PRETENDER,
 };
 
 export const ROLE_USER = 'ROLE_USER';
 export const ROLE_ADMIN = 'ROLE_ADMIN';
-export const ROLE_SUPER_ADMIN = 'ROLE_SUPER_ADMIN';
 export const ROLE_READ_ONLY_USER = 'ROLE_READ_ONLY_USER';
 export const ROLE_ANONYMOUS_USER = 'ROLE_ANONYMOUS_USER';
 
 export const DOMAIN_ROLES = {
   ROLE_USER,
   ROLE_ADMIN,
-  ROLE_SUPER_ADMIN,
   ROLE_READ_ONLY_USER,
   ROLE_ANONYMOUS_USER,
 };
@@ -123,8 +119,6 @@ export const DOMAIN_ROLES = {
 export const LOADING = 'LOADING';
 export const SUCCESS = 'SUCCESS';
 export const FAILURE = 'FAILURE';
-
-export const DEFAULT_TEAM_TYPE = 'default';
 
 export const ROUTES = {
   SIGN_IN: '/signin',

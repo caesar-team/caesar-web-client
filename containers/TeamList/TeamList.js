@@ -1,6 +1,14 @@
 import React, { Component } from 'react';
 import styled from 'styled-components';
-import { Button, TeamCard, LogoLoader, NewTeamModal } from 'components';
+import Link from 'next/link';
+import {
+  Button,
+  TeamCard,
+  LogoLoader,
+  NewTeamModal,
+  ConfirmModal,
+  InviteModal,
+} from 'components';
 
 const LogoWrapper = styled.div`
   display: flex;
@@ -50,7 +58,12 @@ const TeamListWrapper = styled.div`
 const TeamCardStyled = styled(TeamCard)`
   width: calc((100% - 60px) / 2);
   margin-bottom: 30px;
+  cursor: pointer;
 `;
+
+const NEW_TEAM_MODAL = 'newTeamModal';
+const REMOVE_TEAM_MODAL = 'removeTeamModal';
+const INVITE_MEMBER_MODAL = 'inviteMemberModal';
 
 class TeamListContainer extends Component {
   state = this.prepareInitialState();
@@ -59,32 +72,99 @@ class TeamListContainer extends Component {
     this.props.fetchTeamsRequest();
   }
 
-  handleCreateSubmit = ({ name, icon }) => {
-    this.props.createTeamRequest(name, icon);
+  componentDidUpdate(prevProps) {
+    if (prevProps.teamList.length !== this.props.teamList.length) {
+      // justified solution, we come back initialState
+      // eslint-disable-next-line
+      this.setState(this.prepareInitialState());
+    }
+  }
+
+  handleCreateSubmit = ({ title, icon }) => {
+    this.props.createTeamRequest(title, icon);
   };
 
-  handleClickCreateTeam = () => {
-    this.setState({
-      isVisibleModal: true,
-    });
+  handleOpenModal = modal => () => {
+    console.log('handleOpenModal', modal);
+    this.setState(prevState => ({
+      ...prevState,
+      modalVisibilities: {
+        ...prevState.modalVisibilities,
+        [modal]: true,
+      },
+    }));
   };
 
-  handleCancel = () => {
-    this.setState({
-      isVisibleModal: false,
-    });
+  handleCloseModal = modal => () => {
+    this.setState(prevState => ({
+      ...prevState,
+      modalVisibilities: {
+        ...prevState.modalVisibilities,
+        [modal]: false,
+      },
+    }));
+  };
+
+  handleClickRemoveTeam = teamId => event => {
+    console.log('handleClickRemoveTeam');
+    event.preventDefault();
+    event.stopPropagation();
+
+    this.setState(
+      {
+        selectedTeamId: teamId,
+      },
+      this.handleOpenModal(REMOVE_TEAM_MODAL),
+    );
+  };
+
+  handleRemoveTeam = () => {
+    this.props.removeTeamRequest(this.state.selectedTeamId);
+  };
+
+  handleClickInvite = teamId => event => {
+    console.log('handleClickInvite');
+    event.preventDefault();
+    event.stopPropagation();
+
+    this.setState(
+      {
+        selectedTeamId: teamId,
+      },
+      this.handleOpenModal(INVITE_MEMBER_MODAL),
+    );
   };
 
   prepareInitialState() {
     return {
-      removingTeamId: null,
-      isVisibleModal: false,
+      selectedTeamId: null,
+      modalVisibilities: {
+        [NEW_TEAM_MODAL]: false,
+        [REMOVE_TEAM_MODAL]: false,
+        [INVITE_MEMBER_MODAL]: false,
+      },
     };
   }
 
+  renderTeamCards() {
+    const { teamList, members } = this.props;
+
+    return teamList.map(team => (
+      <Link key={team.id} href="/team/[id]" as={`/team/${team.id}`}>
+        <TeamCardStyled
+          key={team.id}
+          {...team}
+          members={members}
+          onClickRemoveTeam={this.handleClickRemoveTeam(team.id)}
+          onClickInviteMember={this.handleClickInvite(team.id)}
+        />
+      </Link>
+    ));
+  }
+
   render() {
-    const { isLoading } = this.props;
-    const { isVisibleModal } = this.state;
+    const { isLoading, members } = this.props;
+    const { modalVisibilities, selectedTeamId } = this.state;
 
     if (isLoading) {
       return (
@@ -94,31 +174,41 @@ class TeamListContainer extends Component {
       );
     }
 
+    const renderedTeamCards = this.renderTeamCards();
+
     return (
       <Wrapper>
         <TopWrapper>
           <Title>Teams</Title>
           <Button
             withOfflineCheck
-            onClick={this.handleClickCreateTeam}
+            onClick={this.handleOpenModal(NEW_TEAM_MODAL)}
             icon="plus"
             color="black"
           >
             ADD TEAM
           </Button>
         </TopWrapper>
-        <TeamListWrapper>
-          <TeamCardStyled />
-          <TeamCardStyled />
-          <TeamCardStyled />
-          <TeamCardStyled />
-        </TeamListWrapper>
-        {isVisibleModal && (
+        <TeamListWrapper>{renderedTeamCards}</TeamListWrapper>
+        {modalVisibilities[NEW_TEAM_MODAL] && (
           <NewTeamModal
             onSubmit={this.handleCreateSubmit}
-            onCancel={this.handleCancel}
+            onCancel={this.this.handleCloseModal(NEW_TEAM_MODAL)}
           />
         )}
+        {modalVisibilities[INVITE_MEMBER_MODAL] && (
+          <InviteModal
+            teamId={selectedTeamId}
+            members={members}
+            onCancel={this.handleCloseModal(INVITE_MEMBER_MODAL)}
+          />
+        )}
+        <ConfirmModal
+          isOpen={modalVisibilities[REMOVE_TEAM_MODAL]}
+          description="Are you sure you want to remove team?"
+          onClickOk={this.handleRemoveTeam}
+          onClickCancel={this.handleCloseModal(REMOVE_TEAM_MODAL)}
+        />
       </Wrapper>
     );
   }

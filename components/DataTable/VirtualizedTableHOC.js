@@ -21,6 +21,7 @@ const TbodyComponent = props => {
   const {
     // eslint-disable-next-line
     children: [items, _],
+    itemSize = ITEM_HEIGHT,
     ...restProps
   } = props;
 
@@ -37,7 +38,7 @@ const TbodyComponent = props => {
             width={width}
             itemCount={items.length}
             itemData={itemData}
-            itemSize={ITEM_HEIGHT}
+            itemSize={itemSize}
           >
             {FixedSizeItem}
           </FixedSizeList>
@@ -79,10 +80,9 @@ const VirtualizedTableHOC = Component => {
     render() {
       return (
         <Component
+          functionalRowRendering
           getTbodyProps={this.getTbodyProps}
           TbodyComponent={TbodyComponent}
-          // Low level customization prop
-          functionalRowRendering
           {...this.props}
         />
       );

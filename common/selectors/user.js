@@ -1,5 +1,5 @@
 import { createSelector } from 'reselect';
-import { teamsByIdSelector } from 'common/selectors/team';
+import { teamsByIdSelector } from 'common/selectors/entities/team';
 
 export const userSelector = state => state.user;
 

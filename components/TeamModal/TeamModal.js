@@ -1,15 +1,8 @@
 import React, { Component, Fragment } from 'react';
 import styled from 'styled-components';
 import memoize from 'memoize-one';
-import {
-  Modal,
-  ModalTitle,
-  Input,
-  Icon,
-  Scrollbar,
-  RadioGroup,
-  Button,
-} from 'components';
+import { Modal, ModalTitle, Input, Icon, Scrollbar, Button } from 'components';
+import { RadioGroup } from '../Radio';
 import { ActiveTeamRow, RadioTeamRow } from './TeamRow';
 
 const ModalDescription = styled.div`
@@ -51,18 +44,11 @@ const ButtonsWrapper = styled.div`
   margin-top: 30px;
 `;
 
-const TEAMS = [
-  { id: '259fb95a-8d55-479f-827a-84cf76634ab2', title: 'Default' },
-  { id: '2', title: 'Privateers' },
-  { id: '3', title: 'Babies' },
-  { id: '4', title: 'Babies' },
-];
-
 class TeamModal extends Component {
   state = this.prepareInitialState();
 
-  filter = memoize((teams, filterText) =>
-    teams.filter(({ title }) => title.toLowerCase().includes(filterText)),
+  filter = memoize((teamList, filterText) =>
+    teamList.filter(({ title }) => title.toLowerCase().includes(filterText)),
   );
 
   handleChange = event => {
@@ -91,10 +77,10 @@ class TeamModal extends Component {
   }
 
   renderTeams() {
-    const { teams = TEAMS, teamId: teamIdFromProps } = this.props;
+    const { teamList, teamId: teamIdFromProps } = this.props;
     const { teamId, filterText } = this.state;
 
-    const filteredTeams = this.filter(teams, filterText);
+    const filteredTeams = this.filter(teamList, filterText);
     const activeTeam = filteredTeams.find(({ id }) => id === teamIdFromProps);
 
     const options = filteredTeams

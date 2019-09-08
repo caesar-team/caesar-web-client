@@ -14,10 +14,11 @@ const convertSizeNameToNumber = sizeName =>
   );
 
 const checkFileSize = raw =>
+  raw &&
   raw.length * BASE_64_LENGTH_BYTE_RATE <= convertSizeNameToNumber(MAX_SIZE);
 
 export const schema = yup.object({
-  name: yup.string().required(),
+  title: yup.string().required(),
   icon: yup.object({
     name: yup.string().required(),
     raw: yup.string().test('fileSize', 'File is too large.', checkFileSize),

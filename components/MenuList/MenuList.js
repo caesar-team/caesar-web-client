@@ -1,6 +1,7 @@
 import React, { PureComponent } from 'react';
 import styled from 'styled-components';
-import Section from './Section';
+import { generateTeamTag } from 'common/utils/team';
+import MenuSection from './MenuSection';
 import { MenuItemWrapper, MenuItem } from './components';
 
 const Menu = styled.div`
@@ -35,10 +36,12 @@ class MenuList extends PureComponent {
     const { openedSectionNames } = this.state;
     const {
       mode,
+      team,
       inbox,
       favorites,
       trash,
-      list,
+      personalLists,
+      teamLists,
       activeListId,
       onClickMenuItem,
       onClickSecureMessage,
@@ -46,21 +49,32 @@ class MenuList extends PureComponent {
 
     return (
       <Menu>
-        <Section
+        <MenuSection
           isOpened
           lists={[inbox, favorites, trash]}
           activeListId={activeListId}
           onClickMenuItem={onClickMenuItem}
         />
-        <Section
+        <MenuSection
           name="personal"
-          lists={list}
+          lists={personalLists}
           activeListId={activeListId}
           isOpened={openedSectionNames.includes('personal')}
           onToggleSection={this.handleToggle('personal')}
           onClickMenuItem={onClickMenuItem}
         />
-        <Section
+        {team && (
+          <MenuSection
+            name={generateTeamTag(team.title)}
+            icon={team.icon}
+            lists={teamLists}
+            activeListId={activeListId}
+            isOpened={openedSectionNames.includes('team')}
+            onToggleSection={this.handleToggle('team')}
+            onClickMenuItem={onClickMenuItem}
+          />
+        )}
+        <MenuSection
           name="tools"
           activeListId={activeListId}
           isOpened={openedSectionNames.includes('tools')}
@@ -74,7 +88,7 @@ class MenuList extends PureComponent {
               Secure Message
             </MenuItem>
           </MenuItemWrapper>
-        </Section>
+        </MenuSection>
       </Menu>
     );
   }

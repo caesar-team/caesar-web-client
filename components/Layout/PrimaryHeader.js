@@ -1,6 +1,13 @@
 import React, { PureComponent, Fragment } from 'react';
+import { connect } from 'react-redux';
 import styled from 'styled-components';
 import Link from 'next/link';
+import { setCurrentTeamId } from 'common/actions/user';
+import {
+  currentTeamSelector,
+  userTeamListSelector,
+} from 'common/selectors/user';
+import { createStructuredSelector } from 'reselect';
 import { Icon } from '../Icon';
 import { Avatar } from '../Avatar';
 import { Dropdown } from '../Dropdown';
@@ -110,7 +117,7 @@ class PrimaryHeader extends PureComponent {
     const { team } = this.props;
 
     if (team.id !== teamId) {
-      // TODO: change team via store
+      this.props.setCurrentTeamId(teamId);
     }
 
     this.handleCloseModal();
@@ -139,6 +146,7 @@ class PrimaryHeader extends PureComponent {
     const {
       user,
       team,
+      teamList,
       withSearch = false,
       searchedText,
       onSearch,
@@ -154,7 +162,7 @@ class PrimaryHeader extends PureComponent {
           <Anchor>Switch Team</Anchor>
         </Option>
         <Option key="settings">
-          <Link href="/settings">
+          <Link href="/settings/manage">
             <Anchor>Settings</Anchor>
           </Link>
         </Option>
@@ -181,14 +189,14 @@ class PrimaryHeader extends PureComponent {
               />
               <UserSection>
                 <Avatar {...user} name={user.email} />
-                <TeamAvatar name={team.title} avatar={team.icon} />
+                {team && <TeamAvatar name={team.title} avatar={team.icon} />}
                 <StyledDropdown
                   overlay={Options}
                   onToggle={this.handleToggleDropdown}
                 >
                   <UserAndTeamWrapper>
                     <UserName>{userName}</UserName>
-                    <TeamName>{team.title}</TeamName>
+                    {team && <TeamName>{team.title}</TeamName>}
                   </UserAndTeamWrapper>
                   <StyledIcon
                     name={
@@ -204,6 +212,7 @@ class PrimaryHeader extends PureComponent {
         </Wrapper>
         {isModalOpened && (
           <TeamModal
+            teamList={teamList}
             teamId={team.id}
             onChangeTeam={this.handleChangeTeamId}
             onCancel={this.handleCloseModal}
@@ -214,4 +223,16 @@ class PrimaryHeader extends PureComponent {
   }
 }
 
-export default PrimaryHeader;
+const mapStateToProps = createStructuredSelector({
+  teamList: userTeamListSelector,
+  team: currentTeamSelector,
+});
+
+const mapDispatchToProps = {
+  setCurrentTeamId,
+};
+
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps,
+)(PrimaryHeader);

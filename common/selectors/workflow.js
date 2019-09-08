@@ -2,10 +2,10 @@ import { createSelector } from 'reselect';
 import {
   listsByIdSelector,
   extendedSortedCustomizableListsSelector,
-} from './list';
-import { itemsByIdSelector } from './item';
-import { childItemsByIdSelector } from './childItem';
-import { membersByIdSelector } from './member';
+} from 'common/selectors/entities/list';
+import { itemsByIdSelector } from 'common/selectors/entities/item';
+import { childItemsByIdSelector } from 'common/selectors/entities/childItem';
+import { membersByIdSelector } from 'common/selectors/entities/member';
 
 export const workflowSelector = state => state.workflow;
 

@@ -7,6 +7,7 @@ import {
   itemReducer,
   childItemReducer,
   teamReducer,
+  applicationReducer,
 } from '../reducers';
 
 const entitiesReducer = combineReducers({
@@ -18,7 +19,8 @@ const entitiesReducer = combineReducers({
 });
 
 export const rootReducer = combineReducers({
-  entities: entitiesReducer,
+  application: applicationReducer,
   user: userReducer,
+  entities: entitiesReducer,
   workflow: workflowReducer,
 });

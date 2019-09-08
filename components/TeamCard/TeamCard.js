@@ -1,6 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
-import { Button, AvatarsList } from 'components';
+import memoizeOne from 'memoize-one';
+import { Button, AvatarsList, DottedMenu } from 'components';
 
 const Wrapper = styled.div`
   display: flex;
@@ -12,7 +13,6 @@ const Wrapper = styled.div`
 
 const TeamWrapper = styled.div`
   display: flex;
-  align-items: center;
   justify-content: space-between;
   margin-bottom: 20px;
   padding-bottom: 20px;
@@ -36,6 +36,10 @@ const TeamInfo = styled.div`
   margin-left: 20px;
 `;
 
+const MenuWrapper = styled.div`
+  display: flex;
+`;
+
 const TeamName = styled.div`
   display: flex;
   flex-direction: column;
@@ -55,26 +59,53 @@ const AvatarsWrapper = styled.div`
   justify-content: space-between;
 `;
 
-const avatars = [
-  { id: 1, name: 'Dmitry Spiridonov', email: 'dspiridonov@4xxi.com' },
-  { id: 2, name: 'Dmitry Spiridonov', email: 'dspiridonov@4xxi.com' },
-];
+const ButtonStyled = styled(Button)`
+  width: 100%;
+  height: 50px;
+`;
 
-const TeamCard = ({ ...props }) => {
+const getMembers = memoizeOne((users, members) =>
+  users.map(({ id }) => members.find(member => member.id === id)),
+);
+
+const TeamCard = ({
+  className,
+  title,
+  icon,
+  users,
+  members,
+  onClickRemoveTeam = Function.prototype,
+  onClickInviteMember = Function.prototype,
+}) => {
+  const shouldShowAvatars = users.length > 0;
+
   return (
-    <Wrapper {...props}>
+    <Wrapper className={className}>
       <TeamWrapper>
         <TeamDetails>
-          <TeamIcon />
+          <TeamIcon src={icon} />
           <TeamInfo>
-            <TeamName>Babies</TeamName>
+            <TeamName>{title}</TeamName>
             <TeamMembers>44 members</TeamMembers>
           </TeamInfo>
         </TeamDetails>
+        <MenuWrapper>
+          <DottedMenu tooltipProps={{ textBoxWidth: '100px' }}>
+            <ButtonStyled color="white" onClick={onClickRemoveTeam}>
+              Remove
+            </ButtonStyled>
+          </DottedMenu>
+        </MenuWrapper>
       </TeamWrapper>
       <AvatarsWrapper>
-        <AvatarsList isSmall avatars={avatars} visibleCount={20} />
-        <Button color="white" icon="plus" />
+        {shouldShowAvatars && (
+          <AvatarsList
+            isSmall
+            avatars={getMembers(users, members)}
+            visibleCount={20}
+          />
+        )}
+        <Button color="white" icon="plus" onClick={onClickInviteMember} />
       </AvatarsWrapper>
     </Wrapper>
   );

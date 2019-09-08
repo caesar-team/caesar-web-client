@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { forwardRef } from 'react';
 import styled from 'styled-components';
 import withOfflineDetection from '../Offline/withOfflineDetection';
 import Icon from '../Icon/Icon';
@@ -89,38 +89,44 @@ const Text = styled.div`
 const getButtonDisabledStatus = (withOfflineCheck, isOnline, disabled) =>
   (withOfflineCheck && !isOnline) || disabled;
 
-const Button = ({
-  icon,
-  color = 'black',
-  htmlType = 'button',
-  children,
-  disabled,
-  withOfflineCheck = false,
-  isHoverBlackBackground,
-  isOnline,
-  ...props
-}) => {
-  const onlyIcon = !children;
-  const withIcon = !!icon;
-  const isDisabled = getButtonDisabledStatus(
-    withOfflineCheck,
-    isOnline,
-    disabled,
-  );
+const Button = forwardRef(
+  (
+    {
+      icon,
+      color = 'black',
+      htmlType = 'button',
+      children,
+      disabled,
+      withOfflineCheck = false,
+      isHoverBlackBackground,
+      isOnline,
+      ...props
+    },
+    ref,
+  ) => {
+    const onlyIcon = !children;
+    const withIcon = !!icon;
+    const isDisabled = getButtonDisabledStatus(
+      withOfflineCheck,
+      isOnline,
+      disabled,
+    );
 
-  return (
-    <StyledButton
-      isHoverBlackBackground={isHoverBlackBackground}
-      type={htmlType}
-      color={color}
-      onlyIcon={onlyIcon}
-      disabled={isDisabled}
-      {...props}
-    >
-      {icon && <Icon name={icon} width={14} height={14} isInButton />}
-      {!onlyIcon && <Text withMargin={withIcon}>{children}</Text>}
-    </StyledButton>
-  );
-};
+    return (
+      <StyledButton
+        ref={ref}
+        isHoverBlackBackground={isHoverBlackBackground}
+        type={htmlType}
+        color={color}
+        onlyIcon={onlyIcon}
+        disabled={isDisabled}
+        {...props}
+      >
+        {icon && <Icon name={icon} width={14} height={14} isInButton />}
+        {!onlyIcon && <Text withMargin={withIcon}>{children}</Text>}
+      </StyledButton>
+    );
+  },
+);
 
 export default withOfflineDetection(Button);

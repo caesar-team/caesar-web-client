@@ -91,3 +91,6 @@ export { RadioGroup, Radio } from './Radio';
 export { NewTeamModal } from './NewTeamModal';
 export { TeamTag } from './TeamTag';
 export { Carousel } from './Carousel';
+export { DottedMenu } from './DottedMenu';
+export { Section } from './Section';
+export { MemberList } from './MemberList';

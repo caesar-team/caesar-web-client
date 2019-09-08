@@ -11,6 +11,7 @@ const itemSchema = new schema.Entity(
     processStrategy: (entity, parent) => ({
       ...entity,
       listId: parent.id,
+      teamId: parent.teamId,
       __type: ITEM_ENTITY_TYPE,
     }),
   },

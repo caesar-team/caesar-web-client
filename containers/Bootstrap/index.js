@@ -2,7 +2,7 @@ import { connect } from 'react-redux';
 import { createStructuredSelector } from 'reselect';
 import { setMasterPassword } from 'common/actions/user';
 import { resetWorkflowStore } from 'common/actions/workflow';
-import { removeItemsData } from 'common/actions/item';
+import { removeItemsData } from 'common/actions/entities/item';
 import { masterPasswordSelector } from 'common/selectors/user';
 import Bootstrap from './Bootstrap';
 

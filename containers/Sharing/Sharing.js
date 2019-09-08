@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { getList } from 'common/api';
+import { getLists } from 'common/api';
 import { matchStrict } from 'common/utils/match';
 import {
   SharingLayout,
@@ -28,7 +28,7 @@ class Sharing extends Component {
   async componentDidMount() {
     const { privateKey, password } = this.props;
 
-    const { data: list } = await getList();
+    const { data: list } = await getLists();
 
     const item = getInboxItem(list);
 

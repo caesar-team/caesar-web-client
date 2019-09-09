@@ -42,11 +42,8 @@ import {
   patchChildAccess,
   patchChildItemBatch,
 } from 'common/api';
-import {
-  encryptItem,
-  encryptItemForUsers,
-  objectToBase64,
-} from 'common/utils/cipherUtils';
+import { encryptItem, encryptItemForUsers } from 'common/utils/cipherUtils';
+import { objectToBase64 } from 'common/utils/base64';
 import {
   INVITE_TYPE,
   PERMISSION_READ,

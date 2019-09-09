@@ -17,6 +17,7 @@ const withFonts = require('next-fonts');
 const withOptimizedImages = require('next-optimized-images');
 const withCSS = require('@zeit/next-css');
 const withOffline = require('next-offline');
+const ThreadsPlugin = require('threads-plugin');
 
 // fix: prevents error when .css files are required by node
 if (typeof require !== 'undefined') {
@@ -64,8 +65,10 @@ module.exports = withPlugins(
   {
     publicRuntimeConfig,
     workboxOpts: workboxOptions,
-    webpack: (config) => {
+    webpack: config => {
       config.output.globalObject = 'this';
+
+      config.plugins.push(new ThreadsPlugin());
 
       return config;
     },

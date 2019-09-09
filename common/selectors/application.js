@@ -22,3 +22,8 @@ export const serverVersionSelector = createSelector(
   versionsSelector,
   versions => versions.server,
 );
+
+export const availableCoresCountSelector = createSelector(
+  applicationSelector,
+  application => application.availableCoresCount,
+);

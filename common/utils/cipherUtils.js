@@ -1,6 +1,4 @@
 import * as openpgp from 'openpgp';
-import btoa from 'btoa';
-import atob from 'atob';
 import { generateKeys } from 'common/utils/key';
 import { generator } from 'common/utils/password';
 import { randomId } from 'common/utils/uuid4';
@@ -35,9 +33,7 @@ export const encryptItem = async (data, key) => {
 };
 
 export const encryptItemsBatch = async (dataSet, key) => {
-  return Promise.all(
-    dataSet.map(async data => await encryptItem(data, key)),
-  );
+  return Promise.all(dataSet.map(async data => await encryptItem(data, key)));
 };
 
 export const encryptByPassword = async (data, password) => {
@@ -87,26 +83,6 @@ export const generateUsersBatch = async emails => {
 
 export const generateAnonymousEmail = () =>
   `anonymous_${randomId()}@caesar.team`;
-
-export const objectToBase64 = object => {
-  try {
-    return typeof window === 'undefined'
-      ? btoa(JSON.stringify(object))
-      : window.btoa(JSON.stringify(object));
-  } catch (ex) {
-    return null;
-  }
-};
-
-export const base64ToObject = b64 => {
-  try {
-    return typeof window === 'undefined'
-      ? JSON.parse(atob(b64))
-      : JSON.parse(window.atob(b64));
-  } catch (ex) {
-    return null;
-  }
-};
 
 export const generateSeedAndVerifier = (email, password) => {
   const seed = srp.getRandomSeed();

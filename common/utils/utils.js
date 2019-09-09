@@ -29,5 +29,17 @@ export const chunk = (input, size) => {
 
 export const objectToArray = obj => Object.values(obj);
 
-export const arrayToObject = arr =>
-  arr.reduce((accumulator, item) => ({ ...accumulator, [item.id]: item }), {});
+export const arrayToObject = (arr, id = 'id') =>
+  arr.reduce((accumulator, item) => ({ ...accumulator, [item[id]]: item }), {});
+
+export const match = (obj, arr, idField = 'id') =>
+  arr.reduce(
+    (accumulator, { [idField]: id, data }) => ({
+      ...accumulator,
+      [id]: {
+        ...obj[id],
+        data,
+      },
+    }),
+    {},
+  );

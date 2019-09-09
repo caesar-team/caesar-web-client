@@ -82,8 +82,8 @@ import {
   encryptItemsBatch,
   generateAnonymousEmail,
   getPrivateKeyObj,
-  objectToBase64,
 } from 'common/utils/cipherUtils';
+import { objectToBase64 } from 'common/utils/base64';
 import {
   ROLE_ANONYMOUS_USER,
   ITEM_REVIEW_MODE,

@@ -13,6 +13,11 @@ const AddButton = styled.button`
   align-items: center;
   justify-content: center;
   cursor: pointer;
+
+  &:hover {
+    background-color: ${({ theme }) => theme.emperor};
+    border-color: ${({ theme }) => theme.emperor};
+  }
 `;
 
 const IconStyled = styled(Icon)`

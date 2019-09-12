@@ -52,7 +52,7 @@ const Item = ({
   childItems,
   allLists,
   user,
-  members = {},
+  membersById = {},
   notification,
   onClickMoveItem = Function.prototype,
   onClickCloseItem = Function.prototype,
@@ -109,7 +109,7 @@ const Item = ({
 
   const renderUpdateNotify = () => {
     const updateUserName =
-      update.userId === ownerId ? user.name : members[update.userId].name;
+      update.userId === ownerId ? user.name : membersById[update.userId].name;
     const updateDate = formatDate(update.createdAt);
 
     return (
@@ -143,7 +143,7 @@ const Item = ({
           owner={owner}
           childItems={childItems}
           user={user}
-          members={members}
+          membersById={membersById}
           allLists={allLists}
           onClickMoveItem={onClickMoveItem}
           onClickCloseItem={onClickCloseItem}
@@ -164,7 +164,7 @@ const Item = ({
           owner={owner}
           childItems={childItems}
           user={user}
-          members={members}
+          membersById={membersById}
           allLists={allLists}
           onClickMoveItem={onClickMoveItem}
           onClickCloseItem={onClickCloseItem}

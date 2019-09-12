@@ -16,6 +16,7 @@ import {
   ADD_TEAM_TO_MEMBER,
   REMOVE_TEAM_FROM_MEMBER,
   REMOVE_TEAM_FROM_MEMBERS_BATCH,
+  ADD_TEAM_TO_MEMBERS_BATCH,
 } from 'common/actions/entities/member';
 
 const initialState = {
@@ -100,6 +101,8 @@ export default createReducer(initialState, {
     };
   },
   [ADD_TEAM_TO_MEMBER](state, { payload }) {
+    console.log('state', state);
+    console.log('payload', payload);
     return {
       ...state,
       byId: {
@@ -108,6 +111,24 @@ export default createReducer(initialState, {
           ...state.byId[payload.memberId],
           teamIds: [...state.byId[payload.memberId].teamIds, payload.teamId],
         },
+      },
+    };
+  },
+  [ADD_TEAM_TO_MEMBERS_BATCH](state, { payload }) {
+    return {
+      ...state,
+      byId: {
+        ...state.byId,
+        ...payload.memberIds.reduce(
+          (accumulator, memberId) => ({
+            ...accumulator,
+            [memberId]: {
+              ...state.byId[memberId],
+              teamIds: [...state.byId[memberId].teamIds, payload.teamId],
+            },
+          }),
+          {},
+        ),
       },
     };
   },

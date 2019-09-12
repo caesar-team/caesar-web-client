@@ -3,7 +3,6 @@ import { decryption } from 'common/sagas/common/decryption';
 import {
   INIT_PREPARATION_DATA_FLOW,
   UPDATE_WORK_IN_PROGRESS_ITEM,
-  REHYDRATE_STORE,
   finishIsLoading,
   setWorkInProgressListId,
   setWorkInProgressItem,
@@ -26,12 +25,8 @@ import {
   masterPasswordSelector,
   currentTeamIdSelector,
 } from 'common/selectors/user';
-import {
-  itemsByIdSelector,
-  itemSelector,
-} from 'common/selectors/entities/item';
+import { itemSelector } from 'common/selectors/entities/item';
 import { workInProgressItemSelector } from 'common/selectors/workflow';
-import { isOnlineSelector } from 'common/selectors/application';
 import { teamListSelector } from 'common/selectors/entities/team';
 import { getFavoritesList } from 'common/normalizers/utils';
 
@@ -114,8 +109,8 @@ export function* initTeamData() {
 export function* initPreparationDataFlowSaga({
   payload: { withItemsDecryption },
 }) {
-  yield fork(initPersonalData, { payload: { withItemsDecryption } });
-  // yield fork(initTeamData);
+  yield call(initPersonalData, { payload: { withItemsDecryption } });
+  yield call(initTeamData);
 }
 
 export function* updateWorkInProgressItemSaga({
@@ -140,19 +135,6 @@ export function* updateWorkInProgressItemSaga({
   }
 }
 
-export function* rehydrateStoreSaga() {
-  try {
-    const isOnline = yield select(isOnlineSelector);
-
-    if (!isOnline) {
-      const itemsById = yield select(itemsByIdSelector);
-      yield call(decryption, { payload: { itemsById } });
-    }
-  } catch (error) {
-    console.log(error);
-  }
-}
-
 export function* setCurrentTeamIdWatchSaga() {
   yield put(setWorkInProgressItem(null));
   yield put(resetWorkInProgressItemIds(null));
@@ -160,18 +142,29 @@ export function* setCurrentTeamIdWatchSaga() {
 
   const currentTeamId = yield select(currentTeamIdSelector);
 
+  if (!currentTeamId) {
+    return;
+  }
+
   const { data } = yield call(getTeamLists, currentTeamId);
 
   const { listsById, itemsById, childItemsById } = convertNodesToEntities(data);
 
   yield put(addListsBatch(listsById));
   yield put(addChildItemsBatch(childItemsById));
-  yield fork(decryption, objectToArray(itemsById));
+
+  const keyPair = yield select(keyPairSelector);
+  const masterPassword = yield select(masterPasswordSelector);
+
+  yield fork(decryption, {
+    items: objectToArray(itemsById),
+    key: keyPair.privateKey,
+    masterPassword,
+  });
 }
 
 export default function* workflowSagas() {
   yield takeLatest(INIT_PREPARATION_DATA_FLOW, initPreparationDataFlowSaga);
   yield takeLatest(UPDATE_WORK_IN_PROGRESS_ITEM, updateWorkInProgressItemSaga);
-  yield takeLatest(REHYDRATE_STORE, rehydrateStoreSaga);
   yield takeLatest(SET_CURRENT_TEAM_ID, setCurrentTeamIdWatchSaga);
 }

@@ -17,14 +17,19 @@ import { addMembersBatch } from 'common/actions/entities/member';
 import { currentTeamIdSelector } from 'common/selectors/user';
 import { convertTeamsToEntity } from 'common/normalizers/normalizers';
 import { getUserSelf, getKeys, getUserTeams } from 'common/api';
-import { setCookieValue } from 'common/utils/token';
 
 export function* fetchUserSelfSaga() {
   try {
     const { data: user } = yield call(getUserSelf);
 
-    yield put(fetchUserSelfSuccess(user));
-    yield put(addMembersBatch({ [user.id]: user }));
+    // TODO: added teamIds on BE side
+    const fixedUser = {
+      ...user,
+      teamIds: user.teamIds || [],
+    };
+
+    yield put(fetchUserSelfSuccess(fixedUser));
+    yield put(addMembersBatch({ [fixedUser.id]: fixedUser }));
   } catch (error) {
     console.log('error', error);
     yield put(fetchUserSelfFailure());
@@ -65,13 +70,8 @@ export function* fetchUserTeamsSaga() {
   }
 }
 
-function* setCurrentTeamIdSaga({ payload: { teamId } }) {
-  yield call(setCookieValue, 'teamId', teamId);
-}
-
 export default function* userSagas() {
   yield takeLatest(FETCH_USER_SELF_REQUEST, fetchUserSelfSaga);
   yield takeLatest(FETCH_KEY_PAIR_REQUEST, fetchKeyPairSaga);
   yield takeLatest(FETCH_USER_TEAMS_REQUEST, fetchUserTeamsSaga);
-  yield takeLatest(SET_CURRENT_TEAM_ID, setCurrentTeamIdSaga);
 }

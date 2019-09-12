@@ -2,10 +2,13 @@ import React, { Component } from 'react';
 import styled from 'styled-components';
 import debounce from 'lodash.debounce';
 import { getSearchUser } from 'common/api';
-import { Input } from '../../Input';
-import { Icon } from '../../Icon';
-import { CircleLoader } from '../../Loader';
-import { MemberList } from '../../MemberList';
+import { uuid4 } from 'common/utils/uuid4';
+import Input from './Input';
+import { Icon } from '../Icon';
+import { CircleLoader } from '../Loader';
+import { MemberList } from '../MemberList';
+
+const EMAIL_REGEX = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
 
 const Wrapper = styled.div`
   display: flex;
@@ -27,6 +30,36 @@ const InputStyled = styled(Input)`
     border: 1px solid ${({ theme }) => theme.gallery};
     background-color: ${({ theme }) => theme.white};
   }
+`;
+
+const AddButton = styled.button`
+  width: 30px;
+  height: 30px;
+  background-color: ${({ disabled, theme }) =>
+    disabled ? theme.gallery : theme.black};
+  border: 1px solid
+    ${({ disabled, theme }) => (disabled ? theme.gallery : theme.black)};
+  border-radius: 50%;
+  outline: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: ${({ disabled }) => (disabled ? 'default' : 'pointer')};
+
+  ${({ disabled, theme }) =>
+    !disabled &&
+    `
+    &:hover {
+      background-color: ${theme.emperor};
+      border-color: ${theme.emperor};
+    }
+  `};
+`;
+
+const IconStyled = styled(Icon)`
+  width: 14px;
+  height: 14px;
+  fill: ${({ theme }) => theme.white};
 `;
 
 const SearchedResultBox = styled.div`
@@ -54,7 +87,14 @@ const SearchedUsersCount = styled.div`
   color: ${({ theme }) => theme.gray};
 `;
 
-class MemberSearchInput extends Component {
+const createNewMember = email => ({
+  id: uuid4(),
+  email,
+  avatar: null,
+  isNew: true,
+});
+
+class UserSearchInput extends Component {
   state = this.prepareInitialState();
 
   getPostfix() {
@@ -72,8 +112,35 @@ class MemberSearchInput extends Component {
       );
     }
 
+    if (
+      !isLoading &&
+      !members.length &&
+      filterText &&
+      filterText.includes('@')
+    ) {
+      const isDisabled = !EMAIL_REGEX.test(filterText);
+
+      return (
+        <AddButton disabled={isDisabled} onClick={this.handleAddNewMember}>
+          <IconStyled name="plus" />
+        </AddButton>
+      );
+    }
+
     return null;
   }
+
+  handleAddNewMember = () => {
+    const { onClickAdd } = this.props;
+    const { filterText } = this.state;
+
+    this.setState({
+      filterText: '',
+      members: [],
+    });
+
+    onClickAdd(createNewMember(filterText));
+  };
 
   // eslint-disable-next-line
   handleChange = event => {
@@ -162,4 +229,4 @@ class MemberSearchInput extends Component {
   }
 }
 
-export default MemberSearchInput;
+export default UserSearchInput;

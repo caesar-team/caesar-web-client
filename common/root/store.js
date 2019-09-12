@@ -3,7 +3,7 @@ import createSagaMiddleware from 'redux-saga';
 import offlineConfig from '@redux-offline/redux-offline/lib/defaults';
 import { composeWithDevTools } from 'redux-devtools-extension';
 import { createOffline } from '@redux-offline/redux-offline';
-import { rehydrateStore } from 'common/actions/workflow';
+import { rehydrateStore } from 'common/actions/application';
 import { rootReducer } from './reducers';
 import { rootSaga } from './sagas';
 import { persistOptions } from './persist';

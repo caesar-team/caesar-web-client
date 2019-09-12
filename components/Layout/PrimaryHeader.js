@@ -116,7 +116,7 @@ class PrimaryHeader extends PureComponent {
   handleChangeTeamId = teamId => {
     const { team } = this.props;
 
-    if (team.id !== teamId) {
+    if (!team || team.id !== teamId) {
       this.props.setCurrentTeamId(teamId);
     }
 
@@ -155,12 +155,17 @@ class PrimaryHeader extends PureComponent {
     const { isDropdownOpened, isModalOpened } = this.state;
 
     const userName = user.name || user.email;
+    const teamId = team ? team.id : null;
+
+    const shouldShowSwitchTeamOption = teamList && teamList.length > 0;
 
     const Options = (
       <Fragment>
-        <Option key="teams" onClick={this.handleShowTeamModal}>
-          <Anchor>Switch Team</Anchor>
-        </Option>
+        {shouldShowSwitchTeamOption && (
+          <Option key="teams" onClick={this.handleShowTeamModal}>
+            <Anchor>Switch Team</Anchor>
+          </Option>
+        )}
         <Option key="settings">
           <Link href="/settings/manage">
             <Anchor>Settings</Anchor>
@@ -213,7 +218,7 @@ class PrimaryHeader extends PureComponent {
         {isModalOpened && (
           <TeamModal
             teamList={teamList}
-            teamId={team.id}
+            teamId={teamId}
             onChangeTeam={this.handleChangeTeamId}
             onCancel={this.handleCloseModal}
           />

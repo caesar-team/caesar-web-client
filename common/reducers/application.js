@@ -1,15 +1,21 @@
 import { createReducer } from 'common/utils/reducer';
 import {
+  UPDATE_GLOBAL_NOTIFICATION,
   SET_APPLICATION_VERSION,
   INIT_CORES_COUNT,
   INCREASE_CORES_COUNT,
   DECREASE_CORES_COUNT,
 } from 'common/actions/application';
+import { DEFAULT_CORES_COUNT } from 'common/constants';
 
 const initialState = {
   isLoading: false,
   isError: false,
-  availableCoresCount: 4,
+  availableCoresCount: DEFAULT_CORES_COUNT,
+  globalNotification: {
+    isLoading: false,
+    text: '',
+  },
   versions: {
     client: null,
     server: null,
@@ -17,6 +23,12 @@ const initialState = {
 };
 
 export default createReducer(initialState, {
+  [UPDATE_GLOBAL_NOTIFICATION](state, { payload }) {
+    return {
+      ...state,
+      globalNotification: payload,
+    };
+  },
   [SET_APPLICATION_VERSION](state, { payload }) {
     return {
       ...state,

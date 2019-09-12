@@ -3,7 +3,7 @@ import styled, { keyframes } from 'styled-components';
 
 const circle = keyframes`
   0% {transform: rotate(0deg) scale(1)}
-  50% {transform: rotate(180deg) scale(0.8)}
+  50% {transform: rotate(180deg) scale(1)}
   100% {transform: rotate(360deg) scale(1)}
 `;
 
@@ -20,8 +20,8 @@ const Loader = styled.div`
   animation-fill-mode: both;
 `;
 
-const CircleLoader = ({ size, color = '#000' }) => (
-  <Loader size={size} color={color} />
+const CircleLoader = ({ className, size, color = '#000' }) => (
+  <Loader className={className} size={size} color={color} />
 );
 
 export default CircleLoader;

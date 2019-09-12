@@ -255,23 +255,23 @@ class DashboardContainer extends Component {
     this.props.removeInviteMemberRequest(childItemId);
   };
 
-  handleActivateShareByLink = () => {
+  handleActivateLink = () => {
     this.props.createAnonymousLinkRequest();
   };
 
-  handleDeactivateShareByLink = () => {
+  handleDeactivateLink = () => {
     this.props.removeAnonymousLinkRequest();
   };
 
-  handleShare = emails => {
+  handleShare = members => {
     const { workInProgressItem, workInProgressItemIds } = this.props;
 
-    if (emails.length > 0) {
+    if (members.length > 0) {
       if (workInProgressItemIds && workInProgressItemIds.length > 0) {
-        this.props.shareItemBatchRequest(workInProgressItemIds, emails);
+        this.props.shareItemBatchRequest(workInProgressItemIds, members);
         this.props.resetWorkInProgressItemIds();
       } else {
-        this.props.shareItemBatchRequest([workInProgressItem.id], emails);
+        this.props.shareItemBatchRequest([workInProgressItem.id], members);
       }
     }
 
@@ -424,14 +424,15 @@ class DashboardContainer extends Component {
 
   render() {
     const {
-      teams,
+      userTeamList,
       notification,
       workInProgressItem,
       workInProgressItemOwner,
+      workInProgressItemSharedMembers,
       workInProgressItemChildItems,
       workInProgressItemIds,
       workInProgressList,
-      members,
+      membersById,
       user,
       team,
       personalLists,
@@ -544,7 +545,7 @@ class DashboardContainer extends Component {
                     childItems={workInProgressItemChildItems}
                     allLists={currentLists}
                     user={user}
-                    members={members}
+                    membersById={membersById}
                     onClickMoveItem={this.handleClickMoveItem}
                     onClickCloseItem={this.handleClickCloseItem}
                     onClickShare={this.handleOpenModal(SHARE_MODAL)}
@@ -568,14 +569,14 @@ class DashboardContainer extends Component {
         </DashboardLayout>
         {modalVisibilities[SHARE_MODAL] && (
           <ShareModal
-            teams={teams}
-            shares={[]}
+            teams={userTeamList}
+            sharedMembers={workInProgressItemSharedMembers}
+            anonymousLink={workInProgressItem && workInProgressItem.shared}
             withAnonymousLink={!isMultiItem}
-            shared={(workInProgressItem && workInProgressItem.shared) || []}
             onShare={this.handleShare}
             onRemove={this.handleRemoveShare}
-            onActivateSharedByLink={this.handleActivateShareByLink}
-            onDeactivateSharedByLink={this.handleDeactivateShareByLink}
+            onActivateLink={this.handleActivateLink}
+            onDeactivateLink={this.handleDeactivateLink}
             onCancel={this.handleCloseModal(SHARE_MODAL)}
             notification={notification}
           />

@@ -21,9 +21,12 @@ export const UPDATE_TEAM_MEMBER_ROLE_SUCCESS =
 export const UPDATE_TEAM_MEMBER_ROLE_FAILURE =
   '@team/UPDATE_TEAM_MEMBER_ROLE_FAILURE';
 
-export const ADD_TEAM_MEMBER_REQUEST = '@team/ADD_TEAM_MEMBER_REQUEST';
-export const ADD_TEAM_MEMBER_SUCCESS = '@team/ADD_TEAM_MEMBER_SUCCESS';
-export const ADD_TEAM_MEMBER_FAILURE = '@team/ADD_TEAM_MEMBER_FAILURE';
+export const ADD_TEAM_MEMBERS_BATCH_REQUEST =
+  '@team/ADD_TEAM_MEMBERS_BATCH_REQUEST';
+export const ADD_TEAM_MEMBERS_BATCH_SUCCESS =
+  '@team/ADD_TEAM_MEMBERS_BATCH_SUCCESS';
+export const ADD_TEAM_MEMBERS_BATCH_FAILURE =
+  '@team/ADD_TEAM_MEMBERS_BATCH_FAILURE';
 
 export const REMOVE_TEAM_MEMBER_REQUEST = '@team/REMOVE_TEAM_MEMBER_REQUEST';
 export const REMOVE_TEAM_MEMBER_SUCCESS = '@team/REMOVE_TEAM_MEMBER_SUCCESS';
@@ -124,26 +127,24 @@ export const updateTeamMemberRoleFailure = () => ({
   type: UPDATE_TEAM_MEMBER_ROLE_FAILURE,
 });
 
-export const addTeamMemberRequest = (teamId, userId, role) => ({
-  type: ADD_TEAM_MEMBER_REQUEST,
+export const addTeamMembersBatchRequest = (teamId, members) => ({
+  type: ADD_TEAM_MEMBERS_BATCH_REQUEST,
   payload: {
     teamId,
-    userId,
-    role,
+    members,
   },
 });
 
-export const addTeamMemberSuccess = (teamId, userId, role) => ({
-  type: ADD_TEAM_MEMBER_SUCCESS,
+export const addTeamMembersBatchSuccess = (teamId, members) => ({
+  type: ADD_TEAM_MEMBERS_BATCH_SUCCESS,
   payload: {
     teamId,
-    userId,
-    role,
+    members,
   },
 });
 
-export const addTeamMemberFailure = () => ({
-  type: ADD_TEAM_MEMBER_FAILURE,
+export const addTeamMembersBatchFailure = () => ({
+  type: ADD_TEAM_MEMBERS_BATCH_FAILURE,
 });
 
 export const removeTeamMemberRequest = (teamId, userId) => ({

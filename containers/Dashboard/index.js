@@ -39,6 +39,7 @@ import {
   workInProgressItemSelector,
   workInProgressItemOwnerSelector,
   workInProgressItemChildItemsSelector,
+  workInProgressItemSharedMembersSelector,
   workInProgressItemIdsSelector,
   workInProgressItemsSelector,
   workInProgressListSelector,
@@ -55,27 +56,28 @@ import {
   keyPairSelector,
   userDataSelector,
   currentTeamSelector,
+  userTeamListSelector,
 } from 'common/selectors/user';
 import { membersByIdSelector } from 'common/selectors/entities/member';
-import { teamListSelector } from 'common/selectors/entities/team';
 import Dashboard from './Dashboard';
 
 const mapStateToProps = createStructuredSelector({
   personalLists: selectableListsWithoutChildrenSelector,
   teamLists: currentTeamListsSelector,
-  teams: teamListSelector,
+  userTeamList: userTeamListSelector,
   listsByType: listsByTypeSelector,
   itemsById: itemsByIdSelector,
   workInProgressItem: workInProgressItemSelector,
   workInProgressItemOwner: workInProgressItemOwnerSelector,
   workInProgressItemChildItems: workInProgressItemChildItemsSelector,
+  workInProgressItemSharedMembers: workInProgressItemSharedMembersSelector,
   workInProgressItemIds: workInProgressItemIdsSelector,
   workInProgressList: workInProgressListSelector,
   visibleListItems: visibleListItemsSelector,
   workInProgressItems: workInProgressItemsSelector,
   trashList: trashListSelector,
   keyPair: keyPairSelector,
-  members: membersByIdSelector,
+  membersById: membersByIdSelector,
   user: userDataSelector,
   team: currentTeamSelector,
   isLoading: isLoadingSelector,

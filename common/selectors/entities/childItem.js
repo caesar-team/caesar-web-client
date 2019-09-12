@@ -9,12 +9,7 @@ export const childItemEntitySelector = createSelector(
 
 export const childItemsByIdSelector = createSelector(
   childItemEntitySelector,
-  childItemEntity => childItemEntity.byId,
-);
-
-export const childItemsSelector = createSelector(
-  childItemEntitySelector,
-  childItemsById => Object.values(childItemsById) || [],
+  childItemEntity => childItemEntity.byId || {},
 );
 
 const childItemIdsPropSelector = (_, props) => props.childItemIds;

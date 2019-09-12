@@ -15,8 +15,6 @@ export const RESET_WORK_IN_PROGRESS_ITEM_IDS =
   '@workflow/RESET_WORK_IN_PROGRESS_ITEM_IDS';
 export const RESET_WORKFLOW_STORE = '@workflow/RESET_WORKFLOW_STORE';
 
-export const REHYDRATE_STORE = '@workflow/REHYDRATE_STORE';
-
 export const initPreparationDataFlow = withItemsDecryption => ({
   type: INIT_PREPARATION_DATA_FLOW,
   payload: {
@@ -64,8 +62,4 @@ export const resetWorkInProgressItemIds = () => ({
 
 export const resetWorkflowStore = () => ({
   type: RESET_WORKFLOW_STORE,
-});
-
-export const rehydrateStore = () => ({
-  type: REHYDRATE_STORE,
 });

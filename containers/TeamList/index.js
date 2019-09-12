@@ -4,23 +4,41 @@ import {
   fetchTeamsRequest,
   createTeamRequest,
   removeTeamRequest,
+  addTeamMembersBatchRequest,
+  removeTeamMemberRequest,
+  updateTeamMemberRoleRequest,
 } from 'common/actions/entities/team';
-import { teamListSelector, isLoadingSelector } from 'common/selectors/entities/team';
-import { userTeamListSelector } from 'common/selectors/user';
-import { memberListSelector } from 'common/selectors/entities/member';
+import { fetchMembersRequest } from 'common/actions/entities/member';
+import {
+  teamsByIdSelector,
+  teamListSelector,
+  isLoadingSelector,
+} from 'common/selectors/entities/team';
+import { userDataSelector, userTeamListSelector } from 'common/selectors/user';
+import {
+  memberListSelector,
+  membersByIdSelector,
+} from 'common/selectors/entities/member';
 import TeamList from './TeamList';
 
 const mapStateToProps = createStructuredSelector({
   isLoading: isLoadingSelector,
-  teamList: teamListSelector,
+  teamsById: teamsByIdSelector,
+  teams: teamListSelector,
+  user: userDataSelector,
   userTeamList: userTeamListSelector,
   members: memberListSelector,
+  membersById: membersByIdSelector,
 });
 
 const mapDispatchToProps = {
+  fetchMembersRequest,
   fetchTeamsRequest,
   createTeamRequest,
   removeTeamRequest,
+  addTeamMembersBatchRequest,
+  removeTeamMemberRequest,
+  updateTeamMemberRoleRequest,
 };
 
 export default connect(

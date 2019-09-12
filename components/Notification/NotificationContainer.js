@@ -8,10 +8,19 @@ const Wrapper = styled.div`
   ${({ position }) =>
     position === 'top-center' &&
     `
-    left: 50%;
-    top: 0;
-    padding-top: 16px;
-    transform: translateX(-50%);
+      left: 50%;
+      top: 0;
+      padding-top: 16px;
+      transform: translateX(-50%);
+  `};
+
+  ${({ position }) =>
+    position === 'bottom-right' &&
+    `
+      right: 0;
+      bottom: 0;
+      padding-bottom: 16px;
+      transform: translateX(-50%);
   `};
 `;
 

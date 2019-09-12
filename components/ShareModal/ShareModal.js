@@ -1,19 +1,17 @@
-import React, { Component } from 'react';
+import React, { Component, Fragment } from 'react';
 import styled from 'styled-components';
 import copy from 'copy-text-to-clipboard';
-import { Modal, ModalTitle, Checkbox, Toggle, TagsInput } from 'components';
-import { base64ToObject, objectToBase64 } from 'common/utils/cipherUtils';
-import { waitIdle } from 'common/utils/utils';
+import { Modal, ModalTitle, UserSearchInput } from 'components';
 import { generateTeamTag } from 'common/utils/team';
-import { KEY_CODES } from 'common/constants';
 import { TeamTag } from '../TeamTag';
 import { Section } from '../Section';
 import { TextWithLines } from '../TextWithLines';
 import { Carousel } from '../Carousel';
 import { MemberList } from '../MemberList';
 import { Button } from '../Button';
-import { INVITED_SECTION, WAITING_SECTION } from './constants';
-import { MemberSearchInput, AnonymousLink } from './components';
+import { INVITED_SECTION } from './constants';
+import { AnonymousLink } from './components';
+import { getAnonymousLink } from './utils';
 
 const Wrapper = styled.div`
   position: relative;
@@ -87,8 +85,30 @@ const ButtonStyled = styled(Button)`
   margin-right: 20px;
 `;
 
-export class ShareModal extends Component {
+class ShareModal extends Component {
   state = this.prepareInitialState();
+
+  componentDidUpdate(prevProps) {
+    const shouldUpdateLoading =
+      getAnonymousLink(prevProps.anonymousLink) !==
+      getAnonymousLink(this.props.anonymousLink);
+
+    if (shouldUpdateLoading) {
+      // eslint-disable-next-line
+      this.setState({
+        isGeneratingLink: false,
+      });
+    }
+  }
+
+  handleToggleSection = sectionName => () => {
+    this.setState(prevState => ({
+      ...prevState,
+      openedSections: prevState.openedSections.includes(sectionName)
+        ? prevState.openedSections.filter(name => name !== sectionName)
+        : [...prevState.openedSections, sectionName],
+    }));
+  };
 
   handleAddMember = member => {
     this.setState(prevState => ({
@@ -111,11 +131,44 @@ export class ShareModal extends Component {
     }));
   };
 
+  handleToggleAnonymousLink = () => {
+    const { anonymousLink, onActivateLink, onDeactivateLink } = this.props;
+
+    const link = getAnonymousLink(anonymousLink);
+    const action = link ? onDeactivateLink : onActivateLink;
+
+    this.setState(
+      {
+        isGeneratingLink: !link,
+      },
+      action,
+    );
+  };
+
+  handleUpdateAnonymousLink = async () => {
+    this.setState(
+      {
+        isGeneratingLink: true,
+      },
+      this.props.onActivateLink,
+    );
+  };
+
+  handleCopy = () => {
+    const { notification, anonymousLink = [] } = this.props;
+
+    copy(getAnonymousLink(anonymousLink));
+
+    notification.show({
+      text: `The shared link has copied.`,
+    });
+  };
+
   handleClickDone = () => {
     const { onShare } = this.props;
-    const { members, teamIds } = this.state;
+    const { members } = this.state;
 
-    onShare(members, teamIds);
+    onShare(members);
   };
 
   prepareInitialState() {
@@ -123,6 +176,7 @@ export class ShareModal extends Component {
       members: [],
       teamIds: [],
       openedSections: [],
+      isGeneratingLink: false,
     };
   }
 
@@ -142,15 +196,25 @@ export class ShareModal extends Component {
   }
 
   render() {
-    const { teams, shares, onCancel } = this.props;
-    const { members } = this.state;
+    const {
+      teams,
+      sharedMembers,
+      anonymousLink,
+      withAnonymousLink,
+      onCancel,
+    } = this.props;
+    const { openedSections, members, isGeneratingLink } = this.state;
 
+    const shouldShowTeamsSection = teams.length > 0;
     const shouldShowAddedMembers = members.length > 0;
-    const shouldShowSharedMembers = shares.length > 0;
+    const shouldShowSharedMembers = sharedMembers.length > 0;
 
     const renderedTeamTags = this.renderTeamTags();
 
-    const searchedBlackListMemberIds = members.map(({ id }) => id);
+    const searchedBlackListMemberIds = [
+      ...members.map(({ id }) => id),
+      ...sharedMembers.map(({ id }) => id),
+    ];
 
     return (
       <Modal
@@ -162,7 +226,7 @@ export class ShareModal extends Component {
       >
         <Wrapper>
           <ModalTitle>Share</ModalTitle>
-          <MemberSearchInput
+          <UserSearchInput
             blackList={searchedBlackListMemberIds}
             onClickAdd={this.handleAddMember}
           />
@@ -174,14 +238,31 @@ export class ShareModal extends Component {
               onClickRemove={this.handleRemoveMember}
             />
           )}
-          <TextWithLinesStyled position="left" width={1}>
-            Teams ({teams.length})
-          </TextWithLinesStyled>
-          <TeamsWrapper>{renderedTeamTags}</TeamsWrapper>
+          {shouldShowTeamsSection && (
+            <Fragment>
+              <TextWithLinesStyled position="left" width={1}>
+                Teams ({teams.length})
+              </TextWithLinesStyled>
+              <TeamsWrapper>{renderedTeamTags}</TeamsWrapper>
+            </Fragment>
+          )}
           {shouldShowSharedMembers && (
-            <SectionStyled name={INVITED_SECTION}>
-              <MemberList members={[]} />
+            <SectionStyled
+              name={INVITED_SECTION}
+              isOpened={openedSections.includes(INVITED_SECTION)}
+              onToggleSection={this.handleToggleSection(INVITED_SECTION)}
+            >
+              <MemberList members={sharedMembers} />
             </SectionStyled>
+          )}
+          {withAnonymousLink && (
+            <AnonymousLink
+              link={anonymousLink}
+              isLoading={isGeneratingLink}
+              onToggle={this.handleToggleAnonymousLink}
+              onCopy={this.handleCopy}
+              onUpdate={this.handleUpdateAnonymousLink}
+            />
           )}
           <ButtonsWrapper>
             <ButtonStyled color="white" onClick={onCancel}>
@@ -194,3 +275,5 @@ export class ShareModal extends Component {
     );
   }
 }
+
+export default ShareModal;

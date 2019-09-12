@@ -15,9 +15,9 @@ import {
   UPDATE_TEAM_MEMBER_ROLE_REQUEST,
   UPDATE_TEAM_MEMBER_ROLE_SUCCESS,
   UPDATE_TEAM_MEMBER_ROLE_FAILURE,
-  ADD_TEAM_MEMBER_REQUEST,
-  ADD_TEAM_MEMBER_SUCCESS,
-  ADD_TEAM_MEMBER_FAILURE,
+  ADD_TEAM_MEMBERS_BATCH_REQUEST,
+  ADD_TEAM_MEMBERS_BATCH_SUCCESS,
+  ADD_TEAM_MEMBERS_BATCH_FAILURE,
   REMOVE_TEAM_MEMBER_REQUEST,
   REMOVE_TEAM_MEMBER_SUCCESS,
   REMOVE_TEAM_MEMBER_FAILURE,
@@ -119,10 +119,10 @@ export default createReducer(initialState, {
   [UPDATE_TEAM_MEMBER_ROLE_FAILURE](state) {
     return state;
   },
-  [ADD_TEAM_MEMBER_REQUEST](state) {
+  [ADD_TEAM_MEMBERS_BATCH_REQUEST](state) {
     return state;
   },
-  [ADD_TEAM_MEMBER_SUCCESS](state, { payload }) {
+  [ADD_TEAM_MEMBERS_BATCH_SUCCESS](state, { payload }) {
     return {
       ...state,
       byId: {
@@ -131,13 +131,13 @@ export default createReducer(initialState, {
           ...state.byId[payload.teamId],
           users: [
             ...state.byId[payload.teamId].users,
-            { id: payload.userId, role: payload.role },
+            ...payload.members.map(({ id, role }) => ({ id, role })),
           ],
         },
       },
     };
   },
-  [ADD_TEAM_MEMBER_FAILURE](state) {
+  [ADD_TEAM_MEMBERS_BATCH_FAILURE](state) {
     return state;
   },
   [REMOVE_TEAM_MEMBER_REQUEST](state) {

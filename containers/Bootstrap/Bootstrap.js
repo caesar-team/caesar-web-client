@@ -4,9 +4,12 @@ import { withRouter } from 'next/router';
 import { getUserBootstrap, getUserSelf } from 'common/api';
 import { DEFAULT_IDLE_TIMEOUT } from 'common/constants';
 import OpenPGPWorker from 'common/openpgp.worker';
-import { SessionChecker } from 'components/SessionChecker';
-import { FullScreenLoader } from 'components/Loader';
-import { BootstrapLayout } from 'components/Layout';
+import {
+  SessionChecker,
+  FullScreenLoader,
+  BootstrapLayout,
+  LoadingNotification,
+} from 'components';
 import { getBootstrapStates, getNavigationPanelSteps } from './utils';
 import {
   TWO_FACTOR_CHECK,
@@ -156,6 +159,7 @@ class Bootstrap extends Component {
 
   render() {
     const {
+      isLoadingGlobalNotification,
       component: PageComponent,
       router,
       shared = {},
@@ -251,6 +255,7 @@ class Bootstrap extends Component {
             password={masterPassword}
             {...props}
           />
+          {isLoadingGlobalNotification && <LoadingNotification />}
         </SessionChecker>
       )
     );

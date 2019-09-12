@@ -142,7 +142,7 @@ const ItemHeader = ({
   isOnline,
   user,
   owner,
-  members,
+  membersById,
   onClickCloseItem,
   onClickRemoveItem,
   onClickEditItem,
@@ -174,14 +174,14 @@ const ItemHeader = ({
   }
 
   const avatars = childItems.reduce((accumulator, item) => {
-    if (!members[item.userId]) {
+    if (!membersById[item.userId]) {
       return accumulator;
     }
 
     if (user.id === item.userId && user.id !== ownerId) {
       accumulator.unshift(user);
     } else if (ownerId !== item.userId) {
-      accumulator.push(members[item.userId]);
+      accumulator.push(membersById[item.userId]);
     }
 
     return accumulator;

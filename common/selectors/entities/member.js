@@ -9,7 +9,15 @@ export const memberEntitySelector = createSelector(
 
 export const membersByIdSelector = createSelector(
   memberEntitySelector,
-  memberEntity => memberEntity.byId,
+  memberEntity => memberEntity.byId || {},
+);
+
+export const memberIdPropSelector = (_, props) => props.memberId;
+
+export const memberSelector = createSelector(
+  membersByIdSelector,
+  memberIdPropSelector,
+  (membersById, memberId) => membersById[memberId],
 );
 
 export const memberListSelector = createSelector(

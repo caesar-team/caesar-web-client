@@ -5,10 +5,12 @@ import { resetWorkflowStore } from 'common/actions/workflow';
 import { initCoresCount } from 'common/actions/application';
 import { removeItemsData } from 'common/actions/entities/item';
 import { masterPasswordSelector } from 'common/selectors/user';
+import { isLoadingGlobalNotificationSelector } from 'common/selectors/application';
 import Bootstrap from './Bootstrap';
 
 const mapStateToProps = createStructuredSelector({
   masterPassword: masterPasswordSelector,
+  isLoadingGlobalNotification: isLoadingGlobalNotificationSelector,
 });
 
 const mapDispatchToProps = {

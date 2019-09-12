@@ -23,7 +23,7 @@ class SettingsTeamPage extends Component {
   render() {
     const { userData, currentTeam } = this.props;
 
-    const shouldShowLoader = !userData || !currentTeam;
+    const shouldShowLoader = !userData;
 
     if (shouldShowLoader) {
       return <FullScreenLoader />;

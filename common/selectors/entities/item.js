@@ -12,6 +12,11 @@ export const itemsByIdSelector = createSelector(
   itemEntity => itemEntity.byId,
 );
 
+export const itemListSelector = createSelector(
+  itemsByIdSelector,
+  byId => Object.values(byId) || [],
+);
+
 const itemIdPropSelector = (_, props) => props.itemId;
 
 export const itemSelector = createSelector(
@@ -26,4 +31,12 @@ export const itemsBatchSelector = createSelector(
   itemsByIdSelector,
   itemIdsPropSelector,
   (itemsById, itemIds) => itemIds.map(itemId => itemsById[itemId]),
+);
+
+const teamIdPropSelector = (_, prop) => prop.teamId;
+
+export const teamItemListSelector = createSelector(
+  itemListSelector,
+  teamIdPropSelector,
+  (itemList, teamId) => itemList.filter(item => item.teamId === teamId),
 );

@@ -43,7 +43,10 @@ const DottedWrapper = styled.button`
 class DottedMenu extends Component {
   state = this.prepareInitialState();
 
-  handleToggle = () => {
+  handleToggle = event => {
+    event.preventDefault();
+    event.stopPropagation();
+
     this.setState(prevState => ({
       isOpened: !prevState.isOpened,
     }));

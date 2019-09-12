@@ -11,6 +11,8 @@ import {
   FETCH_USER_TEAMS_FAILURE,
   SET_MASTER_PASSWORD,
   SET_CURRENT_TEAM_ID,
+  LEAVE_TEAM,
+  JOIN_TEAM,
 } from 'common/actions/user';
 
 const initialState = {
@@ -64,5 +66,14 @@ export default createReducer(initialState, {
   },
   [SET_CURRENT_TEAM_ID](state, { payload }) {
     return { ...state, currentTeamId: payload.teamId };
+  },
+  [JOIN_TEAM](state, { payload }) {
+    return { ...state, teamIds: [...state.teamIds, payload.teamId] };
+  },
+  [LEAVE_TEAM](state, { payload }) {
+    return {
+      ...state,
+      teamIds: state.teamIds.filter(teamId => teamId !== payload.teamId),
+    };
   },
 });

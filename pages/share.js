@@ -1,7 +1,7 @@
 import React, { Fragment } from 'react';
 import { Error, Head } from 'components';
 import { Bootstrap, Sharing } from 'containers';
-import { base64ToObject } from 'common/utils/cipherUtils';
+import { base64ToObject } from 'common/utils/base64';
 import { login } from 'common/utils/authUtils';
 import { getCheckShare } from 'common/api';
 

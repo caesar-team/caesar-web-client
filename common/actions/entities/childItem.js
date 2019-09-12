@@ -82,11 +82,11 @@ export const inviteNewMemberFailure = () => ({
   type: INVITE_NEW_MEMBER_FAILURE,
 });
 
-export const shareItemBatchRequest = (items, emails) => ({
+export const shareItemBatchRequest = (items, members) => ({
   type: SHARE_ITEM_BATCH_REQUEST,
   payload: {
     items,
-    emails,
+    members,
   },
 });
 

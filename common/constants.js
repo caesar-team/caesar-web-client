@@ -16,7 +16,10 @@ export const {
 export const PORTAL_ID = 'portal';
 export const DEFAULT_IDLE_TIMEOUT = 5 * 60 * 1000;
 export const MAX_SIZE_RANDOM_BUFFER = 60000;
-export const WORKER_DECRYPTION_BUFFER_SIZE = 10;
+export const DEFAULT_CORES_COUNT = 4;
+
+export const DECRYPTION_CHUNK_SIZE = 10;
+export const ENCRYPTION_CHUNK_SIZE = 5;
 
 export const ROOT_TYPE = 'root';
 export const INBOX_TYPE = 'inbox';

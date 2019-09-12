@@ -1,4 +1,4 @@
-import { put, call, takeLatest, select } from 'redux-saga/effects';
+import { put, call, takeLatest, select, fork } from 'redux-saga/effects';
 import deepequal from 'fast-deep-equal';
 import {
   ACCEPT_ITEM_UPDATE_REQUEST,
@@ -40,6 +40,7 @@ import {
   removeAnonymousLinkSuccess,
   removeAnonymousLinkFailure,
 } from 'common/actions/entities/item';
+import { encryption } from 'common/sagas/common/encryption';
 import {
   addItemToList,
   addItemsBatchToList,
@@ -59,8 +60,18 @@ import {
   workInProgressItemSelector,
   workInProgressItemIdsSelector,
 } from 'common/selectors/workflow';
-import { favoritesSelector } from 'common/selectors/entities/list';
+import {
+  favoritesSelector,
+  listSelector,
+} from 'common/selectors/entities/list';
 import { itemSelector } from 'common/selectors/entities/item';
+import { membersBatchSelector } from 'common/selectors/entities/member';
+import {
+  keyPairSelector,
+  masterPasswordSelector,
+  userDataSelector,
+} from 'common/selectors/user';
+import { teamSelector } from 'common/selectors/entities/team';
 import {
   acceptUpdateItem,
   patchChildItem,
@@ -90,11 +101,6 @@ import {
   PERMISSION_READ,
   SHARE_TYPE,
 } from 'common/constants';
-import {
-  keyPairSelector,
-  masterPasswordSelector,
-  userDataSelector,
-} from 'common/selectors/user';
 import { generateSharingUrl } from 'common/utils/sharing';
 import { createMemberSaga } from './member';
 
@@ -185,6 +191,7 @@ export function* createItemSaga({
   try {
     const { listId, attachments, type, ...data } = item;
 
+    const list = yield select(listSelector, { listId });
     const keyPair = yield select(keyPairSelector);
     const user = yield select(userDataSelector);
 
@@ -219,6 +226,14 @@ export function* createItemSaga({
     yield put(createItemSuccess(newItem));
     yield put(addItemToList(newItem));
     yield put(updateWorkInProgressItem(itemId, ITEM_REVIEW_MODE));
+
+    if (list.teamId) {
+      const team = yield select(teamSelector, { teamId: list.teamId });
+      const memberIds = team.users.map(({ id }) => id);
+      const members = yield select(membersBatchSelector, { memberIds });
+
+      yield fork(encryption, { items: [newItem], users: members });
+    }
   } catch (error) {
     console.log(error);
     yield put(createItemFailure());

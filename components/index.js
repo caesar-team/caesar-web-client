@@ -17,6 +17,7 @@ export {
   TextArea,
   ShareInput,
   StrengthIndicator,
+  UserSearchInput,
 } from './Input';
 export { InviteModal } from './InviteModal';
 export { Item, MultiItem, Credentials, Document } from './Item';
@@ -34,6 +35,7 @@ export {
 export { ManageList } from './ManageList';
 export { MenuList } from './MenuList';
 export {
+  LoadingNotification,
   NotificationConsumer,
   NotificationProvider,
   withNotification,

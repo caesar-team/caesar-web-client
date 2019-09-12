@@ -13,6 +13,9 @@ export const FETCH_USER_TEAMS_FAILURE = '@user/FETCH_USER_TEAMS_FAILURE';
 export const SET_MASTER_PASSWORD = '@user/SET_MASTER_PASSWORD';
 export const SET_CURRENT_TEAM_ID = '@user/SET_CURRENT_TEAM_ID';
 
+export const JOIN_TEAM = '@user/JOIN_TEAM';
+export const LEAVE_TEAM = '@user/LEAVE_TEAM';
+
 export const fetchUserSelfRequest = () => ({
   type: FETCH_USER_SELF_REQUEST,
 });
@@ -69,6 +72,20 @@ export const setMasterPassword = masterPassword => ({
 
 export const setCurrentTeamId = teamId => ({
   type: SET_CURRENT_TEAM_ID,
+  payload: {
+    teamId,
+  },
+});
+
+export const joinTeam = teamId => ({
+  type: JOIN_TEAM,
+  payload: {
+    teamId,
+  },
+});
+
+export const leaveTeam = teamId => ({
+  type: LEAVE_TEAM,
   payload: {
     teamId,
   },

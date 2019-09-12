@@ -19,6 +19,7 @@ export const FETCH_TEAM_MEMBERS_FAILURE = '@member/FETCH_TEAM_MEMBERS_FAILURE';
 
 export const ADD_MEMBERS_BATCH = '@member/ADD_MEMBERS';
 export const ADD_TEAM_TO_MEMBER = '@member/ADD_TEAM_TO_MEMBER';
+export const ADD_TEAM_TO_MEMBERS_BATCH = '@member/ADD_TEAM_TO_MEMBERS_BATCH';
 export const REMOVE_TEAM_FROM_MEMBER = '@member/REMOVE_TEAM_FROM_MEMBER';
 export const REMOVE_TEAM_FROM_MEMBERS_BATCH =
   '@member/REMOVE_TEAM_FROM_MEMBERS_BATCH';
@@ -107,8 +108,16 @@ export const addMembersBatch = membersById => ({
 export const addTeamToMember = (teamId, memberId) => ({
   type: ADD_TEAM_TO_MEMBER,
   payload: {
-    memberId,
     teamId,
+    memberId,
+  },
+});
+
+export const addTeamToMembersBatch = (teamId, memberIds) => ({
+  type: ADD_TEAM_TO_MEMBERS_BATCH,
+  payload: {
+    teamId,
+    memberIds,
   },
 });
 

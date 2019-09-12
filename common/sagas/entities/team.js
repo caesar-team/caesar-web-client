@@ -1,11 +1,11 @@
-import { put, call, takeLatest, select, all } from 'redux-saga/effects';
+import { put, call, takeLatest, select, all, fork } from 'redux-saga/effects';
 import {
   FETCH_TEAMS_REQUEST,
   FETCH_TEAM_REQUEST,
   CREATE_TEAM_REQUEST,
   REMOVE_TEAM_REQUEST,
   UPDATE_TEAM_MEMBER_ROLE_REQUEST,
-  ADD_TEAM_MEMBER_REQUEST,
+  ADD_TEAM_MEMBERS_BATCH_REQUEST,
   REMOVE_TEAM_MEMBER_REQUEST,
   fetchTeamsSuccess,
   fetchTeamsFailure,
@@ -17,21 +17,31 @@ import {
   removeTeamFailure,
   updateTeamMemberRoleSuccess,
   updateTeamMemberRoleFailure,
-  addTeamMemberSuccess,
-  addTeamMemberFailure,
+  addTeamMembersBatchSuccess,
+  addTeamMembersBatchFailure,
   removeTeamMemberSuccess,
   removeTeamMemberFailure,
   addTeamMember,
 } from 'common/actions/entities/team';
-import { fetchTeamMembersSaga } from 'common/sagas/entities/member';
+import { shareItemBatchSaga } from 'common/sagas/entities/childItem';
+import {
+  fetchTeamMembersSaga,
+  getOrCreateMemberBatchSaga,
+} from 'common/sagas/entities/member';
 import {
   addTeamToMember,
+  addTeamToMembersBatch,
   removeTeamFromMember,
   removeTeamFromMembersBatch,
 } from 'common/actions/entities/member';
-import { setCurrentTeamId } from 'common/actions/user';
+import { setCurrentTeamId, leaveTeam, joinTeam } from 'common/actions/user';
 import { teamSelector } from 'common/selectors/entities/team';
-import { currentTeamIdSelector, userDataSelector } from 'common/selectors/user';
+import { teamItemListSelector } from 'common/selectors/entities/item';
+import {
+  currentTeamIdSelector,
+  userDataSelector,
+  userTeamIdsSelector,
+} from 'common/selectors/user';
 import {
   getTeams,
   postCreateTeam,
@@ -42,7 +52,7 @@ import {
   deleteTeamMember,
 } from 'common/api';
 import { convertTeamsToEntity } from 'common/normalizers/normalizers';
-import { COMMANDS_ROLES } from 'common/constants';
+import { COMMANDS_ROLES, ROLE_USER } from 'common/constants';
 
 export function* fetchTeamsSaga() {
   try {
@@ -87,6 +97,7 @@ export function* createTeamSaga({ payload: { title, icon } }) {
     yield put(createTeamSuccess(data));
     yield put(addTeamToMember(data.id, user.id));
     yield put(addTeamMember(data.id, user.id, COMMANDS_ROLES.USER_ROLE_ADMIN));
+    yield put(joinTeam(data.id));
   } catch (error) {
     console.log(error);
     yield put(createTeamFailure());
@@ -96,8 +107,18 @@ export function* createTeamSaga({ payload: { title, icon } }) {
 export function* removeTeamSaga({ payload: { teamId } }) {
   try {
     const team = yield select(teamSelector, { teamId });
+    const userTeamIds = yield select(userTeamIdsSelector);
+    const currentTeamId = yield select(currentTeamIdSelector);
 
     yield call(deleteTeam, teamId);
+
+    if (userTeamIds.includes(teamId)) {
+      yield put(leaveTeam(teamId));
+    }
+
+    if (teamId === currentTeamId) {
+      yield setCurrentTeamId(null);
+    }
 
     yield put(removeTeamSuccess(teamId));
     yield put(
@@ -122,14 +143,48 @@ export function* updateTeamMemberRoleSaga({
   }
 }
 
-export function* addTeamMemberSaga({ payload: { teamId, userId, role } }) {
+export function* addTeamMembersBatchSaga({ payload: { teamId, members } }) {
   try {
-    yield call(postAddTeamMember, { teamId, userId, role });
-    yield put(addTeamMemberSuccess(teamId, userId, role));
-    yield put(addTeamToMember(teamId, userId));
+    const memberEmails = members.map(({ email }) => email);
+    const memberEmailRolePairs = memberEmails.map(email => ({
+      email,
+      role: ROLE_USER,
+    }));
+
+    const invitedMembers = yield call(getOrCreateMemberBatchSaga, {
+      payload: { emailRolePairs: memberEmailRolePairs },
+    });
+
+    const invitedMembersWithCommandRole = invitedMembers.map(member => ({
+      ...member,
+      role: COMMANDS_ROLES.USER_ROLE_MEMBER,
+    }));
+
+    const invitedMemberIds = invitedMembers.map(({ id }) => id);
+
+    console.log('invitedMembersWithCommandRole', invitedMembersWithCommandRole);
+
+    // TODO: change it on batch
+    yield all(
+      invitedMembersWithCommandRole.map(({ id: userId, role }) =>
+        call(postAddTeamMember, { teamId, userId, role }),
+      ),
+    );
+
+    yield put(
+      addTeamMembersBatchSuccess(teamId, invitedMembersWithCommandRole),
+    );
+    yield put(addTeamToMembersBatch(teamId, invitedMemberIds));
+
+    const teamItemList = yield select(teamItemListSelector, { teamId });
+    const teamItemIds = teamItemList.map(({ id }) => id);
+
+    yield fork(shareItemBatchSaga, {
+      payload: { items: teamItemIds, members: invitedMembers },
+    });
   } catch (error) {
     console.log(error);
-    yield put(addTeamMemberFailure());
+    yield put(addTeamMembersBatchFailure());
   }
 }
 
@@ -150,6 +205,6 @@ export default function* teamSagas() {
   yield takeLatest(CREATE_TEAM_REQUEST, createTeamSaga);
   yield takeLatest(REMOVE_TEAM_REQUEST, removeTeamSaga);
   yield takeLatest(UPDATE_TEAM_MEMBER_ROLE_REQUEST, updateTeamMemberRoleSaga);
-  yield takeLatest(ADD_TEAM_MEMBER_REQUEST, addTeamMemberSaga);
+  yield takeLatest(ADD_TEAM_MEMBERS_BATCH_REQUEST, addTeamMembersBatchSaga);
   yield takeLatest(REMOVE_TEAM_MEMBER_REQUEST, removeTeamMemberSaga);
 }

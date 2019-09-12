@@ -9,6 +9,21 @@ export const isOnlineSelector = createSelector(
 
 export const applicationSelector = state => state.application;
 
+export const globalNotificationSelector = createSelector(
+  applicationSelector,
+  application => application.globalNotification,
+);
+
+export const isLoadingGlobalNotificationSelector = createSelector(
+  globalNotificationSelector,
+  globalNotification => globalNotification.isLoading,
+);
+
+export const globalNotificationTextSelector = createSelector(
+  globalNotificationSelector,
+  globalNotification => globalNotification.text,
+);
+
 export const versionsSelector = createSelector(
   applicationSelector,
   application => application.versions,

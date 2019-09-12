@@ -2,12 +2,15 @@ import { connect } from 'react-redux';
 import { withRouter } from 'next/router';
 import {
   fetchTeamRequest,
-  addTeamMemberRequest,
+  addTeamMembersBatchRequest,
   removeTeamMemberRequest,
   updateTeamMemberRoleRequest,
 } from 'common/actions/entities/team';
-import { fetchTeamMembersRequest } from 'common/actions/entities/member';
-import { isLoadingSelector, teamSelector } from 'common/selectors/entities/team';
+import { fetchMembersRequest } from 'common/actions/entities/member';
+import {
+  isLoadingSelector,
+  teamSelector,
+} from 'common/selectors/entities/team';
 import { membersByIdSelector } from 'common/selectors/entities/member';
 import { userDataSelector } from 'common/selectors/user';
 import Team from './Team';
@@ -21,10 +24,10 @@ const mapStateToProps = (state, { router }) => ({
 
 const mapDispatchToProps = {
   fetchTeamRequest,
-  addTeamMemberRequest,
+  addTeamMembersBatchRequest,
   removeTeamMemberRequest,
   updateTeamMemberRoleRequest,
-  fetchTeamMembersRequest,
+  fetchMembersRequest,
 };
 
 export default withRouter(

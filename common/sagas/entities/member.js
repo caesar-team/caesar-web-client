@@ -12,7 +12,7 @@ import {
   createMemberBatchFailure,
 } from 'common/actions/entities/member';
 import {
-  getUsers,
+  getMembers,
   getUsersByIds,
   getTeamMembers,
   postNewUser,
@@ -33,9 +33,13 @@ const setIsNewFlag = (members, isNew) =>
     isNew,
   }));
 
+const renameUserId = members =>
+  members.map(({ userId, ...member }) => ({ id: userId, ...member }));
+
 export function* fetchMembersSaga({ payload: { memberIds } }) {
   try {
-    const action = memberIds && memberIds.length > 0 ? getUsersByIds : getUsers;
+    const action =
+      memberIds && memberIds.length > 0 ? getUsersByIds : getMembers;
 
     const { data } = yield call(action, memberIds);
 
@@ -88,11 +92,20 @@ export function* createMemberSaga({ payload: { email, role } }) {
   }
 }
 
-export function* createMemberBatchSaga({ payload: { emails, role } }) {
+export function* createMemberBatchSaga({ payload: { emailRolePairs } }) {
   try {
-    if (!emails.length) {
+    if (!emailRolePairs.length) {
       return [];
     }
+
+    const emails = emailRolePairs.map(({ email }) => email);
+    const emailRoleObject = emailRolePairs.reduce(
+      (accumulator, { email, role }) => ({
+        ...accumulator,
+        [email]: role,
+      }),
+      {},
+    );
 
     const generatedUsers = yield call(generateUsersBatch, emails);
 
@@ -102,7 +115,7 @@ export function* createMemberBatchSaga({ payload: { emails, role } }) {
         publicKey,
         encryptedPrivateKey: privateKey,
         plainPassword: password,
-        roles: [role],
+        roles: [emailRoleObject[email]],
         ...generateSeedAndVerifier(email, password),
       }),
     );
@@ -111,18 +124,29 @@ export function* createMemberBatchSaga({ payload: { emails, role } }) {
       data: { users: userIds },
     } = yield call(postNewUserBatch, { users: members });
 
-    const preparedMembersForStore = userIds.map((userId, index) => {
-      const member = members[index];
+    const preparedMembersForStore = userIds.reduce(
+      (accumulator, userId, index) => {
+        const member = members[index];
 
-      return {
-        id: userId,
-        email: member.email,
-        name: member.email,
-        avatar: null,
-        publicKey: member.publicKey,
-        roles: [role],
-      };
-    });
+        return member.roles.includes(ROLE_ANONYMOUS_USER)
+          ? accumulator
+          : [
+              ...accumulator,
+              {
+                id: userId,
+                email: member.email,
+                name: member.email,
+                avatar: null,
+                publicKey: member.publicKey,
+                roles: [emailRoleObject[member.email]],
+                teamIds: [],
+              },
+            ];
+      },
+      [],
+    );
+
+    yield put(createMemberBatchSuccess(preparedMembersForStore));
 
     const returnedMembers = userIds.map((userId, index) => {
       const member = members[index];
@@ -135,10 +159,6 @@ export function* createMemberBatchSaga({ payload: { emails, role } }) {
       };
     });
 
-    if (role !== ROLE_ANONYMOUS_USER) {
-      yield put(createMemberBatchSuccess(preparedMembersForStore));
-    }
-
     return returnedMembers;
   } catch (error) {
     yield put(createMemberBatchFailure());
@@ -146,28 +166,43 @@ export function* createMemberBatchSaga({ payload: { emails, role } }) {
   }
 }
 
-export function* getOrCreateMemberBatchSaga({ payload: { emails, role } }) {
+export function* getOrCreateMemberBatchSaga({ payload: { emailRolePairs } }) {
   try {
+    console.log('emailRolePairs', emailRolePairs);
+
+    const emailRoleObject = emailRolePairs.reduce(
+      (accumulator, { email, role }) => ({
+        ...accumulator,
+        [email]: role,
+      }),
+      {},
+    );
+    const emails = emailRolePairs.map(({ email }) => email);
+
     const { data: existedMembers } = yield call(getPublicKeyByEmailBatch, {
       emails,
     });
 
     const existedMemberEmails = existedMembers.map(({ email }) => email);
-
-    const needCreateMembers = emails.filter(
+    const notExistedMemberEmails = emails.filter(
       email => !existedMemberEmails.includes(email),
     );
 
+    const newMemberEmailRolePairs = notExistedMemberEmails.map(email => ({
+      email,
+      role: emailRoleObject[email],
+    }));
+
     const newMembers = yield call(createMemberBatchSaga, {
       payload: {
-        emails: needCreateMembers,
-        role,
+        emailRolePairs: newMemberEmailRolePairs,
       },
     });
 
+    // TODO: change userId to id on BE side
     return [
-      ...setIsNewFlag(existedMembers, false),
-      ...setIsNewFlag(newMembers, true),
+      ...setIsNewFlag(renameUserId(existedMembers), false),
+      ...setIsNewFlag(renameUserId(newMembers), true),
     ];
   } catch (e) {
     console.log(e);

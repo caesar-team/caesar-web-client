@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
 import styled from 'styled-components';
-import Link from 'next/link';
 import {
   Button,
   TeamCard,
@@ -9,6 +8,7 @@ import {
   ConfirmModal,
   InviteModal,
 } from 'components';
+import memoizeOne from 'memoize-one';
 
 const LogoWrapper = styled.div`
   display: flex;
@@ -70,22 +70,26 @@ class TeamListContainer extends Component {
 
   componentDidMount() {
     this.props.fetchTeamsRequest();
+    this.props.fetchMembersRequest();
   }
 
-  componentDidUpdate(prevProps) {
-    if (prevProps.teamList.length !== this.props.teamList.length) {
-      // justified solution, we come back initialState
-      // eslint-disable-next-line
-      this.setState(this.prepareInitialState());
-    }
-  }
+  getMemberList = memoizeOne((users, members) => {
+    const userIds = users.map(user => user.id);
+
+    return members.map(member =>
+      userIds.includes(member.id)
+        ? { ...member, role: users.find(user => user.id === member.id).role }
+        : member,
+    );
+  });
 
   handleCreateSubmit = ({ title, icon }) => {
     this.props.createTeamRequest(title, icon);
+
+    this.handleCloseModal(NEW_TEAM_MODAL)();
   };
 
   handleOpenModal = modal => () => {
-    console.log('handleOpenModal', modal);
     this.setState(prevState => ({
       ...prevState,
       modalVisibilities: {
@@ -106,7 +110,6 @@ class TeamListContainer extends Component {
   };
 
   handleClickRemoveTeam = teamId => event => {
-    console.log('handleClickRemoveTeam');
     event.preventDefault();
     event.stopPropagation();
 
@@ -120,10 +123,16 @@ class TeamListContainer extends Component {
 
   handleRemoveTeam = () => {
     this.props.removeTeamRequest(this.state.selectedTeamId);
+
+    this.setState(
+      {
+        selectedTeamId: null,
+      },
+      this.handleCloseModal(REMOVE_TEAM_MODAL),
+    );
   };
 
   handleClickInvite = teamId => event => {
-    console.log('handleClickInvite');
     event.preventDefault();
     event.stopPropagation();
 
@@ -133,6 +142,25 @@ class TeamListContainer extends Component {
       },
       this.handleOpenModal(INVITE_MEMBER_MODAL),
     );
+  };
+
+  handleInvite = members => {
+    const { selectedTeamId } = this.state;
+
+    this.props.addTeamMembersBatchRequest(selectedTeamId, members);
+    this.handleCloseModal(INVITE_MEMBER_MODAL)();
+  };
+
+  handleRemoveMember = member => {
+    const { selectedTeamId } = this.state;
+
+    this.props.removeTeamMemberRequest(selectedTeamId, member.id);
+  };
+
+  handleChangeMemberRole = (member, role) => {
+    const { selectedTeamId } = this.state;
+
+    this.props.updateTeamMemberRoleRequest(selectedTeamId, member.id, role);
   };
 
   prepareInitialState() {
@@ -147,23 +175,21 @@ class TeamListContainer extends Component {
   }
 
   renderTeamCards() {
-    const { teamList, members } = this.props;
+    const { teams, members } = this.props;
 
-    return teamList.map(team => (
-      <Link key={team.id} href="/team/[id]" as={`/team/${team.id}`}>
-        <TeamCardStyled
-          key={team.id}
-          {...team}
-          members={members}
-          onClickRemoveTeam={this.handleClickRemoveTeam(team.id)}
-          onClickInviteMember={this.handleClickInvite(team.id)}
-        />
-      </Link>
+    return teams.map(team => (
+      <TeamCardStyled
+        key={team.id}
+        {...team}
+        members={members}
+        onClickRemoveTeam={this.handleClickRemoveTeam(team.id)}
+        onClickInviteMember={this.handleClickInvite(team.id)}
+      />
     ));
   }
 
   render() {
-    const { isLoading, members } = this.props;
+    const { isLoading, teamsById, user, members } = this.props;
     const { modalVisibilities, selectedTeamId } = this.state;
 
     if (isLoading) {
@@ -175,6 +201,16 @@ class TeamListContainer extends Component {
     }
 
     const renderedTeamCards = this.renderTeamCards();
+
+    console.log('selectedTeamId', selectedTeamId);
+    console.log('teamsById', teamsById);
+
+    const membersList = selectedTeamId
+      ? this.getMemberList(
+          teamsById[selectedTeamId].users.filter(({ id }) => id !== user.id),
+          members.filter(({ id }) => id !== user.id),
+        )
+      : [];
 
     return (
       <Wrapper>
@@ -193,14 +229,19 @@ class TeamListContainer extends Component {
         {modalVisibilities[NEW_TEAM_MODAL] && (
           <NewTeamModal
             onSubmit={this.handleCreateSubmit}
-            onCancel={this.this.handleCloseModal(NEW_TEAM_MODAL)}
+            onCancel={this.handleCloseModal(NEW_TEAM_MODAL)}
           />
         )}
         {modalVisibilities[INVITE_MEMBER_MODAL] && (
           <InviteModal
+            user={user}
             teamId={selectedTeamId}
-            members={members}
+            invitedMembers={membersList}
+            onAddMember={this.handleAddMember}
+            onRemoveMember={this.handleRemoveMember}
+            onChangeMemberRole={this.handleChangeMemberRole}
             onCancel={this.handleCloseModal(INVITE_MEMBER_MODAL)}
+            onSubmit={this.handleInvite}
           />
         )}
         <ConfirmModal

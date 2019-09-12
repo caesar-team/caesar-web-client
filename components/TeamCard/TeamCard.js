@@ -1,5 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
+import Link from 'next/link';
 import memoizeOne from 'memoize-one';
 import { Button, AvatarsList, DottedMenu } from 'components';
 
@@ -70,25 +71,29 @@ const getMembers = memoizeOne((users, members) =>
 
 const TeamCard = ({
   className,
+  id,
   title,
   icon,
   users,
   members,
+  onClick = Function.prototype,
   onClickRemoveTeam = Function.prototype,
   onClickInviteMember = Function.prototype,
 }) => {
   const shouldShowAvatars = users.length > 0;
 
   return (
-    <Wrapper className={className}>
+    <Wrapper className={className} onClick={onClick}>
       <TeamWrapper>
-        <TeamDetails>
-          <TeamIcon src={icon} />
-          <TeamInfo>
-            <TeamName>{title}</TeamName>
-            <TeamMembers>44 members</TeamMembers>
-          </TeamInfo>
-        </TeamDetails>
+        <Link key={id} href="/settings/team/[id]" as={`/settings/team/${id}`}>
+          <TeamDetails>
+            <TeamIcon src={icon} />
+            <TeamInfo>
+              <TeamName>{title}</TeamName>
+              <TeamMembers>44 members</TeamMembers>
+            </TeamInfo>
+          </TeamDetails>
+        </Link>
         <MenuWrapper>
           <DottedMenu tooltipProps={{ textBoxWidth: '100px' }}>
             <ButtonStyled color="white" onClick={onClickRemoveTeam}>

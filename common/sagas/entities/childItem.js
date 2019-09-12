@@ -1,4 +1,4 @@
-import { put, call, takeLatest, select } from 'redux-saga/effects';
+import { put, call, fork, takeLatest, select, take } from 'redux-saga/effects';
 import {
   INVITE_MEMBER_REQUEST,
   INVITE_NEW_MEMBER_REQUEST,
@@ -20,12 +20,14 @@ import {
   changeChildItemPermissionSuccess,
   changeChildItemPermissionFailure,
 } from 'common/actions/entities/childItem';
+import { encryption } from 'common/sagas/common/encryption';
 import {
   addChildItemToItem,
   addChildItemsBatchToItem,
   removeChildItemFromItem,
 } from 'common/actions/entities/item';
 import { updateWorkInProgressItem } from 'common/actions/workflow';
+import { ENCRYPTION_FINISHED_EVENT } from 'common/actions/application';
 import {
   memberListSelector,
   membersByIdSelector,
@@ -42,7 +44,7 @@ import {
   patchChildAccess,
   patchChildItemBatch,
 } from 'common/api';
-import { encryptItem, encryptItemForUsers } from 'common/utils/cipherUtils';
+import { encryptItem } from 'common/utils/cipherUtils';
 import { objectToBase64 } from 'common/utils/base64';
 import {
   INVITE_TYPE,
@@ -51,7 +53,7 @@ import {
   ROLE_USER,
 } from 'common/constants';
 import { generateInviteUrl } from 'common/utils/sharing';
-import { createMemberSaga, getOrCreateMemberBatchSaga } from './member';
+import { getOrCreateMemberBatchSaga } from 'common/sagas/entities/member';
 
 export function* inviteMemberSaga({ payload: { userId } }) {
   try {
@@ -90,17 +92,12 @@ export function* inviteMemberSaga({ payload: { userId } }) {
   }
 }
 
-export function* inviteNewMemberSaga({ payload: { email } }) {
+export function* inviteNewMemberSaga({
+  payload: {
+    member: { email, password, masterPassword },
+  },
+}) {
   try {
-    const { id, masterPassword, password } = yield call(createMemberSaga, {
-      payload: {
-        email,
-        role: ROLE_USER,
-      },
-    });
-
-    yield call(inviteMemberSaga, { payload: { userId: id } });
-
     yield call(postInvitation, {
       email,
       url: generateInviteUrl(
@@ -114,6 +111,25 @@ export function* inviteNewMemberSaga({ payload: { email } }) {
   } catch (error) {
     console.log(error);
     yield put(inviteNewMemberFailure());
+  }
+}
+
+function* inviteNewMemberBatchSaga({ payload: { members } }) {
+  try {
+    const invites = members.map(({ email, password, masterPassword }) => ({
+      email,
+      url: generateInviteUrl(
+        objectToBase64({
+          e: email,
+          p: password,
+          mp: masterPassword,
+        }),
+      ),
+    }));
+
+    yield call(postInvitationBatch, { messages: invites });
+  } catch (error) {
+    console.log(error);
   }
 }
 
@@ -132,72 +148,62 @@ export function* removeInviteMemberSaga({ payload: { childItemId } }) {
   }
 }
 
-export function* shareItemBatchSaga({ payload: { items, emails } }) {
+export function* shareItemBatchSaga({ payload: { items, members } }) {
   try {
+    // find items which will be share
     const itemsById = yield select(itemsByIdSelector);
+    const sharingItems = items.map(itemId => itemsById[itemId]);
+    const sharingItemIds = sharingItems.map(({ id }) => id);
 
-    const sharedItems = items.map(itemId => itemsById[itemId]);
-
-    const members = yield call(getOrCreateMemberBatchSaga, {
-      payload: { emails, role: ROLE_USER },
+    // get or create members, get their actual keys and other data
+    const memberEmails = members.map(({ email }) => email);
+    const emailRolePairs = memberEmails.map(email => ({
+      email,
+      role: ROLE_USER,
+    }));
+    const membersOfSharing = yield call(getOrCreateMemberBatchSaga, {
+      payload: { emailRolePairs },
     });
+    const newMembers = members.filter(({ isNew }) => isNew);
 
-    const data = [];
-    const invitations = [];
+    // run pool of workers for encryption items by members key
+    yield fork(encryption, { items: sharingItems, users: membersOfSharing });
 
-    // eslint-disable-next-line
-    for (const item of sharedItems) {
-      const itemInvitedUsers = item.invited.map(({ userId }) => userId);
-
-      const users = members.filter(
-        user => !!user && !itemInvitedUsers.includes(user.userId),
-      );
-
-      const userKeys = users.map(({ publicKey }) => publicKey);
-
-      const invitedEncryptedSecrets = yield call(
-        encryptItemForUsers,
-        item.data,
-        userKeys,
-      );
-
-      const invitedChildItems = invitedEncryptedSecrets.map((secret, idx) => ({
-        secret,
-        userId: users[idx].userId,
-        access: PERMISSION_READ,
-        cause: INVITE_TYPE,
-      }));
-
-      data.push({
-        originalItem: item.id,
-        items: invitedChildItems,
-      });
-
-      invitations.push(
-        ...users
-          .filter(({ isNew }) => !!isNew)
-          .map(({ email, password, masterPassword }) => ({
-            email,
-            url: generateInviteUrl(
-              objectToBase64({
-                e: email,
-                p: password,
-                mp: masterPassword,
-              }),
-            ),
-          })),
-      );
-    }
-
+    // stop and wait
     const {
-      data: { shares },
-    } = yield call(postCreateChildItemBatch, {
-      originalItems: data,
+      payload: { sets: encryptedChildItems },
+    } = yield take(ENCRYPTION_FINISHED_EVENT);
+
+    const preparedChildItemsGroupedByItemId = encryptedChildItems.reduce(
+      (accumulator, { itemId, ...data }) => {
+        if (!accumulator[itemId]) {
+          accumulator[itemId] = [];
+        }
+
+        return { ...accumulator, [itemId]: [...accumulator[itemId], data] };
+      },
+      {},
+    );
+
+    const preparedItemsForRequest = sharingItemIds.map(itemId => ({
+      originalItem: itemId,
+      items: preparedChildItemsGroupedByItemId[itemId].map(
+        ({ userId, secret }) => ({
+          userId,
+          secret,
+          access: PERMISSION_READ,
+          cause: INVITE_TYPE,
+        }),
+      ),
+    }));
+
+    const { data } = yield call(postCreateChildItemBatch, {
+      originalItems: Object.values(preparedItemsForRequest),
     });
 
-    yield call(postInvitationBatch, { messages: invitations });
+    yield fork(inviteNewMemberBatchSaga, { payload: { members: newMembers } });
 
-    const invited = shares.reduce(
+    const shares = data.shares.reduce(
       (accumulator, { originalItemId, items: childItems }) => [
         ...accumulator,
         ...childItems.map(({ id, userId }) => ({
@@ -210,9 +216,9 @@ export function* shareItemBatchSaga({ payload: { items, emails } }) {
       [],
     );
 
-    yield put(shareItemBatchSuccess(invited));
+    yield put(shareItemBatchSuccess(shares));
 
-    const sets = shares.reduce(
+    const sets = data.shares.reduce(
       (accumulator, item) => [
         ...accumulator,
         {
@@ -248,34 +254,38 @@ export function* removeShareSaga({ payload: { shareId } }) {
 
 export function* updateChildItemsBatchSaga({
   payload: {
-    item: { id, data, invited: childItemIds },
+    item: { id, data, invited },
   },
 }) {
   try {
+    // eslint-disable-next-line
+    const childItemIds = invited.map(({ id }) => id);
+    const memberIds = invited.map(({ userId }) => userId);
+
+    const membersById = yield select(membersByIdSelector);
     const childItems = yield select(childItemsBatchSelector, { childItemIds });
-    const members = yield select(membersByIdSelector);
 
-    const userIds = childItems.map(({ userId }) => userId);
-    const memberKeys = userIds.map(userId => members[userId].publicKey);
-
-    const childItemEncryptedSecrets = yield call(
-      encryptItemForUsers,
+    const updatingChildItems = childItems.map(childItem => ({
+      ...childItem,
       data,
-      memberKeys,
-    );
+    }));
+    const members = memberIds.map(memberId => membersById[memberId]);
 
-    const childItemsForRequest = childItemEncryptedSecrets.map(
-      (encryptedSecret, index) => ({
-        userId: userIds[index],
-        secret: encryptedSecret,
-      }),
-    );
+    yield fork(encryption, { items: updatingChildItems, users: members });
+
+    // stop and wait
+    const {
+      payload: { sets: encryptedChildItems },
+    } = yield take(ENCRYPTION_FINISHED_EVENT);
 
     yield call(patchChildItemBatch, {
       collectionItems: [
         {
           originalItem: id,
-          items: childItemsForRequest,
+          items: encryptedChildItems.map(({ userId, secret }) => ({
+            userId,
+            secret,
+          })),
         },
       ],
     });

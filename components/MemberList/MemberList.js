@@ -62,7 +62,8 @@ const MemberList = ({
           <InviteControl
             teamId={teamId}
             member={member}
-            onClick={onClickAdd(member)}
+            onClickAdd={onClickAdd(member)}
+            onClickRemove={onClickRemove(member)}
             onChange={onChangeRole(member)}
           />
         ),

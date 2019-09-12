@@ -42,6 +42,15 @@ export const workInProgressItemChildItemsSelector = createSelector(
       : [],
 );
 
+export const workInProgressItemSharedMembersSelector = createSelector(
+  workInProgressItemChildItemsSelector,
+  membersByIdSelector,
+  (workInProgressItemChildItems, membersById) =>
+    workInProgressItemChildItems.length && Object.values(membersById).length
+      ? workInProgressItemChildItems.map(({ userId }) => membersById[userId])
+      : [],
+);
+
 const constructedWorkInProgressItem = createSelector(
   workInProgressItemSelector,
   workInProgressItemOwnerSelector,

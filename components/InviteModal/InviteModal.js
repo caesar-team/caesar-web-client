@@ -1,121 +1,118 @@
 import React, { Component } from 'react';
 import styled from 'styled-components';
-import memoizeOne from 'memoize-one';
-import { Modal } from '../Modal';
-import { Input } from '../Input';
-import { Icon } from '../Icon';
-import { ModalTitle } from '../ModalTitle';
+import { Modal, ModalTitle, UserSearchInput } from 'components';
 import { MemberList } from '../MemberList';
+import { Button } from '../Button';
 
-const StyledInput = styled(Input)`
-  ${Input.InputField} {
-    height: 50px;
-    border: 1px solid ${({ theme }) => theme.gallery};
-    border-radius: 3px;
-    padding: 15px 20px 15px 54px;
-    font-size: 16px;
-  }
-`;
-
-const StyledIcon = styled(Icon)`
-  fill: ${({ theme }) => theme.gallery};
+const Wrapper = styled.div`
+  position: relative;
 `;
 
 const MemberListStyled = styled(MemberList)`
-  margin-top: 20px;
+  margin-bottom: 30px;
 
   ${MemberList.Member} {
-    padding-left: 0;
-    padding-right: 0;
+    background-color: ${({ theme }) => theme.lightBlue};
+    margin-bottom: 4px;
+
+    &:last-of-type {
+      margin-bottom: 0;
+    }
   }
+`;
+
+const ButtonsWrapper = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  margin-top: 40px;
+`;
+
+const ButtonStyled = styled(Button)`
+  margin-right: 20px;
 `;
 
 class InviteModal extends Component {
   state = this.prepareInitialState();
 
-  filter = memoizeOne((members, filterText) =>
-    members.filter(({ email }) => email.includes(filterText)),
-  );
-
-  handleChange = event => {
-    event.preventDefault();
-
-    this.setState({
-      filterText: event.target.value,
-    });
+  handleAddMember = member => {
+    this.setState(prevState => ({
+      ...prevState,
+      members: [...prevState.members, member],
+    }));
   };
 
-  handleAddMember = member => () => {
-    console.log('handleAddMember', member);
+  handleRemoveMember = member => () => {
+    this.setState(prevState => ({
+      ...prevState,
+      members: prevState.members.filter(({ id }) => id !== member.id),
+    }));
   };
 
-  handleChangeRole = member => (_, role) => {
-    console.log('handleChangeRole', member, role);
+  handleChangeRole = changedRoleMember => (_, role) => {
+    this.setState(prevState => ({
+      ...prevState,
+      members: prevState.members.map(member =>
+        member.id === changedRoleMember.id ? { ...member, role } : member,
+      ),
+    }));
   };
 
-  // handleClickAdd = userId => () => {
-  //   const { onClickInvite } = this.props;
-  //
-  //   onClickInvite(userId);
-  // };
-  //
-  // handleClickAddNewInvite = async () => {
-  //   const { onClickAddNewMember } = this.props;
-  //   const { filterText } = this.state;
-  //
-  //   this.setState({
-  //     filterText: '',
-  //   });
-  //
-  //   await waitIdle();
-  //
-  //   onClickAddNewMember(filterText);
-  // };
-  //
-  // handleChangePermission = childItemId => event => {
-  //   const { checked } = event.currentTarget;
-  //   const { onChangePermission } = this.props;
-  //
-  //   onChangePermission(
-  //     childItemId,
-  //     checked ? PERMISSION_READ : PERMISSION_WRITE,
-  //   );
-  // };
+  handleClickDone = () => {
+    const { onSubmit } = this.props;
+    const { members } = this.state;
+
+    onSubmit(members);
+  };
 
   prepareInitialState() {
     return {
-      filterText: '',
+      members: [],
     };
   }
 
   render() {
-    const { filterText } = this.state;
-    const { members, teamId, onCancel } = this.props;
+    const { invitedMembers, user, onCancel } = this.props;
+    const { members } = this.state;
 
-    const filteredMembers = this.filter(members, filterText);
+    const shouldShowAddedMembers = members.length > 0;
+
+    const searchedBlackListMemberIds = [
+      user.id,
+      ...members.map(({ id }) => id),
+      ...invitedMembers.map(({ id }) => id),
+    ];
 
     return (
       <Modal
         isOpen
-        width={560}
+        width={640}
         onRequestClose={onCancel}
         shouldCloseOnEsc
         shouldCloseOnOverlayClick
       >
-        <ModalTitle>Invite</ModalTitle>
-        <StyledInput
-          placeholder="name@4xxi.com"
-          value={filterText}
-          onChange={this.handleChange}
-          prefix={<StyledIcon name="search" width={20} height={20} />}
-        />
-        <MemberListStyled
-          members={filteredMembers}
-          teamId={teamId}
-          controlType="invite"
-          onClickAdd={this.handleAddMember}
-          onChangeRole={this.handleChangeRole}
-        />
+        <Wrapper>
+          <ModalTitle>Invite</ModalTitle>
+          <UserSearchInput
+            blackList={searchedBlackListMemberIds}
+            onClickAdd={this.handleAddMember}
+          />
+          {shouldShowAddedMembers && (
+            <MemberListStyled
+              maxHeight={200}
+              members={members}
+              controlType="remove"
+              onClickRemove={this.handleRemoveMember}
+              onChangeRole={this.handleChangeRole}
+            />
+          )}
+          <ButtonsWrapper>
+            <ButtonStyled color="white" onClick={onCancel}>
+              CANCEL
+            </ButtonStyled>
+            <Button onClick={this.handleClickDone}>DONE</Button>
+          </ButtonsWrapper>
+        </Wrapper>
       </Modal>
     );
   }

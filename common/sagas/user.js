@@ -1,9 +1,10 @@
 import { put, call, takeLatest, select } from 'redux-saga/effects';
+import Router from 'next/router';
 import {
   FETCH_USER_SELF_REQUEST,
   FETCH_KEY_PAIR_REQUEST,
   FETCH_USER_TEAMS_REQUEST,
-  SET_CURRENT_TEAM_ID,
+  LOGOUT,
   fetchUserSelfSuccess,
   fetchUserSelfFailure,
   fetchKeyPairSuccess,
@@ -70,8 +71,19 @@ export function* fetchUserTeamsSaga() {
   }
 }
 
+export function* logoutSaga() {
+  console.log('logoutSaga');
+  try {
+    localStorage.clear();
+    yield call(Router.push, '/logout');
+  } catch (error) {
+    console.log('error', error);
+  }
+}
+
 export default function* userSagas() {
   yield takeLatest(FETCH_USER_SELF_REQUEST, fetchUserSelfSaga);
   yield takeLatest(FETCH_KEY_PAIR_REQUEST, fetchKeyPairSaga);
   yield takeLatest(FETCH_USER_TEAMS_REQUEST, fetchUserTeamsSaga);
+  yield takeLatest(LOGOUT, logoutSaga);
 }

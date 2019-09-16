@@ -46,18 +46,26 @@ export const TOGGLE_ITEM_TO_FAVORITE_FAILURE =
   '@item/TOGGLE_ITEM_TO_FAVORITE_FAILURE';
 
 export const CREATE_ANONYMOUS_LINK_REQUEST =
-  '@childItem/CREATE_ANONYMOUS_LINK_REQUEST';
+  '@item/CREATE_ANONYMOUS_LINK_REQUEST';
 export const CREATE_ANONYMOUS_LINK_SUCCESS =
-  '@childItem/CREATE_ANONYMOUS_LINK_SUCCESS';
+  '@item/CREATE_ANONYMOUS_LINK_SUCCESS';
 export const CREATE_ANONYMOUS_LINK_FAILURE =
-  '@childItem/CREATE_ANONYMOUS_LINK_FAILURE';
+  '@item/CREATE_ANONYMOUS_LINK_FAILURE';
 
 export const REMOVE_ANONYMOUS_LINK_REQUEST =
-  '@childItem/REMOVE_ANONYMOUS_LINK_REQUEST';
+  '@item/REMOVE_ANONYMOUS_LINK_REQUEST';
 export const REMOVE_ANONYMOUS_LINK_SUCCESS =
-  '@childItem/REMOVE_ANONYMOUS_LINK_SUCCESS';
+  '@item/REMOVE_ANONYMOUS_LINK_SUCCESS';
 export const REMOVE_ANONYMOUS_LINK_FAILURE =
-  '@childItem/REMOVE_ANONYMOUS_LINK_FAILURE';
+  '@item/REMOVE_ANONYMOUS_LINK_FAILURE';
+
+export const SHARE_ITEM_BATCH_REQUEST = '@childItem/SHARE_ITEM_BATCH_REQUEST';
+export const SHARE_ITEM_BATCH_SUCCESS = '@childItem/SHARE_ITEM_BATCH_SUCCESS';
+export const SHARE_ITEM_BATCH_FAILURE = '@childItem/SHARE_ITEM_BATCH_FAILURE';
+
+export const REMOVE_SHARE_REQUEST = '@childItem/REMOVE_SHARE_REQUEST';
+export const REMOVE_SHARE_SUCCESS = '@childItem/REMOVE_SHARE_SUCCESS';
+export const REMOVE_SHARE_FAILURE = '@childItem/REMOVE_SHARE_FAILURE';
 
 export const ADD_ITEMS_BATCH = '@item/ADD_ITEMS_BATCH';
 export const REMOVE_ITEMS_BATCH = '@item/REMOVE_ITEMS_BATCH';
@@ -367,4 +375,43 @@ export const removeChildItemsBatchFromItem = (itemIds, childItemIds) => ({
 
 export const removeItemsData = () => ({
   type: REMOVE_ITEMS_DATA,
+});
+
+export const shareItemBatchRequest = (items, members, teamIds) => ({
+  type: SHARE_ITEM_BATCH_REQUEST,
+  payload: {
+    items,
+    members,
+    teamIds,
+  },
+});
+
+export const shareItemBatchSuccess = invited => ({
+  type: SHARE_ITEM_BATCH_SUCCESS,
+  payload: {
+    invited,
+  },
+});
+
+export const shareItemBatchFailure = () => ({
+  type: SHARE_ITEM_BATCH_FAILURE,
+});
+
+export const removeShareRequest = shareId => ({
+  type: REMOVE_SHARE_REQUEST,
+  payload: {
+    shareId,
+  },
+});
+
+export const removeShareSuccess = (itemId, shareId) => ({
+  type: REMOVE_SHARE_SUCCESS,
+  payload: {
+    itemId,
+    shareId,
+  },
+});
+
+export const removeShareFailure = () => ({
+  type: REMOVE_SHARE_FAILURE,
 });

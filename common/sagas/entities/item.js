@@ -1,4 +1,4 @@
-import { put, call, takeLatest, select, fork } from 'redux-saga/effects';
+import { put, call, takeLatest, select, fork, take } from 'redux-saga/effects';
 import deepequal from 'fast-deep-equal';
 import {
   ACCEPT_ITEM_UPDATE_REQUEST,
@@ -14,6 +14,8 @@ import {
   TOGGLE_ITEM_TO_FAVORITE_REQUEST,
   CREATE_ANONYMOUS_LINK_REQUEST,
   REMOVE_ANONYMOUS_LINK_REQUEST,
+  SHARE_ITEM_BATCH_REQUEST,
+  REMOVE_SHARE_REQUEST,
   acceptItemUpdateSuccess,
   acceptItemUpdateFailure,
   createItemSuccess,
@@ -39,8 +41,12 @@ import {
   createAnonymousLinkFailure,
   removeAnonymousLinkSuccess,
   removeAnonymousLinkFailure,
+  removeChildItemFromItem,
+  shareItemBatchSuccess,
+  shareItemBatchFailure,
+  removeShareSuccess,
+  removeShareFailure,
 } from 'common/actions/entities/item';
-import { encryption } from 'common/sagas/common/encryption';
 import {
   addItemToList,
   addItemsBatchToList,
@@ -50,8 +56,19 @@ import {
   removeItemsBatchFromList,
   toggleItemToFavoriteList,
 } from 'common/actions/entities/list';
-import { removeChildItemsBatch } from 'common/actions/entities/childItem';
-import { updateChildItemsBatchSaga } from 'common/sagas/entities/childItem';
+import {
+  CREATE_CHILD_ITEM_BATCH_FINISHED_EVENT,
+  removeChildItemsBatch,
+} from 'common/actions/entities/childItem';
+import {
+  createChildItemBatchSaga,
+  updateChildItemsBatchSaga,
+} from 'common/sagas/entities/childItem';
+import {
+  prepareUsersForSharing,
+  resolveSharingConflicts,
+} from 'common/sagas/common/share';
+import { inviteNewMemberBatchSaga } from 'common/sagas/common/invite';
 import {
   setWorkInProgressItem,
   updateWorkInProgressItem,
@@ -64,7 +81,10 @@ import {
   favoritesSelector,
   listSelector,
 } from 'common/selectors/entities/list';
-import { itemSelector } from 'common/selectors/entities/item';
+import {
+  itemsByIdSelector,
+  itemSelector,
+} from 'common/selectors/entities/item';
 import { membersBatchSelector } from 'common/selectors/entities/member';
 import {
   keyPairSelector,
@@ -100,6 +120,7 @@ import {
   ITEM_REVIEW_MODE,
   PERMISSION_READ,
   SHARE_TYPE,
+  ITEM_ENTITY_TYPE,
 } from 'common/constants';
 import { generateSharingUrl } from 'common/utils/sharing';
 import { createMemberSaga } from './member';
@@ -213,26 +234,61 @@ export function* createItemSaga({
       id: itemId,
       listId,
       lastUpdated,
+      type,
       favorite: false,
       invited: [],
       shared: null,
       tags: [],
+      teamId: list.teamId,
       ownerId: user.id,
       secret: encryptedItem,
       data: { attachments, ...data },
-      type,
+      __type: ITEM_ENTITY_TYPE,
     };
 
     yield put(createItemSuccess(newItem));
     yield put(addItemToList(newItem));
     yield put(updateWorkInProgressItem(itemId, ITEM_REVIEW_MODE));
 
+    console.log('list', list);
+
     if (list.teamId) {
       const team = yield select(teamSelector, { teamId: list.teamId });
       const memberIds = team.users.map(({ id }) => id);
       const members = yield select(membersBatchSelector, { memberIds });
 
-      yield fork(encryption, { items: [newItem], users: members });
+      const itemUserPairs = members
+        .filter(({ id }) => id !== user.id)
+        .map(({ id, publicKey }) => ({
+          item: { id: itemId, data: newItem.data },
+          user: { id, publicKey },
+        }));
+
+      console.log(newItem, members);
+      yield fork(createChildItemBatchSaga, {
+        payload: { itemUserPairs },
+      });
+
+      const {
+        payload: { childItems },
+      } = yield take(CREATE_CHILD_ITEM_BATCH_FINISHED_EVENT);
+
+      console.log('CREATE_CHILD_ITEM_BATCH_FINISHED_EVENT', childItems);
+
+      const shares = childItems.reduce(
+        // eslint-disable-next-line
+        (accumulator, item) => [
+          ...accumulator,
+          {
+            itemId: item.originalItemId,
+            childItemIds: item.items.map(({ id }) => id),
+          },
+        ],
+        [],
+      );
+
+      yield put(shareItemBatchSuccess(shares));
+      yield put(updateWorkInProgressItem());
     }
   } catch (error) {
     console.log(error);
@@ -508,6 +564,70 @@ export function* removeAnonymousLinkSaga() {
   }
 }
 
+export function* shareItemBatchSaga({ payload: { items, members, teamIds } }) {
+  try {
+    console.log('shareItemBatchSaga', items, members, teamIds);
+
+    const itemsById = yield select(itemsByIdSelector);
+    const sharingItems = items.map(itemId => itemsById[itemId]);
+
+    const { allMembers, newMembers } = yield call(prepareUsersForSharing, {
+      payload: { members, teamIds },
+    });
+
+    console.log('allMembers', allMembers);
+    console.log('newMembers', newMembers);
+
+    const itemUserPairs = yield call(resolveSharingConflicts, {
+      payload: { items: sharingItems, members: allMembers },
+    });
+
+    console.log('itemMemberPairs', itemUserPairs);
+
+    yield fork(inviteNewMemberBatchSaga, { payload: { members: newMembers } });
+    yield fork(createChildItemBatchSaga, { payload: { itemUserPairs } });
+
+    const {
+      payload: { childItems },
+    } = yield take(CREATE_CHILD_ITEM_BATCH_FINISHED_EVENT);
+
+    console.log('CREATE_CHILD_ITEM_BATCH_FINISHED_EVENT', childItems);
+
+    const shares = childItems.reduce(
+      (accumulator, item) => [
+        ...accumulator,
+        {
+          itemId: item.originalItemId,
+          childItemIds: item.items.map(({ id }) => id),
+        },
+      ],
+      [],
+    );
+
+    yield put(shareItemBatchSuccess(shares));
+
+    yield put(updateWorkInProgressItem());
+  } catch (error) {
+    console.log(error);
+    yield put(shareItemBatchFailure());
+  }
+}
+
+export function* removeShareSaga({ payload: { shareId } }) {
+  try {
+    const workInProgressItem = yield select(workInProgressItemSelector);
+
+    yield call(deleteChildItem, shareId);
+
+    yield put(removeChildItemFromItem(workInProgressItem.id, shareId));
+    yield put(removeShareSuccess(workInProgressItem.id, shareId));
+    yield put(updateWorkInProgressItem());
+  } catch (error) {
+    console.log(error);
+    yield put(removeShareFailure());
+  }
+}
+
 export default function* itemSagas() {
   yield takeLatest(REMOVE_ITEM_REQUEST, removeItemSaga);
   yield takeLatest(REMOVE_ITEMS_BATCH_REQUEST, removeItemsBatchSaga);
@@ -522,4 +642,6 @@ export default function* itemSagas() {
   yield takeLatest(TOGGLE_ITEM_TO_FAVORITE_REQUEST, toggleItemToFavoriteSaga);
   yield takeLatest(CREATE_ANONYMOUS_LINK_REQUEST, createAnonymousLinkSaga);
   yield takeLatest(REMOVE_ANONYMOUS_LINK_REQUEST, removeAnonymousLinkSaga);
+  yield takeLatest(SHARE_ITEM_BATCH_REQUEST, shareItemBatchSaga);
+  yield takeLatest(REMOVE_SHARE_REQUEST, removeShareSaga);
 }

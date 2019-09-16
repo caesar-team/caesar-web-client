@@ -111,8 +111,9 @@ class Bootstrap extends Component {
   };
 
   initEncryptionWorker() {
+    openpgp.config.debug = true;
     openpgp.config.aead_protect = false;
-    openpgp.initWorker({ workers: [new OpenPGPWorker()] });
+    // openpgp.initWorker({ workers: [new OpenPGPWorker()] });
   }
 
   currentStepResolver(bootstrap) {

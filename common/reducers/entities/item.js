@@ -39,6 +39,12 @@ import {
   REMOVE_ANONYMOUS_LINK_FAILURE,
   REMOVE_ANONYMOUS_LINK_REQUEST,
   REMOVE_ANONYMOUS_LINK_SUCCESS,
+  SHARE_ITEM_BATCH_REQUEST,
+  SHARE_ITEM_BATCH_SUCCESS,
+  SHARE_ITEM_BATCH_FAILURE,
+  REMOVE_SHARE_FAILURE,
+  REMOVE_SHARE_REQUEST,
+  REMOVE_SHARE_SUCCESS,
   ADD_ITEMS_BATCH,
   REMOVE_ITEMS_BATCH,
   ADD_CHILD_ITEM_TO_ITEM,
@@ -280,6 +286,50 @@ export default createReducer(initialState, {
     };
   },
   [REMOVE_ANONYMOUS_LINK_FAILURE](state) {
+    return state;
+  },
+  [SHARE_ITEM_BATCH_REQUEST](state) {
+    return state;
+  },
+  [SHARE_ITEM_BATCH_SUCCESS](state, { payload }) {
+    return {
+      ...state,
+      byId: {
+        ...state.byId,
+        ...payload.invited.reduce(
+          (accumulator, { itemId, childItemIds }) => ({
+            ...accumulator,
+            [itemId]: {
+              ...state.byId[itemId],
+              invited: [...state.byId[itemId].invited, ...childItemIds],
+            },
+          }),
+          {},
+        ),
+      },
+    };
+  },
+  [SHARE_ITEM_BATCH_FAILURE](state) {
+    return state;
+  },
+  [REMOVE_SHARE_REQUEST](state) {
+    return state;
+  },
+  [REMOVE_SHARE_SUCCESS](state, { payload }) {
+    return {
+      ...state,
+      itemsById: {
+        ...state.itemsById,
+        [payload.itemId]: {
+          ...state.itemsById[payload.itemId],
+          invited: state.itemsById[payload.itemId].invited.filter(
+            invite => invite.id !== payload.shareId,
+          ),
+        },
+      },
+    };
+  },
+  [REMOVE_SHARE_FAILURE](state) {
     return state;
   },
   [ADD_ITEMS_BATCH](state, { payload }) {

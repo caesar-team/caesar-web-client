@@ -1,4 +1,5 @@
 import { createSelector } from 'reselect';
+import { childItemsByIdSelector } from 'common/selectors/entities/childItem';
 
 export const entitiesSelector = state => state.entities;
 
@@ -39,4 +40,20 @@ export const teamItemListSelector = createSelector(
   itemListSelector,
   teamIdPropSelector,
   (itemList, teamId) => itemList.filter(item => item.teamId === teamId),
+);
+
+export const itemsChildItemsBatchSelector = createSelector(
+  itemsByIdSelector,
+  itemIdsPropSelector,
+  childItemsByIdSelector,
+  (itemsById, itemIds, childItemsById) => {
+    return itemIds.reduce((accumulator, itemId) => {
+      return [
+        ...accumulator,
+        ...itemsById[itemId].invited.map(
+          childItemId => childItemsById[childItemId],
+        ),
+      ];
+    }, []);
+  },
 );

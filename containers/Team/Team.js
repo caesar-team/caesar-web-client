@@ -12,7 +12,6 @@ import {
   DottedMenu,
   Icon,
   InviteModal,
-  ConfirmModal,
 } from 'components';
 import { COMMANDS_ROLES } from 'common/constants';
 
@@ -61,8 +60,12 @@ const ButtonStyled = styled(Button)`
 `;
 
 const DataTableStyled = styled(DataTable)`
-  max-height: 400px;
   border: none;
+
+  .rt-table,
+  .rt-tbody {
+    overflow: initial;
+  }
 
   .rt-resizable-header-content {
     padding: 0;
@@ -145,11 +148,7 @@ const HeaderFieldName = styled.div`
   color: ${({ theme }) => theme.gray};
 `;
 
-const RoleField = styled(Field)`
-  & > * {
-    position: absolute;
-  }
-`;
+const RoleField = styled(Field)``;
 
 const MenuField = styled(Field)`
   position: relative;
@@ -204,7 +203,6 @@ const SearchIcon = styled(Icon)`
   fill: ${({ theme }) => theme.gray};
 `;
 
-const REMOVE_TEAM_MODAL = 'removeTeamModal';
 const INVITE_MEMBER_MODAL = 'inviteMemberModal';
 
 const ROW_HEIGHT = 50;
@@ -252,8 +250,9 @@ class TeamContainer extends Component {
   );
 
   componentDidMount() {
-    this.props.fetchTeamRequest(this.props.router.query.id);
-    this.props.fetchMembersRequest();
+    const { id: teamId } = this.props.router.query;
+
+    this.props.initPreparationTeamDataFlow(teamId);
   }
 
   getMemberList = memoizeOne((users, membersById) =>
@@ -262,16 +261,6 @@ class TeamContainer extends Component {
         ...accumulator,
         { ...membersById[user.id], role: user.role },
       ],
-      [],
-    ),
-  );
-
-  getMemberListOutsideTeam = memoizeOne((teamId, membersById) =>
-    Object.values(membersById).reduce(
-      (accumulator, member) =>
-        !member.teamIds || member.teamIds.includes(teamId)
-          ? accumulator
-          : [...accumulator, member],
       [],
     ),
   );
@@ -420,10 +409,6 @@ class TeamContainer extends Component {
     this.props.removeTeamMemberRequest(this.props.team.id, userId);
   };
 
-  handleRemoveTeam = () => {
-    this.props.removeTeamRequest(this.props.team.id);
-  };
-
   handleOpenModal = modal => () => {
     this.setState(prevState => ({
       ...prevState,
@@ -445,9 +430,7 @@ class TeamContainer extends Component {
   };
 
   handleInvite = members => {
-    const { selectedTeamId } = this.state;
-
-    this.props.addTeamMembersBatchRequest(selectedTeamId, members);
+    this.props.addTeamMembersBatchRequest(this.props.team.id, members);
     this.handleCloseModal(INVITE_MEMBER_MODAL)();
   };
 
@@ -458,7 +441,6 @@ class TeamContainer extends Component {
         email: '',
       },
       modalVisibilities: {
-        [REMOVE_TEAM_MODAL]: false,
         [INVITE_MEMBER_MODAL]: false,
       },
     };
@@ -476,12 +458,10 @@ class TeamContainer extends Component {
       );
     }
 
-    const teamUsers = team.users.filter(({ id }) => id !== user.id);
-
-    const membersListOutsideTeam = this.getMemberListOutsideTeam(
-      team.id,
-      membersById,
-    );
+    const teamUsers = team.users
+      ? team.users.filter(({ id }) => id !== user.id)
+      : [];
+    const members = this.getMemberList(teamUsers, membersById);
     const filteredMembersList = this.filterMemberList(
       teamUsers,
       filter,
@@ -501,14 +481,6 @@ class TeamContainer extends Component {
             >
               ADD MEMBER
             </ButtonStyled>
-            <Button
-              withOfflineCheck
-              onClick={this.handleOpenModal(REMOVE_TEAM_MODAL)}
-              icon="trash"
-              color="white"
-            >
-              REMOVE
-            </Button>
           </ButtonsWrapper>
         </TopWrapper>
         <DataTableStyled
@@ -524,7 +496,7 @@ class TeamContainer extends Component {
           <InviteModal
             user={user}
             teamId={team.id}
-            members={membersListOutsideTeam}
+            invitedMembers={members}
             onAddMember={this.handleAddMember}
             onRemoveMember={this.handleRemoveMember}
             onChangeMemberRole={this.handleChangeMemberRole}
@@ -532,12 +504,6 @@ class TeamContainer extends Component {
             onSubmit={this.handleInvite}
           />
         )}
-        <ConfirmModal
-          isOpen={modalVisibilities[REMOVE_TEAM_MODAL]}
-          description="Are you sure you want to remove team?"
-          onClickOk={this.handleRemoveTeam}
-          onClickCancel={this.handleCloseModal(REMOVE_TEAM_MODAL)}
-        />
       </Wrapper>
     );
   }

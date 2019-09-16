@@ -29,3 +29,11 @@ export const teamSelector = createSelector(
   teamIdPropSelector,
   (byId, teamId) => byId[teamId],
 );
+
+const teamIdsPropSelector = (_, props) => props.teamIds;
+
+export const teamsBatchSelector = createSelector(
+  teamsByIdSelector,
+  teamIdsPropSelector,
+  (teamsById, teamIds) => teamIds.map(teamId => teamsById[teamId]),
+);

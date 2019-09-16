@@ -4,9 +4,6 @@ import {
   fetchTeamsRequest,
   createTeamRequest,
   removeTeamRequest,
-  addTeamMembersBatchRequest,
-  removeTeamMemberRequest,
-  updateTeamMemberRoleRequest,
 } from 'common/actions/entities/team';
 import { fetchMembersRequest } from 'common/actions/entities/member';
 import {
@@ -36,9 +33,6 @@ const mapDispatchToProps = {
   fetchTeamsRequest,
   createTeamRequest,
   removeTeamRequest,
-  addTeamMembersBatchRequest,
-  removeTeamMemberRequest,
-  updateTeamMemberRoleRequest,
 };
 
 export default connect(

@@ -23,11 +23,8 @@ import {
   removeTeamMemberFailure,
   addTeamMember,
 } from 'common/actions/entities/team';
-import { shareItemBatchSaga } from 'common/sagas/entities/childItem';
-import {
-  fetchTeamMembersSaga,
-  getOrCreateMemberBatchSaga,
-} from 'common/sagas/entities/member';
+import { createChildItemBatchSaga } from 'common/sagas/entities/childItem';
+import { fetchTeamMembersSaga } from 'common/sagas/entities/member';
 import {
   addTeamToMember,
   addTeamToMembersBatch,
@@ -52,11 +49,18 @@ import {
   deleteTeamMember,
 } from 'common/api';
 import { convertTeamsToEntity } from 'common/normalizers/normalizers';
-import { COMMANDS_ROLES, ROLE_USER } from 'common/constants';
+import { COMMANDS_ROLES, TEAM_ENTITY_TYPE } from 'common/constants';
+import {
+  prepareUsersForSharing,
+  resolveSharingConflicts,
+} from 'common/sagas/common/share';
+import { inviteNewMemberBatchSaga } from 'common/sagas/common/invite';
 
 export function* fetchTeamsSaga() {
   try {
     const { data } = yield call(getTeams);
+
+    console.log('data', data);
 
     yield put(fetchTeamsSuccess(convertTeamsToEntity(data)));
 
@@ -94,7 +98,7 @@ export function* createTeamSaga({ payload: { title, icon } }) {
 
     const user = yield select(userDataSelector);
 
-    yield put(createTeamSuccess(data));
+    yield put(createTeamSuccess({ ...data, __type: TEAM_ENTITY_TYPE }));
     yield put(addTeamToMember(data.id, user.id));
     yield put(addTeamMember(data.id, user.id, COMMANDS_ROLES.USER_ROLE_ADMIN));
     yield put(joinTeam(data.id));
@@ -145,24 +149,25 @@ export function* updateTeamMemberRoleSaga({
 
 export function* addTeamMembersBatchSaga({ payload: { teamId, members } }) {
   try {
-    const memberEmails = members.map(({ email }) => email);
-    const memberEmailRolePairs = memberEmails.map(email => ({
-      email,
-      role: ROLE_USER,
-    }));
-
-    const invitedMembers = yield call(getOrCreateMemberBatchSaga, {
-      payload: { emailRolePairs: memberEmailRolePairs },
+    const { allMembers, newMembers } = yield call(prepareUsersForSharing, {
+      payload: { members, teamIds: [] },
     });
 
-    const invitedMembersWithCommandRole = invitedMembers.map(member => ({
+    console.log('newMembers', newMembers);
+
+    yield fork(inviteNewMemberBatchSaga, { payload: { members: newMembers } });
+
+    const teamItemList = yield select(teamItemListSelector, { teamId });
+
+    const itemUserPairs = yield call(resolveSharingConflicts, {
+      payload: { items: teamItemList, members: allMembers },
+    });
+
+    const invitedMemberIds = allMembers.map(({ id }) => id);
+    const invitedMembersWithCommandRole = allMembers.map(member => ({
       ...member,
       role: COMMANDS_ROLES.USER_ROLE_MEMBER,
     }));
-
-    const invitedMemberIds = invitedMembers.map(({ id }) => id);
-
-    console.log('invitedMembersWithCommandRole', invitedMembersWithCommandRole);
 
     // TODO: change it on batch
     yield all(
@@ -171,16 +176,15 @@ export function* addTeamMembersBatchSaga({ payload: { teamId, members } }) {
       ),
     );
 
+    // TODO: add invite for members new or not new i dunno
+
     yield put(
       addTeamMembersBatchSuccess(teamId, invitedMembersWithCommandRole),
     );
     yield put(addTeamToMembersBatch(teamId, invitedMemberIds));
 
-    const teamItemList = yield select(teamItemListSelector, { teamId });
-    const teamItemIds = teamItemList.map(({ id }) => id);
-
-    yield fork(shareItemBatchSaga, {
-      payload: { items: teamItemIds, members: invitedMembers },
+    yield fork(createChildItemBatchSaga, {
+      payload: { itemUserPairs },
     });
   } catch (error) {
     console.log(error);

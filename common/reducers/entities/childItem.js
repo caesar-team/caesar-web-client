@@ -6,12 +6,9 @@ import {
   REMOVE_INVITE_FAILURE,
   REMOVE_INVITE_REQUEST,
   REMOVE_INVITE_SUCCESS,
-  REMOVE_SHARE_FAILURE,
-  REMOVE_SHARE_REQUEST,
-  REMOVE_SHARE_SUCCESS,
-  SHARE_ITEM_BATCH_FAILURE,
-  SHARE_ITEM_BATCH_REQUEST,
-  SHARE_ITEM_BATCH_SUCCESS,
+  CREATE_CHILD_ITEM_BATCH_REQUEST,
+  CREATE_CHILD_ITEM_BATCH_SUCCESS,
+  CREATE_CHILD_ITEM_BATCH_FAILURE,
   CHANGE_CHILD_ITEM_PERMISSION_REQUEST,
   CHANGE_CHILD_ITEM_PERMISSION_SUCCESS,
   CHANGE_CHILD_ITEM_PERMISSION_FAILURE,
@@ -64,45 +61,19 @@ export default createReducer(initialState, {
   [REMOVE_INVITE_FAILURE](state) {
     return state;
   },
-  [SHARE_ITEM_BATCH_REQUEST](state) {
+  [CREATE_CHILD_ITEM_BATCH_REQUEST](state) {
     return state;
   },
-  [SHARE_ITEM_BATCH_SUCCESS](state, { payload }) {
+  [CREATE_CHILD_ITEM_BATCH_SUCCESS](state, { payload }) {
     return {
       ...state,
       byId: {
         ...state.byId,
-        ...payload.invited.reduce(
-          (accumulator, childItem) => ({
-            ...accumulator,
-            [childItem.id]: childItem,
-          }),
-          {},
-        ),
+        ...payload.childItemsById,
       },
     };
   },
-  [SHARE_ITEM_BATCH_FAILURE](state) {
-    return state;
-  },
-  [REMOVE_SHARE_REQUEST](state) {
-    return state;
-  },
-  [REMOVE_SHARE_SUCCESS](state, { payload }) {
-    return {
-      ...state,
-      itemsById: {
-        ...state.itemsById,
-        [payload.itemId]: {
-          ...state.itemsById[payload.itemId],
-          invited: state.itemsById[payload.itemId].invited.filter(
-            invite => invite.id !== payload.shareId,
-          ),
-        },
-      },
-    };
-  },
-  [REMOVE_SHARE_FAILURE](state) {
+  [CREATE_CHILD_ITEM_BATCH_FAILURE](state) {
     return state;
   },
   [CHANGE_CHILD_ITEM_PERMISSION_REQUEST](state) {
@@ -113,10 +84,7 @@ export default createReducer(initialState, {
       ...state,
       byId: {
         ...state.byId,
-        [payload.childItemId]: {
-          ...state.byId[payload.childItemId],
-          access: payload.permission,
-        },
+        ...payload.childItemsById,
       },
     };
   },

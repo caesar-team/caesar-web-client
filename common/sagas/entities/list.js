@@ -27,7 +27,7 @@ import {
   patchList,
 } from 'common/api';
 
-import { LIST_TYPE } from 'common/constants';
+import { LIST_ENTITY_TYPE, LIST_TYPE } from 'common/constants';
 
 const reorder = (list, startIndex, endIndex) => {
   const result = Array.from(list);
@@ -54,6 +54,7 @@ export function* createListSaga({ payload: { list } }) {
         children: [],
         sort: 0,
         parentId: null,
+        __type: LIST_ENTITY_TYPE,
         ...list,
       }),
     );

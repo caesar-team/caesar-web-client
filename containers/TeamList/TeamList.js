@@ -6,7 +6,6 @@ import {
   LogoLoader,
   NewTeamModal,
   ConfirmModal,
-  InviteModal,
 } from 'components';
 import memoizeOne from 'memoize-one';
 
@@ -63,7 +62,6 @@ const TeamCardStyled = styled(TeamCard)`
 
 const NEW_TEAM_MODAL = 'newTeamModal';
 const REMOVE_TEAM_MODAL = 'removeTeamModal';
-const INVITE_MEMBER_MODAL = 'inviteMemberModal';
 
 class TeamListContainer extends Component {
   state = this.prepareInitialState();
@@ -72,16 +70,6 @@ class TeamListContainer extends Component {
     this.props.fetchTeamsRequest();
     this.props.fetchMembersRequest();
   }
-
-  getMemberList = memoizeOne((users, members) => {
-    const userIds = users.map(user => user.id);
-
-    return members.map(member =>
-      userIds.includes(member.id)
-        ? { ...member, role: users.find(user => user.id === member.id).role }
-        : member,
-    );
-  });
 
   handleCreateSubmit = ({ title, icon }) => {
     this.props.createTeamRequest(title, icon);
@@ -132,31 +120,6 @@ class TeamListContainer extends Component {
     );
   };
 
-  handleClickInvite = teamId => event => {
-    event.preventDefault();
-    event.stopPropagation();
-
-    this.setState(
-      {
-        selectedTeamId: teamId,
-      },
-      this.handleOpenModal(INVITE_MEMBER_MODAL),
-    );
-  };
-
-  handleInvite = members => {
-    const { selectedTeamId } = this.state;
-
-    this.props.addTeamMembersBatchRequest(selectedTeamId, members);
-    this.handleCloseModal(INVITE_MEMBER_MODAL)();
-  };
-
-  handleRemoveMember = member => {
-    const { selectedTeamId } = this.state;
-
-    this.props.removeTeamMemberRequest(selectedTeamId, member.id);
-  };
-
   handleChangeMemberRole = (member, role) => {
     const { selectedTeamId } = this.state;
 
@@ -169,7 +132,6 @@ class TeamListContainer extends Component {
       modalVisibilities: {
         [NEW_TEAM_MODAL]: false,
         [REMOVE_TEAM_MODAL]: false,
-        [INVITE_MEMBER_MODAL]: false,
       },
     };
   }
@@ -183,14 +145,13 @@ class TeamListContainer extends Component {
         {...team}
         members={members}
         onClickRemoveTeam={this.handleClickRemoveTeam(team.id)}
-        onClickInviteMember={this.handleClickInvite(team.id)}
       />
     ));
   }
 
   render() {
-    const { isLoading, teamsById, user, members } = this.props;
-    const { modalVisibilities, selectedTeamId } = this.state;
+    const { isLoading } = this.props;
+    const { modalVisibilities } = this.state;
 
     if (isLoading) {
       return (
@@ -200,17 +161,9 @@ class TeamListContainer extends Component {
       );
     }
 
+    console.log(this.props);
+
     const renderedTeamCards = this.renderTeamCards();
-
-    console.log('selectedTeamId', selectedTeamId);
-    console.log('teamsById', teamsById);
-
-    const membersList = selectedTeamId
-      ? this.getMemberList(
-          teamsById[selectedTeamId].users.filter(({ id }) => id !== user.id),
-          members.filter(({ id }) => id !== user.id),
-        )
-      : [];
 
     return (
       <Wrapper>
@@ -230,18 +183,6 @@ class TeamListContainer extends Component {
           <NewTeamModal
             onSubmit={this.handleCreateSubmit}
             onCancel={this.handleCloseModal(NEW_TEAM_MODAL)}
-          />
-        )}
-        {modalVisibilities[INVITE_MEMBER_MODAL] && (
-          <InviteModal
-            user={user}
-            teamId={selectedTeamId}
-            invitedMembers={membersList}
-            onAddMember={this.handleAddMember}
-            onRemoveMember={this.handleRemoveMember}
-            onChangeMemberRole={this.handleChangeMemberRole}
-            onCancel={this.handleCloseModal(INVITE_MEMBER_MODAL)}
-            onSubmit={this.handleInvite}
           />
         )}
         <ConfirmModal

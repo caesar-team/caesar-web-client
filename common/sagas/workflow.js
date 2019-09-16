@@ -2,6 +2,7 @@ import { put, call, fork, takeLatest, select } from 'redux-saga/effects';
 import { decryption } from 'common/sagas/common/decryption';
 import {
   INIT_PREPARATION_DATA_FLOW,
+  INIT_PREPARATION_TEAM_DATA_FLOW,
   UPDATE_WORK_IN_PROGRESS_ITEM,
   finishIsLoading,
   setWorkInProgressListId,
@@ -12,8 +13,11 @@ import { addListsBatch } from 'common/actions/entities/list';
 import { addItemsBatch } from 'common/actions/entities/item';
 import { SET_CURRENT_TEAM_ID } from 'common/actions/user';
 import { addChildItemsBatch } from 'common/actions/entities/childItem';
-import { fetchMembersSaga } from 'common/sagas/entities/member';
-import { fetchTeamsSaga } from 'common/sagas/entities/team';
+import {
+  fetchMembersSaga,
+  fetchTeamMembersSaga,
+} from 'common/sagas/entities/member';
+import { fetchTeamsSaga, fetchTeamSaga } from 'common/sagas/entities/team';
 import { convertNodesToEntities } from 'common/normalizers/normalizers';
 import { objectToArray } from 'common/utils/utils';
 import { sortItemsByFavorites, getMembersIds } from 'common/utils/workflow';
@@ -106,11 +110,32 @@ export function* initTeamData() {
   }
 }
 
+export function* initPreparationTeamDataFlowSaga({ payload: { teamId } }) {
+  yield fork(fetchTeamSaga, { payload: { teamId } });
+  yield fork(fetchTeamMembersSaga, { payload: { teamId } });
+
+  const { data } = yield call(getTeamLists, teamId);
+
+  const { listsById, itemsById, childItemsById } = convertNodesToEntities(data);
+
+  yield put(addListsBatch(listsById));
+  yield put(addChildItemsBatch(childItemsById));
+
+  const keyPair = yield select(keyPairSelector);
+  const masterPassword = yield select(masterPasswordSelector);
+
+  yield fork(decryption, {
+    items: objectToArray(itemsById),
+    key: keyPair.privateKey,
+    masterPassword,
+  });
+}
+
 export function* initPreparationDataFlowSaga({
   payload: { withItemsDecryption },
 }) {
-  yield call(initPersonalData, { payload: { withItemsDecryption } });
-  yield call(initTeamData);
+  yield fork(initPersonalData, { payload: { withItemsDecryption } });
+  yield fork(initTeamData);
 }
 
 export function* updateWorkInProgressItemSaga({
@@ -165,6 +190,10 @@ export function* setCurrentTeamIdWatchSaga() {
 
 export default function* workflowSagas() {
   yield takeLatest(INIT_PREPARATION_DATA_FLOW, initPreparationDataFlowSaga);
+  yield takeLatest(
+    INIT_PREPARATION_TEAM_DATA_FLOW,
+    initPreparationTeamDataFlowSaga,
+  );
   yield takeLatest(UPDATE_WORK_IN_PROGRESS_ITEM, updateWorkInProgressItemSaga);
   yield takeLatest(SET_CURRENT_TEAM_ID, setCurrentTeamIdWatchSaga);
 }

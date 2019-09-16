@@ -2,7 +2,7 @@ import React, { PureComponent, Fragment } from 'react';
 import { connect } from 'react-redux';
 import styled from 'styled-components';
 import Link from 'next/link';
-import { setCurrentTeamId } from 'common/actions/user';
+import { setCurrentTeamId, logout } from 'common/actions/user';
 import {
   currentTeamSelector,
   userTeamListSelector,
@@ -171,7 +171,7 @@ class PrimaryHeader extends PureComponent {
             <Anchor>Settings</Anchor>
           </Link>
         </Option>
-        <Option key="logout">
+        <Option key="logout" onClick={this.props.logout}>
           <Link href="/logout">
             <Anchor>Logout</Anchor>
           </Link>
@@ -235,6 +235,7 @@ const mapStateToProps = createStructuredSelector({
 
 const mapDispatchToProps = {
   setCurrentTeamId,
+  logout,
 };
 
 export default connect(

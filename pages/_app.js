@@ -43,13 +43,15 @@ class Application extends NextApp {
     if (SHARED_ROUTES.includes(route)) {
       return (
         <ThemeProvider theme={theme}>
-          <NotificationProvider>
-            <GlobalStyles />
-            <Provider store={store}>
-              <Component {...pageProps} />
-              <OfflineNotification />
-            </Provider>
-          </NotificationProvider>
+          <OfflineDetectionProvider>
+            <NotificationProvider>
+              <GlobalStyles />
+              <Provider store={store}>
+                <Component {...pageProps} />
+                <OfflineNotification />
+              </Provider>
+            </NotificationProvider>
+          </OfflineDetectionProvider>
         </ThemeProvider>
       );
     }

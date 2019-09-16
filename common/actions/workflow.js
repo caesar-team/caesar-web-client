@@ -1,5 +1,7 @@
 export const INIT_PREPARATION_DATA_FLOW =
   '@workflow/INIT_PREPARATION_DATA_FLOW';
+export const INIT_PREPARATION_TEAM_DATA_FLOW =
+  '@workflow/INIT_PREPARATION_TEAM_DATA_FLOW';
 
 export const FINISH_IS_LOADING = '@workflow/FINISH_IS_LOADING';
 
@@ -19,6 +21,13 @@ export const initPreparationDataFlow = withItemsDecryption => ({
   type: INIT_PREPARATION_DATA_FLOW,
   payload: {
     withItemsDecryption,
+  },
+});
+
+export const initPreparationTeamDataFlow = teamId => ({
+  type: INIT_PREPARATION_TEAM_DATA_FLOW,
+  payload: {
+    teamId,
   },
 });
 

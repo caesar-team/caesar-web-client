@@ -46,6 +46,12 @@ const CarouselStyled = styled(Carousel)`
 const TeamTagStyled = styled(TeamTag)`
   margin-right: 20px;
 
+  ${({ isActive, theme }) =>
+    isActive &&
+    `
+    border: 1px solid ${theme.gray};
+  `};
+
   &:last-of-type {
     margin-right: 0;
   }
@@ -124,10 +130,12 @@ class ShareModal extends Component {
     }));
   };
 
-  handleClickTeam = teamId => () => {
+  handleToggleTeam = teamId => () => {
     this.setState(prevState => ({
       ...prevState,
-      teamsIds: [...prevState.teamIds, teamId],
+      teamIds: prevState.teamIds.includes(teamId)
+        ? prevState.teamIds.filter(id => id !== teamId)
+        : [...prevState.teamIds, teamId],
     }));
   };
 
@@ -166,9 +174,9 @@ class ShareModal extends Component {
 
   handleClickDone = () => {
     const { onShare } = this.props;
-    const { members } = this.state;
+    const { members, teamIds } = this.state;
 
-    onShare(members);
+    onShare(members, teamIds);
   };
 
   prepareInitialState() {
@@ -181,16 +189,23 @@ class ShareModal extends Component {
   }
 
   renderTeamTags() {
+    const { teamIds } = this.state;
     const { teams } = this.props;
 
-    const renderedTeams = teams.map(({ id, title, ...props }) => (
-      <TeamTagStyled
-        key={id}
-        name={generateTeamTag(title)}
-        onClick={this.handleClickTeam(id)}
-        {...props}
-      />
-    ));
+    const renderedTeams = teams.map(({ id, title, ...props }) => {
+      const isActive = teamIds.includes(id);
+
+      console.log(isActive);
+      return (
+        <TeamTagStyled
+          isActive={isActive}
+          key={id}
+          name={generateTeamTag(title)}
+          onClick={this.handleToggleTeam(id)}
+          {...props}
+        />
+      );
+    });
 
     return <CarouselStyled>{renderedTeams}</CarouselStyled>;
   }

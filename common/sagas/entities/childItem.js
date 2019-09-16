@@ -1,29 +1,25 @@
-import { put, call, fork, takeLatest, select, take } from 'redux-saga/effects';
+import { call, fork, put, select, take, takeLatest } from 'redux-saga/effects';
 import {
+  CHANGE_CHILD_ITEM_PERMISSION_REQUEST,
+  CREATE_CHILD_ITEM_BATCH_REQUEST,
   INVITE_MEMBER_REQUEST,
   INVITE_NEW_MEMBER_REQUEST,
   REMOVE_INVITE_REQUEST,
-  REMOVE_SHARE_REQUEST,
   UPDATE_CHILD_ITEM_BATCH_REQUEST,
-  SHARE_ITEM_BATCH_REQUEST,
-  CHANGE_CHILD_ITEM_PERMISSION_REQUEST,
-  inviteMemberSuccess,
-  inviteMemberFailure,
-  inviteNewMemberFailure,
-  removeInviteMemberSuccess,
-  removeInviteMemberFailure,
-  shareItemBatchSuccess,
-  shareItemBatchFailure,
-  removeShareSuccess,
-  removeShareFailure,
-  updateChildItemsBatchFailure,
-  changeChildItemPermissionSuccess,
   changeChildItemPermissionFailure,
+  changeChildItemPermissionSuccess,
+  inviteMemberFailure,
+  inviteMemberSuccess,
+  inviteNewMemberFailure,
+  removeInviteMemberFailure,
+  removeInviteMemberSuccess,
+  updateChildItemsBatchFailure,
+  createChildItemBatchFinishedEvent,
+  addChildItemsBatch, createChildItemBatchSuccess, createChildItemBatchFailure,
 } from 'common/actions/entities/childItem';
 import { encryption } from 'common/sagas/common/encryption';
 import {
   addChildItemToItem,
-  addChildItemsBatchToItem,
   removeChildItemFromItem,
 } from 'common/actions/entities/item';
 import { updateWorkInProgressItem } from 'common/actions/workflow';
@@ -33,27 +29,24 @@ import {
   membersByIdSelector,
 } from 'common/selectors/entities/member';
 import { workInProgressItemSelector } from 'common/selectors/workflow';
-import { itemsByIdSelector } from 'common/selectors/entities/item';
 import { childItemsBatchSelector } from 'common/selectors/entities/childItem';
 import {
-  postCreateChildItem,
-  postCreateChildItemBatch,
-  postInvitation,
-  postInvitationBatch,
   deleteChildItem,
   patchChildAccess,
   patchChildItemBatch,
+  postCreateChildItem,
+  postCreateChildItemBatch,
+  postInvitation,
 } from 'common/api';
 import { encryptItem } from 'common/utils/cipherUtils';
 import { objectToBase64 } from 'common/utils/base64';
 import {
+  CHILD_ITEM_ENTITY_TYPE,
   INVITE_TYPE,
   PERMISSION_READ,
   PERMISSION_WRITE,
-  ROLE_USER,
 } from 'common/constants';
 import { generateInviteUrl } from 'common/utils/sharing';
-import { getOrCreateMemberBatchSaga } from 'common/sagas/entities/member';
 
 export function* inviteMemberSaga({ payload: { userId } }) {
   try {
@@ -114,25 +107,6 @@ export function* inviteNewMemberSaga({
   }
 }
 
-function* inviteNewMemberBatchSaga({ payload: { members } }) {
-  try {
-    const invites = members.map(({ email, password, masterPassword }) => ({
-      email,
-      url: generateInviteUrl(
-        objectToBase64({
-          e: email,
-          p: password,
-          mp: masterPassword,
-        }),
-      ),
-    }));
-
-    yield call(postInvitationBatch, { messages: invites });
-  } catch (error) {
-    console.log(error);
-  }
-}
-
 export function* removeInviteMemberSaga({ payload: { childItemId } }) {
   try {
     const workInProgressItem = yield select(workInProgressItemSelector);
@@ -148,31 +122,15 @@ export function* removeInviteMemberSaga({ payload: { childItemId } }) {
   }
 }
 
-export function* shareItemBatchSaga({ payload: { items, members } }) {
+export function* createChildItemBatchSaga({ payload: { itemUserPairs } }) {
   try {
-    // find items which will be share
-    const itemsById = yield select(itemsByIdSelector);
-    const sharingItems = items.map(itemId => itemsById[itemId]);
-    const sharingItemIds = sharingItems.map(({ id }) => id);
+    yield fork(encryption, itemUserPairs);
 
-    // get or create members, get their actual keys and other data
-    const memberEmails = members.map(({ email }) => email);
-    const emailRolePairs = memberEmails.map(email => ({
-      email,
-      role: ROLE_USER,
-    }));
-    const membersOfSharing = yield call(getOrCreateMemberBatchSaga, {
-      payload: { emailRolePairs },
-    });
-    const newMembers = members.filter(({ isNew }) => isNew);
-
-    // run pool of workers for encryption items by members key
-    yield fork(encryption, { items: sharingItems, users: membersOfSharing });
-
-    // stop and wait
     const {
       payload: { sets: encryptedChildItems },
     } = yield take(ENCRYPTION_FINISHED_EVENT);
+
+    console.log('encryptedChildItems', encryptedChildItems);
 
     const preparedChildItemsGroupedByItemId = encryptedChildItems.reduce(
       (accumulator, { itemId, ...data }) => {
@@ -185,7 +143,9 @@ export function* shareItemBatchSaga({ payload: { items, members } }) {
       {},
     );
 
-    const preparedItemsForRequest = sharingItemIds.map(itemId => ({
+    const preparedItemsForRequest = Object.keys(
+      preparedChildItemsGroupedByItemId,
+    ).map(itemId => ({
       originalItem: itemId,
       items: preparedChildItemsGroupedByItemId[itemId].map(
         ({ userId, secret }) => ({
@@ -197,58 +157,35 @@ export function* shareItemBatchSaga({ payload: { items, members } }) {
       ),
     }));
 
-    const { data } = yield call(postCreateChildItemBatch, {
+    const {
+      data: { shares },
+    } = yield call(postCreateChildItemBatch, {
       originalItems: Object.values(preparedItemsForRequest),
     });
 
-    yield fork(inviteNewMemberBatchSaga, { payload: { members: newMembers } });
-
-    const shares = data.shares.reduce(
-      (accumulator, { originalItemId, items: childItems }) => [
+    const childItems = shares.reduce(
+      (accumulator, { originalItemId, items }) => [
         ...accumulator,
-        ...childItems.map(({ id, userId }) => ({
-          id,
-          originalItemId,
-          userId,
-          access: PERMISSION_READ,
-        })),
+        ...items.map(item => ({ ...item, originalItemId })),
       ],
       [],
     );
 
-    yield put(shareItemBatchSuccess(shares));
-
-    const sets = data.shares.reduce(
-      (accumulator, item) => [
+    const childItemsById = childItems.reduce(
+      (accumulator, childItem) => ({
         ...accumulator,
-        {
-          itemId: item.originalItemId,
-          childItemIds: item.items.map(({ id }) => id),
+        [childItem.id]: {
+          ...childItem,
+          __type: CHILD_ITEM_ENTITY_TYPE,
         },
-      ],
-      [],
+      }),
+      {},
     );
 
-    yield put(addChildItemsBatchToItem(sets));
-    yield put(updateWorkInProgressItem());
+    yield put(createChildItemBatchSuccess(childItemsById));
+    yield put(createChildItemBatchFinishedEvent(shares));
   } catch (error) {
-    console.log(error);
-    yield put(shareItemBatchFailure());
-  }
-}
-
-export function* removeShareSaga({ payload: { shareId } }) {
-  try {
-    const workInProgressItem = yield select(workInProgressItemSelector);
-
-    yield call(deleteChildItem, shareId);
-
-    yield put(removeChildItemFromItem(workInProgressItem.id, shareId));
-    yield put(removeShareSuccess(workInProgressItem.id, shareId));
-    yield put(updateWorkInProgressItem());
-  } catch (error) {
-    console.log(error);
-    yield put(removeShareFailure());
+    yield put(createChildItemBatchFailure());
   }
 }
 
@@ -259,19 +196,18 @@ export function* updateChildItemsBatchSaga({
 }) {
   try {
     // eslint-disable-next-line
-    const childItemIds = invited.map(({ id }) => id);
-    const memberIds = invited.map(({ userId }) => userId);
+    const childItems = yield select(childItemsBatchSelector, { childItemIds: invited });
+    const memberIds = childItems.map(({ userId }) => userId);
 
     const membersById = yield select(membersByIdSelector);
-    const childItems = yield select(childItemsBatchSelector, { childItemIds });
-
-    const updatingChildItems = childItems.map(childItem => ({
-      ...childItem,
-      data,
-    }));
     const members = memberIds.map(memberId => membersById[memberId]);
 
-    yield fork(encryption, { items: updatingChildItems, users: members });
+    const itemUserPairs = members.map(member => ({
+      item: { id, data },
+      user: member,
+    }));
+
+    yield fork(encryption, itemUserPairs);
 
     // stop and wait
     const {
@@ -312,8 +248,7 @@ export default function* childItemSagas() {
   yield takeLatest(INVITE_MEMBER_REQUEST, inviteMemberSaga);
   yield takeLatest(INVITE_NEW_MEMBER_REQUEST, inviteNewMemberSaga);
   yield takeLatest(REMOVE_INVITE_REQUEST, removeInviteMemberSaga);
-  yield takeLatest(SHARE_ITEM_BATCH_REQUEST, shareItemBatchSaga);
-  yield takeLatest(REMOVE_SHARE_REQUEST, removeShareSaga);
+  yield takeLatest(CREATE_CHILD_ITEM_BATCH_REQUEST, createChildItemBatchSaga);
   yield takeLatest(UPDATE_CHILD_ITEM_BATCH_REQUEST, updateChildItemsBatchSaga);
   yield takeLatest(
     CHANGE_CHILD_ITEM_PERMISSION_REQUEST,

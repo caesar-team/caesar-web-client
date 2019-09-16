@@ -16,6 +16,8 @@ export const SET_CURRENT_TEAM_ID = '@user/SET_CURRENT_TEAM_ID';
 export const JOIN_TEAM = '@user/JOIN_TEAM';
 export const LEAVE_TEAM = '@user/LEAVE_TEAM';
 
+export const LOGOUT = '@user/LOGOUT';
+
 export const fetchUserSelfRequest = () => ({
   type: FETCH_USER_SELF_REQUEST,
 });
@@ -89,4 +91,8 @@ export const leaveTeam = teamId => ({
   payload: {
     teamId,
   },
+});
+
+export const logout = () => ({
+  type: LOGOUT,
 });

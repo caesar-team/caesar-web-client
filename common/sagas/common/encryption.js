@@ -20,20 +20,12 @@ const taskAction = pairs => async task => {
   return await task.encryptAll(pairs);
 };
 
-export function* encryption({ items, users }) {
+export function* encryption(itemUserPairs) {
   const buffer = [];
-
-  const combinations = items.reduce(
-    (accumulator, item) => [
-      ...accumulator,
-      ...users.map(user => ({ item, user })),
-    ],
-    [],
-  );
 
   const availableCoresCount = yield select(availableCoresCountSelector);
 
-  const chunks = chunk(combinations, ENCRYPTION_CHUNK_SIZE);
+  const chunks = chunk(itemUserPairs, ENCRYPTION_CHUNK_SIZE);
 
   const coresCount =
     chunks.length < availableCoresCount ? chunks.length : availableCoresCount;

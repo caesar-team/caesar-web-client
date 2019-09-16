@@ -2,7 +2,7 @@ import React from 'react';
 import styled from 'styled-components';
 import Link from 'next/link';
 import memoizeOne from 'memoize-one';
-import { Button, AvatarsList, DottedMenu } from 'components';
+import { Button, AvatarsList } from 'components';
 
 const Wrapper = styled.div`
   display: flex;
@@ -37,10 +37,6 @@ const TeamInfo = styled.div`
   margin-left: 20px;
 `;
 
-const MenuWrapper = styled.div`
-  display: flex;
-`;
-
 const TeamName = styled.div`
   display: flex;
   flex-direction: column;
@@ -60,11 +56,6 @@ const AvatarsWrapper = styled.div`
   justify-content: space-between;
 `;
 
-const ButtonStyled = styled(Button)`
-  width: 100%;
-  height: 50px;
-`;
-
 const getMembers = memoizeOne((users, members) =>
   users.map(({ id }) => members.find(member => member.id === id)),
 );
@@ -78,14 +69,13 @@ const TeamCard = ({
   members,
   onClick = Function.prototype,
   onClickRemoveTeam = Function.prototype,
-  onClickInviteMember = Function.prototype,
 }) => {
-  const shouldShowAvatars = users.length > 0;
+  const shouldShowAvatars = users && users.length > 0;
 
   return (
     <Wrapper className={className} onClick={onClick}>
-      <TeamWrapper>
-        <Link key={id} href="/settings/team/[id]" as={`/settings/team/${id}`}>
+      <Link key={id} href="/settings/team/[id]" as={`/settings/team/${id}`}>
+        <TeamWrapper>
           <TeamDetails>
             <TeamIcon src={icon} />
             <TeamInfo>
@@ -93,15 +83,8 @@ const TeamCard = ({
               <TeamMembers>44 members</TeamMembers>
             </TeamInfo>
           </TeamDetails>
-        </Link>
-        <MenuWrapper>
-          <DottedMenu tooltipProps={{ textBoxWidth: '100px' }}>
-            <ButtonStyled color="white" onClick={onClickRemoveTeam}>
-              Remove
-            </ButtonStyled>
-          </DottedMenu>
-        </MenuWrapper>
-      </TeamWrapper>
+        </TeamWrapper>
+      </Link>
       <AvatarsWrapper>
         {shouldShowAvatars && (
           <AvatarsList
@@ -110,7 +93,9 @@ const TeamCard = ({
             visibleCount={20}
           />
         )}
-        <Button color="white" icon="plus" onClick={onClickInviteMember} />
+        <Button color="white" onClick={onClickRemoveTeam}>
+          Remove
+        </Button>
       </AvatarsWrapper>
     </Wrapper>
   );

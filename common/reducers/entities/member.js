@@ -124,7 +124,11 @@ export default createReducer(initialState, {
             ...accumulator,
             [memberId]: {
               ...state.byId[memberId],
-              teamIds: [...state.byId[memberId].teamIds, payload.teamId],
+              // TODO: this error because BE side doesn't return teamIds for searched user
+              teamIds: [
+                ...(state.byId[memberId].teamIds || []),
+                payload.teamId,
+              ],
             },
           }),
           {},

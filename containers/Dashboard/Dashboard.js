@@ -263,15 +263,25 @@ class DashboardContainer extends Component {
     this.props.removeAnonymousLinkRequest();
   };
 
-  handleShare = members => {
+  handleShare = (members, teamIds) => {
     const { workInProgressItem, workInProgressItemIds } = this.props;
 
-    if (members.length > 0) {
+    console.log('members', members);
+    console.log('teamIds', teamIds);
+    if (members.length > 0 || teamIds.length > 0) {
       if (workInProgressItemIds && workInProgressItemIds.length > 0) {
-        this.props.shareItemBatchRequest(workInProgressItemIds, members);
+        this.props.shareItemBatchRequest(
+          workInProgressItemIds,
+          members,
+          teamIds,
+        );
         this.props.resetWorkInProgressItemIds();
       } else {
-        this.props.shareItemBatchRequest([workInProgressItem.id], members);
+        this.props.shareItemBatchRequest(
+          [workInProgressItem.id],
+          members,
+          teamIds,
+        );
       }
     }
 

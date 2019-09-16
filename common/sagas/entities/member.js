@@ -1,31 +1,27 @@
-import { put, call, takeLatest } from 'redux-saga/effects';
+import { call, put, takeLatest } from 'redux-saga/effects';
 import {
-  FETCH_MEMBERS_REQUEST,
-  CREATE_MEMBER_REQUEST,
   CREATE_MEMBER_BATCH_REQUEST,
-  FETCH_TEAM_MEMBERS_REQUEST,
-  fetchMembersSuccess,
-  fetchMembersFailure,
-  createMemberSuccess,
-  createMemberFailure,
-  createMemberBatchSuccess,
+  CREATE_MEMBER_REQUEST,
   createMemberBatchFailure,
+  createMemberBatchSuccess,
+  createMemberFailure,
+  createMemberSuccess,
+  FETCH_MEMBERS_REQUEST,
+  FETCH_TEAM_MEMBERS_REQUEST,
+  fetchMembersFailure,
+  fetchMembersSuccess,
 } from 'common/actions/entities/member';
 import {
   getMembers,
-  getUsersByIds,
-  getTeamMembers,
-  postNewUser,
   getPublicKeyByEmailBatch,
+  getTeamMembers,
+  getUsersByIds,
+  postNewUser,
   postNewUserBatch,
 } from 'common/api';
 import { convertMembersToEntity } from 'common/normalizers/normalizers';
-import {
-  generateUser,
-  generateUsersBatch,
-  generateSeedAndVerifier,
-} from 'common/utils/cipherUtils';
-import { ROLE_ANONYMOUS_USER } from 'common/constants';
+import { generateSeedAndVerifier, generateUser, generateUsersBatch } from 'common/utils/cipherUtils';
+import { MEMBER_ENTITY_TYPE, ROLE_ANONYMOUS_USER } from 'common/constants';
 
 const setIsNewFlag = (members, isNew) =>
   members.map(member => ({
@@ -109,6 +105,8 @@ export function* createMemberBatchSaga({ payload: { emailRolePairs } }) {
 
     const generatedUsers = yield call(generateUsersBatch, emails);
 
+    console.log('generatedUsers', generatedUsers);
+
     const members = generatedUsers.map(
       ({ email, password, publicKey, privateKey }) => ({
         email,
@@ -140,6 +138,7 @@ export function* createMemberBatchSaga({ payload: { emailRolePairs } }) {
                 publicKey: member.publicKey,
                 roles: [emailRoleObject[member.email]],
                 teamIds: [],
+                __type: MEMBER_ENTITY_TYPE,
               },
             ];
       },
@@ -148,7 +147,7 @@ export function* createMemberBatchSaga({ payload: { emailRolePairs } }) {
 
     yield put(createMemberBatchSuccess(preparedMembersForStore));
 
-    const returnedMembers = userIds.map((userId, index) => {
+    return userIds.map((userId, index) => {
       const member = members[index];
 
       return {
@@ -158,8 +157,6 @@ export function* createMemberBatchSaga({ payload: { emailRolePairs } }) {
         password: generatedUsers[index].password,
       };
     });
-
-    return returnedMembers;
   } catch (error) {
     yield put(createMemberBatchFailure());
     return null;
@@ -198,6 +195,9 @@ export function* getOrCreateMemberBatchSaga({ payload: { emailRolePairs } }) {
         emailRolePairs: newMemberEmailRolePairs,
       },
     });
+
+    console.log('existedMembers', existedMembers);
+    console.log('newMembers', newMembers, setIsNewFlag(renameUserId(newMembers), true));
 
     // TODO: change userId to id on BE side
     return [

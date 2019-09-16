@@ -83,12 +83,16 @@ class SharedItemsStep extends Component {
       const { data: items } = await getOfferedItems();
       const { data: user } = await getUserSelf();
 
+      console.log('items', items);
+
       const decryptedItems = await Promise.all(
         items.map(
           // eslint-disable-next-line
           async ({ secret }) => await decryptItem(secret, privateKeyObj),
         ),
       );
+
+      console.log('decryptedItems', decryptedItems);
 
       this.setState({
         items: items.map((item, index) => ({
@@ -118,6 +122,9 @@ class SharedItemsStep extends Component {
       onFinish = Function.prototype,
     } = this.props;
     const { items, selectedIds, user } = this.state;
+
+    console.log('oldKeyPair', oldKeyPair);
+    console.log('currentKeyPair', currentKeyPair);
 
     const acceptedItems = items.filter(({ id }) => selectedIds.includes(id));
     const ids = acceptedItems.map(({ id }) => ({ id }));

@@ -3,7 +3,6 @@ import * as openpgp from 'openpgp';
 import { withRouter } from 'next/router';
 import { getUserBootstrap, getUserSelf } from 'common/api';
 import { DEFAULT_IDLE_TIMEOUT } from 'common/constants';
-import OpenPGPWorker from 'common/openpgp.worker';
 import {
   SessionChecker,
   FullScreenLoader,
@@ -40,7 +39,7 @@ class Bootstrap extends Component {
   bootstrap = null;
 
   async componentDidMount() {
-    this.initEncryptionWorker();
+    this.initOpenPGP();
 
     this.props.initCoresCount();
 
@@ -110,10 +109,8 @@ class Bootstrap extends Component {
     });
   };
 
-  initEncryptionWorker() {
-    openpgp.config.debug = true;
+  initOpenPGP() {
     openpgp.config.aead_protect = false;
-    // openpgp.initWorker({ workers: [new OpenPGPWorker()] });
   }
 
   currentStepResolver(bootstrap) {

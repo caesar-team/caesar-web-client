@@ -20,7 +20,11 @@ import {
   postNewUserBatch,
 } from 'common/api';
 import { convertMembersToEntity } from 'common/normalizers/normalizers';
-import { generateSeedAndVerifier, generateUser, generateUsersBatch } from 'common/utils/cipherUtils';
+import {
+  generateSeedAndVerifier,
+  generateUser,
+  generateUsersBatch,
+} from 'common/utils/cipherUtils';
 import { MEMBER_ENTITY_TYPE, ROLE_ANONYMOUS_USER } from 'common/constants';
 
 const setIsNewFlag = (members, isNew) =>
@@ -105,8 +109,6 @@ export function* createMemberBatchSaga({ payload: { emailRolePairs } }) {
 
     const generatedUsers = yield call(generateUsersBatch, emails);
 
-    console.log('generatedUsers', generatedUsers);
-
     const members = generatedUsers.map(
       ({ email, password, publicKey, privateKey }) => ({
         email,
@@ -165,8 +167,6 @@ export function* createMemberBatchSaga({ payload: { emailRolePairs } }) {
 
 export function* getOrCreateMemberBatchSaga({ payload: { emailRolePairs } }) {
   try {
-    console.log('emailRolePairs', emailRolePairs);
-
     const emailRoleObject = emailRolePairs.reduce(
       (accumulator, { email, role }) => ({
         ...accumulator,
@@ -195,9 +195,6 @@ export function* getOrCreateMemberBatchSaga({ payload: { emailRolePairs } }) {
         emailRolePairs: newMemberEmailRolePairs,
       },
     });
-
-    console.log('existedMembers', existedMembers);
-    console.log('newMembers', newMembers, setIsNewFlag(renameUserId(newMembers), true));
 
     // TODO: change userId to id on BE side
     return [

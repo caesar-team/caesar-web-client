@@ -71,6 +71,10 @@ const DataTableStyled = styled(DataTable)`
     padding: 0;
   }
 
+  .rt-tbody .rt-tr-group {
+    border-bottom: none;
+  }
+
   .rt-tr-group {
     margin-bottom: 10px;
     height: 50px;
@@ -485,10 +489,10 @@ class TeamContainer extends Component {
         </TopWrapper>
         <DataTableStyled
           noDataText={null}
+          showPagination={false}
           itemSize={ROW_HEIGHT}
           data={filteredMembersList}
-          showPagination={false}
-          defaultPageSize={filteredMembersList.length}
+          // defaultPageSize={filteredMembersList.length}
           columns={this.getColumns()}
           width={this.calculateWrapperWidth()}
         />

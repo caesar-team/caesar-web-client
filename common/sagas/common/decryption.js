@@ -47,8 +47,6 @@ export function* decryption({ items, key, masterPassword }) {
     try {
       const event = normalizerEvent(yield take(poolChannel));
 
-      console.log(event);
-
       switch (event.type) {
         case TASK_QUEUE_COMPLETED_EVENT_TYPE:
           yield put(addItemsBatch(match(itemsById, event.returnValue)));

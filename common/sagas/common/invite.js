@@ -4,8 +4,6 @@ import { objectToBase64 } from 'common/utils/base64';
 import { postInvitationBatch } from 'common/api';
 
 export function* inviteNewMemberBatchSaga({ payload: { members } }) {
-  console.log('inviteNewMemberBatchSaga', members);
-
   try {
     const invites = members.map(({ email, password, masterPassword }) => ({
       email,

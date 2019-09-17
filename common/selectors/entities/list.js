@@ -129,7 +129,7 @@ const nestedListsSelector = createSelector(
     ),
 );
 
-export const listsByTypeSelector = createSelector(
+export const personalListsByTypeSelector = createSelector(
   inboxSelector,
   nestedListsSelector,
   favoritesSelector,
@@ -140,6 +140,11 @@ export const listsByTypeSelector = createSelector(
     favorites,
     trash,
   }),
+);
+
+export const teamTrashListSelector = createSelector(
+  teamListsSelector,
+  lists => lists.find(({ type }) => type === TRASH_TYPE) || {},
 );
 
 const listIdPropSelector = (_, props) => props.listId;

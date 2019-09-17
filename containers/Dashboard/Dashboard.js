@@ -162,18 +162,20 @@ class DashboardContainer extends Component {
       workInProgressList,
     } = this.props;
 
+    const isTeamList = !!workInProgressList.teamId;
+    const trashListId = isTeamList
+      ? this.props.teamTrashList.id
+      : this.props.trashList.id;
+
     if (workInProgressItemIds.length > 0) {
-      this.props.moveItemsBatchRequest(
-        workInProgressList.id,
-        this.props.listsByType.trash.id,
-      );
+      this.props.moveItemsBatchRequest(workInProgressList.id, trashListId);
       this.props.resetWorkInProgressItemIds();
 
       this.props.notification.show({
         text: `The items have removed`,
       });
     } else {
-      this.props.moveItemRequest(this.props.listsByType.trash.id);
+      this.props.moveItemRequest(trashListId);
       this.props.setWorkInProgressItem(null);
 
       this.props.notification.show({
@@ -266,8 +268,6 @@ class DashboardContainer extends Component {
   handleShare = (members, teamIds) => {
     const { workInProgressItem, workInProgressItemIds } = this.props;
 
-    console.log('members', members);
-    console.log('teamIds', teamIds);
     if (members.length > 0 || teamIds.length > 0) {
       if (workInProgressItemIds && workInProgressItemIds.length > 0) {
         this.props.shareItemBatchRequest(
@@ -447,12 +447,13 @@ class DashboardContainer extends Component {
       team,
       personalLists,
       teamLists,
-      listsByType,
+      personalListsByType,
       visibleListItems,
       workInProgressItems,
       itemsById,
       isLoading,
       trashList,
+      teamTrashList,
     } = this.props;
 
     const { mode, modalVisibilities, searchedText } = this.state;
@@ -467,10 +468,10 @@ class DashboardContainer extends Component {
       workInProgressItemIds && workInProgressItemIds.length > 0;
     const isToolMode = mode === DASHBOARD_TOOL_MODE;
 
-    const isTrashList =
-      workInProgressList && workInProgressList.id === trashList.id;
-    const isTrashItem =
-      workInProgressItem && workInProgressItem.listId === listsByType.trash.id;
+    const isTrash =
+      workInProgressList &&
+      (workInProgressList.id === trashList.id ||
+        workInProgressList.id === teamTrashList.id);
 
     const areAllItemsSelected =
       mode === DASHBOARD_SEARCH_MODE
@@ -497,10 +498,10 @@ class DashboardContainer extends Component {
               <MenuList
                 mode={mode}
                 team={team}
-                inbox={listsByType.inbox}
-                favorites={listsByType.favorites}
-                trash={listsByType.trash}
-                personalLists={listsByType.list}
+                inbox={personalListsByType.inbox}
+                favorites={personalListsByType.favorites}
+                trash={personalListsByType.trash}
+                personalLists={personalListsByType.list}
                 teamLists={teamLists}
                 activeListId={workInProgressList && workInProgressList.id}
                 onClickMenuItem={this.handleClickMenuItem}
@@ -514,7 +515,7 @@ class DashboardContainer extends Component {
                 <MiddleColumnWrapper>
                   {isMultiItem && (
                     <MultiItem
-                      isTrashItems={isTrashList}
+                      isTrashItems={isTrash}
                       workInProgressItemIds={workInProgressItemIds}
                       areAllItemsSelected={areAllItemsSelected}
                       onClickMove={this.handleOpenModal(MOVE_ITEM_MODAL)}
@@ -548,7 +549,7 @@ class DashboardContainer extends Component {
                 </MiddleColumnWrapper>
                 <RightColumnWrapper>
                   <Item
-                    isTrashItem={isTrashItem}
+                    isTrashItem={isTrash}
                     notification={notification}
                     item={workInProgressItem}
                     owner={workInProgressItemOwner}

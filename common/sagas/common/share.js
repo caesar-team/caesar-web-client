@@ -40,14 +40,10 @@ export function* prepareUsersForSharing({ payload: { members, teamIds } }) {
 }
 
 export function* resolveSharingConflicts({ payload: { items, members } }) {
-  console.log('resolveSharingConflicts', items, members);
-
   const childItemsBatch = yield select(itemsChildItemsBatchSelector, {
     itemIds: items.map(({ id }) => id),
   });
   const groupedChildItemsByItemId = groupBy(childItemsBatch, 'originalItemId');
-
-  console.log('groupedChildItemsByItemId', groupedChildItemsByItemId);
 
   return items.reduce((outer, { id: itemId, data }) => {
     const itemChildItems = groupedChildItemsByItemId[itemId] || [];

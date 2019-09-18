@@ -80,8 +80,6 @@ class TeamModal extends Component {
     const { teamList, teamId: teamIdFromProps } = this.props;
     const { teamId, filterText } = this.state;
 
-    console.log('teamList', teamList);
-
     const filteredTeams = this.filter(teamList, filterText);
     const activeTeam = filteredTeams.find(({ id }) => id === teamIdFromProps);
 

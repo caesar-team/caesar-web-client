@@ -7,6 +7,8 @@ import {
   Checkbox,
   Button,
   Scrollbar,
+  Icon,
+  Avatar,
 } from 'components';
 import {
   encryptItem,
@@ -18,7 +20,10 @@ import {
   patchAcceptItem,
   patchChildItemBatch,
   getUserSelf,
+  getUserTeams,
+  patchAcceptTeamItems,
 } from 'common/api';
+import { ITEM_CREDENTIALS_TYPE } from 'common/constants';
 import { NavigationPanelStyled } from '../../components';
 import { SHARED_ITEMS_CHECK } from '../../constants';
 
@@ -30,13 +35,13 @@ const ScrollbarStyled = styled(Scrollbar)`
 const ListWrapper = styled.div`
   display: flex;
   flex-direction: column;
-  margin-top: 30px;
 `;
 
 const ItemRow = styled.div`
   display: flex;
   align-items: center;
-  padding: 10px 20px;
+  justify-content: space-between;
+  padding: 10px 0;
   border-bottom: 1px solid ${({ theme }) => theme.gallery};
 
   &:last-child {
@@ -44,16 +49,47 @@ const ItemRow = styled.div`
   }
 `;
 
+const ItemNameAndType = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+`;
+
 const ItemName = styled.div`
   font-size: 16px;
   margin-left: 20px;
+`;
+
+const TeamRow = styled.div`
+  display: flex;
+  align-items: center;
+  border-radius: 2px;
+  border: 1px solid ${({ theme }) => theme.gallery};
+  padding: 10px 20px;
+  margin-bottom: 10px;
+`;
+
+const TeamDetails = styled.div`
+  display: flex;
+  flex-direction: column;
+  margin-left: 20px;
+`;
+
+const TeamName = styled.div`
+  font-size: 18px;
+  letter-spacing: 0.6px;
+`;
+
+const TeamItemsWrapper = styled.div`
+  font-size: 14px;
+  letter-spacing: 0.4px;
+  color: ${({ theme }) => theme.gray};
 `;
 
 const ButtonWrapper = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-top: 30px;
 `;
 
 const ButtonStyled = styled(Button)`
@@ -61,10 +97,40 @@ const ButtonStyled = styled(Button)`
   font-size: 18px;
 `;
 
+const Section = styled.div`
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 40px;
+
+  &:last-of-type {
+    margin-bottom: 0;
+  }
+`;
+
+const SectionName = styled.div`
+  font-size: 18px;
+  font-weight: 600;
+  letter-spacing: 0.6px;
+  margin-bottom: 16px;
+`;
+
+const ItemTypeBox = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 3px;
+  background-color: ${({ theme }) => theme.gallery};
+`;
+
+const IconStyled = styled(Icon)`
+  width: 20px;
+  height: 20px;
+`;
+
 class SharedItemsStep extends Component {
   state = this.prepareInitialState();
-
-  items = null;
 
   async componentDidMount() {
     const {
@@ -82,25 +148,30 @@ class SharedItemsStep extends Component {
     try {
       const { data: items } = await getOfferedItems();
       const { data: user } = await getUserSelf();
+      const { data: teams } = await getUserTeams();
 
-      console.log('items', items);
+      console.log('teams', teams);
+
+      const { personal: personalItems, teams: teamsItems } = items;
 
       const decryptedItems = await Promise.all(
-        items.map(
+        personalItems.map(
           // eslint-disable-next-line
           async ({ secret }) => await decryptItem(secret, privateKeyObj),
         ),
       );
 
-      console.log('decryptedItems', decryptedItems);
-
       this.setState({
-        items: items.map((item, index) => ({
-          ...item,
-          secret: decryptedItems[index],
-        })),
-        selectedIds: items.map(({ id }) => id),
+        items: {
+          personal: personalItems.map((item, index) => ({
+            ...item,
+            secret: decryptedItems[index],
+          })),
+          teams: teamsItems,
+        },
+        selectedIds: personalItems.map(({ id }) => id),
         user,
+        teams,
       });
     } catch (e) {
       console.log(e);
@@ -119,24 +190,52 @@ class SharedItemsStep extends Component {
     const {
       oldKeyPair,
       currentKeyPair,
+      oldMasterPassword,
+      currentMasterPassword,
       onFinish = Function.prototype,
     } = this.props;
     const { items, selectedIds, user } = this.state;
 
-    console.log('oldKeyPair', oldKeyPair);
-    console.log('currentKeyPair', currentKeyPair);
+    const personalItems = items.personal.filter(({ id }) =>
+      selectedIds.includes(id),
+    );
+    const personalItemIds = personalItems.map(({ id }) => ({ id }));
 
-    const acceptedItems = items.filter(({ id }) => selectedIds.includes(id));
-    const ids = acceptedItems.map(({ id }) => ({ id }));
+    const teamsItems = items.teams.reduce(
+      (accumulator, { items: teamItems }) => [...accumulator, ...teamItems],
+      [],
+    );
 
     try {
-      if (acceptedItems.length > 0) {
-        await patchAcceptItem({ items: ids });
+      if (personalItemIds.length > 0) {
+        await patchAcceptItem({ items: personalItemIds });
       }
 
+      await patchAcceptTeamItems();
+
       if (oldKeyPair) {
-        const decryptedAcceptedItems = await Promise.all(
-          acceptedItems.map(async ({ secret, originalItemId }) => ({
+        const privateKeyObj = await getPrivateKeyObj(
+          oldKeyPair.encryptedPrivateKey || currentKeyPair.encryptedPrivateKey,
+          oldMasterPassword || currentMasterPassword,
+        );
+
+        const teamItemSecrets = await Promise.all(
+          teamsItems.map(
+            // eslint-disable-next-line
+            async ({ secret }) => await decryptItem(secret, privateKeyObj),
+          ),
+        );
+
+        const allItems = [
+          ...personalItems,
+          ...teamsItems.map((item, index) => ({
+            ...item,
+            secret: teamItemSecrets[index],
+          })),
+        ];
+
+        const encryptedItems = await Promise.all(
+          allItems.map(async ({ secret, originalItemId }) => ({
             originalItem: originalItemId,
             items: [
               {
@@ -147,7 +246,7 @@ class SharedItemsStep extends Component {
           })),
         );
 
-        await patchChildItemBatch({ collectionItems: decryptedAcceptedItems });
+        await patchChildItemBatch({ collectionItems: encryptedItems });
       }
 
       onFinish();
@@ -158,36 +257,77 @@ class SharedItemsStep extends Component {
 
   prepareInitialState() {
     return {
-      items: [],
+      items: {},
       selectedIds: [],
     };
   }
 
-  renderItems() {
+  renderPersonalItems() {
     const { selectedIds, items } = this.state;
 
-    const renderedItems = items.map(({ id, secret: { name } }) => {
-      const isActive = selectedIds.includes(id);
+    if (!items.personal) {
+      return null;
+    }
 
-      return (
-        <ItemRow key={id}>
-          <Checkbox checked={isActive} onChange={this.handleSelectRow(id)} />
-          <ItemName>{name}</ItemName>
-        </ItemRow>
-      );
-    });
+    const renderedItems = items.personal.map(
+      ({ id, type, secret: { name } }) => {
+        const isActive = selectedIds.includes(id);
+        const iconName = type === ITEM_CREDENTIALS_TYPE ? 'key' : 'securenote';
+
+        return (
+          <ItemRow key={id}>
+            <ItemNameAndType>
+              <ItemTypeBox>
+                <IconStyled name={iconName} />
+              </ItemTypeBox>
+              <ItemName>{name}</ItemName>
+            </ItemNameAndType>
+            <Checkbox checked={isActive} onChange={this.handleSelectRow(id)} />
+          </ItemRow>
+        );
+      },
+    );
 
     return (
       <ListWrapper>
-        <ScrollbarStyled>{renderedItems}</ScrollbarStyled>
+        <ScrollbarStyled autoHeight autoHeightMax={400}>
+          {renderedItems}
+        </ScrollbarStyled>
       </ListWrapper>
     );
   }
 
+  renderTeamsItems() {
+    const { items, teams } = this.state;
+
+    if (!items.teams || !teams) {
+      return null;
+    }
+
+    return items.teams.map(({ id, items: teamItems }) => {
+      const team = teams.find(({ id: teamId }) => teamId === id);
+
+      return (
+        <TeamRow key={id}>
+          <Avatar avatar={team.icon} />
+          <TeamDetails>
+            <TeamName>{team.title}</TeamName>
+            <TeamItemsWrapper>{teamItems.length} item(-s)</TeamItemsWrapper>
+          </TeamDetails>
+        </TeamRow>
+      );
+    });
+  }
+
   render() {
+    const { items } = this.state;
     const { navigationSteps } = this.props;
 
-    const renderedItems = this.renderItems();
+    const renderedPersonalItems = this.renderPersonalItems();
+    const renderedTeamsItems = this.renderTeamsItems();
+
+    const shouldShowPersonalItems = items.personal && items.personal.length > 0;
+    const shouldShowTeamsItems = items.teams && items.teams.length > 0;
 
     return (
       <Fragment>
@@ -200,9 +340,20 @@ class SharedItemsStep extends Component {
         <AuthDescription>
           You can accept or reject next shared items
         </AuthDescription>
-        {renderedItems}
+        {shouldShowPersonalItems && (
+          <Section>
+            <SectionName>New Items:</SectionName>
+            {renderedPersonalItems}
+          </Section>
+        )}
+        {shouldShowTeamsItems && (
+          <Section>
+            <SectionName>Team Items:</SectionName>
+            {renderedTeamsItems}
+          </Section>
+        )}
         <ButtonWrapper>
-          <ButtonStyled onClick={this.handleAccept}>ACCEPT</ButtonStyled>
+          <ButtonStyled onClick={this.handleAccept}>Start Work</ButtonStyled>
         </ButtonWrapper>
       </Fragment>
     );

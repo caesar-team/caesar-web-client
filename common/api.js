@@ -198,3 +198,5 @@ export const getTeamLists = teamId => callApi.get(`/teams/${teamId}/lists`);
 export const getSearchUser = text => callApi.get(`/users/search/${text}`);
 
 export const getMembers = () => callApi.get('/users');
+
+export const patchAcceptTeamItems = () => callApi.patch('/accept_teams_items');

@@ -72,24 +72,22 @@ const Slider = styled.span`
   `};
 `;
 
-const Toggle = ({ onChange, checked, disabled, name, isLoading, ...props }) => {
-  return (
-    <Wrapper>
-      <InputContainer>
-        <Input
-          {...props}
-          type="checkbox"
-          name={name}
-          checked={checked}
-          disabled={disabled || isLoading}
-          onChange={onChange}
-        />
-        <Slider isLoading={isLoading}>
-          {isLoading && <CircleLoader size={20} color="white" />}
-        </Slider>
-      </InputContainer>
-    </Wrapper>
-  );
-};
+const Toggle = ({ onChange, checked, disabled, name, isLoading, ...props }) => (
+  <Wrapper>
+    <InputContainer>
+      <Input
+        {...props}
+        type="checkbox"
+        name={name}
+        checked={checked}
+        disabled={disabled || isLoading}
+        onChange={onChange}
+      />
+      <Slider isLoading={isLoading}>
+        {isLoading && <CircleLoader size={20} color="white" />}
+      </Slider>
+    </InputContainer>
+  </Wrapper>
+);
 
 export default Toggle;

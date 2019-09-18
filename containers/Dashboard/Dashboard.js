@@ -241,20 +241,8 @@ class DashboardContainer extends Component {
     this.props.setWorkInProgressItem(null);
   };
 
-  handleInviteMember = userId => {
-    this.props.inviteMemberRequest(userId);
-  };
-
-  handleAddNewMember = email => {
-    this.props.inviteNewMemberRequest(email);
-  };
-
   handleChangePermission = (childItemId, permission) => {
     this.props.changeChildItemPermissionRequest(childItemId, permission);
-  };
-
-  handleRemoveInvite = childItemId => {
-    this.props.removeInviteMemberRequest(childItemId);
   };
 
   handleActivateLink = () => {

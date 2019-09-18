@@ -7,7 +7,6 @@ import {
   NewTeamModal,
   ConfirmModal,
 } from 'components';
-import memoizeOne from 'memoize-one';
 
 const LogoWrapper = styled.div`
   display: flex;
@@ -160,8 +159,6 @@ class TeamListContainer extends Component {
         </LogoWrapper>
       );
     }
-
-    console.log(this.props);
 
     const renderedTeamCards = this.renderTeamCards();
 

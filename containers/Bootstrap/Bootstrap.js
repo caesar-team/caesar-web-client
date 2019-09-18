@@ -9,6 +9,8 @@ import {
   BootstrapLayout,
   LoadingNotification,
 } from 'components';
+import OpenPGPWorker from 'public/openpgp.worker';
+import { isClient } from 'common/utils/isEnvironment';
 import { getBootstrapStates, getNavigationPanelSteps } from './utils';
 import {
   TWO_FACTOR_CHECK,
@@ -38,9 +40,18 @@ class Bootstrap extends Component {
 
   bootstrap = null;
 
-  async componentDidMount() {
-    this.initOpenPGP();
+  constructor(props) {
+    super(props);
 
+    // we don't need initialize it in componentDidMound
+    // because openpgp must be initialized before children component will be
+    // initialized via componentDidMount
+    if (isClient) {
+      this.initOpenPGP();
+    }
+  }
+
+  async componentDidMount() {
     this.props.initCoresCount();
 
     const { data: bootstrap } = await getUserBootstrap();
@@ -110,7 +121,10 @@ class Bootstrap extends Component {
   };
 
   initOpenPGP() {
+    const worker = new OpenPGPWorker();
+
     openpgp.config.aead_protect = false;
+    openpgp.initWorker({ workers: [worker] });
   }
 
   currentStepResolver(bootstrap) {

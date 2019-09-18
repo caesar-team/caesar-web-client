@@ -22,12 +22,7 @@ import {
   shareItemBatchRequest,
   removeShareRequest,
 } from 'common/actions/entities/item';
-import {
-  inviteMemberRequest,
-  inviteNewMemberRequest,
-  removeInviteMemberRequest,
-  changeChildItemPermissionRequest,
-} from 'common/actions/entities/childItem';
+import { changeChildItemPermissionRequest } from 'common/actions/entities/childItem';
 import {
   fetchKeyPairRequest,
   fetchUserSelfRequest,
@@ -100,9 +95,6 @@ const mapDispatchToProps = {
   acceptItemUpdateRequest,
   rejectItemUpdateRequest,
   changeChildItemPermissionRequest,
-  inviteMemberRequest,
-  inviteNewMemberRequest,
-  removeInviteMemberRequest,
   shareItemBatchRequest,
   removeShareRequest,
   createAnonymousLinkRequest,

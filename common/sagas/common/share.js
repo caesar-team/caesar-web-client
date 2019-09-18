@@ -2,7 +2,10 @@ import { call, select } from '@redux-saga/core/effects';
 import groupBy from 'lodash.groupby';
 import { getOrCreateMemberBatchSaga } from 'common/sagas/entities/member';
 import { teamsBatchSelector } from 'common/selectors/entities/team';
-import { membersBatchSelector } from 'common/selectors/entities/member';
+import {
+  membersBatchSelector,
+  membersByIdSelector,
+} from 'common/selectors/entities/member';
 import { userDataSelector } from 'common/selectors/user';
 import { itemsChildItemsBatchSelector } from 'common/selectors/entities/item';
 import { ROLE_USER } from 'common/constants';
@@ -33,8 +36,14 @@ export function* prepareUsersForSharing({ payload: { members, teamIds } }) {
     ({ id }) => id !== user.id,
   );
 
+  const uniqMemberIds = [...new Set(allMembers.map(({ id }) => id))];
+
+  const membersById = yield select(membersByIdSelector);
+
+  const uniqMembers = uniqMemberIds.map(id => membersById[id]);
+
   return {
-    allMembers,
+    allMembers: uniqMembers,
     newMembers,
   };
 }

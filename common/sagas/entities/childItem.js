@@ -2,125 +2,29 @@ import { call, fork, put, select, take, takeLatest } from 'redux-saga/effects';
 import {
   CHANGE_CHILD_ITEM_PERMISSION_REQUEST,
   CREATE_CHILD_ITEM_BATCH_REQUEST,
-  INVITE_MEMBER_REQUEST,
-  INVITE_NEW_MEMBER_REQUEST,
-  REMOVE_INVITE_REQUEST,
   UPDATE_CHILD_ITEM_BATCH_REQUEST,
   changeChildItemPermissionFailure,
   changeChildItemPermissionSuccess,
-  inviteMemberFailure,
-  inviteMemberSuccess,
-  inviteNewMemberFailure,
-  removeInviteMemberFailure,
-  removeInviteMemberSuccess,
   updateChildItemsBatchFailure,
   createChildItemBatchFinishedEvent,
-  addChildItemsBatch, createChildItemBatchSuccess, createChildItemBatchFailure,
+  createChildItemBatchSuccess,
+  createChildItemBatchFailure,
 } from 'common/actions/entities/childItem';
 import { encryption } from 'common/sagas/common/encryption';
-import {
-  addChildItemToItem,
-  removeChildItemFromItem,
-} from 'common/actions/entities/item';
 import { updateWorkInProgressItem } from 'common/actions/workflow';
 import { ENCRYPTION_FINISHED_EVENT } from 'common/actions/application';
-import {
-  memberListSelector,
-  membersByIdSelector,
-} from 'common/selectors/entities/member';
-import { workInProgressItemSelector } from 'common/selectors/workflow';
+import { membersByIdSelector } from 'common/selectors/entities/member';
 import { childItemsBatchSelector } from 'common/selectors/entities/childItem';
 import {
-  deleteChildItem,
   patchChildAccess,
   patchChildItemBatch,
-  postCreateChildItem,
   postCreateChildItemBatch,
-  postInvitation,
 } from 'common/api';
-import { encryptItem } from 'common/utils/cipherUtils';
-import { objectToBase64 } from 'common/utils/base64';
 import {
   CHILD_ITEM_ENTITY_TYPE,
   INVITE_TYPE,
   PERMISSION_READ,
-  PERMISSION_WRITE,
 } from 'common/constants';
-import { generateInviteUrl } from 'common/utils/sharing';
-
-export function* inviteMemberSaga({ payload: { userId } }) {
-  try {
-    const workInProgressItem = yield select(workInProgressItemSelector);
-    const members = yield select(memberListSelector);
-
-    const member = members.find(({ id }) => id === userId);
-
-    const encryptedItemSecret = yield call(
-      encryptItem,
-      workInProgressItem.data,
-      member.publicKey,
-    );
-
-    const {
-      data: { items },
-    } = yield call(postCreateChildItem, workInProgressItem.id, {
-      items: [
-        {
-          userId: member.id,
-          secret: encryptedItemSecret,
-          cause: INVITE_TYPE,
-          access: PERMISSION_WRITE,
-        },
-      ],
-    });
-
-    const childItemId = items[0].id;
-
-    yield put(inviteMemberSuccess(workInProgressItem.id, childItemId, member));
-    yield put(addChildItemToItem(workInProgressItem.id, childItemId));
-    yield put(updateWorkInProgressItem());
-  } catch (error) {
-    console.log(error);
-    yield put(inviteMemberFailure());
-  }
-}
-
-export function* inviteNewMemberSaga({
-  payload: {
-    member: { email, password, masterPassword },
-  },
-}) {
-  try {
-    yield call(postInvitation, {
-      email,
-      url: generateInviteUrl(
-        objectToBase64({
-          e: email,
-          p: password,
-          mp: masterPassword,
-        }),
-      ),
-    });
-  } catch (error) {
-    console.log(error);
-    yield put(inviteNewMemberFailure());
-  }
-}
-
-export function* removeInviteMemberSaga({ payload: { childItemId } }) {
-  try {
-    const workInProgressItem = yield select(workInProgressItemSelector);
-
-    yield call(deleteChildItem, childItemId);
-
-    yield put(removeInviteMemberSuccess(childItemId));
-    yield put(removeChildItemFromItem(workInProgressItem.id, childItemId));
-    yield put(updateWorkInProgressItem());
-  } catch (error) {
-    console.log(error);
-    yield put(removeInviteMemberFailure());
-  }
-}
 
 export function* createChildItemBatchSaga({ payload: { itemUserPairs } }) {
   try {
@@ -129,8 +33,6 @@ export function* createChildItemBatchSaga({ payload: { itemUserPairs } }) {
     const {
       payload: { sets: encryptedChildItems },
     } = yield take(ENCRYPTION_FINISHED_EVENT);
-
-    console.log('encryptedChildItems', encryptedChildItems);
 
     const preparedChildItemsGroupedByItemId = encryptedChildItems.reduce(
       (accumulator, { itemId, ...data }) => {
@@ -245,9 +147,6 @@ export function* changeChildItemPermissionSaga({
 }
 
 export default function* childItemSagas() {
-  yield takeLatest(INVITE_MEMBER_REQUEST, inviteMemberSaga);
-  yield takeLatest(INVITE_NEW_MEMBER_REQUEST, inviteNewMemberSaga);
-  yield takeLatest(REMOVE_INVITE_REQUEST, removeInviteMemberSaga);
   yield takeLatest(CREATE_CHILD_ITEM_BATCH_REQUEST, createChildItemBatchSaga);
   yield takeLatest(UPDATE_CHILD_ITEM_BATCH_REQUEST, updateChildItemsBatchSaga);
   yield takeLatest(

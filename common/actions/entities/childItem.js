@@ -1,14 +1,3 @@
-export const INVITE_MEMBER_REQUEST = '@childItem/INVITE_MEMBER_REQUEST';
-export const INVITE_MEMBER_SUCCESS = '@childItem/INVITE_MEMBER_SUCCESS';
-export const INVITE_MEMBER_FAILURE = '@childItem/INVITE_MEMBER_FAILURE';
-
-export const REMOVE_INVITE_REQUEST = '@childItem/REMOVE_INVITE_REQUEST';
-export const REMOVE_INVITE_SUCCESS = '@childItem/REMOVE_INVITE_SUCCESS';
-export const REMOVE_INVITE_FAILURE = '@childItem/REMOVE_INVITE_FAILURE';
-
-export const INVITE_NEW_MEMBER_REQUEST = '@childItem/INVITE_NEW_MEMBER_REQUEST';
-export const INVITE_NEW_MEMBER_FAILURE = '@childItem/INVITE_NEW_MEMBER_FAILURE';
-
 export const CREATE_CHILD_ITEM_BATCH_REQUEST =
   '@childItem/CREATE_CHILD_ITEM_BATCH_REQUEST';
 export const CREATE_CHILD_ITEM_BATCH_SUCCESS =
@@ -34,55 +23,6 @@ export const RESET_STORE = '@childItem/RESET_STORE';
 
 export const CREATE_CHILD_ITEM_BATCH_FINISHED_EVENT =
   '@childItem/CREATE_CHILD_ITEM_BATCH_FINISHED_EVENT';
-
-export const inviteMemberRequest = userId => ({
-  type: INVITE_MEMBER_REQUEST,
-  payload: {
-    userId,
-  },
-});
-
-export const inviteMemberSuccess = (itemId, childItemId, member) => ({
-  type: INVITE_MEMBER_SUCCESS,
-  payload: {
-    itemId,
-    childItemId,
-    member,
-  },
-});
-
-export const inviteMemberFailure = () => ({
-  type: INVITE_MEMBER_FAILURE,
-});
-
-export const removeInviteMemberRequest = childItemId => ({
-  type: REMOVE_INVITE_REQUEST,
-  payload: {
-    childItemId,
-  },
-});
-
-export const removeInviteMemberSuccess = childItemId => ({
-  type: REMOVE_INVITE_SUCCESS,
-  payload: {
-    childItemId,
-  },
-});
-
-export const removeInviteMemberFailure = () => ({
-  type: REMOVE_INVITE_FAILURE,
-});
-
-export const inviteNewMemberRequest = email => ({
-  type: INVITE_NEW_MEMBER_REQUEST,
-  payload: {
-    email,
-  },
-});
-
-export const inviteNewMemberFailure = () => ({
-  type: INVITE_NEW_MEMBER_FAILURE,
-});
 
 export const createChildItemBatchRequest = () => ({
   type: CREATE_CHILD_ITEM_BATCH_REQUEST,

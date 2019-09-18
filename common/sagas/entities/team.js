@@ -60,8 +60,6 @@ export function* fetchTeamsSaga() {
   try {
     const { data } = yield call(getTeams);
 
-    console.log('data', data);
-
     yield put(fetchTeamsSuccess(convertTeamsToEntity(data)));
 
     const currentTeamId = yield select(currentTeamIdSelector);
@@ -152,8 +150,6 @@ export function* addTeamMembersBatchSaga({ payload: { teamId, members } }) {
     const { allMembers, newMembers } = yield call(prepareUsersForSharing, {
       payload: { members, teamIds: [] },
     });
-
-    console.log('newMembers', newMembers);
 
     yield fork(inviteNewMemberBatchSaga, { payload: { members: newMembers } });
 

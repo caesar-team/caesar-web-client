@@ -250,8 +250,6 @@ export function* createItemSaga({
     yield put(addItemToList(newItem));
     yield put(updateWorkInProgressItem(itemId, ITEM_REVIEW_MODE));
 
-    console.log('list', list);
-
     if (list.teamId) {
       const team = yield select(teamSelector, { teamId: list.teamId });
       const memberIds = team.users.map(({ id }) => id);
@@ -264,7 +262,6 @@ export function* createItemSaga({
           user: { id, publicKey },
         }));
 
-      console.log(newItem, members);
       yield fork(createChildItemBatchSaga, {
         payload: { itemUserPairs },
       });
@@ -272,8 +269,6 @@ export function* createItemSaga({
       const {
         payload: { childItems },
       } = yield take(CREATE_CHILD_ITEM_BATCH_FINISHED_EVENT);
-
-      console.log('CREATE_CHILD_ITEM_BATCH_FINISHED_EVENT', childItems);
 
       const shares = childItems.reduce(
         // eslint-disable-next-line
@@ -566,8 +561,6 @@ export function* removeAnonymousLinkSaga() {
 
 export function* shareItemBatchSaga({ payload: { items, members, teamIds } }) {
   try {
-    console.log('shareItemBatchSaga', items, members, teamIds);
-
     const itemsById = yield select(itemsByIdSelector);
     const sharingItems = items.map(itemId => itemsById[itemId]);
 
@@ -575,14 +568,9 @@ export function* shareItemBatchSaga({ payload: { items, members, teamIds } }) {
       payload: { members, teamIds },
     });
 
-    console.log('allMembers', allMembers);
-    console.log('newMembers', newMembers);
-
     const itemUserPairs = yield call(resolveSharingConflicts, {
       payload: { items: sharingItems, members: allMembers },
     });
-
-    console.log('itemMemberPairs', itemUserPairs);
 
     yield fork(inviteNewMemberBatchSaga, { payload: { members: newMembers } });
     yield fork(createChildItemBatchSaga, { payload: { itemUserPairs } });
@@ -590,8 +578,6 @@ export function* shareItemBatchSaga({ payload: { items, members, teamIds } }) {
     const {
       payload: { childItems },
     } = yield take(CREATE_CHILD_ITEM_BATCH_FINISHED_EVENT);
-
-    console.log('CREATE_CHILD_ITEM_BATCH_FINISHED_EVENT', childItems);
 
     const shares = childItems.reduce(
       (accumulator, item) => [

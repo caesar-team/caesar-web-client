@@ -195,7 +195,6 @@ class ShareModal extends Component {
     const renderedTeams = teams.map(({ id, title, ...props }) => {
       const isActive = teamIds.includes(id);
 
-      console.log(isActive);
       return (
         <TeamTagStyled
           isActive={isActive}

@@ -209,7 +209,7 @@ class UserSearchInput extends Component {
     return (
       <Wrapper className={className}>
         <InputStyled
-          placeholder="Enter email addresses…"
+          placeholder="Enter personal email addresses…"
           value={filterText}
           onChange={this.handleChange}
           prefix={Prefix}

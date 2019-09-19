@@ -48,15 +48,15 @@ const NotifyButton = styled(Button)`
 const Item = ({
   isTrashItem = false,
   item,
+  owner,
   childItems,
   allLists,
   user,
-  members = {},
+  membersById = {},
   notification,
   onClickMoveItem = Function.prototype,
   onClickCloseItem = Function.prototype,
   onClickEditItem = Function.prototype,
-  onClickInvite = Function.prototype,
   onClickShare = Function.prototype,
   onFinishCreateWorkflow = Function.prototype,
   onFinishEditWorkflow = Function.prototype,
@@ -72,7 +72,7 @@ const Item = ({
     return <EmptyItem />;
   }
 
-  const { mode, type, update, owner, id } = item;
+  const { mode, type, update, ownerId, id } = item;
 
   const renderedItemForm = matchStrict(
     type,
@@ -104,12 +104,12 @@ const Item = ({
     (acc, childItem) => (childItem.userId === user.id ? childItem.access : acc),
     null,
   );
-  const hasWriteAccess = owner.id === user.id || access === PERMISSION_WRITE;
+  const hasWriteAccess = ownerId === user.id || access === PERMISSION_WRITE;
   const isReadOnly = access && !hasWriteAccess;
 
   const renderUpdateNotify = () => {
     const updateUserName =
-      update.userId === owner.id ? user.name : members[update.userId].name;
+      update.userId === ownerId ? user.name : membersById[update.userId].name;
     const updateDate = formatDate(update.createdAt);
 
     return (
@@ -140,15 +140,15 @@ const Item = ({
           isTrashItem={isTrashItem}
           isReadOnly={isReadOnly}
           item={item}
+          owner={owner}
           childItems={childItems}
           user={user}
-          members={members}
+          membersById={membersById}
           allLists={allLists}
           onClickMoveItem={onClickMoveItem}
           onClickCloseItem={onClickCloseItem}
           onClickRemoveItem={onClickRemoveItem}
           onClickEditItem={onClickEditItem}
-          onClickInvite={onClickInvite}
           onClickShare={onClickShare}
           onClickRestoreItem={onClickRestoreItem}
           onToggleFavorites={onToggleFavorites}
@@ -161,15 +161,15 @@ const Item = ({
           isTrashItem={isTrashItem}
           isReadOnly={isReadOnly}
           item={item}
+          owner={owner}
           childItems={childItems}
           user={user}
-          members={members}
+          membersById={membersById}
           allLists={allLists}
           onClickMoveItem={onClickMoveItem}
           onClickCloseItem={onClickCloseItem}
           onClickRemoveItem={onClickRemoveItem}
           onClickEditItem={onClickEditItem}
-          onClickInvite={onClickInvite}
           onClickShare={onClickShare}
           onClickRestoreItem={onClickRestoreItem}
           onToggleFavorites={onToggleFavorites}

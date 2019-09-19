@@ -1,7 +1,7 @@
 import React, { Fragment } from 'react';
 import { Error, Head } from 'components';
 import { Bootstrap, Invite } from 'containers';
-import { base64ToObject } from 'common/utils/cipherUtils';
+import { base64ToObject } from 'common/utils/base64';
 import { login } from 'common/utils/authUtils';
 
 const validFields = ['e', 'p', 'mp'];
@@ -26,6 +26,8 @@ InvitePage.getInitialProps = async ({
   query: { encryption = '' },
 }) => {
   const shared = base64ToObject(encryption);
+
+  console.log('shared', shared);
 
   if (!shared || !validateFields(shared, validFields)) {
     return { statusCode: 404 };

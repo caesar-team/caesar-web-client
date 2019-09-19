@@ -2,7 +2,7 @@ import React from 'react';
 import styled from 'styled-components';
 import { CircleLoader } from '../Loader';
 
-const GlobalContainer = styled.label`
+const Wrapper = styled.label`
   display: flex;
   justify-content: center;
   align-items: center;
@@ -36,9 +36,9 @@ const Input = styled.input`
     box-shadow: 0 0 1px #2196f3;
   }
   &:checked + span:before {
-    -webkit-transform: translateX(18px);
+    -webkit-transform: translateX(20px);
     -ms-transform: translateX(18px);
-    transform: translateX(18px);
+    transform: translateX(pxpx);
   }
 `;
 
@@ -63,9 +63,8 @@ const Slider = styled.span`
       position: relative;
       border-radius: 50%;
       content: '';
-      height: 16px;
-      width: 16px;
-      left: 4px;
+      height: 20px;
+      width: 20px;
       background-color: ${theme.white};
       -webkit-transition: 0.4s;
       transition: 0.4s;
@@ -73,27 +72,22 @@ const Slider = styled.span`
   `};
 `;
 
-const StyledLoader = styled(CircleLoader)`
-  position: absolute;
-  top: 2px;
-  left: 2px;
-`;
-
-const Toggle = ({ onChange, checked, disabled, name, isLoading, ...props }) => {
-  return (
-    <GlobalContainer>
-      <InputContainer onChange={onChange}>
-        <Input
-          {...props}
-          type="checkbox"
-          name={name}
-          checked={checked}
-          disabled={disabled || isLoading}
-        />
-        <Slider isLoading={isLoading}>{isLoading && <StyledLoader />}</Slider>
-      </InputContainer>
-    </GlobalContainer>
-  );
-};
+const Toggle = ({ onChange, checked, disabled, name, isLoading, ...props }) => (
+  <Wrapper>
+    <InputContainer>
+      <Input
+        {...props}
+        type="checkbox"
+        name={name}
+        checked={checked}
+        disabled={disabled || isLoading}
+        onChange={onChange}
+      />
+      <Slider isLoading={isLoading}>
+        {isLoading && <CircleLoader size={20} color="white" />}
+      </Slider>
+    </InputContainer>
+  </Wrapper>
+);
 
 export default Toggle;

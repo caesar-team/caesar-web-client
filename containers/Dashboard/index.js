@@ -1,7 +1,7 @@
 import { connect } from 'react-redux';
 import { createStructuredSelector } from 'reselect';
 import {
-  fetchNodesRequest,
+  initPreparationDataFlow,
   setWorkInProgressItem,
   setWorkInProgressItemIds,
   setWorkInProgressListId,
@@ -19,21 +19,22 @@ import {
   toggleItemToFavoriteRequest,
   createAnonymousLinkRequest,
   removeAnonymousLinkRequest,
-} from 'common/actions/item';
-import {
-  inviteMemberRequest,
-  inviteNewMemberRequest,
-  removeInviteMemberRequest,
   shareItemBatchRequest,
   removeShareRequest,
-  changeChildItemPermissionRequest,
-} from 'common/actions/childItem';
-import { fetchKeyPairRequest, fetchUserSelfRequest } from 'common/actions/user';
-import { fetchMembersRequest } from 'common/actions/member';
+} from 'common/actions/entities/item';
+import { changeChildItemPermissionRequest } from 'common/actions/entities/childItem';
+import {
+  fetchKeyPairRequest,
+  fetchUserSelfRequest,
+  fetchUserTeamsRequest,
+} from 'common/actions/user';
+import { fetchTeamsRequest } from 'common/actions/entities/team';
 import {
   isLoadingSelector,
   workInProgressItemSelector,
+  workInProgressItemOwnerSelector,
   workInProgressItemChildItemsSelector,
+  workInProgressItemSharedMembersSelector,
   workInProgressItemIdsSelector,
   workInProgressItemsSelector,
   workInProgressListSelector,
@@ -41,36 +42,50 @@ import {
 } from 'common/selectors/workflow';
 import {
   selectableListsWithoutChildrenSelector,
-  listsByTypeSelector,
+  personalListsByTypeSelector,
   trashListSelector,
-} from 'common/selectors/list';
-import { itemsByIdSelector } from 'common/selectors/item';
-import { keyPairSelector, userDataSelector } from 'common/selectors/user';
-import { membersByIdSelector } from 'common/selectors/member';
+  teamTrashListSelector,
+  currentTeamListsSelector,
+} from 'common/selectors/entities/list';
+import { itemsByIdSelector } from 'common/selectors/entities/item';
+import {
+  keyPairSelector,
+  userDataSelector,
+  currentTeamSelector,
+  userTeamListSelector,
+} from 'common/selectors/user';
+import { membersByIdSelector } from 'common/selectors/entities/member';
 import Dashboard from './Dashboard';
 
 const mapStateToProps = createStructuredSelector({
-  lists: selectableListsWithoutChildrenSelector,
-  listsByType: listsByTypeSelector,
+  personalLists: selectableListsWithoutChildrenSelector,
+  teamLists: currentTeamListsSelector,
+  userTeamList: userTeamListSelector,
+  personalListsByType: personalListsByTypeSelector,
   itemsById: itemsByIdSelector,
   workInProgressItem: workInProgressItemSelector,
+  workInProgressItemOwner: workInProgressItemOwnerSelector,
   workInProgressItemChildItems: workInProgressItemChildItemsSelector,
+  workInProgressItemSharedMembers: workInProgressItemSharedMembersSelector,
   workInProgressItemIds: workInProgressItemIdsSelector,
   workInProgressList: workInProgressListSelector,
   visibleListItems: visibleListItemsSelector,
   workInProgressItems: workInProgressItemsSelector,
   trashList: trashListSelector,
+  teamTrashList: teamTrashListSelector,
   keyPair: keyPairSelector,
-  members: membersByIdSelector,
+  membersById: membersByIdSelector,
   user: userDataSelector,
+  team: currentTeamSelector,
   isLoading: isLoadingSelector,
 });
 
 const mapDispatchToProps = {
-  fetchNodesRequest,
+  initPreparationDataFlow,
   fetchKeyPairRequest,
-  fetchMembersRequest,
   fetchUserSelfRequest,
+  fetchUserTeamsRequest,
+  fetchTeamsRequest,
   moveItemRequest,
   moveItemsBatchRequest,
   createItemRequest,
@@ -80,9 +95,6 @@ const mapDispatchToProps = {
   acceptItemUpdateRequest,
   rejectItemUpdateRequest,
   changeChildItemPermissionRequest,
-  inviteMemberRequest,
-  inviteNewMemberRequest,
-  removeInviteMemberRequest,
   shareItemBatchRequest,
   removeShareRequest,
   createAnonymousLinkRequest,

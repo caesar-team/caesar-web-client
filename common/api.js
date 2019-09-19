@@ -1,11 +1,11 @@
 import axios from 'axios';
-import { removeToken } from './utils/token';
+import { removeCookieValue } from './utils/token';
 import { API_URI, API_BASE_PATH } from './constants';
 import { isClient } from './utils/isEnvironment';
 
 const softExit = () => {
   if (isClient) {
-    removeToken();
+    removeCookieValue('token');
 
     // TODO: change via Router
     if (window.location.pathname !== '/signin') {
@@ -67,7 +67,7 @@ export const postActivateTwoFactor = data =>
 export const postCheckTwoFactor = data => callApi.post('/auth/2fa', data);
 
 // post
-export const getList = token =>
+export const getLists = token =>
   callApi.get('/list', {
     headers: {
       Authorization: token ? `Bearer ${token}` : '',
@@ -127,8 +127,6 @@ export const removeList = listId => callApi.delete(`/list/${listId}`);
 
 export const toggleFavorite = id => callApi.post(`/item/${id}/favorite`);
 
-export const getPublicKeyByEmail = email => callApi.get(`/key/${email}`);
-
 export const getPublicKeyByEmailBatch = data =>
   callApi.post('/key/batch', data);
 
@@ -166,3 +164,39 @@ export const patchResetPassword = (token, data) =>
 export const postSecureMessage = data => callApi.post('/message', data);
 
 export const getSecureMessage = id => callApi.get(`/message/${id}`);
+
+export const getUserTeams = () => callApi.get('/user/teams');
+
+export const getTeams = () => callApi.get('/teams');
+
+export const getUsersByIds = userIds =>
+  callApi.get(`/users?${userIds.map(userId => `ids[]=${userId}`).join('&')}`);
+
+export const getTeamMembers = teamId => callApi.get(`/teams/${teamId}/members`);
+
+export const postCreateTeam = data => callApi.post('/teams', data);
+
+export const deleteTeam = teamId => callApi.delete(`/teams/${teamId}`);
+
+export const getTeam = teamId => callApi.get(`/teams/${teamId}`);
+
+export const updateTeamMember = ({ teamId, userId, role }) =>
+  callApi.patch(`/teams/${teamId}/members/${userId}`, {
+    userRole: role,
+  });
+
+export const deleteTeamMember = ({ teamId, userId }) =>
+  callApi.delete(`/teams/${teamId}/members/${userId}`);
+
+export const postAddTeamMember = ({ teamId, userId, role }) =>
+  callApi.post(`/teams/${teamId}/members/${userId}`, {
+    userRole: role,
+  });
+
+export const getTeamLists = teamId => callApi.get(`/teams/${teamId}/lists`);
+
+export const getSearchUser = text => callApi.get(`/users/search/${text}`);
+
+export const getMembers = () => callApi.get('/users');
+
+export const patchAcceptTeamItems = () => callApi.patch('/accept_teams_items');

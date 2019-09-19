@@ -3,10 +3,14 @@ import * as openpgp from 'openpgp';
 import { withRouter } from 'next/router';
 import { getUserBootstrap, getUserSelf } from 'common/api';
 import { DEFAULT_IDLE_TIMEOUT } from 'common/constants';
-import EncryptionWorker from 'common/encryption.worker';
-import { SessionChecker } from 'components/SessionChecker';
-import { FullScreenLoader } from 'components/Loader';
-import { BootstrapLayout } from 'components/Layout';
+import {
+  SessionChecker,
+  FullScreenLoader,
+  BootstrapLayout,
+  LoadingNotification,
+} from 'components';
+import OpenPGPWorker from 'public/openpgp.worker';
+import { isClient } from 'common/utils/isEnvironment';
 import { getBootstrapStates, getNavigationPanelSteps } from './utils';
 import {
   TWO_FACTOR_CHECK,
@@ -36,8 +40,19 @@ class Bootstrap extends Component {
 
   bootstrap = null;
 
+  constructor(props) {
+    super(props);
+
+    // we don't need initialize it in componentDidMound
+    // because openpgp must be initialized before children component will be
+    // initialized via componentDidMount
+    if (isClient) {
+      this.initOpenPGP();
+    }
+  }
+
   async componentDidMount() {
-    this.initEncryptionWorker();
+    this.props.initCoresCount();
 
     const { data: bootstrap } = await getUserBootstrap();
     const { data: user } = await getUserSelf();
@@ -105,12 +120,11 @@ class Bootstrap extends Component {
     });
   };
 
-  initEncryptionWorker() {
+  initOpenPGP() {
+    const worker = new OpenPGPWorker();
+
     openpgp.config.aead_protect = false;
-
-    this.worker = new EncryptionWorker();
-
-    openpgp.initWorker({ workers: [this.worker] });
+    openpgp.initWorker({ workers: [worker] });
   }
 
   currentStepResolver(bootstrap) {
@@ -157,6 +171,7 @@ class Bootstrap extends Component {
 
   render() {
     const {
+      isLoadingGlobalNotification,
       component: PageComponent,
       router,
       shared = {},
@@ -252,6 +267,7 @@ class Bootstrap extends Component {
             password={masterPassword}
             {...props}
           />
+          {isLoadingGlobalNotification && <LoadingNotification />}
         </SessionChecker>
       )
     );

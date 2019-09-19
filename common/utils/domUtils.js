@@ -56,3 +56,47 @@ export function elementIsFocused(element) {
     element.contains(document.activeElement)
   );
 }
+
+export const getFaviconURL = () => {
+  const links = document.getElementsByTagName('link');
+  let tag = null;
+
+  for (let i = 0, l = links.length; i < l; i++) {
+    if (
+      links[i].getAttribute('rel') === 'icon' ||
+      links[i].getAttribute('rel') === 'shortcut icon'
+    ) {
+      tag = links[i];
+    }
+  }
+
+  return tag ? tag.getAttribute('href') : '/favicon.ico';
+};
+
+export const removeFaviconTag = () => {
+  const links = Array.prototype.slice.call(
+    document.getElementsByTagName('link'),
+    0,
+  );
+  const head = document.getElementsByTagName('head')[0];
+
+  for (let i = 0, l = links.length; i < l; i++) {
+    if (
+      links[i].getAttribute('rel') === 'icon' ||
+      links[i].getAttribute('rel') === 'shortcut icon'
+    ) {
+      head.removeChild(links[i]);
+    }
+  }
+};
+
+export const setFaviconTag = url => {
+  removeFaviconTag();
+
+  const link = document.createElement('link');
+  link.type = 'image/x-icon';
+  link.rel = 'icon';
+  link.href = url;
+
+  document.getElementsByTagName('head')[0].appendChild(link);
+};

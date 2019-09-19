@@ -1,12 +1,13 @@
 import React, { Component, Fragment } from 'react';
 import styled from 'styled-components';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
-import { AvatarsList } from 'components/Avatar';
-import { withOfflineDetection } from 'components/Offline';
 import Link from 'next/link';
 import { DEFAULT_LIST_TYPE } from 'common/constants';
+import Button from '../Button/Button';
+import DottedMenu from '../DottedMenu/DottedMenu';
+import AvatarsList from '../Avatar/AvatarsList';
+import withOfflineDetection from '../Offline/withOfflineDetection';
 import { Icon } from '../Icon';
-import { ListOptions } from './ListOptions';
 
 const getTableColAlignStyles = ({ align }) => {
   switch (align) {
@@ -77,6 +78,11 @@ const MembersCol = styled.div`
 const StyledIcon = styled(Icon)`
   cursor: pointer;
   fill: ${({ theme }) => theme.gray};
+`;
+
+const StyledButton = styled(Button)`
+  width: 100%;
+  height: 50px;
 `;
 
 const ListWrapper = styled.div``;
@@ -172,12 +178,26 @@ class ManageList extends Component {
                   avatars={generateAvatars(listItem.invited)}
                 />
                 {isOnline && (
-                  <ListOptions
-                    index={index}
-                    listId={listItem.id}
-                    onClickEditList={onClickEditList}
-                    onClickRemoveList={onClickRemoveList}
-                  />
+                  <DottedMenu
+                    tooltipProps={{
+                      textBoxWidth: '100px',
+                      arrowAlign: 'start',
+                      position: 'bottom center',
+                    }}
+                  >
+                    <StyledButton
+                      color="white"
+                      onClick={onClickEditList(listItem.id)}
+                    >
+                      Edit
+                    </StyledButton>
+                    <StyledButton
+                      color="white"
+                      onClick={onClickRemoveList(listItem.id)}
+                    >
+                      Remove
+                    </StyledButton>
+                  </DottedMenu>
                 )}
               </MembersCol>
             </TableCol>

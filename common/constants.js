@@ -16,7 +16,10 @@ export const {
 export const PORTAL_ID = 'portal';
 export const DEFAULT_IDLE_TIMEOUT = 5 * 60 * 1000;
 export const MAX_SIZE_RANDOM_BUFFER = 60000;
-export const WORKER_DECRYPTION_BUFFER_SIZE = 10;
+export const DEFAULT_CORES_COUNT = 4;
+
+export const DECRYPTION_CHUNK_SIZE = 10;
+export const ENCRYPTION_CHUNK_SIZE = 5;
 
 export const ROOT_TYPE = 'root';
 export const INBOX_TYPE = 'inbox';
@@ -33,7 +36,7 @@ export const LIST_TYPES = {
 
 export const DASHBOARD_DEFAULT_MODE = 'DEFAULT_MODE';
 export const DASHBOARD_SEARCH_MODE = 'SEARCH_MODE';
-export const DASHBOARD_SECURE_MESSAGE_MODE = 'SECURE_MESSAGE_MODE';
+export const DASHBOARD_TOOL_MODE = 'SECURE_MESSAGE_MODE';
 
 export const ITEM_REVIEW_MODE = 'review';
 export const ITEM_WORKFLOW_EDIT_MODE = 'edit';
@@ -94,10 +97,72 @@ export const DEFAULT_SECONDS_LIMIT = 60 * 60;
 export const INVITE_TYPE = 'invite';
 export const SHARE_TYPE = 'share';
 
-export const USER_ROLE = 'ROLE_USER';
-export const READ_ONLY_USER_ROLE = 'ROLE_READ_ONLY_USER';
-export const ANONYMOUS_USER_ROLE = 'ROLE_ANONYMOUS_USER';
+export const USER_ROLE_ADMIN = 'admin';
+export const USER_ROLE_MEMBER = 'member';
+export const USER_ROLE_GUEST = 'guest';
+
+export const COMMANDS_ROLES = {
+  USER_ROLE_ADMIN,
+  USER_ROLE_MEMBER,
+  USER_ROLE_GUEST,
+};
+
+export const ROLE_USER = 'ROLE_USER';
+export const ROLE_ADMIN = 'ROLE_ADMIN';
+export const ROLE_READ_ONLY_USER = 'ROLE_READ_ONLY_USER';
+export const ROLE_ANONYMOUS_USER = 'ROLE_ANONYMOUS_USER';
+
+export const DOMAIN_ROLES = {
+  ROLE_USER,
+  ROLE_ADMIN,
+  ROLE_READ_ONLY_USER,
+  ROLE_ANONYMOUS_USER,
+};
 
 export const LOADING = 'LOADING';
 export const SUCCESS = 'SUCCESS';
 export const FAILURE = 'FAILURE';
+
+export const ROUTES = {
+  SIGN_IN: '/signin',
+  SIGN_UP: '/signup',
+  RESETTING: '/resetting',
+  MESSAGE: '/message',
+  SECURE: '/secure',
+  SHARE: '/share',
+  INVITE: '/invite',
+  DASHBOARD: '/',
+  MANAGE: '/manage',
+  IMPORT: '/import',
+  TEAM: '/team',
+};
+
+export const SHARED_ROUTES = [ROUTES.SHARE, ROUTES.INVITE];
+
+// require bootstrap
+// TODO: figure out better naming
+export const LOCKED_ROUTES = [
+  ROUTES.DASHBOARD,
+  ROUTES.MANAGE,
+  ROUTES.IMPORT,
+  ROUTES.TEAM,
+];
+
+// don't require bootstrap routes
+// TODO: figure out better naming
+export const UNLOCKED_ROUTES = [
+  ROUTES.SIGN_IN,
+  ROUTES.SIGN_UP,
+  ROUTES.RESETTING,
+  ROUTES.MESSAGE,
+  ROUTES.SECURE,
+  ROUTES.SHARE,
+  ROUTES.INVITE,
+];
+
+export const CHILD_ITEM_ENTITY_TYPE = 'ChildItem';
+export const ITEM_ENTITY_TYPE = 'Item';
+export const LIST_ENTITY_TYPE = 'List';
+export const TEAM_ENTITY_TYPE = 'Team';
+export const MEMBER_ENTITY_TYPE = 'Member';
+export const USER_TYPE = 'User';

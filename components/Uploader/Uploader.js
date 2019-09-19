@@ -86,6 +86,7 @@ const Uploader = ({
   error,
   files: previousFiles = [],
   notification,
+  children,
   ...props
 }) => {
   const handleDrop = async acceptedFiles => {
@@ -116,22 +117,26 @@ const Uploader = ({
       onDrop={handleDrop}
       {...props}
     >
-      {({ getRootProps, getInputProps, isDragActive }) => (
-        <Container {...getRootProps()} isDragActive={isDragActive}>
-          <input {...getInputProps()} />
-          <StyledIcon
-            name="inbox"
-            width={40}
-            height={36}
-            isDragActive={isDragActive}
-          />
-          <Text>
-            Drag and drop your file here or <Link>upload</Link>.
-          </Text>
-          <ExtText>{extText}</ExtText>
-          {error && <Error>{error}</Error>}
-        </Container>
-      )}
+      {({ getRootProps, getInputProps, isDragActive }) =>
+        children ? (
+          children({ getRootProps, getInputProps, isDragActive })
+        ) : (
+          <Container {...getRootProps()} isDragActive={isDragActive}>
+            <input {...getInputProps()} />
+            <StyledIcon
+              name="inbox"
+              width={40}
+              height={36}
+              isDragActive={isDragActive}
+            />
+            <Text>
+              Drag and drop your file here or <Link>upload</Link>.
+            </Text>
+            <ExtText>{extText}</ExtText>
+            {error && <Error>{error}</Error>}
+          </Container>
+        )
+      }
     </Dropzone>
   );
 };

@@ -1,6 +1,7 @@
 import React from 'react';
+import { connect } from 'react-redux';
 import styled from 'styled-components';
-import { withRouter } from 'next/router';
+import { logout } from 'common/actions/user';
 import { Avatar } from '../Avatar';
 import { Button } from '../Button';
 import { Logo } from './Logo';
@@ -37,7 +38,7 @@ const UserName = styled.div`
   margin-left: 20px;
 `;
 
-const BootstrapHeader = ({ user, router }) => (
+const BootstrapHeader = ({ user, ...props }) => (
   <Wrapper>
     <LogoWrapper>
       <Logo href="/" />
@@ -47,11 +48,20 @@ const BootstrapHeader = ({ user, router }) => (
         <Avatar {...user} name={user.email} />
         <UserName>{user.name}</UserName>
       </UserInfo>
-      <Button color="white" onClick={() => router.push('/logout')}>
+      <Button color="white" onClick={props.logout}>
         LOG OUT
       </Button>
     </UserSection>
   </Wrapper>
 );
 
-export default withRouter(BootstrapHeader);
+const mapStateToProps = () => ({});
+
+const mapDispatchToProps = {
+  logout,
+};
+
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps,
+)(BootstrapHeader);

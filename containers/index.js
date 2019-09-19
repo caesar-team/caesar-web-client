@@ -8,3 +8,5 @@ export { SignInContainer } from './SignIn';
 export { SignUpContainer } from './SignUp';
 export { ResetPasswordContainer } from './ResetPassword';
 export { SecureMessageContainer } from './SecureMessage';
+export { default as TeamListContainer } from './TeamList';
+export { default as TeamContainer } from './Team';

@@ -102,11 +102,13 @@ const Row = styled.div`
       background: ${({ theme }) => theme.gallery};
     `}
 `;
+
 const ItemTypeIcon = props => {
   const { type } = props;
   const icon = ITEM_ICON_TYPES[type] || ITEM_ICON_TYPES[ITEM_CREDENTIALS_TYPE];
   return <Icon name={icon} width={20} height={20} fill="#fff" />;
 };
+
 const Item = ({
   id,
   lastUpdated,

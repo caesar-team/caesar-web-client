@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import styled from 'styled-components';
-import debounce from 'debounce';
+import debounce from 'lodash.debounce';
 import { formatNumber } from 'common/utils/number';
 
 const Wrapper = styled.div`

@@ -126,7 +126,11 @@ const List = ({
   onClickCreateItem = Function.prototype,
 }) => {
   if (!workInProgressList && !workInProgressItemIds.length) {
-    return null;
+    return (
+      <Wrapper isEmpty>
+        <EmptyList />
+      </Wrapper>
+    );
   }
 
   const itemTypesOptions = [

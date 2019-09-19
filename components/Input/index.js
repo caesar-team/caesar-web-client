@@ -6,3 +6,4 @@ export { default as TextArea } from './TextArea';
 export { default as ShareInput } from './ShareInput';
 export { default as SearchInput } from './SearchInput';
 export { default as StrengthIndicator } from './StrengthIndicator';
+export { default as UserSearchInput } from './UserSearchInput';

@@ -1,6 +1,4 @@
-export { default as memberReducer } from './member';
+export * from './entities';
+export { default as applicationReducer } from './application';
 export { default as userReducer } from './user';
 export { default as workflowReducer } from './workflow';
-export { default as listReducer } from './list';
-export { default as itemReducer } from './item';
-export { default as childItemReducer } from './childItem';

@@ -28,6 +28,6 @@ const userTransform = createTransform(
 );
 
 export const persistOptions = {
-  blacklist: ['workflow'],
+  blacklist: ['application', 'workflow'],
   transforms: [itemTransform, userTransform],
 };

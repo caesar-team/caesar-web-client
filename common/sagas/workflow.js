@@ -1,150 +1,141 @@
-import { take, put, call, takeLatest, select, all } from 'redux-saga/effects';
-import { eventChannel } from 'redux-saga';
+import { put, call, fork, takeLatest, select } from 'redux-saga/effects';
+import { decryption } from 'common/sagas/common/decryption';
 import {
-  FETCH_NODES_REQUEST,
+  INIT_PREPARATION_DATA_FLOW,
+  INIT_PREPARATION_TEAM_DATA_FLOW,
   UPDATE_WORK_IN_PROGRESS_ITEM,
-  REHYDRATE_STORE,
-  fetchNodesFailure,
-  fetchNodesSuccess,
   finishIsLoading,
   setWorkInProgressListId,
   setWorkInProgressItem,
+  resetWorkInProgressItemIds,
 } from 'common/actions/workflow';
-import { addListsBatch } from 'common/actions/list';
-import { addItemsBatch } from 'common/actions/item';
-import { addChildItemsBatch } from 'common/actions/childItem';
+import { addListsBatch } from 'common/actions/entities/list';
+import { addItemsBatch } from 'common/actions/entities/item';
+import { SET_CURRENT_TEAM_ID } from 'common/actions/user';
+import { addChildItemsBatch } from 'common/actions/entities/childItem';
+import {
+  fetchMembersSaga,
+  fetchTeamMembersSaga,
+} from 'common/sagas/entities/member';
+import { fetchTeamsSaga, fetchTeamSaga } from 'common/sagas/entities/team';
 import { convertNodesToEntities } from 'common/normalizers/normalizers';
-import { getWorkersCount } from 'common/utils/worker';
-import { uuid4 } from 'common/utils/uuid4';
-import DecryptWorker from 'common/decryption.worker';
-import { getList } from 'common/api';
+import { objectToArray } from 'common/utils/utils';
+import { sortItemsByFavorites, getMembersIds } from 'common/utils/workflow';
+import { getLists, getTeamLists } from 'common/api';
 import { ITEM_REVIEW_MODE } from 'common/constants';
-import { favoriteListSelector } from 'common/selectors/list';
-import { keyPairSelector, masterPasswordSelector } from 'common/selectors/user';
-import { itemsByIdSelector, itemSelector } from 'common/selectors/item';
+import { favoriteListSelector } from 'common/selectors/entities/list';
+import {
+  keyPairSelector,
+  masterPasswordSelector,
+  currentTeamIdSelector,
+} from 'common/selectors/user';
+import { itemSelector } from 'common/selectors/entities/item';
 import { workInProgressItemSelector } from 'common/selectors/workflow';
-import { isOnlineSelector } from 'common/selectors/offline';
+import { teamListSelector } from 'common/selectors/entities/team';
+import { getFavoritesList } from 'common/normalizers/utils';
 
-const chunk = (input, size) => {
-  return input.reduce((arr, item, idx) => {
-    return idx % size === 0
-      ? [...arr, [item]]
-      : [...arr.slice(0, -1), [...arr.slice(-1)[0], item]];
-  }, []);
-};
-
-const objectToArray = obj => Object.values(obj);
-
-const arrayToObject = arr =>
-  arr.reduce((accumulator, item) => ({ ...accumulator, [item.id]: item }), {});
-
-const getWorkerEvents = workerId => ({
-  eventToWorker: `decryptItems_${workerId}`,
-  eventFromWorker: `emitDecryptedItems_${workerId}`,
-});
-
-function createWebWorkerChannel(data) {
-  const workerId = uuid4();
-  const worker = new DecryptWorker();
-  const workerEvents = getWorkerEvents(workerId);
-
-  worker.postMessage({
-    event: workerEvents.eventToWorker,
-    data: { events: workerEvents, ...data },
-  });
-
-  return eventChannel(emitter => {
-    // eslint-disable-next-line
-    worker.onmessage = ({ data: { event, items } }) => {
-      if (event === workerEvents.eventFromWorker) {
-        emitter(items);
-      }
-    };
-
-    return () => worker.terminate();
-  });
-}
-
-export function* decryptionChunkItemsSaga(itemsById) {
-  const keyPair = yield select(keyPairSelector);
-  const masterPassword = yield select(masterPasswordSelector);
-
-  const webWorkerChannel = yield call(createWebWorkerChannel, {
-    items: objectToArray(itemsById).map(({ id, secret }) => ({ id, secret })),
-    privateKey: keyPair.privateKey,
-    masterPassword,
-  });
-
-  while (webWorkerChannel) {
-    try {
-      const decryptedItems = yield take(webWorkerChannel);
-      const preparedItems = decryptedItems.reduce(
-        (accumulator, { id, data }) => ({
-          ...accumulator,
-          [id]: {
-            ...itemsById[id],
-            data,
-          },
-        }),
-        {},
-      );
-
-      yield put(addItemsBatch(preparedItems));
-
-      yield put(finishIsLoading());
-    } catch (error) {
-      console.log(error);
-    }
-  }
-}
-
-function* decryptionItems({ payload: { itemsById } }) {
-  const items = objectToArray(itemsById);
-
-  if (items.length) {
-    const preparedItems = items.sort(
-      (a, b) => Number(b.favorite) - Number(a.favorite),
-    );
-    const poolSize = getWorkersCount();
-    const chunks = chunk(preparedItems, Math.ceil(items.length / poolSize));
-
-    yield all(
-      chunks.map(chunkItems =>
-        call(decryptionChunkItemsSaga, arrayToObject(chunkItems)),
-      ),
-    );
-  } else {
-    yield put(finishIsLoading());
-  }
-}
-
-export function* fetchNodesSaga({ payload: { withItemsDecryption } }) {
+export function* initPersonalData({ payload: { withItemsDecryption } }) {
   try {
-    const { data } = yield call(getList);
+    const { data } = yield call(getLists);
 
     const { listsById, itemsById, childItemsById } = convertNodesToEntities(
       data,
     );
 
-    yield put(addListsBatch(listsById));
+    const favoritesList = getFavoritesList(itemsById);
+
+    yield fork(fetchMembersSaga, {
+      payload: { memberIds: getMembersIds(itemsById, childItemsById) },
+    });
+
+    yield put(
+      addListsBatch({
+        ...listsById,
+        [favoritesList.id]: favoritesList,
+      }),
+    );
     yield put(addChildItemsBatch(childItemsById));
 
-    yield put(fetchNodesSuccess(listsById));
-
-    const favoriteList = yield select(favoriteListSelector);
-
-    yield put(setWorkInProgressListId(favoriteList.id));
-
     if (withItemsDecryption) {
-      yield call(decryptionItems, { payload: { itemsById } });
+      const keyPair = yield select(keyPairSelector);
+      const masterPassword = yield select(masterPasswordSelector);
+
+      yield fork(decryption, {
+        items: sortItemsByFavorites(objectToArray(itemsById)),
+        key: keyPair.privateKey,
+        masterPassword,
+      });
+
+      yield put(finishIsLoading());
     } else {
       yield put(addItemsBatch(itemsById));
       yield put(finishIsLoading());
     }
+
+    const favoriteList = yield select(favoriteListSelector);
+    yield put(setWorkInProgressListId(favoriteList.id));
   } catch (error) {
     console.log(error);
-    yield put(fetchNodesFailure());
   }
+}
+
+export function* initTeamData() {
+  try {
+    yield call(fetchTeamsSaga);
+
+    const teamsList = yield select(teamListSelector);
+    const currentTeamId = yield select(currentTeamIdSelector);
+
+    if (teamsList.length && currentTeamId) {
+      const { data } = yield call(getTeamLists, currentTeamId);
+
+      const { listsById, itemsById, childItemsById } = convertNodesToEntities(
+        data,
+      );
+
+      yield put(addListsBatch(listsById));
+      yield put(addChildItemsBatch(childItemsById));
+
+      const keyPair = yield select(keyPairSelector);
+      const masterPassword = yield select(masterPasswordSelector);
+
+      yield fork(decryption, {
+        items: objectToArray(itemsById),
+        key: keyPair.privateKey,
+        masterPassword,
+      });
+    }
+  } catch (error) {
+    console.log(error);
+  }
+}
+
+export function* initPreparationTeamDataFlowSaga({ payload: { teamId } }) {
+  yield fork(fetchTeamSaga, { payload: { teamId } });
+  yield fork(fetchTeamMembersSaga, { payload: { teamId } });
+
+  const { data } = yield call(getTeamLists, teamId);
+
+  const { listsById, itemsById, childItemsById } = convertNodesToEntities(data);
+
+  yield put(addListsBatch(listsById));
+  yield put(addChildItemsBatch(childItemsById));
+
+  const keyPair = yield select(keyPairSelector);
+  const masterPassword = yield select(masterPasswordSelector);
+
+  yield fork(decryption, {
+    items: objectToArray(itemsById),
+    key: keyPair.privateKey,
+    masterPassword,
+  });
+}
+
+export function* initPreparationDataFlowSaga({
+  payload: { withItemsDecryption },
+}) {
+  yield fork(initPersonalData, { payload: { withItemsDecryption } });
+  yield fork(initTeamData);
 }
 
 export function* updateWorkInProgressItemSaga({
@@ -169,21 +160,40 @@ export function* updateWorkInProgressItemSaga({
   }
 }
 
-export function* rehydrateStoreSaga() {
-  try {
-    const isOnline = yield select(isOnlineSelector);
+export function* setCurrentTeamIdWatchSaga() {
+  yield put(setWorkInProgressItem(null));
+  yield put(resetWorkInProgressItemIds(null));
+  yield put(setWorkInProgressListId(null));
 
-    if (!isOnline) {
-      const itemsById = yield select(itemsByIdSelector);
-      yield call(decryptionItems, { payload: { itemsById } });
-    }
-  } catch (error) {
-    console.log(error);
+  const currentTeamId = yield select(currentTeamIdSelector);
+
+  if (!currentTeamId) {
+    return;
   }
+
+  const { data } = yield call(getTeamLists, currentTeamId);
+
+  const { listsById, itemsById, childItemsById } = convertNodesToEntities(data);
+
+  yield put(addListsBatch(listsById));
+  yield put(addChildItemsBatch(childItemsById));
+
+  const keyPair = yield select(keyPairSelector);
+  const masterPassword = yield select(masterPasswordSelector);
+
+  yield fork(decryption, {
+    items: objectToArray(itemsById),
+    key: keyPair.privateKey,
+    masterPassword,
+  });
 }
 
 export default function* workflowSagas() {
-  yield takeLatest(FETCH_NODES_REQUEST, fetchNodesSaga);
+  yield takeLatest(INIT_PREPARATION_DATA_FLOW, initPreparationDataFlowSaga);
+  yield takeLatest(
+    INIT_PREPARATION_TEAM_DATA_FLOW,
+    initPreparationTeamDataFlowSaga,
+  );
   yield takeLatest(UPDATE_WORK_IN_PROGRESS_ITEM, updateWorkInProgressItemSaga);
-  yield takeLatest(REHYDRATE_STORE, rehydrateStoreSaga);
+  yield takeLatest(SET_CURRENT_TEAM_ID, setCurrentTeamIdWatchSaga);
 }

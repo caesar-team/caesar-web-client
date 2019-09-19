@@ -1,11 +1,11 @@
 import { createSelector } from 'reselect';
 import {
   listsByIdSelector,
-  favoriteListSelector,
   extendedSortedCustomizableListsSelector,
-} from './list';
-import { itemsByIdSelector } from './item';
-import { childItemsByIdSelector } from './childItem';
+} from 'common/selectors/entities/list';
+import { itemsByIdSelector } from 'common/selectors/entities/item';
+import { childItemsByIdSelector } from 'common/selectors/entities/childItem';
+import { membersByIdSelector } from 'common/selectors/entities/member';
 
 export const workflowSelector = state => state.workflow;
 
@@ -24,6 +24,15 @@ export const workInProgressItemSelector = createSelector(
   workflow => workflow.workInProgressItem,
 );
 
+export const workInProgressItemOwnerSelector = createSelector(
+  workInProgressItemSelector,
+  membersByIdSelector,
+  (workInProgressItem, membersById) =>
+    workInProgressItem && Object.values(membersById).length
+      ? membersById[workInProgressItem.ownerId]
+      : null,
+);
+
 export const workInProgressItemChildItemsSelector = createSelector(
   workInProgressItemSelector,
   childItemsByIdSelector,
@@ -31,6 +40,30 @@ export const workInProgressItemChildItemsSelector = createSelector(
     workInProgressItem && Object.values(childItemsById).length
       ? workInProgressItem.invited.map(id => childItemsById[id])
       : [],
+);
+
+export const workInProgressItemSharedMembersSelector = createSelector(
+  workInProgressItemChildItemsSelector,
+  membersByIdSelector,
+  (workInProgressItemChildItems, membersById) =>
+    workInProgressItemChildItems.length && Object.values(membersById).length
+      ? workInProgressItemChildItems.map(({ userId }) => membersById[userId])
+      : [],
+);
+
+const constructedWorkInProgressItem = createSelector(
+  workInProgressItemSelector,
+  workInProgressItemOwnerSelector,
+  workInProgressItemChildItemsSelector,
+  (
+    workInProgressItem,
+    workInProgressItemOwner,
+    workInProgressItemChildItems,
+  ) => ({
+    ...workInProgressItem,
+    owner: workInProgressItemOwner,
+    invited: workInProgressItemChildItems,
+  }),
 );
 
 export const workInProgressListIdSelector = createSelector(
@@ -46,10 +79,7 @@ export const workInProgressItemIdsSelector = createSelector(
 export const workInProgressListSelector = createSelector(
   listsByIdSelector,
   workInProgressListIdSelector,
-  favoriteListSelector,
-  (listsById, workInProgressListId, favoriteList) => {
-    return listsById[workInProgressListId] || favoriteList;
-  },
+  (listsById, workInProgressListId) => listsById[workInProgressListId],
 );
 
 export const workInProgressItemsSelector = createSelector(

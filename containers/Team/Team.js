@@ -160,10 +160,15 @@ const MenuField = styled(Field)`
   padding-right: 20px;
 `;
 
-const MenuButton = styled(Button)`
+const MenuWrapper = styled.div`
   width: 100%;
   height: 50px;
   position: absolute;
+`;
+
+const MenuButton = styled(Button)`
+  width: 100%;
+  height: 50px;
 `;
 
 const SelectStyled = styled(Select)`
@@ -357,14 +362,18 @@ class TeamContainer extends Component {
               textBoxWidth: '100px',
               arrowAlign: 'start',
               position: 'left center',
+              padding: '0px 0px',
+              flat: true,
             }}
           >
-            <MenuButton
-              color="white"
-              onClick={this.handleRemoveMember(original.id)}
-            >
-              Remove
-            </MenuButton>
+            <MenuWrapper>
+              <MenuButton
+                color="white"
+                onClick={this.handleRemoveMember(original.id)}
+              >
+                Remove
+              </MenuButton>
+            </MenuWrapper>
           </DottedMenu>
         </MenuField>
       ),

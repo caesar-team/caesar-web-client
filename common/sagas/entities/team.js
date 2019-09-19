@@ -202,27 +202,29 @@ export function* addTeamMembersBatchSaga({ payload: { teamId, members } }) {
     );
     yield put(addTeamToMembersBatch(teamId, invitedMemberIds));
 
-    yield fork(createChildItemBatchSaga, {
-      payload: { itemUserPairs },
-    });
+    if (itemUserPairs.length > 0) {
+      yield fork(createChildItemBatchSaga, {
+        payload: { itemUserPairs },
+      });
 
-    const {
-      payload: { childItems },
-    } = yield take(CREATE_CHILD_ITEM_BATCH_FINISHED_EVENT);
+      const {
+        payload: { childItems },
+      } = yield take(CREATE_CHILD_ITEM_BATCH_FINISHED_EVENT);
 
-    const itemIdsWithChildItemIdsSet = childItems.reduce(
-      // eslint-disable-next-line
-      (accumulator, item) => [
-        ...accumulator,
-        {
-          itemId: item.originalItemId,
-          childItemIds: item.items.map(({ id }) => id),
-        },
-      ],
-      [],
-    );
+      const itemIdsWithChildItemIdsSet = childItems.reduce(
+        // eslint-disable-next-line
+        (accumulator, item) => [
+          ...accumulator,
+          {
+            itemId: item.originalItemId,
+            childItemIds: item.items.map(({ id }) => id),
+          },
+        ],
+        [],
+      );
 
-    yield put(addChildItemsBatchToItems(itemIdsWithChildItemIdsSet));
+      yield put(addChildItemsBatchToItems(itemIdsWithChildItemIdsSet));
+    }
   } catch (error) {
     console.log(error);
     yield put(addTeamMembersBatchFailure());

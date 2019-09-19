@@ -46,6 +46,7 @@ import {
   shareItemBatchFailure,
   removeShareSuccess,
   removeShareFailure,
+  addChildItemsBatchToItems,
 } from 'common/actions/entities/item';
 import {
   addItemToList,
@@ -285,7 +286,7 @@ export function* createItemSaga({
         [],
       );
 
-      yield put(shareItemBatchSuccess(shares));
+      yield put(addChildItemsBatchToItems(shares));
       yield put(updateWorkInProgressItem());
     }
   } catch (error) {

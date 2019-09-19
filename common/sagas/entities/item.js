@@ -66,7 +66,7 @@ import {
 } from 'common/sagas/entities/childItem';
 import {
   prepareUsersForSharing,
-  resolveSharingConflicts,
+  getItemUserPairs,
 } from 'common/sagas/common/share';
 import { inviteNewMemberBatchSaga } from 'common/sagas/common/invite';
 import {
@@ -82,7 +82,7 @@ import {
   listSelector,
 } from 'common/selectors/entities/list';
 import {
-  itemsByIdSelector,
+  itemsBatchSelector,
   itemSelector,
 } from 'common/selectors/entities/item';
 import { membersBatchSelector } from 'common/selectors/entities/member';
@@ -91,7 +91,10 @@ import {
   masterPasswordSelector,
   userDataSelector,
 } from 'common/selectors/user';
-import { teamSelector } from 'common/selectors/entities/team';
+import {
+  teamSelector,
+  teamsMembersSelector,
+} from 'common/selectors/entities/team';
 import {
   acceptUpdateItem,
   patchChildItem,
@@ -259,7 +262,7 @@ export function* createItemSaga({
         .filter(({ id }) => id !== user.id)
         .map(({ id, publicKey }) => ({
           item: { id: itemId, data: newItem.data },
-          user: { id, publicKey },
+          user: { id, publicKey, teamId: list.teamId },
         }));
 
       yield fork(createChildItemBatchSaga, {
@@ -559,20 +562,39 @@ export function* removeAnonymousLinkSaga() {
   }
 }
 
-export function* shareItemBatchSaga({ payload: { items, members, teamIds } }) {
+export function* shareItemBatchSaga({
+  payload: { itemIds, members, teamIds },
+}) {
   try {
-    const itemsById = yield select(itemsByIdSelector);
-    const sharingItems = items.map(itemId => itemsById[itemId]);
+    const user = yield select(userDataSelector);
+    const items = yield select(itemsBatchSelector, { itemIds });
 
-    const { allMembers, newMembers } = yield call(prepareUsersForSharing, {
-      payload: { members, teamIds },
+    const preparedMembers = yield call(prepareUsersForSharing, members);
+
+    const newMembers = preparedMembers.filter(({ isNew }) => isNew);
+
+    const directMembers = preparedMembers.map(member => ({
+      ...member,
+      teamId: null,
+    }));
+
+    const teamsMembers = yield select(teamsMembersSelector, { teamIds });
+
+    const allMembers = [...directMembers, ...teamsMembers].filter(
+      member => member.id !== user.id,
+    );
+
+    const itemUserPairs = yield call(getItemUserPairs, {
+      items,
+      members: allMembers,
     });
 
-    const itemUserPairs = yield call(resolveSharingConflicts, {
-      payload: { items: sharingItems, members: allMembers },
-    });
+    if (newMembers.length > 0) {
+      yield fork(inviteNewMemberBatchSaga, {
+        payload: { members: newMembers },
+      });
+    }
 
-    yield fork(inviteNewMemberBatchSaga, { payload: { members: newMembers } });
     yield fork(createChildItemBatchSaga, { payload: { itemUserPairs } });
 
     const {

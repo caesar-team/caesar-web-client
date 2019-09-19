@@ -1,4 +1,5 @@
 import { createSelector } from 'reselect';
+import { membersByIdSelector } from 'common/selectors/entities/member';
 
 export const entitiesSelector = state => state.entities;
 
@@ -36,4 +37,27 @@ export const teamsBatchSelector = createSelector(
   teamsByIdSelector,
   teamIdsPropSelector,
   (teamsById, teamIds) => teamIds.map(teamId => teamsById[teamId]),
+);
+
+export const teamMembersSelector = createSelector(
+  teamSelector,
+  membersByIdSelector,
+  (team, membersById) => team.users.map(({ userId }) => membersById[userId]),
+);
+
+export const teamsMembersSelector = createSelector(
+  teamsBatchSelector,
+  membersByIdSelector,
+  (teams, membersById) => {
+    return teams.reduce(
+      (accumulator, team) => [
+        ...accumulator,
+        ...team.users.map(({ id }) => ({
+          ...membersById[id],
+          teamId: team.id,
+        })),
+      ],
+      [],
+    );
+  },
 );

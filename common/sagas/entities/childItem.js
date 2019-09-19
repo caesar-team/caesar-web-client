@@ -50,8 +50,9 @@ export function* createChildItemBatchSaga({ payload: { itemUserPairs } }) {
     ).map(itemId => ({
       originalItem: itemId,
       items: preparedChildItemsGroupedByItemId[itemId].map(
-        ({ userId, secret }) => ({
+        ({ userId, secret, teamId }) => ({
           userId,
+          teamId,
           secret,
           access: PERMISSION_READ,
           cause: INVITE_TYPE,

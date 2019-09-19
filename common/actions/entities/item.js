@@ -72,9 +72,13 @@ export const REMOVE_ITEMS_BATCH = '@item/REMOVE_ITEMS_BATCH';
 export const ADD_CHILD_ITEM_TO_ITEM = '@item/ADD_CHILD_ITEM_TO_ITEM';
 export const ADD_CHILD_ITEMS_BATCH_TO_ITEM =
   '@item/ADD_CHILD_ITEMS_BATCH_TO_ITEM';
+export const ADD_CHILD_ITEMS_BATCH_TO_ITEMS =
+  '@item/ADD_CHILD_ITEMS_BATCH_TO_ITEMS';
 export const REMOVE_CHILD_ITEM_FROM_ITEM = '@item/REMOVE_CHILD_ITEM_FROM_ITEM';
 export const REMOVE_CHILD_ITEMS_BATCH_FROM_ITEM =
   '@item/REMOVE_CHILD_ITEMS_BATCH_FROM_ITEM';
+export const REMOVE_CHILD_ITEMS_BATCH_FROM_ITEMS =
+  '@item/REMOVE_CHILD_ITEMS_BATCH_FROM_ITEMS';
 
 export const REMOVE_ITEMS_DATA = '@item/REMOVE_ITEMS_DATA';
 
@@ -350,8 +354,15 @@ export const addChildItemToItem = (itemId, childItemId) => ({
   },
 });
 
-export const addChildItemsBatchToItem = itemIdsWithChildItemIdsSet => ({
+export const addChildItemsBatchToItem = itemIdWithChildItemIdsSet => ({
   type: ADD_CHILD_ITEMS_BATCH_TO_ITEM,
+  payload: {
+    itemIdWithChildItemIdsSet,
+  },
+});
+
+export const addChildItemsBatchToItems = itemIdsWithChildItemIdsSet => ({
+  type: ADD_CHILD_ITEMS_BATCH_TO_ITEMS,
   payload: {
     itemIdsWithChildItemIdsSet,
   },
@@ -365,8 +376,16 @@ export const removeChildItemFromItem = (itemId, childItemId) => ({
   },
 });
 
-export const removeChildItemsBatchFromItem = (itemIds, childItemIds) => ({
+export const removeChildItemsBatchFromItem = (itemId, childItemIds) => ({
   type: REMOVE_CHILD_ITEMS_BATCH_FROM_ITEM,
+  payload: {
+    itemId,
+    childItemIds,
+  },
+});
+
+export const removeChildItemsBatchFromItems = (itemIds, childItemIds) => ({
+  type: REMOVE_CHILD_ITEMS_BATCH_FROM_ITEMS,
   payload: {
     itemIds,
     childItemIds,
@@ -377,10 +396,10 @@ export const removeItemsData = () => ({
   type: REMOVE_ITEMS_DATA,
 });
 
-export const shareItemBatchRequest = (items, members, teamIds) => ({
+export const shareItemBatchRequest = (itemIds, members, teamIds) => ({
   type: SHARE_ITEM_BATCH_REQUEST,
   payload: {
-    items,
+    itemIds,
     members,
     teamIds,
   },

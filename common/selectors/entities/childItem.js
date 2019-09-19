@@ -12,6 +12,11 @@ export const childItemsByIdSelector = createSelector(
   childItemEntity => childItemEntity.byId || {},
 );
 
+export const childItemListSelector = createSelector(
+  childItemsByIdSelector,
+  byId => Object.values(byId) || [],
+);
+
 const childItemIdsPropSelector = (_, props) => props.childItemIds;
 
 export const childItemsBatchSelector = createSelector(
@@ -20,3 +25,14 @@ export const childItemsBatchSelector = createSelector(
   (childItemsById, childItemsIds) =>
     childItemsIds.map(childItemId => childItemsById[childItemId]),
 );
+
+const filterFn = fields => childItem =>
+  Object.keys(fields).every(
+    fieldName => childItem[fieldName] === fields[fieldName],
+  );
+
+export const createChildItemsFilterSelector = fields =>
+  createSelector(
+    childItemListSelector,
+    childItems => childItems.filter(filterFn(fields)),
+  );

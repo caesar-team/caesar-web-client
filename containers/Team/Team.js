@@ -492,7 +492,6 @@ class TeamContainer extends Component {
           showPagination={false}
           itemSize={ROW_HEIGHT}
           data={filteredMembersList}
-          // defaultPageSize={filteredMembersList.length}
           columns={this.getColumns()}
           width={this.calculateWrapperWidth()}
         />

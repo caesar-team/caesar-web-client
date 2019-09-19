@@ -1,4 +1,12 @@
-import { put, call, takeLatest, select, all, fork } from 'redux-saga/effects';
+import {
+  put,
+  call,
+  takeLatest,
+  select,
+  all,
+  fork,
+  take,
+} from 'redux-saga/effects';
 import {
   FETCH_TEAMS_REQUEST,
   FETCH_TEAM_REQUEST,
@@ -31,6 +39,14 @@ import {
   removeTeamFromMember,
   removeTeamFromMembersBatch,
 } from 'common/actions/entities/member';
+import {
+  removeChildItemsBatchFromItems,
+  addChildItemsBatchToItems,
+} from 'common/actions/entities/item';
+import {
+  CREATE_CHILD_ITEM_BATCH_FINISHED_EVENT,
+  removeChildItemsBatch,
+} from 'common/actions/entities/childItem';
 import { setCurrentTeamId, leaveTeam, joinTeam } from 'common/actions/user';
 import { teamSelector } from 'common/selectors/entities/team';
 import { teamItemListSelector } from 'common/selectors/entities/item';
@@ -52,9 +68,10 @@ import { convertTeamsToEntity } from 'common/normalizers/normalizers';
 import { COMMANDS_ROLES, TEAM_ENTITY_TYPE } from 'common/constants';
 import {
   prepareUsersForSharing,
-  resolveSharingConflicts,
+  getItemUserPairs,
 } from 'common/sagas/common/share';
 import { inviteNewMemberBatchSaga } from 'common/sagas/common/invite';
+import { createChildItemsFilterSelector } from 'common/selectors/entities/childItem';
 
 export function* fetchTeamsSaga() {
   try {
@@ -147,20 +164,26 @@ export function* updateTeamMemberRoleSaga({
 
 export function* addTeamMembersBatchSaga({ payload: { teamId, members } }) {
   try {
-    const { allMembers, newMembers } = yield call(prepareUsersForSharing, {
-      payload: { members, teamIds: [] },
-    });
+    const preparedMembers = yield call(prepareUsersForSharing, members);
 
-    yield fork(inviteNewMemberBatchSaga, { payload: { members: newMembers } });
+    const teamMembers = preparedMembers.map(member => ({ ...member, teamId }));
+    const newMembers = preparedMembers.filter(({ isNew }) => isNew);
+
+    if (newMembers.length > 0) {
+      yield fork(inviteNewMemberBatchSaga, {
+        payload: { members: newMembers },
+      });
+    }
 
     const teamItemList = yield select(teamItemListSelector, { teamId });
 
-    const itemUserPairs = yield call(resolveSharingConflicts, {
-      payload: { items: teamItemList, members: allMembers },
+    const itemUserPairs = yield call(getItemUserPairs, {
+      items: teamItemList,
+      members: teamMembers,
     });
 
-    const invitedMemberIds = allMembers.map(({ id }) => id);
-    const invitedMembersWithCommandRole = allMembers.map(member => ({
+    const invitedMemberIds = teamMembers.map(({ id }) => id);
+    const invitedMembersWithCommandRole = teamMembers.map(member => ({
       ...member,
       role: COMMANDS_ROLES.USER_ROLE_MEMBER,
     }));
@@ -182,6 +205,24 @@ export function* addTeamMembersBatchSaga({ payload: { teamId, members } }) {
     yield fork(createChildItemBatchSaga, {
       payload: { itemUserPairs },
     });
+
+    const {
+      payload: { childItems },
+    } = yield take(CREATE_CHILD_ITEM_BATCH_FINISHED_EVENT);
+
+    const itemIdsWithChildItemIdsSet = childItems.reduce(
+      // eslint-disable-next-line
+      (accumulator, item) => [
+        ...accumulator,
+        {
+          itemId: item.originalItemId,
+          childItemIds: item.items.map(({ id }) => id),
+        },
+      ],
+      [],
+    );
+
+    yield put(addChildItemsBatchToItems(itemIdsWithChildItemIdsSet));
   } catch (error) {
     console.log(error);
     yield put(addTeamMembersBatchFailure());
@@ -193,6 +234,21 @@ export function* removeTeamMemberSaga({ payload: { teamId, userId } }) {
     yield call(deleteTeamMember, { teamId, userId });
     yield put(removeTeamMemberSuccess(teamId, userId));
     yield put(removeTeamFromMember(teamId, userId));
+
+    const childItemsFilterSelector = createChildItemsFilterSelector({
+      teamId,
+      userId,
+    });
+
+    const childItems = yield select(childItemsFilterSelector);
+
+    const childItemIds = childItems.map(({ id }) => id);
+    const originalItemIds = childItems.map(
+      ({ originalItemId }) => originalItemId,
+    );
+
+    yield put(removeChildItemsBatch(childItemIds));
+    yield put(removeChildItemsBatchFromItems(originalItemIds, childItemIds));
   } catch (error) {
     console.log(error);
     yield put(removeTeamMemberFailure());

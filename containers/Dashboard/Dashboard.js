@@ -452,8 +452,10 @@ class DashboardContainer extends Component {
 
     const searchedItems = this.filter(Object.values(itemsById), searchedText);
 
+    const isTeamItem = workInProgressItem && workInProgressItem.teamId;
     const isMultiItem =
       workInProgressItemIds && workInProgressItemIds.length > 0;
+
     const isToolMode = mode === DASHBOARD_TOOL_MODE;
 
     const isTrash =
@@ -470,6 +472,10 @@ class DashboardContainer extends Component {
       workInProgressItem && workInProgressItem.teamId
         ? teamLists
         : personalLists;
+
+    const availableTeamsForSharing = isTeamItem
+      ? userTeamList.filter(({ id }) => id !== workInProgressItem.teamId)
+      : userTeamList;
 
     return (
       <Fragment>
@@ -568,7 +574,7 @@ class DashboardContainer extends Component {
         </DashboardLayout>
         {modalVisibilities[SHARE_MODAL] && (
           <ShareModal
-            teams={userTeamList}
+            teams={availableTeamsForSharing}
             sharedMembers={workInProgressItemSharedMembers}
             anonymousLink={workInProgressItem && workInProgressItem.shared}
             withAnonymousLink={!isMultiItem}

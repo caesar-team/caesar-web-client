@@ -261,6 +261,7 @@ class TeamContainer extends Component {
   componentDidMount() {
     const { id: teamId } = this.props.router.query;
 
+    this.props.fetchKeyPairRequest();
     this.props.initPreparationTeamDataFlow(teamId);
   }
 

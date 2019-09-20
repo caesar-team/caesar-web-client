@@ -1,5 +1,6 @@
 import { connect } from 'react-redux';
 import { createStructuredSelector } from 'reselect';
+import { fetchKeyPairRequest } from 'common/actions/user';
 import {
   fetchTeamsRequest,
   createTeamRequest,
@@ -29,6 +30,7 @@ const mapStateToProps = createStructuredSelector({
 });
 
 const mapDispatchToProps = {
+  fetchKeyPairRequest,
   fetchMembersRequest,
   fetchTeamsRequest,
   createTeamRequest,

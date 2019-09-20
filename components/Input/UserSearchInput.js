@@ -75,6 +75,12 @@ const SearchedResultBox = styled.div`
   width: 100%;
 `;
 
+const IconWrapper = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+`;
+
 const SearchIcon = styled(Icon)`
   width: 18px;
   height: 18px;
@@ -85,6 +91,18 @@ const SearchedUsersCount = styled.div`
   font-size: 12px;
   letter-spacing: 0.34px;
   color: ${({ theme }) => theme.gray};
+  margin-right: 20px;
+`;
+
+const CloseIcon = styled(Icon)`
+  cursor: pointer;
+  width: 14px;
+  height: 14px;
+  fill: ${({ theme }) => theme.gray};
+
+  &:hover {
+    fill: ${({ theme }) => theme.black};
+  }
 `;
 
 const createNewMember = email => ({
@@ -106,9 +124,12 @@ class UserSearchInput extends Component {
 
     if (members.length && filterText) {
       return (
-        <SearchedUsersCount>
-          {members.length} member{members.length === 1 ? '' : 's'}
-        </SearchedUsersCount>
+        <IconWrapper>
+          <SearchedUsersCount>
+            {members.length} member{members.length === 1 ? '' : 's'}
+          </SearchedUsersCount>
+          <CloseIcon name="close" onClick={this.handleClickReset} />
+        </IconWrapper>
       );
     }
 
@@ -164,9 +185,17 @@ class UserSearchInput extends Component {
     this.setState(prevState => ({
       ...prevState,
       members: prevState.members.filter(({ id }) => id !== member.id),
+      filterText: prevState.members.length === 1 ? '' : prevState.filterText,
     }));
 
     onClickAdd(member);
+  };
+
+  handleClickReset = () => {
+    this.setState({
+      members: [],
+      filterText: '',
+    });
   };
 
   search = async text => {
@@ -209,6 +238,7 @@ class UserSearchInput extends Component {
     return (
       <Wrapper className={className}>
         <InputStyled
+          autoComplete="off"
           placeholder="Enter email addresses…"
           value={filterText}
           onChange={this.handleChange}

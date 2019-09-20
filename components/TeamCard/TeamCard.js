@@ -80,7 +80,7 @@ const TeamCard = ({
             <TeamIcon src={icon} />
             <TeamInfo>
               <TeamName>{title}</TeamName>
-              <TeamMembers>44 members</TeamMembers>
+              <TeamMembers>{users.length} members</TeamMembers>
             </TeamInfo>
           </TeamDetails>
         </TeamWrapper>

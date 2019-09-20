@@ -66,6 +66,7 @@ class TeamListContainer extends Component {
   state = this.prepareInitialState();
 
   componentDidMount() {
+    this.props.fetchKeyPairRequest();
     this.props.fetchTeamsRequest();
     this.props.fetchMembersRequest();
   }

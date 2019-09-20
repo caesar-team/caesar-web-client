@@ -113,6 +113,16 @@ const FavoriteButton = styled.button`
   `}
 `;
 
+const IconStyled = styled(Icon)`
+  width: 20px;
+  height: 20px;
+  fill: ${({ theme }) => theme.gray};
+
+  &:hover {
+    fill: ${({ theme }) => theme.black};
+  }
+`;
+
 const StyledDropdown = styled(Dropdown)`
   width: 100%;
 `;
@@ -242,7 +252,7 @@ const ItemHeader = ({
           disabled={!isOnline}
           onClick={onToggleFavorites(itemId)}
         >
-          <Icon
+          <IconStyled
             withOfflineCheck
             name={favorite ? 'favorite-active' : 'favorite'}
             width={20}

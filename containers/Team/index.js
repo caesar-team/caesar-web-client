@@ -1,7 +1,7 @@
 import { connect } from 'react-redux';
 import { withRouter } from 'next/router';
+import { fetchKeyPairRequest } from 'common/actions/user';
 import {
-  fetchTeamRequest,
   addTeamMembersBatchRequest,
   removeTeamMemberRequest,
   updateTeamMemberRoleRequest,
@@ -23,6 +23,7 @@ const mapStateToProps = (state, { router }) => ({
 });
 
 const mapDispatchToProps = {
+  fetchKeyPairRequest,
   addTeamMembersBatchRequest,
   removeTeamMemberRequest,
   updateTeamMemberRoleRequest,

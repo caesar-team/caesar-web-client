@@ -19,6 +19,7 @@ const Wrapper = styled.div`
   overflow: hidden;
   vertical-align: middle;
   width: ${({ isSmall }) => (isSmall ? '30px' : '40px')};
+  min-width: ${({ isSmall }) => (isSmall ? '30px' : '40px')};
   height: ${({ isSmall }) => (isSmall ? '30px' : '40px')};
   border-radius: 50%;
 `;

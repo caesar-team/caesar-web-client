@@ -30,6 +30,10 @@ const Title = styled.div`
   letter-spacing: 0.6px;
   color: ${({ theme }) => theme.black};
   margin-bottom: 8px;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  max-width: 278px;
+  white-space: nowrap;
 `;
 
 const Box = styled.div`

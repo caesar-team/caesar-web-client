@@ -18,11 +18,14 @@ const Wrapper = styled.div`
 `;
 
 const TextWithLinesStyled = styled(TextWithLines)`
-  position: absolute;
   font-size: 14px;
   font-weight: normal;
   letter-spacing: 0.4px;
   color: ${({ theme }) => theme.emperor};
+`;
+
+const TextWithLinesAbsolute = styled(TextWithLinesStyled)`
+  position: absolute;
 `;
 
 const TeamsWrapper = styled.div`
@@ -69,6 +72,7 @@ const SectionStyled = styled(Section)`
 
 const MemberListStyled = styled(MemberList)`
   margin-bottom: 30px;
+  margin-top: 10px;
 
   ${MemberList.Member} {
     background-color: ${({ theme }) => theme.lightBlue};
@@ -245,18 +249,23 @@ class ShareModal extends Component {
             onClickAdd={this.handleAddMember}
           />
           {shouldShowAddedMembers && (
-            <MemberListStyled
-              maxHeight={200}
-              members={members}
-              controlType="remove"
-              onClickRemove={this.handleRemoveMember}
-            />
+            <Fragment>
+              <TextWithLinesStyled position="left" width={1}>
+                Personal
+              </TextWithLinesStyled>
+              <MemberListStyled
+                maxHeight={200}
+                members={members}
+                controlType="remove"
+                onClickRemove={this.handleRemoveMember}
+              />
+            </Fragment>
           )}
           {shouldShowTeamsSection && (
             <Fragment>
-              <TextWithLinesStyled position="left" width={1}>
+              <TextWithLinesAbsolute position="left" width={1}>
                 Teams ({teams.length})
-              </TextWithLinesStyled>
+              </TextWithLinesAbsolute>
               <TeamsWrapper>{renderedTeamTags}</TeamsWrapper>
             </Fragment>
           )}

@@ -14,15 +14,20 @@ import {
   RemoveButtonWrapper,
 } from '../components';
 
-const StyledEyeIcon = styled(Icon)`
-  margin-right: 20px;
+const IconStyled = styled(Icon)`
+  width: 20px;
+  height: 20px;
   cursor: pointer;
+
   fill: ${({ theme }) => theme.gray};
+
+  &:hover {
+    fill: ${({ theme }) => theme.black};
+  }
 `;
 
-const StyledIcon = styled(Icon)`
-  cursor: pointer;
-  fill: ${({ theme }) => theme.gray};
+const EyeIconStyled = styled(IconStyled)`
+  margin-right: 20px;
 `;
 
 const StyledWebsiteLink = styled.a`
@@ -111,12 +116,7 @@ class Credentials extends Component {
             <Row>
               <FieldValue>
                 <FixedSizeField>{login}</FixedSizeField>
-                <StyledIcon
-                  name="copy"
-                  width={19}
-                  height={19}
-                  onClick={this.handleCopy('login')}
-                />
+                <IconStyled name="copy" onClick={this.handleCopy('login')} />
               </FieldValue>
             </Row>
           </Field>
@@ -130,9 +130,9 @@ class Credentials extends Component {
                     onHoldStart={this.handleToggleVisibility(true)}
                     onHoldEnd={this.handleToggleVisibility(false)}
                   >
-                    <StyledEyeIcon name={eyeIconName} width={20} height={20} />
+                    <EyeIconStyled name={eyeIconName} />
                   </HoldClickBehaviour>
-                  <StyledIcon
+                  <IconStyled
                     name="copy"
                     width={19}
                     height={19}

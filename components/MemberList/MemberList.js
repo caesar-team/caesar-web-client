@@ -24,6 +24,11 @@ const MemberWrapper = styled.div`
   align-items: center;
   justify-content: space-between;
   padding: 10px 20px;
+  cursor: pointer;
+
+  &:hover {
+    background-color: ${({ theme }) => theme.snow};
+  }
 `;
 
 const ControlWrapper = styled.div`

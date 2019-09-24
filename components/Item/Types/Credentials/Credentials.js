@@ -83,7 +83,6 @@ class Credentials extends Component {
       isReadOnly,
       isSharedItem = false,
       item: {
-        listId,
         data: { login, pass, website, note, attachments = [] },
       },
       childItems,
@@ -91,10 +90,6 @@ class Credentials extends Component {
 
     const pwd = isPasswordVisible ? pass : pass.replace(/./g, '*');
     const eyeIconName = isPasswordVisible ? 'eye-off' : 'eye-on';
-    const listName =
-      allLists.length > 0
-        ? allLists.find(({ id }) => id === listId).label
-        : null;
 
     const shouldShowWebsite = !!website;
     const shouldShowNote = !!note;
@@ -150,12 +145,6 @@ class Credentials extends Component {
                   {website}
                 </StyledWebsiteLink>
               </FieldValue>
-            </Field>
-          )}
-          {listName && (
-            <Field>
-              <Label>List</Label>
-              <FieldValue>{listName}</FieldValue>
             </Field>
           )}
           {shouldShowNote && (

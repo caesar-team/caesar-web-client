@@ -67,6 +67,7 @@ export const REMOVE_SHARE_REQUEST = '@childItem/REMOVE_SHARE_REQUEST';
 export const REMOVE_SHARE_SUCCESS = '@childItem/REMOVE_SHARE_SUCCESS';
 export const REMOVE_SHARE_FAILURE = '@childItem/REMOVE_SHARE_FAILURE';
 
+export const UPDATE_ITEM_FIELD = '@item/UPDATE_ITEM_FIELD';
 export const ADD_ITEMS_BATCH = '@item/ADD_ITEMS_BATCH';
 export const REMOVE_ITEMS_BATCH = '@item/REMOVE_ITEMS_BATCH';
 export const ADD_CHILD_ITEM_TO_ITEM = '@item/ADD_CHILD_ITEM_TO_ITEM';
@@ -332,6 +333,15 @@ export const removeAnonymousLinkFailure = () => ({
   type: REMOVE_ANONYMOUS_LINK_FAILURE,
 });
 
+export const updateItemField = (itemId, key, value) => ({
+  type: UPDATE_ITEM_FIELD,
+  payload: {
+    itemId,
+    key,
+    value,
+  },
+});
+
 export const addItemsBatch = itemsById => ({
   type: ADD_ITEMS_BATCH,
   payload: {
@@ -396,12 +406,18 @@ export const removeItemsData = () => ({
   type: REMOVE_ITEMS_DATA,
 });
 
-export const shareItemBatchRequest = (itemIds, members, teamIds) => ({
+export const shareItemBatchRequest = (
+  { itemIds, members, teamIds },
+  options,
+) => ({
   type: SHARE_ITEM_BATCH_REQUEST,
   payload: {
-    itemIds,
-    members,
-    teamIds,
+    data: {
+      itemIds,
+      members,
+      teamIds,
+    },
+    options,
   },
 });
 

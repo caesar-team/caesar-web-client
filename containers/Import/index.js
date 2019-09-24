@@ -1,6 +1,6 @@
 import { connect } from 'react-redux';
 import { createItemsBatchRequest } from 'common/actions/entities/item';
-import { initPreparationDataFlow } from 'common/actions/workflow';
+import { initWorkflow } from 'common/actions/workflow';
 import { fetchKeyPairRequest, fetchUserSelfRequest } from 'common/actions/user';
 import { createStructuredSelector } from 'reselect';
 import { selectableListsWithoutChildrenSelector } from 'common/selectors/entities/list';
@@ -15,7 +15,7 @@ const mapStateToProps = createStructuredSelector({
 });
 
 const mapDispatchToProps = {
-  initPreparationDataFlow,
+  initWorkflow,
   fetchKeyPairRequest,
   fetchUserSelfRequest,
   createItemsBatchRequest,

@@ -49,6 +49,7 @@ export const teamsMembersSelector = createSelector(
   teamsBatchSelector,
   membersByIdSelector,
   (teams, membersById) => {
+    console.log('teamsMembersSelector', teams, membersById);
     return teams.reduce(
       (accumulator, team) => [
         ...accumulator,

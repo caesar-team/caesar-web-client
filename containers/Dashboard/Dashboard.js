@@ -80,16 +80,11 @@ class DashboardContainer extends Component {
   );
 
   componentDidMount() {
-    this.props.fetchUserSelfRequest();
     this.props.fetchKeyPairRequest();
+    this.props.fetchUserSelfRequest();
     this.props.fetchUserTeamsRequest();
 
-    // TODO: added checkpoint for situation when
-    // TODO: 1) we dont have items and we need to load and decrypt them
-    // TODO: 2) we have not decrypted items and we need just to decrypt them
-    // TODO: 3) we have encrypted items we need to do nothing
-    // withItemsDecryption = true
-    this.props.initPreparationDataFlow(true);
+    this.props.initWorkflow();
   }
 
   // eslint-disable-next-line
@@ -190,7 +185,7 @@ class DashboardContainer extends Component {
     this.props.createItemRequest(data, setSubmitting);
   };
 
-  handleClickMoveItem = (_, listId) => {
+  handleClickMoveItem = (teamId, listId) => {
     this.props.moveItemRequest(listId);
     this.props.setWorkInProgressItem(null);
 
@@ -258,18 +253,18 @@ class DashboardContainer extends Component {
 
     if (members.length > 0 || teamIds.length > 0) {
       if (workInProgressItemIds && workInProgressItemIds.length > 0) {
-        this.props.shareItemBatchRequest(
-          workInProgressItemIds,
+        this.props.shareItemBatchRequest({
+          itemIds: workInProgressItemIds,
           members,
           teamIds,
-        );
+        });
         this.props.resetWorkInProgressItemIds();
       } else {
-        this.props.shareItemBatchRequest(
-          [workInProgressItem.id],
+        this.props.shareItemBatchRequest({
+          itemIds: [workInProgressItem.id],
           members,
           teamIds,
-        );
+        });
       }
     }
 
@@ -442,6 +437,7 @@ class DashboardContainer extends Component {
       isLoading,
       trashList,
       teamTrashList,
+      selectableTeamsLists,
     } = this.props;
 
     const { mode, modalVisibilities, searchedText } = this.state;
@@ -543,12 +539,12 @@ class DashboardContainer extends Component {
                 </MiddleColumnWrapper>
                 <RightColumnWrapper>
                   <Item
+                    teamsLists={selectableTeamsLists}
                     isTrashItem={isTrash}
                     notification={notification}
                     item={workInProgressItem}
                     owner={workInProgressItemOwner}
                     childItems={workInProgressItemChildItems}
-                    allLists={currentLists}
                     user={user}
                     membersById={membersById}
                     onClickMoveItem={this.handleClickMoveItem}

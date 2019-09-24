@@ -38,12 +38,11 @@ const renameUserId = members =>
 
 export function* fetchMembersSaga() {
   try {
-    const { data: defaultMembers } = yield call(getDefaultTeamMembers);
-    const { data: members } = yield call(getMembers);
+    const { data: members } = yield call(getDefaultTeamMembers);
 
     yield put(
       fetchMembersSuccess(
-        convertMembersToEntity([...defaultMembers, ...members]),
+        convertMembersToEntity(members),
       ),
     );
   } catch (e) {

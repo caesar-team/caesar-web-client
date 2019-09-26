@@ -15,7 +15,6 @@ export const {
 
 export const PORTAL_ID = 'portal';
 export const DEFAULT_IDLE_TIMEOUT = 5 * 60 * 1000;
-export const MAX_SIZE_RANDOM_BUFFER = 60000;
 export const DEFAULT_CORES_COUNT = 4;
 
 export const DECRYPTION_CHUNK_SIZE = 10;
@@ -33,6 +32,8 @@ export const LIST_TYPES = {
   LIST_TYPE,
   TRASH_TYPE,
 };
+
+export const DEFAULT_TEAM_TYPE = 'default';
 
 export const DASHBOARD_DEFAULT_MODE = 'DEFAULT_MODE';
 export const DASHBOARD_SEARCH_MODE = 'SEARCH_MODE';
@@ -91,20 +92,15 @@ export const KEY_CODES = {
 export const PERMISSION_READ = 'read';
 export const PERMISSION_WRITE = 'write';
 
-export const DEFAULT_REQUESTS_LIMIT = 10;
-export const DEFAULT_SECONDS_LIMIT = 60 * 60;
-
 export const INVITE_TYPE = 'invite';
 export const SHARE_TYPE = 'share';
 
 export const USER_ROLE_ADMIN = 'admin';
 export const USER_ROLE_MEMBER = 'member';
-export const USER_ROLE_GUEST = 'guest';
 
 export const COMMANDS_ROLES = {
   USER_ROLE_ADMIN,
   USER_ROLE_MEMBER,
-  USER_ROLE_GUEST,
 };
 
 export const ROLE_USER = 'ROLE_USER';
@@ -165,4 +161,3 @@ export const ITEM_ENTITY_TYPE = 'Item';
 export const LIST_ENTITY_TYPE = 'List';
 export const TEAM_ENTITY_TYPE = 'Team';
 export const MEMBER_ENTITY_TYPE = 'Member';
-export const USER_TYPE = 'User';

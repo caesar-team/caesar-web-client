@@ -13,7 +13,7 @@ import {
   Icon,
   InviteModal,
 } from 'components';
-import { COMMANDS_ROLES } from 'common/constants';
+import { COMMANDS_ROLES, DEFAULT_TEAM_TYPE } from 'common/constants';
 
 const LogoWrapper = styled.div`
   display: flex;
@@ -232,10 +232,6 @@ const OPTIONS = [
     value: COMMANDS_ROLES.USER_ROLE_MEMBER,
     label: COMMANDS_ROLES.USER_ROLE_MEMBER,
   },
-  {
-    value: COMMANDS_ROLES.USER_ROLE_GUEST,
-    label: COMMANDS_ROLES.USER_ROLE_GUEST,
-  },
 ];
 
 const Prefix = <SearchIcon name="search" />;
@@ -259,8 +255,6 @@ class TeamContainer extends Component {
   );
 
   componentDidMount() {
-    const { id: teamId } = this.props.router.query;
-
     this.props.fetchKeyPairRequest();
     this.props.initWorkflow();
   }
@@ -472,6 +466,8 @@ class TeamContainer extends Component {
       );
     }
 
+    const isDefaultTeam = team.type === DEFAULT_TEAM_TYPE;
+
     const teamUsers = team.users
       ? team.users.filter(({ id }) => id !== user.id)
       : [];
@@ -486,16 +482,18 @@ class TeamContainer extends Component {
       <Wrapper ref={this.wrapperRef}>
         <TopWrapper>
           <Title>{team.title}</Title>
-          <ButtonsWrapper>
-            <ButtonStyled
-              withOfflineCheck
-              onClick={this.handleOpenModal(INVITE_MEMBER_MODAL)}
-              icon="plus"
-              color="black"
-            >
-              ADD MEMBER
-            </ButtonStyled>
-          </ButtonsWrapper>
+          {!isDefaultTeam && (
+            <ButtonsWrapper>
+              <ButtonStyled
+                withOfflineCheck
+                onClick={this.handleOpenModal(INVITE_MEMBER_MODAL)}
+                icon="plus"
+                color="black"
+              >
+                ADD MEMBER
+              </ButtonStyled>
+            </ButtonsWrapper>
+          )}
         </TopWrapper>
         <DataTableStyled
           noDataText={null}

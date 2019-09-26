@@ -19,7 +19,6 @@ export const Document = props => {
     isReadOnly,
     isSharedItem,
     item: {
-      listId,
       data: { note, attachments = [] },
     },
     childItems,
@@ -27,8 +26,6 @@ export const Document = props => {
   const shouldShowNote = !!note;
   const shouldShowAttachments = attachments && attachments.length > 0;
   const shouldShowRemove = !isSharedItem && !isTrashItem;
-  const listName =
-    allLists.length > 0 ? allLists.find(({ id }) => id === listId).label : null;
 
   return (
     <Wrapper>
@@ -39,12 +36,6 @@ export const Document = props => {
         {...props}
       />
       <FieldWrapper>
-        {listName && (
-          <Field>
-            <Label>List</Label>
-            <FieldValue>{listName}</FieldValue>
-          </Field>
-        )}
         {shouldShowNote && (
           <Field>
             <Label>Note</Label>

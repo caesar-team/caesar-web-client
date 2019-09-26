@@ -138,7 +138,6 @@ const renderAttachments = (attachments = [], errors = [], setFieldValue) =>
 
 const DocumentForm = ({
   item: { data, listId, type },
-  allLists = [],
   mode,
   onFinishCreateWorkflow,
   onFinishEditWorkflow,
@@ -149,13 +148,6 @@ const DocumentForm = ({
   const action = isEditMode ? onFinishEditWorkflow : onFinishCreateWorkflow;
 
   const buttonText = isEditMode ? 'Update' : 'Add';
-
-  const preparedOptions = allLists
-    .filter(({ type: listType }) => listType !== TRASH_TYPE)
-    .map(({ id, label }) => ({
-      value: id,
-      label: upperFirst(label),
-    }));
 
   return (
     <Formik
@@ -197,16 +189,6 @@ const DocumentForm = ({
               />
             )}
           />
-          <Row>
-            <AdditionalLabel>List</AdditionalLabel>
-            <Select
-              name="listId"
-              placeholder="Select option"
-              value={values.listId}
-              options={preparedOptions}
-              onChange={setFieldValue}
-            />
-          </Row>
           <Row>
             <AdditionalLabel>Notes</AdditionalLabel>
             <FastField

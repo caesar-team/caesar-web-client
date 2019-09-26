@@ -80,16 +80,11 @@ class DashboardContainer extends Component {
   );
 
   componentDidMount() {
-    this.props.fetchUserSelfRequest();
     this.props.fetchKeyPairRequest();
+    this.props.fetchUserSelfRequest();
     this.props.fetchUserTeamsRequest();
 
-    // TODO: added checkpoint for situation when
-    // TODO: 1) we dont have items and we need to load and decrypt them
-    // TODO: 2) we have not decrypted items and we need just to decrypt them
-    // TODO: 3) we have encrypted items we need to do nothing
-    // withItemsDecryption = true
-    this.props.initPreparationDataFlow(true);
+    this.props.initWorkflow();
   }
 
   // eslint-disable-next-line
@@ -190,8 +185,8 @@ class DashboardContainer extends Component {
     this.props.createItemRequest(data, setSubmitting);
   };
 
-  handleClickMoveItem = (_, listId) => {
-    this.props.moveItemRequest(listId);
+  handleClickMoveItem = (teamId, listId) => {
+    this.props.moveItemRequest(this.props.workInProgressItem.id, listId);
     this.props.setWorkInProgressItem(null);
 
     this.props.notification.show({
@@ -258,18 +253,18 @@ class DashboardContainer extends Component {
 
     if (members.length > 0 || teamIds.length > 0) {
       if (workInProgressItemIds && workInProgressItemIds.length > 0) {
-        this.props.shareItemBatchRequest(
-          workInProgressItemIds,
+        this.props.shareItemBatchRequest({
+          itemIds: workInProgressItemIds,
           members,
           teamIds,
-        );
+        });
         this.props.resetWorkInProgressItemIds();
       } else {
-        this.props.shareItemBatchRequest(
-          [workInProgressItem.id],
+        this.props.shareItemBatchRequest({
+          itemIds: [workInProgressItem.id],
           members,
           teamIds,
-        );
+        });
       }
     }
 
@@ -281,16 +276,14 @@ class DashboardContainer extends Component {
   };
 
   handleClickMoveItems = listId => {
-    const { workInProgressList } = this.props;
-
-    this.props.moveItemsBatchRequest(workInProgressList.id, listId);
+    this.props.moveItemsBatchRequest(this.props.workInProgressItemIds, listId);
     this.props.resetWorkInProgressItemIds();
 
     this.props.notification.show({
       text: 'The items have moved.',
     });
 
-    this.handleCloseModal('move')();
+    this.handleCloseModal(MOVE_ITEM_MODAL)();
   };
 
   handleOpenModal = modal => () => {
@@ -433,7 +426,6 @@ class DashboardContainer extends Component {
       membersById,
       user,
       team,
-      personalLists,
       teamLists,
       personalListsByType,
       visibleListItems,
@@ -442,6 +434,7 @@ class DashboardContainer extends Component {
       isLoading,
       trashList,
       teamTrashList,
+      selectableTeamsLists,
     } = this.props;
 
     const { mode, modalVisibilities, searchedText } = this.state;
@@ -467,11 +460,6 @@ class DashboardContainer extends Component {
       mode === DASHBOARD_SEARCH_MODE
         ? searchedItems.length === workInProgressItemIds.length
         : visibleListItems.length === workInProgressItemIds.length;
-
-    const currentLists =
-      workInProgressItem && workInProgressItem.teamId
-        ? teamLists
-        : personalLists;
 
     const availableTeamsForSharing = isTeamItem
       ? userTeamList.filter(({ id }) => id !== workInProgressItem.teamId)
@@ -543,12 +531,12 @@ class DashboardContainer extends Component {
                 </MiddleColumnWrapper>
                 <RightColumnWrapper>
                   <Item
+                    teamsLists={selectableTeamsLists}
                     isTrashItem={isTrash}
                     notification={notification}
                     item={workInProgressItem}
                     owner={workInProgressItemOwner}
                     childItems={workInProgressItemChildItems}
-                    allLists={currentLists}
                     user={user}
                     membersById={membersById}
                     onClickMoveItem={this.handleClickMoveItem}
@@ -588,9 +576,8 @@ class DashboardContainer extends Component {
         )}
         {modalVisibilities[MOVE_ITEM_MODAL] && (
           <MoveModal
-            lists={currentLists}
+            teamsLists={selectableTeamsLists}
             items={workInProgressItems}
-            workInProgressListId={workInProgressList.id}
             onMove={this.handleClickMoveItems}
             onCancel={this.handleCloseModal(MOVE_ITEM_MODAL)}
             onRemove={this.handleCtrlSelectionItemBehaviour}

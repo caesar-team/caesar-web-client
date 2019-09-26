@@ -14,10 +14,7 @@ import {
   removeListRequest,
   sortListRequest,
 } from 'common/actions/entities/list';
-import {
-  initPreparationDataFlow,
-  setWorkInProgressListId,
-} from 'common/actions/workflow';
+import { initWorkflow, setWorkInProgressListId } from 'common/actions/workflow';
 import { fetchMembersRequest } from 'common/actions/entities/member';
 import { fetchUserSelfRequest, fetchKeyPairRequest } from 'common/actions/user';
 import ManageList from './ManageList';
@@ -33,7 +30,7 @@ const mapStateToProps = createStructuredSelector({
 
 const mapDispatchToProps = {
   fetchKeyPairRequest,
-  initPreparationDataFlow,
+  initWorkflow,
   fetchMembersRequest,
   fetchUserSelfRequest,
   createListRequest,

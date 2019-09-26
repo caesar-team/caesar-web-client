@@ -12,10 +12,9 @@ import {
   fetchMembersSuccess,
 } from 'common/actions/entities/member';
 import {
-  getMembers,
+  getDefaultTeamMembers,
   getPublicKeyByEmailBatch,
   getTeamMembers,
-  getUsersByIds,
   postNewUser,
   postNewUserBatch,
 } from 'common/api';
@@ -36,14 +35,11 @@ const setIsNewFlag = (members, isNew) =>
 const renameUserId = members =>
   members.map(({ userId, ...member }) => ({ id: userId, ...member }));
 
-export function* fetchMembersSaga({ payload: { memberIds } }) {
+export function* fetchMembersSaga() {
   try {
-    const action =
-      memberIds && memberIds.length > 0 ? getUsersByIds : getMembers;
+    const { data: members } = yield call(getDefaultTeamMembers);
 
-    const { data } = yield call(action, memberIds);
-
-    yield put(fetchMembersSuccess(convertMembersToEntity(data)));
+    yield put(fetchMembersSuccess(convertMembersToEntity(members)));
   } catch (e) {
     yield put(fetchMembersFailure());
   }

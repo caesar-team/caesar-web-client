@@ -1,7 +1,7 @@
 import { connect } from 'react-redux';
 import { createStructuredSelector } from 'reselect';
 import {
-  initPreparationDataFlow,
+  initWorkflow,
   setWorkInProgressItem,
   setWorkInProgressItemIds,
   setWorkInProgressListId,
@@ -41,11 +41,11 @@ import {
   visibleListItemsSelector,
 } from 'common/selectors/workflow';
 import {
-  selectableListsWithoutChildrenSelector,
   personalListsByTypeSelector,
   trashListSelector,
   teamTrashListSelector,
   currentTeamListsSelector,
+  selectableTeamsListsSelector,
 } from 'common/selectors/entities/list';
 import { itemsByIdSelector } from 'common/selectors/entities/item';
 import {
@@ -58,7 +58,6 @@ import { membersByIdSelector } from 'common/selectors/entities/member';
 import Dashboard from './Dashboard';
 
 const mapStateToProps = createStructuredSelector({
-  personalLists: selectableListsWithoutChildrenSelector,
   teamLists: currentTeamListsSelector,
   userTeamList: userTeamListSelector,
   personalListsByType: personalListsByTypeSelector,
@@ -75,13 +74,14 @@ const mapStateToProps = createStructuredSelector({
   teamTrashList: teamTrashListSelector,
   keyPair: keyPairSelector,
   membersById: membersByIdSelector,
+  selectableTeamsLists: selectableTeamsListsSelector,
   user: userDataSelector,
   team: currentTeamSelector,
   isLoading: isLoadingSelector,
 });
 
 const mapDispatchToProps = {
-  initPreparationDataFlow,
+  initWorkflow,
   fetchKeyPairRequest,
   fetchUserSelfRequest,
   fetchUserTeamsRequest,

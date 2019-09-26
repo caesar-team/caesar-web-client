@@ -75,7 +75,7 @@ class Import extends Component {
 
   componentDidMount() {
     this.props.fetchKeyPairRequest();
-    this.props.initPreparationDataFlow(false);
+    this.props.initWorkflow();
   }
 
   handleOnload = ({ file }) => {

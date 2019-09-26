@@ -1,4 +1,12 @@
-import { put, call, takeLatest, select, fork, take } from 'redux-saga/effects';
+import {
+  put,
+  call,
+  takeLatest,
+  select,
+  fork,
+  take,
+  all,
+} from 'redux-saga/effects';
 import deepequal from 'fast-deep-equal';
 import {
   ACCEPT_ITEM_UPDATE_REQUEST,
@@ -27,7 +35,6 @@ import {
   updateItemFailure,
   moveItemSuccess,
   moveItemFailure,
-  moveItemsBatchSuccess,
   moveItemsBatchFailure,
   rejectItemUpdateSuccess,
   rejectItemUpdateFailure,
@@ -42,17 +49,18 @@ import {
   removeAnonymousLinkSuccess,
   removeAnonymousLinkFailure,
   removeChildItemFromItem,
+  removeChildItemsBatchFromItem,
   shareItemBatchSuccess,
   shareItemBatchFailure,
   removeShareSuccess,
   removeShareFailure,
   addChildItemsBatchToItems,
+  updateItemField,
 } from 'common/actions/entities/item';
 import {
   addItemToList,
   addItemsBatchToList,
   moveItemToList,
-  moveItemsBatchToList,
   removeItemFromList,
   removeItemsBatchFromList,
   toggleItemToFavoriteList,
@@ -109,7 +117,6 @@ import {
   toggleFavorite,
   updateItem,
   updateMoveItem,
-  updateMoveItemsBatch,
 } from 'common/api';
 import {
   decryptItem,
@@ -168,41 +175,154 @@ export function* removeItemsBatchSaga({ payload: { listId } }) {
   }
 }
 
-export function* moveItemSaga({ payload: { listId } }) {
+export function* shareItemBatchSaga({
+  payload: {
+    data: { itemIds, members, teamIds },
+    options: { includeIniciator = true },
+  },
+}) {
+  try {
+    const user = yield select(userDataSelector);
+    const items = yield select(itemsBatchSelector, { itemIds });
+
+    const preparedMembers = yield call(prepareUsersForSharing, members);
+
+    const newMembers = preparedMembers.filter(({ isNew }) => isNew);
+
+    const directMembers = preparedMembers.map(member => ({
+      ...member,
+      teamId: null,
+    }));
+
+    const teamsMembers = yield select(teamsMembersSelector, { teamIds });
+
+    const preparedTeamsMembers = includeIniciator
+      ? teamsMembers
+      : teamsMembers.filter(member => member.id !== user.id);
+
+    const allMembers = [...directMembers, ...preparedTeamsMembers];
+
+    const itemUserPairs = yield call(getItemUserPairs, {
+      items,
+      members: allMembers,
+    });
+
+    if (newMembers.length > 0) {
+      yield fork(inviteNewMemberBatchSaga, {
+        payload: { members: newMembers },
+      });
+    }
+
+    yield fork(createChildItemBatchSaga, { payload: { itemUserPairs } });
+
+    const {
+      payload: { childItems },
+    } = yield take(CREATE_CHILD_ITEM_BATCH_FINISHED_EVENT);
+
+    const shares = childItems.reduce(
+      (accumulator, item) => [
+        ...accumulator,
+        {
+          itemId: item.originalItemId,
+          childItemIds: item.items.map(({ id }) => id),
+        },
+      ],
+      [],
+    );
+
+    yield put(shareItemBatchSuccess(shares));
+
+    yield put(updateWorkInProgressItem());
+  } catch (error) {
+    console.log(error);
+    yield put(shareItemBatchFailure());
+  }
+}
+
+export function* removeShareSaga({ payload: { shareId } }) {
   try {
     const workInProgressItem = yield select(workInProgressItemSelector);
 
-    yield call(updateMoveItem, workInProgressItem.id, { listId });
-    yield put(
-      moveItemSuccess(workInProgressItem.id, workInProgressItem.listId, listId),
-    );
-    yield put(
-      moveItemToList(workInProgressItem.id, workInProgressItem.listId, listId),
-    );
+    yield call(deleteChildItem, shareId);
+
+    yield put(removeChildItemFromItem(workInProgressItem.id, shareId));
+    yield put(removeShareSuccess(workInProgressItem.id, shareId));
     yield put(updateWorkInProgressItem());
+  } catch (error) {
+    console.log(error);
+    yield put(removeShareFailure());
+  }
+}
+
+export function* moveItemSaga({ payload: { itemId, listId } }) {
+  try {
+    const item = yield select(itemSelector, { itemId });
+    const childItemIds = item.invited;
+
+    const oldList = yield select(listSelector, {
+      listId: item.listId,
+    });
+    const newList = yield select(listSelector, { listId });
+
+    yield call(updateMoveItem, item.id, {
+      listId,
+    });
+    yield put(moveItemSuccess(item.id, item.listId, listId));
+    yield put(moveItemToList(item.id, item.listId, listId));
+
+    if (oldList.teamId !== newList.teamId) {
+      yield put(updateItemField(item.id, 'teamId', newList.teamId));
+    }
+
+    if (!oldList.teamId && newList.teamId) {
+      yield fork(shareItemBatchSaga, {
+        payload: {
+          data: {
+            itemIds: [item.id],
+            members: [],
+            teamIds: [newList.teamId],
+          },
+          options: {
+            includeIniciator: false,
+          },
+        },
+      });
+    }
+
+    if (oldList.teamId && !newList.teamId) {
+      yield put(removeChildItemsBatchFromItem(item.id, childItemIds));
+      yield put(removeChildItemsBatch(childItemIds));
+    }
+
+    if (oldList.teamId && newList.teamId && oldList.teamId !== newList.teamId) {
+      yield put(removeChildItemsBatchFromItem(item.id, childItemIds));
+      yield put(removeChildItemsBatch(childItemIds));
+      yield fork(shareItemBatchSaga, {
+        payload: {
+          data: {
+            itemIds: [item.id],
+            members: [],
+            teamIds: [newList.teamId],
+          },
+          options: {
+            includeIniciator: false,
+          },
+        },
+      });
+    }
   } catch (error) {
     console.log(error);
     yield put(moveItemFailure());
   }
 }
 
-export function* moveItemsBatchSaga({ payload: { oldListId, newListId } }) {
+export function* moveItemsBatchSaga({ payload: { itemIds, listId } }) {
   try {
-    const workInProgressItemIds = yield select(workInProgressItemIdsSelector);
-
-    if (workInProgressItemIds.length > 0) {
-      yield call(
-        updateMoveItemsBatch,
-        { items: workInProgressItemIds },
-        newListId,
-      );
-      yield put(
-        moveItemsBatchSuccess(workInProgressItemIds, oldListId, newListId),
-      );
-      yield put(
-        moveItemsBatchToList(workInProgressItemIds, oldListId, newListId),
-      );
-    }
+    yield all(
+      itemIds.map(itemId =>
+        call(moveItemSaga, { payload: { itemId, listId } }),
+      ),
+    );
   } catch (error) {
     console.log(error);
     yield put(moveItemsBatchFailure());
@@ -560,80 +680,6 @@ export function* removeAnonymousLinkSaga() {
   } catch (error) {
     console.log(error);
     yield put(removeAnonymousLinkFailure());
-  }
-}
-
-export function* shareItemBatchSaga({
-  payload: { itemIds, members, teamIds },
-}) {
-  try {
-    const user = yield select(userDataSelector);
-    const items = yield select(itemsBatchSelector, { itemIds });
-
-    const preparedMembers = yield call(prepareUsersForSharing, members);
-
-    const newMembers = preparedMembers.filter(({ isNew }) => isNew);
-
-    const directMembers = preparedMembers.map(member => ({
-      ...member,
-      teamId: null,
-    }));
-
-    const teamsMembers = yield select(teamsMembersSelector, { teamIds });
-
-    const allMembers = [...directMembers, ...teamsMembers].filter(
-      member => member.id !== user.id,
-    );
-
-    const itemUserPairs = yield call(getItemUserPairs, {
-      items,
-      members: allMembers,
-    });
-
-    if (newMembers.length > 0) {
-      yield fork(inviteNewMemberBatchSaga, {
-        payload: { members: newMembers },
-      });
-    }
-
-    yield fork(createChildItemBatchSaga, { payload: { itemUserPairs } });
-
-    const {
-      payload: { childItems },
-    } = yield take(CREATE_CHILD_ITEM_BATCH_FINISHED_EVENT);
-
-    const shares = childItems.reduce(
-      (accumulator, item) => [
-        ...accumulator,
-        {
-          itemId: item.originalItemId,
-          childItemIds: item.items.map(({ id }) => id),
-        },
-      ],
-      [],
-    );
-
-    yield put(shareItemBatchSuccess(shares));
-
-    yield put(updateWorkInProgressItem());
-  } catch (error) {
-    console.log(error);
-    yield put(shareItemBatchFailure());
-  }
-}
-
-export function* removeShareSaga({ payload: { shareId } }) {
-  try {
-    const workInProgressItem = yield select(workInProgressItemSelector);
-
-    yield call(deleteChildItem, shareId);
-
-    yield put(removeChildItemFromItem(workInProgressItem.id, shareId));
-    yield put(removeShareSuccess(workInProgressItem.id, shareId));
-    yield put(updateWorkInProgressItem());
-  } catch (error) {
-    console.log(error);
-    yield put(removeShareFailure());
   }
 }
 

@@ -7,6 +7,7 @@ import {
 } from 'common/constants';
 import { itemsByIdSelector } from 'common/selectors/entities/item';
 import { childItemsByIdSelector } from 'common/selectors/entities/childItem';
+import { teamListSelector } from 'common/selectors/entities/team';
 import { currentTeamIdSelector } from 'common/selectors/user';
 
 export const entitiesSelector = state => state.entities;
@@ -153,4 +154,31 @@ export const listSelector = createSelector(
   listsByIdSelector,
   listIdPropSelector,
   (listsById, listId) => listsById[listId],
+);
+
+export const selectableTeamsListsSelector = createSelector(
+  teamListSelector,
+  personalListsSelector,
+  teamListsSelector,
+  (teamList, personalLists, teamLists) => {
+    const filterLists = lists =>
+      lists.filter(
+        ({ type }) => ![INBOX_TYPE, FAVORITES_TYPE, TRASH_TYPE].includes(type),
+      );
+
+    return [
+      {
+        id: 'personal',
+        name: 'personal',
+        icon: null,
+        lists: filterLists(personalLists),
+      },
+      ...teamList.map(team => ({
+        id: team.id,
+        name: team.title,
+        icon: team.icon,
+        lists: filterLists(teamLists.filter(list => list.teamId === team.id)),
+      })),
+    ];
+  },
 );

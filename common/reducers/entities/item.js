@@ -52,7 +52,9 @@ import {
   REMOVE_CHILD_ITEM_FROM_ITEM,
   REMOVE_CHILD_ITEMS_BATCH_FROM_ITEM,
   REMOVE_CHILD_ITEMS_BATCH_FROM_ITEMS,
-  REMOVE_ITEMS_DATA, ADD_CHILD_ITEMS_BATCH_TO_ITEMS,
+  REMOVE_ITEMS_DATA,
+  ADD_CHILD_ITEMS_BATCH_TO_ITEMS,
+  UPDATE_ITEM_FIELD,
 } from 'common/actions/entities/item';
 
 const initialState = {
@@ -190,7 +192,6 @@ export default createReducer(initialState, {
     return state;
   },
   [UPDATE_ITEM_SUCCESS](state, { payload }) {
-    console.log(payload);
     return {
       ...state,
       byId: {
@@ -463,6 +464,18 @@ export default createReducer(initialState, {
         }),
         {},
       ),
+    };
+  },
+  [UPDATE_ITEM_FIELD](state, { payload }) {
+    return {
+      ...state,
+      byId: {
+        ...state.byId,
+        [payload.itemId]: {
+          ...state.byId[payload.itemId],
+          [payload.key]: payload.value,
+        },
+      },
     };
   },
 });

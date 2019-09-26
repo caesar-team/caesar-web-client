@@ -6,7 +6,7 @@ import {
   removeTeamMemberRequest,
   updateTeamMemberRoleRequest,
 } from 'common/actions/entities/team';
-import { initPreparationTeamDataFlow } from 'common/actions/workflow';
+import { initWorkflow } from 'common/actions/workflow';
 import {
   isLoadingSelector,
   teamSelector,
@@ -27,7 +27,7 @@ const mapDispatchToProps = {
   addTeamMembersBatchRequest,
   removeTeamMemberRequest,
   updateTeamMemberRoleRequest,
-  initPreparationTeamDataFlow,
+  initWorkflow,
 };
 
 export default withRouter(

@@ -199,4 +199,7 @@ export const getSearchUser = text => callApi.get(`/users/search/${text}`);
 
 export const getMembers = () => callApi.get('/users');
 
+export const getDefaultTeamMembers = () =>
+  callApi.get('/teams/default/members');
+
 export const patchAcceptTeamItems = () => callApi.patch('/accept_teams_items');

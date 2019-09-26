@@ -50,9 +50,9 @@ const Item = ({
   item,
   owner,
   childItems,
-  allLists,
   user,
   membersById = {},
+  teamsLists = [],
   notification,
   onClickMoveItem = Function.prototype,
   onClickCloseItem = Function.prototype,
@@ -80,7 +80,6 @@ const Item = ({
       [ITEM_CREDENTIALS_TYPE]: (
         <CredentialsForm
           item={item}
-          allLists={allLists}
           mode={mode}
           onFinishCreateWorkflow={onFinishCreateWorkflow}
           onFinishEditWorkflow={onFinishEditWorkflow}
@@ -90,7 +89,6 @@ const Item = ({
       [ITEM_DOCUMENT_TYPE]: (
         <DocumentForm
           item={item}
-          allLists={allLists}
           mode={mode}
           onFinishCreateWorkflow={onFinishCreateWorkflow}
           onFinishEditWorkflow={onFinishEditWorkflow}
@@ -144,7 +142,7 @@ const Item = ({
           childItems={childItems}
           user={user}
           membersById={membersById}
-          allLists={allLists}
+          teamsLists={teamsLists}
           onClickMoveItem={onClickMoveItem}
           onClickCloseItem={onClickCloseItem}
           onClickRemoveItem={onClickRemoveItem}
@@ -165,7 +163,7 @@ const Item = ({
           childItems={childItems}
           user={user}
           membersById={membersById}
-          allLists={allLists}
+          teamsLists={teamsLists}
           onClickMoveItem={onClickMoveItem}
           onClickCloseItem={onClickCloseItem}
           onClickRemoveItem={onClickRemoveItem}
@@ -200,7 +198,6 @@ const Item = ({
 
 export default memo(Item, (prevProps, nextProps) => {
   return (
-    equal(prevProps.allLists, nextProps.allLists) &&
     equal(prevProps.item, nextProps.item) &&
     equal(prevProps.members, nextProps.members) &&
     equal(prevProps.notification, nextProps.notification)

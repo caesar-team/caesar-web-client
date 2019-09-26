@@ -1,7 +1,4 @@
-export const INIT_PREPARATION_DATA_FLOW =
-  '@workflow/INIT_PREPARATION_DATA_FLOW';
-export const INIT_PREPARATION_TEAM_DATA_FLOW =
-  '@workflow/INIT_PREPARATION_TEAM_DATA_FLOW';
+export const INIT_WORKFLOW = '@workflow/INIT_WORKFLOW';
 
 export const FINISH_IS_LOADING = '@workflow/FINISH_IS_LOADING';
 
@@ -17,18 +14,8 @@ export const RESET_WORK_IN_PROGRESS_ITEM_IDS =
   '@workflow/RESET_WORK_IN_PROGRESS_ITEM_IDS';
 export const RESET_WORKFLOW_STORE = '@workflow/RESET_WORKFLOW_STORE';
 
-export const initPreparationDataFlow = withItemsDecryption => ({
-  type: INIT_PREPARATION_DATA_FLOW,
-  payload: {
-    withItemsDecryption,
-  },
-});
-
-export const initPreparationTeamDataFlow = teamId => ({
-  type: INIT_PREPARATION_TEAM_DATA_FLOW,
-  payload: {
-    teamId,
-  },
+export const initWorkflow = () => ({
+  type: INIT_WORKFLOW,
 });
 
 export const finishIsLoading = () => ({

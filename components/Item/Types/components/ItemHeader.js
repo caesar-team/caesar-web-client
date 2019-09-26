@@ -1,13 +1,13 @@
-import React, { Fragment } from 'react';
+import React, { Fragment, Component } from 'react';
 import styled from 'styled-components';
 import { formatDate } from 'common/utils/dateUtils';
 import { upperFirst } from 'common/utils/string';
+import { generateTeamTag } from 'common/utils/team';
 import { Icon } from 'components/Icon';
 import { Button } from 'components/Button';
 import { Avatar, AvatarsList } from 'components/Avatar';
 import { withOfflineDetection } from 'components/Offline';
 import { Dropdown } from 'components/Dropdown';
-import { TRASH_TYPE } from 'common/constants';
 import { Row } from './Row';
 
 const StyledRow = styled(Row)`
@@ -114,8 +114,6 @@ const FavoriteButton = styled.button`
 `;
 
 const IconStyled = styled(Icon)`
-  width: 20px;
-  height: 20px;
   fill: ${({ theme }) => theme.gray};
 
   &:hover {
@@ -123,175 +121,342 @@ const IconStyled = styled(Icon)`
   }
 `;
 
-const StyledDropdown = styled(Dropdown)`
+const ArrowIcon = styled(IconStyled)`
+  width: 10px;
+  height: 6px;
+`;
+
+const DropdownStyled = styled(Dropdown)`
+  display: flex;
+  align-items: center;
   width: 100%;
-`;
-
-const MoveTo = styled.a`
   cursor: pointer;
-  height: 40px;
-  font-size: 14px;
-  letter-spacing: 0.4px;
-  border-radius: 3px;
-  outline: none;
-  padding: 10px 20px;
-  transition: all 0.2s;
-  border: 1px solid ${({ theme }) => theme.gallery};
-
-  &:hover {
-    border: 1px solid ${({ theme }) => theme.black};
-  }
 `;
 
-const ItemHeader = ({
-  allLists,
-  isReadOnly,
-  hasWriteAccess,
-  isTrashItem,
-  isSharedItem,
-  isOnline,
-  user,
-  owner,
-  membersById,
-  onClickCloseItem,
-  onClickRemoveItem,
-  onClickEditItem,
-  onClickShare,
-  onClickRestoreItem,
-  onClickMoveItem,
-  onToggleFavorites,
-  item: {
-    id: itemId,
-    listId,
-    lastUpdated,
-    favorite,
-    ownerId,
-    data: { name },
-  },
-  childItems,
-}) => {
-  if (isSharedItem) {
+const DropdownValue = styled.div`
+  font-size: 16px;
+  letter-spacing: 0.5px;
+  margin-right: 10px;
+`;
+
+const Separator = styled.div`
+  font-size: 16px;
+  margin: 0 20px;
+`;
+
+const Option = styled.div`
+  display: flex;
+  align-items: center;
+  padding: 10px 20px;
+  border: none;
+  background: none;
+  cursor: pointer;
+`;
+
+const TeamAvatar = styled.div`
+  display: flex;
+  align-items: center;
+  width: 20px;
+  height: 20px;
+  border-radius: 100%;
+  margin-right: 10px;
+`;
+
+const TeamImg = styled.img`
+  object-fit: cover;
+  width: 20px;
+  height: 20px;
+`;
+
+const MoveButton = styled(Button)`
+  margin-left: 20px;
+`;
+
+const generateListOptions = (lists, currentListId) =>
+  lists
+    .filter(({ id }) => id !== currentListId)
+    .map(({ id, label }) => ({ value: id, label: upperFirst(label) }));
+
+const generateTeamOptions = (teams, currentTeamId) =>
+  teams
+    .filter(({ id }) => id !== currentTeamId)
+    .map(team => ({
+      value: team.id,
+      label: team.id === 'personal' ? 'personal' : generateTeamTag(team.name),
+    }));
+
+const renderOption = teams => (value, label) => {
+  // eslint-disable-next-line
+  const team = teams.find(team => team.id === value);
+  const shouldShowAvatar = value !== 'personal';
+
+  return (
+    <Option>
+      {shouldShowAvatar && (
+        <TeamAvatar>
+          <TeamImg src={team.icon} />
+        </TeamAvatar>
+      )}
+      {label}
+    </Option>
+  );
+};
+
+class ItemHeader extends Component {
+  state = this.prepareInitialState();
+
+  handleSelectTeamId = (_, teamId) => {
+    const { teamsLists } = this.props;
+
+    const currentTeam = teamsLists.find(team =>
+      teamId ? team.id === teamId : team.id === 'personal',
+    );
+
+    const defaultList = currentTeam.lists.find(
+      list => list.label.toLowerCase() === 'default',
+    );
+
+    this.setState({
+      currentTeamId: teamId,
+      currentListId: defaultList.id,
+    });
+  };
+
+  handleSelectListId = (_, listId) => {
+    this.setState({
+      currentListId: listId,
+    });
+  };
+
+  handleClickMoveItem = () => {
+    const { currentTeamId, currentListId } = this.state;
+    const { onClickMoveItem = Function.prototype } = this.props;
+
+    onClickMoveItem(currentTeamId, currentListId);
+  };
+
+  prepareInitialState() {
+    const {
+      item: { teamId, listId },
+    } = this.props;
+
+    return {
+      currentTeamId: teamId,
+      currentListId: listId,
+    };
+  }
+
+  render() {
+    const {
+      isReadOnly,
+      hasWriteAccess,
+      isTrashItem,
+      isSharedItem,
+      isOnline,
+      user,
+      owner,
+      membersById,
+      teamsLists,
+      onClickCloseItem,
+      onClickRemoveItem,
+      onClickEditItem,
+      onClickShare,
+      onClickRestoreItem,
+      onToggleFavorites,
+      item: {
+        id: itemId,
+        teamId,
+        listId,
+        lastUpdated,
+        favorite,
+        ownerId,
+        data: { name },
+      },
+      childItems,
+    } = this.props;
+
+    const { currentTeamId, currentListId } = this.state;
+
+    if (isSharedItem) {
+      return (
+        <Fragment>
+          <StyledRow>
+            <UpdatedDate>Last updated {formatDate(lastUpdated)}</UpdatedDate>
+          </StyledRow>
+          <Row>
+            <Title>{name}</Title>
+          </Row>
+        </Fragment>
+      );
+    }
+
+    const avatars = childItems.reduce((accumulator, item) => {
+      if (!membersById[item.userId]) {
+        return accumulator;
+      }
+
+      if (user.id === item.userId && user.id !== ownerId) {
+        accumulator.unshift(user);
+      } else if (ownerId !== item.userId) {
+        accumulator.push(membersById[item.userId]);
+      }
+
+      return accumulator;
+    }, []);
+
+    const hasInvited = childItems.length > 0;
+    const isOwner = user.id === ownerId;
+
+    const currentTeam = teamsLists.find(team =>
+      currentTeamId ? team.id === currentTeamId : team.id === 'personal',
+    );
+    const currentList = currentTeam.lists.find(
+      list => list.id === currentListId,
+    );
+
+    const teamOptions = generateTeamOptions(teamsLists, currentTeam.id);
+    const listOptions = generateListOptions(currentTeam.lists, currentListId);
+
+    const shouldShowTeamDropdownIcon = teamOptions.length >= 1;
+    const shouldShowListDropdownIcon = listOptions.length >= 1;
+    const shouldShowMoveButton =
+      listId !== currentListId || teamId !== currentTeamId;
+
+    const currentTeamTag =
+      currentTeam.id === 'personal'
+        ? 'personal'
+        : generateTeamTag(currentTeam.name);
+
     return (
       <Fragment>
-        <StyledRow>
-          <UpdatedDate>Last updated {formatDate(lastUpdated)}</UpdatedDate>
-        </StyledRow>
+        <Row>
+          <Row>
+            {!isTrashItem && (
+              <Fragment>
+                {shouldShowTeamDropdownIcon ? (
+                  <DropdownStyled
+                    onClick={this.handleSelectTeamId}
+                    options={teamOptions}
+                    optionRender={renderOption(teamsLists)}
+                  >
+                    {currentTeam.id !== 'personal' && (
+                      <TeamAvatar>
+                        <TeamImg src={currentTeam.icon} />
+                      </TeamAvatar>
+                    )}
+                    <DropdownValue>{currentTeamTag}</DropdownValue>
+                    <ArrowIcon name="arrow-down-big" />
+                  </DropdownStyled>
+                ) : (
+                  <Fragment>
+                    {currentTeam.id !== 'personal' && (
+                      <TeamAvatar>
+                        <TeamImg src={currentTeam.icon} />
+                      </TeamAvatar>
+                    )}
+                    <DropdownValue>{currentTeamTag}</DropdownValue>
+                  </Fragment>
+                )}
+                <Separator>|</Separator>
+                {shouldShowListDropdownIcon ? (
+                  <DropdownStyled
+                    onClick={this.handleSelectListId}
+                    options={listOptions}
+                  >
+                    <DropdownValue>{currentList.label}</DropdownValue>
+                    <ArrowIcon name="arrow-down-big" />
+                  </DropdownStyled>
+                ) : (
+                  <DropdownValue>{currentList.label}</DropdownValue>
+                )}
+                {shouldShowMoveButton && (
+                  <MoveButton color="white" onClick={this.handleClickMoveItem}>
+                    MOVE
+                  </MoveButton>
+                )}
+              </Fragment>
+            )}
+          </Row>
+          <Row>
+            {isTrashItem ? (
+              <ButtonsWrapper>
+                <Button
+                  withOfflineCheck
+                  color="white"
+                  onClick={onClickRestoreItem}
+                >
+                  RESTORE
+                </Button>
+                <ItemButton
+                  color="white"
+                  icon="trash"
+                  onClick={onClickRemoveItem}
+                >
+                  REMOVE
+                </ItemButton>
+              </ButtonsWrapper>
+            ) : (
+              hasWriteAccess && (
+                <EditButton
+                  withOfflineCheck
+                  color="white"
+                  icon="pencil"
+                  onClick={onClickEditItem}
+                >
+                  EDIT
+                </EditButton>
+              )
+            )}
+            <ItemButton color="white" icon="close" onClick={onClickCloseItem} />
+          </Row>
+        </Row>
         <Row>
           <Title>{name}</Title>
+          <FavoriteButton
+            disabled={!isOnline}
+            onClick={onToggleFavorites(itemId)}
+          >
+            <IconStyled
+              withOfflineCheck
+              name={favorite ? 'favorite-active' : 'favorite'}
+              width={20}
+              height={20}
+            />
+          </FavoriteButton>
         </Row>
+        <InviteRow>
+          <Row>
+            <Avatar
+              name={owner ? owner.name : ''}
+              avatar={owner ? owner.avatar : ''}
+            />
+            <Owner>
+              <OwnerName>{owner ? owner.name : ''}</OwnerName>
+              <OwnerStatus>owner</OwnerStatus>
+            </Owner>
+          </Row>
+          <Row>
+            {!isTrashItem && isOwner && (
+              <ShareButton
+                disabled={!isOnline}
+                onClick={onClickShare}
+                hasInvited={hasInvited}
+              >
+                <Icon
+                  isInButton
+                  withOfflineCheck
+                  name="plus"
+                  width={14}
+                  height={14}
+                />
+              </ShareButton>
+            )}
+            <StyledAvatarsList avatars={avatars} />
+          </Row>
+        </InviteRow>
       </Fragment>
     );
   }
-
-  const avatars = childItems.reduce((accumulator, item) => {
-    if (!membersById[item.userId]) {
-      return accumulator;
-    }
-
-    if (user.id === item.userId && user.id !== ownerId) {
-      accumulator.unshift(user);
-    } else if (ownerId !== item.userId) {
-      accumulator.push(membersById[item.userId]);
-    }
-
-    return accumulator;
-  }, []);
-
-  const hasInvited = childItems.length > 0;
-  const isOwner = user.id === ownerId;
-
-  const options = allLists
-    .filter(({ id, type }) => type !== TRASH_TYPE && id !== listId)
-    .map(({ label, id }) => ({ value: id, label: upperFirst(label) }));
-
-  return (
-    <Fragment>
-      <Row>
-        <UpdatedDate>Last updated {formatDate(lastUpdated)}</UpdatedDate>
-        <Row>
-          {isReadOnly && (
-            <StyledDropdown options={options} onClick={onClickMoveItem}>
-              <MoveTo>MOVE TO</MoveTo>
-            </StyledDropdown>
-          )}
-          {isTrashItem ? (
-            <ButtonsWrapper>
-              <Button
-                withOfflineCheck
-                color="white"
-                onClick={onClickRestoreItem}
-              >
-                RESTORE
-              </Button>
-              <ItemButton
-                color="white"
-                icon="trash"
-                onClick={onClickRemoveItem}
-              >
-                REMOVE
-              </ItemButton>
-            </ButtonsWrapper>
-          ) : (
-            hasWriteAccess && (
-              <EditButton
-                withOfflineCheck
-                color="white"
-                icon="pencil"
-                onClick={onClickEditItem}
-              >
-                EDIT
-              </EditButton>
-            )
-          )}
-          <ItemButton color="white" icon="close" onClick={onClickCloseItem} />
-        </Row>
-      </Row>
-      <Row>
-        <Title>{name}</Title>
-        <FavoriteButton
-          disabled={!isOnline}
-          onClick={onToggleFavorites(itemId)}
-        >
-          <IconStyled
-            withOfflineCheck
-            name={favorite ? 'favorite-active' : 'favorite'}
-            width={20}
-            height={20}
-          />
-        </FavoriteButton>
-      </Row>
-      <InviteRow>
-        <Row>
-          <Avatar
-            name={owner ? owner.name : ''}
-            avatar={owner ? owner.avatar : ''}
-          />
-          <Owner>
-            <OwnerName>{owner ? owner.name : ''}</OwnerName>
-            <OwnerStatus>owner</OwnerStatus>
-          </Owner>
-        </Row>
-        <Row>
-          {!isTrashItem && isOwner && (
-            <ShareButton
-              disabled={!isOnline}
-              onClick={onClickShare}
-              hasInvited={hasInvited}
-            >
-              <Icon
-                isInButton
-                withOfflineCheck
-                name="plus"
-                width={14}
-                height={14}
-              />
-            </ShareButton>
-          )}
-          <StyledAvatarsList avatars={avatars} />
-        </Row>
-      </InviteRow>
-    </Fragment>
-  );
-};
+}
 
 export default withOfflineDetection(ItemHeader);

@@ -262,7 +262,7 @@ class TeamContainer extends Component {
     const { id: teamId } = this.props.router.query;
 
     this.props.fetchKeyPairRequest();
-    this.props.initPreparationTeamDataFlow(teamId);
+    this.props.initWorkflow();
   }
 
   getMemberList = memoizeOne((users, membersById) =>

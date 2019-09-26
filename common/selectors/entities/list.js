@@ -162,9 +162,7 @@ export const selectableTeamsListsSelector = createSelector(
   teamListsSelector,
   (teamList, personalLists, teamLists) => {
     const filterLists = lists =>
-      lists.filter(
-        ({ type }) => ![INBOX_TYPE, FAVORITES_TYPE, TRASH_TYPE].includes(type),
-      );
+      lists.filter(({ type }) => ![FAVORITES_TYPE, TRASH_TYPE].includes(type));
 
     return [
       {

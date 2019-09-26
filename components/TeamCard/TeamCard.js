@@ -71,7 +71,7 @@ const TeamCard = ({
   onClick = Function.prototype,
   onClickRemoveTeam = Function.prototype,
 }) => {
-  const shouldShowAvatars = users && users.length > 0;
+  const areMembersAvailable = users && users.length > 0;
 
   return (
     <Wrapper className={className} onClick={onClick}>
@@ -81,13 +81,15 @@ const TeamCard = ({
             <TeamIcon src={icon} />
             <TeamInfo>
               <TeamName>{title}</TeamName>
-              <TeamMembers>{users.length} members</TeamMembers>
+              {areMembersAvailable && (
+                <TeamMembers>{users.length} members</TeamMembers>
+              )}
             </TeamInfo>
           </TeamDetails>
         </TeamWrapper>
       </Link>
       <AvatarsWrapper>
-        {shouldShowAvatars && (
+        {areMembersAvailable && (
           <AvatarsList
             isSmall
             avatars={getMembers(users, members)}

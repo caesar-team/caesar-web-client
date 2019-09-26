@@ -8,6 +8,7 @@ import {
   withNotification,
 } from 'components';
 import {
+  INBOX_TYPE,
   ITEM_CREDENTIALS_TYPE,
   ITEM_DOCUMENT_TYPE,
   ITEM_REVIEW_MODE,
@@ -15,11 +16,13 @@ import {
 import { getPrivateKeyObj, decryptItem } from 'common/utils/cipherUtils';
 
 const getInboxItem = list => {
-  if (!list || !list[0] || !list[0].children || !list[0].children[0]) {
+  const inbox = list.find(({ type }) => type === INBOX_TYPE);
+
+  if (!inbox || !inbox.children) {
     return null;
   }
 
-  return list[0].children[0];
+  return inbox.children[0];
 };
 
 class Sharing extends Component {
@@ -33,7 +36,7 @@ class Sharing extends Component {
     const item = getInboxItem(list);
 
     const privateKeyObj = await getPrivateKeyObj(privateKey, password);
-    const decryptedSecret = await decryptItem(item.data, privateKeyObj);
+    const decryptedSecret = await decryptItem(item.secret, privateKeyObj);
 
     this.setState({
       item: { ...item, data: decryptedSecret, mode: ITEM_REVIEW_MODE },

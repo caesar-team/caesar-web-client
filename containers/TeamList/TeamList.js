@@ -7,6 +7,7 @@ import {
   NewTeamModal,
   ConfirmModal,
 } from 'components';
+import { DEFAULT_TEAM_TYPE } from '../../common/constants';
 
 const LogoWrapper = styled.div`
   display: flex;
@@ -142,6 +143,7 @@ class TeamListContainer extends Component {
     return teams.map(team => (
       <TeamCardStyled
         key={team.id}
+        isRemoveButtonVisible={team.type !== DEFAULT_TEAM_TYPE}
         {...team}
         members={members}
         onClickRemoveTeam={this.handleClickRemoveTeam(team.id)}

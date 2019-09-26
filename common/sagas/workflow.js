@@ -10,14 +10,14 @@ import {
 } from 'common/actions/workflow';
 import { addListsBatch } from 'common/actions/entities/list';
 import { addItemsBatch } from 'common/actions/entities/item';
-import { SET_CURRENT_TEAM_ID } from 'common/actions/user';
+import { SET_CURRENT_TEAM_ID, setCurrentTeamId } from 'common/actions/user';
 import { addChildItemsBatch } from 'common/actions/entities/childItem';
 import { fetchMembersSaga } from 'common/sagas/entities/member';
 import { convertNodesToEntities } from 'common/normalizers/normalizers';
 import { objectToArray } from 'common/utils/utils';
 import { sortItemsByFavorites } from 'common/utils/workflow';
 import { getLists, getTeamLists, getTeams } from 'common/api';
-import { ITEM_REVIEW_MODE } from 'common/constants';
+import { DEFAULT_TEAM_TYPE, ITEM_REVIEW_MODE } from 'common/constants';
 import { favoriteListSelector } from 'common/selectors/entities/list';
 import {
   keyPairSelector,
@@ -68,26 +68,30 @@ function* initTeam(team) {
   try {
     const currentTeamId = yield select(currentTeamIdSelector);
 
-    const { data: lists } = yield call(getTeamLists, team.id);
-
-    const { listsById, itemsById, childItemsById } = convertNodesToEntities(
-      lists,
-    );
-
-    yield put(addListsBatch(listsById));
-    yield put(addChildItemsBatch(childItemsById));
-
-    if (currentTeamId === team.id) {
-      const keyPair = yield select(keyPairSelector);
-      const masterPassword = yield select(masterPasswordSelector);
-
-      yield fork(decryption, {
-        items: objectToArray(itemsById),
-        key: keyPair.privateKey,
-        masterPassword,
-      });
+    if (!currentTeamId && team.type === DEFAULT_TEAM_TYPE) {
+      yield put(setCurrentTeamId(team.id));
     } else {
-      yield put(addItemsBatch(itemsById));
+      const { data: lists } = yield call(getTeamLists, team.id);
+
+      const { listsById, itemsById, childItemsById } = convertNodesToEntities(
+        lists,
+      );
+
+      yield put(addListsBatch(listsById));
+      yield put(addChildItemsBatch(childItemsById));
+
+      if (currentTeamId === team.id) {
+        const keyPair = yield select(keyPairSelector);
+        const masterPassword = yield select(masterPasswordSelector);
+
+        yield fork(decryption, {
+          items: objectToArray(itemsById),
+          key: keyPair.privateKey,
+          masterPassword,
+        });
+      } else {
+        yield put(addItemsBatch(itemsById));
+      }
     }
   } catch (error) {
     console.log(error);

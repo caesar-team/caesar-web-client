@@ -95,7 +95,6 @@ export const ActiveTeamRow = ({ data: { id, title, icon } }) => {
         <AvatarStyled name={title} avatar={icon} />
         <TeamDetails>
           <TeamName>{title}</TeamName>
-          <TeamMembers>44 members</TeamMembers>
         </TeamDetails>
       </InnerWrapper>
       <ActivePointer>Active</ActivePointer>
@@ -113,7 +112,6 @@ export const RadioTeamRow = ({
     <AvatarStyled name={title} avatar={icon} />
     <TeamDetails>
       <TeamName>{title}</TeamName>
-      <TeamMembers>44 members</TeamMembers>
     </TeamDetails>
   </RadioStyled>
 );

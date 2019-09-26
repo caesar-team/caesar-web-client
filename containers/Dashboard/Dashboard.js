@@ -186,7 +186,7 @@ class DashboardContainer extends Component {
   };
 
   handleClickMoveItem = (teamId, listId) => {
-    this.props.moveItemRequest(listId);
+    this.props.moveItemRequest(this.props.workInProgressItem.id, listId);
     this.props.setWorkInProgressItem(null);
 
     this.props.notification.show({
@@ -276,16 +276,14 @@ class DashboardContainer extends Component {
   };
 
   handleClickMoveItems = listId => {
-    const { workInProgressList } = this.props;
-
-    this.props.moveItemsBatchRequest(workInProgressList.id, listId);
+    this.props.moveItemsBatchRequest(this.props.workInProgressItemIds, listId);
     this.props.resetWorkInProgressItemIds();
 
     this.props.notification.show({
       text: 'The items have moved.',
     });
 
-    this.handleCloseModal('move')();
+    this.handleCloseModal(MOVE_ITEM_MODAL)();
   };
 
   handleOpenModal = modal => () => {
@@ -428,7 +426,6 @@ class DashboardContainer extends Component {
       membersById,
       user,
       team,
-      personalLists,
       teamLists,
       personalListsByType,
       visibleListItems,
@@ -463,11 +460,6 @@ class DashboardContainer extends Component {
       mode === DASHBOARD_SEARCH_MODE
         ? searchedItems.length === workInProgressItemIds.length
         : visibleListItems.length === workInProgressItemIds.length;
-
-    const currentLists =
-      workInProgressItem && workInProgressItem.teamId
-        ? teamLists
-        : personalLists;
 
     const availableTeamsForSharing = isTeamItem
       ? userTeamList.filter(({ id }) => id !== workInProgressItem.teamId)
@@ -584,9 +576,8 @@ class DashboardContainer extends Component {
         )}
         {modalVisibilities[MOVE_ITEM_MODAL] && (
           <MoveModal
-            lists={currentLists}
+            teamsLists={selectableTeamsLists}
             items={workInProgressItems}
-            workInProgressListId={workInProgressList.id}
             onMove={this.handleClickMoveItems}
             onCancel={this.handleCloseModal(MOVE_ITEM_MODAL)}
             onRemove={this.handleCtrlSelectionItemBehaviour}

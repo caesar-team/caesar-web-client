@@ -11,7 +11,6 @@ import {
   Scrollbar,
 } from 'components';
 import { upperFirst } from 'common/utils/string';
-import { TRASH_TYPE } from '../../common/constants';
 
 const ModalDescription = styled.div`
   padding-bottom: 20px;
@@ -60,22 +59,35 @@ const ListItemStyled = styled(ListItem)`
   }
 `;
 
-const getOptions = memoize((lists, removedListId, activeListId) =>
-  lists
-    .filter(({ id, type }) => type !== TRASH_TYPE && id !== removedListId)
-    .map(({ label, id }) => ({
-      value: id,
-      label: upperFirst(label),
-      isDisabled: id === activeListId,
-    })),
+const getTeamOptions = memoize((teams, currentTeamId) =>
+  teams.map(({ value, label }) => ({
+    value,
+    label: upperFirst(label),
+    isDisabled: value === currentTeamId,
+  })),
+);
+
+const getListOptions = memoize((lists, currentListId) =>
+  lists.map(({ value, label }) => ({
+    value,
+    label: upperFirst(label),
+    isDisabled: value === currentListId,
+  })),
 );
 
 class MoveModal extends Component {
   state = this.prepareInitialState();
 
+  handleChangeTeamId = (_, value) => {
+    console.log('handleChangeTeamId', value);
+    this.setState({
+      currentTeamId: value,
+    });
+  };
+
   handleChangeListId = (_, value) => {
     this.setState({
-      activeListId: value,
+      currentListId: value,
     });
   };
 
@@ -84,12 +96,13 @@ class MoveModal extends Component {
   };
 
   handleClickMove = () => {
-    this.props.onMove(this.state.activeListId);
+    this.props.onMove(this.state.currentListId);
   };
 
   prepareInitialState() {
     return {
-      activeListId: null,
+      currentTeamId: null,
+      currentListId: null,
     };
   }
 
@@ -107,11 +120,21 @@ class MoveModal extends Component {
   }
 
   render() {
-    const { lists, items, workInProgressListId, onCancel } = this.props;
-    const { activeListId } = this.state;
+    const { teamsLists, items, onCancel } = this.props;
+    const { currentTeamId, currentListId } = this.state;
 
-    const isButtonDisabled = !items.length || !activeListId;
+    const isButtonDisabled = !items.length || !currentListId;
     const renderedItems = this.renderItems();
+
+    const teams = teamsLists.map(({ id, name }) => ({
+      value: id,
+      label: name,
+    }));
+    const currentTeam = teamsLists.find(({ id }) => id === currentTeamId);
+
+    const lists = currentTeam
+      ? currentTeam.lists.map(({ id, label }) => ({ value: id, label }))
+      : [];
 
     return (
       <Modal
@@ -125,12 +148,22 @@ class MoveModal extends Component {
         <ModalDescription>Move selected items</ModalDescription>
         <SelectWrapper>
           <SelectStyled
-            placeholder="Choose a list where to move…"
-            options={getOptions(lists, workInProgressListId, activeListId)}
-            value={activeListId}
-            onChange={this.handleChangeListId}
+            placeholder="Choose a team where to move…"
+            options={getTeamOptions(teams, currentTeamId)}
+            value={currentTeamId}
+            onChange={this.handleChangeTeamId}
           />
         </SelectWrapper>
+        {currentTeamId && (
+          <SelectWrapper>
+            <SelectStyled
+              placeholder="Choose a list where to move…"
+              options={getListOptions(lists, currentListId)}
+              value={currentListId}
+              onChange={this.handleChangeListId}
+            />
+          </SelectWrapper>
+        )}
         <TextWithLines>Selected ({items.length})</TextWithLines>
         <ListWrapper>
           <Scrollbar autoHeight autoHeightMax={400}>

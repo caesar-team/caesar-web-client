@@ -41,7 +41,6 @@ import {
   visibleListItemsSelector,
 } from 'common/selectors/workflow';
 import {
-  selectableListsWithoutChildrenSelector,
   personalListsByTypeSelector,
   trashListSelector,
   teamTrashListSelector,
@@ -59,7 +58,6 @@ import { membersByIdSelector } from 'common/selectors/entities/member';
 import Dashboard from './Dashboard';
 
 const mapStateToProps = createStructuredSelector({
-  personalLists: selectableListsWithoutChildrenSelector,
   teamLists: currentTeamListsSelector,
   userTeamList: userTeamListSelector,
   personalListsByType: personalListsByTypeSelector,

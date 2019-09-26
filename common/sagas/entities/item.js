@@ -1,4 +1,12 @@
-import { put, call, takeLatest, select, fork, take } from 'redux-saga/effects';
+import {
+  put,
+  call,
+  takeLatest,
+  select,
+  fork,
+  take,
+  all,
+} from 'redux-saga/effects';
 import deepequal from 'fast-deep-equal';
 import {
   ACCEPT_ITEM_UPDATE_REQUEST,
@@ -27,7 +35,6 @@ import {
   updateItemFailure,
   moveItemSuccess,
   moveItemFailure,
-  moveItemsBatchSuccess,
   moveItemsBatchFailure,
   rejectItemUpdateSuccess,
   rejectItemUpdateFailure,
@@ -54,7 +61,6 @@ import {
   addItemToList,
   addItemsBatchToList,
   moveItemToList,
-  moveItemsBatchToList,
   removeItemFromList,
   removeItemsBatchFromList,
   toggleItemToFavoriteList,
@@ -111,7 +117,6 @@ import {
   toggleFavorite,
   updateItem,
   updateMoveItem,
-  updateMoveItemsBatch,
 } from 'common/api';
 import {
   decryptItem,
@@ -173,7 +178,7 @@ export function* removeItemsBatchSaga({ payload: { listId } }) {
 export function* shareItemBatchSaga({
   payload: {
     data: { itemIds, members, teamIds },
-    options: { includeOwner = true },
+    options: { includeIniciator = true },
   },
 }) {
   try {
@@ -192,7 +197,7 @@ export function* shareItemBatchSaga({
 
     const teamsMembers = yield select(teamsMembersSelector, { teamIds });
 
-    const preparedTeamsMembers = includeOwner
+    const preparedTeamsMembers = includeIniciator
       ? teamsMembers
       : teamsMembers.filter(member => member.id !== user.id);
 
@@ -250,68 +255,58 @@ export function* removeShareSaga({ payload: { shareId } }) {
   }
 }
 
-export function* moveItemSaga({ payload: { listId } }) {
+export function* moveItemSaga({ payload: { itemId, listId } }) {
   try {
-    const workInProgressItem = yield select(workInProgressItemSelector);
-    const childItemIds = workInProgressItem.invited;
+    const item = yield select(itemSelector, { itemId });
+    const childItemIds = item.invited;
 
     const oldList = yield select(listSelector, {
-      listId: workInProgressItem.listId,
+      listId: item.listId,
     });
     const newList = yield select(listSelector, { listId });
 
-    yield call(updateMoveItem, workInProgressItem.id, {
+    yield call(updateMoveItem, item.id, {
       listId,
     });
-    yield put(
-      moveItemSuccess(workInProgressItem.id, workInProgressItem.listId, listId),
-    );
-    yield put(
-      moveItemToList(workInProgressItem.id, workInProgressItem.listId, listId),
-    );
+    yield put(moveItemSuccess(item.id, item.listId, listId));
+    yield put(moveItemToList(item.id, item.listId, listId));
 
     if (oldList.teamId !== newList.teamId) {
-      yield put(
-        updateItemField(workInProgressItem.id, 'teamId', newList.teamId),
-      );
+      yield put(updateItemField(item.id, 'teamId', newList.teamId));
     }
 
     if (!oldList.teamId && newList.teamId) {
       yield fork(shareItemBatchSaga, {
         payload: {
           data: {
-            itemIds: [workInProgressItem.id],
+            itemIds: [item.id],
             members: [],
             teamIds: [newList.teamId],
           },
           options: {
-            includeOwner: false,
+            includeIniciator: false,
           },
         },
       });
     }
 
     if (oldList.teamId && !newList.teamId) {
-      yield put(
-        removeChildItemsBatchFromItem(workInProgressItem.id, childItemIds),
-      );
+      yield put(removeChildItemsBatchFromItem(item.id, childItemIds));
       yield put(removeChildItemsBatch(childItemIds));
     }
 
     if (oldList.teamId && newList.teamId && oldList.teamId !== newList.teamId) {
-      yield put(
-        removeChildItemsBatchFromItem(workInProgressItem.id, childItemIds),
-      );
+      yield put(removeChildItemsBatchFromItem(item.id, childItemIds));
       yield put(removeChildItemsBatch(childItemIds));
       yield fork(shareItemBatchSaga, {
         payload: {
           data: {
-            itemIds: [workInProgressItem.id],
+            itemIds: [item.id],
             members: [],
             teamIds: [newList.teamId],
           },
           options: {
-            includeOwner: false,
+            includeIniciator: false,
           },
         },
       });
@@ -322,23 +317,13 @@ export function* moveItemSaga({ payload: { listId } }) {
   }
 }
 
-export function* moveItemsBatchSaga({ payload: { oldListId, newListId } }) {
+export function* moveItemsBatchSaga({ payload: { itemIds, listId } }) {
   try {
-    const workInProgressItemIds = yield select(workInProgressItemIdsSelector);
-
-    if (workInProgressItemIds.length > 0) {
-      yield call(
-        updateMoveItemsBatch,
-        { items: workInProgressItemIds },
-        newListId,
-      );
-      yield put(
-        moveItemsBatchSuccess(workInProgressItemIds, oldListId, newListId),
-      );
-      yield put(
-        moveItemsBatchToList(workInProgressItemIds, oldListId, newListId),
-      );
-    }
+    yield all(
+      itemIds.map(itemId =>
+        call(moveItemSaga, { payload: { itemId, listId } }),
+      ),
+    );
   } catch (error) {
     console.log(error);
     yield put(moveItemsBatchFailure());

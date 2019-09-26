@@ -12,7 +12,6 @@ import {
   fetchMembersSuccess,
 } from 'common/actions/entities/member';
 import {
-  getMembers,
   getDefaultTeamMembers,
   getPublicKeyByEmailBatch,
   getTeamMembers,
@@ -40,11 +39,7 @@ export function* fetchMembersSaga() {
   try {
     const { data: members } = yield call(getDefaultTeamMembers);
 
-    yield put(
-      fetchMembersSuccess(
-        convertMembersToEntity(members),
-      ),
-    );
+    yield put(fetchMembersSuccess(convertMembersToEntity(members)));
   } catch (e) {
     yield put(fetchMembersFailure());
   }

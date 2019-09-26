@@ -67,6 +67,7 @@ const TeamCard = ({
   icon,
   users,
   members,
+  isRemoveButtonVisible = false,
   onClick = Function.prototype,
   onClickRemoveTeam = Function.prototype,
 }) => {
@@ -93,9 +94,11 @@ const TeamCard = ({
             visibleCount={20}
           />
         )}
-        <Button color="white" onClick={onClickRemoveTeam}>
-          Remove
-        </Button>
+        {isRemoveButtonVisible && (
+          <Button color="white" onClick={onClickRemoveTeam}>
+            Remove
+          </Button>
+        )}
       </AvatarsWrapper>
     </Wrapper>
   );

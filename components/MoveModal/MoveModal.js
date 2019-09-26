@@ -79,7 +79,6 @@ class MoveModal extends Component {
   state = this.prepareInitialState();
 
   handleChangeTeamId = (_, value) => {
-    console.log('handleChangeTeamId', value);
     this.setState({
       currentTeamId: value,
     });

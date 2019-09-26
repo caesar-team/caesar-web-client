@@ -182,7 +182,6 @@ export function* shareItemBatchSaga({
   },
 }) {
   try {
-    console.log('shareItemBatchSaga', itemIds, members, teamIds);
     const user = yield select(userDataSelector);
     const items = yield select(itemsBatchSelector, { itemIds });
 

@@ -1,6 +1,7 @@
 import React, { PureComponent } from 'react';
 import styled from 'styled-components';
 import { generateTeamTag } from 'common/utils/team';
+import { Scrollbar } from '../Scrollbar';
 import MenuSection from './MenuSection';
 import { MenuItemWrapper, MenuItem } from './components';
 
@@ -48,48 +49,50 @@ class MenuList extends PureComponent {
     } = this.props;
 
     return (
-      <Menu>
-        <MenuSection
-          isOpened
-          lists={[inbox, favorites, trash]}
-          activeListId={activeListId}
-          onClickMenuItem={onClickMenuItem}
-        />
-        <MenuSection
-          name="personal"
-          lists={personalLists}
-          activeListId={activeListId}
-          isOpened={openedSectionNames.includes('personal')}
-          onToggleSection={this.handleToggle('personal')}
-          onClickMenuItem={onClickMenuItem}
-        />
-        {team && (
+      <Scrollbar>
+        <Menu>
           <MenuSection
-            name={generateTeamTag(team.title)}
-            icon={team.icon}
-            lists={teamLists}
+            isOpened
+            lists={[inbox, favorites, trash]}
             activeListId={activeListId}
-            isOpened={openedSectionNames.includes('team')}
-            onToggleSection={this.handleToggle('team')}
             onClickMenuItem={onClickMenuItem}
           />
-        )}
-        <MenuSection
-          name="tools"
-          activeListId={activeListId}
-          isOpened={openedSectionNames.includes('tools')}
-          onToggleSection={this.handleToggle('tools')}
-        >
-          <MenuItemWrapper>
-            <MenuItem
-              isActive={mode === SECURE_MESSAGE_MODE}
-              onClick={onClickSecureMessage}
-            >
-              Secure Message
-            </MenuItem>
-          </MenuItemWrapper>
-        </MenuSection>
-      </Menu>
+          <MenuSection
+            name="personal"
+            lists={personalLists}
+            activeListId={activeListId}
+            isOpened={openedSectionNames.includes('personal')}
+            onToggleSection={this.handleToggle('personal')}
+            onClickMenuItem={onClickMenuItem}
+          />
+          {team && (
+            <MenuSection
+              name={generateTeamTag(team.title)}
+              icon={team.icon}
+              lists={teamLists}
+              activeListId={activeListId}
+              isOpened={openedSectionNames.includes('team')}
+              onToggleSection={this.handleToggle('team')}
+              onClickMenuItem={onClickMenuItem}
+            />
+          )}
+          <MenuSection
+            name="tools"
+            activeListId={activeListId}
+            isOpened={openedSectionNames.includes('tools')}
+            onToggleSection={this.handleToggle('tools')}
+          >
+            <MenuItemWrapper>
+              <MenuItem
+                isActive={mode === SECURE_MESSAGE_MODE}
+                onClick={onClickSecureMessage}
+              >
+                Secure Message
+              </MenuItem>
+            </MenuItemWrapper>
+          </MenuSection>
+        </Menu>
+      </Scrollbar>
     );
   }
 }

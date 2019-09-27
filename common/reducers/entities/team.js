@@ -59,7 +59,10 @@ export default createReducer(initialState, {
       isError: false,
       byId: {
         ...state.byId,
-        [payload.team.id]: payload.team,
+        [payload.team.id]: {
+          ...(state.byId[payload.team.id] || {}),
+          ...payload.team,
+        },
       },
     };
   },

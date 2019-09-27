@@ -27,6 +27,7 @@ import {
 import { itemSelector } from 'common/selectors/entities/item';
 import { workInProgressItemSelector } from 'common/selectors/workflow';
 import { getFavoritesList } from 'common/normalizers/utils';
+import { fetchTeamSuccess } from '../actions/entities/team';
 
 function* initPersonal() {
   try {
@@ -66,6 +67,8 @@ function* initPersonal() {
 
 function* initTeam(team) {
   try {
+    yield put(fetchTeamSuccess(team));
+
     const currentTeamId = yield select(currentTeamIdSelector);
 
     if (!currentTeamId && team.type === DEFAULT_TEAM_TYPE) {

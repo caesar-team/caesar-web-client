@@ -89,6 +89,7 @@ import {
 import {
   favoritesSelector,
   listSelector,
+  allTrashListIdsSelector,
 } from 'common/selectors/entities/list';
 import {
   itemsBatchSelector,
@@ -254,10 +255,31 @@ export function* removeShareSaga({ payload: { shareId } }) {
   }
 }
 
+export function* toggleItemToFavoriteSaga({ payload: { itemId } }) {
+  try {
+    const favoritesList = yield select(favoritesSelector);
+
+    const {
+      data: { favorite: isFavorite },
+    } = yield call(toggleFavorite, itemId);
+
+    yield put(
+      toggleItemToFavoriteSuccess(itemId, favoritesList.id, isFavorite),
+    );
+    yield put(toggleItemToFavoriteList(itemId, favoritesList.id, isFavorite));
+    yield put(updateWorkInProgressItem(itemId));
+  } catch (error) {
+    console.log(error);
+    yield put(toggleItemToFavoriteFailure());
+  }
+}
+
 export function* moveItemSaga({ payload: { itemId, listId } }) {
   try {
     const item = yield select(itemSelector, { itemId });
     const childItemIds = item.invited;
+
+    const allTrashListIds = yield select(allTrashListIdsSelector);
 
     const oldList = yield select(listSelector, {
       listId: item.listId,
@@ -269,6 +291,10 @@ export function* moveItemSaga({ payload: { itemId, listId } }) {
     });
     yield put(moveItemSuccess(item.id, item.listId, listId));
     yield put(moveItemToList(item.id, item.listId, listId));
+
+    if (item.favorite && allTrashListIds.includes(listId)) {
+      yield fork(toggleItemToFavoriteSaga, { payload: { itemId } });
+    }
 
     if (oldList.teamId !== newList.teamId) {
       yield put(updateItemField(item.id, 'teamId', newList.teamId));
@@ -577,25 +603,6 @@ export function* rejectItemSaga({ payload: { id } }) {
   } catch (error) {
     console.log(error);
     yield put(rejectItemUpdateFailure(error));
-  }
-}
-
-export function* toggleItemToFavoriteSaga({ payload: { itemId } }) {
-  try {
-    const favoritesList = yield select(favoritesSelector);
-
-    const {
-      data: { favorite: isFavorite },
-    } = yield call(toggleFavorite, itemId);
-
-    yield put(
-      toggleItemToFavoriteSuccess(itemId, favoritesList.id, isFavorite),
-    );
-    yield put(toggleItemToFavoriteList(itemId, favoritesList.id, isFavorite));
-    yield put(updateWorkInProgressItem(itemId));
-  } catch (error) {
-    console.log(error);
-    yield put(toggleItemToFavoriteFailure());
   }
 }
 

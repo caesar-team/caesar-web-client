@@ -159,18 +159,20 @@ class DashboardContainer extends Component {
 
     const isTeamList = !!workInProgressList.teamId;
     const trashListId = isTeamList
-      ? this.props.teamTrashList.id
+      ? this.props.teamsTrashLists.find(
+          ({ teamId }) => teamId === workInProgressList.teamId,
+        ).id
       : this.props.trashList.id;
 
     if (workInProgressItemIds.length > 0) {
-      this.props.moveItemsBatchRequest(workInProgressList.id, trashListId);
+      this.props.moveItemsBatchRequest(workInProgressItemIds, trashListId);
       this.props.resetWorkInProgressItemIds();
 
       this.props.notification.show({
         text: `The items have removed`,
       });
     } else {
-      this.props.moveItemRequest(trashListId);
+      this.props.moveItemRequest(workInProgressItem.id, trashListId);
       this.props.setWorkInProgressItem(null);
 
       this.props.notification.show({
@@ -228,7 +230,12 @@ class DashboardContainer extends Component {
   };
 
   handleClickRestoreItem = async () => {
-    this.props.moveItemRequest(this.props.workInProgressItem.previousListId);
+    const { workInProgressItem } = this.props;
+
+    this.props.moveItemRequest(
+      workInProgressItem.id,
+      workInProgressItem.previousListId,
+    );
     this.props.setWorkInProgressItem(null);
   };
 
@@ -433,7 +440,7 @@ class DashboardContainer extends Component {
       itemsById,
       isLoading,
       trashList,
-      teamTrashList,
+      teamsTrashLists,
       selectableTeamsLists,
     } = this.props;
 
@@ -451,10 +458,16 @@ class DashboardContainer extends Component {
 
     const isToolMode = mode === DASHBOARD_TOOL_MODE;
 
-    const isTrash =
+    const isTrashItem =
+      workInProgressItem &&
+      (workInProgressItem.listId === trashList.id ||
+        teamsTrashLists
+          .map(({ id }) => id)
+          .includes(workInProgressItem.listId));
+    const isTrashList =
       workInProgressList &&
       (workInProgressList.id === trashList.id ||
-        workInProgressList.id === teamTrashList.id);
+        teamsTrashLists.map(({ id }) => id).includes(workInProgressList.id));
 
     const areAllItemsSelected =
       mode === DASHBOARD_SEARCH_MODE
@@ -497,7 +510,7 @@ class DashboardContainer extends Component {
                 <MiddleColumnWrapper>
                   {isMultiItem && (
                     <MultiItem
-                      isTrashItems={isTrash}
+                      isTrashItems={isTrashList}
                       workInProgressItemIds={workInProgressItemIds}
                       areAllItemsSelected={areAllItemsSelected}
                       onClickMove={this.handleOpenModal(MOVE_ITEM_MODAL)}
@@ -532,7 +545,7 @@ class DashboardContainer extends Component {
                 <RightColumnWrapper>
                   <Item
                     teamsLists={selectableTeamsLists}
-                    isTrashItem={isTrash}
+                    isTrashItem={isTrashItem}
                     notification={notification}
                     item={workInProgressItem}
                     owner={workInProgressItemOwner}

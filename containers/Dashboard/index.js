@@ -43,7 +43,7 @@ import {
 import {
   personalListsByTypeSelector,
   trashListSelector,
-  teamTrashListSelector,
+  teamsTrashListsSelector,
   currentTeamListsSelector,
   selectableTeamsListsSelector,
 } from 'common/selectors/entities/list';
@@ -71,7 +71,7 @@ const mapStateToProps = createStructuredSelector({
   visibleListItems: visibleListItemsSelector,
   workInProgressItems: workInProgressItemsSelector,
   trashList: trashListSelector,
-  teamTrashList: teamTrashListSelector,
+  teamsTrashLists: teamsTrashListsSelector,
   keyPair: keyPairSelector,
   membersById: membersByIdSelector,
   selectableTeamsLists: selectableTeamsListsSelector,

@@ -143,9 +143,18 @@ export const personalListsByTypeSelector = createSelector(
   }),
 );
 
-export const teamTrashListSelector = createSelector(
+export const teamsTrashListsSelector = createSelector(
   teamListsSelector,
-  lists => lists.find(({ type }) => type === TRASH_TYPE) || {},
+  lists => lists.filter(({ type }) => type === TRASH_TYPE) || [],
+);
+
+export const allTrashListIdsSelector = createSelector(
+  trashListSelector,
+  teamsTrashListsSelector,
+  (trashList, teamsTrashLists) => [
+    trashList.id,
+    ...teamsTrashLists.map(({ id }) => id),
+  ],
 );
 
 const listIdPropSelector = (_, props) => props.listId;

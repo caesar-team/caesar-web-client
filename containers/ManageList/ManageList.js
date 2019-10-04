@@ -2,10 +2,11 @@ import React, { Component } from 'react';
 import styled from 'styled-components';
 import {
   ManageList,
-  ListFormModal,
+  NewListModal,
   ConfirmModal,
   Button,
   TextLoader,
+  withNotification,
 } from 'components';
 import {
   LIST_WORKFLOW_EDIT_MODE,
@@ -56,10 +57,7 @@ class ManageListContainer extends Component {
     this.props.fetchKeyPairRequest();
     this.props.fetchMembersRequest();
 
-    if (this.props.shouldLoadNodes) {
-      // withItemsDecryption = false
-      this.props.fetchNodesRequest(false);
-    }
+    this.props.initWorkflow();
   }
 
   handleClickCreateList = () => {
@@ -93,12 +91,16 @@ class ManageListContainer extends Component {
 
     this.props.editListRequest({ ...workInProgressList, ...list });
 
+    this.props.notification.show({
+      text: 'The list has updated.',
+    });
+
     this.setState({
       isVisibleModal: false,
     });
   };
 
-  handleClickRemovePost = listId => () => {
+  handleClickRemoveList = listId => () => {
     this.setState({
       removingListId: listId,
     });
@@ -106,6 +108,10 @@ class ManageListContainer extends Component {
 
   handleRemoveList = () => {
     this.props.removeListRequest(this.state.removingListId);
+
+    this.props.notification.show({
+      text: 'The list has deleted.',
+    });
 
     this.setState({
       removingListId: null,
@@ -131,7 +137,7 @@ class ManageListContainer extends Component {
   prepareInitialState() {
     return {
       mode: null,
-      workInProgressListId: null,
+      removingListId: null,
       isVisibleModal: false,
     };
   }
@@ -153,6 +159,7 @@ class ManageListContainer extends Component {
         <TopWrapper>
           <Title>Lists</Title>
           <Button
+            withOfflineCheck
             onClick={this.handleClickCreateList}
             icon="plus"
             color="black"
@@ -167,11 +174,11 @@ class ManageListContainer extends Component {
             members={members}
             onChangeSort={this.handleChangeSort}
             onClickEditList={this.handleClickEditList}
-            onClickRemoveList={this.handleClickRemovePost}
+            onClickRemoveList={this.handleClickRemoveList}
           />
         </ManageListWrapper>
         {isVisibleModal && (
-          <ListFormModal
+          <NewListModal
             list={mode === LIST_WORKFLOW_CREATE_MODE ? [] : workInProgressList}
             mode={mode}
             onSubmit={
@@ -193,4 +200,4 @@ class ManageListContainer extends Component {
   }
 }
 
-export default ManageListContainer;
+export default withNotification(ManageListContainer);

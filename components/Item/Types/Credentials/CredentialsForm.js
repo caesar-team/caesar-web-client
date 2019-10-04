@@ -2,14 +2,12 @@ import React from 'react';
 import styled from 'styled-components';
 import { Formik, FastField } from 'formik';
 import { checkError } from 'common/utils/formikUtils';
-import { upperFirst } from 'common/utils/string';
-import { ITEM_WORKFLOW_EDIT_MODE, TRASH_TYPE } from 'common/constants';
+import { ITEM_WORKFLOW_EDIT_MODE } from 'common/constants';
 import {
   Uploader,
   Input,
   PasswordInput,
   Button,
-  Select,
   TextArea,
   File,
   FormInput,
@@ -127,8 +125,8 @@ const ErrorStyled = styled(Error)`
   margin: 20px 0;
 `;
 
-const createInitialValues = (secret, listId, type) => ({
-  ...secret,
+const createInitialValues = (data, listId, type) => ({
+  ...data,
   listId,
   type,
 });
@@ -157,8 +155,7 @@ const renderAttachments = (attachments = [], errors = [], setFieldValue) =>
   ));
 
 const CredentialsForm = ({
-  item: { secret, listId, type },
-  allLists = [],
+  item: { data, listId, type },
   mode,
   notification,
   onFinishCreateWorkflow,
@@ -171,20 +168,13 @@ const CredentialsForm = ({
 
   const buttonText = isEditMode ? 'Update' : 'Add';
 
-  const preparedOptions = allLists
-    .filter(({ type: listType }) => listType !== TRASH_TYPE)
-    .map(({ id, label }) => ({
-      value: id,
-      label: upperFirst(label),
-    }));
-
   return (
     <Formik
       key="credentialsForm"
-      initialValues={createInitialValues(secret, listId, type)}
+      initialValues={createInitialValues(data, listId, type)}
       onSubmit={action}
       isInitialValid={schema.isValidSync(
-        createInitialValues(secret, listId, type),
+        createInitialValues(data, listId, type),
       )}
       validationSchema={schema}
       render={({
@@ -258,16 +248,6 @@ const CredentialsForm = ({
                   error={checkError(touched, errors, 'website')}
                 />
               )}
-            />
-          </Row>
-          <Row>
-            <AdditionalLabel>List</AdditionalLabel>
-            <Select
-              name="listId"
-              placeholder="Select option"
-              value={values.listId}
-              options={preparedOptions}
-              onChange={setFieldValue}
             />
           </Row>
           <Row>

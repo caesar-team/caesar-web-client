@@ -18,9 +18,7 @@ const SecondaryHeader = ({
 }) => (
   <Fragment>
     <Logo href={url} width={142} height={40} />
-    <StyledButton onClick={() => router.push(url)}>
-      {buttonText}
-    </StyledButton>
+    <StyledButton onClick={() => router.push(url)}>{buttonText}</StyledButton>
   </Fragment>
 );
 

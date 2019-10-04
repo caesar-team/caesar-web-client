@@ -147,8 +147,8 @@ export const ItemHeader = ({
     lastUpdated,
     invited,
     favorite,
-    owner,
-    secret: { name },
+    ownerId,
+    data: { name },
   },
 }) => {
   if (isSharedItem) {
@@ -169,9 +169,9 @@ export const ItemHeader = ({
       return accumulator;
     }
 
-    if (user.id === item.userId && user.id !== owner.id) {
+    if (user.id === item.userId && user.id !== ownerId) {
       accumulator.unshift(user);
-    } else if (owner.id !== item.userId) {
+    } else if (ownerId !== item.userId) {
       accumulator.push(members[item.userId]);
     }
 
@@ -179,7 +179,7 @@ export const ItemHeader = ({
   }, []);
 
   const hasInvited = invited.length > 0;
-  const isOwner = user.id === owner.id;
+  const isOwner = user.id === ownerId;
 
   const options = allLists
     .filter(({ id, type }) => type !== TRASH_TYPE && id !== listId)

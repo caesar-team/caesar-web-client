@@ -5,7 +5,7 @@ import { Wrapper, FieldWrapper, Field, FieldValue, Title } from '../components';
 export const Document = props => {
   const {
     item: {
-      secret: { name, note },
+      data: { name, note },
     },
   } = props;
   const shouldShowNote = !!note;

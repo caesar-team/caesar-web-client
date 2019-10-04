@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import styled from 'styled-components';
-import debounce from 'debounce';
+import debounce from 'lodash.debounce';
 import { formatNumber } from 'common/utils/number';
 
 const Wrapper = styled.div`
@@ -49,11 +49,14 @@ const RangeValue = styled.div`
   white-space: nowrap;
 `;
 
-const RangeControl = styled.div.attrs({
-  style: ({ position }) => ({
-    left: `calc(${position}% - 8px)`,
-  }),
-})`
+const RangeControl = styled.div.attrs(props => ({
+  style: {
+    left: `calc(${props.position}% - 8px)`,
+  },
+}))`
+  display: flex;
+  align-items: center;
+  justify-content: center;
   position: absolute;
   z-index: 15;
   top: 50%;
@@ -71,22 +74,13 @@ const RangeControl = styled.div.attrs({
       color: ${({ theme }) => theme.black};
     }
   }
+`;
 
-  &:before {
-    content: '|';
-    color: ${({ theme }) => theme.white};
-    position: absolute;
-    right: 4px;
-    top: 1px;
-  }
-
-  &:after {
-    content: '|';
-    color: ${({ theme }) => theme.white};
-    position: absolute;
-    left: 4px;
-    top: 1px;
-  }
+const Separator = styled.div`
+  width: 6px;
+  height: 10px;
+  border-left: 1px solid ${({ theme }) => theme.white};
+  border-right: 1px solid ${({ theme }) => theme.white};
 `;
 
 const RangeActiveLine = styled.div`
@@ -147,6 +141,7 @@ class RangeInput extends Component {
     const value = this.getValue({ target });
 
     if (!value) return 0;
+
     return ((value - min) / (max - min)) * 100;
   };
 
@@ -288,6 +283,7 @@ class RangeInput extends Component {
           ref={this.toControlRef}
           position={toPosition}
         >
+          <Separator />
           <RangeValue style={{ top: 20 }}>
             {formatNumber({ value: toValue })}
           </RangeValue>

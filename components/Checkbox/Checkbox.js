@@ -11,7 +11,8 @@ const StyledLabel = styled.label`
 `;
 
 const Box = styled.span`
-  display: flex;
+  // if checkbox is used inside Tooltip, this one affects display position to block
+  display: flex !important;
   align-items: center;
   justify-content: center;
   width: 20px;

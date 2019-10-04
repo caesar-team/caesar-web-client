@@ -1,6 +1,6 @@
 import React from 'react';
 // eslint-disable-next-line
-import { default as NextApp, Container } from 'next/app';
+import { default as NextApp } from 'next/app';
 import { ThemeProvider, createGlobalStyle } from 'styled-components';
 import globalStyles from 'common/styles/globalStyles';
 import { entryResolver } from 'common/utils/entryResolver';
@@ -9,27 +9,25 @@ import { Provider } from 'react-redux';
 import withRedux from 'next-redux-wrapper';
 import withReduxSaga from 'next-redux-saga';
 import { configureWebStore } from 'common/root/store';
-import { Bootstrap } from '../containers';
-import { NotificationProvider } from '../components';
+import { UNLOCKED_ROUTES, SHARED_ROUTES } from 'common/constants';
+import { Bootstrap } from 'containers';
+import {
+  NotificationProvider,
+  OfflineDetectionProvider,
+  OfflineNotification,
+  AbilityProvider,
+} from 'components';
 
 const GlobalStyles = createGlobalStyle`${globalStyles}`;
-
-const isNotRequiredTokenRoutes = [
-  '/signin',
-  '/signup',
-  '/resetting',
-  '/message',
-  '/secure',
-];
-const isSharedRoutes = ['/share', 'invite'];
 
 class Application extends NextApp {
   static async getInitialProps({ Component, router: { route }, ctx }) {
     entryResolver({ route, ctx });
 
-    const pageProps = Component.getInitialProps
-      ? await Component.getInitialProps(ctx)
-      : {};
+    const pageProps =
+      Component.getInitialProps && UNLOCKED_ROUTES.includes(route)
+        ? await Component.getInitialProps(ctx)
+        : {};
 
     return { pageProps };
   }
@@ -42,29 +40,28 @@ class Application extends NextApp {
       store,
     } = this.props;
 
-    if (isNotRequiredTokenRoutes.includes(route)) {
+    if (SHARED_ROUTES.includes(route)) {
       return (
         <ThemeProvider theme={theme}>
-          <NotificationProvider>
-            <Container>
+          <OfflineDetectionProvider>
+            <NotificationProvider>
               <GlobalStyles />
-              <Component {...pageProps} />
-            </Container>
-          </NotificationProvider>
+              <Provider store={store}>
+                <Component {...pageProps} />
+                <OfflineNotification />
+              </Provider>
+            </NotificationProvider>
+          </OfflineDetectionProvider>
         </ThemeProvider>
       );
     }
 
-    if (isSharedRoutes.includes(route)) {
+    if (UNLOCKED_ROUTES.includes(route)) {
       return (
         <ThemeProvider theme={theme}>
           <NotificationProvider>
-            <Container>
-              <GlobalStyles />
-              <Provider store={store}>
-                <Component {...pageProps} />
-              </Provider>
-            </Container>
+            <GlobalStyles />
+            <Component {...pageProps} />
           </NotificationProvider>
         </ThemeProvider>
       );
@@ -73,12 +70,15 @@ class Application extends NextApp {
     return (
       <ThemeProvider theme={theme}>
         <NotificationProvider>
-          <Container>
+          <OfflineDetectionProvider>
             <GlobalStyles />
             <Provider store={store}>
-              <Bootstrap {...pageProps} component={Component} />
+              <AbilityProvider>
+                <Bootstrap {...pageProps} component={Component} />
+                <OfflineNotification />
+              </AbilityProvider>
             </Provider>
-          </Container>
+          </OfflineDetectionProvider>
         </NotificationProvider>
       </ThemeProvider>
     );

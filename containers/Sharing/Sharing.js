@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { getList } from 'common/api';
+import { getLists } from 'common/api';
 import { matchStrict } from 'common/utils/match';
 import {
   SharingLayout,
@@ -8,6 +8,7 @@ import {
   withNotification,
 } from 'components';
 import {
+  INBOX_TYPE,
   ITEM_CREDENTIALS_TYPE,
   ITEM_DOCUMENT_TYPE,
   ITEM_REVIEW_MODE,
@@ -15,11 +16,13 @@ import {
 import { getPrivateKeyObj, decryptItem } from 'common/utils/cipherUtils';
 
 const getInboxItem = list => {
-  if (!list || !list[0] || !list[0].children || !list[0].children[0]) {
+  const inbox = list.find(({ type }) => type === INBOX_TYPE);
+
+  if (!inbox || !inbox.children) {
     return null;
   }
 
-  return list[0].children[0];
+  return inbox.children[0];
 };
 
 class Sharing extends Component {
@@ -28,7 +31,7 @@ class Sharing extends Component {
   async componentDidMount() {
     const { privateKey, password } = this.props;
 
-    const { data: list } = await getList();
+    const { data: list } = await getLists();
 
     const item = getInboxItem(list);
 
@@ -36,7 +39,7 @@ class Sharing extends Component {
     const decryptedSecret = await decryptItem(item.secret, privateKeyObj);
 
     this.setState({
-      item: { ...item, secret: decryptedSecret, mode: ITEM_REVIEW_MODE },
+      item: { ...item, data: decryptedSecret, mode: ITEM_REVIEW_MODE },
     });
   }
 

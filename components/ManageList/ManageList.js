@@ -1,11 +1,12 @@
 import React, { Component, Fragment } from 'react';
 import styled from 'styled-components';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
-import { AvatarsList } from 'components/Avatar';
 import Link from 'next/link';
 import { DEFAULT_LIST_TYPE } from 'common/constants';
-import { Icon } from '../Icon';
-import { ListOptions } from './ListOptions';
+import Button from '../Button/Button';
+import DottedMenu from '../DottedMenu/DottedMenu';
+import AvatarsList from '../Avatar/AvatarsList';
+import withOfflineDetection from '../Offline/withOfflineDetection';
 
 const getTableColAlignStyles = ({ align }) => {
   switch (align) {
@@ -56,47 +57,19 @@ const ListNameLink = styled.a`
   border-bottom: 1px dashed transparent;
 `;
 
-const ListName = styled.div`
-  display: flex;
-  align-items: center;
-
-  &:hover {
-    ${ListNameLink} {
-      color: ${({ theme }) => theme.black};
-      border-color: ${({ theme }) => theme.black};
-    }
-  }
-`;
-
 const MembersCol = styled.div`
   display: flex;
   align-items: center;
 `;
 
-const StyledIcon = styled(Icon)`
-  cursor: pointer;
-  fill: ${({ theme }) => theme.gray};
+const StyledButton = styled(Button)`
+  width: 100%;
+  height: 50px;
 `;
 
 const ListWrapper = styled.div``;
 
 class ManageList extends Component {
-  state = {
-    hoverRowIndex: null,
-  };
-
-  handleMouseEnter = index => {
-    this.setState({
-      hoverRowIndex: index,
-    });
-  };
-
-  handleMouseLeave = () => {
-    this.setState({
-      hoverRowIndex: null,
-    });
-  };
-
   handleDragEnd = ({ draggableId, source, destination }) => {
     const { onChangeSort = Function.prototype } = this.props;
 
@@ -115,8 +88,8 @@ class ManageList extends Component {
   };
 
   renderItems() {
-    const { hoverRowIndex } = this.state;
     const {
+      isOnline,
       lists,
       members,
       onClickEditList = Function.prototype,
@@ -142,22 +115,14 @@ class ManageList extends Component {
             {...provided.dragHandleProps}
           >
             <TableCol align="left" width="33.33333%">
-              <ListName
-                onMouseEnter={() => this.handleMouseEnter(index)}
-                onMouseLeave={this.handleMouseLeave}
+              <Link
+                href={{
+                  pathname: '/',
+                  query: { listId: listItem.id },
+                }}
               >
-                <Link
-                  href={{
-                    pathname: '/',
-                    query: { listId: listItem.id },
-                  }}
-                >
-                  <ListNameLink>{listItem.label}</ListNameLink>
-                </Link>
-                {index === hoverRowIndex && (
-                  <StyledIcon name="edit" width="14" height="14" />
-                )}
-              </ListName>
+                <ListNameLink>{listItem.label}</ListNameLink>
+              </Link>
             </TableCol>
             <TableCol align="center" width="33.33333%">
               {listItem.count}
@@ -169,12 +134,28 @@ class ManageList extends Component {
                   visibleCount="4"
                   avatars={generateAvatars(listItem.invited)}
                 />
-                <ListOptions
-                  index={index}
-                  listId={listItem.id}
-                  onClickEditList={onClickEditList}
-                  onClickRemoveList={onClickRemoveList}
-                />
+                {isOnline && (
+                  <DottedMenu
+                    tooltipProps={{
+                      textBoxWidth: '100px',
+                      arrowAlign: 'start',
+                      position: 'bottom center',
+                    }}
+                  >
+                    <StyledButton
+                      color="white"
+                      onClick={onClickEditList(listItem.id)}
+                    >
+                      Edit
+                    </StyledButton>
+                    <StyledButton
+                      color="white"
+                      onClick={onClickRemoveList(listItem.id)}
+                    >
+                      Remove
+                    </StyledButton>
+                  </DottedMenu>
+                )}
               </MembersCol>
             </TableCol>
           </TableRow>
@@ -221,4 +202,4 @@ class ManageList extends Component {
   }
 }
 
-export default ManageList;
+export default withOfflineDetection(ManageList);

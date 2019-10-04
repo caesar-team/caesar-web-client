@@ -1,11 +1,13 @@
 import { connect } from 'react-redux';
 import { createStructuredSelector } from 'reselect';
 import {
-  fetchNodesRequest,
-  setWorkInProgressListId,
+  initWorkflow,
   setWorkInProgressItem,
   setWorkInProgressItemIds,
+  setWorkInProgressListId,
   resetWorkInProgressItemIds,
+} from 'common/actions/workflow';
+import {
   moveItemRequest,
   moveItemsBatchRequest,
   createItemRequest,
@@ -14,57 +16,76 @@ import {
   removeItemsBatchRequest,
   acceptItemUpdateRequest,
   rejectItemUpdateRequest,
-  changeItemPermissionRequest,
-  inviteMemberRequest,
-  inviteNewMemberRequest,
-  removeInviteMemberRequest,
-  shareItemRequest,
-  shareItems,
-  removeShareRequest,
+  toggleItemToFavoriteRequest,
   createAnonymousLinkRequest,
   removeAnonymousLinkRequest,
-  toggleItemToFavoriteRequest,
-  resetStore,
-} from 'common/actions/node';
-import { fetchKeyPairRequest, fetchUserSelfRequest } from 'common/actions/user';
-import { fetchMembersRequest } from 'common/actions/member';
+  shareItemBatchRequest,
+  removeShareRequest,
+} from 'common/actions/entities/item';
+import { changeChildItemPermissionRequest } from 'common/actions/entities/childItem';
 import {
-  selectableListsWithoutChildrenSelector,
-  itemsByIdSelector,
+  fetchKeyPairRequest,
+  fetchUserSelfRequest,
+  fetchUserTeamsRequest,
+} from 'common/actions/user';
+import { fetchTeamsRequest } from 'common/actions/entities/team';
+import {
+  isLoadingSelector,
   workInProgressItemSelector,
+  workInProgressItemOwnerSelector,
+  workInProgressItemChildItemsSelector,
+  workInProgressItemSharedMembersSelector,
   workInProgressItemIdsSelector,
   workInProgressItemsSelector,
   workInProgressListSelector,
   visibleListItemsSelector,
-  listsByTypeSelector,
-  isLoadingSelector,
+} from 'common/selectors/workflow';
+import {
+  personalListsByTypeSelector,
   trashListSelector,
-} from 'common/selectors/node';
-import { keyPairSelector, userDataSelector } from 'common/selectors/user';
-import { byIdSelector } from 'common/selectors/member';
+  teamsTrashListsSelector,
+  currentTeamListsSelector,
+  selectableTeamsListsSelector,
+} from 'common/selectors/entities/list';
+import { itemsByIdSelector } from 'common/selectors/entities/item';
+import {
+  keyPairSelector,
+  userDataSelector,
+  currentTeamSelector,
+  userTeamListSelector,
+} from 'common/selectors/user';
+import { membersByIdSelector } from 'common/selectors/entities/member';
 import Dashboard from './Dashboard';
 
 const mapStateToProps = createStructuredSelector({
-  lists: selectableListsWithoutChildrenSelector,
-  listsByType: listsByTypeSelector,
+  teamLists: currentTeamListsSelector,
+  userTeamList: userTeamListSelector,
+  personalListsByType: personalListsByTypeSelector,
   itemsById: itemsByIdSelector,
   workInProgressItem: workInProgressItemSelector,
+  workInProgressItemOwner: workInProgressItemOwnerSelector,
+  workInProgressItemChildItems: workInProgressItemChildItemsSelector,
+  workInProgressItemSharedMembers: workInProgressItemSharedMembersSelector,
   workInProgressItemIds: workInProgressItemIdsSelector,
   workInProgressList: workInProgressListSelector,
   visibleListItems: visibleListItemsSelector,
   workInProgressItems: workInProgressItemsSelector,
   trashList: trashListSelector,
+  teamsTrashLists: teamsTrashListsSelector,
   keyPair: keyPairSelector,
-  members: byIdSelector,
+  membersById: membersByIdSelector,
+  selectableTeamsLists: selectableTeamsListsSelector,
   user: userDataSelector,
+  team: currentTeamSelector,
   isLoading: isLoadingSelector,
 });
 
 const mapDispatchToProps = {
-  fetchNodesRequest,
+  initWorkflow,
   fetchKeyPairRequest,
-  fetchMembersRequest,
   fetchUserSelfRequest,
+  fetchUserTeamsRequest,
+  fetchTeamsRequest,
   moveItemRequest,
   moveItemsBatchRequest,
   createItemRequest,
@@ -73,12 +94,8 @@ const mapDispatchToProps = {
   removeItemsBatchRequest,
   acceptItemUpdateRequest,
   rejectItemUpdateRequest,
-  changeItemPermissionRequest,
-  inviteMemberRequest,
-  inviteNewMemberRequest,
-  removeInviteMemberRequest,
-  shareItemRequest,
-  shareItems,
+  changeChildItemPermissionRequest,
+  shareItemBatchRequest,
   removeShareRequest,
   createAnonymousLinkRequest,
   removeAnonymousLinkRequest,
@@ -87,7 +104,6 @@ const mapDispatchToProps = {
   setWorkInProgressItem,
   setWorkInProgressItemIds,
   resetWorkInProgressItemIds,
-  resetStore,
 };
 
 export default connect(

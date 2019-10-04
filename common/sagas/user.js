@@ -1,20 +1,38 @@
-import { put, call, takeLatest } from 'redux-saga/effects';
+import { put, call, takeLatest, select } from 'redux-saga/effects';
+import Router from 'next/router';
 import {
   FETCH_USER_SELF_REQUEST,
   FETCH_KEY_PAIR_REQUEST,
+  FETCH_USER_TEAMS_REQUEST,
+  LOGOUT,
   fetchUserSelfSuccess,
   fetchUserSelfFailure,
   fetchKeyPairSuccess,
   fetchKeyPairFailure,
+  fetchUserTeamsSuccess,
+  fetchUserTeamsFailure,
+  setCurrentTeamId,
 } from 'common/actions/user';
-import { getUserSelf, getKeys } from 'common/api';
+import { addTeamsBatch } from 'common/actions/entities/team';
+import { addMembersBatch } from 'common/actions/entities/member';
+import { currentTeamIdSelector } from 'common/selectors/user';
+import { convertTeamsToEntity } from 'common/normalizers/normalizers';
+import { getUserSelf, getKeys, getUserTeams } from 'common/api';
 
 export function* fetchUserSelfSaga() {
   try {
-    const { data } = yield call(getUserSelf);
+    const { data: user } = yield call(getUserSelf);
 
-    yield put(fetchUserSelfSuccess(data));
-  } catch (e) {
+    // TODO: added teamIds on BE side
+    const fixedUser = {
+      ...user,
+      teamIds: user.teamIds || [],
+    };
+
+    yield put(fetchUserSelfSuccess(fixedUser));
+    yield put(addMembersBatch({ [fixedUser.id]: fixedUser }));
+  } catch (error) {
+    console.log('error', error);
     yield put(fetchUserSelfFailure());
   }
 }
@@ -29,12 +47,43 @@ export function* fetchKeyPairSaga() {
         publicKey: data.publicKey,
       }),
     );
-  } catch (e) {
+  } catch (error) {
+    console.log('error', error);
     yield put(fetchKeyPairFailure());
   }
 }
 
-export function* userSagas() {
+export function* fetchUserTeamsSaga() {
+  try {
+    const { data } = yield call(getUserTeams);
+
+    if (data.length) {
+      yield put(fetchUserTeamsSuccess(data.map(({ id }) => id)));
+      // TODO: need fixes from BE
+      yield put(addTeamsBatch(convertTeamsToEntity(data)));
+
+      const currentTeamId = yield select(currentTeamIdSelector);
+      put(setCurrentTeamId(currentTeamId || data[0].id));
+    }
+  } catch (error) {
+    console.log('error', error);
+    yield put(fetchUserTeamsFailure());
+  }
+}
+
+export function* logoutSaga() {
+  console.log('logoutSaga');
+  try {
+    localStorage.clear();
+    yield call(Router.push, '/logout');
+  } catch (error) {
+    console.log('error', error);
+  }
+}
+
+export default function* userSagas() {
   yield takeLatest(FETCH_USER_SELF_REQUEST, fetchUserSelfSaga);
   yield takeLatest(FETCH_KEY_PAIR_REQUEST, fetchKeyPairSaga);
+  yield takeLatest(FETCH_USER_TEAMS_REQUEST, fetchUserTeamsSaga);
+  yield takeLatest(LOGOUT, logoutSaga);
 }

@@ -48,14 +48,15 @@ const NotifyButton = styled(Button)`
 const Item = ({
   isTrashItem = false,
   item,
-  allLists,
+  owner,
+  childItems,
   user,
-  members = {},
+  membersById = {},
+  teamsLists = [],
   notification,
   onClickMoveItem = Function.prototype,
   onClickCloseItem = Function.prototype,
   onClickEditItem = Function.prototype,
-  onClickInvite = Function.prototype,
   onClickShare = Function.prototype,
   onFinishCreateWorkflow = Function.prototype,
   onFinishEditWorkflow = Function.prototype,
@@ -65,13 +66,13 @@ const Item = ({
   onClickMoveToTrash = Function.prototype,
   onToggleFavorites = Function.prototype,
   onClickAcceptUpdate = Function.prototype,
-  onClickReject = Function.prototype,
+  onClickRejectUpdate = Function.prototype,
 }) => {
   if (!item) {
     return <EmptyItem />;
   }
 
-  const { mode, type, invited, update, owner, id } = item;
+  const { mode, type, update, ownerId, id } = item;
 
   const renderedItemForm = matchStrict(
     type,
@@ -79,7 +80,6 @@ const Item = ({
       [ITEM_CREDENTIALS_TYPE]: (
         <CredentialsForm
           item={item}
-          allLists={allLists}
           mode={mode}
           onFinishCreateWorkflow={onFinishCreateWorkflow}
           onFinishEditWorkflow={onFinishEditWorkflow}
@@ -89,7 +89,6 @@ const Item = ({
       [ITEM_DOCUMENT_TYPE]: (
         <DocumentForm
           item={item}
-          allLists={allLists}
           mode={mode}
           onFinishCreateWorkflow={onFinishCreateWorkflow}
           onFinishEditWorkflow={onFinishEditWorkflow}
@@ -99,16 +98,16 @@ const Item = ({
     },
     null,
   );
-  const access = invited.reduce(
-    (acc, invite) => (invite.userId === user.id ? invite.access : acc),
+  const access = childItems.reduce(
+    (acc, childItem) => (childItem.userId === user.id ? childItem.access : acc),
     null,
   );
-  const hasWriteAccess = owner.id === user.id || access === PERMISSION_WRITE;
+  const hasWriteAccess = ownerId === user.id || access === PERMISSION_WRITE;
   const isReadOnly = access && !hasWriteAccess;
 
   const renderUpdateNotify = () => {
     const updateUserName =
-      update.userId === owner.id ? user.name : members[update.userId].name;
+      update.userId === ownerId ? user.name : membersById[update.userId].name;
     const updateDate = formatDate(update.createdAt);
 
     return (
@@ -118,7 +117,7 @@ const Item = ({
           {`Item has been changed by ${updateUserName} at ${updateDate}`}
         </NotifyText>
         <NotifyButtonsWrapper>
-          <Button color="white" onClick={onClickReject(id)}>
+          <Button color="white" onClick={onClickRejectUpdate(id)}>
             Reject
           </Button>
           <NotifyButton color="white" onClick={onClickAcceptUpdate(id)}>
@@ -139,14 +138,15 @@ const Item = ({
           isTrashItem={isTrashItem}
           isReadOnly={isReadOnly}
           item={item}
+          owner={owner}
+          childItems={childItems}
           user={user}
-          members={members}
-          allLists={allLists}
+          membersById={membersById}
+          teamsLists={teamsLists}
           onClickMoveItem={onClickMoveItem}
           onClickCloseItem={onClickCloseItem}
           onClickRemoveItem={onClickRemoveItem}
           onClickEditItem={onClickEditItem}
-          onClickInvite={onClickInvite}
           onClickShare={onClickShare}
           onClickRestoreItem={onClickRestoreItem}
           onToggleFavorites={onToggleFavorites}
@@ -159,14 +159,15 @@ const Item = ({
           isTrashItem={isTrashItem}
           isReadOnly={isReadOnly}
           item={item}
+          owner={owner}
+          childItems={childItems}
           user={user}
-          members={members}
-          allLists={allLists}
+          membersById={membersById}
+          teamsLists={teamsLists}
           onClickMoveItem={onClickMoveItem}
           onClickCloseItem={onClickCloseItem}
           onClickRemoveItem={onClickRemoveItem}
           onClickEditItem={onClickEditItem}
-          onClickInvite={onClickInvite}
           onClickShare={onClickShare}
           onClickRestoreItem={onClickRestoreItem}
           onToggleFavorites={onToggleFavorites}
@@ -197,7 +198,6 @@ const Item = ({
 
 export default memo(Item, (prevProps, nextProps) => {
   return (
-    equal(prevProps.allLists, nextProps.allLists) &&
     equal(prevProps.item, nextProps.item) &&
     equal(prevProps.members, nextProps.members) &&
     equal(prevProps.notification, nextProps.notification)

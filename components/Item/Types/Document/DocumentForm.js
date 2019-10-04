@@ -106,8 +106,8 @@ const ErrorStyled = styled(Error)`
   margin: 20px 0;
 `;
 
-const createInitialValues = (secret, listId, type) => ({
-  ...secret,
+const createInitialValues = (data, listId, type) => ({
+  ...data,
   listId,
   type,
 });
@@ -137,8 +137,7 @@ const renderAttachments = (attachments = [], errors = [], setFieldValue) =>
   ));
 
 const DocumentForm = ({
-  item: { secret, listId, type },
-  allLists = [],
+  item: { data, listId, type },
   mode,
   onFinishCreateWorkflow,
   onFinishEditWorkflow,
@@ -150,20 +149,13 @@ const DocumentForm = ({
 
   const buttonText = isEditMode ? 'Update' : 'Add';
 
-  const preparedOptions = allLists
-    .filter(({ type: listType }) => listType !== TRASH_TYPE)
-    .map(({ id, label }) => ({
-      value: id,
-      label: upperFirst(label),
-    }));
-
   return (
     <Formik
       key="documentForm"
-      initialValues={createInitialValues(secret, listId, type)}
+      initialValues={createInitialValues(data, listId, type)}
       onSubmit={action}
       isInitialValid={schema.isValidSync(
-        createInitialValues(secret, listId, type),
+        createInitialValues(data, listId, type),
       )}
       validationSchema={schema}
       render={({
@@ -197,16 +189,6 @@ const DocumentForm = ({
               />
             )}
           />
-          <Row>
-            <AdditionalLabel>List</AdditionalLabel>
-            <Select
-              name="listId"
-              placeholder="Select option"
-              value={values.listId}
-              options={preparedOptions}
-              onChange={setFieldValue}
-            />
-          </Row>
           <Row>
             <AdditionalLabel>Notes</AdditionalLabel>
             <FastField

@@ -1,179 +1,118 @@
 import React, { Component } from 'react';
 import styled from 'styled-components';
-import memoize from 'memoize-one';
-import { PERMISSION_WRITE, PERMISSION_READ } from 'common/constants';
-import Member from './Member';
-import { Modal } from '../Modal';
-import { Input } from '../Input';
-import { Icon } from '../Icon';
-import { ModalTitle } from '../ModalTitle';
-import { Scrollbar } from '../Scrollbar';
+import { Modal, ModalTitle, UserSearchInput } from 'components';
+import { MemberList } from '../MemberList';
+import { Button } from '../Button';
 
-const StyledInput = styled(Input)`
-  ${Input.InputField} {
-    height: 50px;
-    border: 1px solid ${({ theme }) => theme.gallery};
-    border-radius: 3px;
-    padding: 15px 20px 15px 54px;
-    font-size: 16px;
+const Wrapper = styled.div`
+  position: relative;
+`;
+
+const MemberListStyled = styled(MemberList)`
+  margin-bottom: 30px;
+
+  ${MemberList.Member} {
+    background-color: ${({ theme }) => theme.lightBlue};
+    margin-bottom: 4px;
+
+    &:last-of-type {
+      margin-bottom: 0;
+    }
   }
 `;
 
-const StyledIcon = styled(Icon)`
-  fill: ${({ theme }) => theme.gallery};
-`;
-
-const ListWrapper = styled.div`
-  display: flex;
-  flex-direction: column;
-  margin-top: 20px;
-`;
-
-const ListTitle = styled.div`
-  font-size: 18px;
-  letter-spacing: 0.6px;
-  color: ${({ theme }) => theme.emperor};
-`;
-
-const AddInviteBox = styled.div`
-  cursor: pointer;
-  box-shadow: 0 11px 23px 0 rgba(0, 0, 0, 0.1);
-`;
-
-const AddInvite = styled.div`
+const ButtonsWrapper = styled.div`
   display: flex;
   align-items: center;
-  padding: 10px;
+  justify-content: flex-end;
+  margin-top: 40px;
 `;
 
-const InvitedEmail = styled.div`
-  font-weight: bold;
-  margin-left: 3px;
-`;
-
-const StyledIconInvite = styled(Icon)`
+const ButtonStyled = styled(Button)`
   margin-right: 20px;
 `;
 
-const MembersWrapper = styled.div`
-  display: flex;
-  flex-direction: column;
-  min-height: 400px;
-  margin-top: 15px;
-`;
-
 class InviteModal extends Component {
-  state = {
-    filterText: '',
+  state = this.prepareInitialState();
+
+  handleAddMember = member => {
+    this.setState(prevState => ({
+      ...prevState,
+      members: [...prevState.members, member],
+    }));
   };
 
-  filter = memoize((members, filterText) =>
-    Object.values(members).filter(({ email }) => email.includes(filterText)),
-  );
-
-  handleChange = event => {
-    event.preventDefault();
-
-    this.setState({
-      filterText: event.target.value,
-    });
+  handleRemoveMember = member => () => {
+    this.setState(prevState => ({
+      ...prevState,
+      members: prevState.members.filter(({ id }) => id !== member.id),
+    }));
   };
 
-  handleClickAdd = userId => () => {
-    const { onClickInvite } = this.props;
-
-    onClickInvite(userId);
+  handleChangeRole = changedRoleMember => (_, role) => {
+    this.setState(prevState => ({
+      ...prevState,
+      members: prevState.members.map(member =>
+        member.id === changedRoleMember.id ? { ...member, role } : member,
+      ),
+    }));
   };
 
-  handleClickAddNewInvite = () => {
-    const { onClickAddNewMember } = this.props;
-    const { filterText } = this.state;
+  handleClickDone = () => {
+    const { onSubmit } = this.props;
+    const { members } = this.state;
 
-    this.setState(
-      {
-        filterText: '',
-      },
-      () => onClickAddNewMember(filterText),
-    );
+    onSubmit(members);
   };
 
-  handleChangePermission = userId => event => {
-    const { checked } = event.currentTarget;
-    const { onChangePermission } = this.props;
-
-    onChangePermission(userId, checked ? PERMISSION_READ : PERMISSION_WRITE);
-  };
-
-  handleClickRemove = userId => () => {
-    const { onRemoveInvite } = this.props;
-
-    onRemoveInvite(userId);
-  };
-
-  renderMemberList(filteredMembers) {
-    const { invited } = this.props;
-    const invitesByUserId = invited.reduce((acc, invite) => {
-      acc[invite.userId] = invite;
-      return acc;
-    }, {});
-
-    return filteredMembers.map(({ id, ...member }) => {
-      const isReadOnly =
-        invitesByUserId[id] && invitesByUserId[id].access === PERMISSION_READ;
-
-      return (
-        <Member
-          key={id}
-          {...member}
-          isReadOnly={isReadOnly}
-          isInvited={Object.keys(invitesByUserId).includes(id)}
-          onClickPermissionChange={this.handleChangePermission(id)}
-          onClickAdd={this.handleClickAdd(id)}
-          onClickRemove={this.handleClickRemove(id)}
-        />
-      );
-    });
+  prepareInitialState() {
+    return {
+      members: [],
+    };
   }
 
   render() {
-    const { filterText } = this.state;
-    const { members, onCancel } = this.props;
+    const { invitedMembers, user, onCancel } = this.props;
+    const { members } = this.state;
 
-    const filteredMembers = this.filter(members, filterText);
-    const shouldShowAddInviteOption =
-      !filteredMembers.length && !!filterText && filterText.includes('@');
+    const shouldShowAddedMembers = members.length > 0;
+
+    const searchedBlackListMemberIds = [
+      user.id,
+      ...members.map(({ id }) => id),
+      ...invitedMembers.map(({ id }) => id),
+    ];
 
     return (
       <Modal
         isOpen
-        width={560}
+        width={640}
         onRequestClose={onCancel}
         shouldCloseOnEsc
         shouldCloseOnOverlayClick
       >
-        <ModalTitle>Invite</ModalTitle>
-        <StyledInput
-          placeholder="name@4xxi.com"
-          value={filterText}
-          onChange={this.handleChange}
-          prefix={<StyledIcon name="search" width={20} height={20} />}
-        />
-        {shouldShowAddInviteOption && (
-          <AddInviteBox onClick={this.handleClickAddNewInvite}>
-            <AddInvite>
-              <StyledIconInvite name="plus" width={16} height={16} />
-              Invite <InvitedEmail>{filterText}</InvitedEmail>
-            </AddInvite>
-          </AddInviteBox>
-        )}
-        <ListWrapper>
-          <ListTitle>Team members</ListTitle>
-          <MembersWrapper>
-            <Scrollbar autoHeight autoHeightMax={400}>
-              {this.renderMemberList(filteredMembers)}
-            </Scrollbar>
-          </MembersWrapper>
-        </ListWrapper>
+        <Wrapper>
+          <ModalTitle>Invite</ModalTitle>
+          <UserSearchInput
+            blackList={searchedBlackListMemberIds}
+            onClickAdd={this.handleAddMember}
+          />
+          {shouldShowAddedMembers && (
+            <MemberListStyled
+              maxHeight={200}
+              members={members}
+              controlType="remove"
+              onClickRemove={this.handleRemoveMember}
+              onChangeRole={this.handleChangeRole}
+            />
+          )}
+          <ButtonsWrapper>
+            <ButtonStyled color="white" onClick={onCancel}>
+              CANCEL
+            </ButtonStyled>
+            <Button onClick={this.handleClickDone}>DONE</Button>
+          </ButtonsWrapper>
+        </Wrapper>
       </Modal>
     );
   }

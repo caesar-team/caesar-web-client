@@ -1,28 +1,27 @@
 import { connect } from 'react-redux';
 import { createStructuredSelector } from 'reselect';
+import { extendedSortedCustomizableListsSelector } from 'common/selectors/entities/list';
 import {
-  extendedSortedCustomizableListsSelector,
   workInProgressListSelector,
   isLoadingSelector,
   shouldLoadNodesSelector,
-} from 'common/selectors/node';
+} from 'common/selectors/workflow';
 import { userDataSelector } from 'common/selectors/user';
-import { byIdSelector } from 'common/selectors/member';
+import { membersByIdSelector } from 'common/selectors/entities/member';
 import {
-  fetchNodesRequest,
   createListRequest,
   editListRequest,
   removeListRequest,
   sortListRequest,
-  setWorkInProgressListId,
-} from 'common/actions/node';
-import { fetchMembersRequest } from 'common/actions/member';
+} from 'common/actions/entities/list';
+import { initWorkflow, setWorkInProgressListId } from 'common/actions/workflow';
+import { fetchMembersRequest } from 'common/actions/entities/member';
 import { fetchUserSelfRequest, fetchKeyPairRequest } from 'common/actions/user';
 import ManageList from './ManageList';
 
 const mapStateToProps = createStructuredSelector({
   lists: extendedSortedCustomizableListsSelector,
-  members: byIdSelector,
+  members: membersByIdSelector,
   user: userDataSelector,
   workInProgressList: workInProgressListSelector,
   isLoading: isLoadingSelector,
@@ -31,7 +30,7 @@ const mapStateToProps = createStructuredSelector({
 
 const mapDispatchToProps = {
   fetchKeyPairRequest,
-  fetchNodesRequest,
+  initWorkflow,
   fetchMembersRequest,
   fetchUserSelfRequest,
   createListRequest,

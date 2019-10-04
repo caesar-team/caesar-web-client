@@ -5,15 +5,16 @@ import {
   postActivateTwoFactor,
   postCheckTwoFactor,
 } from 'common/api';
-import { getTrustedDeviceToken, setToken } from 'common/utils/token';
+import { getTrustedDeviceToken, setCookieValue } from 'common/utils/token';
 import { matchStrict } from 'common/utils/match';
 import { Head } from 'components';
+import { NavigationPanelStyled } from '../../components';
 import {
   TWO_FACTOR_CREATE,
-  TWO_FACTOR_CHECK,
   TWO_FACTOR_BACKUPS,
+  TWO_FACTOR_CHECK,
 } from '../../constants';
-import TwoFactorCreateForm from './TwoFactorCreateForm';
+import TwoFactorForm from './TwoFactorForm';
 import TwoFactorCheckForm from './TwoFactorCheckForm';
 import TwoFactorBackupForm from './TwoFactorBackupForm';
 
@@ -38,18 +39,6 @@ class TwoFactorStep extends Component {
     }
   }
 
-  handleClickReturn = () => {
-    this.setState({
-      step: TWO_FACTOR_CREATE,
-    });
-  };
-
-  handleClickNext = () => {
-    this.setState({
-      step: TWO_FACTOR_CHECK,
-    });
-  };
-
   handleSubmit = async ({ code, fpCheck }, { setSubmitting, setErrors }) => {
     const { initialStep, onFinish } = this.props;
 
@@ -73,7 +62,7 @@ class TwoFactorStep extends Component {
       } = await action(post);
 
       if (token) {
-        setToken(token);
+        setCookieValue('token', token);
       }
 
       // eslint-disable-next-line
@@ -106,28 +95,16 @@ class TwoFactorStep extends Component {
   }
 
   render() {
+    const { navigationSteps } = this.props;
     const { qr, code, codes, step } = this.state;
-    const { initialStep } = this.props;
-
-    const allowReturn = initialStep === TWO_FACTOR_CREATE;
 
     const renderedStep = matchStrict(
       step,
       {
         [TWO_FACTOR_CREATE]: (
-          <TwoFactorCreateForm
-            qr={qr}
-            code={code}
-            onClickNext={this.handleClickNext}
-          />
+          <TwoFactorForm qr={qr} code={code} onSubmit={this.handleSubmit} />
         ),
-        [TWO_FACTOR_CHECK]: (
-          <TwoFactorCheckForm
-            allowReturn={allowReturn}
-            onClickReturn={this.handleClickReturn}
-            onSubmit={this.handleSubmit}
-          />
-        ),
+        [TWO_FACTOR_CHECK]: <TwoFactorCheckForm onSubmit={this.handleSubmit} />,
         [TWO_FACTOR_BACKUPS]: (
           <TwoFactorBackupForm
             codes={codes}
@@ -141,6 +118,7 @@ class TwoFactorStep extends Component {
     return (
       <Fragment>
         <Head title="Two-Factor" />
+        <NavigationPanelStyled currentStep={step} steps={navigationSteps} />
         {renderedStep}
       </Fragment>
     );

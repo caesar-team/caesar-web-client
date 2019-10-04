@@ -66,17 +66,19 @@ const MultiItem = ({
         {workInProgressItemIds.length} items
       </LeftTopWrapper>
       <RightTopWrapper>
-        <Button color="white" onClick={onClickMove}>
+        <Button withOfflineCheck color="white" onClick={onClickMove}>
           MOVE
         </Button>
         <ButtonStyled
           onlyIcon
+          withOfflineCheck
           color="white"
           icon="share"
           onClick={onClickShare}
         />
         <Button
           onlyIcon
+          withOfflineCheck
           color="white"
           icon="trash"
           onClick={isTrashItems ? onClickRemove : onClickMoveToTrash}

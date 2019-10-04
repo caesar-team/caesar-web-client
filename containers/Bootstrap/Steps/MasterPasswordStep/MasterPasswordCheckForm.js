@@ -23,13 +23,13 @@ const Title = styled.div`
 `;
 
 const StyledLogo = styled(Icon)`
-  fill: ${({ theme }) => theme.white};
+  fill: ${({ theme }) => theme.lightGray};
 `;
 
 const MasterPasswordCheckForm = ({ onSubmit }) => (
   <Wrapper>
     <Head title="[LOCKED] Caesar" />
-    <StyledLogo name="logo" width={210} height={45} />
+    <StyledLogo name="logo-new" width={210} height={45} />
     <Title>Enter your master password</Title>
     <Formik
       initialValues={{ password: '' }}
@@ -44,6 +44,7 @@ const MasterPasswordCheckForm = ({ onSubmit }) => (
               <LockInput
                 {...field}
                 autoFocus
+                maxLength={24}
                 onClick={submitForm}
                 onBackspace={resetForm}
                 isError={Object.keys(errors).length !== 0}

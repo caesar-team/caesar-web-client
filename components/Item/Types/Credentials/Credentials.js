@@ -14,15 +14,20 @@ import {
   RemoveButtonWrapper,
 } from '../components';
 
-const StyledEyeIcon = styled(Icon)`
-  margin-right: 20px;
+const IconStyled = styled(Icon)`
+  width: 20px;
+  height: 20px;
   cursor: pointer;
+
   fill: ${({ theme }) => theme.gray};
+
+  &:hover {
+    fill: ${({ theme }) => theme.black};
+  }
 `;
 
-const StyledIcon = styled(Icon)`
-  cursor: pointer;
-  fill: ${({ theme }) => theme.gray};
+const EyeIconStyled = styled(IconStyled)`
+  margin-right: 20px;
 `;
 
 const StyledWebsiteLink = styled.a`
@@ -56,10 +61,10 @@ class Credentials extends Component {
   handleCopy = field => () => {
     const {
       notification,
-      item: { secret },
+      item: { data },
     } = this.props;
 
-    copy(secret[field]);
+    copy(data[field]);
 
     const fieldText = field === 'login' ? 'Login' : 'Password';
 
@@ -78,17 +83,13 @@ class Credentials extends Component {
       isReadOnly,
       isSharedItem = false,
       item: {
-        listId,
-        secret: { login, pass, website, note, attachments = [] },
+        data: { login, pass, website, note, attachments = [] },
       },
+      childItems,
     } = this.props;
 
     const pwd = isPasswordVisible ? pass : pass.replace(/./g, '*');
     const eyeIconName = isPasswordVisible ? 'eye-off' : 'eye-on';
-    const listName =
-      allLists.length > 0
-        ? allLists.find(({ id }) => id === listId).label
-        : null;
 
     const shouldShowWebsite = !!website;
     const shouldShowNote = !!note;
@@ -101,6 +102,7 @@ class Credentials extends Component {
           isSharedItem={isSharedItem}
           isReadOnly={isReadOnly}
           allLists={allLists}
+          childItems={childItems}
           {...this.props}
         />
         <FieldWrapper>
@@ -109,12 +111,7 @@ class Credentials extends Component {
             <Row>
               <FieldValue>
                 <FixedSizeField>{login}</FixedSizeField>
-                <StyledIcon
-                  name="copy"
-                  width={19}
-                  height={19}
-                  onClick={this.handleCopy('login')}
-                />
+                <IconStyled name="copy" onClick={this.handleCopy('login')} />
               </FieldValue>
             </Row>
           </Field>
@@ -128,9 +125,9 @@ class Credentials extends Component {
                     onHoldStart={this.handleToggleVisibility(true)}
                     onHoldEnd={this.handleToggleVisibility(false)}
                   >
-                    <StyledEyeIcon name={eyeIconName} width={20} height={20} />
+                    <EyeIconStyled name={eyeIconName} />
                   </HoldClickBehaviour>
-                  <StyledIcon
+                  <IconStyled
                     name="copy"
                     width={19}
                     height={19}
@@ -150,12 +147,6 @@ class Credentials extends Component {
               </FieldValue>
             </Field>
           )}
-          {listName && (
-            <Field>
-              <Label>List</Label>
-              <FieldValue>{listName}</FieldValue>
-            </Field>
-          )}
           {shouldShowNote && (
             <Field>
               <Label>Note</Label>
@@ -167,6 +158,7 @@ class Credentials extends Component {
         {shouldShowRemove && (
           <RemoveButtonWrapper>
             <RemoveButton
+              withOfflineCheck
               color="white"
               icon="trash"
               onClick={onClickMoveToTrash}

@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import { FastField, Formik } from 'formik';
 import copy from 'copy-text-to-clipboard';
 import { formatNumbersByColumns } from 'common/utils/format';
-import { Button, Checkbox, Link } from 'components';
+import { Button, Checkbox, AuthTitle } from 'components';
 import { downloadTextData } from 'common/utils/download';
 import { printData } from 'common/utils/print';
 import { backupInitialValues } from './constants';
@@ -21,12 +21,6 @@ const Form = styled.form`
   display: flex;
   flex-direction: column;
   align-items: center;
-`;
-
-const Title = styled.div`
-  font-size: 36px;
-  letter-spacing: 1px;
-  margin-bottom: 10px;
 `;
 
 const Description = styled.div`
@@ -88,7 +82,7 @@ const TwoFactorBackupForm = ({ codes, onSubmit }) => (
       onSubmit={onSubmit}
       render={({ handleSubmit, isSubmitting, isValid }) => (
         <Form onSubmit={handleSubmit}>
-          <Title>Save your backup codes</Title>
+          <AuthTitle>Save your backup codes</AuthTitle>
           <Description>
             Backup codes let you access your account if lost your phone. Keep
             these codes somewhere safe but accessible.

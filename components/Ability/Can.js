@@ -1,5 +1,5 @@
 import { createContextualCan } from '@casl/react';
-import { AbilityConsumer } from './Ability';
+import { AbilityConsumer } from './AbilityProvider';
 
 const Can = createContextualCan(AbilityConsumer);
 

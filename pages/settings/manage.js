@@ -1,36 +1,59 @@
-import React, { Fragment } from 'react';
+import React, { Component, Fragment } from 'react';
+import { connect } from 'react-redux';
+import { createStructuredSelector } from 'reselect';
 import { ManageListContainer } from 'containers';
-import { Head, SettingsLayout, SettingsSidebar } from 'components';
-import { isServer } from 'common/utils/isEnvironment';
-import { getToken } from 'common/utils/token';
-import { getUserSelf } from 'common/api';
+import {
+  FullScreenLoader,
+  Head,
+  SettingsLayout,
+  SettingsSidebar,
+} from 'components';
+import { currentTeamSelector, userDataSelector } from 'common/selectors/user';
+import {
+  fetchUserSelfRequest,
+  fetchUserTeamsRequest,
+} from 'common/actions/user';
 
-const SettingsManageList = ({ user }) => (
-  <Fragment>
-    <Head title="List Management" />
-    <SettingsLayout user={user}>
-      <Fragment>
-        <SettingsSidebar />
-        <ManageListContainer />
-      </Fragment>
-    </SettingsLayout>
-  </Fragment>
-);
-
-SettingsManageList.getInitialProps = async ({ req }) => {
-  try {
-    const token = isServer ? req.cookies.token : getToken();
-    const { data: user } = await getUserSelf(token);
-
-    return {
-      user,
-    };
-  } catch (e) {
-    // TODO: figure out about request errors
-    // console.log(e.response);
+class SettingsManageListPage extends Component {
+  componentDidMount() {
+    this.props.fetchUserSelfRequest();
+    this.props.fetchUserTeamsRequest();
   }
 
-  return {};
+  render() {
+    const { userData, currentTeam } = this.props;
+
+    const shouldShowLoader = !userData;
+
+    if (shouldShowLoader) {
+      return <FullScreenLoader />;
+    }
+
+    return (
+      <Fragment>
+        <Head title="Manage List" />
+        <SettingsLayout user={userData} team={currentTeam}>
+          <Fragment>
+            <SettingsSidebar />
+            <ManageListContainer />
+          </Fragment>
+        </SettingsLayout>
+      </Fragment>
+    );
+  }
+}
+
+const mapStateToProps = createStructuredSelector({
+  userData: userDataSelector,
+  currentTeam: currentTeamSelector,
+});
+
+const mapDispatchToProps = {
+  fetchUserSelfRequest,
+  fetchUserTeamsRequest,
 };
 
-export default SettingsManageList;
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps,
+)(SettingsManageListPage);

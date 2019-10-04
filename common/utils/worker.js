@@ -1,3 +1,5 @@
+import { isClient } from 'common/utils/isEnvironment';
+
 export function getWorkersCount() {
-  return navigator.hardwareConcurrency + 1;
+  return isClient ? navigator.hardwareConcurrency + 1 : 4;
 }

@@ -1,7 +1,7 @@
 import React, { Fragment } from 'react';
 import { Error, Head } from 'components';
 import { Bootstrap, Sharing } from 'containers';
-import { base64ToObject } from 'common/utils/cipherUtils';
+import { base64ToObject } from 'common/utils/base64';
 import { login } from 'common/utils/authUtils';
 import { getCheckShare } from 'common/api';
 
@@ -27,8 +27,17 @@ SharePage.getInitialProps = async ({
   query: { encryption = '', shareId = '' },
 }) => {
   const shared = base64ToObject(encryption);
-
-  if (!shared || !validateFields(shared, validFields)) {
+  const isFieldsValidated = validateFields(shared, validFields);
+  
+  if (!shared || !isFieldsValidated) {
+    const cause = "";
+    if(!shared) {
+      cause += "404 caused by the shared variable. \n";
+    }
+    if(!isFieldsValidated) {
+      cause += "404 caused by the isFieldsValidated function. \n";
+    }
+    console.error(cause);
     return { statusCode: 404 };
   }
 

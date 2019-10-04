@@ -1,194 +1,238 @@
 import React, { Component, Fragment } from 'react';
 import styled from 'styled-components';
 import copy from 'copy-text-to-clipboard';
-import {
-  Modal,
-  ModalTitle,
-  Button,
-  Checkbox,
-  Toggle,
-  TagsInput,
-} from 'components';
-import { base64ToObject, objectToBase64 } from 'common/utils/cipherUtils';
-import { generateSharingUrl } from 'common/utils/sharing';
-import { KEY_CODES } from 'common/constants';
+import { Modal, ModalTitle, UserSearchInput } from 'components';
+import { generateTeamTag } from 'common/utils/team';
+import { TeamTag } from '../TeamTag';
+import { Section } from '../Section';
+import { TextWithLines } from '../TextWithLines';
+import { Carousel } from '../Carousel';
+import { MemberList } from '../MemberList';
+import { Button } from '../Button';
+import { INVITED_SECTION } from './constants';
+import { AnonymousLink } from './components';
+import { getAnonymousLink } from './utils';
 
-const ModalDescription = styled.div`
-  padding-bottom: 20px;
-  text-align: center;
+const Wrapper = styled.div`
+  position: relative;
+`;
+
+const TextWithLinesStyled = styled(TextWithLines)`
   font-size: 14px;
-  color: ${({ theme }) => theme.black};
+  font-weight: normal;
+  letter-spacing: 0.4px;
+  color: ${({ theme }) => theme.emperor};
 `;
 
-const Row = styled.div`
-  margin-bottom: 20px;
+const TextWithLinesAbsolute = styled(TextWithLinesStyled)`
+  position: absolute;
 `;
 
-const LinkRow = styled.div`
-  margin-top: 20px;
+const TeamsWrapper = styled.div`
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 40px;
 `;
 
-const ToggleLabel = styled.label`
-  display: inline-flex;
-  align-items: center;
+const CarouselStyled = styled(Carousel)`
+  ${Carousel.ArrowsWrapper} {
+    background-color: ${({ theme }) => theme.white};
+    width: 55px;
+    top: 4px;
+
+    > *:first-child {
+      margin-left: 20px;
+    }
+  }
 `;
 
-const ToggleLabelText = styled.span`
-  padding-left: 10px;
-  font-size: 14px;
+const TeamTagStyled = styled(TeamTag)`
+  margin-right: 20px;
+
+  ${({ isActive, theme }) =>
+    isActive &&
+    `
+    border: 1px solid ${theme.gray};
+  `};
+
+  &:last-of-type {
+    margin-right: 0;
+  }
+`;
+
+const SectionStyled = styled(Section)`
+  margin-bottom: 30px;
+
+  ${Section.Name} {
+    font-size: 14px;
+    letter-spacing: 0.4px;
+    color: ${({ theme }) => theme.emperor};
+  }
+`;
+
+const MemberListStyled = styled(MemberList)`
+  margin-bottom: 30px;
+  margin-top: 10px;
+
+  ${MemberList.Member} {
+    background-color: ${({ theme }) => theme.lightBlue};
+    margin-bottom: 4px;
+
+    &:last-of-type {
+      margin-bottom: 0;
+    }
+  }
 `;
 
 const ButtonsWrapper = styled.div`
   display: flex;
-  justify-content: flex-end;
-`;
-
-const StyledButton = styled(Button)`
-  margin-left: 20px;
-  text-transform: uppercase;
-`;
-
-const SharedLinkWrapper = styled.div`
-  max-width: 100%;
-  padding: 20px;
-  background-color: ${({ theme }) => theme.snow};
-  border-radius: 3px;
-`;
-
-const SharedLink = styled.div`
-  position: relative;
-  padding: 15px 20px;
-  background-color: ${({ theme }) => theme.white};
-  border: 1px solid ${({ theme }) => theme.gallery};
-  border-radius: 3px;
-  word-break: break-all;
-  white-space: pre-wrap;
-`;
-
-const SharedLinkActions = styled.div`
-  display: flex;
   align-items: center;
-  padding-top: 20px;
+  justify-content: flex-end;
+  margin-top: 40px;
 `;
 
-const SharedLinkActionsButtons = styled.div`
-  display: flex;
-  margin-left: auto;
+const ButtonStyled = styled(Button)`
+  margin-right: 20px;
 `;
 
-const SharedLinkActionsButton = styled(Button)`
-  text-transform: uppercase;
-  margin-left: 20px;
-`;
-
-const EMAIL_REGEX = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-
-const getEncryption = link => link.match(/\/([\w|+-]+)$/)[1];
-const getShareId = link => link.match(/share\/(.+)\//)[1];
-
-const getAnonymousLink = shared =>
-  (shared.find(({ link }) => !!link) || {}).link;
-
-export class ShareModal extends Component {
+class ShareModal extends Component {
   state = this.prepareInitialState();
 
-  static getDerivedStateFromProps(nextProps, prevState) {
-    if (prevState.isLoading && !!getAnonymousLink(nextProps.shared)) {
-      return {
-        isLoading: false,
-      };
-    }
+  componentDidUpdate(prevProps) {
+    const shouldUpdateLoading =
+      getAnonymousLink(prevProps.anonymousLink) !==
+      getAnonymousLink(this.props.anonymousLink);
 
-    return null;
+    if (shouldUpdateLoading) {
+      // eslint-disable-next-line
+      this.setState({
+        isGeneratingLink: false,
+      });
+    }
   }
 
-  handleShareByLinkChange = () => {
-    const {
-      shared,
-      onActivateSharedByLink,
-      onDeactivateSharedByLink,
-    } = this.props;
-
-    const link = getAnonymousLink(shared);
-
-    if (!link) {
-      this.setState(
-        {
-          isLoading: true,
-        },
-        onActivateSharedByLink,
-      );
-    } else {
-      onDeactivateSharedByLink();
-    }
-  };
-
-  handleToggleSeparateLink = () => {
+  handleToggleSection = sectionName => () => {
     this.setState(prevState => ({
-      isUseMasterPassword: !prevState.isUseMasterPassword,
+      ...prevState,
+      openedSections: prevState.openedSections.includes(sectionName)
+        ? prevState.openedSections.filter(name => name !== sectionName)
+        : [...prevState.openedSections, sectionName],
     }));
   };
 
-  handleCopySharedLink = () => {
-    const { isUseMasterPassword } = this.state;
-    const { notification, shared = [] } = this.props;
+  handleAddMember = member => {
+    this.setState(prevState => ({
+      ...prevState,
+      members: [...prevState.members, member],
+    }));
+  };
 
-    copy(this.generateLinkText(getAnonymousLink(shared), isUseMasterPassword));
+  handleRemoveMember = member => () => {
+    this.setState(prevState => ({
+      ...prevState,
+      members: prevState.members.filter(({ id }) => id !== member.id),
+    }));
+  };
+
+  handleToggleTeam = teamId => () => {
+    this.setState(prevState => ({
+      ...prevState,
+      teamIds: prevState.teamIds.includes(teamId)
+        ? prevState.teamIds.filter(id => id !== teamId)
+        : [...prevState.teamIds, teamId],
+    }));
+  };
+
+  handleToggleAnonymousLink = () => {
+    const { anonymousLink, onActivateLink, onDeactivateLink } = this.props;
+
+    const link = getAnonymousLink(anonymousLink);
+    const action = link ? onDeactivateLink : onActivateLink;
+
+    this.setState(
+      {
+        isGeneratingLink: !link,
+      },
+      action,
+    );
+  };
+
+  handleUpdateAnonymousLink = async () => {
+    this.setState(
+      {
+        isGeneratingLink: true,
+      },
+      this.props.onActivateLink,
+    );
+  };
+
+  handleCopy = () => {
+    const { notification, anonymousLink = [] } = this.props;
+
+    copy(getAnonymousLink(anonymousLink));
 
     notification.show({
       text: `The shared link has copied.`,
     });
   };
 
-  handleShare = () => {
+  handleClickDone = () => {
     const { onShare } = this.props;
-    const { emails } = this.state;
+    const { members, teamIds } = this.state;
 
-    return onShare && onShare(emails);
+    onShare(members, teamIds);
   };
-
-  handleAddEmail = emails => {
-    this.setState({ emails });
-  };
-
-  handleRemoveEmail = email => () => {
-    this.setState(prevState => ({
-      emails: prevState.emails.filter(oldEmail => oldEmail !== email),
-    }));
-  };
-
-  generateLinkText(link, isUseMasterPassword) {
-    const linkObj = base64ToObject(getEncryption(link));
-
-    if (!isUseMasterPassword) {
-      return link;
-    }
-
-    const { mp, ...linkData } = linkObj;
-
-    return `${generateSharingUrl(
-      getShareId(link),
-      objectToBase64(linkData),
-    )}\nMaster password: ${mp}`;
-  }
 
   prepareInitialState() {
     return {
-      emails: [],
-      isUseMasterPassword: false,
-      isLoading: false,
+      members: [],
+      teamIds: [],
+      openedSections: [],
+      isGeneratingLink: false,
     };
   }
 
-  render() {
-    const { isUseMasterPassword, isLoading } = this.state;
-    const { onCancel, shared = [], withAnonymousLink } = this.props;
+  renderTeamTags() {
+    const { teamIds } = this.state;
+    const { teams } = this.props;
 
-    const link = withAnonymousLink ? getAnonymousLink(shared) : '';
-    const switcherText = link ? 'Link access enabled' : 'Link access disabled';
-    const linkText = link
-      ? this.generateLinkText(link, isUseMasterPassword)
-      : '';
+    const renderedTeams = teams.map(({ id, title, ...props }) => {
+      const isActive = teamIds.includes(id);
+
+      return (
+        <TeamTagStyled
+          isActive={isActive}
+          key={id}
+          name={generateTeamTag(title)}
+          onClick={this.handleToggleTeam(id)}
+          {...props}
+        />
+      );
+    });
+
+    return <CarouselStyled>{renderedTeams}</CarouselStyled>;
+  }
+
+  render() {
+    const {
+      teams,
+      sharedMembers,
+      anonymousLink,
+      withAnonymousLink,
+      onCancel,
+    } = this.props;
+    const { openedSections, members, isGeneratingLink } = this.state;
+
+    const shouldShowTeamsSection = teams.length > 0;
+    const shouldShowAddedMembers = members.length > 0;
+    const shouldShowSharedMembers = sharedMembers.length > 0;
+
+    const renderedTeamTags = this.renderTeamTags();
+
+    const searchedBlackListMemberIds = [
+      ...members.map(({ id }) => id),
+      ...sharedMembers.map(({ id }) => id),
+    ];
 
     return (
       <Modal
@@ -198,67 +242,61 @@ export class ShareModal extends Component {
         shouldCloseOnEsc
         shouldCloseOnOverlayClick
       >
-        <ModalTitle>Share</ModalTitle>
-        <ModalDescription>
-          Share item will be available in read mode
-        </ModalDescription>
-        <Row>
-          <TagsInput
-            addOnPaste
-            value={this.state.emails}
-            validationRegex={EMAIL_REGEX}
-            inputProps={{ placeholder: 'Type email and press space or tab' }}
-            addKeys={[KEY_CODES.TAB, KEY_CODES.SPACE, KEY_CODES.ENTER]}
-            onChange={this.handleAddEmail}
+        <Wrapper>
+          <ModalTitle>Share</ModalTitle>
+          <UserSearchInput
+            blackList={searchedBlackListMemberIds}
+            onClickAdd={this.handleAddMember}
           />
-        </Row>
-        {withAnonymousLink && (
-          <Fragment>
-            <LinkRow>
-              <ToggleLabel>
-                <Toggle
-                  value={!!link}
-                  isLoading={isLoading}
-                  onChange={this.handleShareByLinkChange}
-                />
-                <ToggleLabelText>{switcherText}</ToggleLabelText>
-              </ToggleLabel>
-            </LinkRow>
-            {link && (
-              <Row>
-                <SharedLinkWrapper>
-                  <SharedLink>{linkText}</SharedLink>
-                  <SharedLinkActions>
-                    <Checkbox
-                      checked={isUseMasterPassword}
-                      onChange={this.handleToggleSeparateLink}
-                    >
-                      Use master password
-                    </Checkbox>
-                    <SharedLinkActionsButtons>
-                      <SharedLinkActionsButton
-                        color="white"
-                        icon="copy"
-                        onClick={this.handleCopySharedLink}
-                      >
-                        Copy
-                      </SharedLinkActionsButton>
-                    </SharedLinkActionsButtons>
-                  </SharedLinkActions>
-                </SharedLinkWrapper>
-              </Row>
-            )}
-          </Fragment>
-        )}
-        <ButtonsWrapper>
-          <StyledButton color="white" onClick={onCancel}>
-            Cancel
-          </StyledButton>
-          <StyledButton color="black" onClick={this.handleShare}>
-            Done
-          </StyledButton>
-        </ButtonsWrapper>
+          {shouldShowAddedMembers && (
+            <Fragment>
+              <TextWithLinesStyled position="left" width={1}>
+                Personal
+              </TextWithLinesStyled>
+              <MemberListStyled
+                maxHeight={200}
+                members={members}
+                controlType="remove"
+                onClickRemove={this.handleRemoveMember}
+              />
+            </Fragment>
+          )}
+          {shouldShowTeamsSection && (
+            <Fragment>
+              <TextWithLinesAbsolute position="left" width={1}>
+                Teams ({teams.length})
+              </TextWithLinesAbsolute>
+              <TeamsWrapper>{renderedTeamTags}</TeamsWrapper>
+            </Fragment>
+          )}
+          {shouldShowSharedMembers && (
+            <SectionStyled
+              name={INVITED_SECTION}
+              isOpened={openedSections.includes(INVITED_SECTION)}
+              onToggleSection={this.handleToggleSection(INVITED_SECTION)}
+            >
+              <MemberList members={sharedMembers} />
+            </SectionStyled>
+          )}
+          {withAnonymousLink && (
+            <AnonymousLink
+              link={anonymousLink}
+              isLoading={isGeneratingLink}
+              onToggle={this.handleToggleAnonymousLink}
+              onCopy={this.handleCopy}
+              onUpdate={this.handleUpdateAnonymousLink}
+            />
+          )}
+          <ButtonsWrapper>
+            <ButtonStyled color="white" onClick={onCancel}>
+              CANCEL
+            </ButtonStyled>
+            <Button onClick={this.handleClickDone}>DONE</Button>
+          </ButtonsWrapper>
+        </Wrapper>
       </Modal>
     );
   }
 }
+
+export default ShareModal;

@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { forwardRef } from 'react';
 import styled from 'styled-components';
+import withOfflineDetection from '../Offline/withOfflineDetection';
 import Icon from '../Icon/Icon';
 
 const getButtonStyles = ({ color, theme }) => {
@@ -67,7 +68,7 @@ const StyledButton = styled.button`
   `};
 
   &[disabled] {
-    opacity: 0.2;
+    opacity: 0.5;
     cursor: not-allowed;
   }
 
@@ -85,29 +86,47 @@ const Text = styled.div`
   margin-left: ${({ withMargin }) => (withMargin ? '10px' : 0)};
 `;
 
-const Button = ({
-  icon,
-  color = 'black',
-  htmlType = 'button',
-  children,
-  isHoverBlackBackground,
-  ...props
-}) => {
-  const onlyIcon = !children;
-  const withIcon = !!icon;
+const getButtonDisabledStatus = (withOfflineCheck, isOnline, disabled) =>
+  (withOfflineCheck && !isOnline) || disabled;
 
-  return (
-    <StyledButton
-      isHoverBlackBackground={isHoverBlackBackground}
-      type={htmlType}
-      color={color}
-      onlyIcon={onlyIcon}
-      {...props}
-    >
-      {icon && <Icon name={icon} width={14} height={14} isInButton />}
-      {!onlyIcon && <Text withMargin={withIcon}>{children}</Text>}
-    </StyledButton>
-  );
-};
+const Button = forwardRef(
+  (
+    {
+      icon,
+      color = 'black',
+      htmlType = 'button',
+      children,
+      disabled,
+      withOfflineCheck = false,
+      isHoverBlackBackground,
+      isOnline,
+      ...props
+    },
+    ref,
+  ) => {
+    const onlyIcon = !children;
+    const withIcon = !!icon;
+    const isDisabled = getButtonDisabledStatus(
+      withOfflineCheck,
+      isOnline,
+      disabled,
+    );
 
-export default Button;
+    return (
+      <StyledButton
+        ref={ref}
+        isHoverBlackBackground={isHoverBlackBackground}
+        type={htmlType}
+        color={color}
+        onlyIcon={onlyIcon}
+        disabled={isDisabled}
+        {...props}
+      >
+        {icon && <Icon name={icon} width={14} height={14} isInButton />}
+        {!onlyIcon && <Text withMargin={withIcon}>{children}</Text>}
+      </StyledButton>
+    );
+  },
+);
+
+export default withOfflineDetection(Button);

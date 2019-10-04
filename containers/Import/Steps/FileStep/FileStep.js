@@ -18,7 +18,7 @@ const Title = styled.div`
 `;
 
 const initialValues = {
-  file: {},
+  file: undefined,
 };
 
 const FileStep = ({ onSubmit }) => (

@@ -30,6 +30,10 @@ const Title = styled.div`
   letter-spacing: 0.6px;
   color: ${({ theme }) => theme.black};
   margin-bottom: 8px;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  max-width: 278px;
+  white-space: nowrap;
 `;
 
 const Box = styled.div`
@@ -102,15 +106,17 @@ const Row = styled.div`
       background: ${({ theme }) => theme.gallery};
     `}
 `;
+
 const ItemTypeIcon = props => {
   const { type } = props;
   const icon = ITEM_ICON_TYPES[type] || ITEM_ICON_TYPES[ITEM_CREDENTIALS_TYPE];
   return <Icon name={icon} width={20} height={20} fill="#fff" />;
 };
+
 const Item = ({
   id,
   lastUpdated,
-  secret: { name, attachments },
+  data: { name, attachments },
   type,
   invited,
   isMultiItem = false,

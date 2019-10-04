@@ -19,6 +19,7 @@ const Wrapper = styled.div`
   overflow: hidden;
   vertical-align: middle;
   width: ${({ isSmall }) => (isSmall ? '30px' : '40px')};
+  min-width: ${({ isSmall }) => (isSmall ? '30px' : '40px')};
   height: ${({ isSmall }) => (isSmall ? '30px' : '40px')};
   border-radius: 50%;
 `;
@@ -41,9 +42,13 @@ const Avatar = ({ name, email, avatar, children, isSmall, ...props }) => {
   }
 
   if (avatar) {
+    const avatarIcon = avatar.startsWith('data:')
+      ? avatar
+      : `${API_URI}/${avatar}`;
+
     return (
       <Wrapper isSmall={isSmall} {...props}>
-        <Image src={`${API_URI}/${avatar}`} />
+        <Image src={avatarIcon} />
       </Wrapper>
     );
   }

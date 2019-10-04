@@ -1,8 +1,18 @@
 import { AbilityBuilder } from '@casl/ability';
 import {
-  USER_ROLE,
-  READ_ONLY_USER_ROLE,
-  ANONYMOUS_USER_ROLE,
+  COMMANDS_ROLES,
+  DOMAIN_ROLES,
+
+  CHILD_ITEM_ENTITY_TYPE,
+  ITEM_ENTITY_TYPE,
+  LIST_ENTITY_TYPE,
+  TEAM_ENTITY_TYPE,
+  MEMBER_ENTITY_TYPE,
+
+  INBOX_TYPE,
+  FAVORITES_TYPE,
+  TRASH_TYPE,
+  DEFAULT_LIST_TYPE,
 } from './constants';
 
 function subjectName(item) {
@@ -13,12 +23,31 @@ function subjectName(item) {
   return item.__type;
 }
 
-export const createAbility = ({ id: userId, roles }) => {
+const defineCommandRules = (user, can) => {
+  const { id: userId, roles } = user;
+
+  if (roles.includes(COMMANDS_ROLES.USER_ROLE_ADMIN)) {
+    can('crud', TEAM_ENTITY_TYPE);
+  }
+};
+
+const defineDomainRules = (user, can) => {
+  const { id: userId, roles } = user;
+
+  if (roles.includes(DOMAIN_ROLES.USER_ROLE_ADMIN)) {
+    can('crud', ITEM_ENTITY_TYPE);
+  }
+};
+
+export const createAbility = user => {
+  if (!user) {
+    return AbilityBuilder.define({ subjectName }, can => {
+      // TODO: figure out about disable all actions for unknown user
+    });
+  }
+
   return AbilityBuilder.define({ subjectName }, can => {
-    if (roles.includes(USER_ROLE)) {
-      can('read', 'Item');
-      can(['create', 'update', 'delete'], 'Item', { ownerId: userId });
-      can('share', 'Item', { ownerId: userId });
-    }
+    defineCommandRules(user, can);
+    defineDomainRules(user, can);
   });
 };

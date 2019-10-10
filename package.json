@@ -46,7 +46,7 @@
     "next-fonts": "^0.17.0",
     "next-offline": "^4.0.5",
     "next-redux-saga": "^4.0.2",
-    "next-redux-wrapper": "^3.0.0-alpha.3",
+    "next-redux-wrapper": "^4.0.0",
     "normalizr": "^3.4.0",
     "object-sizeof": "^1.5.1",
     "openpgp": "^4.6.2",

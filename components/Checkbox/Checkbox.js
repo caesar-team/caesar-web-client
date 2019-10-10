@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React from 'react';
 import styled from 'styled-components';
 import { Icon } from '../Icon';
 
@@ -39,26 +39,20 @@ const StyledInput = styled.input`
   opacity: 0;
 `;
 
-class Checkbox extends Component {
-  render() {
-    const { isDisabled, children, checked, className, ...props } = this.props;
-
-    return (
-      <StyledLabel isDisabled={isDisabled} className={className}>
-        <Box isChecked={checked}>
-          <Icon name="check" isInButton width={14} height={10} />
-        </Box>
-        <StyledInput
-          type="checkbox"
-          disabled={isDisabled}
-          checked={checked}
-          {...props}
-        />
-        {children && <Text isDisabled={isDisabled}>{children}</Text>}
-      </StyledLabel>
-    );
-  }
-}
+const Checkbox = ({ isDisabled, children, checked, className, ...props }) => (
+  <StyledLabel isDisabled={isDisabled} className={className}>
+    <Box isChecked={checked}>
+      <Icon name="check" isInButton width={14} height={10} />
+    </Box>
+    <StyledInput
+      type="checkbox"
+      disabled={isDisabled}
+      checked={checked}
+      {...props}
+    />
+    {children && <Text isDisabled={isDisabled}>{children}</Text>}
+  </StyledLabel>
+);
 
 Checkbox.Text = Text;
 Checkbox.Box = Box;

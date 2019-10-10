@@ -59,10 +59,12 @@ class Application extends NextApp {
     if (UNLOCKED_ROUTES.includes(route)) {
       return (
         <ThemeProvider theme={theme}>
-          <NotificationProvider>
-            <GlobalStyles />
-            <Component {...pageProps} />
-          </NotificationProvider>
+          <OfflineDetectionProvider>
+            <NotificationProvider>
+              <GlobalStyles />
+              <Component {...pageProps} />
+            </NotificationProvider>
+          </OfflineDetectionProvider>
         </ThemeProvider>
       );
     }

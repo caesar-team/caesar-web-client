@@ -12,6 +12,7 @@ import {
   DottedMenu,
   Icon,
   InviteModal,
+  Can,
 } from 'components';
 import { COMMANDS_ROLES, DEFAULT_TEAM_TYPE } from 'common/constants';
 
@@ -270,7 +271,10 @@ class TeamContainer extends Component {
   );
 
   getColumns() {
+    const { team } = this.props;
     const { filter } = this.state;
+
+    console.log('team', team);
 
     const columnWidths = this.calculateColumnWidths();
 
@@ -331,12 +335,17 @@ class TeamContainer extends Component {
       width: columnWidths.role,
       Cell: ({ original }) => (
         <RoleField>
-          <SelectStyled
-            name="role"
-            value={original.role}
-            options={OPTIONS}
-            onChange={this.handleChangeRole(original.id)}
-          />
+          <Can I="update" of={team}>
+            <SelectStyled
+              name="role"
+              value={original.role}
+              options={OPTIONS}
+              onChange={this.handleChangeRole(original.id)}
+            />
+          </Can>
+          <Can not I="update" of={team}>
+            {original.role}
+          </Can>
         </RoleField>
       ),
       Header: (
@@ -351,26 +360,28 @@ class TeamContainer extends Component {
       resizable: false,
       width: columnWidths.menu,
       Cell: ({ original }) => (
-        <MenuField>
-          <DottedMenu
-            tooltipProps={{
-              textBoxWidth: '100px',
-              arrowAlign: 'start',
-              position: 'left center',
-              padding: '0px 0px',
-              flat: true,
-            }}
-          >
-            <MenuWrapper>
-              <MenuButton
-                color="white"
-                onClick={this.handleRemoveMember(original.id)}
-              >
-                Remove
-              </MenuButton>
-            </MenuWrapper>
-          </DottedMenu>
-        </MenuField>
+        <Can I="update" of={team}>
+          <MenuField>
+            <DottedMenu
+              tooltipProps={{
+                textBoxWidth: '100px',
+                arrowAlign: 'start',
+                position: 'left center',
+                padding: '0px 0px',
+                flat: true,
+              }}
+            >
+              <MenuWrapper>
+                <MenuButton
+                  color="white"
+                  onClick={this.handleRemoveMember(original.id)}
+                >
+                  Remove
+                </MenuButton>
+              </MenuWrapper>
+            </DottedMenu>
+          </MenuField>
+        </Can>
       ),
       Header: <HeaderField />,
     };
@@ -483,16 +494,18 @@ class TeamContainer extends Component {
         <TopWrapper>
           <Title>{team.title}</Title>
           {!isDefaultTeam && (
-            <ButtonsWrapper>
-              <ButtonStyled
-                withOfflineCheck
-                onClick={this.handleOpenModal(INVITE_MEMBER_MODAL)}
-                icon="plus"
-                color="black"
-              >
-                ADD MEMBER
-              </ButtonStyled>
-            </ButtonsWrapper>
+            <Can I="update" of={team}>
+              <ButtonsWrapper>
+                <ButtonStyled
+                  withOfflineCheck
+                  onClick={this.handleOpenModal(INVITE_MEMBER_MODAL)}
+                  icon="plus"
+                  color="black"
+                >
+                  ADD MEMBER
+                </ButtonStyled>
+              </ButtonsWrapper>
+            </Can>
           )}
         </TopWrapper>
         <DataTableStyled

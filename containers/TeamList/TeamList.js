@@ -6,6 +6,7 @@ import {
   LogoLoader,
   NewTeamModal,
   ConfirmModal,
+  Can,
 } from 'components';
 import { DEFAULT_TEAM_TYPE } from '../../common/constants';
 
@@ -143,9 +144,9 @@ class TeamListContainer extends Component {
     return teams.map(team => (
       <TeamCardStyled
         key={team.id}
-        isRemoveButtonVisible={team.type !== DEFAULT_TEAM_TYPE}
-        {...team}
+        team={team}
         members={members}
+        isRemoveButtonVisible={team.type !== DEFAULT_TEAM_TYPE}
         onClickRemoveTeam={this.handleClickRemoveTeam(team.id)}
       />
     ));
@@ -169,14 +170,16 @@ class TeamListContainer extends Component {
       <Wrapper>
         <TopWrapper>
           <Title>Teams</Title>
-          <Button
-            withOfflineCheck
-            onClick={this.handleOpenModal(NEW_TEAM_MODAL)}
-            icon="plus"
-            color="black"
-          >
-            ADD TEAM
-          </Button>
+          <Can I="create" of="Team">
+            <Button
+              withOfflineCheck
+              onClick={this.handleOpenModal(NEW_TEAM_MODAL)}
+              icon="plus"
+              color="black"
+            >
+              ADD TEAM
+            </Button>
+          </Can>
         </TopWrapper>
         <TeamListWrapper>{renderedTeamCards}</TeamListWrapper>
         {modalVisibilities[NEW_TEAM_MODAL] && (

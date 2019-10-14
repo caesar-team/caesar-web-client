@@ -15,19 +15,23 @@ import {
   DEFAULT_LIST_TYPE,
 } from './constants';
 
-function subjectName(item) {
-  if (!item || typeof item === 'string') {
-    return item;
+function subjectName(subject) {
+  console.log('subject', subject);
+  if (!subject || typeof subject === 'string') {
+    return subject;
   }
 
-  return item.__type;
+  return subject.__type;
 }
 
 const defineCommandRules = (user, can) => {
-  const { id: userId, roles } = user;
+  const { roles } = user;
 
-  if (roles.includes(COMMANDS_ROLES.USER_ROLE_ADMIN)) {
+  if (roles.includes(DOMAIN_ROLES.ROLE_ADMIN)) {
     can('crud', TEAM_ENTITY_TYPE);
+  } else {
+    can('update', TEAM_ENTITY_TYPE, { userRole: 'admin' });
+    can('read', TEAM_ENTITY_TYPE);
   }
 };
 
@@ -37,6 +41,8 @@ const defineDomainRules = (user, can) => {
   if (roles.includes(DOMAIN_ROLES.USER_ROLE_ADMIN)) {
     can('crud', ITEM_ENTITY_TYPE);
   }
+
+
 };
 
 export const createAbility = user => {

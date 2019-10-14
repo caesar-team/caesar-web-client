@@ -11,6 +11,7 @@ import {
   fetchMembersFailure,
   fetchMembersSuccess,
 } from 'common/actions/entities/member';
+import { updateGlobalNotification } from 'common/actions/application';
 import {
   getDefaultTeamMembers,
   getPublicKeyByEmailBatch,

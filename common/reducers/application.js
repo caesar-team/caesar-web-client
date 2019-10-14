@@ -14,6 +14,7 @@ const initialState = {
   availableCoresCount: DEFAULT_CORES_COUNT,
   globalNotification: {
     isLoading: false,
+    isError: false,
     text: '',
   },
   versions: {

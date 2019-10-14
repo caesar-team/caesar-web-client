@@ -35,7 +35,7 @@ export {
 export { ManageList } from './ManageList';
 export { MenuList } from './MenuList';
 export {
-  LoadingNotification,
+  GlobalNotification,
   NotificationConsumer,
   NotificationProvider,
   withNotification,

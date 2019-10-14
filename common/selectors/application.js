@@ -19,6 +19,11 @@ export const isLoadingGlobalNotificationSelector = createSelector(
   globalNotification => globalNotification.isLoading,
 );
 
+export const isErrorGlobalNotificationSelector = createSelector(
+  globalNotificationSelector,
+  globalNotification => globalNotification.isError,
+);
+
 export const globalNotificationTextSelector = createSelector(
   globalNotificationSelector,
   globalNotification => globalNotification.text,

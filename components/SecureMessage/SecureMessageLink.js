@@ -39,10 +39,11 @@ const stripHtml = html => {
   return tmp.textContent || tmp.innerText || '';
 };
 
+// eslint-disable-next-line
 const getLinkText = (link, password) => `Please, follow the link and enter the password
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-URL: <strong>${APP_URI}/message/${link}</strong>
-Password: <strong>${password}</strong>
+URL: ${APP_URI}/message/${link}
+Password: ${password}
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 Securely created with ${APP_URI}`;
 

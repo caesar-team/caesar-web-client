@@ -82,11 +82,13 @@ class Credentials extends Component {
       isTrashItem,
       isReadOnly,
       isSharedItem = false,
-      item: {
-        data: { login, pass, website, note, attachments = [] },
-      },
+      item,
       childItems,
     } = this.props;
+
+    const {
+      data: { login, pass, website, note, attachments = [] },
+    } = item;
 
     const pwd = isPasswordVisible ? pass : pass.replace(/./g, '*');
     const eyeIconName = isPasswordVisible ? 'eye-off' : 'eye-on';

@@ -4,8 +4,8 @@ import equal from 'fast-deep-equal';
 import memoize from 'memoize-one';
 import { FixedSizeList } from 'react-window';
 import AutoSizer from 'react-virtualized-auto-sizer';
-import { ITEM_TYPES, LIST_TYPE } from 'common/constants';
-import { Icon } from 'components';
+import { ITEM_TYPES } from 'common/constants';
+import { Icon, Can } from 'components';
 import FixedSizeItem from './FixedSizeItem';
 import ScrollbarVirtualList from './ScrollbarVirtualList';
 import EmptyList from './EmptyList';
@@ -170,14 +170,14 @@ const List = ({
     );
   };
 
-  const shouldShowAdd = workInProgressList.type === LIST_TYPE;
+  console.log('workInProgressList', workInProgressList);
 
   return (
     <Wrapper isEmpty={isEmpty}>
       {!isMultiItem && (
         <TitleWrapper>
           <Title>{workInProgressList.label}</Title>
-          {shouldShowAdd && (
+          <Can I="update" of={workInProgressList}>
             <Dropdown
               options={itemTypesOptions}
               onClick={onClickCreateItem}
@@ -193,7 +193,7 @@ const List = ({
                 />
               </CreateButton>
             </Dropdown>
-          )}
+          </Can>
         </TitleWrapper>
       )}
       {renderedList()}

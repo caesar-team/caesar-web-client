@@ -263,19 +263,20 @@ class ItemHeader extends Component {
       onClickShare,
       onClickRestoreItem,
       onToggleFavorites,
-      item: {
-        id: itemId,
-        teamId,
-        listId,
-        lastUpdated,
-        favorite,
-        ownerId,
-        data: { name },
-      },
+      item,
       childItems,
     } = this.props;
-
     const { currentTeamId, currentListId } = this.state;
+
+    const {
+      id: itemId,
+      teamId,
+      listId,
+      lastUpdated,
+      favorite,
+      ownerId,
+      data: { name },
+    } = item;
 
     if (isSharedItem) {
       return (
@@ -290,15 +291,15 @@ class ItemHeader extends Component {
       );
     }
 
-    const avatars = childItems.reduce((accumulator, item) => {
-      if (!membersById[item.userId]) {
+    const avatars = childItems.reduce((accumulator, childItem) => {
+      if (!membersById[childItem.userId]) {
         return accumulator;
       }
 
-      if (user.id === item.userId && user.id !== ownerId) {
+      if (user.id === childItem.userId && user.id !== ownerId) {
         accumulator.unshift(user);
-      } else if (ownerId !== item.userId) {
-        accumulator.push(membersById[item.userId]);
+      } else if (ownerId !== childItem.userId) {
+        accumulator.push(membersById[childItem.userId]);
       }
 
       return accumulator;

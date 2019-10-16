@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import styled from 'styled-components';
 import memoize from 'memoize-one';
-import { upperFirst } from 'common/utils/string';
 import { waitIdle } from 'common/utils/utils';
 import {
   ITEM_DOCUMENT_TYPE,
@@ -146,7 +145,7 @@ class DataStep extends Component {
       Cell: ({ original }) => (
         <Checkbox
           checked={!!selectedRows[original.index]}
-          onChange={this.handleSelectRow(original.index.toString())}
+          onChange={this.handleSelectRow(original.index)}
         />
       ),
       Header: props => (
@@ -306,6 +305,16 @@ class DataStep extends Component {
     this.handleChangeField(index, 'type', value);
   };
 
+  handleChangeTeamId = (_, value) => {
+    this.setState(prevState => ({
+      teamId: value,
+      listId:
+        prevState.teamId !== value
+          ? this.props.teamsLists.find(({ id }) => id === value).lists[0].id
+          : prevState.listId,
+    }));
+  };
+
   handleChangeListId = (_, value) => {
     this.setState({
       listId: value,
@@ -320,7 +329,8 @@ class DataStep extends Component {
 
   prepareInitialState() {
     return {
-      listId: this.props.lists[0].id,
+      teamId: this.props.teamsLists[0].id,
+      listId: this.props.teamsLists[0].lists[0].id,
       filterText: '',
       selectedRows: normalize(this.props.data),
       data: this.props.data,
@@ -329,14 +339,27 @@ class DataStep extends Component {
   }
 
   render() {
-    const { lists, onCancel } = this.props;
-    const { data, selectedRows, filterText, listId, isSubmitting } = this.state;
+    const { teamsLists, onCancel } = this.props;
+    const {
+      data,
+      selectedRows,
+      filterText,
+      teamId,
+      listId,
+      isSubmitting,
+    } = this.state;
 
     const selectedRowsLength = denormalize(selectedRows).length;
 
-    const options = lists.map(({ label, id }) => ({
+    const teamOptions = teamsLists.map(({ id, name }) => ({
       value: id,
-      label: upperFirst(label),
+      label: name.toLowerCase(),
+    }));
+
+    const currentTeam = teamsLists.find(({ id }) => id === teamId);
+    const currentTeamListsOptions = currentTeam.lists.map(({ id, label }) => ({
+      value: id,
+      label: label.toLowerCase(),
     }));
 
     const isButtonDisabled = isSubmitting || !selectedRowsLength;
@@ -356,10 +379,16 @@ class DataStep extends Component {
           columns={this.getColumns()}
         />
         <SelectListWrapper>
-          <MoveToText>Move to list:</MoveToText>
+          <MoveToText>Select team and list of importing:</MoveToText>
           <StyledSelect
             boxDirection="up"
-            options={options}
+            options={teamOptions}
+            value={teamId}
+            onChange={this.handleChangeTeamId}
+          />
+          <StyledSelect
+            boxDirection="up"
+            options={currentTeamListsOptions}
             value={listId}
             onChange={this.handleChangeListId}
           />

@@ -178,7 +178,7 @@ export function* removeItemsBatchSaga({ payload: { listId } }) {
 
 export function* shareItemBatchSaga({
   payload: {
-    data: { itemIds, members, teamIds },
+    data: { itemIds = [], members = [], teamIds = [] },
     options: { includeIniciator = true },
   },
 }) {
@@ -448,6 +448,7 @@ export function* createItemsBatchSaga({
   meta: { setSubmitting },
 }) {
   try {
+    const list = yield select(listSelector, { listId });
     const keyPair = yield select(keyPairSelector);
     const user = yield select(userDataSelector);
 
@@ -489,6 +490,20 @@ export function* createItemsBatchSaga({
 
     yield put(createItemsBatchSuccess(preparedForStoreItems));
     yield put(addItemsBatchToList(data.map(({ id }) => id), listId));
+
+    if (list.teamId) {
+      yield fork(shareItemBatchSaga, {
+        payload: {
+          data: {
+            itemIds: data.map(({ id }) => id),
+            teamIds: [list.teamId],
+          },
+          options: {
+            includeIniciator: false,
+          },
+        },
+      });
+    }
   } catch (error) {
     console.log(error);
     yield put(createItemsBatchFailure());

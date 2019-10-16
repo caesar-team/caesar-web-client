@@ -14,7 +14,11 @@ import {
   InviteModal,
   Can,
 } from 'components';
-import { COMMANDS_ROLES, DEFAULT_TEAM_TYPE } from 'common/constants';
+import {
+  COMMANDS_ROLES,
+  DEFAULT_TEAM_TYPE,
+  DELETE_PERMISSION,
+} from 'common/constants';
 
 const LogoWrapper = styled.div`
   display: flex;
@@ -360,7 +364,7 @@ class TeamContainer extends Component {
       resizable: false,
       width: columnWidths.menu,
       Cell: ({ original }) => (
-        <Can I="update" of={team}>
+        <Can I={DELETE_PERMISSION} of={team}>
           <MenuField>
             <DottedMenu
               tooltipProps={{

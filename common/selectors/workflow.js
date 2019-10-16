@@ -23,15 +23,27 @@ export const isErrorSelector = createSelector(
 export const workInProgressItemSelector = createSelector(
   workflowSelector,
   teamsByIdSelector,
-  (workflow, teamsById) => {
+  listsByIdSelector,
+  (workflow, teamsById, listById) => {
     const { workInProgressItem } = workflow;
 
-    const userRole =
-      workInProgressItem && workInProgressItem.teamId
-        ? teamsById[workInProgressItem.teamId].userRole
+    const list =
+      workInProgressItem && workInProgressItem.listId
+        ? listById[workInProgressItem.listId]
         : null;
 
-    return workInProgressItem ? { ...workInProgressItem, userRole } : null;
+    const team =
+      workInProgressItem && workInProgressItem.teamId
+        ? teamsById[workInProgressItem.teamId]
+        : null;
+
+    return workInProgressItem
+      ? {
+          ...workInProgressItem,
+          userRole: team ? team.userRole : null,
+          listType: list ? list.type : null,
+        }
+      : null;
   },
 );
 

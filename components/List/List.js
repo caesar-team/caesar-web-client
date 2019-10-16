@@ -4,7 +4,7 @@ import equal from 'fast-deep-equal';
 import memoize from 'memoize-one';
 import { FixedSizeList } from 'react-window';
 import AutoSizer from 'react-virtualized-auto-sizer';
-import { ITEM_TYPES } from 'common/constants';
+import { ITEM_TYPES, UPDATE_PERMISSION } from 'common/constants';
 import { Icon, Can } from 'components';
 import FixedSizeItem from './FixedSizeItem';
 import ScrollbarVirtualList from './ScrollbarVirtualList';
@@ -177,7 +177,7 @@ const List = ({
       {!isMultiItem && (
         <TitleWrapper>
           <Title>{workInProgressList.label}</Title>
-          <Can I="update" of={workInProgressList}>
+          <Can I={UPDATE_PERMISSION} of={workInProgressList}>
             <Dropdown
               options={itemTypesOptions}
               onClick={onClickCreateItem}

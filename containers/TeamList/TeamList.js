@@ -8,7 +8,7 @@ import {
   ConfirmModal,
   Can,
 } from 'components';
-import { DEFAULT_TEAM_TYPE } from '../../common/constants';
+import { DEFAULT_TEAM_TYPE, CREATE_PERMISSION, TEAM_ENTITY_TYPE } from 'common/constants';
 
 const LogoWrapper = styled.div`
   display: flex;
@@ -170,7 +170,7 @@ class TeamListContainer extends Component {
       <Wrapper>
         <TopWrapper>
           <Title>Teams</Title>
-          <Can I="create" of="Team">
+          <Can I={CREATE_PERMISSION} of={TEAM_ENTITY_TYPE}>
             <Button
               withOfflineCheck
               onClick={this.handleOpenModal(NEW_TEAM_MODAL)}

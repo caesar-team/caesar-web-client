@@ -2,16 +2,26 @@ import { AbilityBuilder } from '@casl/ability';
 import {
   COMMANDS_ROLES,
   DOMAIN_ROLES,
-  CHILD_ITEM_ENTITY_TYPE,
-  ITEM_ENTITY_TYPE,
-  LIST_ENTITY_TYPE,
-  TEAM_ENTITY_TYPE,
-  MEMBER_ENTITY_TYPE,
+  PERMISSIONS,
+  ENTITIES,
+  EXTRA_ACTIONS,
   LIST_TYPE,
 } from './constants';
 
+const { TEAM_ENTITY_TYPE, ITEM_ENTITY_TYPE, LIST_ENTITY_TYPE } = ENTITIES;
+
+const {
+  CRUD_PERMISSION,
+  CREATE_PERMISSION,
+  READ_PERMISSION,
+  UPDATE_PERMISSION,
+  DELETE_PERMISSION,
+} = PERMISSIONS;
+
+const ALL = 'all';
+
 function subjectName(subject) {
-  console.log('subject', subject);
+  // console.log('subject', subject);
   if (!subject || typeof subject === 'string') {
     return subject;
   }
@@ -19,58 +29,61 @@ function subjectName(subject) {
   return subject.__type;
 }
 
-const defineRulesForUnknownUser = cannot => {
-  cannot('crud', TEAM_ENTITY_TYPE);
-  cannot('crud', LIST_ENTITY_TYPE);
-  cannot('crud', ITEM_ENTITY_TYPE);
-  cannot('crud', CHILD_ITEM_ENTITY_TYPE);
-  cannot('crud', MEMBER_ENTITY_TYPE);
-};
+const defineRulesForUnknownUser = cannot => cannot(CRUD_PERMISSION, ALL);
 
-const defineAdminRules = can => {
-  can('crud', TEAM_ENTITY_TYPE);
-  can('crud', LIST_ENTITY_TYPE);
-  can('crud', ITEM_ENTITY_TYPE);
-  can('crud', CHILD_ITEM_ENTITY_TYPE);
-  can('crud', MEMBER_ENTITY_TYPE);
+const defineRulesForAdminUser = can => {
+  can(CRUD_PERMISSION, TEAM_ENTITY_TYPE);
+  can(CRUD_PERMISSION, LIST_ENTITY_TYPE, { type: { $eq: LIST_TYPE } });
+  can(CRUD_PERMISSION, ITEM_ENTITY_TYPE);
+  can(CRUD_PERMISSION, TEAM_ENTITY_TYPE);
 };
 
 const defineCommandSubjectRules = (user, can) => {
   // command admin rules
-  can('update', TEAM_ENTITY_TYPE, {
+  can(UPDATE_PERMISSION, TEAM_ENTITY_TYPE, {
     userRole: COMMANDS_ROLES.USER_ROLE_ADMIN,
   });
-  can('crud', LIST_ENTITY_TYPE, {
+
+  can(CRUD_PERMISSION, LIST_ENTITY_TYPE, {
     teamId: { $ne: null },
-    type: { $eq: LIST_TYPE },
+    type: LIST_TYPE,
     userRole: COMMANDS_ROLES.USER_ROLE_ADMIN,
   });
-  can('crud', ITEM_ENTITY_TYPE, {
+
+  can(CRUD_PERMISSION, ITEM_ENTITY_TYPE, {
     teamId: { $ne: null },
     userRole: COMMANDS_ROLES.USER_ROLE_ADMIN,
   });
 
   // command member rules
-  can('read', TEAM_ENTITY_TYPE, {
+  can(READ_PERMISSION, TEAM_ENTITY_TYPE, {
     teamId: { $ne: null },
     userRole: COMMANDS_ROLES.USER_ROLE_MEMBER,
   });
-  can('read', LIST_ENTITY_TYPE, {
+
+  can(READ_PERMISSION, LIST_ENTITY_TYPE, {
     teamId: { $ne: null },
     userRole: COMMANDS_ROLES.USER_ROLE_MEMBER,
   });
-  can('read', ITEM_ENTITY_TYPE, {
+
+  can(READ_PERMISSION, ITEM_ENTITY_TYPE, {
     teamId: { $ne: null },
     userRole: COMMANDS_ROLES.USER_ROLE_MEMBER,
   });
 };
 
 const definePersonalSubjectRules = (user, can) => {
-  can('crud', LIST_ENTITY_TYPE, {
-    teamId: { $eq: null },
-    type: { $eq: LIST_TYPE },
+  can(CRUD_PERMISSION, LIST_ENTITY_TYPE, {
+    teamId: null,
+    type: LIST_TYPE,
   });
-  can('crud', ITEM_ENTITY_TYPE, { teamId: { $eq: null } });
+
+  can(CREATE_PERMISSION, ITEM_ENTITY_TYPE, { teamId: null });
+  can(UPDATE_PERMISSION, ITEM_ENTITY_TYPE, {
+    teamId: null,
+    ownerId: user.id,
+  });
+  can(DELETE_PERMISSION, ITEM_ENTITY_TYPE, { teamId: null });
 };
 
 export const createAbility = user => {
@@ -79,7 +92,7 @@ export const createAbility = user => {
   }
 
   if (user.roles.includes(DOMAIN_ROLES.ROLE_ADMIN)) {
-    return AbilityBuilder.define(defineAdminRules);
+    return AbilityBuilder.define(defineRulesForAdminUser);
   }
 
   return AbilityBuilder.define({ subjectName }, can => {

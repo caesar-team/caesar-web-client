@@ -3,6 +3,7 @@ import styled from 'styled-components';
 import Link from 'next/link';
 import memoizeOne from 'memoize-one';
 import { Button, AvatarsList, Can } from 'components';
+import { DELETE_PERMISSION } from 'common/constants';
 
 const Wrapper = styled.div`
   display: flex;
@@ -95,7 +96,7 @@ const TeamCard = ({
           />
         )}
         {isRemoveButtonVisible && (
-          <Can I="delete" of={team}>
+          <Can I={DELETE_PERMISSION} of={team}>
             <Button color="white" onClick={onClickRemoveTeam}>
               Remove
             </Button>

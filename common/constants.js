@@ -161,3 +161,35 @@ export const ITEM_ENTITY_TYPE = 'Item';
 export const LIST_ENTITY_TYPE = 'List';
 export const TEAM_ENTITY_TYPE = 'Team';
 export const MEMBER_ENTITY_TYPE = 'Member';
+
+export const ENTITIES = {
+  CHILD_ITEM_ENTITY_TYPE,
+  ITEM_ENTITY_TYPE,
+  LIST_ENTITY_TYPE,
+  TEAM_ENTITY_TYPE,
+  MEMBER_ENTITY_TYPE,
+};
+
+export const CRUD_PERMISSION = 'crud';
+export const CREATE_PERMISSION = 'create';
+export const READ_PERMISSION = 'read';
+export const UPDATE_PERMISSION = 'update';
+export const DELETE_PERMISSION = 'delete';
+
+export const PERMISSIONS = {
+  CRUD_PERMISSION,
+  CREATE_PERMISSION,
+  READ_PERMISSION,
+  UPDATE_PERMISSION,
+  DELETE_PERMISSION,
+};
+
+export const MOVE_EXTRA_ACTION = 'move';
+export const SHARE_EXTRA_ACTION = 'share';
+export const UPDATE_COMMAND_ROLE_EXTRA_ACTION = 'updateCommandRole';
+
+export const EXTRA_ACTIONS = {
+  MOVE_EXTRA_ACTION,
+  SHARE_EXTRA_ACTION,
+  UPDATE_COMMAND_ROLE_EXTRA_ACTION,
+};

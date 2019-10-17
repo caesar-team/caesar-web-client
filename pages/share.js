@@ -28,15 +28,18 @@ SharePage.getInitialProps = async ({
 }) => {
   const shared = base64ToObject(encryption);
   const isFieldsValidated = validateFields(shared, validFields);
-  
+
   if (!shared || !isFieldsValidated) {
-    const cause = "";
-    if(!shared) {
-      cause += "404 caused by the shared variable. \n";
+    let cause = '';
+
+    if (!shared) {
+      cause += '404 caused by the shared variable. \n';
     }
-    if(!isFieldsValidated) {
-      cause += "404 caused by the isFieldsValidated function. \n";
+
+    if (!isFieldsValidated) {
+      cause += '404 caused by the isFieldsValidated function. \n';
     }
+
     console.error(cause);
     return { statusCode: 404 };
   }

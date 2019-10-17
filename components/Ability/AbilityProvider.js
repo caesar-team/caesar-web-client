@@ -13,8 +13,6 @@ class AbilityProvider extends PureComponent {
 
     const ability = createAbility(userData);
 
-    console.log('ability rules', ability.rules);
-
     return <Provider value={ability}>{children}</Provider>;
   }
 }

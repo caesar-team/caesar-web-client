@@ -18,6 +18,8 @@ import {
   COMMANDS_ROLES,
   DEFAULT_TEAM_TYPE,
   DELETE_PERMISSION,
+  CHANGE_TEAM_MEMBER_ROLE_PERMISSION,
+  JOIN_MEMBER_TO_TEAM,
 } from 'common/constants';
 
 const LogoWrapper = styled.div`
@@ -278,8 +280,6 @@ class TeamContainer extends Component {
     const { team } = this.props;
     const { filter } = this.state;
 
-    console.log('team', team);
-
     const columnWidths = this.calculateColumnWidths();
 
     const nameColumn = {
@@ -339,7 +339,7 @@ class TeamContainer extends Component {
       width: columnWidths.role,
       Cell: ({ original }) => (
         <RoleField>
-          <Can I="change_team_member_role" of={team}>
+          <Can I={CHANGE_TEAM_MEMBER_ROLE_PERMISSION} of={team}>
             <SelectStyled
               name="role"
               value={original.role}
@@ -347,7 +347,7 @@ class TeamContainer extends Component {
               onChange={this.handleChangeRole(original.id)}
             />
           </Can>
-          <Can not I="change_team_member_role" of={team}>
+          <Can not I={CHANGE_TEAM_MEMBER_ROLE_PERMISSION} of={team}>
             {original.role}
           </Can>
         </RoleField>
@@ -498,7 +498,7 @@ class TeamContainer extends Component {
         <TopWrapper>
           <Title>{team.title}</Title>
           {!isDefaultTeam && (
-            <Can I="change_team_member_role" of={team}>
+            <Can I={JOIN_MEMBER_TO_TEAM} of={team}>
               <ButtonsWrapper>
                 <ButtonStyled
                   withOfflineCheck

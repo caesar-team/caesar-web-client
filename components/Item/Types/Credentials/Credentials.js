@@ -1,7 +1,8 @@
 import React, { Component } from 'react';
 import styled from 'styled-components';
 import copy from 'copy-text-to-clipboard';
-import { Icon, Label, HoldClickBehaviour } from 'components';
+import { Icon, Label, HoldClickBehaviour, Can } from 'components';
+import { DELETE_PERMISSION } from 'common/constants';
 import {
   Wrapper,
   Row,
@@ -158,16 +159,18 @@ class Credentials extends Component {
         </FieldWrapper>
         {shouldShowAttachments && <Attachments attachments={attachments} />}
         {shouldShowRemove && (
-          <RemoveButtonWrapper>
-            <RemoveButton
-              withOfflineCheck
-              color="white"
-              icon="trash"
-              onClick={onClickMoveToTrash}
-            >
-              Remove
-            </RemoveButton>
-          </RemoveButtonWrapper>
+          <Can I={DELETE_PERMISSION} of={item}>
+            <RemoveButtonWrapper>
+              <RemoveButton
+                withOfflineCheck
+                color="white"
+                icon="trash"
+                onClick={onClickMoveToTrash}
+              >
+                Remove
+              </RemoveButton>
+            </RemoveButtonWrapper>
+          </Can>
         )}
       </Wrapper>
     );

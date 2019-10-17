@@ -4,7 +4,6 @@ import {
   DOMAIN_ROLES,
   PERMISSIONS,
   ENTITIES,
-  EXTRA_ACTIONS,
   LIST_TYPE,
 } from './constants';
 
@@ -13,9 +12,12 @@ const { TEAM_ENTITY_TYPE, ITEM_ENTITY_TYPE, LIST_ENTITY_TYPE } = ENTITIES;
 const {
   CRUD_PERMISSION,
   CREATE_PERMISSION,
-  READ_PERMISSION,
   UPDATE_PERMISSION,
   DELETE_PERMISSION,
+  CHANGE_TEAM_MEMBER_ROLE_PERMISSION,
+  JOIN_MEMBER_TO_TEAM,
+  MOVE_ITEM_PERMISSION,
+  SHARE_ITEM_PERMISSION,
 } = PERMISSIONS;
 
 const ALL = 'all';
@@ -33,57 +35,60 @@ const defineRulesForUnknownUser = cannot => cannot(CRUD_PERMISSION, ALL);
 
 const defineRulesForAdminUser = can => {
   can(CRUD_PERMISSION, TEAM_ENTITY_TYPE);
-  can(CRUD_PERMISSION, LIST_ENTITY_TYPE, { type: { $eq: LIST_TYPE } });
+  can(CRUD_PERMISSION, LIST_ENTITY_TYPE, { type: LIST_TYPE });
   can(CRUD_PERMISSION, ITEM_ENTITY_TYPE);
   can(CRUD_PERMISSION, TEAM_ENTITY_TYPE);
+
+  can(CHANGE_TEAM_MEMBER_ROLE_PERMISSION, TEAM_ENTITY_TYPE);
+  can(JOIN_MEMBER_TO_TEAM, TEAM_ENTITY_TYPE);
+  can(MOVE_ITEM_PERMISSION, ITEM_ENTITY_TYPE);
 };
 
 const defineCommandSubjectRules = (user, can) => {
   // command admin rules
-  can('change_team_member_role', TEAM_ENTITY_TYPE, {
+  can(CHANGE_TEAM_MEMBER_ROLE_PERMISSION, TEAM_ENTITY_TYPE, {
     userRole: COMMANDS_ROLES.USER_ROLE_ADMIN,
   });
 
-  can(CRUD_PERMISSION, LIST_ENTITY_TYPE, {
-    teamId: { $ne: null },
-    type: LIST_TYPE,
+  can(JOIN_MEMBER_TO_TEAM, TEAM_ENTITY_TYPE, {
     userRole: COMMANDS_ROLES.USER_ROLE_ADMIN,
   });
 
   can(CRUD_PERMISSION, ITEM_ENTITY_TYPE, {
-    teamId: { $ne: null },
     userRole: COMMANDS_ROLES.USER_ROLE_ADMIN,
+    teamId: { $ne: null },
+    listType: LIST_TYPE,
   });
 
-  // command member rules
-  can(READ_PERMISSION, TEAM_ENTITY_TYPE, {
+  can(SHARE_ITEM_PERMISSION, ITEM_ENTITY_TYPE, {
+    userRole: COMMANDS_ROLES.USER_ROLE_ADMIN,
     teamId: { $ne: null },
-    userRole: COMMANDS_ROLES.USER_ROLE_MEMBER,
-  });
-
-  can(READ_PERMISSION, LIST_ENTITY_TYPE, {
-    teamId: { $ne: null },
-    userRole: COMMANDS_ROLES.USER_ROLE_MEMBER,
-  });
-
-  can(READ_PERMISSION, ITEM_ENTITY_TYPE, {
-    teamId: { $ne: null },
-    userRole: COMMANDS_ROLES.USER_ROLE_MEMBER,
   });
 };
 
 const definePersonalSubjectRules = (user, can) => {
-  can(CRUD_PERMISSION, LIST_ENTITY_TYPE, {
+  can(MOVE_ITEM_PERMISSION, ITEM_ENTITY_TYPE, {
     teamId: null,
-    type: LIST_TYPE,
   });
 
-  can(CREATE_PERMISSION, ITEM_ENTITY_TYPE, { teamId: null });
+  can(CREATE_PERMISSION, ITEM_ENTITY_TYPE, {
+    teamId: null,
+    listType: LIST_TYPE,
+  });
+
   can(UPDATE_PERMISSION, ITEM_ENTITY_TYPE, {
     teamId: null,
     ownerId: user.id,
   });
-  can(DELETE_PERMISSION, ITEM_ENTITY_TYPE, { teamId: null });
+
+  can(DELETE_PERMISSION, ITEM_ENTITY_TYPE, {
+    teamId: null,
+  });
+
+  can(SHARE_ITEM_PERMISSION, ITEM_ENTITY_TYPE, {
+    teamId: null,
+    ownerId: user.id,
+  });
 };
 
 export const createAbility = user => {
@@ -92,7 +97,7 @@ export const createAbility = user => {
   }
 
   if (user.roles.includes(DOMAIN_ROLES.ROLE_ADMIN)) {
-    return AbilityBuilder.define(defineRulesForAdminUser);
+    return AbilityBuilder.define({ subjectName }, defineRulesForAdminUser);
   }
 
   return AbilityBuilder.define({ subjectName }, can => {

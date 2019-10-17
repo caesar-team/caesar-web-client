@@ -4,7 +4,11 @@ import equal from 'fast-deep-equal';
 import memoize from 'memoize-one';
 import { FixedSizeList } from 'react-window';
 import AutoSizer from 'react-virtualized-auto-sizer';
-import { ITEM_TYPES, UPDATE_PERMISSION } from 'common/constants';
+import {
+  ITEM_TYPES,
+  CREATE_PERMISSION,
+  ITEM_ENTITY_TYPE,
+} from 'common/constants';
 import { Icon, Can } from 'components';
 import FixedSizeItem from './FixedSizeItem';
 import ScrollbarVirtualList from './ScrollbarVirtualList';
@@ -170,14 +174,19 @@ const List = ({
     );
   };
 
-  console.log('workInProgressList', workInProgressList);
+  const itemSubject = {
+    __type: ITEM_ENTITY_TYPE,
+    listType: workInProgressList.type,
+    teamId: workInProgressList.teamId,
+    userRole: workInProgressList.userRole,
+  };
 
   return (
     <Wrapper isEmpty={isEmpty}>
       {!isMultiItem && (
         <TitleWrapper>
           <Title>{workInProgressList.label}</Title>
-          <Can I={UPDATE_PERMISSION} of={workInProgressList}>
+          <Can I={CREATE_PERMISSION} of={itemSubject}>
             <Dropdown
               options={itemTypesOptions}
               onClick={onClickCreateItem}

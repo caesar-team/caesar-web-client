@@ -8,7 +8,11 @@ import {
   ConfirmModal,
   Can,
 } from 'components';
-import { DEFAULT_TEAM_TYPE, CREATE_PERMISSION, TEAM_ENTITY_TYPE } from 'common/constants';
+import {
+  DEFAULT_TEAM_TYPE,
+  CREATE_PERMISSION,
+  TEAM_ENTITY_TYPE,
+} from 'common/constants';
 
 const LogoWrapper = styled.div`
   display: flex;

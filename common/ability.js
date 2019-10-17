@@ -40,7 +40,7 @@ const defineRulesForAdminUser = can => {
 
 const defineCommandSubjectRules = (user, can) => {
   // command admin rules
-  can(UPDATE_PERMISSION, TEAM_ENTITY_TYPE, {
+  can('change_team_member_role', TEAM_ENTITY_TYPE, {
     userRole: COMMANDS_ROLES.USER_ROLE_ADMIN,
   });
 

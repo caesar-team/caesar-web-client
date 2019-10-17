@@ -170,11 +170,16 @@ export const ENTITIES = {
   MEMBER_ENTITY_TYPE,
 };
 
+// casl permissions
 export const CRUD_PERMISSION = 'crud';
 export const CREATE_PERMISSION = 'create';
 export const READ_PERMISSION = 'read';
 export const UPDATE_PERMISSION = 'update';
 export const DELETE_PERMISSION = 'delete';
+
+// custom permissions
+export const CHANGE_TEAM_MEMBER_ROLE_PERMISSION = 'changeRole';
+export const MOVE_ITEM_PERMISSION = 'moveItem';
 
 export const PERMISSIONS = {
   CRUD_PERMISSION,
@@ -182,14 +187,7 @@ export const PERMISSIONS = {
   READ_PERMISSION,
   UPDATE_PERMISSION,
   DELETE_PERMISSION,
-};
 
-export const MOVE_EXTRA_ACTION = 'move';
-export const SHARE_EXTRA_ACTION = 'share';
-export const UPDATE_COMMAND_ROLE_EXTRA_ACTION = 'updateCommandRole';
-
-export const EXTRA_ACTIONS = {
-  MOVE_EXTRA_ACTION,
-  SHARE_EXTRA_ACTION,
-  UPDATE_COMMAND_ROLE_EXTRA_ACTION,
+  CHANGE_TEAM_MEMBER_ROLE_PERMISSION,
+  MOVE_ITEM_PERMISSION,
 };

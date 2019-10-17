@@ -339,7 +339,7 @@ class TeamContainer extends Component {
       width: columnWidths.role,
       Cell: ({ original }) => (
         <RoleField>
-          <Can I="update" of={team}>
+          <Can I="change_team_member_role" of={team}>
             <SelectStyled
               name="role"
               value={original.role}
@@ -347,7 +347,7 @@ class TeamContainer extends Component {
               onChange={this.handleChangeRole(original.id)}
             />
           </Can>
-          <Can not I="update" of={team}>
+          <Can not I="change_team_member_role" of={team}>
             {original.role}
           </Can>
         </RoleField>
@@ -498,7 +498,7 @@ class TeamContainer extends Component {
         <TopWrapper>
           <Title>{team.title}</Title>
           {!isDefaultTeam && (
-            <Can I="update" of={team}>
+            <Can I="change_team_member_role" of={team}>
               <ButtonsWrapper>
                 <ButtonStyled
                   withOfflineCheck

@@ -58,7 +58,11 @@ const AvatarsWrapper = styled.div`
 `;
 
 const getMembers = memoizeOne((users, members) =>
-  users.map(({ id }) => members.find(member => member.id === id)),
+  users.reduce((accumulator, { id }) => {
+    const member = members.find(user => user.id === id);
+
+    return member ? [...accumulator, member] : accumulator;
+  }, []),
 );
 
 const TeamCard = ({

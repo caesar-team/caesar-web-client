@@ -99,7 +99,11 @@ class ManageList extends Component {
     const generateAvatars = invites => {
       const invitedUserIds = [...new Set(invites.map(invite => invite.userId))];
 
-      return invitedUserIds.map(userId => members[userId]);
+      return invitedUserIds.reduce(
+        (accumulator, userId) =>
+          members[userId] ? [...accumulator, members[userId]] : accumulator,
+        [],
+      );
     };
 
     const filteredList = lists.filter(

@@ -44,6 +44,12 @@ app.prepare().then(() => {
     res.redirect('/signin');
   });
 
+  // BE endpoint
+  // eslint-disable-next-line
+  server.get('/srp_login_confirm', (req, res, next) => {
+    next();
+  });
+
   server.get('/check_auth', (req, res) => {
     const token = req.query && req.query.jwt;
 

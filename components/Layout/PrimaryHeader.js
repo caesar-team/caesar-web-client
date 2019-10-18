@@ -172,9 +172,7 @@ class PrimaryHeader extends PureComponent {
           </Link>
         </Option>
         <Option key="logout" onClick={this.props.logout}>
-          <Link href="/logout">
-            <Anchor>Logout</Anchor>
-          </Link>
+          <Anchor>Logout</Anchor>
         </Option>
       </Fragment>
     );

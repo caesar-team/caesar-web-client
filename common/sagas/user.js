@@ -1,5 +1,4 @@
 import { put, call, takeLatest, select } from 'redux-saga/effects';
-import Router from 'next/router';
 import {
   FETCH_USER_SELF_REQUEST,
   FETCH_KEY_PAIR_REQUEST,
@@ -72,10 +71,10 @@ export function* fetchUserTeamsSaga() {
 }
 
 export function* logoutSaga() {
-  console.log('logoutSaga');
   try {
-    localStorage.clear();
-    yield call(Router.push, '/logout');
+    yield call([localStorage, localStorage.clear]);
+    // eslint-disable-next-line
+    yield call(() => (window.location.href = '/logout'));
   } catch (error) {
     console.log('error', error);
   }

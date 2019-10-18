@@ -6,6 +6,7 @@ import {
 import { itemsByIdSelector } from 'common/selectors/entities/item';
 import { childItemsByIdSelector } from 'common/selectors/entities/childItem';
 import { membersByIdSelector } from 'common/selectors/entities/member';
+import { teamsByIdSelector } from 'common/selectors/entities/team';
 
 export const workflowSelector = state => state.workflow;
 
@@ -21,7 +22,29 @@ export const isErrorSelector = createSelector(
 
 export const workInProgressItemSelector = createSelector(
   workflowSelector,
-  workflow => workflow.workInProgressItem,
+  teamsByIdSelector,
+  listsByIdSelector,
+  (workflow, teamsById, listById) => {
+    const { workInProgressItem } = workflow;
+
+    const list =
+      workInProgressItem && workInProgressItem.listId
+        ? listById[workInProgressItem.listId]
+        : null;
+
+    const team =
+      workInProgressItem && workInProgressItem.teamId
+        ? teamsById[workInProgressItem.teamId]
+        : null;
+
+    return workInProgressItem
+      ? {
+          ...workInProgressItem,
+          userRole: team ? team.userRole : null,
+          listType: list ? list.type : null,
+        }
+      : null;
+  },
 );
 
 export const workInProgressItemOwnerSelector = createSelector(
@@ -78,8 +101,20 @@ export const workInProgressItemIdsSelector = createSelector(
 
 export const workInProgressListSelector = createSelector(
   listsByIdSelector,
+  teamsByIdSelector,
   workInProgressListIdSelector,
-  (listsById, workInProgressListId) => listsById[workInProgressListId],
+  (listsById, teamsById, workInProgressListId) => {
+    const list = listsById[workInProgressListId];
+    const userRole =
+      list && list.teamId ? teamsById[list.teamId].userRole : null;
+
+    return list
+      ? {
+          ...list,
+          userRole,
+        }
+      : null;
+  },
 );
 
 export const workInProgressItemsSelector = createSelector(

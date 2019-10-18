@@ -8,6 +8,13 @@ import { Button } from 'components/Button';
 import { Avatar, AvatarsList } from 'components/Avatar';
 import { withOfflineDetection } from 'components/Offline';
 import { Dropdown } from 'components/Dropdown';
+import { Can, AbilityContext } from 'components/Ability';
+import {
+  MOVE_ITEM_PERMISSION,
+  DELETE_PERMISSION,
+  UPDATE_PERMISSION,
+  SHARE_ITEM_PERMISSION,
+} from 'common/constants';
 import { Row } from './Row';
 
 const StyledRow = styled(Row)`
@@ -263,19 +270,20 @@ class ItemHeader extends Component {
       onClickShare,
       onClickRestoreItem,
       onToggleFavorites,
-      item: {
-        id: itemId,
-        teamId,
-        listId,
-        lastUpdated,
-        favorite,
-        ownerId,
-        data: { name },
-      },
+      item,
       childItems,
     } = this.props;
-
     const { currentTeamId, currentListId } = this.state;
+
+    const {
+      id: itemId,
+      teamId,
+      listId,
+      lastUpdated,
+      favorite,
+      ownerId,
+      data: { name },
+    } = item;
 
     if (isSharedItem) {
       return (
@@ -290,15 +298,15 @@ class ItemHeader extends Component {
       );
     }
 
-    const avatars = childItems.reduce((accumulator, item) => {
-      if (!membersById[item.userId]) {
+    const avatars = childItems.reduce((accumulator, childItem) => {
+      if (!membersById[childItem.userId]) {
         return accumulator;
       }
 
-      if (user.id === item.userId && user.id !== ownerId) {
+      if (user.id === childItem.userId && user.id !== ownerId) {
         accumulator.unshift(user);
-      } else if (ownerId !== item.userId) {
-        accumulator.push(membersById[item.userId]);
+      } else if (ownerId !== childItem.userId) {
+        accumulator.push(membersById[childItem.userId]);
       }
 
       return accumulator;
@@ -317,8 +325,12 @@ class ItemHeader extends Component {
     const teamOptions = generateTeamOptions(teamsLists, currentTeam.id);
     const listOptions = generateListOptions(currentTeam.lists, currentListId);
 
-    const shouldShowTeamDropdownIcon = teamOptions.length >= 1;
-    const shouldShowListDropdownIcon = listOptions.length >= 1;
+    const shouldShowTeamDropdownIcon =
+      this.context.can(MOVE_ITEM_PERMISSION, item) && teamOptions.length >= 1;
+
+    const shouldShowListDropdownIcon =
+      this.context.can(MOVE_ITEM_PERMISSION, item) && listOptions.length >= 1;
+
     const shouldShowMoveButton =
       listId !== currentListId || teamId !== currentTeamId;
 
@@ -380,31 +392,37 @@ class ItemHeader extends Component {
           <Row>
             {isTrashItem ? (
               <ButtonsWrapper>
-                <Button
-                  withOfflineCheck
-                  color="white"
-                  onClick={onClickRestoreItem}
-                >
-                  RESTORE
-                </Button>
-                <ItemButton
-                  color="white"
-                  icon="trash"
-                  onClick={onClickRemoveItem}
-                >
-                  REMOVE
-                </ItemButton>
+                <Can I={MOVE_ITEM_PERMISSION} of={item}>
+                  <Button
+                    withOfflineCheck
+                    color="white"
+                    onClick={onClickRestoreItem}
+                  >
+                    RESTORE
+                  </Button>
+                </Can>
+                <Can I={DELETE_PERMISSION} of={item}>
+                  <ItemButton
+                    color="white"
+                    icon="trash"
+                    onClick={onClickRemoveItem}
+                  >
+                    REMOVE
+                  </ItemButton>
+                </Can>
               </ButtonsWrapper>
             ) : (
               hasWriteAccess && (
-                <EditButton
-                  withOfflineCheck
-                  color="white"
-                  icon="pencil"
-                  onClick={onClickEditItem}
-                >
-                  EDIT
-                </EditButton>
+                <Can I={UPDATE_PERMISSION} of={item}>
+                  <EditButton
+                    withOfflineCheck
+                    color="white"
+                    icon="pencil"
+                    onClick={onClickEditItem}
+                  >
+                    EDIT
+                  </EditButton>
+                </Can>
               )
             )}
             <ItemButton color="white" icon="close" onClick={onClickCloseItem} />
@@ -437,19 +455,21 @@ class ItemHeader extends Component {
           </Row>
           <Row>
             {!isTrashItem && isOwner && (
-              <ShareButton
-                disabled={!isOnline}
-                onClick={onClickShare}
-                hasInvited={hasInvited}
-              >
-                <Icon
-                  isInButton
-                  withOfflineCheck
-                  name="plus"
-                  width={14}
-                  height={14}
-                />
-              </ShareButton>
+              <Can I={SHARE_ITEM_PERMISSION} of={item}>
+                <ShareButton
+                  disabled={!isOnline}
+                  onClick={onClickShare}
+                  hasInvited={hasInvited}
+                >
+                  <Icon
+                    isInButton
+                    withOfflineCheck
+                    name="plus"
+                    width={14}
+                    height={14}
+                  />
+                </ShareButton>
+              </Can>
             )}
             <StyledAvatarsList avatars={avatars} />
           </Row>
@@ -458,5 +478,7 @@ class ItemHeader extends Component {
     );
   }
 }
+
+ItemHeader.contextType = AbilityContext;
 
 export default withOfflineDetection(ItemHeader);

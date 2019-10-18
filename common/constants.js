@@ -161,3 +161,37 @@ export const ITEM_ENTITY_TYPE = 'Item';
 export const LIST_ENTITY_TYPE = 'List';
 export const TEAM_ENTITY_TYPE = 'Team';
 export const MEMBER_ENTITY_TYPE = 'Member';
+
+export const ENTITIES = {
+  CHILD_ITEM_ENTITY_TYPE,
+  ITEM_ENTITY_TYPE,
+  LIST_ENTITY_TYPE,
+  TEAM_ENTITY_TYPE,
+  MEMBER_ENTITY_TYPE,
+};
+
+// casl permissions
+export const CRUD_PERMISSION = 'crud';
+export const CREATE_PERMISSION = 'create';
+export const READ_PERMISSION = 'read';
+export const UPDATE_PERMISSION = 'update';
+export const DELETE_PERMISSION = 'delete';
+
+// custom permissions
+export const CHANGE_TEAM_MEMBER_ROLE_PERMISSION = 'changeRole';
+export const JOIN_MEMBER_TO_TEAM = 'joinMember';
+export const MOVE_ITEM_PERMISSION = 'moveItem';
+export const SHARE_ITEM_PERMISSION = 'share';
+
+export const PERMISSIONS = {
+  CRUD_PERMISSION,
+  CREATE_PERMISSION,
+  READ_PERMISSION,
+  UPDATE_PERMISSION,
+  DELETE_PERMISSION,
+
+  CHANGE_TEAM_MEMBER_ROLE_PERMISSION,
+  MOVE_ITEM_PERMISSION,
+  JOIN_MEMBER_TO_TEAM,
+  SHARE_ITEM_PERMISSION,
+};

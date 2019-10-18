@@ -2,7 +2,8 @@ import React from 'react';
 import styled from 'styled-components';
 import Link from 'next/link';
 import memoizeOne from 'memoize-one';
-import { Button, AvatarsList } from 'components';
+import { Button, AvatarsList, Can } from 'components';
+import { DELETE_PERMISSION } from 'common/constants';
 
 const Wrapper = styled.div`
   display: flex;
@@ -62,15 +63,13 @@ const getMembers = memoizeOne((users, members) =>
 
 const TeamCard = ({
   className,
-  id,
-  title,
-  icon,
-  users,
+  team,
   members,
   isRemoveButtonVisible = false,
   onClick = Function.prototype,
   onClickRemoveTeam = Function.prototype,
 }) => {
+  const { id, title, icon, users } = team;
   const areMembersAvailable = users && users.length > 0;
 
   return (
@@ -97,9 +96,11 @@ const TeamCard = ({
           />
         )}
         {isRemoveButtonVisible && (
-          <Button color="white" onClick={onClickRemoveTeam}>
-            Remove
-          </Button>
+          <Can I={DELETE_PERMISSION} of={team}>
+            <Button color="white" onClick={onClickRemoveTeam}>
+              Remove
+            </Button>
+          </Can>
         )}
       </AvatarsWrapper>
     </Wrapper>

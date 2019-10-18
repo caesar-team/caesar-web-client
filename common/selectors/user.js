@@ -28,6 +28,18 @@ export const userTeamIdsSelector = createSelector(
   user => user.teamIds,
 );
 
+export const caslUserDataSelector = createSelector(
+  userDataSelector,
+  userTeamIdsSelector,
+  (userData, userTeamIds) =>
+    userData
+      ? {
+          ...userData,
+          teamIds: userTeamIds,
+        }
+      : null,
+);
+
 export const userTeamListSelector = createSelector(
   teamsByIdSelector,
   userTeamIdsSelector,

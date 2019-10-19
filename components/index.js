@@ -1,4 +1,4 @@
-export { AbilityProvider, Can } from './Ability';
+export { AbilityProvider, Can, AbilityContext } from './Ability';
 export { Avatar, AvatarsList } from './Avatar';
 export { Badge } from './Badge';
 export { Breadcrumbs } from './Breadcrumbs';

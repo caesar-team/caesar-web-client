@@ -42,6 +42,7 @@ const CloseIcon = styled(IconStyled)`
 const GlobalNotification = ({
   text = 'Your request is in progress...',
   isError = false,
+  onClose = Function.prototype,
   className,
 }) => (
   <Wrapper className={className}>
@@ -52,7 +53,7 @@ const GlobalNotification = ({
         <CircleLoader size={16} color="white" />
       )}
       <Text>{text}</Text>
-      {isError && <CloseIcon name="close" />}
+      {isError && <CloseIcon name="close" onClick={onClose} />}
     </InnerWrapper>
   </Wrapper>
 );

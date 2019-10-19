@@ -64,6 +64,7 @@ import {
   postAddTeamMember,
   deleteTeamMember,
 } from 'common/api';
+import { getServerErrorMessage } from 'common/utils/error';
 import { convertTeamsToEntity } from 'common/normalizers/normalizers';
 import { COMMANDS_ROLES, TEAM_ENTITY_TYPE } from 'common/constants';
 import {
@@ -72,6 +73,7 @@ import {
 } from 'common/sagas/common/share';
 import { inviteNewMemberBatchSaga } from 'common/sagas/common/invite';
 import { createChildItemsFilterSelector } from 'common/selectors/entities/childItem';
+import { updateGlobalNotification } from 'common/actions/application';
 
 export function* fetchTeamsSaga() {
   try {
@@ -92,6 +94,9 @@ export function* fetchTeamsSaga() {
     );
   } catch (error) {
     console.log(error);
+    yield put(
+      updateGlobalNotification(getServerErrorMessage(error), false, true),
+    );
     yield put(fetchTeamsFailure());
   }
 }
@@ -103,6 +108,9 @@ export function* fetchTeamSaga({ payload: { teamId } }) {
     yield put(fetchTeamSuccess(data));
   } catch (error) {
     console.log(error);
+    yield put(
+      updateGlobalNotification(getServerErrorMessage(error), false, true),
+    );
     yield put(fetchTeamFailure());
   }
 }
@@ -119,6 +127,9 @@ export function* createTeamSaga({ payload: { title, icon } }) {
     yield put(joinTeam(data.id));
   } catch (error) {
     console.log(error);
+    yield put(
+      updateGlobalNotification(getServerErrorMessage(error), false, true),
+    );
     yield put(createTeamFailure());
   }
 }
@@ -145,6 +156,9 @@ export function* removeTeamSaga({ payload: { teamId } }) {
     );
   } catch (error) {
     console.log(error);
+    yield put(
+      updateGlobalNotification(getServerErrorMessage(error), false, true),
+    );
     yield put(removeTeamFailure());
   }
 }
@@ -158,6 +172,9 @@ export function* updateTeamMemberRoleSaga({
     yield put(updateTeamMemberRoleSuccess(teamId, userId, role));
   } catch (error) {
     console.log(error);
+    yield put(
+      updateGlobalNotification(getServerErrorMessage(error), false, true),
+    );
     yield put(updateTeamMemberRoleFailure());
   }
 }
@@ -253,6 +270,9 @@ export function* removeTeamMemberSaga({ payload: { teamId, userId } }) {
     yield put(removeChildItemsBatchFromItems(originalItemIds, childItemIds));
   } catch (error) {
     console.log(error);
+    yield put(
+      updateGlobalNotification(getServerErrorMessage(error), false, true),
+    );
     yield put(removeTeamMemberFailure());
   }
 }

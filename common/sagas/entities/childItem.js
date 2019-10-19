@@ -23,6 +23,7 @@ import {
   patchChildItemBatch,
   postCreateChildItemBatch,
 } from 'common/api';
+import { getServerErrorMessage } from 'common/utils/error';
 import {
   CHILD_ITEM_ENTITY_TYPE,
   INVITE_TYPE,
@@ -108,6 +109,10 @@ export function* createChildItemBatchSaga({ payload: { itemUserPairs } }) {
 
     yield put(createChildItemBatchFinishedEvent(shares));
   } catch (error) {
+    console.log(error);
+    yield put(
+      updateGlobalNotification(getServerErrorMessage(error), false, true),
+    );
     yield put(createChildItemBatchFailure());
   }
 }
@@ -160,6 +165,9 @@ export function* updateChildItemsBatchSaga({
     yield put(updateGlobalNotification(NOOP_NOTIFICATION, false));
   } catch (error) {
     console.log(error);
+    yield put(
+      updateGlobalNotification(getServerErrorMessage(error), false, true),
+    );
     yield put(updateChildItemsBatchFailure());
   }
 }
@@ -173,6 +181,10 @@ export function* changeChildItemPermissionSaga({
     yield put(changeChildItemPermissionSuccess(childItemId, permission));
     yield put(updateWorkInProgressItem());
   } catch (error) {
+    console.log(error);
+    yield put(
+      updateGlobalNotification(getServerErrorMessage(error), false, true),
+    );
     yield put(changeChildItemPermissionFailure());
   }
 }

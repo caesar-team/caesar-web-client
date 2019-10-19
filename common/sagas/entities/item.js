@@ -127,6 +127,7 @@ import {
   generateAnonymousEmail,
   getPrivateKeyObj,
 } from 'common/utils/cipherUtils';
+import { getServerErrorMessage } from 'common/utils/error';
 import { objectToBase64 } from 'common/utils/base64';
 import {
   ROLE_ANONYMOUS_USER,
@@ -140,7 +141,6 @@ import {
   ENCRYPTING_ITEM_NOTIFICATION,
   PREPARING_USERS_NOTIFICATION,
   MOVING_ITEM_NOTIFICATION,
-  MOVING_ITEMS_NOTIFICATION,
   REMOVING_ITEM_NOTIFICATION,
   REMOVING_ITEMS_NOTIFICATION,
   REMOVING_CHILD_ITEMS_NOTIFICATION,
@@ -177,6 +177,9 @@ export function* removeItemSaga({ payload: { itemId, listId } }) {
     yield put(updateGlobalNotification(NOOP_NOTIFICATION, false));
   } catch (error) {
     console.log(error);
+    yield put(
+      updateGlobalNotification(getServerErrorMessage(error), false, true),
+    );
     yield put(removeItemFailure());
   }
 }
@@ -202,13 +205,16 @@ export function* removeItemsBatchSaga({ payload: { listId } }) {
     yield put(updateGlobalNotification(NOOP_NOTIFICATION, false));
   } catch (error) {
     console.log(error);
+    yield put(
+      updateGlobalNotification(getServerErrorMessage(error), false, true),
+    );
     yield put(removeItemsBatchFailure());
   }
 }
 
 export function* shareItemBatchSaga({
   payload: {
-    data: { itemIds, members, teamIds },
+    data: { itemIds = [], members = [], teamIds = [] },
     options: { includeIniciator = true },
   },
 }) {
@@ -272,6 +278,9 @@ export function* shareItemBatchSaga({
     yield put(updateGlobalNotification(NOOP_NOTIFICATION, false));
   } catch (error) {
     console.log(error);
+    yield put(
+      updateGlobalNotification(getServerErrorMessage(error), false, true),
+    );
     yield put(shareItemBatchFailure());
   }
 }
@@ -292,6 +301,9 @@ export function* removeShareSaga({ payload: { shareId } }) {
     yield put(updateGlobalNotification(NOOP_NOTIFICATION, false));
   } catch (error) {
     console.log(error);
+    yield put(
+      updateGlobalNotification(getServerErrorMessage(error), false, true),
+    );
     yield put(removeShareFailure());
   }
 }
@@ -311,6 +323,9 @@ export function* toggleItemToFavoriteSaga({ payload: { itemId } }) {
     yield put(updateWorkInProgressItem(itemId));
   } catch (error) {
     console.log(error);
+    yield put(
+      updateGlobalNotification(getServerErrorMessage(error), false, true),
+    );
     yield put(toggleItemToFavoriteFailure());
   }
 }
@@ -407,6 +422,9 @@ export function* moveItemsBatchSaga({ payload: { itemIds, listId } }) {
     );
   } catch (error) {
     console.log(error);
+    yield put(
+      updateGlobalNotification(getServerErrorMessage(error), false, true),
+    );
     yield put(moveItemsBatchFailure());
   }
 }
@@ -499,6 +517,9 @@ export function* createItemSaga({
     }
   } catch (error) {
     console.log(error);
+    yield put(
+      updateGlobalNotification(getServerErrorMessage(error), false, true),
+    );
     yield put(createItemFailure());
   } finally {
     yield put(updateGlobalNotification(NOOP_NOTIFICATION, false));
@@ -511,6 +532,7 @@ export function* createItemsBatchSaga({
   meta: { setSubmitting },
 }) {
   try {
+    const list = yield select(listSelector, { listId });
     const keyPair = yield select(keyPairSelector);
     const user = yield select(userDataSelector);
 
@@ -552,8 +574,25 @@ export function* createItemsBatchSaga({
 
     yield put(createItemsBatchSuccess(preparedForStoreItems));
     yield put(addItemsBatchToList(data.map(({ id }) => id), listId));
+
+    if (list.teamId) {
+      yield fork(shareItemBatchSaga, {
+        payload: {
+          data: {
+            itemIds: data.map(({ id }) => id),
+            teamIds: [list.teamId],
+          },
+          options: {
+            includeIniciator: false,
+          },
+        },
+      });
+    }
   } catch (error) {
     console.log(error);
+    yield put(
+      updateGlobalNotification(getServerErrorMessage(error), false, true),
+    );
     yield put(createItemsBatchFailure());
   } finally {
     setSubmitting(false);
@@ -581,6 +620,9 @@ export function* updateItemSaga({ payload: { item } }) {
     yield put(updateGlobalNotification(NOOP_NOTIFICATION, false));
   } catch (error) {
     console.log(error);
+    yield put(
+      updateGlobalNotification(getServerErrorMessage(error), false, true),
+    );
     yield put(updateItemFailure());
   }
 }
@@ -625,6 +667,9 @@ export function* editItemSaga({ payload: { item }, meta: { setSubmitting } }) {
     yield put(updateWorkInProgressItem(editedItem.id, ITEM_REVIEW_MODE));
   } catch (error) {
     console.log(error);
+    yield put(
+      updateGlobalNotification(getServerErrorMessage(error), false, true),
+    );
     yield put(editItemFailure());
   } finally {
     setSubmitting(false);
@@ -659,6 +704,9 @@ export function* acceptItemSaga({ payload: { id } }) {
     yield put(updateWorkInProgressItem());
   } catch (error) {
     console.error(error);
+    yield put(
+      updateGlobalNotification(getServerErrorMessage(error), false, true),
+    );
     yield put(acceptItemUpdateFailure(error));
   }
 }
@@ -671,6 +719,9 @@ export function* rejectItemSaga({ payload: { id } }) {
     yield put(updateWorkInProgressItem());
   } catch (error) {
     console.log(error);
+    yield put(
+      updateGlobalNotification(getServerErrorMessage(error), false, true),
+    );
     yield put(rejectItemUpdateFailure(error));
   }
 }
@@ -741,6 +792,9 @@ export function* createAnonymousLinkSaga() {
     yield put(updateWorkInProgressItem());
   } catch (error) {
     console.log(error);
+    yield put(
+      updateGlobalNotification(getServerErrorMessage(error), false, true),
+    );
     yield put(createAnonymousLinkFailure());
   }
 }
@@ -755,6 +809,9 @@ export function* removeAnonymousLinkSaga() {
     yield put(updateWorkInProgressItem());
   } catch (error) {
     console.log(error);
+    yield put(
+      updateGlobalNotification(getServerErrorMessage(error), false, true),
+    );
     yield put(removeAnonymousLinkFailure());
   }
 }

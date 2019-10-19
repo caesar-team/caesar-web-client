@@ -11,7 +11,6 @@ import {
   fetchMembersFailure,
   fetchMembersSuccess,
 } from 'common/actions/entities/member';
-import { updateGlobalNotification } from 'common/actions/application';
 import {
   getDefaultTeamMembers,
   getPublicKeyByEmailBatch,
@@ -41,7 +40,8 @@ export function* fetchMembersSaga() {
     const { data: members } = yield call(getDefaultTeamMembers);
 
     yield put(fetchMembersSuccess(convertMembersToEntity(members)));
-  } catch (e) {
+  } catch (error) {
+    console.log(error);
     yield put(fetchMembersFailure());
   }
 }

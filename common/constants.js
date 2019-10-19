@@ -182,3 +182,37 @@ export const REMOVING_CHILD_ITEMS_NOTIFICATION = 'Child Items are removing...';
 export const UPDATING_ITEM_NOTIFICATION = 'Item is updating...';
 export const UPDATING_CHILD_ITEMS_NOTIFICATION = 'Child items are updating...';
 export const NOOP_NOTIFICATION = '';
+
+export const ENTITIES = {
+  CHILD_ITEM_ENTITY_TYPE,
+  ITEM_ENTITY_TYPE,
+  LIST_ENTITY_TYPE,
+  TEAM_ENTITY_TYPE,
+  MEMBER_ENTITY_TYPE,
+};
+
+// casl permissions
+export const CRUD_PERMISSION = 'crud';
+export const CREATE_PERMISSION = 'create';
+export const READ_PERMISSION = 'read';
+export const UPDATE_PERMISSION = 'update';
+export const DELETE_PERMISSION = 'delete';
+
+// custom permissions
+export const CHANGE_TEAM_MEMBER_ROLE_PERMISSION = 'changeRole';
+export const JOIN_MEMBER_TO_TEAM = 'joinMember';
+export const MOVE_ITEM_PERMISSION = 'moveItem';
+export const SHARE_ITEM_PERMISSION = 'share';
+
+export const PERMISSIONS = {
+  CRUD_PERMISSION,
+  CREATE_PERMISSION,
+  READ_PERMISSION,
+  UPDATE_PERMISSION,
+  DELETE_PERMISSION,
+
+  CHANGE_TEAM_MEMBER_ROLE_PERMISSION,
+  MOVE_ITEM_PERMISSION,
+  JOIN_MEMBER_TO_TEAM,
+  SHARE_ITEM_PERMISSION,
+};

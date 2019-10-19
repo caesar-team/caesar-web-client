@@ -223,6 +223,8 @@ class ShareModal extends Component {
     } = this.props;
     const { openedSections, members, isGeneratingLink } = this.state;
 
+    console.log('sharedMembers', sharedMembers);
+
     const shouldShowTeamsSection = teams.length > 0;
     const shouldShowAddedMembers = members.length > 0;
     const shouldShowSharedMembers = sharedMembers.length > 0;

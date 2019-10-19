@@ -46,8 +46,6 @@ export function* createChildItemBatchSaga({ payload: { itemUserPairs } }) {
       payload: { sets: encryptedChildItems },
     } = yield take(ENCRYPTION_FINISHED_EVENT);
 
-    console.log('encryptedChildItems', encryptedChildItems);
-
     yield put(
       updateGlobalNotification(CREATING_CHILD_ITEMS_NOTIFICATION, true),
     );
@@ -109,7 +107,6 @@ export function* createChildItemBatchSaga({ payload: { itemUserPairs } }) {
 
     yield put(createChildItemBatchFinishedEvent(shares));
   } catch (error) {
-    console.log(error);
     yield put(
       updateGlobalNotification(getServerErrorMessage(error), false, true),
     );

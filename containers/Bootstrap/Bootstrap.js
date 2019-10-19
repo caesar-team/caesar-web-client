@@ -258,6 +258,9 @@ class Bootstrap extends Component {
       );
     }
 
+    const shouldShowGlobalNotification =
+      isLoadingGlobalNotification || isErrorGlobalNotification;
+
     // TODO: during refactoring to rename:
     // TODO: - password to masterPassword
     // TODO: - privateKey to encryptedPrivateKey
@@ -273,7 +276,7 @@ class Bootstrap extends Component {
             password={masterPassword}
             {...props}
           />
-          {isLoadingGlobalNotification && (
+          {shouldShowGlobalNotification && (
             <GlobalNotification
               text={globalNotificationText}
               isError={isErrorGlobalNotification}

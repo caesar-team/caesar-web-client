@@ -96,7 +96,7 @@ const TeamCard = ({
           <AvatarsList
             isSmall
             avatars={getMembers(users, members)}
-            visibleCount={20}
+            visibleCount={10}
           />
         )}
         {isRemoveButtonVisible && (

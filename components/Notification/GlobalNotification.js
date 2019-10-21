@@ -26,6 +26,10 @@ const Text = styled.div`
   letter-spacing: 0.4px;
   color: ${({ theme }) => theme.white};
   margin-left: 20px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+  max-width: 400px;
 `;
 
 const IconStyled = styled(Icon)`

@@ -181,6 +181,10 @@ export const REMOVING_ITEMS_NOTIFICATION = 'Items are removing...';
 export const REMOVING_CHILD_ITEMS_NOTIFICATION = 'Child Items are removing...';
 export const UPDATING_ITEM_NOTIFICATION = 'Item is updating...';
 export const UPDATING_CHILD_ITEMS_NOTIFICATION = 'Child items are updating...';
+export const REMOVING_TEAM_NOTIFICATION = 'Team is removing...';
+export const REMOVING_MEMBER_FROM_TEAM_NOTIFICATION =
+  'Member is removing from team...';
+export const SENDING_INVITES_NOTIFICATION = 'Invites are sending...';
 export const NOOP_NOTIFICATION = '';
 
 export const ENTITIES = {

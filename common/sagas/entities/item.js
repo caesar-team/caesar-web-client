@@ -129,6 +129,7 @@ import {
 } from 'common/utils/cipherUtils';
 import { getServerErrorMessage } from 'common/utils/error';
 import { objectToBase64 } from 'common/utils/base64';
+import { chunk } from 'common/utils/utils';
 import {
   ROLE_ANONYMOUS_USER,
   ITEM_REVIEW_MODE,
@@ -149,6 +150,8 @@ import {
 } from 'common/constants';
 import { generateSharingUrl } from 'common/utils/sharing';
 import { createMemberSaga } from './member';
+
+const ITEMS_CHUNK_SIZE = 50;
 
 export function* removeItemSaga({ payload: { itemId, listId } }) {
   try {
@@ -190,10 +193,17 @@ export function* removeItemsBatchSaga({ payload: { listId } }) {
 
     const workInProgressItemIds = yield select(workInProgressItemIdsSelector);
 
-    yield call(
-      removeItemsBatch,
-      workInProgressItemIds.map(id => `items[]=${id}`).join('&'),
+    const itemIdsChunks = chunk(workInProgressItemIds, ITEMS_CHUNK_SIZE);
+
+    yield all(
+      itemIdsChunks.map(itemIdsChunk =>
+        call(
+          removeItemsBatch,
+          itemIdsChunk.map(id => `items[]=${id}`).join('&'),
+        ),
+      ),
     );
+
     yield put(setWorkInProgressItem(null));
     yield put(removeItemsBatchSuccess(workInProgressItemIds, listId));
 

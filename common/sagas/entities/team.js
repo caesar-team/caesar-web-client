@@ -66,7 +66,15 @@ import {
 } from 'common/api';
 import { getServerErrorMessage } from 'common/utils/error';
 import { convertTeamsToEntity } from 'common/normalizers/normalizers';
-import { COMMANDS_ROLES, TEAM_ENTITY_TYPE } from 'common/constants';
+import {
+  COMMANDS_ROLES,
+  TEAM_ENTITY_TYPE,
+  PREPARING_USERS_NOTIFICATION,
+  REMOVING_CHILD_ITEMS_NOTIFICATION,
+  REMOVING_MEMBER_FROM_TEAM_NOTIFICATION,
+  SENDING_INVITES_NOTIFICATION,
+  NOOP_NOTIFICATION,
+} from 'common/constants';
 import {
   prepareUsersForSharing,
   getItemUserPairs,
@@ -181,12 +189,16 @@ export function* updateTeamMemberRoleSaga({
 
 export function* addTeamMembersBatchSaga({ payload: { teamId, members } }) {
   try {
+    yield put(updateGlobalNotification(PREPARING_USERS_NOTIFICATION, true));
+
     const preparedMembers = yield call(prepareUsersForSharing, members);
 
     const teamMembers = preparedMembers.map(member => ({ ...member, teamId }));
     const newMembers = preparedMembers.filter(({ isNew }) => isNew);
 
     if (newMembers.length > 0) {
+      yield put(updateGlobalNotification(SENDING_INVITES_NOTIFICATION, true));
+
       yield fork(inviteNewMemberBatchSaga, {
         payload: { members: newMembers },
       });
@@ -242,17 +254,30 @@ export function* addTeamMembersBatchSaga({ payload: { teamId, members } }) {
 
       yield put(addChildItemsBatchToItems(itemIdsWithChildItemIdsSet));
     }
+
+    yield put(updateGlobalNotification(NOOP_NOTIFICATION, false));
   } catch (error) {
     console.log(error);
+    yield put(
+      updateGlobalNotification(getServerErrorMessage(error), false, true),
+    );
     yield put(addTeamMembersBatchFailure());
   }
 }
 
 export function* removeTeamMemberSaga({ payload: { teamId, userId } }) {
   try {
+    yield put(
+      updateGlobalNotification(REMOVING_MEMBER_FROM_TEAM_NOTIFICATION, true),
+    );
+
     yield call(deleteTeamMember, { teamId, userId });
     yield put(removeTeamMemberSuccess(teamId, userId));
     yield put(removeTeamFromMember(teamId, userId));
+
+    yield put(
+      updateGlobalNotification(REMOVING_CHILD_ITEMS_NOTIFICATION, true),
+    );
 
     const childItemsFilterSelector = createChildItemsFilterSelector({
       teamId,
@@ -262,12 +287,15 @@ export function* removeTeamMemberSaga({ payload: { teamId, userId } }) {
     const childItems = yield select(childItemsFilterSelector);
 
     const childItemIds = childItems.map(({ id }) => id);
+
     const originalItemIds = childItems.map(
       ({ originalItemId }) => originalItemId,
     );
 
     yield put(removeChildItemsBatch(childItemIds));
     yield put(removeChildItemsBatchFromItems(originalItemIds, childItemIds));
+
+    yield put(updateGlobalNotification(NOOP_NOTIFICATION, false));
   } catch (error) {
     console.log(error);
     yield put(

@@ -61,10 +61,10 @@ export default createReducer(initialState, {
     return {
       ...state,
       byId: Object.keys(state.byId).reduce(
-        (accumulator, itemId) =>
-          payload.childItemIds.includes(itemId)
+        (accumulator, childItemId) =>
+          payload.childItemIds.includes(childItemId)
             ? accumulator
-            : { ...accumulator, [itemId]: state.byId[itemId] },
+            : { ...accumulator, [childItemId]: state.byId[childItemId] },
         {},
       ),
     };

@@ -1,4 +1,12 @@
-import { call, fork, put, select, take, takeLatest } from 'redux-saga/effects';
+import {
+  call,
+  fork,
+  all,
+  put,
+  select,
+  take,
+  takeLatest,
+} from 'redux-saga/effects';
 import {
   CHANGE_CHILD_ITEM_PERMISSION_REQUEST,
   CREATE_CHILD_ITEM_BATCH_REQUEST,
@@ -24,6 +32,7 @@ import {
   postCreateChildItemBatch,
 } from 'common/api';
 import { getServerErrorMessage } from 'common/utils/error';
+import { chunk } from 'common/utils/utils';
 import {
   CHILD_ITEM_ENTITY_TYPE,
   INVITE_TYPE,
@@ -33,6 +42,8 @@ import {
   ENCRYPTING_CHILD_ITEMS_NOTIFICATION,
   NOOP_NOTIFICATION,
 } from 'common/constants';
+
+const ITEM_CHILD_ITEM_CHUNK_SIZE = 50;
 
 export function* createChildItemBatchSaga({ payload: { itemUserPairs } }) {
   try {
@@ -61,7 +72,7 @@ export function* createChildItemBatchSaga({ payload: { itemUserPairs } }) {
       {},
     );
 
-    const preparedItemsForRequest = Object.keys(
+    const itemChildItemsSets = Object.keys(
       preparedChildItemsGroupedByItemId,
     ).map(itemId => ({
       originalItem: itemId,
@@ -76,11 +87,26 @@ export function* createChildItemBatchSaga({ payload: { itemUserPairs } }) {
       ),
     }));
 
-    const {
-      data: { shares },
-    } = yield call(postCreateChildItemBatch, {
-      originalItems: Object.values(preparedItemsForRequest),
-    });
+    const itemChildItemsSetsChunks = chunk(
+      itemChildItemsSets,
+      ITEM_CHILD_ITEM_CHUNK_SIZE,
+    );
+
+    const itemChildItemsSetsChunksResponse = yield all(
+      itemChildItemsSetsChunks.map(itemChildItemsSetsChunk =>
+        call(postCreateChildItemBatch, {
+          originalItems: itemChildItemsSetsChunk,
+        }),
+      ),
+    );
+
+    const shares = itemChildItemsSetsChunksResponse.reduce(
+      (accumulator, itemChildItemsSetsChunk) => [
+        ...accumulator,
+        ...itemChildItemsSetsChunk.data.shares,
+      ],
+      [],
+    );
 
     const childItems = shares.reduce(
       (accumulator, { originalItemId, items }) => [
@@ -107,6 +133,7 @@ export function* createChildItemBatchSaga({ payload: { itemUserPairs } }) {
 
     yield put(createChildItemBatchFinishedEvent(shares));
   } catch (error) {
+    console.log(error);
     yield put(
       updateGlobalNotification(getServerErrorMessage(error), false, true),
     );

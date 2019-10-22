@@ -33,14 +33,16 @@ const Text = styled.div`
 `;
 
 const IconStyled = styled(Icon)`
-  width: 16px;
-  height: 16px;
+  width: 20px;
+  height: 20px;
   fill: ${({ theme }) => theme.white};
 `;
 
 const CloseIcon = styled(IconStyled)`
-  margin-left: 20px;
+  margin-left: 16px;
   cursor: pointer;
+  width: 16px;
+  height: 16px;
 `;
 
 const GlobalNotification = ({
@@ -52,7 +54,7 @@ const GlobalNotification = ({
   <Wrapper className={className}>
     <InnerWrapper>
       {isError ? (
-        <IconStyled name="warning" />
+        <IconStyled name="loader-error" />
       ) : (
         <CircleLoader size={16} color="white" />
       )}

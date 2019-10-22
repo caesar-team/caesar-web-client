@@ -42,6 +42,7 @@ const defineRulesForAdminUser = can => {
   can(CHANGE_TEAM_MEMBER_ROLE_PERMISSION, TEAM_ENTITY_TYPE);
   can(JOIN_MEMBER_TO_TEAM, TEAM_ENTITY_TYPE);
   can(MOVE_ITEM_PERMISSION, ITEM_ENTITY_TYPE);
+  can(SHARE_ITEM_PERMISSION, ITEM_ENTITY_TYPE);
 };
 
 const defineCommandSubjectRules = (user, can) => {
@@ -61,6 +62,11 @@ const defineCommandSubjectRules = (user, can) => {
   });
 
   can(SHARE_ITEM_PERMISSION, ITEM_ENTITY_TYPE, {
+    userRole: COMMANDS_ROLES.USER_ROLE_ADMIN,
+    teamId: { $ne: null },
+  });
+
+  can(MOVE_ITEM_PERMISSION, ITEM_ENTITY_TYPE, {
     userRole: COMMANDS_ROLES.USER_ROLE_ADMIN,
     teamId: { $ne: null },
   });

@@ -14,6 +14,7 @@ import {
   DashboardLayout,
   SecureMessage,
   FullScreenLoader,
+  AbilityContext,
 } from 'components';
 import {
   ITEM_REVIEW_MODE,
@@ -23,6 +24,9 @@ import {
   DASHBOARD_SEARCH_MODE,
   DASHBOARD_TOOL_MODE,
   ITEM_CREDENTIALS_TYPE,
+  MOVE_ITEM_PERMISSION,
+  SHARE_ITEM_PERMISSION,
+  DELETE_PERMISSION,
 } from 'common/constants';
 import { initialItemData } from './utils';
 
@@ -109,6 +113,26 @@ class DashboardContainer extends Component {
   };
 
   handleClickItem = itemId => event => {
+    const { itemsById, workInProgressList } = this.props;
+
+    const item = itemsById[itemId];
+
+    const itemSubject = {
+      ...item,
+      listType: workInProgressList.type,
+      userRole: workInProgressList.userRole,
+    };
+
+    const teamItemGuard =
+      this.context.can(MOVE_ITEM_PERMISSION, itemSubject) &&
+      this.context.can(SHARE_ITEM_PERMISSION, itemSubject) &&
+      this.context.can(DELETE_PERMISSION, itemSubject);
+
+    if (!teamItemGuard) {
+      this.handleDefaultSelectionItemBehaviour(itemId);
+      return;
+    }
+
     if ((event.ctrlKey || event.metaKey) && event.shiftKey) {
       this.handleCtrlShiftSelectionItemBehaviour(itemId);
     } else if (event.ctrlKey || event.metaKey) {
@@ -612,5 +636,7 @@ class DashboardContainer extends Component {
     );
   }
 }
+
+DashboardContainer.contextType = AbilityContext;
 
 export default withNotification(DashboardContainer);

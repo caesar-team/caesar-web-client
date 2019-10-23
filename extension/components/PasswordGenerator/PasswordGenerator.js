@@ -105,7 +105,7 @@ function copyTextToClipboard(text, notification) {
   document.execCommand('copy', false, null);
 
   notification.show({
-    text: `The password has copied.`,
+    text: `The password has been copied.`,
   });
 }
 

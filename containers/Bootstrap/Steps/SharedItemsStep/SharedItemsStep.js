@@ -336,7 +336,7 @@ class SharedItemsStep extends Component {
           currentStep={SHARED_ITEMS_CHECK}
           steps={navigationSteps}
         />
-        <AuthTitle>Someone shared items for you:</AuthTitle>
+        <AuthTitle>Someone has shared items with you</AuthTitle>
         <AuthDescription>
           You can accept or reject next shared items
         </AuthDescription>

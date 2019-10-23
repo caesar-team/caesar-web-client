@@ -184,7 +184,7 @@ class SecureMessageForm extends Component {
                 render={({ field }) => (
                   <TextAreaStyled
                     {...field}
-                    placeholder="Devide et Impera"
+                    placeholder='"Devide et Impera"'
                     onBlur={setFieldTouched}
                     error={checkError(touched, errors, 'text')}
                   />
@@ -210,7 +210,7 @@ class SecureMessageForm extends Component {
             </AttachmentsSection>
             <SelectRow>
               <Column>
-                <Label>Numbers of Attempts</Label>
+                <Label>Number of Attempts</Label>
                 <StyledSelect
                   boxOffset={60}
                   name="requestsLimit"
@@ -221,7 +221,7 @@ class SecureMessageForm extends Component {
                 />
               </Column>
               <ColumnStyled>
-                <Label>Data expires after</Label>
+                <Label>Data expires in</Label>
                 <StyledSelect
                   boxOffset={60}
                   name="secondsLimit"

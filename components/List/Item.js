@@ -29,7 +29,7 @@ const Title = styled.div`
   line-height: 18px;
   letter-spacing: 0.6px;
   color: ${({ theme }) => theme.black};
-  margin-bottom: 8px;
+  margin-bottom: 7px;
   text-overflow: ellipsis;
   overflow: hidden;
   max-width: 278px;

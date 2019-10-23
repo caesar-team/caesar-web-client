@@ -195,9 +195,7 @@ class ManageList extends Component {
             <TableCol align="center" width="33.33333%">
               Elements
             </TableCol>
-            <TableCol align="right" width="33.33333%">
-              Members
-            </TableCol>
+            <TableCol align="right" width="33.33333%" />
           </TableHeader>
         </Table>
         {this.renderItems()}

@@ -59,13 +59,13 @@ const CreateButton = styled.div`
   background-color: ${({ theme }) => theme.white};
   border: 1px solid ${({ theme }) => theme.gallery};
 
-  ${({ disabled }) =>
+  ${({ theme, disabled }) =>
     !disabled &&
     `
   &:hover {
-    color: ${({ theme }) => theme.white};
-    background-color: ${({ theme }) => theme.black};
-    border: 1px solid ${({ theme }) => theme.black};
+    color: ${theme.white};
+    background-color: ${theme.black};
+    border: 1px solid ${theme.black};
   }
   `}
 `;

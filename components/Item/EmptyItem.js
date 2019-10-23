@@ -28,9 +28,9 @@ const StyledIcon = styled(Icon)`
 
 const EmptyItem = () => (
   <Fragment>
-    <ImageLeft src={EmptyLeftImg} />
+    {/*<ImageLeft src={EmptyLeftImg} />*/}
     <StyledIcon name="logo" width={205} height={46} />
-    <ImageRight src={EmptyRightImg} />
+    {/*<ImageRight src={EmptyRightImg} />*/}
   </Fragment>
 );
 

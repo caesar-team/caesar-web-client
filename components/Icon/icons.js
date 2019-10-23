@@ -56,3 +56,4 @@ import 'public/images/svg/icon-team-ava-5.svg?sprite';
 import 'public/images/svg/icon-trash.svg?sprite';
 import 'public/images/svg/icon-update.svg?sprite';
 import 'public/images/svg/icon-warning.svg?sprite';
+import 'public/images/svg/icon-loader-error.svg?sprite';

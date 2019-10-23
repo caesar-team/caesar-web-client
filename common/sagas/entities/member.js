@@ -40,7 +40,8 @@ export function* fetchMembersSaga() {
     const { data: members } = yield call(getDefaultTeamMembers);
 
     yield put(fetchMembersSuccess(convertMembersToEntity(members)));
-  } catch (e) {
+  } catch (error) {
+    console.log(error);
     yield put(fetchMembersFailure());
   }
 }

@@ -34,7 +34,7 @@ callApi.interceptors.response.use(
       }
     }
 
-    return Promise.reject(error);
+    return Promise.reject(error.response);
   },
 );
 

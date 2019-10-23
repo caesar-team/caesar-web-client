@@ -70,7 +70,13 @@ export const workInProgressItemSharedMembersSelector = createSelector(
   membersByIdSelector,
   (workInProgressItemChildItems, membersById) =>
     workInProgressItemChildItems.length && Object.values(membersById).length
-      ? workInProgressItemChildItems.map(({ userId }) => membersById[userId])
+      ? workInProgressItemChildItems.reduce(
+          (accumulator, { userId }) =>
+            membersById[userId]
+              ? [...accumulator, membersById[userId]]
+              : accumulator,
+          [],
+        )
       : [],
 );
 

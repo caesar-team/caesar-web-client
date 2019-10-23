@@ -10,6 +10,7 @@ import {
 } from 'common/actions/workflow';
 import { addListsBatch } from 'common/actions/entities/list';
 import { addItemsBatch } from 'common/actions/entities/item';
+import { updateGlobalNotification } from 'common/actions/application';
 import { SET_CURRENT_TEAM_ID, setCurrentTeamId } from 'common/actions/user';
 import { addChildItemsBatch } from 'common/actions/entities/childItem';
 import { fetchMembersSaga } from 'common/sagas/entities/member';
@@ -27,7 +28,8 @@ import {
 import { itemSelector } from 'common/selectors/entities/item';
 import { workInProgressItemSelector } from 'common/selectors/workflow';
 import { getFavoritesList } from 'common/normalizers/utils';
-import { fetchTeamSuccess } from '../actions/entities/team';
+import { fetchTeamSuccess } from 'common/actions/entities/team';
+import { getServerErrorMessage } from 'common/utils/error';
 
 function* initPersonal() {
   try {
@@ -62,6 +64,9 @@ function* initPersonal() {
     yield put(finishIsLoading());
   } catch (error) {
     console.log(error);
+    yield put(
+      updateGlobalNotification(getServerErrorMessage(error), false, true),
+    );
   }
 }
 
@@ -98,6 +103,9 @@ function* initTeam(team) {
     }
   } catch (error) {
     console.log(error);
+    yield put(
+      updateGlobalNotification(getServerErrorMessage(error), false, true),
+    );
   }
 }
 
@@ -108,6 +116,9 @@ function* initTeams() {
     yield all(teams.map(team => call(initTeam, team)));
   } catch (error) {
     console.log(error);
+    yield put(
+      updateGlobalNotification(getServerErrorMessage(error), false, true),
+    );
   }
 }
 
@@ -140,31 +151,40 @@ export function* updateWorkInProgressItemSaga({
 }
 
 export function* setCurrentTeamIdWatchSaga() {
-  yield put(setWorkInProgressItem(null));
-  yield put(resetWorkInProgressItemIds(null));
-  yield put(setWorkInProgressListId(null));
+  try {
+    yield put(setWorkInProgressItem(null));
+    yield put(resetWorkInProgressItemIds(null));
+    yield put(setWorkInProgressListId(null));
 
-  const currentTeamId = yield select(currentTeamIdSelector);
+    const currentTeamId = yield select(currentTeamIdSelector);
 
-  if (!currentTeamId) {
-    return;
+    if (!currentTeamId) {
+      return;
+    }
+
+    const { data } = yield call(getTeamLists, currentTeamId);
+
+    const { listsById, itemsById, childItemsById } = convertNodesToEntities(
+      data,
+    );
+
+    yield put(addListsBatch(listsById));
+    yield put(addChildItemsBatch(childItemsById));
+
+    const keyPair = yield select(keyPairSelector);
+    const masterPassword = yield select(masterPasswordSelector);
+
+    yield fork(decryption, {
+      items: objectToArray(itemsById),
+      key: keyPair.privateKey,
+      masterPassword,
+    });
+  } catch (error) {
+    console.log(error);
+    yield put(
+      updateGlobalNotification(getServerErrorMessage(error), false, true),
+    );
   }
-
-  const { data } = yield call(getTeamLists, currentTeamId);
-
-  const { listsById, itemsById, childItemsById } = convertNodesToEntities(data);
-
-  yield put(addListsBatch(listsById));
-  yield put(addChildItemsBatch(childItemsById));
-
-  const keyPair = yield select(keyPairSelector);
-  const masterPassword = yield select(masterPasswordSelector);
-
-  yield fork(decryption, {
-    items: objectToArray(itemsById),
-    key: keyPair.privateKey,
-    masterPassword,
-  });
 }
 
 export default function* workflowSagas() {

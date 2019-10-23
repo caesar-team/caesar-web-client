@@ -74,6 +74,11 @@ const DataTableStyled = styled(DataTable)`
     overflow: initial;
   }
 
+  .rt-tbody {
+    height: calc(100vh - 340px);
+    overflow: scroll;
+  }
+
   .rt-resizable-header-content {
     padding: 0;
   }
@@ -517,6 +522,7 @@ class TeamContainer extends Component {
           showPagination={false}
           itemSize={ROW_HEIGHT}
           data={filteredMembersList}
+          pageSize={filteredMembersList.length}
           columns={this.getColumns()}
           width={this.calculateWrapperWidth()}
         />

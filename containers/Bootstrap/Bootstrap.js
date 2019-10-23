@@ -2,12 +2,12 @@ import React, { Component } from 'react';
 import * as openpgp from 'openpgp';
 import { withRouter } from 'next/router';
 import { getUserBootstrap, getUserSelf } from 'common/api';
-import { DEFAULT_IDLE_TIMEOUT } from 'common/constants';
+import { DEFAULT_IDLE_TIMEOUT, NOOP_NOTIFICATION } from 'common/constants';
 import {
   SessionChecker,
   FullScreenLoader,
   BootstrapLayout,
-  LoadingNotification,
+  GlobalNotification,
 } from 'components';
 import OpenPGPWorker from 'public/openpgp.worker';
 import { isClient } from 'common/utils/isEnvironment';
@@ -120,6 +120,10 @@ class Bootstrap extends Component {
     });
   };
 
+  handleCloseNotification = () => {
+    this.props.updateGlobalNotification(NOOP_NOTIFICATION, false);
+  };
+
   initOpenPGP() {
     const worker = new OpenPGPWorker();
 
@@ -172,6 +176,8 @@ class Bootstrap extends Component {
   render() {
     const {
       isLoadingGlobalNotification,
+      isErrorGlobalNotification,
+      globalNotificationText,
       component: PageComponent,
       router,
       shared = {},
@@ -252,6 +258,9 @@ class Bootstrap extends Component {
       );
     }
 
+    const shouldShowGlobalNotification =
+      isLoadingGlobalNotification || isErrorGlobalNotification;
+
     // TODO: during refactoring to rename:
     // TODO: - password to masterPassword
     // TODO: - privateKey to encryptedPrivateKey
@@ -267,7 +276,13 @@ class Bootstrap extends Component {
             password={masterPassword}
             {...props}
           />
-          {isLoadingGlobalNotification && <LoadingNotification />}
+          {shouldShowGlobalNotification && (
+            <GlobalNotification
+              text={globalNotificationText}
+              isError={isErrorGlobalNotification}
+              onClose={this.handleCloseNotification}
+            />
+          )}
         </SessionChecker>
       )
     );

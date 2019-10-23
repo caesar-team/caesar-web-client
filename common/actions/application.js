@@ -10,10 +10,11 @@ export const REHYDRATE_STORE = '@workflow/REHYDRATE_STORE';
 export const ENCRYPTION_FINISHED_EVENT = '@app/ENCRYPTION_FINISHED_EVENT';
 export const DECRYPTION_FINISHED = '@app/DECRYPTION_FINISHED';
 
-export const updateGlobalNotification = (isLoading, text) => ({
+export const updateGlobalNotification = (text, isLoading, isError = false) => ({
   type: UPDATE_GLOBAL_NOTIFICATION,
   payload: {
     isLoading,
+    isError,
     text,
   },
 });

@@ -10,7 +10,7 @@ const REGEXP_TEXT_MATCH = [
     regexp: REGEXP_AT_LEAST_ONE_SPECIAL_CHARACTER,
   },
   { text: '1 number', regexp: REGEXP_AT_LEAST_ONE_NUMBER },
-  { text: '8 character minimum', regexp: REGEXP_MINIMUM_LENGTH },
+  { text: '8 characters minimum', regexp: REGEXP_MINIMUM_LENGTH },
 ];
 
 const checkIsPasswordValid = value =>

@@ -217,8 +217,7 @@ class Import extends Component {
 
     return (
       <Wrapper>
-        <Title>Settings / Import</Title>
-        <Description>Select file type to import:</Description>
+        <Title>Import</Title>
         <StepWrapper>{this.renderStep()}</StepWrapper>
         <StyledNavigationPanel
           steps={STEPS}

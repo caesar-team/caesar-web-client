@@ -28,7 +28,7 @@ const Icon = styled.div`
     position: absolute;
     color: ${({ theme }) => theme.white};
     top: -2px;
-    left: 8px;
+    left: 6px;
   }
 `;
 

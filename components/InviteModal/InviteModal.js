@@ -92,7 +92,7 @@ class InviteModal extends Component {
         shouldCloseOnOverlayClick
       >
         <Wrapper>
-          <ModalTitle>Invite</ModalTitle>
+          <ModalTitle>Add Members</ModalTitle>
           <UserSearchInput
             blackList={searchedBlackListMemberIds}
             onClickAdd={this.handleAddMember}

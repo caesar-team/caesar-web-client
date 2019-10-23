@@ -200,7 +200,7 @@ class DashboardContainer extends Component {
       this.props.setWorkInProgressItem(null);
 
       this.props.notification.show({
-        text: `The ${getItemTypeText(workInProgressItem)} has removed`,
+        text: `The ${getItemTypeText(workInProgressItem)} has been removed`,
       });
     }
 
@@ -216,7 +216,9 @@ class DashboardContainer extends Component {
     this.props.setWorkInProgressItem(null);
 
     this.props.notification.show({
-      text: `The ${getItemTypeText(this.props.workInProgressItem)} has moved.`,
+      text: `The ${getItemTypeText(
+        this.props.workInProgressItem,
+      )} has been moved.`,
     });
   };
 
@@ -224,7 +226,7 @@ class DashboardContainer extends Component {
     this.props.editItemRequest(data, setSubmitting);
 
     this.props.notification.show({
-      text: `The ${getItemTypeText(data)} has updated`,
+      text: `The ${getItemTypeText(data)} has been updated`,
     });
   };
 

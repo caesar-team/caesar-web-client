@@ -172,7 +172,7 @@ class ShareModal extends Component {
     copy(getAnonymousLink(anonymousLink));
 
     notification.show({
-      text: `The shared link has copied.`,
+      text: `The shared link has been copied.`,
     });
   };
 

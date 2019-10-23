@@ -124,7 +124,7 @@ class SecureMessageContainer extends Component {
     copy(decryptedMessage.text);
 
     notification.show({
-      text: `The text has copied.`,
+      text: `The text has been copied.`,
     });
   };
 

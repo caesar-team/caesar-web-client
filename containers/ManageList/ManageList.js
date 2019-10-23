@@ -92,7 +92,7 @@ class ManageListContainer extends Component {
     this.props.editListRequest({ ...workInProgressList, ...list });
 
     this.props.notification.show({
-      text: 'The list has updated.',
+      text: 'The list has been updated.',
     });
 
     this.setState({

@@ -26,7 +26,7 @@ const StyledLink = styled(Link)`
 `;
 
 const LINKS = [
-  { link: '/settings/manage', name: 'Manage List' },
+  { link: '/settings/manage', name: 'Lists' },
   { link: '/settings/import', name: 'Import' },
   { link: '/settings/team', name: 'Teams' },
 ];

@@ -137,16 +137,12 @@ import {
   SHARE_TYPE,
   ITEM_ENTITY_TYPE,
   CREATING_ITEM_NOTIFICATION,
-  SHARING_ITEM_NOTIFICATION,
-  SHARING_ITEMS_NOTIFICATION,
+  CREATING_ITEMS_NOTIFICATION,
+  SHARING_IN_PROGRESS_NOTIFICATION,
   ENCRYPTING_ITEM_NOTIFICATION,
-  PREPARING_USERS_NOTIFICATION,
-  MOVING_ITEM_NOTIFICATION,
-  REMOVING_ITEM_NOTIFICATION,
-  REMOVING_ITEMS_NOTIFICATION,
-  REMOVING_CHILD_ITEMS_NOTIFICATION,
+  MOVING_IN_PROGRESS_NOTIFICATION,
+  REMOVING_IN_PROGRESS_NOTIFICATION,
   NOOP_NOTIFICATION,
-  UPDATING_ITEM_NOTIFICATION,
 } from 'common/constants';
 import { generateSharingUrl } from 'common/utils/sharing';
 import { createMemberSaga } from './member';
@@ -155,7 +151,9 @@ const ITEMS_CHUNK_SIZE = 50;
 
 export function* removeItemSaga({ payload: { itemId, listId } }) {
   try {
-    yield put(updateGlobalNotification(REMOVING_ITEM_NOTIFICATION, true));
+    yield put(
+      updateGlobalNotification(REMOVING_IN_PROGRESS_NOTIFICATION, true),
+    );
 
     const item = yield select(itemSelector, { itemId });
 
@@ -165,9 +163,6 @@ export function* removeItemSaga({ payload: { itemId, listId } }) {
     yield put(removeItemSuccess(itemId, listId));
 
     if (item.invited && item.invited.length > 0) {
-      yield put(
-        updateGlobalNotification(REMOVING_CHILD_ITEMS_NOTIFICATION, true),
-      );
       yield put(removeChildItemsBatch(item.invited));
     }
 
@@ -189,7 +184,9 @@ export function* removeItemSaga({ payload: { itemId, listId } }) {
 
 export function* removeItemsBatchSaga({ payload: { listId } }) {
   try {
-    yield put(updateGlobalNotification(REMOVING_ITEMS_NOTIFICATION, true));
+    yield put(
+      updateGlobalNotification(REMOVING_IN_PROGRESS_NOTIFICATION, true),
+    );
 
     const workInProgressItemIds = yield select(workInProgressItemIdsSelector);
 
@@ -207,9 +204,6 @@ export function* removeItemsBatchSaga({ payload: { listId } }) {
     yield put(setWorkInProgressItem(null));
     yield put(removeItemsBatchSuccess(workInProgressItemIds, listId));
 
-    yield put(
-      updateGlobalNotification(REMOVING_CHILD_ITEMS_NOTIFICATION, true),
-    );
     yield put(removeItemsBatchFromList(workInProgressItemIds, listId));
 
     yield put(updateGlobalNotification(NOOP_NOTIFICATION, false));
@@ -229,14 +223,12 @@ export function* shareItemBatchSaga({
   },
 }) {
   try {
+    yield put(updateGlobalNotification(SHARING_IN_PROGRESS_NOTIFICATION, true));
+
     const user = yield select(userDataSelector);
     const items = yield select(itemsBatchSelector, { itemIds });
 
-    yield put(updateGlobalNotification(PREPARING_USERS_NOTIFICATION, true));
-
     const preparedMembers = yield call(prepareUsersForSharing, members);
-
-    yield put(updateGlobalNotification(SHARING_ITEMS_NOTIFICATION, true));
 
     const newMembers = preparedMembers.filter(({ isNew }) => isNew);
 
@@ -297,9 +289,6 @@ export function* shareItemBatchSaga({
 
 export function* removeShareSaga({ payload: { shareId } }) {
   try {
-    yield put(
-      updateGlobalNotification(REMOVING_CHILD_ITEMS_NOTIFICATION, true),
-    );
     const workInProgressItem = yield select(workInProgressItemSelector);
 
     yield call(deleteChildItem, shareId);
@@ -342,7 +331,7 @@ export function* toggleItemToFavoriteSaga({ payload: { itemId } }) {
 
 export function* moveItemSaga({ payload: { itemId, listId } }) {
   try {
-    yield put(updateGlobalNotification(MOVING_ITEM_NOTIFICATION, true));
+    yield put(updateGlobalNotification(MOVING_IN_PROGRESS_NOTIFICATION, true));
 
     const item = yield select(itemSelector, { itemId });
     const childItemIds = item.invited;
@@ -386,10 +375,6 @@ export function* moveItemSaga({ payload: { itemId, listId } }) {
     }
 
     if (oldList.teamId && !newList.teamId) {
-      yield put(
-        updateGlobalNotification(REMOVING_CHILD_ITEMS_NOTIFICATION, true),
-      );
-
       yield put(removeChildItemsBatchFromItem(item.id, childItemIds));
       yield put(removeChildItemsBatch(childItemIds));
 
@@ -397,10 +382,6 @@ export function* moveItemSaga({ payload: { itemId, listId } }) {
     }
 
     if (oldList.teamId && newList.teamId && oldList.teamId !== newList.teamId) {
-      yield put(
-        updateGlobalNotification(REMOVING_CHILD_ITEMS_NOTIFICATION, true),
-      );
-
       yield put(removeChildItemsBatchFromItem(item.id, childItemIds));
       yield put(removeChildItemsBatch(childItemIds));
 
@@ -489,7 +470,9 @@ export function* createItemSaga({
     yield put(updateWorkInProgressItem(itemId, ITEM_REVIEW_MODE));
 
     if (list.teamId) {
-      yield put(updateGlobalNotification(SHARING_ITEM_NOTIFICATION, true));
+      yield put(
+        updateGlobalNotification(SHARING_IN_PROGRESS_NOTIFICATION, true),
+      );
 
       const team = yield select(teamSelector, { teamId: list.teamId });
       const memberIds = team.users.map(({ id }) => id);
@@ -542,6 +525,8 @@ export function* createItemsBatchSaga({
   meta: { setSubmitting },
 }) {
   try {
+    yield put(updateGlobalNotification(CREATING_ITEMS_NOTIFICATION, true));
+
     const list = yield select(listSelector, { listId });
     const keyPair = yield select(keyPairSelector);
     const user = yield select(userDataSelector);
@@ -597,6 +582,8 @@ export function* createItemsBatchSaga({
           },
         },
       });
+    } else {
+      yield put(updateGlobalNotification(NOOP_NOTIFICATION, false));
     }
   } catch (error) {
     console.log(error);
@@ -620,8 +607,6 @@ export function* updateItemSaga({ payload: { item } }) {
       item.data,
       keyPair.publicKey,
     );
-
-    yield put(updateGlobalNotification(UPDATING_ITEM_NOTIFICATION, true));
 
     yield call(updateItem, item.id, { item: { secret: encryptedItemSecret } });
 

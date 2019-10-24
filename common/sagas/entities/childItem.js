@@ -37,9 +37,6 @@ import {
   CHILD_ITEM_ENTITY_TYPE,
   INVITE_TYPE,
   PERMISSION_READ,
-  CREATING_CHILD_ITEMS_NOTIFICATION,
-  UPDATING_CHILD_ITEMS_NOTIFICATION,
-  ENCRYPTING_CHILD_ITEMS_NOTIFICATION,
   NOOP_NOTIFICATION,
 } from 'common/constants';
 
@@ -47,19 +44,11 @@ const ITEM_CHILD_ITEM_CHUNK_SIZE = 50;
 
 export function* createChildItemBatchSaga({ payload: { itemUserPairs } }) {
   try {
-    yield put(
-      updateGlobalNotification(ENCRYPTING_CHILD_ITEMS_NOTIFICATION, true),
-    );
-
     yield fork(encryption, itemUserPairs);
 
     const {
       payload: { sets: encryptedChildItems },
     } = yield take(ENCRYPTION_FINISHED_EVENT);
-
-    yield put(
-      updateGlobalNotification(CREATING_CHILD_ITEMS_NOTIFICATION, true),
-    );
 
     const preparedChildItemsGroupedByItemId = encryptedChildItems.reduce(
       (accumulator, { itemId, ...data }) => {
@@ -147,10 +136,6 @@ export function* updateChildItemsBatchSaga({
   },
 }) {
   try {
-    yield put(
-      updateGlobalNotification(ENCRYPTING_CHILD_ITEMS_NOTIFICATION, true),
-    );
-
     // eslint-disable-next-line
     const childItems = yield select(childItemsBatchSelector, { childItemIds: invited });
     const memberIds = childItems.map(({ userId }) => userId);
@@ -169,10 +154,6 @@ export function* updateChildItemsBatchSaga({
     const {
       payload: { sets: encryptedChildItems },
     } = yield take(ENCRYPTION_FINISHED_EVENT);
-
-    yield put(
-      updateGlobalNotification(UPDATING_CHILD_ITEMS_NOTIFICATION, true),
-    );
 
     yield call(patchChildItemBatch, {
       collectionItems: [

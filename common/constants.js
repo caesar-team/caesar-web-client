@@ -162,29 +162,13 @@ export const LIST_ENTITY_TYPE = 'List';
 export const TEAM_ENTITY_TYPE = 'Team';
 export const MEMBER_ENTITY_TYPE = 'Member';
 
-export const ENCRYPTING_ITEM_NOTIFICATION = 'Item is encrypting';
-export const CREATING_ITEM_NOTIFICATION = 'Item is creating...';
-export const SHARING_ITEM_NOTIFICATION =
-  'Item is sharing on members and teams...';
-export const ENCRYPTING_ITEMS_NOTIFICATION = 'Items are encrypting';
-export const ENCRYPTING_CHILD_ITEMS_NOTIFICATION =
-  'Child items are encrypting...';
-export const CREATING_ITEMS_NOTIFICATION = 'Items are creating...';
-export const CREATING_CHILD_ITEMS_NOTIFICATION = 'Child items are creating...';
-export const SHARING_ITEMS_NOTIFICATION =
-  'Items are sharing on members and teams...';
-export const PREPARING_USERS_NOTIFICATION = 'Preparing users...';
-export const MOVING_ITEM_NOTIFICATION = 'Item is moving...';
-export const MOVING_ITEMS_NOTIFICATION = 'Items are moving...';
-export const REMOVING_ITEM_NOTIFICATION = 'Item is removing...';
-export const REMOVING_ITEMS_NOTIFICATION = 'Items are removing...';
-export const REMOVING_CHILD_ITEMS_NOTIFICATION = 'Child Items are removing...';
-export const UPDATING_ITEM_NOTIFICATION = 'Item is updating...';
-export const UPDATING_CHILD_ITEMS_NOTIFICATION = 'Child items are updating...';
-export const REMOVING_TEAM_NOTIFICATION = 'Team is removing...';
-export const REMOVING_MEMBER_FROM_TEAM_NOTIFICATION =
-  'Member is removing from team...';
-export const SENDING_INVITES_NOTIFICATION = 'Invites are sending...';
+export const ENCRYPTING_ITEM_NOTIFICATION = 'Encryption in progress...';
+export const CREATING_ITEM_NOTIFICATION = 'The item is being created...';
+export const SHARING_IN_PROGRESS_NOTIFICATION = 'Sharing in progress...';
+export const CREATING_ITEMS_NOTIFICATION =
+  'Import in progress. The items are being created..';
+export const MOVING_IN_PROGRESS_NOTIFICATION = 'Moving in progress...';
+export const REMOVING_IN_PROGRESS_NOTIFICATION = 'Removing in progress...';
 export const NOOP_NOTIFICATION = '';
 
 export const ENTITIES = {

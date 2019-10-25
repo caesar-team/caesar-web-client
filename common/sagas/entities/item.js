@@ -256,26 +256,28 @@ export function* shareItemBatchSaga({
       });
     }
 
-    yield fork(createChildItemBatchSaga, { payload: { itemUserPairs } });
+    if (itemUserPairs.length > 0) {
+      yield fork(createChildItemBatchSaga, { payload: { itemUserPairs } });
 
-    const {
-      payload: { childItems },
-    } = yield take(CREATE_CHILD_ITEM_BATCH_FINISHED_EVENT);
+      const {
+        payload: { childItems },
+      } = yield take(CREATE_CHILD_ITEM_BATCH_FINISHED_EVENT);
 
-    const shares = childItems.reduce(
-      (accumulator, item) => [
-        ...accumulator,
-        {
-          itemId: item.originalItemId,
-          childItemIds: item.items.map(({ id }) => id),
-        },
-      ],
-      [],
-    );
+      const shares = childItems.reduce(
+        (accumulator, item) => [
+          ...accumulator,
+          {
+            itemId: item.originalItemId,
+            childItemIds: item.items.map(({ id }) => id),
+          },
+        ],
+        [],
+      );
 
-    yield put(shareItemBatchSuccess(shares));
+      yield put(shareItemBatchSuccess(shares));
 
-    yield put(updateWorkInProgressItem());
+      yield put(updateWorkInProgressItem());
+    }
 
     yield put(updateGlobalNotification(NOOP_NOTIFICATION, false));
   } catch (error) {
@@ -485,28 +487,30 @@ export function* createItemSaga({
           user: { id, publicKey, teamId: list.teamId },
         }));
 
-      yield fork(createChildItemBatchSaga, {
-        payload: { itemUserPairs },
-      });
+      if (itemUserPairs.length > 0) {
+        yield fork(createChildItemBatchSaga, {
+          payload: { itemUserPairs },
+        });
 
-      const {
-        payload: { childItems },
-      } = yield take(CREATE_CHILD_ITEM_BATCH_FINISHED_EVENT);
+        const {
+          payload: { childItems },
+        } = yield take(CREATE_CHILD_ITEM_BATCH_FINISHED_EVENT);
 
-      const shares = childItems.reduce(
-        // eslint-disable-next-line
-        (accumulator, item) => [
-          ...accumulator,
-          {
-            itemId: item.originalItemId,
-            childItemIds: item.items.map(({ id }) => id),
-          },
-        ],
-        [],
-      );
+        const shares = childItems.reduce(
+          // eslint-disable-next-line
+          (accumulator, item) => [
+            ...accumulator,
+            {
+              itemId: item.originalItemId,
+              childItemIds: item.items.map(({ id }) => id),
+            },
+          ],
+          [],
+        );
 
-      yield put(addChildItemsBatchToItems(shares));
-      yield put(updateWorkInProgressItem());
+        yield put(addChildItemsBatchToItems(shares));
+        yield put(updateWorkInProgressItem());
+      }
     }
   } catch (error) {
     console.log(error);

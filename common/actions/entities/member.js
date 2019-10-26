@@ -80,24 +80,6 @@ export const createMemberBatchFailure = () => ({
   type: CREATE_MEMBER_BATCH_FAILURE,
 });
 
-export const fetchTeamMembersRequest = teamId => ({
-  type: FETCH_TEAM_MEMBERS_REQUEST,
-  payload: {
-    teamId,
-  },
-});
-
-export const fetchTeamMembersSuccess = membersById => ({
-  type: FETCH_TEAM_MEMBERS_SUCCESS,
-  payload: {
-    membersById,
-  },
-});
-
-export const fetchTeamMembersFailure = () => ({
-  type: FETCH_TEAM_MEMBERS_FAILURE,
-});
-
 export const addMembersBatch = membersById => ({
   type: ADD_MEMBERS_BATCH,
   payload: {

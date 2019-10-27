@@ -14,13 +14,18 @@ export const getPrivateKeyObj = async (privateKey, password) => {
 };
 
 export const decryptItem = async (secretArmored, privateKeyObj) => {
-  const secret = await openpgp.message.readArmored(secretArmored);
-  const { data } = await openpgp.decrypt({
-    message: secret,
-    privateKeys: [privateKeyObj],
-  });
+  try {
+    const secret = await openpgp.message.readArmored(secretArmored);
+    const { data } = await openpgp.decrypt({
+      message: secret,
+      privateKeys: [privateKeyObj],
+    });
 
-  return JSON.parse(data);
+    return JSON.parse(data);
+  } catch (error) {
+    console.log('decryption error', error);
+    return null;
+  }
 };
 
 export const encryptItem = async (data, key) => {

@@ -31,7 +31,7 @@ class SettingsManageListPage extends Component {
 
     return (
       <Fragment>
-        <Head title="Manage List" />
+        <Head title="Lists" />
         <SettingsLayout user={userData} team={currentTeam}>
           <Fragment>
             <SettingsSidebar />

@@ -1,6 +1,6 @@
 import { connect } from 'react-redux';
 import { createStructuredSelector } from 'reselect';
-import { setMasterPassword } from 'common/actions/user';
+import { setMasterPassword, setKeyPair } from 'common/actions/user';
 import { resetWorkflowStore } from 'common/actions/workflow';
 import {
   initCoresCount,
@@ -24,6 +24,7 @@ const mapStateToProps = createStructuredSelector({
 
 const mapDispatchToProps = {
   setMasterPassword,
+  setKeyPair,
   resetWorkflowStore,
   removeItemsData,
   initCoresCount,

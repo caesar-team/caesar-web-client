@@ -84,7 +84,6 @@ class DashboardContainer extends Component {
   );
 
   componentDidMount() {
-    this.props.fetchKeyPairRequest();
     this.props.fetchUserSelfRequest();
     this.props.fetchUserTeamsRequest();
 

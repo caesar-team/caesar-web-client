@@ -267,7 +267,6 @@ class TeamContainer extends Component {
   );
 
   componentDidMount() {
-    this.props.fetchKeyPairRequest();
     this.props.initWorkflow();
   }
 

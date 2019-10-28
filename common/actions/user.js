@@ -11,6 +11,7 @@ export const FETCH_USER_TEAMS_SUCCESS = '@user/FETCH_USER_TEAMS_SUCCESS';
 export const FETCH_USER_TEAMS_FAILURE = '@user/FETCH_USER_TEAMS_FAILURE';
 
 export const SET_MASTER_PASSWORD = '@user/SET_MASTER_PASSWORD';
+export const SET_KEY_PAIR = '@user/SET_KEY_PAIR';
 export const SET_CURRENT_TEAM_ID = '@user/SET_CURRENT_TEAM_ID';
 
 export const JOIN_TEAM = '@user/JOIN_TEAM';
@@ -69,6 +70,13 @@ export const setMasterPassword = masterPassword => ({
   type: SET_MASTER_PASSWORD,
   payload: {
     masterPassword,
+  },
+});
+
+export const setKeyPair = keyPair => ({
+  type: SET_KEY_PAIR,
+  payload: {
+    keyPair,
   },
 });
 

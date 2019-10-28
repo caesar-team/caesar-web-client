@@ -27,6 +27,7 @@ import {
   MasterPasswordStep,
   SharedItemsStep,
 } from './Steps';
+import { setKeyPair } from '../../common/actions/user';
 
 const TWO_FACTOR_STEPS = [TWO_FACTOR_CREATE, TWO_FACTOR_CHECK];
 const PASSWORD_STEPS = [PASSWORD_CHANGE];
@@ -93,6 +94,10 @@ class Bootstrap extends Component {
     const { sharedItemsState } = this.bootstrap;
 
     this.props.setMasterPassword(masterPassword);
+    this.props.setKeyPair({
+      publicKey: currentKeyPair.publicKey,
+      privateKey: currentKeyPair.encryptedPrivateKey,
+    });
 
     this.setState({
       oldKeyPair,

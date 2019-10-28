@@ -7,6 +7,7 @@ import {
 } from 'common/actions/application';
 import { availableCoresCountSelector } from 'common/selectors/application';
 import { arrayToObject, chunk, match } from 'common/utils/utils';
+import { checkItemsAfterDecryption } from 'common/utils/item';
 import { DECRYPTION_CHUNK_SIZE } from 'common/constants';
 import { createPoolChannel } from './channels';
 import { normalizeEvent } from './utils';
@@ -49,7 +50,11 @@ export function* decryption({ items, key, masterPassword }) {
 
       switch (event.type) {
         case TASK_QUEUE_COMPLETED_EVENT_TYPE:
-          yield put(addItemsBatch(match(itemsById, event.returnValue)));
+          yield put(
+            addItemsBatch(
+              match(itemsById, checkItemsAfterDecryption(event.returnValue)),
+            ),
+          );
           break;
         case POOL_QUEUE_FINISHED_EVENT_TYPE:
           yield put(increaseCoresCount(coresCount));

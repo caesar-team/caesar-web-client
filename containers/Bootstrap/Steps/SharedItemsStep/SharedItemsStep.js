@@ -150,8 +150,6 @@ class SharedItemsStep extends Component {
       const { data: user } = await getUserSelf();
       const { data: teams } = await getUserTeams();
 
-      console.log('teams', teams);
-
       const { personal: personalItems, teams: teamsItems } = items;
 
       const decryptedItems = await Promise.all(

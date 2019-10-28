@@ -154,7 +154,7 @@ class PrimaryHeader extends PureComponent {
     } = this.props;
     const { isDropdownOpened, isModalOpened } = this.state;
 
-    const userName = user.name || user.email;
+    const userName = (user && (user.name || user.email)) || '';
     const teamId = team ? team.id : null;
 
     const shouldShowSwitchTeamOption = teamList && teamList.length > 0;

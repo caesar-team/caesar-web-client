@@ -95,8 +95,12 @@ export const extendedSortedCustomizableListsSelector = createSelector(
               itemsById[itemId]
                 ? [
                     ...accumulator,
-                    ...itemsById[itemId].invited.map(
-                      childItemId => childItemsById[childItemId],
+                    ...itemsById[itemId].invited.reduce(
+                      (acc, childItemId) =>
+                        childItemsById[childItemId]
+                          ? [...acc, childItemsById[childItemId]]
+                          : acc,
+                      [],
                     ),
                   ]
                 : accumulator,

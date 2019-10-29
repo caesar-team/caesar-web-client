@@ -10,6 +10,7 @@ import {
   FETCH_USER_TEAMS_SUCCESS,
   FETCH_USER_TEAMS_FAILURE,
   SET_MASTER_PASSWORD,
+  SET_KEY_PAIR,
   SET_CURRENT_TEAM_ID,
   LEAVE_TEAM,
   JOIN_TEAM,
@@ -63,6 +64,9 @@ export default createReducer(initialState, {
   },
   [SET_MASTER_PASSWORD](state, { payload }) {
     return { ...state, masterPassword: payload.masterPassword };
+  },
+  [SET_KEY_PAIR](state, { payload }) {
+    return { ...state, keyPair: payload.keyPair };
   },
   [SET_CURRENT_TEAM_ID](state, { payload }) {
     return { ...state, currentTeamId: payload.teamId };

@@ -54,7 +54,6 @@ class ManageListContainer extends Component {
 
   componentDidMount() {
     this.props.fetchUserSelfRequest();
-    this.props.fetchKeyPairRequest();
     this.props.fetchMembersRequest();
 
     this.props.initWorkflow();

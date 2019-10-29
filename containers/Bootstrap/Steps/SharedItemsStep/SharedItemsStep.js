@@ -336,7 +336,7 @@ class SharedItemsStep extends Component {
         />
         <AuthTitle>Someone has shared items with you</AuthTitle>
         <AuthDescription>
-          You can accept or reject next shared items
+          You can accept or reject the following shared items
         </AuthDescription>
         {shouldShowPersonalItems && (
           <Section>

@@ -74,7 +74,6 @@ class Import extends Component {
   state = this.prepareInitialState();
 
   componentDidMount() {
-    this.props.fetchKeyPairRequest();
     this.props.initWorkflow();
   }
 

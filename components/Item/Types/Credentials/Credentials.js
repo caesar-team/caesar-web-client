@@ -36,6 +36,7 @@ const StyledWebsiteLink = styled.a`
   cursor: pointer;
   color: inherit;
   transition: all 0.2s;
+  word-break: break-all;
 
   &:hover {
     color: ${({ theme }) => theme.emperor};

@@ -19,6 +19,7 @@ import {
   MASTER_PASSWORD_CHECK,
   MASTER_PASSWORD_CREATE,
   SHARED_ITEMS_CHECK,
+  SHARED_ITEMS_SKIP,
   BOOTSTRAP_FINISH,
 } from './constants';
 import {
@@ -110,6 +111,8 @@ class Bootstrap extends Component {
   };
 
   handleFinishSharedItems = () => {
+    this.bootstrap.sharedItemsState = SHARED_ITEMS_SKIP;
+
     this.setState({
       currentStep: BOOTSTRAP_FINISH,
     });

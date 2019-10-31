@@ -106,8 +106,10 @@ const Item = ({
   const isReadOnly = access && !hasWriteAccess;
 
   const renderUpdateNotify = () => {
-    const updateUserName =
-      update.userId === ownerId ? user.name : membersById[update.userId].name;
+    const updateUserName = membersById[update.userId]
+      ? membersById[update.userId].name
+      : '';
+
     const updateDate = formatDate(update.createdAt);
 
     return (

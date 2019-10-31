@@ -184,7 +184,7 @@ class SecureMessageForm extends Component {
                 render={({ field }) => (
                   <TextAreaStyled
                     {...field}
-                    placeholder='"Devide et Impera"'
+                    placeholder="Divide et Impera"
                     onBlur={setFieldTouched}
                     error={checkError(touched, errors, 'text')}
                   />

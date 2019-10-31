@@ -27,6 +27,7 @@ import {
   MOVE_ITEM_PERMISSION,
   SHARE_ITEM_PERMISSION,
   DELETE_PERMISSION,
+  INBOX_TYPE,
 } from 'common/constants';
 import { initialItemData } from './utils';
 
@@ -127,7 +128,7 @@ class DashboardContainer extends Component {
       this.context.can(SHARE_ITEM_PERMISSION, itemSubject) &&
       this.context.can(DELETE_PERMISSION, itemSubject);
 
-    if (!teamItemGuard) {
+    if (itemSubject.teamId && !teamItemGuard) {
       this.handleDefaultSelectionItemBehaviour(itemId);
       return;
     }
@@ -494,6 +495,9 @@ class DashboardContainer extends Component {
       (workInProgressList.id === trashList.id ||
         teamsTrashLists.map(({ id }) => id).includes(workInProgressList.id));
 
+    const isInboxList =
+      workInProgressList && workInProgressList.type === INBOX_TYPE;
+
     const areAllItemsSelected =
       mode === DASHBOARD_SEARCH_MODE
         ? searchedItems.length === workInProgressItemIds.length
@@ -535,6 +539,7 @@ class DashboardContainer extends Component {
                 <MiddleColumnWrapper>
                   {isMultiItem && (
                     <MultiItem
+                      isInboxList={isInboxList}
                       isTrashItems={isTrashList}
                       workInProgressItemIds={workInProgressItemIds}
                       areAllItemsSelected={areAllItemsSelected}

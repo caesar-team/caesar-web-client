@@ -26,7 +26,7 @@ const RightTopWrapper = styled.div`
 `;
 
 const ButtonStyled = styled(Button)`
-  margin: 0 10px;
+  margin-right: 10px;
 `;
 
 const CheckboxStyled = styled(Checkbox)`
@@ -46,6 +46,9 @@ const CheckboxStyled = styled(Checkbox)`
 `;
 
 const MultiItem = ({
+  // TODO: remove this check here
+  isInboxList = false,
+  //
   isTrashItems = false,
   areAllItemsSelected = false,
   workInProgressItemIds,
@@ -66,16 +69,18 @@ const MultiItem = ({
         {workInProgressItemIds.length} items
       </LeftTopWrapper>
       <RightTopWrapper>
-        <Button withOfflineCheck color="white" onClick={onClickMove}>
+        <ButtonStyled withOfflineCheck color="white" onClick={onClickMove}>
           MOVE
-        </Button>
-        <ButtonStyled
-          onlyIcon
-          withOfflineCheck
-          color="white"
-          icon="share"
-          onClick={onClickShare}
-        />
+        </ButtonStyled>
+        {!isInboxList && (
+          <ButtonStyled
+            onlyIcon
+            withOfflineCheck
+            color="white"
+            icon="share"
+            onClick={onClickShare}
+          />
+        )}
         <Button
           onlyIcon
           withOfflineCheck

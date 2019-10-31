@@ -134,7 +134,6 @@ const TwoFactorCheckForm = ({ onSubmit }) => (
               />
             )}
           />
-          {errors.code && <Error>{errors.code}</Error>}
           <CheckboxWrapper>
             <FastField
               name="fpCheck"

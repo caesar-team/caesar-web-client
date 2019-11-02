@@ -189,6 +189,7 @@ export const DELETE_PERMISSION = 'delete';
 // custom permissions
 export const CHANGE_TEAM_MEMBER_ROLE_PERMISSION = 'changeRole';
 export const JOIN_MEMBER_TO_TEAM = 'joinMember';
+export const LEAVE_MEMBER_FROM_TEAM = 'leaveMember';
 export const MOVE_ITEM_PERMISSION = 'moveItem';
 export const SHARE_ITEM_PERMISSION = 'share';
 
@@ -202,5 +203,6 @@ export const PERMISSIONS = {
   CHANGE_TEAM_MEMBER_ROLE_PERMISSION,
   MOVE_ITEM_PERMISSION,
   JOIN_MEMBER_TO_TEAM,
+  LEAVE_MEMBER_FROM_TEAM,
   SHARE_ITEM_PERMISSION,
 };

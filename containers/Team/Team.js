@@ -20,6 +20,7 @@ import {
   DELETE_PERMISSION,
   CHANGE_TEAM_MEMBER_ROLE_PERMISSION,
   JOIN_MEMBER_TO_TEAM,
+  LEAVE_MEMBER_FROM_TEAM,
 } from 'common/constants';
 
 const LogoWrapper = styled.div`
@@ -368,7 +369,7 @@ class TeamContainer extends Component {
       resizable: false,
       width: columnWidths.menu,
       Cell: ({ original }) => (
-        <Can I={DELETE_PERMISSION} of={team}>
+        <Can I={LEAVE_MEMBER_FROM_TEAM} of={team}>
           <MenuField>
             <DottedMenu
               tooltipProps={{

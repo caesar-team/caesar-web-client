@@ -29,13 +29,6 @@ const Title = styled.div`
   margin-bottom: 30px;
 `;
 
-const Description = styled.div`
-  font-size: 18px;
-  letter-spacing: 0.6px;
-  color: ${({ theme }) => theme.black};
-  margin-bottom: 25px;
-`;
-
 const StepWrapper = styled.div`
   display: flex;
   flex-direction: column;
@@ -74,7 +67,7 @@ class Import extends Component {
   state = this.prepareInitialState();
 
   componentDidMount() {
-    this.props.initWorkflow();
+    this.props.initWorkflow(false);
   }
 
   handleOnload = ({ file }) => {

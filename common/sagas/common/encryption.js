@@ -1,10 +1,6 @@
 import { Pool, spawn, Worker } from 'threads';
 import { call, put, take, select } from 'redux-saga/effects';
-import {
-  increaseCoresCount,
-  decreaseCoresCount,
-  encryptionFinishedEvent,
-} from 'common/actions/application';
+import { encryptionFinishedEvent } from 'common/actions/application';
 import { availableCoresCountSelector } from 'common/selectors/application';
 import { chunk } from 'common/utils/utils';
 import { ENCRYPTION_CHUNK_SIZE } from 'common/constants';
@@ -27,10 +23,7 @@ export function* encryption(itemUserPairs) {
 
   const chunks = chunk(itemUserPairs, ENCRYPTION_CHUNK_SIZE);
 
-  const coresCount =
-    chunks.length < availableCoresCount ? chunks.length : availableCoresCount;
-
-  yield put(decreaseCoresCount(coresCount));
+  const coresCount = (availableCoresCount - 1) / 2;
 
   const normalizerEvent = normalizeEvent(coresCount);
   const pool = Pool(() => spawn(new Worker('../../workers/encryption')), {
@@ -49,7 +42,7 @@ export function* encryption(itemUserPairs) {
           buffer.push(...event.returnValue);
           break;
         case POOL_QUEUE_FINISHED_EVENT_TYPE:
-          yield put(increaseCoresCount(coresCount));
+          // yield put(increaseCoresCount(coresCount));
           yield put(encryptionFinishedEvent(buffer));
           poolChannel.close();
           break;

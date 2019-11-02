@@ -38,6 +38,7 @@ export const encryptItem = async (data, key) => {
 };
 
 export const encryptItemsBatch = async (dataSet, key) => {
+  // eslint-disable-next-line
   return Promise.all(dataSet.map(async data => await encryptItem(data, key)));
 };
 
@@ -59,9 +60,6 @@ export const decryptByPassword = async (secretArmored, password) => {
 
   return JSON.parse(data);
 };
-
-export const encryptItemForUsers = async (data, keys) =>
-  Promise.all(keys.map(async key => await encryptItem(data, key)));
 
 export const generateUser = async email => {
   const masterPassword = generator();

@@ -1,10 +1,6 @@
 import { Pool, spawn, Worker } from 'threads';
 import { call, put, take, select } from 'redux-saga/effects';
 import { addItemsBatch } from 'common/actions/entities/item';
-import {
-  increaseCoresCount,
-  decreaseCoresCount,
-} from 'common/actions/application';
 import { availableCoresCountSelector } from 'common/selectors/application';
 import { arrayToObject, chunk, match } from 'common/utils/utils';
 import { checkItemsAfterDecryption } from 'common/utils/item';
@@ -29,10 +25,7 @@ export function* decryption({ items, key, masterPassword }) {
   const itemsById = arrayToObject(items);
   const chunks = chunk(items, DECRYPTION_CHUNK_SIZE);
 
-  const coresCount =
-    chunks.length < availableCoresCount ? chunks.length : availableCoresCount;
-
-  yield put(decreaseCoresCount(coresCount));
+  const coresCount = (availableCoresCount - 1) / 2;
 
   const normalizerEvent = normalizeEvent(coresCount);
   const pool = Pool(() => spawn(new Worker('../../workers/decryption')), {
@@ -57,7 +50,6 @@ export function* decryption({ items, key, masterPassword }) {
           );
           break;
         case POOL_QUEUE_FINISHED_EVENT_TYPE:
-          yield put(increaseCoresCount(coresCount));
           poolChannel.close();
           break;
         default:

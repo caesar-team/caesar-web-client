@@ -119,8 +119,8 @@ class DashboardContainer extends Component {
 
     const itemSubject = {
       ...item,
-      listType: workInProgressList.type,
-      userRole: workInProgressList.userRole,
+      listType: workInProgressList && workInProgressList.type,
+      userRole: workInProgressList && workInProgressList.userRole,
     };
 
     const teamItemGuard =

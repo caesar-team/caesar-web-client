@@ -14,8 +14,11 @@ export const RESET_WORK_IN_PROGRESS_ITEM_IDS =
   '@workflow/RESET_WORK_IN_PROGRESS_ITEM_IDS';
 export const RESET_WORKFLOW_STORE = '@workflow/RESET_WORKFLOW_STORE';
 
-export const initWorkflow = () => ({
+export const initWorkflow = (withDecryption = true) => ({
   type: INIT_WORKFLOW,
+  payload: {
+    withDecryption,
+  },
 });
 
 export const finishIsLoading = () => ({

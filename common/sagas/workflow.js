@@ -31,7 +31,7 @@ import { getFavoritesList } from 'common/normalizers/utils';
 import { fetchTeamSuccess } from 'common/actions/entities/team';
 import { getServerErrorMessage } from 'common/utils/error';
 
-function* initPersonal() {
+function* initPersonal(withDecryption) {
   try {
     const { data: lists } = yield call(getLists);
 
@@ -39,14 +39,16 @@ function* initPersonal() {
       lists,
     );
 
-    const keyPair = yield select(keyPairSelector);
-    const masterPassword = yield select(masterPasswordSelector);
+    if (withDecryption) {
+      const keyPair = yield select(keyPairSelector);
+      const masterPassword = yield select(masterPasswordSelector);
 
-    yield fork(decryption, {
-      items: sortItemsByFavorites(objectToArray(itemsById)),
-      key: keyPair.privateKey,
-      masterPassword,
-    });
+      yield fork(decryption, {
+        items: sortItemsByFavorites(objectToArray(itemsById)),
+        key: keyPair.privateKey,
+        masterPassword,
+      });
+    }
 
     const favoritesList = getFavoritesList(itemsById);
 
@@ -70,7 +72,7 @@ function* initPersonal() {
   }
 }
 
-function* initTeam(team) {
+function* initTeam(team, withDecryption) {
   try {
     yield put(fetchTeamSuccess(team));
 
@@ -88,7 +90,7 @@ function* initTeam(team) {
       yield put(addListsBatch(listsById));
       yield put(addChildItemsBatch(childItemsById));
 
-      if (currentTeamId === team.id) {
+      if (currentTeamId === team.id && withDecryption) {
         const keyPair = yield select(keyPairSelector);
         const masterPassword = yield select(masterPasswordSelector);
 
@@ -109,11 +111,11 @@ function* initTeam(team) {
   }
 }
 
-function* initTeams() {
+function* initTeams(withDecryption) {
   try {
     const { data: teams } = yield call(getTeams);
 
-    yield all(teams.map(team => call(initTeam, team)));
+    yield all(teams.map(team => call(initTeam, team, withDecryption)));
   } catch (error) {
     console.log(error);
     yield put(
@@ -122,10 +124,10 @@ function* initTeams() {
   }
 }
 
-export function* initWorkflow() {
+export function* initWorkflow({ payload: { withDecryption = true } }) {
   yield fork(fetchMembersSaga);
-  yield fork(initPersonal);
-  yield fork(initTeams);
+  yield fork(initPersonal, withDecryption);
+  yield fork(initTeams, withDecryption);
 }
 
 export function* updateWorkInProgressItemSaga({

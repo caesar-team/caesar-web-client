@@ -1,7 +1,6 @@
 import { Pool, spawn, Worker } from 'threads';
-import { call, put, take, select } from 'redux-saga/effects';
+import { call, put, take } from 'redux-saga/effects';
 import { addItemsBatch } from 'common/actions/entities/item';
-import { availableCoresCountSelector } from 'common/selectors/application';
 import { arrayToObject, chunk, match } from 'common/utils/utils';
 import { checkItemsAfterDecryption } from 'common/utils/item';
 import { DECRYPTION_CHUNK_SIZE } from 'common/constants';
@@ -19,14 +18,7 @@ const taskAction = (items, key, masterPassword) => async task => {
   return await task.decryptAll(items);
 };
 
-export function* decryption({ items, key, masterPassword }) {
-  const availableCoresCount = yield select(availableCoresCountSelector);
-
-  const itemsById = arrayToObject(items);
-  const chunks = chunk(items, DECRYPTION_CHUNK_SIZE);
-
-  const coresCount = (availableCoresCount - 1) / 2;
-
+export function* decryption({ chunks, key, masterPassword, coresCount }) {
   const normalizerEvent = normalizeEvent(coresCount);
   const pool = Pool(() => spawn(new Worker('../../workers/decryption')), {
     name: 'decryption',
@@ -43,12 +35,7 @@ export function* decryption({ items, key, masterPassword }) {
 
       switch (event.type) {
         case TASK_QUEUE_COMPLETED_EVENT_TYPE:
-          yield put(
-            addItemsBatch(
-              match(itemsById, checkItemsAfterDecryption(event.returnValue)),
-            ),
-          );
-          break;
+          return event.returnValue;
         case POOL_QUEUE_FINISHED_EVENT_TYPE:
           poolChannel.close();
           break;

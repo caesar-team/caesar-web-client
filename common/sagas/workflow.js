@@ -43,11 +43,20 @@ function* initPersonal(withDecryption) {
       const keyPair = yield select(keyPairSelector);
       const masterPassword = yield select(masterPasswordSelector);
 
-      yield fork(decryption, {
-        items: sortItemsByFavorites(objectToArray(itemsById)),
-        key: keyPair.privateKey,
-        masterPassword,
+      yield put({
+        type: 'decryption',
+        payload: {
+          items: sortItemsByFavorites(objectToArray(itemsById)),
+          key: keyPair.privateKey,
+          masterPassword,
+        },
       });
+
+      // yield fork(decryption, {
+      //   items: sortItemsByFavorites(objectToArray(itemsById)),
+      //   key: keyPair.privateKey,
+      //   masterPassword,
+      // });
     }
 
     const favoritesList = getFavoritesList(itemsById);
@@ -127,7 +136,7 @@ function* initTeams(withDecryption) {
 export function* initWorkflow({ payload: { withDecryption = true } }) {
   yield fork(fetchMembersSaga);
   yield fork(initPersonal, withDecryption);
-  yield fork(initTeams, withDecryption);
+  // yield fork(initTeams, withDecryption);
 }
 
 export function* updateWorkInProgressItemSaga({

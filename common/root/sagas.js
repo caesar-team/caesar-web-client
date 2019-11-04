@@ -9,6 +9,7 @@ import {
   childItemSagas,
   teamSagas,
 } from 'common/sagas';
+import { watchRequests } from 'common/sagas/common/job';
 
 const sagas = [
   userSagas,
@@ -22,5 +23,6 @@ const sagas = [
 ];
 
 export function* rootSaga() {
+  yield fork(watchRequests);
   yield all(sagas.map(fork));
 }

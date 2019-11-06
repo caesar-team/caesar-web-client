@@ -4,7 +4,7 @@ import { withRouter } from 'next/router';
 import { matchStrict } from 'common/utils/match';
 import { parseFile } from 'common/utils/importUtils';
 import { ITEM_CREDENTIALS_TYPE, ITEM_DOCUMENT_TYPE } from 'common/constants';
-import { NavigationPanel, TextLoader } from 'components';
+import { NavigationPanel, LogoLoader } from 'components';
 import { DataStep, FieldsStep, FileStep, ImportingStep } from './Steps';
 import {
   DATA_STEP,
@@ -20,6 +20,17 @@ const Wrapper = styled.div`
   background: ${({ theme }) => theme.lightBlue};
   width: 100%;
   padding: 60px;
+`;
+
+const LogoWrapper = styled.div`
+  display: flex;
+  flex-direction: column;
+  background: ${({ theme }) => theme.lightBlue};
+  width: 100%;
+  position: relative;
+  height: calc(100vh - 70px);
+  align-items: center;
+  justify-content: center;
 `;
 
 const Title = styled.div`
@@ -201,9 +212,9 @@ class Import extends Component {
 
     if (isLoading) {
       return (
-        <Wrapper>
-          <TextLoader />
-        </Wrapper>
+        <LogoWrapper>
+          <LogoLoader textColor="black" />
+        </LogoWrapper>
       );
     }
 

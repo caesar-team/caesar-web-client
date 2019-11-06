@@ -1,7 +1,6 @@
 import { Pool, spawn, Worker } from 'threads';
-import { call, put, take, select } from 'redux-saga/effects';
+import { call, put, take } from 'redux-saga/effects';
 import { encryptionFinishedEvent } from 'common/actions/application';
-import { availableCoresCountSelector } from 'common/selectors/application';
 import { chunk } from 'common/utils/utils';
 import { ENCRYPTION_CHUNK_SIZE } from 'common/constants';
 import { createPoolChannel } from './channels';
@@ -9,6 +8,7 @@ import { normalizeEvent } from './utils';
 import {
   TASK_QUEUE_COMPLETED_EVENT_TYPE,
   POOL_QUEUE_FINISHED_EVENT_TYPE,
+  POOL_QUEUE_INITIALIZED_EVENT_TYPE,
 } from './constants';
 
 const taskAction = pairs => async task => {
@@ -16,14 +16,10 @@ const taskAction = pairs => async task => {
   return await task.encryptAll(pairs);
 };
 
-export function* encryption(itemUserPairs) {
+export function* encryption({ items, coresCount }) {
   const buffer = [];
 
-  const availableCoresCount = yield select(availableCoresCountSelector);
-
-  const chunks = chunk(itemUserPairs, ENCRYPTION_CHUNK_SIZE);
-
-  const coresCount = (availableCoresCount - 1) / 2;
+  const chunks = chunk(items, ENCRYPTION_CHUNK_SIZE);
 
   const normalizerEvent = normalizeEvent(coresCount);
   const pool = Pool(() => spawn(new Worker('../../workers/encryption')), {
@@ -31,6 +27,15 @@ export function* encryption(itemUserPairs) {
     size: coresCount,
   });
   const poolChannel = yield call(createPoolChannel, pool);
+
+  while (poolChannel) {
+    const event = yield take(poolChannel);
+
+    if (event.type === POOL_QUEUE_INITIALIZED_EVENT_TYPE) {
+      break;
+    }
+  }
+
   chunks.map(pairs => pool.queue(taskAction(pairs)));
 
   while (poolChannel) {
@@ -42,7 +47,6 @@ export function* encryption(itemUserPairs) {
           buffer.push(...event.returnValue);
           break;
         case POOL_QUEUE_FINISHED_EVENT_TYPE:
-          // yield put(increaseCoresCount(coresCount));
           yield put(encryptionFinishedEvent(buffer));
           poolChannel.close();
           break;

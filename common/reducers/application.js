@@ -11,6 +11,7 @@ import { DEFAULT_CORES_COUNT } from 'common/constants';
 const initialState = {
   isLoading: false,
   isError: false,
+  maxCoresCount: DEFAULT_CORES_COUNT,
   availableCoresCount: DEFAULT_CORES_COUNT,
   globalNotification: {
     isLoading: false,
@@ -42,6 +43,7 @@ export default createReducer(initialState, {
   [INIT_CORES_COUNT](state, { payload }) {
     return {
       ...state,
+      maxCoresCount: payload.count,
       availableCoresCount: payload.count,
     };
   },

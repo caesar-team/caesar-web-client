@@ -1,5 +1,4 @@
 import { put, call, fork, takeLatest, select, all } from 'redux-saga/effects';
-import { decryption } from 'common/sagas/common/decryption';
 import {
   INIT_WORKFLOW,
   UPDATE_WORK_IN_PROGRESS_ITEM,
@@ -7,6 +6,7 @@ import {
   setWorkInProgressListId,
   setWorkInProgressItem,
   resetWorkInProgressItemIds,
+  decryption,
 } from 'common/actions/workflow';
 import { addListsBatch } from 'common/actions/entities/list';
 import { addItemsBatch } from 'common/actions/entities/item';
@@ -42,21 +42,17 @@ function* initPersonal(withDecryption) {
     if (withDecryption) {
       const keyPair = yield select(keyPairSelector);
       const masterPassword = yield select(masterPasswordSelector);
+      const items = sortItemsByFavorites(objectToArray(itemsById));
 
-      yield put({
-        type: 'decryption',
-        payload: {
-          items: sortItemsByFavorites(objectToArray(itemsById)),
-          key: keyPair.privateKey,
-          masterPassword,
-        },
-      });
-
-      // yield fork(decryption, {
-      //   items: sortItemsByFavorites(objectToArray(itemsById)),
-      //   key: keyPair.privateKey,
-      //   masterPassword,
-      // });
+      if (items && items.length > 0) {
+        yield put(
+          decryption({
+            items,
+            key: keyPair.privateKey,
+            masterPassword,
+          }),
+        );
+      }
     }
 
     const favoritesList = getFavoritesList(itemsById);
@@ -102,12 +98,17 @@ function* initTeam(team, withDecryption) {
       if (currentTeamId === team.id && withDecryption) {
         const keyPair = yield select(keyPairSelector);
         const masterPassword = yield select(masterPasswordSelector);
+        const items = objectToArray(itemsById);
 
-        yield fork(decryption, {
-          items: objectToArray(itemsById),
-          key: keyPair.privateKey,
-          masterPassword,
-        });
+        if (items && items.length > 0) {
+          yield put(
+            decryption({
+              items,
+              key: keyPair.privateKey,
+              masterPassword,
+            }),
+          );
+        }
       } else {
         yield put(addItemsBatch(itemsById));
       }
@@ -136,7 +137,7 @@ function* initTeams(withDecryption) {
 export function* initWorkflow({ payload: { withDecryption = true } }) {
   yield fork(fetchMembersSaga);
   yield fork(initPersonal, withDecryption);
-  // yield fork(initTeams, withDecryption);
+  yield fork(initTeams, withDecryption);
 }
 
 export function* updateWorkInProgressItemSaga({
@@ -184,12 +185,17 @@ export function* setCurrentTeamIdWatchSaga() {
 
     const keyPair = yield select(keyPairSelector);
     const masterPassword = yield select(masterPasswordSelector);
+    const items = objectToArray(itemsById);
 
-    yield fork(decryption, {
-      items: objectToArray(itemsById),
-      key: keyPair.privateKey,
-      masterPassword,
-    });
+    if (items && items.length > 0) {
+      yield put(
+        decryption({
+          items,
+          key: keyPair.privateKey,
+          masterPassword,
+        }),
+      );
+    }
   } catch (error) {
     console.log(error);
     yield put(

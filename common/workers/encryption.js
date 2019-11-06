@@ -6,13 +6,10 @@ self.window = self;
 
 const encryption = {
   async encryptAll(pairs) {
-    console.log('encryptAll pairs', pairs);
     // eslint-disable-next-line
     return await Promise.all(
       pairs.map(async ({ item, user }) => {
         const data = await encryptItem(item.data, user.publicKey);
-
-        console.log('data', data);
 
         return {
           itemId: item.id,

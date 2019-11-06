@@ -17,8 +17,8 @@ export const PORTAL_ID = 'portal';
 export const DEFAULT_IDLE_TIMEOUT = 5 * 60 * 1000;
 export const DEFAULT_CORES_COUNT = 4;
 
-export const DECRYPTION_CHUNK_SIZE = 10;
-export const ENCRYPTION_CHUNK_SIZE = 5;
+export const DECRYPTION_CHUNK_SIZE = 25;
+export const ENCRYPTION_CHUNK_SIZE = 25;
 
 export const ROOT_TYPE = 'root';
 export const INBOX_TYPE = 'inbox';
@@ -114,10 +114,6 @@ export const DOMAIN_ROLES = {
   ROLE_READ_ONLY_USER,
   ROLE_ANONYMOUS_USER,
 };
-
-export const LOADING = 'LOADING';
-export const SUCCESS = 'SUCCESS';
-export const FAILURE = 'FAILURE';
 
 export const ROUTES = {
   SIGN_IN: '/signin',

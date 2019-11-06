@@ -9,7 +9,8 @@ import {
   childItemSagas,
   teamSagas,
 } from 'common/sagas';
-import { watchRequests } from 'common/sagas/common/job';
+import { jobLoadBalancerSaga } from 'common/sagas/common/job';
+import { isClient } from 'common/utils/isEnvironment';
 
 const sagas = [
   userSagas,
@@ -23,6 +24,9 @@ const sagas = [
 ];
 
 export function* rootSaga() {
-  yield fork(watchRequests);
+  if (isClient) {
+    yield fork(jobLoadBalancerSaga);
+  }
+
   yield all(sagas.map(fork));
 }

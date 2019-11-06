@@ -1,76 +1,111 @@
-import { channel } from 'redux-saga';
-import { call, put, take, fork, select } from 'redux-saga/effects';
+import { call, put, take, select, spawn } from 'redux-saga/effects';
 import { availableCoresCountSelector } from 'common/selectors/application';
-import { DECRYPTION_CHUNK_SIZE, ENCRYPTION_CHUNK_SIZE } from 'common/constants';
-import { arrayToObject, chunk, match } from 'common/utils/utils';
 import {
   increaseCoresCount,
   decreaseCoresCount,
 } from 'common/actions/application';
+import {
+  DECRYPTION,
+  DECRYPTION_END,
+  ENCRYPTION,
+  ENCRYPTION_END,
+} from 'common/actions/workflow';
+import { decryption } from 'common/sagas/common/decryption';
+import { encryption } from 'common/sagas/common/encryption';
+import { createQueue } from 'common/utils/queue';
+import { uuid4 } from 'common/utils/uuid4';
+import { DECRYPTION_CHUNK_SIZE, ENCRYPTION_CHUNK_SIZE } from 'common/constants';
 
-const DECRYPTION = 'decryption';
-const DECRYPTION_FINISHED = 'decryption_finished';
+const JOB_EVENTS = [DECRYPTION, DECRYPTION_END, ENCRYPTION, ENCRYPTION_END];
+const JOB_END_EVENTS = [DECRYPTION_END, ENCRYPTION_END];
 
-const ENCRYPTION = 'encryption';
-const ENCRYPTION_FINISHED = 'encryption_finished';
+function getRequiredCoresCountFor(action) {
+  const { type, payload } = action;
 
-function prepareItemsFor(job, items) {
-  if (job === 'decryption') {
-    return chunk(items, DECRYPTION_CHUNK_SIZE);
-  }
+  const chunkSize =
+    type === DECRYPTION ? DECRYPTION_CHUNK_SIZE : ENCRYPTION_CHUNK_SIZE;
 
-  return null;
+  return Math.ceil(payload.items.length / chunkSize);
 }
 
-function getCoresCount(availableCoresCount, chunks) {
-  return chunks.length < availableCoresCount
-    ? chunks.length
+function canRunJobImmediately(availableCoresCount) {
+  return availableCoresCount > 0;
+}
+
+function getCoresCountFor(action, availableCoresCount) {
+  const requiredCoresCount = getRequiredCoresCountFor(action);
+
+  return requiredCoresCount < availableCoresCount
+    ? requiredCoresCount
     : availableCoresCount;
 }
 
-function* handleDecryptionRequest(chan) {
-  while (true) {
-    const payload = yield take(chan);
-    console.log('handleDecryptionRequest', payload);
-    yield put({ type: DECRYPTION_FINISHED });
-  }
+function isEndJob(type) {
+  return type && JOB_END_EVENTS.includes(type);
 }
 
-function* handleEncryptionRequest(chan) {
-  while (true) {
-    const payload = yield take(chan);
-    console.log('handleEncryptionRequest', payload);
-    yield put({ type: ENCRYPTION_FINISHED });
-  }
+function prepareJob(action, coresCount) {
+  return {
+    id: uuid4(),
+    action,
+    coresCount,
+  };
 }
 
-export function* watchRequests() {
-  console.log('watchRequests init');
+// job object:
+// - id
+// - coresCount
+// - action: { type, payload }
+function* jobSaga({ id, coresCount, action }) {
+  const job = action.type === DECRYPTION ? decryption : encryption;
 
-  const chan = yield call(channel);
+  const endEventType =
+    action.type === DECRYPTION ? DECRYPTION_END : ENCRYPTION_END;
 
-  yield fork(handleDecryptionRequest, chan);
-  yield fork(handleEncryptionRequest, chan);
+  yield call(job, { coresCount, ...action.payload });
+  yield put({ type: endEventType, payload: { id, coresCount } });
+}
+
+export function* jobLoadBalancerSaga() {
+  const queue = createQueue();
 
   while (true) {
-    const { type, payload } = yield take([DECRYPTION, ENCRYPTION]);
+    const action = yield take(JOB_EVENTS);
 
-    const availableCoresCount = yield select(availableCoresCountSelector);
+    if (isEndJob(action.type)) {
+      yield put(increaseCoresCount(action.payload.coresCount));
 
-    if (!availableCoresCount) {
-      // eslint-disable-next-line
-      const { payload } = yield take([DECRYPTION_FINISHED, ENCRYPTION_FINISHED]);
-      yield put(increaseCoresCount(payload.coresCount));
+      const availableCoresCount = yield select(availableCoresCountSelector);
+
+      if (!queue.isEmpty()) {
+        if (canRunJobImmediately(availableCoresCount)) {
+          const nextJob = queue.dequeue();
+
+          const coresCount = getCoresCountFor(
+            nextJob.action,
+            availableCoresCount,
+          );
+          const job = prepareJob(nextJob.action, coresCount);
+
+          yield put(decreaseCoresCount(coresCount));
+          yield spawn(jobSaga, job);
+        }
+      }
+    } else {
+      const availableCoresCount = yield select(availableCoresCountSelector);
+
+      if (canRunJobImmediately(availableCoresCount)) {
+        const coresCount = getCoresCountFor(action, availableCoresCount);
+        const job = prepareJob(action, coresCount);
+
+        yield put(decreaseCoresCount(coresCount));
+        yield spawn(jobSaga, job);
+      } else {
+        // cores count will be estimated when job will be pulled out from queue
+        const job = prepareJob(action, null);
+
+        queue.enqueue(job);
+      }
     }
-
-    const chunks = prepareItemsFor(type, payload.items);
-    const coresCount = getCoresCount(availableCoresCount, chunks);
-
-    yield put(decreaseCoresCount(coresCount));
-    // 1) check current available count of cores
-    // 2)
-    console.log('payload', payload, availableCoresCount, coresCount);
-
-    yield put(chan, payload);
   }
 }

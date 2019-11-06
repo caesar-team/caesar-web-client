@@ -18,8 +18,7 @@ import {
   createChildItemBatchSuccess,
   createChildItemBatchFailure,
 } from 'common/actions/entities/childItem';
-import { encryption } from 'common/sagas/common/encryption';
-import { updateWorkInProgressItem } from 'common/actions/workflow';
+import { updateWorkInProgressItem, encryption } from 'common/actions/workflow';
 import {
   ENCRYPTION_FINISHED_EVENT,
   updateGlobalNotification,
@@ -44,7 +43,7 @@ const ITEM_CHILD_ITEM_CHUNK_SIZE = 50;
 
 export function* createChildItemBatchSaga({ payload: { itemUserPairs } }) {
   try {
-    yield fork(encryption, itemUserPairs);
+    yield put(encryption({ items: itemUserPairs }));
 
     const {
       payload: { sets: encryptedChildItems },

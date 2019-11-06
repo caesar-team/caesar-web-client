@@ -14,6 +14,11 @@ export const RESET_WORK_IN_PROGRESS_ITEM_IDS =
   '@workflow/RESET_WORK_IN_PROGRESS_ITEM_IDS';
 export const RESET_WORKFLOW_STORE = '@workflow/RESET_WORKFLOW_STORE';
 
+export const DECRYPTION = '@workflow/DECRYPTION';
+export const DECRYPTION_END = '@workflow/DECRYPTION_END';
+export const ENCRYPTION = '@workflow/ENCRYPTION';
+export const ENCRYPTION_END = '@workflow/ENCRYPTION_END';
+
 export const initWorkflow = (withDecryption = true) => ({
   type: INIT_WORKFLOW,
   payload: {
@@ -61,4 +66,36 @@ export const resetWorkInProgressItemIds = () => ({
 
 export const resetWorkflowStore = () => ({
   type: RESET_WORKFLOW_STORE,
+});
+
+export const decryption = ({ items, key, masterPassword }) => ({
+  type: DECRYPTION,
+  payload: {
+    items,
+    key,
+    masterPassword,
+  },
+});
+
+export const decryptionEnd = (id, coresCount) => ({
+  type: DECRYPTION_END,
+  payload: {
+    id,
+    coresCount,
+  },
+});
+
+export const encryption = ({ items }) => ({
+  type: ENCRYPTION,
+  payload: {
+    items,
+  },
+});
+
+export const encryptionEnd = (id, coresCount) => ({
+  type: ENCRYPTION_END,
+  payload: {
+    id,
+    coresCount,
+  },
 });

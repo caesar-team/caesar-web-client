@@ -47,3 +47,8 @@ export const availableCoresCountSelector = createSelector(
   applicationSelector,
   application => application.availableCoresCount,
 );
+
+export const maxCoresCountSelector = createSelector(
+  applicationSelector,
+  application => application.maxCoresCount,
+);

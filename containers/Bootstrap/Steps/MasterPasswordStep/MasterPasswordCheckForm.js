@@ -47,7 +47,7 @@ const MasterPasswordCheckForm = ({ onSubmit }) => (
                 maxLength={24}
                 onClick={submitForm}
                 onBackspace={resetForm}
-                isError={Object.keys(errors).length !== 0}
+                isError={errors && Object.keys(errors).length !== 0}
               />
             )}
           />

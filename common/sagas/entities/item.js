@@ -616,6 +616,8 @@ export function* updateItemSaga({ payload: { item } }) {
 
     yield put(updateItemSuccess({ ...item, secret: encryptedItemSecret }));
 
+    yield put(updateWorkInProgressItem());
+
     yield put(updateGlobalNotification(NOOP_NOTIFICATION, false));
   } catch (error) {
     console.log(error);

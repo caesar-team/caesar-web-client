@@ -4,7 +4,7 @@ import zxcvbn from 'zxcvbn';
 const GOOD_PASSWORD_SCORE = 3;
 
 const checkIsPasswordValid = value =>
-  zxcvbn(value).score >= GOOD_PASSWORD_SCORE;
+  value && zxcvbn(value).score >= GOOD_PASSWORD_SCORE;
 
 export const passwordSchema = yup.object().shape({
   password: yup
@@ -22,7 +22,3 @@ export const createConfirmPasswordSchema = password =>
       )
       .required(),
   });
-
-export const checkPasswordSchema = yup.object({
-  password: yup.string().required(),
-});

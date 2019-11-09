@@ -332,7 +332,7 @@ class ItemHeader extends Component {
       this.context.can(MOVE_ITEM_PERMISSION, item) && listOptions.length >= 1;
 
     const shouldShowMoveButton =
-      listId !== currentListId || teamId !== currentTeamId;
+      listId !== currentListId || (teamId && teamId !== currentTeamId);
 
     const currentTeamTag =
       currentTeam.id === 'personal'

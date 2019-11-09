@@ -181,7 +181,7 @@ class DashboardContainer extends Component {
       workInProgressList,
     } = this.props;
 
-    const isTeamList = !!workInProgressList.teamId;
+    const isTeamList = workInProgressList && !!workInProgressList.teamId;
     const trashListId = isTeamList
       ? this.props.teamsTrashLists.find(
           ({ teamId }) => teamId === workInProgressList.teamId,

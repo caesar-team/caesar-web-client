@@ -192,6 +192,8 @@ class SharedItemsStep extends Component {
       currentMasterPassword,
       onFinish = Function.prototype,
     } = this.props;
+    this.setState({ isLoading: true });
+
     const { items, selectedIds, user } = this.state;
 
     const personalItems = items.personal.filter(({ id }) =>
@@ -257,6 +259,7 @@ class SharedItemsStep extends Component {
     return {
       items: {},
       selectedIds: [],
+      isLoading: false,
     };
   }
 
@@ -318,7 +321,7 @@ class SharedItemsStep extends Component {
   }
 
   render() {
-    const { items } = this.state;
+    const { items, isLoading } = this.state;
     const { navigationSteps } = this.props;
 
     const renderedPersonalItems = this.renderPersonalItems();
@@ -351,7 +354,9 @@ class SharedItemsStep extends Component {
           </Section>
         )}
         <ButtonWrapper>
-          <ButtonStyled onClick={this.handleAccept}>Start Work</ButtonStyled>
+          <ButtonStyled disabled={isLoading} onClick={this.handleAccept}>
+            Start Work
+          </ButtonStyled>
         </ButtonWrapper>
       </Fragment>
     );

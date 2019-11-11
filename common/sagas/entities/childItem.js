@@ -147,7 +147,7 @@ export function* updateChildItemsBatchSaga({
       user: member,
     }));
 
-    yield fork(encryption, itemUserPairs);
+    yield put(encryption({ items: itemUserPairs }));
 
     // stop and wait
     const {

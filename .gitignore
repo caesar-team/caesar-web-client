@@ -7,3 +7,5 @@ yarn-error.log
 /extension/.env.development
 /extension/.env.production
 /build
+.DS_Store
+.env

@@ -40,6 +40,10 @@ const publicRuntimeConfig = {
   LENGTH_KEY: process.env.LENGTH_KEY || 2048,
 };
 
+const serverRuntimeConfig = {
+  SENTRY_DSN: process.env.SENTRY_DSN,
+};
+
 const workboxOptions = {
   runtimeCaching: [
     {
@@ -64,6 +68,7 @@ module.exports = withPlugins(
   [withOffline, withWorkers, withFonts, withOptimizedImages, withCSS],
   {
     publicRuntimeConfig,
+    serverRuntimeConfig,
     workboxOpts: workboxOptions,
     webpack: config => {
       config.output.globalObject = 'this';

@@ -1,6 +1,6 @@
 import getConfig from 'next/config';
 
-const { publicRuntimeConfig = {} } = getConfig() || {};
+const { publicRuntimeConfig = {}, serverRuntimeConfig = {} } = getConfig() || {};
 
 export const {
   API_URI,
@@ -12,6 +12,10 @@ export const {
   TOTAL_MAX_UPLOADING_FILES_SIZES,
   LENGTH_KEY,
 } = publicRuntimeConfig;
+
+export const {
+  SENTRY_DSN,
+} = serverRuntimeConfig;
 
 export const PORTAL_ID = 'portal';
 export const DEFAULT_IDLE_TIMEOUT = 5 * 60 * 1000;

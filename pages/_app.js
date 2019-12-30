@@ -1,4 +1,7 @@
 import React from 'react';
+import {
+  SENTRY_DSN
+} from '../common/constants';
 // eslint-disable-next-line
 import { default as NextApp } from 'next/app';
 import { ThemeProvider, createGlobalStyle } from 'styled-components';
@@ -17,8 +20,11 @@ import {
   OfflineNotification,
   AbilityProvider,
 } from 'components';
+import * as Sentry from '@sentry/browser';
 
 const GlobalStyles = createGlobalStyle`${globalStyles}`;
+
+Sentry.init({dsn: SENTRY_DSN });
 
 class Application extends NextApp {
   static async getInitialProps({ Component, router: { route }, ctx }) {
@@ -30,6 +36,18 @@ class Application extends NextApp {
         : {};
 
     return { pageProps };
+  }
+
+  componentDidCatch(error, errorInfo) {
+    Sentry.withScope((scope) => {
+        Object.keys(errorInfo).forEach((key) => {
+            scope.setExtra(key, errorInfo[key]);
+        });
+
+        Sentry.captureException(error);
+    });
+
+    super.componentDidCatch(error, errorInfo);
   }
 
   render() {

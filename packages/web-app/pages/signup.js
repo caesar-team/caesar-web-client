@@ -1,6 +1,6 @@
 import React, { Fragment } from 'react';
-import { SignUpContainer } from '../containers';
-import { Head } from '../components';
+import { SignUpContainer } from '@caesar/containers';
+import { Head } from '@caesar/components';
 
 export default () => (
   <Fragment>

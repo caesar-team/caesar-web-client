@@ -1,7 +1,7 @@
 import React, { Fragment } from 'react';
-import { Error, Head } from 'components';
-import { SecureMessageContainer } from 'containers';
-import { getSecureMessage } from 'common/api';
+import { Error, Head } from '@caesar/components';
+import { SecureMessageContainer } from '@caesar/containers';
+import { getSecureMessage } from '@caesar/common/api';
 
 const MessagePage = ({ statusCode, message }) => (
   <Fragment>

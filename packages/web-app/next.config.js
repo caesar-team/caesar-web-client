@@ -18,7 +18,7 @@ const withOptimizedImages = require('next-optimized-images');
 const withCSS = require('@zeit/next-css');
 const withOffline = require('next-offline');
 const ThreadsPlugin = require('threads-plugin');
-const withTM = require('next-transpile-modules')(['@caesar/assets']);
+const withTM = require('next-transpile-modules')(['@caesar/assets','@caesar/common', '@caesar/containers', '@caesar/components']);
 
 // fix: prevents error when .css files are required by node
 if (typeof require !== 'undefined') {

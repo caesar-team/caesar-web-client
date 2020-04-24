@@ -5,9 +5,9 @@ import { DEFAULT_IDLE_TIMEOUT } from '@caesar-utils/constants';
 import OpenPGPWorker from '@caesar-utils/encryption.worker';
 import { validateKeys } from '@caesar-utils/utils/key';
 import { match } from '@caesar-utils/utils/match';
+import { Dashboard, MasterPassword } from '@caesar/containers';
+import { Login } from '@caesar/components';
 import { SessionChecker } from '@caesar-ui';
-import { Dashboard, MasterPassword } from 'containers';
-import { Login } from 'components';
 
 const Wrapper = styled.div`
   width: 576px;

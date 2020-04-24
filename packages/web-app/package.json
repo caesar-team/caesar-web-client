@@ -15,6 +15,8 @@
   },
   "dependencies": {
     "@caesar/assets": "1.0.0",
+    "@caesar/common": "1.0.0",
+    "@caesar/containers": "1.0.0",
     "@casl/ability": "^3.1.2",
     "@casl/react": "^1.0.2",
     "@redux-offline/redux-offline": "^2.5.2",

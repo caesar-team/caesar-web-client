@@ -1,9 +1,9 @@
 import React, { Fragment } from 'react';
 import styled from 'styled-components';
 import { formatDate } from '@caesar-utils/utils/dateUtils';
+import { TRASH_TYPE } from '@caesar-utils/constants';
 import { upperFirst } from '@caesar-utils//utils/string';
 import { Icon, Button, Avatar, AvatarsList, Dropdown } from '@caesar-ui';
-import { TRASH_TYPE } from '@caesar-utils/constants';
 import { Row } from './Row';
 
 const StyledRow = styled(Row)`

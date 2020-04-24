@@ -4,8 +4,8 @@ import {
   ITEM_CREDENTIALS_TYPE,
   ITEM_DOCUMENT_TYPE,
 } from '@caesar-utils/constants';
-import { Scrollbar } from '@caesar-ui';
 import { matchStrict } from '@caesar-utils/utils/match';
+import { Scrollbar } from '@caesar-ui';
 import EmptyItem from './EmptyItem';
 import { Credentials, Document } from './Types';
 

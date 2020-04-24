@@ -1,18 +1,21 @@
 import React, { Component, Fragment } from 'react';
 import { connect } from 'react-redux';
 import { createStructuredSelector } from 'reselect';
-import { ManageListContainer } from 'containers';
+import { ManageListContainer } from '@caesar/containers';
 import {
   FullScreenLoader,
   Head,
   SettingsLayout,
   SettingsSidebar,
-} from 'components';
-import { currentTeamSelector, userDataSelector } from 'common/selectors/user';
+} from '@caesar/components';
+import {
+  currentTeamSelector,
+  userDataSelector,
+} from '@caesar/common/selectors/user';
 import {
   fetchUserSelfRequest,
   fetchUserTeamsRequest,
-} from 'common/actions/user';
+} from '@caesar/common/actions/user';
 
 class SettingsManageListPage extends Component {
   componentDidMount() {

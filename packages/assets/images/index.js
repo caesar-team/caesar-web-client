@@ -1,14 +1,1 @@
-export close from 'svg/icon-close.svg?sprite';
-export arrow_down_big from 'svg/icon-arrow-down-big.svg?sprite';
-export arrow_down_small from 'svg/icon-arrow-down-small.svg?sprite';
-export arrow_up_big from 'svg/icon-arrow-up-big.svg?sprite';
-export arrow_up_small from 'svg/icon-arrow-up-small.svg?sprite';
-export arrow_next from 'svg/icon-arrow-next.svg?sprite';
-export inbox from 'svg/icon-inbox.svg?sprite';
-export logo_4xxi from 'svg/icon-logo-4xxi.svg?sprite';
-export logo from 'svg/icon-logo-new.svg?sprite';
-export logo_secure from 'svg/icon-logo-secure-message.svg?sprite';
-export lock from 'svg/icon-lock.svg?sprite';
-export copy from 'svg/icon-copy.svg?sprite';
-export download from 'svg/icon-download.svg?sprite';
-export dice from 'svg/icon-dice.svg?sprite';
+export { default as loader } from './loader.png';

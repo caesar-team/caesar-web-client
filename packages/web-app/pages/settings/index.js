@@ -1,4 +1,4 @@
-import { redirectTo } from 'common/utils/routerUtils';
+import { redirectTo } from '@caesar/common/utils/routerUtils';
 
 const SettingsIndexPage = () => null;
 

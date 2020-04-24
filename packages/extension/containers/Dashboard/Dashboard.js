@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import styled from 'styled-components';
 import { ITEM_REVIEW_MODE } from '@caesar-utils/constants';
-import { Lists, ListOption, Item, PasswordGenerator, Loader } from 'components';
+import { Lists, ListOption, Item, PasswordGenerator, Loader } from '@caesar/components';
 import { Icon, Scrollbar } from '@caesar-ui';
 
 const Wrapper = styled.div`

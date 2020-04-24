@@ -3,5 +3,9 @@
   "version": "1.0.0",
   "repository": "git@github.com:caesar-team/caesar-web-client.git",
   "author": "<ave@caesar.team>",
-  "license": "SEE LICENSE IN LICENSE"
+  "license": "SEE LICENSE IN LICENSE",
+  "dependencies": {
+    "polished": "^3.5.2",
+    "@caesar/assets": "1.0.0"
+  }
 }

@@ -6,13 +6,16 @@ import {
   Head,
   SettingsLayout,
   SettingsSidebar,
-} from 'components';
-import { ImportContainer } from 'containers';
-import { currentTeamSelector, userDataSelector } from 'common/selectors/user';
+} from '@caesar/components';
+import { ImportContainer } from '@caesar/containers';
+import {
+  currentTeamSelector,
+  userDataSelector,
+} from '@caesar/common/selectors/user';
 import {
   fetchUserSelfRequest,
   fetchUserTeamsRequest,
-} from 'common/actions/user';
+} from '@caesar/common/actions/user';
 
 class SettingsImportPage extends Component {
   componentDidMount() {

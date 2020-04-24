@@ -2,17 +2,9 @@ import React from 'react';
 // eslint-disable-next-line
 import { default as NextDocument, Head, Main, NextScript } from 'next/document';
 import styled, { ServerStyleSheet } from 'styled-components';
-import { PORTAL_ID } from 'common/constants';
+import { PORTAL_ID } from '@caesar/common/constants';
 import sprite from 'svg-sprite-loader/runtime/sprite.build';
-import * as Sentry from '@sentry/browser';
 
-process.on('unhandledRejection', err => {
-  Sentry.captureException(err);
-});
-
-process.on('uncaughtException', err => {
-  Sentry.captureException(err);
-});
 const Body = styled.body``;
 
 export default class Document extends NextDocument {

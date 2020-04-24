@@ -6,7 +6,7 @@ import sprite from 'svg-sprite-loader/runtime/sprite.build';
 import theme from '@caesar-utils/theme';
 import { configureExtensionStore } from '@caesar-utils/root/store';
 import globalStyles from '@caesar-utils/styles/globalStyles';
-import { App } from 'containers';
+import { App } from '@caesar/containers';
 import { NotificationProvider } from '@caesar-ui';
 
 function run(token) {

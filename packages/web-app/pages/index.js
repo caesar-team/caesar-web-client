@@ -1,6 +1,6 @@
 import React, { Fragment } from 'react';
-import { DashboardContainer } from '../containers';
-import { Head } from '../components';
+import { DashboardContainer } from '@caesar/containers';
+import { Head } from '@caesar/components';
 // import * from
 const DashboardPage = props => (
   <Fragment>

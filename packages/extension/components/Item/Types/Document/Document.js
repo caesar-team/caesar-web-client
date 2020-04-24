@@ -1,6 +1,6 @@
 import React from 'react';
 import { Label } from '@caesar-ui';
-import { Wrapper, FieldWrapper, Field, FieldValue, Title } from '../components';
+import { Wrapper, FieldWrapper, Field, FieldValue, Title } from '@caesar/components';
 
 export const Document = props => {
   const {

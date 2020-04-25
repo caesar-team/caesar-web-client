@@ -196,9 +196,8 @@ const CredentialsForm = ({
               {buttonText}
             </SubmitButton>
           </ButtonWrapper>
-          <FastField
-            name="name"
-            render={({ field }) => (
+          <FastField name="name">
+            {({ field }) => (
               <TitleInput
                 {...field}
                 onBlur={setFieldTouched}
@@ -207,11 +206,10 @@ const CredentialsForm = ({
                 error={checkError(touched, errors, 'name')}
               />
             )}
-          />
+          </FastField>
           <Row>
-            <FastField
-              name="login"
-              render={({ field }) => (
+            <FastField name="login">
+              {({ field }) => (
                 <FormInput
                   {...field}
                   onBlur={setFieldTouched}
@@ -220,12 +218,11 @@ const CredentialsForm = ({
                   error={checkError(touched, errors, 'login')}
                 />
               )}
-            />
+            </FastField>
           </Row>
           <Row>
-            <FastField
-              name="pass"
-              render={({ field }) => (
+            <FastField name="pass">
+              {({ field }) => (
                 <FormPasswordInput
                   {...field}
                   onBlur={setFieldTouched}
@@ -234,12 +231,11 @@ const CredentialsForm = ({
                   error={checkError(touched, errors, 'pass')}
                 />
               )}
-            />
+            </FastField>
           </Row>
           <Row>
-            <FastField
-              name="website"
-              render={({ field }) => (
+            <FastField name="website">
+              {({ field }) => (
                 <FormInput
                   {...field}
                   onBlur={setFieldTouched}
@@ -248,14 +244,13 @@ const CredentialsForm = ({
                   error={checkError(touched, errors, 'website')}
                 />
               )}
-            />
+            </FastField>
           </Row>
           <Row>
             <AdditionalLabel>Notes</AdditionalLabel>
-            <FastField
-              name="note"
-              render={({ field }) => <TextArea {...field} />}
-            />
+            <FastField name="note">
+              {({ field }) => <TextArea {...field} />}
+            </FastField>
           </Row>
           <AttachmentsSection>
             <Attachment>Attachments</Attachment>

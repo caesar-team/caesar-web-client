@@ -3,7 +3,7 @@
 .env.production
 .env.development
 yarn-error.log
-/node_modules
+node_modules
 /extension/.env.development
 /extension/.env.production
 build

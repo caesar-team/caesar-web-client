@@ -9,67 +9,73 @@ if (require('fs').existsSync(envFile)) {
     }`,
   });
 }
-
-const APP_URI = process.env.APP_URI || 'http://localhost';
-const APP_PORT = process.env.APP_PORT || 3000;
-
 const path = require('path');
-const express = require('express');
-const favicon = require('serve-favicon');
-const next = require('next');
-const cookieParser = require('cookie-parser');
-const helmet = require('helmet');
+const APP_URI = process.env.APP_URI || 'http://localhost';
+const fastify = require('fastify')({
+  pluginTimeout: 10000 * 2,
+  logger: { level: 'error' },
+});
+const fastifyStatic = require('fastify-static');
+const Next = require('next');
 
-const dev = process.env.NODE_ENV !== 'production';
-const app = next({ dev });
-const handle = app.getRequestHandler();
+const APP_PORT = parseInt(process.env.APP_PORT, 10) || 3000;
+const IS_DEV = process.env.NODE_ENV !== 'production';
 
-app.prepare().then(() => {
-  const server = express();
-
-  server.use(helmet());
-  server.use(cookieParser());
-  server.use(
-    favicon(path.join(__dirname, 'public/images/favicon', 'favicon.ico')),
-  );
-  server.use('/public', express.static('public'));
-  server.use(
-    '/service-worker.js',
-    express.static(path.join(__dirname, '.next', 'service-worker.js')),
-  );
-
-  // server.get('/message/:messageId', (req, res) => {
-  //   app.render(req, res, '/message', {
-  //     messageId: req.params.messageId,
-  //   });
-  // });
-
-  server.get('/', (req, res) => {
-    app.render(req, res, '/');
-  });
-
-  server.get('*', (req, res) => {
-    handle(req, res);
-  });
-
-  const instance = server.listen(APP_PORT, error => {
-    if (error) {
-      throw error;
-    }
-
-    // eslint-disable-next-line no-console
-    console.log(`> Ready on ${APP_URI}:${APP_PORT}`);
-  });
-
-  process.on('SIGINT', () => {
-    // eslint-disable-next-line no-console
-    console.info('SIGINT signal received.');
-    instance.close(err => {
-      if (err) {
-        // eslint-disable-next-line no-console
-        console.error(err);
-        process.exit(1);
+fastify.register((fastify, opts, next) => {
+  const app = Next({ dev: IS_DEV });
+  const handle = app.getRequestHandler();
+  app
+    .prepare()
+    .then(() => {
+      if (IS_DEV) {
+        fastify.get('/_next/*', (req, reply) => {
+          return handle(req.req, reply.res).then(() => {
+            reply.sent = true;
+          });
+        });
       }
-    });
-  });
+
+      fastify.get('/favicon.ico', (req, reply) => {
+        reply.sendFile('images/favicon/favicon.ico'); // serving path.join(__dirname, 'public', 'myHtml.html') directly
+      });
+      fastify.get('/favicon-locked.ico', (req, reply) => {
+        reply.sendFile('images/favicon/favicon-locked.ico'); // serving path.join(__dirname, 'public', 'myHtml.html') directly
+      });
+
+      // fastify.get('/a', (req, reply) => {
+      //   return app.render(req.req, reply.res, '/a', req.query).then(() => {
+      //     reply.sent = true;
+      //   });
+      // });
+      //
+      // fastify.get('/b', (req, reply) => {
+      //   return app.render(req.req, reply.res, '/b', req.query).then(() => {
+      //     reply.sent = true;
+      //   });
+      // });
+
+      fastify.all('/*', (req, reply) => {
+        return handle(req.req, reply.res).then(() => {
+          reply.sent = true;
+        });
+      });
+
+      fastify.setNotFoundHandler((request, reply) => {
+        return app.render404(request.req, reply.res).then(() => {
+          reply.sent = true;
+        });
+      });
+
+      next();
+    })
+    .catch(err => next(err));
+});
+fastify.register(fastifyStatic, {
+  root: path.join(__dirname, 'public'),
+  prefix: '/public/', // optional: default '/'
+});
+fastify.listen(APP_PORT, err => {
+  if (err) throw err;
+  // eslint-disable-next-line no-console
+  console.log(`> Ready on http://localhost:${APP_PORT}`);
 });

@@ -3,7 +3,14 @@ import styled from 'styled-components';
 import { Formik, FastField } from 'formik';
 import { checkError } from '@caesar/common/utils/formikUtils';
 import { ITEM_WORKFLOW_EDIT_MODE, TRASH_TYPE } from '@caesar/common/constants';
-import { Uploader, Input, Button, Select, TextArea, File } from '@caesar/components';
+import {
+  Uploader,
+  Input,
+  Button,
+  Select,
+  TextArea,
+  File,
+} from '@caesar/components';
 import { upperFirst } from '@caesar/common/utils/string';
 import { Form } from '../components';
 import { schema } from './schema';
@@ -177,9 +184,8 @@ const DocumentForm = ({
               {buttonText}
             </SubmitButton>
           </ButtonWrapper>
-          <FastField
-            name="name"
-            render={({ field }) => (
+          <FastField name="name">
+            {({ field }) => (
               <TitleInput
                 {...field}
                 onBlur={setFieldTouched}
@@ -188,13 +194,12 @@ const DocumentForm = ({
                 error={checkError(touched, errors, 'name')}
               />
             )}
-          />
+          </FastField>
           <Row>
             <AdditionalLabel>Notes</AdditionalLabel>
-            <FastField
-              name="note"
-              render={({ field }) => <TextArea {...field} />}
-            />
+            <FastField name="note">
+              {({ field }) => <TextArea {...field} />}
+            </FastField>
           </Row>
           <AttachmentsSection>
             <Attachment>Attachments</Attachment>

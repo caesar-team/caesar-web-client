@@ -1,9 +1,9 @@
 import React, { Fragment } from 'react';
 import styled from 'styled-components';
 import { withRouter } from 'next/router';
+import { IS_AUTHORIZATION_ENABLE } from '@caesar/common/constants';
 import { Logo } from './Logo';
 import { Button } from '../Button';
-import { AUTHORIZATION_ENABLE } from '@caesar/common/constants';
 
 const StyledButton = styled(Button)`
   font-size: 18px;
@@ -15,13 +15,14 @@ const StyledButton = styled(Button)`
 const SecondaryHeader = ({
   router,
   buttonText = 'Sign In',
-  url = '/signin',
+  url = IS_AUTHORIZATION_ENABLE ? '/signin' : '/',
+  isButtonShow = IS_AUTHORIZATION_ENABLE,
 }) => (
   <Fragment>
     <Logo href={url} width={142} height={40} />
-    {AUTHORIZATION_ENABLE &&
+    {isButtonShow && (
       <StyledButton onClick={() => router.push(url)}>{buttonText}</StyledButton>
-    }
+    )}
   </Fragment>
 );
 

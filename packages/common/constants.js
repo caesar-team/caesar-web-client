@@ -14,6 +14,8 @@ export const {
   AUTHORIZATION_ENABLE,
 } = publicRuntimeConfig;
 
+export const IS_AUTHORIZATION_ENABLE =
+  typeof AUTHORIZATION_ENABLE === 'undefined' ? true : AUTHORIZATION_ENABLE;
 export const PORTAL_ID = 'portal';
 
 export const DEFAULT_IDLE_TIMEOUT = 5 * 60 * 1000;

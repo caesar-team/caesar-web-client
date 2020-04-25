@@ -218,6 +218,11 @@ class SecureMessageContainer extends Component {
       decryptedMessage.attachments &&
       decryptedMessage.attachments.length > 0;
 
+    const shouldShowTextButton =
+      decryptedMessage &&
+      decryptedMessage.text &&
+      decryptedMessage.text.length > 0;
+
     return (
       <Wrapper>
         <StyledLogo name="logo-secure-message" width={214} height={60} />
@@ -225,13 +230,15 @@ class SecureMessageContainer extends Component {
         {renderedStep}
         {shouldShowButtons && (
           <ButtonsWrapper>
-            <Button
-              color="white"
-              icon="copy"
-              onClick={this.handleClickCopyText}
-            >
-              Copy text
-            </Button>
+            {shouldShowTextButton && (
+              <ButtonStyled
+                color="white"
+                icon="copy"
+                onClick={this.handleClickCopyText}
+              >
+                Copy text
+              </ButtonStyled>
+            )}
             {shouldShowDownloadButton && (
               <ButtonStyled
                 color="white"

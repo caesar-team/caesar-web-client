@@ -166,7 +166,8 @@ class SecureMessageForm extends Component {
         initialValues={initialValues}
         onSubmit={onSubmit}
         validationSchema={schema}
-        render={({
+      >
+        {({
           values,
           errors,
           touched,
@@ -175,6 +176,7 @@ class SecureMessageForm extends Component {
           setFieldTouched,
           isSubmitting,
           isValid,
+          dirty,
         }) => (
           <Form onSubmit={handleSubmit}>
             <Row>
@@ -243,12 +245,11 @@ class SecureMessageForm extends Component {
             {isCustomPassword && (
               <Row>
                 <Label>Password</Label>
-                <FastField
-                  name="password"
-                  render={({ field }) => (
+                <FastField name="password">
+                  {({ field }) => (
                     <InputStyled {...field} onBlur={setFieldTouched} />
                   )}
-                />
+                </FastField>
                 {checkError(touched, errors, 'password') && (
                   <Error>{checkError(touched, errors, 'password')}</Error>
                 )}
@@ -257,14 +258,14 @@ class SecureMessageForm extends Component {
             <ButtonWrapper>
               <StyledButton
                 htmlType="submit"
-                disabled={isSubmitting || !isValid || !isOnline}
+                disabled={isSubmitting || !(isValid && dirty) || !isOnline}
               >
                 Create Secure Message
               </StyledButton>
             </ButtonWrapper>
           </Form>
         )}
-      />
+      </Formik>
     );
   }
 }

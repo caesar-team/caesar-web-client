@@ -10,6 +10,7 @@ import { persistOptions } from './persist';
 
 export function configureWebStore(preloadedState) {
   const composeEnhancers = composeWithDevTools({});
+
   const sagaMiddleware = createSagaMiddleware();
   const {
     middleware: offlineMiddleware,
@@ -29,6 +30,7 @@ export function configureWebStore(preloadedState) {
       applyMiddleware(sagaMiddleware, offlineMiddleware),
     ),
   );
+  // const persistor = persistStore(store);
 
   const sagaTask = sagaMiddleware.run(rootSaga);
 

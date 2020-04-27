@@ -1,4 +1,5 @@
 import { createTransform } from 'redux-persist';
+import * as localForage from 'localforage';
 
 const itemTransform = createTransform(
   inboundState => ({
@@ -28,6 +29,8 @@ const userTransform = createTransform(
 );
 
 export const persistOptions = {
+  key: 'root',
+  localForage,
   blacklist: ['application', 'workflow'],
   transforms: [itemTransform, userTransform],
 };

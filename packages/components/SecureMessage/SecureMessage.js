@@ -1,5 +1,6 @@
 import React, { Component, Fragment } from 'react';
 import styled from 'styled-components';
+import { media } from '@caesar/assets/styles/media';
 import { match } from '@caesar/common/utils/match';
 import { encryptByPassword } from '@caesar/common/utils/cipherUtils';
 import { generator } from '@caesar/common/utils/password';
@@ -18,6 +19,10 @@ const Wrapper = styled.div`
   width: 100%;
   padding: 40px 0;
   min-height: calc(100vh - 150px);
+
+  ${media.mobile`
+    padding: 20px 0;
+  `}
 `;
 
 const Title = styled.div`
@@ -25,6 +30,11 @@ const Title = styled.div`
   letter-spacing: 1px;
   color: ${({ theme }) => theme.black};
   margin-bottom: 40px;
+
+  ${media.mobile`
+    margin-bottom: 10px;
+    line-height: 1.11;
+  `}
 `;
 
 class SecureMessage extends Component {

@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import styled from 'styled-components';
 import { Formik, FastField } from 'formik';
+import { media } from '@caesar/assets/styles/media';
 import {
   Checkbox,
   TextArea,
@@ -43,6 +44,11 @@ const Column = styled.div`
 
 const ColumnStyled = styled(Column)`
   margin-left: 20px;
+
+  ${media.wideMobile`
+    margin-top: 20px;
+    margin-left: 0;
+  `}
 `;
 
 const Label = styled.div`
@@ -94,6 +100,10 @@ const SelectRow = styled.div`
   width: 100%;
   margin-top: 20px;
   margin-bottom: 30px;
+
+  ${media.wideMobile`
+    flex-wrap: wrap;
+  `}
 `;
 
 const StyledSelect = styled(Select)`

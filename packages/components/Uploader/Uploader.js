@@ -15,7 +15,7 @@ const Container = styled.div`
     ${({ theme, isDragActive }) =>
       isDragActive ? theme.color.blue : theme.color.gray};
   width: 100%;
-  padding: 24px 0;
+  padding: 24px 5px;
   cursor: pointer;
   outline: none;
   transition: all 0.2s;

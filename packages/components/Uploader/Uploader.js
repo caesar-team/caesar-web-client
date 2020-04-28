@@ -10,9 +10,10 @@ const Container = styled.div`
   justify-content: center;
   align-items: center;
   background-color: ${({ theme, isDragActive }) =>
-    isDragActive ? theme.lightBlueUploader : theme.snow};
+    isDragActive ? theme.color.lightBlueUploader : theme.color.snow};
   border: 1px dashed
-    ${({ theme, isDragActive }) => (isDragActive ? theme.blue : theme.gray)};
+    ${({ theme, isDragActive }) =>
+      isDragActive ? theme.color.blue : theme.color.gray};
   width: 100%;
   padding: 24px 0;
   cursor: pointer;
@@ -21,34 +22,35 @@ const Container = styled.div`
 `;
 
 const Text = styled.span`
-  font-size: 18px;
+  margin-bottom: 3px;
+  font-size: 16px;
   letter-spacing: 0.6px;
   text-align: center;
-  color: ${({ theme }) => theme.emperor};
+  color: ${({ theme }) => theme.color.emperor};
 `;
 
-const ExtText = styled.div`
-  font-size: 16px;
+const HintText = styled.div`
+  font-size: 14px;
   letter-spacing: 0.5px;
-  color: ${({ theme }) => theme.gray};
+  color: ${({ theme }) => theme.color.gray};
 `;
 
 const Link = styled.a`
-  color: ${({ theme }) => theme.blue};
+  color: ${({ theme }) => theme.color.black};
 `;
 
 const StyledIcon = styled(Icon)`
   fill: ${({ theme, isDragActive }) =>
-    isDragActive ? theme.blue : theme.gray};
+    isDragActive ? theme.color.gray : theme.color.black};
   transition: all 0.2s;
-  margin-bottom: 10px;
+  margin-right: 15px;
 `;
 
 const Error = styled.div`
   margin-top: 8px;
   font-size: 14px;
   letter-spacing: 0.4px;
-  color: ${({ theme }) => theme.red};
+  color: ${({ theme }) => theme.color.red};
 `;
 
 const splitFilesToUniqAndDuplicates = files => {
@@ -82,7 +84,7 @@ const Uploader = ({
   multiple = false,
   accept,
   onChange,
-  extText = '.rar .zip .doc .docx .pdf .jpg...',
+  hintText = 'Not more than 25 MB',
   error,
   files: previousFiles = [],
   notification,
@@ -123,16 +125,16 @@ const Uploader = ({
         ) : (
           <Container {...getRootProps()} isDragActive={isDragActive}>
             <input {...getInputProps()} />
-            <StyledIcon
-              name="inbox"
-              width={40}
-              height={36}
-              isDragActive={isDragActive}
-            />
             <Text>
-              Drag and drop your file here or <Link>upload</Link>.
+              <StyledIcon
+                name="download"
+                width={16}
+                height={16}
+                isDragActive={isDragActive}
+              />
+              <Link>Upload File</Link> or drag and drop your file here
             </Text>
-            <ExtText>{extText}</ExtText>
+            <HintText>{hintText}</HintText>
             {error && <Error>{error}</Error>}
           </Container>
         )

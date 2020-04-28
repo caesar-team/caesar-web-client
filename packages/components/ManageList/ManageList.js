@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import Link from 'next/link';
 import { DEFAULT_LIST_TYPE } from '@caesar/common/constants';
-import Button from '../Button/Button';
+import { Button } from '../Button';
 import DottedMenu from '../DottedMenu/DottedMenu';
 import AvatarsList from '../Avatar/AvatarsList';
 import withOfflineDetection from '../Offline/withOfflineDetection';

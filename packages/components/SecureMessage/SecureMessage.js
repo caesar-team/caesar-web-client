@@ -16,8 +16,8 @@ const Wrapper = styled.div`
   display: flex;
   flex-direction: column;
   width: 100%;
-  padding: 40px 60px;
-  height: calc(100vh - 70px);
+  padding: 40px 0;
+  min-height: calc(100vh - 150px);
 `;
 
 const Title = styled.div`

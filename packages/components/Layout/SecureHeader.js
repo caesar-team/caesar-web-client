@@ -38,9 +38,13 @@ const SecureHeaderComponent = ({
       {isButtonShow && (
         <>
           {isMobile ? (
-            <StyledButton onClick={() => router.push('/signin')} icon="login" />
+            <StyledButton
+              onClick={() => router.push('/signin')}
+              icon="login"
+              color="white"
+            />
           ) : (
-            <StyledButton onClick={() => router.push('/signin')}>
+            <StyledButton onClick={() => router.push('/signin')} color="white">
               Log In
             </StyledButton>
           )}

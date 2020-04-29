@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import styled from 'styled-components';
 import { Formik, FastField } from 'formik';
+import { media } from '@caesar/assets/styles/media';
 import {
   Checkbox,
   TextArea,
@@ -28,7 +29,7 @@ const Row = styled.div`
   position: relative;
   display: flex;
   flex-direction: column;
-  margin-bottom: 30px;
+  margin-bottom: 10px;
 
   &:last-child {
     margin-bottom: 0;
@@ -43,6 +44,11 @@ const Column = styled.div`
 
 const ColumnStyled = styled(Column)`
   margin-left: 20px;
+
+  ${media.wideMobile`
+    margin-top: 20px;
+    margin-left: 0;
+  `}
 `;
 
 const Label = styled.div`
@@ -92,8 +98,12 @@ const FileRow = styled.div`
 const SelectRow = styled.div`
   display: flex;
   width: 100%;
+  margin-top: 20px;
   margin-bottom: 30px;
-  margin-top: 30px;
+
+  ${media.wideMobile`
+    flex-wrap: wrap;
+  `}
 `;
 
 const StyledSelect = styled(Select)`
@@ -112,14 +122,21 @@ const StyledSelect = styled(Select)`
 `;
 
 const ButtonWrapper = styled.div`
+  position: relative;
   margin: 30px 0;
 `;
 
 const StyledButton = styled(Button)`
-  font-size: 18px;
-  letter-spacing: 0.6px;
-  padding: 18px 30px;
-  height: 60px;
+  position: relative;
+`;
+
+const ButtonImg = styled.img`
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 279px;
+  height: 200px;
+  transform: translate(-110px, -70px);
 `;
 
 const checkAttachmentsError = (errors, index) =>
@@ -211,17 +228,6 @@ class SecureMessageForm extends Component {
             </AttachmentsSection>
             <SelectRow>
               <Column>
-                <Label>Number of Attempts</Label>
-                <StyledSelect
-                  boxOffset={60}
-                  name="requestsLimit"
-                  placeholder="Select option"
-                  value={values.requestsLimit}
-                  options={requestsLimitOptions}
-                  onChange={setFieldValue}
-                />
-              </Column>
-              <ColumnStyled>
                 <Label>Data expires in</Label>
                 <StyledSelect
                   boxOffset={60}
@@ -229,6 +235,17 @@ class SecureMessageForm extends Component {
                   placeholder="Select option"
                   value={values.secondsLimit}
                   options={secondsLimitOptions}
+                  onChange={setFieldValue}
+                />
+              </Column>
+              <ColumnStyled>
+                <Label>Number of Attempts</Label>
+                <StyledSelect
+                  boxOffset={60}
+                  name="requestsLimit"
+                  placeholder="Select option"
+                  value={values.requestsLimit}
+                  options={requestsLimitOptions}
                   onChange={setFieldValue}
                 />
               </ColumnStyled>
@@ -256,8 +273,13 @@ class SecureMessageForm extends Component {
               </Row>
             )}
             <ButtonWrapper>
+              <ButtonImg
+                srcSet="/images/secure-bg-btn@2x.png 2x, /images/secure-bg-btn@3x.png 3x"
+                src="/images/secure-bg-btn.png"
+              />
               <StyledButton
                 htmlType="submit"
+                isHigh
                 disabled={isSubmitting || !(isValid && dirty) || !isOnline}
               >
                 Create Secure Message

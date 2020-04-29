@@ -15,6 +15,7 @@ const Box = styled.span`
   display: flex !important;
   align-items: center;
   justify-content: center;
+  align-self: flex-start;
   width: 20px;
   height: 20px;
   color: ${({ theme }) => theme.white};

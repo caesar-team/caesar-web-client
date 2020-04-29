@@ -6,13 +6,13 @@ import Icon from '../Icon/Icon';
 const getButtonStyles = ({ color, theme }) => {
   const colorsMap = {
     black: `
-      color: ${theme.white};
-      background-color: ${theme.black};
+      color: ${theme.color.white};
+      background-color: ${theme.color.black};
     `,
     white: `
-      background-color: ${theme.white};
-      color: ${theme.emperor};
-      border: 1px solid ${theme.gallery};
+      background-color: ${theme.color.white};
+      color: ${theme.color.emperor};
+      border: 1px solid ${theme.color.gallery};
     `,
   };
 
@@ -22,12 +22,12 @@ const getButtonStyles = ({ color, theme }) => {
 const getButtonHoverStyles = ({ color, theme }) => {
   const colorsMap = {
     black: `
-      background-color: ${theme.emperor};
+      background-color: ${theme.color.emperor};
     `,
     white: `
-      color: ${theme.black};
-      background-color: ${theme.white};
-      border: 1px solid ${theme.black};
+      color: ${theme.color.black};
+      background-color: ${theme.color.white};
+      border: 1px solid ${theme.color.black};
     `,
   };
 
@@ -37,9 +37,9 @@ const getButtonHoverStyles = ({ color, theme }) => {
 const getButtonHoverBlackBackgroundStyles = ({ color, theme }) => {
   const colorsMap = {
     white: `
-      color: ${theme.white};
-      background-color: ${theme.black};
-      border: 1px solid ${theme.black};
+      color: ${theme.color.white};
+      background-color: ${theme.color.black};
+      border: 1px solid ${theme.color.black};
     `,
   };
 
@@ -50,15 +50,17 @@ const StyledButton = styled.button`
   display: flex;
   align-items: center;
   justify-content: center;
-  height: 40px;
-  font-size: 14px;
-  letter-spacing: 0.4px;
+  height: ${({ isHigh }) => (isHigh ? '60px' : '40px')};
+  padding: ${({ isHigh }) => (isHigh ? '18px 30px' : '10px 20px')};
+  font-size: ${({ isHigh }) => (isHigh ? '18px' : '14px')};
+  letter-spacing: ${({ isHigh }) => (isHigh ? '0.6px' : '0.4px')};
   border-radius: 3px;
   border: 0;
   outline: none;
   cursor: pointer;
-  padding: 10px 20px;
   transition: all 0.2s;
+
+  ${({ isHigh }) => !isHigh && `text-transform: uppercase;`}
 
   ${({ onlyIcon }) =>
     onlyIcon &&
@@ -67,11 +69,6 @@ const StyledButton = styled.button`
     padding: 0;
   `};
 
-  &[disabled] {
-    opacity: 0.5;
-    cursor: not-allowed;
-  }
-
   ${getButtonStyles};
 
   &:hover {
@@ -79,6 +76,11 @@ const StyledButton = styled.button`
       isHoverBlackBackground
         ? getButtonHoverBlackBackgroundStyles
         : getButtonHoverStyles};
+  }
+
+  &[disabled] {
+    background-color: ${({ theme }) => theme.color.gallery};
+    cursor: not-allowed;
   }
 `;
 
@@ -89,7 +91,7 @@ const Text = styled.div`
 const getButtonDisabledStatus = (withOfflineCheck, isOnline, disabled) =>
   (withOfflineCheck && !isOnline) || disabled;
 
-const Button = forwardRef(
+const ButtonComponent = forwardRef(
   (
     {
       icon,
@@ -100,6 +102,7 @@ const Button = forwardRef(
       withOfflineCheck = false,
       isHoverBlackBackground,
       isOnline,
+      isHigh,
       ...props
     },
     ref,
@@ -120,6 +123,7 @@ const Button = forwardRef(
         color={color}
         onlyIcon={onlyIcon}
         disabled={isDisabled}
+        isHigh={isHigh}
         {...props}
       >
         {icon && <Icon name={icon} width={14} height={14} isInButton />}
@@ -129,4 +133,4 @@ const Button = forwardRef(
   },
 );
 
-export default withOfflineDetection(Button);
+export const Button = withOfflineDetection(ButtonComponent);

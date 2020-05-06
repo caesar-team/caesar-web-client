@@ -1,5 +1,5 @@
 ﻿---
-apiVersion: apps/v1beta2
+apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: caesar-web-client
@@ -22,11 +22,11 @@ spec:
     metadata:
       labels:
         app: caesar-web-client
-        CICD_GIT_COMMIT: "${CICD_GIT_COMMIT}"
+        CICD_GIT_COMMIT: "$CICD_GIT_COMMIT"
     spec:
       containers:
       - name: caesar-web-client
-        image: "caesarteam/caesar-web-client:${CICD_GIT_BRANCH}"
+        image: "caesarteam/caesar-web-client:$CICD_GIT_BRANCH"
         imagePullPolicy: Always
         envFrom:
         - configMapRef:

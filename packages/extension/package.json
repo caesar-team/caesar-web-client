@@ -1,0 +1,15 @@
+{
+  "name": "@caesar/extention",
+  "version": "1.0.0",
+  "repository": "git@github.com:caesar-team/caesar-web-client.git",
+  "author": "<ave@caesar.team>",
+  "license": "SEE LICENSE IN LICENSE",
+  "scripts": {
+    "dev": "next",
+    "build": "next build",
+    "start": "next start"
+  },
+  "dependencies": {
+
+  }
+}

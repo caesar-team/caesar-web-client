@@ -1,9 +1,12 @@
-/.idea
-/.next
+.idea
+.next
 .env.production
 .env.development
 yarn-error.log
-/node_modules
+node_modules
 /extension/.env.development
 /extension/.env.production
-/build
+build
+.DS_Store
+.env
+.history

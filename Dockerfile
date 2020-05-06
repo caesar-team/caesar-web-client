@@ -5,46 +5,50 @@ FROM node:10.16-alpine AS base
 RUN mkdir -p /var/app && chown -R node /var/app
 # Set working directory
 WORKDIR /var/app
+
+#
+# ---- Dependencies (with packages) ----
+FROM base AS dependencies
+RUN apk add --update python build-base
 # Copy project file
 COPY package.json .
 COPY yarn.lock .
-COPY public .
-#
-# ---- Dependencies ----
-FROM base AS dependencies
-RUN apk add --update python build-base
-# install node packages
-RUN yarn install --production --no-progress
-# copy production node_modules aside
-RUN cp -R node_modules prod_node_modules
-# install ALL node_modules, including 'devDependencies'
-RUN yarn install --no-progress
-
-# Run in production mode
-ENV NODE_ENV=production
+# Copy packages
+COPY packages/assets packages/assets
+COPY packages/common packages/common
+COPY packages/components packages/components
+COPY packages/containers packages/containers
+# Resolve package dependencies
+RUN yarn
 
 #
 # ---- Test & Build ----
 # run linters, setup and tests
-FROM dependencies AS build
-COPY . .
-# Setup environment variables
-ARG API_URI
-ARG APP_URI
-ENV NODE_ENV=production
-RUN yarn build
+FROM dependencies AS build_web_app
+COPY packages/web-app packages/web-app
+# Resolve the web-app dependencies
+RUN yarn
+RUN yarn build:production
 
 #
-# ---- Release ----
-FROM base AS release
+# ---- Test & Build ----
+# run linters, setup and tests
+FROM dependencies AS build_secure_app
+COPY packages/secure-app packages/secure-app
+# Resolve the web-app dependencies
+RUN yarn
+RUN yarn secure:build:production
+
+#
+# ---- Release Web App ----
+FROM base AS release_web_app
 # copy production node_modules
-COPY --from=dependencies /var/app/node_modules ./node_modules
-COPY --from=build /var/app/.next ./.next
-COPY ./server.js ./server.js
-COPY ./next.config.js ./next.config.js
-COPY ./public ./public
-# Setup environment variables
-ENV NODE_ENV=production
+COPY --from=build_web_app /var/app/node_modules /var/app/packages/web-app/node_modules
+COPY --from=build_web_app /var/app/packages/web-app/.next packages/web-app/.next
+COPY packages/web-app/server.js packages/web-app/server.js
+COPY packages/web-app/package.json packages/web-app/package.json
+COPY packages/web-app/public packages/web-app/public
+COPY package.json .
 # expose port and define CMD
 EXPOSE 3000
-CMD yarn prod
+CMD yarn start:production

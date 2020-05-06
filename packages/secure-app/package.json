@@ -7,10 +7,10 @@
   "license": "SEE LICENSE IN LICENSE",
   "scripts": {
     "dev": "node server.js",
-    "build:production": "cross-env NODE_ENV=production next build",
-    "start:production": "cross-env NODE_ENV=production node ./server.js",
-    "dev-extension": "NODE_ENV=development webpack --config extension/webpack.dev.config.js --watch",
-    "build-extension": "NODE_ENV=production webpack --config extension/webpack.prod.config.js"
+    "build:production": "$(yarn bin)/cross-env NODE_ENV=production next build",
+    "start:production": "$(yarn bin)/cross-env NODE_ENV=production node ./server.js",
+    "dev-extension": "$(yarn bin)/cross-env NODE_ENV=development webpack --config extension/webpack.dev.config.js --watch",
+    "build-extension": "$(yarn bin)/cross-env NODE_ENV=production webpack --config extension/webpack.prod.config.js"
   },
   "dependencies": {
     "@caesar/assets": "1.0.0",

@@ -7,9 +7,8 @@
   "license": "SEE LICENSE IN LICENSE",
   "scripts": {
     "dev": "node server.js",
-    "build": "next build",
-    "start": "node server.js",
-    "prod": "yarn start",
+    "build:production": "cross-env NODE_ENV=production next build",
+    "start:production": "cross-env NODE_ENV=production node ./server.js",
     "dev-extension": "NODE_ENV=development webpack --config extension/webpack.dev.config.js --watch",
     "build-extension": "NODE_ENV=production webpack --config extension/webpack.prod.config.js"
   },
@@ -29,6 +28,7 @@
     "btoa": "^1.2.1",
     "cookie-parser": "^1.4.4",
     "copy-text-to-clipboard": "^2.1.0",
+    "cross-env": "^7.0.2",
     "deepmerge": "^4.0.0",
     "dotenv": "^8.0.0",
     "express": "^4.17.1",

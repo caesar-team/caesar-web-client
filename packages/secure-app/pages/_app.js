@@ -12,6 +12,12 @@ import {
   OfflineDetectionProvider,
 } from '@caesar/components';
 
+import {
+  fixedSizeListener,
+  fixedSizeUnListener,
+} from '@caesar/common/utils/forceScreenSize';
+import { PWA_WINDOW_SIZE } from '@caesar/common/constants';
+
 const GlobalStyles = createGlobalStyle`${globalStyles}`;
 
 class Application extends NextApp {
@@ -25,7 +31,16 @@ class Application extends NextApp {
     return { pageProps };
   }
 
+  componentDidMount() {
+    fixedSizeListener(PWA_WINDOW_SIZE.width, PWA_WINDOW_SIZE.height);
+  }
+
+  componentWillUnmount() {
+    fixedSizeUnListener();
+  }
+
   componentDidCatch(error, errorInfo) {
+    fixedSizeUnListener();
     super.componentDidCatch(error, errorInfo);
   }
 

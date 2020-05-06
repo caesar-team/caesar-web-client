@@ -1,6 +1,6 @@
 import axios from 'axios';
 import { removeCookieValue } from './utils/token';
-import { API_URI, API_BASE_PATH } from './constants';
+import { API_URI, API_BASE_PATH, IS_EXTENSION_APP } from './constants';
 import { isClient } from './utils/isEnvironment';
 
 const softExit = () => {
@@ -26,7 +26,7 @@ callApi.interceptors.response.use(
     if (error.response) {
       switch (error.response.status) {
         case 401:
-          if (!process.env.IS_EXTENSION) softExit();
+          if (!IS_EXTENSION_APP) softExit();
           break;
         default:
           // console.log(error.response.data);

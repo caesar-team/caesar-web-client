@@ -1,0 +1,11 @@
+{
+  "name": "@caesar/containers",
+  "version": "1.0.0",
+  "repository": "git@github.com:caesar-team/caesar-web-client.git",
+  "author": "<ave@caesar.team>",
+  "license": "SEE LICENSE IN LICENSE",
+  "dependencies": {
+    "@caesar/assets": "1.0.0",
+    "@caesar/common": "1.0.0"
+  }
+}

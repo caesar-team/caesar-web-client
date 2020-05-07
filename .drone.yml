@@ -127,24 +127,6 @@ globals:
   - sed -i "s/\$CICD_GIT_COMMIT/$CICD_GIT_COMMIT/g" deploy/*
   - kubectl apply -f deploy/ -n dev-caesar-team
 
-- &stepMasterDeploy
-  name: deploy staging
-  image: sinlead/drone-kubectl
-  settings:
-    kubernetes_server:
-      from_secret: staging_url
-    kubernetes_token: 
-      from_secret: staging_token
-    kubernetes_cert: 
-      from_secret: staging_ca
-  environment:
-    CICD_GIT_COMMIT: ${DRONE_COMMIT}
-    CICD_GIT_BRANCH: ${DRONE_BRANCH}
-  commands:
-  - sed -i "s/\$CICD_GIT_BRANCH/$CICD_GIT_BRANCH/g" deploy/*
-  - sed -i "s/\$CICD_GIT_COMMIT/$CICD_GIT_COMMIT/g" deploy/*
-  - kubectl apply -f deploy/ -n demo-caesar-team
-
 - &stepNotifyToSlack
   name: notify-to-slack
   image: plugins/slack
@@ -184,10 +166,6 @@ steps:
 - <<: *stepDevelopDeploy
   when:
     branch: [ develop ]
-
-- <<: *stepMasterDeploy
-  when:
-    branch: [ master ]
 
 - <<: *stepNotifyToSlack
   when:

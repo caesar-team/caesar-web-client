@@ -39,19 +39,26 @@ const publicRuntimeConfig = {
   MAX_UPLOADING_FILE_SIZE: process.env.MAX_UPLOADING_FILE_SIZE || '256KB',
   TOTAL_MAX_UPLOADING_FILES_SIZES: process.env.TOTAL_MAX_UPLOADING_FILES_SIZES || '5M',
   LENGTH_KEY: process.env.LENGTH_KEY || 2048,
+  AUTHORIZATION_ENABLE: process.env.AUTHORIZATION_ENABLE === "false",
+  APP_TYPE: process.env.APP_TYPE || 'general',
 };
 
 const serverRuntimeConfig = {
-  SENTRY_DSN: process.env.SENTRY_DSN,
+
 };
 
 const workboxOptions = {
+  swDest: 'static/service-worker.js',
   runtimeCaching: [
+    {
+      urlPattern: /.png|.svg|.jpg$/,
+      handler: 'CacheFirst'
+    },
     {
       urlPattern: /^https?.*/,
       handler: "NetworkFirst",
       options: {
-        cacheName: "https-calls",
+        cacheName: "offlineCache",
         networkTimeoutSeconds: 15,
         expiration: {
           maxEntries: 150,
@@ -62,7 +69,7 @@ const workboxOptions = {
         }
       }
     }
-  ]
+  ],
 };
 
 module.exports = withPlugins(
@@ -71,6 +78,16 @@ module.exports = withPlugins(
     publicRuntimeConfig,
     serverRuntimeConfig,
     workboxOpts: workboxOptions,
+    experimental: {
+      async rewrites() {
+        return [
+          {
+            source: '/service-worker.js',
+            destination: '/_next/static/service-worker.js',
+          },
+        ]
+      },
+    },
     webpack: config => {
       config.output.globalObject = 'this';
 

@@ -44,7 +44,7 @@ const publicRuntimeConfig = {
 };
 
 const serverRuntimeConfig = {
-  SENTRY_DSN: process.env.SENTRY_DSN,
+
 };
 
 const workboxOptions = {

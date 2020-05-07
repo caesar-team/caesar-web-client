@@ -3,7 +3,6 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: caesar-web-client
-  namespace: dev-caesar-team
   labels:
     app.kubernetes.io/name: caesar
 spec:

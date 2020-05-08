@@ -105,7 +105,8 @@ const AuthForm = ({ onSubmit }) => (
     onSubmit={onSubmit}
     initialValues={{ email: '', password: '' }}
     validationSchema={schema}
-    render={({
+  >
+    {({
       errors,
       touched,
       handleSubmit,
@@ -115,9 +116,8 @@ const AuthForm = ({ onSubmit }) => (
     }) => (
       <Form onSubmit={handleSubmit}>
         <Row>
-          <FastField
-            name="email"
-            render={({ field }) => (
+          <FastField name="email">
+            {({ field }) => (
               <StyledEmailInput
                 {...field}
                 onBlur={setFieldTouched}
@@ -125,15 +125,14 @@ const AuthForm = ({ onSubmit }) => (
                 prefix={EmailInputPrefix}
               />
             )}
-          />
+          </FastField>
           {checkError(touched, errors, 'email') && (
             <Error>{errors.email}</Error>
           )}
         </Row>
         <Row>
-          <FastField
-            name="password"
-            render={({ field }) => (
+          <FastField name="password">
+            {({ field }) => (
               <StyledPasswordInput
                 {...field}
                 onBlur={setFieldTouched}
@@ -141,7 +140,7 @@ const AuthForm = ({ onSubmit }) => (
                 prefix={PasswordInputPrefix}
               />
             )}
-          />
+          </FastField>
           {checkError(touched, errors, 'password') && (
             <Error>{errors.password}</Error>
           )}
@@ -154,7 +153,7 @@ const AuthForm = ({ onSubmit }) => (
         </ButtonWrapper>
       </Form>
     )}
-  />
+  </Formik>
 );
 
 export default AuthForm;

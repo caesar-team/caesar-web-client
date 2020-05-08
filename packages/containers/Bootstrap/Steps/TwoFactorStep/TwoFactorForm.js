@@ -166,17 +166,11 @@ class TwoFactorForm extends Component {
           initialValues={initialValues}
           validationSchema={codeSchema}
           onSubmit={onSubmit}
-          render={({
-            errors,
-            handleSubmit,
-            isSubmitting,
-            setFieldValue,
-            values,
-          }) => (
+        >
+          {({ errors, handleSubmit, isSubmitting, setFieldValue, values }) => (
             <Form onSubmit={handleSubmit}>
-              <FastField
-                name="code"
-                render={() => (
+              <FastField name="code">
+                {() => (
                   <CodeInput
                     onChange={value => setFieldValue('code', value, true)}
                     length={CODE_LENGTH}
@@ -185,16 +179,15 @@ class TwoFactorForm extends Component {
                     errors={errors}
                   />
                 )}
-              />
+              </FastField>
               <CheckboxWrapper>
-                <FastField
-                  name="fpCheck"
-                  render={({ field }) => (
+                <FastField name="fpCheck">
+                  {({ field }) => (
                     <Checkbox {...field} checked={field.value}>
                       Remember device
                     </Checkbox>
                   )}
-                />
+                </FastField>
               </CheckboxWrapper>
               <NextButton
                 htmlType="submit"
@@ -204,7 +197,7 @@ class TwoFactorForm extends Component {
               </NextButton>
             </Form>
           )}
-        />
+        </Formik>
       </Wrapper>
     );
   }

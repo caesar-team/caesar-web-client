@@ -40,13 +40,13 @@ const MasterPasswordConfirmForm = ({
     initialValues={{ confirmPassword: '' }}
     validationSchema={createConfirmPasswordSchema(masterPassword)}
     onSubmit={onSubmit}
-    render={({ errors, touched, handleSubmit, isSubmitting, isValid }) => (
+  >
+    {({ errors, touched, handleSubmit, isSubmitting, isValid }) => (
       <Form onSubmit={handleSubmit}>
-        <AuthTitle>Сonfirmation</AuthTitle>
+        <AuthTitle>Confirmation</AuthTitle>
         <AuthDescription>Confirm your master password</AuthDescription>
-        <FastField
-          name="confirmPassword"
-          render={({ field }) => (
+        <FastField name="confirmPassword">
+          {({ field }) => (
             <MasterPasswordInput
               {...field}
               autoFocus
@@ -55,7 +55,7 @@ const MasterPasswordConfirmForm = ({
               error={checkError(touched, errors, 'confirmPassword')}
             />
           )}
-        />
+        </FastField>
         <ButtonsWrapper>
           <BackLink disabled={isSubmitting} onClick={onClickReturn}>
             Change password
@@ -66,7 +66,7 @@ const MasterPasswordConfirmForm = ({
         </ButtonsWrapper>
       </Form>
     )}
-  />
+  </Formik>
 );
 
 export default MasterPasswordConfirmForm;

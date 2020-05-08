@@ -101,7 +101,8 @@ const SignUpForm = ({ onSubmit }) => (
     onSubmit={onSubmit}
     initialValues={{ email: '', password: '', confirmPassword: '' }}
     validationSchema={schema}
-    render={({
+  >
+    {({
       errors,
       touched,
       handleSubmit,
@@ -111,9 +112,8 @@ const SignUpForm = ({ onSubmit }) => (
     }) => (
       <Form onSubmit={handleSubmit}>
         <Row>
-          <FastField
-            name="email"
-            render={({ field }) => (
+          <FastField name="email">
+            {({ field }) => (
               <StyledEmailInput
                 {...field}
                 onBlur={setFieldTouched}
@@ -121,15 +121,14 @@ const SignUpForm = ({ onSubmit }) => (
                 prefix={EmailInputPrefix}
               />
             )}
-          />
+          </FastField>
           {checkError(touched, errors, 'email') && (
             <Error>{errors.email}</Error>
           )}
         </Row>
         <Row>
-          <FastField
-            name="password"
-            render={({ field }) => (
+          <FastField name="password">
+            {({ field }) => (
               <StyledPasswordInput
                 {...field}
                 onBlur={setFieldTouched}
@@ -137,15 +136,14 @@ const SignUpForm = ({ onSubmit }) => (
                 prefix={PasswordInputPrefix}
               />
             )}
-          />
+          </FastField>
           {checkError(touched, errors, 'password') && (
             <Error>{errors.password}</Error>
           )}
         </Row>
         <Row>
-          <FastField
-            name="confirmPassword"
-            render={({ field }) => (
+          <FastField name="confirmPassword">
+            {({ field }) => (
               <StyledPasswordInput
                 {...field}
                 onBlur={setFieldTouched}
@@ -153,7 +151,7 @@ const SignUpForm = ({ onSubmit }) => (
                 prefix={PasswordInputPrefix}
               />
             )}
-          />
+          </FastField>
           {checkError(touched, errors, 'confirmPassword') && (
             <Error>{errors.confirmPassword}</Error>
           )}
@@ -165,7 +163,7 @@ const SignUpForm = ({ onSubmit }) => (
         </ButtonWrapper>
       </Form>
     )}
-  />
+  </Formik>
 );
 
 export default SignUpForm;

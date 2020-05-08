@@ -165,7 +165,8 @@ const DocumentForm = ({
         createInitialValues(data, listId, type),
       )}
       validationSchema={schema}
-      render={({
+    >
+      {({
         values,
         errors,
         touched,
@@ -224,7 +225,7 @@ const DocumentForm = ({
           </AttachmentsSection>
         </Form>
       )}
-    />
+    </Formik>
   );
 };
 

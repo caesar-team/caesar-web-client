@@ -49,18 +49,12 @@ class NewListModal extends Component {
           onSubmit={onSubmit}
           isInitialValid={schema.isValidSync(this.createInitialValue(list))}
           validationSchema={schema}
-          render={({
-            errors,
-            touched,
-            handleSubmit,
-            isSubmitting,
-            isValid,
-          }) => (
+        >
+          {({ errors, touched, handleSubmit, isSubmitting, isValid }) => (
             <form onSubmit={handleSubmit}>
               <Label>Name</Label>
-              <FastField
-                name="label"
-                render={({ field }) => (
+              <FastField name="label">
+                {({ field }) => (
                   <FormInput
                     autoFocus
                     withBorder
@@ -68,7 +62,7 @@ class NewListModal extends Component {
                     error={checkError(touched, errors, 'label')}
                   />
                 )}
-              />
+              </FastField>
               <ButtonWrapper>
                 <Button
                   disabled={isSubmitting || !isValid}
@@ -80,7 +74,7 @@ class NewListModal extends Component {
               </ButtonWrapper>
             </form>
           )}
-        />
+        </Formik>
       </Modal>
     );
   }

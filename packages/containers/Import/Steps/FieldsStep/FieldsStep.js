@@ -129,13 +129,8 @@ const FieldsStep = ({ headings, initialValues, onSubmit, onCancel }) => (
     isInitialValid={schema.isValidSync({ ...defaultValues, ...initialValues })}
     onSubmit={onSubmit}
     validationSchema={schema}
-    render={({
-      values,
-      setFieldValue,
-      handleSubmit,
-      isSubmitting,
-      isValid,
-    }) => (
+  >
+    {({ values, setFieldValue, handleSubmit, isSubmitting, isValid }) => (
       <Wrapper>
         <Form onSubmit={handleSubmit}>
           <Title>Match the fields in Caesar with the fields in your file</Title>
@@ -201,7 +196,7 @@ const FieldsStep = ({ headings, initialValues, onSubmit, onCancel }) => (
         </Form>
       </Wrapper>
     )}
-  />
+  </Formik>
 );
 
 export default FieldsStep;

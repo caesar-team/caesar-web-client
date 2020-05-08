@@ -1,7 +1,14 @@
 import React, { Component } from 'react';
 import styled from 'styled-components';
 import { Formik, FastField } from 'formik';
-import { Modal, FormInput, Button, Label, Icon, Uploader } from '@caesar/components';
+import {
+  Modal,
+  FormInput,
+  Button,
+  Label,
+  Icon,
+  Uploader,
+} from '@caesar/components';
 import { checkError } from '@caesar/common/utils/formikUtils';
 import IconTeam1 from '@caesar/assets/icons/svg/icon-team-ava-1.svg';
 import IconTeam2 from '@caesar/assets/icons/svg/icon-team-ava-2.svg';
@@ -221,7 +228,8 @@ class NewTeamModal extends Component {
           initialValues={this.createInitialValue()}
           onSubmit={this.handleSubmit}
           validationSchema={schema}
-          render={({
+        >
+          {({
             values,
             errors,
             touched,
@@ -232,9 +240,9 @@ class NewTeamModal extends Component {
           }) => (
             <form onSubmit={handleSubmit}>
               <Label>Group name</Label>
-              <FastField
-                name="title"
-                render={({ field }) => (
+              <FastField name="title">
+                {' '}
+                {({ field }) => (
                   <FormInput
                     autoFocus
                     withBorder
@@ -242,7 +250,7 @@ class NewTeamModal extends Component {
                     error={checkError(touched, errors, 'title')}
                   />
                 )}
-              />
+              </FastField>
               <GroupAvatarsWrapper>
                 <GroupAvatarsTitle>Group avatar</GroupAvatarsTitle>
                 <GroupAvatarsTip>
@@ -262,7 +270,7 @@ class NewTeamModal extends Component {
               </ButtonWrapper>
             </form>
           )}
-        />
+        </Formik>
       </Modal>
     );
   }

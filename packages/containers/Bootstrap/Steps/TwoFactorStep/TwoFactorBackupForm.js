@@ -80,7 +80,8 @@ const TwoFactorBackupForm = ({ codes, onSubmit }) => (
       initialValues={backupInitialValues}
       validationSchema={agreeSchema}
       onSubmit={onSubmit}
-      render={({ handleSubmit, isSubmitting, isValid }) => (
+    >
+      {({ handleSubmit, isSubmitting, isValid }) => (
         <Form onSubmit={handleSubmit}>
           <AuthTitle>Save your backup codes</AuthTitle>
           <Description>
@@ -115,20 +116,19 @@ const TwoFactorBackupForm = ({ codes, onSubmit }) => (
               PRINT
             </StyledButton>
           </ButtonsWrapper>
-          <FastField
-            name="agreeCheck"
-            render={({ field }) => (
+          <FastField name="agreeCheck">
+            {({ field }) => (
               <StyledCheckbox {...field} checked={field.value}>
                 I have printed or saved these codes
               </StyledCheckbox>
             )}
-          />
+          </FastField>
           <NextButton htmlType="submit" disabled={isSubmitting || !isValid}>
             Continue
           </NextButton>
         </Form>
       )}
-    />
+    </Formik>
   </Wrapper>
 );
 

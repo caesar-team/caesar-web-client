@@ -114,17 +114,11 @@ const TwoFactorCheckForm = ({ onSubmit }) => (
       initialValues={initialValues}
       validationSchema={codeSchema}
       onSubmit={onSubmit}
-      render={({
-        errors,
-        handleSubmit,
-        isSubmitting,
-        setFieldValue,
-        values,
-      }) => (
+    >
+      {({ errors, handleSubmit, isSubmitting, setFieldValue, values }) => (
         <Form onSubmit={handleSubmit}>
-          <FastField
-            name="code"
-            render={() => (
+          <FastField name="code">
+            {() => (
               <CodeInput
                 onChange={value => setFieldValue('code', value, true)}
                 length={CODE_LENGTH}
@@ -133,16 +127,15 @@ const TwoFactorCheckForm = ({ onSubmit }) => (
                 errors={errors}
               />
             )}
-          />
+          </FastField>
           <CheckboxWrapper>
-            <FastField
-              name="fpCheck"
-              render={({ field }) => (
+            <FastField name="fpCheck">
+              {({ field }) => (
                 <Checkbox {...field} checked={field.value}>
                   Remember device
                 </Checkbox>
               )}
-            />
+            </FastField>
           </CheckboxWrapper>
           <NextButton
             htmlType="submit"
@@ -152,7 +145,7 @@ const TwoFactorCheckForm = ({ onSubmit }) => (
           </NextButton>
         </Form>
       )}
-    />
+    </Formik>
   </Wrapper>
 );
 

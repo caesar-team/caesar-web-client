@@ -36,11 +36,11 @@ const MasterPasswordCheckForm = ({ onSubmit }) => (
       validationSchema={passwordSchema}
       onSubmit={onSubmit}
       validateOnChange={false}
-      render={({ errors, handleSubmit, submitForm, resetForm }) => (
+    >
+      {({ errors, handleSubmit, submitForm, resetForm }) => (
         <form onSubmit={handleSubmit}>
-          <FastField
-            name="password"
-            render={({ field }) => (
+          <FastField name="password">
+            {({ field }) => (
               <LockInput
                 {...field}
                 autoFocus
@@ -50,10 +50,10 @@ const MasterPasswordCheckForm = ({ onSubmit }) => (
                 isError={errors && Object.keys(errors).length !== 0}
               />
             )}
-          />
+          </FastField>
         </form>
       )}
-    />
+    </Formik>
   </Wrapper>
 );
 

@@ -117,7 +117,8 @@ class MasterPasswordCreateForm extends PureComponent {
         isInitialValid={passwordSchema.isValidSync(initialValues)}
         validationSchema={passwordSchema}
         onSubmit={onSubmit}
-        render={({
+      >
+        {({
           errors,
           touched,
           handleSubmit,
@@ -132,9 +133,8 @@ class MasterPasswordCreateForm extends PureComponent {
             <AuthTitle>Master Password</AuthTitle>
             <AuthDescription>Create master password for Caesar</AuthDescription>
             <FieldWrapper>
-              <FastField
-                name="password"
-                render={({ field }) => (
+              <FastField name="password">
+                {({ field }) => (
                   <MasterPasswordInput
                     {...field}
                     isAlwaysVisibleIcon
@@ -145,7 +145,7 @@ class MasterPasswordCreateForm extends PureComponent {
                     }
                   />
                 )}
-              />
+              </FastField>
               <Tooltip
                 show={values.password && !isValid}
                 textBoxWidth="280px"
@@ -185,7 +185,7 @@ class MasterPasswordCreateForm extends PureComponent {
             </StyledButton>
           </Form>
         )}
-      />
+      </Formik>
     );
   }
 }

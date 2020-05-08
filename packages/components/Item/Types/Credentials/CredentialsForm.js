@@ -177,7 +177,8 @@ const CredentialsForm = ({
         createInitialValues(data, listId, type),
       )}
       validationSchema={schema}
-      render={({
+    >
+      {({
         values,
         errors,
         touched,
@@ -277,7 +278,7 @@ const CredentialsForm = ({
           </AttachmentsSection>
         </Form>
       )}
-    />
+    </Formik>
   );
 };
 

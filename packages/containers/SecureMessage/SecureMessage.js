@@ -148,7 +148,8 @@ class SecureMessageContainer extends Component {
         validationSchema={schema}
         onSubmit={this.handleSubmitPassword}
         validateOnChange={false}
-        render={({ errors, handleSubmit, submitForm, resetForm }) => (
+      >
+        {({ errors, handleSubmit, submitForm, resetForm }) => (
           <form onSubmit={handleSubmit}>
             <FastField name="password">
               {({ field }) => (
@@ -163,7 +164,7 @@ class SecureMessageContainer extends Component {
             </FastField>
           </form>
         )}
-      />
+      </Formik>
     );
   }
 

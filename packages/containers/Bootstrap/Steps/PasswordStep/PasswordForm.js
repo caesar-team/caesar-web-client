@@ -79,7 +79,8 @@ const PasswordForm = ({ onSubmit }) => (
     onSubmit={onSubmit}
     initialValues={initialValues}
     validationSchema={schema}
-    render={({
+  >
+    {({
       errors,
       touched,
       handleSubmit,
@@ -89,9 +90,8 @@ const PasswordForm = ({ onSubmit }) => (
     }) => (
       <Form onSubmit={handleSubmit}>
         <Row>
-          <FastField
-            name="password"
-            render={({ field }) => (
+          <FastField name="password">
+            {({ field }) => (
               <StyledPasswordInput
                 {...field}
                 onBlur={setFieldTouched}
@@ -99,15 +99,14 @@ const PasswordForm = ({ onSubmit }) => (
                 prefix={PasswordInputPrefix}
               />
             )}
-          />
+          </FastField>
           {checkError(touched, errors, 'password') && (
             <Error>{errors.password}</Error>
           )}
         </Row>
         <Row>
-          <FastField
-            name="confirmPassword"
-            render={({ field }) => (
+          <FastField name="confirmPassword">
+            {({ field }) => (
               <StyledPasswordInput
                 {...field}
                 onBlur={setFieldTouched}
@@ -115,7 +114,7 @@ const PasswordForm = ({ onSubmit }) => (
                 prefix={PasswordInputPrefix}
               />
             )}
-          />
+          </FastField>
           {checkError(touched, errors, 'confirmPassword') && (
             <Error>{errors.confirmPassword}</Error>
           )}
@@ -127,7 +126,7 @@ const PasswordForm = ({ onSubmit }) => (
         </ButtonWrapper>
       </Form>
     )}
-  />
+  </Formik>
 );
 
 export default PasswordForm;

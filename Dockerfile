@@ -46,12 +46,14 @@ FROM base AS release_web_app
 COPY --from=build_web_app /var/app/node_modules /var/app/packages/web-app/node_modules
 COPY --from=build_web_app /var/app/packages/web-app/.next packages/web-app/.next
 COPY packages/web-app/server.js packages/web-app/server.js
+COPY packages/web-app/next.config.js packages/web-app/next.config.js
 COPY packages/web-app/package.json packages/web-app/package.json
 COPY packages/web-app/public packages/web-app/public
 # Copy Secure App
 COPY --from=build_secure_app /var/app/node_modules /var/app/packages/secure-app/node_modules
 COPY --from=build_secure_app /var/app/packages/secure-app/.next packages/secure-app/.next
 COPY packages/web-app/server.js packages/secure-app/server.js
+COPY packages/web-app/next.config.js packages/secure-app/next.config.js
 COPY packages/web-app/package.json packages/secure-app/package.json
 COPY packages/web-app/public packages/secure-app/public
 # Copy basic script

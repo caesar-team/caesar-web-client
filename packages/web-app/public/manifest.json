@@ -1,7 +1,7 @@
 {
-  "name": "Caesar.Team Secure Message",
-  "short_name": "caesar-Secure",
-  "description": "Share your message and files in the secure way.",
+  "name": "Caesar.Team Password Manager",
+  "short_name": "caesar-team",
+  "description": "Share your passwords and files with the team.",
   "icons": [
     {
       "src": "/public/images/favicon/android-chrome-192x192.png",

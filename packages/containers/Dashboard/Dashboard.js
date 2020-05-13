@@ -510,7 +510,6 @@ class DashboardContainer extends Component {
     return (
       <Fragment>
         <DashboardLayout
-          withSearch
           user={user}
           team={team}
           searchedText={searchedText}

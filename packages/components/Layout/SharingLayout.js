@@ -29,7 +29,7 @@ const LayoutConstructorStyled = styled(LayoutConstructor)`
 
 const Header = () => (
   <Fragment>
-    <Icon name="logo-new" width={106} height={30} />
+    <Icon name="logo-caesar-4xxi" width={106} height={30} />
     <Link href="/logout" onClick={() => Router.push('/logout')}>
       Logout
     </Link>

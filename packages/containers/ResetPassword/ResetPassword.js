@@ -40,7 +40,7 @@ class ResetPasswordContainer extends Component {
     return (
       <Fragment>
         <IconWrapper>
-          <Icon name="logo-new" height={40} width={142} />
+          <Icon name="logo-caesar-4xxi" height={40} width={142} />
         </IconWrapper>
         <StyledButton onClick={() => router.push('/signin')}>
           Sign In

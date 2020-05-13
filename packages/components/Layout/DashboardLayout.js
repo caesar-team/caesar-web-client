@@ -12,7 +12,6 @@ const LayoutConstructorStyled = styled(LayoutConstructor)`
 const DashboardLayout = ({
   user,
   team,
-  withSearch,
   searchedText,
   onSearch,
   onClickReset,
@@ -24,7 +23,6 @@ const DashboardLayout = ({
       <PrimaryHeader
         user={user}
         team={team}
-        withSearch={withSearch}
         searchedText={searchedText}
         onSearch={onSearch}
         onClickReset={onClickReset}

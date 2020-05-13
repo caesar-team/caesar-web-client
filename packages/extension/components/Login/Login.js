@@ -37,7 +37,7 @@ const Login = () => {
   return (
     <Wrapper>
       <InnerWrapper>
-        <StyledLogo name="logo-new" width={210} height={45} />
+        <StyledLogo name="logo-caesar-4xxi" width={210} height={45} />
         <ButtonStyled
           color="white"
           onClick={() => chrome.tabs.create({ url: process.env.APP_URI })}

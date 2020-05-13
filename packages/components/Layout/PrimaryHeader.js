@@ -1,4 +1,4 @@
-import React, { PureComponent, Fragment } from 'react';
+import React, { PureComponent } from 'react';
 import { connect } from 'react-redux';
 import styled from 'styled-components';
 import Link from 'next/link';
@@ -30,8 +30,6 @@ const LeftWrapper = styled.div`
   width: 300px;
   flex-shrink: 0;
   padding-left: 60px;
-  ${({ withBorder, theme }) =>
-    withBorder && `border-right: 1px solid ${theme.gallery}`};
 `;
 
 const RightWrapper = styled.div`
@@ -147,7 +145,6 @@ class PrimaryHeader extends PureComponent {
       user,
       team,
       teamList,
-      withSearch = false,
       searchedText,
       onSearch,
       onClickReset,
@@ -160,7 +157,7 @@ class PrimaryHeader extends PureComponent {
     const shouldShowSwitchTeamOption = teamList && teamList.length > 0;
 
     const Options = (
-      <Fragment>
+      <>
         {shouldShowSwitchTeamOption && (
           <Option key="teams" onClick={this.handleShowTeamModal}>
             <Anchor>Switch Team</Anchor>
@@ -174,13 +171,13 @@ class PrimaryHeader extends PureComponent {
         <Option key="logout" onClick={this.props.logout}>
           <Anchor>Logout</Anchor>
         </Option>
-      </Fragment>
+      </>
     );
 
     return (
-      <Fragment>
+      <>
         <Wrapper>
-          <LeftWrapper withBorder={withSearch}>
+          <LeftWrapper>
             <Logo href="/" />
           </LeftWrapper>
           {!!user && (
@@ -221,7 +218,7 @@ class PrimaryHeader extends PureComponent {
             onCancel={this.handleCloseModal}
           />
         )}
-      </Fragment>
+      </>
     );
   }
 }

@@ -4,7 +4,7 @@ import Input from './Input';
 import { Icon } from '../Icon';
 
 const InputStyled = styled(Input)`
-  padding-left: 20px;
+  padding-left: 34px;
 
   ${Input.InputField} {
     border-bottom: none;

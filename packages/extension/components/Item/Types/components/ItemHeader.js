@@ -242,7 +242,7 @@ export const ItemHeader = ({
         <Row>
           {!isTrashItem && isOwner && (
             <InviteButton onClick={onClickInvite} hasInvited={hasInvited}>
-              <Icon name="plus" width={14} height={14} isInButton />
+              <Icon name="plus" width={14} height={14} />
             </InviteButton>
           )}
           <StyledAvatarsList avatars={avatars} />

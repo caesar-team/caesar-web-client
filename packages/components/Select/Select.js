@@ -67,6 +67,11 @@ const Option = styled.div`
   }
 `;
 
+const ArrowIcon = styled(Icon)`
+  transform: ${({ isOpened }) => (isOpened ? 'scaleY(-1)' : 'scaleY(1)')};
+  transition: all 0.2s;
+`;
+
 const BOX_DIRECTION_DOWN = 'down';
 
 const DEFAULT_TOP_OFFSET = 48;
@@ -146,7 +151,6 @@ class SelectInner extends Component {
     } = this.props;
     const { isOpened } = this.state;
 
-    const iconName = isOpened ? 'arrow-up-big' : 'arrow-down-big';
     const selectedLabel = value
       ? (options.find(({ value: optionValue }) => optionValue === value) || {})
           .label
@@ -171,7 +175,12 @@ class SelectInner extends Component {
               />
             )}
           </ValueText>
-          <Icon name={iconName} width={16} height={16} />
+          <ArrowIcon
+            name="arrow-triangle"
+            width={16}
+            height={16}
+            isOpened={isOpened}
+          />
         </SelectedOption>
         {isOpened && (
           <Box top={topOffset}>

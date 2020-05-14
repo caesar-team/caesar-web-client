@@ -193,13 +193,7 @@ const List = ({
               optionRender={renderOption}
             >
               <CreateButton disabled={!isOnline}>
-                <Icon
-                  isInButton
-                  withOfflineCheck
-                  name="plus"
-                  width={14}
-                  height={14}
-                />
+                <Icon withOfflineCheck name="plus" width={14} height={14} />
               </CreateButton>
             </Dropdown>
           </Can>

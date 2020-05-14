@@ -32,6 +32,8 @@ const ArrowIcon = styled(Icon)`
   height: 8px;
   margin-left: 20px;
   fill: ${({ theme }) => theme.lightGray};
+  transform: ${({ isOpened }) => (isOpened ? 'scaleY(-1)' : 'scaleY(1)')};
+  transition: all 0.2s;
 `;
 
 const TextWithLinesStyled = styled(TextWithLines)`
@@ -52,7 +54,6 @@ const Section = ({
   className,
   onToggleSection = Function.prototype,
 }) => {
-  const iconName = isOpened ? 'arrow-up-small' : 'arrow-down-small';
   const onToggleEvent = name ? onToggleSection : Function.prototype;
 
   return (
@@ -63,7 +64,11 @@ const Section = ({
             {icon && <IconImage src={icon} />}
             {name}
           </TextWithLinesStyled>
-          <ArrowIcon name={iconName} />
+          <ArrowIcon
+            name="arrow-triangle"
+            isOpened={isOpened}
+            color="lightGray"
+          />
         </SectionName>
       )}
       {isOpened && <ContentWrapper>{children}</ContentWrapper>}

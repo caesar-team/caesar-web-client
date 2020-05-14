@@ -76,9 +76,9 @@ class LockInput extends Component {
             type="password"
           />
           <StyledArrowIcon
-            name="arrow-next"
-            width={16}
-            height={16}
+            name="arrow"
+            width={20}
+            height={20}
             onClick={onClick}
           />
         </InnerWrapper>

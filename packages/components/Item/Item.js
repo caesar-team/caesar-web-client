@@ -114,7 +114,7 @@ const Item = ({
 
     return (
       <Notify withButton>
-        <Icon name="warning" width={14} height={14} isInButton />
+        <Icon name="warning" width={14} height={14} />
         <NotifyText>
           {`Item has been changed by ${updateUserName} at ${updateDate}`}
         </NotifyText>
@@ -184,7 +184,7 @@ const Item = ({
     <Fragment>
       {isReadOnly && (
         <Notify>
-          <Icon name="warning" width={14} height={14} isInButton />
+          <Icon name="warning" width={14} height={14} />
           <NotifyText>You can read only</NotifyText>
         </Notify>
       )}

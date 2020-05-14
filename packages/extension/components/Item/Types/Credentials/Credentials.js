@@ -108,7 +108,7 @@ class Credentials extends Component {
               <FieldValue>
                 {website}
                 <StyledWebsiteLink href={site} target="_newtab">
-                  <Icon name="arrow-next" width={18} height={10} />
+                  <Icon name="arrow" width={18} height={10} />
                 </StyledWebsiteLink>
               </FieldValue>
             </Field>

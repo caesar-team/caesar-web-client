@@ -16,7 +16,7 @@ const ShareControl = () => {
             View only
           </Checkbox>
           <IconWrapper isFilled onClick={onClickRemove}>
-            <StyledIcon isFilled name="ok" width={14} height={14} />
+            <StyledIcon isFilled name="checkmark" width={14} height={14} />
           </IconWrapper>
         </Fragment>
       ) : (

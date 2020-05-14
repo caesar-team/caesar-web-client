@@ -23,7 +23,7 @@ export const Logo = ({
 }) => (
   <Link passHref href={href}>
     <LogoLink>
-      <Icon name={iconName} width={width} height={height} />
+      <Icon name={iconName} width={width} height={height} color="black" />
     </LogoLink>
   </Link>
 );

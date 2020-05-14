@@ -51,9 +51,10 @@ const StyledButton = styled.button`
   align-items: center;
   justify-content: center;
   height: ${({ isHigh }) => (isHigh ? '60px' : '40px')};
-  padding: ${({ isHigh }) => (isHigh ? '18px 30px' : '10px 20px')};
+  padding: ${({ isHigh }) => (isHigh ? '18px 30px' : '11px 20px')};
   font-size: ${({ isHigh }) => (isHigh ? '18px' : '14px')};
   letter-spacing: ${({ isHigh }) => (isHigh ? '0.6px' : '0.4px')};
+  white-space: nowrap;
   border-radius: 3px;
   border: 0;
   outline: none;
@@ -85,7 +86,7 @@ const StyledButton = styled.button`
 `;
 
 const Text = styled.div`
-  margin-left: ${({ withMargin }) => (withMargin ? '10px' : 0)};
+  margin-left: ${({ withMargin }) => (withMargin ? '15px' : 0)};
 `;
 
 const getButtonDisabledStatus = (withOfflineCheck, isOnline, disabled) =>
@@ -126,7 +127,7 @@ const ButtonComponent = forwardRef(
         isHigh={isHigh}
         {...props}
       >
-        {icon && <Icon name={icon} width={14} height={14} isInButton />}
+        {icon && <Icon name={icon} width={16} height={16} />}
         {!onlyIcon && <Text withMargin={withIcon}>{children}</Text>}
       </StyledButton>
     );

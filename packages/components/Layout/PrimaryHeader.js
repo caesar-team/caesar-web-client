@@ -102,7 +102,9 @@ const Anchor = styled.a`
 `;
 
 const StyledIcon = styled(Icon)`
-  fill: ${({ theme }) => theme.gray};
+  transform: ${({ isDropdownOpened }) =>
+    isDropdownOpened ? 'scaleY(-1)' : 'scaleY(1)'};
+  transition: all 0.2s;
 `;
 
 class PrimaryHeader extends PureComponent {
@@ -199,11 +201,11 @@ class PrimaryHeader extends PureComponent {
                     {team && <TeamName>{team.title}</TeamName>}
                   </UserAndTeamWrapper>
                   <StyledIcon
-                    name={
-                      isDropdownOpened ? 'arrow-up-small' : 'arrow-down-small'
-                    }
+                    name="arrow-triangle"
                     width={10}
                     height={16}
+                    color="middleGray"
+                    isDropdownOpened={isDropdownOpened}
                   />
                 </StyledDropdown>
               </UserSection>

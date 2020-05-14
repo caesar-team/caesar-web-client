@@ -9,9 +9,9 @@ import {
 } from '@caesar/common/selectors/user';
 import { createStructuredSelector } from 'reselect';
 import { Icon } from '../Icon';
-import { Avatar } from '../Avatar';
 import { Dropdown } from '../Dropdown';
 import { SearchInput } from '../Input';
+import { Button } from '../Button';
 import { TeamModal } from '../TeamModal';
 import { Logo } from './Logo';
 
@@ -29,14 +29,18 @@ const LeftWrapper = styled.div`
   align-items: center;
   width: 300px;
   flex-shrink: 0;
-  padding-left: 60px;
+  padding-left: 25px;
 `;
 
 const RightWrapper = styled.div`
   display: flex;
   align-items: center;
   flex-grow: 1;
-  padding: 0 30px;
+  padding: 0 25px;
+`;
+
+const AddItemButton = styled(Button)`
+  margin-right: 10px;
 `;
 
 const UserSection = styled.div`
@@ -46,11 +50,6 @@ const UserSection = styled.div`
   margin-left: auto;
 `;
 
-const UserAndTeamWrapper = styled.div`
-  display: flex;
-  flex-direction: column;
-`;
-
 const UserName = styled.div`
   font-size: 16px;
   letter-spacing: 0.5px;
@@ -58,19 +57,8 @@ const UserName = styled.div`
   margin-right: 15px;
 `;
 
-const TeamName = styled.div`
-  font-size: 14px;
-  letter-spacing: 0.4px;
-  color: ${({ theme }) => theme.gray};
-`;
-
-const TeamAvatar = styled(Avatar)`
-  margin-left: -8px;
-`;
-
 const StyledDropdown = styled(Dropdown)`
   display: flex;
-  min-width: 200px;
   color: ${({ theme }) => theme.black};
   flex-direction: row;
   align-items: center;
@@ -160,6 +148,7 @@ class PrimaryHeader extends PureComponent {
 
     const Options = (
       <>
+        {/* TODO: Replace Switch Team in secondary header */}
         {shouldShowSwitchTeamOption && (
           <Option key="teams" onClick={this.handleShowTeamModal}>
             <Anchor>Switch Team</Anchor>
@@ -189,17 +178,21 @@ class PrimaryHeader extends PureComponent {
                 onChange={onSearch}
                 onClickReset={onClickReset}
               />
+              {/* TODO: Add functional */}
+              <AddItemButton icon="plus">Add item</AddItemButton>
               <UserSection>
-                <Avatar {...user} name={user.email} />
-                {team && <TeamAvatar name={team.title} avatar={team.icon} />}
+                {/* TODO: Remove teamName to secondary header */}
+                {/* <Avatar {...user} name={user.email} /> */}
+                {/* {team && <TeamAvatar name={team.title} avatar={team.icon} />} */}
                 <StyledDropdown
                   overlay={Options}
                   onToggle={this.handleToggleDropdown}
                 >
-                  <UserAndTeamWrapper>
-                    <UserName>{userName}</UserName>
-                    {team && <TeamName>{team.title}</TeamName>}
-                  </UserAndTeamWrapper>
+                  {/* <UserAndTeamWrapper> */}
+                  <UserName>{userName}</UserName>
+                  {/* TODO: Remove teamName to secondary header */}
+                  {/* {team && <TeamName>{team.title}</TeamName>} */}
+                  {/* </UserAndTeamWrapper> */}
                   <StyledIcon
                     name="arrow-triangle"
                     width={10}
@@ -209,6 +202,7 @@ class PrimaryHeader extends PureComponent {
                   />
                 </StyledDropdown>
               </UserSection>
+              {/* TODO: Add notifications */}
             </RightWrapper>
           )}
         </Wrapper>

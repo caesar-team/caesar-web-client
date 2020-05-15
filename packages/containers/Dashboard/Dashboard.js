@@ -34,20 +34,20 @@ import { initialItemData } from './utils';
 const CenterWrapper = styled.div`
   display: flex;
   width: 100%;
-  min-height: calc(100vh - 70px);
+  min-height: calc(100vh - 55px);
 `;
 
 const Sidebar = styled.aside`
   flex: 0 0 287px;
-  border-right: 1px solid ${({ theme }) => theme.gallery};
+  border-right: 1px solid ${({ theme }) => theme.color.gallery};
 `;
 
 const MiddleColumnWrapper = styled.div`
   display: flex;
   flex-direction: column;
   flex: 0 0 431px;
-  background: ${({ theme }) => theme.lightBlue};
-  border-right: 1px solid ${({ theme }) => theme.gallery};
+  background: ${({ theme }) => theme.color.lightBlue};
+  border-right: 1px solid ${({ theme }) => theme.color.gallery};
 `;
 
 const RightColumnWrapper = styled.div`

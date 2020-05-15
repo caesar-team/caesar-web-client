@@ -11,9 +11,9 @@ const Wrapper = styled.div`
   position: relative;
   display: flex;
   flex-direction: column;
-  height: calc(100vh - 70px);
+  height: calc(100vh - 55px);
   background-color: ${({ isEmpty, theme }) =>
-    isEmpty ? theme.white : theme.lightBlue};
+    isEmpty ? theme.color.white : theme.color.lightBlue};
 `;
 
 const TitleWrapper = styled.div`
@@ -23,14 +23,14 @@ const TitleWrapper = styled.div`
   flex-shrink: 0;
   height: 62px;
   padding: 10px 30px;
-  background-color: ${({ theme }) => theme.lightBlue};
-  border-bottom: 1px solid ${({ theme }) => theme.gallery};
+  background-color: ${({ theme }) => theme.color.lightBlue};
+  border-bottom: 1px solid ${({ theme }) => theme.color.gallery};
 `;
 
 const Title = styled.div`
   font-size: 18px;
   letter-spacing: 0.6px;
-  color: ${({ theme }) => theme.black};
+  color: ${({ theme }) => theme.color.black};
 `;
 
 const ITEM_HEIGHT = 80;

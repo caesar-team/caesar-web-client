@@ -7,10 +7,10 @@ const Wrapper = styled.div`
   display: flex;
   flex-direction: column;
   min-width: 300px;
-  height: calc(100vh - 70px);
+  height: calc(100vh - 55px);
   padding-top: 110px;
   padding-left: 60px;
-  border-right: 1px solid ${({ theme }) => theme.gallery};
+  border-right: 1px solid ${({ theme }) => theme.color.gallery};
 `;
 
 const StyledLink = styled(Link)`

@@ -21,7 +21,7 @@ const Wrapper = styled.div`
   position: relative;
   display: flex;
   flex-direction: column;
-  height: calc(100vh - 70px);
+  height: calc(100vh - 55px);
   background-color: ${({ isEmpty, theme }) =>
     isEmpty ? theme.color.white : theme.color.lightBlue};
 `;
@@ -193,7 +193,7 @@ const List = ({
               console.log('Sharing modal');
             }}
           />
-          {/* <Can I={CREATE_PERMISSION} of={itemSubject}>
+          <Can I={CREATE_PERMISSION} of={itemSubject}>
             <Dropdown
               options={itemTypesOptions}
               onClick={onClickCreateItem}
@@ -204,7 +204,7 @@ const List = ({
                 <Icon withOfflineCheck name="plus" width={14} height={14} />
               </CreateButton>
             </Dropdown>
-          </Can> */}
+          </Can>
         </ColumnHeader>
       )}
       {renderedList()}

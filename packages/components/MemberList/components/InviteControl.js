@@ -13,8 +13,8 @@ const Wrapper = styled.div`
 const AddButton = styled.button`
   width: 30px;
   height: 30px;
-  background-color: ${({ theme }) => theme.white};
-  border: 1px solid ${({ theme }) => theme.black};
+  background-color: ${({ theme }) => theme.color.white};
+  border: 1px solid ${({ theme }) => theme.color.black};
   border-radius: 50%;
   outline: none;
   display: flex;
@@ -26,14 +26,14 @@ const AddButton = styled.button`
 const IconStyled = styled(Icon)`
   width: 14px;
   height: 14px;
-  fill: ${({ theme }) => theme.black};
+  fill: ${({ theme }) => theme.color.black};
   cursor: pointer;
 `;
 
 const SelectStyled = styled(Select)`
   width: 200px;
   height: 40px;
-  border: 1px solid ${({ theme }) => theme.gallery};
+  border: 1px solid ${({ theme }) => theme.color.gallery};
   margin-right: 20px;
 `;
 

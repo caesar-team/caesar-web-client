@@ -22,7 +22,7 @@ const InviteRow = styled(Row)`
 const UpdatedDate = styled.div`
   font-size: 14px;
   letter-spacing: 0.4px;
-  color: ${({ theme }) => theme.emperor};
+  color: ${({ theme }) => theme.color.emperor};
 `;
 
 const Owner = styled.div`
@@ -34,13 +34,13 @@ const Owner = styled.div`
 const OwnerName = styled.div`
   font-size: 16px;
   letter-spacing: 0.5px;
-  color: ${({ theme }) => theme.black};
+  color: ${({ theme }) => theme.color.black};
 `;
 
 const OwnerStatus = styled.div`
   font-size: 14px;
   letter-spacing: 0.4px;
-  color: ${({ theme }) => theme.gray};
+  color: ${({ theme }) => theme.color.gray};
 `;
 
 const StyledAvatarsList = styled(AvatarsList)`
@@ -55,16 +55,16 @@ const InviteButton = styled.button`
   width: 40px;
   height: 40px;
   ${({ hasInvited }) => hasInvited && 'margin-right: -10px'};
-  color: ${({ theme }) => theme.emperor};
-  border: 1px dashed ${({ theme }) => theme.gallery};
+  color: ${({ theme }) => theme.color.emperor};
+  border: 1px dashed ${({ theme }) => theme.color.gallery};
   border-radius: 50%;
   outline: none;
   cursor: pointer;
   transition: all 0.2s;
 
   &:hover {
-    color: ${({ theme }) => theme.black};
-    border-color: ${({ theme }) => theme.emperor};
+    color: ${({ theme }) => theme.color.black};
+    border-color: ${({ theme }) => theme.color.emperor};
   }
 `;
 
@@ -87,7 +87,7 @@ const Title = styled.div`
   font-size: 16px;
   font-weight: 600;
   letter-spacing: 0.5px;
-  color: ${({ theme }) => theme.black};
+  color: ${({ theme }) => theme.color.black};
 `;
 
 const FavoriteButton = styled.button`
@@ -118,10 +118,10 @@ const MoveTo = styled.a`
   outline: none;
   padding: 10px 20px;
   transition: all 0.2s;
-  border: 1px solid ${({ theme }) => theme.gallery};
+  border: 1px solid ${({ theme }) => theme.color.gallery};
 
   &:hover {
-    border: 1px solid ${({ theme }) => theme.black};
+    border: 1px solid ${({ theme }) => theme.color.black};
   }
 `;
 

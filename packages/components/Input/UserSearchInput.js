@@ -27,8 +27,8 @@ const InputStyled = styled(Input)`
     font-size: 16px;
     letter-spacing: 0.5px;
     padding: 15px 20px 15px 50px;
-    border: 1px solid ${({ theme }) => theme.gallery};
-    background-color: ${({ theme }) => theme.white};
+    border: 1px solid ${({ theme }) => theme.color.gallery};
+    background-color: ${({ theme }) => theme.color.white};
   }
 `;
 
@@ -36,9 +36,10 @@ const AddButton = styled.button`
   width: 30px;
   height: 30px;
   background-color: ${({ disabled, theme }) =>
-    disabled ? theme.gallery : theme.black};
+    disabled ? theme.color.gallery : theme.color.black};
   border: 1px solid
-    ${({ disabled, theme }) => (disabled ? theme.gallery : theme.black)};
+    ${({ disabled, theme }) =>
+      disabled ? theme.color.gallery : theme.color.black};
   border-radius: 50%;
   outline: none;
   display: flex;
@@ -50,8 +51,8 @@ const AddButton = styled.button`
     !disabled &&
     `
     &:hover {
-      background-color: ${theme.emperor};
-      border-color: ${theme.emperor};
+      background-color: ${theme.color.emperor};
+      border-color: ${theme.color.emperor};
     }
   `};
 `;
@@ -59,14 +60,14 @@ const AddButton = styled.button`
 const IconStyled = styled(Icon)`
   width: 14px;
   height: 14px;
-  fill: ${({ theme }) => theme.white};
+  fill: ${({ theme }) => theme.color.white};
 `;
 
 const SearchedResultBox = styled.div`
   display: flex;
   flex-direction: column;
-  background-color: ${({ theme }) => theme.white};
-  border: 1px solid ${({ theme }) => theme.gallery};
+  background-color: ${({ theme }) => theme.color.white};
+  border: 1px solid ${({ theme }) => theme.color.gallery};
   border-top: none;
   max-height: 400px;
   position: absolute;
@@ -84,13 +85,13 @@ const IconWrapper = styled.div`
 const SearchIcon = styled(Icon)`
   width: 18px;
   height: 18px;
-  fill: ${({ theme }) => theme.gallery};
+  fill: ${({ theme }) => theme.color.gallery};
 `;
 
 const SearchedUsersCount = styled.div`
   font-size: 12px;
   letter-spacing: 0.34px;
-  color: ${({ theme }) => theme.gray};
+  color: ${({ theme }) => theme.color.gray};
   margin-right: 20px;
 `;
 
@@ -98,10 +99,10 @@ const CloseIcon = styled(Icon)`
   cursor: pointer;
   width: 14px;
   height: 14px;
-  fill: ${({ theme }) => theme.gray};
+  fill: ${({ theme }) => theme.color.gray};
 
   &:hover {
-    fill: ${({ theme }) => theme.black};
+    fill: ${({ theme }) => theme.color.black};
   }
 `;
 

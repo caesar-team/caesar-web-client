@@ -6,8 +6,8 @@ import { Checkbox } from '../Checkbox';
 const Wrapper = styled.div`
   display: flex;
   justify-content: space-between;
-  background: ${({ theme }) => theme.black};
-  color: ${({ theme }) => theme.white};
+  background: ${({ theme }) => theme.color.black};
+  color: ${({ theme }) => theme.color.white};
   position: relative;
   height: 61px;
   padding: 0 20px;
@@ -33,8 +33,8 @@ const CheckboxStyled = styled(Checkbox)`
   margin-right: 20px;
 
   ${Checkbox.Box} {
-    background-color: ${({ theme }) => theme.emperor};
-    border: 1px solid ${({ theme }) => theme.emperor};
+    background-color: ${({ theme }) => theme.color.emperor};
+    border: 1px solid ${({ theme }) => theme.color.emperor};
 
     ${({ checked }) => `
 

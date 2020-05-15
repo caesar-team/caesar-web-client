@@ -20,13 +20,13 @@ const Icon = styled.div`
   justify-content: center;
   width: 18px;
   height: 18px;
-  background-color: ${({ theme }) => theme.black};
+  background-color: ${({ theme }) => theme.color.black};
   border-radius: 50%;
 
   &:before {
     content: '!';
     position: absolute;
-    color: ${({ theme }) => theme.white};
+    color: ${({ theme }) => theme.color.white};
     top: -2px;
     left: 6px;
   }
@@ -35,7 +35,7 @@ const Icon = styled.div`
 const Title = styled.div`
   font-size: 18px;
   letter-spacing: 0.6px;
-  color: ${({ theme }) => theme.black};
+  color: ${({ theme }) => theme.color.black};
   margin-left: 10px;
   text-transform: uppercase;
 `;
@@ -43,7 +43,7 @@ const Title = styled.div`
 const Description = styled.div`
   font-size: 18px;
   letter-spacing: 0.6px;
-  color: ${({ theme }) => theme.emperor};
+  color: ${({ theme }) => theme.color.emperor};
   margin-top: 26px;
   margin-bottom: 35px;
 `;

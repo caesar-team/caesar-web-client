@@ -13,15 +13,15 @@ const RangeBase = styled.div`
   position: relative;
   height: 8px;
   border-radius: 3px;
-  border: 1px solid ${({ theme }) => theme.gallery};
-  background-color: ${({ theme }) => theme.white};
+  border: 1px solid ${({ theme }) => theme.color.gallery};
+  background-color: ${({ theme }) => theme.color.white};
 
   &:before {
     content: '${({ minValue }) => minValue}';
     position: absolute;
     top: 15px;
     left: -4px;
-    color: ${({ theme }) => theme.lightGray};
+    color: ${({ theme }) => theme.color.lightGray};
     font-size: 11px;
     font-weight: 600;
   }
@@ -31,7 +31,7 @@ const RangeBase = styled.div`
     position: absolute;
     top: 15px;
     right: -7px;
-    color: ${({ theme }) => theme.lightGray};
+    color: ${({ theme }) => theme.color.lightGray};
     font-size: 11px;
     font-weight: 600;
   }
@@ -45,7 +45,7 @@ const RangeValue = styled.div`
   font-size: 11px;
   font-weight: 600;
   letter-spacing: 0.4px;
-  color: ${({ theme }) => theme.black};
+  color: ${({ theme }) => theme.color.black};
   white-space: nowrap;
 `;
 
@@ -63,15 +63,15 @@ const RangeControl = styled.div.attrs(props => ({
   transform: translateY(-50%);
   width: 16px;
   height: 16px;
-  background-color: ${({ theme }) => theme.black};
+  background-color: ${({ theme }) => theme.color.black};
   box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.2);
   border-radius: 2px;
   cursor: pointer;
 
   &:hover {
-    background-color: ${({ theme }) => theme.black};
+    background-color: ${({ theme }) => theme.color.black};
     & > ${RangeValue} {
-      color: ${({ theme }) => theme.black};
+      color: ${({ theme }) => theme.color.black};
     }
   }
 `;
@@ -79,8 +79,8 @@ const RangeControl = styled.div.attrs(props => ({
 const Separator = styled.div`
   width: 6px;
   height: 10px;
-  border-left: 1px solid ${({ theme }) => theme.white};
-  border-right: 1px solid ${({ theme }) => theme.white};
+  border-left: 1px solid ${({ theme }) => theme.color.white};
+  border-right: 1px solid ${({ theme }) => theme.color.white};
 `;
 
 const RangeActiveLine = styled.div`
@@ -89,8 +89,8 @@ const RangeActiveLine = styled.div`
   top: 0;
   height: 8px;
   border-radius: 3px;
-  background-color: ${({ theme }) => theme.black};
-  border: 1px solid ${({ theme }) => theme.black};
+  background-color: ${({ theme }) => theme.color.black};
+  border: 1px solid ${({ theme }) => theme.color.black};
 `;
 
 class RangeInput extends Component {

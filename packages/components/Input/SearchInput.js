@@ -8,7 +8,7 @@ const InputStyled = styled(Input)`
 
   ${Input.InputField} {
     border-bottom: none;
-    background-color: ${({ theme }) => theme.white};
+    background-color: ${({ theme }) => theme.color.white};
   }
 
   ${Input.Prefix} {

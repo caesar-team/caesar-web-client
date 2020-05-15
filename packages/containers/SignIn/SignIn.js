@@ -34,11 +34,11 @@ const AuthWrapper = styled.a`
   cursor: pointer;
   border-radius: 3px;
   box-shadow: 0 11px 23px 0 rgba(0, 0, 0, 0.1);
-  background-color: ${({ theme }) => theme.black};
+  background-color: ${({ theme }) => theme.color.black};
   transition: all 0.2s;
 
   &:hover {
-    background-color: ${({ theme }) => theme.emperor};
+    background-color: ${({ theme }) => theme.color.emperor};
   }
 `;
 
@@ -49,14 +49,14 @@ const GoogleLogoWrapper = styled.div`
   background-color: rgba(255, 255, 255, 0.15);
   width: 60px;
   height: 100%;
-  color: ${({ theme }) => theme.white};
+  color: ${({ theme }) => theme.color.white};
 `;
 
 const GoogleAuthText = styled.div`
   margin: auto;
   font-size: 18px;
   letter-spacing: 0.6px;
-  color: ${({ theme }) => theme.white};
+  color: ${({ theme }) => theme.color.white};
 `;
 
 const headerComponent = <SecondaryHeader buttonText="Sign Up" url="/signup" />;

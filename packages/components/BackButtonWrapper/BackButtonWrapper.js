@@ -6,7 +6,7 @@ const BackButtonWrapper = styled.div`
   left: 55px;
   font-size: 14px;
   letter-spacing: 0.4px;
-  color: ${({ theme }) => theme.black};
+  color: ${({ theme }) => theme.color.black};
 `;
 
 export default BackButtonWrapper;

@@ -12,7 +12,7 @@ const ItemType = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
-  background-color: ${({ theme }) => theme.gray};
+  background-color: ${({ theme }) => theme.color.gray};
   border-radius: 3px;
   margin-right: 20px;
   width: 40px;
@@ -31,7 +31,7 @@ const Title = styled.div`
   font-size: 18px;
   line-height: 18px;
   letter-spacing: 0.6px;
-  color: ${({ theme }) => theme.black};
+  color: ${({ theme }) => theme.color.black};
   margin-bottom: 7px;
   text-overflow: ellipsis;
   overflow: hidden;
@@ -53,18 +53,18 @@ const Text = styled.div`
   font-size: 14px;
   line-height: 14px;
   letter-spacing: 0.4px;
-  color: ${({ theme }) => theme.gray};
+  color: ${({ theme }) => theme.color.gray};
 `;
 
 const IconText = styled.div`
   font-size: 14px;
   line-height: 14px;
   letter-spacing: 0.4px;
-  color: ${({ theme }) => theme.gray};
+  color: ${({ theme }) => theme.color.gray};
 `;
 
 const StyledIcon = styled(Icon)`
-  fill: ${({ theme }) => theme.gray};
+  fill: ${({ theme }) => theme.color.gray};
   margin-right: 5px;
 `;
 
@@ -82,8 +82,8 @@ const CloseIcon = styled(Icon)`
 
 const CheckboxStyled = styled(Checkbox)`
   ${Checkbox.Box} {
-    background-color: ${({ theme }) => theme.emperor};
-    border: 1px solid ${({ theme }) => theme.emperor};
+    background-color: ${({ theme }) => theme.color.emperor};
+    border: 1px solid ${({ theme }) => theme.color.emperor};
 
     ${({ checked }) => `
       > svg {
@@ -98,15 +98,15 @@ const Row = styled.div`
   display: flex;
   padding: 20px 30px 20px;
   background: ${({ theme, isActive }) =>
-    isActive ? theme.white : theme.lightBlue};
+    isActive ? theme.color.white : theme.color.lightBlue};
   cursor: pointer;
-  border-bottom: 1px solid ${({ theme }) => theme.gallery};
+  border-bottom: 1px solid ${({ theme }) => theme.color.gallery};
 
   ${({ isMultiItem, isActive }) =>
     isActive &&
     isMultiItem &&
     css`
-      background: ${({ theme }) => theme.gallery};
+      background: ${({ theme }) => theme.color.gallery};
     `}
 `;
 

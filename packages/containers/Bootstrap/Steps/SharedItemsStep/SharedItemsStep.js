@@ -42,7 +42,7 @@ const ItemRow = styled.div`
   align-items: center;
   justify-content: space-between;
   padding: 10px 0;
-  border-bottom: 1px solid ${({ theme }) => theme.gallery};
+  border-bottom: 1px solid ${({ theme }) => theme.color.gallery};
 
   &:last-child {
     border-bottom: none;
@@ -64,7 +64,7 @@ const TeamRow = styled.div`
   display: flex;
   align-items: center;
   border-radius: 2px;
-  border: 1px solid ${({ theme }) => theme.gallery};
+  border: 1px solid ${({ theme }) => theme.color.gallery};
   padding: 10px 20px;
   margin-bottom: 10px;
 `;
@@ -83,7 +83,7 @@ const TeamName = styled.div`
 const TeamItemsWrapper = styled.div`
   font-size: 14px;
   letter-spacing: 0.4px;
-  color: ${({ theme }) => theme.gray};
+  color: ${({ theme }) => theme.color.gray};
 `;
 
 const ButtonWrapper = styled.div`
@@ -121,7 +121,7 @@ const ItemTypeBox = styled.div`
   width: 40px;
   height: 40px;
   border-radius: 3px;
-  background-color: ${({ theme }) => theme.gallery};
+  background-color: ${({ theme }) => theme.color.gallery};
 `;
 
 const IconStyled = styled(Icon)`

@@ -38,7 +38,7 @@ const Error = styled.div`
   text-align: center;
   font-size: 14px;
   letter-spacing: 0.4px;
-  color: ${({ theme }) => theme.red};
+  color: ${({ theme }) => theme.color.red};
 `;
 
 const TipWrapper = styled.div`
@@ -72,7 +72,7 @@ const ApplicationDescription = styled.div`
 const ApplicationLink = styled.a`
   font-size: 14px;
   letter-spacing: 0.6px;
-  color: ${({ theme }) => theme.black};
+  color: ${({ theme }) => theme.color.black};
   display: contents;
 `;
 

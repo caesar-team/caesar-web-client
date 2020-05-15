@@ -20,7 +20,7 @@ const Title = styled.div`
   font-size: 16px;
   font-weight: 600;
   letter-spacing: 0.5px;
-  color: ${({ theme }) => theme.black};
+  color: ${({ theme }) => theme.color.black};
 `;
 
 const PasswordOutput = styled.div`
@@ -29,8 +29,8 @@ const PasswordOutput = styled.div`
   font-size: 15px;
   font-weight: 500;
   letter-spacing: 0.8px;
-  color: ${({ theme }) => theme.black};
-  border-bottom: 2px solid ${({ theme }) => theme.emperor};
+  color: ${({ theme }) => theme.color.black};
+  border-bottom: 2px solid ${({ theme }) => theme.color.emperor};
   height: 40px;
   width: 100%;
   margin-bottom: 10px;
@@ -63,7 +63,7 @@ const CheckboxStyled = styled(Checkbox)`
   ${Checkbox.Text} {
     font-size: 14px;
     letter-spacing: 0.4px;
-    color: ${({ theme }) => theme.black};
+    color: ${({ theme }) => theme.color.black};
   }
 `;
 
@@ -72,7 +72,7 @@ const Shape = styled.div`
   justify-content: center;
   align-items: center;
   border-radius: 3px;
-  border: 1px solid ${({ theme }) => theme.gallery};
+  border: 1px solid ${({ theme }) => theme.color.gallery};
   cursor: pointer;
 `;
 
@@ -86,7 +86,7 @@ const ShapeStyled = styled(Shape)`
 const LengthText = styled.div`
   font-size: 14px;
   letter-spacing: 0.4px;
-  color: ${({ theme }) => theme.black};
+  color: ${({ theme }) => theme.color.black};
 `;
 
 const RangeInputStyled = styled(RangeInput)`

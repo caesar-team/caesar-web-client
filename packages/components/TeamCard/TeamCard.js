@@ -10,7 +10,7 @@ const Wrapper = styled.div`
   flex-direction: column;
   padding: 20px;
   border-radius: 3px;
-  background-color: ${({ theme }) => theme.white};
+  background-color: ${({ theme }) => theme.color.white};
 `;
 
 const TeamWrapper = styled.div`
@@ -18,7 +18,7 @@ const TeamWrapper = styled.div`
   justify-content: space-between;
   margin-bottom: 20px;
   padding-bottom: 20px;
-  border-bottom: 1px solid ${({ theme }) => theme.lightBlue};
+  border-bottom: 1px solid ${({ theme }) => theme.color.lightBlue};
 `;
 
 const TeamDetails = styled.div`
@@ -48,7 +48,7 @@ const TeamName = styled.div`
 const TeamMembers = styled.div`
   font-size: 18px;
   letter-spacing: 0.6px;
-  color: ${({ theme }) => theme.gray};
+  color: ${({ theme }) => theme.color.gray};
 `;
 
 const AvatarsWrapper = styled.div`

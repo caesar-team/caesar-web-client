@@ -6,7 +6,7 @@ import '@caesar/assets/icons/svg';
 const Svg = styled.svg`
   display: inline-block;
   vertical-align: middle;
-  color: ${({ color, theme }) => theme.color[color]};
+  color: ${({ color, theme }) => theme.color.color[color]};
   fill: currentColor;
 
   ${({ disabled }) => disabled && `opacity: 0.5`}

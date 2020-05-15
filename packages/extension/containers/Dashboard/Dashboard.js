@@ -1,7 +1,13 @@
 import React, { Component } from 'react';
 import styled from 'styled-components';
 import { ITEM_REVIEW_MODE } from '@caesar-utils/constants';
-import { Lists, ListOption, Item, PasswordGenerator, Loader } from '@caesar/components';
+import {
+  Lists,
+  ListOption,
+  Item,
+  PasswordGenerator,
+  Loader,
+} from '@caesar/components';
 import { Icon, Scrollbar } from '@caesar-ui';
 
 const Wrapper = styled.div`
@@ -14,8 +20,8 @@ const LeftWrapper = styled.div`
   max-width: 240px;
   width: 100%;
   min-height: 100vh;
-  border-right: 1px solid ${({ theme }) => theme.gallery};
-  background: ${({ theme }) => theme.snow};
+  border-right: 1px solid ${({ theme }) => theme.color.gallery};
+  background: ${({ theme }) => theme.color.snow};
 `;
 
 const RightWrapper = styled.div`
@@ -35,7 +41,7 @@ const TopLists = styled.div`
 const GeneratorOption = styled.div`
   display: flex;
   align-items: center;
-  border-bottom: 1px solid ${({ theme }) => theme.gallery};
+  border-bottom: 1px solid ${({ theme }) => theme.color.gallery};
   cursor: pointer;
   max-height: 40px;
   min-height: 40px;
@@ -45,7 +51,7 @@ const GeneratorOptionName = styled.div`
   font-size: 16px;
   font-weight: ${({ isActive }) => (isActive ? 600 : 400)};
   letter-spacing: 0.5px;
-  color: ${({ theme }) => theme.black};
+  color: ${({ theme }) => theme.color.black};
   margin-left: 16px;
 `;
 

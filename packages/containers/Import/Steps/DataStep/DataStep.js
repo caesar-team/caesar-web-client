@@ -29,21 +29,21 @@ const Title = styled.div`
 `;
 
 const SearchInput = styled(Input)`
-  border: 1px solid ${({ theme }) => theme.gallery};
+  border: 1px solid ${({ theme }) => theme.color.gallery};
   margin-bottom: 10px;
 
   ${Input.InputField} {
     padding: 10px 0 10px 50px;
-    background: ${({ theme }) => theme.white};
+    background: ${({ theme }) => theme.color.white};
 
     &:hover {
-      background: ${({ theme }) => theme.white};
+      background: ${({ theme }) => theme.color.white};
     }
   }
 `;
 
 const StyledIcon = styled(Icon)`
-  fill: ${({ theme }) => theme.gallery};
+  fill: ${({ theme }) => theme.color.gallery};
 `;
 
 const BottomWrapper = styled.div`

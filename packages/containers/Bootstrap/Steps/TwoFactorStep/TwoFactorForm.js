@@ -79,7 +79,7 @@ const NextButton = styled(Button)`
 const ApplicationLink = styled.a`
   font-size: 14px;
   letter-spacing: 0.6px;
-  color: ${({ theme }) => theme.black};
+  color: ${({ theme }) => theme.color.black};
 `;
 
 const Form = styled.form`
@@ -94,7 +94,7 @@ const Error = styled.div`
   text-align: center;
   font-size: 14px;
   letter-spacing: 0.4px;
-  color: ${({ theme }) => theme.red};
+  color: ${({ theme }) => theme.color.red};
 `;
 
 const CheckboxWrapper = styled.div`
@@ -109,10 +109,10 @@ const IconStyled = styled(Icon)`
   height: 20px;
   cursor: pointer;
 
-  fill: ${({ theme }) => theme.gray};
+  fill: ${({ theme }) => theme.color.gray};
 
   &:hover {
-    fill: ${({ theme }) => theme.black};
+    fill: ${({ theme }) => theme.color.black};
   }
 `;
 

@@ -4,7 +4,7 @@ import { Icon } from '@caesar-ui';
 
 const StyledIcon = styled(Icon)`
   margin: auto auto;
-  fill: ${({ theme }) => theme.emperor};
+  fill: ${({ theme }) => theme.color.emperor};
 `;
 
 const EmptyItem = () => (

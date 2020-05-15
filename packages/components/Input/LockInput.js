@@ -14,7 +14,7 @@ const InnerWrapper = styled.div`
   align-items: center;
   height: 60px;
   border-radius: 3px;
-  background-color: ${({ theme }) => theme.darkGray};
+  background-color: ${({ theme }) => theme.color.darkGray};
   min-width: 400px;
 `;
 
@@ -27,23 +27,25 @@ const IconWrapper = styled.div`
 `;
 
 const StyledIcon = styled(Icon)`
-  fill: ${({ isError, theme }) => (isError ? theme.red : theme.white)};
+  fill: ${({ isError, theme }) =>
+    isError ? theme.color.red : theme.color.white};
 `;
 
 const StyledArrowIcon = styled(Icon)`
-  fill: ${({ theme }) => theme.lightGray};
+  fill: ${({ theme }) => theme.color.lightGray};
   margin-right: 24px;
   cursor: pointer;
 
   &:hover {
-    fill: ${({ theme }) => theme.white};
+    fill: ${({ theme }) => theme.color.white};
   }
 `;
 
 const StyledInput = styled(Input)`
   ${Input.InputField} {
-    color: ${({ theme, isError }) => (isError ? theme.red : theme.white)};
-    background-color: ${({ theme }) => theme.darkGray};
+    color: ${({ theme, isError }) =>
+      isError ? theme.color.red : theme.color.white};
+    background-color: ${({ theme }) => theme.color.darkGray};
     height: 58px;
     width: 100%;
     padding-right: 20px;

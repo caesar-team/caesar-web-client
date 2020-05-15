@@ -14,7 +14,7 @@ const StyledButton = styled.button`
   outline: none;
 
   &:hover {
-    color: ${({ theme }) => theme.gray};
+    color: ${({ theme }) => theme.color.gray};
   }
 `;
 

@@ -14,15 +14,15 @@ const Text = styled.div`
   font-size: 18px;
   font-weight: 600;
   letter-spacing: 0.6px;
-  color: ${({ theme }) => theme.black};
+  color: ${({ theme }) => theme.color.black};
   margin-bottom: 20px;
 `;
 
 const Link = styled.div`
   position: relative;
   padding: 15px 20px;
-  background-color: ${({ theme }) => theme.white};
-  border: 1px solid ${({ theme }) => theme.gallery};
+  background-color: ${({ theme }) => theme.color.white};
+  border: 1px solid ${({ theme }) => theme.color.gallery};
   border-radius: 3px;
   word-break: break-all;
   white-space: pre-wrap;

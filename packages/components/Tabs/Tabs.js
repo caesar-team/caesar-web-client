@@ -14,7 +14,7 @@ const PanelWrapper = styled.div`
   width: 100%;
   padding: 30px;
   border-radius: 3px;
-  background: ${({ theme }) => theme.white};
+  background: ${({ theme }) => theme.color.white};
 `;
 
 export class Tabs extends Component {

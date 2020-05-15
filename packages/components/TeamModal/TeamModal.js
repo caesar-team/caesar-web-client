@@ -1,7 +1,14 @@
 import React, { Component, Fragment } from 'react';
 import styled from 'styled-components';
 import memoize from 'memoize-one';
-import { Modal, ModalTitle, Input, Icon, Scrollbar, Button } from '@caesar/components';
+import {
+  Modal,
+  ModalTitle,
+  Input,
+  Icon,
+  Scrollbar,
+  Button,
+} from '@caesar/components';
 import { RadioGroup } from '../Radio';
 import { ActiveTeamRow, RadioTeamRow } from './TeamRow';
 
@@ -9,13 +16,13 @@ const ModalDescription = styled.div`
   padding-bottom: 20px;
   text-align: center;
   font-size: 14px;
-  color: ${({ theme }) => theme.black};
+  color: ${({ theme }) => theme.color.black};
 `;
 
 const StyledInput = styled(Input)`
   ${Input.InputField} {
     height: 50px;
-    border: 1px solid ${({ theme }) => theme.gallery};
+    border: 1px solid ${({ theme }) => theme.color.gallery};
     border-radius: 3px;
     padding: 15px 20px 15px 54px;
     font-size: 16px;
@@ -23,7 +30,7 @@ const StyledInput = styled(Input)`
 `;
 
 const StyledIcon = styled(Icon)`
-  fill: ${({ theme }) => theme.gallery};
+  fill: ${({ theme }) => theme.color.gallery};
 `;
 
 const TeamList = styled.div`

@@ -24,14 +24,14 @@ const CheckboxStyled = styled(Checkbox)`
   ${Checkbox.Text} {
     font-size: 14px;
     letter-spacing: 0.4px;
-    color: ${({ theme }) => theme.black};
+    color: ${({ theme }) => theme.color.black};
   }
 `;
 
 const LengthText = styled.div`
   font-size: 14px;
   letter-spacing: 0.4px;
-  color: ${({ theme }) => theme.black};
+  color: ${({ theme }) => theme.color.black};
 `;
 
 const RangeInputStyled = styled(RangeInput)`

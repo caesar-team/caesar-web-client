@@ -31,7 +31,7 @@ const DottedWrapper = styled.button`
     display: block;
     width: 2px;
     height: 2px;
-    background-color: ${({ theme }) => theme.gray};
+    background-color: ${({ theme }) => theme.color.gray};
     border-radius: 50%;
 
     &:nth-child(2) {

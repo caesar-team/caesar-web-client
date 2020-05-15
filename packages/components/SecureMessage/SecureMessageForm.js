@@ -54,17 +54,17 @@ const ColumnStyled = styled(Column)`
 const Label = styled.div`
   font-size: 18px;
   letter-spacing: 0.6px;
-  color: ${({ theme }) => theme.black};
+  color: ${({ theme }) => theme.color.black};
 `;
 
 const InputStyled = styled(PasswordInput)`
   border-radius: 3px;
-  border: solid 1px ${({ theme }) => theme.gallery};
+  border: solid 1px ${({ theme }) => theme.color.gallery};
 `;
 
 const TextAreaStyled = styled(TextArea)`
   ${TextArea.TextAreaField} {
-    background: ${({ theme }) => theme.white};
+    background: ${({ theme }) => theme.color.white};
   }
 `;
 
@@ -72,7 +72,7 @@ const Error = styled.div`
   margin-top: 8px;
   font-size: 14px;
   letter-spacing: 0.4px;
-  color: ${({ theme }) => theme.red};
+  color: ${({ theme }) => theme.color.red};
 `;
 
 const AttachmentsSection = styled.div`
@@ -108,7 +108,7 @@ const SelectRow = styled.div`
 
 const StyledSelect = styled(Select)`
   margin-top: 10px;
-  border: 1px solid ${({ theme }) => theme.gallery};
+  border: 1px solid ${({ theme }) => theme.color.gallery};
   border-radius: 3px;
   padding: 18px 20px;
   height: 60px;

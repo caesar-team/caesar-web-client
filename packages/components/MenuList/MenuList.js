@@ -22,7 +22,6 @@ const StyledDropdown = styled(Dropdown)`
 const ColumnHeader = styled.div`
   display: flex;
   align-items: center;
-  flex-shrink: 0;
   height: 56px;
   padding: 8px 24px;
   background-color: ${({ theme }) => theme.color.snow};

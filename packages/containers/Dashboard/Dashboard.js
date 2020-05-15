@@ -31,20 +31,6 @@ import {
 } from '@caesar/common/constants';
 import { initialItemData } from './utils';
 
-const MiddleColumnWrapper = styled.div`
-  display: flex;
-  flex-direction: column;
-  width: 431px;
-  flex-shrink: 0;
-  background: ${({ theme }) => theme.lightBlue};
-  border-right: 1px solid ${({ theme }) => theme.gallery};
-`;
-
-const RightColumnWrapper = styled.div`
-  position: relative;
-  flex-grow: 1;
-`;
-
 const CenterWrapper = styled.div`
   display: flex;
   width: 100%;
@@ -52,9 +38,21 @@ const CenterWrapper = styled.div`
 `;
 
 const Sidebar = styled.aside`
-  width: 287px;
-  flex-shrink: 0;
+  flex: 0 0 287px;
   border-right: 1px solid ${({ theme }) => theme.gallery};
+`;
+
+const MiddleColumnWrapper = styled.div`
+  display: flex;
+  flex-direction: column;
+  flex: 0 0 431px;
+  background: ${({ theme }) => theme.lightBlue};
+  border-right: 1px solid ${({ theme }) => theme.gallery};
+`;
+
+const RightColumnWrapper = styled.div`
+  position: relative;
+  flex-grow: 1;
 `;
 
 const SHARE_MODAL = 'shareModal';

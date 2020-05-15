@@ -1,4 +1,4 @@
-import React, { Fragment, Component } from 'react';
+import React, { Component } from 'react';
 import styled from 'styled-components';
 import { formatDate } from '@caesar/common/utils/dateUtils';
 import { upperFirst } from '@caesar/common/utils/string';
@@ -33,7 +33,7 @@ const InviteRow = styled(Row)`
 const UpdatedDate = styled.div`
   font-size: 14px;
   letter-spacing: 0.4px;
-  color: ${({ theme }) => theme.emperor};
+  color: ${({ theme }) => theme.color.emperor};
 `;
 
 const Owner = styled.div`
@@ -45,13 +45,13 @@ const Owner = styled.div`
 const OwnerName = styled.div`
   font-size: 16px;
   letter-spacing: 0.5px;
-  color: ${({ theme }) => theme.black};
+  color: ${({ theme }) => theme.color.black};
 `;
 
 const OwnerStatus = styled.div`
   font-size: 14px;
   letter-spacing: 0.4px;
-  color: ${({ theme }) => theme.gray};
+  color: ${({ theme }) => theme.color.gray};
 `;
 
 const StyledAvatarsList = styled(AvatarsList)`
@@ -66,8 +66,8 @@ const ShareButton = styled.button`
   width: 40px;
   height: 40px;
   ${({ hasInvited }) => hasInvited && 'margin-right: -10px'};
-  color: ${({ theme }) => theme.emperor};
-  border: 1px dashed ${({ theme }) => theme.gallery};
+  color: ${({ theme }) => theme.color.emperor};
+  border: 1px dashed ${({ theme }) => theme.color.gallery};
   border-radius: 50%;
   outline: none;
   cursor: ${({ disabled }) => (disabled ? 'not-allowed' : 'pointer')};
@@ -77,8 +77,8 @@ const ShareButton = styled.button`
     !disabled &&
     `
       &:hover {
-        color: ${theme.black};
-        border-color: ${theme.emperor};
+        color: ${theme.color.black};
+        border-color: ${theme.color.emperor};
       }
   `}
 `;
@@ -98,7 +98,7 @@ const Title = styled.div`
   padding: 4px 0;
   font-size: 36px;
   letter-spacing: 1px;
-  color: ${({ theme }) => theme.black};
+  color: ${({ theme }) => theme.color.black};
 `;
 
 const FavoriteButton = styled.button`
@@ -121,10 +121,10 @@ const FavoriteButton = styled.button`
 `;
 
 const IconStyled = styled(Icon)`
-  fill: ${({ theme }) => theme.gray};
+  fill: ${({ theme }) => theme.color.gray};
 
   &:hover {
-    fill: ${({ theme }) => theme.black};
+    fill: ${({ theme }) => theme.color.black};
   }
 `;
 
@@ -287,14 +287,14 @@ class ItemHeader extends Component {
 
     if (isSharedItem) {
       return (
-        <Fragment>
+        <>
           <StyledRow>
             <UpdatedDate>Last updated {formatDate(lastUpdated)}</UpdatedDate>
           </StyledRow>
           <Row>
             <Title>{name}</Title>
           </Row>
-        </Fragment>
+        </>
       );
     }
 
@@ -340,11 +340,11 @@ class ItemHeader extends Component {
         : generateTeamTag(currentTeam.name);
 
     return (
-      <Fragment>
+      <>
         <Row>
           <Row>
             {!isTrashItem && (
-              <Fragment>
+              <>
                 {shouldShowTeamDropdownIcon ? (
                   <DropdownStyled
                     onClick={this.handleSelectTeamId}
@@ -360,14 +360,14 @@ class ItemHeader extends Component {
                     <ArrowIcon name="arrow-triangle" />
                   </DropdownStyled>
                 ) : (
-                  <Fragment>
+                  <>
                     {currentTeam.id !== 'personal' && (
                       <TeamAvatar>
                         <TeamImg src={currentTeam.icon} />
                       </TeamAvatar>
                     )}
                     <DropdownValue>{currentTeamTag}</DropdownValue>
-                  </Fragment>
+                  </>
                 )}
                 <Separator>|</Separator>
                 {shouldShowListDropdownIcon ? (
@@ -386,7 +386,7 @@ class ItemHeader extends Component {
                     MOVE
                   </MoveButton>
                 )}
-              </Fragment>
+              </>
             )}
           </Row>
           <Row>
@@ -468,7 +468,7 @@ class ItemHeader extends Component {
             <StyledAvatarsList avatars={avatars} />
           </Row>
         </InviteRow>
-      </Fragment>
+      </>
     );
   }
 }

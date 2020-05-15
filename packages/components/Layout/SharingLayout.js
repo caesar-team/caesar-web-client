@@ -1,4 +1,4 @@
-import React, { Fragment } from 'react';
+import React from 'react';
 import styled from 'styled-components';
 import Router from 'next/router';
 import LayoutConstructor from './LayoutConstructor';
@@ -11,7 +11,7 @@ const LayoutConstructorStyled = styled(LayoutConstructor)`
 
   ${LayoutConstructor.TopWrapper} {
     justify-content: space-between;
-    border-bottom: 1px solid ${({ theme }) => theme.gallery};
+    border-bottom: 1px solid ${({ theme }) => theme.color.gallery};
     margin-bottom: 10px;
     padding: 20px;
   }
@@ -28,12 +28,12 @@ const LayoutConstructorStyled = styled(LayoutConstructor)`
 `;
 
 const Header = () => (
-  <Fragment>
+  <>
     <Icon name="logo-caesar-4xxi" width={106} height={30} />
     <Link href="/logout" onClick={() => Router.push('/logout')}>
       Logout
     </Link>
-  </Fragment>
+  </>
 );
 
 const SharingLayout = props => (

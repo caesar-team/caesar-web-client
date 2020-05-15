@@ -25,8 +25,7 @@ const Wrapper = styled.header`
 const LeftWrapper = styled.div`
   display: flex;
   align-items: center;
-  width: 287px;
-  flex-shrink: 0;
+  flex: 0 0 287px;
   padding-left: 24px;
 `;
 

@@ -35,14 +35,7 @@ const SearchInput = ({
 
   const iconComponent = searchedText ? CloseIconComponent : SearchIconComponent;
 
-  return (
-    <InputStyled
-      prefix={iconComponent}
-      placeholder=""
-      value={searchedText}
-      {...props}
-    />
-  );
+  return <InputStyled prefix={iconComponent} value={searchedText} {...props} />;
 };
 
 export default SearchInput;

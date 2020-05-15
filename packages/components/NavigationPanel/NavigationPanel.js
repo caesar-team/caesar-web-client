@@ -89,12 +89,7 @@ const NavigationPanel = ({
 
     return (
       <SeparatorIconWrapper key={index}>
-        <StyledIcon
-          name="arrow-next"
-          isActive={isActive}
-          width={18}
-          height={10}
-        />
+        <StyledIcon name="arrow" isActive={isActive} width={18} height={10} />
       </SeparatorIconWrapper>
     );
   };

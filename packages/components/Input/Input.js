@@ -22,10 +22,10 @@ const LabelText = styled.div`
 `;
 
 const InputField = styled.input`
-  padding: 18px 20px;
+  padding: 9px 16px;
   display: block;
   width: 100%;
-  font-size: 18px;
+  font-size: 16px;
   letter-spacing: 0.6px;
   background-color: ${({ theme, isFocused }) =>
     isFocused ? theme.snow : theme.white};

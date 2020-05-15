@@ -1,5 +1,5 @@
-import React, { PureComponent, Fragment } from 'react';
-import { connect } from 'react-redux';
+import React, { memo, useState } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
 import styled from 'styled-components';
 import Link from 'next/link';
 import { setCurrentTeamId, logout } from '@caesar/common/actions/user';
@@ -7,11 +7,10 @@ import {
   currentTeamSelector,
   userTeamListSelector,
 } from '@caesar/common/selectors/user';
-import { createStructuredSelector } from 'reselect';
 import { Icon } from '../Icon';
-import { Avatar } from '../Avatar';
 import { Dropdown } from '../Dropdown';
 import { SearchInput } from '../Input';
+import { Button } from '../Button';
 import { TeamModal } from '../TeamModal';
 import { Logo } from './Logo';
 
@@ -20,25 +19,26 @@ const Wrapper = styled.header`
   border-bottom: 1px solid ${({ theme }) => theme.gallery};
   width: 100%;
   background-color: ${({ theme }) => theme.white};
-  max-height: 70px;
-  min-height: 70px;
+  height: 56px;
 `;
 
 const LeftWrapper = styled.div`
   display: flex;
   align-items: center;
-  width: 300px;
+  width: 287px;
   flex-shrink: 0;
-  padding-left: 60px;
-  ${({ withBorder, theme }) =>
-    withBorder && `border-right: 1px solid ${theme.gallery}`};
+  padding-left: 25px;
 `;
 
 const RightWrapper = styled.div`
   display: flex;
   align-items: center;
   flex-grow: 1;
-  padding: 0 30px;
+  padding: 0 25px;
+`;
+
+const AddItemButton = styled(Button)`
+  margin-right: 10px;
 `;
 
 const UserSection = styled.div`
@@ -48,11 +48,6 @@ const UserSection = styled.div`
   margin-left: auto;
 `;
 
-const UserAndTeamWrapper = styled.div`
-  display: flex;
-  flex-direction: column;
-`;
-
 const UserName = styled.div`
   font-size: 16px;
   letter-spacing: 0.5px;
@@ -60,19 +55,8 @@ const UserName = styled.div`
   margin-right: 15px;
 `;
 
-const TeamName = styled.div`
-  font-size: 14px;
-  letter-spacing: 0.4px;
-  color: ${({ theme }) => theme.gray};
-`;
-
-const TeamAvatar = styled(Avatar)`
-  margin-left: -8px;
-`;
-
 const StyledDropdown = styled(Dropdown)`
   display: flex;
-  min-width: 200px;
   color: ${({ theme }) => theme.black};
   flex-direction: row;
   align-items: center;
@@ -104,139 +88,113 @@ const Anchor = styled.a`
 `;
 
 const StyledIcon = styled(Icon)`
-  fill: ${({ theme }) => theme.gray};
+  transform: ${({ isDropdownOpened }) =>
+    isDropdownOpened ? 'scaleY(-1)' : 'scaleY(1)'};
+  transition: all 0.2s;
 `;
 
-class PrimaryHeader extends PureComponent {
-  state = {
-    isDropdownOpened: false,
-    isModalOpened: false,
+const PrimaryHeaderComponent = ({
+  user,
+  searchedText,
+  onSearch,
+  onClickReset,
+}) => {
+  const dispatch = useDispatch();
+  const teamList = useSelector(userTeamListSelector);
+  const team = useSelector(currentTeamSelector);
+  const [isDropdownOpened, setIsDropdownOpened] = useState(false);
+  const [isModalOpened, setIsModalOpened] = useState(false);
+  const userName = (user && (user.name || user.email)) || '';
+  const shouldShowSwitchTeamOption = teamList && teamList.length > 0;
+
+  const handleToggleDropdown = () => {
+    setIsDropdownOpened(!isDropdownOpened);
   };
 
-  handleChangeTeamId = teamId => {
-    const { team } = this.props;
+  const handleShowTeamModal = () => {
+    setIsDropdownOpened(false);
+    setIsModalOpened(true);
+  };
 
+  const handleCloseModal = () => {
+    setIsModalOpened(false);
+  };
+
+  const handleChangeTeamId = teamId => {
     if (!team || team.id !== teamId) {
-      this.props.setCurrentTeamId(teamId);
+      dispatch(setCurrentTeamId(teamId));
     }
 
-    this.handleCloseModal();
+    handleCloseModal();
   };
 
-  handleToggleDropdown = isDropdownOpened => {
-    this.setState({
-      isDropdownOpened,
-    });
-  };
-
-  handleShowTeamModal = () => {
-    this.setState({
-      isDropdownOpened: false,
-      isModalOpened: true,
-    });
-  };
-
-  handleCloseModal = () => {
-    this.setState({
-      isModalOpened: false,
-    });
-  };
-
-  render() {
-    const {
-      user,
-      team,
-      teamList,
-      withSearch = false,
-      searchedText,
-      onSearch,
-      onClickReset,
-    } = this.props;
-    const { isDropdownOpened, isModalOpened } = this.state;
-
-    const userName = (user && (user.name || user.email)) || '';
-    const teamId = team ? team.id : null;
-
-    const shouldShowSwitchTeamOption = teamList && teamList.length > 0;
-
-    const Options = (
-      <Fragment>
-        {shouldShowSwitchTeamOption && (
-          <Option key="teams" onClick={this.handleShowTeamModal}>
-            <Anchor>Switch Team</Anchor>
-          </Option>
-        )}
-        <Option key="settings">
-          <Link href="/settings/manage">
-            <Anchor>Settings</Anchor>
-          </Link>
+  const Options = (
+    <>
+      {/* TODO: Replace Switch Team in secondary header */}
+      {shouldShowSwitchTeamOption && (
+        <Option key="teams" onClick={handleShowTeamModal}>
+          <Anchor>Switch Team</Anchor>
         </Option>
-        <Option key="logout" onClick={this.props.logout}>
-          <Anchor>Logout</Anchor>
-        </Option>
-      </Fragment>
-    );
+      )}
+      <Option key="settings">
+        <Link href="/settings/manage">
+          <Anchor>Settings</Anchor>
+        </Link>
+      </Option>
+      <Option key="logout" onClick={() => dispatch(logout())}>
+        <Anchor>Logout</Anchor>
+      </Option>
+    </>
+  );
 
-    return (
-      <Fragment>
-        <Wrapper>
-          <LeftWrapper withBorder={withSearch}>
-            <Logo href="/" />
-          </LeftWrapper>
-          {!!user && (
-            <RightWrapper>
-              <SearchInput
-                searchedText={searchedText}
-                onChange={onSearch}
-                onClickReset={onClickReset}
-              />
-              <UserSection>
-                <Avatar {...user} name={user.email} />
-                {team && <TeamAvatar name={team.title} avatar={team.icon} />}
-                <StyledDropdown
-                  overlay={Options}
-                  onToggle={this.handleToggleDropdown}
-                >
-                  <UserAndTeamWrapper>
-                    <UserName>{userName}</UserName>
-                    {team && <TeamName>{team.title}</TeamName>}
-                  </UserAndTeamWrapper>
-                  <StyledIcon
-                    name={
-                      isDropdownOpened ? 'arrow-up-small' : 'arrow-down-small'
-                    }
-                    width={10}
-                    height={16}
-                  />
-                </StyledDropdown>
-              </UserSection>
-            </RightWrapper>
-          )}
-        </Wrapper>
-        {isModalOpened && (
-          <TeamModal
-            teamList={teamList}
-            teamId={teamId}
-            onChangeTeam={this.handleChangeTeamId}
-            onCancel={this.handleCloseModal}
-          />
+  return (
+    <>
+      <Wrapper>
+        <LeftWrapper>
+          <Logo href="/" />
+        </LeftWrapper>
+        {!!user && (
+          <RightWrapper>
+            <SearchInput
+              searchedText={searchedText}
+              onChange={onSearch}
+              onClickReset={onClickReset}
+            />
+            {/* TODO: Add functional */}
+            <AddItemButton icon="plus">Add item</AddItemButton>
+            <UserSection>
+              {/* TODO: Remove teamName to secondary header */}
+              {/* <Avatar {...user} name={user.email} /> */}
+              {/* {team && <TeamAvatar name={team.title} avatar={team.icon} />} */}
+              <StyledDropdown overlay={Options} onToggle={handleToggleDropdown}>
+                {/* <UserAndTeamWrapper> */}
+                <UserName>{userName}</UserName>
+                {/* TODO: Remove teamName to secondary header */}
+                {/* {team && <TeamName>{team.title}</TeamName>} */}
+                {/* </UserAndTeamWrapper> */}
+                <StyledIcon
+                  name="arrow-triangle"
+                  width={10}
+                  height={16}
+                  color="middleGray"
+                  isDropdownOpened={isDropdownOpened}
+                />
+              </StyledDropdown>
+            </UserSection>
+            {/* TODO: Add notifications */}
+          </RightWrapper>
         )}
-      </Fragment>
-    );
-  }
-}
-
-const mapStateToProps = createStructuredSelector({
-  teamList: userTeamListSelector,
-  team: currentTeamSelector,
-});
-
-const mapDispatchToProps = {
-  setCurrentTeamId,
-  logout,
+      </Wrapper>
+      {isModalOpened && (
+        <TeamModal
+          teamList={teamList}
+          teamId={team ? team.id : null}
+          onChangeTeam={handleChangeTeamId}
+          onCancel={handleCloseModal}
+        />
+      )}
+    </>
+  );
 };
 
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps,
-)(PrimaryHeader);
+export const PrimaryHeader = memo(PrimaryHeaderComponent);

@@ -74,6 +74,11 @@ const StyledIcon = styled(Icon)`
   margin-right: 16px;
 `;
 
+const ArrowIcon = styled(Icon)`
+  transform: ${({ isActive }) => (isActive ? 'scaleY(-1)' : 'scaleY(1)')};
+  transition: all 0.2s;
+`;
+
 const ListOption = ({
   list,
   items = [],
@@ -99,8 +104,6 @@ const ListOption = ({
     );
   });
 
-  const iconName = isActive ? 'arrow-up-small' : 'arrow-down-small';
-
   return (
     <List key={list.id} onClick={onClickList(list.id)}>
       <ListDetails>
@@ -112,7 +115,12 @@ const ListOption = ({
         ) : (
           <ListName isActive={isActive}>{upperFirst(list.label)}</ListName>
         )}
-        <Icon name={iconName} width={10} height={6} />
+        <ArrowIcon
+          name="arrow-triangle"
+          width={10}
+          height={6}
+          isActive={isActive}
+        />
       </ListDetails>
       {isActive && <ItemsWrapper>{renderedItems}</ItemsWrapper>}
     </List>

@@ -1,7 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
-import { Icon } from '../Icon';
 import DownloadIcon from '@caesar/assets/icons/svg/icon-download-white.svg';
+import { Icon } from '../Icon';
 
 const FileExt = styled.div`
   position: relative;

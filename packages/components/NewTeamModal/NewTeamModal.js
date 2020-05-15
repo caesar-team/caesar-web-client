@@ -172,7 +172,7 @@ class NewTeamModal extends Component {
           <IconStyled name={name} />
           {isActive && (
             <SelectedIconWrapper>
-              <TopIconStyled name="check" />
+              <TopIconStyled name="checkmark" />
             </SelectedIconWrapper>
           )}
         </IconWrapper>
@@ -203,7 +203,7 @@ class NewTeamModal extends Component {
           <UploadedImageWrapper>
             <UploadedImage src={icon.raw} />
             <SelectedIconWrapper>
-              <TopIconStyled name="check" />
+              <TopIconStyled name="checkmark" />
             </SelectedIconWrapper>
           </UploadedImageWrapper>
         )}

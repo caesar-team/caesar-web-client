@@ -33,7 +33,7 @@ const SecureHeaderComponent = ({
         href={url}
         width={isMobile ? 25 : 107}
         height={30}
-        iconName={isMobile ? 'caesar' : 'logo-new'}
+        iconName={isMobile ? 'caesar' : 'logo-caesar-4xxi'}
       />
       {isButtonShow && (
         <>

@@ -1,20 +1,8 @@
-// Need to change all arrows to 7-14 and delete 2-5
-import './icon-arrow-back.svg?sprite';
-import './icon-arrow-left.svg?sprite';
-import './icon-arrow-next.svg?sprite';
-import './icon-arrow-right.svg?sprite';
-// Need to change all arrows to this 7-14 and delete 2-5
-import './icon-arrow-up-big.svg?sprite';
-import './icon-arrow-up-small.svg?sprite';
-import './icon-arrow-down-big.svg?sprite';
-import './icon-arrow-down-small.svg?sprite';
-import './icon-arrow-left-big.svg?sprite';
-import './icon-arrow-left-small.svg?sprite';
-import './icon-arrow-right-big.svg?sprite';
-import './icon-arrow-right-small.svg?sprite';
+import './icon-arrow.svg?sprite';
+import './icon-arrow-triangle.svg?sprite'; // triangle
 import './icon-at.svg?sprite';
 import './icon-bitmap.svg?sprite';
-import './icon-check.svg?sprite';
+import './icon-checkmark.svg?sprite';
 import './icon-clip.svg?sprite';
 import './icon-close.svg?sprite';
 import './icon-copy.svg?sprite';
@@ -33,16 +21,15 @@ import './icon-history.svg?sprite';
 import './icon-inbox.svg?sprite';
 import './icon-key.svg?sprite';
 import './icon-key-diagonal.svg?sprite';
-import './icon-logo.svg?sprite';
 import './icon-caesar.svg?sprite';
 import './icon-login.svg?sprite';
 import './icon-logo-4xxi.svg?sprite';
-import './icon-logo-new.svg?sprite';
+import './icon-logo-caesar.svg?sprite';
+import './icon-logo-caesar-4xxi.svg?sprite';
 import './icon-logo-secure-message.svg?sprite';
 import './icon-mail.svg?sprite';
 import './icon-lock.svg?sprite';
 import './icon-more.svg?sprite';
-import './icon-ok.svg?sprite';
 import './icon-pencil.svg?sprite';
 import './icon-plus.svg?sprite';
 import './icon-print.svg?sprite';

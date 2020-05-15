@@ -1,4 +1,4 @@
-import React, { Component, Fragment } from 'react';
+import React, { Component } from 'react';
 import styled from 'styled-components';
 import memoize from 'memoize-one';
 import {
@@ -34,7 +34,7 @@ import { initialItemData } from './utils';
 const MiddleColumnWrapper = styled.div`
   display: flex;
   flex-direction: column;
-  width: 400px;
+  width: 431px;
   flex-shrink: 0;
   background: ${({ theme }) => theme.lightBlue};
   border-right: 1px solid ${({ theme }) => theme.gallery};
@@ -52,7 +52,7 @@ const CenterWrapper = styled.div`
 `;
 
 const Sidebar = styled.aside`
-  width: 300px;
+  width: 287px;
   flex-shrink: 0;
   border-right: 1px solid ${({ theme }) => theme.gallery};
 `;
@@ -508,9 +508,8 @@ class DashboardContainer extends Component {
       : userTeamList;
 
     return (
-      <Fragment>
+      <>
         <DashboardLayout
-          withSearch
           user={user}
           team={team}
           searchedText={searchedText}
@@ -535,7 +534,7 @@ class DashboardContainer extends Component {
             {isToolMode ? (
               <SecureMessage withScroll />
             ) : (
-              <Fragment>
+              <>
                 <MiddleColumnWrapper>
                   {isMultiItem && (
                     <MultiItem
@@ -599,7 +598,7 @@ class DashboardContainer extends Component {
                     onClickRejectUpdate={this.handleRejectUpdate}
                   />
                 </RightColumnWrapper>
-              </Fragment>
+              </>
             )}
           </CenterWrapper>
         </DashboardLayout>
@@ -638,7 +637,7 @@ class DashboardContainer extends Component {
           onClickOk={this.handleRemoveItem}
           onClickCancel={this.handleCloseModal(REMOVE_ITEM_MODAL)}
         />
-      </Fragment>
+      </>
     );
   }
 }

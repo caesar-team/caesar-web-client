@@ -19,6 +19,10 @@ const LinkText = styled.div`
   margin-left: 20px;
 `;
 
+const BackIcon = styled(Icon)`
+  transform: scaleX(-1);
+`;
+
 const BackLink = ({
   children,
   disabled,
@@ -30,7 +34,7 @@ const BackLink = ({
     disabled={disabled}
     onClick={disabled ? Function.prototype : onClick}
   >
-    <Icon name="arrow-back" width={16} height={16} />
+    <BackIcon name="arrow" width={16} height={16} />
     <LinkText>{children}</LinkText>
   </Wrapper>
 );

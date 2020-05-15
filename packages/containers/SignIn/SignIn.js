@@ -108,7 +108,7 @@ class SignInContainer extends Component {
             <TextWithLines width={1}>OR</TextWithLines>
             <AuthWrapper href={googleAuthUrl}>
               <GoogleLogoWrapper>
-                <Icon name="google" width={20} height={20} isInButton />
+                <Icon name="google" width={20} height={20} />
               </GoogleLogoWrapper>
               <GoogleAuthText>Log in with Google</GoogleAuthText>
             </AuthWrapper>

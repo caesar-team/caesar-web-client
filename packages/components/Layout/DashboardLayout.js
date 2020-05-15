@@ -2,7 +2,7 @@ import React from 'react';
 import styled from 'styled-components';
 import ScrollLock from 'react-scrolllock';
 import LayoutConstructor from './LayoutConstructor';
-import PrimaryHeader from './PrimaryHeader';
+import { PrimaryHeader } from './PrimaryHeader';
 
 const LayoutConstructorStyled = styled(LayoutConstructor)`
   padding: 0;
@@ -12,7 +12,6 @@ const LayoutConstructorStyled = styled(LayoutConstructor)`
 const DashboardLayout = ({
   user,
   team,
-  withSearch,
   searchedText,
   onSearch,
   onClickReset,
@@ -24,7 +23,6 @@ const DashboardLayout = ({
       <PrimaryHeader
         user={user}
         team={team}
-        withSearch={withSearch}
         searchedText={searchedText}
         onSearch={onSearch}
         onClickReset={onClickReset}

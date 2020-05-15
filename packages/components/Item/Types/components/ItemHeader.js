@@ -357,7 +357,7 @@ class ItemHeader extends Component {
                       </TeamAvatar>
                     )}
                     <DropdownValue>{currentTeamTag}</DropdownValue>
-                    <ArrowIcon name="arrow-down-big" />
+                    <ArrowIcon name="arrow-triangle" />
                   </DropdownStyled>
                 ) : (
                   <Fragment>
@@ -376,7 +376,7 @@ class ItemHeader extends Component {
                     options={listOptions}
                   >
                     <DropdownValue>{currentList.label}</DropdownValue>
-                    <ArrowIcon name="arrow-down-big" />
+                    <ArrowIcon name="arrow-triangle" />
                   </DropdownStyled>
                 ) : (
                   <DropdownValue>{currentList.label}</DropdownValue>
@@ -461,13 +461,7 @@ class ItemHeader extends Component {
                   onClick={onClickShare}
                   hasInvited={hasInvited}
                 >
-                  <Icon
-                    isInButton
-                    withOfflineCheck
-                    name="plus"
-                    width={14}
-                    height={14}
-                  />
+                  <Icon withOfflineCheck name="plus" width={14} height={14} />
                 </ShareButton>
               </Can>
             )}

@@ -6,7 +6,8 @@ import '@caesar/assets/icons/svg';
 const Svg = styled.svg`
   display: inline-block;
   vertical-align: middle;
-  fill: ${({ isInButton }) => (isInButton ? 'currentColor' : '')};
+  color: ${({ color, theme }) => theme.color[color]};
+  fill: currentColor;
 
   & > * {
     ${({ disabled }) => disabled && `opacity: 0.5`}
@@ -18,7 +19,7 @@ const getIconDisabledStatus = (withOfflineCheck, isOnline, disabled) =>
 
 const Icon = ({
   name,
-  isInButton,
+  color,
   withOfflineCheck = false,
   isOnline,
   disabled,
@@ -46,7 +47,7 @@ const Icon = ({
       };
 
   return (
-    <Svg isInButton={isInButton} disabled={isDisabled} {...props} {...events}>
+    <Svg color={color} disabled={isDisabled} {...props} {...events}>
       <use xlinkHref={`#icon-${name}--sprite`} />
     </Svg>
   );

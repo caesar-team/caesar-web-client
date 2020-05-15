@@ -8,6 +8,7 @@ import {
   ITEM_TYPES,
   CREATE_PERMISSION,
   ITEM_ENTITY_TYPE,
+  ITEM_ICON_TYPES,
 } from '@caesar/common/constants';
 import { Icon, Can } from '@caesar/components';
 import FixedSizeItem from './FixedSizeItem';
@@ -15,7 +16,6 @@ import ScrollbarVirtualList from './ScrollbarVirtualList';
 import EmptyList from './EmptyList';
 import { Dropdown } from '../Dropdown';
 import { withOfflineDetection } from '../Offline';
-import { ITEM_ICON_TYPES } from '@caesar/common/constants';
 
 const Wrapper = styled.div`
   position: relative;
@@ -23,26 +23,25 @@ const Wrapper = styled.div`
   flex-direction: column;
   height: calc(100vh - 70px);
   background-color: ${({ isEmpty, theme }) =>
-    isEmpty ? theme.white : theme.lightBlue};
+    isEmpty ? theme.color.white : theme.color.lightBlue};
 `;
 
-const TitleWrapper = styled.div`
+const ColumnHeader = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
   flex-shrink: 0;
-  height: 61px;
-  padding: 10px 30px;
-  background-color: ${({ theme }) => theme.white};
-  border-bottom: 1px solid ${({ theme }) => theme.gallery};
+  height: 56px;
+  padding: 8px 24px;
+  background-color: ${({ theme }) => theme.color.snow};
+  border-bottom: 1px solid ${({ theme }) => theme.color.gallery};
 `;
 
-const Title = styled.div`
-  font-size: 18px;
+const ColumnTitle = styled.div`
+  font-size: 16px;
   font-weight: bold;
-  text-transform: capitalize;
   letter-spacing: 0.6px;
-  color: ${({ theme }) => theme.black};
+  color: ${({ theme }) => theme.color.black};
 `;
 
 const CreateButton = styled.div`
@@ -55,17 +54,17 @@ const CreateButton = styled.div`
   outline: none;
   cursor: ${({ disabled }) => (disabled ? 'not-allowed' : 'pointer')};
   transition: all 0.2s;
-  color: ${({ theme }) => theme.emperor};
-  background-color: ${({ theme }) => theme.white};
-  border: 1px solid ${({ theme }) => theme.gallery};
+  color: ${({ theme }) => theme.color.emperor};
+  background-color: ${({ theme }) => theme.color.white};
+  border: 1px solid ${({ theme }) => theme.color.gallery};
 
   ${({ theme, disabled }) =>
     !disabled &&
     `
   &:hover {
-    color: ${theme.white};
-    background-color: ${theme.black};
-    border: 1px solid ${theme.black};
+    color: ${theme.color.white};
+    background-color: ${theme.color.black};
+    border: 1px solid ${theme.color.black};
   }
   `}
 `;
@@ -87,8 +86,8 @@ const Option = styled.button`
   white-space: nowrap;
 
   &:hover {
-    background-color: ${({ theme }) => theme.snow};
-    color: ${({ theme }) => theme.gray};
+    background-color: ${({ theme }) => theme.color.snow};
+    color: ${({ theme }) => theme.color.gray};
   }
 `;
 
@@ -184,8 +183,8 @@ const List = ({
   return (
     <Wrapper isEmpty={isEmpty}>
       {!isMultiItem && (
-        <TitleWrapper>
-          <Title>{workInProgressList.label}</Title>
+        <ColumnHeader>
+          <ColumnTitle>{workInProgressList.label}</ColumnTitle>
           <Can I={CREATE_PERMISSION} of={itemSubject}>
             <Dropdown
               options={itemTypesOptions}
@@ -193,17 +192,11 @@ const List = ({
               optionRender={renderOption}
             >
               <CreateButton disabled={!isOnline}>
-                <Icon
-                  isInButton
-                  withOfflineCheck
-                  name="plus"
-                  width={14}
-                  height={14}
-                />
+                <Icon withOfflineCheck name="plus" width={14} height={14} />
               </CreateButton>
             </Dropdown>
           </Can>
-        </TitleWrapper>
+        </ColumnHeader>
       )}
       {renderedList()}
     </Wrapper>

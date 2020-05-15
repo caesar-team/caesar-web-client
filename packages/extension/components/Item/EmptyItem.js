@@ -9,7 +9,7 @@ const StyledIcon = styled(Icon)`
 
 const EmptyItem = () => (
   <Fragment>
-    <StyledIcon name="logo" width={142} height={40} />
+    <StyledIcon name="logo-caesar-4xxi" width={142} height={40} />
   </Fragment>
 );
 

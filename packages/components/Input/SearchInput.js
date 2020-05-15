@@ -4,7 +4,7 @@ import Input from './Input';
 import { Icon } from '../Icon';
 
 const InputStyled = styled(Input)`
-  padding-left: 20px;
+  padding-left: 34px;
 
   ${Input.InputField} {
     border-bottom: none;
@@ -25,7 +25,9 @@ const SearchInput = ({
   onClickReset = Function.prototype,
   ...props
 }) => {
-  const SearchIconComponent = <Icon name="search" width={18} height={18} />;
+  const SearchIconComponent = (
+    <Icon name="search" width={20} height={20} color="gray" />
+  );
 
   const CloseIconComponent = (
     <CloseIcon name="close" width={18} height={18} onClick={onClickReset} />
@@ -36,7 +38,7 @@ const SearchInput = ({
   return (
     <InputStyled
       prefix={iconComponent}
-      placeholder="Search by Caesar…"
+      placeholder=""
       value={searchedText}
       {...props}
     />

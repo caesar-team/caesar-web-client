@@ -43,7 +43,7 @@ const StyledInput = styled.input`
 const Checkbox = ({ isDisabled, children, checked, className, ...props }) => (
   <StyledLabel isDisabled={isDisabled} className={className}>
     <Box isChecked={checked}>
-      <Icon name="check" isInButton width={14} height={10} />
+      <Icon name="checkmark" width={14} height={10} />
     </Box>
     <StyledInput
       type="checkbox"

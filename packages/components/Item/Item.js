@@ -1,4 +1,4 @@
-import React, { Fragment, memo } from 'react';
+import React, { memo } from 'react';
 import styled from 'styled-components';
 import {
   ITEM_REVIEW_MODE,
@@ -21,18 +21,35 @@ const Wrapper = styled.div`
   height: calc(100vh - 70px);
 `;
 
+const ColumnHeader = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-shrink: 0;
+  height: 56px;
+  padding: 8px 24px;
+  background-color: ${({ theme }) => theme.color.snow};
+  border-bottom: 1px solid ${({ theme }) => theme.color.gallery};
+`;
+
+const ColumnTitle = styled.div`
+  font-size: 16px;
+  letter-spacing: 0.6px;
+  color: ${({ theme }) => theme.color.black};
+`;
+
 const Notify = styled.div`
   display: flex;
   align-items: center;
   padding: ${({ withButton }) =>
     withButton ? '10px 10px 10px 26px' : '20px 10px 20px 26px'};
-  color: ${({ theme }) => theme.white};
-  background-color: ${({ theme }) => theme.black};
+  color: ${({ theme }) => theme.color.white};
+  background-color: ${({ theme }) => theme.color.black};
 `;
 
 const NotifyText = styled.div`
   padding-left: 20px;
-  color: ${({ theme }) => theme.white};
+  color: ${({ theme }) => theme.color.white};
 `;
 
 const NotifyButtonsWrapper = styled.div`
@@ -113,20 +130,25 @@ const Item = ({
     const updateDate = formatDate(update.createdAt);
 
     return (
-      <Notify withButton>
-        <Icon name="warning" width={14} height={14} isInButton />
-        <NotifyText>
-          {`Item has been changed by ${updateUserName} at ${updateDate}`}
-        </NotifyText>
-        <NotifyButtonsWrapper>
-          <Button color="white" onClick={onClickRejectUpdate(id)}>
-            Reject
-          </Button>
-          <NotifyButton color="white" onClick={onClickAcceptUpdate(id)}>
-            Accept
-          </NotifyButton>
-        </NotifyButtonsWrapper>
-      </Notify>
+      <>
+        <ColumnHeader>
+          <ColumnTitle>Personal | Passwords</ColumnTitle>
+        </ColumnHeader>
+        <Notify withButton>
+          <Icon name="warning" width={14} height={14} />
+          <NotifyText>
+            {`Item has been changed by ${updateUserName} at ${updateDate}`}
+          </NotifyText>
+          <NotifyButtonsWrapper>
+            <Button color="white" onClick={onClickRejectUpdate(id)}>
+              Reject
+            </Button>
+            <NotifyButton color="white" onClick={onClickAcceptUpdate(id)}>
+              Accept
+            </NotifyButton>
+          </NotifyButtonsWrapper>
+        </Notify>
+      </>
     );
   };
 
@@ -181,10 +203,13 @@ const Item = ({
   );
 
   return (
-    <Fragment>
+    <>
+      <ColumnHeader>
+        <ColumnTitle>Personal | Passwords</ColumnTitle>
+      </ColumnHeader>
       {isReadOnly && (
         <Notify>
-          <Icon name="warning" width={14} height={14} isInButton />
+          <Icon name="warning" width={14} height={14} />
           <NotifyText>You can read only</NotifyText>
         </Notify>
       )}
@@ -194,7 +219,7 @@ const Item = ({
           {mode === ITEM_REVIEW_MODE ? renderedItem : renderedItemForm}
         </Wrapper>
       </Scrollbar>
-    </Fragment>
+    </>
   );
 };
 

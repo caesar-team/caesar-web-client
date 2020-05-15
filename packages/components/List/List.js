@@ -61,11 +61,11 @@ const CreateButton = styled.div`
   ${({ theme, disabled }) =>
     !disabled &&
     `
-  &:hover {
-    color: ${theme.color.white};
-    background-color: ${theme.color.black};
-    border: 1px solid ${theme.color.black};
-  }
+      &:hover {
+        color: ${theme.color.white};
+        background-color: ${theme.color.black};
+        border: 1px solid ${theme.color.black};
+      }
   `}
 `;
 

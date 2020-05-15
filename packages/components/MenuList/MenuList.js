@@ -1,13 +1,26 @@
-import React, { PureComponent } from 'react';
+import React, { memo, useState } from 'react';
+import { useSelector } from 'react-redux';
 import styled from 'styled-components';
+import { userDataSelector } from '@caesar/common/selectors/user';
+import { teamsByIdSelector } from '@caesar/common/selectors/entities/team';
 import { generateTeamTag } from '@caesar/common/utils/team';
 import { Scrollbar } from '../Scrollbar';
+import { Dropdown } from '../Dropdown';
+import { Avatar } from '../Avatar';
+import { Icon } from '../Icon';
+import { TeamsList } from '../TeamsList';
+import { Overlay } from '../Modal';
 import MenuSection from './MenuSection';
 import { MenuItemWrapper, MenuItem } from './components';
 
+const StyledDropdown = styled(Dropdown)`
+  ${Dropdown.Box} {
+    width: 100%;
+  }
+`;
+
 const ColumnHeader = styled.div`
   display: flex;
-  justify-content: space-between;
   align-items: center;
   flex-shrink: 0;
   height: 56px;
@@ -17,9 +30,17 @@ const ColumnHeader = styled.div`
 `;
 
 const ColumnTitle = styled.div`
+  margin-left: 16px;
   font-size: 16px;
   letter-spacing: 0.6px;
   color: ${({ theme }) => theme.color.black};
+`;
+
+const DropdownIcon = styled(Icon)`
+  margin-left: auto;
+  transform: ${({ isDropdownOpened }) =>
+    isDropdownOpened ? 'scaleY(-1)' : 'scaleY(1)'};
+  transition: transform 0.2s;
 `;
 
 const Menu = styled.div`
@@ -30,93 +51,113 @@ const Menu = styled.div`
 
 const SECURE_MESSAGE_MODE = 'SECURE_MESSAGE_MODE';
 
-class MenuList extends PureComponent {
-  state = this.prepareInitialState();
+const MenuListComponent = ({
+  mode,
+  team,
+  inbox,
+  favorites,
+  trash,
+  personalLists,
+  teamLists,
+  activeListId,
+  onClickMenuItem,
+  onClickSecureMessage,
+}) => {
+  const user = useSelector(userDataSelector);
+  const teamList = useSelector(teamsByIdSelector);
+  const [isDropdownOpened, setIsDropdownOpened] = useState(false);
+  const [openedSectionNames, setOpenedSectionNames] = useState([
+    'personal',
+    'tools',
+  ]);
+  const [activeTeamId, setActiveTeamId] = useState('');
 
-  handleToggle = name => () => {
-    this.setState(prevState => ({
-      ...prevState,
-      openedSectionNames: prevState.openedSectionNames.includes(name)
-        ? prevState.openedSectionNames.filter(
-            sectionName => sectionName !== name,
-          )
-        : prevState.openedSectionNames.concat(name),
-    }));
+  const handleToggleDropdown = isOpened => {
+    setIsDropdownOpened(isOpened);
   };
 
-  prepareInitialState() {
-    return {
-      openedSectionNames: ['personal', 'tools'],
-    };
-  }
+  const handleToggleSection = name => () => {
+    const newState = openedSectionNames.includes(name)
+      ? openedSectionNames.filter(sectionName => sectionName !== name)
+      : openedSectionNames.concat(name);
 
-  render() {
-    const { openedSectionNames } = this.state;
-    const {
-      mode,
-      team,
-      inbox,
-      favorites,
-      trash,
-      personalLists,
-      teamLists,
-      activeListId,
-      onClickMenuItem,
-      onClickSecureMessage,
-    } = this.props;
+    setOpenedSectionNames(newState);
+  };
 
-    return (
-      <>
+  return (
+    <>
+      <StyledDropdown
+        renderOverlay={handleToggle => (
+          <TeamsList
+            activeTeamId={activeTeamId}
+            handleToggle={id => {
+              setActiveTeamId(id);
+              handleToggle();
+            }}
+          />
+        )}
+        onToggle={handleToggleDropdown}
+      >
         <ColumnHeader>
-          <ColumnTitle>Personal</ColumnTitle>
+          <Avatar avatar={teamList[activeTeamId]?.icon} {...user} isSmall />
+          <ColumnTitle>
+            {activeTeamId ? teamList[activeTeamId].title : 'Personal'}
+          </ColumnTitle>
+          <DropdownIcon
+            name="arrow-triangle"
+            width={12}
+            height={12}
+            isDropdownOpened={isDropdownOpened}
+          />
         </ColumnHeader>
-        <Scrollbar>
-          <Menu>
+      </StyledDropdown>
+      <Scrollbar>
+        <Menu>
+          <MenuSection
+            isOpened
+            lists={[inbox, favorites, trash]}
+            activeListId={activeListId}
+            onClickMenuItem={onClickMenuItem}
+          />
+          <MenuSection
+            name="personal"
+            lists={personalLists}
+            activeListId={activeListId}
+            isOpened={openedSectionNames.includes('personal')}
+            onToggleSection={handleToggleSection('personal')}
+            onClickMenuItem={onClickMenuItem}
+          />
+          {team && (
             <MenuSection
-              isOpened
-              lists={[inbox, favorites, trash]}
+              name={generateTeamTag(team.title)}
+              icon={team.icon}
+              lists={teamLists}
               activeListId={activeListId}
+              isOpened={openedSectionNames.includes('team')}
+              onToggleSection={handleToggleSection('team')}
               onClickMenuItem={onClickMenuItem}
             />
-            <MenuSection
-              name="personal"
-              lists={personalLists}
-              activeListId={activeListId}
-              isOpened={openedSectionNames.includes('personal')}
-              onToggleSection={this.handleToggle('personal')}
-              onClickMenuItem={onClickMenuItem}
-            />
-            {team && (
-              <MenuSection
-                name={generateTeamTag(team.title)}
-                icon={team.icon}
-                lists={teamLists}
-                activeListId={activeListId}
-                isOpened={openedSectionNames.includes('team')}
-                onToggleSection={this.handleToggle('team')}
-                onClickMenuItem={onClickMenuItem}
-              />
-            )}
-            <MenuSection
-              name="tools"
-              activeListId={activeListId}
-              isOpened={openedSectionNames.includes('tools')}
-              onToggleSection={this.handleToggle('tools')}
-            >
-              <MenuItemWrapper>
-                <MenuItem
-                  isActive={mode === SECURE_MESSAGE_MODE}
-                  onClick={onClickSecureMessage}
-                >
-                  Secure Message
-                </MenuItem>
-              </MenuItemWrapper>
-            </MenuSection>
-          </Menu>
-        </Scrollbar>
-      </>
-    );
-  }
-}
+          )}
+          <MenuSection
+            name="tools"
+            activeListId={activeListId}
+            isOpened={openedSectionNames.includes('tools')}
+            onToggleSection={handleToggleSection('tools')}
+          >
+            <MenuItemWrapper>
+              <MenuItem
+                isActive={mode === SECURE_MESSAGE_MODE}
+                onClick={onClickSecureMessage}
+              >
+                Secure Message
+              </MenuItem>
+            </MenuItemWrapper>
+          </MenuSection>
+        </Menu>
+      </Scrollbar>
+      {isDropdownOpened && <Overlay />}
+    </>
+  );
+};
 
-export default MenuList;
+export const MenuList = memo(MenuListComponent);

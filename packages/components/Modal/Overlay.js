@@ -7,12 +7,10 @@ const Wrapper = styled.div`
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: rgba(50, 46, 47, 0.95);
+  background-color: rgba(0, 0, 0, 0.5);
   z-index: 11;
 `;
 
-const Overlay = ({ onClick, onMouseDown, ...props }) => (
+export const Overlay = ({ onClick, onMouseDown, ...props }) => (
   <Wrapper {...props} onClick={onClick} onMouseDown={onMouseDown} />
 );
-
-export default Overlay;

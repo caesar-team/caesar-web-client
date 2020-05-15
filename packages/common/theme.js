@@ -23,7 +23,7 @@ const theme = {
     gray: '#888',
     middleGray: '#979797',
     lightGray: '#cccccc',
-    snow: '#f9f9f9',
+    snow: '#f9f9f9', // TODO: или '#fbf9f9'?
     gallery: '#eaeaea',
     alto: '#d6d6d6',
     blue: '#3385ff',

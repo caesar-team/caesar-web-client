@@ -31,9 +31,9 @@ const ArrowIcon = styled(Icon)`
   width: 16px;
   height: 8px;
   margin-left: 20px;
-  fill: ${({ theme }) => theme.lightGray};
+  fill: ${({ theme }) => theme.color.lightGray};
   transform: ${({ isOpened }) => (isOpened ? 'scaleY(-1)' : 'scaleY(1)')};
-  transition: all 0.2s;
+  transition: transform 0.2s;
 `;
 
 const TextWithLinesStyled = styled(TextWithLines)`

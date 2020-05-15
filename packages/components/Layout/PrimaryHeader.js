@@ -16,9 +16,9 @@ import { Logo } from './Logo';
 
 const Wrapper = styled.header`
   display: flex;
-  border-bottom: 1px solid ${({ theme }) => theme.gallery};
+  border-bottom: 1px solid ${({ theme }) => theme.color.gallery};
   width: 100%;
-  background-color: ${({ theme }) => theme.white};
+  background-color: ${({ theme }) => theme.color.white};
   height: 56px;
 `;
 
@@ -27,14 +27,14 @@ const LeftWrapper = styled.div`
   align-items: center;
   width: 287px;
   flex-shrink: 0;
-  padding-left: 25px;
+  padding-left: 24px;
 `;
 
 const RightWrapper = styled.div`
   display: flex;
   align-items: center;
   flex-grow: 1;
-  padding: 0 25px;
+  padding: 0 24px;
 `;
 
 const AddItemButton = styled(Button)`
@@ -57,14 +57,14 @@ const UserName = styled.div`
 
 const StyledDropdown = styled(Dropdown)`
   display: flex;
-  color: ${({ theme }) => theme.black};
+  color: ${({ theme }) => theme.color.black};
   flex-direction: row;
   align-items: center;
   cursor: pointer;
   transition: all 0.2s;
 
   &:hover {
-    color: ${({ theme }) => theme.emperor};
+    color: ${({ theme }) => theme.color.emperor};
   }
 `;
 
@@ -72,25 +72,25 @@ const Option = styled.div`
   padding: 10px 30px;
   font-size: 16px;
   letter-spacing: 0.5px;
-  color: ${({ theme }) => theme.black};
+  color: ${({ theme }) => theme.color.black};
 `;
 
 const Anchor = styled.a`
-  color: ${({ theme }) => theme.black};
+  color: ${({ theme }) => theme.color.black};
   white-space: nowrap;
   text-decoration: none;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: color 0.2s;
 
   &:hover {
-    color: ${({ theme }) => theme.gray};
+    color: ${({ theme }) => theme.color.gray};
   }
 `;
 
 const StyledIcon = styled(Icon)`
   transform: ${({ isDropdownOpened }) =>
     isDropdownOpened ? 'scaleY(-1)' : 'scaleY(1)'};
-  transition: all 0.2s;
+  transition: transform 0.2s;
 `;
 
 const PrimaryHeaderComponent = ({
@@ -163,15 +163,12 @@ const PrimaryHeaderComponent = ({
             {/* TODO: Add functional */}
             <AddItemButton icon="plus">Add item</AddItemButton>
             <UserSection>
-              {/* TODO: Remove teamName to secondary header */}
-              {/* <Avatar {...user} name={user.email} /> */}
-              {/* {team && <TeamAvatar name={team.title} avatar={team.icon} />} */}
-              <StyledDropdown overlay={Options} onToggle={handleToggleDropdown}>
-                {/* <UserAndTeamWrapper> */}
+              <StyledDropdown
+                renderOverlay={() => Options}
+                onToggle={handleToggleDropdown}
+                withTriangleAtTop
+              >
                 <UserName>{userName}</UserName>
-                {/* TODO: Remove teamName to secondary header */}
-                {/* {team && <TeamName>{team.title}</TeamName>} */}
-                {/* </UserAndTeamWrapper> */}
                 <StyledIcon
                   name="arrow-triangle"
                   width={10}

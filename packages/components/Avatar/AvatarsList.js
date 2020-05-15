@@ -1,6 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
-import Avatar from './Avatar';
+import { Avatar } from './Avatar';
 
 const Wrapper = styled.div`
   display: flex;
@@ -8,7 +8,7 @@ const Wrapper = styled.div`
 
 const StyledAvatar = styled(Avatar)`
   margin-right: -10px;
-  border: 1px solid ${({ theme }) => theme.white};
+  border: 1px solid ${({ theme }) => theme.color.white};
 
   &:last-child {
     margin-right: 0;
@@ -16,7 +16,7 @@ const StyledAvatar = styled(Avatar)`
 `;
 
 const AvatarNumberStyled = styled(Avatar)`
-  border: 1px solid ${({ theme }) => theme.white};
+  border: 1px solid ${({ theme }) => theme.color.white};
 `;
 
 const DEFAULT_VISIBLE_AVATARS_COUNT = 3;

@@ -128,7 +128,6 @@ class Input extends Component {
         <InputField
           {...props}
           autoComplete="off"
-          // autoComplete="new-password"
           onFocus={this.onFocus}
           onBlur={this.onBlur}
           isFocused={isFocused}

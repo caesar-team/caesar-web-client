@@ -70,7 +70,8 @@ const TextAreaStyled = styled(TextArea)`
 `;
 
 const Error = styled.div`
-  margin-top: 8px;
+  margin-right: 8px;
+  margin-left: 8px;
   font-size: 14px;
   color: ${({ theme }) => theme.color.red};
 `;
@@ -88,17 +89,23 @@ const AttachmentsSection = styled.div`
 `;
 
 const Attachments = styled.div`
-  display: flex;
-  flex-direction: column;
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  grid-gap: 24px;
+  padding-top: 8px;
+
+  ${media.wideMobile`
+    grid-template-columns: 1fr 1fr;
+    grid-gap: 16px;
+  `}
+
+  ${media.mobile`
+    grid-template-columns: 1fr;
+    grid-gap: 8px;
+  `}
 `;
 
-const FileRow = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  position: relative;
-  margin: 20px 0;
-`;
+const FileRow = styled.div``;
 
 const SelectRow = styled.div`
   position: relative;

@@ -26,14 +26,14 @@ const SecureHeaderComponent = ({
   isButtonShow = IS_AUTHORIZATION_ENABLE,
 }) => {
   const { isMobile } = useMedia();
-  const getLogoName = () => {
+  const getLogoParams = () => {
     switch (true) {
       case !IS_AUTHORIZATION_ENABLE:
-        return 'logo-caesar-secure';
+        return { name: 'logo-caesar-secure', width: 170 };
       case isMobile:
-        return 'caesar';
+        return { name: 'caesar', width: 25 };
       default:
-        return 'logo-caesar-4xxi';
+        return { name: 'logo-caesar-4xxi', width: 107 };
     }
   };
 
@@ -41,9 +41,9 @@ const SecureHeaderComponent = ({
     <Wrapper>
       <Logo
         href={url}
-        width={isMobile ? 25 : 107}
+        width={getLogoParams().width}
         height={30}
-        iconName={getLogoName()}
+        iconName={getLogoParams().name}
       />
       {isButtonShow && (
         <>

@@ -2,37 +2,51 @@ import React from 'react';
 import styled from 'styled-components';
 import copy from 'copy-text-to-clipboard';
 import { APP_URI } from '@caesar/common/constants';
+import { media } from '@caesar/assets/styles/media';
 import { Button, withNotification } from '@caesar/components';
 import ReadOnlyContentEditable from '../Common/ContentEditable';
 
-const Wrapper = styled.div`
-  display: flex;
-  flex-direction: column;
-`;
-
 const Text = styled.div`
-  font-size: 18px;
+  margin-bottom: 16px;
+  font-size: 16px;
   font-weight: 600;
-  letter-spacing: 0.6px;
   color: ${({ theme }) => theme.color.black};
-  margin-bottom: 20px;
 `;
 
 const Link = styled.div`
   position: relative;
-  padding: 15px 20px;
+  padding: 16px;
+  margin-bottom: 20px;
   background-color: ${({ theme }) => theme.color.white};
   border: 1px solid ${({ theme }) => theme.color.gallery};
-  border-radius: 3px;
+  border-radius: 4px;
   word-break: break-all;
   white-space: pre-wrap;
-  margin-bottom: 20px;
 `;
 
 const ButtonsWrapper = styled.div`
   display: flex;
   justify-content: space-between;
+
+  ${media.wideMobile`
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-gap: 16px;
+  `}
+
+  ${media.mobile`
+    grid-template-columns: 1fr;
+  `}
 `;
+
+const CreateNewButton = styled(Button)`
+  grid-area: 2 / 1 / 3 / 3;
+
+  ${media.mobile`
+    grid-area: auto;
+  `}
+`;
+
 const stripHtml = html => {
   const tmp = document.createElement('DIV');
   tmp.innerHTML = html;
@@ -65,7 +79,7 @@ const SecureMessageLink = ({
   };
 
   return (
-    <Wrapper>
+    <>
       <Text>Use the temporary encrypted link below to retrieve the secret</Text>
       <Link>
         <ReadOnlyContentEditable html={getLinkText(link, password)} />
@@ -91,9 +105,11 @@ const SecureMessageLink = ({
         >
           Copy The Link
         </Button>
-        <Button onClick={onClickReturn}>Create New Secure Message</Button>
+        <CreateNewButton onClick={onClickReturn}>
+          Create New Secure Message
+        </CreateNewButton>
       </ButtonsWrapper>
-    </Wrapper>
+    </>
   );
 };
 

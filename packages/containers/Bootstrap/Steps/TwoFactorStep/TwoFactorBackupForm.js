@@ -25,7 +25,6 @@ const Form = styled.form`
 
 const Description = styled.div`
   font-size: 18px;
-  letter-spacing: 0.6px;
   text-align: center;
   color: ${({ theme }) => theme.color.gray};
 `;
@@ -40,7 +39,6 @@ const Codes = styled.div`
 
 const Code = styled.div`
   font-size: 18px;
-  letter-spacing: 0.6px;
   line-height: 25px;
   padding: 20px 25px;
   flex: 0 0 25%;
@@ -63,7 +61,6 @@ const StyledButton = styled(Button)`
 const StyledCheckbox = styled(Checkbox)`
   ${Checkbox.Text} {
     font-size: 18px;
-    letter-spacing: 0.6px;
   }
 `;
 

@@ -31,7 +31,6 @@ const StatusCode = styled.div`
 
 const Description = styled.div`
   font-size: 18px;
-  letter-spacing: 0.6px;
 `;
 
 const Error = ({ statusCode }) => (

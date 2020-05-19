@@ -60,12 +60,10 @@ const QrCodeAndApplicationDescription = styled.div`
 const QrCodeDescription = styled.div`
   font-size: 14px;
   line-height: 1.5;
-  letter-spacing: 0.47px;
 `;
 
 const QrCodeKey = styled.span`
   font-size: 36px;
-  letter-spacing: 1px;
   text-align: center;
 `;
 
@@ -78,7 +76,6 @@ const NextButton = styled(Button)`
 
 const ApplicationLink = styled.a`
   font-size: 14px;
-  letter-spacing: 0.6px;
   color: ${({ theme }) => theme.color.black};
 `;
 
@@ -93,7 +90,6 @@ const Error = styled.div`
   padding-top: 10px;
   text-align: center;
   font-size: 14px;
-  letter-spacing: 0.4px;
   color: ${({ theme }) => theme.color.red};
 `;
 

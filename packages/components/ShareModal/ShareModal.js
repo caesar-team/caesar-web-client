@@ -20,7 +20,6 @@ const Wrapper = styled.div`
 const TextWithLinesStyled = styled(TextWithLines)`
   font-size: 14px;
   font-weight: normal;
-  letter-spacing: 0.4px;
   color: ${({ theme }) => theme.color.emperor};
 `;
 
@@ -65,7 +64,6 @@ const SectionStyled = styled(Section)`
 
   ${Section.Name} {
     font-size: 14px;
-    letter-spacing: 0.4px;
     color: ${({ theme }) => theme.color.emperor};
   }
 `;

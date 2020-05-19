@@ -14,7 +14,6 @@ const Form = styled.form``;
 const Title = styled.div`
   font-size: 18px;
   font-weight: 600;
-  letter-spacing: 0.6px;
   margin-bottom: 25px;
 `;
 
@@ -37,7 +36,6 @@ const Column = styled.div`
 
 const Label = styled.div`
   font-size: 14px;
-  letter-spacing: 0.4px;
   margin-bottom: 10px;
 `;
 
@@ -45,7 +43,6 @@ const Box = styled.div`
   display: flex;
   font-size: 18px;
   line-height: 18px;
-  letter-spacing: 0.6px;
   border-radius: 3px;
   border: 1px solid ${({ theme }) => theme.color.gallery};
   background-color: ${({ theme }) => theme.color.snow};
@@ -78,7 +75,6 @@ const BottomWrapper = styled.div`
 
 const RequiredText = styled.div`
   font-size: 14px;
-  letter-spacing: 0.4px;
   color: ${({ theme }) => theme.color.gray};
   position: relative;
   padding-left: 20px;

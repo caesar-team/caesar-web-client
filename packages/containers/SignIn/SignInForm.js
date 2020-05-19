@@ -24,10 +24,6 @@ const StyledEmailInput = styled(Input)`
   display: flex;
   border: 1px solid ${({ theme }) => theme.color.lightGray};
 
-  ${Input.InputField} {
-    line-height: 20px;
-  }
-
   ${Input.Prefix} {
     position: relative;
     transform: inherit;
@@ -39,10 +35,6 @@ const StyledEmailInput = styled(Input)`
 const StyledPasswordInput = styled(PasswordInput)`
   display: flex;
   border: 1px solid ${({ theme }) => theme.color.lightGray};
-
-  ${PasswordInput.InputField} {
-    line-height: 20px;
-  }
 
   ${PasswordInput.Prefix} {
     position: relative;
@@ -64,13 +56,11 @@ const Prefix = styled.div`
 const Error = styled.div`
   margin-top: 8px;
   font-size: 14px;
-  letter-spacing: 0.4px;
   color: ${({ theme }) => theme.color.red};
 `;
 
 const StyledButton = styled(Button)`
   font-size: 18px;
-  letter-spacing: 0.6px;
   padding: 18px 30px;
   height: 60px;
 `;

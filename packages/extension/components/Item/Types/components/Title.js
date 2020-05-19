@@ -6,7 +6,6 @@ export const Title = styled.div`
   font-style: normal;
   font-stretch: normal;
   line-height: normal;
-  letter-spacing: 0.5px;
   color: ${({ theme }) => theme.color.black};
   margin-bottom: 20px;
 `;

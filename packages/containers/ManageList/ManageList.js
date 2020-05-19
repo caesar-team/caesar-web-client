@@ -37,7 +37,6 @@ const Title = styled.div`
 
 const Description = styled.div`
   font-size: 18px;
-  letter-spacing: 0.6px;
   color: ${({ theme }) => theme.color.black};
   margin-bottom: 25px;
 `;

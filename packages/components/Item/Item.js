@@ -56,7 +56,6 @@ const ColumnHeader = styled.div`
 
 const ColumnTitle = styled.div`
   font-size: 16px;
-  letter-spacing: 0.6px;
   color: ${({ theme }) => theme.color.black};
 `;
 

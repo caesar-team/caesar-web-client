@@ -24,7 +24,6 @@ const InnerWrapper = styled.div`
 
 const Title = styled.div`
   font-size: 18px;
-  letter-spacing: 0.6px;
   color: ${({ theme }) => theme.color.lightGray};
   margin: 32px 0;
 `;

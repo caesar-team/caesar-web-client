@@ -19,7 +19,6 @@ const Wrapper = styled.div`
 const Title = styled.div`
   font-size: 16px;
   font-weight: 600;
-  letter-spacing: 0.5px;
   color: ${({ theme }) => theme.color.black};
 `;
 
@@ -28,7 +27,6 @@ const PasswordOutput = styled.div`
   align-items: center;
   font-size: 15px;
   font-weight: 500;
-  letter-spacing: 0.8px;
   color: ${({ theme }) => theme.color.black};
   border-bottom: 2px solid ${({ theme }) => theme.color.emperor};
   height: 40px;
@@ -62,7 +60,6 @@ const Options = styled.div`
 const CheckboxStyled = styled(Checkbox)`
   ${Checkbox.Text} {
     font-size: 14px;
-    letter-spacing: 0.4px;
     color: ${({ theme }) => theme.color.black};
   }
 `;
@@ -85,7 +82,6 @@ const ShapeStyled = styled(Shape)`
 
 const LengthText = styled.div`
   font-size: 14px;
-  letter-spacing: 0.4px;
   color: ${({ theme }) => theme.color.black};
 `;
 

@@ -32,7 +32,6 @@ const TeamIconImage = styled.img`
 
 const TeamName = styled.div`
   font-size: 16px;
-  letter-spacing: 0.5px;
   margin: 0 10px;
 `;
 

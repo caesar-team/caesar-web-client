@@ -30,7 +30,6 @@ const SeparatorIconWrapper = styled.div`
 const StepDescription = styled.span`
   font-size: 14px;
   font-weight: 600;
-  letter-spacing: 0.4px;
   color: ${({ isActive, theme }) =>
     isActive ? theme.color.black : theme.color.gray};
 `;

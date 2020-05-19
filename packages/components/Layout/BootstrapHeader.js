@@ -33,7 +33,6 @@ const UserInfo = styled.div`
 
 const UserName = styled.div`
   font-size: 16px;
-  letter-spacing: 0.5px;
   text-align: right;
   margin-left: 20px;
 `;

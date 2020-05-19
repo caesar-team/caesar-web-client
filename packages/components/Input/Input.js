@@ -16,7 +16,6 @@ const LabelText = styled.div`
   font-size: ${({ isFocused, value }) =>
     isFocused || value ? '14px' : '18px'};
   line-height: 1.5;
-  letter-spacing: 0.6px;
   color: ${({ theme }) => theme.color.gray};
   transition: all 0.2s;
 `;
@@ -26,7 +25,6 @@ const InputField = styled.input`
   display: block;
   width: 100%;
   font-size: 16px;
-  letter-spacing: 0.6px;
   background-color: ${({ theme, isFocused }) =>
     isFocused ? theme.color.snow : theme.color.white};
   border: none;
@@ -70,7 +68,6 @@ const Error = styled.div`
   padding-left: 15px;
   margin-top: 8px;
   font-size: 14px;
-  letter-spacing: 0.4px;
   color: ${({ theme }) => theme.color.red};
 `;
 

@@ -15,7 +15,6 @@ const Wrapper = styled.div`
 const LinkText = styled.div`
   font-size: 14px;
   font-weight: 500;
-  letter-spacing: 0.4px;
   margin-left: 20px;
 `;
 

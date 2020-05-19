@@ -34,13 +34,11 @@ const GroupAvatarsWrapper = styled.div`
 
 const GroupAvatarsTitle = styled.div`
   font-size: 18px;
-  letter-spacing: 0.6px;
   color: ${({ theme }) => theme.color.emperor};
 `;
 
 const GroupAvatarsTip = styled.div`
   font-size: 14px;
-  letter-spacing: 0.4px;
   color: ${({ theme }) => theme.color.gray};
 `;
 

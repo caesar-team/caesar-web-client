@@ -6,7 +6,6 @@ const StyledButton = styled.button`
   display: inline-flex;
   align-items: center;
   padding: 3px;
-  letter-spacing: inherit;
   background: none;
   border: none;
   cursor: pointer;

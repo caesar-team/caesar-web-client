@@ -26,7 +26,6 @@ const StyledLogo = styled(Icon)`
 
 const ButtonStyled = styled(Button)`
   font-size: 18px;
-  letter-spacing: 0.6px;
   padding: 18px 30px;
   height: 60px;
   margin-top: 40px;

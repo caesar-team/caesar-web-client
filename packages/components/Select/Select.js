@@ -178,8 +178,8 @@ class SelectInner extends Component {
           </ValueText>
           <ArrowIcon
             name="arrow-triangle"
-            width={16}
-            height={16}
+            width={10}
+            height={6}
             isOpened={isOpened}
           />
         </SelectedOption>

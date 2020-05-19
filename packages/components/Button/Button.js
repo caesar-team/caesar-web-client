@@ -51,7 +51,7 @@ const StyledButton = styled.button`
   align-items: center;
   justify-content: center;
   height: ${({ isHigh }) => (isHigh ? '60px' : '40px')};
-  padding: ${({ isHigh }) => (isHigh ? '18px 30px' : '11px 20px')};
+  padding: ${({ isHigh }) => (isHigh ? '18px 30px' : '11px 16px')};
   font-size: ${({ isHigh }) => (isHigh ? '18px' : '14px')};
   letter-spacing: ${({ isHigh }) => (isHigh ? '0.6px' : '0.4px')};
   white-space: nowrap;

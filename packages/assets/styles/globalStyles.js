@@ -13,6 +13,8 @@ export default `
     font-family: 'AvenirNext';
     font-weight: normal;
     font-style: normal;
+    font-size: 16px;
+    letter-spacing: 0.4px;
   }
 
   button,

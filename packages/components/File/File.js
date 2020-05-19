@@ -11,9 +11,8 @@ const FileExt = styled.div`
   width: 40px;
   height: 40px;
   font-size: 14px;
-  letter-spacing: 0.4px;
-  background-color: ${({ theme }) => theme.color.gray};
   color: ${({ theme }) => theme.color.white};
+  background-color: ${({ theme }) => theme.color.black};
   border-radius: 3px 0 3px 3px;
   cursor: pointer;
   transition: all 0.2s;
@@ -23,9 +22,9 @@ const FileExt = styled.div`
     position: absolute;
     top: 0;
     right: 0;
-    background: ${({ theme }) => theme.color.alto};
     display: block;
     width: 0;
+    background: ${({ theme }) => theme.color.alto};
     border-style: solid;
     border-width: 4px;
     border-color: ${({ theme }) =>
@@ -57,24 +56,40 @@ const Details = styled.div`
 `;
 
 const FileName = styled.div`
-  font-size: 18px;
+  font-size: 16px;
   line-height: 18px;
-  letter-spacing: 0.6px;
   color: ${({ theme }) => theme.color.black};
-  margin-bottom: 8px;
+  margin-bottom: 5px;
 `;
 
 const FileSize = styled.div`
   font-size: 14px;
   line-height: 14px;
-  letter-spacing: 0.4px;
   color: ${({ theme }) => theme.color.gray};
 `;
 
-const UploadedWrapper = styled.div`
+const ErrorWrapper = styled.div`
   display: flex;
+`;
+
+const CloseIcon = styled(Icon)`
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  color: ${({ theme }) => theme.color.gray};
+  cursor: pointer;
+`;
+
+const UploadedWrapper = styled.div`
+  position: relative;
+  display: flex;
+  padding: 8px;
+  border-radius: 4px;
+  transition: background-color 0.2s;
 
   &:hover {
+    background-color: ${({ theme }) => theme.color.snow};
+
     ${FileExt} {
       background: ${({ theme }) => theme.color.black};
       color: ${({ theme }) => theme.color.white};
@@ -86,17 +101,11 @@ const UploadedWrapper = styled.div`
         background: ${({ theme }) => theme.color.black};
       }
     }
+
+    ${CloseIcon} {
+      color: ${({ theme }) => theme.color.black};
+    }
   }
-`;
-
-const ErrorWrapper = styled.div`
-  display: flex;
-`;
-
-const StyledCloseIcon = styled(Icon)`
-  fill: ${({ theme }) => theme.color.gray};
-  margin-left: 10px;
-  cursor: pointer;
 `;
 
 const units = ['bytes', 'KB', 'MB'];
@@ -133,10 +142,10 @@ const File = ({
           <FileName>{filename}</FileName>
           <FileSize>{size}</FileSize>
         </Details>
-        <StyledCloseIcon
+        <CloseIcon
           name="close"
-          width={10}
-          height={10}
+          width={12}
+          height={12}
           onClick={onClickRemove}
         />
       </ErrorWrapper>
@@ -151,10 +160,10 @@ const File = ({
         <FileSize>{size}</FileSize>
       </Details>
       {onClickRemove && (
-        <StyledCloseIcon
+        <CloseIcon
           name="close"
-          width={10}
-          height={10}
+          width={12}
+          height={12}
           onClick={onClickRemove}
         />
       )}

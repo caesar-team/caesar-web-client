@@ -17,23 +17,11 @@ const Wrapper = styled.div`
   display: flex;
   flex-direction: column;
   width: 100%;
-  padding: 40px 0;
+  padding: 22px 0;
   min-height: calc(100vh - 150px);
 
   ${media.mobile`
-    padding: 20px 0;
-  `}
-`;
-
-const Title = styled.div`
-  font-size: 36px;
-  letter-spacing: 1px;
-  color: ${({ theme }) => theme.color.black};
-  margin-bottom: 40px;
-
-  ${media.mobile`
-    margin-bottom: 10px;
-    line-height: 1.11;
+    padding: 16px 0;
   `}
 `;
 
@@ -104,10 +92,7 @@ class SecureMessage extends Component {
 
     return (
       <Wrapper className={className}>
-        <ContentWrapperComponent>
-          <Title>Caesar Secure Message</Title>
-          {renderedStep}
-        </ContentWrapperComponent>
+        <ContentWrapperComponent>{renderedStep}</ContentWrapperComponent>
       </Wrapper>
     );
   }

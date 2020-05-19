@@ -13,8 +13,8 @@ const LayoutConstructorStyled = styled(LayoutConstructor)`
     border-bottom: 1px solid ${({ theme }) => theme.color.gallery};
 
     ${media.mobile`
-      padding-right: 20px;
-      padding-left: 20px;
+      padding-right: 16px;
+      padding-left: 16px;
     `}
   }
 
@@ -25,18 +25,18 @@ const LayoutConstructorStyled = styled(LayoutConstructor)`
     margin: 0 auto;
 
     ${media.mobile`
-      padding-right: 20px;
-      padding-left: 20px;
+      padding-right: 16px;
+      padding-left: 16px;
     `}
   }
 
   ${LayoutConstructor.BottomWrapper} {
-    padding: 30px;
+    padding: 24px;
     margin-top: 0;
 
     ${media.mobile`
-      padding-right: 20px;
-      padding-left: 20px;
+      padding-right: 16px;
+      padding-left: 16px;
     `}
   }
 `;

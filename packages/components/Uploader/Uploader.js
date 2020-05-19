@@ -2,6 +2,7 @@ import React from 'react';
 import styled from 'styled-components';
 import Dropzone from 'react-dropzone';
 import { filesToBase64 } from '@caesar/common/utils/file';
+import { useMedia } from '@caesar/common/hooks';
 import { Icon } from '../Icon';
 
 const Container = styled.div`
@@ -9,11 +10,10 @@ const Container = styled.div`
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  background-color: ${({ theme, isDragActive }) =>
-    isDragActive ? theme.color.lightBlueUploader : theme.color.snow};
+  background-color: ${({ theme }) => theme.color.snow};
   border: 1px dashed
     ${({ theme, isDragActive }) =>
-      isDragActive ? theme.color.blue : theme.color.gray};
+      isDragActive ? theme.color.black : theme.color.gray};
   width: 100%;
   padding: 16px 5px;
   cursor: pointer;
@@ -24,14 +24,12 @@ const Container = styled.div`
 const Text = styled.span`
   margin-bottom: 5px;
   font-size: 16px;
-  letter-spacing: 0.6px;
   text-align: center;
   color: ${({ theme }) => theme.color.emperor};
 `;
 
 const HintText = styled.div`
   font-size: 14px;
-  letter-spacing: 0.5px;
   color: ${({ theme }) => theme.color.gray};
 `;
 
@@ -49,7 +47,6 @@ const StyledIcon = styled(Icon)`
 const Error = styled.div`
   margin-top: 8px;
   font-size: 14px;
-  letter-spacing: 0.4px;
   color: ${({ theme }) => theme.color.red};
 `;
 
@@ -91,6 +88,8 @@ const Uploader = ({
   children,
   ...props
 }) => {
+  const { isMobile } = useMedia();
+
   const handleDrop = async acceptedFiles => {
     const previews = await filesToBase64(acceptedFiles);
     const files = acceptedFiles.map(({ name: fileName }, index) => ({
@@ -132,7 +131,8 @@ const Uploader = ({
                 height={16}
                 isDragActive={isDragActive}
               />
-              <Link>Upload File</Link> or drag and drop your file here
+              <Link>Upload File</Link>
+              {!isMobile && ' or drag and drop your file here'}
             </Text>
             <HintText>{hintText}</HintText>
             {error && <Error>{error}</Error>}

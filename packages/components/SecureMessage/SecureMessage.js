@@ -21,7 +21,7 @@ const Wrapper = styled.div`
   min-height: calc(100vh - 150px);
 
   ${media.mobile`
-    padding: 20px 0;
+    padding: 16px 0;
   `}
 `;
 

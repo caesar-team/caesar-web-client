@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import styled from 'styled-components';
+// TODO: Replace with import {useClickAway} from 'react-use';
 import enhanceWithClickOutside from 'react-click-outside';
 import { Tooltip } from '../Tooltip';
 
@@ -30,7 +31,7 @@ const DottedWrapper = styled.button`
     display: block;
     width: 2px;
     height: 2px;
-    background-color: ${({ theme }) => theme.gray};
+    background-color: ${({ theme }) => theme.color.gray};
     border-radius: 50%;
 
     &:nth-child(2) {

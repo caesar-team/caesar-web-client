@@ -10,7 +10,7 @@ import {
   ITEM_ENTITY_TYPE,
   ITEM_ICON_TYPES,
 } from '@caesar/common/constants';
-import { Icon, Can } from '@caesar/components';
+import { Icon, Can, Button } from '@caesar/components';
 import FixedSizeItem from './FixedSizeItem';
 import ScrollbarVirtualList from './ScrollbarVirtualList';
 import EmptyList from './EmptyList';
@@ -21,7 +21,7 @@ const Wrapper = styled.div`
   position: relative;
   display: flex;
   flex-direction: column;
-  height: calc(100vh - 70px);
+  height: calc(100vh - 55px);
   background-color: ${({ isEmpty, theme }) =>
     isEmpty ? theme.color.white : theme.color.lightBlue};
 `;
@@ -30,7 +30,6 @@ const ColumnHeader = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
-  flex-shrink: 0;
   height: 56px;
   padding: 8px 24px;
   background-color: ${({ theme }) => theme.color.snow};
@@ -61,11 +60,11 @@ const CreateButton = styled.div`
   ${({ theme, disabled }) =>
     !disabled &&
     `
-  &:hover {
-    color: ${theme.color.white};
-    background-color: ${theme.color.black};
-    border: 1px solid ${theme.color.black};
-  }
+      &:hover {
+        color: ${theme.color.white};
+        background-color: ${theme.color.black};
+        border: 1px solid ${theme.color.black};
+      }
   `}
 `;
 
@@ -185,11 +184,21 @@ const List = ({
       {!isMultiItem && (
         <ColumnHeader>
           <ColumnTitle>{workInProgressList.label}</ColumnTitle>
+          {/* TODO: Set condition when to show this button */}
+          <Button
+            icon="share-network"
+            color="white"
+            onClick={() => {
+              // TODO: Adde sharing list functional
+              console.log('Sharing modal');
+            }}
+          />
           <Can I={CREATE_PERMISSION} of={itemSubject}>
             <Dropdown
               options={itemTypesOptions}
               onClick={onClickCreateItem}
               optionRender={renderOption}
+              withTriangleAtTop
             >
               <CreateButton disabled={!isOnline}>
                 <Icon withOfflineCheck name="plus" width={14} height={14} />

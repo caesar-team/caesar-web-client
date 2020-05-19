@@ -10,7 +10,7 @@ const Wrapper = styled.div`
   display: flex;
   align-items: center;
   justify-content: space-between;
-  border-bottom: 1px solid ${({ theme }) => theme.gallery};
+  border-bottom: 1px solid ${({ theme }) => theme.color.gallery};
   padding: 16px 60px;
   width: 100%;
   margin-bottom: 20px;

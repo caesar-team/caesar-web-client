@@ -48,15 +48,15 @@ const TitleInput = styled(Input)`
     padding: 0;
     font-size: 36px;
     letter-spacing: 1px;
-    color: ${({ theme }) => theme.black};
+    color: ${({ theme }) => theme.color.black};
 
     &::placeholder {
       padding-left: 8px;
-      color: ${({ theme }) => theme.lightGray};
+      color: ${({ theme }) => theme.color.lightGray};
     }
 
     &:focus {
-      background-color: ${({ theme }) => theme.white};
+      background-color: ${({ theme }) => theme.color.white};
     }
   }
 `;
@@ -67,7 +67,7 @@ const AdditionalLabel = styled.div`
   left: 15px;
   font-size: 14px;
   letter-spacing: 0.4px;
-  color: ${({ theme }) => theme.gray};
+  color: ${({ theme }) => theme.color.gray};
 `;
 
 const AttachmentsSection = styled.div`
@@ -80,7 +80,7 @@ const Attachment = styled.div`
   font-size: 18px;
   font-weight: bold;
   letter-spacing: 0.6px;
-  color: ${({ theme }) => theme.black};
+  color: ${({ theme }) => theme.color.black};
   margin-bottom: 25px;
 `;
 
@@ -106,7 +106,7 @@ const Error = styled.div`
   text-align: center;
   font-size: 14px;
   letter-spacing: 0.4px;
-  color: ${({ theme }) => theme.red};
+  color: ${({ theme }) => theme.color.red};
 `;
 
 const ErrorStyled = styled(Error)`

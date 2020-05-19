@@ -20,7 +20,7 @@ import {
 const Wrapper = styled.div`
   display: flex;
   flex-direction: column;
-  background: ${({ theme }) => theme.lightBlue};
+  background: ${({ theme }) => theme.color.lightBlue};
   width: 100%;
   padding: 60px;
 `;
@@ -28,10 +28,10 @@ const Wrapper = styled.div`
 const LogoWrapper = styled.div`
   display: flex;
   flex-direction: column;
-  background: ${({ theme }) => theme.lightBlue};
+  background: ${({ theme }) => theme.color.lightBlue};
   width: 100%;
   position: relative;
-  height: calc(100vh - 70px);
+  height: calc(100vh - 55px);
   align-items: center;
   justify-content: center;
 `;
@@ -39,14 +39,14 @@ const LogoWrapper = styled.div`
 const Title = styled.div`
   font-size: 36px;
   letter-spacing: 1px;
-  color: ${({ theme }) => theme.black};
+  color: ${({ theme }) => theme.color.black};
   margin-bottom: 30px;
 `;
 
 const StepWrapper = styled.div`
   display: flex;
   flex-direction: column;
-  background: ${({ theme }) => theme.white};
+  background: ${({ theme }) => theme.color.white};
   padding: 30px;
 `;
 

@@ -23,7 +23,7 @@ const Row = styled.div`
 
 const StyledPasswordInput = styled(PasswordInput)`
   display: flex;
-  border: 1px solid ${({ theme }) => theme.lightGray};
+  border: 1px solid ${({ theme }) => theme.color.lightGray};
 
   ${PasswordInput.InputField} {
     line-height: 20px;
@@ -43,14 +43,14 @@ const Prefix = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
-  border-right: 1px solid ${({ theme }) => theme.lightGray};
+  border-right: 1px solid ${({ theme }) => theme.color.lightGray};
 `;
 
 const Error = styled.div`
   margin-top: 8px;
   font-size: 14px;
   letter-spacing: 0.4px;
-  color: ${({ theme }) => theme.red};
+  color: ${({ theme }) => theme.color.red};
 `;
 
 const ButtonWrapper = styled.div`

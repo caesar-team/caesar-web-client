@@ -9,7 +9,7 @@ const Wrapper = styled.div`
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  background-color: ${({ theme }) => theme.emperor};
+  background-color: ${({ theme }) => theme.color.emperor};
   width: 100%;
   height: 100%;
 `;
@@ -25,12 +25,12 @@ const InnerWrapper = styled.div`
 const Title = styled.div`
   font-size: 18px;
   letter-spacing: 0.6px;
-  color: ${({ theme }) => theme.lightGray};
+  color: ${({ theme }) => theme.color.lightGray};
   margin: 32px 0;
 `;
 
 const StyledLogo = styled(Icon)`
-  fill: ${({ theme }) => theme.white};
+  fill: ${({ theme }) => theme.color.white};
 `;
 
 const MasterPassword = ({ onSubmit }) => (

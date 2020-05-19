@@ -5,7 +5,7 @@ const Progress = styled.div`
   display: flex;
   height: 10px;
   overflow: hidden;
-  background-color: ${({ theme }) => theme.gallery};
+  background-color: ${({ theme }) => theme.color.gallery};
   border-radius: 3px;
 `;
 
@@ -15,7 +15,7 @@ const Line = styled.div`
   justify-content: center;
   text-align: center;
   white-space: nowrap;
-  background-color: ${({ theme }) => theme.black};
+  background-color: ${({ theme }) => theme.color.black};
   transition: width 0.6s ease;
   width: ${({ value }) => `calc(100% * ${value})`};
 `;

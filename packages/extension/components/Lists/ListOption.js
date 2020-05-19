@@ -15,7 +15,7 @@ const ListName = styled.div`
   font-size: 16px;
   font-weight: ${({ isActive }) => (isActive ? 600 : 400)};
   letter-spacing: 0.5px;
-  color: ${({ theme }) => theme.black};
+  color: ${({ theme }) => theme.color.black};
 `;
 
 const NameAndIconWrapper = styled.div`
@@ -29,8 +29,8 @@ const ListDetails = styled.div`
   align-items: center;
   font-size: 16px;
   letter-spacing: 0.5px;
-  color: ${({ theme }) => theme.black};
-  border-bottom: 1px solid ${({ theme }) => theme.gallery};
+  color: ${({ theme }) => theme.color.black};
+  border-bottom: 1px solid ${({ theme }) => theme.color.gallery};
   max-height: 40px;
   min-height: 40px;
 `;
@@ -42,7 +42,7 @@ const Item = styled.div`
   cursor: pointer;
   max-height: 40px;
   min-height: 40px;
-  border-bottom: 1px solid ${({ theme }) => theme.gallery};
+  border-bottom: 1px solid ${({ theme }) => theme.color.gallery};
 `;
 
 const ItemType = styled.div`
@@ -51,7 +51,7 @@ const ItemType = styled.div`
   align-items: center;
   width: 24px;
   height: 24px;
-  background: ${({ theme }) => theme.black};
+  background: ${({ theme }) => theme.color.black};
   margin-right: 16px;
 `;
 
@@ -62,7 +62,7 @@ const ItemName = styled.div`
   font-size: 16px;
   font-weight: ${({ isActive }) => (isActive ? 600 : 400)};
   letter-spacing: 0.5px;
-  color: ${({ theme }) => theme.black};
+  color: ${({ theme }) => theme.color.black};
 `;
 
 const ItemsWrapper = styled.div`
@@ -76,7 +76,7 @@ const StyledIcon = styled(Icon)`
 
 const ArrowIcon = styled(Icon)`
   transform: ${({ isActive }) => (isActive ? 'scaleY(-1)' : 'scaleY(1)')};
-  transition: all 0.2s;
+  transition: transform 0.2s;
 `;
 
 const ListOption = ({

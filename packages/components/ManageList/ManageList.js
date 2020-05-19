@@ -31,15 +31,15 @@ const TableRow = styled.div`
   margin-bottom: 5px;
   font-size: 18px;
   line-height: 1.3;
-  color: ${({ theme }) => theme.black};
-  background-color: ${({ theme }) => theme.white};
+  color: ${({ theme }) => theme.color.black};
+  background-color: ${({ theme }) => theme.color.white};
 `;
 
 const TableHeader = styled(TableRow)`
   margin-bottom: 20px;
-  color: ${({ theme }) => theme.gray};
-  background-color: ${({ theme }) => theme.lightBlue};
-  border-bottom: 1px solid ${({ theme }) => theme.gray};
+  color: ${({ theme }) => theme.color.gray};
+  background-color: ${({ theme }) => theme.color.lightBlue};
+  border-bottom: 1px solid ${({ theme }) => theme.color.gray};
 `;
 
 const TableCol = styled.div`
@@ -52,7 +52,7 @@ const TableCol = styled.div`
 
 const ListNameLink = styled.a`
   display: inline-block;
-  color: ${({ theme }) => theme.black};
+  color: ${({ theme }) => theme.color.black};
   margin-right: 10px;
   border-bottom: 1px dashed transparent;
 `;

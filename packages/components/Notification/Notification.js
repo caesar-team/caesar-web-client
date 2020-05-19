@@ -7,31 +7,31 @@ const Wrapper = styled.div`
   align-items: center;
   justify-content: space-between;
   padding: 11px 15px;
-  background: ${({ theme }) => theme.black};
+  background: ${({ theme }) => theme.color.black};
   position: relative;
   border-radius: 3px;
   box-shadow: 0 11px 23px 0 rgba(0, 0, 0, 0.08);
 `;
 
 const StyledIcon = styled(Icon)`
-  fill: ${({ theme }) => theme.white};
+  fill: ${({ theme }) => theme.color.white};
   margin-right: 20px;
 `;
 
 const Text = styled.div`
   font-size: 14px;
   letter-spacing: 0.4px;
-  color: ${({ theme }) => theme.white};
+  color: ${({ theme }) => theme.color.white};
 `;
 
 const ActionLink = styled.a`
   text-transform: uppercase;
   font-size: 16px;
   letter-spacing: 0.5px;
-  color: ${({ theme }) => theme.white};
+  color: ${({ theme }) => theme.color.white};
 
   &:hover {
-    color: ${({ theme }) => theme.gray};
+    color: ${({ theme }) => theme.color.gray};
   }
 `;
 

@@ -31,11 +31,13 @@ const StepDescription = styled.span`
   font-size: 14px;
   font-weight: 600;
   letter-spacing: 0.4px;
-  color: ${({ isActive, theme }) => (isActive ? theme.black : theme.gray)};
+  color: ${({ isActive, theme }) =>
+    isActive ? theme.color.black : theme.color.gray};
 `;
 
 const StyledIcon = styled(Icon)`
-  fill: ${({ isActive, theme }) => (isActive ? theme.black : theme.gray)};
+  fill: ${({ isActive, theme }) =>
+    isActive ? theme.color.black : theme.color.gray};
 `;
 
 const getStepIndex = (steps, stepName) => {

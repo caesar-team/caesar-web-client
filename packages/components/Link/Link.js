@@ -6,10 +6,10 @@ const StyledAnchor = styled.a`
   cursor: pointer;
   font-size: 18px;
   letter-spacing: 0.6px;
-  color: ${({ theme }) => theme.black};
+  color: ${({ theme }) => theme.color.black};
 
   &:hover {
-    color: ${({ theme }) => theme.gray};
+    color: ${({ theme }) => theme.color.gray};
   }
 `;
 

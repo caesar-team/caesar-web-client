@@ -9,9 +9,7 @@ const Svg = styled.svg`
   color: ${({ color, theme }) => theme.color[color]};
   fill: currentColor;
 
-  & > * {
-    ${({ disabled }) => disabled && `opacity: 0.5`}
-  }
+  ${({ disabled }) => disabled && `opacity: 0.5`}
 `;
 
 const getIconDisabledStatus = (withOfflineCheck, isOnline, disabled) =>

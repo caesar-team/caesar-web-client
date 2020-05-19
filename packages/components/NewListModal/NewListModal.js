@@ -11,7 +11,7 @@ const FormTitle = styled.div`
   text-align: center;
   font-size: 18px;
   font-weight: 700;
-  color: ${({ theme }) => theme.black};
+  color: ${({ theme }) => theme.color.black};
   text-transform: uppercase;
 `;
 

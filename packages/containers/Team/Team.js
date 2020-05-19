@@ -25,10 +25,10 @@ import {
 const LogoWrapper = styled.div`
   display: flex;
   flex-direction: column;
-  background: ${({ theme }) => theme.lightBlue};
+  background: ${({ theme }) => theme.color.lightBlue};
   width: 100%;
   position: relative;
-  height: calc(100vh - 70px);
+  height: calc(100vh - 55px);
   align-items: center;
   justify-content: center;
 `;
@@ -36,7 +36,7 @@ const LogoWrapper = styled.div`
 const Wrapper = styled.div`
   display: flex;
   flex-direction: column;
-  background: ${({ theme }) => theme.lightBlue};
+  background: ${({ theme }) => theme.color.lightBlue};
   width: 100%;
   max-width: calc(100vw - 300px);
   padding: 60px;
@@ -53,7 +53,7 @@ const TopWrapper = styled.div`
 const Title = styled.div`
   font-size: 36px;
   letter-spacing: 1px;
-  color: ${({ theme }) => theme.black};
+  color: ${({ theme }) => theme.color.black};
 `;
 
 const ButtonsWrapper = styled.div`
@@ -123,7 +123,7 @@ const Field = styled.div`
   align-items: center;
   justify-content: flex-start;
   width: 100%;
-  background-color: ${({ theme }) => theme.white};
+  background-color: ${({ theme }) => theme.color.white};
   height: 50px;
 `;
 
@@ -140,7 +140,7 @@ const Name = styled.div`
 const Email = styled.div`
   font-size: 16px;
   letter-spacing: 0.5px;
-  color: ${({ theme }) => theme.gray};
+  color: ${({ theme }) => theme.color.gray};
 `;
 
 const HeaderField = styled.div`
@@ -149,8 +149,8 @@ const HeaderField = styled.div`
   justify-content: flex-start;
   width: 100%;
   height: 50px;
-  border-bottom: 1px solid ${({ theme }) => theme.black};
-  background-color: ${({ theme }) => theme.lightBlue};
+  border-bottom: 1px solid ${({ theme }) => theme.color.black};
+  background-color: ${({ theme }) => theme.color.lightBlue};
 `;
 
 const NameHeaderField = styled(HeaderField)`
@@ -161,7 +161,7 @@ const HeaderFieldName = styled.div`
   font-size: 14px;
   font-weight: 500;
   letter-spacing: 0.47px;
-  color: ${({ theme }) => theme.gray};
+  color: ${({ theme }) => theme.color.gray};
 `;
 
 const RoleField = styled(Field)``;
@@ -185,7 +185,7 @@ const MenuButton = styled(Button)`
 
 const SelectStyled = styled(Select)`
   border-radius: 3px;
-  border: 1px solid ${({ theme }) => theme.gallery};
+  border: 1px solid ${({ theme }) => theme.color.gallery};
   width: 136px;
   height: 38px;
 `;
@@ -193,7 +193,7 @@ const SelectStyled = styled(Select)`
 const InputStyled = styled(Input)`
   width: 100%;
   height: 50px;
-  border-bottom: 1px solid ${({ theme }) => theme.black};
+  border-bottom: 1px solid ${({ theme }) => theme.color.black};
   padding: 0;
   display: flex;
   align-items: center;
@@ -213,15 +213,15 @@ const InputStyled = styled(Input)`
     font-size: 14px;
     font-weight: 500;
     letter-spacing: 0.47px;
-    color: ${({ theme }) => theme.gray};
-    background-color: ${({ theme }) => theme.lightBlue};
+    color: ${({ theme }) => theme.color.gray};
+    background-color: ${({ theme }) => theme.color.lightBlue};
   }
 `;
 
 const SearchIcon = styled(Icon)`
   width: 14px;
   height: 14px;
-  fill: ${({ theme }) => theme.gray};
+  fill: ${({ theme }) => theme.color.gray};
 `;
 
 const INVITE_MEMBER_MODAL = 'inviteMemberModal';

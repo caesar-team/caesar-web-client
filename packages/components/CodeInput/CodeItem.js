@@ -13,7 +13,9 @@ const StyledInput = styled.input`
   border: none;
   outline: none;
   background: ${({ errors, theme }) =>
-    Object.keys(errors).length === 0 ? theme.lightBlue : theme.lightRed};
+    Object.keys(errors).length === 0
+      ? theme.color.lightBlue
+      : theme.color.lightRed};
 
   &:last-child {
     margin-right: 0;

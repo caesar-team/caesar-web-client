@@ -21,7 +21,7 @@ const TextWithLinesStyled = styled(TextWithLines)`
   font-size: 14px;
   font-weight: normal;
   letter-spacing: 0.4px;
-  color: ${({ theme }) => theme.emperor};
+  color: ${({ theme }) => theme.color.emperor};
 `;
 
 const TextWithLinesAbsolute = styled(TextWithLinesStyled)`
@@ -36,7 +36,7 @@ const TeamsWrapper = styled.div`
 
 const CarouselStyled = styled(Carousel)`
   ${Carousel.ArrowsWrapper} {
-    background-color: ${({ theme }) => theme.white};
+    background-color: ${({ theme }) => theme.color.white};
     width: 55px;
     top: 4px;
 
@@ -52,7 +52,7 @@ const TeamTagStyled = styled(TeamTag)`
   ${({ isActive, theme }) =>
     isActive &&
     `
-    border: 1px solid ${theme.gray};
+    border: 1px solid ${theme.color.gray};
   `};
 
   &:last-of-type {
@@ -66,7 +66,7 @@ const SectionStyled = styled(Section)`
   ${Section.Name} {
     font-size: 14px;
     letter-spacing: 0.4px;
-    color: ${({ theme }) => theme.emperor};
+    color: ${({ theme }) => theme.color.emperor};
   }
 `;
 
@@ -75,7 +75,7 @@ const MemberListStyled = styled(MemberList)`
   margin-top: 10px;
 
   ${MemberList.Member} {
-    background-color: ${({ theme }) => theme.lightBlue};
+    background-color: ${({ theme }) => theme.color.lightBlue};
     margin-bottom: 4px;
 
     &:last-of-type {

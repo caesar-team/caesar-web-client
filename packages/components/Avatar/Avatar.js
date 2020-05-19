@@ -12,15 +12,15 @@ const Wrapper = styled.div`
   padding: 0;
   list-style: none;
   text-align: center;
-  background: ${({ theme }) => theme.gray};
-  color: ${({ theme }) => theme.white};
+  background: ${({ theme }) => theme.color.gray};
+  color: ${({ theme }) => theme.color.white};
   white-space: nowrap;
   position: relative;
   overflow: hidden;
   vertical-align: middle;
-  width: ${({ isSmall }) => (isSmall ? '30px' : '40px')};
-  min-width: ${({ isSmall }) => (isSmall ? '30px' : '40px')};
-  height: ${({ isSmall }) => (isSmall ? '30px' : '40px')};
+  width: ${({ isSmall }) => (isSmall ? '32px' : '40px')};
+  min-width: ${({ isSmall }) => (isSmall ? '32px' : '40px')};
+  height: ${({ isSmall }) => (isSmall ? '32px' : '40px')};
   border-radius: 50%;
 `;
 
@@ -32,7 +32,14 @@ const Image = styled.img`
   border-style: none;
 `;
 
-const Avatar = ({ name, email, avatar, children, isSmall, ...props }) => {
+export const Avatar = ({
+  name,
+  email,
+  avatar,
+  children,
+  isSmall,
+  ...props
+}) => {
   if (children) {
     return (
       <Wrapper isSmall={isSmall} {...props}>
@@ -56,7 +63,7 @@ const Avatar = ({ name, email, avatar, children, isSmall, ...props }) => {
   if (email) {
     return (
       <Wrapper isSmall={isSmall} {...props}>
-        <Gravatar email={email} size={isSmall ? 30 : 40} />
+        <Gravatar email={email} size={isSmall ? 32 : 40} />
       </Wrapper>
     );
   }
@@ -69,5 +76,3 @@ const Avatar = ({ name, email, avatar, children, isSmall, ...props }) => {
     </Wrapper>
   );
 };
-
-export default Avatar;

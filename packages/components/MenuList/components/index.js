@@ -18,5 +18,6 @@ export const MenuItem = styled.div`
   font-size: 18px;
   font-weight: ${({ isActive }) => (isActive ? 'bold' : 'normal')};
   text-transform: capitalize;
-  color: ${({ theme, isActive }) => (isActive ? theme.black : theme.emperor)};
+  color: ${({ theme, isActive }) =>
+    isActive ? theme.color.black : theme.color.emperor};
 `;

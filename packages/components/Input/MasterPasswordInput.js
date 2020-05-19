@@ -14,7 +14,7 @@ const InnerWrapper = styled.div`
   align-items: center;
   height: 60px;
   border: 1px solid
-    ${({ theme, isError }) => (isError ? theme.red : theme.gallery)};
+    ${({ theme, isError }) => (isError ? theme.color.red : theme.color.gallery)};
   border-radius: 3px;
 `;
 
@@ -26,7 +26,7 @@ const IconWrapper = styled.div`
   width: 60px;
   min-width: 60px;
   border-right: 1px solid
-    ${({ theme, isError }) => (isError ? theme.red : theme.gallery)};
+    ${({ theme, isError }) => (isError ? theme.color.red : theme.color.gallery)};
 `;
 
 const StyledPasswordInput = styled(PasswordInput)`
@@ -41,7 +41,7 @@ const Error = styled.div`
   top: 68px;
   font-size: 14px;
   letter-spacing: 0.4px;
-  color: ${({ theme }) => theme.red};
+  color: ${({ theme }) => theme.color.red};
 `;
 
 const MasterPasswordInput = ({ error, ...props }) => {

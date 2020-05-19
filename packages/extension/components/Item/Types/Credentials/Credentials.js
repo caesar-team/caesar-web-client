@@ -14,12 +14,12 @@ import {
 const StyledEyeIcon = styled(Icon)`
   margin-right: 20px;
   cursor: pointer;
-  fill: ${({ theme }) => theme.gray};
+  fill: ${({ theme }) => theme.color.gray};
 `;
 
 const StyledIcon = styled(Icon)`
   cursor: pointer;
-  fill: ${({ theme }) => theme.gray};
+  fill: ${({ theme }) => theme.color.gray};
 `;
 
 const StyledWebsiteLink = styled.a``;

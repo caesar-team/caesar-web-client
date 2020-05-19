@@ -17,7 +17,7 @@ const LabelText = styled.div`
     isFocused || value ? '14px' : '18px'};
   line-height: 1.5;
   letter-spacing: 0.6px;
-  color: ${({ theme }) => theme.gray};
+  color: ${({ theme }) => theme.color.gray};
   transition: all 0.2s;
 `;
 
@@ -28,17 +28,17 @@ const InputField = styled.input`
   font-size: 16px;
   letter-spacing: 0.6px;
   background-color: ${({ theme, isFocused }) =>
-    isFocused ? theme.snow : theme.white};
+    isFocused ? theme.color.snow : theme.color.white};
   border: none;
   border-bottom: ${({ theme, withBorder, isFocused }) =>
     withBorder && !isFocused
-      ? `1px solid ${theme.gallery}`
+      ? `1px solid ${theme.color.gallery}`
       : '1px solid transparent'};
   outline: none;
 
   &::placeholder {
     padding: 5px 0;
-    color: ${({ theme }) => theme.gray};
+    color: ${({ theme }) => theme.color.gray};
   }
 
   &:-webkit-autofill,
@@ -71,7 +71,7 @@ const Error = styled.div`
   margin-top: 8px;
   font-size: 14px;
   letter-spacing: 0.4px;
-  color: ${({ theme }) => theme.red};
+  color: ${({ theme }) => theme.color.red};
 `;
 
 class Input extends Component {

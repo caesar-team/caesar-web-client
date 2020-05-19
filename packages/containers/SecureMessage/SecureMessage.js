@@ -21,32 +21,32 @@ const Wrapper = styled.div`
   align-items: center;
   width: 100vw;
   height: 100vh;
-  background-color: ${({ theme }) => theme.emperor};
+  background-color: ${({ theme }) => theme.color.emperor};
 `;
 
 const Title = styled.div`
   font-size: 18px;
   letter-spacing: 0.6px;
-  color: ${({ theme }) => theme.lightGray};
+  color: ${({ theme }) => theme.color.lightGray};
   margin-bottom: 30px;
   margin-top: 60px;
 `;
 
 const StyledLogo = styled(Icon)`
-  fill: ${({ theme }) => theme.white};
+  fill: ${({ theme }) => theme.color.white};
 `;
 
 const MessageWrapper = styled.div`
   display: flex;
   flex-direction: column;
-  background: ${({ theme }) => theme.darkGray};
+  background: ${({ theme }) => theme.color.darkGray};
   padding: 0 20px;
   max-width: 620px;
   width: 100%;
 `;
 
 const Message = styled.div`
-  color: ${({ theme }) => theme.white};
+  color: ${({ theme }) => theme.color.white};
   padding: 20px 0;
   max-height: 400px;
   height: 100%;
@@ -61,10 +61,10 @@ const Attachments = styled.div`
 
 const FileStyled = styled(File)`
   ${File.FileName} {
-    color: ${({ theme }) => theme.white};
+    color: ${({ theme }) => theme.color.white};
 
     &:hover {
-      color: ${({ theme }) => theme.white};
+      color: ${({ theme }) => theme.color.white};
     }
   }
 
@@ -73,7 +73,7 @@ const FileStyled = styled(File)`
 
     &:before {
       border-color: ${({ theme }) =>
-        `${theme.darkGray} ${theme.darkGray} transparent transparent`};
+        `${theme.color.darkGray} ${theme.color.darkGray} transparent transparent`};
     }
   }
 

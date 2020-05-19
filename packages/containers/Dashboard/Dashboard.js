@@ -31,30 +31,28 @@ import {
 } from '@caesar/common/constants';
 import { initialItemData } from './utils';
 
+const CenterWrapper = styled.div`
+  display: flex;
+  width: 100%;
+  min-height: calc(100vh - 55px);
+`;
+
+const Sidebar = styled.aside`
+  flex: 0 0 287px;
+  border-right: 1px solid ${({ theme }) => theme.color.gallery};
+`;
+
 const MiddleColumnWrapper = styled.div`
   display: flex;
   flex-direction: column;
-  width: 431px;
-  flex-shrink: 0;
-  background: ${({ theme }) => theme.lightBlue};
-  border-right: 1px solid ${({ theme }) => theme.gallery};
+  flex: 0 0 431px;
+  background: ${({ theme }) => theme.color.lightBlue};
+  border-right: 1px solid ${({ theme }) => theme.color.gallery};
 `;
 
 const RightColumnWrapper = styled.div`
   position: relative;
   flex-grow: 1;
-`;
-
-const CenterWrapper = styled.div`
-  display: flex;
-  width: 100%;
-  min-height: calc(100vh - 70px);
-`;
-
-const Sidebar = styled.aside`
-  width: 287px;
-  flex-shrink: 0;
-  border-right: 1px solid ${({ theme }) => theme.gallery};
 `;
 
 const SHARE_MODAL = 'shareModal';

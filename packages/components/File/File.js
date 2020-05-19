@@ -12,8 +12,8 @@ const FileExt = styled.div`
   height: 40px;
   font-size: 14px;
   letter-spacing: 0.4px;
-  background-color: ${({ theme }) => theme.gray};
-  color: ${({ theme }) => theme.white};
+  background-color: ${({ theme }) => theme.color.gray};
+  color: ${({ theme }) => theme.color.white};
   border-radius: 3px 0 3px 3px;
   cursor: pointer;
   transition: all 0.2s;
@@ -23,13 +23,13 @@ const FileExt = styled.div`
     position: absolute;
     top: 0;
     right: 0;
-    background: ${({ theme }) => theme.alto};
+    background: ${({ theme }) => theme.color.alto};
     display: block;
     width: 0;
     border-style: solid;
     border-width: 4px;
     border-color: ${({ theme }) =>
-      `${theme.white} ${theme.white} transparent transparent`};
+      `${theme.color.white} ${theme.color.white} transparent transparent`};
     border-radius: 0 0 0 3px;
   }
 `;
@@ -38,7 +38,7 @@ const ErrorStatus = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
-  border: 3px solid ${({ theme }) => theme.red};
+  border: 3px solid ${({ theme }) => theme.color.red};
   border-radius: 50%;
   width: 40px;
   height: 40px;
@@ -46,7 +46,7 @@ const ErrorStatus = styled.div`
   &:after {
     content: '!';
     position: absolute;
-    color: ${({ theme }) => theme.red};
+    color: ${({ theme }) => theme.color.red};
   }
 `;
 
@@ -60,7 +60,7 @@ const FileName = styled.div`
   font-size: 18px;
   line-height: 18px;
   letter-spacing: 0.6px;
-  color: ${({ theme }) => theme.black};
+  color: ${({ theme }) => theme.color.black};
   margin-bottom: 8px;
 `;
 
@@ -68,7 +68,7 @@ const FileSize = styled.div`
   font-size: 14px;
   line-height: 14px;
   letter-spacing: 0.4px;
-  color: ${({ theme }) => theme.gray};
+  color: ${({ theme }) => theme.color.gray};
 `;
 
 const UploadedWrapper = styled.div`
@@ -76,14 +76,14 @@ const UploadedWrapper = styled.div`
 
   &:hover {
     ${FileExt} {
-      background: ${({ theme }) => theme.black};
-      color: ${({ theme }) => theme.white};
+      background: ${({ theme }) => theme.color.black};
+      color: ${({ theme }) => theme.color.white};
       font-size: 0;
       background: url(${DownloadIcon}) no-repeat center
-        ${({ theme }) => theme.black};
+        ${({ theme }) => theme.color.black};
 
       &:before {
-        background: ${({ theme }) => theme.black};
+        background: ${({ theme }) => theme.color.black};
       }
     }
   }
@@ -94,7 +94,7 @@ const ErrorWrapper = styled.div`
 `;
 
 const StyledCloseIcon = styled(Icon)`
-  fill: ${({ theme }) => theme.gray};
+  fill: ${({ theme }) => theme.color.gray};
   margin-left: 10px;
   cursor: pointer;
 `;

@@ -11,19 +11,19 @@ const Wrapper = styled.div`
   align-items: center;
   width: 100vw;
   height: 100vh;
-  background-color: ${({ theme }) => theme.emperor};
+  background-color: ${({ theme }) => theme.color.emperor};
 `;
 
 const Title = styled.div`
   font-size: 18px;
   letter-spacing: 0.6px;
-  color: ${({ theme }) => theme.lightGray};
+  color: ${({ theme }) => theme.color.lightGray};
   margin-bottom: 36px;
   margin-top: 140px;
 `;
 
 const StyledLogo = styled(Icon)`
-  fill: ${({ theme }) => theme.lightGray};
+  fill: ${({ theme }) => theme.color.lightGray};
 `;
 
 const MasterPasswordCheckForm = ({ onSubmit }) => (

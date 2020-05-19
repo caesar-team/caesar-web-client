@@ -10,7 +10,7 @@ const Wrapper = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
-  background: ${({ theme }) => theme.emperor};
+  background: ${({ theme }) => theme.color.emperor};
   border-radius: 3px;
   box-shadow: 0 11px 23px 0 rgba(0, 0, 0, 0.08);
   padding-top: 6px;
@@ -21,7 +21,7 @@ const Text = styled.div`
   font-size: 14px;
   font-weight: 600;
   letter-spacing: 0.4px;
-  color: ${({ theme }) => theme.white};
+  color: ${({ theme }) => theme.color.white};
   margin-right: 6px;
 `;
 

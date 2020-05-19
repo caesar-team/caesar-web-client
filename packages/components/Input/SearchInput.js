@@ -8,7 +8,7 @@ const InputStyled = styled(Input)`
 
   ${Input.InputField} {
     border-bottom: none;
-    background-color: ${({ theme }) => theme.white};
+    background-color: ${({ theme }) => theme.color.white};
   }
 
   ${Input.Prefix} {
@@ -35,14 +35,7 @@ const SearchInput = ({
 
   const iconComponent = searchedText ? CloseIconComponent : SearchIconComponent;
 
-  return (
-    <InputStyled
-      prefix={iconComponent}
-      placeholder=""
-      value={searchedText}
-      {...props}
-    />
-  );
+  return <InputStyled prefix={iconComponent} value={searchedText} {...props} />;
 };
 
 export default SearchInput;

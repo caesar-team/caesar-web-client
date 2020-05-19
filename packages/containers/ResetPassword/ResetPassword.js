@@ -1,4 +1,4 @@
-import React, { Component, Fragment } from 'react';
+import React, { Component } from 'react';
 import styled from 'styled-components';
 import Router from 'next/router';
 import { AuthTitle, AuthLayout, Icon, Button } from '@caesar/components';
@@ -38,14 +38,14 @@ class ResetPasswordContainer extends Component {
     const { router } = this.props;
 
     return (
-      <Fragment>
+      <>
         <IconWrapper>
           <Icon name="logo-caesar-4xxi" height={40} width={142} />
         </IconWrapper>
         <StyledButton onClick={() => router.push('/signin')}>
           Sign In
         </StyledButton>
-      </Fragment>
+      </>
     );
   }
 

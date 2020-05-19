@@ -8,14 +8,14 @@ const Text = styled.div`
   font-size: 18px;
   font-weight: 600;
   letter-spacing: 0.6px;
-  color: ${({ theme }) => theme.black};
+  color: ${({ theme }) => theme.color.black};
 `;
 
 const WarningText = styled.div`
   font-size: 14px;
   font-weight: 600;
   letter-spacing: 0.4px;
-  color: ${({ theme }) => theme.black};
+  color: ${({ theme }) => theme.color.black};
   margin-left: 10px;
 `;
 

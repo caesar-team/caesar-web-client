@@ -18,19 +18,21 @@ const Box = styled.span`
   align-self: flex-start;
   width: 20px;
   height: 20px;
-  color: ${({ theme }) => theme.white};
+  color: ${({ theme }) => theme.color.white};
   border: 1px solid
-    ${({ isChecked, theme }) => (isChecked ? theme.black : theme.gallery)};
+    ${({ isChecked, theme }) =>
+      isChecked ? theme.color.black : theme.color.gallery};
   border-radius: 2px;
   background-color: ${({ isChecked, theme }) =>
-    isChecked ? theme.black : theme.white};
+    isChecked ? theme.color.black : theme.color.white};
   transition: 0.3s;
-  ${({ isFocused, theme }) => isFocused && `border-color: ${theme.black}`};
+  ${({ isFocused, theme }) =>
+    isFocused && `border-color: ${theme.color.black}`};
 `;
 
 const Text = styled.span`
   padding-left: 10px;
-  color: ${({ theme, isDisabled }) => isDisabled && theme.gray};
+  color: ${({ theme, isDisabled }) => isDisabled && theme.color.gray};
 `;
 
 const StyledInput = styled.input`

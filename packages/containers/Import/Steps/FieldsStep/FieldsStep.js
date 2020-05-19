@@ -47,8 +47,8 @@ const Box = styled.div`
   line-height: 18px;
   letter-spacing: 0.6px;
   border-radius: 3px;
-  border: 1px solid ${({ theme }) => theme.gallery};
-  background-color: ${({ theme }) => theme.snow};
+  border: 1px solid ${({ theme }) => theme.color.gallery};
+  background-color: ${({ theme }) => theme.color.snow};
   position: relative;
   padding: 10px 15px;
   margin-bottom: 10px;
@@ -79,7 +79,7 @@ const BottomWrapper = styled.div`
 const RequiredText = styled.div`
   font-size: 14px;
   letter-spacing: 0.4px;
-  color: ${({ theme }) => theme.gray};
+  color: ${({ theme }) => theme.color.gray};
   position: relative;
   padding-left: 20px;
 
@@ -89,12 +89,12 @@ const RequiredText = styled.div`
     top: 0;
     left: 6px;
     line-height: 6px;
-    color: ${({ theme }) => theme.black};
+    color: ${({ theme }) => theme.color.black};
   }
 `;
 
 const StyledSelect = styled(Select)`
-  border: 1px solid ${({ theme }) => theme.gallery};
+  border: 1px solid ${({ theme }) => theme.color.gallery};
   margin-bottom: 10px;
   font-size: 18px;
   line-height: 18px;

@@ -16,12 +16,12 @@ const MemberInfo = styled.div`
 
 const MemberName = styled.div`
   font-size: 16px;
-  color: ${({ theme }) => theme.black};
+  color: ${({ theme }) => theme.color.black};
 `;
 
 const MemberEmail = styled.div`
   font-size: 14px;
-  color: ${({ theme }) => theme.gray};
+  color: ${({ theme }) => theme.color.gray};
 `;
 
 const Member = ({ name, email, avatar, className }) => (

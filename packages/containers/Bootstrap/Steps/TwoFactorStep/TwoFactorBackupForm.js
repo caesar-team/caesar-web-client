@@ -27,13 +27,13 @@ const Description = styled.div`
   font-size: 18px;
   letter-spacing: 0.6px;
   text-align: center;
-  color: ${({ theme }) => theme.gray};
+  color: ${({ theme }) => theme.color.gray};
 `;
 
 const Codes = styled.div`
   display: flex;
   flex-wrap: wrap;
-  background: ${({ theme }) => theme.lightBlue};
+  background: ${({ theme }) => theme.color.lightBlue};
   border-radius: 4px;
   margin: 50px 0 30px;
 `;

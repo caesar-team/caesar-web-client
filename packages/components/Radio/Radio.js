@@ -7,7 +7,7 @@ const Label = styled.label`
   min-height: 20px;
   cursor: ${({ disabled }) => (disabled ? 'not-allowed' : 'pointer')};
   font-size: 14px;
-  color: ${({ theme }) => theme.black};
+  color: ${({ theme }) => theme.color.black};
 
   &:hover {
     user-select: none;
@@ -21,7 +21,7 @@ const Label = styled.label`
     width: 20px;
     height: 20px;
     background-color: #fff;
-    border: 1px solid ${({ theme }) => theme.black};
+    border: 1px solid ${({ theme }) => theme.color.black};
     border-radius: 50%;
   }
 `;
@@ -33,7 +33,7 @@ const RadioIcon = styled.div`
   width: 14px;
   height: 14px;
   background-color: ${({ theme, checked }) =>
-    checked ? theme.black : theme.white};
+    checked ? theme.color.black : theme.color.white};
   border-radius: 50%;
   z-index: 1;
 `;

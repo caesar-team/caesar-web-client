@@ -16,7 +16,8 @@ const TeamDetails = styled.div`
 const TeamName = styled.div`
   font-size: 18px;
   letter-spacing: 0.6px;
-  color: ${({ theme, isActive }) => (isActive ? theme.white : theme.black)};
+  color: ${({ theme, isActive }) =>
+    isActive ? theme.color.white : theme.color.black};
 `;
 
 const TeamMembers = styled.div`
@@ -26,20 +27,20 @@ const TeamMembers = styled.div`
   font-stretch: normal;
   line-height: normal;
   letter-spacing: 0.4px;
-  color: ${({ theme }) => theme.gray};
+  color: ${({ theme }) => theme.color.gray};
 `;
 
 const RadioStyled = styled(Radio)`
   display: flex;
   align-items: center;
   width: 100%;
-  border: 1px solid ${({ theme }) => theme.gallery};
+  border: 1px solid ${({ theme }) => theme.color.gallery};
   padding: 10px 20px;
   border-radius: 3px;
   margin-bottom: 10px;
 
   &:hover {
-    background-color: ${({ theme, isActive }) => !isActive && theme.snow};
+    background-color: ${({ theme, isActive }) => !isActive && theme.color.snow};
   }
 
   &:last-of-type {
@@ -60,7 +61,7 @@ const RadioStyled = styled(Radio)`
 const ActivePointer = styled.div`
   font-size: 14px;
   letter-spacing: 0.4px;
-  color: ${({ theme }) => theme.white};
+  color: ${({ theme }) => theme.color.white};
 `;
 
 const Wrapper = styled.div`
@@ -70,8 +71,8 @@ const Wrapper = styled.div`
   justify-content: space-between;
   padding: 10px 20px;
   border-radius: 3px;
-  border: 1px solid ${({ theme }) => theme.black};
-  background-color: ${({ theme }) => theme.black};
+  border: 1px solid ${({ theme }) => theme.color.black};
+  background-color: ${({ theme }) => theme.color.black};
   margin-bottom: 10px;
 
   &:last-of-type {
@@ -79,7 +80,7 @@ const Wrapper = styled.div`
   }
 
   ${TeamName} {
-    color: ${({ theme }) => theme.white};
+    color: ${({ theme }) => theme.color.white};
   }
 `;
 

@@ -22,7 +22,7 @@ const FormTitle = styled.div`
   text-align: center;
   font-size: 18px;
   font-weight: 700;
-  color: ${({ theme }) => theme.black};
+  color: ${({ theme }) => theme.color.black};
   text-transform: uppercase;
 `;
 
@@ -35,13 +35,13 @@ const GroupAvatarsWrapper = styled.div`
 const GroupAvatarsTitle = styled.div`
   font-size: 18px;
   letter-spacing: 0.6px;
-  color: ${({ theme }) => theme.emperor};
+  color: ${({ theme }) => theme.color.emperor};
 `;
 
 const GroupAvatarsTip = styled.div`
   font-size: 14px;
   letter-spacing: 0.4px;
-  color: ${({ theme }) => theme.gray};
+  color: ${({ theme }) => theme.color.gray};
 `;
 
 const AvatarsWrapper = styled.div`
@@ -62,7 +62,7 @@ const IconWrapper = styled.div`
   &:hover {
     &:after {
       content: '';
-      border: 2px solid ${({ theme }) => theme.black};
+      border: 2px solid ${({ theme }) => theme.color.black};
       height: 62px;
       border-radius: 100%;
       width: 62px;
@@ -80,7 +80,7 @@ const IconStyled = styled(Icon)`
 const TopIconStyled = styled(Icon)`
   width: 12px;
   height: 12px;
-  fill: ${({ theme }) => theme.white};
+  fill: ${({ theme }) => theme.color.white};
 `;
 
 const SelectedIconWrapper = styled.div`
@@ -93,7 +93,7 @@ const SelectedIconWrapper = styled.div`
   width: 20px;
   height: 20px;
   border-radius: 100%;
-  background-color: ${({ theme }) => theme.black};
+  background-color: ${({ theme }) => theme.color.black};
 `;
 
 const ButtonWrapper = styled.div`
@@ -109,7 +109,7 @@ const UploaderWrapper = styled.div`
   border-radius: 100%;
   width: 60px;
   height: 60px;
-  border: 1px solid ${({ theme }) => theme.gallery};
+  border: 1px solid ${({ theme }) => theme.color.gallery};
   cursor: pointer;
 `;
 

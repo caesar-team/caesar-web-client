@@ -46,7 +46,7 @@ const PasswordIndicatorStyled = styled(PasswordIndicator)`
 const StrengthIndicatorStyled = styled(StrengthIndicator)`
   font-size: 14px;
   letter-spacing: 0.4px;
-  color: ${({ theme }) => theme.gray};
+  color: ${({ theme }) => theme.color.gray};
   padding: 15px;
 
   ${StrengthIndicator.Text} {
@@ -56,7 +56,7 @@ const StrengthIndicatorStyled = styled(StrengthIndicator)`
   ${StrengthIndicator.HelperText} {
     font-size: 14px;
     letter-spacing: 0.4px;
-    color: ${({ theme }) => theme.gray};
+    color: ${({ theme }) => theme.color.gray};
     margin-bottom: 8px;
 
     &:last-of-type {
@@ -77,7 +77,7 @@ const BottomWrapper = styled.div`
   text-align: center;
   font-size: 18px;
   letter-spacing: 0.6px;
-  color: ${({ theme }) => theme.gray};
+  color: ${({ theme }) => theme.color.gray};
 `;
 
 const DiceIcon = styled(Icon)`

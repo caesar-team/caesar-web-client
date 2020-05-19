@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+// TODO: Replace with import {useClickAway} from 'react-use';
 import enhanceWithClickOutside from 'react-click-outside';
 import { PasswordGenerator, Tooltip } from '@caesar/components';
 import { generator } from '@caesar/common/utils/password';

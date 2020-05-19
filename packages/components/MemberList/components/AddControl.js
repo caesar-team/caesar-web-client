@@ -5,8 +5,8 @@ import { Icon } from '../../Icon';
 const AddButton = styled.button`
   width: 30px;
   height: 30px;
-  background-color: ${({ theme }) => theme.black};
-  border: 1px solid ${({ theme }) => theme.black};
+  background-color: ${({ theme }) => theme.color.black};
+  border: 1px solid ${({ theme }) => theme.color.black};
   border-radius: 50%;
   outline: none;
   display: flex;
@@ -15,15 +15,15 @@ const AddButton = styled.button`
   cursor: pointer;
 
   &:hover {
-    background-color: ${({ theme }) => theme.emperor};
-    border-color: ${({ theme }) => theme.emperor};
+    background-color: ${({ theme }) => theme.color.emperor};
+    border-color: ${({ theme }) => theme.color.emperor};
   }
 `;
 
 const IconStyled = styled(Icon)`
   width: 14px;
   height: 14px;
-  fill: ${({ theme }) => theme.white};
+  fill: ${({ theme }) => theme.color.white};
 `;
 
 const AddControl = ({ className, onClick }) => (

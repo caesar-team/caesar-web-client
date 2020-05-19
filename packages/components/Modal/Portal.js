@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import { KEY_CODES } from '@caesar/common/constants';
 import { elementIsFocused } from '@caesar/common/utils/domUtils';
 import { Icon } from '../Icon';
-import Overlay from './Overlay';
+import { Overlay } from './Overlay';
 
 const CloseButton = styled.button`
   position: absolute;
@@ -22,7 +22,7 @@ const CloseButton = styled.button`
 `;
 
 const StyledIcon = styled(Icon)`
-  fill: ${({ theme }) => theme.gray};
+  fill: ${({ theme }) => theme.color.gray};
 `;
 
 const ContentWrapper = styled.div`
@@ -30,7 +30,7 @@ const ContentWrapper = styled.div`
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  background: ${({ theme }) => theme.white};
+  background: ${({ theme }) => theme.color.white};
   border-radius: 3px;
   outline: none;
   padding: 30px 40px 40px;

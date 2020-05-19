@@ -16,6 +16,20 @@ const theme = {
     red: '#ff3355',
     lightRed: 'rgba(255, 51, 85, 0.1)',
   },
+  font: {
+    size: {
+      big: '30px',
+      main: '16px',
+      small: '14px',
+      xs: '12px',
+    },
+    lineHeight: {
+      big: 1.2,
+      main: 1.5,
+      small: 1.14,
+      xs: 1.33,
+    },
+  },
 };
 
 export default theme;

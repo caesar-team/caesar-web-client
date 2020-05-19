@@ -27,9 +27,10 @@ const Form = styled.form`
 
 const Row = styled.div`
   position: relative;
+  z-index: 1;
   display: flex;
   flex-direction: column;
-  margin-bottom: 10px;
+  margin-bottom: 16px;
 
   &:last-child {
     margin-bottom: 0;
@@ -44,17 +45,12 @@ const Column = styled.div`
 
 const ColumnStyled = styled(Column)`
   margin-left: 20px;
-
-  ${media.wideMobile`
-    margin-top: 20px;
-    margin-left: 0;
-  `}
 `;
 
 const Label = styled.div`
-  font-size: 18px;
-  letter-spacing: 0.6px;
-  color: ${({ theme }) => theme.color.black};
+  margin-bottom: 8px;
+  font-size: 14px;
+  color: ${({ theme }) => theme.color.gray};
 `;
 
 const InputStyled = styled(PasswordInput)`
@@ -71,15 +67,14 @@ const TextAreaStyled = styled(TextArea)`
 const Error = styled.div`
   margin-top: 8px;
   font-size: 14px;
-  letter-spacing: 0.4px;
   color: ${({ theme }) => theme.color.red};
 `;
 
 const AttachmentsSection = styled.div`
   display: flex;
   flex-direction: column;
-  margin-top: 20px;
-  margin-bottom: 20px;
+  margin-top: 16px;
+  margin-bottom: 16px;
 `;
 
 const Attachments = styled.div`
@@ -98,32 +93,35 @@ const FileRow = styled.div`
 const SelectRow = styled.div`
   display: flex;
   width: 100%;
-  margin-top: 20px;
-  margin-bottom: 30px;
+  margin-top: 22px;
+  margin-bottom: 24px;
 
   ${media.wideMobile`
-    flex-wrap: wrap;
+    margin-top: 14px;
+    margin-bottom: 16px;
   `}
 `;
 
 const StyledSelect = styled(Select)`
-  margin-top: 10px;
+  height: 40px;
+  padding: 8px 16px;
   border: 1px solid ${({ theme }) => theme.color.gallery};
   border-radius: 3px;
-  padding: 18px 20px;
-  height: 60px;
 
   ${Select.ValueText} {
     padding: 0;
-    font-size: 18px;
+    font-size: 16px;
     font-weight: 600;
-    letter-spacing: 0.6px;
   }
 `;
 
 const ButtonWrapper = styled.div`
   position: relative;
-  margin: 30px 0;
+  margin: 24px 0;
+
+  ${media.wideMobile`
+    margin: 16px 0;
+  `}
 `;
 
 const StyledButton = styled(Button)`
@@ -279,7 +277,6 @@ class SecureMessageForm extends Component {
               />
               <StyledButton
                 htmlType="submit"
-                isHigh
                 disabled={isSubmitting || !(isValid && dirty) || !isOnline}
               >
                 Create Secure Message

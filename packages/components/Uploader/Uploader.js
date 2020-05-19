@@ -15,14 +15,14 @@ const Container = styled.div`
     ${({ theme, isDragActive }) =>
       isDragActive ? theme.color.blue : theme.color.gray};
   width: 100%;
-  padding: 24px 5px;
+  padding: 16px 5px;
   cursor: pointer;
   outline: none;
   transition: all 0.2s;
 `;
 
 const Text = styled.span`
-  margin-bottom: 3px;
+  margin-bottom: 5px;
   font-size: 16px;
   letter-spacing: 0.6px;
   text-align: center;

@@ -20,14 +20,14 @@ const TextAreaField = styled.textarea`
   padding: 7px 15px;
   display: block;
   width: 100%;
-  font-size: 18px;
-  letter-spacing: 0.6px;
+  font-size: 16px;
+  line-height: 1.5;
   color: ${({ theme }) => theme.color.black};
   border: 1px solid ${({ theme }) => theme.color.gallery};
   border-radius: 3px;
   background-color: ${({ theme }) => theme.color.snow};
   outline: none;
-  min-height: 120px;
+  min-height: 112px;
   resize: none;
 
   &::placeholder {

@@ -2,7 +2,6 @@ import React from 'react';
 import styled from 'styled-components';
 import { media } from '@caesar/assets/styles/media';
 import LayoutConstructor from './LayoutConstructor';
-import Footer from './Footer';
 import { SecureHeader } from './SecureHeader';
 
 const LayoutConstructorStyled = styled(LayoutConstructor)`
@@ -10,7 +9,7 @@ const LayoutConstructorStyled = styled(LayoutConstructor)`
 
   ${LayoutConstructor.TopWrapper} {
     justify-content: space-between;
-    padding: 15px 30px;
+    padding: 8px 24px;
     border-bottom: 1px solid ${({ theme }) => theme.color.gallery};
 
     ${media.mobile`
@@ -21,8 +20,8 @@ const LayoutConstructorStyled = styled(LayoutConstructor)`
 
   ${LayoutConstructor.MainWrapper} {
     width: 100%;
-    max-width: 860px;
-    padding: 0 30px;
+    max-width: 848px;
+    padding: 0 24px;
     margin: 0 auto;
 
     ${media.mobile`
@@ -42,10 +41,16 @@ const LayoutConstructorStyled = styled(LayoutConstructor)`
   }
 `;
 
+const Version = styled.div`
+  z-index: 1;
+  font-size: 12px;
+  color: ${({ theme }) => theme.color.gray};
+`;
+
 const SecureLayout = props => (
   <LayoutConstructorStyled
     headerComponent={<SecureHeader />}
-    footerComponent={Footer}
+    footerComponent={<Version>v.1.0.1-112604c.0</Version>}
     {...props}
   />
 );

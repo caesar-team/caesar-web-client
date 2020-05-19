@@ -16,8 +16,8 @@ const Box = styled.span`
   align-items: center;
   justify-content: center;
   align-self: flex-start;
-  width: 20px;
-  height: 20px;
+  width: 24px;
+  height: 24px;
   color: ${({ theme }) => theme.color.white};
   border: 1px solid
     ${({ isChecked, theme }) =>
@@ -31,7 +31,8 @@ const Box = styled.span`
 `;
 
 const Text = styled.span`
-  padding-left: 10px;
+  padding-left: 16px;
+  line-height: 1.5;
   color: ${({ theme, isDisabled }) => isDisabled && theme.color.gray};
 `;
 

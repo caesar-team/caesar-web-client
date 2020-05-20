@@ -25,6 +25,7 @@ const InputField = styled.input`
   display: block;
   width: 100%;
   font-size: 16px;
+  line-height: 1;
   background-color: ${({ theme, isFocused }) =>
     isFocused ? theme.color.snow : theme.color.white};
   border: none;
@@ -45,6 +46,10 @@ const InputField = styled.input`
   &:-webkit-autofill:active {
     -webkit-transition: 'color 9999s ease-out, background-color 9999s ease-out';
     -webkit-transition-delay: 9999s;
+  }
+
+  &::-webkit-credentials-auto-fill-button {
+    visibility: hidden;
   }
 `;
 

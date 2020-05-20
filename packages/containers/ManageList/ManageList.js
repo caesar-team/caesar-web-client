@@ -31,7 +31,6 @@ const TopWrapper = styled.div`
 
 const Title = styled.div`
   font-size: 36px;
-  letter-spacing: 1px;
   color: ${({ theme }) => theme.color.black};
 `;
 

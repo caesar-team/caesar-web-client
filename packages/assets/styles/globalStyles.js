@@ -1,4 +1,5 @@
 import { normalize } from 'polished';
+import theme from '@caesar/common/theme';
 import fonts from './fonts';
 
 export default `
@@ -8,12 +9,13 @@ export default `
   html {
     -moz-osx-font-smoothing: grayscale;
     -webkit-font-smoothing: antialiased;
-    background-color: #fff;
+    background-color: ${theme.color.white};
     min-width: 20rem;
     font-family: 'AvenirNext';
     font-weight: normal;
     font-style: normal;
-    font-size: 16px;
+    font-size: ${theme.font.size.main};
+    line-height: ${theme.font.lineHeight.main};
     letter-spacing: 0.4px;
   }
 

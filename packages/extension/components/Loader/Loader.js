@@ -33,7 +33,6 @@ const LoaderIndicator = styled.div`
 
 const LoadingText = styled.div`
   font-size: 18px;
-  letter-spacing: 0.6px;
   margin-top: 20px;
   color: ${({ theme }) => theme.color.white};
   width: 100%;

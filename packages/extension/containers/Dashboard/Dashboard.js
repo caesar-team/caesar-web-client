@@ -50,7 +50,6 @@ const GeneratorOption = styled.div`
 const GeneratorOptionName = styled.div`
   font-size: 16px;
   font-weight: ${({ isActive }) => (isActive ? 600 : 400)};
-  letter-spacing: 0.5px;
   color: ${({ theme }) => theme.color.black};
   margin-left: 16px;
 `;

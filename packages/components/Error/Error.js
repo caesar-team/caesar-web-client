@@ -24,14 +24,12 @@ const TextWrapper = styled.div`
 
 const StatusCode = styled.div`
   font-size: 36px;
-  letter-spacing: 1px;
   text-align: center;
   margin-bottom: 10px;
 `;
 
 const Description = styled.div`
   font-size: 18px;
-  letter-spacing: 0.6px;
 `;
 
 const Error = ({ statusCode }) => (

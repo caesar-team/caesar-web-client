@@ -55,7 +55,6 @@ const GoogleLogoWrapper = styled.div`
 const GoogleAuthText = styled.div`
   margin: auto;
   font-size: 18px;
-  letter-spacing: 0.6px;
   color: ${({ theme }) => theme.color.white};
 `;
 

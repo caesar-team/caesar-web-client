@@ -48,7 +48,6 @@ const TitleInput = styled(Input)`
   ${Input.InputField} {
     padding: 0;
     font-size: 36px;
-    letter-spacing: 1px;
     color: ${({ theme }) => theme.color.black};
 
     &::placeholder {
@@ -78,7 +77,6 @@ const AdditionalLabel = styled.div`
   top: -20px;
   left: 15px;
   font-size: 14px;
-  letter-spacing: 0.4px;
   color: ${({ theme }) => theme.color.gray};
 `;
 
@@ -91,7 +89,6 @@ const AttachmentsSection = styled.div`
 const Attachment = styled.div`
   font-size: 18px;
   font-weight: bold;
-  letter-spacing: 0.6px;
   color: ${({ theme }) => theme.color.black};
   margin-bottom: 25px;
 `;
@@ -117,7 +114,6 @@ const FileRow = styled.div`
 const Error = styled.div`
   text-align: center;
   font-size: 14px;
-  letter-spacing: 0.4px;
   color: ${({ theme }) => theme.color.red};
 `;
 

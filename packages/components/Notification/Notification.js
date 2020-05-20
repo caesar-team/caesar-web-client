@@ -20,14 +20,12 @@ const StyledIcon = styled(Icon)`
 
 const Text = styled.div`
   font-size: 14px;
-  letter-spacing: 0.4px;
   color: ${({ theme }) => theme.color.white};
 `;
 
 const ActionLink = styled.a`
   text-transform: uppercase;
   font-size: 16px;
-  letter-spacing: 0.5px;
   color: ${({ theme }) => theme.color.white};
 
   &:hover {

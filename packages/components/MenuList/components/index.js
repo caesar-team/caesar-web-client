@@ -14,7 +14,6 @@ export const MenuItemWrapper = styled.div`
 `;
 
 export const MenuItem = styled.div`
-  letter-spacing: 0.6px;
   font-size: 18px;
   font-weight: ${({ isActive }) => (isActive ? 'bold' : 'normal')};
   text-transform: capitalize;

@@ -37,7 +37,6 @@ const Error = styled.div`
   padding-top: 10px;
   text-align: center;
   font-size: 14px;
-  letter-spacing: 0.4px;
   color: ${({ theme }) => theme.color.red};
 `;
 
@@ -66,12 +65,10 @@ const ApplicationDescription = styled.div`
   flex-direction: column;
   font-size: 14px;
   line-height: 1.5;
-  letter-spacing: 0.47px;
 `;
 
 const ApplicationLink = styled.a`
   font-size: 14px;
-  letter-spacing: 0.6px;
   color: ${({ theme }) => theme.color.black};
   display: contents;
 `;

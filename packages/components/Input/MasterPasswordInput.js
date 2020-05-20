@@ -40,7 +40,6 @@ const Error = styled.div`
   position: absolute;
   top: 68px;
   font-size: 14px;
-  letter-spacing: 0.4px;
   color: ${({ theme }) => theme.color.red};
 `;
 

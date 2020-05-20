@@ -30,7 +30,6 @@ const Indicator = styled.div`
 const ScoreName = styled.div`
   font-size: 12px;
   font-weight: 600;
-  letter-spacing: 0.3px;
   color: ${({ theme }) => theme.color.black};
   margin-left: 16px;
   width: 80px;

@@ -7,7 +7,6 @@ import { Button } from '../Button';
 
 const StyledButton = styled(Button)`
   font-size: 18px;
-  letter-spacing: 0.6px;
   padding: 18px 30px;
   height: 60px;
 `;

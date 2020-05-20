@@ -77,12 +77,10 @@ const TeamDetails = styled.div`
 
 const TeamName = styled.div`
   font-size: 18px;
-  letter-spacing: 0.6px;
 `;
 
 const TeamItemsWrapper = styled.div`
   font-size: 14px;
-  letter-spacing: 0.4px;
   color: ${({ theme }) => theme.color.gray};
 `;
 
@@ -110,7 +108,6 @@ const Section = styled.div`
 const SectionName = styled.div`
   font-size: 18px;
   font-weight: 600;
-  letter-spacing: 0.6px;
   margin-bottom: 16px;
 `;
 

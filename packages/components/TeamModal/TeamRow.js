@@ -15,7 +15,6 @@ const TeamDetails = styled.div`
 
 const TeamName = styled.div`
   font-size: 18px;
-  letter-spacing: 0.6px;
   color: ${({ theme, isActive }) =>
     isActive ? theme.color.white : theme.color.black};
 `;
@@ -26,7 +25,6 @@ const TeamMembers = styled.div`
   font-style: normal;
   font-stretch: normal;
   line-height: normal;
-  letter-spacing: 0.4px;
   color: ${({ theme }) => theme.color.gray};
 `;
 
@@ -60,7 +58,6 @@ const RadioStyled = styled(Radio)`
 
 const ActivePointer = styled.div`
   font-size: 14px;
-  letter-spacing: 0.4px;
   color: ${({ theme }) => theme.color.white};
 `;
 

@@ -23,7 +23,6 @@ const ValueText = styled.div`
   display: flex;
   align-items: center;
   font-size: 18px;
-  letter-spacing: 0.6px;
   color: ${({ theme }) => theme.color.black};
   position: relative;
   width: 100%;
@@ -54,7 +53,6 @@ const Option = styled.div`
   display: flex;
   padding: 10px 15px;
   font-size: 16px;
-  letter-spacing: 0.5px;
   font-weight: ${({ isActive }) => (isActive ? 'bold' : 'normal')};
   color: ${({ theme, isDisabled }) =>
     isDisabled ? theme.color.lightGray : theme.color.emperor};

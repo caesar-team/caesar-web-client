@@ -5,7 +5,6 @@ import { Icon } from '../Icon';
 const FourXXIText = styled.div`
   font-size: 12px;
   font-weight: 600;
-  letter-spacing: 0.5px;
   color: ${({ theme }) => theme.color.black};
   margin-left: 10px;
 `;

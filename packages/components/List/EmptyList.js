@@ -14,7 +14,6 @@ const Text = styled.div`
   top: 325px;
   left: 50%;
   font-size: 18px;
-  letter-spacing: 0.6px;
   transform: translateX(-50%);
 `;
 

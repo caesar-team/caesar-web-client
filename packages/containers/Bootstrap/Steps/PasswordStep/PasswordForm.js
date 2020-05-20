@@ -25,10 +25,6 @@ const StyledPasswordInput = styled(PasswordInput)`
   display: flex;
   border: 1px solid ${({ theme }) => theme.color.lightGray};
 
-  ${PasswordInput.InputField} {
-    line-height: 20px;
-  }
-
   ${PasswordInput.Prefix} {
     position: relative;
     transform: inherit;
@@ -49,7 +45,6 @@ const Prefix = styled.div`
 const Error = styled.div`
   margin-top: 8px;
   font-size: 14px;
-  letter-spacing: 0.4px;
   color: ${({ theme }) => theme.color.red};
 `;
 

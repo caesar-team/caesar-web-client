@@ -20,7 +20,6 @@ const Wrapper = styled.div`
 const Text = styled.div`
   font-size: 14px;
   font-weight: 600;
-  letter-spacing: 0.4px;
   color: ${({ theme }) => theme.color.white};
   margin-right: 6px;
 `;

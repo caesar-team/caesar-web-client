@@ -35,7 +35,6 @@ const TooltipText = styled.div`
   padding: 4px 10px;
   font-size: 12px;
   font-weight: 600;
-  letter-spacing: 0.4px;
   color: ${({ theme }) => theme.color.white};
 `;
 

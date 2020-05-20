@@ -32,7 +32,6 @@ const InviteRow = styled(Row)`
 
 const UpdatedDate = styled.div`
   font-size: 14px;
-  letter-spacing: 0.4px;
   color: ${({ theme }) => theme.color.emperor};
 `;
 
@@ -44,13 +43,11 @@ const Owner = styled.div`
 
 const OwnerName = styled.div`
   font-size: 16px;
-  letter-spacing: 0.5px;
   color: ${({ theme }) => theme.color.black};
 `;
 
 const OwnerStatus = styled.div`
   font-size: 14px;
-  letter-spacing: 0.4px;
   color: ${({ theme }) => theme.color.gray};
 `;
 
@@ -97,7 +94,6 @@ const ButtonsWrapper = styled.div`
 const Title = styled.div`
   padding: 4px 0;
   font-size: 36px;
-  letter-spacing: 1px;
   color: ${({ theme }) => theme.color.black};
 `;
 
@@ -142,7 +138,6 @@ const DropdownStyled = styled(Dropdown)`
 
 const DropdownValue = styled.div`
   font-size: 16px;
-  letter-spacing: 0.5px;
   margin-right: 10px;
 `;
 

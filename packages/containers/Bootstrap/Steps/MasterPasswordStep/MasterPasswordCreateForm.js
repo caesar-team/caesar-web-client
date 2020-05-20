@@ -34,7 +34,6 @@ const FieldWrapper = styled.div`
 const TipText = styled.div`
   font-size: 14px;
   line-height: 1.5;
-  letter-spacing: 0.4px;
   text-align: center;
   margin-top: 20px;
 `;
@@ -45,7 +44,6 @@ const PasswordIndicatorStyled = styled(PasswordIndicator)`
 
 const StrengthIndicatorStyled = styled(StrengthIndicator)`
   font-size: 14px;
-  letter-spacing: 0.4px;
   color: ${({ theme }) => theme.color.gray};
   padding: 15px;
 
@@ -55,7 +53,6 @@ const StrengthIndicatorStyled = styled(StrengthIndicator)`
 
   ${StrengthIndicator.HelperText} {
     font-size: 14px;
-    letter-spacing: 0.4px;
     color: ${({ theme }) => theme.color.gray};
     margin-bottom: 8px;
 
@@ -76,7 +73,6 @@ const BottomWrapper = styled.div`
   margin-top: 40px;
   text-align: center;
   font-size: 18px;
-  letter-spacing: 0.6px;
   color: ${({ theme }) => theme.color.gray};
 `;
 

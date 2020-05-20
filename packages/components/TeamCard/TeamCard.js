@@ -42,12 +42,10 @@ const TeamName = styled.div`
   display: flex;
   flex-direction: column;
   font-size: 18px;
-  letter-spacing: 0.6px;
 `;
 
 const TeamMembers = styled.div`
   font-size: 18px;
-  letter-spacing: 0.6px;
   color: ${({ theme }) => theme.color.gray};
 `;
 

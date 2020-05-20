@@ -25,7 +25,6 @@ const ToggleWrapper = styled.div`
 
 const ToggleLabel = styled.div`
   font-size: 14px;
-  letter-spacing: 0.4px;
   color: ${({ isActive, theme }) =>
     isActive ? theme.color.black : theme.color.gray};
   margin-left: 20px;
@@ -53,7 +52,6 @@ const LinkWrapper = styled.div`
 
 const LinkText = styled.div`
   font-size: 14px;
-  letter-spacing: 0.4px;
   color: ${({ theme }) => theme.color.emperor};
   text-overflow: ellipsis;
   white-space: nowrap;

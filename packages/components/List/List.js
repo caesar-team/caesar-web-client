@@ -39,7 +39,6 @@ const ColumnHeader = styled.div`
 const ColumnTitle = styled.div`
   font-size: 16px;
   font-weight: bold;
-  letter-spacing: 0.6px;
   color: ${({ theme }) => theme.color.black};
 `;
 
@@ -77,7 +76,6 @@ const Option = styled.button`
   width: 100%;
   align-items: center;
   font-size: 16px;
-  letter-spacing: 0.5px;
   padding: 10px 30px;
   border: none;
   background: none;

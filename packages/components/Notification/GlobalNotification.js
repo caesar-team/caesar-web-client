@@ -23,7 +23,6 @@ const InnerWrapper = styled.div`
 const Text = styled.div`
   font-size: 14px;
   font-weight: 600;
-  letter-spacing: 0.4px;
   color: ${({ theme }) => theme.color.white};
   margin-left: 20px;
   text-overflow: ellipsis;

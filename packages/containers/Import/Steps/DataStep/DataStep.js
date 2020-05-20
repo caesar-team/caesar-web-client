@@ -24,7 +24,6 @@ const Wrapper = styled.div`
 const Title = styled.div`
   font-size: 18px;
   font-weight: 600;
-  letter-spacing: 0.6px;
   margin-bottom: 20px;
 `;
 
@@ -56,7 +55,6 @@ const BottomWrapper = styled.div`
 const SelectedItems = styled.div`
   font-size: 14px;
   font-weight: 600;
-  letter-spacing: 0.4px;
 `;
 
 const ButtonsWrapper = styled.div`
@@ -97,7 +95,6 @@ const SelectListWrapper = styled.div`
 
 const MoveToText = styled.div`
   font-size: 14px;
-  letter-spacing: 0.4px;
   margin-right: 20px;
 `;
 

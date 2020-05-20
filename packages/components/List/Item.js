@@ -30,7 +30,6 @@ const Details = styled.div`
 const Title = styled.div`
   font-size: 18px;
   line-height: 18px;
-  letter-spacing: 0.6px;
   color: ${({ theme }) => theme.color.black};
   margin-bottom: 7px;
   text-overflow: ellipsis;
@@ -52,14 +51,12 @@ const StyledBox = styled(Box)`
 const Text = styled.div`
   font-size: 14px;
   line-height: 14px;
-  letter-spacing: 0.4px;
   color: ${({ theme }) => theme.color.gray};
 `;
 
 const IconText = styled.div`
   font-size: 14px;
   line-height: 14px;
-  letter-spacing: 0.4px;
   color: ${({ theme }) => theme.color.gray};
 `;
 

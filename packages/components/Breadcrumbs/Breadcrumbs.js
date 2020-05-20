@@ -9,7 +9,6 @@ const Wrapper = styled.div`
 
 const Item = styled.div`
   font-size: 16px;
-  letter-spacing: 0.5px;
   color: ${({ isFirst, theme }) =>
     isFirst ? theme.color.black : theme.color.gray};
 

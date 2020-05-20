@@ -16,7 +16,6 @@ const Wrapper = styled.div`
 
 const Title = styled.div`
   font-size: 18px;
-  letter-spacing: 0.6px;
   color: ${({ theme }) => theme.color.lightGray};
   margin-bottom: 36px;
   margin-top: 140px;

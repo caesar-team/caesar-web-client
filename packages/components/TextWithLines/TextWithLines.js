@@ -51,7 +51,6 @@ const getPseudoStyles = ({ position = 'center', width = 2 }) => {
 const TextWithLines = styled.div`
   font-size: 14px;
   font-weight: 600;
-  letter-spacing: 0.4px;
   color: ${({ theme }) => theme.color.lightGray};
   text-transform: uppercase;
   display: flex;

@@ -49,7 +49,6 @@ const UserSection = styled.div`
 
 const UserName = styled.div`
   font-size: 16px;
-  letter-spacing: 0.5px;
   margin-left: 15px;
   margin-right: 15px;
 `;
@@ -70,7 +69,6 @@ const StyledDropdown = styled(Dropdown)`
 const Option = styled.div`
   padding: 10px 30px;
   font-size: 16px;
-  letter-spacing: 0.5px;
   color: ${({ theme }) => theme.color.black};
 `;
 

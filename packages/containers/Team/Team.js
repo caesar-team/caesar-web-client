@@ -52,7 +52,6 @@ const TopWrapper = styled.div`
 
 const Title = styled.div`
   font-size: 36px;
-  letter-spacing: 1px;
   color: ${({ theme }) => theme.color.black};
 `;
 
@@ -133,13 +132,11 @@ const NameField = styled(Field)`
 
 const Name = styled.div`
   font-size: 18px;
-  letter-spacing: 0.6px;
   margin-left: 20px;
 `;
 
 const Email = styled.div`
   font-size: 16px;
-  letter-spacing: 0.5px;
   color: ${({ theme }) => theme.color.gray};
 `;
 
@@ -160,7 +157,6 @@ const NameHeaderField = styled(HeaderField)`
 const HeaderFieldName = styled.div`
   font-size: 14px;
   font-weight: 500;
-  letter-spacing: 0.47px;
   color: ${({ theme }) => theme.color.gray};
 `;
 
@@ -212,7 +208,6 @@ const InputStyled = styled(Input)`
     padding: 15px 0;
     font-size: 14px;
     font-weight: 500;
-    letter-spacing: 0.47px;
     color: ${({ theme }) => theme.color.gray};
     background-color: ${({ theme }) => theme.color.lightBlue};
   }

@@ -44,7 +44,6 @@ const RangeValue = styled.div`
   transform: translateX(-50%);
   font-size: 11px;
   font-weight: 600;
-  letter-spacing: 0.4px;
   color: ${({ theme }) => theme.color.black};
   white-space: nowrap;
 `;

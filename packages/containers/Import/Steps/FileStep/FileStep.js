@@ -13,7 +13,6 @@ const Form = styled.form``;
 const Title = styled.div`
   font-size: 18px;
   font-weight: 600;
-  letter-spacing: 0.6px;
   margin-bottom: 25px;
 `;
 

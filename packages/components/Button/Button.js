@@ -26,7 +26,6 @@ const getButtonHoverStyles = ({ color, theme }) => {
     `,
     white: `
       color: ${theme.color.black};
-      background-color: ${theme.color.white};
       border: 1px solid ${theme.color.black};
     `,
   };
@@ -34,12 +33,28 @@ const getButtonHoverStyles = ({ color, theme }) => {
   return colorsMap[color];
 };
 
-const getButtonHoverBlackBackgroundStyles = ({ color, theme }) => {
+const getButtonPressedStyles = ({ color, theme }) => {
   const colorsMap = {
+    black: `
+      background-color: ${theme.color.gray};
+    `,
     white: `
-      color: ${theme.color.white};
-      background-color: ${theme.color.black};
-      border: 1px solid ${theme.color.black};
+      color: ${theme.color.emperor};
+      border: 1px solid ${theme.color.gray};
+    `,
+  };
+
+  return colorsMap[color];
+};
+
+const getButtonDisabledStyles = ({ color, theme }) => {
+  const colorsMap = {
+    black: `
+      background-color: ${theme.color.gallery};
+    `,
+    white: `
+      color: ${theme.color.gallery};
+      border: 1px solid ${theme.color.gallery};
     `,
   };
 
@@ -73,20 +88,26 @@ const StyledButton = styled.button`
   ${getButtonStyles};
 
   &:hover {
-    ${({ isHoverBlackBackground }) =>
-      isHoverBlackBackground
-        ? getButtonHoverBlackBackgroundStyles
-        : getButtonHoverStyles};
+    ${getButtonHoverStyles};
+  }
+
+  &:focus {
+    outline: 1px dashed ${({ theme }) => theme.color.lightGray};
+    outline-offset: 4px;
+  }
+
+  &:active {
+    ${getButtonPressedStyles};
   }
 
   &[disabled] {
-    background-color: ${({ theme }) => theme.color.gallery};
-    cursor: not-allowed;
+    ${getButtonDisabledStyles};
+    pointer-events: none;
   }
 `;
 
 const Text = styled.div`
-  margin-left: ${({ withMargin }) => (withMargin ? '15px' : 0)};
+  margin-left: ${({ withMargin }) => (withMargin ? '16px' : 0)};
 `;
 
 const getButtonDisabledStatus = (withOfflineCheck, isOnline, disabled) =>
@@ -101,7 +122,6 @@ const ButtonComponent = forwardRef(
       children,
       disabled,
       withOfflineCheck = false,
-      isHoverBlackBackground,
       isOnline,
       isHigh,
       ...props
@@ -119,7 +139,6 @@ const ButtonComponent = forwardRef(
     return (
       <StyledButton
         ref={ref}
-        isHoverBlackBackground={isHoverBlackBackground}
         type={htmlType}
         color={color}
         onlyIcon={onlyIcon}

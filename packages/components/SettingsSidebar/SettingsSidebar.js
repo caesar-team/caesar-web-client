@@ -16,7 +16,6 @@ const Wrapper = styled.div`
 const StyledLink = styled(Link)`
   font-size: 18px;
   font-weight: ${({ isActive }) => (isActive ? 600 : 'normal')};
-  letter-spacing: 0.6px;
   margin-bottom: 25px;
   text-decoration: none;
 

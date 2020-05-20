@@ -12,7 +12,6 @@ const LabelText = styled.div`
   font-size: 14px;
   font-weight: 500;
   line-height: 1.5;
-  letter-spacing: 0.6px;
   color: ${({ theme }) => theme.color.black};
 `;
 
@@ -38,7 +37,6 @@ const TextAreaField = styled.textarea`
 const Error = styled.div`
   margin-top: 8px;
   font-size: 14px;
-  letter-spacing: 0.4px;
   color: ${({ theme }) => theme.color.red};
 `;
 

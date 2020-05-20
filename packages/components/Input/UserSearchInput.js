@@ -25,7 +25,6 @@ const InputStyled = styled(Input)`
   ${Input.InputField} {
     height: 48px;
     font-size: 16px;
-    letter-spacing: 0.5px;
     padding: 15px 20px 15px 50px;
     border: 1px solid ${({ theme }) => theme.color.gallery};
     background-color: ${({ theme }) => theme.color.white};
@@ -90,7 +89,6 @@ const SearchIcon = styled(Icon)`
 
 const SearchedUsersCount = styled.div`
   font-size: 12px;
-  letter-spacing: 0.34px;
   color: ${({ theme }) => theme.color.gray};
   margin-right: 20px;
 `;

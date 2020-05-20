@@ -14,7 +14,6 @@ const List = styled.div`
 const ListName = styled.div`
   font-size: 16px;
   font-weight: ${({ isActive }) => (isActive ? 600 : 400)};
-  letter-spacing: 0.5px;
   color: ${({ theme }) => theme.color.black};
 `;
 
@@ -28,7 +27,6 @@ const ListDetails = styled.div`
   justify-content: space-between;
   align-items: center;
   font-size: 16px;
-  letter-spacing: 0.5px;
   color: ${({ theme }) => theme.color.black};
   border-bottom: 1px solid ${({ theme }) => theme.color.gallery};
   max-height: 40px;
@@ -61,7 +59,6 @@ const ItemName = styled.div`
   padding: 10px 0;
   font-size: 16px;
   font-weight: ${({ isActive }) => (isActive ? 600 : 400)};
-  letter-spacing: 0.5px;
   color: ${({ theme }) => theme.color.black};
 `;
 

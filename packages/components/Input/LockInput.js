@@ -45,7 +45,7 @@ const StyledInput = styled(Input)`
   ${Input.InputField} {
     color: ${({ theme, isError }) =>
       isError ? theme.color.red : theme.color.white};
-    background-color: ${({ theme }) => theme.color.darkGray};
+    background-color: transparent;
     height: 58px;
     width: 100%;
     padding-right: 20px;

@@ -1,3 +1,4 @@
+import Router from 'next/router';
 import { put, call, takeLatest, select } from 'redux-saga/effects';
 import {
   FETCH_USER_SELF_REQUEST,
@@ -75,8 +76,7 @@ export function* logoutSaga() {
   try {
     yield call([localStorage, localStorage.clear]);
     yield call(removeCookieValue, 'token');
-    // eslint-disable-next-line
-    yield call(() => (window.location.href = '/logout'));
+    yield call(Router.push, '/logout');
   } catch (error) {
     console.log('error', error);
   }

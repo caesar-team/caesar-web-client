@@ -13,6 +13,7 @@ export const {
   LENGTH_KEY,
   AUTHORIZATION_ENABLE,
   APP_TYPE,
+  APP_VERSION,
 } = publicRuntimeConfig;
 
 export const PWA_WINDOW_SIZE = {

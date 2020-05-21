@@ -1,6 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
 import { media } from '@caesar/assets/styles/media';
+import { APP_VERSION } from '@caesar/common/constants';
 import LayoutConstructor from './LayoutConstructor';
 import { SecureHeader } from './SecureHeader';
 
@@ -41,18 +42,21 @@ const LayoutConstructorStyled = styled(LayoutConstructor)`
   }
 `;
 
-const Version = styled.div`
+const AppVersion = styled.div`
   z-index: 1;
-  font-size: 12px;
+  font-size: ${({ theme }) => theme.font.size.xs};
+  line-height: ${({ theme }) => theme.font.lineHeight.xs};
   color: ${({ theme }) => theme.color.gray};
 `;
 
-const SecureLayout = props => (
-  <LayoutConstructorStyled
-    headerComponent={<SecureHeader />}
-    footerComponent={<Version>v.1.0.1-112604c.0</Version>}
-    {...props}
-  />
-);
+const SecureLayout = props => {
+  return (
+    <LayoutConstructorStyled
+      headerComponent={<SecureHeader />}
+      footerComponent={<AppVersion>{APP_VERSION}</AppVersion>}
+      {...props}
+    />
+  );
+};
 
 export default SecureLayout;

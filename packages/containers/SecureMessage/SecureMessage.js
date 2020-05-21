@@ -38,25 +38,25 @@ const StyledLogo = styled(Icon)`
 const MessageWrapper = styled.div`
   display: flex;
   flex-direction: column;
-  background: ${({ theme }) => theme.color.darkGray};
-  padding: 0 20px;
-  max-width: 620px;
   width: 100%;
+  max-width: 620px;
+  padding: 0 24px;
+  background: ${({ theme }) => theme.color.darkGray};
 `;
 
-const Message = styled.div`
+const Message = styled.textarea`
+  padding: 24px 0;
+  width: 100%;
+  height: 191px;
+  resize: none;
+  font-size: inherit;
   color: ${({ theme }) => theme.color.white};
-  padding: 20px 0;
-  max-height: 400px;
-  height: 100%;
-  user-select: none;
+  background: transparent;
+  border: none;
+  outline: none;
 `;
 
-const Attachments = styled.div`
-  padding: 20px 0;
-  max-height: 400px;
-  height: 100%;
-`;
+const Attachments = styled.div``;
 
 const FileStyled = styled(File)`
   ${File.FileName} {
@@ -186,15 +186,15 @@ class SecureMessageContainer extends Component {
     return (
       <MessageWrapper>
         {shouldShowText && (
-          <Scrollbar autoHeight>
-            <Message
-              dangerouslySetInnerHTML={{ __html: decryptedMessage.text }}
-            />
+          <Scrollbar autoHeight autoHeightMax={191}>
+            <Message readOnly>{decryptedMessage.text}</Message>
           </Scrollbar>
         )}
         {shouldShowAttachments && (
           <Attachments>
-            <Scrollbar autoHeight>{renderedAttachments}</Scrollbar>
+            <Scrollbar autoHeight autoHeightMax={230}>
+              {renderedAttachments}
+            </Scrollbar>
           </Attachments>
         )}
       </MessageWrapper>

@@ -6,6 +6,7 @@ import { parseFile } from '@caesar/common/utils/importUtils';
 import {
   ITEM_CREDENTIALS_TYPE,
   ITEM_DOCUMENT_TYPE,
+  ROUTES,
 } from '@caesar/common/constants';
 import { NavigationPanel, LogoLoader } from '@caesar/components';
 import { DataStep, FieldsStep, FileStep, ImportingStep } from './Steps';
@@ -129,7 +130,7 @@ class Import extends Component {
   };
 
   handleClickToDashboard = () => {
-    this.props.router.push('/');
+    this.props.router.push(ROUTES.DASHBOARD);
   };
 
   handleCancelFlow = () => {

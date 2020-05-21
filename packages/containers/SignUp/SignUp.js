@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { withTheme } from 'styled-components';
 import Router, { withRouter } from 'next/router';
+import { ROUTES } from '@caesar/common/constants';
 import {
   AuthTitle,
   AuthDescription,
@@ -17,7 +18,7 @@ class SignUpContainer extends Component {
     try {
       await registration(email, password);
 
-      Router.push('/signin');
+      Router.push(ROUTES.SIGN_IN);
     } catch (e) {
       setErrors({
         email: 'Wrong email',

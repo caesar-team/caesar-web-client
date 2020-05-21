@@ -132,6 +132,7 @@ export const DOMAIN_ROLES = {
 export const ROUTES = {
   SIGN_IN: '/signin',
   SIGN_UP: '/signup',
+  LOGOUT: '/logout',
   RESETTING: '/resetting',
   MESSAGE: '/message',
   SECURE: '/secure',

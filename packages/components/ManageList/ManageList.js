@@ -2,7 +2,7 @@ import React, { Component, Fragment } from 'react';
 import styled from 'styled-components';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import Link from 'next/link';
-import { DEFAULT_LIST_TYPE } from '@caesar/common/constants';
+import { DEFAULT_LIST_TYPE, ROUTES } from '@caesar/common/constants';
 import { Button } from '../Button';
 import DottedMenu from '../DottedMenu/DottedMenu';
 import AvatarsList from '../Avatar/AvatarsList';
@@ -121,7 +121,7 @@ class ManageList extends Component {
             <TableCol align="left" width="33.33333%">
               <Link
                 href={{
-                  pathname: '/',
+                  pathname: ROUTES.DASHBOARD,
                   query: { listId: listItem.id },
                 }}
               >

@@ -19,6 +19,7 @@ import { currentTeamIdSelector } from '@caesar/common/selectors/user';
 import { convertTeamsToEntity } from '@caesar/common/normalizers/normalizers';
 import { getUserSelf, getKeys, getUserTeams } from '@caesar/common/api';
 import { removeCookieValue } from '@caesar/common/utils/token';
+import { ROUTES } from '@caesar/common/constants';
 
 export function* fetchUserSelfSaga() {
   try {
@@ -76,7 +77,7 @@ export function* logoutSaga() {
   try {
     yield call([localStorage, localStorage.clear]);
     yield call(removeCookieValue, 'token');
-    yield call(Router.push, '/logout');
+    yield call(Router.push, ROUTES.LOGOUT);
   } catch (error) {
     console.log('error', error);
   }

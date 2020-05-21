@@ -1,6 +1,7 @@
 import React, { memo, useState } from 'react';
 import { useSelector } from 'react-redux';
 import styled from 'styled-components';
+import { APP_VERSION } from '@caesar/common/constants';
 import { userDataSelector } from '@caesar/common/selectors/user';
 import { teamsByIdSelector } from '@caesar/common/selectors/entities/team';
 import { generateTeamTag } from '@caesar/common/utils/team';
@@ -45,6 +46,14 @@ const Menu = styled.div`
   display: flex;
   flex-direction: column;
   margin: 16px 30px 0 60px;
+`;
+
+const AppVersion = styled.div`
+  padding: 8px 0;
+  margin-top: auto;
+  font-size: ${({ theme }) => theme.font.size.xs};
+  line-height: ${({ theme }) => theme.font.lineHeight.xs};
+  color: ${({ theme }) => theme.color.gray};
 `;
 
 const SECURE_MESSAGE_MODE = 'SECURE_MESSAGE_MODE';
@@ -151,6 +160,7 @@ const MenuListComponent = ({
               </MenuItem>
             </MenuItemWrapper>
           </MenuSection>
+          <AppVersion>{APP_VERSION}</AppVersion>
         </Menu>
       </Scrollbar>
       {isDropdownOpened && <Overlay />}

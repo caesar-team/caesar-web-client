@@ -4,6 +4,7 @@
 [![Documentation](https://img.shields.io/badge/documentation-no-red.svg)](https://docs.caesar.team)
 [![License: PolyForm Internal Use](https://img.shields.io/badge/license-Polyform%20Internal%20Use-yellow)](https://polyformproject.org/licenses/internal-use/1.0.0/)
 [![Twitter: CaesarTeamApp](https://img.shields.io/twitter/follow/CaesarTeamApp.svg?style=social)](https://twitter.com/CaesarTeamApp)
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fcaesar-team%2Fcaesar-web-client.svg?type=shield)](https://app.fossa.com/projects/git%2Bgithub.com%2Fcaesar-team%2Fcaesar-web-client?ref=badge_shield)
 
 > Caesar is the open-source solution for safe work with sensitive data (passwords, passports, docs etc )
 
@@ -39,3 +40,6 @@ Feel free to check [issues page](https://github.com/caesar-team/caesar.team/issu
 Copyright © 2019 [ave@caesar.team](https://github.com/caesar-team).
 
 This project is [PolyForm Internal Use](https://polyformproject.org/licenses/internal-use/1.0.0/) licensed.
+
+
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fcaesar-team%2Fcaesar-web-client.svg?type=large)](https://app.fossa.com/projects/git%2Bgithub.com%2Fcaesar-team%2Fcaesar-web-client?ref=badge_large)

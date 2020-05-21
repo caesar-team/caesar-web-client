@@ -48,7 +48,7 @@ const BootstrapHeader = ({ user, ...props }) => (
         <UserName>{user.name}</UserName>
       </UserInfo>
       <Button color="white" onClick={props.logout}>
-        LOG OUT
+        Log out
       </Button>
     </UserSection>
   </Wrapper>

@@ -31,7 +31,7 @@ const Header = () => (
   <>
     <Icon name="logo-caesar-4xxi" width={106} height={30} />
     <Link href="/logout" onClick={() => Router.push('/logout')}>
-      Logout
+      Log out
     </Link>
   </>
 );

@@ -17,6 +17,7 @@ import { addMembersBatch } from '@caesar/common/actions/entities/member';
 import { currentTeamIdSelector } from '@caesar/common/selectors/user';
 import { convertTeamsToEntity } from '@caesar/common/normalizers/normalizers';
 import { getUserSelf, getKeys, getUserTeams } from '@caesar/common/api';
+import { removeCookieValue } from '@caesar/common/utils/token';
 
 export function* fetchUserSelfSaga() {
   try {
@@ -73,6 +74,7 @@ export function* fetchUserTeamsSaga() {
 export function* logoutSaga() {
   try {
     yield call([localStorage, localStorage.clear]);
+    yield call(removeCookieValue, 'token');
     // eslint-disable-next-line
     yield call(() => (window.location.href = '/logout'));
   } catch (error) {

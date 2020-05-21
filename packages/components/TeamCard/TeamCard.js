@@ -30,6 +30,7 @@ const TeamIcon = styled.img`
   object-fit: cover;
   width: 80px;
   height: 80px;
+  border-radius: 50%;
 `;
 
 const TeamInfo = styled.div`

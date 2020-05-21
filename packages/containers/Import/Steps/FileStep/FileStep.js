@@ -33,7 +33,6 @@ const FileStep = ({ onSubmit }) => (
           <Title>Upload your CSV file</Title>
           <Uploader
             name="file"
-            accept="text/csv"
             files={values.file}
             extText="*.csv file"
             error={errors.file ? errors.file.name || errors.file.raw : null}

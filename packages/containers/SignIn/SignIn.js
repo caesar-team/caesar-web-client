@@ -6,6 +6,7 @@ import {
   APP_URI,
   AUTH_ENDPOINT,
   REDIRECT_AUTH_ENDPOINT,
+  ROUTES,
 } from '@caesar/common/constants';
 import { isServer } from '@caesar/common/utils/isEnvironment';
 import {
@@ -86,7 +87,7 @@ class SignInContainer extends Component {
 
       setCookieValue('token', jwt);
 
-      Router.push('/');
+      Router.push(ROUTES.DASHBOARD);
     } catch (e) {
       setErrors({ email: 'Wrong email', password: 'Wrong password' });
       setSubmitting(false);

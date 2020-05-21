@@ -1,15 +1,15 @@
+import Router from 'next/router';
 import axios from 'axios';
 import { removeCookieValue } from './utils/token';
-import { API_URI, API_BASE_PATH, IS_EXTENSION_APP } from './constants';
+import { API_URI, API_BASE_PATH, IS_EXTENSION_APP, ROUTES } from './constants';
 import { isClient } from './utils/isEnvironment';
 
 const softExit = () => {
   if (isClient) {
     removeCookieValue('token');
 
-    // TODO: change via Router
-    if (window.location.pathname !== '/signin') {
-      window.location.href = '/signin';
+    if (Router.router.pathname !== ROUTES.SIGN_IN) {
+      Router.push(ROUTES.SIGN_IN);
     }
   }
 };

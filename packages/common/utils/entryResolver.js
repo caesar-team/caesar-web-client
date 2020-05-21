@@ -1,3 +1,4 @@
+import { ROUTES } from '@caesar/common/constants';
 import { redirectTo } from './routerUtils';
 import { getCookieValue } from './token';
 import { UNLOCKED_ROUTES } from '../constants';
@@ -10,7 +11,7 @@ export function entryResolver({ route, ctx: { req, res } }) {
       req && req.cookies ? req.cookies.token : getCookieValue('token');
 
     if (!token) {
-      redirectTo(res, '/signin', 302);
+      redirectTo(res, ROUTES.SIGN_IN, 302);
     }
   }
 }

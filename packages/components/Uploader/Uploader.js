@@ -87,6 +87,7 @@ const Uploader = ({
   files: previousFiles = [],
   notification,
   children,
+  className,
   ...props
 }) => {
   const { isWideMobile, isMobile } = useMedia();
@@ -123,7 +124,11 @@ const Uploader = ({
         children ? (
           children({ getRootProps, getInputProps, isDragActive })
         ) : (
-          <Container {...getRootProps()} isDragActive={isDragActive}>
+          <Container
+            {...getRootProps()}
+            isDragActive={isDragActive}
+            className={className}
+          >
             <input {...getInputProps()} />
             <Text>
               <StyledIcon

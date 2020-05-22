@@ -10,8 +10,13 @@ const LayoutConstructorStyled = styled(LayoutConstructor)`
 
   ${LayoutConstructor.TopWrapper} {
     justify-content: space-between;
-    padding: 8px 24px;
+    padding: 16px 24px;
     border-bottom: 1px solid ${({ theme }) => theme.color.gallery};
+
+    ${media.desktop`
+      padding-top: 8px;
+      padding-bottom: 8px;
+    `}
 
     ${media.mobile`
       padding-right: 16px;

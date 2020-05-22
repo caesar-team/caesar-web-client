@@ -45,7 +45,7 @@ const publicRuntimeConfig = {
   TOTAL_MAX_UPLOADING_FILES_SIZES:
     process.env.TOTAL_MAX_UPLOADING_FILES_SIZES || '5M',
   LENGTH_KEY: process.env.LENGTH_KEY || 2048,
-  AUTHORIZATION_ENABLE: process.env.AUTHORIZATION_ENABLE === 'false',
+  AUTHORIZATION_ENABLE: process.env.AUTHORIZATION_ENABLE !== 'false',
   APP_TYPE: process.env.APP_TYPE || 'general',
   APP_VERSION: process.env.APP_VERSION,
 };

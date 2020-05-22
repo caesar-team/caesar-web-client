@@ -5,7 +5,6 @@ import { media } from '@caesar/assets/styles/media';
 import {
   Checkbox,
   TextArea,
-  // Uploader,
   PasswordInput,
   File,
   Button,

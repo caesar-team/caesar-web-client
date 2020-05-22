@@ -16,7 +16,7 @@ const Text = styled.div`
 const Link = styled.div`
   position: relative;
   padding: 16px;
-  margin-bottom: 20px;
+  margin-bottom: 24px;
   background-color: ${({ theme }) => theme.color.white};
   border: 1px solid ${({ theme }) => theme.color.gallery};
   border-radius: 4px;
@@ -27,6 +27,7 @@ const Link = styled.div`
 const ButtonsWrapper = styled.div`
   display: flex;
   justify-content: space-between;
+  align-items: center;
 
   ${media.wideMobile`
     display: grid;
@@ -39,8 +40,22 @@ const ButtonsWrapper = styled.div`
   `}
 `;
 
+const CopyAllButton = styled(Button)`
+  margin-right: 24px;
+
+  ${media.wideMobile`
+    margin-right: 0;
+  `}
+`;
+
 const CreateNewButton = styled(Button)`
   grid-area: 2 / 1 / 3 / 3;
+  margin-left: auto;
+  font-weight: 600;
+
+  ${media.wideMobile`
+    margin-left: 0;
+  `}
 
   ${media.mobile`
     grid-area: auto;
@@ -57,10 +72,10 @@ const getLinkText = (
   link,
   password,
 ) => `Please, follow the link and enter the password
-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+- - - - - - - - - - - - - - - - - - - - - - - - - -
 URL: <strong>${APP_URI}/message/${link}</strong>
 Password: <strong>${password}</strong>
-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+- - - - - - - - - - - - - - - - - - - - - - - - - -
 Securely created with ${APP_URI}`;
 
 const SecureMessageLink = ({
@@ -85,7 +100,8 @@ const SecureMessageLink = ({
         <ReadOnlyContentEditable html={getLinkText(link, password)} />
       </Link>
       <ButtonsWrapper>
-        <Button
+        <CopyAllButton
+          icon="copy"
           onClick={() =>
             handleClickCopy(
               getLinkText(link, password),
@@ -94,8 +110,10 @@ const SecureMessageLink = ({
           }
         >
           Copy All
-        </Button>
+        </CopyAllButton>
         <Button
+          icon="link"
+          color="white"
           onClick={() =>
             handleClickCopy(
               `${APP_URI}/message/${link}`,
@@ -103,9 +121,9 @@ const SecureMessageLink = ({
             )
           }
         >
-          Copy The Link
+          Copy Link
         </Button>
-        <CreateNewButton onClick={onClickReturn}>
+        <CreateNewButton color="transparent" onClick={onClickReturn}>
           Create New Secure Message
         </CreateNewButton>
       </ButtonsWrapper>

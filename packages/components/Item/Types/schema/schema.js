@@ -31,7 +31,17 @@ export const attachmentsSchema = yup
   .array(
     yup.object({
       name: yup.string().required(),
-      raw: yup.string().test('fileSize', 'File is too large.', checkFileSize),
+      raw: yup
+        .string()
+        .test(
+          'fileSize',
+          `Maximum file size is ${MAX_UPLOADING_FILE_SIZE}`,
+          checkFileSize,
+        ),
     }),
   )
-  .test('fileSizes', 'Files are too large.', checkAllFileSizes);
+  .test(
+    'fileSizes',
+    `All attachments cannot be over ${TOTAL_MAX_UPLOADING_FILES_SIZES}`,
+    checkAllFileSizes,
+  );

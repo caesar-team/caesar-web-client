@@ -89,7 +89,7 @@ const SecureMessageLink = ({
           onClick={() =>
             handleClickCopy(
               getLinkText(link, password),
-              'The link and password have copied!',
+              'The link and the password have been copied!',
             )
           }
         >
@@ -99,7 +99,7 @@ const SecureMessageLink = ({
           onClick={() =>
             handleClickCopy(
               `${APP_URI}/message/${link}`,
-              'The link have copied!',
+              'The link has been copied!',
             )
           }
         >

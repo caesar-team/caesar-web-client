@@ -88,7 +88,7 @@ const Uploader = ({
   children,
   ...props
 }) => {
-  const { isMobile } = useMedia();
+  const { isWideMobile, isMobile } = useMedia();
 
   const handleDrop = async acceptedFiles => {
     const previews = await filesToBase64(acceptedFiles);
@@ -132,7 +132,7 @@ const Uploader = ({
                 isDragActive={isDragActive}
               />
               <Link>Upload File</Link>
-              {!isMobile && ' or drag and drop your file here'}
+              {!isWideMobile && !isMobile && ' or drag and drop your file here'}
             </Text>
             <HintText>{hintText}</HintText>
             {error && <Error>{error}</Error>}

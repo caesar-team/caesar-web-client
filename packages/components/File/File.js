@@ -85,7 +85,7 @@ const UploadedWrapper = styled.div`
   display: flex;
   padding: 8px;
   border-radius: 4px;
-  transition: background-color 0.2s;
+  transition: color, background-color 0.2s;
 
   &:hover {
     background-color: ${({ theme }) => theme.color.snow};

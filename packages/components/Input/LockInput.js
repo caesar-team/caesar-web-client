@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import styled from 'styled-components';
 import { KEY_CODES } from '@caesar/common/constants';
+import { media } from '@caesar/assets/styles/media';
 import Input from './Input';
 import { Icon } from '../Icon';
 
@@ -16,6 +17,10 @@ const InnerWrapper = styled.div`
   border-radius: 3px;
   background-color: ${({ theme }) => theme.color.darkGray};
   min-width: 400px;
+
+  ${media.mobile`
+    min-width: 320px;
+  `}
 `;
 
 const IconWrapper = styled.div`
@@ -69,7 +74,7 @@ class LockInput extends Component {
       <Wrapper>
         <InnerWrapper isError={isError}>
           <IconWrapper isError={isError}>
-            <StyledIcon name="lock" width={20} height={24} isError={isError} />
+            <StyledIcon name="lock" width={24} height={24} isError={isError} />
           </IconWrapper>
           <StyledInput
             {...props}

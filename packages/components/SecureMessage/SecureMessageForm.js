@@ -109,7 +109,7 @@ const FileRow = styled.div``;
 
 const SelectRow = styled.div`
   position: relative;
-  z-index: 1;
+  z-index: 2;
   display: flex;
   width: 100%;
   margin-top: 22px;
@@ -259,7 +259,7 @@ const SecureMessageForm = ({ onSubmit, notification, isOnline }) => {
             <Column>
               <Label>Data expires in</Label>
               <StyledSelect
-                boxOffset={60}
+                boxOffset={39}
                 name="secondsLimit"
                 placeholder="Select option"
                 value={values.secondsLimit}
@@ -270,7 +270,7 @@ const SecureMessageForm = ({ onSubmit, notification, isOnline }) => {
             <ColumnStyled>
               <Label>{isMobile ? 'Attempts' : 'Number of Attempts'}</Label>
               <StyledSelect
-                boxOffset={60}
+                boxOffset={39}
                 name="requestsLimit"
                 placeholder="Select option"
                 value={values.requestsLimit}

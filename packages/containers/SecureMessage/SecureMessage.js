@@ -27,8 +27,8 @@ const Wrapper = styled.div`
 const Title = styled.div`
   font-size: 18px;
   color: ${({ theme }) => theme.color.lightGray};
-  margin-bottom: 30px;
-  margin-top: 60px;
+  margin-bottom: 23px;
+  margin-top: 50px;
 `;
 
 const StyledLogo = styled(Icon)`
@@ -40,30 +40,32 @@ const MessageWrapper = styled.div`
   flex-direction: column;
   width: 100%;
   max-width: 620px;
-  padding: 0 24px;
+  padding: 24px;
   background: ${({ theme }) => theme.color.darkGray};
 `;
 
-const Message = styled.textarea`
-  padding: 24px 0;
+const Message = styled.div`
   width: 100%;
-  height: 191px;
-  resize: none;
+  height: 100%;
+  max-height: 183px;
   font-size: inherit;
   color: ${({ theme }) => theme.color.white};
   background: transparent;
-  border: none;
-  outline: none;
+  user-select: text;
 `;
 
-const Attachments = styled.div``;
+const Attachments = styled.div`
+  ${({ withText }) => withText && 'margin-top: 24px;'}
+`;
 
 const FileStyled = styled(File)`
   ${File.FileName} {
     color: ${({ theme }) => theme.color.white};
+  }
 
-    &:hover {
-      color: ${({ theme }) => theme.color.white};
+  &:hover {
+    ${File.FileName} {
+      color: ${({ theme }) => theme.color.black};
     }
   }
 
@@ -148,21 +150,27 @@ class SecureMessageContainer extends Component {
         onSubmit={this.handleSubmitPassword}
         validateOnChange={false}
       >
-        {({ errors, handleSubmit, submitForm, resetForm }) => (
-          <form onSubmit={handleSubmit}>
-            <FastField name="password">
-              {({ field }) => (
-                <LockInput
-                  {...field}
-                  autoFocus
-                  onClick={submitForm}
-                  onBackspace={resetForm}
-                  isError={Object.keys(errors).length !== 0}
-                />
-              )}
-            </FastField>
-          </form>
-        )}
+        {({ values, errors, handleSubmit, submitForm, resetForm }) => {
+          // TODO: Remove consoles when we debug it
+          console.log('values: ', values);
+          console.log('errors: ', errors);
+
+          return (
+            <form onSubmit={handleSubmit}>
+              <FastField name="password">
+                {({ field }) => (
+                  <LockInput
+                    {...field}
+                    autoFocus
+                    onClick={submitForm}
+                    onBackspace={resetForm}
+                    isError={Object.keys(errors).length !== 0}
+                  />
+                )}
+              </FastField>
+            </form>
+          );
+        }}
       </Formik>
     );
   }
@@ -183,16 +191,23 @@ class SecureMessageContainer extends Component {
       ),
     );
 
+    const text = String.raw`${decryptedMessage.text}`;
+    const result = `${text.replace(/\n/g, '<br/>')}`;
+
     return (
       <MessageWrapper>
         {shouldShowText && (
-          <Scrollbar autoHeight autoHeightMax={191}>
-            <Message readOnly>{decryptedMessage.text}</Message>
+          <Scrollbar autoHeight autoHeightMax={183}>
+            <Message
+              dangerouslySetInnerHTML={{
+                __html: result,
+              }}
+            />
           </Scrollbar>
         )}
         {shouldShowAttachments && (
-          <Attachments>
-            <Scrollbar autoHeight autoHeightMax={230}>
+          <Attachments withText={shouldShowText}>
+            <Scrollbar autoHeight autoHeightMax={235}>
               {renderedAttachments}
             </Scrollbar>
           </Attachments>

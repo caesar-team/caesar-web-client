@@ -19,6 +19,7 @@ const getButtonStyles = ({ color, theme }) => {
       padding: 0;
       color: ${theme.color.black};
       text-transform: none;
+      background-color: transparent;
     `,
   };
 

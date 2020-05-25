@@ -1,6 +1,8 @@
 import React from 'react';
+import { useHover } from 'react-use';
 import styled from 'styled-components';
-import DownloadIcon from '@caesar/assets/icons/svg/icon-download-white.svg';
+import DownloadIconSvg from '@caesar/assets/icons/svg/icon-download-white.svg';
+import CloseIconSvg from '@caesar/assets/icons/svg/icon-close-white.svg';
 import { Icon } from '../Icon';
 
 const FileExt = styled.div`
@@ -95,8 +97,9 @@ const UploadedWrapper = styled.div`
       background: ${({ theme }) => theme.color.black};
       color: ${({ theme }) => theme.color.white};
       font-size: 0;
-      background: url(${DownloadIcon}) no-repeat center
-        ${({ theme }) => theme.color.black};
+      background: url(${({ isHoveringCloseIcon }) =>
+          isHoveringCloseIcon ? CloseIconSvg : DownloadIconSvg})
+        no-repeat center ${({ theme }) => theme.color.black};
 
       &:before {
         background: ${({ theme }) => theme.color.black};
@@ -135,6 +138,14 @@ const File = ({
   const filename = name.replace(/\.[^/.]+$/, '');
   const size = formatBytes(Math.round((raw.length * 3) / 4));
 
+  const closeIconComponent = (
+    <CloseIcon name="close" width={12} height={12} onClick={onClickRemove} />
+  );
+
+  const [hoverableCloseIcon, isHoveringCloseIcon] = useHover(
+    closeIconComponent,
+  );
+
   if (status === ERROR_STATUS) {
     return (
       <ErrorWrapper>
@@ -143,31 +154,19 @@ const File = ({
           <FileName>{filename}</FileName>
           <FileSize>{size}</FileSize>
         </Details>
-        <CloseIcon
-          name="close"
-          width={12}
-          height={12}
-          onClick={onClickRemove}
-        />
+        {onClickRemove && hoverableCloseIcon}
       </ErrorWrapper>
     );
   }
 
   return (
-    <UploadedWrapper {...props}>
+    <UploadedWrapper isHoveringCloseIcon={isHoveringCloseIcon} {...props}>
       <FileExt onClick={onClickDownload}>{ext}</FileExt>
       <Details>
         <FileName>{filename}</FileName>
         <FileSize>{size}</FileSize>
       </Details>
-      {onClickRemove && (
-        <CloseIcon
-          name="close"
-          width={12}
-          height={12}
-          onClick={onClickRemove}
-        />
-      )}
+      {onClickRemove && hoverableCloseIcon}
     </UploadedWrapper>
   );
 };

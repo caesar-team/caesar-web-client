@@ -12,6 +12,7 @@ import {
 import { FastField, Formik } from 'formik';
 import { decryptByPassword } from '@caesar/common/utils/cipherUtils';
 import { downloadAsZip, downloadFile } from '@caesar/common/utils/file';
+import { media } from '@caesar/assets/styles/media';
 import { schema } from './schema';
 
 const Wrapper = styled.div`
@@ -88,11 +89,28 @@ const FileStyled = styled(File)`
 const ButtonsWrapper = styled.div`
   display: flex;
   justify-content: center;
-  margin-top: 30px;
+  padding: 0 24px;
+  margin-top: 24px;
+
+  ${media.mobile`
+    flex-direction: column;
+    width: 100%;
+  `}
 `;
 
 const ButtonStyled = styled(Button)`
-  margin-left: 20px;
+  ${media.mobile`
+    width: 100%;
+  `}
+
+  &:not(:first-child) {
+    margin-left: 24px;
+
+    ${media.mobile`
+    margin-left: 0;
+    margin-top: 24px;
+  `}
+  }
 `;
 
 class SecureMessageContainer extends Component {

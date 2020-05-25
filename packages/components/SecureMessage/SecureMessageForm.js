@@ -79,8 +79,6 @@ const TextAreaStyled = styled(TextArea)`
 `;
 
 const Error = styled.div`
-  margin-right: 8px;
-  margin-left: 8px;
   font-size: 14px;
   color: ${({ theme }) => theme.color.red};
 `;
@@ -112,17 +110,17 @@ const StyledUploader = styled(Uploader)`
 
 const Attachments = styled.div`
   display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr);
   grid-gap: 24px;
   padding-top: 8px;
 
   ${media.wideMobile`
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
     grid-gap: 16px;
   `}
 
   ${media.mobile`
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
     grid-gap: 8px;
   `}
 `;

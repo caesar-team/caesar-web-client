@@ -5,7 +5,6 @@ import { media } from '@caesar/assets/styles/media';
 import {
   Checkbox,
   TextArea,
-  Uploader,
   PasswordInput,
   File,
   Button,
@@ -15,6 +14,7 @@ import {
 import { Select } from '@caesar/components/Select';
 import { checkError } from '@caesar/common/utils/formikUtils';
 import { useMedia } from '@caesar/common/hooks';
+import { Uploader } from '../Uploader';
 import {
   initialValues,
   requestsLimitOptions,
@@ -31,11 +31,15 @@ const Row = styled.div`
   z-index: 1;
   display: flex;
   flex-direction: column;
-  margin-bottom: 16px;
+  margin-bottom: 40px;
 
   &:last-child {
     margin-bottom: 0;
   }
+
+  ${media.desktop`
+    margin-bottom: 16px;
+  `}
 
   ${media.mobile`
     margin-bottom: 8px;
@@ -53,9 +57,14 @@ const ColumnStyled = styled(Column)`
 `;
 
 const Label = styled.div`
-  margin-bottom: 8px;
-  font-size: 14px;
+  margin-bottom: 16px;
+  font-size: 16px;
   color: ${({ theme }) => theme.color.gray};
+
+  ${media.desktop`
+    margin-bottom: 8px;
+    font-size: 14px;
+  `}
 `;
 
 const InputStyled = styled(PasswordInput)`
@@ -79,12 +88,25 @@ const Error = styled.div`
 const AttachmentsSection = styled.div`
   display: flex;
   flex-direction: column;
-  margin-top: 16px;
-  margin-bottom: 16px;
+  margin-top: 40px;
+  margin-bottom: 40px;
+
+  ${media.desktop`
+    margin-top: 16px;
+    margin-bottom: 16px;
+  `}
 
   ${media.mobile`
     margin-top: 8px;
     margin-bottom: 8px;
+  `}
+`;
+
+const StyledUploader = styled(Uploader)`
+  padding: 24px 5px;
+
+  ${media.desktop`
+    padding: 16px 5px;
   `}
 `;
 
@@ -112,8 +134,13 @@ const SelectRow = styled.div`
   z-index: 2;
   display: flex;
   width: 100%;
-  margin-top: 22px;
-  margin-bottom: 24px;
+  margin-top: 38px;
+  margin-bottom: 40px;
+
+  ${media.desktop`
+    margin-top: 22px;
+    margin-bottom: 24px;
+  `}
 
   ${media.wideMobile`
     margin-top: 14px;
@@ -136,7 +163,11 @@ const StyledSelect = styled(Select)`
 
 const ButtonWrapper = styled.div`
   position: relative;
-  margin: 24px 0;
+  margin: 40px 0;
+
+  ${media.desktop`
+    margin: 24px 0;
+  `}
 
   ${media.wideMobile`
     margin: 16px 0;
@@ -239,7 +270,7 @@ const SecureMessageForm = ({ onSubmit, notification, isOnline }) => {
             )}
           </Row>
           <AttachmentsSection>
-            <Uploader
+            <StyledUploader
               multiple
               asPreview
               name="attachments"

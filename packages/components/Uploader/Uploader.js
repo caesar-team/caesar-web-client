@@ -3,6 +3,7 @@ import styled from 'styled-components';
 import Dropzone from 'react-dropzone';
 import { filesToBase64 } from '@caesar/common/utils/file';
 import { useMedia } from '@caesar/common/hooks';
+import { TOTAL_MAX_UPLOADING_FILES_SIZES } from '@caesar/common/constants';
 import { Icon } from '../Icon';
 
 const Container = styled.div`
@@ -81,11 +82,12 @@ const Uploader = ({
   multiple = false,
   accept,
   onChange,
-  hintText = 'Not more than 25 MB',
+  hintText = `Not more than ${TOTAL_MAX_UPLOADING_FILES_SIZES}`,
   error,
   files: previousFiles = [],
   notification,
   children,
+  className,
   ...props
 }) => {
   const { isWideMobile, isMobile } = useMedia();
@@ -122,7 +124,11 @@ const Uploader = ({
         children ? (
           children({ getRootProps, getInputProps, isDragActive })
         ) : (
-          <Container {...getRootProps()} isDragActive={isDragActive}>
+          <Container
+            {...getRootProps()}
+            isDragActive={isDragActive}
+            className={className}
+          >
             <input {...getInputProps()} />
             <Text>
               <StyledIcon

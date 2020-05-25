@@ -21,6 +21,8 @@ export const schema = yup.object({
   title: yup.string().required(),
   icon: yup.object({
     name: yup.string().required(),
-    raw: yup.string().test('fileSize', 'File is too large.', checkFileSize),
+    raw: yup
+      .string()
+      .test('fileSize', `Maximum file size is ${MAX_SIZE}`, checkFileSize),
   }),
 });

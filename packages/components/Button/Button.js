@@ -14,6 +14,12 @@ const getButtonStyles = ({ color, theme }) => {
       color: ${theme.color.emperor};
       border: 1px solid ${theme.color.gallery};
     `,
+    transparent: `
+      height: 22px;
+      padding: 0;
+      color: ${theme.color.black};
+      text-transform: none;
+    `,
   };
 
   return colorsMap[color];
@@ -27,6 +33,10 @@ const getButtonHoverStyles = ({ color, theme }) => {
     white: `
       color: ${theme.color.black};
       border: 1px solid ${theme.color.black};
+    `,
+    transparent: `
+      color: ${theme.color.gray};
+      text-transform: none;
     `,
   };
 
@@ -42,6 +52,10 @@ const getButtonPressedStyles = ({ color, theme }) => {
       color: ${theme.color.emperor};
       border: 1px solid ${theme.color.gray};
     `,
+    transparent: `
+      color: ${theme.color.emperor};
+      text-transform: none;
+    `,
   };
 
   return colorsMap[color];
@@ -55,6 +69,10 @@ const getButtonDisabledStyles = ({ color, theme }) => {
     white: `
       color: ${theme.color.gallery};
       border: 1px solid ${theme.color.gallery};
+    `,
+    transparent: `
+      color: ${theme.color.lightGray};
+      text-transform: none;
     `,
   };
 

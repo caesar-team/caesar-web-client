@@ -8,6 +8,7 @@ const FileExt = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
+  flex: 0 0 40px;
   width: 40px;
   height: 40px;
   font-size: 14px;
@@ -24,7 +25,7 @@ const FileExt = styled.div`
     right: 0;
     display: block;
     width: 0;
-    background: ${({ theme }) => theme.color.alto};
+    background: ${({ theme }) => theme.color.gray};
     border-style: solid;
     border-width: 4px;
     border-color: ${({ theme }) =>

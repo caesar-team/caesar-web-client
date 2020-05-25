@@ -17,8 +17,12 @@ const Wrapper = styled.div`
   display: flex;
   flex-direction: column;
   width: 100%;
-  padding: 22px 0;
   min-height: calc(100vh - 150px);
+  padding: 38px 0;
+
+  ${media.desktop`
+    padding: 22px 0;
+  `}
 
   ${media.mobile`
     padding: 16px 0;
@@ -36,6 +40,8 @@ class SecureMessage extends Component {
   ) => {
     try {
       const pwd = password || generator();
+      // TODO: Delete this console
+      console.log('pwd: ', pwd);
 
       const encryptedMessage = await encryptByPassword(secret, pwd);
 

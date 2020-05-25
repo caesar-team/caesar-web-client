@@ -110,6 +110,8 @@ class SecureMessageContainer extends Component {
         decryptedMessage,
       });
     } catch (error) {
+      // TODO: Delete this console
+      console.log('error: ', error);
       setErrors({
         password: 'Sorry, but the password is wrong :(',
       });
@@ -150,27 +152,21 @@ class SecureMessageContainer extends Component {
         onSubmit={this.handleSubmitPassword}
         validateOnChange={false}
       >
-        {({ values, errors, handleSubmit, submitForm, resetForm }) => {
-          // TODO: Remove consoles when we debug it
-          console.log('values: ', values);
-          console.log('errors: ', errors);
-
-          return (
-            <form onSubmit={handleSubmit}>
-              <FastField name="password">
-                {({ field }) => (
-                  <LockInput
-                    {...field}
-                    autoFocus
-                    onClick={submitForm}
-                    onBackspace={resetForm}
-                    isError={Object.keys(errors).length !== 0}
-                  />
-                )}
-              </FastField>
-            </form>
-          );
-        }}
+        {({ errors, handleSubmit, submitForm, resetForm }) => (
+          <form onSubmit={handleSubmit}>
+            <FastField name="password">
+              {({ field }) => (
+                <LockInput
+                  {...field}
+                  autoFocus
+                  onClick={submitForm}
+                  onBackspace={resetForm}
+                  isError={Object.keys(errors).length !== 0}
+                />
+              )}
+            </FastField>
+          </form>
+        )}
       </Formik>
     );
   }

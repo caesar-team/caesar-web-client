@@ -39,6 +39,7 @@ const ColumnHeader = styled.div`
 const ColumnTitle = styled.div`
   font-size: 16px;
   font-weight: bold;
+  text-transform: capitalize;
   color: ${({ theme }) => theme.color.black};
 `;
 

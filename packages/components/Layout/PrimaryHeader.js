@@ -3,6 +3,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import equal from 'fast-deep-equal';
 import styled from 'styled-components';
 import Link from 'next/link';
+import { useNavigatorOnline } from '@caesar/common/hooks';
 import { setCurrentTeamId, logout } from '@caesar/common/actions/user';
 import {
   currentTeamSelector,
@@ -21,7 +22,6 @@ import { Button } from '../Button';
 import { TeamModal } from '../TeamModal';
 import { Can } from '../Ability';
 import { Logo } from './Logo';
-import { withOfflineDetection } from '../Offline';
 
 const Wrapper = styled.header`
   display: flex;
@@ -137,7 +137,6 @@ const renderAddItemOptions = (value, label) => (
 const PrimaryHeaderComponent = ({
   user,
   searchedText,
-  isOnline,
   onSearch,
   onClickReset,
   workInProgressList,
@@ -146,6 +145,7 @@ const PrimaryHeaderComponent = ({
   const dispatch = useDispatch();
   const teamList = useSelector(userTeamListSelector);
   const team = useSelector(currentTeamSelector);
+  const isOnline = useNavigatorOnline();
   const [isDropdownOpened, setIsDropdownOpened] = useState(false);
   const [isModalOpened, setIsModalOpened] = useState(false);
   const userName = (user && (user.name || user.email)) || '';
@@ -261,8 +261,7 @@ const PrimaryHeaderComponent = ({
   );
 };
 
-export const PrimaryHeader = withOfflineDetection(
-  memo(PrimaryHeaderComponent, (prevProps, nextProps) =>
-    equal(prevProps, nextProps),
-  ),
+export const PrimaryHeader = memo(
+  PrimaryHeaderComponent,
+  (prevProps, nextProps) => equal(prevProps, nextProps),
 );

@@ -513,6 +513,8 @@ class DashboardContainer extends Component {
           searchedText={searchedText}
           onSearch={this.handleSearch}
           onClickReset={this.handleClickResetSearch}
+          workInProgressList={workInProgressList}
+          onClickCreateItem={this.handleClickCreateItem}
         >
           <CenterWrapper>
             <Sidebar>
@@ -557,7 +559,6 @@ class DashboardContainer extends Component {
                       workInProgressItemIds={workInProgressItemIds}
                       items={visibleListItems}
                       onClickItem={this.handleClickItem}
-                      onClickCreateItem={this.handleClickCreateItem}
                     />
                   ) : (
                     <SearchList

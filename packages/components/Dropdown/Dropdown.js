@@ -49,6 +49,11 @@ const Option = styled.button`
   border: none;
   background: none;
   cursor: pointer;
+  transition: background-color 0.2s;
+
+  &:hover {
+    background-color: ${({ theme }) => theme.color.snow};
+  }
 `;
 
 const Button = styled.button`
@@ -61,6 +66,7 @@ const Button = styled.button`
 
 const DropdownComponent = ({
   withTriangleAtTop,
+  ButtonElement,
   name,
   renderOverlay = Function.prototype,
   options,
@@ -114,9 +120,13 @@ const DropdownComponent = ({
 
   return (
     <Wrapper ref={dropdownRef}>
-      <Button type="button" className={className} onClick={handleToggle}>
-        {children}
-      </Button>
+      {ButtonElement ? (
+        <ButtonElement handleToggle={handleToggle} />
+      ) : (
+        <Button type="button" className={className} onClick={handleToggle}>
+          {children}
+        </Button>
+      )}
       {isOpened && (
         <Box withTriangleAtTop={withTriangleAtTop}>
           <OptionsList>{renderedOptions}</OptionsList>

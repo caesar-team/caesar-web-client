@@ -1,6 +1,8 @@
 import React from 'react';
+import { useHover } from 'react-use';
 import styled from 'styled-components';
-import DownloadIcon from '@caesar/assets/icons/svg/icon-download-white.svg';
+import DownloadIconSvg from '@caesar/assets/icons/svg/icon-download-white.svg';
+import CloseIconSvg from '@caesar/assets/icons/svg/icon-close-white.svg';
 import { Icon } from '../Icon';
 
 const FileExt = styled.div`
@@ -15,7 +17,6 @@ const FileExt = styled.div`
   color: ${({ theme }) => theme.color.white};
   background-color: ${({ theme }) => theme.color.black};
   border-radius: 3px 0 3px 3px;
-  cursor: pointer;
   transition: all 0.2s;
 
   &:before {
@@ -93,21 +94,26 @@ const UploadedWrapper = styled.div`
   display: flex;
   padding: 8px 28px 8px 8px;
   border-radius: 4px;
+  cursor: pointer;
   transition: color, background-color 0.2s;
 
   &:hover {
     background-color: ${({ theme }) => theme.color.snow};
 
     ${FileExt} {
-      background: ${({ theme }) => theme.color.black};
-      color: ${({ theme }) => theme.color.white};
-      font-size: 0;
-      background: url(${DownloadIcon}) no-repeat center
-        ${({ theme }) => theme.color.black};
+      ${({ isHoveringCloseIcon, theme }) =>
+        !isHoveringCloseIcon &&
+        `
+          background: ${theme.color.black};
+          color: ${theme.color.white};
+          font-size: 0;
+          background: url(${DownloadIconSvg})
+            no-repeat center ${theme.color.black};
 
-      &:before {
-        background: ${({ theme }) => theme.color.black};
-      }
+          &:before {
+            background: ${theme.color.black};
+          }
+        `}
     }
 
     ${CloseIcon} {
@@ -142,6 +148,24 @@ const File = ({
   const filename = name.replace(/\.[^/.]+$/, '');
   const size = formatBytes(Math.round((raw.length * 3) / 4));
 
+  const handleClickCloseIcon = e => {
+    e.stopPropagation();
+    onClickRemove();
+  };
+
+  const closeIconComponent = (
+    <CloseIcon
+      name="close"
+      width={12}
+      height={12}
+      onClick={handleClickCloseIcon}
+    />
+  );
+
+  const [hoverableCloseIcon, isHoveringCloseIcon] = useHover(
+    closeIconComponent,
+  );
+
   if (status === ERROR_STATUS) {
     return (
       <ErrorWrapper>
@@ -150,31 +174,23 @@ const File = ({
           <FileName>{filename}</FileName>
           <FileSize>{size}</FileSize>
         </Details>
-        <CloseIcon
-          name="close"
-          width={12}
-          height={12}
-          onClick={onClickRemove}
-        />
+        {onClickRemove && hoverableCloseIcon}
       </ErrorWrapper>
     );
   }
 
   return (
-    <UploadedWrapper {...props}>
-      <FileExt onClick={onClickDownload}>{ext}</FileExt>
+    <UploadedWrapper
+      isHoveringCloseIcon={isHoveringCloseIcon}
+      onClick={onClickDownload}
+      {...props}
+    >
+      <FileExt>{ext}</FileExt>
       <Details>
         <FileName>{filename}</FileName>
         <FileSize>{size}</FileSize>
       </Details>
-      {onClickRemove && (
-        <CloseIcon
-          name="close"
-          width={12}
-          height={12}
-          onClick={onClickRemove}
-        />
-      )}
+      {onClickRemove && hoverableCloseIcon}
     </UploadedWrapper>
   );
 };

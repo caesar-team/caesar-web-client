@@ -13,6 +13,7 @@ import {
 } from '@caesar/components';
 import { Select } from '@caesar/components/Select';
 import { checkError } from '@caesar/common/utils/formikUtils';
+import { downloadFile } from '@caesar/common/utils/file';
 import { useMedia } from '@caesar/common/hooks';
 import { Uploader } from '../Uploader';
 import {
@@ -189,6 +190,12 @@ const ButtonImg = styled.img`
   transform: translate(-110px, -70px);
 `;
 
+const handleClickDownloadFile = attachment => {
+  const { raw, name } = attachment;
+
+  downloadFile(raw, name);
+};
+
 const checkAttachmentsError = (errors, index) =>
   errors[index] && errors[index].raw;
 
@@ -198,6 +205,7 @@ const renderAttachments = (attachments = [], errors = [], setFieldValue) =>
       <File
         key={index}
         status={checkAttachmentsError(errors, index) ? 'error' : 'uploaded'}
+        onClickDownload={() => handleClickDownloadFile(attachment)}
         onClickRemove={() =>
           setFieldValue(
             'attachments',

@@ -3,24 +3,16 @@ import { useSelector, useDispatch } from 'react-redux';
 import equal from 'fast-deep-equal';
 import styled from 'styled-components';
 import Link from 'next/link';
-import { useNavigatorOnline } from '@caesar/common/hooks';
 import { setCurrentTeamId, logout } from '@caesar/common/actions/user';
 import {
   currentTeamSelector,
   userTeamListSelector,
 } from '@caesar/common/selectors/user';
-import {
-  ITEM_TYPES,
-  ITEM_ICON_TYPES,
-  CREATE_PERMISSION,
-  ITEM_ENTITY_TYPE,
-} from '@caesar/common/constants';
 import { Icon } from '../Icon';
 import { Dropdown } from '../Dropdown';
 import { SearchInput } from '../Input';
-import { Button } from '../Button';
 import { TeamModal } from '../TeamModal';
-import { Can } from '../Ability';
+import { AddItem } from '../AddItem';
 import { Logo } from './Logo';
 
 const Wrapper = styled.header`
@@ -45,7 +37,7 @@ const RightWrapper = styled.div`
   padding: 0 24px;
 `;
 
-const AddItemButton = styled(Button)`
+const AddItemButton = styled(AddItem)`
   margin-right: 10px;
 `;
 
@@ -63,15 +55,17 @@ const UserName = styled.div`
 `;
 
 const StyledDropdown = styled(Dropdown)`
-  display: flex;
-  color: ${({ theme }) => theme.color.black};
-  flex-direction: row;
-  align-items: center;
-  cursor: pointer;
-  transition: all 0.2s;
+  ${Dropdown.Button} {
+    display: flex;
+    color: ${({ theme }) => theme.color.black};
+    flex-direction: row;
+    align-items: center;
+    cursor: pointer;
+    transition: all 0.2s;
 
-  &:hover {
-    color: ${({ theme }) => theme.color.emperor};
+    &:hover {
+      color: ${({ theme }) => theme.color.emperor};
+    }
   }
 `;
 
@@ -99,41 +93,6 @@ const ArrowIcon = styled(Icon)`
   transition: transform 0.2s;
 `;
 
-const PlusIcon = styled(Icon)`
-  margin-right: 15px;
-`;
-
-const AddItemOption = styled.button`
-  display: flex;
-  width: 100%;
-  align-items: center;
-  font-size: 16px;
-  padding: 10px 30px;
-  border: none;
-  background: none;
-  cursor: pointer;
-  white-space: nowrap;
-  transition: background-color 0.2s;
-
-  &:hover {
-    background-color: ${({ theme }) => theme.color.snow};
-  }
-`;
-
-const { ITEM_CREDENTIALS_TYPE, ITEM_DOCUMENT_TYPE } = ITEM_TYPES;
-
-const itemTypesOptions = [
-  { label: 'Password', value: ITEM_CREDENTIALS_TYPE },
-  { label: 'Secure note', value: ITEM_DOCUMENT_TYPE },
-];
-
-const renderAddItemOptions = (value, label) => (
-  <AddItemOption key={value}>
-    <PlusIcon name={ITEM_ICON_TYPES[value]} width={16} height={16} />
-    {label}
-  </AddItemOption>
-);
-
 const PrimaryHeaderComponent = ({
   user,
   searchedText,
@@ -145,7 +104,6 @@ const PrimaryHeaderComponent = ({
   const dispatch = useDispatch();
   const teamList = useSelector(userTeamListSelector);
   const team = useSelector(currentTeamSelector);
-  const isOnline = useNavigatorOnline();
   const [isDropdownOpened, setIsDropdownOpened] = useState(false);
   const [isModalOpened, setIsModalOpened] = useState(false);
   const userName = (user && (user.name || user.email)) || '';
@@ -170,13 +128,6 @@ const PrimaryHeaderComponent = ({
     }
 
     handleCloseModal();
-  };
-
-  const itemSubject = {
-    __type: ITEM_ENTITY_TYPE,
-    listType: workInProgressList.type,
-    teamId: workInProgressList.teamId,
-    userRole: workInProgressList.userRole,
   };
 
   const Options = (
@@ -211,24 +162,10 @@ const PrimaryHeaderComponent = ({
               onChange={onSearch}
               onClickReset={onClickReset}
             />
-            <Can I={CREATE_PERMISSION} of={itemSubject}>
-              <Dropdown
-                options={itemTypesOptions}
-                onClick={onClickCreateItem}
-                optionRender={renderAddItemOptions}
-                withTriangleAtTop
-                ButtonElement={({ handleToggle }) => (
-                  <AddItemButton
-                    withOfflineCheck
-                    isOnline={isOnline}
-                    icon="plus"
-                    onClick={handleToggle}
-                  >
-                    Add item
-                  </AddItemButton>
-                )}
-              />
-            </Can>
+            <AddItemButton
+              workInProgressList={workInProgressList}
+              onClickCreateItem={onClickCreateItem}
+            />
             <UserSection>
               <StyledDropdown
                 renderOverlay={() => Options}

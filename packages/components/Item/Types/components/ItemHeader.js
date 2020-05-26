@@ -130,10 +130,12 @@ const ArrowIcon = styled(IconStyled)`
 `;
 
 const DropdownStyled = styled(Dropdown)`
-  display: flex;
-  align-items: center;
-  width: 100%;
-  cursor: pointer;
+  ${Dropdown.Button} {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    cursor: pointer;
+  }
 `;
 
 const DropdownValue = styled.div`

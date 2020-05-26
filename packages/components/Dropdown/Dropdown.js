@@ -119,11 +119,11 @@ const DropdownComponent = ({
   });
 
   return (
-    <Wrapper ref={dropdownRef}>
+    <Wrapper ref={dropdownRef} className={className}>
       {ButtonElement ? (
         <ButtonElement handleToggle={handleToggle} />
       ) : (
-        <Button type="button" className={className} onClick={handleToggle}>
+        <Button type="button" onClick={handleToggle}>
           {children}
         </Button>
       )}
@@ -137,5 +137,8 @@ const DropdownComponent = ({
 };
 
 const Dropdown = memo(DropdownComponent);
+
+Dropdown.Button = Button;
 Dropdown.Box = Box;
+
 export { Dropdown };

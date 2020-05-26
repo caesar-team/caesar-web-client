@@ -102,7 +102,9 @@ const FavoriteButton = styled.button`
 `;
 
 const StyledDropdown = styled(Dropdown)`
-  width: 100%;
+  ${Dropdown.Button} {
+    width: 100%;
+  }
 `;
 
 const MoveTo = styled.a`

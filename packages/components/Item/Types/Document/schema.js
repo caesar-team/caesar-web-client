@@ -1,9 +1,9 @@
 import * as yup from 'yup';
-import { errorMessages } from '@caesar/common/utils/errorMessages';
-import { attachmentsSchema } from '../schema/schema';
+import { ERROR } from '@caesar/common/validation/constants';
+import { attachmentsSchema } from '@caesar/common/validation/schema';
 
 export const schema = yup.object({
-  name: yup.string().required(errorMessages.required),
+  name: yup.string().required(ERROR.REQUIRED),
   note: yup.string(),
   attachments: attachmentsSchema,
 });

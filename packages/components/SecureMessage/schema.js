@@ -1,12 +1,6 @@
 import * as yup from 'yup';
-import { errorMessages } from '@caesar/common/utils/errorMessages';
-
-export const attachmentsSchema = yup.array(
-  yup.object({
-    name: yup.string().required(),
-    raw: yup.string(),
-  }),
-);
+import { ERROR } from '@caesar/common/validation/constants';
+import { attachmentsSchema } from '@caesar/common/validation/schema';
 
 export const schema = yup.object({
   text: yup
@@ -14,7 +8,7 @@ export const schema = yup.object({
     .when('attachments', (attachments, textSchema) =>
       attachments && attachments.length
         ? textSchema
-        : textSchema.required(errorMessages.required),
+        : textSchema.required(ERROR.REQUIRED),
     ),
   password: yup.string(),
   requestsLimit: yup.number().required(),

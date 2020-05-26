@@ -38,10 +38,11 @@ const ErrorStatus = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
-  border: 3px solid ${({ theme }) => theme.color.red};
-  border-radius: 50%;
+  flex: 0 0 40px;
   width: 40px;
   height: 40px;
+  border: 3px solid ${({ theme }) => theme.color.red};
+  border-radius: 50%;
 
   &:after {
     content: '!';
@@ -54,6 +55,7 @@ const Details = styled.div`
   display: flex;
   flex-direction: column;
   margin-left: 16px;
+  overflow: hidden;
 `;
 
 const FileName = styled.div`
@@ -61,6 +63,9 @@ const FileName = styled.div`
   line-height: 18px;
   color: ${({ theme }) => theme.color.black};
   margin-bottom: 5px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 `;
 
 const FileSize = styled.div`
@@ -70,7 +75,9 @@ const FileSize = styled.div`
 `;
 
 const ErrorWrapper = styled.div`
+  position: relative;
   display: flex;
+  padding-right: 28px;
 `;
 
 const CloseIcon = styled(Icon)`
@@ -84,7 +91,7 @@ const CloseIcon = styled(Icon)`
 const UploadedWrapper = styled.div`
   position: relative;
   display: flex;
-  padding: 8px;
+  padding: 8px 28px 8px 8px;
   border-radius: 4px;
   transition: color, background-color 0.2s;
 

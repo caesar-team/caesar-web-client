@@ -21,7 +21,9 @@ const Wrapper = styled.div`
   justify-content: center;
   align-items: center;
   width: 100vw;
-  height: 100vh;
+  height: 100%;
+  min-height: 100vh;
+  padding: 24px 16px;
   background-color: ${({ theme }) => theme.color.emperor};
 `;
 

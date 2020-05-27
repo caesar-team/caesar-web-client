@@ -7,11 +7,11 @@ export const BASE_64_LENGTH_BYTE_RATE = 3 / 4;
 export const SIZE_NAME_RATE_MAP = {
   B: 1,
   KB: 1024,
-  M: 1024 * 1024,
+  MB: 1024 * 1024,
 };
 
 export const convertSizeNameToNumber = sizeName =>
-  sizeName.replace(/(\d+)(B|KB|M)/, (match, size, type) =>
+  sizeName.replace(/(\d+)(B|KB|MB)/, (match, size, type) =>
     size && type ? Number(size) * SIZE_NAME_RATE_MAP[type] : 0,
   );
 

@@ -105,10 +105,6 @@ const Error = styled.div`
   color: ${({ theme }) => theme.color.red};
 `;
 
-const ErrorStyled = styled(Error)`
-  margin: 20px 0;
-`;
-
 const createInitialValues = (data, listId, type) => ({
   ...data,
   listId,
@@ -203,15 +199,14 @@ const DocumentForm = ({
             <Uploader
               name="attachments"
               files={values.attachments}
-              error={errors.attachments}
+              error={
+                typeof errors?.attachments === 'string'
+                  ? errors.attachments
+                  : ''
+              }
               multiple
               onChange={setFieldValue}
             />
-            {errors &&
-              errors.attachments &&
-              typeof errors.attachments === 'string' && (
-                <ErrorStyled>{errors.attachments}</ErrorStyled>
-              )}
             <Attachments>
               {renderAttachments(
                 values.attachments,

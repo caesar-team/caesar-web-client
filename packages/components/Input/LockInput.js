@@ -19,7 +19,7 @@ const InnerWrapper = styled.div`
   min-width: 400px;
 
   ${media.mobile`
-    min-width: 320px;
+    min-width: 288px;
   `}
 `;
 

@@ -41,7 +41,7 @@ class SecureMessage extends Component {
     try {
       const pwd = password || generator();
       // TODO: Delete this console
-      console.log('pwd: ', pwd);
+      // console.log('pwd: ', pwd);
 
       const encryptedMessage = await encryptByPassword(secret, pwd);
 

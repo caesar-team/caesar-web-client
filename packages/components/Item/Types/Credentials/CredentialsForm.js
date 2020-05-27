@@ -117,10 +117,6 @@ const Error = styled.div`
   color: ${({ theme }) => theme.color.red};
 `;
 
-const ErrorStyled = styled(Error)`
-  margin: 20px 0;
-`;
-
 const createInitialValues = (data, listId, type) => ({
   ...data,
   listId,
@@ -257,14 +253,13 @@ const CredentialsForm = ({
               notification={notification}
               name="attachments"
               files={values.attachments}
-              error={errors.attachments}
+              error={
+                typeof errors?.attachments === 'string'
+                  ? errors.attachments
+                  : ''
+              }
               onChange={setFieldValue}
             />
-            {errors &&
-              errors.attachments &&
-              typeof errors.attachments === 'string' && (
-                <ErrorStyled>{errors.attachments}</ErrorStyled>
-              )}
             <Attachments>
               {renderAttachments(
                 values.attachments,

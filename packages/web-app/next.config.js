@@ -43,7 +43,7 @@ const publicRuntimeConfig = {
   REDIRECT_AUTH_ENDPOINT: process.env.REDIRECT_AUTH_ENDPOINT || 'check_auth',
   MAX_UPLOADING_FILE_SIZE: process.env.MAX_UPLOADING_FILE_SIZE || '256KB',
   TOTAL_MAX_UPLOADING_FILES_SIZES:
-    process.env.TOTAL_MAX_UPLOADING_FILES_SIZES || '5M',
+    process.env.TOTAL_MAX_UPLOADING_FILES_SIZES || '5MB',
   LENGTH_KEY: process.env.LENGTH_KEY || 2048,
   AUTHORIZATION_ENABLE: process.env.AUTHORIZATION_ENABLE !== 'false',
   APP_TYPE: process.env.APP_TYPE || 'general',

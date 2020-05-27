@@ -281,7 +281,11 @@ const SecureMessageForm = ({ onSubmit, notification, isOnline }) => {
               asPreview
               name="attachments"
               files={values.attachments}
-              error={errors.attachments}
+              error={
+                typeof errors?.attachments === 'string'
+                  ? errors.attachments
+                  : ''
+              }
               notification={notification}
               onChange={setFieldValue}
             />

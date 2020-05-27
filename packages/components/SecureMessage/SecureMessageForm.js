@@ -281,6 +281,7 @@ const SecureMessageForm = ({ onSubmit, notification, isOnline }) => {
               asPreview
               name="attachments"
               files={values.attachments}
+              error={errors.attachments}
               notification={notification}
               onChange={setFieldValue}
             />

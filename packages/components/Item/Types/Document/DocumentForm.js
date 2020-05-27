@@ -203,6 +203,7 @@ const DocumentForm = ({
             <Uploader
               name="attachments"
               files={values.attachments}
+              error={errors.attachments}
               multiple
               onChange={setFieldValue}
             />

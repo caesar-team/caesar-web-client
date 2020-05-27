@@ -257,6 +257,7 @@ const CredentialsForm = ({
               notification={notification}
               name="attachments"
               files={values.attachments}
+              error={errors.attachments}
               onChange={setFieldValue}
             />
             {errors &&

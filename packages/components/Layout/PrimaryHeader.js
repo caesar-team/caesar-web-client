@@ -1,5 +1,6 @@
 import React, { memo, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
+import equal from 'fast-deep-equal';
 import styled from 'styled-components';
 import Link from 'next/link';
 import { setCurrentTeamId, logout } from '@caesar/common/actions/user';
@@ -10,8 +11,8 @@ import {
 import { Icon } from '../Icon';
 import { Dropdown } from '../Dropdown';
 import { SearchInput } from '../Input';
-import { Button } from '../Button';
 import { TeamModal } from '../TeamModal';
+import { AddItem } from '../AddItem';
 import { Logo } from './Logo';
 
 const Wrapper = styled.header`
@@ -36,7 +37,7 @@ const RightWrapper = styled.div`
   padding: 0 24px;
 `;
 
-const AddItemButton = styled(Button)`
+const AddItemButton = styled(AddItem)`
   margin-right: 10px;
 `;
 
@@ -54,15 +55,17 @@ const UserName = styled.div`
 `;
 
 const StyledDropdown = styled(Dropdown)`
-  display: flex;
-  color: ${({ theme }) => theme.color.black};
-  flex-direction: row;
-  align-items: center;
-  cursor: pointer;
-  transition: all 0.2s;
+  ${Dropdown.Button} {
+    display: flex;
+    color: ${({ theme }) => theme.color.black};
+    flex-direction: row;
+    align-items: center;
+    cursor: pointer;
+    transition: all 0.2s;
 
-  &:hover {
-    color: ${({ theme }) => theme.color.emperor};
+    &:hover {
+      color: ${({ theme }) => theme.color.emperor};
+    }
   }
 `;
 
@@ -70,21 +73,21 @@ const Option = styled.div`
   padding: 10px 30px;
   font-size: 16px;
   color: ${({ theme }) => theme.color.black};
-`;
-
-const Anchor = styled.a`
-  color: ${({ theme }) => theme.color.black};
-  white-space: nowrap;
-  text-decoration: none;
   cursor: pointer;
-  transition: color 0.2s;
+  transition: background-color 0.2s;
 
   &:hover {
-    color: ${({ theme }) => theme.color.gray};
+    background-color: ${({ theme }) => theme.color.snow};
   }
 `;
 
-const StyledIcon = styled(Icon)`
+const Anchor = styled.a`
+  color: inherit;
+  white-space: nowrap;
+  text-decoration: none;
+`;
+
+const ArrowIcon = styled(Icon)`
   transform: ${({ isDropdownOpened }) =>
     isDropdownOpened ? 'scaleY(-1)' : 'scaleY(1)'};
   transition: transform 0.2s;
@@ -95,6 +98,8 @@ const PrimaryHeaderComponent = ({
   searchedText,
   onSearch,
   onClickReset,
+  workInProgressList,
+  onClickCreateItem = Function.prototype,
 }) => {
   const dispatch = useDispatch();
   const teamList = useSelector(userTeamListSelector);
@@ -157,8 +162,10 @@ const PrimaryHeaderComponent = ({
               onChange={onSearch}
               onClickReset={onClickReset}
             />
-            {/* TODO: Add functional */}
-            <AddItemButton icon="plus">Add item</AddItemButton>
+            <AddItemButton
+              workInProgressList={workInProgressList}
+              onClickCreateItem={onClickCreateItem}
+            />
             <UserSection>
               <StyledDropdown
                 renderOverlay={() => Options}
@@ -166,7 +173,7 @@ const PrimaryHeaderComponent = ({
                 withTriangleAtTop
               >
                 <UserName>{userName}</UserName>
-                <StyledIcon
+                <ArrowIcon
                   name="arrow-triangle"
                   width={10}
                   height={16}
@@ -191,4 +198,7 @@ const PrimaryHeaderComponent = ({
   );
 };
 
-export const PrimaryHeader = memo(PrimaryHeaderComponent);
+export const PrimaryHeader = memo(
+  PrimaryHeaderComponent,
+  (prevProps, nextProps) => equal(prevProps, nextProps),
+);

@@ -21,29 +21,6 @@ const Wrapper = styled.div`
   height: calc(100vh - 111px);
 `;
 
-const ItemFooter = styled.div`
-  display: flex;
-  justify-content: flex-end;
-  align-items: center;
-  margin-top: auto;
-  padding: 24px 0;
-`;
-
-const BuiltBy = styled.span`
-  margin-right: 16px;
-  font-size: 14px;
-  font-weight: 500;
-  color: ${({ theme }) => theme.color.gray};
-`;
-
-const Link4XXI = styled.a`
-  color: inherit;
-
-  &:hover {
-    text-decoration: none;
-  }
-`;
-
 const ColumnHeader = styled.div`
   display: flex;
   justify-content: space-between;
@@ -238,15 +215,6 @@ const Item = ({
       <Scrollbar>
         <Wrapper>
           {mode === ITEM_REVIEW_MODE ? renderedItem : renderedItemForm}
-          <ItemFooter>
-            <BuiltBy>
-              Built by{' '}
-              <Link4XXI href="https://4xxi.com/en" target="_blank">
-                4xxi team
-              </Link4XXI>
-            </BuiltBy>
-            <Icon name="logo-4xxi" color="gray" width={20} height={20} />
-          </ItemFooter>
         </Wrapper>
       </Scrollbar>
     </>

@@ -15,6 +15,8 @@ const DashboardLayout = ({
   searchedText,
   onSearch,
   onClickReset,
+  workInProgressList,
+  onClickCreateItem,
   children,
   ...props
 }) => (
@@ -26,6 +28,8 @@ const DashboardLayout = ({
         searchedText={searchedText}
         onSearch={onSearch}
         onClickReset={onClickReset}
+        workInProgressList={workInProgressList}
+        onClickCreateItem={onClickCreateItem}
       />
     }
     {...props}

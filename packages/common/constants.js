@@ -179,7 +179,7 @@ export const ENCRYPTING_ITEM_NOTIFICATION = 'Encryption in progress...';
 export const CREATING_ITEM_NOTIFICATION = 'The item is being created...';
 export const SHARING_IN_PROGRESS_NOTIFICATION = 'Sharing in progress...';
 export const CREATING_ITEMS_NOTIFICATION =
-  'Import in progress. The items are being created..';
+  'Import in progress. The items are being created...';
 export const MOVING_IN_PROGRESS_NOTIFICATION = 'Moving in progress...';
 export const REMOVING_IN_PROGRESS_NOTIFICATION = 'Removing in progress...';
 export const NOOP_NOTIFICATION = '';

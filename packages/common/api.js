@@ -26,7 +26,13 @@ callApi.interceptors.response.use(
     if (error.response) {
       switch (error.response.status) {
         case 401:
-          if (!IS_EXTENSION_APP) softExit();
+          if (
+            !IS_EXTENSION_APP &&
+            error.response.config.url !== '/auth/2fa' &&
+            error.response.config.url !== '/auth/2fa/activate'
+          ) {
+            softExit();
+          }
           break;
         default:
           // console.log(error.response.data);

@@ -1,6 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
-import { Formik, FastField } from 'formik';
+import { useFormik } from 'formik';
 import {
   AuthTitle,
   AuthDescription,
@@ -85,65 +85,74 @@ const NextButton = styled(Button)`
   margin-top: 60px;
 `;
 
-const TwoFactorCheckForm = ({ onSubmit }) => (
-  <Wrapper>
-    <AuthTitle>Two Factor Authentication</AuthTitle>
-    <AuthDescription>Enter the code</AuthDescription>
-    <TipWrapper>
-      <ImageWrapper>
-        <MobileImage src={MobileImg} />
-      </ImageWrapper>
-      <ApplicationDescription>
-        Please open{' '}
-        <ApplicationLink target="_blank" href={AUTHY_LINK}>
-          Authy
-        </ApplicationLink>{' '}
-        or{' '}
-        <ApplicationLink target="_blank" href={GOOGLE_AUTHENTICATOR_LINK}>
-          Google Authenticator
-        </ApplicationLink>{' '}
-        app on your phone device and enter the code in the field below.
-      </ApplicationDescription>
-    </TipWrapper>
-    <TextWithLines>Enter the 6-digit code from the app</TextWithLines>
-    <Formik
-      key="codeForm"
-      initialValues={initialValues}
-      validationSchema={codeSchema}
-      onSubmit={onSubmit}
-    >
-      {({ errors, handleSubmit, isSubmitting, setFieldValue, values }) => (
-        <Form onSubmit={handleSubmit}>
-          <FastField name="code">
-            {() => (
-              <CodeInput
-                onChange={value => setFieldValue('code', value, true)}
-                length={CODE_LENGTH}
-                focus
-                disabled={isSubmitting}
-                errors={errors}
-              />
-            )}
-          </FastField>
-          <CheckboxWrapper>
-            <FastField name="fpCheck">
-              {({ field }) => (
-                <Checkbox {...field} checked={field.value}>
-                  Remember device
-                </Checkbox>
-              )}
-            </FastField>
-          </CheckboxWrapper>
-          <NextButton
-            htmlType="submit"
-            disabled={isSubmitting || values.code.length !== CODE_LENGTH}
-          >
-            Continue
-          </NextButton>
-        </Form>
-      )}
-    </Formik>
-  </Wrapper>
-);
+export const TwoFactorCheckForm = ({ onSubmit }) => {
+  const {
+    touched,
+    values,
+    errors,
+    setFieldValue,
+    setFieldTouched,
+    handleSubmit,
+    isSubmitting,
+  } = useFormik({
+    initialValues,
+    validationSchema: codeSchema,
+    onSubmit,
+  });
 
-export default TwoFactorCheckForm;
+  const handleChangeCheckbox = value => {
+    if (!touched.rememberDevice) {
+      setFieldTouched('rememberDevice');
+    }
+
+    setFieldValue('rememberDevice', value);
+  };
+
+  return (
+    <Wrapper>
+      <AuthTitle>Two Factor Authentication</AuthTitle>
+      <AuthDescription>Enter the code</AuthDescription>
+      <TipWrapper>
+        <ImageWrapper>
+          <MobileImage src={MobileImg} />
+        </ImageWrapper>
+        <ApplicationDescription>
+          Please open{' '}
+          <ApplicationLink target="_blank" href={AUTHY_LINK}>
+            Authy
+          </ApplicationLink>{' '}
+          or{' '}
+          <ApplicationLink target="_blank" href={GOOGLE_AUTHENTICATOR_LINK}>
+            Google Authenticator
+          </ApplicationLink>{' '}
+          app on your phone device and enter the code in the field below.
+        </ApplicationDescription>
+      </TipWrapper>
+      <TextWithLines>Enter the 6-digit code from the app</TextWithLines>
+
+      <Form onSubmit={handleSubmit}>
+        <CodeInput
+          onChange={value => setFieldValue('code', value, true)}
+          length={CODE_LENGTH}
+          focus
+          disabled={isSubmitting}
+          errors={errors}
+        />
+        <CheckboxWrapper>
+          <Checkbox
+            name="rememberDevice"
+            onChange={e => handleChangeCheckbox(e.target.checked)}
+          >
+            Remember device
+          </Checkbox>
+        </CheckboxWrapper>
+        <NextButton
+          htmlType="submit"
+          disabled={isSubmitting || values?.code?.length !== CODE_LENGTH}
+        >
+          Continue
+        </NextButton>
+      </Form>
+    </Wrapper>
+  );
+};

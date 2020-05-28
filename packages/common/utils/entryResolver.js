@@ -3,6 +3,7 @@ import { redirectTo } from './routerUtils';
 import { getCookieValue } from './token';
 import { UNLOCKED_ROUTES } from '../constants';
 
+// TODO: Need to fix this. It calls eternal loop
 export function entryResolver({ route, ctx: { req, res } }) {
   const needToken = !UNLOCKED_ROUTES.includes(route);
 

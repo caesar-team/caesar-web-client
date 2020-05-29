@@ -72,6 +72,7 @@ const NewTeamModal = ({ onSubmit, onCancel = Function.prototype }) => {
         <Label>Group name</Label>
         <FormInput
           name="title"
+          values={values.title}
           autoFocus
           withBorder
           error={checkError(touched, errors, 'title')}

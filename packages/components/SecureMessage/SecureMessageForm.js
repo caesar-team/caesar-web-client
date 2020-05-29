@@ -80,6 +80,8 @@ const TextAreaStyled = styled(TextArea)`
 `;
 
 const Error = styled.div`
+  position: relative;
+  z-index: 1;
   font-size: 14px;
   color: ${({ theme }) => theme.color.red};
 `;
@@ -162,6 +164,8 @@ const StyledSelect = styled(Select)`
 
 const ButtonWrapper = styled.div`
   position: relative;
+  display: flex;
+  align-items: center;
   margin: 40px 0;
 
   ${media.desktop`
@@ -340,6 +344,12 @@ const SecureMessageFormComponent = ({ onSubmit, notification, isOnline }) => {
           )}
         </Row>
       )}
+      {errors?.form && (
+        <>
+          <Error>Oops… Something went wrong</Error>
+          <Error>Please, click again on Create secure message</Error>
+        </>
+      )}
       <ButtonWrapper>
         <ButtonImg
           srcSet="/images/secure-bg-btn@2x.png 2x, /images/secure-bg-btn@3x.png 3x"
@@ -347,7 +357,9 @@ const SecureMessageFormComponent = ({ onSubmit, notification, isOnline }) => {
         />
         <StyledButton
           htmlType="submit"
-          disabled={isSubmitting || !(isValid && dirty) || !isOnline}
+          disabled={
+            isSubmitting || (!isValid && !errors?.form && !dirty) || !isOnline
+          }
         >
           Create Secure Message
         </StyledButton>

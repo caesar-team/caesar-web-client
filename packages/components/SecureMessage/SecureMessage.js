@@ -2,7 +2,10 @@ import React, { useState, Fragment } from 'react';
 import styled from 'styled-components';
 import { media } from '@caesar/assets/styles/media';
 import { match } from '@caesar/common/utils/match';
-import { encryptByPassword } from '@caesar/common/utils/cipherUtils';
+import {
+  encryptByPassword,
+  decryptByPassword,
+} from '@caesar/common/utils/cipherUtils';
 import { generator } from '@caesar/common/utils/password';
 import { postSecureMessage } from '@caesar/common/api';
 import { ENCRYPTING_ITEM_NOTIFICATION } from '@caesar/common/constants';
@@ -43,8 +46,10 @@ const SecureMessageComponent = ({
 
   const handleSubmitForm = async (
     { secondsLimit, requestsLimit, password: passwordValue, ...secret },
-    { setSubmitting },
+    { setSubmitting, setFieldError },
   ) => {
+    setFieldError('form', '');
+
     try {
       notification.show({
         text: ENCRYPTING_ITEM_NOTIFICATION,
@@ -52,6 +57,7 @@ const SecureMessageComponent = ({
       const pwd = passwordValue || generator();
 
       const encryptedMessage = await encryptByPassword(secret, pwd);
+      await decryptByPassword(encryptedMessage, pwd);
 
       const {
         data: { id },
@@ -68,6 +74,7 @@ const SecureMessageComponent = ({
       });
     } catch (error) {
       console.log(error);
+      setFieldError('form', error.message);
     } finally {
       setSubmitting(false);
       notification.hide();

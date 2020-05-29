@@ -5,9 +5,10 @@ import { match } from '@caesar/common/utils/match';
 import { encryptByPassword } from '@caesar/common/utils/cipherUtils';
 import { generator } from '@caesar/common/utils/password';
 import { postSecureMessage } from '@caesar/common/api';
-import { Scrollbar } from '@caesar/components';
-import SecureMessageForm from './SecureMessageForm';
-import SecureMessageLink from './SecureMessageLink';
+import { ENCRYPTING_ITEM_NOTIFICATION } from '@caesar/common/constants';
+import { Scrollbar, withNotification } from '@caesar/components';
+import { SecureMessageForm } from './SecureMessageForm';
+import { SecureMessageLink } from './SecureMessageLink';
 import {
   SECURE_MESSAGE_FORM_STEP,
   SECURE_MESSAGE_LINK_STEP,
@@ -29,7 +30,7 @@ const Wrapper = styled.div`
   `}
 `;
 
-class SecureMessage extends Component {
+class SecureMessageComponent extends Component {
   state = {
     step: SECURE_MESSAGE_FORM_STEP,
   };
@@ -38,10 +39,13 @@ class SecureMessage extends Component {
     { secondsLimit, requestsLimit, password, ...secret },
     { setSubmitting },
   ) => {
+    const { notification } = this.props;
+
     try {
+      notification.show({
+        text: ENCRYPTING_ITEM_NOTIFICATION,
+      });
       const pwd = password || generator();
-      // TODO: Delete this console
-      // console.log('pwd: ', pwd);
 
       const encryptedMessage = await encryptByPassword(secret, pwd);
 
@@ -62,6 +66,7 @@ class SecureMessage extends Component {
       console.log(error);
     } finally {
       setSubmitting(false);
+      notification.hide();
     }
   };
 
@@ -104,4 +109,4 @@ class SecureMessage extends Component {
   }
 }
 
-export default SecureMessage;
+export const SecureMessage = withNotification(SecureMessageComponent);

@@ -130,7 +130,6 @@ class SecureMessageContainer extends Component {
         decryptedMessage,
       });
     } catch (error) {
-      // TODO: Delete this console
       console.log('error: ', error);
       setErrors({
         password: 'Sorry, but the password is wrong :(',

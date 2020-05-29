@@ -78,7 +78,7 @@ Password: <strong>${password}</strong>
 - - - - - - - - - - - - - - - - - - - - - - - - - -
 Securely created with ${APP_URI}`;
 
-const SecureMessageLink = ({
+const SecureMessageLinkComponent = ({
   notification,
   link = '',
   password = '',
@@ -131,4 +131,4 @@ const SecureMessageLink = ({
   );
 };
 
-export default withNotification(SecureMessageLink);
+export const SecureMessageLink = withNotification(SecureMessageLinkComponent);

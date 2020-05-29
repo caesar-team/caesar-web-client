@@ -1,7 +1,7 @@
 # Welcome to Caesar.Team 👋
 ![Version](https://img.shields.io/badge/version-1.4.1-blue.svg?cacheSeconds=2592000)
 ![Prerequisite](https://img.shields.io/badge/node-%3E%3D10-blue.svg)
-[![Documentation](https://img.shields.io/badge/documentation-no-red.svg)](https://docs.caesar.team)
+[![Documentation](https://img.shields.io/badge/documentation-yes-green.svg)](https://docs.caesar.team)
 [![License: PolyForm Internal Use](https://img.shields.io/badge/license-Polyform%20Internal%20Use-yellow)](https://polyformproject.org/licenses/internal-use/1.0.0/)
 [![Twitter: CaesarTeamApp](https://img.shields.io/twitter/follow/CaesarTeamApp.svg?style=social)](https://twitter.com/CaesarTeamApp)
 

@@ -1,1 +1,1 @@
-export { default as SecureMessageContainer } from './SecureMessage';
+export { SecureMessageContainer } from './SecureMessage';

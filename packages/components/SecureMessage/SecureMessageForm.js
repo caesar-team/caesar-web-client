@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
-import { Formik, FastField } from 'formik';
+import { useFormik } from 'formik';
 import { media } from '@caesar/assets/styles/media';
 import {
   Checkbox,
@@ -80,6 +80,8 @@ const TextAreaStyled = styled(TextArea)`
 `;
 
 const Error = styled.div`
+  position: relative;
+  z-index: 1;
   font-size: 14px;
   color: ${({ theme }) => theme.color.red};
 `;
@@ -162,6 +164,8 @@ const StyledSelect = styled(Select)`
 
 const ButtonWrapper = styled.div`
   position: relative;
+  display: flex;
+  align-items: center;
   margin: 40px 0;
 
   ${media.desktop`
@@ -220,147 +224,150 @@ const renderAttachments = (attachments = [], errors = [], setFieldValue) =>
     </FileRow>
   ));
 
-const SecureMessageForm = ({ onSubmit, notification, isOnline }) => {
+const SecureMessageFormComponent = ({ onSubmit, notification, isOnline }) => {
   const { isMobile } = useMedia();
   const [isCustomPassword, setIsCustomPassword] = useState(false);
 
-  const handleChange = () => {
+  const handleChangeCustomPassword = () => {
     setIsCustomPassword(!isCustomPassword);
   };
 
+  const {
+    values,
+    errors,
+    touched,
+    setFieldValue,
+    handleBlur,
+    handleChange,
+    handleSubmit,
+    isSubmitting,
+    isValid,
+    dirty,
+  } = useFormik({
+    initialValues,
+    onSubmit,
+    validationSchema: schema,
+  });
+
   return (
-    <Formik
-      key="secureMessageForm"
-      initialValues={initialValues}
-      onSubmit={onSubmit}
-      validationSchema={schema}
-    >
-      {({
-        values,
-        errors,
-        touched,
-        handleSubmit,
-        setFieldValue,
-        setFieldTouched,
-        isSubmitting,
-        isValid,
-        dirty,
-      }) => (
-        <Form onSubmit={handleSubmit}>
-          <Row>
-            {isMobile ? (
-              <FastField name="text">
-                {({ field }) => (
-                  <TextAreaStyled
-                    {...field}
-                    placeholder="Text or image to encrypt and expire"
-                    onBlur={setFieldTouched}
-                    error={checkError(touched, errors, 'text')}
-                  />
-                )}
-              </FastField>
-            ) : (
-              <>
-                <Label>Text or image to encrypt and expire</Label>
-                <FastField name="text">
-                  {({ field }) => (
-                    <TextAreaStyled
-                      {...field}
-                      placeholder="Divide et Impera"
-                      onBlur={setFieldTouched}
-                      error={checkError(touched, errors, 'text')}
-                    />
-                  )}
-                </FastField>
-              </>
-            )}
-          </Row>
-          <AttachmentsSection>
-            <StyledUploader
-              multiple
-              asPreview
-              name="attachments"
-              files={values.attachments}
-              error={
-                typeof errors?.attachments === 'string'
-                  ? errors.attachments
-                  : ''
-              }
-              notification={notification}
-              onChange={setFieldValue}
+    <Form onSubmit={handleSubmit}>
+      <Row>
+        {isMobile ? (
+          <TextAreaStyled
+            placeholder="Text or image to encrypt and expire"
+            name="text"
+            value={values.text}
+            onBlur={handleBlur}
+            onChange={handleChange}
+            error={checkError(touched, errors, 'text')}
+          />
+        ) : (
+          <>
+            <Label>Text or image to encrypt and expire</Label>
+            <TextAreaStyled
+              placeholder="Divide et Impera"
+              name="text"
+              value={values.text}
+              onBlur={handleBlur}
+              onChange={handleChange}
+              error={checkError(touched, errors, 'text')}
             />
-            <Attachments>
-              {renderAttachments(
-                values.attachments,
-                errors.attachments,
-                setFieldValue,
-              )}
-            </Attachments>
-          </AttachmentsSection>
-          <SelectRow>
-            <Column>
-              <Label>Data expires in</Label>
-              <StyledSelect
-                boxOffset={39}
-                name="secondsLimit"
-                placeholder="Select option"
-                value={values.secondsLimit}
-                options={secondsLimitOptions}
-                onChange={setFieldValue}
-              />
-            </Column>
-            <ColumnStyled>
-              <Label>{isMobile ? 'Attempts' : 'Number of Attempts'}</Label>
-              <StyledSelect
-                boxOffset={39}
-                name="requestsLimit"
-                placeholder="Select option"
-                value={values.requestsLimit}
-                options={requestsLimitOptions}
-                onChange={setFieldValue}
-              />
-            </ColumnStyled>
-          </SelectRow>
-          {!isMobile && (
-            <Row>
-              <Checkbox
-                checked={isCustomPassword}
-                value={isCustomPassword}
-                onChange={handleChange}
-              >
-                Create my own password for access to encrypted data
-              </Checkbox>
-            </Row>
+          </>
+        )}
+      </Row>
+      <AttachmentsSection>
+        <StyledUploader
+          multiple
+          asPreview
+          name="attachments"
+          files={values.attachments}
+          error={
+            typeof errors?.attachments === 'string' ? errors.attachments : ''
+          }
+          notification={notification}
+          onChange={setFieldValue}
+        />
+        <Attachments>
+          {renderAttachments(
+            values.attachments,
+            errors.attachments,
+            setFieldValue,
           )}
-          {isCustomPassword && (
-            <Row>
-              <Label>Password</Label>
-              <FastField name="password">
-                {({ field }) => (
-                  <InputStyled {...field} onBlur={setFieldTouched} />
-                )}
-              </FastField>
-              {checkError(touched, errors, 'password') && (
-                <Error>{checkError(touched, errors, 'password')}</Error>
-              )}
-            </Row>
-          )}
-          <ButtonWrapper>
-            <ButtonImg
-              srcSet="/images/secure-bg-btn@2x.png 2x, /images/secure-bg-btn@3x.png 3x"
-              src="/images/secure-bg-btn.png"
-            />
-            <StyledButton
-              htmlType="submit"
-              disabled={isSubmitting || !(isValid && dirty) || !isOnline}
-            >
-              Create Secure Message
-            </StyledButton>
-          </ButtonWrapper>
-        </Form>
+        </Attachments>
+      </AttachmentsSection>
+      <SelectRow>
+        <Column>
+          <Label>Data expires in</Label>
+          <StyledSelect
+            boxOffset={39}
+            name="secondsLimit"
+            placeholder="Select option"
+            value={values.secondsLimit}
+            options={secondsLimitOptions}
+            onChange={setFieldValue}
+          />
+        </Column>
+        <ColumnStyled>
+          <Label>{isMobile ? 'Attempts' : 'Number of Attempts'}</Label>
+          <StyledSelect
+            boxOffset={39}
+            name="requestsLimit"
+            placeholder="Select option"
+            value={values.requestsLimit}
+            options={requestsLimitOptions}
+            onChange={setFieldValue}
+          />
+        </ColumnStyled>
+      </SelectRow>
+      {!isMobile && (
+        <Row>
+          <Checkbox
+            checked={isCustomPassword}
+            value={isCustomPassword}
+            onChange={handleChangeCustomPassword}
+          >
+            Create my own password for access to encrypted data
+          </Checkbox>
+        </Row>
       )}
-    </Formik>
+      {isCustomPassword && (
+        <Row>
+          <Label>Password</Label>
+          <InputStyled
+            name="password"
+            value={values.password}
+            onBlur={handleBlur}
+            onChange={handleChange}
+          />
+          {checkError(touched, errors, 'password') && (
+            <Error>{checkError(touched, errors, 'password')}</Error>
+          )}
+        </Row>
+      )}
+      {errors?.form && (
+        <>
+          <Error>Oops… Something went wrong</Error>
+          <Error>Please, click again on Create secure message</Error>
+        </>
+      )}
+      <ButtonWrapper>
+        <ButtonImg
+          srcSet="/images/secure-bg-btn@2x.png 2x, /images/secure-bg-btn@3x.png 3x"
+          src="/images/secure-bg-btn.png"
+        />
+        <StyledButton
+          htmlType="submit"
+          disabled={
+            isSubmitting || (!isValid && !errors?.form && !dirty) || !isOnline
+          }
+        >
+          Create Secure Message
+        </StyledButton>
+      </ButtonWrapper>
+    </Form>
   );
 };
 
-export default withOfflineDetection(withNotification(SecureMessageForm));
+export const SecureMessageForm = withOfflineDetection(
+  withNotification(SecureMessageFormComponent),
+);

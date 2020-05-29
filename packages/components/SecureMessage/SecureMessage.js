@@ -1,4 +1,4 @@
-import React, { Component, Fragment } from 'react';
+import React, { useState, Fragment } from 'react';
 import styled from 'styled-components';
 import { media } from '@caesar/assets/styles/media';
 import { match } from '@caesar/common/utils/match';
@@ -30,22 +30,26 @@ const Wrapper = styled.div`
   `}
 `;
 
-class SecureMessageComponent extends Component {
-  state = {
+const SecureMessageComponent = ({
+  notification,
+  withScroll = false,
+  className,
+}) => {
+  const [{ step, password, link }, setState] = useState({
     step: SECURE_MESSAGE_FORM_STEP,
-  };
+    password: null,
+    link: null,
+  });
 
-  handleSubmitForm = async (
-    { secondsLimit, requestsLimit, password, ...secret },
+  const handleSubmitForm = async (
+    { secondsLimit, requestsLimit, password: passwordValue, ...secret },
     { setSubmitting },
   ) => {
-    const { notification } = this.props;
-
     try {
       notification.show({
         text: ENCRYPTING_ITEM_NOTIFICATION,
       });
-      const pwd = password || generator();
+      const pwd = passwordValue || generator();
 
       const encryptedMessage = await encryptByPassword(secret, pwd);
 
@@ -57,7 +61,7 @@ class SecureMessageComponent extends Component {
         requestsLimit,
       });
 
-      this.setState({
+      setState({
         step: SECURE_MESSAGE_LINK_STEP,
         password: pwd,
         link: id,
@@ -70,43 +74,38 @@ class SecureMessageComponent extends Component {
     }
   };
 
-  handleClickReturn = () => {
-    this.setState({
-      link: null,
-      password: null,
+  const handleClickReturn = () => {
+    setState({
       step: SECURE_MESSAGE_FORM_STEP,
+      password: null,
+      link: null,
     });
   };
 
-  render() {
-    const { withScroll = false, className } = this.props;
-    const { step, password, link } = this.state;
+  const renderedStep = match(
+    step,
+    {
+      SECURE_MESSAGE_FORM_STEP: (
+        <SecureMessageForm onSubmit={handleSubmitForm} />
+      ),
+      SECURE_MESSAGE_LINK_STEP: (
+        <SecureMessageLink
+          link={link}
+          password={password}
+          onClickReturn={handleClickReturn}
+        />
+      ),
+    },
+    null,
+  );
 
-    const renderedStep = match(
-      step,
-      {
-        SECURE_MESSAGE_FORM_STEP: (
-          <SecureMessageForm onSubmit={this.handleSubmitForm} />
-        ),
-        SECURE_MESSAGE_LINK_STEP: (
-          <SecureMessageLink
-            link={link}
-            password={password}
-            onClickReturn={this.handleClickReturn}
-          />
-        ),
-      },
-      null,
-    );
+  const ContentWrapperComponent = withScroll ? Scrollbar : Fragment;
 
-    const ContentWrapperComponent = withScroll ? Scrollbar : Fragment;
-
-    return (
-      <Wrapper className={className}>
-        <ContentWrapperComponent>{renderedStep}</ContentWrapperComponent>
-      </Wrapper>
-    );
-  }
-}
+  return (
+    <Wrapper className={className}>
+      <ContentWrapperComponent>{renderedStep}</ContentWrapperComponent>
+    </Wrapper>
+  );
+};
 
 export const SecureMessage = withNotification(SecureMessageComponent);

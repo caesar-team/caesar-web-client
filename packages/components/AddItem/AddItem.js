@@ -56,9 +56,9 @@ export const AddItem = ({
 
   const itemSubject = {
     __type: ITEM_ENTITY_TYPE,
-    listType: workInProgressList.type,
-    teamId: workInProgressList.teamId,
-    userRole: workInProgressList.userRole,
+    listType: workInProgressList?.type,
+    teamId: workInProgressList?.teamId,
+    userRole: workInProgressList?.userRole,
   };
 
   return (

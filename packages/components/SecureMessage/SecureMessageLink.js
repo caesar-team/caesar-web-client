@@ -1,4 +1,5 @@
 import React from 'react';
+import { useEffectOnce } from 'react-use';
 import styled from 'styled-components';
 import copy from 'copy-text-to-clipboard';
 import { APP_URI } from '@caesar/common/constants';
@@ -84,6 +85,10 @@ const SecureMessageLinkComponent = ({
   password = '',
   onClickReturn,
 }) => {
+  useEffectOnce(() => {
+    notification.hide();
+  });
+
   const handleClickCopy = (data, notify) => {
     copy(stripHtml(data));
 

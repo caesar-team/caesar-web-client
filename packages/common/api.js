@@ -1,3 +1,4 @@
+// TODO: Rewrite all this requests with fetch 'packages/common/fetch.js'
 import Router from 'next/router';
 import axios from 'axios';
 import { removeCookieValue } from './utils/token';
@@ -166,8 +167,6 @@ export const patchAcceptItem = data => callApi.patch('/accept_item', data);
 
 export const patchResetPassword = (token, data) =>
   callApi.patch(`/auth/srpp/reset/${token}`, data);
-
-export const postSecureMessage = data => callApi.post('/message', data);
 
 export const getSecureMessage = id => callApi.get(`/message/${id}`);
 

@@ -358,7 +358,7 @@ const SecureMessageFormComponent = ({ onSubmit, notification, isOnline }) => {
         <StyledButton
           htmlType="submit"
           disabled={
-            isSubmitting || (!isValid && !errors?.form && !dirty) || !isOnline
+            isSubmitting || (!isValid && !errors?.form) || !dirty || !isOnline
           }
         >
           Create Secure Message

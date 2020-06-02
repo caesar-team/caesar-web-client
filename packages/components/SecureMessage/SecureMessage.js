@@ -8,7 +8,10 @@ import {
 } from '@caesar/common/utils/cipherUtils';
 import { generator } from '@caesar/common/utils/password';
 import { postSecureMessage } from '@caesar/common/fetch';
-import { ENCRYPTING_ITEM_NOTIFICATION } from '@caesar/common/constants';
+import {
+  ENCRYPTING_ITEM_NOTIFICATION,
+  REDIRECT_NOTIFICATION,
+} from '@caesar/common/constants';
 import { Scrollbar, withNotification } from '@caesar/components';
 import { SecureMessageForm } from './SecureMessageForm';
 import { SecureMessageLink } from './SecureMessageLink';
@@ -70,12 +73,15 @@ const SecureMessageComponent = ({
           link: id,
         });
       });
+      notification.show({
+        text: REDIRECT_NOTIFICATION,
+      });
     } catch (error) {
       console.log(error);
       setFieldError('form', error.message);
+      notification.hide();
     } finally {
       setSubmitting(false);
-      notification.hide();
     }
   };
 

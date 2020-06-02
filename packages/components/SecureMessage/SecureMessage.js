@@ -7,7 +7,7 @@ import {
   decryptByPassword,
 } from '@caesar/common/utils/cipherUtils';
 import { generator } from '@caesar/common/utils/password';
-import { postSecureMessage } from '@caesar/common/api';
+import { postSecureMessage } from '@caesar/common/fetch';
 import { ENCRYPTING_ITEM_NOTIFICATION } from '@caesar/common/constants';
 import { Scrollbar, withNotification } from '@caesar/components';
 import { SecureMessageForm } from './SecureMessageForm';
@@ -59,18 +59,16 @@ const SecureMessageComponent = ({
       const encryptedMessage = await encryptByPassword(secret, pwd);
       await decryptByPassword(encryptedMessage, pwd);
 
-      const {
-        data: { id },
-      } = await postSecureMessage({
+      postSecureMessage({
         message: encryptedMessage,
         secondsLimit,
         requestsLimit,
-      });
-
-      setState({
-        step: SECURE_MESSAGE_LINK_STEP,
-        password: pwd,
-        link: id,
+      }).then(({ id }) => {
+        setState({
+          step: SECURE_MESSAGE_LINK_STEP,
+          password: pwd,
+          link: id,
+        });
       });
     } catch (error) {
       console.log(error);

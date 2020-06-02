@@ -12,17 +12,24 @@ export const PasswordStep = ({ message, setDecryptedMessage }) => {
     try {
       const decryptedMessage = await decryptByPassword(message, password);
       setDecryptedMessage(decryptedMessage);
+      setSubmitting(false);
     } catch (error) {
       console.log('error: ', error);
       setErrors({
         password: 'Sorry, but the password is wrong :(',
       });
-    } finally {
       setSubmitting(false);
     }
   };
 
-  const { errors, values, handleSubmit, submitForm, resetForm } = useFormik({
+  const {
+    errors,
+    values,
+    handleChange,
+    handleSubmit,
+    submitForm,
+    resetForm,
+  } = useFormik({
     initialValues: { password: '' },
     validationSchema: schema,
     onSubmit: handleSubmitPassword,
@@ -35,6 +42,7 @@ export const PasswordStep = ({ message, setDecryptedMessage }) => {
         autoFocus
         name="password"
         value={values.password}
+        onChange={handleChange}
         onClick={submitForm}
         onBackspace={resetForm}
         isError={Object.keys(errors).length !== 0}

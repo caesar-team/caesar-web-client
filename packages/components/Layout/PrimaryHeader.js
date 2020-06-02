@@ -1,17 +1,12 @@
 import React, { memo, useState } from 'react';
-import { useSelector, useDispatch } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import equal from 'fast-deep-equal';
 import styled from 'styled-components';
 import Link from 'next/link';
-import { setCurrentTeamId, logout } from '@caesar/common/actions/user';
-import {
-  currentTeamSelector,
-  userTeamListSelector,
-} from '@caesar/common/selectors/user';
+import { logout } from '@caesar/common/actions/user';
 import { Icon } from '../Icon';
 import { Dropdown } from '../Dropdown';
 import { SearchInput } from '../Input';
-import { TeamModal } from '../TeamModal';
 import { AddItem } from '../AddItem';
 import { Logo } from './Logo';
 
@@ -102,42 +97,15 @@ const PrimaryHeaderComponent = ({
   onClickCreateItem = Function.prototype,
 }) => {
   const dispatch = useDispatch();
-  const teamList = useSelector(userTeamListSelector);
-  const team = useSelector(currentTeamSelector);
   const [isDropdownOpened, setIsDropdownOpened] = useState(false);
-  const [isModalOpened, setIsModalOpened] = useState(false);
   const userName = (user && (user.name || user.email)) || '';
-  const shouldShowSwitchTeamOption = teamList && teamList.length > 0;
 
   const handleToggleDropdown = () => {
     setIsDropdownOpened(!isDropdownOpened);
   };
 
-  const handleShowTeamModal = () => {
-    setIsDropdownOpened(false);
-    setIsModalOpened(true);
-  };
-
-  const handleCloseModal = () => {
-    setIsModalOpened(false);
-  };
-
-  const handleChangeTeamId = teamId => {
-    if (!team || team.id !== teamId) {
-      dispatch(setCurrentTeamId(teamId));
-    }
-
-    handleCloseModal();
-  };
-
   const Options = (
     <>
-      {/* TODO: Replace Switch Team in secondary header */}
-      {shouldShowSwitchTeamOption && (
-        <Option key="teams" onClick={handleShowTeamModal}>
-          <Anchor>Switch Team</Anchor>
-        </Option>
-      )}
       <Option key="settings">
         <Link href="/settings/manage">
           <Anchor>Settings</Anchor>
@@ -186,14 +154,6 @@ const PrimaryHeaderComponent = ({
           </RightWrapper>
         )}
       </Wrapper>
-      {isModalOpened && (
-        <TeamModal
-          teamList={teamList}
-          teamId={team ? team.id : null}
-          onChangeTeam={handleChangeTeamId}
-          onCancel={handleCloseModal}
-        />
-      )}
     </>
   );
 };

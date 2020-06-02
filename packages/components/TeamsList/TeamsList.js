@@ -1,10 +1,12 @@
 import React, { memo } from 'react';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import styled from 'styled-components';
 import {
   userDataSelector,
   userTeamListSelector,
+  currentTeamSelector,
 } from '@caesar/common/selectors/user';
+import { setCurrentTeamId } from '@caesar/common/actions/user';
 import { Avatar } from '../Avatar';
 
 const Option = styled.div`
@@ -29,8 +31,16 @@ const StyledAvatar = styled(Avatar)`
 `;
 
 const TeamsListComponent = ({ activeTeamId, handleToggle }) => {
+  const dispatch = useDispatch();
   const user = useSelector(userDataSelector);
   const teamList = useSelector(userTeamListSelector);
+  const currentTeam = useSelector(currentTeamSelector);
+
+  const handleChangeTeamId = teamId => {
+    if (!currentTeam || currentTeam.id !== teamId) {
+      dispatch(setCurrentTeamId(teamId));
+    }
+  };
 
   return (
     <>
@@ -50,6 +60,7 @@ const TeamsListComponent = ({ activeTeamId, handleToggle }) => {
             key={team.id}
             onClick={() => {
               handleToggle(team.id);
+              handleChangeTeamId(team.id);
             }}
           >
             <StyledAvatar avatar={team.icon} isSmall />

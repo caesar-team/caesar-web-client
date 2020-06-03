@@ -8,6 +8,7 @@ const Wrapper = styled.div`
   display: flex;
   flex-direction: column;
   position: relative;
+  background-color: ${({ theme }) => theme.color.white};
 `;
 
 const SelectedOption = styled.div`

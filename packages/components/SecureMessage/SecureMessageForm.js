@@ -29,7 +29,6 @@ const Form = styled.form`
 
 const Row = styled.div`
   position: relative;
-  z-index: 1;
   display: flex;
   flex-direction: column;
   margin-bottom: 40px;
@@ -80,8 +79,6 @@ const TextAreaStyled = styled(TextArea)`
 `;
 
 const Error = styled.div`
-  position: relative;
-  z-index: 1;
   font-size: 14px;
   color: ${({ theme }) => theme.color.red};
 `;
@@ -131,8 +128,6 @@ const Attachments = styled.div`
 const FileRow = styled.div``;
 
 const SelectRow = styled.div`
-  position: relative;
-  z-index: 2;
   display: flex;
   width: 100%;
   margin-top: 38px;
@@ -163,7 +158,6 @@ const StyledSelect = styled(Select)`
 `;
 
 const ButtonWrapper = styled.div`
-  position: relative;
   display: flex;
   align-items: center;
   margin: 40px 0;
@@ -178,20 +172,9 @@ const ButtonWrapper = styled.div`
 `;
 
 const StyledButton = styled(Button)`
-  position: relative;
-
   ${media.mobile`
     width: 100%;
   `}
-`;
-
-const ButtonImg = styled.img`
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 279px;
-  height: 200px;
-  transform: translate(-110px, -70px);
 `;
 
 const handleClickDownloadFile = attachment => {
@@ -351,10 +334,6 @@ const SecureMessageFormComponent = ({ onSubmit, notification, isOnline }) => {
         </>
       )}
       <ButtonWrapper>
-        <ButtonImg
-          srcSet="/images/secure-bg-btn@2x.png 2x, /images/secure-bg-btn@3x.png 3x"
-          src="/images/secure-bg-btn.png"
-        />
         <StyledButton
           htmlType="submit"
           disabled={

@@ -97,24 +97,21 @@ globals:
     from_secret: password
 
 - &stepFeatureBuild
-  name: build test
   image: plugins/docker
   settings:
     <<: *confNoSaveBuild
 
 - &stepDevelopBuild
-  name: build
   image: plugins/docker
   settings:
     tags: ${DRONE_BRANCH}
     <<: *confSaveBuild
 
 - &stepMasterBuild
-    name: build
-    image: plugins/docker
-    settings:
-      tags: [ "${DRONE_BRANCH}", "latest" ]
-      <<: *confSaveBuild
+  image: plugins/docker
+  settings:
+    tags: [ "${DRONE_BRANCH}", "latest" ]
+    <<: *confSaveBuild
   
 - &stepDevelopDeploy
   name: deploy develop
@@ -180,15 +177,18 @@ globals:
       {{/success}}
 
 steps:
-- <<: *stepFeatureBuild
+- name: build feature
+  <<: *stepFeatureBuild
   when:
     branch: [ feature/* ]
 
-- <<: *stepDevelopBuild
+- name: build develop
+  <<: *stepDevelopBuild
   when:
     branch: [ develop ]
 
-- <<: *stepMasterBuild
+- name: build master
+  <<: *stepMasterBuild
   when:
     branch: [ master ]
 

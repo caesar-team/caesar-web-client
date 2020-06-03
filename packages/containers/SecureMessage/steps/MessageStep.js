@@ -8,7 +8,7 @@ const MessageWrapper = styled.div`
   flex-direction: column;
   width: 100%;
   max-width: 620px;
-  padding: 24px;
+  padding: 22px 24px 24px;
   background: ${({ theme }) => theme.color.darkGray};
 `;
 
@@ -20,6 +20,13 @@ const Message = styled.div`
   color: ${({ theme }) => theme.color.white};
   background: transparent;
   user-select: text;
+  ${({ withAttach }) => withAttach && 'margin-bottom: 20px;'};
+`;
+
+const Separator = styled.div`
+  width: 100%;
+  height: 1px;
+  background: ${({ theme }) => theme.color.emperor};
 `;
 
 const Attachments = styled.div`
@@ -81,12 +88,14 @@ export const MessageStep = ({ decryptedMessage }) => {
       {shouldShowText && (
         <Scrollbar autoHeight autoHeightMax={183}>
           <Message
+            withAttach={shouldShowAttachments}
             dangerouslySetInnerHTML={{
               __html: result,
             }}
           />
         </Scrollbar>
       )}
+      {shouldShowText && shouldShowAttachments && <Separator />}
       {shouldShowAttachments && (
         <Attachments withText={shouldShowText}>
           <Scrollbar autoHeight autoHeightMax={235}>

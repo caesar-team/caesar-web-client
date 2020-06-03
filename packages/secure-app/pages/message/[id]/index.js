@@ -1,18 +1,18 @@
-import React, { Fragment } from 'react';
+import React from 'react';
 import { Error, Head } from '@caesar/components';
 import { SecureMessageContainer } from '@caesar/containers';
 import { getSecureMessage } from '@caesar/common/api';
 import { IS_PROD } from '@caesar/common/constants';
 
 const MessagePage = ({ statusCode, message }) => (
-  <Fragment>
+  <>
     <Head title="Secure Message" />
     {statusCode ? (
       <Error statusCode={statusCode} />
     ) : (
       <SecureMessageContainer message={message} />
     )}
-  </Fragment>
+  </>
 );
 
 MessagePage.getInitialProps = async ({ query: { id = '' } }) => {

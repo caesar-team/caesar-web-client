@@ -11,7 +11,7 @@ export default `
     src:
       url(${regularWoffUrl}) format('woff'),
       url(${regularWoff2Url}) format('woff2'),
-      url(${regularTtfUrl}) format('ttf');
+      url(${regularTtfUrl}) format('ttf'),
       url(${regularEotUrl}) format('eot');
   }
 `;

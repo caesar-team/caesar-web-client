@@ -23,6 +23,12 @@ get:
   name: registry
 ---
 kind: secret
+name: namespace
+get:
+  path: caesar-team/data/caesar-web-client
+  name: namespace
+---
+kind: secret
 name: develop_url
 get:
   path: secret/data/k8s-4xxi
@@ -153,12 +159,15 @@ globals:
   name: regex
   image: sinlead/drone-kubectl
   environment:
+    K8S_NAMESPACE:
+      from_secret: namespace
     CICD_GIT_COMMIT: ${DRONE_COMMIT}
     CICD_GIT_BRANCH: ${DRONE_BRANCH}
   commands:
   - sed -i "s/\$CICD_GIT_COMMIT/$CICD_GIT_COMMIT/g" deploy/*
   - echo $CICD_GIT_COMMIT
   - cat deploy/* | grep CICD_GIT_COMMIT
+  - echo $K8S_NAMESPACE
 
 - &stepNotifyToSlack
   name: notify-to-slack

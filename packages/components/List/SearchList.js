@@ -1,11 +1,11 @@
 import React from 'react';
 import styled from 'styled-components';
+import memoize from 'memoize-one';
 import AutoSizer from 'react-virtualized-auto-sizer';
 import { FixedSizeList } from 'react-window';
-import memoize from 'memoize-one';
-import FixedSizeItem from './FixedSizeItem';
-import ScrollbarVirtualList from './ScrollbarVirtualList';
-import EmptyList from './EmptyList';
+import { FixedSizeItem } from './FixedSizeItem';
+import { ScrollbarVirtualList } from './ScrollbarVirtualList';
+import { EmptyList } from './EmptyList';
 
 const Wrapper = styled.div`
   position: relative;
@@ -50,7 +50,7 @@ const createItemData = memoize(
   }),
 );
 
-const SearchList = ({
+export const SearchList = ({
   isMultiItem = false,
   workInProgressItem,
   workInProgressItemIds,
@@ -103,5 +103,3 @@ const SearchList = ({
     </Wrapper>
   );
 };
-
-export default SearchList;

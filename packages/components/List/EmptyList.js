@@ -18,11 +18,9 @@ const Text = styled.div`
   transform: translateX(-50%);
 `;
 
-const EmptyList = () => (
+export const EmptyList = () => (
   <>
     <Image srcSet={`${EmptyImg2x} 2x, ${EmptyImg3x} 3x`} src={EmptyImg} />
     <Text>No elements</Text>
   </>
 );
-
-export default EmptyList;

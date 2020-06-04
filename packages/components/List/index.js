@@ -1,3 +1,3 @@
-export { default as List } from './List';
-export { default as SearchList } from './SearchList';
-export { default as ListItem } from './Item';
+export { List } from './List';
+export { SearchList } from './SearchList';
+export { Item as ListItem } from './Item';

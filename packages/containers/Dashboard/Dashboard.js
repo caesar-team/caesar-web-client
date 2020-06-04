@@ -3,9 +3,6 @@ import styled from 'styled-components';
 import memoize from 'memoize-one';
 import {
   Item,
-  MultiItem,
-  List,
-  SearchList,
   ShareModal,
   MoveModal,
   ConfirmModal,
@@ -27,9 +24,15 @@ import {
   MOVE_ITEM_PERMISSION,
   SHARE_ITEM_PERMISSION,
   DELETE_PERMISSION,
-  INBOX_TYPE,
 } from '@caesar/common/constants';
+import { MiddleColumn } from './components/MiddleColumn';
 import { initialItemData } from './utils';
+import {
+  SHARE_MODAL,
+  MOVE_ITEM_MODAL,
+  MOVE_TO_TRASH_MODAL,
+  REMOVE_ITEM_MODAL,
+} from './constants';
 
 const CenterWrapper = styled.div`
   display: flex;
@@ -54,11 +57,6 @@ const RightColumnWrapper = styled.div`
   position: relative;
   flex-grow: 1;
 `;
-
-const SHARE_MODAL = 'shareModal';
-const MOVE_ITEM_MODAL = 'moveItem';
-const MOVE_TO_TRASH_MODAL = 'moveToTrashModal';
-const REMOVE_ITEM_MODAL = 'removeItemModal';
 
 const SECRET_SEARCH_FIELDS = ['name', 'note', 'website'];
 
@@ -109,6 +107,7 @@ class DashboardContainer extends Component {
     });
   };
 
+  // TODO: Replace into MiddleColumnComponent
   handleClickItem = itemId => event => {
     const { itemsById, workInProgressList } = this.props;
 
@@ -474,6 +473,7 @@ class DashboardContainer extends Component {
     const searchedItems = this.filter(Object.values(itemsById), searchedText);
 
     const isTeamItem = workInProgressItem && workInProgressItem.teamId;
+    // TODO: Replace in modal?
     const isMultiItem =
       workInProgressItemIds && workInProgressItemIds.length > 0;
 
@@ -485,18 +485,6 @@ class DashboardContainer extends Component {
         teamsTrashLists
           .map(({ id }) => id)
           .includes(workInProgressItem.listId));
-    const isTrashList =
-      workInProgressList &&
-      (workInProgressList.id === trashList.id ||
-        teamsTrashLists.map(({ id }) => id).includes(workInProgressList.id));
-
-    const isInboxList =
-      workInProgressList && workInProgressList.type === INBOX_TYPE;
-
-    const areAllItemsSelected =
-      mode === DASHBOARD_SEARCH_MODE
-        ? searchedItems.length === workInProgressItemIds.length
-        : visibleListItems.length === workInProgressItemIds.length;
 
     const availableTeamsForSharing = isTeamItem
       ? userTeamList.filter(({ id }) => id !== workInProgressItem.teamId)
@@ -528,39 +516,13 @@ class DashboardContainer extends Component {
             ) : (
               <>
                 <MiddleColumnWrapper>
-                  {isMultiItem && (
-                    <MultiItem
-                      isInboxList={isInboxList}
-                      isTrashItems={isTrashList}
-                      workInProgressItemIds={workInProgressItemIds}
-                      areAllItemsSelected={areAllItemsSelected}
-                      onClickMove={this.handleOpenModal(MOVE_ITEM_MODAL)}
-                      onClickMoveToTrash={this.handleOpenModal(
-                        MOVE_TO_TRASH_MODAL,
-                      )}
-                      onClickRemove={this.handleOpenModal(REMOVE_ITEM_MODAL)}
-                      onClickShare={this.handleOpenModal(SHARE_MODAL)}
-                      onSelectAll={this.handleSelectAllListItems}
-                    />
-                  )}
-                  {mode === DASHBOARD_DEFAULT_MODE ? (
-                    <List
-                      isMultiItem={isMultiItem}
-                      workInProgressList={workInProgressList}
-                      workInProgressItem={workInProgressItem}
-                      workInProgressItemIds={workInProgressItemIds}
-                      items={visibleListItems}
-                      onClickItem={this.handleClickItem}
-                    />
-                  ) : (
-                    <SearchList
-                      isMultiItem={isMultiItem}
-                      items={searchedItems}
-                      workInProgressItem={workInProgressItem}
-                      workInProgressItemIds={workInProgressItemIds}
-                      onClickItem={this.handleClickItem}
-                    />
-                  )}
+                  <MiddleColumn
+                    mode={mode}
+                    searchedItems={searchedItems}
+                    handleClickItem={this.handleClickItem}
+                    handleOpenModal={this.handleOpenModal}
+                    handleSelectAllListItems={this.handleSelectAllListItems}
+                  />
                 </MiddleColumnWrapper>
                 <RightColumnWrapper>
                   <Item

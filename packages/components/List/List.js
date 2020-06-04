@@ -2,12 +2,12 @@ import React, { memo } from 'react';
 import styled from 'styled-components';
 import equal from 'fast-deep-equal';
 import memoize from 'memoize-one';
-import { FixedSizeList } from 'react-window';
 import AutoSizer from 'react-virtualized-auto-sizer';
+import { FixedSizeList } from 'react-window';
 import { Button } from '@caesar/components';
-import FixedSizeItem from './FixedSizeItem';
-import ScrollbarVirtualList from './ScrollbarVirtualList';
-import EmptyList from './EmptyList';
+import { FixedSizeItem } from './FixedSizeItem';
+import { ScrollbarVirtualList } from './ScrollbarVirtualList';
+import { EmptyList } from './EmptyList';
 
 const Wrapper = styled.div`
   position: relative;
@@ -15,7 +15,7 @@ const Wrapper = styled.div`
   flex-direction: column;
   height: calc(100vh - 55px);
   background-color: ${({ isEmpty, theme }) =>
-    isEmpty ? theme.color.white : theme.color.lightBlue};
+    isEmpty ? theme.color.white : theme.color.alto};
 `;
 
 const ColumnHeader = styled.div`
@@ -35,7 +35,7 @@ const ColumnTitle = styled.div`
   color: ${({ theme }) => theme.color.black};
 `;
 
-const ITEM_HEIGHT = 80;
+const ITEM_HEIGHT = 56;
 
 const createItemData = memoize(
   (
@@ -53,7 +53,7 @@ const createItemData = memoize(
   }),
 );
 
-const List = ({
+const ListComponent = ({
   isMultiItem = false,
   workInProgressList,
   workInProgressItem,
@@ -121,6 +121,6 @@ const List = ({
   );
 };
 
-export default memo(List, (prevProps, nextProps) =>
+export const List = memo(ListComponent, (prevProps, nextProps) =>
   equal(prevProps, nextProps),
 );

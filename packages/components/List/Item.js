@@ -1,6 +1,5 @@
 import React from 'react';
-import styled, { css } from 'styled-components';
-import { formatDate } from '@caesar/common/utils/dateUtils';
+import styled from 'styled-components';
 import {
   ITEM_CREDENTIALS_TYPE,
   ITEM_ICON_TYPES,
@@ -8,73 +7,59 @@ import {
 import { Icon } from '../Icon';
 import { Checkbox } from '../Checkbox';
 
-const ItemType = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background-color: ${({ theme }) => theme.color.gray};
-  border-radius: 3px;
-  margin-right: 20px;
-  width: 40px;
-  min-width: 40px;
-  height: 40px;
-`;
-
-const Details = styled.div`
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  width: 100%;
-`;
-
 const Title = styled.div`
-  font-size: 18px;
-  line-height: 18px;
-  color: ${({ theme }) => theme.color.black};
-  margin-bottom: 7px;
+  margin-right: auto;
+  margin-left: 16px;
   text-overflow: ellipsis;
   overflow: hidden;
-  max-width: 278px;
   white-space: nowrap;
 `;
 
-const Box = styled.div`
+const Row = styled.div`
+  position: relative;
   display: flex;
-  justify-content: space-between;
   align-items: center;
+  padding: 8px 23px;
+  background: ${({ isActive, theme }) =>
+    isActive ? theme.color.white : 'transparent'};
+  border-top: 1px solid transparent;
+  border-bottom: 1px solid transparent;
+  cursor: pointer;
+  transition: all 0.2s;
+
+    &:hover {
+      background: ${({ theme }) => theme.color.white};
+      border-top-color: ${({ theme }) => theme.color.gallery};
+      border-bottom-color: ${({ theme }) => theme.color.gallery};
+    }
+
+  ${({ isMultiItem, isActive, theme }) =>
+    isActive &&
+    isMultiItem &&
+    `
+      background: ${theme.color.gallery};
+    `}
+
+  ${({ isActive, theme }) =>
+    isActive &&
+    `
+      border-top-color: ${theme.color.gallery};
+      border-bottom-color: ${theme.color.gallery};
+    `}
+
+  ${Title} {
+    font-weight: ${({ isActive }) => (isActive ? 600 : 400)};
+  }
 `;
 
-const StyledBox = styled(Box)`
-  margin-left: 20px;
-`;
-
-const Text = styled.div`
-  font-size: 14px;
-  line-height: 14px;
-  color: ${({ theme }) => theme.color.gray};
-`;
-
-const IconText = styled.div`
-  font-size: 14px;
-  line-height: 14px;
-  color: ${({ theme }) => theme.color.gray};
-`;
-
-const StyledIcon = styled(Icon)`
-  fill: ${({ theme }) => theme.color.gray};
-  margin-right: 5px;
-`;
-
-const FavoriteIcon = styled(Icon)`
-  position: absolute;
-  top: 8px;
-  right: 8px;
-`;
-
-const CloseIcon = styled(Icon)`
-  position: absolute;
-  top: 8px;
-  right: 8px;
+const TypeIconWrapper = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex: 0 0 40px;
+  height: 40px;
+  background: ${({ theme }) => theme.color.gray};
+  border-radius: 4px;
 `;
 
 const CheckboxStyled = styled(Checkbox)`
@@ -90,32 +75,38 @@ const CheckboxStyled = styled(Checkbox)`
   }
 `;
 
-const Row = styled.div`
-  position: relative;
+const Addon = styled.div`
   display: flex;
-  padding: 20px 30px 20px;
-  background: ${({ theme, isActive }) =>
-    isActive ? theme.color.white : theme.color.lightBlue};
-  cursor: pointer;
-  border-bottom: 1px solid ${({ theme }) => theme.color.gallery};
-
-  ${({ isMultiItem, isActive }) =>
-    isActive &&
-    isMultiItem &&
-    css`
-      background: ${({ theme }) => theme.color.gallery};
-    `}
+  align-items: center;
+  margin-left: 16px;
+  color: ${({ theme }) => theme.color.gray};
 `;
 
-const ItemTypeIcon = props => {
-  const { type } = props;
+const AddonText = styled.div`
+  margin-left: 4px;
+  font-size: ${({ theme }) => theme.font.size.small};
+`;
+
+const Favorite = styled(Icon)`
+  position: absolute;
+  top: 4px;
+  right: 4px;
+`;
+
+const CloseIcon = styled(Icon)`
+  position: absolute;
+  top: 4px;
+  right: 4px;
+`;
+
+const ItemTypeIcon = ({ type }) => {
   const icon = ITEM_ICON_TYPES[type] || ITEM_ICON_TYPES[ITEM_CREDENTIALS_TYPE];
-  return <Icon name={icon} width={20} height={20} fill="#fff" />;
+
+  return <Icon name={icon} width={20} height={20} color="white" />;
 };
 
-const Item = ({
+export const Item = ({
   id,
-  lastUpdated,
   data: { name, attachments },
   type,
   invited,
@@ -141,41 +132,37 @@ const Item = ({
       isMultiItem={isMultiItem}
       {...props}
     >
-      <ItemType>
-        {isMultiItem ? (
-          <CheckboxStyled checked={isActive} onChange={Function.prototype} />
-        ) : (
+      {isMultiItem ? (
+        <CheckboxStyled checked={isActive} onChange={Function.prototype} />
+      ) : (
+        <TypeIconWrapper>
           <ItemTypeIcon type={type} />
-        )}
-      </ItemType>
-      <Details>
-        <Title>{name}</Title>
-        <Box>
-          <Text>{formatDate(lastUpdated)}</Text>
-          <Box>
-            {shouldShowAttachments && (
-              <Box>
-                <StyledIcon name="clip" width={14} height={14} />
-                <IconText>{attachments.length}</IconText>
-              </Box>
-            )}
-            {shouldShowMembers && (
-              <StyledBox>
-                <StyledIcon name="group" width={14} height={14} />
-                <IconText>{invited.length}</IconText>
-              </StyledBox>
-            )}
-          </Box>
-        </Box>
-      </Details>
+        </TypeIconWrapper>
+      )}
+      <Title>{name}</Title>
+      {shouldShowAttachments && (
+        <Addon>
+          <Icon name="clip" width={16} height={16} />
+          <AddonText>{attachments.length}</AddonText>
+        </Addon>
+      )}
+      {shouldShowMembers && (
+        <Addon>
+          <Icon name="group" width={16} height={16} />
+          <AddonText>{invited.length}</AddonText>
+        </Addon>
+      )}
       {shouldShowFavoriteIcon && (
-        <FavoriteIcon name="favorite-active" width={14} height={14} />
+        <Favorite
+          name="favorite-active"
+          width={16}
+          height={16}
+          color="emperor"
+        />
       )}
       {isClosable && (
-        <CloseIcon name="close" width={14} height={14} onClick={onClickClose} />
+        <CloseIcon name="close" width={16} height={16} onClick={onClickClose} />
       )}
     </Row>
   );
 };
-
-export default Item;

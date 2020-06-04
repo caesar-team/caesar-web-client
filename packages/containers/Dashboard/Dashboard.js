@@ -89,8 +89,7 @@ class DashboardContainer extends Component {
     this.props.initWorkflow();
   }
 
-  // eslint-disable-next-line
-  handleClickMenuItem = id => () => {
+  handleClickMenuItem = id => {
     this.props.setWorkInProgressListId(id);
     this.props.setWorkInProgressItem(null);
     this.props.resetWorkInProgressItemIds();
@@ -457,8 +456,6 @@ class DashboardContainer extends Component {
       membersById,
       user,
       team,
-      teamLists,
-      personalListsByType,
       visibleListItems,
       workInProgressItems,
       itemsById,
@@ -520,17 +517,12 @@ class DashboardContainer extends Component {
             <Sidebar>
               <MenuList
                 mode={mode}
-                team={team}
-                inbox={personalListsByType.inbox}
-                favorites={personalListsByType.favorites}
-                trash={personalListsByType.trash}
-                personalLists={personalListsByType.list}
-                teamLists={teamLists}
                 activeListId={workInProgressList && workInProgressList.id}
                 onClickMenuItem={this.handleClickMenuItem}
                 onClickSecureMessage={this.handleClickSecureMessage}
               />
             </Sidebar>
+            {/* TODO: isToolMode - is redundant? */}
             {isToolMode ? (
               <SecureMessage withScroll />
             ) : (

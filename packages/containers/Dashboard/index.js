@@ -41,10 +41,8 @@ import {
   visibleListItemsSelector,
 } from '@caesar/common/selectors/workflow';
 import {
-  personalListsByTypeSelector,
   trashListSelector,
   teamsTrashListsSelector,
-  currentTeamListsSelector,
   selectableTeamsListsSelector,
 } from '@caesar/common/selectors/entities/list';
 import { itemsByIdSelector } from '@caesar/common/selectors/entities/item';
@@ -58,9 +56,7 @@ import { membersByIdSelector } from '@caesar/common/selectors/entities/member';
 import Dashboard from './Dashboard';
 
 const mapStateToProps = createStructuredSelector({
-  teamLists: currentTeamListsSelector,
   userTeamList: userTeamListSelector,
-  personalListsByType: personalListsByTypeSelector,
   itemsById: itemsByIdSelector,
   workInProgressItem: workInProgressItemSelector,
   workInProgressItemOwner: workInProgressItemOwnerSelector,

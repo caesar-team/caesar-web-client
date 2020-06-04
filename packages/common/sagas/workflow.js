@@ -21,7 +21,11 @@ import { convertNodesToEntities } from '@caesar/common/normalizers/normalizers';
 import { objectToArray } from '@caesar/common/utils/utils';
 import { sortItemsByFavorites } from '@caesar/common/utils/workflow';
 import { getLists, getTeamLists, getTeams } from '@caesar/common/api';
-import { DEFAULT_TEAM_TYPE, ITEM_REVIEW_MODE } from '@caesar/common/constants';
+import {
+  DEFAULT_TEAM_TYPE,
+  ITEM_REVIEW_MODE,
+  PERSONAL_TEAM_TYPE,
+} from '@caesar/common/constants';
 import { favoriteListSelector } from '@caesar/common/selectors/entities/list';
 import {
   keyPairSelector,
@@ -85,6 +89,10 @@ function* initTeam(team, withDecryption) {
     yield put(fetchTeamSuccess(team));
 
     const currentTeamId = yield select(currentTeamIdSelector);
+
+    if (currentTeamId === PERSONAL_TEAM_TYPE) {
+      return;
+    }
 
     if (!currentTeamId && team.type === DEFAULT_TEAM_TYPE) {
       yield put(setCurrentTeamId(team.id));
@@ -173,7 +181,7 @@ export function* setCurrentTeamIdWatchSaga() {
 
     const currentTeamId = yield select(currentTeamIdSelector);
 
-    if (!currentTeamId) {
+    if (!currentTeamId || currentTeamId === PERSONAL_TEAM_TYPE) {
       return;
     }
 

@@ -4,6 +4,7 @@ import {
   INBOX_TYPE,
   LIST_TYPE,
   TRASH_TYPE,
+  PERSONAL_TEAM_TYPE,
 } from '@caesar/common/constants';
 import { itemsByIdSelector } from '@caesar/common/selectors/entities/item';
 import { childItemsByIdSelector } from '@caesar/common/selectors/entities/childItem';
@@ -40,8 +41,21 @@ export const teamListsSelector = createSelector(
 export const currentTeamListsSelector = createSelector(
   teamListsSelector,
   currentTeamIdSelector,
-  (teamLists, currentTeamId) =>
-    teamLists.filter(list => list.teamId === currentTeamId),
+  (teamLists, currentTeamId) => ({
+    list: teamLists
+      .filter(
+        list =>
+          list.teamId === currentTeamId &&
+          ![FAVORITES_TYPE, TRASH_TYPE].includes(list.type),
+      )
+      .sort((a, b) => a.sort - b.sort),
+    favorites: teamLists.filter(
+      list => list.teamId === currentTeamId && list.type === FAVORITES_TYPE,
+    )[0],
+    trash: teamLists.filter(
+      list => list.teamId === currentTeamId && list.type === TRASH_TYPE,
+    )[0],
+  }),
 );
 
 export const favoriteListSelector = createSelector(
@@ -129,9 +143,11 @@ export const favoritesSelector = createSelector(
 const nestedListsSelector = createSelector(
   personalListsSelector,
   lists =>
-    lists.filter(
-      ({ type }) => ![INBOX_TYPE, FAVORITES_TYPE, TRASH_TYPE].includes(type),
-    ),
+    lists
+      .filter(
+        ({ type }) => ![INBOX_TYPE, FAVORITES_TYPE, TRASH_TYPE].includes(type),
+      )
+      .sort((a, b) => a.sort - b.sort),
 );
 
 export const personalListsByTypeSelector = createSelector(
@@ -179,8 +195,8 @@ export const selectableTeamsListsSelector = createSelector(
 
     return [
       {
-        id: 'personal',
-        name: 'personal',
+        id: PERSONAL_TEAM_TYPE,
+        name: PERSONAL_TEAM_TYPE,
         icon: null,
         lists: filterLists(personalLists),
       },

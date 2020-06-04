@@ -91,7 +91,6 @@ export { ShareModal } from './ShareModal';
 export { Tab, Tabs } from './Tabs';
 export { TagsInput } from './TagsInput';
 export { TeamCard } from './TeamCard';
-export { TeamModal } from './TeamModal'; // Delete ??
 export { TeamsList } from './TeamsList';
 export { TeamTag } from './TeamTag';
 export { TextWithLines } from './TextWithLines';

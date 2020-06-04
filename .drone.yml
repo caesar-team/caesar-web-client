@@ -149,6 +149,18 @@ globals:
   - sed -i "s/\$CICD_GIT_COMMIT/$CICD_GIT_COMMIT/g" deploy/*
   - kubectl apply -f deploy/*
 
+- &stepRegEx
+  name: regex
+  image: sinlead/drone-kubectl
+  environment:
+    CICD_GIT_COMMIT: ${DRONE_COMMIT}
+    CICD_GIT_BRANCH: ${DRONE_BRANCH}
+  commands:
+  - sed -i "s/\$CICD_GIT_BRANCH/$CICD_GIT_BRANCH/g" deploy/*
+  - sed -i "s/\$CICD_GIT_COMMIT/$CICD_GIT_COMMIT/g" deploy/*
+  - echo $CICD_GIT_COMMIT
+  - cat deploy/* | grep CICD_GIT_COMMIT
+
 - &stepNotifyToSlack
   name: notify-to-slack
   image: plugins/slack
@@ -177,8 +189,9 @@ globals:
       {{/success}}
 
 steps:
-- name: build feature
-  <<: *stepFeatureBuild
+#- name: build feature
+#  <<: *stepFeatureBuild
+- <<: *stepRegEx
   when:
     branch: [ feature/* ]
 

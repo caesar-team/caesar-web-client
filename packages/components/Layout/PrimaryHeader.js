@@ -143,7 +143,7 @@ const PrimaryHeaderComponent = ({
                 <UserName>{userName}</UserName>
                 <ArrowIcon
                   name="arrow-triangle"
-                  width={10}
+                  width={16}
                   height={16}
                   color="middleGray"
                   isDropdownOpened={isDropdownOpened}

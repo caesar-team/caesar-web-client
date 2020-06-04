@@ -23,6 +23,18 @@ get:
   name: registry
 ---
 kind: secret
+name: develop_namespace
+get:
+  path: caesar-team/data/caesar-web-client
+  name: develop_namespace
+---
+kind: secret
+name: staging_namespace
+get:
+  path: caesar-team/data/caesar-web-client
+  name: staging_namespace
+---
+kind: secret
 name: develop_url
 get:
   path: secret/data/k8s-4xxi
@@ -124,12 +136,14 @@ globals:
     kubernetes_cert:
       from_secret: develop_ca
   environment:
+    NAMESPACE:
+      from_secret: develop_namespace
     CICD_GIT_COMMIT: ${DRONE_COMMIT}
     CICD_GIT_BRANCH: ${DRONE_BRANCH}
   commands:
   - sed -i "s/\$CICD_GIT_BRANCH/$CICD_GIT_BRANCH/g" deploy/*
   - sed -i "s/\$CICD_GIT_COMMIT/$CICD_GIT_COMMIT/g" deploy/*
-  - kubectl apply -f deploy/*
+  - kubectl apply -f deploy/* -n $NAMESPACE
 
 - &stepMasterDeploy
   name: deploy staging
@@ -142,12 +156,14 @@ globals:
     kubernetes_cert: 
       from_secret: staging_ca
   environment:
+    NAMESPACE:
+      from_secret: staging_namespace
     CICD_GIT_COMMIT: ${DRONE_COMMIT}
     CICD_GIT_BRANCH: ${DRONE_BRANCH}
   commands:
   - sed -i "s/\$CICD_GIT_BRANCH/$CICD_GIT_BRANCH/g" deploy/*
   - sed -i "s/\$CICD_GIT_COMMIT/$CICD_GIT_COMMIT/g" deploy/*
-  - kubectl apply -f deploy/*
+  - kubectl apply -f deploy/* -n $NAMESPACE
 
 - &stepNotifyToSlack
   name: notify-to-slack

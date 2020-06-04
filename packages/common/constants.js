@@ -50,6 +50,7 @@ export const LIST_TYPES = {
 };
 
 export const DEFAULT_TEAM_TYPE = 'default';
+export const PERSONAL_TEAM_TYPE = 'personal';
 
 export const DASHBOARD_DEFAULT_MODE = 'DEFAULT_MODE';
 export const DASHBOARD_SEARCH_MODE = 'SEARCH_MODE';

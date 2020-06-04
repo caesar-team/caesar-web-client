@@ -1,6 +1,7 @@
 import React, { memo } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import styled from 'styled-components';
+import { PERSONAL_TEAM_TYPE } from '@caesar/common/constants';
 import {
   userDataSelector,
   userTeamListSelector,
@@ -37,7 +38,7 @@ const TeamsListComponent = ({ activeTeamId, handleToggle }) => {
   const currentTeam = useSelector(currentTeamSelector);
 
   const handleChangeTeamId = teamId => {
-    if (!currentTeam || currentTeam.id !== teamId) {
+    if (currentTeam?.id !== teamId) {
       dispatch(setCurrentTeamId(teamId));
     }
   };
@@ -47,7 +48,8 @@ const TeamsListComponent = ({ activeTeamId, handleToggle }) => {
       {activeTeamId && (
         <Option
           onClick={() => {
-            handleToggle('');
+            handleToggle();
+            handleChangeTeamId(PERSONAL_TEAM_TYPE);
           }}
         >
           <StyledAvatar {...user} isSmall />
@@ -59,7 +61,7 @@ const TeamsListComponent = ({ activeTeamId, handleToggle }) => {
           <Option
             key={team.id}
             onClick={() => {
-              handleToggle(team.id);
+              handleToggle();
               handleChangeTeamId(team.id);
             }}
           >

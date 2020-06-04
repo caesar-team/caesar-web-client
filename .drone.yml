@@ -129,7 +129,7 @@ globals:
   commands:
   - sed -i "s/\$CICD_GIT_BRANCH/$CICD_GIT_BRANCH/g" deploy/*
   - sed -i "s/\$CICD_GIT_COMMIT/$CICD_GIT_COMMIT/g" deploy/*
-  - kubectl apply -f deploy/
+  - kubectl apply -f deploy/*
 
 - &stepMasterDeploy
   name: deploy staging
@@ -147,7 +147,7 @@ globals:
   commands:
   - sed -i "s/\$CICD_GIT_BRANCH/$CICD_GIT_BRANCH/g" deploy/*
   - sed -i "s/\$CICD_GIT_COMMIT/$CICD_GIT_COMMIT/g" deploy/*
-  - kubectl apply -f deploy/
+  - kubectl apply -f deploy/*
 
 - &stepNotifyToSlack
   name: notify-to-slack

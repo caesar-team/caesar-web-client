@@ -5,7 +5,7 @@ import {
   INBOX_TYPE,
   DASHBOARD_SEARCH_MODE,
 } from '@caesar/common/constants';
-import { MultiItem, List, SearchList } from '@caesar/components';
+import { MultiItem, List } from '@caesar/components';
 import {
   workInProgressItemSelector,
   workInProgressItemIdsSelector,
@@ -66,25 +66,17 @@ const MiddleColumnComponent = ({
           onSelectAll={handleSelectAllListItems}
         />
       )}
-      {mode === DASHBOARD_DEFAULT_MODE ? (
-        <List
-          isMultiItem={isMultiItem}
-          workInProgressList={workInProgressList}
-          workInProgressItem={workInProgressItem}
-          workInProgressItemIds={workInProgressItemIds}
-          items={visibleListItems}
-          onClickItem={handleClickItem}
-        />
-      ) : (
-        // TODO: Redesign SearchList?
-        <SearchList
-          isMultiItem={isMultiItem}
-          items={searchedItems}
-          workInProgressItem={workInProgressItem}
-          workInProgressItemIds={workInProgressItemIds}
-          onClickItem={handleClickItem}
-        />
-      )}
+      <List
+        mode={mode}
+        isMultiItem={isMultiItem}
+        workInProgressList={workInProgressList}
+        workInProgressItem={workInProgressItem}
+        workInProgressItemIds={workInProgressItemIds}
+        items={
+          mode === DASHBOARD_DEFAULT_MODE ? visibleListItems : searchedItems
+        }
+        onClickItem={handleClickItem}
+      />
     </>
   );
 };

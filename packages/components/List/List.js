@@ -4,6 +4,7 @@ import equal from 'fast-deep-equal';
 import memoize from 'memoize-one';
 import AutoSizer from 'react-virtualized-auto-sizer';
 import { FixedSizeList } from 'react-window';
+import { DASHBOARD_DEFAULT_MODE } from '@caesar/common/constants';
 import { Button } from '@caesar/components';
 import { FixedSizeItem } from './FixedSizeItem';
 import { ScrollbarVirtualList } from './ScrollbarVirtualList';
@@ -24,7 +25,7 @@ const ColumnHeader = styled.div`
   align-items: center;
   height: 56px;
   padding: 8px 24px;
-  background-color: ${({ theme }) => theme.color.snow};
+  background-color: ${({ theme }) => theme.color.alto};
   border-bottom: 1px solid ${({ theme }) => theme.color.gallery};
 `;
 
@@ -54,14 +55,21 @@ const createItemData = memoize(
 );
 
 const ListComponent = ({
+  mode,
   isMultiItem = false,
-  workInProgressList,
+  workInProgressList = null,
   workInProgressItem,
   workInProgressItemIds,
   items = [],
   onClickItem = Function.prototype,
 }) => {
-  if (!workInProgressList && !workInProgressItemIds.length) {
+  const isDashboardDefaultMode = mode === DASHBOARD_DEFAULT_MODE;
+
+  if (
+    isDashboardDefaultMode &&
+    !workInProgressList &&
+    !workInProgressItemIds.length
+  ) {
     return (
       <Wrapper isEmpty>
         <EmptyList />
@@ -105,7 +113,11 @@ const ListComponent = ({
     <Wrapper isEmpty={isEmpty}>
       {!isMultiItem && (
         <ColumnHeader>
-          <ColumnTitle>{workInProgressList.label}</ColumnTitle>
+          <ColumnTitle>
+            {isDashboardDefaultMode
+              ? workInProgressList.label
+              : `Search results (${items.length} elements):`}
+          </ColumnTitle>
           {/* TODO: Add sharing list functional; Set condition when to show this button */}
           {/* <Button
             icon="share-network"

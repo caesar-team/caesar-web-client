@@ -87,7 +87,7 @@ const MenuListInnerComponent = ({
   const isPersonal = !currentTeam;
   const personalLists = useSelector(personalListsByTypeSelector);
   const teamLists = useSelector(currentTeamListsSelector);
-  const [isListsOpened, setIsListsOpened] = useState(false);
+  const [isListsOpened, setIsListsOpened] = useState(true);
 
   const menuList = [
     {

@@ -73,6 +73,11 @@ const CheckboxStyled = styled(Checkbox)`
       }
     `}
   }
+
+  ${Checkbox.Input}:checked + ${Checkbox.Box} {
+    background-color: ${({ theme }) => theme.color.emperor};
+    border-color: ${({ theme }) => theme.color.emperor};
+  }
 `;
 
 const Addon = styled.div`
@@ -132,13 +137,13 @@ export const Item = ({
       isMultiItem={isMultiItem}
       {...props}
     >
-      {isMultiItem ? (
-        <CheckboxStyled checked={isActive} onChange={Function.prototype} />
-      ) : (
-        <TypeIconWrapper>
+      <TypeIconWrapper>
+        {isMultiItem ? (
+          <CheckboxStyled checked={isActive} onChange={Function.prototype} />
+        ) : (
           <ItemTypeIcon type={type} />
-        </TypeIconWrapper>
-      )}
+        )}
+      </TypeIconWrapper>
       <Title>{name}</Title>
       {shouldShowAttachments && (
         <Addon>

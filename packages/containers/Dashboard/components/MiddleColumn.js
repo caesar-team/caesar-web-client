@@ -55,7 +55,7 @@ const MiddleColumnComponent = ({
       {isMultiItem && (
         // TODO: Redesign MultiItem?
         <MultiItem
-          isInboxList={isInboxList}
+          isInboxItems={isInboxList}
           isTrashItems={isTrashList}
           workInProgressItemIds={workInProgressItemIds}
           areAllItemsSelected={areAllItemsSelected}

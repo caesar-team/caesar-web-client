@@ -10,7 +10,7 @@ import { Button, Icon } from '@caesar/components';
 import { formatDate } from '@caesar/common/utils/dateUtils';
 import { matchStrict } from '@caesar/common/utils/match';
 import equal from 'fast-deep-equal';
-import EmptyItem from './EmptyItem';
+import { EmptyItem } from './EmptyItem';
 import { Credentials, CredentialsForm, DocumentForm, Document } from './Types';
 import { Scrollbar } from '../Scrollbar';
 
@@ -60,7 +60,7 @@ const NotifyButton = styled(Button)`
   margin-left: 20px;
 `;
 
-const Item = ({
+const ItemComponent = ({
   isTrashItem = false,
   item,
   owner,
@@ -221,7 +221,7 @@ const Item = ({
   );
 };
 
-export default memo(Item, (prevProps, nextProps) => {
+export const Item = memo(ItemComponent, (prevProps, nextProps) => {
   return (
     equal(prevProps.item, nextProps.item) &&
     equal(prevProps.members, nextProps.members) &&

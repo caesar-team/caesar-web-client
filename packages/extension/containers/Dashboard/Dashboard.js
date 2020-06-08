@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import styled from 'styled-components';
-import { ITEM_REVIEW_MODE } from '@caesar-utils/constants';
+import { ITEM_MODE } from '@caesar-utils/constants';
 import {
   Lists,
   ListOption,
@@ -54,8 +54,10 @@ const GeneratorOptionName = styled.div`
   margin-left: 16px;
 `;
 
-const ITEM_MODE = 'ITEM_MODE';
-const PASSWORD_GENERATOR_MODE = 'PASSWORD_GENERATOR_MODE';
+const MODE = {
+  ITEM: 'ITEM_MODE',
+  PASSWORD_GENERATOR: 'PASSWORD_GENERATOR_MODE',
+};
 
 class Dashboard extends Component {
   state = this.prepareInitialState();
@@ -69,7 +71,7 @@ class Dashboard extends Component {
     this.props.setWorkInProgressItem(null);
 
     this.setState({
-      mode: PASSWORD_GENERATOR_MODE,
+      mode: MODE.PASSWORD_GENERATOR,
     });
   };
 
@@ -81,7 +83,7 @@ class Dashboard extends Component {
     );
 
     this.setState({
-      mode: ITEM_MODE,
+      mode: MODE.ITEM,
     });
   };
 
@@ -91,13 +93,13 @@ class Dashboard extends Component {
 
     this.props.setWorkInProgressItem(
       this.props.itemsById[itemId],
-      ITEM_REVIEW_MODE,
+      ITEM_MODE.REVIEW,
     );
   };
 
   prepareInitialState() {
     return {
-      mode: ITEM_MODE,
+      mode: MODE.ITEM,
     };
   }
 
@@ -111,7 +113,7 @@ class Dashboard extends Component {
     } = this.props;
 
     const isActive =
-      mode !== PASSWORD_GENERATOR_MODE &&
+      mode !== MODE.PASSWORD_GENERATOR &&
       workInProgressList &&
       favoritesList.id === workInProgressList.id;
 
@@ -131,7 +133,7 @@ class Dashboard extends Component {
   renderPasswordGenerator() {
     const { mode } = this.state;
 
-    const isActive = mode === PASSWORD_GENERATOR_MODE;
+    const isActive = mode === MODE.PASSWORD_GENERATOR;
 
     return (
       <GeneratorOption onClick={this.handleChangeMode}>
@@ -179,7 +181,7 @@ class Dashboard extends Component {
           </Scrollbar>
         </LeftWrapper>
         <RightWrapper>
-          {mode === ITEM_MODE ? (
+          {mode === MODE.ITEM ? (
             <Item item={workInProgressItem} />
           ) : (
             <PasswordGenerator />

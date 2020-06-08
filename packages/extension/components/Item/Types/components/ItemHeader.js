@@ -1,7 +1,7 @@
-import React, { Fragment } from 'react';
+import React from 'react';
 import styled from 'styled-components';
 import { formatDate } from '@caesar-utils/utils/dateUtils';
-import { TRASH_TYPE } from '@caesar-utils/constants';
+import { LIST_TYPE } from '@caesar-utils/constants';
 import { upperFirst } from '@caesar-utils//utils/string';
 import { Icon, Button, Avatar, AvatarsList, Dropdown } from '@caesar-ui';
 import { Row } from './Row';
@@ -150,14 +150,14 @@ export const ItemHeader = ({
 }) => {
   if (isSharedItem) {
     return (
-      <Fragment>
+      <>
         <StyledRow>
           <UpdatedDate>Last updated {formatDate(lastUpdated)}</UpdatedDate>
         </StyledRow>
         <Row>
           <Title>{name}</Title>
         </Row>
-      </Fragment>
+      </>
     );
   }
 
@@ -179,11 +179,11 @@ export const ItemHeader = ({
   const isOwner = user.id === ownerId;
 
   const options = allLists
-    .filter(({ id, type }) => type !== TRASH_TYPE && id !== listId)
+    .filter(({ id, type }) => type !== LIST_TYPE.TRASH && id !== listId)
     .map(({ label, id }) => ({ value: id, label: upperFirst(label) }));
 
   return (
-    <Fragment>
+    <>
       <Row>
         <UpdatedDate>Last updated {formatDate(lastUpdated)}</UpdatedDate>
         <Row>
@@ -250,6 +250,6 @@ export const ItemHeader = ({
           )}
         </Row>
       </InviteRow>
-    </Fragment>
+    </>
   );
 };

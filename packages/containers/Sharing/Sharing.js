@@ -7,19 +7,14 @@ import {
   Document,
   withNotification,
 } from '@caesar/components';
-import {
-  INBOX_TYPE,
-  ITEM_CREDENTIALS_TYPE,
-  ITEM_DOCUMENT_TYPE,
-  ITEM_REVIEW_MODE,
-} from '@caesar/common/constants';
+import { LIST_TYPE, ITEM_TYPE, ITEM_MODE } from '@caesar/common/constants';
 import {
   getPrivateKeyObj,
   decryptItem,
 } from '@caesar/common/utils/cipherUtils';
 
 const getInboxItem = list => {
-  const inbox = list.find(({ type }) => type === INBOX_TYPE);
+  const inbox = list.find(({ type }) => type === LIST_TYPE.INBOX);
 
   if (!inbox || !inbox.children) {
     return null;
@@ -42,7 +37,7 @@ class Sharing extends Component {
     const decryptedSecret = await decryptItem(item.secret, privateKeyObj);
 
     this.setState({
-      item: { ...item, data: decryptedSecret, mode: ITEM_REVIEW_MODE },
+      item: { ...item, data: decryptedSecret, mode: ITEM_MODE.REVIEW },
     });
   }
 
@@ -64,10 +59,10 @@ class Sharing extends Component {
     const renderedItem = matchStrict(
       item.type,
       {
-        [ITEM_CREDENTIALS_TYPE]: (
+        [ITEM_TYPE.CREDENTIALS]: (
           <Credentials isSharedItem item={item} notification={notification} />
         ),
-        [ITEM_DOCUMENT_TYPE]: (
+        [ITEM_TYPE.DOCUMENT]: (
           <Document isSharedItem item={item} notification={notification} />
         ),
       },

@@ -36,7 +36,7 @@ import {
 import { getServerErrorMessage } from '@caesar/common/utils/error';
 import { chunk } from '@caesar/common/utils/utils';
 import {
-  CHILD_ITEM_ENTITY_TYPE,
+  ENTITY_TYPE,
   INVITE_TYPE,
   PERMISSION_READ,
   NOOP_NOTIFICATION,
@@ -112,7 +112,7 @@ export function* createChildItemBatchSaga({ payload: { itemUserPairs } }) {
         ...accumulator,
         [childItem.id]: {
           ...childItem,
-          __type: CHILD_ITEM_ENTITY_TYPE,
+          __type: ENTITY_TYPE.CHILD_ITEM,
         },
       }),
       {},
@@ -139,7 +139,9 @@ export function* updateChildItemsBatchSaga({
 }) {
   try {
     // eslint-disable-next-line
-    const childItems = yield select(childItemsBatchSelector, { childItemIds: invited });
+    const childItems = yield select(childItemsBatchSelector, {
+      childItemIds: invited,
+    });
     const memberIds = childItems.map(({ userId }) => userId);
 
     const membersById = yield select(membersByIdSelector);

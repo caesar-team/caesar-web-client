@@ -1,9 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
-import {
-  ITEM_CREDENTIALS_TYPE,
-  ITEM_ICON_TYPES,
-} from '@caesar/common/constants';
+import { ITEM_TYPE, ITEM_ICON_TYPE } from '@caesar/common/constants';
 import { Icon } from '../Icon';
 import { Checkbox } from '../Checkbox';
 
@@ -105,7 +102,7 @@ const CloseIcon = styled(Icon)`
 `;
 
 const ItemTypeIcon = ({ type }) => {
-  const icon = ITEM_ICON_TYPES[type] || ITEM_ICON_TYPES[ITEM_CREDENTIALS_TYPE];
+  const icon = ITEM_ICON_TYPE[type] || ITEM_ICON_TYPE[ITEM_TYPE.CREDENTIALS];
 
   return <Icon name={icon} width={20} height={20} color="white" />;
 };

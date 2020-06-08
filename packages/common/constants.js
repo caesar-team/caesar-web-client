@@ -36,62 +36,59 @@ export const DEFAULT_CORES_COUNT = 4;
 export const DECRYPTION_CHUNK_SIZE = 25;
 export const ENCRYPTION_CHUNK_SIZE = 25;
 
-export const ROOT_TYPE = 'root';
-export const INBOX_TYPE = 'inbox';
-export const LIST_TYPE = 'list';
-export const DEFAULT_LIST_TYPE = 'default';
-export const TRASH_TYPE = 'trash';
-export const FAVORITES_TYPE = 'favorites';
-export const LIST_TYPES = {
-  ROOT_TYPE,
-  INBOX_TYPE,
-  LIST_TYPE,
-  TRASH_TYPE,
+export const LIST_TYPE = {
+  ROOT: 'root',
+  INBOX: 'inbox',
+  LIST: 'list',
+  TRASH: 'trash',
+  DEFAULT: 'default',
+  FAVORITES: 'favorites',
 };
 
-export const DEFAULT_TEAM_TYPE = 'default';
-export const PERSONAL_TEAM_TYPE = 'personal';
-
-export const DASHBOARD_DEFAULT_MODE = 'DEFAULT_MODE';
-export const DASHBOARD_SEARCH_MODE = 'SEARCH_MODE';
-export const DASHBOARD_TOOL_MODE = 'SECURE_MESSAGE_MODE';
-
-export const ITEM_REVIEW_MODE = 'review';
-export const ITEM_WORKFLOW_EDIT_MODE = 'edit';
-export const ITEM_WORKFLOW_CREATE_MODE = 'create';
-export const ITEM_MODES = {
-  ITEM_REVIEW_MODE,
-  ITEM_WORKFLOW_EDIT_MODE,
-  ITEM_WORKFLOW_CREATE_MODE,
+export const TEAM_TYPE = {
+  DEFAULT: 'default',
+  PERSONAL: 'personal',
 };
 
-export const LIST_REVIEW_MODE = 'review';
-export const LIST_WORKFLOW_EDIT_MODE = 'edit';
-export const LIST_WORKFLOW_CREATE_MODE = 'create';
-export const LIST_MODES = {
-  LIST_REVIEW_MODE,
-  LIST_WORKFLOW_EDIT_MODE,
-  LIST_WORKFLOW_CREATE_MODE,
+export const DASHBOARD_MODE = {
+  DEFAULT: 'DEFAULT_MODE',
+  SEARCH: 'SEARCH_MODE',
+  TOOL: 'SECURE_MESSAGE_MODE',
+};
+
+export const ITEM_MODE = {
+  REVIEW: 'review',
+  WORKFLOW_EDIT: 'edit',
+  WORKFLOW_CREATE: 'create',
+};
+
+export const LIST_MODE = {
+  REVIEW: 'review',
+  WORKFLOW_EDIT: 'edit',
+  WORKFLOW_CREATE: 'create',
 };
 
 // mb some types are not included here, don't have enough information
-export const ITEM_CREDENTIALS_TYPE = 'credentials';
-export const ITEM_CREDIT_CARD_TYPE = 'card';
-export const ITEM_DOCUMENT_TYPE = 'document';
-export const ITEM_TYPES_ARRAY = [
-  ITEM_CREDENTIALS_TYPE,
-  ITEM_CREDIT_CARD_TYPE,
-  ITEM_DOCUMENT_TYPE,
-];
-export const ITEM_TYPES = {
-  ITEM_CREDENTIALS_TYPE,
-  ITEM_CREDIT_CARD_TYPE,
-  ITEM_DOCUMENT_TYPE,
+export const ITEM_TYPE = {
+  CREDENTIALS: 'credentials',
+  CREDIT_CARD: 'card',
+  DOCUMENT: 'document',
 };
 
-export const ITEM_ICON_TYPES = {
-  [ITEM_CREDENTIALS_TYPE]: 'key',
-  [ITEM_DOCUMENT_TYPE]: 'securenote',
+export const ITEM_TYPES_ARRAY = [
+  ITEM_TYPE.CREDENTIALS,
+  ITEM_TYPE.CREDIT_CARD,
+  ITEM_TYPE.DOCUMENT,
+];
+
+export const ITEM_TEXT_TYPE = {
+  [ITEM_TYPE.CREDENTIALS]: 'credential',
+  [ITEM_TYPE.DOCUMENT]: 'note',
+};
+
+export const ITEM_ICON_TYPE = {
+  [ITEM_TYPE.CREDENTIALS]: 'key',
+  [ITEM_TYPE.DOCUMENT]: 'securenote',
 };
 
 export const KEY_CODES = {
@@ -106,31 +103,8 @@ export const KEY_CODES = {
   ARROW_DOWN: 40,
 };
 
-export const PERMISSION_READ = 'read';
-export const PERMISSION_WRITE = 'write';
-
 export const INVITE_TYPE = 'invite';
 export const SHARE_TYPE = 'share';
-
-export const USER_ROLE_ADMIN = 'admin';
-export const USER_ROLE_MEMBER = 'member';
-
-export const COMMANDS_ROLES = {
-  USER_ROLE_ADMIN,
-  USER_ROLE_MEMBER,
-};
-
-export const ROLE_USER = 'ROLE_USER';
-export const ROLE_ADMIN = 'ROLE_ADMIN';
-export const ROLE_READ_ONLY_USER = 'ROLE_READ_ONLY_USER';
-export const ROLE_ANONYMOUS_USER = 'ROLE_ANONYMOUS_USER';
-
-export const DOMAIN_ROLES = {
-  ROLE_USER,
-  ROLE_ADMIN,
-  ROLE_READ_ONLY_USER,
-  ROLE_ANONYMOUS_USER,
-};
 
 export const ROUTES = {
   SIGN_IN: '/signin',
@@ -170,11 +144,13 @@ export const UNLOCKED_ROUTES = [
   ROUTES.INVITE,
 ];
 
-export const CHILD_ITEM_ENTITY_TYPE = 'ChildItem';
-export const ITEM_ENTITY_TYPE = 'Item';
-export const LIST_ENTITY_TYPE = 'List';
-export const TEAM_ENTITY_TYPE = 'Team';
-export const MEMBER_ENTITY_TYPE = 'Member';
+export const ENTITY_TYPE = {
+  CHILD_ITEM: 'ChildItem',
+  ITEM: 'Item',
+  LIST: 'List',
+  TEAM: 'Team',
+  MEMBER: 'Member',
+};
 
 export const ENCRYPTING_ITEM_NOTIFICATION = 'Encryption in progress...';
 export const CREATING_ITEM_NOTIFICATION = 'The item is being created...';
@@ -186,12 +162,27 @@ export const REMOVING_IN_PROGRESS_NOTIFICATION = 'Removing in progress...';
 export const REDIRECT_NOTIFICATION = 'Redirecting...';
 export const NOOP_NOTIFICATION = '';
 
-export const ENTITIES = {
-  CHILD_ITEM_ENTITY_TYPE,
-  ITEM_ENTITY_TYPE,
-  LIST_ENTITY_TYPE,
-  TEAM_ENTITY_TYPE,
-  MEMBER_ENTITY_TYPE,
+export const PERMISSION_READ = 'read';
+export const PERMISSION_WRITE = 'write';
+
+export const USER_ROLE_ADMIN = 'admin';
+export const USER_ROLE_MEMBER = 'member';
+
+export const COMMANDS_ROLES = {
+  USER_ROLE_ADMIN,
+  USER_ROLE_MEMBER,
+};
+
+export const ROLE_USER = 'ROLE_USER';
+export const ROLE_ADMIN = 'ROLE_ADMIN';
+export const ROLE_READ_ONLY_USER = 'ROLE_READ_ONLY_USER';
+export const ROLE_ANONYMOUS_USER = 'ROLE_ANONYMOUS_USER';
+
+export const DOMAIN_ROLES = {
+  ROLE_USER,
+  ROLE_ADMIN,
+  ROLE_READ_ONLY_USER,
+  ROLE_ANONYMOUS_USER,
 };
 
 // casl permissions

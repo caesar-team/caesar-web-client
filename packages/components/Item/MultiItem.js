@@ -4,51 +4,49 @@ import { Button } from '@caesar/components';
 import { Checkbox } from '../Checkbox';
 
 const Wrapper = styled.div`
-  display: flex;
-  justify-content: space-between;
-  background: ${({ theme }) => theme.color.black};
-  color: ${({ theme }) => theme.color.white};
   position: relative;
-  height: 61px;
-  padding: 0 20px;
-`;
-
-const LeftTopWrapper = styled.div`
   display: flex;
   align-items: center;
-  margin-left: 20px;
+  height: 56px;
+  padding: 4px 24px;
+  color: ${({ theme }) => theme.color.white};
+  background: ${({ theme }) => theme.color.black};
 `;
 
-const RightTopWrapper = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
+const Title = styled.div`
+  margin-right: auto;
+  margin-left: 16px;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
 `;
 
 const ButtonStyled = styled(Button)`
-  margin-right: 10px;
+  margin-left: 8px;
 `;
 
 const CheckboxStyled = styled(Checkbox)`
-  margin-right: 20px;
+  margin: 0 8px;
 
   ${Checkbox.Box} {
     background-color: ${({ theme }) => theme.color.emperor};
-    border: 1px solid ${({ theme }) => theme.color.emperor};
+    border-color: ${({ theme }) => theme.color.emperor};
 
     ${({ checked }) => `
-
       > svg {
         display: ${checked ? 'block' : 'none'};
       }
     `}
   }
+
+  ${Checkbox.Input}:checked + ${Checkbox.Box} {
+    background-color: ${({ theme }) => theme.color.emperor};
+    border-color: ${({ theme }) => theme.color.emperor};
+  }
 `;
 
-const MultiItem = ({
-  // TODO: remove this check here
-  isInboxList = false,
-  //
+export const MultiItem = ({
+  isInboxItems = false,
   isTrashItems = false,
   areAllItemsSelected = false,
   workInProgressItemIds,
@@ -64,33 +62,25 @@ const MultiItem = ({
 
   return (
     <Wrapper>
-      <LeftTopWrapper>
-        <CheckboxStyled checked={areAllItemsSelected} onChange={onSelectAll} />
-        {workInProgressItemIds.length} items
-      </LeftTopWrapper>
-      <RightTopWrapper>
-        <ButtonStyled withOfflineCheck color="white" onClick={onClickMove}>
-          MOVE
-        </ButtonStyled>
-        {!isInboxList && (
-          <ButtonStyled
-            onlyIcon
-            withOfflineCheck
-            color="white"
-            icon="share"
-            onClick={onClickShare}
-          />
-        )}
-        <Button
-          onlyIcon
+      <CheckboxStyled checked={areAllItemsSelected} onChange={onSelectAll} />
+      <Title>{workInProgressItemIds.length} items</Title>
+      <ButtonStyled withOfflineCheck color="white" onClick={onClickMove}>
+        MOVE
+      </ButtonStyled>
+      {!isInboxItems && (
+        <ButtonStyled
           withOfflineCheck
           color="white"
-          icon="trash"
-          onClick={isTrashItems ? onClickRemove : onClickMoveToTrash}
+          icon="share"
+          onClick={onClickShare}
         />
-      </RightTopWrapper>
+      )}
+      <ButtonStyled
+        withOfflineCheck
+        color="white"
+        icon="trash"
+        onClick={isTrashItems ? onClickRemove : onClickMoveToTrash}
+      />
     </Wrapper>
   );
 };
-
-export default MultiItem;

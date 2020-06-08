@@ -2,12 +2,13 @@ import React, { memo } from 'react';
 import styled from 'styled-components';
 import equal from 'fast-deep-equal';
 import memoize from 'memoize-one';
-import { FixedSizeList } from 'react-window';
 import AutoSizer from 'react-virtualized-auto-sizer';
+import { FixedSizeList } from 'react-window';
+import { DASHBOARD_DEFAULT_MODE } from '@caesar/common/constants';
 import { Button } from '@caesar/components';
-import FixedSizeItem from './FixedSizeItem';
-import ScrollbarVirtualList from './ScrollbarVirtualList';
-import EmptyList from './EmptyList';
+import { FixedSizeItem } from './FixedSizeItem';
+import { ScrollbarVirtualList } from './ScrollbarVirtualList';
+import { EmptyList } from './EmptyList';
 
 const Wrapper = styled.div`
   position: relative;
@@ -15,7 +16,7 @@ const Wrapper = styled.div`
   flex-direction: column;
   height: calc(100vh - 55px);
   background-color: ${({ isEmpty, theme }) =>
-    isEmpty ? theme.color.white : theme.color.lightBlue};
+    isEmpty ? theme.color.white : theme.color.alto};
 `;
 
 const ColumnHeader = styled.div`
@@ -24,7 +25,7 @@ const ColumnHeader = styled.div`
   align-items: center;
   height: 56px;
   padding: 8px 24px;
-  background-color: ${({ theme }) => theme.color.snow};
+  background-color: ${({ theme }) => theme.color.alto};
   border-bottom: 1px solid ${({ theme }) => theme.color.gallery};
 `;
 
@@ -35,7 +36,7 @@ const ColumnTitle = styled.div`
   color: ${({ theme }) => theme.color.black};
 `;
 
-const ITEM_HEIGHT = 80;
+const ITEM_HEIGHT = 56;
 
 const createItemData = memoize(
   (
@@ -53,15 +54,22 @@ const createItemData = memoize(
   }),
 );
 
-const List = ({
+const ListComponent = ({
+  mode,
   isMultiItem = false,
-  workInProgressList,
+  workInProgressList = null,
   workInProgressItem,
   workInProgressItemIds,
   items = [],
   onClickItem = Function.prototype,
 }) => {
-  if (!workInProgressList && !workInProgressItemIds.length) {
+  const isDashboardDefaultMode = mode === DASHBOARD_DEFAULT_MODE;
+
+  if (
+    isDashboardDefaultMode &&
+    !workInProgressList &&
+    !workInProgressItemIds.length
+  ) {
     return (
       <Wrapper isEmpty>
         <EmptyList />
@@ -105,7 +113,11 @@ const List = ({
     <Wrapper isEmpty={isEmpty}>
       {!isMultiItem && (
         <ColumnHeader>
-          <ColumnTitle>{workInProgressList.label}</ColumnTitle>
+          <ColumnTitle>
+            {isDashboardDefaultMode
+              ? workInProgressList.label
+              : `Search results (${items.length} elements):`}
+          </ColumnTitle>
           {/* TODO: Add sharing list functional; Set condition when to show this button */}
           {/* <Button
             icon="share-network"
@@ -121,6 +133,6 @@ const List = ({
   );
 };
 
-export default memo(List, (prevProps, nextProps) =>
+export const List = memo(ListComponent, (prevProps, nextProps) =>
   equal(prevProps, nextProps),
 );

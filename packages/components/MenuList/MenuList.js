@@ -26,7 +26,7 @@ const ColumnHeader = styled.div`
   align-items: center;
   height: 56px;
   padding: 8px 24px;
-  background-color: ${({ theme }) => theme.color.snow};
+  background-color: ${({ theme }) => theme.color.alto};
   border-bottom: 1px solid ${({ theme }) => theme.color.gallery};
 `;
 

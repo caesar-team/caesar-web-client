@@ -35,10 +35,11 @@ const MenuItemInner = styled.div`
     isActive ? theme.color.black : theme.color.emperor};
   background-color: ${({ isActive, theme }) =>
     isActive ? theme.color.snow : theme.color.white};
-  cursor: pointer;
-  transition: all 0.2s;
   border-top: 1px solid transparent;
   border-bottom: 1px solid transparent;
+  cursor: pointer;
+  transition: all 0.2s;
+
   ${({ isActive, theme }) =>
     isActive &&
     `
@@ -86,7 +87,7 @@ const MenuListInnerComponent = ({
   const isPersonal = !currentTeam;
   const personalLists = useSelector(personalListsByTypeSelector);
   const teamLists = useSelector(currentTeamListsSelector);
-  const [isListsOpened, setIsListsOpened] = useState(false);
+  const [isListsOpened, setIsListsOpened] = useState(true);
 
   const menuList = [
     {

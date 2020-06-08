@@ -48,7 +48,7 @@ export {
   SecondaryHeader,
 } from './Layout';
 export { Link } from './Link';
-export { List, SearchList, ListItem } from './List';
+export { List, ListItem } from './List';
 export {
   Loader,
   CircleLoader,

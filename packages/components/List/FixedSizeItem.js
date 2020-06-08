@@ -1,8 +1,8 @@
 import React, { memo } from 'react';
 import { areEqual } from 'react-window';
-import Item from './Item';
+import { Item } from './Item';
 
-const FixedSizeItem = memo(({ data, index, style }) => {
+const FixedSizeItemComponent = ({ data, index, style }) => {
   const {
     items,
     isMultiItem,
@@ -27,6 +27,6 @@ const FixedSizeItem = memo(({ data, index, style }) => {
       {...item}
     />
   );
-}, areEqual);
+};
 
-export default FixedSizeItem;
+export const FixedSizeItem = memo(FixedSizeItemComponent, areEqual);

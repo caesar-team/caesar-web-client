@@ -132,6 +132,7 @@ export const DOMAIN_ROLES = {
 };
 
 export const ROUTES = {
+  MAIN: '/',
   SIGN_IN: '/signin',
   SIGN_UP: '/signup',
   LOGOUT: '/logout',

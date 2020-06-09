@@ -16,7 +16,7 @@ import {
 } from '@caesar/components';
 import {
   COMMANDS_ROLES,
-  DEFAULT_TEAM_TYPE,
+  TEAM_TYPE,
   CHANGE_TEAM_MEMBER_ROLE_PERMISSION,
   JOIN_MEMBER_TO_TEAM,
   LEAVE_MEMBER_FROM_TEAM,
@@ -480,7 +480,7 @@ class TeamContainer extends Component {
       );
     }
 
-    const isDefaultTeam = team.type === DEFAULT_TEAM_TYPE;
+    const isDefaultTeam = team.type === TEAM_TYPE.DEFAULT;
 
     const teamUsers = team.users
       ? team.users.filter(({ id }) => id !== user.id)

@@ -1,11 +1,18 @@
 import React, { memo, useState } from 'react';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import styled from 'styled-components';
+import { DASHBOARD_MODE } from '@caesar/common/constants';
 import { currentTeamSelector } from '@caesar/common/selectors/user';
 import {
   personalListsByTypeSelector,
   currentTeamListsSelector,
 } from '@caesar/common/selectors/entities/list';
+import { workInProgressListSelector } from '@caesar/common/selectors/workflow';
+import {
+  setWorkInProgressItem,
+  setWorkInProgressListId,
+  resetWorkInProgressItemIds,
+} from '@caesar/common/actions/workflow';
 import { Icon } from '../Icon';
 
 const ListAddIcon = styled(Icon)`
@@ -77,17 +84,31 @@ const ListItem = styled(MenuItemInner)`
 
 const SECURE_MESSAGE_MODE = 'SECURE_MESSAGE_MODE';
 
-const MenuListInnerComponent = ({
-  activeListId,
-  onClickMenuItem,
-  mode,
-  onClickSecureMessage,
-}) => {
+const MenuListInnerComponent = ({ mode, setSearchedText, setMode }) => {
+  const dispatch = useDispatch();
   const currentTeam = useSelector(currentTeamSelector);
   const isPersonal = !currentTeam;
   const personalLists = useSelector(personalListsByTypeSelector);
   const teamLists = useSelector(currentTeamListsSelector);
+  const workInProgressList = useSelector(workInProgressListSelector);
+  const activeListId = workInProgressList && workInProgressList.id;
   const [isListsOpened, setIsListsOpened] = useState(true);
+
+  const handleClickMenuItem = id => {
+    dispatch(setWorkInProgressListId(id));
+    dispatch(setWorkInProgressItem(null));
+    dispatch(resetWorkInProgressItemIds());
+
+    setMode(DASHBOARD_MODE.DEFAULT);
+    setSearchedText('');
+  };
+
+  const handleClickSecureMessage = () => {
+    dispatch(setWorkInProgressListId(null));
+
+    setMode(DASHBOARD_MODE.TOOL);
+    setSearchedText('');
+  };
 
   const menuList = [
     {
@@ -138,12 +159,12 @@ const MenuListInnerComponent = ({
             withChildren={children}
             onClick={() => {
               if (id === SECURE_MESSAGE_MODE) {
-                return onClickSecureMessage();
+                return handleClickSecureMessage();
               }
 
               return children
                 ? setIsListsOpened(!isListsOpened)
-                : onClickMenuItem(id);
+                : handleClickMenuItem(id);
             }}
           >
             <Icon name={icon} width={16} height={16} />
@@ -162,7 +183,10 @@ const MenuListInnerComponent = ({
           </MenuItemInner>
           {isListsOpened &&
             children?.map(({ id: listId, label }) => (
-              <ListItem key={listId} onClick={() => onClickMenuItem(listId)}>
+              <ListItem
+                key={listId}
+                onClick={() => handleClickMenuItem(listId)}
+              >
                 {label}
               </ListItem>
             ))}

@@ -51,12 +51,7 @@ class NotificationProvider extends PureComponent {
   };
 
   render() {
-    const {
-      children,
-      component = Notification,
-      timeout = 2500,
-      position = 'top-center',
-    } = this.props;
+    const { children, component = Notification } = this.props;
     const { notifications } = this.state;
 
     return (
@@ -71,8 +66,6 @@ class NotificationProvider extends PureComponent {
             onHide={this.handleHide}
             onRemove={this.handleNotificationRemove}
             component={component}
-            timeout={timeout}
-            position={position}
           />
         ))}
       </Provider>

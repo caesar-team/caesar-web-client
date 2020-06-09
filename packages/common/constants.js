@@ -183,6 +183,7 @@ export const CREATING_ITEMS_NOTIFICATION =
 export const MOVING_IN_PROGRESS_NOTIFICATION = 'Moving in progress...';
 export const REMOVING_IN_PROGRESS_NOTIFICATION = 'Removing in progress...';
 export const REDIRECT_NOTIFICATION = 'Redirecting...';
+export const SAVE_NOTIFICATION = 'Saving...';
 export const NOOP_NOTIFICATION = '';
 
 export const ENTITIES = {

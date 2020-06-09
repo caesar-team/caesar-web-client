@@ -41,11 +41,11 @@ export {
   BootstrapLayout,
   DashboardLayout,
   ErrorLayout,
+  PrimaryHeader,
+  SecondaryHeader,
   SettingsLayout,
   SharingLayout,
   SecureLayout,
-  PrimaryHeader,
-  SecondaryHeader,
 } from './Layout';
 export { Link } from './Link';
 export { List, SearchList, ListItem } from './List';

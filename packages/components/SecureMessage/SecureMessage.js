@@ -47,50 +47,54 @@ const SecureMessageComponent = ({
     link: null,
   });
 
-  const handleSubmitForm = async (
+  const handleSubmitForm = (
     { secondsLimit, requestsLimit, password: passwordValue, ...secret },
     { setSubmitting, setFieldError },
   ) => {
-    setFieldError('form', '');
+    const submit = async () => {
+      setFieldError('form', '');
 
-    try {
-      notification.show({
-        text: ENCRYPTING_ITEM_NOTIFICATION,
-        options: {
-          position: 'bottom-right',
-        },
-      });
-      const pwd = passwordValue || generator();
-
-      const encryptedMessage = await encryptByPassword(secret, pwd);
-      await decryptByPassword(encryptedMessage, pwd);
-
-      notification.show({
-        text: SAVE_NOTIFICATION,
-        options: {
-          timeout: 0,
-          position: 'bottom-right',
-        },
-      });
-
-      postSecureMessage({
-        message: encryptedMessage,
-        secondsLimit,
-        requestsLimit,
-      }).then(({ id }) => {
-        setSubmitting(false);
-        setState({
-          step: SECURE_MESSAGE_LINK_STEP,
-          password: pwd,
-          link: id,
+      try {
+        notification.show({
+          text: ENCRYPTING_ITEM_NOTIFICATION,
+          options: {
+            position: 'bottom-right',
+          },
         });
-      });
-    } catch (error) {
-      console.log(error);
-      setFieldError('form', error.message);
-      notification.hide();
-      setSubmitting(false);
-    }
+        const pwd = passwordValue || generator();
+
+        const encryptedMessage = await encryptByPassword(secret, pwd);
+        await decryptByPassword(encryptedMessage, pwd);
+
+        notification.show({
+          text: SAVE_NOTIFICATION,
+          options: {
+            timeout: 0,
+            position: 'bottom-right',
+          },
+        });
+
+        postSecureMessage({
+          message: encryptedMessage,
+          secondsLimit,
+          requestsLimit,
+        }).then(({ id }) => {
+          setSubmitting(false);
+          setState({
+            step: SECURE_MESSAGE_LINK_STEP,
+            password: pwd,
+            link: id,
+          });
+        });
+      } catch (error) {
+        console.log(error);
+        setFieldError('form', error.message);
+        notification.hide();
+        setSubmitting(false);
+      }
+    };
+
+    submit();
   };
 
   const handleClickReturn = () => {

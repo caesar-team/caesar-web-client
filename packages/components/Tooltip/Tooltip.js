@@ -1,7 +1,7 @@
 import React from 'react';
 import ToolTip from 'react-power-tooltip';
 
-const Tooltip = props => (
+export const Tooltip = props => (
   <ToolTip
     fontWeight="normal"
     borderRadius="3px"
@@ -10,5 +10,3 @@ const Tooltip = props => (
     {...props}
   />
 );
-
-export default Tooltip;

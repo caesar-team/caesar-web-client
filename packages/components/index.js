@@ -21,6 +21,7 @@ export { Error } from './Error';
 export { File } from './File';
 export { FormInput } from './FormInput';
 export { Head } from './Head';
+export { Hint } from './Hint';
 export { HoldClickBehaviour } from './HoldClickBehaviour';
 export { Icon } from './Icon';
 export {

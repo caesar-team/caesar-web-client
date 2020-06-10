@@ -17,9 +17,11 @@ const Container = styled.div`
       isDragActive ? theme.color.black : theme.color.gray};
   width: 100%;
   padding: 16px 5px;
-  cursor: pointer;
+  cursor: ${({ isDisabled }) => (isDisabled ? 'not-allowed' : 'pointer')};
   outline: none;
   transition: all 0.2s;
+
+  ${({ isDisabled }) => isDisabled && `opacity: 0.3;`}
 `;
 
 const Text = styled.span`
@@ -57,7 +59,7 @@ const splitFilesToUniqAndDuplicates = files => {
 
   const map = new Map();
 
-  // eslint-disable-next-line
+  // eslint-disable-next-line no-restricted-syntax
   for (const file of files) {
     const checkLabel = `${file.name}_${file.raw.length}`;
 
@@ -86,6 +88,7 @@ const Uploader = ({
   error,
   files: previousFiles = [],
   notification,
+  disabled,
   children,
   className,
   ...props
@@ -117,6 +120,7 @@ const Uploader = ({
     <Dropzone
       multiple={multiple}
       accept={accept}
+      disabled={disabled}
       onDrop={handleDrop}
       {...props}
     >
@@ -127,6 +131,7 @@ const Uploader = ({
           <Container
             {...getRootProps()}
             isDragActive={isDragActive}
+            isDisabled={disabled}
             className={className}
           >
             <input {...getInputProps()} />

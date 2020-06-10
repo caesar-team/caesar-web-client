@@ -9,18 +9,15 @@ const Wrapper = styled.div`
     position === 'top-center' &&
     `
       left: 50%;
-      top: 0;
-      padding-top: 16px;
+      top: 16px;
       transform: translateX(-50%);
   `};
 
   ${({ position }) =>
     position === 'bottom-right' &&
     `
-      right: 0;
-      bottom: 0;
-      padding-bottom: 16px;
-      transform: translateX(-50%);
+      right: 16px;
+      bottom: 60px;
   `};
 `;
 
@@ -32,7 +29,9 @@ class NotificationContainer extends PureComponent {
   }
 
   startTimer = () => {
-    const { timeout } = this.props;
+    const { options: { timeout = 2500 } = {} } = this.props.notificationProps;
+
+    if (timeout === 0) return;
 
     this.timer = setTimeout(this.hide, timeout);
   };
@@ -52,11 +51,8 @@ class NotificationContainer extends PureComponent {
   };
 
   render() {
-    const {
-      notificationProps,
-      component: Component,
-      position = 'top-center',
-    } = this.props;
+    const { notificationProps, component: Component } = this.props;
+    const { options: { position = 'top-center' } = {} } = notificationProps;
 
     return (
       <Wrapper position={position}>

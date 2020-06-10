@@ -1,9 +1,6 @@
 import React, { Fragment } from 'react';
 import styled from 'styled-components';
-import {
-  ITEM_CREDENTIALS_TYPE,
-  ITEM_DOCUMENT_TYPE,
-} from '@caesar-utils/constants';
+import { ITEM_TYPE } from '@caesar-utils/constants';
 import { matchStrict } from '@caesar-utils/utils/match';
 import { Scrollbar } from '@caesar-ui';
 import EmptyItem from './EmptyItem';
@@ -26,8 +23,8 @@ const Item = ({ item }) => {
   const renderedItem = matchStrict(
     type,
     {
-      [ITEM_CREDENTIALS_TYPE]: <Credentials item={item} />,
-      [ITEM_DOCUMENT_TYPE]: <Document item={item} />,
+      [ITEM_TYPE.CREDENTIALS]: <Credentials item={item} />,
+      [ITEM_TYPE.DOCUMENT]: <Document item={item} />,
     },
     null,
   );

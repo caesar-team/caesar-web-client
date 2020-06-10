@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import { Formik, FastField } from 'formik';
 import { Modal, FormInput, Button, Label } from '@caesar/components';
 import { checkError } from '@caesar/common/utils/formikUtils';
-import { LIST_WORKFLOW_CREATE_MODE } from '@caesar/common/constants';
+import { LIST_MODE } from '@caesar/common/constants';
 import { schema } from './schema';
 
 const FormTitle = styled.div`
@@ -32,7 +32,7 @@ class NewListModal extends Component {
       onSubmit = Function.prototype,
     } = this.props;
 
-    const isCreateMode = mode === LIST_WORKFLOW_CREATE_MODE;
+    const isCreateMode = mode === LIST_MODE.WORKFLOW_CREATE;
 
     return (
       <Modal

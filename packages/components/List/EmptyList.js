@@ -1,7 +1,8 @@
-import React, { Fragment } from 'react';
+import React from 'react';
 import styled from 'styled-components';
 import EmptyImg from '@caesar/assets/images/empty-list.png';
 import EmptyImg2x from '@caesar/assets/images/empty-list@2x.png';
+import EmptyImg3x from '@caesar/assets/images/empty-list@3x.png';
 
 const Image = styled.img`
   margin-top: 15px;
@@ -17,15 +18,9 @@ const Text = styled.div`
   transform: translateX(-50%);
 `;
 
-const EmptyList = props => (
-  <Fragment>
-    <Image
-      src={EmptyImg}
-      srcSet={`${EmptyImg} 1x, ${EmptyImg2x} 2x`}
-      {...props}
-    />
+export const EmptyList = () => (
+  <>
+    <Image srcSet={`${EmptyImg2x} 2x, ${EmptyImg3x} 3x`} src={EmptyImg} />
     <Text>No elements</Text>
-  </Fragment>
+  </>
 );
-
-export default EmptyList;

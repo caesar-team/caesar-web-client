@@ -8,10 +8,7 @@ import {
   TextLoader,
   withNotification,
 } from '@caesar/components';
-import {
-  LIST_WORKFLOW_EDIT_MODE,
-  LIST_WORKFLOW_CREATE_MODE,
-} from '@caesar/common/constants';
+import { LIST_MODE } from '@caesar/common/constants';
 
 const Wrapper = styled.div`
   display: flex;
@@ -60,7 +57,7 @@ class ManageListContainer extends Component {
   handleClickCreateList = () => {
     this.setState({
       isVisibleModal: true,
-      mode: LIST_WORKFLOW_CREATE_MODE,
+      mode: LIST_MODE.WORKFLOW_CREATE,
     });
   };
 
@@ -68,7 +65,7 @@ class ManageListContainer extends Component {
     this.setState(
       {
         isVisibleModal: true,
-        mode: LIST_WORKFLOW_EDIT_MODE,
+        mode: LIST_MODE.WORKFLOW_EDIT,
       },
       () => this.props.setWorkInProgressListId(listId),
     );
@@ -176,10 +173,10 @@ class ManageListContainer extends Component {
         </ManageListWrapper>
         {isVisibleModal && (
           <NewListModal
-            list={mode === LIST_WORKFLOW_CREATE_MODE ? [] : workInProgressList}
+            list={mode === LIST_MODE.WORKFLOW_CREATE ? [] : workInProgressList}
             mode={mode}
             onSubmit={
-              mode === LIST_WORKFLOW_CREATE_MODE
+              mode === LIST_MODE.WORKFLOW_CREATE
                 ? this.handleCreateList
                 : this.handleEditList
             }

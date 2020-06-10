@@ -23,6 +23,18 @@ get:
   name: registry
 ---
 kind: secret
+name: develop_namespace
+get:
+  path: caesar-team/data/caesar-web-client
+  name: develop_namespace
+---
+kind: secret
+name: staging_namespace
+get:
+  path: caesar-team/data/caesar-web-client
+  name: staging_namespace
+---
+kind: secret
 name: develop_url
 get:
   path: secret/data/k8s-4xxi
@@ -91,24 +103,28 @@ globals:
   dockerfile: Dockerfile
   repo: 
     from_secret: repository
-  tag: ${DRONE_BRANCH}
   username:
     from_secret: username
   password:
     from_secret: password
 
-- &stepCheckBuild
-  name: build test
+- &stepFeatureBuild
   image: plugins/docker
   settings:
     <<: *confNoSaveBuild
 
-- &stepMainBuild
-  name: build
+- &stepDevelopBuild
   image: plugins/docker
   settings:
+    tags: ${DRONE_BRANCH}
     <<: *confSaveBuild
 
+- &stepMasterBuild
+  image: plugins/docker
+  settings:
+    tags: [ "${DRONE_BRANCH}", "latest" ]
+    <<: *confSaveBuild
+  
 - &stepDevelopDeploy
   name: deploy develop
   image: sinlead/drone-kubectl
@@ -120,12 +136,34 @@ globals:
     kubernetes_cert:
       from_secret: develop_ca
   environment:
+    NAMESPACE:
+      from_secret: develop_namespace
     CICD_GIT_COMMIT: ${DRONE_COMMIT}
     CICD_GIT_BRANCH: ${DRONE_BRANCH}
   commands:
   - sed -i "s/\$CICD_GIT_BRANCH/$CICD_GIT_BRANCH/g" deploy/*
   - sed -i "s/\$CICD_GIT_COMMIT/$CICD_GIT_COMMIT/g" deploy/*
-  - kubectl apply -f deploy/ -n dev-caesar-team
+  - kubectl apply -f deploy/* -n $NAMESPACE
+
+- &stepMasterDeploy
+  name: deploy staging
+  image: sinlead/drone-kubectl
+  settings:
+    kubernetes_server:
+      from_secret: staging_url
+    kubernetes_token: 
+      from_secret: staging_token
+    kubernetes_cert: 
+      from_secret: staging_ca
+  environment:
+    NAMESPACE:
+      from_secret: staging_namespace
+    CICD_GIT_COMMIT: ${DRONE_COMMIT}
+    CICD_GIT_BRANCH: ${DRONE_BRANCH}
+  commands:
+  - sed -i "s/\$CICD_GIT_BRANCH/$CICD_GIT_BRANCH/g" deploy/*
+  - sed -i "s/\$CICD_GIT_COMMIT/$CICD_GIT_COMMIT/g" deploy/*
+  - kubectl apply -f deploy/* -n $NAMESPACE
 
 - &stepNotifyToSlack
   name: notify-to-slack
@@ -155,17 +193,28 @@ globals:
       {{/success}}
 
 steps:
-- <<: *stepCheckBuild
+- name: build feature
+  <<: *stepFeatureBuild
   when:
     branch: [ feature/* ]
 
-- <<: *stepMainBuild
+- name: build develop
+  <<: *stepDevelopBuild
   when:
-    branch: [ develop, master ]
+    branch: [ develop ]
+
+- name: build master
+  <<: *stepMasterBuild
+  when:
+    branch: [ master ]
 
 - <<: *stepDevelopDeploy
   when:
     branch: [ develop ]
+
+- <<: *stepMasterDeploy
+  when:
+    branch: [ master ]
 
 - <<: *stepNotifyToSlack
   when:
@@ -177,4 +226,4 @@ trigger:
   - master
   - develop
   - feature/*
-
+  

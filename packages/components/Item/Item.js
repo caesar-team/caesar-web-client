@@ -1,16 +1,38 @@
 import React, { memo } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
 import styled from 'styled-components';
 import {
-  ITEM_REVIEW_MODE,
-  ITEM_CREDENTIALS_TYPE,
-  ITEM_DOCUMENT_TYPE,
+  ITEM_MODE,
+  ITEM_TYPE,
+  ITEM_TEXT_TYPE,
   PERMISSION_WRITE,
 } from '@caesar/common/constants';
+import { userDataSelector } from '@caesar/common/selectors/user';
+import {
+  workInProgressItemSelector,
+  workInProgressItemOwnerSelector,
+  workInProgressItemChildItemsSelector,
+} from '@caesar/common/selectors/workflow';
+import {
+  trashListSelector,
+  teamsTrashListsSelector,
+  selectableTeamsListsSelector,
+} from '@caesar/common/selectors/entities/list';
+import { membersByIdSelector } from '@caesar/common/selectors/entities/member';
+import { setWorkInProgressItem } from '@caesar/common/actions/workflow';
+import {
+  moveItemRequest,
+  createItemRequest,
+  editItemRequest,
+  acceptItemUpdateRequest,
+  rejectItemUpdateRequest,
+  toggleItemToFavoriteRequest,
+} from '@caesar/common/actions/entities/item';
 import { Button, Icon } from '@caesar/components';
 import { formatDate } from '@caesar/common/utils/dateUtils';
 import { matchStrict } from '@caesar/common/utils/match';
 import equal from 'fast-deep-equal';
-import EmptyItem from './EmptyItem';
+import { EmptyItem } from './EmptyItem';
 import { Credentials, CredentialsForm, DocumentForm, Document } from './Types';
 import { Scrollbar } from '../Scrollbar';
 
@@ -27,7 +49,7 @@ const ColumnHeader = styled.div`
   align-items: center;
   height: 56px;
   padding: 8px 24px;
-  background-color: ${({ theme }) => theme.color.snow};
+  background-color: ${({ theme }) => theme.color.alto};
   border-bottom: 1px solid ${({ theme }) => theme.color.gallery};
 `;
 
@@ -60,29 +82,82 @@ const NotifyButton = styled(Button)`
   margin-left: 20px;
 `;
 
-const Item = ({
-  isTrashItem = false,
-  item,
-  owner,
-  childItems,
-  user,
-  membersById = {},
-  teamsLists = [],
+const ItemComponent = ({
   notification,
-  onClickMoveItem = Function.prototype,
-  onClickCloseItem = Function.prototype,
-  onClickEditItem = Function.prototype,
   onClickShare = Function.prototype,
-  onFinishCreateWorkflow = Function.prototype,
-  onFinishEditWorkflow = Function.prototype,
-  onCancelWorkflow = Function.prototype,
-  onClickRemoveItem = Function.prototype,
-  onClickRestoreItem = Function.prototype,
   onClickMoveToTrash = Function.prototype,
-  onToggleFavorites = Function.prototype,
-  onClickAcceptUpdate = Function.prototype,
-  onClickRejectUpdate = Function.prototype,
+  onClickRemoveItem = Function.prototype,
 }) => {
+  const dispatch = useDispatch();
+  const user = useSelector(userDataSelector);
+  const teamsLists = useSelector(selectableTeamsListsSelector);
+  const item = useSelector(workInProgressItemSelector);
+  const owner = useSelector(workInProgressItemOwnerSelector);
+  const childItems = useSelector(workInProgressItemChildItemsSelector);
+  const membersById = useSelector(membersByIdSelector);
+  const trashList = useSelector(trashListSelector);
+  const teamsTrashLists = useSelector(teamsTrashListsSelector);
+
+  const isTrashItem =
+    item &&
+    (item.listId === trashList.id ||
+      teamsTrashLists.map(({ id }) => id).includes(item.listId));
+
+  const handleClickMoveItem = (teamId, listId) => {
+    dispatch(moveItemRequest(item.id, listId));
+    dispatch(setWorkInProgressItem(null));
+
+    notification.show({
+      text: `The ${ITEM_TEXT_TYPE[item.type]} has been moved.`,
+    });
+  };
+
+  const handleClickCloseItem = () => {
+    dispatch(setWorkInProgressItem(null));
+  };
+
+  const handleClickEditItem = () => {
+    dispatch(setWorkInProgressItem(item, ITEM_MODE.WORKFLOW_EDIT));
+  };
+
+  const handleFinishCreateWorkflow = (data, { setSubmitting }) => {
+    dispatch(createItemRequest(data, setSubmitting));
+  };
+
+  const handleFinishEditWorkflow = (data, { setSubmitting }) => {
+    dispatch(editItemRequest(data, setSubmitting));
+
+    notification.show({
+      text: `The ${ITEM_TEXT_TYPE[data.type]} has been updated`,
+    });
+  };
+
+  const handleClickCancelWorkflow = () => {
+    dispatch(
+      setWorkInProgressItem(
+        item.mode === ITEM_MODE.WORKFLOW_EDIT ? item : null,
+        item.mode === ITEM_MODE.WORKFLOW_EDIT ? ITEM_MODE.REVIEW : null,
+      ),
+    );
+  };
+
+  const handleClickRestoreItem = async () => {
+    dispatch(moveItemRequest(item.id, item.previousListId));
+    dispatch(setWorkInProgressItem(null));
+  };
+
+  const handleToggleFavorites = id => () => {
+    dispatch(toggleItemToFavoriteRequest(id));
+  };
+
+  const handleAcceptUpdate = id => () => {
+    dispatch(acceptItemUpdateRequest(id));
+  };
+
+  const handleRejectUpdate = id => () => {
+    dispatch(rejectItemUpdateRequest(id));
+  };
+
   if (!item) {
     return <EmptyItem />;
   }
@@ -92,27 +167,28 @@ const Item = ({
   const renderedItemForm = matchStrict(
     type,
     {
-      [ITEM_CREDENTIALS_TYPE]: (
+      [ITEM_TYPE.CREDENTIALS]: (
         <CredentialsForm
           item={item}
           mode={mode}
-          onFinishCreateWorkflow={onFinishCreateWorkflow}
-          onFinishEditWorkflow={onFinishEditWorkflow}
-          onCancelWorkflow={onCancelWorkflow}
+          onFinishCreateWorkflow={handleFinishCreateWorkflow}
+          onFinishEditWorkflow={handleFinishEditWorkflow}
+          onCancelWorkflow={handleClickCancelWorkflow}
         />
       ),
-      [ITEM_DOCUMENT_TYPE]: (
+      [ITEM_TYPE.DOCUMENT]: (
         <DocumentForm
           item={item}
           mode={mode}
-          onFinishCreateWorkflow={onFinishCreateWorkflow}
-          onFinishEditWorkflow={onFinishEditWorkflow}
-          onCancelWorkflow={onCancelWorkflow}
+          onFinishCreateWorkflow={handleFinishCreateWorkflow}
+          onFinishEditWorkflow={handleFinishEditWorkflow}
+          onCancelWorkflow={handleClickCancelWorkflow}
         />
       ),
     },
     null,
   );
+
   const access = childItems.reduce(
     (acc, childItem) => (childItem.userId === user.id ? childItem.access : acc),
     null,
@@ -138,10 +214,10 @@ const Item = ({
             {`Item has been changed by ${updateUserName} at ${updateDate}`}
           </NotifyText>
           <NotifyButtonsWrapper>
-            <Button color="white" onClick={onClickRejectUpdate(id)}>
+            <Button color="white" onClick={handleRejectUpdate(id)}>
               Reject
             </Button>
-            <NotifyButton color="white" onClick={onClickAcceptUpdate(id)}>
+            <NotifyButton color="white" onClick={handleAcceptUpdate(id)}>
               Accept
             </NotifyButton>
           </NotifyButtonsWrapper>
@@ -153,7 +229,7 @@ const Item = ({
   const renderedItem = matchStrict(
     type,
     {
-      [ITEM_CREDENTIALS_TYPE]: (
+      [ITEM_TYPE.CREDENTIALS]: (
         <Credentials
           notification={notification}
           hasWriteAccess={hasWriteAccess}
@@ -165,17 +241,17 @@ const Item = ({
           user={user}
           membersById={membersById}
           teamsLists={teamsLists}
-          onClickMoveItem={onClickMoveItem}
-          onClickCloseItem={onClickCloseItem}
+          onClickMoveItem={handleClickMoveItem}
+          onClickCloseItem={handleClickCloseItem}
           onClickRemoveItem={onClickRemoveItem}
-          onClickEditItem={onClickEditItem}
+          onClickEditItem={handleClickEditItem}
           onClickShare={onClickShare}
-          onClickRestoreItem={onClickRestoreItem}
-          onToggleFavorites={onToggleFavorites}
+          onClickRestoreItem={handleClickRestoreItem}
+          onToggleFavorites={handleToggleFavorites}
           onClickMoveToTrash={onClickMoveToTrash}
         />
       ),
-      [ITEM_DOCUMENT_TYPE]: (
+      [ITEM_TYPE.DOCUMENT]: (
         <Document
           hasWriteAccess={hasWriteAccess}
           isTrashItem={isTrashItem}
@@ -186,13 +262,13 @@ const Item = ({
           user={user}
           membersById={membersById}
           teamsLists={teamsLists}
-          onClickMoveItem={onClickMoveItem}
-          onClickCloseItem={onClickCloseItem}
+          onClickMoveItem={handleClickMoveItem}
+          onClickCloseItem={handleClickCloseItem}
           onClickRemoveItem={onClickRemoveItem}
-          onClickEditItem={onClickEditItem}
+          onClickEditItem={handleClickEditItem}
           onClickShare={onClickShare}
-          onClickRestoreItem={onClickRestoreItem}
-          onToggleFavorites={onToggleFavorites}
+          onClickRestoreItem={handleClickRestoreItem}
+          onToggleFavorites={handleToggleFavorites}
           onClickMoveToTrash={onClickMoveToTrash}
         />
       ),
@@ -214,14 +290,14 @@ const Item = ({
       {update && renderUpdateNotify()}
       <Scrollbar>
         <Wrapper>
-          {mode === ITEM_REVIEW_MODE ? renderedItem : renderedItemForm}
+          {mode === ITEM_MODE.REVIEW ? renderedItem : renderedItemForm}
         </Wrapper>
       </Scrollbar>
     </>
   );
 };
 
-export default memo(Item, (prevProps, nextProps) => {
+export const Item = memo(ItemComponent, (prevProps, nextProps) => {
   return (
     equal(prevProps.item, nextProps.item) &&
     equal(prevProps.members, nextProps.members) &&

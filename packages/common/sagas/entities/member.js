@@ -24,10 +24,7 @@ import {
   generateUser,
   generateUsersBatch,
 } from '@caesar/common/utils/cipherUtils';
-import {
-  MEMBER_ENTITY_TYPE,
-  ROLE_ANONYMOUS_USER,
-} from '@caesar/common/constants';
+import { ENTITY_TYPE, ROLE_ANONYMOUS_USER } from '@caesar/common/constants';
 
 const setIsNewFlag = (members, isNew) =>
   members.map(member => ({
@@ -140,7 +137,7 @@ export function* createMemberBatchSaga({ payload: { emailRolePairs } }) {
                 publicKey: member.publicKey,
                 roles: [emailRoleObject[member.email]],
                 teamIds: [],
-                __type: MEMBER_ENTITY_TYPE,
+                __type: ENTITY_TYPE.MEMBER,
               },
             ];
       },

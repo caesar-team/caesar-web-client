@@ -2,7 +2,6 @@ import React, { Component } from 'react';
 import styled from 'styled-components';
 import { formatDate } from '@caesar/common/utils/dateUtils';
 import { upperFirst } from '@caesar/common/utils/string';
-import { generateTeamTag } from '@caesar/common/utils/team';
 import { Icon } from '@caesar/components/Icon';
 import { Button } from '@caesar/components/Button';
 import { Avatar, AvatarsList } from '@caesar/components/Avatar';
@@ -186,7 +185,7 @@ const generateTeamOptions = (teams, currentTeamId) =>
     .filter(({ id }) => id !== currentTeamId)
     .map(team => ({
       value: team.id,
-      label: team.id === 'personal' ? 'personal' : generateTeamTag(team.name),
+      label: team.id === 'personal' ? 'personal' : team.name,
     }));
 
 const renderOption = teams => (value, label) => {
@@ -332,9 +331,7 @@ class ItemHeader extends Component {
       listId !== currentListId || (teamId && teamId !== currentTeamId);
 
     const currentTeamTag =
-      currentTeam.id === 'personal'
-        ? 'personal'
-        : generateTeamTag(currentTeam.name);
+      currentTeam.id === 'personal' ? 'personal' : currentTeam.name;
 
     return (
       <>

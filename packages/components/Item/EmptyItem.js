@@ -26,12 +26,10 @@ const StyledIcon = styled(Icon)`
   fill: ${({ theme }) => theme.color.emperor};
 `;
 
-const EmptyItem = () => (
+export const EmptyItem = () => (
   <>
     {/* <ImageLeft src={EmptyLeftImg} /> */}
     <StyledIcon name="logo-caesar" width={205} height={46} />
     {/* <ImageRight src={EmptyRightImg} /> */}
   </>
 );
-
-export default EmptyItem;

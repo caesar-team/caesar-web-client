@@ -1,5 +1,5 @@
 import { schema } from 'normalizr';
-import { LIST_ENTITY_TYPE } from '@caesar/common/constants';
+import { ENTITY_TYPE } from '@caesar/common/constants';
 import itemSchema from './item';
 
 const listSchema = new schema.Entity(
@@ -10,7 +10,7 @@ const listSchema = new schema.Entity(
   {
     processStrategy: entity => ({
       ...entity,
-      __type: LIST_ENTITY_TYPE,
+      __type: ENTITY_TYPE.LIST,
     }),
   },
 );

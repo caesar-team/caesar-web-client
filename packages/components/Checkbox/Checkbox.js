@@ -6,7 +6,6 @@ const StyledLabel = styled.label`
   display: flex;
   align-items: center;
   cursor: pointer;
-
   pointer-events: ${({ isDisabled }) => isDisabled && 'none'};
 `;
 
@@ -15,7 +14,7 @@ const StyledInput = styled.input`
 `;
 
 const Box = styled.span`
-  // if checkbox is used inside Tooltip, this one affects display position to block
+  /* if checkbox is used inside Tooltip, this one affects display position to block */
   display: flex !important;
   align-items: center;
   justify-content: center;
@@ -59,5 +58,6 @@ const Checkbox = ({ isDisabled, children, checked, className, ...props }) => (
 
 Checkbox.Text = Text;
 Checkbox.Box = Box;
+Checkbox.Input = StyledInput;
 
 export default Checkbox;

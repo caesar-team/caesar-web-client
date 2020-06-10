@@ -2,10 +2,10 @@ import React from 'react';
 import styled from 'styled-components';
 import { useNavigatorOnline } from '@caesar/common/hooks';
 import {
-  ITEM_TYPES,
-  ITEM_ICON_TYPES,
+  ITEM_TYPE,
+  ITEM_ICON_TYPE,
   CREATE_PERMISSION,
-  ITEM_ENTITY_TYPE,
+  ENTITY_TYPE,
 } from '@caesar/common/constants';
 import { Button } from '../Button';
 import { Icon } from '../Icon';
@@ -33,16 +33,16 @@ const AddItemOption = styled.button`
   }
 `;
 
-const { ITEM_CREDENTIALS_TYPE, ITEM_DOCUMENT_TYPE } = ITEM_TYPES;
+const { CREDENTIALS, DOCUMENT } = ITEM_TYPE;
 
 const itemTypesOptions = [
-  { label: 'Password', value: ITEM_CREDENTIALS_TYPE },
-  { label: 'Secure note', value: ITEM_DOCUMENT_TYPE },
+  { label: 'Password', value: CREDENTIALS },
+  { label: 'Secure note', value: DOCUMENT },
 ];
 
 const renderAddItemOptions = (value, label) => (
   <AddItemOption key={value}>
-    <PlusIcon name={ITEM_ICON_TYPES[value]} width={16} height={16} />
+    <PlusIcon name={ITEM_ICON_TYPE[value]} width={16} height={16} />
     {label}
   </AddItemOption>
 );
@@ -55,7 +55,7 @@ export const AddItem = ({
   const isOnline = useNavigatorOnline();
 
   const itemSubject = {
-    __type: ITEM_ENTITY_TYPE,
+    __type: ENTITY_TYPE.ITEM,
     listType: workInProgressList?.type,
     teamId: workInProgressList?.teamId,
     userRole: workInProgressList?.userRole,

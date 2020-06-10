@@ -18,6 +18,10 @@ const SelectedOption = styled.div`
   border-bottom: 1px solid ${({ theme }) => theme.color.gallery};
   padding: 5px 15px;
   cursor: pointer;
+
+  &[disabled] {
+    pointer-events: none;
+  }
 `;
 
 const ValueText = styled.div`

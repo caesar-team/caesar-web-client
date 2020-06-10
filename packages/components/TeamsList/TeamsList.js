@@ -31,13 +31,20 @@ const StyledAvatar = styled(Avatar)`
   margin-right: 16px;
 `;
 
-const TeamsListComponent = ({ activeTeamId, handleToggle }) => {
+const TeamsListComponent = ({
+  activeTeamId,
+  handleToggle,
+  setIsListsOpened,
+}) => {
   const dispatch = useDispatch();
   const user = useSelector(userDataSelector);
   const teamList = useSelector(userTeamListSelector);
   const currentTeam = useSelector(currentTeamSelector);
 
-  const handleChangeTeamId = teamId => {
+  const handleChangeTeam = teamId => {
+    handleToggle();
+    setIsListsOpened(true);
+
     if (currentTeam?.id !== teamId) {
       dispatch(setCurrentTeamId(teamId));
     }
@@ -48,8 +55,7 @@ const TeamsListComponent = ({ activeTeamId, handleToggle }) => {
       {activeTeamId && (
         <Option
           onClick={() => {
-            handleToggle();
-            handleChangeTeamId(TEAM_TYPE.PERSONAL);
+            handleChangeTeam(TEAM_TYPE.PERSONAL);
           }}
         >
           <StyledAvatar {...user} isSmall />
@@ -61,8 +67,7 @@ const TeamsListComponent = ({ activeTeamId, handleToggle }) => {
           <Option
             key={team.id}
             onClick={() => {
-              handleToggle();
-              handleChangeTeamId(team.id);
+              handleChangeTeam(team.id);
             }}
           >
             <StyledAvatar avatar={team.icon} isSmall />

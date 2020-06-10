@@ -84,7 +84,13 @@ const ListItem = styled(MenuItemInner)`
 
 const SECURE_MESSAGE_MODE = 'SECURE_MESSAGE_MODE';
 
-const MenuListInnerComponent = ({ mode, setSearchedText, setMode }) => {
+const MenuListInnerComponent = ({
+  mode,
+  setSearchedText,
+  setMode,
+  isListsOpened,
+  setIsListsOpened,
+}) => {
   const dispatch = useDispatch();
   const currentTeam = useSelector(currentTeamSelector);
   const isPersonal = !currentTeam;
@@ -92,7 +98,6 @@ const MenuListInnerComponent = ({ mode, setSearchedText, setMode }) => {
   const teamLists = useSelector(currentTeamListsSelector);
   const workInProgressList = useSelector(workInProgressListSelector);
   const activeListId = workInProgressList && workInProgressList.id;
-  const [isListsOpened, setIsListsOpened] = useState(true);
 
   const handleClickMenuItem = id => {
     dispatch(setWorkInProgressListId(id));

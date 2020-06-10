@@ -61,6 +61,7 @@ const MenuListComponent = ({ mode, setSearchedText, setMode }) => {
   const user = useSelector(userDataSelector);
   const teamList = useSelector(teamsByIdSelector);
   const [isDropdownOpened, setIsDropdownOpened] = useState(false);
+  const [isListsOpened, setIsListsOpened] = useState(true);
   const activeTeamId = currentTeam?.id || TEAM_TYPE.PERSONAL;
 
   const handleToggleDropdown = isOpened => {
@@ -71,7 +72,11 @@ const MenuListComponent = ({ mode, setSearchedText, setMode }) => {
     <>
       <StyledDropdown
         renderOverlay={handleToggle => (
-          <TeamsList activeTeamId={activeTeamId} handleToggle={handleToggle} />
+          <TeamsList
+            activeTeamId={activeTeamId}
+            handleToggle={handleToggle}
+            setIsListsOpened={setIsListsOpened}
+          />
         )}
         onToggle={handleToggleDropdown}
       >
@@ -96,6 +101,8 @@ const MenuListComponent = ({ mode, setSearchedText, setMode }) => {
             mode={mode}
             setSearchedText={setSearchedText}
             setMode={setMode}
+            isListsOpened={isListsOpened}
+            setIsListsOpened={setIsListsOpened}
           />
           <AppVersion>{APP_VERSION}</AppVersion>
         </Menu>

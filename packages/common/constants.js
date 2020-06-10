@@ -107,6 +107,7 @@ export const INVITE_TYPE = 'invite';
 export const SHARE_TYPE = 'share';
 
 export const ROUTES = {
+  MAIN: '/',
   SIGN_IN: '/signin',
   SIGN_UP: '/signup',
   LOGOUT: '/logout',
@@ -160,6 +161,7 @@ export const CREATING_ITEMS_NOTIFICATION =
 export const MOVING_IN_PROGRESS_NOTIFICATION = 'Moving in progress...';
 export const REMOVING_IN_PROGRESS_NOTIFICATION = 'Removing in progress...';
 export const REDIRECT_NOTIFICATION = 'Redirecting...';
+export const SAVE_NOTIFICATION = 'Saving...';
 export const NOOP_NOTIFICATION = '';
 
 export const PERMISSION_READ = 'read';

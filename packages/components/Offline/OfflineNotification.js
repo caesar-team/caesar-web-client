@@ -1,34 +1,38 @@
 import React from 'react';
 import styled from 'styled-components';
-import Icon from '../Icon/Icon';
+import { Icon } from '../Icon';
 import withOfflineDetection from './withOfflineDetection';
 
 const Wrapper = styled.div`
   position: absolute;
+  right: 0;
   bottom: 0;
-  width: 100%;
+  left: 0;
   display: flex;
-  align-items: center;
   justify-content: center;
-  background: ${({ theme }) => theme.color.emperor};
-  border-radius: 3px;
-  box-shadow: 0 11px 23px 0 rgba(0, 0, 0, 0.08);
-  padding-top: 6px;
-  padding-bottom: 6px;
+  align-items: center;
+  height: 40px;
+  font-weight: 600;
+  color: ${({ isOnLightBg, theme }) =>
+    isOnLightBg ? theme.color.white : theme.color.black};
+  background-color: ${({ isOnLightBg, theme }) =>
+    isOnLightBg ? theme.color.emperor : theme.color.alto};
 `;
 
 const Text = styled.div`
-  font-size: 14px;
-  font-weight: 600;
-  color: ${({ theme }) => theme.color.white};
-  margin-right: 6px;
+  margin-right: 8px;
 `;
 
-const OfflineNotification = ({ isOnline }) =>
+const OfflineNotification = ({ isOnline, isOnLightBg = true }) =>
   !isOnline && (
-    <Wrapper>
-      <Text>You have lost connection</Text>
-      <Icon name="warning" width={14} height={14} fill="#fff" />
+    <Wrapper isOnLightBg={isOnLightBg}>
+      <Text>You are currently offline.</Text>
+      <Icon
+        name="warning"
+        width={20}
+        height={20}
+        color={isOnLightBg ? 'white' : 'black'}
+      />
     </Wrapper>
   );
 

@@ -67,6 +67,7 @@ class Application extends NextApp {
             <NotificationProvider>
               <GlobalStyles />
               <Component {...pageProps} />
+              <OfflineNotification />
             </NotificationProvider>
           </OfflineDetectionProvider>
         </ThemeProvider>

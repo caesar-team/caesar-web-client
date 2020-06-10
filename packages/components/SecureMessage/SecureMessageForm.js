@@ -237,7 +237,7 @@ const SecureMessageFormComponent = ({ onSubmit, notification, isOnline }) => {
       <Row>
         {isMobile ? (
           <TextAreaStyled
-            placeholder="Text or image to encrypt and expire"
+            placeholder="Text or attachments to encrypt and expire"
             name="text"
             value={values.text}
             onBlur={handleBlur}
@@ -246,7 +246,7 @@ const SecureMessageFormComponent = ({ onSubmit, notification, isOnline }) => {
           />
         ) : (
           <>
-            <Label>Text or image to encrypt and expire</Label>
+            <Label>Text or attachments to encrypt and expire</Label>
             <TextAreaStyled
               placeholder="Divide et Impera"
               name="text"
@@ -254,6 +254,7 @@ const SecureMessageFormComponent = ({ onSubmit, notification, isOnline }) => {
               onBlur={handleBlur}
               onChange={handleChange}
               error={checkError(touched, errors, 'text')}
+              disabled={isSubmitting}
             />
           </>
         )}
@@ -269,6 +270,7 @@ const SecureMessageFormComponent = ({ onSubmit, notification, isOnline }) => {
           }
           notification={notification}
           onChange={setFieldValue}
+          disabled={isSubmitting}
         />
         <Attachments>
           {renderAttachments(

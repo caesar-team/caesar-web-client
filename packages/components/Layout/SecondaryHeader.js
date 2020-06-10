@@ -14,7 +14,7 @@ const StyledButton = styled(Button)`
 const SecondaryHeader = ({
   router,
   buttonText = 'Sign In',
-  url = IS_AUTHORIZATION_ENABLE ? ROUTES.SIGN_IN : '/',
+  url = IS_AUTHORIZATION_ENABLE ? ROUTES.SIGN_IN : ROUTES.MAIN,
   isButtonShow = IS_AUTHORIZATION_ENABLE,
 }) => (
   <Fragment>

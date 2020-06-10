@@ -291,6 +291,7 @@ const SecureMessageFormComponent = ({ onSubmit, notification, isOnline }) => {
             value={values.secondsLimit}
             options={secondsLimitOptions}
             onChange={setFieldValue}
+            disabled={isSubmitting}
           />
         </Column>
         <ColumnStyled>
@@ -302,6 +303,7 @@ const SecureMessageFormComponent = ({ onSubmit, notification, isOnline }) => {
             value={values.requestsLimit}
             options={requestsLimitOptions}
             onChange={setFieldValue}
+            disabled={isSubmitting}
           />
         </ColumnStyled>
       </SelectRow>
@@ -311,6 +313,7 @@ const SecureMessageFormComponent = ({ onSubmit, notification, isOnline }) => {
             checked={isCustomPassword}
             value={isCustomPassword}
             onChange={handleChangeCustomPassword}
+            isDisabled={isSubmitting}
           >
             Create my own password for access to encrypted data
           </Checkbox>
@@ -324,6 +327,7 @@ const SecureMessageFormComponent = ({ onSubmit, notification, isOnline }) => {
             value={values.password}
             onBlur={handleBlur}
             onChange={handleChange}
+            disabled={isSubmitting}
           />
           {checkError(touched, errors, 'password') && (
             <Error>{checkError(touched, errors, 'password')}</Error>
@@ -337,7 +341,7 @@ const SecureMessageFormComponent = ({ onSubmit, notification, isOnline }) => {
         </>
       )}
       <ButtonWrapper>
-        <Hint text="You can’t move or delete, read only">
+        <Hint text={!dirty ? 'Please, add text or attachments' : ''}>
           <StyledButton
             htmlType="submit"
             disabled={

@@ -10,6 +10,7 @@ import {
   Button,
   withNotification,
   withOfflineDetection,
+  Hint,
 } from '@caesar/components';
 import { Select } from '@caesar/components/Select';
 import { checkError } from '@caesar/common/utils/formikUtils';
@@ -336,14 +337,16 @@ const SecureMessageFormComponent = ({ onSubmit, notification, isOnline }) => {
         </>
       )}
       <ButtonWrapper>
-        <StyledButton
-          htmlType="submit"
-          disabled={
-            isSubmitting || (!isValid && !errors?.form) || !dirty || !isOnline
-          }
-        >
-          Create Secure Message
-        </StyledButton>
+        <Hint text="You can’t move or delete, read only">
+          <StyledButton
+            htmlType="submit"
+            disabled={
+              isSubmitting || (!isValid && !errors?.form) || !dirty || !isOnline
+            }
+          >
+            Create Secure Message
+          </StyledButton>
+        </Hint>
       </ButtonWrapper>
     </Form>
   );

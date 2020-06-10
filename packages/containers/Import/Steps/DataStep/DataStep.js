@@ -2,11 +2,7 @@ import React, { Component } from 'react';
 import styled from 'styled-components';
 import memoize from 'memoize-one';
 import { waitIdle } from '@caesar/common/utils/utils';
-import {
-  ITEM_DOCUMENT_TYPE,
-  ITEM_CREDENTIALS_TYPE,
-  KEY_CODES,
-} from '@caesar/common/constants';
+import { ITEM_TYPE, KEY_CODES } from '@caesar/common/constants';
 import {
   Input,
   Icon,
@@ -167,12 +163,12 @@ class DataStep extends Component {
 
         const options = [
           {
-            value: ITEM_CREDENTIALS_TYPE,
+            value: ITEM_TYPE.CREDENTIALS,
             label: 'Password',
             isDisabled: isCredentialsDisabled,
           },
           {
-            value: ITEM_DOCUMENT_TYPE,
+            value: ITEM_TYPE.DOCUMENT,
             label: 'Secure Note',
             isDisabled: isDocumentDisabled,
           },

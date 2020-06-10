@@ -9,9 +9,9 @@ import {
   Can,
 } from '@caesar/components';
 import {
-  DEFAULT_TEAM_TYPE,
+  TEAM_TYPE,
   CREATE_PERMISSION,
-  TEAM_ENTITY_TYPE,
+  ENTITY_TYPE,
 } from '@caesar/common/constants';
 
 const LogoWrapper = styled.div`
@@ -148,7 +148,7 @@ class TeamListContainer extends Component {
         key={team.id}
         team={team}
         members={members}
-        isRemoveButtonVisible={team.type !== DEFAULT_TEAM_TYPE}
+        isRemoveButtonVisible={team.type !== TEAM_TYPE.DEFAULT}
         onClickRemoveTeam={this.handleClickRemoveTeam(team.id)}
       />
     ));
@@ -172,7 +172,7 @@ class TeamListContainer extends Component {
       <Wrapper>
         <TopWrapper>
           <Title>Teams</Title>
-          <Can I={CREATE_PERMISSION} of={TEAM_ENTITY_TYPE}>
+          <Can I={CREATE_PERMISSION} of={ENTITY_TYPE.TEAM}>
             <Button
               withOfflineCheck
               onClick={this.handleOpenModal(NEW_TEAM_MODAL)}

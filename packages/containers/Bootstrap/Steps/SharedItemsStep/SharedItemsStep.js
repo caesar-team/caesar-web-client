@@ -23,7 +23,7 @@ import {
   getUserTeams,
   patchAcceptTeamItems,
 } from '@caesar/common/api';
-import { ITEM_CREDENTIALS_TYPE } from '@caesar/common/constants';
+import { ITEM_TYPE } from '@caesar/common/constants';
 import { NavigationPanelStyled } from '../../components';
 import { SHARED_ITEMS_CHECK } from '../../constants';
 
@@ -270,7 +270,7 @@ class SharedItemsStep extends Component {
     const renderedItems = items.personal.map(
       ({ id, type, secret: { name } }) => {
         const isActive = selectedIds.includes(id);
-        const iconName = type === ITEM_CREDENTIALS_TYPE ? 'key' : 'securenote';
+        const iconName = type === ITEM_TYPE.CREDENTIALS ? 'key' : 'securenote';
 
         return (
           <ItemRow key={id}>

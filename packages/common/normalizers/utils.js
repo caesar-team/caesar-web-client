@@ -1,5 +1,5 @@
 import { uuid4 } from '@caesar/common/utils/uuid4';
-import { FAVORITES_TYPE } from '@caesar/common/constants';
+import { LIST_TYPE } from '@caesar/common/constants';
 
 export const getFavoritesList = itemsById => {
   const favoriteListId = uuid4();
@@ -9,7 +9,7 @@ export const getFavoritesList = itemsById => {
 
   return {
     id: favoriteListId,
-    type: FAVORITES_TYPE,
+    type: LIST_TYPE.FAVORITES,
     label: 'Favorites',
     children: favorites,
   };

@@ -72,7 +72,7 @@ import { getServerErrorMessage } from '@caesar/common/utils/error';
 import { convertTeamsToEntity } from '@caesar/common/normalizers/normalizers';
 import {
   COMMANDS_ROLES,
-  TEAM_ENTITY_TYPE,
+  ENTITY_TYPE,
   NOOP_NOTIFICATION,
 } from '@caesar/common/constants';
 import {
@@ -129,7 +129,7 @@ export function* createTeamSaga({ payload: { title, icon } }) {
 
     const user = yield select(userDataSelector);
 
-    yield put(createTeamSuccess({ ...data, __type: TEAM_ENTITY_TYPE }));
+    yield put(createTeamSuccess({ ...data, __type: ENTITY_TYPE.TEAM }));
     yield put(addTeamToMember(data.id, user.id));
     yield put(addTeamMember(data.id, user.id, COMMANDS_ROLES.USER_ROLE_ADMIN));
     yield put(joinTeam(data.id));

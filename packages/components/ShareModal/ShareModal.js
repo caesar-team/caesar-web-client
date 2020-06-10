@@ -2,7 +2,6 @@ import React, { Component, Fragment } from 'react';
 import styled from 'styled-components';
 import copy from 'copy-text-to-clipboard';
 import { Modal, ModalTitle, UserSearchInput } from '@caesar/components';
-import { generateTeamTag } from '@caesar/common/utils/team';
 import { TeamTag } from '../TeamTag';
 import { Section } from '../Section';
 import { TextWithLines } from '../TextWithLines';
@@ -201,7 +200,7 @@ class ShareModal extends Component {
         <TeamTagStyled
           isActive={isActive}
           key={id}
-          name={generateTeamTag(title)}
+          name={title}
           onClick={this.handleToggleTeam(id)}
           {...props}
         />

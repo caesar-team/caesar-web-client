@@ -1,18 +1,19 @@
 import React, { memo, useState } from 'react';
 import { useSelector } from 'react-redux';
 import styled from 'styled-components';
-import { APP_VERSION } from '@caesar/common/constants';
-import { userDataSelector } from '@caesar/common/selectors/user';
+import { APP_VERSION, TEAM_TYPE } from '@caesar/common/constants';
+import {
+  userDataSelector,
+  currentTeamSelector,
+} from '@caesar/common/selectors/user';
 import { teamsByIdSelector } from '@caesar/common/selectors/entities/team';
-import { generateTeamTag } from '@caesar/common/utils/team';
 import { Scrollbar } from '../Scrollbar';
 import { Dropdown } from '../Dropdown';
 import { Avatar } from '../Avatar';
 import { Icon } from '../Icon';
 import { TeamsList } from '../TeamsList';
 import { Overlay } from '../Modal';
-import MenuSection from './MenuSection';
-import { MenuItemWrapper, MenuItem } from './components';
+import { MenuListInner } from './MenuListInner';
 
 const StyledDropdown = styled(Dropdown)`
   ${Dropdown.Box} {
@@ -25,7 +26,7 @@ const ColumnHeader = styled.div`
   align-items: center;
   height: 56px;
   padding: 8px 24px;
-  background-color: ${({ theme }) => theme.color.snow};
+  background-color: ${({ theme }) => theme.color.alto};
   border-bottom: 1px solid ${({ theme }) => theme.color.gallery};
 `;
 
@@ -45,70 +46,41 @@ const DropdownIcon = styled(Icon)`
 const Menu = styled.div`
   display: flex;
   flex-direction: column;
-  margin: 16px 30px 0 60px;
 `;
 
 const AppVersion = styled.div`
-  padding: 8px 0;
+  padding: 8px 24px;
   margin-top: auto;
   font-size: ${({ theme }) => theme.font.size.xs};
   line-height: ${({ theme }) => theme.font.lineHeight.xs};
   color: ${({ theme }) => theme.color.gray};
 `;
 
-const SECURE_MESSAGE_MODE = 'SECURE_MESSAGE_MODE';
-
-const MenuListComponent = ({
-  mode,
-  team,
-  inbox,
-  favorites,
-  trash,
-  personalLists,
-  teamLists,
-  activeListId,
-  onClickMenuItem,
-  onClickSecureMessage,
-}) => {
+const MenuListComponent = ({ mode, setSearchedText, setMode }) => {
+  const currentTeam = useSelector(currentTeamSelector);
   const user = useSelector(userDataSelector);
   const teamList = useSelector(teamsByIdSelector);
   const [isDropdownOpened, setIsDropdownOpened] = useState(false);
-  const [openedSectionNames, setOpenedSectionNames] = useState([
-    'personal',
-    'tools',
-  ]);
-  const [activeTeamId, setActiveTeamId] = useState('');
+  const activeTeamId = currentTeam?.id || TEAM_TYPE.PERSONAL;
 
   const handleToggleDropdown = isOpened => {
     setIsDropdownOpened(isOpened);
-  };
-
-  const handleToggleSection = name => () => {
-    const newState = openedSectionNames.includes(name)
-      ? openedSectionNames.filter(sectionName => sectionName !== name)
-      : openedSectionNames.concat(name);
-
-    setOpenedSectionNames(newState);
   };
 
   return (
     <>
       <StyledDropdown
         renderOverlay={handleToggle => (
-          <TeamsList
-            activeTeamId={activeTeamId}
-            handleToggle={id => {
-              setActiveTeamId(id);
-              handleToggle();
-            }}
-          />
+          <TeamsList activeTeamId={activeTeamId} handleToggle={handleToggle} />
         )}
         onToggle={handleToggleDropdown}
       >
         <ColumnHeader>
           <Avatar avatar={teamList[activeTeamId]?.icon} {...user} isSmall />
           <ColumnTitle>
-            {activeTeamId ? teamList[activeTeamId].title : 'Personal'}
+            {activeTeamId !== TEAM_TYPE.PERSONAL
+              ? teamList[activeTeamId].title
+              : 'Personal'}
           </ColumnTitle>
           <DropdownIcon
             name="arrow-triangle"
@@ -120,46 +92,11 @@ const MenuListComponent = ({
       </StyledDropdown>
       <Scrollbar>
         <Menu>
-          <MenuSection
-            isOpened
-            lists={[inbox, favorites, trash]}
-            activeListId={activeListId}
-            onClickMenuItem={onClickMenuItem}
+          <MenuListInner
+            mode={mode}
+            setSearchedText={setSearchedText}
+            setMode={setMode}
           />
-          <MenuSection
-            name="personal"
-            lists={personalLists}
-            activeListId={activeListId}
-            isOpened={openedSectionNames.includes('personal')}
-            onToggleSection={handleToggleSection('personal')}
-            onClickMenuItem={onClickMenuItem}
-          />
-          {team && (
-            <MenuSection
-              name={generateTeamTag(team.title)}
-              icon={team.icon}
-              lists={teamLists}
-              activeListId={activeListId}
-              isOpened={openedSectionNames.includes('team')}
-              onToggleSection={handleToggleSection('team')}
-              onClickMenuItem={onClickMenuItem}
-            />
-          )}
-          <MenuSection
-            name="tools"
-            activeListId={activeListId}
-            isOpened={openedSectionNames.includes('tools')}
-            onToggleSection={handleToggleSection('tools')}
-          >
-            <MenuItemWrapper>
-              <MenuItem
-                isActive={mode === SECURE_MESSAGE_MODE}
-                onClick={onClickSecureMessage}
-              >
-                Secure Message
-              </MenuItem>
-            </MenuItemWrapper>
-          </MenuSection>
           <AppVersion>{APP_VERSION}</AppVersion>
         </Menu>
       </Scrollbar>

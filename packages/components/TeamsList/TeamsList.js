@@ -1,10 +1,13 @@
 import React, { memo } from 'react';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import styled from 'styled-components';
+import { TEAM_TYPE } from '@caesar/common/constants';
 import {
   userDataSelector,
   userTeamListSelector,
+  currentTeamSelector,
 } from '@caesar/common/selectors/user';
+import { setCurrentTeamId } from '@caesar/common/actions/user';
 import { Avatar } from '../Avatar';
 
 const Option = styled.div`
@@ -29,15 +32,24 @@ const StyledAvatar = styled(Avatar)`
 `;
 
 const TeamsListComponent = ({ activeTeamId, handleToggle }) => {
+  const dispatch = useDispatch();
   const user = useSelector(userDataSelector);
   const teamList = useSelector(userTeamListSelector);
+  const currentTeam = useSelector(currentTeamSelector);
+
+  const handleChangeTeamId = teamId => {
+    if (currentTeam?.id !== teamId) {
+      dispatch(setCurrentTeamId(teamId));
+    }
+  };
 
   return (
     <>
       {activeTeamId && (
         <Option
           onClick={() => {
-            handleToggle('');
+            handleToggle();
+            handleChangeTeamId(TEAM_TYPE.PERSONAL);
           }}
         >
           <StyledAvatar {...user} isSmall />
@@ -49,7 +61,8 @@ const TeamsListComponent = ({ activeTeamId, handleToggle }) => {
           <Option
             key={team.id}
             onClick={() => {
-              handleToggle(team.id);
+              handleToggle();
+              handleChangeTeamId(team.id);
             }}
           >
             <StyledAvatar avatar={team.icon} isSmall />

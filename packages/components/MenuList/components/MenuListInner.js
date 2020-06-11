@@ -1,4 +1,4 @@
-import React, { memo, useState } from 'react';
+import React, { memo } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import styled from 'styled-components';
 import { DASHBOARD_MODE } from '@caesar/common/constants';
@@ -13,11 +13,19 @@ import {
   setWorkInProgressListId,
   resetWorkInProgressItemIds,
 } from '@caesar/common/actions/workflow';
-import { Icon } from '../Icon';
+import { Icon } from '../../Icon';
+import { ListItem } from './ListItem';
+import { MenuItemInner } from './styledComponents';
+
+const MenuItem = styled.div``;
+
+const MenuItemTitle = styled.div`
+  padding-left: 16px;
+  margin-right: auto;
+`;
 
 const ListAddIcon = styled(Icon)`
   margin-right: 16px;
-  margin-left: auto;
   transform: ${({ isListsOpened }) =>
     isListsOpened ? 'scaleY(-1)' : 'scaleY(1)'};
   transition: transform 0.2s;
@@ -29,57 +37,18 @@ const ListAddIcon = styled(Icon)`
   }
 `;
 
-const MenuItem = styled.div``;
-
-const MenuItemInner = styled.div`
-  display: flex;
-  justify-content: flex-start;
-  align-items: center;
-  padding: 7px 24px;
-  font-weight: ${({ fontWeight, isActive }) =>
-    isActive ? 600 : fontWeight || 400};
-  color: ${({ isActive, theme }) =>
-    isActive ? theme.color.black : theme.color.emperor};
-  background-color: ${({ isActive, theme }) =>
-    isActive ? theme.color.snow : theme.color.white};
-  border-top: 1px solid transparent;
-  border-bottom: 1px solid transparent;
-  cursor: pointer;
-  transition: all 0.2s;
-
-  ${({ isActive, theme }) =>
-    isActive &&
-    `
-      border-top-color: ${theme.color.gallery};
-      border-bottom-color: ${theme.color.gallery};
-    `}
-
+const StyledMenuItemInner = styled(MenuItemInner)`
   &:hover {
-    background-color: ${({ withChildren, theme }) =>
-      !withChildren && theme.color.snow};
-    border-top-color: ${({ withChildren, theme }) =>
-      !withChildren && theme.color.gallery};
-    border-bottom-color: ${({ withChildren, theme }) =>
-      !withChildren && theme.color.gallery};
-
     ${ListAddIcon} {
       opacity: 1;
     }
   }
 `;
 
-const MenuItemTitle = styled.div`
-  padding-left: ${({ withIcon }) => (withIcon ? '16px' : '0')};
-`;
-
 const ListToggleIcon = styled(Icon)`
   transform: ${({ isListsOpened }) =>
     isListsOpened ? 'scaleY(-1)' : 'scaleY(1)'};
   transition: transform 0.2s;
-`;
-
-const ListItem = styled(MenuItemInner)`
-  padding: 7px 24px 7px 56px;
 `;
 
 const SECURE_MESSAGE_MODE = 'SECURE_MESSAGE_MODE';
@@ -113,6 +82,12 @@ const MenuListInnerComponent = ({
 
     setMode(DASHBOARD_MODE.TOOL);
     setSearchedText('');
+  };
+
+  const handleClickAddList = event => {
+    event.stopPropagation();
+    setIsListsOpened(true);
+    console.log('handleClickAddList: ');
   };
 
   const menuList = [
@@ -150,33 +125,40 @@ const MenuListInnerComponent = ({
     },
   ];
 
-  return menuList.map(
-    ({ id, icon, title, children }) =>
+  return menuList.map(({ id, icon, title, children }) => {
+    const withChildren = id === 'lists';
+
+    return (
       id && (
         <MenuItem key={id || title}>
-          <MenuItemInner
+          <StyledMenuItemInner
             isActive={
               id === SECURE_MESSAGE_MODE
                 ? mode === SECURE_MESSAGE_MODE
                 : activeListId === id
             }
             fontWeight={id === SECURE_MESSAGE_MODE ? 600 : 400}
-            withChildren={children}
+            withChildren={withChildren}
             onClick={() => {
               if (id === SECURE_MESSAGE_MODE) {
                 return handleClickSecureMessage();
               }
 
-              return children
+              return withChildren
                 ? setIsListsOpened(!isListsOpened)
                 : handleClickMenuItem(id);
             }}
           >
             <Icon name={icon} width={16} height={16} />
-            <MenuItemTitle withIcon>{title}</MenuItemTitle>
-            {children && (
+            <MenuItemTitle>{title}</MenuItemTitle>
+            {withChildren && (
               <>
-                <ListAddIcon name="plus" width={16} height={16} />
+                <ListAddIcon
+                  name="plus"
+                  width={16}
+                  height={16}
+                  onClick={handleClickAddList}
+                />
                 <ListToggleIcon
                   name="arrow-triangle"
                   width={16}
@@ -185,19 +167,23 @@ const MenuListInnerComponent = ({
                 />
               </>
             )}
-          </MenuItemInner>
-          {isListsOpened &&
-            children?.map(({ id: listId, label }) => (
-              <ListItem
-                key={listId}
-                onClick={() => handleClickMenuItem(listId)}
-              >
-                {label}
-              </ListItem>
-            ))}
+          </StyledMenuItemInner>
+          {isListsOpened && (
+            <>
+              {children?.map(item => (
+                <ListItem
+                  key={item.id}
+                  item={item}
+                  activeListId={activeListId}
+                  handleClickMenuItem={handleClickMenuItem}
+                />
+              ))}
+            </>
+          )}
         </MenuItem>
-      ),
-  );
+      )
+    );
+  });
 };
 
 export const MenuListInner = memo(MenuListInnerComponent);

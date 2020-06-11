@@ -13,7 +13,7 @@ import { Avatar } from '../Avatar';
 import { Icon } from '../Icon';
 import { TeamsList } from '../TeamsList';
 import { Overlay } from '../Modal';
-import { MenuListInner } from './MenuListInner';
+import { MenuListInner } from './components/MenuListInner';
 
 const StyledDropdown = styled(Dropdown)`
   ${Dropdown.Box} {

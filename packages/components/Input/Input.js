@@ -66,7 +66,7 @@ const PostFix = styled.div`
   top: 50%;
   transform: translateY(-50%);
   line-height: 0;
-  right: 25px;
+  right: 16px;
 `;
 
 const Error = styled.div`

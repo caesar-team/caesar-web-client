@@ -1,4 +1,4 @@
-import React, { memo } from 'react';
+import React, { memo, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import styled from 'styled-components';
 import { DASHBOARD_MODE } from '@caesar/common/constants';
@@ -67,6 +67,7 @@ const MenuListInnerComponent = ({
   const teamLists = useSelector(currentTeamListsSelector);
   const workInProgressList = useSelector(workInProgressListSelector);
   const activeListId = workInProgressList && workInProgressList.id;
+  const [isCreatingMode, setIsCreatingMode] = useState(false);
 
   const handleClickMenuItem = id => {
     dispatch(setWorkInProgressListId(id));
@@ -87,7 +88,7 @@ const MenuListInnerComponent = ({
   const handleClickAddList = event => {
     event.stopPropagation();
     setIsListsOpened(true);
-    console.log('handleClickAddList: ');
+    setIsCreatingMode(true);
   };
 
   const menuList = [
@@ -170,6 +171,12 @@ const MenuListInnerComponent = ({
           </StyledMenuItemInner>
           {isListsOpened && (
             <>
+              {id === 'lists' && isCreatingMode && (
+                <ListItem
+                  isCreatingMode={isCreatingMode}
+                  setIsCreatingMode={setIsCreatingMode}
+                />
+              )}
               {children?.map(item => (
                 <ListItem
                   key={item.id}

@@ -2,7 +2,10 @@ import React, { useState, useRef } from 'react';
 import { useClickAway } from 'react-use';
 import { useDispatch } from 'react-redux';
 import styled from 'styled-components';
-import { editListRequest } from '@caesar/common/actions/entities/list';
+import {
+  createListRequest,
+  editListRequest,
+} from '@caesar/common/actions/entities/list';
 import { Icon } from '../../Icon';
 import { Input } from '../../Input';
 import { ConfirmRemoveListModal } from './ConfirmRemoveListModal';
@@ -22,8 +25,16 @@ const StyledInput = styled(Input)`
 
 const StyledIcon = styled(Icon)`
   margin-left: 16px;
-  transition: color 0.2s;
+  transition: color 0.2s, opacity 0.2s;
   cursor: pointer;
+
+  ${({ isDisabled }) =>
+    isDisabled &&
+    isDisabled !== undefined &&
+    `
+      pointer-events: none;
+      opacity: 0.2;
+    `}
 
   &:hover {
     color: ${({ theme }) => theme.color.black};
@@ -49,11 +60,17 @@ const Wrapper = styled(MenuItemInner)`
   }
 `;
 
-export const ListItem = ({ item, activeListId, handleClickMenuItem }) => {
+export const ListItem = ({
+  item = {},
+  activeListId,
+  handleClickMenuItem = Function.prototype,
+  isCreatingMode,
+  setIsCreatingMode,
+}) => {
   const dispatch = useDispatch();
   const { id, label, children = [] } = item;
   const isDefault = label === 'default';
-  const [isEditMode, setIsEditMode] = useState(false);
+  const [isEditMode, setIsEditMode] = useState(isCreatingMode);
   const [isOpenedPopup, setIsOpenedPopup] = useState(false);
   const [value, setValue] = useState(label);
 
@@ -66,11 +83,21 @@ export const ListItem = ({ item, activeListId, handleClickMenuItem }) => {
   };
 
   const handleClickAcceptEdit = () => {
-    dispatch(editListRequest({ ...item, label: value }));
+    if (isCreatingMode) {
+      dispatch(createListRequest({ label: value }));
+      setIsCreatingMode(false);
+    } else {
+      dispatch(editListRequest({ ...item, label: value }));
+    }
+
     setIsEditMode(false);
   };
 
   const handleClickClose = () => {
+    if (isCreatingMode) {
+      setIsCreatingMode(false);
+    }
+
     setIsEditMode(false);
   };
 
@@ -78,6 +105,10 @@ export const ListItem = ({ item, activeListId, handleClickMenuItem }) => {
   useClickAway(inputRef, () => {
     if (isEditMode) {
       setIsEditMode(false);
+
+      if (isCreatingMode) {
+        setIsCreatingMode(false);
+      }
     }
   });
 
@@ -102,6 +133,7 @@ export const ListItem = ({ item, activeListId, handleClickMenuItem }) => {
                   width={16}
                   height={16}
                   color="gray"
+                  isDisabled={!value || value === label}
                   onClick={handleClickAcceptEdit}
                 />
                 <StyledIcon

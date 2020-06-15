@@ -22,7 +22,6 @@ const StyledButton = styled(Button)`
 
 const SecureHeaderComponent = ({
   router,
-  url = IS_AUTHORIZATION_ENABLE ? ROUTES.SIGN_IN : '/',
   isButtonShow = IS_AUTHORIZATION_ENABLE,
 }) => {
   const { isMobile, isWideDesktop } = useMedia();
@@ -40,7 +39,7 @@ const SecureHeaderComponent = ({
   return (
     <Wrapper>
       <Logo
-        href={url}
+        href={ROUTES.MAIN}
         width={getLogoParams().width}
         height={isWideDesktop ? 40 : 30}
         iconName={getLogoParams().name}

@@ -1,7 +1,7 @@
 import React, { memo, useState } from 'react';
 import { useSelector } from 'react-redux';
 import styled from 'styled-components';
-import { APP_VERSION, PERSONAL_TEAM_TYPE } from '@caesar/common/constants';
+import { APP_VERSION, TEAM_TYPE } from '@caesar/common/constants';
 import {
   userDataSelector,
   currentTeamSelector,
@@ -56,17 +56,12 @@ const AppVersion = styled.div`
   color: ${({ theme }) => theme.color.gray};
 `;
 
-const MenuListComponent = ({
-  mode,
-  activeListId,
-  onClickMenuItem,
-  onClickSecureMessage,
-}) => {
+const MenuListComponent = ({ mode, setSearchedText, setMode }) => {
   const currentTeam = useSelector(currentTeamSelector);
   const user = useSelector(userDataSelector);
   const teamList = useSelector(teamsByIdSelector);
   const [isDropdownOpened, setIsDropdownOpened] = useState(false);
-  const activeTeamId = currentTeam?.id || PERSONAL_TEAM_TYPE;
+  const activeTeamId = currentTeam?.id || TEAM_TYPE.PERSONAL;
 
   const handleToggleDropdown = isOpened => {
     setIsDropdownOpened(isOpened);
@@ -83,7 +78,7 @@ const MenuListComponent = ({
         <ColumnHeader>
           <Avatar avatar={teamList[activeTeamId]?.icon} {...user} isSmall />
           <ColumnTitle>
-            {activeTeamId !== PERSONAL_TEAM_TYPE
+            {activeTeamId !== TEAM_TYPE.PERSONAL
               ? teamList[activeTeamId].title
               : 'Personal'}
           </ColumnTitle>
@@ -98,10 +93,9 @@ const MenuListComponent = ({
       <Scrollbar>
         <Menu>
           <MenuListInner
-            activeListId={activeListId}
-            onClickMenuItem={onClickMenuItem}
             mode={mode}
-            onClickSecureMessage={onClickSecureMessage}
+            setSearchedText={setSearchedText}
+            setMode={setMode}
           />
           <AppVersion>{APP_VERSION}</AppVersion>
         </Menu>

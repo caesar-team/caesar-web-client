@@ -4,7 +4,7 @@ import equal from 'fast-deep-equal';
 import memoize from 'memoize-one';
 import AutoSizer from 'react-virtualized-auto-sizer';
 import { FixedSizeList } from 'react-window';
-import { DASHBOARD_DEFAULT_MODE } from '@caesar/common/constants';
+import { DASHBOARD_MODE } from '@caesar/common/constants';
 import { Button } from '@caesar/components';
 import { FixedSizeItem } from './FixedSizeItem';
 import { ScrollbarVirtualList } from './ScrollbarVirtualList';
@@ -63,7 +63,7 @@ const ListComponent = ({
   items = [],
   onClickItem = Function.prototype,
 }) => {
-  const isDashboardDefaultMode = mode === DASHBOARD_DEFAULT_MODE;
+  const isDashboardDefaultMode = mode === DASHBOARD_MODE.DEFAULT;
 
   if (
     isDashboardDefaultMode &&

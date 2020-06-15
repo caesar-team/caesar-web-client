@@ -1,11 +1,5 @@
 import { createSelector } from 'reselect';
-import {
-  FAVORITES_TYPE,
-  INBOX_TYPE,
-  LIST_TYPE,
-  TRASH_TYPE,
-  PERSONAL_TEAM_TYPE,
-} from '@caesar/common/constants';
+import { LIST_TYPE, TEAM_TYPE } from '@caesar/common/constants';
 import { itemsByIdSelector } from '@caesar/common/selectors/entities/item';
 import { childItemsByIdSelector } from '@caesar/common/selectors/entities/childItem';
 import { teamListSelector } from '@caesar/common/selectors/entities/team';
@@ -46,14 +40,15 @@ export const currentTeamListsSelector = createSelector(
       .filter(
         list =>
           list.teamId === currentTeamId &&
-          ![FAVORITES_TYPE, TRASH_TYPE].includes(list.type),
+          ![LIST_TYPE.FAVORITES, LIST_TYPE.TRASH].includes(list.type),
       )
       .sort((a, b) => a.sort - b.sort),
     favorites: teamLists.filter(
-      list => list.teamId === currentTeamId && list.type === FAVORITES_TYPE,
+      list =>
+        list.teamId === currentTeamId && list.type === LIST_TYPE.FAVORITES,
     )[0],
     trash: teamLists.filter(
-      list => list.teamId === currentTeamId && list.type === TRASH_TYPE,
+      list => list.teamId === currentTeamId && list.type === LIST_TYPE.TRASH,
     )[0],
   }),
 );
@@ -66,15 +61,15 @@ export const favoriteListSelector = createSelector(
 
 export const trashListSelector = createSelector(
   personalListsSelector,
-  lists => lists.find(list => list.type === TRASH_TYPE),
+  lists => lists.find(list => list.type === LIST_TYPE.TRASH),
 );
 
 export const selectableListsSelector = createSelector(
   personalListsSelector,
   lists => [
-    ...lists.filter(list => list.type === INBOX_TYPE),
-    ...lists.filter(list => list.type === TRASH_TYPE),
-    ...lists.filter(list => list.type === LIST_TYPE),
+    ...lists.filter(list => list.type === LIST_TYPE.INBOX),
+    ...lists.filter(list => list.type === LIST_TYPE.TRASH),
+    ...lists.filter(list => list.type === LIST_TYPE.LIST),
   ],
 );
 
@@ -86,7 +81,9 @@ export const selectableListsWithoutChildrenSelector = createSelector(
 export const customizableListsSelector = createSelector(
   personalListsSelector,
   lists =>
-    lists.filter(list => list.type === LIST_TYPE && list.label !== 'default'),
+    lists.filter(
+      list => list.type === LIST_TYPE.LIST && list.label !== 'default',
+    ),
 );
 
 export const sortedCustomizableListsSelector = createSelector(
@@ -127,17 +124,17 @@ export const extendedSortedCustomizableListsSelector = createSelector(
 
 export const inboxSelector = createSelector(
   personalListsSelector,
-  lists => lists.find(({ type }) => type === INBOX_TYPE) || {},
+  lists => lists.find(({ type }) => type === LIST_TYPE.INBOX) || {},
 );
 
 const trashSelector = createSelector(
   personalListsSelector,
-  lists => lists.find(({ type }) => type === TRASH_TYPE) || {},
+  lists => lists.find(({ type }) => type === LIST_TYPE.TRASH) || {},
 );
 
 export const favoritesSelector = createSelector(
   personalListsSelector,
-  lists => lists.find(({ type }) => type === FAVORITES_TYPE) || {},
+  lists => lists.find(({ type }) => type === LIST_TYPE.FAVORITES) || {},
 );
 
 const nestedListsSelector = createSelector(
@@ -145,7 +142,10 @@ const nestedListsSelector = createSelector(
   lists =>
     lists
       .filter(
-        ({ type }) => ![INBOX_TYPE, FAVORITES_TYPE, TRASH_TYPE].includes(type),
+        ({ type }) =>
+          ![LIST_TYPE.INBOX, LIST_TYPE.FAVORITES, LIST_TYPE.TRASH].includes(
+            type,
+          ),
       )
       .sort((a, b) => a.sort - b.sort),
 );
@@ -165,7 +165,7 @@ export const personalListsByTypeSelector = createSelector(
 
 export const teamsTrashListsSelector = createSelector(
   teamListsSelector,
-  lists => lists.filter(({ type }) => type === TRASH_TYPE) || [],
+  lists => lists.filter(({ type }) => type === LIST_TYPE.TRASH) || [],
 );
 
 export const allTrashListIdsSelector = createSelector(
@@ -191,12 +191,14 @@ export const selectableTeamsListsSelector = createSelector(
   teamListsSelector,
   (teamList, personalLists, teamLists) => {
     const filterLists = lists =>
-      lists.filter(({ type }) => ![FAVORITES_TYPE, TRASH_TYPE].includes(type));
+      lists.filter(
+        ({ type }) => ![LIST_TYPE.FAVORITES, LIST_TYPE.TRASH].includes(type),
+      );
 
     return [
       {
-        id: PERSONAL_TEAM_TYPE,
-        name: PERSONAL_TEAM_TYPE,
+        id: TEAM_TYPE.PERSONAL,
+        name: TEAM_TYPE.PERSONAL,
         icon: null,
         lists: filterLists(personalLists),
       },

@@ -1,7 +1,7 @@
 import React, { memo } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import styled from 'styled-components';
-import { PERSONAL_TEAM_TYPE } from '@caesar/common/constants';
+import { TEAM_TYPE } from '@caesar/common/constants';
 import {
   userDataSelector,
   userTeamListSelector,
@@ -49,7 +49,7 @@ const TeamsListComponent = ({ activeTeamId, handleToggle }) => {
         <Option
           onClick={() => {
             handleToggle();
-            handleChangeTeamId(PERSONAL_TEAM_TYPE);
+            handleChangeTeamId(TEAM_TYPE.PERSONAL);
           }}
         >
           <StyledAvatar {...user} isSmall />

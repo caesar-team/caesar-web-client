@@ -21,11 +21,7 @@ import { convertNodesToEntities } from '@caesar/common/normalizers/normalizers';
 import { objectToArray } from '@caesar/common/utils/utils';
 import { sortItemsByFavorites } from '@caesar/common/utils/workflow';
 import { getLists, getTeamLists, getTeams } from '@caesar/common/api';
-import {
-  DEFAULT_TEAM_TYPE,
-  ITEM_REVIEW_MODE,
-  PERSONAL_TEAM_TYPE,
-} from '@caesar/common/constants';
+import { TEAM_TYPE, ITEM_MODE } from '@caesar/common/constants';
 import { favoriteListSelector } from '@caesar/common/selectors/entities/list';
 import {
   keyPairSelector,
@@ -90,11 +86,11 @@ function* initTeam(team, withDecryption) {
 
     const currentTeamId = yield select(currentTeamIdSelector);
 
-    if (currentTeamId === PERSONAL_TEAM_TYPE) {
+    if (currentTeamId === TEAM_TYPE.PERSONAL) {
       return;
     }
 
-    if (!currentTeamId && team.type === DEFAULT_TEAM_TYPE) {
+    if (!currentTeamId && team.type === TEAM_TYPE.DEFAULT) {
       yield put(setCurrentTeamId(team.id));
     } else {
       const { data: lists } = yield call(getTeamLists, team.id);
@@ -152,7 +148,7 @@ export function* initWorkflow({ payload: { withDecryption = true } }) {
 }
 
 export function* updateWorkInProgressItemSaga({
-  payload: { itemId, mode = ITEM_REVIEW_MODE },
+  payload: { itemId, mode = ITEM_MODE.REVIEW },
 }) {
   let id = null;
 
@@ -181,7 +177,7 @@ export function* setCurrentTeamIdWatchSaga() {
 
     const currentTeamId = yield select(currentTeamIdSelector);
 
-    if (!currentTeamId || currentTeamId === PERSONAL_TEAM_TYPE) {
+    if (!currentTeamId || currentTeamId === TEAM_TYPE.PERSONAL) {
       return;
     }
 

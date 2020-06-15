@@ -2,7 +2,7 @@ import React from 'react';
 import styled from 'styled-components';
 import { Formik, FastField } from 'formik';
 import { checkError } from '@caesar/common/utils/formikUtils';
-import { ITEM_WORKFLOW_EDIT_MODE } from '@caesar/common/constants';
+import { ITEM_MODE } from '@caesar/common/constants';
 import {
   Uploader,
   Input,
@@ -154,7 +154,7 @@ const CredentialsForm = ({
   onFinishEditWorkflow,
   onCancelWorkflow,
 }) => {
-  const isEditMode = mode === ITEM_WORKFLOW_EDIT_MODE;
+  const isEditMode = mode === ITEM_MODE.WORKFLOW_EDIT;
 
   const action = isEditMode ? onFinishEditWorkflow : onFinishCreateWorkflow;
 

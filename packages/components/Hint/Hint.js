@@ -31,6 +31,6 @@ const Wrapper = styled.div`
 export const Hint = ({ text, children }) => (
   <Wrapper>
     {children}
-    <Inner>{text}</Inner>
+    {text && <Inner>{text}</Inner>}
   </Wrapper>
 );

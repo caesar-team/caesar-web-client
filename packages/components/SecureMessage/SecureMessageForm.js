@@ -126,7 +126,11 @@ const Attachments = styled.div`
   `}
 `;
 
-const FileRow = styled.div``;
+const FileRow = styled.div`
+  &[disabled] {
+    pointer-events: none;
+  }
+`;
 
 const SelectRow = styled.div`
   display: flex;
@@ -187,9 +191,14 @@ const handleClickDownloadFile = attachment => {
 const checkAttachmentsError = (errors, index) =>
   errors[index] && errors[index].raw;
 
-const renderAttachments = (attachments = [], errors = [], setFieldValue) =>
+const renderAttachments = (
+  attachments = [],
+  errors = [],
+  setFieldValue,
+  isSubmitting,
+) =>
   attachments.map((attachment, index) => (
-    <FileRow key={index}>
+    <FileRow key={index} disabled={isSubmitting}>
       <File
         key={index}
         status={checkAttachmentsError(errors, index) ? 'error' : 'uploaded'}
@@ -212,10 +221,6 @@ const SecureMessageFormComponent = ({ onSubmit, notification, isOnline }) => {
   const { isMobile } = useMedia();
   const [isCustomPassword, setIsCustomPassword] = useState(false);
 
-  const handleChangeCustomPassword = () => {
-    setIsCustomPassword(!isCustomPassword);
-  };
-
   const {
     values,
     errors,
@@ -226,12 +231,21 @@ const SecureMessageFormComponent = ({ onSubmit, notification, isOnline }) => {
     handleSubmit,
     isSubmitting,
     isValid,
-    dirty,
   } = useFormik({
     initialValues,
     onSubmit,
     validationSchema: schema,
   });
+
+  const dirty = values.text || values.attachments.length;
+
+  const handleChangeCustomPassword = () => {
+    setIsCustomPassword(!isCustomPassword);
+
+    if (isCustomPassword) {
+      setFieldValue('password', '');
+    }
+  };
 
   return (
     <Form onSubmit={handleSubmit}>
@@ -278,6 +292,7 @@ const SecureMessageFormComponent = ({ onSubmit, notification, isOnline }) => {
             values.attachments,
             errors.attachments,
             setFieldValue,
+            isSubmitting,
           )}
         </Attachments>
       </AttachmentsSection>
@@ -291,6 +306,7 @@ const SecureMessageFormComponent = ({ onSubmit, notification, isOnline }) => {
             value={values.secondsLimit}
             options={secondsLimitOptions}
             onChange={setFieldValue}
+            disabled={isSubmitting}
           />
         </Column>
         <ColumnStyled>
@@ -302,6 +318,7 @@ const SecureMessageFormComponent = ({ onSubmit, notification, isOnline }) => {
             value={values.requestsLimit}
             options={requestsLimitOptions}
             onChange={setFieldValue}
+            disabled={isSubmitting}
           />
         </ColumnStyled>
       </SelectRow>
@@ -311,6 +328,7 @@ const SecureMessageFormComponent = ({ onSubmit, notification, isOnline }) => {
             checked={isCustomPassword}
             value={isCustomPassword}
             onChange={handleChangeCustomPassword}
+            isDisabled={isSubmitting}
           >
             Create my own password for access to encrypted data
           </Checkbox>
@@ -324,6 +342,7 @@ const SecureMessageFormComponent = ({ onSubmit, notification, isOnline }) => {
             value={values.password}
             onBlur={handleBlur}
             onChange={handleChange}
+            disabled={isSubmitting}
           />
           {checkError(touched, errors, 'password') && (
             <Error>{checkError(touched, errors, 'password')}</Error>
@@ -337,7 +356,7 @@ const SecureMessageFormComponent = ({ onSubmit, notification, isOnline }) => {
         </>
       )}
       <ButtonWrapper>
-        <Hint text="You can’t move or delete, read only">
+        <Hint text={!dirty ? 'Please, add text or attachments' : ''}>
           <StyledButton
             htmlType="submit"
             disabled={

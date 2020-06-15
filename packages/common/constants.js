@@ -62,12 +62,6 @@ export const ITEM_MODE = {
   WORKFLOW_CREATE: 'create',
 };
 
-export const LIST_MODE = {
-  REVIEW: 'review',
-  WORKFLOW_EDIT: 'edit',
-  WORKFLOW_CREATE: 'create',
-};
-
 // mb some types are not included here, don't have enough information
 export const ITEM_TYPE = {
   CREDENTIALS: 'credentials',
@@ -117,7 +111,7 @@ export const ROUTES = {
   SHARE: '/share',
   INVITE: '/invite',
   DASHBOARD: '/',
-  MANAGE: '/manage',
+  SETTINGS: '/settings',
   IMPORT: '/import',
   TEAM: '/team',
 };
@@ -126,12 +120,7 @@ export const SHARED_ROUTES = [ROUTES.SHARE, ROUTES.INVITE];
 
 // require bootstrap
 // TODO: figure out better naming
-export const LOCKED_ROUTES = [
-  ROUTES.DASHBOARD,
-  ROUTES.MANAGE,
-  ROUTES.IMPORT,
-  ROUTES.TEAM,
-];
+export const LOCKED_ROUTES = [ROUTES.DASHBOARD, ROUTES.IMPORT, ROUTES.TEAM];
 
 // don't require bootstrap routes
 // TODO: figure out better naming

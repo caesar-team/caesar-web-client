@@ -1,6 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
 import Link from 'next/link';
+import { APP_TYPE } from '@caesar/common/constants';
 import { Icon } from '../Icon';
 
 const LogoLink = styled.a`
@@ -20,10 +21,15 @@ export const Logo = ({
   iconName = 'logo-caesar-4xxi',
   width = DEFAULT_LOGO_WIDTH,
   height = DEFAULT_LOGO_HEIGHT,
-}) => (
-  <Link passHref href={href}>
-    <LogoLink>
+}) =>
+  APP_TYPE === 'secure' ? (
+    <LogoLink href={href}>
       <Icon name={iconName} width={width} height={height} color="black" />
     </LogoLink>
-  </Link>
-);
+  ) : (
+    <Link passHref href={href}>
+      <LogoLink>
+        <Icon name={iconName} width={width} height={height} color="black" />
+      </LogoLink>
+    </Link>
+  );

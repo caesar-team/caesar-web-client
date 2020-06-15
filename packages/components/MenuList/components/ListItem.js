@@ -170,7 +170,7 @@ export const ListItem = ({
         )}
       </Draggable>
       <ConfirmRemoveListModal
-        id={id}
+        item={item}
         isOpenedPopup={isOpenedPopup}
         setIsOpenedPopup={setIsOpenedPopup}
       />

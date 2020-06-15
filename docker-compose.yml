@@ -6,10 +6,10 @@ services:
       dockerfile: ./Dockerfile
       context: ./
       args:
-        API_URI: "http://loc.caesar.team"
-        APP_URI: "http://loc.caesar.team"
+        API_URI: ${API_URI}
+        APP_URI: ${APP_URI}
     environment:
-      API_URI: "http://loc.caesar.team"
-      APP_URI: "http://loc.caesar.team"
+      - API_URI
+      - APP_URI
     ports:
-      - "3000:3000"
+      - "${EXTERNAL_PORT}:3000"

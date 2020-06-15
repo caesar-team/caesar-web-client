@@ -16,15 +16,6 @@ export const MenuItemInner = styled.div`
   cursor: pointer;
   transition: all 0.2s;
 
-  &:hover {
-    background-color: ${({ withChildren, isEdit, theme }) =>
-      !withChildren && !isEdit && theme.color.snow};
-    border-top-color: ${({ withChildren, isEdit, theme }) =>
-      !withChildren && !isEdit && theme.color.gallery};
-    border-bottom-color: ${({ withChildren, isEdit, theme }) =>
-      !withChildren && !isEdit && theme.color.gallery};
-  }
-
   ${({ isActive, theme }) =>
     isActive &&
     `

@@ -1,5 +1,6 @@
 import React, { memo, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
+import { DragDropContext, Droppable } from 'react-beautiful-dnd';
 import styled from 'styled-components';
 import { DASHBOARD_MODE } from '@caesar/common/constants';
 import { currentTeamSelector } from '@caesar/common/selectors/user';
@@ -13,6 +14,7 @@ import {
   setWorkInProgressListId,
   resetWorkInProgressItemIds,
 } from '@caesar/common/actions/workflow';
+import { sortListRequest } from '@caesar/common/actions/entities/list';
 import { Icon } from '../../Icon';
 import { ListItem } from './ListItem';
 import { MenuItemInner } from './styledComponents';
@@ -39,6 +41,13 @@ const ListAddIcon = styled(Icon)`
 
 const StyledMenuItemInner = styled(MenuItemInner)`
   &:hover {
+    background-color: ${({ withChildren, isEdit, theme }) =>
+      !withChildren && !isEdit && theme.color.snow};
+    border-top-color: ${({ withChildren, isEdit, theme }) =>
+      !withChildren && !isEdit && theme.color.gallery};
+    border-bottom-color: ${({ withChildren, isEdit, theme }) =>
+      !withChildren && !isEdit && theme.color.gallery};
+
     ${ListAddIcon} {
       opacity: 1;
     }
@@ -89,6 +98,21 @@ const MenuListInnerComponent = ({
     event.stopPropagation();
     setIsListsOpened(true);
     setIsCreatingMode(true);
+  };
+
+  const handleDragEnd = ({ draggableId, source, destination }) => {
+    if (!destination) {
+      return;
+    }
+
+    if (
+      destination.droppableId === source.droppableId &&
+      destination.index === source.index
+    ) {
+      return;
+    }
+
+    dispatch(sortListRequest(draggableId, source.index, destination.index));
   };
 
   const menuList = [
@@ -177,14 +201,30 @@ const MenuListInnerComponent = ({
                   setIsCreatingMode={setIsCreatingMode}
                 />
               )}
-              {children?.map(item => (
-                <ListItem
-                  key={item.id}
-                  item={item}
-                  activeListId={activeListId}
-                  handleClickMenuItem={handleClickMenuItem}
-                />
-              ))}
+              {children && (
+                <DragDropContext onDragEnd={handleDragEnd}>
+                  <Droppable
+                    droppableId="droppable"
+                    type="lists"
+                    key={children.length}
+                  >
+                    {provided => (
+                      <div ref={provided.innerRef} {...provided.droppableProps}>
+                        {children.map((item, index) => (
+                          <ListItem
+                            key={item.id}
+                            item={item}
+                            activeListId={activeListId}
+                            index={index}
+                            handleClickMenuItem={handleClickMenuItem}
+                          />
+                        ))}
+                        {provided.placeholder}
+                      </div>
+                    )}
+                  </Droppable>
+                </DragDropContext>
+              )}
             </>
           )}
         </MenuItem>

@@ -1,13 +1,13 @@
-import React, { useState, useRef } from 'react';
-import { useClickAway } from 'react-use';
+import React, { useState } from 'react';
 import { useDispatch } from 'react-redux';
+import { Draggable } from 'react-beautiful-dnd';
 import styled from 'styled-components';
 import {
   createListRequest,
   editListRequest,
 } from '@caesar/common/actions/entities/list';
 import { Icon } from '../../Icon';
-import { Input } from '../../Input';
+import { ListItemInput } from './ListItemInput';
 import { ConfirmRemoveListModal } from './ConfirmRemoveListModal';
 import { MenuItemInner } from './styledComponents';
 
@@ -16,12 +16,6 @@ const Title = styled.div`
 `;
 
 const Counter = styled.div``;
-
-const StyledInput = styled(Input)`
-  ${Input.InputField} {
-    padding-right: 80px;
-  }
-`;
 
 const StyledIcon = styled(Icon)`
   margin-left: 16px;
@@ -45,16 +39,30 @@ const ItemIcon = styled(StyledIcon)`
   display: none;
 `;
 
+const DnDIcon = styled(ItemIcon)`
+  position: absolute;
+  top: 50%;
+  left: 24px;
+  margin-left: 0;
+  transform: translateY(-50%);
+`;
+
 const Wrapper = styled(MenuItemInner)`
+  position: relative;
   padding: ${({ isEdit }) => (isEdit ? '0 24px 0 40px' : '7px 24px 7px 56px')};
   color: ${({ isActive, theme }) =>
     isActive ? theme.color.black : theme.color.gray};
 
   &:hover {
+    color: ${({ theme }) => theme.color.black};
+
     ${Counter} {
       ${({ isDefault }) => !isDefault && `display: none;`}
     }
     ${ItemIcon} {
+      display: block;
+    }
+    ${DnDIcon} {
       display: block;
     }
   }
@@ -63,6 +71,7 @@ const Wrapper = styled(MenuItemInner)`
 export const ListItem = ({
   item = {},
   activeListId,
+  index,
   handleClickMenuItem = Function.prototype,
   isCreatingMode,
   setIsCreatingMode,
@@ -101,76 +110,65 @@ export const ListItem = ({
     setIsEditMode(false);
   };
 
-  const inputRef = useRef(null);
-  useClickAway(inputRef, () => {
-    if (isEditMode) {
-      setIsEditMode(false);
-
-      if (isCreatingMode) {
-        setIsCreatingMode(false);
-      }
-    }
-  });
-
   return (
     <>
-      <Wrapper
-        ref={inputRef}
-        isActive={activeListId === id && !isEditMode}
-        onClick={() => handleClickMenuItem(id)}
-        isEdit={isEditMode}
-        isDefault={isDefault}
-      >
-        {isEditMode ? (
-          <StyledInput
-            autoFocus
-            value={value}
-            onChange={e => setValue(e.target.value)}
-            postfix={
+      <Draggable key={id} draggableId={id} index={index}>
+        {provided => (
+          <Wrapper
+            isActive={activeListId === id && !isEditMode}
+            onClick={() => handleClickMenuItem(id)}
+            isEdit={isEditMode}
+            isDefault={isDefault}
+            ref={provided.innerRef}
+            {...provided.draggableProps}
+            {...provided.dragHandleProps}
+          >
+            {isEditMode ? (
+              <ListItemInput
+                isEditMode={isEditMode}
+                setIsEditMode={setIsEditMode}
+                isCreatingMode={isCreatingMode}
+                setIsCreatingMode={setIsCreatingMode}
+                value={value}
+                setValue={setValue}
+                label={label}
+                handleClickAcceptEdit={handleClickAcceptEdit}
+                handleClickClose={handleClickClose}
+              />
+            ) : (
               <>
-                <StyledIcon
-                  name="checkmark"
+                <DnDIcon
+                  name="drag-n-drop"
                   width={16}
                   height={16}
                   color="gray"
-                  isDisabled={!value || value === label}
-                  onClick={handleClickAcceptEdit}
                 />
-                <StyledIcon
-                  name="close"
-                  width={12}
-                  height={12}
-                  color="gray"
-                  onClick={handleClickClose}
-                />
-              </>
-            }
-          />
-        ) : (
-          <>
-            <Title>{label}</Title>
-            <Counter>{children.length}</Counter>
-            {!isDefault && (
-              <>
-                <ItemIcon
-                  name="pencil"
-                  width={16}
-                  height={16}
-                  color="gray"
-                  onClick={handleClickEdit}
-                />
-                <ItemIcon
-                  name="trash"
-                  width={16}
-                  height={16}
-                  color="gray"
-                  onClick={handleClickRemove}
-                />
+                <Title>{label}</Title>
+                <Counter>{children.length}</Counter>
+                {!isDefault && (
+                  <>
+                    <ItemIcon
+                      name="pencil"
+                      width={16}
+                      height={16}
+                      color="gray"
+                      onClick={handleClickEdit}
+                    />
+                    <ItemIcon
+                      name="trash"
+                      width={16}
+                      height={16}
+                      color="gray"
+                      onClick={handleClickRemove}
+                    />
+                  </>
+                )}
               </>
             )}
-          </>
+            <DnDIcon name="drag-n-drop" width={16} height={16} color="gray" />
+          </Wrapper>
         )}
-      </Wrapper>
+      </Draggable>
       <ConfirmRemoveListModal
         id={id}
         isOpenedPopup={isOpenedPopup}

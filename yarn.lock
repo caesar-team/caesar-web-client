@@ -1410,10 +1410,30 @@
   resolved "https://registry.yarnpkg.com/@types/js-cookie/-/js-cookie-2.2.6.tgz#f1a1cb35aff47bc5cfb05cb0c441ca91e914c26f"
   integrity sha512-+oY0FDTO2GYKEV0YPvSshGq9t7YozVkgvXLty7zogQNuCxBhT9/3INX9Q7H1aRZ4SUDRXAKlJuA4EA5nTt7SNw==
 
+"@types/prop-types@*":
+  version "15.7.3"
+  resolved "https://registry.yarnpkg.com/@types/prop-types/-/prop-types-15.7.3.tgz#2ab0d5da2e5815f94b0b9d4b95d1e5f243ab2ca7"
+  integrity sha512-KfRL3PuHmqQLOG+2tGpRO26Ctg+Cq1E01D2DMriKEATHgWLfeNDmq9e29Q9WIky0dQ3NPkd1mzYH8Lm936Z9qw==
+
 "@types/q@^1.5.1":
   version "1.5.2"
   resolved "https://registry.yarnpkg.com/@types/q/-/q-1.5.2.tgz#690a1475b84f2a884fd07cd797c00f5f31356ea8"
   integrity sha512-ce5d3q03Ex0sy4R14722Rmt6MT07Ua+k4FwDfdcToYJcMKNtRVQvJ6JCAPdAmAnbRb6CsX6aYb9m96NGod9uTw==
+
+"@types/react-table@^6.8.5":
+  version "6.8.7"
+  resolved "https://registry.yarnpkg.com/@types/react-table/-/react-table-6.8.7.tgz#210ffa2862dd3711350676c0bdbbfbff45f14b84"
+  integrity sha512-1U0xl47jk0BzE+HNHgxZYSLvtybSvnlLhOpW9Mfqf9iuRm/fGqgRab3TKivPCY6Tl7WPFM2hWEJ1GnsuSFc9AQ==
+  dependencies:
+    "@types/react" "*"
+
+"@types/react@*":
+  version "16.9.36"
+  resolved "https://registry.yarnpkg.com/@types/react/-/react-16.9.36.tgz#ade589ff51e2a903e34ee4669e05dbfa0c1ce849"
+  integrity sha512-mGgUb/Rk/vGx4NCvquRuSH0GHBQKb1OqpGS9cT9lFxlTLHZgkksgI60TuIxubmn7JuCb+sENHhQciqa0npm0AQ==
+  dependencies:
+    "@types/prop-types" "*"
+    csstype "^2.2.0"
 
 "@webassemblyjs/ast@1.9.0":
   version "1.9.0"
@@ -3882,7 +3902,7 @@ csso@^4.0.2:
   dependencies:
     css-tree "1.0.0-alpha.39"
 
-csstype@^2.5.5:
+csstype@^2.2.0, csstype@^2.5.5:
   version "2.6.10"
   resolved "https://registry.yarnpkg.com/csstype/-/csstype-2.6.10.tgz#e63af50e66d7c266edb6b32909cfd0aabe03928b"
   integrity sha512-D34BqZU4cIlMCY93rZHbrq9pjTAQJ3U8S8rfBqjwHxkGPThWFjzZDQpgMJY0QViLxth6ZKYiwFBo14RdN44U/w==
@@ -8738,12 +8758,14 @@ react-scrolllock@^4.0.1:
     exenv "^1.2.2"
     react-node-resolver "^2.0.1"
 
-react-table@6.10.0:
-  version "6.10.0"
-  resolved "https://registry.yarnpkg.com/react-table/-/react-table-6.10.0.tgz#20444b19d8ca3c1a08e7544e5c3a93e4ba56690e"
-  integrity sha512-s/mQLI1+mNvlae45MfAZyZ04YIT3jUzWJqx34s0tfwpDdgJkpeK6vyzwMUkKFCpGODBxpjBOekYZzcEmk+2FiQ==
+react-table@6.11.5:
+  version "6.11.5"
+  resolved "https://registry.yarnpkg.com/react-table/-/react-table-6.11.5.tgz#84e52885db426a07a6c4ce2c7e942f2cd4e2aa58"
+  integrity sha512-LM+AS9v//7Y7lAlgTWW/cW6Sn5VOb3EsSkKQfQTzOW8FngB1FUskLLNEVkAYsTX9LjOWR3QlGjykJqCE6eXT/g==
   dependencies:
+    "@types/react-table" "^6.8.5"
     classnames "^2.2.5"
+    react-is "^16.8.1"
 
 react-tagsinput@^3.19.0:
   version "3.19.0"

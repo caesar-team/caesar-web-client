@@ -17,7 +17,6 @@ const StyledIcon = styled(Icon)`
 
   ${({ isDisabled }) =>
     isDisabled &&
-    isDisabled !== undefined &&
     `
       pointer-events: none;
       opacity: 0.2;
@@ -27,6 +26,8 @@ const StyledIcon = styled(Icon)`
     color: ${({ theme }) => theme.color.black};
   }
 `;
+
+const MAX_LIST_LABEL_LENGTH = 75;
 
 export const ListItemInput = ({
   isEditMode,
@@ -51,31 +52,40 @@ export const ListItemInput = ({
     }
   });
 
+  const handleInputChange = e => {
+    const newValue = e.target.value;
+
+    if (newValue.length >= MAX_LIST_LABEL_LENGTH) return;
+
+    setValue(newValue);
+  };
+
   return (
-    <StyledInput
-      ref={inputRef}
-      autoFocus
-      value={value}
-      onChange={e => setValue(e.target.value)}
-      postfix={
-        <>
-          <StyledIcon
-            name="checkmark"
-            width={16}
-            height={16}
-            color="gray"
-            isDisabled={!value || value === label}
-            onClick={handleClickAcceptEdit}
-          />
-          <StyledIcon
-            name="close"
-            width={12}
-            height={12}
-            color="gray"
-            onClick={handleClickClose}
-          />
-        </>
-      }
-    />
+    <div ref={inputRef}>
+      <StyledInput
+        autoFocus
+        value={value}
+        onChange={handleInputChange}
+        postfix={
+          <>
+            <StyledIcon
+              name="checkmark"
+              width={16}
+              height={16}
+              color="gray"
+              isDisabled={!value || value === label}
+              onClick={handleClickAcceptEdit}
+            />
+            <StyledIcon
+              name="close"
+              width={12}
+              height={12}
+              color="gray"
+              onClick={handleClickClose}
+            />
+          </>
+        }
+      />
+    </div>
   );
 };

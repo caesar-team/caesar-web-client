@@ -40,7 +40,7 @@ const ConfirmModal = ({
   description,
   icon,
   confirmBtnText = 'Confirm',
-  onClickOk,
+  onClickConfirm,
   onClickCancel,
 }) => (
   <Modal
@@ -59,7 +59,7 @@ const ConfirmModal = ({
         <StyledButton color="white" onClick={onClickCancel}>
           Cancel
         </StyledButton>
-        <Button icon={icon} onClick={onClickOk}>
+        <Button icon={icon} onClick={onClickConfirm}>
           {confirmBtnText}
         </Button>
       </ButtonsWrapper>

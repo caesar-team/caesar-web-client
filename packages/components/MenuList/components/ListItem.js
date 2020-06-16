@@ -22,14 +22,6 @@ const StyledIcon = styled(Icon)`
   transition: color 0.2s, opacity 0.2s;
   cursor: pointer;
 
-  ${({ isDisabled }) =>
-    isDisabled &&
-    isDisabled !== undefined &&
-    `
-      pointer-events: none;
-      opacity: 0.2;
-    `}
-
   &:hover {
     color: ${({ theme }) => theme.color.black};
   }
@@ -45,6 +37,7 @@ const DnDIcon = styled(ItemIcon)`
   left: 24px;
   margin-left: 0;
   transform: translateY(-50%);
+  cursor: grab;
 `;
 
 const Wrapper = styled(MenuItemInner)`
@@ -63,7 +56,7 @@ const Wrapper = styled(MenuItemInner)`
       display: block;
     }
     ${DnDIcon} {
-      display: block;
+      display: ${({ isEdit }) => (isEdit ? 'none' : 'block')};
     }
   }
 `;
@@ -108,11 +101,69 @@ export const ListItem = ({
     }
 
     setIsEditMode(false);
+    setValue(label);
   };
 
-  return (
+  const renderInner = () => (
     <>
-      <Draggable key={id} draggableId={id} index={index}>
+      {isEditMode ? (
+        <ListItemInput
+          isEditMode={isEditMode}
+          setIsEditMode={setIsEditMode}
+          isCreatingMode={isCreatingMode}
+          setIsCreatingMode={setIsCreatingMode}
+          value={value}
+          setValue={setValue}
+          label={label}
+          handleClickAcceptEdit={handleClickAcceptEdit}
+          handleClickClose={handleClickClose}
+        />
+      ) : (
+        <>
+          <DnDIcon name="drag-n-drop" width={16} height={16} color="gray" />
+          <Title>{label}</Title>
+          <Counter>{children.length}</Counter>
+          {!isDefault && (
+            <>
+              <ItemIcon
+                name="pencil"
+                width={16}
+                height={16}
+                color="gray"
+                onClick={handleClickEdit}
+              />
+              <ItemIcon
+                name="trash"
+                width={16}
+                height={16}
+                color="gray"
+                onClick={handleClickRemove}
+              />
+            </>
+          )}
+        </>
+      )}
+      <DnDIcon name="drag-n-drop" width={16} height={16} color="gray" />
+    </>
+  );
+
+  return isCreatingMode ? (
+    <Wrapper
+      isActive={activeListId === id && !isEditMode}
+      onClick={() => handleClickMenuItem(id)}
+      isEdit={isEditMode}
+      isDefault={isDefault}
+    >
+      {renderInner()}
+    </Wrapper>
+  ) : (
+    <>
+      <Draggable
+        key={id}
+        draggableId={id}
+        index={index}
+        isDragDisabled={isEditMode}
+      >
         {provided => (
           <Wrapper
             isActive={activeListId === id && !isEditMode}
@@ -123,49 +174,7 @@ export const ListItem = ({
             {...provided.draggableProps}
             {...provided.dragHandleProps}
           >
-            {isEditMode ? (
-              <ListItemInput
-                isEditMode={isEditMode}
-                setIsEditMode={setIsEditMode}
-                isCreatingMode={isCreatingMode}
-                setIsCreatingMode={setIsCreatingMode}
-                value={value}
-                setValue={setValue}
-                label={label}
-                handleClickAcceptEdit={handleClickAcceptEdit}
-                handleClickClose={handleClickClose}
-              />
-            ) : (
-              <>
-                <DnDIcon
-                  name="drag-n-drop"
-                  width={16}
-                  height={16}
-                  color="gray"
-                />
-                <Title>{label}</Title>
-                <Counter>{children.length}</Counter>
-                {!isDefault && (
-                  <>
-                    <ItemIcon
-                      name="pencil"
-                      width={16}
-                      height={16}
-                      color="gray"
-                      onClick={handleClickEdit}
-                    />
-                    <ItemIcon
-                      name="trash"
-                      width={16}
-                      height={16}
-                      color="gray"
-                      onClick={handleClickRemove}
-                    />
-                  </>
-                )}
-              </>
-            )}
-            <DnDIcon name="drag-n-drop" width={16} height={16} color="gray" />
+            {renderInner()}
           </Wrapper>
         )}
       </Draggable>

@@ -27,7 +27,7 @@ export const ConfirmRemoveListModal = ({
       }`}
       icon="trash"
       confirmBtnText="Remove"
-      onClickOk={handleClickConfirmRemove}
+      onClickConfirm={handleClickConfirmRemove}
       onClickCancel={() => setIsOpenedPopup(false)}
     />
   );

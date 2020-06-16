@@ -93,7 +93,7 @@
     "@babel/core": "7.9.0",
     "@babel/plugin-proposal-class-properties": "7.5.5",
     "@babel/preset-react": "7.0.0",
-    "@svgr/webpack": "4.3.2",
+    "@svgr/webpack": "4.3.3",
     "babel-core": "6.26.3",
     "babel-eslint": "^10.0.2",
     "babel-loader": "8.0.6",

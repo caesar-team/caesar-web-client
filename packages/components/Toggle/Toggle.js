@@ -20,15 +20,15 @@ const InputContainer = styled.label`
 
 const Input = styled.input`
   &:checked + span {
-    background-color: ${({ theme }) => theme.black};
+    background-color: ${({ theme }) => theme.color.black};
   }
   &:disabled + span {
-    background-color: ${({ theme }) => theme.gray};
+    background-color: ${({ theme }) => theme.color.gray};
     opacity: 0.4;
     cursor: not-allowed;
   }
   &:disabled:checked + span {
-    background-color: ${({ theme }) => theme.black};
+    background-color: ${({ theme }) => theme.color.black};
     opacity: 0.4;
     cursor: not-allowed;
   }
@@ -51,7 +51,7 @@ const Slider = styled.span`
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: ${({ theme }) => theme.gray};
+  background-color: ${({ theme }) => theme.color.gray};
   -webkit-transition: 0.4s;
   transition: 0.4s;
   border-radius: 34px;
@@ -65,7 +65,7 @@ const Slider = styled.span`
       content: '';
       height: 20px;
       width: 20px;
-      background-color: ${theme.white};
+      background-color: ${theme.color.white};
       -webkit-transition: 0.4s;
       transition: 0.4s;
     }

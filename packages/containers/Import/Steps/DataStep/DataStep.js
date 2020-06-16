@@ -2,11 +2,7 @@ import React, { Component } from 'react';
 import styled from 'styled-components';
 import memoize from 'memoize-one';
 import { waitIdle } from '@caesar/common/utils/utils';
-import {
-  ITEM_DOCUMENT_TYPE,
-  ITEM_CREDENTIALS_TYPE,
-  KEY_CODES,
-} from '@caesar/common/constants';
+import { ITEM_TYPE, KEY_CODES } from '@caesar/common/constants';
 import {
   Input,
   Icon,
@@ -24,26 +20,25 @@ const Wrapper = styled.div`
 const Title = styled.div`
   font-size: 18px;
   font-weight: 600;
-  letter-spacing: 0.6px;
   margin-bottom: 20px;
 `;
 
 const SearchInput = styled(Input)`
-  border: 1px solid ${({ theme }) => theme.gallery};
+  border: 1px solid ${({ theme }) => theme.color.gallery};
   margin-bottom: 10px;
 
   ${Input.InputField} {
     padding: 10px 0 10px 50px;
-    background: ${({ theme }) => theme.white};
+    background: ${({ theme }) => theme.color.white};
 
     &:hover {
-      background: ${({ theme }) => theme.white};
+      background: ${({ theme }) => theme.color.white};
     }
   }
 `;
 
 const StyledIcon = styled(Icon)`
-  fill: ${({ theme }) => theme.gallery};
+  fill: ${({ theme }) => theme.color.gallery};
 `;
 
 const BottomWrapper = styled.div`
@@ -56,7 +51,6 @@ const BottomWrapper = styled.div`
 const SelectedItems = styled.div`
   font-size: 14px;
   font-weight: 600;
-  letter-spacing: 0.4px;
 `;
 
 const ButtonsWrapper = styled.div`
@@ -97,7 +91,6 @@ const SelectListWrapper = styled.div`
 
 const MoveToText = styled.div`
   font-size: 14px;
-  letter-spacing: 0.4px;
   margin-right: 20px;
 `;
 
@@ -170,12 +163,12 @@ class DataStep extends Component {
 
         const options = [
           {
-            value: ITEM_CREDENTIALS_TYPE,
+            value: ITEM_TYPE.CREDENTIALS,
             label: 'Password',
             isDisabled: isCredentialsDisabled,
           },
           {
-            value: ITEM_DOCUMENT_TYPE,
+            value: ITEM_TYPE.DOCUMENT,
             label: 'Secure Note',
             isDisabled: isDocumentDisabled,
           },

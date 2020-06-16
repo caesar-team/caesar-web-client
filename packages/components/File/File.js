@@ -1,21 +1,22 @@
 import React from 'react';
+import { useHover } from 'react-use';
 import styled from 'styled-components';
+import DownloadIconSvg from '@caesar/assets/icons/svg/icon-download-white.svg';
+import CloseIconSvg from '@caesar/assets/icons/svg/icon-close-white.svg';
 import { Icon } from '../Icon';
-import DownloadIcon from '@caesar/assets/icons/svg/icon-download-white.svg';
 
 const FileExt = styled.div`
   position: relative;
   display: flex;
   align-items: center;
   justify-content: center;
+  flex: 0 0 40px;
   width: 40px;
   height: 40px;
   font-size: 14px;
-  letter-spacing: 0.4px;
-  background-color: ${({ theme }) => theme.gray};
-  color: ${({ theme }) => theme.white};
+  color: ${({ theme }) => theme.color.white};
+  background-color: ${({ theme }) => theme.color.black};
   border-radius: 3px 0 3px 3px;
-  cursor: pointer;
   transition: all 0.2s;
 
   &:before {
@@ -23,13 +24,13 @@ const FileExt = styled.div`
     position: absolute;
     top: 0;
     right: 0;
-    background: ${({ theme }) => theme.alto};
     display: block;
     width: 0;
+    background: ${({ theme }) => theme.color.gray};
     border-style: solid;
     border-width: 4px;
     border-color: ${({ theme }) =>
-      `${theme.white} ${theme.white} transparent transparent`};
+      `${theme.color.white} ${theme.color.white} transparent transparent`};
     border-radius: 0 0 0 3px;
   }
 `;
@@ -38,15 +39,16 @@ const ErrorStatus = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
-  border: 3px solid ${({ theme }) => theme.red};
-  border-radius: 50%;
+  flex: 0 0 40px;
   width: 40px;
   height: 40px;
+  border: 3px solid ${({ theme }) => theme.color.red};
+  border-radius: 50%;
 
   &:after {
     content: '!';
     position: absolute;
-    color: ${({ theme }) => theme.red};
+    color: ${({ theme }) => theme.color.red};
   }
 `;
 
@@ -54,49 +56,70 @@ const Details = styled.div`
   display: flex;
   flex-direction: column;
   margin-left: 16px;
+  overflow: hidden;
 `;
 
 const FileName = styled.div`
-  font-size: 18px;
+  font-size: 16px;
   line-height: 18px;
-  letter-spacing: 0.6px;
-  color: ${({ theme }) => theme.black};
-  margin-bottom: 8px;
+  color: ${({ theme }) => theme.color.black};
+  margin-bottom: 5px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 `;
 
 const FileSize = styled.div`
   font-size: 14px;
   line-height: 14px;
-  letter-spacing: 0.4px;
-  color: ${({ theme }) => theme.gray};
-`;
-
-const UploadedWrapper = styled.div`
-  display: flex;
-
-  &:hover {
-    ${FileExt} {
-      background: ${({ theme }) => theme.black};
-      color: ${({ theme }) => theme.white};
-      font-size: 0;
-      background: url(${DownloadIcon}) no-repeat center
-        ${({ theme }) => theme.black};
-
-      &:before {
-        background: ${({ theme }) => theme.black};
-      }
-    }
-  }
+  color: ${({ theme }) => theme.color.gray};
 `;
 
 const ErrorWrapper = styled.div`
+  position: relative;
   display: flex;
+  padding-right: 28px;
 `;
 
-const StyledCloseIcon = styled(Icon)`
-  fill: ${({ theme }) => theme.gray};
-  margin-left: 10px;
+const CloseIcon = styled(Icon)`
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  color: ${({ theme }) => theme.color.gray};
   cursor: pointer;
+`;
+
+const UploadedWrapper = styled.div`
+  position: relative;
+  display: flex;
+  padding: 8px 28px 8px 8px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: color, background-color 0.2s;
+
+  &:hover {
+    background-color: ${({ theme }) => theme.color.snow};
+
+    ${FileExt} {
+      ${({ isHoveringCloseIcon, theme }) =>
+        !isHoveringCloseIcon &&
+        `
+          background: ${theme.color.black};
+          color: ${theme.color.white};
+          font-size: 0;
+          background: url(${DownloadIconSvg})
+            no-repeat center ${theme.color.black};
+
+          &:before {
+            background: ${theme.color.black};
+          }
+        `}
+    }
+
+    ${CloseIcon} {
+      color: ${({ theme }) => theme.color.black};
+    }
+  }
 `;
 
 const units = ['bytes', 'KB', 'MB'];
@@ -125,6 +148,24 @@ const File = ({
   const filename = name.replace(/\.[^/.]+$/, '');
   const size = formatBytes(Math.round((raw.length * 3) / 4));
 
+  const handleClickCloseIcon = e => {
+    e.stopPropagation();
+    onClickRemove();
+  };
+
+  const closeIconComponent = (
+    <CloseIcon
+      name="close"
+      width={12}
+      height={12}
+      onClick={handleClickCloseIcon}
+    />
+  );
+
+  const [hoverableCloseIcon, isHoveringCloseIcon] = useHover(
+    closeIconComponent,
+  );
+
   if (status === ERROR_STATUS) {
     return (
       <ErrorWrapper>
@@ -133,31 +174,23 @@ const File = ({
           <FileName>{filename}</FileName>
           <FileSize>{size}</FileSize>
         </Details>
-        <StyledCloseIcon
-          name="close"
-          width={10}
-          height={10}
-          onClick={onClickRemove}
-        />
+        {onClickRemove && hoverableCloseIcon}
       </ErrorWrapper>
     );
   }
 
   return (
-    <UploadedWrapper {...props}>
-      <FileExt onClick={onClickDownload}>{ext}</FileExt>
+    <UploadedWrapper
+      isHoveringCloseIcon={isHoveringCloseIcon}
+      onClick={onClickDownload}
+      {...props}
+    >
+      <FileExt>{ext}</FileExt>
       <Details>
         <FileName>{filename}</FileName>
         <FileSize>{size}</FileSize>
       </Details>
-      {onClickRemove && (
-        <StyledCloseIcon
-          name="close"
-          width={10}
-          height={10}
-          onClick={onClickRemove}
-        />
-      )}
+      {onClickRemove && hoverableCloseIcon}
     </UploadedWrapper>
   );
 };

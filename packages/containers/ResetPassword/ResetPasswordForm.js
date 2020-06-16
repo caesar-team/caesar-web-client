@@ -22,11 +22,7 @@ const Row = styled.div`
 
 const StyledPasswordInput = styled(PasswordInput)`
   display: flex;
-  border: 1px solid ${({ theme }) => theme.lightGray};
-
-  ${PasswordInput.InputField} {
-    line-height: 20px;
-  }
+  border: 1px solid ${({ theme }) => theme.color.lightGray};
 
   ${PasswordInput.Prefix} {
     position: relative;
@@ -42,19 +38,17 @@ const Prefix = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
-  border-right: 1px solid ${({ theme }) => theme.lightGray};
+  border-right: 1px solid ${({ theme }) => theme.color.lightGray};
 `;
 
 const Error = styled.div`
   margin-top: 8px;
   font-size: 14px;
-  letter-spacing: 0.4px;
-  color: ${({ theme }) => theme.red};
+  color: ${({ theme }) => theme.color.red};
 `;
 
 const StyledButton = styled(Button)`
   font-size: 18px;
-  letter-spacing: 0.6px;
   padding: 18px 30px;
   height: 60px;
 `;
@@ -79,7 +73,8 @@ const ResetPasswordForm = ({ onSubmit }) => (
     onSubmit={onSubmit}
     initialValues={{ password: '', confirmPassword: '' }}
     validationSchema={schema}
-    render={({
+  >
+    {({
       errors,
       touched,
       handleSubmit,
@@ -89,9 +84,8 @@ const ResetPasswordForm = ({ onSubmit }) => (
     }) => (
       <Form onSubmit={handleSubmit}>
         <Row>
-          <FastField
-            name="password"
-            render={({ field }) => (
+          <FastField name="password">
+            {({ field }) => (
               <StyledPasswordInput
                 {...field}
                 onBlur={setFieldTouched}
@@ -99,15 +93,14 @@ const ResetPasswordForm = ({ onSubmit }) => (
                 prefix={PasswordInputPrefix}
               />
             )}
-          />
+          </FastField>
           {checkError(touched, errors, 'password') && (
             <Error>{errors.password}</Error>
           )}
         </Row>
         <Row>
-          <FastField
-            name="confirmPassword"
-            render={({ field }) => (
+          <FastField name="confirmPassword">
+            {({ field }) => (
               <StyledPasswordInput
                 {...field}
                 onBlur={setFieldTouched}
@@ -115,7 +108,7 @@ const ResetPasswordForm = ({ onSubmit }) => (
                 prefix={PasswordInputPrefix}
               />
             )}
-          />
+          </FastField>
           {checkError(touched, errors, 'confirmPassword') && (
             <Error>{errors.confirmPassword}</Error>
           )}
@@ -127,7 +120,7 @@ const ResetPasswordForm = ({ onSubmit }) => (
         </ButtonWrapper>
       </Form>
     )}
-  />
+  </Formik>
 );
 
 export default ResetPasswordForm;

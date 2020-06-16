@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import styled from 'styled-components';
+// TODO: Replace with import {useClickAway} from 'react-use';
 import enhanceWithClickOutside from 'react-click-outside';
 import { Icon } from '../Icon';
 
@@ -7,23 +8,27 @@ const Wrapper = styled.div`
   display: flex;
   flex-direction: column;
   position: relative;
+  background-color: ${({ theme }) => theme.color.white};
 `;
 
 const SelectedOption = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
-  border-bottom: 1px solid ${({ theme }) => theme.gallery};
+  border-bottom: 1px solid ${({ theme }) => theme.color.gallery};
   padding: 5px 15px;
   cursor: pointer;
+
+  &[disabled] {
+    pointer-events: none;
+  }
 `;
 
 const ValueText = styled.div`
   display: flex;
   align-items: center;
   font-size: 18px;
-  letter-spacing: 0.6px;
-  color: ${({ theme }) => theme.black};
+  color: ${({ theme }) => theme.color.black};
   position: relative;
   width: 100%;
 `;
@@ -44,7 +49,7 @@ const OptionsList = styled.div`
   display: flex;
   flex-direction: column;
   position: relative;
-  border: 1px solid ${({ theme }) => theme.gallery};
+  border: 1px solid ${({ theme }) => theme.color.gallery};
   border-radius: 3px;
   width: 100%;
 `;
@@ -53,18 +58,22 @@ const Option = styled.div`
   display: flex;
   padding: 10px 15px;
   font-size: 16px;
-  letter-spacing: 0.5px;
   font-weight: ${({ isActive }) => (isActive ? 'bold' : 'normal')};
   color: ${({ theme, isDisabled }) =>
-    isDisabled ? theme.lightGray : theme.emperor};
+    isDisabled ? theme.color.lightGray : theme.color.emperor};
   background-color: ${({ theme, isActive }) =>
-    isActive ? theme.snow : theme.white};
+    isActive ? theme.color.snow : theme.color.white};
   cursor: ${({ isDisabled }) => (isDisabled ? 'default' : 'pointer')};
 
   &:hover {
     color: ${({ theme, isDisabled }) =>
-      isDisabled ? theme.lightGray : theme.black};
+      isDisabled ? theme.color.lightGray : theme.color.black};
   }
+`;
+
+const ArrowIcon = styled(Icon)`
+  transform: ${({ isOpened }) => (isOpened ? 'scaleY(-1)' : 'scaleY(1)')};
+  transition: transform 0.2s;
 `;
 
 const BOX_DIRECTION_DOWN = 'down';
@@ -146,7 +155,6 @@ class SelectInner extends Component {
     } = this.props;
     const { isOpened } = this.state;
 
-    const iconName = isOpened ? 'arrow-up-big' : 'arrow-down-big';
     const selectedLabel = value
       ? (options.find(({ value: optionValue }) => optionValue === value) || {})
           .label
@@ -171,7 +179,12 @@ class SelectInner extends Component {
               />
             )}
           </ValueText>
-          <Icon name={iconName} width={16} height={16} />
+          <ArrowIcon
+            name="arrow-triangle"
+            width={10}
+            height={6}
+            isOpened={isOpened}
+          />
         </SelectedOption>
         {isOpened && (
           <Box top={topOffset}>

@@ -11,7 +11,7 @@ const Wrapper = styled.div`
 const CloseIcon = styled(Icon)`
   width: 10px;
   height: 10px;
-  fill: ${({ theme }) => theme.gray};
+  fill: ${({ theme }) => theme.color.gray};
   cursor: pointer;
   margin-left: 20px;
 `;
@@ -31,12 +31,11 @@ const TooltipText = styled.div`
   display: flex;
   align-items: center;
   border-radius: 3px;
-  background-color: ${({ theme }) => theme.black};
+  background-color: ${({ theme }) => theme.color.black};
   padding: 4px 10px;
   font-size: 12px;
   font-weight: 600;
-  letter-spacing: 0.4px;
-  color: ${({ theme }) => theme.white};
+  color: ${({ theme }) => theme.color.white};
 `;
 
 class RemoveControl extends Component {

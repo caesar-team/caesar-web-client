@@ -22,11 +22,7 @@ const Row = styled.div`
 
 const StyledEmailInput = styled(Input)`
   display: flex;
-  border: 1px solid ${({ theme }) => theme.lightGray};
-
-  ${Input.InputField} {
-    line-height: 20px;
-  }
+  border: 1px solid ${({ theme }) => theme.color.lightGray};
 
   ${Input.Prefix} {
     position: relative;
@@ -38,11 +34,7 @@ const StyledEmailInput = styled(Input)`
 
 const StyledPasswordInput = styled(PasswordInput)`
   display: flex;
-  border: 1px solid ${({ theme }) => theme.lightGray};
-
-  ${PasswordInput.InputField} {
-    line-height: 20px;
-  }
+  border: 1px solid ${({ theme }) => theme.color.lightGray};
 
   ${PasswordInput.Prefix} {
     position: relative;
@@ -58,19 +50,17 @@ const Prefix = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
-  border-right: 1px solid ${({ theme }) => theme.lightGray};
+  border-right: 1px solid ${({ theme }) => theme.color.lightGray};
 `;
 
 const Error = styled.div`
   margin-top: 8px;
   font-size: 14px;
-  letter-spacing: 0.4px;
-  color: ${({ theme }) => theme.red};
+  color: ${({ theme }) => theme.color.red};
 `;
 
 const StyledButton = styled(Button)`
   font-size: 18px;
-  letter-spacing: 0.6px;
   padding: 18px 30px;
   height: 60px;
 `;
@@ -105,7 +95,8 @@ const SignInForm = ({ onSubmit }) => (
     onSubmit={onSubmit}
     initialValues={{ email: '', password: '' }}
     validationSchema={schema}
-    render={({
+  >
+    {({
       errors,
       touched,
       handleSubmit,
@@ -115,9 +106,8 @@ const SignInForm = ({ onSubmit }) => (
     }) => (
       <Form onSubmit={handleSubmit}>
         <Row>
-          <FastField
-            name="email"
-            render={({ field }) => (
+          <FastField name="email">
+            {({ field }) => (
               <StyledEmailInput
                 {...field}
                 onBlur={setFieldTouched}
@@ -125,15 +115,14 @@ const SignInForm = ({ onSubmit }) => (
                 prefix={EmailInputPrefix}
               />
             )}
-          />
+          </FastField>
           {checkError(touched, errors, 'email') && (
             <Error>{errors.email}</Error>
           )}
         </Row>
         <Row>
-          <FastField
-            name="password"
-            render={({ field }) => (
+          <FastField name="password">
+            {({ field }) => (
               <StyledPasswordInput
                 {...field}
                 onBlur={setFieldTouched}
@@ -141,7 +130,7 @@ const SignInForm = ({ onSubmit }) => (
                 prefix={PasswordInputPrefix}
               />
             )}
-          />
+          </FastField>
           {checkError(touched, errors, 'password') && (
             <Error>{errors.password}</Error>
           )}
@@ -154,7 +143,7 @@ const SignInForm = ({ onSubmit }) => (
         </ButtonWrapper>
       </Form>
     )}
-  />
+  </Formik>
 );
 
 export default SignInForm;

@@ -1,3 +1,4 @@
+import Router from 'next/router';
 import { put, call, takeLatest, select } from 'redux-saga/effects';
 import {
   FETCH_USER_SELF_REQUEST,
@@ -17,6 +18,8 @@ import { addMembersBatch } from '@caesar/common/actions/entities/member';
 import { currentTeamIdSelector } from '@caesar/common/selectors/user';
 import { convertTeamsToEntity } from '@caesar/common/normalizers/normalizers';
 import { getUserSelf, getKeys, getUserTeams } from '@caesar/common/api';
+import { removeCookieValue } from '@caesar/common/utils/token';
+import { ROUTES } from '@caesar/common/constants';
 
 export function* fetchUserSelfSaga() {
   try {
@@ -73,8 +76,8 @@ export function* fetchUserTeamsSaga() {
 export function* logoutSaga() {
   try {
     yield call([localStorage, localStorage.clear]);
-    // eslint-disable-next-line
-    yield call(() => (window.location.href = '/logout'));
+    yield call(removeCookieValue, 'token');
+    yield call(Router.push, ROUTES.LOGOUT);
   } catch (error) {
     console.log('error', error);
   }

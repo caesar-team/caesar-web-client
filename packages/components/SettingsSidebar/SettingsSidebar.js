@@ -7,16 +7,15 @@ const Wrapper = styled.div`
   display: flex;
   flex-direction: column;
   min-width: 300px;
-  height: calc(100vh - 70px);
+  height: calc(100vh - 55px);
   padding-top: 110px;
   padding-left: 60px;
-  border-right: 1px solid ${({ theme }) => theme.gallery};
+  border-right: 1px solid ${({ theme }) => theme.color.gallery};
 `;
 
 const StyledLink = styled(Link)`
   font-size: 18px;
   font-weight: ${({ isActive }) => (isActive ? 600 : 'normal')};
-  letter-spacing: 0.6px;
   margin-bottom: 25px;
   text-decoration: none;
 

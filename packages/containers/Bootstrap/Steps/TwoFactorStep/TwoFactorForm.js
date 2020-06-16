@@ -60,12 +60,10 @@ const QrCodeAndApplicationDescription = styled.div`
 const QrCodeDescription = styled.div`
   font-size: 14px;
   line-height: 1.5;
-  letter-spacing: 0.47px;
 `;
 
 const QrCodeKey = styled.span`
   font-size: 36px;
-  letter-spacing: 1px;
   text-align: center;
 `;
 
@@ -78,8 +76,7 @@ const NextButton = styled(Button)`
 
 const ApplicationLink = styled.a`
   font-size: 14px;
-  letter-spacing: 0.6px;
-  color: ${({ theme }) => theme.black};
+  color: ${({ theme }) => theme.color.black};
 `;
 
 const Form = styled.form`
@@ -93,8 +90,7 @@ const Error = styled.div`
   padding-top: 10px;
   text-align: center;
   font-size: 14px;
-  letter-spacing: 0.4px;
-  color: ${({ theme }) => theme.red};
+  color: ${({ theme }) => theme.color.red};
 `;
 
 const CheckboxWrapper = styled.div`
@@ -109,10 +105,10 @@ const IconStyled = styled(Icon)`
   height: 20px;
   cursor: pointer;
 
-  fill: ${({ theme }) => theme.gray};
+  fill: ${({ theme }) => theme.color.gray};
 
   &:hover {
-    fill: ${({ theme }) => theme.black};
+    fill: ${({ theme }) => theme.color.black};
   }
 `;
 
@@ -166,17 +162,11 @@ class TwoFactorForm extends Component {
           initialValues={initialValues}
           validationSchema={codeSchema}
           onSubmit={onSubmit}
-          render={({
-            errors,
-            handleSubmit,
-            isSubmitting,
-            setFieldValue,
-            values,
-          }) => (
+        >
+          {({ errors, handleSubmit, isSubmitting, setFieldValue, values }) => (
             <Form onSubmit={handleSubmit}>
-              <FastField
-                name="code"
-                render={() => (
+              <FastField name="code">
+                {() => (
                   <CodeInput
                     onChange={value => setFieldValue('code', value, true)}
                     length={CODE_LENGTH}
@@ -185,16 +175,15 @@ class TwoFactorForm extends Component {
                     errors={errors}
                   />
                 )}
-              />
+              </FastField>
               <CheckboxWrapper>
-                <FastField
-                  name="fpCheck"
-                  render={({ field }) => (
+                <FastField name="fpCheck">
+                  {({ field }) => (
                     <Checkbox {...field} checked={field.value}>
                       Remember device
                     </Checkbox>
                   )}
-                />
+                </FastField>
               </CheckboxWrapper>
               <NextButton
                 htmlType="submit"
@@ -204,7 +193,7 @@ class TwoFactorForm extends Component {
               </NextButton>
             </Form>
           )}
-        />
+        </Formik>
       </Wrapper>
     );
   }

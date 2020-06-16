@@ -1,4 +1,4 @@
-import React, { Fragment } from 'react';
+import React from 'react';
 import styled from 'styled-components';
 import { Icon } from '@caesar/components';
 import EmptyLeftImg from '@caesar/assets/images/empty-left.png';
@@ -23,15 +23,13 @@ const StyledIcon = styled(Icon)`
   top: 0;
   bottom: 0;
   margin: auto auto;
-  fill: ${({ theme }) => theme.emperor};
+  fill: ${({ theme }) => theme.color.emperor};
 `;
 
-const EmptyItem = () => (
-  <Fragment>
+export const EmptyItem = () => (
+  <>
     {/* <ImageLeft src={EmptyLeftImg} /> */}
-    <StyledIcon name="logo" width={205} height={46} />
+    <StyledIcon name="logo-caesar" width={205} height={46} />
     {/* <ImageRight src={EmptyRightImg} /> */}
-  </Fragment>
+  </>
 );
-
-export default EmptyItem;

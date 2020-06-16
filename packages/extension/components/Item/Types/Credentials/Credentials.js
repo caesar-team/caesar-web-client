@@ -14,12 +14,12 @@ import {
 const StyledEyeIcon = styled(Icon)`
   margin-right: 20px;
   cursor: pointer;
-  fill: ${({ theme }) => theme.gray};
+  fill: ${({ theme }) => theme.color.gray};
 `;
 
 const StyledIcon = styled(Icon)`
   cursor: pointer;
-  fill: ${({ theme }) => theme.gray};
+  fill: ${({ theme }) => theme.color.gray};
 `;
 
 const StyledWebsiteLink = styled.a``;
@@ -108,7 +108,7 @@ class Credentials extends Component {
               <FieldValue>
                 {website}
                 <StyledWebsiteLink href={site} target="_newtab">
-                  <Icon name="arrow-next" width={18} height={10} />
+                  <Icon name="arrow" width={18} height={10} />
                 </StyledWebsiteLink>
               </FieldValue>
             </Field>

@@ -25,22 +25,20 @@ const Form = styled.form`
 
 const Description = styled.div`
   font-size: 18px;
-  letter-spacing: 0.6px;
   text-align: center;
-  color: ${({ theme }) => theme.gray};
+  color: ${({ theme }) => theme.color.gray};
 `;
 
 const Codes = styled.div`
   display: flex;
   flex-wrap: wrap;
-  background: ${({ theme }) => theme.lightBlue};
+  background: ${({ theme }) => theme.color.lightBlue};
   border-radius: 4px;
   margin: 50px 0 30px;
 `;
 
 const Code = styled.div`
   font-size: 18px;
-  letter-spacing: 0.6px;
   line-height: 25px;
   padding: 20px 25px;
   flex: 0 0 25%;
@@ -63,7 +61,6 @@ const StyledButton = styled(Button)`
 const StyledCheckbox = styled(Checkbox)`
   ${Checkbox.Text} {
     font-size: 18px;
-    letter-spacing: 0.6px;
   }
 `;
 
@@ -80,7 +77,8 @@ const TwoFactorBackupForm = ({ codes, onSubmit }) => (
       initialValues={backupInitialValues}
       validationSchema={agreeSchema}
       onSubmit={onSubmit}
-      render={({ handleSubmit, isSubmitting, isValid }) => (
+    >
+      {({ handleSubmit, isSubmitting, isValid }) => (
         <Form onSubmit={handleSubmit}>
           <AuthTitle>Save your backup codes</AuthTitle>
           <Description>
@@ -115,20 +113,19 @@ const TwoFactorBackupForm = ({ codes, onSubmit }) => (
               PRINT
             </StyledButton>
           </ButtonsWrapper>
-          <FastField
-            name="agreeCheck"
-            render={({ field }) => (
+          <FastField name="agreeCheck">
+            {({ field }) => (
               <StyledCheckbox {...field} checked={field.value}>
                 I have printed or saved these codes
               </StyledCheckbox>
             )}
-          />
+          </FastField>
           <NextButton htmlType="submit" disabled={isSubmitting || !isValid}>
             Continue
           </NextButton>
         </Form>
       )}
-    />
+    </Formik>
   </Wrapper>
 );
 

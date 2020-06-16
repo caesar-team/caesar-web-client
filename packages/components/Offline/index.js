@@ -1,3 +1,5 @@
+// Use useNavigatorOnline hook instead
+// TODO: This need to delete
 export { default as withOfflineDetection } from './withOfflineDetection';
 export {
   default as OfflineDetectionProvider,

@@ -5,8 +5,7 @@ export const FieldValue = styled.div`
   justify-content: space-between;
   align-items: center;
   font-size: 18px;
-  letter-spacing: 0.6px;
-  color: ${({ theme }) => theme.black};
+  color: ${({ theme }) => theme.color.black};
   width: 100%;
   padding: 0 15px;
   margin-top: 12px;

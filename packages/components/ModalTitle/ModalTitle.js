@@ -5,8 +5,7 @@ export const ModalTitle = styled.div`
   justify-content: center;
   font-size: 18px;
   font-weight: bold;
-  letter-spacing: 0.6px;
-  color: ${({ theme }) => theme.black};
+  color: ${({ theme }) => theme.color.black};
   text-transform: uppercase;
   margin-bottom: 25px;
 `;

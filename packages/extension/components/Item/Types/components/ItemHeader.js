@@ -1,7 +1,7 @@
-import React, { Fragment } from 'react';
+import React from 'react';
 import styled from 'styled-components';
 import { formatDate } from '@caesar-utils/utils/dateUtils';
-import { TRASH_TYPE } from '@caesar-utils/constants';
+import { LIST_TYPE } from '@caesar-utils/constants';
 import { upperFirst } from '@caesar-utils//utils/string';
 import { Icon, Button, Avatar, AvatarsList, Dropdown } from '@caesar-ui';
 import { Row } from './Row';
@@ -21,8 +21,7 @@ const InviteRow = styled(Row)`
 
 const UpdatedDate = styled.div`
   font-size: 14px;
-  letter-spacing: 0.4px;
-  color: ${({ theme }) => theme.emperor};
+  color: ${({ theme }) => theme.color.emperor};
 `;
 
 const Owner = styled.div`
@@ -33,14 +32,12 @@ const Owner = styled.div`
 
 const OwnerName = styled.div`
   font-size: 16px;
-  letter-spacing: 0.5px;
-  color: ${({ theme }) => theme.black};
+  color: ${({ theme }) => theme.color.black};
 `;
 
 const OwnerStatus = styled.div`
   font-size: 14px;
-  letter-spacing: 0.4px;
-  color: ${({ theme }) => theme.gray};
+  color: ${({ theme }) => theme.color.gray};
 `;
 
 const StyledAvatarsList = styled(AvatarsList)`
@@ -55,16 +52,16 @@ const InviteButton = styled.button`
   width: 40px;
   height: 40px;
   ${({ hasInvited }) => hasInvited && 'margin-right: -10px'};
-  color: ${({ theme }) => theme.emperor};
-  border: 1px dashed ${({ theme }) => theme.gallery};
+  color: ${({ theme }) => theme.color.emperor};
+  border: 1px dashed ${({ theme }) => theme.color.gallery};
   border-radius: 50%;
   outline: none;
   cursor: pointer;
   transition: all 0.2s;
 
   &:hover {
-    color: ${({ theme }) => theme.black};
-    border-color: ${({ theme }) => theme.emperor};
+    color: ${({ theme }) => theme.color.black};
+    border-color: ${({ theme }) => theme.color.emperor};
   }
 `;
 
@@ -86,8 +83,7 @@ const ButtonsWrapper = styled.div`
 const Title = styled.div`
   font-size: 16px;
   font-weight: 600;
-  letter-spacing: 0.5px;
-  color: ${({ theme }) => theme.black};
+  color: ${({ theme }) => theme.color.black};
 `;
 
 const FavoriteButton = styled.button`
@@ -106,22 +102,23 @@ const FavoriteButton = styled.button`
 `;
 
 const StyledDropdown = styled(Dropdown)`
-  width: 100%;
+  ${Dropdown.Button} {
+    width: 100%;
+  }
 `;
 
 const MoveTo = styled.a`
   cursor: pointer;
   height: 40px;
   font-size: 14px;
-  letter-spacing: 0.4px;
   border-radius: 3px;
   outline: none;
   padding: 10px 20px;
   transition: all 0.2s;
-  border: 1px solid ${({ theme }) => theme.gallery};
+  border: 1px solid ${({ theme }) => theme.color.gallery};
 
   &:hover {
-    border: 1px solid ${({ theme }) => theme.black};
+    border: 1px solid ${({ theme }) => theme.color.black};
   }
 `;
 
@@ -153,14 +150,14 @@ export const ItemHeader = ({
 }) => {
   if (isSharedItem) {
     return (
-      <Fragment>
+      <>
         <StyledRow>
           <UpdatedDate>Last updated {formatDate(lastUpdated)}</UpdatedDate>
         </StyledRow>
         <Row>
           <Title>{name}</Title>
         </Row>
-      </Fragment>
+      </>
     );
   }
 
@@ -182,11 +179,11 @@ export const ItemHeader = ({
   const isOwner = user.id === ownerId;
 
   const options = allLists
-    .filter(({ id, type }) => type !== TRASH_TYPE && id !== listId)
+    .filter(({ id, type }) => type !== LIST_TYPE.TRASH && id !== listId)
     .map(({ label, id }) => ({ value: id, label: upperFirst(label) }));
 
   return (
-    <Fragment>
+    <>
       <Row>
         <UpdatedDate>Last updated {formatDate(lastUpdated)}</UpdatedDate>
         <Row>
@@ -242,7 +239,7 @@ export const ItemHeader = ({
         <Row>
           {!isTrashItem && isOwner && (
             <InviteButton onClick={onClickInvite} hasInvited={hasInvited}>
-              <Icon name="plus" width={14} height={14} isInButton />
+              <Icon name="plus" width={14} height={14} />
             </InviteButton>
           )}
           <StyledAvatarsList avatars={avatars} />
@@ -253,6 +250,6 @@ export const ItemHeader = ({
           )}
         </Row>
       </InviteRow>
-    </Fragment>
+    </>
   );
 };

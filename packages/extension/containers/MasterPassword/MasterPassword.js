@@ -9,7 +9,7 @@ const Wrapper = styled.div`
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  background-color: ${({ theme }) => theme.emperor};
+  background-color: ${({ theme }) => theme.color.emperor};
   width: 100%;
   height: 100%;
 `;
@@ -24,30 +24,29 @@ const InnerWrapper = styled.div`
 
 const Title = styled.div`
   font-size: 18px;
-  letter-spacing: 0.6px;
-  color: ${({ theme }) => theme.lightGray};
+  color: ${({ theme }) => theme.color.lightGray};
   margin: 32px 0;
 `;
 
 const StyledLogo = styled(Icon)`
-  fill: ${({ theme }) => theme.white};
+  fill: ${({ theme }) => theme.color.white};
 `;
 
 const MasterPassword = ({ onSubmit }) => (
   <Wrapper>
     <InnerWrapper>
-      <StyledLogo name="logo-new" width={210} height={45} />
+      <StyledLogo name="logo-caesar-4xxi" width={210} height={45} />
       <Title>Enter your master password</Title>
       <Formik
         initialValues={{ password: '' }}
         validationSchema={passwordSchema}
         onSubmit={onSubmit}
         validateOnChange={false}
-        render={({ errors, handleSubmit, submitForm, resetForm }) => (
+      >
+        {({ errors, handleSubmit, submitForm, resetForm }) => (
           <form onSubmit={handleSubmit}>
-            <FastField
-              name="password"
-              render={({ field }) => (
+            <FastField name="password">
+              {({ field }) => (
                 <LockInput
                   {...field}
                   autoFocus
@@ -56,10 +55,10 @@ const MasterPassword = ({ onSubmit }) => (
                   isError={Object.keys(errors).length !== 0}
                 />
               )}
-            />
+            </FastField>
           </form>
         )}
-      />
+      </Formik>
     </InnerWrapper>
   </Wrapper>
 );

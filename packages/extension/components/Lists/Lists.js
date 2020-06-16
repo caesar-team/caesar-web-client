@@ -13,8 +13,7 @@ const Wrapper = styled.div`
 const ListsName = styled.div`
   margin-top: 12px;
   font-size: 14px;
-  letter-spacing: 0.4px;
-  color: ${({ theme }) => theme.gray};
+  color: ${({ theme }) => theme.color.gray};
 `;
 
 class Lists extends Component {

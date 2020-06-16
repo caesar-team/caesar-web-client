@@ -10,7 +10,7 @@ const Wrapper = styled.div`
   display: flex;
   align-items: center;
   justify-content: space-between;
-  border-bottom: 1px solid ${({ theme }) => theme.gallery};
+  border-bottom: 1px solid ${({ theme }) => theme.color.gallery};
   padding: 16px 60px;
   width: 100%;
   margin-bottom: 20px;
@@ -33,7 +33,6 @@ const UserInfo = styled.div`
 
 const UserName = styled.div`
   font-size: 16px;
-  letter-spacing: 0.5px;
   text-align: right;
   margin-left: 20px;
 `;
@@ -49,7 +48,7 @@ const BootstrapHeader = ({ user, ...props }) => (
         <UserName>{user.name}</UserName>
       </UserInfo>
       <Button color="white" onClick={props.logout}>
-        LOG OUT
+        Log out
       </Button>
     </UserSection>
   </Wrapper>

@@ -18,8 +18,7 @@ const AttachmentsHeaderRow = styled(Row)`
 const Title = styled.div`
   font-size: 18px;
   font-weight: bold;
-  letter-spacing: 0.6px;
-  color: ${({ theme }) => theme.black};
+  color: ${({ theme }) => theme.color.black};
   margin-bottom: 24px;
 `;
 
@@ -31,16 +30,15 @@ const StyledDownloadIcon = styled(Icon)`
 
 const DownloadAll = styled.div`
   font-size: 14px;
-  letter-spacing: 0.4px;
-  color: ${({ theme }) => theme.black};
+  color: ${({ theme }) => theme.color.black};
   cursor: pointer;
   transition: all 0.2s;
 
   &:hover {
-    color: ${({ theme }) => theme.emperor};
+    color: ${({ theme }) => theme.color.emperor};
 
     svg {
-      fill: ${({ theme }) => theme.emperor};
+      fill: ${({ theme }) => theme.color.emperor};
     }
   }
 `;

@@ -27,7 +27,7 @@ const MemberWrapper = styled.div`
   cursor: pointer;
 
   &:hover {
-    background-color: ${({ theme }) => theme.snow};
+    background-color: ${({ theme }) => theme.color.snow};
   }
 `;
 

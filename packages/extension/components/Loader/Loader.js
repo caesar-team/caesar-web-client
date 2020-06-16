@@ -8,7 +8,7 @@ const Wrapper = styled.div`
   align-items: center;
   width: 100vw;
   height: 100vh;
-  background-color: ${({ theme }) => theme.emperor};
+  background-color: ${({ theme }) => theme.color.emperor};
 `;
 
 const play = keyframes`
@@ -33,9 +33,8 @@ const LoaderIndicator = styled.div`
 
 const LoadingText = styled.div`
   font-size: 18px;
-  letter-spacing: 0.6px;
   margin-top: 20px;
-  color: ${({ theme }) => theme.white};
+  color: ${({ theme }) => theme.color.white};
   width: 100%;
   text-align: center;
 `;

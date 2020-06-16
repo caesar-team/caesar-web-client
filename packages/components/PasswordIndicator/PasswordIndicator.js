@@ -20,7 +20,7 @@ const Indicator = styled.div`
   margin-right: 10px;
   border: 1px solid
     ${({ isAcceptable, theme }) =>
-      isAcceptable ? theme.black : theme.lightGray};
+      isAcceptable ? theme.color.black : theme.color.lightGray};
 
   &:last-child {
     margin-right: 0;
@@ -30,8 +30,7 @@ const Indicator = styled.div`
 const ScoreName = styled.div`
   font-size: 12px;
   font-weight: 600;
-  letter-spacing: 0.3px;
-  color: ${({ theme }) => theme.black};
+  color: ${({ theme }) => theme.color.black};
   margin-left: 16px;
   width: 80px;
   text-align: right;

@@ -9,18 +9,18 @@ import {
   Can,
 } from '@caesar/components';
 import {
-  DEFAULT_TEAM_TYPE,
+  TEAM_TYPE,
   CREATE_PERMISSION,
-  TEAM_ENTITY_TYPE,
+  ENTITY_TYPE,
 } from '@caesar/common/constants';
 
 const LogoWrapper = styled.div`
   display: flex;
   flex-direction: column;
-  background: ${({ theme }) => theme.lightBlue};
+  background: ${({ theme }) => theme.color.lightBlue};
   width: 100%;
   position: relative;
-  height: calc(100vh - 70px);
+  height: calc(100vh - 55px);
   align-items: center;
   justify-content: center;
 `;
@@ -28,7 +28,7 @@ const LogoWrapper = styled.div`
 const Wrapper = styled.div`
   display: flex;
   flex-direction: column;
-  background: ${({ theme }) => theme.lightBlue};
+  background: ${({ theme }) => theme.color.lightBlue};
   width: 100%;
   padding: 60px;
   position: relative;
@@ -43,8 +43,7 @@ const TopWrapper = styled.div`
 
 const Title = styled.div`
   font-size: 36px;
-  letter-spacing: 1px;
-  color: ${({ theme }) => theme.black};
+  color: ${({ theme }) => theme.color.black};
 `;
 
 const TeamListWrapper = styled.div`
@@ -149,7 +148,7 @@ class TeamListContainer extends Component {
         key={team.id}
         team={team}
         members={members}
-        isRemoveButtonVisible={team.type !== DEFAULT_TEAM_TYPE}
+        isRemoveButtonVisible={team.type !== TEAM_TYPE.DEFAULT}
         onClickRemoveTeam={this.handleClickRemoveTeam(team.id)}
       />
     ));
@@ -173,14 +172,14 @@ class TeamListContainer extends Component {
       <Wrapper>
         <TopWrapper>
           <Title>Teams</Title>
-          <Can I={CREATE_PERMISSION} of={TEAM_ENTITY_TYPE}>
+          <Can I={CREATE_PERMISSION} of={ENTITY_TYPE.TEAM}>
             <Button
               withOfflineCheck
               onClick={this.handleOpenModal(NEW_TEAM_MODAL)}
               icon="plus"
               color="black"
             >
-              ADD TEAM
+              Add team
             </Button>
           </Can>
         </TopWrapper>

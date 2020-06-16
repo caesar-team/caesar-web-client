@@ -53,6 +53,7 @@ export const encryptByPassword = async (data, password) => {
 
 export const decryptByPassword = async (secretArmored, password) => {
   const secret = await openpgp.message.readArmored(secretArmored);
+
   const { data } = await openpgp.decrypt({
     message: secret,
     passwords: [password],

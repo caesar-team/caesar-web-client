@@ -13,7 +13,6 @@ const Form = styled.form``;
 const Title = styled.div`
   font-size: 18px;
   font-weight: 600;
-  letter-spacing: 0.6px;
   margin-bottom: 25px;
 `;
 
@@ -27,25 +26,25 @@ const FileStep = ({ onSubmit }) => (
     initialValues={initialValues}
     onSubmit={onSubmit}
     validationSchema={createSchema('csv')}
-    render={({ values, errors, setFieldValue, handleSubmit, submitForm }) => (
+  >
+    {({ values, errors, setFieldValue, handleSubmit, submitForm }) => (
       <Wrapper>
         <Form onSubmit={handleSubmit}>
           <Title>Upload your CSV file</Title>
           <Uploader
             name="file"
-            accept="text/csv"
             files={values.file}
             extText="*.csv file"
             error={errors.file ? errors.file.name || errors.file.raw : null}
             onChange={(name, file) => {
               setFieldValue('file', file);
-              submitForm();
+              submitForm().then();
             }}
           />
         </Form>
       </Wrapper>
     )}
-  />
+  </Formik>
 );
 
 export default FileStep;

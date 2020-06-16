@@ -1,5 +1,5 @@
 import { schema } from 'normalizr';
-import { ITEM_ENTITY_TYPE } from '@caesar/common/constants';
+import { ENTITY_TYPE } from '@caesar/common/constants';
 import childItemSchema from './childItem';
 
 const itemSchema = new schema.Entity(
@@ -12,7 +12,7 @@ const itemSchema = new schema.Entity(
       ...entity,
       listId: parent.id,
       teamId: parent.teamId,
-      __type: ITEM_ENTITY_TYPE,
+      __type: ENTITY_TYPE.ITEM,
     }),
   },
 );

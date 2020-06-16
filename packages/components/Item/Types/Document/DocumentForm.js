@@ -2,7 +2,7 @@ import React from 'react';
 import styled from 'styled-components';
 import { Formik, FastField } from 'formik';
 import { checkError } from '@caesar/common/utils/formikUtils';
-import { ITEM_WORKFLOW_EDIT_MODE, TRASH_TYPE } from '@caesar/common/constants';
+import { ITEM_MODE } from '@caesar/common/constants';
 import {
   Uploader,
   Input,
@@ -47,16 +47,15 @@ const TitleInput = styled(Input)`
   ${Input.InputField} {
     padding: 0;
     font-size: 36px;
-    letter-spacing: 1px;
-    color: ${({ theme }) => theme.black};
+    color: ${({ theme }) => theme.color.black};
 
     &::placeholder {
       padding-left: 8px;
-      color: ${({ theme }) => theme.lightGray};
+      color: ${({ theme }) => theme.color.lightGray};
     }
 
     &:focus {
-      background-color: ${({ theme }) => theme.white};
+      background-color: ${({ theme }) => theme.color.white};
     }
   }
 `;
@@ -66,8 +65,7 @@ const AdditionalLabel = styled.div`
   top: -20px;
   left: 15px;
   font-size: 14px;
-  letter-spacing: 0.4px;
-  color: ${({ theme }) => theme.gray};
+  color: ${({ theme }) => theme.color.gray};
 `;
 
 const AttachmentsSection = styled.div`
@@ -79,8 +77,7 @@ const AttachmentsSection = styled.div`
 const Attachment = styled.div`
   font-size: 18px;
   font-weight: bold;
-  letter-spacing: 0.6px;
-  color: ${({ theme }) => theme.black};
+  color: ${({ theme }) => theme.color.black};
   margin-bottom: 25px;
 `;
 
@@ -105,12 +102,7 @@ const FileRow = styled.div`
 const Error = styled.div`
   text-align: center;
   font-size: 14px;
-  letter-spacing: 0.4px;
-  color: ${({ theme }) => theme.red};
-`;
-
-const ErrorStyled = styled(Error)`
-  margin: 20px 0;
+  color: ${({ theme }) => theme.color.red};
 `;
 
 const createInitialValues = (data, listId, type) => ({
@@ -150,7 +142,7 @@ const DocumentForm = ({
   onFinishEditWorkflow,
   onCancelWorkflow,
 }) => {
-  const isEditMode = mode === ITEM_WORKFLOW_EDIT_MODE;
+  const isEditMode = mode === ITEM_MODE.WORKFLOW_EDIT;
 
   const action = isEditMode ? onFinishEditWorkflow : onFinishCreateWorkflow;
 
@@ -165,7 +157,8 @@ const DocumentForm = ({
         createInitialValues(data, listId, type),
       )}
       validationSchema={schema}
-      render={({
+    >
+      {({
         values,
         errors,
         touched,
@@ -206,14 +199,14 @@ const DocumentForm = ({
             <Uploader
               name="attachments"
               files={values.attachments}
+              error={
+                typeof errors?.attachments === 'string'
+                  ? errors.attachments
+                  : ''
+              }
               multiple
               onChange={setFieldValue}
             />
-            {errors &&
-              errors.attachments &&
-              typeof errors.attachments === 'string' && (
-                <ErrorStyled>{errors.attachments}</ErrorStyled>
-              )}
             <Attachments>
               {renderAttachments(
                 values.attachments,
@@ -224,7 +217,7 @@ const DocumentForm = ({
           </AttachmentsSection>
         </Form>
       )}
-    />
+    </Formik>
   );
 };
 

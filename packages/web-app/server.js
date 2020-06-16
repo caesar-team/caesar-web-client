@@ -33,6 +33,7 @@ app.prepare().then(() => {
     favicon(path.join(__dirname, '/public/images/favicon', 'favicon.ico')),
   );
   server.use('/public', express.static('public'));
+  server.use('/_next', express.static('.next'));
   server.use(
     '/service-worker.js',
     express.static(path.join(__dirname, '.next', 'service-worker.js')),

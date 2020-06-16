@@ -1,13 +1,12 @@
 import React, { Fragment } from 'react';
 import styled from 'styled-components';
 import { withRouter } from 'next/router';
-import { IS_AUTHORIZATION_ENABLE } from '@caesar/common/constants';
+import { IS_AUTHORIZATION_ENABLE, ROUTES } from '@caesar/common/constants';
 import { Logo } from './Logo';
 import { Button } from '../Button';
 
 const StyledButton = styled(Button)`
   font-size: 18px;
-  letter-spacing: 0.6px;
   padding: 18px 30px;
   height: 60px;
 `;
@@ -15,7 +14,7 @@ const StyledButton = styled(Button)`
 const SecondaryHeader = ({
   router,
   buttonText = 'Sign In',
-  url = IS_AUTHORIZATION_ENABLE ? '/signin' : '/',
+  url = IS_AUTHORIZATION_ENABLE ? ROUTES.SIGN_IN : ROUTES.MAIN,
   isButtonShow = IS_AUTHORIZATION_ENABLE,
 }) => (
   <Fragment>

@@ -1,6 +1,7 @@
-import React, { Component, Fragment } from 'react';
+import React, { Component } from 'react';
 import styled from 'styled-components';
 import Router from 'next/router';
+import { ROUTES } from '@caesar/common/constants';
 import { AuthTitle, AuthLayout, Icon, Button } from '@caesar/components';
 import { changePassword } from '@caesar/common/utils/authUtils';
 import ResetPasswordForm from './ResetPasswordForm';
@@ -11,7 +12,6 @@ const IconWrapper = styled.div`
 
 const StyledButton = styled(Button)`
   font-size: 18px;
-  letter-spacing: 0.6px;
   padding: 18px 30px;
   height: 60px;
 `;
@@ -23,7 +23,7 @@ class ResetPasswordContainer extends Component {
     try {
       await changePassword(token, email, password);
 
-      Router.push('/signin');
+      Router.push(ROUTES.SIGN_IN);
     } catch (e) {
       setErrors({
         email: 'Wrong email',
@@ -38,14 +38,14 @@ class ResetPasswordContainer extends Component {
     const { router } = this.props;
 
     return (
-      <Fragment>
+      <>
         <IconWrapper>
-          <Icon name="logo-new" height={40} width={142} />
+          <Icon name="logo-caesar-4xxi" height={40} width={142} />
         </IconWrapper>
-        <StyledButton onClick={() => router.push('/signin')}>
+        <StyledButton onClick={() => router.push(ROUTES.SIGN_IN)}>
           Sign In
         </StyledButton>
-      </Fragment>
+      </>
     );
   }
 

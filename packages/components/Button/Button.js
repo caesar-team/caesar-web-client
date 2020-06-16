@@ -14,6 +14,13 @@ const getButtonStyles = ({ color, theme }) => {
       color: ${theme.color.emperor};
       border: 1px solid ${theme.color.gallery};
     `,
+    transparent: `
+      height: 22px;
+      padding: 0;
+      color: ${theme.color.black};
+      text-transform: none;
+      background-color: transparent;
+    `,
   };
 
   return colorsMap[color];
@@ -26,20 +33,47 @@ const getButtonHoverStyles = ({ color, theme }) => {
     `,
     white: `
       color: ${theme.color.black};
-      background-color: ${theme.color.white};
       border: 1px solid ${theme.color.black};
+    `,
+    transparent: `
+      color: ${theme.color.gray};
+      text-transform: none;
     `,
   };
 
   return colorsMap[color];
 };
 
-const getButtonHoverBlackBackgroundStyles = ({ color, theme }) => {
+const getButtonPressedStyles = ({ color, theme }) => {
   const colorsMap = {
+    black: `
+      background-color: ${theme.color.gray};
+    `,
     white: `
-      color: ${theme.color.white};
-      background-color: ${theme.color.black};
-      border: 1px solid ${theme.color.black};
+      color: ${theme.color.emperor};
+      border: 1px solid ${theme.color.gray};
+    `,
+    transparent: `
+      color: ${theme.color.emperor};
+      text-transform: none;
+    `,
+  };
+
+  return colorsMap[color];
+};
+
+const getButtonDisabledStyles = ({ color, theme }) => {
+  const colorsMap = {
+    black: `
+      background-color: ${theme.color.gallery};
+    `,
+    white: `
+      color: ${theme.color.gallery};
+      border: 1px solid ${theme.color.gallery};
+    `,
+    transparent: `
+      color: ${theme.color.lightGray};
+      text-transform: none;
     `,
   };
 
@@ -51,9 +85,10 @@ const StyledButton = styled.button`
   align-items: center;
   justify-content: center;
   height: ${({ isHigh }) => (isHigh ? '60px' : '40px')};
-  padding: ${({ isHigh }) => (isHigh ? '18px 30px' : '10px 20px')};
+  padding: ${({ isHigh }) => (isHigh ? '18px 30px' : '11px 16px')};
   font-size: ${({ isHigh }) => (isHigh ? '18px' : '14px')};
   letter-spacing: ${({ isHigh }) => (isHigh ? '0.6px' : '0.4px')};
+  white-space: nowrap;
   border-radius: 3px;
   border: 0;
   outline: none;
@@ -72,20 +107,26 @@ const StyledButton = styled.button`
   ${getButtonStyles};
 
   &:hover {
-    ${({ isHoverBlackBackground }) =>
-      isHoverBlackBackground
-        ? getButtonHoverBlackBackgroundStyles
-        : getButtonHoverStyles};
+    ${getButtonHoverStyles};
+  }
+
+  &:focus {
+    outline: 1px dashed ${({ theme }) => theme.color.lightGray};
+    outline-offset: 4px;
+  }
+
+  &:active {
+    ${getButtonPressedStyles};
   }
 
   &[disabled] {
-    background-color: ${({ theme }) => theme.color.gallery};
-    cursor: not-allowed;
+    ${getButtonDisabledStyles};
+    pointer-events: none;
   }
 `;
 
 const Text = styled.div`
-  margin-left: ${({ withMargin }) => (withMargin ? '10px' : 0)};
+  margin-left: ${({ withMargin }) => (withMargin ? '16px' : 0)};
 `;
 
 const getButtonDisabledStatus = (withOfflineCheck, isOnline, disabled) =>
@@ -100,7 +141,6 @@ const ButtonComponent = forwardRef(
       children,
       disabled,
       withOfflineCheck = false,
-      isHoverBlackBackground,
       isOnline,
       isHigh,
       ...props
@@ -118,7 +158,6 @@ const ButtonComponent = forwardRef(
     return (
       <StyledButton
         ref={ref}
-        isHoverBlackBackground={isHoverBlackBackground}
         type={htmlType}
         color={color}
         onlyIcon={onlyIcon}
@@ -126,7 +165,7 @@ const ButtonComponent = forwardRef(
         isHigh={isHigh}
         {...props}
       >
-        {icon && <Icon name={icon} width={14} height={14} isInButton />}
+        {icon && <Icon name={icon} width={16} height={16} />}
         {!onlyIcon && <Text withMargin={withIcon}>{children}</Text>}
       </StyledButton>
     );

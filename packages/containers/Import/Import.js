@@ -3,10 +3,7 @@ import styled from 'styled-components';
 import { withRouter } from 'next/router';
 import { matchStrict } from '@caesar/common/utils/match';
 import { parseFile } from '@caesar/common/utils/importUtils';
-import {
-  ITEM_CREDENTIALS_TYPE,
-  ITEM_DOCUMENT_TYPE,
-} from '@caesar/common/constants';
+import { ITEM_TYPE, ROUTES } from '@caesar/common/constants';
 import { NavigationPanel, LogoLoader } from '@caesar/components';
 import { DataStep, FieldsStep, FileStep, ImportingStep } from './Steps';
 import {
@@ -20,7 +17,7 @@ import {
 const Wrapper = styled.div`
   display: flex;
   flex-direction: column;
-  background: ${({ theme }) => theme.lightBlue};
+  background: ${({ theme }) => theme.color.lightBlue};
   width: 100%;
   padding: 60px;
 `;
@@ -28,25 +25,24 @@ const Wrapper = styled.div`
 const LogoWrapper = styled.div`
   display: flex;
   flex-direction: column;
-  background: ${({ theme }) => theme.lightBlue};
+  background: ${({ theme }) => theme.color.lightBlue};
   width: 100%;
   position: relative;
-  height: calc(100vh - 70px);
+  height: calc(100vh - 55px);
   align-items: center;
   justify-content: center;
 `;
 
 const Title = styled.div`
   font-size: 36px;
-  letter-spacing: 1px;
-  color: ${({ theme }) => theme.black};
+  color: ${({ theme }) => theme.color.black};
   margin-bottom: 30px;
 `;
 
 const StepWrapper = styled.div`
   display: flex;
   flex-direction: column;
-  background: ${({ theme }) => theme.white};
+  background: ${({ theme }) => theme.color.white};
   padding: 30px;
 `;
 
@@ -62,7 +58,7 @@ const normalizeData = (rows, { name, login, pass, website, note }) =>
     pass: row[pass],
     website: row[website],
     note: row[note],
-    type: row[pass] && row[login] ? ITEM_CREDENTIALS_TYPE : ITEM_DOCUMENT_TYPE,
+    type: row[pass] && row[login] ? ITEM_TYPE.CREDENTIALS : ITEM_TYPE.DOCUMENT,
   }));
 
 const pick = (object, keys) =>
@@ -130,7 +126,7 @@ class Import extends Component {
   };
 
   handleClickToDashboard = () => {
-    this.props.router.push('/');
+    this.props.router.push(ROUTES.DASHBOARD);
   };
 
   handleCancelFlow = () => {
@@ -142,7 +138,7 @@ class Import extends Component {
     const items = data.map(({ type, ...secret }) => {
       const fields = pick(
         secret,
-        type === ITEM_CREDENTIALS_TYPE
+        type === ITEM_TYPE.CREDENTIALS
           ? CREDENTIALS_TYPE_FIELDS
           : DOCUMENT_TYPE_FIELDS,
       );

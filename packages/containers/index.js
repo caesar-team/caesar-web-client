@@ -1,5 +1,5 @@
 export { default as Bootstrap } from './Bootstrap';
-export { default as DashboardContainer } from './Dashboard';
+export { Dashboard as DashboardContainer } from './Dashboard';
 export { default as ManageListContainer } from './ManageList';
 export { Sharing } from './Sharing';
 export { Invite } from './Invite';

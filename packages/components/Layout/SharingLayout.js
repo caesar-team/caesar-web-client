@@ -1,6 +1,7 @@
-import React, { Fragment } from 'react';
+import React from 'react';
 import styled from 'styled-components';
 import Router from 'next/router';
+import { ROUTES } from '@caesar/common/constants';
 import LayoutConstructor from './LayoutConstructor';
 import Footer from './Footer';
 import { Icon } from '../Icon';
@@ -11,7 +12,7 @@ const LayoutConstructorStyled = styled(LayoutConstructor)`
 
   ${LayoutConstructor.TopWrapper} {
     justify-content: space-between;
-    border-bottom: 1px solid ${({ theme }) => theme.gallery};
+    border-bottom: 1px solid ${({ theme }) => theme.color.gallery};
     margin-bottom: 10px;
     padding: 20px;
   }
@@ -28,12 +29,12 @@ const LayoutConstructorStyled = styled(LayoutConstructor)`
 `;
 
 const Header = () => (
-  <Fragment>
-    <Icon name="logo-new" width={106} height={30} />
-    <Link href="/logout" onClick={() => Router.push('/logout')}>
-      Logout
+  <>
+    <Icon name="logo-caesar-4xxi" width={106} height={30} />
+    <Link href="/logout" onClick={() => Router.push(ROUTES.LOGOUT)}>
+      Log out
     </Link>
-  </Fragment>
+  </>
 );
 
 const SharingLayout = props => (

@@ -18,7 +18,7 @@ import {
   TWO_FACTOR_CHECK,
 } from '../../constants';
 import TwoFactorForm from './TwoFactorForm';
-import TwoFactorCheckForm from './TwoFactorCheckForm';
+import { TwoFactorCheckForm } from './TwoFactorCheckForm';
 import TwoFactorBackupForm from './TwoFactorBackupForm';
 
 class TwoFactorStep extends Component {
@@ -68,7 +68,7 @@ class TwoFactorStep extends Component {
         setCookieValue('token', token);
       }
 
-      // eslint-disable-next-line
+      // eslint-disable-next-line no-unused-expressions
       isCreateFlow
         ? this.setState({
             step: TWO_FACTOR_BACKUPS,

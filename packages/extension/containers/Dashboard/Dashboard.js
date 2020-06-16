@@ -1,7 +1,13 @@
 import React, { Component } from 'react';
 import styled from 'styled-components';
-import { ITEM_REVIEW_MODE } from '@caesar-utils/constants';
-import { Lists, ListOption, Item, PasswordGenerator, Loader } from '@caesar/components';
+import { ITEM_MODE } from '@caesar-utils/constants';
+import {
+  Lists,
+  ListOption,
+  Item,
+  PasswordGenerator,
+  Loader,
+} from '@caesar/components';
 import { Icon, Scrollbar } from '@caesar-ui';
 
 const Wrapper = styled.div`
@@ -14,8 +20,8 @@ const LeftWrapper = styled.div`
   max-width: 240px;
   width: 100%;
   min-height: 100vh;
-  border-right: 1px solid ${({ theme }) => theme.gallery};
-  background: ${({ theme }) => theme.snow};
+  border-right: 1px solid ${({ theme }) => theme.color.gallery};
+  background: ${({ theme }) => theme.color.snow};
 `;
 
 const RightWrapper = styled.div`
@@ -35,7 +41,7 @@ const TopLists = styled.div`
 const GeneratorOption = styled.div`
   display: flex;
   align-items: center;
-  border-bottom: 1px solid ${({ theme }) => theme.gallery};
+  border-bottom: 1px solid ${({ theme }) => theme.color.gallery};
   cursor: pointer;
   max-height: 40px;
   min-height: 40px;
@@ -44,13 +50,14 @@ const GeneratorOption = styled.div`
 const GeneratorOptionName = styled.div`
   font-size: 16px;
   font-weight: ${({ isActive }) => (isActive ? 600 : 400)};
-  letter-spacing: 0.5px;
-  color: ${({ theme }) => theme.black};
+  color: ${({ theme }) => theme.color.black};
   margin-left: 16px;
 `;
 
-const ITEM_MODE = 'ITEM_MODE';
-const PASSWORD_GENERATOR_MODE = 'PASSWORD_GENERATOR_MODE';
+const MODE = {
+  ITEM: 'ITEM_MODE',
+  PASSWORD_GENERATOR: 'PASSWORD_GENERATOR_MODE',
+};
 
 class Dashboard extends Component {
   state = this.prepareInitialState();
@@ -64,7 +71,7 @@ class Dashboard extends Component {
     this.props.setWorkInProgressItem(null);
 
     this.setState({
-      mode: PASSWORD_GENERATOR_MODE,
+      mode: MODE.PASSWORD_GENERATOR,
     });
   };
 
@@ -76,7 +83,7 @@ class Dashboard extends Component {
     );
 
     this.setState({
-      mode: ITEM_MODE,
+      mode: MODE.ITEM,
     });
   };
 
@@ -86,13 +93,13 @@ class Dashboard extends Component {
 
     this.props.setWorkInProgressItem(
       this.props.itemsById[itemId],
-      ITEM_REVIEW_MODE,
+      ITEM_MODE.REVIEW,
     );
   };
 
   prepareInitialState() {
     return {
-      mode: ITEM_MODE,
+      mode: MODE.ITEM,
     };
   }
 
@@ -106,7 +113,7 @@ class Dashboard extends Component {
     } = this.props;
 
     const isActive =
-      mode !== PASSWORD_GENERATOR_MODE &&
+      mode !== MODE.PASSWORD_GENERATOR &&
       workInProgressList &&
       favoritesList.id === workInProgressList.id;
 
@@ -126,7 +133,7 @@ class Dashboard extends Component {
   renderPasswordGenerator() {
     const { mode } = this.state;
 
-    const isActive = mode === PASSWORD_GENERATOR_MODE;
+    const isActive = mode === MODE.PASSWORD_GENERATOR;
 
     return (
       <GeneratorOption onClick={this.handleChangeMode}>
@@ -174,7 +181,7 @@ class Dashboard extends Component {
           </Scrollbar>
         </LeftWrapper>
         <RightWrapper>
-          {mode === ITEM_MODE ? (
+          {mode === MODE.ITEM ? (
             <Item item={workInProgressItem} />
           ) : (
             <PasswordGenerator />

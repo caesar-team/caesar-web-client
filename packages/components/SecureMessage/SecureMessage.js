@@ -1,13 +1,20 @@
-import React, { Component, Fragment } from 'react';
+import React, { useState, Fragment } from 'react';
 import styled from 'styled-components';
 import { media } from '@caesar/assets/styles/media';
 import { match } from '@caesar/common/utils/match';
-import { encryptByPassword } from '@caesar/common/utils/cipherUtils';
+import {
+  encryptByPassword,
+  decryptByPassword,
+} from '@caesar/common/utils/cipherUtils';
 import { generator } from '@caesar/common/utils/password';
-import { postSecureMessage } from '@caesar/common/api';
-import { Scrollbar } from '@caesar/components';
-import SecureMessageForm from './SecureMessageForm';
-import SecureMessageLink from './SecureMessageLink';
+import { postSecureMessage } from '@caesar/common/fetch';
+import {
+  ENCRYPTING_ITEM_NOTIFICATION,
+  SAVE_NOTIFICATION,
+} from '@caesar/common/constants';
+import { Scrollbar, withNotification } from '@caesar/components';
+import { SecureMessageForm } from './SecureMessageForm';
+import { SecureMessageLink } from './SecureMessageLink';
 import {
   SECURE_MESSAGE_FORM_STEP,
   SECURE_MESSAGE_LINK_STEP,
@@ -17,100 +24,111 @@ const Wrapper = styled.div`
   display: flex;
   flex-direction: column;
   width: 100%;
-  padding: 40px 0;
   min-height: calc(100vh - 150px);
+  padding: 38px 0;
+
+  ${media.desktop`
+    padding: 22px 0;
+  `}
 
   ${media.mobile`
-    padding: 20px 0;
+    padding: 16px 0;
   `}
 `;
 
-const Title = styled.div`
-  font-size: 36px;
-  letter-spacing: 1px;
-  color: ${({ theme }) => theme.black};
-  margin-bottom: 40px;
-
-  ${media.mobile`
-    margin-bottom: 10px;
-    line-height: 1.11;
-  `}
-`;
-
-class SecureMessage extends Component {
-  state = {
+const SecureMessageComponent = ({
+  notification,
+  withScroll = false,
+  className,
+}) => {
+  const [{ step, password, link }, setState] = useState({
     step: SECURE_MESSAGE_FORM_STEP,
-  };
+    password: null,
+    link: null,
+  });
 
-  handleSubmitForm = async (
-    { secondsLimit, requestsLimit, password, ...secret },
-    { setSubmitting },
+  const handleSubmitForm = (
+    { secondsLimit, requestsLimit, password: passwordValue, ...secret },
+    { setSubmitting, setFieldError },
   ) => {
-    try {
-      const pwd = password || generator();
+    const submit = async () => {
+      setFieldError('form', '');
 
-      const encryptedMessage = await encryptByPassword(secret, pwd);
+      try {
+        notification.show({
+          text: ENCRYPTING_ITEM_NOTIFICATION,
+          options: {
+            position: 'bottom-right',
+          },
+        });
+        const pwd = passwordValue || generator();
 
-      const {
-        data: { id },
-      } = await postSecureMessage({
-        message: encryptedMessage,
-        secondsLimit,
-        requestsLimit,
-      });
+        const encryptedMessage = await encryptByPassword(secret, pwd);
+        await decryptByPassword(encryptedMessage, pwd);
 
-      this.setState({
-        step: SECURE_MESSAGE_LINK_STEP,
-        password: pwd,
-        link: id,
-      });
-    } catch (error) {
-      console.log(error);
-    } finally {
-      setSubmitting(false);
-    }
+        notification.show({
+          text: SAVE_NOTIFICATION,
+          options: {
+            timeout: 0,
+            position: 'bottom-right',
+          },
+        });
+
+        postSecureMessage({
+          message: encryptedMessage,
+          secondsLimit,
+          requestsLimit,
+        }).then(({ id }) => {
+          setSubmitting(false);
+          setState({
+            step: SECURE_MESSAGE_LINK_STEP,
+            password: pwd,
+            link: id,
+          });
+        });
+      } catch (error) {
+        console.log(error);
+        setFieldError('form', error.message);
+        notification.hide();
+        setSubmitting(false);
+      }
+    };
+
+    submit();
   };
 
-  handleClickReturn = () => {
-    this.setState({
-      link: null,
-      password: null,
+  const handleClickReturn = () => {
+    setState({
       step: SECURE_MESSAGE_FORM_STEP,
+      password: null,
+      link: null,
     });
   };
 
-  render() {
-    const { withScroll = false, className } = this.props;
-    const { step, password, link } = this.state;
+  const renderedStep = match(
+    step,
+    {
+      SECURE_MESSAGE_FORM_STEP: (
+        <SecureMessageForm onSubmit={handleSubmitForm} />
+      ),
+      SECURE_MESSAGE_LINK_STEP: (
+        <SecureMessageLink
+          link={link}
+          password={password}
+          onClickReturn={handleClickReturn}
+        />
+      ),
+    },
+    null,
+  );
 
-    const renderedStep = match(
-      step,
-      {
-        SECURE_MESSAGE_FORM_STEP: (
-          <SecureMessageForm onSubmit={this.handleSubmitForm} />
-        ),
-        SECURE_MESSAGE_LINK_STEP: (
-          <SecureMessageLink
-            link={link}
-            password={password}
-            onClickReturn={this.handleClickReturn}
-          />
-        ),
-      },
-      null,
-    );
+  const ContentWrapperComponent = withScroll ? Scrollbar : Fragment;
 
-    const ContentWrapperComponent = withScroll ? Scrollbar : Fragment;
+  return (
+    <Wrapper className={className}>
+      <ContentWrapperComponent>{renderedStep}</ContentWrapperComponent>
+    </Wrapper>
+  );
+};
 
-    return (
-      <Wrapper className={className}>
-        <ContentWrapperComponent>
-          <Title>Caesar Secure Message</Title>
-          {renderedStep}
-        </ContentWrapperComponent>
-      </Wrapper>
-    );
-  }
-}
-
-export default SecureMessage;
+export const SecureMessage = withNotification(SecureMessageComponent);

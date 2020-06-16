@@ -11,7 +11,7 @@ const Wrapper = styled.div`
   justify-content: center;
   align-items: center;
   padding: 60px 60px 30px;
-  background: ${({ theme }) => theme.white};
+  background: ${({ theme }) => theme.color.white};
   flex: 1;
   overflow: auto;
   min-height: 100vh;

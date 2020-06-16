@@ -34,7 +34,6 @@ const FieldWrapper = styled.div`
 const TipText = styled.div`
   font-size: 14px;
   line-height: 1.5;
-  letter-spacing: 0.4px;
   text-align: center;
   margin-top: 20px;
 `;
@@ -45,8 +44,7 @@ const PasswordIndicatorStyled = styled(PasswordIndicator)`
 
 const StrengthIndicatorStyled = styled(StrengthIndicator)`
   font-size: 14px;
-  letter-spacing: 0.4px;
-  color: ${({ theme }) => theme.gray};
+  color: ${({ theme }) => theme.color.gray};
   padding: 15px;
 
   ${StrengthIndicator.Text} {
@@ -55,8 +53,7 @@ const StrengthIndicatorStyled = styled(StrengthIndicator)`
 
   ${StrengthIndicator.HelperText} {
     font-size: 14px;
-    letter-spacing: 0.4px;
-    color: ${({ theme }) => theme.gray};
+    color: ${({ theme }) => theme.color.gray};
     margin-bottom: 8px;
 
     &:last-of-type {
@@ -76,8 +73,7 @@ const BottomWrapper = styled.div`
   margin-top: 40px;
   text-align: center;
   font-size: 18px;
-  letter-spacing: 0.6px;
-  color: ${({ theme }) => theme.gray};
+  color: ${({ theme }) => theme.color.gray};
 `;
 
 const DiceIcon = styled(Icon)`
@@ -117,7 +113,8 @@ class MasterPasswordCreateForm extends PureComponent {
         isInitialValid={passwordSchema.isValidSync(initialValues)}
         validationSchema={passwordSchema}
         onSubmit={onSubmit}
-        render={({
+      >
+        {({
           errors,
           touched,
           handleSubmit,
@@ -132,9 +129,8 @@ class MasterPasswordCreateForm extends PureComponent {
             <AuthTitle>Master Password</AuthTitle>
             <AuthDescription>Create master password for Caesar</AuthDescription>
             <FieldWrapper>
-              <FastField
-                name="password"
-                render={({ field }) => (
+              <FastField name="password">
+                {({ field }) => (
                   <MasterPasswordInput
                     {...field}
                     isAlwaysVisibleIcon
@@ -145,7 +141,7 @@ class MasterPasswordCreateForm extends PureComponent {
                     }
                   />
                 )}
-              />
+              </FastField>
               <Tooltip
                 show={values.password && !isValid}
                 textBoxWidth="280px"
@@ -185,7 +181,7 @@ class MasterPasswordCreateForm extends PureComponent {
             </StyledButton>
           </Form>
         )}
-      />
+      </Formik>
     );
   }
 }

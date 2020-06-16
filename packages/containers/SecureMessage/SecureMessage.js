@@ -1,18 +1,10 @@
-import React, { Component } from 'react';
+import React, { useState } from 'react';
 import styled from 'styled-components';
 import copy from 'copy-text-to-clipboard';
-import {
-  Icon,
-  LockInput,
-  File,
-  Button,
-  Scrollbar,
-  withNotification,
-} from '@caesar/components';
-import { FastField, Formik } from 'formik';
-import { decryptByPassword } from '@caesar/common/utils/cipherUtils';
-import { downloadAsZip, downloadFile } from '@caesar/common/utils/file';
-import { schema } from './schema';
+import { Icon, Button, withNotification } from '@caesar/components';
+import { downloadAsZip } from '@caesar/common/utils/file';
+import { media } from '@caesar/assets/styles/media';
+import { MessageStep, PasswordStep } from './steps';
 
 const Wrapper = styled.div`
   display: flex;
@@ -20,107 +12,54 @@ const Wrapper = styled.div`
   justify-content: center;
   align-items: center;
   width: 100vw;
-  height: 100vh;
-  background-color: ${({ theme }) => theme.emperor};
+  height: 100%;
+  min-height: 100vh;
+  padding: 24px 16px;
+  background-color: ${({ theme }) => theme.color.emperor};
 `;
 
 const Title = styled.div`
   font-size: 18px;
-  letter-spacing: 0.6px;
-  color: ${({ theme }) => theme.lightGray};
-  margin-bottom: 30px;
-  margin-top: 60px;
+  color: ${({ theme }) => theme.color.lightGray};
+  margin-bottom: 23px;
+  margin-top: 50px;
 `;
 
 const StyledLogo = styled(Icon)`
-  fill: ${({ theme }) => theme.white};
-`;
-
-const MessageWrapper = styled.div`
-  display: flex;
-  flex-direction: column;
-  background: ${({ theme }) => theme.darkGray};
-  padding: 0 20px;
-  max-width: 620px;
-  width: 100%;
-`;
-
-const Message = styled.div`
-  color: ${({ theme }) => theme.white};
-  padding: 20px 0;
-  max-height: 400px;
-  height: 100%;
-  user-select: none;
-`;
-
-const Attachments = styled.div`
-  padding: 20px 0;
-  max-height: 400px;
-  height: 100%;
-`;
-
-const FileStyled = styled(File)`
-  ${File.FileName} {
-    color: ${({ theme }) => theme.white};
-
-    &:hover {
-      color: ${({ theme }) => theme.white};
-    }
-  }
-
-  ${File.FileExt} {
-    margin-bottom: 0;
-
-    &:before {
-      border-color: ${({ theme }) =>
-        `${theme.darkGray} ${theme.darkGray} transparent transparent`};
-    }
-  }
-
-  margin-bottom: 10px;
-
-  &:last-child {
-    margin-bottom: 0;
-  }
+  fill: ${({ theme }) => theme.color.white};
 `;
 
 const ButtonsWrapper = styled.div`
   display: flex;
   justify-content: center;
-  margin-top: 30px;
+  padding: 0 24px;
+  margin-top: 24px;
+
+  ${media.mobile`
+    flex-direction: column;
+    width: 100%;
+  `}
 `;
 
 const ButtonStyled = styled(Button)`
-  margin-left: 20px;
+  ${media.mobile`
+    width: 100%;
+  `}
+
+  &:not(:first-child) {
+    margin-left: 24px;
+
+    ${media.mobile`
+    margin-left: 0;
+    margin-top: 24px;
+  `}
+  }
 `;
 
-class SecureMessageContainer extends Component {
-  state = {
-    decryptedMessage: null,
-  };
+const SecureMessageContainerComponent = ({ notification, message }) => {
+  const [decryptedMessage, setDecryptedMessage] = useState(null);
 
-  handleSubmitPassword = async ({ password }, { setSubmitting, setErrors }) => {
-    try {
-      const { message } = this.props;
-
-      const decryptedMessage = await decryptByPassword(message, password);
-
-      this.setState({
-        decryptedMessage,
-      });
-    } catch (error) {
-      setErrors({
-        password: 'Sorry, but the password is wrong :(',
-      });
-    } finally {
-      setSubmitting(false);
-    }
-  };
-
-  handleClickCopyText = () => {
-    const { notification } = this.props;
-    const { decryptedMessage } = this.state;
-
+  const handleClickCopyText = () => {
     copy(decryptedMessage.text);
 
     notification.show({
@@ -128,131 +67,62 @@ class SecureMessageContainer extends Component {
     });
   };
 
-  handleClickDownloadFile = index => () => {
-    const { decryptedMessage } = this.state;
-    const { raw, name } = decryptedMessage.attachments[index];
-
-    downloadFile(raw, name);
-  };
-
-  handleClickDownloadFiles = () => {
-    const { decryptedMessage } = this.state;
-
+  const handleClickDownloadFiles = () => {
     downloadAsZip(decryptedMessage.attachments);
   };
 
-  renderPasswordStep() {
-    return (
-      <Formik
-        initialValues={{ password: '' }}
-        validationSchema={schema}
-        onSubmit={this.handleSubmitPassword}
-        validateOnChange={false}
-        render={({ errors, handleSubmit, submitForm, resetForm }) => (
-          <form onSubmit={handleSubmit}>
-            <FastField name="password">
-              {({ field }) => (
-                <LockInput
-                  {...field}
-                  autoFocus
-                  onClick={submitForm}
-                  onBackspace={resetForm}
-                  isError={Object.keys(errors).length !== 0}
-                />
-              )}
-            </FastField>
-          </form>
-        )}
-      />
-    );
-  }
+  const title = decryptedMessage
+    ? 'It’s your secret'
+    : 'Enter password to access';
+  const shouldShowButtons = !!decryptedMessage;
+  const shouldShowDownloadButton =
+    decryptedMessage &&
+    decryptedMessage.attachments &&
+    decryptedMessage.attachments.length > 0;
 
-  renderMessageStep() {
-    const { decryptedMessage } = this.state;
+  const shouldShowTextButton =
+    decryptedMessage &&
+    decryptedMessage.text &&
+    decryptedMessage.text.length > 0;
 
-    const shouldShowText = !!decryptedMessage.text;
-    const shouldShowAttachments = decryptedMessage.attachments.length > 0;
-
-    const renderedAttachments = decryptedMessage.attachments.map(
-      (attachment, index) => (
-        <FileStyled
-          key={index}
-          onClickDownload={this.handleClickDownloadFile(index)}
-          {...attachment}
+  return (
+    <Wrapper>
+      <StyledLogo name="logo-secure-message" width={214} height={60} />
+      <Title>{title}</Title>
+      {decryptedMessage ? (
+        <MessageStep decryptedMessage={decryptedMessage} />
+      ) : (
+        <PasswordStep
+          message={message}
+          setDecryptedMessage={setDecryptedMessage}
         />
-      ),
-    );
+      )}
+      {shouldShowButtons && (
+        <ButtonsWrapper>
+          {shouldShowTextButton && (
+            <ButtonStyled
+              color="white"
+              icon="copy"
+              onClick={handleClickCopyText}
+            >
+              Copy text
+            </ButtonStyled>
+          )}
+          {shouldShowDownloadButton && (
+            <ButtonStyled
+              color="white"
+              icon="download"
+              onClick={handleClickDownloadFiles}
+            >
+              Download all files
+            </ButtonStyled>
+          )}
+        </ButtonsWrapper>
+      )}
+    </Wrapper>
+  );
+};
 
-    return (
-      <MessageWrapper>
-        {shouldShowText && (
-          <Scrollbar autoHeight>
-            <Message
-              dangerouslySetInnerHTML={{ __html: decryptedMessage.text }}
-            />
-          </Scrollbar>
-        )}
-        {shouldShowAttachments && (
-          <Attachments>
-            <Scrollbar autoHeight>{renderedAttachments}</Scrollbar>
-          </Attachments>
-        )}
-      </MessageWrapper>
-    );
-  }
-
-  render() {
-    const { decryptedMessage } = this.state;
-
-    const title = decryptedMessage
-      ? 'It’s your secret'
-      : 'Enter password to access';
-
-    const renderedStep = decryptedMessage
-      ? this.renderMessageStep()
-      : this.renderPasswordStep();
-
-    const shouldShowButtons = !!decryptedMessage;
-    const shouldShowDownloadButton =
-      decryptedMessage &&
-      decryptedMessage.attachments &&
-      decryptedMessage.attachments.length > 0;
-
-    const shouldShowTextButton =
-      decryptedMessage &&
-      decryptedMessage.text &&
-      decryptedMessage.text.length > 0;
-
-    return (
-      <Wrapper>
-        <StyledLogo name="logo-secure-message" width={214} height={60} />
-        <Title>{title}</Title>
-        {renderedStep}
-        {shouldShowButtons && (
-          <ButtonsWrapper>
-            {shouldShowTextButton && (
-              <ButtonStyled
-                color="white"
-                icon="copy"
-                onClick={this.handleClickCopyText}
-              >
-                Copy text
-              </ButtonStyled>
-            )}
-            {shouldShowDownloadButton && (
-              <ButtonStyled
-                color="white"
-                icon="download"
-                onClick={this.handleClickDownloadFiles}
-              >
-                Download all files
-              </ButtonStyled>
-            )}
-          </ButtonsWrapper>
-        )}
-      </Wrapper>
-    );
-  }
-}
-
-export default withNotification(SecureMessageContainer);
+export const SecureMessageContainer = withNotification(
+  SecureMessageContainerComponent,
+);

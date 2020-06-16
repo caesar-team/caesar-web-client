@@ -24,7 +24,6 @@
 .ReactTable .rt-tbody .rt-td {
   border-right: 0;
   font-size: 16px;
-  letter-spacing: 0.5px;
   color: #000000;
   display: flex;
   align-items: center;
@@ -39,7 +38,6 @@
 .rt-resizable-header-content {
   font-size: 14px;
   line-height: 20px;
-  letter-spacing: 0.4px;
   color: #888888;
   padding: 10px 0;
 }

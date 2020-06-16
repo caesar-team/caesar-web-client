@@ -1,8 +1,7 @@
-import React, { Fragment, Component } from 'react';
+import React, { Component } from 'react';
 import styled from 'styled-components';
 import { formatDate } from '@caesar/common/utils/dateUtils';
 import { upperFirst } from '@caesar/common/utils/string';
-import { generateTeamTag } from '@caesar/common/utils/team';
 import { Icon } from '@caesar/components/Icon';
 import { Button } from '@caesar/components/Button';
 import { Avatar, AvatarsList } from '@caesar/components/Avatar';
@@ -32,8 +31,7 @@ const InviteRow = styled(Row)`
 
 const UpdatedDate = styled.div`
   font-size: 14px;
-  letter-spacing: 0.4px;
-  color: ${({ theme }) => theme.emperor};
+  color: ${({ theme }) => theme.color.emperor};
 `;
 
 const Owner = styled.div`
@@ -44,14 +42,12 @@ const Owner = styled.div`
 
 const OwnerName = styled.div`
   font-size: 16px;
-  letter-spacing: 0.5px;
-  color: ${({ theme }) => theme.black};
+  color: ${({ theme }) => theme.color.black};
 `;
 
 const OwnerStatus = styled.div`
   font-size: 14px;
-  letter-spacing: 0.4px;
-  color: ${({ theme }) => theme.gray};
+  color: ${({ theme }) => theme.color.gray};
 `;
 
 const StyledAvatarsList = styled(AvatarsList)`
@@ -66,8 +62,8 @@ const ShareButton = styled.button`
   width: 40px;
   height: 40px;
   ${({ hasInvited }) => hasInvited && 'margin-right: -10px'};
-  color: ${({ theme }) => theme.emperor};
-  border: 1px dashed ${({ theme }) => theme.gallery};
+  color: ${({ theme }) => theme.color.emperor};
+  border: 1px dashed ${({ theme }) => theme.color.gallery};
   border-radius: 50%;
   outline: none;
   cursor: ${({ disabled }) => (disabled ? 'not-allowed' : 'pointer')};
@@ -77,8 +73,8 @@ const ShareButton = styled.button`
     !disabled &&
     `
       &:hover {
-        color: ${theme.black};
-        border-color: ${theme.emperor};
+        color: ${theme.color.black};
+        border-color: ${theme.color.emperor};
       }
   `}
 `;
@@ -97,8 +93,7 @@ const ButtonsWrapper = styled.div`
 const Title = styled.div`
   padding: 4px 0;
   font-size: 36px;
-  letter-spacing: 1px;
-  color: ${({ theme }) => theme.black};
+  color: ${({ theme }) => theme.color.black};
 `;
 
 const FavoriteButton = styled.button`
@@ -121,10 +116,10 @@ const FavoriteButton = styled.button`
 `;
 
 const IconStyled = styled(Icon)`
-  fill: ${({ theme }) => theme.gray};
+  fill: ${({ theme }) => theme.color.gray};
 
   &:hover {
-    fill: ${({ theme }) => theme.black};
+    fill: ${({ theme }) => theme.color.black};
   }
 `;
 
@@ -134,15 +129,16 @@ const ArrowIcon = styled(IconStyled)`
 `;
 
 const DropdownStyled = styled(Dropdown)`
-  display: flex;
-  align-items: center;
-  width: 100%;
-  cursor: pointer;
+  ${Dropdown.Button} {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    cursor: pointer;
+  }
 `;
 
 const DropdownValue = styled.div`
   font-size: 16px;
-  letter-spacing: 0.5px;
   margin-right: 10px;
 `;
 
@@ -189,7 +185,7 @@ const generateTeamOptions = (teams, currentTeamId) =>
     .filter(({ id }) => id !== currentTeamId)
     .map(team => ({
       value: team.id,
-      label: team.id === 'personal' ? 'personal' : generateTeamTag(team.name),
+      label: team.id === 'personal' ? 'personal' : team.name,
     }));
 
 const renderOption = teams => (value, label) => {
@@ -287,14 +283,14 @@ class ItemHeader extends Component {
 
     if (isSharedItem) {
       return (
-        <Fragment>
+        <>
           <StyledRow>
             <UpdatedDate>Last updated {formatDate(lastUpdated)}</UpdatedDate>
           </StyledRow>
           <Row>
             <Title>{name}</Title>
           </Row>
-        </Fragment>
+        </>
       );
     }
 
@@ -335,16 +331,14 @@ class ItemHeader extends Component {
       listId !== currentListId || (teamId && teamId !== currentTeamId);
 
     const currentTeamTag =
-      currentTeam.id === 'personal'
-        ? 'personal'
-        : generateTeamTag(currentTeam.name);
+      currentTeam.id === 'personal' ? 'personal' : currentTeam.name;
 
     return (
-      <Fragment>
+      <>
         <Row>
           <Row>
             {!isTrashItem && (
-              <Fragment>
+              <>
                 {shouldShowTeamDropdownIcon ? (
                   <DropdownStyled
                     onClick={this.handleSelectTeamId}
@@ -357,17 +351,17 @@ class ItemHeader extends Component {
                       </TeamAvatar>
                     )}
                     <DropdownValue>{currentTeamTag}</DropdownValue>
-                    <ArrowIcon name="arrow-down-big" />
+                    <ArrowIcon name="arrow-triangle" />
                   </DropdownStyled>
                 ) : (
-                  <Fragment>
+                  <>
                     {currentTeam.id !== 'personal' && (
                       <TeamAvatar>
                         <TeamImg src={currentTeam.icon} />
                       </TeamAvatar>
                     )}
                     <DropdownValue>{currentTeamTag}</DropdownValue>
-                  </Fragment>
+                  </>
                 )}
                 <Separator>|</Separator>
                 {shouldShowListDropdownIcon ? (
@@ -376,7 +370,7 @@ class ItemHeader extends Component {
                     options={listOptions}
                   >
                     <DropdownValue>{currentList.label}</DropdownValue>
-                    <ArrowIcon name="arrow-down-big" />
+                    <ArrowIcon name="arrow-triangle" />
                   </DropdownStyled>
                 ) : (
                   <DropdownValue>{currentList.label}</DropdownValue>
@@ -386,7 +380,7 @@ class ItemHeader extends Component {
                     MOVE
                   </MoveButton>
                 )}
-              </Fragment>
+              </>
             )}
           </Row>
           <Row>
@@ -461,20 +455,14 @@ class ItemHeader extends Component {
                   onClick={onClickShare}
                   hasInvited={hasInvited}
                 >
-                  <Icon
-                    isInButton
-                    withOfflineCheck
-                    name="plus"
-                    width={14}
-                    height={14}
-                  />
+                  <Icon withOfflineCheck name="plus" width={14} height={14} />
                 </ShareButton>
               </Can>
             )}
             <StyledAvatarsList avatars={avatars} />
           </Row>
         </InviteRow>
-      </Fragment>
+      </>
     );
   }
 }

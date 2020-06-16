@@ -1,19 +1,22 @@
-import React, { Component } from 'react';
+import React, { useState } from 'react';
 import styled from 'styled-components';
-import { Formik, FastField } from 'formik';
+import { useFormik } from 'formik';
 import { media } from '@caesar/assets/styles/media';
 import {
   Checkbox,
   TextArea,
-  Uploader,
   PasswordInput,
   File,
   Button,
   withNotification,
   withOfflineDetection,
+  Hint,
 } from '@caesar/components';
 import { Select } from '@caesar/components/Select';
 import { checkError } from '@caesar/common/utils/formikUtils';
+import { downloadFile } from '@caesar/common/utils/file';
+import { useMedia } from '@caesar/common/hooks';
+import { Uploader } from '../Uploader';
 import {
   initialValues,
   requestsLimitOptions,
@@ -29,11 +32,19 @@ const Row = styled.div`
   position: relative;
   display: flex;
   flex-direction: column;
-  margin-bottom: 10px;
+  margin-bottom: 40px;
 
   &:last-child {
     margin-bottom: 0;
   }
+
+  ${media.desktop`
+    margin-bottom: 16px;
+  `}
+
+  ${media.mobile`
+    margin-bottom: 8px;
+  `}
 `;
 
 const Column = styled.div`
@@ -43,111 +54,155 @@ const Column = styled.div`
 `;
 
 const ColumnStyled = styled(Column)`
-  margin-left: 20px;
-
-  ${media.wideMobile`
-    margin-top: 20px;
-    margin-left: 0;
-  `}
+  margin-left: 16px;
 `;
 
 const Label = styled.div`
-  font-size: 18px;
-  letter-spacing: 0.6px;
-  color: ${({ theme }) => theme.black};
+  margin-bottom: 16px;
+  font-size: 16px;
+  color: ${({ theme }) => theme.color.gray};
+
+  ${media.desktop`
+    margin-bottom: 8px;
+    font-size: 14px;
+  `}
 `;
 
 const InputStyled = styled(PasswordInput)`
   border-radius: 3px;
-  border: solid 1px ${({ theme }) => theme.gallery};
+  border: solid 1px ${({ theme }) => theme.color.gallery};
 `;
 
 const TextAreaStyled = styled(TextArea)`
   ${TextArea.TextAreaField} {
-    background: ${({ theme }) => theme.white};
+    background: ${({ theme }) => theme.color.white};
   }
 `;
 
 const Error = styled.div`
-  margin-top: 8px;
   font-size: 14px;
-  letter-spacing: 0.4px;
-  color: ${({ theme }) => theme.red};
+  color: ${({ theme }) => theme.color.red};
 `;
 
 const AttachmentsSection = styled.div`
   display: flex;
   flex-direction: column;
-  margin-top: 20px;
-  margin-bottom: 20px;
+  margin-top: 40px;
+  margin-bottom: 40px;
+
+  ${media.desktop`
+    margin-top: 16px;
+    margin-bottom: 16px;
+  `}
+
+  ${media.mobile`
+    margin-top: 8px;
+    margin-bottom: 8px;
+  `}
+`;
+
+const StyledUploader = styled(Uploader)`
+  padding: 24px 5px;
+
+  ${media.desktop`
+    padding: 16px 5px;
+  `}
 `;
 
 const Attachments = styled.div`
-  display: flex;
-  flex-direction: column;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr);
+  grid-gap: 24px;
+  padding-top: 8px;
+
+  ${media.wideMobile`
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    grid-gap: 16px;
+  `}
+
+  ${media.mobile`
+    grid-template-columns: minmax(0, 1fr);
+    grid-gap: 8px;
+  `}
 `;
 
 const FileRow = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  position: relative;
-  margin: 20px 0;
+  &[disabled] {
+    pointer-events: none;
+  }
 `;
 
 const SelectRow = styled.div`
   display: flex;
   width: 100%;
-  margin-top: 20px;
-  margin-bottom: 30px;
+  margin-top: 38px;
+  margin-bottom: 40px;
+
+  ${media.desktop`
+    margin-top: 22px;
+    margin-bottom: 24px;
+  `}
 
   ${media.wideMobile`
-    flex-wrap: wrap;
+    margin-top: 14px;
+    margin-bottom: 16px;
   `}
 `;
 
 const StyledSelect = styled(Select)`
-  margin-top: 10px;
-  border: 1px solid ${({ theme }) => theme.gallery};
+  height: 40px;
+  padding: 8px 16px;
+  border: 1px solid ${({ theme }) => theme.color.gallery};
   border-radius: 3px;
-  padding: 18px 20px;
-  height: 60px;
 
   ${Select.ValueText} {
     padding: 0;
-    font-size: 18px;
+    font-size: 16px;
     font-weight: 600;
-    letter-spacing: 0.6px;
   }
 `;
 
 const ButtonWrapper = styled.div`
-  position: relative;
-  margin: 30px 0;
+  display: flex;
+  align-items: center;
+  margin: 40px 0;
+
+  ${media.desktop`
+    margin: 24px 0;
+  `}
+
+  ${media.wideMobile`
+    margin: 16px 0;
+  `}
 `;
 
 const StyledButton = styled(Button)`
-  position: relative;
+  ${media.mobile`
+    width: 100%;
+  `}
 `;
 
-const ButtonImg = styled.img`
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 279px;
-  height: 200px;
-  transform: translate(-110px, -70px);
-`;
+const handleClickDownloadFile = attachment => {
+  const { raw, name } = attachment;
+
+  downloadFile(raw, name);
+};
 
 const checkAttachmentsError = (errors, index) =>
   errors[index] && errors[index].raw;
 
-const renderAttachments = (attachments = [], errors = [], setFieldValue) =>
+const renderAttachments = (
+  attachments = [],
+  errors = [],
+  setFieldValue,
+  isSubmitting,
+) =>
   attachments.map((attachment, index) => (
-    <FileRow key={index}>
+    <FileRow key={index} disabled={isSubmitting}>
       <File
         key={index}
         status={checkAttachmentsError(errors, index) ? 'error' : 'uploaded'}
+        onClickDownload={() => handleClickDownloadFile(attachment)}
         onClickRemove={() =>
           setFieldValue(
             'attachments',
@@ -162,134 +217,160 @@ const renderAttachments = (attachments = [], errors = [], setFieldValue) =>
     </FileRow>
   ));
 
-class SecureMessageForm extends Component {
-  state = {
-    isCustomPassword: false,
+const SecureMessageFormComponent = ({ onSubmit, notification, isOnline }) => {
+  const { isMobile } = useMedia();
+  const [isCustomPassword, setIsCustomPassword] = useState(false);
+
+  const {
+    values,
+    errors,
+    touched,
+    setFieldValue,
+    handleBlur,
+    handleChange,
+    handleSubmit,
+    isSubmitting,
+    isValid,
+  } = useFormik({
+    initialValues,
+    onSubmit,
+    validationSchema: schema,
+  });
+
+  const dirty = values.text || values.attachments.length;
+
+  const handleChangeCustomPassword = () => {
+    setIsCustomPassword(!isCustomPassword);
+
+    if (isCustomPassword) {
+      setFieldValue('password', '');
+    }
   };
 
-  handleChange = () => {
-    this.setState(prevState => ({
-      isCustomPassword: !prevState.isCustomPassword,
-    }));
-  };
-
-  render() {
-    const { onSubmit, notification, isOnline } = this.props;
-    const { isCustomPassword } = this.state;
-
-    return (
-      <Formik
-        key="secureMessageForm"
-        initialValues={initialValues}
-        onSubmit={onSubmit}
-        validationSchema={schema}
-      >
-        {({
-          values,
-          errors,
-          touched,
-          handleSubmit,
-          setFieldValue,
-          setFieldTouched,
-          isSubmitting,
-          isValid,
-          dirty,
-        }) => (
-          <Form onSubmit={handleSubmit}>
-            <Row>
-              <Label>Text or image to encrypt and expire</Label>
-              <FastField name="text">
-                {({ field }) => (
-                  <TextAreaStyled
-                    {...field}
-                    placeholder="Divide et Impera"
-                    onBlur={setFieldTouched}
-                    error={checkError(touched, errors, 'text')}
-                  />
-                )}
-              </FastField>
-            </Row>
-            <AttachmentsSection>
-              <Uploader
-                multiple
-                asPreview
-                name="attachments"
-                files={values.attachments}
-                notification={notification}
-                onChange={setFieldValue}
-              />
-              <Attachments>
-                {renderAttachments(
-                  values.attachments,
-                  errors.attachments,
-                  setFieldValue,
-                )}
-              </Attachments>
-            </AttachmentsSection>
-            <SelectRow>
-              <Column>
-                <Label>Data expires in</Label>
-                <StyledSelect
-                  boxOffset={60}
-                  name="secondsLimit"
-                  placeholder="Select option"
-                  value={values.secondsLimit}
-                  options={secondsLimitOptions}
-                  onChange={setFieldValue}
-                />
-              </Column>
-              <ColumnStyled>
-                <Label>Number of Attempts</Label>
-                <StyledSelect
-                  boxOffset={60}
-                  name="requestsLimit"
-                  placeholder="Select option"
-                  value={values.requestsLimit}
-                  options={requestsLimitOptions}
-                  onChange={setFieldValue}
-                />
-              </ColumnStyled>
-            </SelectRow>
-            <Row>
-              <Checkbox
-                checked={isCustomPassword}
-                value={isCustomPassword}
-                onChange={this.handleChange}
-              >
-                Create my own password for access to encrypted data
-              </Checkbox>
-            </Row>
-            {isCustomPassword && (
-              <Row>
-                <Label>Password</Label>
-                <FastField name="password">
-                  {({ field }) => (
-                    <InputStyled {...field} onBlur={setFieldTouched} />
-                  )}
-                </FastField>
-                {checkError(touched, errors, 'password') && (
-                  <Error>{checkError(touched, errors, 'password')}</Error>
-                )}
-              </Row>
-            )}
-            <ButtonWrapper>
-              <ButtonImg
-                srcSet="/images/secure-bg-btn@2x.png 2x, /images/secure-bg-btn@3x.png 3x"
-                src="/images/secure-bg-btn.png"
-              />
-              <StyledButton
-                htmlType="submit"
-                isHigh
-                disabled={isSubmitting || !(isValid && dirty) || !isOnline}
-              >
-                Create Secure Message
-              </StyledButton>
-            </ButtonWrapper>
-          </Form>
+  return (
+    <Form onSubmit={handleSubmit}>
+      <Row>
+        {isMobile ? (
+          <TextAreaStyled
+            placeholder="Text or attachments to encrypt and expire"
+            name="text"
+            value={values.text}
+            onBlur={handleBlur}
+            onChange={handleChange}
+            error={checkError(touched, errors, 'text')}
+          />
+        ) : (
+          <>
+            <Label>Text or attachments to encrypt and expire</Label>
+            <TextAreaStyled
+              placeholder="Divide et Impera"
+              name="text"
+              value={values.text}
+              onBlur={handleBlur}
+              onChange={handleChange}
+              error={checkError(touched, errors, 'text')}
+              disabled={isSubmitting}
+            />
+          </>
         )}
-      </Formik>
-    );
-  }
-}
+      </Row>
+      <AttachmentsSection>
+        <StyledUploader
+          multiple
+          asPreview
+          name="attachments"
+          files={values.attachments}
+          error={
+            typeof errors?.attachments === 'string' ? errors.attachments : ''
+          }
+          notification={notification}
+          onChange={setFieldValue}
+          disabled={isSubmitting}
+        />
+        <Attachments>
+          {renderAttachments(
+            values.attachments,
+            errors.attachments,
+            setFieldValue,
+            isSubmitting,
+          )}
+        </Attachments>
+      </AttachmentsSection>
+      <SelectRow>
+        <Column>
+          <Label>Data expires in</Label>
+          <StyledSelect
+            boxOffset={39}
+            name="secondsLimit"
+            placeholder="Select option"
+            value={values.secondsLimit}
+            options={secondsLimitOptions}
+            onChange={setFieldValue}
+            disabled={isSubmitting}
+          />
+        </Column>
+        <ColumnStyled>
+          <Label>{isMobile ? 'Attempts' : 'Number of Attempts'}</Label>
+          <StyledSelect
+            boxOffset={39}
+            name="requestsLimit"
+            placeholder="Select option"
+            value={values.requestsLimit}
+            options={requestsLimitOptions}
+            onChange={setFieldValue}
+            disabled={isSubmitting}
+          />
+        </ColumnStyled>
+      </SelectRow>
+      {!isMobile && (
+        <Row>
+          <Checkbox
+            checked={isCustomPassword}
+            value={isCustomPassword}
+            onChange={handleChangeCustomPassword}
+            isDisabled={isSubmitting}
+          >
+            Create my own password for access to encrypted data
+          </Checkbox>
+        </Row>
+      )}
+      {isCustomPassword && (
+        <Row>
+          <Label>Password</Label>
+          <InputStyled
+            name="password"
+            value={values.password}
+            onBlur={handleBlur}
+            onChange={handleChange}
+            disabled={isSubmitting}
+          />
+          {checkError(touched, errors, 'password') && (
+            <Error>{checkError(touched, errors, 'password')}</Error>
+          )}
+        </Row>
+      )}
+      {errors?.form && (
+        <>
+          <Error>Oops… Something went wrong</Error>
+          <Error>Please, click again on Create secure message</Error>
+        </>
+      )}
+      <ButtonWrapper>
+        <Hint text={!dirty ? 'Please, add text or attachments' : ''}>
+          <StyledButton
+            htmlType="submit"
+            disabled={
+              isSubmitting || (!isValid && !errors?.form) || !dirty || !isOnline
+            }
+          >
+            Create Secure Message
+          </StyledButton>
+        </Hint>
+      </ButtonWrapper>
+    </Form>
+  );
+};
 
-export default withOfflineDetection(withNotification(SecureMessageForm));
+export const SecureMessageForm = withOfflineDetection(
+  withNotification(SecureMessageFormComponent),
+);

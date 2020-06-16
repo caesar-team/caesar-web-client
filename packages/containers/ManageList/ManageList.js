@@ -8,15 +8,12 @@ import {
   TextLoader,
   withNotification,
 } from '@caesar/components';
-import {
-  LIST_WORKFLOW_EDIT_MODE,
-  LIST_WORKFLOW_CREATE_MODE,
-} from '@caesar/common/constants';
+import { LIST_MODE } from '@caesar/common/constants';
 
 const Wrapper = styled.div`
   display: flex;
   flex-direction: column;
-  background: ${({ theme }) => theme.lightBlue};
+  background: ${({ theme }) => theme.color.lightBlue};
   width: 100%;
   padding: 60px;
   position: relative;
@@ -31,21 +28,19 @@ const TopWrapper = styled.div`
 
 const Title = styled.div`
   font-size: 36px;
-  letter-spacing: 1px;
-  color: ${({ theme }) => theme.black};
+  color: ${({ theme }) => theme.color.black};
 `;
 
 const Description = styled.div`
   font-size: 18px;
-  letter-spacing: 0.6px;
-  color: ${({ theme }) => theme.black};
+  color: ${({ theme }) => theme.color.black};
   margin-bottom: 25px;
 `;
 
 const ManageListWrapper = styled.div`
   display: flex;
   flex-direction: column;
-  background: ${({ theme }) => theme.white};
+  background: ${({ theme }) => theme.color.white};
   padding: 30px;
 `;
 
@@ -62,7 +57,7 @@ class ManageListContainer extends Component {
   handleClickCreateList = () => {
     this.setState({
       isVisibleModal: true,
-      mode: LIST_WORKFLOW_CREATE_MODE,
+      mode: LIST_MODE.WORKFLOW_CREATE,
     });
   };
 
@@ -70,7 +65,7 @@ class ManageListContainer extends Component {
     this.setState(
       {
         isVisibleModal: true,
-        mode: LIST_WORKFLOW_EDIT_MODE,
+        mode: LIST_MODE.WORKFLOW_EDIT,
       },
       () => this.props.setWorkInProgressListId(listId),
     );
@@ -178,10 +173,10 @@ class ManageListContainer extends Component {
         </ManageListWrapper>
         {isVisibleModal && (
           <NewListModal
-            list={mode === LIST_WORKFLOW_CREATE_MODE ? [] : workInProgressList}
+            list={mode === LIST_MODE.WORKFLOW_CREATE ? [] : workInProgressList}
             mode={mode}
             onSubmit={
-              mode === LIST_WORKFLOW_CREATE_MODE
+              mode === LIST_MODE.WORKFLOW_CREATE
                 ? this.handleCreateList
                 : this.handleEditList
             }

@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import { Formik, FastField } from 'formik';
 import { Modal, FormInput, Button, Label } from '@caesar/components';
 import { checkError } from '@caesar/common/utils/formikUtils';
-import { LIST_WORKFLOW_CREATE_MODE } from '@caesar/common/constants';
+import { LIST_MODE } from '@caesar/common/constants';
 import { schema } from './schema';
 
 const FormTitle = styled.div`
@@ -11,7 +11,7 @@ const FormTitle = styled.div`
   text-align: center;
   font-size: 18px;
   font-weight: 700;
-  color: ${({ theme }) => theme.black};
+  color: ${({ theme }) => theme.color.black};
   text-transform: uppercase;
 `;
 
@@ -32,7 +32,7 @@ class NewListModal extends Component {
       onSubmit = Function.prototype,
     } = this.props;
 
-    const isCreateMode = mode === LIST_WORKFLOW_CREATE_MODE;
+    const isCreateMode = mode === LIST_MODE.WORKFLOW_CREATE;
 
     return (
       <Modal
@@ -49,18 +49,12 @@ class NewListModal extends Component {
           onSubmit={onSubmit}
           isInitialValid={schema.isValidSync(this.createInitialValue(list))}
           validationSchema={schema}
-          render={({
-            errors,
-            touched,
-            handleSubmit,
-            isSubmitting,
-            isValid,
-          }) => (
+        >
+          {({ errors, touched, handleSubmit, isSubmitting, isValid }) => (
             <form onSubmit={handleSubmit}>
               <Label>Name</Label>
-              <FastField
-                name="label"
-                render={({ field }) => (
+              <FastField name="label">
+                {({ field }) => (
                   <FormInput
                     autoFocus
                     withBorder
@@ -68,7 +62,7 @@ class NewListModal extends Component {
                     error={checkError(touched, errors, 'label')}
                   />
                 )}
-              />
+              </FastField>
               <ButtonWrapper>
                 <Button
                   disabled={isSubmitting || !isValid}
@@ -80,7 +74,7 @@ class NewListModal extends Component {
               </ButtonWrapper>
             </form>
           )}
-        />
+        </Formik>
       </Modal>
     );
   }

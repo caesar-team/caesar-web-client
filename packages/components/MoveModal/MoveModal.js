@@ -16,7 +16,7 @@ const ModalDescription = styled.div`
   padding-bottom: 20px;
   text-align: center;
   font-size: 14px;
-  color: ${({ theme }) => theme.black};
+  color: ${({ theme }) => theme.color.black};
 `;
 
 const ButtonsWrapper = styled.div`
@@ -30,7 +30,7 @@ const StyledButton = styled(Button)`
 `;
 
 const SelectStyled = styled(Select)`
-  border: 1px solid ${({ theme }) => theme.gallery};
+  border: 1px solid ${({ theme }) => theme.color.gallery};
   border-radius: 3px;
   height: 48px;
 `;

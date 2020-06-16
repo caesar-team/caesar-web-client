@@ -6,12 +6,12 @@ const Wrapper = styled.div`
   align-items: center;
   justify-content: space-between;
   border-radius: 20px;
-  border: 1px solid ${({ theme }) => theme.gallery};
-  background-color: ${({ theme }) => theme.white};
+  border: 1px solid ${({ theme }) => theme.color.gallery};
+  background-color: ${({ theme }) => theme.color.white};
   cursor: pointer;
 
   &:hover {
-    border: 1px solid ${({ theme }) => theme.gray};
+    border: 1px solid ${({ theme }) => theme.color.gray};
   }
 `;
 
@@ -32,7 +32,6 @@ const TeamIconImage = styled.img`
 
 const TeamName = styled.div`
   font-size: 16px;
-  letter-spacing: 0.5px;
   margin: 0 10px;
 `;
 

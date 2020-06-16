@@ -12,34 +12,32 @@ const LabelText = styled.div`
   font-size: 14px;
   font-weight: 500;
   line-height: 1.5;
-  letter-spacing: 0.6px;
-  color: ${({ theme }) => theme.black};
+  color: ${({ theme }) => theme.color.black};
 `;
 
 const TextAreaField = styled.textarea`
   padding: 7px 15px;
   display: block;
   width: 100%;
-  font-size: 18px;
-  letter-spacing: 0.6px;
-  color: ${({ theme }) => theme.black};
-  border: 1px solid ${({ theme }) => theme.gallery};
+  font-size: 16px;
+  line-height: 1.5;
+  color: ${({ theme }) => theme.color.black};
+  border: 1px solid ${({ theme }) => theme.color.gallery};
   border-radius: 3px;
-  background-color: ${({ theme }) => theme.snow};
+  background-color: ${({ theme }) => theme.color.snow};
   outline: none;
-  min-height: 120px;
+  min-height: 112px;
   resize: none;
 
   &::placeholder {
-    color: ${({ theme }) => theme.lightGray};
+    color: ${({ theme }) => theme.color.lightGray};
   }
 `;
 
 const Error = styled.div`
   margin-top: 8px;
   font-size: 14px;
-  letter-spacing: 0.4px;
-  color: ${({ theme }) => theme.red};
+  color: ${({ theme }) => theme.color.red};
 `;
 
 const TextArea = ({

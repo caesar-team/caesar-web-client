@@ -4,7 +4,7 @@ import { CircleLoader } from '../Loader';
 import { Icon } from '../Icon';
 
 const Wrapper = styled.div`
-  background-color: ${({ theme }) => theme.emperor};
+  background-color: ${({ theme }) => theme.color.emperor};
   position: absolute;
   bottom: 10px;
   right: 60px;
@@ -23,8 +23,7 @@ const InnerWrapper = styled.div`
 const Text = styled.div`
   font-size: 14px;
   font-weight: 600;
-  letter-spacing: 0.4px;
-  color: ${({ theme }) => theme.white};
+  color: ${({ theme }) => theme.color.white};
   margin-left: 20px;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -35,7 +34,7 @@ const Text = styled.div`
 const IconStyled = styled(Icon)`
   width: 20px;
   height: 20px;
-  fill: ${({ theme }) => theme.white};
+  fill: ${({ theme }) => theme.color.white};
 `;
 
 const CloseIcon = styled(IconStyled)`

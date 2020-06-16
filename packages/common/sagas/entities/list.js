@@ -26,8 +26,7 @@ import {
   patchListSort,
   patchList,
 } from '@caesar/common/api';
-
-import { LIST_ENTITY_TYPE, LIST_TYPE } from '@caesar/common/constants';
+import { ENTITY_TYPE, LIST_TYPE } from '@caesar/common/constants';
 
 const reorder = (list, startIndex, endIndex) => {
   const result = Array.from(list);
@@ -50,11 +49,11 @@ export function* createListSaga({ payload: { list } }) {
     yield put(
       createListSuccess(listId, {
         id: listId,
-        type: LIST_TYPE,
+        type: LIST_TYPE.LIST,
         children: [],
         sort: 0,
         parentId: null,
-        __type: LIST_ENTITY_TYPE,
+        __type: ENTITY_TYPE.LIST,
         ...list,
       }),
     );

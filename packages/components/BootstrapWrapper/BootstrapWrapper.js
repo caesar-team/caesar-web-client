@@ -41,15 +41,14 @@ const BottomWrapper = styled.div`
 const FourXXIText = styled.div`
   font-size: 12px;
   font-weight: 600;
-  letter-spacing: 0.5px;
-  color: ${({ theme }) => theme.black};
+  color: ${({ theme }) => theme.color.black};
   margin-left: 10px;
 `;
 
 const FourXXILink = styled.a`
   text-decoration: underline;
   font-weight: 600;
-  color: ${({ theme }) => theme.black};
+  color: ${({ theme }) => theme.color.black};
 `;
 
 const BootstrapWrapper = ({ children }) => (

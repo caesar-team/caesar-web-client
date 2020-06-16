@@ -20,10 +20,10 @@ const IconStyled = styled(Icon)`
   height: 20px;
   cursor: pointer;
 
-  fill: ${({ theme }) => theme.gray};
+  fill: ${({ theme }) => theme.color.gray};
 
   &:hover {
-    fill: ${({ theme }) => theme.black};
+    fill: ${({ theme }) => theme.color.black};
   }
 `;
 
@@ -39,7 +39,7 @@ const StyledWebsiteLink = styled.a`
   word-break: break-all;
 
   &:hover {
-    color: ${({ theme }) => theme.emperor};
+    color: ${({ theme }) => theme.color.emperor};
   }
 `;
 

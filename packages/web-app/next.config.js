@@ -18,7 +18,12 @@ const withOptimizedImages = require('next-optimized-images');
 const withCSS = require('@zeit/next-css');
 const withOffline = require('next-offline');
 const ThreadsPlugin = require('threads-plugin');
-const withTM = require('next-transpile-modules')(['@caesar/assets','@caesar/common', '@caesar/containers', '@caesar/components']);
+const withTM = require('next-transpile-modules')([
+  '@caesar/assets',
+  '@caesar/common',
+  '@caesar/containers',
+  '@caesar/components',
+]);
 
 // fix: prevents error when .css files are required by node
 if (typeof require !== 'undefined') {
@@ -37,21 +42,28 @@ const publicRuntimeConfig = {
   AUTH_ENDPOINT: process.env.AUTH_ENDPOINT || 'connect/google',
   REDIRECT_AUTH_ENDPOINT: process.env.REDIRECT_AUTH_ENDPOINT || 'check_auth',
   MAX_UPLOADING_FILE_SIZE: process.env.MAX_UPLOADING_FILE_SIZE || '256KB',
-  TOTAL_MAX_UPLOADING_FILES_SIZES: process.env.TOTAL_MAX_UPLOADING_FILES_SIZES || '5M',
+  TOTAL_MAX_UPLOADING_FILES_SIZES:
+    process.env.TOTAL_MAX_UPLOADING_FILES_SIZES || '5MB',
   LENGTH_KEY: process.env.LENGTH_KEY || 2048,
+  AUTHORIZATION_ENABLE: process.env.AUTHORIZATION_ENABLE !== 'false',
+  APP_TYPE: process.env.APP_TYPE || 'general',
+  APP_VERSION: process.env.APP_VERSION,
 };
 
-const serverRuntimeConfig = {
-  SENTRY_DSN: process.env.SENTRY_DSN,
-};
+const serverRuntimeConfig = {};
 
 const workboxOptions = {
+  swDest: 'static/service-worker.js',
   runtimeCaching: [
     {
+      urlPattern: /.png|.svg|.jpg$/,
+      handler: 'CacheFirst',
+    },
+    {
       urlPattern: /^https?.*/,
-      handler: "NetworkFirst",
+      handler: 'NetworkFirst',
       options: {
-        cacheName: "https-calls",
+        cacheName: 'offlineCache',
         networkTimeoutSeconds: 15,
         expiration: {
           maxEntries: 150,
@@ -59,10 +71,10 @@ const workboxOptions = {
         },
         cacheableResponse: {
           statuses: [0, 200],
-        }
-      }
-    }
-  ]
+        },
+      },
+    },
+  ],
 };
 
 module.exports = withPlugins(
@@ -71,6 +83,16 @@ module.exports = withPlugins(
     publicRuntimeConfig,
     serverRuntimeConfig,
     workboxOpts: workboxOptions,
+    experimental: {
+      async rewrites() {
+        return [
+          {
+            source: '/service-worker.js',
+            destination: '/_next/static/service-worker.js',
+          },
+        ];
+      },
+    },
     webpack: config => {
       config.output.globalObject = 'this';
 

@@ -23,7 +23,7 @@ import {
   getUserTeams,
   patchAcceptTeamItems,
 } from '@caesar/common/api';
-import { ITEM_CREDENTIALS_TYPE } from '@caesar/common/constants';
+import { ITEM_TYPE } from '@caesar/common/constants';
 import { NavigationPanelStyled } from '../../components';
 import { SHARED_ITEMS_CHECK } from '../../constants';
 
@@ -42,7 +42,7 @@ const ItemRow = styled.div`
   align-items: center;
   justify-content: space-between;
   padding: 10px 0;
-  border-bottom: 1px solid ${({ theme }) => theme.gallery};
+  border-bottom: 1px solid ${({ theme }) => theme.color.gallery};
 
   &:last-child {
     border-bottom: none;
@@ -64,7 +64,7 @@ const TeamRow = styled.div`
   display: flex;
   align-items: center;
   border-radius: 2px;
-  border: 1px solid ${({ theme }) => theme.gallery};
+  border: 1px solid ${({ theme }) => theme.color.gallery};
   padding: 10px 20px;
   margin-bottom: 10px;
 `;
@@ -77,13 +77,11 @@ const TeamDetails = styled.div`
 
 const TeamName = styled.div`
   font-size: 18px;
-  letter-spacing: 0.6px;
 `;
 
 const TeamItemsWrapper = styled.div`
   font-size: 14px;
-  letter-spacing: 0.4px;
-  color: ${({ theme }) => theme.gray};
+  color: ${({ theme }) => theme.color.gray};
 `;
 
 const ButtonWrapper = styled.div`
@@ -110,7 +108,6 @@ const Section = styled.div`
 const SectionName = styled.div`
   font-size: 18px;
   font-weight: 600;
-  letter-spacing: 0.6px;
   margin-bottom: 16px;
 `;
 
@@ -121,7 +118,7 @@ const ItemTypeBox = styled.div`
   width: 40px;
   height: 40px;
   border-radius: 3px;
-  background-color: ${({ theme }) => theme.gallery};
+  background-color: ${({ theme }) => theme.color.gallery};
 `;
 
 const IconStyled = styled(Icon)`
@@ -273,7 +270,7 @@ class SharedItemsStep extends Component {
     const renderedItems = items.personal.map(
       ({ id, type, secret: { name } }) => {
         const isActive = selectedIds.includes(id);
-        const iconName = type === ITEM_CREDENTIALS_TYPE ? 'key' : 'securenote';
+        const iconName = type === ITEM_TYPE.CREDENTIALS ? 'key' : 'securenote';
 
         return (
           <ItemRow key={id}>

@@ -1,7 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
 import { withRouter } from 'next/router';
-import { IS_AUTHORIZATION_ENABLE } from '@caesar/common/constants';
+import { IS_AUTHORIZATION_ENABLE, ROUTES } from '@caesar/common/constants';
 import { useMedia } from '@caesar/common/hooks';
 import { Logo } from './Logo';
 import { Button } from '../Button';
@@ -22,33 +22,45 @@ const StyledButton = styled(Button)`
 
 const SecureHeaderComponent = ({
   router,
-  url = IS_AUTHORIZATION_ENABLE ? '/signin' : '/',
   isButtonShow = IS_AUTHORIZATION_ENABLE,
 }) => {
-  const { isMobile } = useMedia();
+  const { isMobile, isWideDesktop } = useMedia();
+  const getLogoParams = () => {
+    switch (true) {
+      case !IS_AUTHORIZATION_ENABLE:
+        return { name: 'logo-caesar-secure', width: isWideDesktop ? 200 : 170 };
+      case isMobile:
+        return { name: 'caesar', width: 25 };
+      default:
+        return { name: 'logo-caesar-4xxi', width: isWideDesktop ? 130 : 107 };
+    }
+  };
 
   return (
     <Wrapper>
       <Logo
-        href={url}
-        width={isMobile ? 25 : 107}
-        height={30}
-        iconName={isMobile ? 'caesar' : 'logo-new'}
+        href={ROUTES.MAIN}
+        width={getLogoParams().width}
+        height={isWideDesktop ? 40 : 30}
+        iconName={getLogoParams().name}
       />
       {isButtonShow && (
         <>
           {isMobile ? (
             <StyledButton
-              onClick={() => router.push('/signin')}
+              onClick={() => router.push(ROUTES.SIGN_IN)}
               icon="login"
               color="white"
             />
           ) : (
-            <StyledButton onClick={() => router.push('/signin')} color="white">
+            <StyledButton
+              onClick={() => router.push(ROUTES.SIGN_IN)}
+              color="white"
+            >
               Log In
             </StyledButton>
           )}
-          <Button onClick={() => router.push('/signup')}>Sign Up</Button>
+          <Button onClick={() => router.push(ROUTES.SIGN_UP)}>Sign Up</Button>
         </>
       )}
     </Wrapper>

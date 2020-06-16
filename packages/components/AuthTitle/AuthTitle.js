@@ -5,8 +5,7 @@ const AuthTitle = styled.h1`
   margin-bottom: 8px;
   font-size: 36px;
   font-weight: 400;
-  color: ${({ theme }) => theme.black};
-  letter-spacing: 1px;
+  color: ${({ theme }) => theme.color.black};
   text-align: center;
 `;
 

@@ -132,10 +132,10 @@ import { objectToBase64 } from '@caesar/common/utils/base64';
 import { chunk } from '@caesar/common/utils/utils';
 import {
   ROLE_ANONYMOUS_USER,
-  ITEM_REVIEW_MODE,
+  ITEM_MODE,
   PERMISSION_READ,
   SHARE_TYPE,
-  ITEM_ENTITY_TYPE,
+  ENTITY_TYPE,
   CREATING_ITEM_NOTIFICATION,
   CREATING_ITEMS_NOTIFICATION,
   SHARING_IN_PROGRESS_NOTIFICATION,
@@ -464,12 +464,12 @@ export function* createItemSaga({
       ownerId: user.id,
       secret: encryptedItem,
       data: { attachments, ...data },
-      __type: ITEM_ENTITY_TYPE,
+      __type: ENTITY_TYPE.ITEM,
     };
 
     yield put(createItemSuccess(newItem));
     yield put(addItemToList(newItem));
-    yield put(updateWorkInProgressItem(itemId, ITEM_REVIEW_MODE));
+    yield put(updateWorkInProgressItem(itemId, ITEM_MODE.REVIEW));
 
     if (list.teamId) {
       yield put(
@@ -665,7 +665,7 @@ export function* editItemSaga({ payload: { item }, meta: { setSubmitting } }) {
       }
     }
 
-    yield put(updateWorkInProgressItem(editedItem.id, ITEM_REVIEW_MODE));
+    yield put(updateWorkInProgressItem(editedItem.id, ITEM_MODE.REVIEW));
   } catch (error) {
     console.log(error);
     yield put(

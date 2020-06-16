@@ -13,6 +13,14 @@ const ArrowIcon = styled(Icon)`
   cursor: ${({ disabled }) => (disabled ? 'default' : 'pointer')};
 `;
 
+const ArrowLeftIcon = styled(ArrowIcon)`
+  transform: rotate(90deg);
+`;
+
+const ArrowRightIcon = styled(ArrowIcon)`
+  transform: rotate(-90deg);
+`;
+
 const ArrowsWrapper = styled.div`
   display: flex;
   align-items: center;
@@ -107,13 +115,13 @@ class Carousel extends Component {
     return (
       <Wrapper className={className}>
         <ArrowsWrapper>
-          <ArrowIcon
-            name="arrow-left-big"
+          <ArrowLeftIcon
+            name="arrow-triangle"
             disabled={isLeftArrowDisabled}
             onClick={this.handleClickShift(LEFT_DIRECTION)}
           />
-          <ArrowIcon
-            name="arrow-right-big"
+          <ArrowRightIcon
+            name="arrow-triangle"
             disabled={isRightArrowDisabled}
             onClick={this.handleClickShift(RIGHT_DIRECTION)}
           />

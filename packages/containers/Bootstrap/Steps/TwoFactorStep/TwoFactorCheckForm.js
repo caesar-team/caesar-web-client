@@ -1,6 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
-import { Formik, FastField } from 'formik';
+import { useFormik } from 'formik';
 import {
   AuthTitle,
   AuthDescription,
@@ -37,8 +37,7 @@ const Error = styled.div`
   padding-top: 10px;
   text-align: center;
   font-size: 14px;
-  letter-spacing: 0.4px;
-  color: ${({ theme }) => theme.red};
+  color: ${({ theme }) => theme.color.red};
 `;
 
 const TipWrapper = styled.div`
@@ -66,13 +65,11 @@ const ApplicationDescription = styled.div`
   flex-direction: column;
   font-size: 14px;
   line-height: 1.5;
-  letter-spacing: 0.47px;
 `;
 
 const ApplicationLink = styled.a`
   font-size: 14px;
-  letter-spacing: 0.6px;
-  color: ${({ theme }) => theme.black};
+  color: ${({ theme }) => theme.color.black};
   display: contents;
 `;
 
@@ -88,72 +85,74 @@ const NextButton = styled(Button)`
   margin-top: 60px;
 `;
 
-const TwoFactorCheckForm = ({ onSubmit }) => (
-  <Wrapper>
-    <AuthTitle>Two Factor Authentication</AuthTitle>
-    <AuthDescription>Enter the code</AuthDescription>
-    <TipWrapper>
-      <ImageWrapper>
-        <MobileImage src={MobileImg} />
-      </ImageWrapper>
-      <ApplicationDescription>
-        Please open{' '}
-        <ApplicationLink target="_blank" href={AUTHY_LINK}>
-          Authy
-        </ApplicationLink>{' '}
-        or{' '}
-        <ApplicationLink target="_blank" href={GOOGLE_AUTHENTICATOR_LINK}>
-          Google Authenticator
-        </ApplicationLink>{' '}
-        app on your phone device and enter the code in the field below.
-      </ApplicationDescription>
-    </TipWrapper>
-    <TextWithLines>Enter the 6-digit code from the app</TextWithLines>
-    <Formik
-      key="codeForm"
-      initialValues={initialValues}
-      validationSchema={codeSchema}
-      onSubmit={onSubmit}
-      render={({
-        errors,
-        handleSubmit,
-        isSubmitting,
-        setFieldValue,
-        values,
-      }) => (
-        <Form onSubmit={handleSubmit}>
-          <FastField
-            name="code"
-            render={() => (
-              <CodeInput
-                onChange={value => setFieldValue('code', value, true)}
-                length={CODE_LENGTH}
-                focus
-                disabled={isSubmitting}
-                errors={errors}
-              />
-            )}
-          />
-          <CheckboxWrapper>
-            <FastField
-              name="fpCheck"
-              render={({ field }) => (
-                <Checkbox {...field} checked={field.value}>
-                  Remember device
-                </Checkbox>
-              )}
-            />
-          </CheckboxWrapper>
-          <NextButton
-            htmlType="submit"
-            disabled={isSubmitting || values.code.length !== CODE_LENGTH}
-          >
-            Continue
-          </NextButton>
-        </Form>
-      )}
-    />
-  </Wrapper>
-);
+export const TwoFactorCheckForm = ({ onSubmit }) => {
+  const {
+    touched,
+    values,
+    errors,
+    setFieldValue,
+    setFieldTouched,
+    handleSubmit,
+    isSubmitting,
+  } = useFormik({
+    initialValues,
+    validationSchema: codeSchema,
+    onSubmit,
+  });
 
-export default TwoFactorCheckForm;
+  const handleChangeCheckbox = value => {
+    if (!touched.rememberDevice) {
+      setFieldTouched('rememberDevice');
+    }
+
+    setFieldValue('rememberDevice', value);
+  };
+
+  return (
+    <Wrapper>
+      <AuthTitle>Two Factor Authentication</AuthTitle>
+      <AuthDescription>Enter the code</AuthDescription>
+      <TipWrapper>
+        <ImageWrapper>
+          <MobileImage src={MobileImg} />
+        </ImageWrapper>
+        <ApplicationDescription>
+          Please open{' '}
+          <ApplicationLink target="_blank" href={AUTHY_LINK}>
+            Authy
+          </ApplicationLink>{' '}
+          or{' '}
+          <ApplicationLink target="_blank" href={GOOGLE_AUTHENTICATOR_LINK}>
+            Google Authenticator
+          </ApplicationLink>{' '}
+          app on your phone device and enter the code in the field below.
+        </ApplicationDescription>
+      </TipWrapper>
+      <TextWithLines>Enter the 6-digit code from the app</TextWithLines>
+
+      <Form onSubmit={handleSubmit}>
+        <CodeInput
+          onChange={value => setFieldValue('code', value, true)}
+          length={CODE_LENGTH}
+          focus
+          disabled={isSubmitting}
+          errors={errors}
+        />
+        <CheckboxWrapper>
+          <Checkbox
+            name="rememberDevice"
+            onChange={e => handleChangeCheckbox(e.target.checked)}
+          >
+            Remember device
+          </Checkbox>
+        </CheckboxWrapper>
+        <NextButton
+          htmlType="submit"
+          disabled={isSubmitting || values?.code?.length !== CODE_LENGTH}
+        >
+          Continue
+        </NextButton>
+      </Form>
+    </Wrapper>
+  );
+};

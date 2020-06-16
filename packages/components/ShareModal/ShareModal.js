@@ -2,7 +2,6 @@ import React, { Component, Fragment } from 'react';
 import styled from 'styled-components';
 import copy from 'copy-text-to-clipboard';
 import { Modal, ModalTitle, UserSearchInput } from '@caesar/components';
-import { generateTeamTag } from '@caesar/common/utils/team';
 import { TeamTag } from '../TeamTag';
 import { Section } from '../Section';
 import { TextWithLines } from '../TextWithLines';
@@ -20,8 +19,7 @@ const Wrapper = styled.div`
 const TextWithLinesStyled = styled(TextWithLines)`
   font-size: 14px;
   font-weight: normal;
-  letter-spacing: 0.4px;
-  color: ${({ theme }) => theme.emperor};
+  color: ${({ theme }) => theme.color.emperor};
 `;
 
 const TextWithLinesAbsolute = styled(TextWithLinesStyled)`
@@ -36,7 +34,7 @@ const TeamsWrapper = styled.div`
 
 const CarouselStyled = styled(Carousel)`
   ${Carousel.ArrowsWrapper} {
-    background-color: ${({ theme }) => theme.white};
+    background-color: ${({ theme }) => theme.color.white};
     width: 55px;
     top: 4px;
 
@@ -52,7 +50,7 @@ const TeamTagStyled = styled(TeamTag)`
   ${({ isActive, theme }) =>
     isActive &&
     `
-    border: 1px solid ${theme.gray};
+    border: 1px solid ${theme.color.gray};
   `};
 
   &:last-of-type {
@@ -65,8 +63,7 @@ const SectionStyled = styled(Section)`
 
   ${Section.Name} {
     font-size: 14px;
-    letter-spacing: 0.4px;
-    color: ${({ theme }) => theme.emperor};
+    color: ${({ theme }) => theme.color.emperor};
   }
 `;
 
@@ -75,7 +72,7 @@ const MemberListStyled = styled(MemberList)`
   margin-top: 10px;
 
   ${MemberList.Member} {
-    background-color: ${({ theme }) => theme.lightBlue};
+    background-color: ${({ theme }) => theme.color.lightBlue};
     margin-bottom: 4px;
 
     &:last-of-type {
@@ -203,7 +200,7 @@ class ShareModal extends Component {
         <TeamTagStyled
           isActive={isActive}
           key={id}
-          name={generateTeamTag(title)}
+          name={title}
           onClick={this.handleToggleTeam(id)}
           {...props}
         />

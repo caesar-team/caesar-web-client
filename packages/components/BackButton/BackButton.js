@@ -6,7 +6,6 @@ const StyledButton = styled.button`
   display: inline-flex;
   align-items: center;
   padding: 3px;
-  letter-spacing: inherit;
   background: none;
   border: none;
   cursor: pointer;
@@ -14,7 +13,7 @@ const StyledButton = styled.button`
   outline: none;
 
   &:hover {
-    color: ${({ theme }) => theme.gray};
+    color: ${({ theme }) => theme.color.gray};
   }
 `;
 
@@ -23,9 +22,13 @@ const Text = styled.span`
   font-size: 14px;
 `;
 
+const BackIcon = styled(Icon)`
+  transform: scaleX(-1);
+`;
+
 const BackButton = ({ children, ...props }) => (
   <StyledButton type="button" {...props}>
-    <Icon name="arrow-back" isInButton width={14} height={14} />
+    <BackIcon name="arrow" width={14} height={14} />
     <Text>{children}</Text>
   </StyledButton>
 );

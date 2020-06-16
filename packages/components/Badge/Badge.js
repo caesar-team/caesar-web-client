@@ -7,10 +7,9 @@ const Wrapper = styled.div`
   justify-content: center;
   font-size: 14px;
   line-height: 1.1;
-  letter-spacing: 0.5px;
-  color: ${({ theme }) => theme.gray};
+  color: ${({ theme }) => theme.color.gray};
   border-radius: 10px;
-  border: 1px solid ${({ theme }) => theme.gallery};
+  border: 1px solid ${({ theme }) => theme.color.gallery};
   min-width: 30px;
   padding: 2px 6px 1px;
 `;

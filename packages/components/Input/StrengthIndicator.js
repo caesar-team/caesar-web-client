@@ -14,7 +14,8 @@ const Helpers = styled.div`
 
 const HelperText = styled(({ isActive, ...props }) => <div {...props} />)`
   font-size: 18px;
-  color: ${({ theme, isActive }) => (isActive ? theme.emperor : theme.gallery)};
+  color: ${({ theme, isActive }) =>
+    isActive ? theme.color.emperor : theme.color.gallery};
   margin-bottom: 16px;
 
   &:last-of-type {
@@ -27,7 +28,7 @@ const HelperText = styled(({ isActive, ...props }) => <div {...props} />)`
     height: 10px;
     border-radius: 50%;
     background: ${({ theme, isActive }) =>
-      isActive ? theme.black : theme.gallery};
+      isActive ? theme.color.black : theme.color.gallery};
     display: inline-block;
     margin-right: 10px;
   }

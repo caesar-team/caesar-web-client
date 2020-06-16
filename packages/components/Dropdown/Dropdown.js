@@ -1,6 +1,6 @@
-import React, { Component, cloneElement } from 'react';
+import React, { cloneElement, memo, useState, useRef } from 'react';
+import { useUpdateEffect, useClickAway } from 'react-use';
 import styled from 'styled-components';
-import enhanceWithClickOutside from 'react-click-outside';
 
 const Wrapper = styled.div`
   display: flex;
@@ -12,32 +12,34 @@ const Box = styled.div`
   position: absolute;
   display: flex;
   flex-direction: column;
-  top: calc(100% + 19px);
+  top: ${({ withTriangleAtTop }) =>
+    withTriangleAtTop ? 'calc(100% + 19px)' : 'calc(100% - 1px)'};
   right: 0;
   z-index: 100;
   border-radius: 3px;
-  background-color: ${({ theme }) => theme.white};
-  border: 1px solid ${({ theme }) => theme.gallery};
+  background-color: ${({ theme }) => theme.color.white};
+  border: 1px solid ${({ theme }) => theme.color.gallery};
 
   &::before {
     position: absolute;
     z-index: 1;
-    display: block;
+    display: ${({ withTriangleAtTop }) =>
+      withTriangleAtTop ? 'block' : 'none'};
     width: 15px;
     height: 15px;
     right: 10px;
     top: -7px;
     content: '';
     transform: rotate(45deg);
-    background-color: ${({ theme }) => theme.white};
-    border: 1px solid ${({ theme }) => theme.gallery};
+    background-color: ${({ theme }) => theme.color.white};
+    border: 1px solid ${({ theme }) => theme.color.gallery};
   }
 `;
 
 const OptionsList = styled.div`
   position: relative;
   z-index: 2;
-  background-color: ${({ theme }) => theme.white};
+  background-color: ${({ theme }) => theme.color.white};
   border-radius: 3px;
   overflow: hidden;
 `;
@@ -47,6 +49,11 @@ const Option = styled.button`
   border: none;
   background: none;
   cursor: pointer;
+  transition: background-color 0.2s;
+
+  &:hover {
+    background-color: ${({ theme }) => theme.color.snow};
+  }
 `;
 
 const Button = styled.button`
@@ -54,75 +61,84 @@ const Button = styled.button`
   background-color: transparent;
   outline: none;
   padding: 0;
+  cursor: pointer;
 `;
 
-class DropdownInner extends Component {
-  state = {
-    isOpen: false,
+const DropdownComponent = ({
+  withTriangleAtTop,
+  ButtonElement,
+  name,
+  renderOverlay = Function.prototype,
+  options,
+  optionRender,
+  children,
+  onClick,
+  onToggle,
+  className,
+}) => {
+  const [isOpened, setIsOpened] = useState(false);
+
+  const handleToggle = () => {
+    setIsOpened(!isOpened);
   };
 
-  componentDidUpdate(prevProps, prevState) {
-    const { onToggle } = this.props;
-    if (prevState.isOpen !== this.state.isOpen && onToggle) {
-      onToggle(this.state.isOpen);
-    }
-  }
-
-  handleClick = value => () => {
-    const { name, onClick } = this.props;
-    this.handleToggle();
+  const handleClick = value => () => {
+    handleToggle();
 
     if (onClick) onClick(name, value);
   };
 
-  handleToggle = () => {
-    this.setState(prevState => ({
-      isOpen: !prevState.isOpen,
-    }));
-  };
-
-  handleClickOutside() {
-    this.setState({
-      isOpen: false,
-    });
-  }
-
-  renderOptions() {
-    const { options, optionRender } = this.props;
-
+  const renderOptions = () => {
     return options.map(({ label, value }, index) =>
       optionRender ? (
         cloneElement(optionRender(value, label), {
           key: index,
-          onClick: this.handleClick(value),
+          onClick: handleClick(value),
         })
       ) : (
-        <Option key={index} onClick={this.handleClick(value)}>
+        <Option key={index} onClick={handleClick(value)}>
           {label}
         </Option>
       ),
     );
-  }
+  };
 
-  render() {
-    const { isOpen } = this.state;
-    const { children, options, overlay, className } = this.props;
+  useUpdateEffect(() => {
+    if (onToggle) {
+      onToggle(isOpened);
+    }
+  }, [isOpened]);
 
-    const renderedOptions = options ? this.renderOptions() : overlay;
+  const renderedOptions = options
+    ? renderOptions()
+    : renderOverlay(handleToggle);
 
-    return (
-      <Wrapper>
-        <Button type="button" className={className} onClick={this.handleToggle}>
+  const dropdownRef = useRef(null);
+  useClickAway(dropdownRef, () => {
+    setIsOpened(false);
+  });
+
+  return (
+    <Wrapper ref={dropdownRef} className={className}>
+      {ButtonElement ? (
+        <ButtonElement handleToggle={handleToggle} />
+      ) : (
+        <Button type="button" onClick={handleToggle}>
           {children}
         </Button>
-        {isOpen && (
-          <Box>
-            <OptionsList>{renderedOptions}</OptionsList>
-          </Box>
-        )}
-      </Wrapper>
-    );
-  }
-}
+      )}
+      {isOpened && (
+        <Box withTriangleAtTop={withTriangleAtTop}>
+          <OptionsList>{renderedOptions}</OptionsList>
+        </Box>
+      )}
+    </Wrapper>
+  );
+};
 
-export const Dropdown = enhanceWithClickOutside(DropdownInner);
+const Dropdown = memo(DropdownComponent);
+
+Dropdown.Button = Button;
+Dropdown.Box = Box;
+
+export { Dropdown };

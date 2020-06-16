@@ -14,7 +14,6 @@ const Form = styled.form``;
 const Title = styled.div`
   font-size: 18px;
   font-weight: 600;
-  letter-spacing: 0.6px;
   margin-bottom: 25px;
 `;
 
@@ -37,7 +36,6 @@ const Column = styled.div`
 
 const Label = styled.div`
   font-size: 14px;
-  letter-spacing: 0.4px;
   margin-bottom: 10px;
 `;
 
@@ -45,10 +43,9 @@ const Box = styled.div`
   display: flex;
   font-size: 18px;
   line-height: 18px;
-  letter-spacing: 0.6px;
   border-radius: 3px;
-  border: 1px solid ${({ theme }) => theme.gallery};
-  background-color: ${({ theme }) => theme.snow};
+  border: 1px solid ${({ theme }) => theme.color.gallery};
+  background-color: ${({ theme }) => theme.color.snow};
   position: relative;
   padding: 10px 15px;
   margin-bottom: 10px;
@@ -78,8 +75,7 @@ const BottomWrapper = styled.div`
 
 const RequiredText = styled.div`
   font-size: 14px;
-  letter-spacing: 0.4px;
-  color: ${({ theme }) => theme.gray};
+  color: ${({ theme }) => theme.color.gray};
   position: relative;
   padding-left: 20px;
 
@@ -89,12 +85,12 @@ const RequiredText = styled.div`
     top: 0;
     left: 6px;
     line-height: 6px;
-    color: ${({ theme }) => theme.black};
+    color: ${({ theme }) => theme.color.black};
   }
 `;
 
 const StyledSelect = styled(Select)`
-  border: 1px solid ${({ theme }) => theme.gallery};
+  border: 1px solid ${({ theme }) => theme.color.gallery};
   margin-bottom: 10px;
   font-size: 18px;
   line-height: 18px;
@@ -129,13 +125,8 @@ const FieldsStep = ({ headings, initialValues, onSubmit, onCancel }) => (
     isInitialValid={schema.isValidSync({ ...defaultValues, ...initialValues })}
     onSubmit={onSubmit}
     validationSchema={schema}
-    render={({
-      values,
-      setFieldValue,
-      handleSubmit,
-      isSubmitting,
-      isValid,
-    }) => (
+  >
+    {({ values, setFieldValue, handleSubmit, isSubmitting, isValid }) => (
       <Wrapper>
         <Form onSubmit={handleSubmit}>
           <Title>Match the fields in Caesar with the fields in your file</Title>
@@ -201,7 +192,7 @@ const FieldsStep = ({ headings, initialValues, onSubmit, onCancel }) => (
         </Form>
       </Wrapper>
     )}
-  />
+  </Formik>
 );
 
 export default FieldsStep;

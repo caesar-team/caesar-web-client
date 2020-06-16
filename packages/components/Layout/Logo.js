@@ -1,6 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
 import Link from 'next/link';
+import { IS_SECURE_APP } from '@caesar/common/constants';
 import { Icon } from '../Icon';
 
 const LogoLink = styled.a`
@@ -12,18 +13,23 @@ const LogoLink = styled.a`
   }
 `;
 
-const DEFAULT_LOGO_WIDTH = 106;
-const DEFAULT_LOGO_HEIGHT = 30;
+const DEFAULT_LOGO_WIDTH = 102;
+const DEFAULT_LOGO_HEIGHT = 32;
 
 export const Logo = ({
   href,
-  iconName = 'logo-new',
+  iconName = 'logo-caesar-4xxi',
   width = DEFAULT_LOGO_WIDTH,
   height = DEFAULT_LOGO_HEIGHT,
-}) => (
-  <Link passHref href={href}>
-    <LogoLink>
-      <Icon name={iconName} width={width} height={height} />
+}) =>
+  IS_SECURE_APP ? (
+    <LogoLink href={href}>
+      <Icon name={iconName} width={width} height={height} color="black" />
     </LogoLink>
-  </Link>
-);
+  ) : (
+    <Link passHref href={href}>
+      <LogoLink>
+        <Icon name={iconName} width={width} height={height} color="black" />
+      </LogoLink>
+    </Link>
+  );

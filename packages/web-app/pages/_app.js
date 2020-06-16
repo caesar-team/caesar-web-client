@@ -4,7 +4,6 @@ import { default as NextApp } from 'next/app';
 import { ThemeProvider, createGlobalStyle } from 'styled-components';
 import '@caesar/assets/styles/additionalStyles';
 import globalStyles from '@caesar/assets/styles/globalStyles';
-import { entryResolver } from '@caesar/common/utils/entryResolver';
 import theme from '@caesar/common/theme';
 import { Provider } from 'react-redux';
 import withRedux from 'next-redux-wrapper';
@@ -23,7 +22,7 @@ const GlobalStyles = createGlobalStyle`${globalStyles}`;
 
 class Application extends NextApp {
   static async getInitialProps({ Component, router: { route }, ctx }) {
-    entryResolver({ route, ctx });
+    // entryResolver({ route, ctx });
 
     const pageProps =
       Component.getInitialProps && UNLOCKED_ROUTES.includes(route)
@@ -68,6 +67,7 @@ class Application extends NextApp {
             <NotificationProvider>
               <GlobalStyles />
               <Component {...pageProps} />
+              <OfflineNotification />
             </NotificationProvider>
           </OfflineDetectionProvider>
         </ThemeProvider>

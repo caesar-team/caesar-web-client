@@ -1,15 +1,16 @@
+// TODO: Rewrite all this requests with fetch 'packages/common/fetch.js'
+import Router from 'next/router';
 import axios from 'axios';
 import { removeCookieValue } from './utils/token';
-import { API_URI, API_BASE_PATH, IS_EXTENSION_APP } from './constants';
+import { API_URI, API_BASE_PATH, IS_EXTENSION_APP, ROUTES } from './constants';
 import { isClient } from './utils/isEnvironment';
 
 const softExit = () => {
   if (isClient) {
     removeCookieValue('token');
 
-    // TODO: change via Router
-    if (window.location.pathname !== '/signin') {
-      window.location.href = '/signin';
+    if (Router.router.pathname !== ROUTES.SIGN_IN) {
+      Router.push(ROUTES.SIGN_IN);
     }
   }
 };
@@ -26,7 +27,13 @@ callApi.interceptors.response.use(
     if (error.response) {
       switch (error.response.status) {
         case 401:
-          if (!IS_EXTENSION_APP) softExit();
+          if (
+            !IS_EXTENSION_APP &&
+            error.response.config.url !== '/auth/2fa' &&
+            error.response.config.url !== '/auth/2fa/activate'
+          ) {
+            softExit();
+          }
           break;
         default:
           // console.log(error.response.data);
@@ -160,8 +167,6 @@ export const patchAcceptItem = data => callApi.patch('/accept_item', data);
 
 export const patchResetPassword = (token, data) =>
   callApi.patch(`/auth/srpp/reset/${token}`, data);
-
-export const postSecureMessage = data => callApi.post('/message', data);
 
 export const getSecureMessage = id => callApi.get(`/message/${id}`);
 

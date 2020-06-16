@@ -14,8 +14,7 @@ const List = styled.div`
 const ListName = styled.div`
   font-size: 16px;
   font-weight: ${({ isActive }) => (isActive ? 600 : 400)};
-  letter-spacing: 0.5px;
-  color: ${({ theme }) => theme.black};
+  color: ${({ theme }) => theme.color.black};
 `;
 
 const NameAndIconWrapper = styled.div`
@@ -28,9 +27,8 @@ const ListDetails = styled.div`
   justify-content: space-between;
   align-items: center;
   font-size: 16px;
-  letter-spacing: 0.5px;
-  color: ${({ theme }) => theme.black};
-  border-bottom: 1px solid ${({ theme }) => theme.gallery};
+  color: ${({ theme }) => theme.color.black};
+  border-bottom: 1px solid ${({ theme }) => theme.color.gallery};
   max-height: 40px;
   min-height: 40px;
 `;
@@ -42,7 +40,7 @@ const Item = styled.div`
   cursor: pointer;
   max-height: 40px;
   min-height: 40px;
-  border-bottom: 1px solid ${({ theme }) => theme.gallery};
+  border-bottom: 1px solid ${({ theme }) => theme.color.gallery};
 `;
 
 const ItemType = styled.div`
@@ -51,7 +49,7 @@ const ItemType = styled.div`
   align-items: center;
   width: 24px;
   height: 24px;
-  background: ${({ theme }) => theme.black};
+  background: ${({ theme }) => theme.color.black};
   margin-right: 16px;
 `;
 
@@ -61,8 +59,7 @@ const ItemName = styled.div`
   padding: 10px 0;
   font-size: 16px;
   font-weight: ${({ isActive }) => (isActive ? 600 : 400)};
-  letter-spacing: 0.5px;
-  color: ${({ theme }) => theme.black};
+  color: ${({ theme }) => theme.color.black};
 `;
 
 const ItemsWrapper = styled.div`
@@ -72,6 +69,11 @@ const ItemsWrapper = styled.div`
 
 const StyledIcon = styled(Icon)`
   margin-right: 16px;
+`;
+
+const ArrowIcon = styled(Icon)`
+  transform: ${({ isActive }) => (isActive ? 'scaleY(-1)' : 'scaleY(1)')};
+  transition: transform 0.2s;
 `;
 
 const ListOption = ({
@@ -99,8 +101,6 @@ const ListOption = ({
     );
   });
 
-  const iconName = isActive ? 'arrow-up-small' : 'arrow-down-small';
-
   return (
     <List key={list.id} onClick={onClickList(list.id)}>
       <ListDetails>
@@ -112,7 +112,12 @@ const ListOption = ({
         ) : (
           <ListName isActive={isActive}>{upperFirst(list.label)}</ListName>
         )}
-        <Icon name={iconName} width={10} height={6} />
+        <ArrowIcon
+          name="arrow-triangle"
+          width={10}
+          height={6}
+          isActive={isActive}
+        />
       </ListDetails>
       {isActive && <ItemsWrapper>{renderedItems}</ItemsWrapper>}
     </List>

@@ -5,11 +5,11 @@ import Input from './Input';
 import Icon from '../Icon/Icon';
 
 const StyledIcon = styled(Icon)`
-  fill: ${({ theme }) => theme.gray};
+  fill: ${({ theme }) => theme.color.gray};
 `;
 
 const StyledInput = styled(Input)`
-  border: 1px solid ${({ theme }) => theme.gallery};
+  border: 1px solid ${({ theme }) => theme.color.gallery};
   padding-left: 35px;
 
   ${Input.InputField} {
@@ -67,7 +67,7 @@ class ShareInput extends Component {
         {...this.props}
         value={value}
         placeholder="Enter email addresses"
-        prefix={<StyledIcon name="at" width={18} height={18} />}
+        prefix={<StyledIcon name="email" width={18} height={18} />}
         onChange={this.handleChange}
         onBlur={this.handleBlur}
         onKeyDown={this.handleKeyDown}

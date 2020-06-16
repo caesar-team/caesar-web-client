@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import styled from 'styled-components';
 import { KEY_CODES } from '@caesar/common/constants';
+import { media } from '@caesar/assets/styles/media';
 import Input from './Input';
 import { Icon } from '../Icon';
 
@@ -14,8 +15,12 @@ const InnerWrapper = styled.div`
   align-items: center;
   height: 60px;
   border-radius: 3px;
-  background-color: ${({ theme }) => theme.darkGray};
+  background-color: ${({ theme }) => theme.color.darkGray};
   min-width: 400px;
+
+  ${media.mobile`
+    min-width: 288px;
+  `}
 `;
 
 const IconWrapper = styled.div`
@@ -27,23 +32,25 @@ const IconWrapper = styled.div`
 `;
 
 const StyledIcon = styled(Icon)`
-  fill: ${({ isError, theme }) => (isError ? theme.red : theme.white)};
+  fill: ${({ isError, theme }) =>
+    isError ? theme.color.red : theme.color.white};
 `;
 
 const StyledArrowIcon = styled(Icon)`
-  fill: ${({ theme }) => theme.lightGray};
+  fill: ${({ theme }) => theme.color.lightGray};
   margin-right: 24px;
   cursor: pointer;
 
   &:hover {
-    fill: ${({ theme }) => theme.white};
+    fill: ${({ theme }) => theme.color.white};
   }
 `;
 
 const StyledInput = styled(Input)`
   ${Input.InputField} {
-    color: ${({ theme, isError }) => (isError ? theme.red : theme.white)};
-    background-color: ${({ theme }) => theme.darkGray};
+    color: ${({ theme, isError }) =>
+      isError ? theme.color.red : theme.color.white};
+    background-color: transparent;
     height: 58px;
     width: 100%;
     padding-right: 20px;
@@ -67,7 +74,7 @@ class LockInput extends Component {
       <Wrapper>
         <InnerWrapper isError={isError}>
           <IconWrapper isError={isError}>
-            <StyledIcon name="lock" width={20} height={24} isError={isError} />
+            <StyledIcon name="lock" width={24} height={24} isError={isError} />
           </IconWrapper>
           <StyledInput
             {...props}
@@ -76,9 +83,9 @@ class LockInput extends Component {
             type="password"
           />
           <StyledArrowIcon
-            name="arrow-next"
-            width={16}
-            height={16}
+            name="arrow"
+            width={20}
+            height={20}
             onClick={onClick}
           />
         </InnerWrapper>

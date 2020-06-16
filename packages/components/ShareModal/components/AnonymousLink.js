@@ -14,7 +14,7 @@ const AnonymousLinkWrapper = styled.div`
   display: flex;
   flex-direction: column;
   border-radius: 3px;
-  background-color: ${({ theme }) => theme.snow};
+  background-color: ${({ theme }) => theme.color.snow};
   padding: 10px 20px;
 `;
 
@@ -25,8 +25,8 @@ const ToggleWrapper = styled.div`
 
 const ToggleLabel = styled.div`
   font-size: 14px;
-  letter-spacing: 0.4px;
-  color: ${({ isActive, theme }) => (isActive ? theme.black : theme.gray)};
+  color: ${({ isActive, theme }) =>
+    isActive ? theme.color.black : theme.color.gray};
   margin-left: 20px;
 `;
 
@@ -44,16 +44,15 @@ const LinkWrapper = styled.div`
   justify-content: space-between;
   height: 40px;
   border-radius: 3px;
-  border: solid 1px ${({ theme }) => theme.gallery};
-  background-color: ${({ theme }) => theme.white};
+  border: solid 1px ${({ theme }) => theme.color.gallery};
+  background-color: ${({ theme }) => theme.color.white};
   padding: 10px 20px;
   width: 100%;
 `;
 
 const LinkText = styled.div`
   font-size: 14px;
-  letter-spacing: 0.4px;
-  color: ${({ theme }) => theme.emperor};
+  color: ${({ theme }) => theme.color.emperor};
   text-overflow: ellipsis;
   white-space: nowrap;
   overflow: hidden;
@@ -64,10 +63,11 @@ const UpdateIcon = styled(Icon)`
   width: 20px;
   height: 20px;
   cursor: pointer;
-  fill: ${({ theme }) => theme.emperor};
+  fill: ${({ theme }) => theme.color.emperor};
 
   &:hover {
-    fill: ${({ disabled, theme }) => (disabled ? theme.emperor : theme.black)};
+    fill: ${({ disabled, theme }) =>
+      disabled ? theme.color.emperor : theme.color.black};
   }
 `;
 

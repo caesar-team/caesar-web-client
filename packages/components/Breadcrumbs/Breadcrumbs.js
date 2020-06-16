@@ -4,18 +4,18 @@ import styled from 'styled-components';
 const Wrapper = styled.div`
   display: flex;
   align-items: center;
-  background-color: ${({ theme }) => theme.white};
+  background-color: ${({ theme }) => theme.color.white};
 `;
 
 const Item = styled.div`
   font-size: 16px;
-  letter-spacing: 0.5px;
-  color: ${({ isFirst, theme }) => (isFirst ? theme.black : theme.gray)};
+  color: ${({ isFirst, theme }) =>
+    isFirst ? theme.color.black : theme.color.gray};
 
   &:after {
     content: '—';
     margin: 0 8px;
-    color: ${({ theme }) => theme.gallery};
+    color: ${({ theme }) => theme.color.gallery};
   }
 `;
 

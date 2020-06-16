@@ -4,7 +4,7 @@ import styled from 'styled-components';
 const getTabStyles = ({ isActive, theme }) => {
   if (isActive) {
     return `
-      background: ${theme.white};
+      background: ${theme.color.white};
     `;
   }
 
@@ -14,7 +14,7 @@ const getTabStyles = ({ isActive, theme }) => {
 };
 
 const StyledTab = styled.li`
-  background-color: ${({ theme }) => theme.white};
+  background-color: ${({ theme }) => theme.color.white};
   display: inline-block;
   outline: 0;
   margin-bottom: -1px;
@@ -22,7 +22,7 @@ const StyledTab = styled.li`
   cursor: pointer;
   border-radius: 3px;
   background: ${({ isActive, theme }) =>
-    isActive ? theme.white : 'transparent'};
+    isActive ? theme.color.white : 'transparent'};
 
   &:not(:first-child) {
     border-left: none;

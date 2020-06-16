@@ -63,16 +63,16 @@ const IconStyled = styled(Icon)`
 `;
 
 const SearchedResultBox = styled.div`
+  position: absolute;
+  top: 47px;
+  z-index: ${({ theme }) => theme.z.basic};
   display: flex;
   flex-direction: column;
+  width: 100%;
+  max-height: 400px;
   background-color: ${({ theme }) => theme.color.white};
   border: 1px solid ${({ theme }) => theme.color.gallery};
   border-top: none;
-  max-height: 400px;
-  position: absolute;
-  z-index: 11;
-  top: 47px;
-  width: 100%;
 `;
 
 const IconWrapper = styled.div`

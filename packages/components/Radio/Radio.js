@@ -30,12 +30,12 @@ const RadioIcon = styled.div`
   position: absolute;
   top: 3px;
   left: 3px;
+  z-index: ${({ theme }) => theme.z.basic};
   width: 14px;
   height: 14px;
   background-color: ${({ theme, checked }) =>
     checked ? theme.color.black : theme.color.white};
   border-radius: 50%;
-  z-index: 1;
 `;
 
 const StyledInput = styled.input`

@@ -4,6 +4,7 @@ import equal from 'fast-deep-equal';
 import styled from 'styled-components';
 import Link from 'next/link';
 import { logout } from '@caesar/common/actions/user';
+import { ROUTES } from '@caesar/common/constants';
 import { Icon } from '../Icon';
 import { Dropdown } from '../Dropdown';
 import { SearchInput } from '../Input';
@@ -107,7 +108,7 @@ const PrimaryHeaderComponent = ({
   const Options = (
     <>
       <Option key="settings">
-        <Link href="/settings/manage">
+        <Link href={ROUTES.SETTINGS + ROUTES.TEAM}>
           <Anchor>Settings</Anchor>
         </Link>
       </Option>

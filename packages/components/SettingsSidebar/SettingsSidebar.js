@@ -1,6 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
 import { withRouter } from 'next/router';
+import { ROUTES } from '@caesar/common/constants';
 import { Link } from '@caesar/components';
 
 const Wrapper = styled.div`
@@ -25,9 +26,8 @@ const StyledLink = styled(Link)`
 `;
 
 const LINKS = [
-  { link: '/settings/manage', name: 'Lists' },
-  { link: '/settings/import', name: 'Import' },
-  { link: '/settings/team', name: 'Teams' },
+  { link: ROUTES.SETTINGS + ROUTES.TEAM, name: 'Teams' },
+  { link: ROUTES.SETTINGS + ROUTES.IMPORT, name: 'Import' },
 ];
 
 const SettingsSidebar = ({ router: { route } }) => {

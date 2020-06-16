@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import Link from 'next/link';
 import memoizeOne from 'memoize-one';
 import { Button, AvatarsList, Can } from '@caesar/components';
-import { DELETE_PERMISSION } from '@caesar/common/constants';
+import { DELETE_PERMISSION, ROUTES } from '@caesar/common/constants';
 
 const Wrapper = styled.div`
   display: flex;
@@ -77,7 +77,11 @@ const TeamCard = ({
 
   return (
     <Wrapper className={className} onClick={onClick}>
-      <Link key={id} href="/settings/team/[id]" as={`/settings/team/${id}`}>
+      <Link
+        key={id}
+        href={`${ROUTES.SETTINGS}${ROUTES.TEAM}/[id]`}
+        as={`${ROUTES.SETTINGS}${ROUTES.TEAM}/${id}`}
+      >
         <TeamWrapper>
           <TeamDetails>
             <TeamIcon src={icon} />

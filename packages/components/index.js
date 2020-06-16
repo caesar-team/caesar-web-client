@@ -57,14 +57,12 @@ export {
   FullScreenLoader,
   LogoLoader,
 } from './Loader';
-export { ManageList } from './ManageList';
 export { MemberList } from './MemberList';
 export { MenuList } from './MenuList';
 export { Modal } from './Modal';
 export { ModalTitle } from './ModalTitle';
 // export { MoveModal } from './MoveModal';
 export { NavigationPanel } from './NavigationPanel';
-export { NewListModal } from './NewListModal';
 export { NewTeamModal } from './NewTeamModal'; // Delete ??
 export {
   GlobalNotification,

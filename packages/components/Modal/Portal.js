@@ -7,33 +7,33 @@ import { Overlay } from './Overlay';
 
 const CloseButton = styled.button`
   position: absolute;
-  top: 20px;
-  right: 20px;
+  top: 16px;
+  right: 16px;
   padding: 0;
-  cursor: pointer;
   background: none;
   border: none;
-  transition: 0.35s;
   outline: none;
-
-  &:hover {
-    opacity: 0.75;
-  }
+  cursor: pointer;
 `;
 
-const StyledIcon = styled(Icon)`
-  fill: ${({ theme }) => theme.color.gray};
+const CloseIcon = styled(Icon)`
+  color: ${({ theme }) => theme.color.gray};
+  transition: color 0.2s;
+
+  &:hover {
+    color: ${({ theme }) => theme.color.black};
+  }
 `;
 
 const ContentWrapper = styled.div`
   position: absolute;
   top: 50%;
   left: 50%;
-  transform: translate(-50%, -50%);
+  padding: 40px;
   background: ${({ theme }) => theme.color.white};
-  border-radius: 3px;
+  border-radius: 4px;
+  transform: translate(-50%, -50%);
   outline: none;
-  padding: 30px 40px 40px;
 
   ${({ width }) => width && `width: ${width}px`};
 `;
@@ -160,8 +160,7 @@ class Portal extends Component {
     this.shouldClose = false;
   };
 
-  requestClose = event =>
-    this.props.onRequestClose && this.props.onRequestClose();
+  requestClose = () => this.props.onRequestClose && this.props.onRequestClose();
 
   afterClose = () => {
     const { bodyOpenClassName } = this.props;
@@ -201,7 +200,7 @@ class Portal extends Component {
           {...props}
         >
           <CloseButton onClick={this.handleClickCloseButton}>
-            <StyledIcon name="close" width="20" height="20" />
+            <CloseIcon name="close" width="12" height="12" />
           </CloseButton>
           {children}
         </ContentWrapper>

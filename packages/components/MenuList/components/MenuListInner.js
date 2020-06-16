@@ -1,5 +1,6 @@
 import React, { memo, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
+import { DragDropContext, Droppable } from 'react-beautiful-dnd';
 import styled from 'styled-components';
 import { DASHBOARD_MODE } from '@caesar/common/constants';
 import { currentTeamSelector } from '@caesar/common/selectors/user';
@@ -13,11 +14,20 @@ import {
   setWorkInProgressListId,
   resetWorkInProgressItemIds,
 } from '@caesar/common/actions/workflow';
-import { Icon } from '../Icon';
+import { sortListRequest } from '@caesar/common/actions/entities/list';
+import { Icon } from '../../Icon';
+import { ListItem } from './ListItem';
+import { MenuItemInner } from './styledComponents';
+
+const MenuItem = styled.div``;
+
+const MenuItemTitle = styled.div`
+  padding-left: 16px;
+  margin-right: auto;
+`;
 
 const ListAddIcon = styled(Icon)`
   margin-right: 16px;
-  margin-left: auto;
   transform: ${({ isListsOpened }) =>
     isListsOpened ? 'scaleY(-1)' : 'scaleY(1)'};
   transition: transform 0.2s;
@@ -29,47 +39,19 @@ const ListAddIcon = styled(Icon)`
   }
 `;
 
-const MenuItem = styled.div``;
-
-const MenuItemInner = styled.div`
-  display: flex;
-  justify-content: flex-start;
-  align-items: center;
-  padding: 7px 24px;
-  font-weight: ${({ fontWeight, isActive }) =>
-    isActive ? 600 : fontWeight || 400};
-  color: ${({ isActive, theme }) =>
-    isActive ? theme.color.black : theme.color.emperor};
-  background-color: ${({ isActive, theme }) =>
-    isActive ? theme.color.snow : theme.color.white};
-  border-top: 1px solid transparent;
-  border-bottom: 1px solid transparent;
-  cursor: pointer;
-  transition: all 0.2s;
-
-  ${({ isActive, theme }) =>
-    isActive &&
-    `
-      border-top-color: ${theme.color.gallery};
-      border-bottom-color: ${theme.color.gallery};
-    `}
-
+const StyledMenuItemInner = styled(MenuItemInner)`
   &:hover {
-    background-color: ${({ withChildren, theme }) =>
-      !withChildren && theme.color.snow};
-    border-top-color: ${({ withChildren, theme }) =>
-      !withChildren && theme.color.gallery};
-    border-bottom-color: ${({ withChildren, theme }) =>
-      !withChildren && theme.color.gallery};
+    background-color: ${({ withChildren, isEdit, theme }) =>
+      !withChildren && !isEdit && theme.color.snow};
+    border-top-color: ${({ withChildren, isEdit, theme }) =>
+      !withChildren && !isEdit && theme.color.gallery};
+    border-bottom-color: ${({ withChildren, isEdit, theme }) =>
+      !withChildren && !isEdit && theme.color.gallery};
 
     ${ListAddIcon} {
       opacity: 1;
     }
   }
-`;
-
-const MenuItemTitle = styled.div`
-  padding-left: ${({ withIcon }) => (withIcon ? '16px' : '0')};
 `;
 
 const ListToggleIcon = styled(Icon)`
@@ -78,13 +60,15 @@ const ListToggleIcon = styled(Icon)`
   transition: transform 0.2s;
 `;
 
-const ListItem = styled(MenuItemInner)`
-  padding: 7px 24px 7px 56px;
-`;
-
 const SECURE_MESSAGE_MODE = 'SECURE_MESSAGE_MODE';
 
-const MenuListInnerComponent = ({ mode, setSearchedText, setMode }) => {
+const MenuListInnerComponent = ({
+  mode,
+  setSearchedText,
+  setMode,
+  isListsOpened,
+  setIsListsOpened,
+}) => {
   const dispatch = useDispatch();
   const currentTeam = useSelector(currentTeamSelector);
   const isPersonal = !currentTeam;
@@ -92,7 +76,7 @@ const MenuListInnerComponent = ({ mode, setSearchedText, setMode }) => {
   const teamLists = useSelector(currentTeamListsSelector);
   const workInProgressList = useSelector(workInProgressListSelector);
   const activeListId = workInProgressList && workInProgressList.id;
-  const [isListsOpened, setIsListsOpened] = useState(true);
+  const [isCreatingMode, setIsCreatingMode] = useState(false);
 
   const handleClickMenuItem = id => {
     dispatch(setWorkInProgressListId(id));
@@ -108,6 +92,27 @@ const MenuListInnerComponent = ({ mode, setSearchedText, setMode }) => {
 
     setMode(DASHBOARD_MODE.TOOL);
     setSearchedText('');
+  };
+
+  const handleClickAddList = event => {
+    event.stopPropagation();
+    setIsListsOpened(true);
+    setIsCreatingMode(true);
+  };
+
+  const handleDragEnd = ({ draggableId, source, destination }) => {
+    if (!destination) {
+      return;
+    }
+
+    if (
+      destination.droppableId === source.droppableId &&
+      destination.index === source.index
+    ) {
+      return;
+    }
+
+    dispatch(sortListRequest(draggableId, source.index, destination.index));
   };
 
   const menuList = [
@@ -145,33 +150,40 @@ const MenuListInnerComponent = ({ mode, setSearchedText, setMode }) => {
     },
   ];
 
-  return menuList.map(
-    ({ id, icon, title, children }) =>
+  return menuList.map(({ id, icon, title, children }) => {
+    const withChildren = id === 'lists';
+
+    return (
       id && (
         <MenuItem key={id || title}>
-          <MenuItemInner
+          <StyledMenuItemInner
             isActive={
               id === SECURE_MESSAGE_MODE
                 ? mode === SECURE_MESSAGE_MODE
                 : activeListId === id
             }
             fontWeight={id === SECURE_MESSAGE_MODE ? 600 : 400}
-            withChildren={children}
+            withChildren={withChildren}
             onClick={() => {
               if (id === SECURE_MESSAGE_MODE) {
                 return handleClickSecureMessage();
               }
 
-              return children
+              return withChildren
                 ? setIsListsOpened(!isListsOpened)
                 : handleClickMenuItem(id);
             }}
           >
             <Icon name={icon} width={16} height={16} />
-            <MenuItemTitle withIcon>{title}</MenuItemTitle>
-            {children && (
+            <MenuItemTitle>{title}</MenuItemTitle>
+            {withChildren && (
               <>
-                <ListAddIcon name="plus" width={16} height={16} />
+                <ListAddIcon
+                  name="plus"
+                  width={16}
+                  height={16}
+                  onClick={handleClickAddList}
+                />
                 <ListToggleIcon
                   name="arrow-triangle"
                   width={16}
@@ -180,19 +192,45 @@ const MenuListInnerComponent = ({ mode, setSearchedText, setMode }) => {
                 />
               </>
             )}
-          </MenuItemInner>
-          {isListsOpened &&
-            children?.map(({ id: listId, label }) => (
-              <ListItem
-                key={listId}
-                onClick={() => handleClickMenuItem(listId)}
-              >
-                {label}
-              </ListItem>
-            ))}
+          </StyledMenuItemInner>
+          {isListsOpened && (
+            <>
+              {id === 'lists' && isCreatingMode && (
+                <ListItem
+                  isCreatingMode={isCreatingMode}
+                  setIsCreatingMode={setIsCreatingMode}
+                />
+              )}
+              {children && (
+                <DragDropContext onDragEnd={handleDragEnd}>
+                  <Droppable
+                    droppableId="droppable"
+                    type="lists"
+                    key={children.length}
+                  >
+                    {provided => (
+                      <div ref={provided.innerRef} {...provided.droppableProps}>
+                        {children.map((item, index) => (
+                          <ListItem
+                            key={item.id}
+                            item={item}
+                            activeListId={activeListId}
+                            index={index}
+                            handleClickMenuItem={handleClickMenuItem}
+                          />
+                        ))}
+                        {provided.placeholder}
+                      </div>
+                    )}
+                  </Droppable>
+                </DragDropContext>
+              )}
+            </>
+          )}
         </MenuItem>
-      ),
-  );
+      )
+    );
+  });
 };
 
 export const MenuListInner = memo(MenuListInnerComponent);

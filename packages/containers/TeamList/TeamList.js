@@ -193,7 +193,7 @@ class TeamListContainer extends Component {
         <ConfirmModal
           isOpen={modalVisibilities[REMOVE_TEAM_MODAL]}
           description="Are you sure you want to remove team?"
-          onClickOk={this.handleRemoveTeam}
+          onClickConfirm={this.handleRemoveTeam}
           onClickCancel={this.handleCloseModal(REMOVE_TEAM_MODAL)}
         />
       </Wrapper>

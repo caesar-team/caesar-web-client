@@ -2,6 +2,7 @@ import React from 'react';
 import styled from 'styled-components';
 import { Modal } from '../Modal';
 import { Button } from '../Button';
+import { Icon } from '../Icon';
 
 const Wrapper = styled.div`
   display: flex;
@@ -13,37 +14,15 @@ const Header = styled.div`
   align-items: center;
 `;
 
-const Icon = styled.div`
-  position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 18px;
-  height: 18px;
-  background-color: ${({ theme }) => theme.color.black};
-  border-radius: 50%;
-
-  &:before {
-    content: '!';
-    position: absolute;
-    color: ${({ theme }) => theme.color.white};
-    top: -2px;
-    left: 6px;
-  }
-`;
-
 const Title = styled.div`
-  font-size: 18px;
-  color: ${({ theme }) => theme.color.black};
-  margin-left: 10px;
+  margin-left: 16px;
+  font-weight: 600;
   text-transform: uppercase;
 `;
 
 const Description = styled.div`
-  font-size: 18px;
   color: ${({ theme }) => theme.color.emperor};
-  margin-top: 26px;
-  margin-bottom: 35px;
+  margin: 16px 0;
 `;
 
 const ButtonsWrapper = styled.div`
@@ -59,7 +38,9 @@ const ConfirmModal = ({
   isOpen,
   title = 'Warning',
   description,
-  onClickOk,
+  icon,
+  confirmBtnText = 'Confirm',
+  onClickConfirm,
   onClickCancel,
 }) => (
   <Modal
@@ -70,16 +51,16 @@ const ConfirmModal = ({
   >
     <Wrapper>
       <Header>
-        <Icon />
+        <Icon name="warning" width={20} height={20} color="black" />
         <Title>{title}</Title>
       </Header>
       <Description>{description}</Description>
       <ButtonsWrapper>
         <StyledButton color="white" onClick={onClickCancel}>
-          CANCEL
+          Cancel
         </StyledButton>
-        <Button icon="trash" onClick={onClickOk}>
-          REMOVE
+        <Button icon={icon} onClick={onClickConfirm}>
+          {confirmBtnText}
         </Button>
       </ButtonsWrapper>
     </Wrapper>

@@ -1,7 +1,11 @@
 import React, { memo, useState } from 'react';
 import { useSelector } from 'react-redux';
 import styled from 'styled-components';
-import { APP_VERSION, TEAM_TYPE } from '@caesar/common/constants';
+import {
+  APP_VERSION,
+  TEAM_TYPE,
+  TEAM_TEXT_TYPE,
+} from '@caesar/common/constants';
 import {
   userDataSelector,
   currentTeamSelector,
@@ -22,11 +26,14 @@ const StyledDropdown = styled(Dropdown)`
 `;
 
 const ColumnHeader = styled.div`
+  position: relative;
+  z-index: ${({ theme }) => theme.z.dropdown};
   display: flex;
   align-items: center;
   height: 56px;
   padding: 8px 24px;
-  background-color: ${({ theme }) => theme.color.alto};
+  background-color: ${({ bgColor, theme }) =>
+    bgColor ? theme.color[bgColor] : theme.color.alto};
   border-bottom: 1px solid ${({ theme }) => theme.color.gallery};
 `;
 
@@ -68,6 +75,17 @@ const MenuListComponent = ({ mode, setSearchedText, setMode }) => {
     setIsDropdownOpened(isOpened);
   };
 
+  const getColumnTitle = () => {
+    switch (true) {
+      case activeTeamId === TEAM_TYPE.PERSONAL:
+        return TEAM_TEXT_TYPE[TEAM_TYPE.PERSONAL];
+      case teamList[activeTeamId].title.toLowerCase() === TEAM_TYPE.DEFAULT:
+        return TEAM_TEXT_TYPE[TEAM_TYPE.DEFAULT];
+      default:
+        return teamList[activeTeamId].title;
+    }
+  };
+
   return (
     <>
       <StyledDropdown
@@ -80,13 +98,9 @@ const MenuListComponent = ({ mode, setSearchedText, setMode }) => {
         )}
         onToggle={handleToggleDropdown}
       >
-        <ColumnHeader>
+        <ColumnHeader bgColor={isDropdownOpened ? 'white' : 'alto'}>
           <Avatar avatar={teamList[activeTeamId]?.icon} {...user} isSmall />
-          <ColumnTitle>
-            {activeTeamId !== TEAM_TYPE.PERSONAL
-              ? teamList[activeTeamId].title
-              : 'Personal'}
-          </ColumnTitle>
+          <ColumnTitle>{getColumnTitle()}</ColumnTitle>
           <DropdownIcon
             name="arrow-triangle"
             width={12}

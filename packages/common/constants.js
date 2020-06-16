@@ -50,6 +50,11 @@ export const TEAM_TYPE = {
   PERSONAL: 'personal',
 };
 
+export const TEAM_TEXT_TYPE = {
+  [TEAM_TYPE.DEFAULT]: 'All users',
+  [TEAM_TYPE.PERSONAL]: 'Personal',
+};
+
 export const DASHBOARD_MODE = {
   DEFAULT: 'DEFAULT_MODE',
   SEARCH: 'SEARCH_MODE',

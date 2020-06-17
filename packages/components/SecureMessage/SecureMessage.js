@@ -11,8 +11,10 @@ import { postSecureMessage } from '@caesar/common/fetch';
 import {
   ENCRYPTING_ITEM_NOTIFICATION,
   SAVE_NOTIFICATION,
+  VERIFICATION_IN_PROGRESS_NOTIFICATION,
 } from '@caesar/common/constants';
 import { Scrollbar, withNotification } from '@caesar/components';
+import passwordGenerator from '@caesar/common/utils/passwordGenerator';
 import { SecureMessageForm } from './SecureMessageForm';
 import { SecureMessageLink } from './SecureMessageLink';
 import {
@@ -61,9 +63,17 @@ const SecureMessageComponent = ({
             position: 'bottom-right',
           },
         });
-        const pwd = passwordValue || generator();
+        const pwd = passwordValue || passwordGenerator();
 
         const encryptedMessage = await encryptByPassword(secret, pwd);
+
+        notification.show({
+          text: VERIFICATION_IN_PROGRESS_NOTIFICATION,
+          options: {
+            position: 'bottom-right',
+          },
+        });
+
         await decryptByPassword(encryptedMessage, pwd);
 
         notification.show({

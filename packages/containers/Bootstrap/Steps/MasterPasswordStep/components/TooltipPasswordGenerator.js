@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 // TODO: Replace with import {useClickAway} from 'react-use';
 import enhanceWithClickOutside from 'react-click-outside';
 import { PasswordGenerator, Tooltip } from '@caesar/components';
-import { generator } from '@caesar/common/utils/password';
+import passwordGenerator from '@caesar/common/utils/passwordGenerator';
 
 const DEFAULT_LENGTH = 16;
 
@@ -36,7 +36,7 @@ class TooltipPasswordGenerator extends Component {
     const { onGeneratePassword } = this.props;
     const { length, digits, specials } = this.state;
 
-    onGeneratePassword(generator(length, { digits, specials }));
+    onGeneratePassword(passwordGenerator(length, { digits, specials }));
   };
 
   handleChangeOption = optionType => event => {

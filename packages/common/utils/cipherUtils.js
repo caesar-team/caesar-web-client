@@ -1,8 +1,8 @@
 import * as openpgp from 'openpgp';
 import { generateKeys } from '@caesar/common/utils/key';
-import { generator } from '@caesar/common/utils/password';
 import { randomId } from '@caesar/common/utils/uuid4';
 import { createSrp } from './srp';
+import passwordGenerator from './passwordGenerator';
 
 const srp = createSrp();
 
@@ -63,8 +63,8 @@ export const decryptByPassword = async (secretArmored, password) => {
 };
 
 export const generateUser = async email => {
-  const masterPassword = generator();
-  const password = generator();
+  const masterPassword = passwordGenerator();
+  const password = passwordGenerator();
 
   const keys = await generateKeys(masterPassword, [email]);
 
@@ -72,8 +72,8 @@ export const generateUser = async email => {
 };
 
 export const generateUsersBatch = async emails => {
-  const masterPassword = generator();
-  const password = generator();
+  const masterPassword = passwordGenerator();
+  const password = passwordGenerator();
 
   const keys = await generateKeys(masterPassword, emails);
 

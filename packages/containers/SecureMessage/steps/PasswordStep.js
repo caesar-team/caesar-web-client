@@ -6,13 +6,13 @@ import { schema } from '../schema';
 
 export const PasswordStep = ({ message, password, setDecryptedMessage }) => {
   const handleSubmitPassword = async (
-    { passwordMessage },
+    { messagePassword },
     { setSubmitting, setErrors },
   ) => {
     try {
       const decryptedMessage = await decryptByPassword(
         message,
-        passwordMessage,
+        messagePassword,
       );
       setDecryptedMessage(decryptedMessage);
       setSubmitting(false);
@@ -33,7 +33,7 @@ export const PasswordStep = ({ message, password, setDecryptedMessage }) => {
     submitForm,
     resetForm,
   } = useFormik({
-    initialValues: { password },
+    initialValues: { messagePassword: password },
     validationSchema: schema,
     onSubmit: handleSubmitPassword,
     validateOnChange: false,
@@ -43,8 +43,8 @@ export const PasswordStep = ({ message, password, setDecryptedMessage }) => {
     <form onSubmit={handleSubmit}>
       <LockInput
         autoFocus
-        name="password"
-        value={values.password}
+        name="messagePassword"
+        value={values.messagePassword}
         onChange={handleChange}
         onClick={submitForm}
         onBackspace={resetForm}

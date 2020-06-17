@@ -19,14 +19,11 @@ const MessagePage = ({ statusCode, message, password }) => (
 MessagePage.getInitialProps = async ({ query }) => {
   let { id } = query;
   let password;
-  console.log('UUID_REGEXP', UUID_REGEXP.test(id));
-  console.log(query);
+
   if (id.length > 0 && !UUID_REGEXP.test(id)) {
     const plObject = base64ToObject(id);
-    console.log('plObject', plObject);
     id = plObject.messageId;
     password = plObject.password;
-    console.log(id, password);
   }
 
   try {

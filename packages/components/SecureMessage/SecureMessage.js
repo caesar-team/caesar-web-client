@@ -6,7 +6,6 @@ import {
   encryptByPassword,
   decryptByPassword,
 } from '@caesar/common/utils/cipherUtils';
-import { generator } from '@caesar/common/utils/password';
 import { postSecureMessage } from '@caesar/common/fetch';
 import {
   ENCRYPTING_ITEM_NOTIFICATION,

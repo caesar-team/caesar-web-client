@@ -86,7 +86,7 @@ const getLinkText = (
 ) => `Please, follow the link and enter the password
 - - - - - - - - - - - - - - - - - - - - - - - - - -
 URL: <strong>${APP_URI}/message/${messageId}</strong>
-Password: <strong>${password}</strong>
+Password: <strong>${encodeURI(password)}</strong>
 - - - - - - - - - - - - - - - - - - - - - - - - - -
 Securely created with ${APP_URI}`;
 
@@ -142,7 +142,7 @@ const SecureMessageLinkComponent = ({
           onClick={() =>
             handleClickCopyLink(
               makePasswordlessLink(messageId, password),
-              'The passwordless link have been copied!',
+              'The passwordless link has been copied!',
             )
           }
         >

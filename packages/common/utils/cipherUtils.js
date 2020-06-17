@@ -2,7 +2,7 @@ import * as openpgp from 'openpgp';
 import { generateKeys } from '@caesar/common/utils/key';
 import { randomId } from '@caesar/common/utils/uuid4';
 import { createSrp } from './srp';
-import passwordGenerator from './passwordGenerator';
+import { passwordGenerator } from './passwordGenerator';
 
 const srp = createSrp();
 
@@ -24,6 +24,7 @@ export const decryptItem = async (secretArmored, privateKeyObj) => {
     return JSON.parse(data);
   } catch (error) {
     console.log('decryption error', error);
+
     return null;
   }
 };

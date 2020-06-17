@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 // TODO: Replace with import {useClickAway} from 'react-use';
 import enhanceWithClickOutside from 'react-click-outside';
 import { PasswordGenerator, Tooltip } from '@caesar/components';
-import passwordGenerator from '@caesar/common/utils/passwordGenerator';
+import { passwordGenerator } from '@caesar/common/utils/passwordGenerator';
 
 const DEFAULT_LENGTH = 16;
 

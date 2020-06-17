@@ -13,7 +13,7 @@ import {
   VERIFICATION_IN_PROGRESS_NOTIFICATION,
 } from '@caesar/common/constants';
 import { Scrollbar, withNotification } from '@caesar/components';
-import passwordGenerator from '@caesar/common/utils/passwordGenerator';
+import { passwordGenerator } from '@caesar/common/utils/passwordGenerator';
 import { SecureMessageForm } from './SecureMessageForm';
 import { SecureMessageLink } from './SecureMessageLink';
 import {

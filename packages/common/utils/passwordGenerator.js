@@ -1,7 +1,7 @@
 const DEFAULT_OPTIONS = {
   symbols: {
     digits: '1234567890',
-    specials: '!@#$%^&*()+-{}<>_:=',
+    specials: '!@#$%^&*()+-{}_:=',
     lowerCase: 'abcdefghijklmnopqrstuvwxyz',
     upperCase: 'ABCDEFGHIJKLMNOPQRSTUVWXYZ',
   },
@@ -21,7 +21,7 @@ const buildCharsSet = options => {
 
   return validChats;
 };
-const passwordGenerator = (
+export const passwordGenerator = (
   length = DEFAULT_LENGTH,
   options = DEFAULT_OPTIONS,
 ) => {
@@ -34,5 +34,3 @@ const passwordGenerator = (
 
   return String.fromCharCode.apply(null, array);
 };
-
-export default passwordGenerator;

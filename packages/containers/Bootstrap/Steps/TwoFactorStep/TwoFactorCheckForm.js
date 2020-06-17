@@ -33,13 +33,6 @@ const Form = styled.form`
   margin-top: 50px;
 `;
 
-const Error = styled.div`
-  padding-top: 10px;
-  text-align: center;
-  font-size: 14px;
-  color: ${({ theme }) => theme.color.red};
-`;
-
 const TipWrapper = styled.div`
   display: flex;
   align-items: center;

@@ -40,8 +40,8 @@ const IconCloseStyled = styled(Icon)`
 
 const Box = styled.div`
   position: absolute;
-  z-index: 11;
   top: ${({ top }) => `${top}px`};
+  z-index: ${({ theme }) => theme.zIndex.basic};
   width: 100%;
 `;
 
@@ -181,8 +181,8 @@ class SelectInner extends Component {
           </ValueText>
           <ArrowIcon
             name="arrow-triangle"
-            width={10}
-            height={6}
+            width={16}
+            height={16}
             isOpened={isOpened}
           />
         </SelectedOption>

@@ -155,7 +155,7 @@ const MenuListInnerComponent = ({
 
     return (
       id && (
-        <MenuItem key={id || title}>
+        <MenuItem key={id}>
           <StyledMenuItemInner
             isActive={
               id === SECURE_MESSAGE_MODE

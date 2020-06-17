@@ -4,13 +4,16 @@ import { LockInput } from '@caesar/components';
 import { decryptByPassword } from '@caesar/common/utils/cipherUtils';
 import { schema } from '../schema';
 
-export const PasswordStep = ({ message, setDecryptedMessage }) => {
+export const PasswordStep = ({ message, password, setDecryptedMessage }) => {
   const handleSubmitPassword = async (
-    { password },
+    { passwordMessage },
     { setSubmitting, setErrors },
   ) => {
     try {
-      const decryptedMessage = await decryptByPassword(message, password);
+      const decryptedMessage = await decryptByPassword(
+        message,
+        passwordMessage,
+      );
       setDecryptedMessage(decryptedMessage);
       setSubmitting(false);
     } catch (error) {
@@ -30,7 +33,7 @@ export const PasswordStep = ({ message, setDecryptedMessage }) => {
     submitForm,
     resetForm,
   } = useFormik({
-    initialValues: { password: '' },
+    initialValues: { password },
     validationSchema: schema,
     onSubmit: handleSubmitPassword,
     validateOnChange: false,

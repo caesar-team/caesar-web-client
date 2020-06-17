@@ -4,6 +4,7 @@ import copy from 'copy-text-to-clipboard';
 import { Icon, Button, withNotification } from '@caesar/components';
 import { downloadAsZip } from '@caesar/common/utils/file';
 import { media } from '@caesar/assets/styles/media';
+import { decryptByPassword } from '@caesar/common/utils/cipherUtils';
 import { MessageStep, PasswordStep } from './steps';
 
 const Wrapper = styled.div`
@@ -56,7 +57,12 @@ const ButtonStyled = styled(Button)`
   }
 `;
 
-const SecureMessageContainerComponent = ({ notification, message }) => {
+
+const SecureMessageContainerComponent = ({
+  notification,
+  message,
+  password,
+}) => {
   const [decryptedMessage, setDecryptedMessage] = useState(null);
 
   const handleClickCopyText = () => {
@@ -94,6 +100,7 @@ const SecureMessageContainerComponent = ({ notification, message }) => {
       ) : (
         <PasswordStep
           message={message}
+          password={password}
           setDecryptedMessage={setDecryptedMessage}
         />
       )}

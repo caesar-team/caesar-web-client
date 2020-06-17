@@ -46,8 +46,8 @@ app.prepare().then(() => {
   });
 
   // BE endpoint
-  // eslint-disable-next-line
-  server.get('/srp_login_confirm', (req, res, next) => {
+  // eslint-disable-next-line no-shadow
+  server.get('/api/srp_login_confirm', (req, res, next) => {
     next();
   });
 

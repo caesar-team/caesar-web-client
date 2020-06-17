@@ -67,6 +67,7 @@ const CreateNewButton = styled(Button)`
 const stripHtml = html => {
   const tmp = document.createElement('DIV');
   tmp.innerHTML = html;
+
   return tmp.textContent || tmp.innerText || '';
 };
 
@@ -75,6 +76,7 @@ const makePasswordlessLink = (messageId, password) => {
     messageId,
     password,
   });
+
   return `${APP_URI}/message/${encodedObject}`;
 };
 
@@ -103,6 +105,7 @@ const SecureMessageLinkComponent = ({
     notification.show({
       text: notify,
     });
+
     return false;
   };
   const handleClickCopyText = (data, notify) => {
@@ -111,6 +114,7 @@ const SecureMessageLinkComponent = ({
     notification.show({
       text: notify,
     });
+
     return false;
   };
 

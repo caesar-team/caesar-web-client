@@ -18,6 +18,7 @@ const buildCharsSet = options => {
   validChats += options.lowerCase ? options.symbols.lowerCase : '';
   validChats += options.digits ? options.symbols.digits : '';
   validChats += options.specials ? options.symbols.specials : '';
+
   return validChats;
 };
 const passwordGenerator = (
@@ -30,6 +31,7 @@ const passwordGenerator = (
   const crypto = getCrypto();
   crypto.getRandomValues(array);
   array = array.map(x => validChars.charCodeAt(x % validChars.length));
+
   return String.fromCharCode.apply(null, array);
 };
 

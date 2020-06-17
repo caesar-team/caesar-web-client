@@ -39,7 +39,8 @@
     "no-confusing-arrow": 0,
     "no-underscore-dangle": 0,
     "class-methods-use-this": 0,
-    "camelcase": 0
+    "camelcase": ["error", { "properties": "always" } ],
+    "newline-before-return": 1
   },
   "env": {
     "browser": true,

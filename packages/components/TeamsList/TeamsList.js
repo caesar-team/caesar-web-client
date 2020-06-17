@@ -1,7 +1,8 @@
 import React, { memo } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import styled from 'styled-components';
-import { TEAM_TYPE } from '@caesar/common/constants';
+import { sortByName } from '@caesar/common/utils/utils';
+import { TEAM_TYPE, TEAM_TEXT_TYPE } from '@caesar/common/constants';
 import {
   userDataSelector,
   userTeamListSelector,
@@ -38,8 +39,11 @@ const TeamsListComponent = ({
 }) => {
   const dispatch = useDispatch();
   const user = useSelector(userDataSelector);
-  const teamList = useSelector(userTeamListSelector);
   const currentTeam = useSelector(currentTeamSelector);
+  const teamList = useSelector(userTeamListSelector).sort((a, b) => {
+    if (a.title.toLowerCase() === TEAM_TYPE.DEFAULT) return 1;
+    return sortByName(a.title, b.title);
+  });
 
   const handleChangeTeam = teamId => {
     handleToggle();
@@ -52,7 +56,7 @@ const TeamsListComponent = ({
 
   return (
     <>
-      {activeTeamId && (
+      {activeTeamId !== TEAM_TYPE.PERSONAL && (
         <Option
           onClick={() => {
             handleChangeTeam(TEAM_TYPE.PERSONAL);
@@ -71,7 +75,9 @@ const TeamsListComponent = ({
             }}
           >
             <StyledAvatar avatar={team.icon} isSmall />
-            {team.title}
+            {team.title.toLowerCase() === TEAM_TYPE.DEFAULT
+              ? TEAM_TEXT_TYPE[TEAM_TYPE.DEFAULT]
+              : team.title}
           </Option>
         );
       })}

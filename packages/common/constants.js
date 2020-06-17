@@ -45,6 +45,15 @@ export const LIST_TYPE = {
   FAVORITES: 'favorites',
 };
 
+export const LIST_TYPES_ARRAY = [
+  LIST_TYPE.ROOT,
+  LIST_TYPE.INBOX,
+  LIST_TYPE.LIST,
+  LIST_TYPE.TRASH,
+  LIST_TYPE.DEFAULT,
+  LIST_TYPE.FAVORITES,
+];
+
 export const TEAM_TYPE = {
   DEFAULT: 'default',
   PERSONAL: 'personal',

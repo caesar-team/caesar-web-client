@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { Draggable } from 'react-beautiful-dnd';
 import styled from 'styled-components';
+import { upperFirst } from '@caesar/common/utils/string';
+import { LIST_TYPES_ARRAY } from '@caesar/common/constants';
 import {
   createListRequest,
   editListRequest,
@@ -108,6 +110,10 @@ export const ListItem = ({
     setValue(label);
   };
 
+  const itemTitle = LIST_TYPES_ARRAY.includes(label)
+    ? upperFirst(label)
+    : label;
+
   const renderInner = () => (
     <>
       {isEditMode ? (
@@ -125,7 +131,7 @@ export const ListItem = ({
       ) : (
         <>
           <DnDIcon name="drag-n-drop" width={16} height={16} color="gray" />
-          <Title>{label}</Title>
+          <Title>{itemTitle}</Title>
           <Counter>{children.length}</Counter>
           {!isDefault && (
             <>

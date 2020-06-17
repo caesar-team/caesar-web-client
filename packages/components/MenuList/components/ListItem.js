@@ -13,11 +13,15 @@ import { MenuItemInner } from './styledComponents';
 
 const Title = styled.div`
   margin-right: auto;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
 `;
 
 const Counter = styled.div``;
 
 const StyledIcon = styled(Icon)`
+  flex: 0 0 16px;
   margin-left: 16px;
   transition: color 0.2s, opacity 0.2s;
   cursor: pointer;

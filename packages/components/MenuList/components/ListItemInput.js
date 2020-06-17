@@ -1,5 +1,5 @@
 import React, { useRef } from 'react';
-import { useClickAway } from 'react-use';
+import { useClickAway, useKeyPressEvent } from 'react-use';
 import styled from 'styled-components';
 import { Icon } from '../../Icon';
 import { Input } from '../../Input';
@@ -55,10 +55,17 @@ export const ListItemInput = ({
   const handleInputChange = e => {
     const newValue = e.target.value;
 
-    if (newValue.length >= MAX_LIST_LABEL_LENGTH) return;
+    if (
+      value?.length >= MAX_LIST_LABEL_LENGTH &&
+      newValue.length >= MAX_LIST_LABEL_LENGTH
+    )
+      return;
 
-    setValue(newValue);
+    setValue(newValue.slice(0, MAX_LIST_LABEL_LENGTH));
   };
+
+  useKeyPressEvent('Enter', handleClickAcceptEdit);
+  useKeyPressEvent('Escape', handleClickClose);
 
   return (
     <div ref={inputRef}>

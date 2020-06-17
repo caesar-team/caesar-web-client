@@ -30,10 +30,10 @@ const theme = {
       xs: 1.33,
     },
   },
-  z: {
+  zIndex: {
     hidden: -1,
     basic: 1,
-    topBasic: 2,
+    upBasic: 2,
     overlay: 3,
     dropdown: 4,
     modal: 5,

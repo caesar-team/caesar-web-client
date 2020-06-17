@@ -27,7 +27,7 @@ const StyledDropdown = styled(Dropdown)`
 
 const ColumnHeader = styled.div`
   position: relative;
-  z-index: ${({ theme }) => theme.z.dropdown};
+  z-index: ${({ theme }) => theme.zIndex.dropdown};
   display: flex;
   align-items: center;
   height: 56px;

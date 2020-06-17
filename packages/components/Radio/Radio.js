@@ -30,7 +30,7 @@ const RadioIcon = styled.div`
   position: absolute;
   top: 3px;
   left: 3px;
-  z-index: ${({ theme }) => theme.z.basic};
+  z-index: ${({ theme }) => theme.zIndex.basic};
   width: 14px;
   height: 14px;
   background-color: ${({ theme, checked }) =>

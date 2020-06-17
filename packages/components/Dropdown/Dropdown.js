@@ -15,7 +15,7 @@ const Box = styled.div`
   top: ${({ withTriangleAtTop }) =>
     withTriangleAtTop ? 'calc(100% + 19px)' : 'calc(100% - 1px)'};
   right: 0;
-  z-index: ${({ theme }) => theme.z.dropdown};
+  z-index: ${({ theme }) => theme.zIndex.dropdown};
   border-radius: 3px;
   background-color: ${({ theme }) => theme.color.white};
   border: 1px solid ${({ theme }) => theme.color.gallery};

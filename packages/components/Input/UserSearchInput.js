@@ -65,7 +65,7 @@ const IconStyled = styled(Icon)`
 const SearchedResultBox = styled.div`
   position: absolute;
   top: 47px;
-  z-index: ${({ theme }) => theme.z.basic};
+  z-index: ${({ theme }) => theme.zIndex.basic};
   display: flex;
   flex-direction: column;
   width: 100%;

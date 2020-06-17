@@ -8,7 +8,7 @@ const Wrapper = styled.div`
   position: absolute;
   bottom: 10px;
   right: 60px;
-  z-index: ${({ theme }) => theme.z.notification};
+  z-index: ${({ theme }) => theme.zIndex.notification};
   border-radius: 3px;
 `;
 

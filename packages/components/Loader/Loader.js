@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import { Icon } from '../Icon';
 
 const Wrapper = styled.div`
-  z-index: ${({ theme }) => theme.z.overlay};
+  z-index: ${({ theme }) => theme.zIndex.overlay};
   display: flex;
   align-items: center;
   justify-content: center;

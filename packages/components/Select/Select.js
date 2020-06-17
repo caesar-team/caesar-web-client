@@ -41,7 +41,7 @@ const IconCloseStyled = styled(Icon)`
 const Box = styled.div`
   position: absolute;
   top: ${({ top }) => `${top}px`};
-  z-index: ${({ theme }) => theme.z.basic};
+  z-index: ${({ theme }) => theme.zIndex.basic};
   width: 100%;
 `;
 

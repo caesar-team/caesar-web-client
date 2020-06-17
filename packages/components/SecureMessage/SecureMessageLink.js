@@ -99,7 +99,6 @@ const SecureMessageLinkComponent = ({
   });
 
   const handleClickCopyLink = (link, notify) => {
-    console.log(link);
     copy(link);
     notification.show({
       text: notify,

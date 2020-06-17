@@ -5,7 +5,7 @@ const Inner = styled.div`
   position: absolute;
   top: -8px;
   left: 50%;
-  z-index: -1;
+  z-index: ${({ theme }) => theme.zIndex.hidden};
   padding: 4px 8px;
   font-size: ${({ theme }) => theme.font.size.xs};
   font-weight: 600;
@@ -23,7 +23,7 @@ const Wrapper = styled.div`
   position: relative;
 
   &:hover ${Inner} {
-    z-index: 1;
+    z-index: ${({ theme }) => theme.zIndex.basic};
     opacity: 1;
   }
 `;

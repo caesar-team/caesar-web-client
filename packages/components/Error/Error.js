@@ -15,7 +15,6 @@ const TextWrapper = styled.div`
   top: 0;
   bottom: 0;
   margin: auto auto;
-  z-index: 11;
   display: flex;
   flex-direction: column;
   align-items: center;

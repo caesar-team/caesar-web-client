@@ -9,7 +9,7 @@ const theme = {
     snow: '#fbf9f9',
     white: '#fff',
     red: '#ff3355',
-    // The below colors are redundant. Need to get rid of them
+    // TODO: The below colors are redundant. Need to get rid of them
     darkGray: '#363636',
     middleGray: '#979797',
     blue: '#3385ff',
@@ -29,6 +29,15 @@ const theme = {
       small: 1.14,
       xs: 1.33,
     },
+  },
+  zIndex: {
+    hidden: -1,
+    basic: 1,
+    upBasic: 2,
+    overlay: 3,
+    dropdown: 4,
+    modal: 5,
+    notification: 6,
   },
 };
 

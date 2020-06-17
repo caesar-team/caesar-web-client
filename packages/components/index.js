@@ -50,13 +50,7 @@ export {
 } from './Layout';
 export { Link } from './Link';
 export { List, ListItem } from './List';
-export {
-  Loader,
-  CircleLoader,
-  TextLoader,
-  FullScreenLoader,
-  LogoLoader,
-} from './Loader';
+export { Loader, CircleLoader, FullScreenLoader, LogoLoader } from './Loader';
 export { MemberList } from './MemberList';
 export { MenuList } from './MenuList';
 export { Modal } from './Modal';

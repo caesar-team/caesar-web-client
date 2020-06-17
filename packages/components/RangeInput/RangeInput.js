@@ -57,7 +57,7 @@ const RangeControl = styled.div.attrs(props => ({
   align-items: center;
   justify-content: center;
   position: absolute;
-  z-index: 15;
+  z-index: ${({ theme }) => theme.zIndex.upBasic};
   top: 50%;
   transform: translateY(-50%);
   width: 16px;
@@ -84,7 +84,7 @@ const Separator = styled.div`
 
 const RangeActiveLine = styled.div`
   position: absolute;
-  z-index: 10;
+  z-index: ${({ theme }) => theme.zIndex.basic};
   top: 0;
   height: 8px;
   border-radius: 3px;

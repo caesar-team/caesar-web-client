@@ -157,6 +157,8 @@ export const ENTITY_TYPE = {
 };
 
 export const ENCRYPTING_ITEM_NOTIFICATION = 'Encryption in progress...';
+export const VERIFICATION_IN_PROGRESS_NOTIFICATION =
+  'Verification in progress...';
 export const CREATING_ITEM_NOTIFICATION = 'The item is being created...';
 export const SHARING_IN_PROGRESS_NOTIFICATION = 'Sharing in progress...';
 export const CREATING_ITEMS_NOTIFICATION =
@@ -217,3 +219,5 @@ export const PERMISSIONS = {
   LEAVE_MEMBER_FROM_TEAM,
   SHARE_ITEM_PERMISSION,
 };
+
+export const UUID_REGEXP = /\b[0-9a-f]{8}\b-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-\b[0-9a-f]{12}\b/;

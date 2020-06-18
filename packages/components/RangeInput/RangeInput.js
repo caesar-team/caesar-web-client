@@ -132,6 +132,7 @@ class RangeInput extends Component {
 
     if (value && value > max) return max;
     if (value && value < min) return min;
+
     return value || min;
   };
 

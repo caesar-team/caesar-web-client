@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import styled from 'styled-components';
 import zxcvbn from 'zxcvbn';
-import { generator } from '@caesar-utils/utils/password';
+import { passwordGenerator } from '@caesar-utils/utils/passwordGenerator';
 import {
   PasswordIndicator,
   Checkbox,
@@ -105,7 +105,7 @@ function copyTextToClipboard(text, notification) {
   });
 }
 
-class PasswordGenerator extends Component {
+class PasswordpasswordGenerator extends Component {
   state = this.prepareInitialState();
 
   handleChangeOption = option => () => {
@@ -118,7 +118,7 @@ class PasswordGenerator extends Component {
     };
 
     this.setState({
-      password: generator(length, nextOptions),
+      password: passwordGenerator(length, nextOptions),
       options: {
         length,
         ...nextOptions,
@@ -136,7 +136,7 @@ class PasswordGenerator extends Component {
     } = this.state;
 
     this.setState({
-      password: generator(toValue, options),
+      password: passwordGenerator(toValue, options),
       options: {
         ...options,
         length: toValue,
@@ -150,7 +150,7 @@ class PasswordGenerator extends Component {
     } = this.state;
 
     this.setState({
-      password: generator(length, otherOptions),
+      password: passwordGenerator(length, otherOptions),
     });
   };
 
@@ -167,7 +167,7 @@ class PasswordGenerator extends Component {
     };
 
     return {
-      password: generator(DEFAULT_LENGTH, options),
+      password: passwordGenerator(DEFAULT_LENGTH, options),
       options: {
         ...options,
         length: DEFAULT_LENGTH,
@@ -184,7 +184,7 @@ class PasswordGenerator extends Component {
 
     return (
       <Wrapper>
-        <Title>Password Generator</Title>
+        <Title>Password passwordGenerator</Title>
         <Row>
           <PasswordOutput>{password}</PasswordOutput>
           <ShapeStyled>
@@ -227,4 +227,4 @@ class PasswordGenerator extends Component {
   }
 }
 
-export default withNotification(PasswordGenerator);
+export default withNotification(PasswordpasswordGenerator);

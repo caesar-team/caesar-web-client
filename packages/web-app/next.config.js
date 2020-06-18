@@ -48,6 +48,7 @@ const publicRuntimeConfig = {
   AUTHORIZATION_ENABLE: process.env.AUTHORIZATION_ENABLE !== 'false',
   APP_TYPE: process.env.APP_TYPE || 'general',
   APP_VERSION: process.env.APP_VERSION,
+  LOG_LEVEL: process.env.LOG_LEVEL || process.env.NODE_ENV === 'production' ? 'error' : 'info',
 };
 
 const serverRuntimeConfig = {};
@@ -93,10 +94,17 @@ module.exports = withPlugins(
         ];
       },
     },
-    webpack: config => {
+    webpack: (config, { isServer }) => {
       config.output.globalObject = 'this';
 
       config.plugins.push(new ThreadsPlugin());
+
+      //FIX: https://github.com/vercel/next.js/issues/7755#issuecomment-508633125
+      if (!isServer) {
+        config.node = {
+          fs: 'empty'
+        }
+      }
 
       return config;
     },

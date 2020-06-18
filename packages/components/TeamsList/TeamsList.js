@@ -42,6 +42,7 @@ const TeamsListComponent = ({
   const currentTeam = useSelector(currentTeamSelector);
   const teamList = useSelector(userTeamListSelector).sort((a, b) => {
     if (a.title.toLowerCase() === TEAM_TYPE.DEFAULT) return 1;
+    if (b.title.toLowerCase() === TEAM_TYPE.DEFAULT) return -1;
 
     return sortByName(a.title, b.title);
   });

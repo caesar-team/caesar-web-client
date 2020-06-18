@@ -5,6 +5,7 @@ import copy from 'copy-text-to-clipboard';
 import { APP_URI } from '@caesar/common/constants';
 import { media } from '@caesar/assets/styles/media';
 import { Button, withNotification } from '@caesar/components';
+import { objectToBase64 } from '@caesar/common/utils/base64';
 import ReadOnlyContentEditable from '../Common/ContentEditable';
 
 const Text = styled.div`
@@ -66,22 +67,32 @@ const CreateNewButton = styled(Button)`
 const stripHtml = html => {
   const tmp = document.createElement('DIV');
   tmp.innerHTML = html;
+
   return tmp.textContent || tmp.innerText || '';
 };
 
+const makePasswordlessLink = (messageId, password) => {
+  const encodedObject = objectToBase64({
+    messageId,
+    password,
+  });
+
+  return `${APP_URI}/message/${encodedObject}`;
+};
+
 const getLinkText = (
-  link,
+  messageId,
   password,
 ) => `Please, follow the link and enter the password
 - - - - - - - - - - - - - - - - - - - - - - - - - -
-URL: <strong>${APP_URI}/message/${link}</strong>
-Password: <strong>${password}</strong>
+URL: <strong>${APP_URI}/message/${messageId}</strong>
+Password: <strong>${encodeURI(password)}</strong>
 - - - - - - - - - - - - - - - - - - - - - - - - - -
 Securely created with ${APP_URI}`;
 
 const SecureMessageLinkComponent = ({
   notification,
-  link = '',
+  link: messageId = '',
   password = '',
   onClickReturn,
 }) => {
@@ -89,12 +100,21 @@ const SecureMessageLinkComponent = ({
     notification.hide();
   });
 
-  const handleClickCopy = (data, notify) => {
+  const handleClickCopyLink = (link, notify) => {
+    copy(link);
+    notification.show({
+      text: notify,
+    });
+
+    return false;
+  };
+  const handleClickCopyText = (data, notify) => {
     copy(stripHtml(data));
 
     notification.show({
       text: notify,
     });
+
     return false;
   };
 
@@ -102,14 +122,14 @@ const SecureMessageLinkComponent = ({
     <>
       <Text>Use the temporary encrypted link below to retrieve the secret</Text>
       <Link>
-        <ReadOnlyContentEditable html={getLinkText(link, password)} />
+        <ReadOnlyContentEditable html={getLinkText(messageId, password)} />
       </Link>
       <ButtonsWrapper>
         <CopyAllButton
           icon="copy"
           onClick={() =>
-            handleClickCopy(
-              getLinkText(link, password),
+            handleClickCopyText(
+              getLinkText(messageId, password),
               'The link and the password have been copied!',
             )
           }
@@ -120,13 +140,13 @@ const SecureMessageLinkComponent = ({
           icon="link"
           color="white"
           onClick={() =>
-            handleClickCopy(
-              `${APP_URI}/message/${link}`,
-              'The link has been copied!',
+            handleClickCopyLink(
+              makePasswordlessLink(messageId, password),
+              'The passwordless link has been copied!',
             )
           }
         >
-          Copy Link
+          Copy The Passwordless Link
         </Button>
         <CreateNewButton color="transparent" onClick={onClickReturn}>
           Create New Secure Message

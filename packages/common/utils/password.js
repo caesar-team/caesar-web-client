@@ -1,7 +1,8 @@
+// @Deprecated
 import { pick } from './utils';
 
 const DIGITS = '1234567890';
-const SPECIALS = '!@#$%^&*()+-,.{}<>_:~=';
+const SPECIALS = '!@#$%^&*()+-{}<>_:=';
 const LOWER_CASE = 'abcdefghijklmnopqrstuvwxyz';
 const UPPER_CASE = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
 

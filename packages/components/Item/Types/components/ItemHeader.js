@@ -1,6 +1,12 @@
 import React, { Component } from 'react';
 import styled from 'styled-components';
-import { TEAM_TYPE } from '@caesar/common/constants';
+import {
+  TEAM_TYPE,
+  MOVE_ITEM_PERMISSION,
+  DELETE_PERMISSION,
+  UPDATE_PERMISSION,
+  SHARE_ITEM_PERMISSION,
+} from '@caesar/common/constants';
 import { formatDate } from '@caesar/common/utils/dateUtils';
 import { upperFirst } from '@caesar/common/utils/string';
 import { Icon } from '@caesar/components/Icon';
@@ -9,12 +15,7 @@ import { Avatar, AvatarsList } from '@caesar/components/Avatar';
 import { withOfflineDetection } from '@caesar/components/Offline';
 import { Dropdown } from '@caesar/components/Dropdown';
 import { Can, AbilityContext } from '@caesar/components/Ability';
-import {
-  MOVE_ITEM_PERMISSION,
-  DELETE_PERMISSION,
-  UPDATE_PERMISSION,
-  SHARE_ITEM_PERMISSION,
-} from '@caesar/common/constants';
+
 import { Row } from './Row';
 
 const StyledRow = styled(Row)`

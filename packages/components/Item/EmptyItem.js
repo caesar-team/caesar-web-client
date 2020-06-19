@@ -23,13 +23,12 @@ const StyledIcon = styled(Icon)`
   top: 0;
   bottom: 0;
   margin: auto auto;
-  fill: ${({ theme }) => theme.color.emperor};
 `;
 
 export const EmptyItem = () => (
   <>
     {/* <ImageLeft src={EmptyLeftImg} /> */}
-    <StyledIcon name="logo-caesar" width={205} height={46} />
+    <StyledIcon name="logo-caesar" width={205} height={46} color="emperor" />
     {/* <ImageRight src={EmptyRightImg} /> */}
   </>
 );

@@ -6,7 +6,10 @@ import { APP_URI } from '@caesar/common/constants';
 import { media } from '@caesar/assets/styles/media';
 import { Button, withNotification } from '@caesar/components';
 import { objectToBase64 } from '@caesar/common/utils/base64';
+import { logger } from '@caesar/common/utils/logger';
+import { formatDate } from '@caesar/common/utils/dateUtils';
 import ReadOnlyContentEditable from '../Common/ContentEditable';
+import { SECURE_MESSAGE_LINK_STEP } from './constants';
 
 const Text = styled.div`
   margin-bottom: 16px;
@@ -79,23 +82,38 @@ const makePasswordlessLink = (messageId, password) => {
 
   return `${APP_URI}/message/${encodedObject}`;
 };
+const getExpireDate = seconds => {
+  const expireDate = new Date();
+  expireDate.setSeconds(expireDate.getSeconds() + seconds);
 
+  return formatDate(expireDate.toISOString());
+};
 const getLinkText = (
   messageId,
   password,
+  seconds,
 ) => `Please, follow the link and enter the password
 - - - - - - - - - - - - - - - - - - - - - - - - - -
 URL: <strong>${APP_URI}/message/${messageId}</strong>
 Password: <strong>${encodeURI(password)}</strong>
+Expired: ${getExpireDate(seconds)}
 - - - - - - - - - - - - - - - - - - - - - - - - - -
 Securely created with ${APP_URI}`;
 
 const SecureMessageLinkComponent = ({
   notification,
-  link: messageId = '',
+  messageId = '',
   password = '',
+  seconds = null,
+  requests = null,
   onClickReturn,
 }) => {
+  logger.info({
+    password,
+    seconds,
+    requests,
+    messageId,
+  });
   useEffectOnce(() => {
     notification.hide();
   });
@@ -104,6 +122,9 @@ const SecureMessageLinkComponent = ({
     copy(link);
     notification.show({
       text: notify,
+      options: {
+        timeout: 1000,
+      },
     });
 
     return false;
@@ -113,6 +134,9 @@ const SecureMessageLinkComponent = ({
 
     notification.show({
       text: notify,
+      options: {
+        timeout: 1000,
+      },
     });
 
     return false;
@@ -122,14 +146,16 @@ const SecureMessageLinkComponent = ({
     <>
       <Text>Use the temporary encrypted link below to retrieve the secret</Text>
       <Link>
-        <ReadOnlyContentEditable html={getLinkText(messageId, password)} />
+        <ReadOnlyContentEditable
+          html={getLinkText(messageId, password, seconds, requests)}
+        />
       </Link>
       <ButtonsWrapper>
         <CopyAllButton
           icon="copy"
           onClick={() =>
             handleClickCopyText(
-              getLinkText(messageId, password),
+              getLinkText(messageId, password, seconds, requests),
               'The link and the password have been copied!',
             )
           }

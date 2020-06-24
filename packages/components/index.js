@@ -35,7 +35,7 @@ export {
   UserSearchInput,
 } from './Input';
 export { InviteModal } from './InviteModal';
-export { Item, MultiItem, Credentials, Document } from './Item';
+export { Item, MultiItem, Credentials, Document } from './ItemNew';
 export { Label } from './Label';
 export {
   AuthLayout,

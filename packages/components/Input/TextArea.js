@@ -2,32 +2,42 @@ import React from 'react';
 import styled from 'styled-components';
 
 const Label = styled.label`
-  display: block;
   position: relative;
+  display: block;
   width: 100%;
 `;
 
 const LabelText = styled.div`
-  margin-bottom: 15px;
-  font-size: 14px;
-  font-weight: 500;
-  line-height: 1.5;
-  color: ${({ theme }) => theme.color.black};
+  padding: 0 16px;
+  margin-bottom: 8px;
+  font-size: ${({ theme }) => theme.font.size.small};
+  color: ${({ theme }) => theme.color.gray};
 `;
 
 const TextAreaField = styled.textarea`
-  padding: 7px 15px;
+  padding: 8px 16px;
   display: block;
   width: 100%;
-  font-size: 16px;
-  line-height: 1.5;
+  min-height: 112px;
+  font-size: ${({ theme }) => theme.font.size.main};
+  line-height: ${({ theme }) => theme.font.lineHeight.main};
+  letter-spacing: inherit;
   color: ${({ theme }) => theme.color.black};
+  background-color: ${({ theme }) => theme.color.snow};
   border: 1px solid ${({ theme }) => theme.color.gallery};
   border-radius: 3px;
-  background-color: ${({ theme }) => theme.color.snow};
   outline: none;
-  min-height: 112px;
   resize: none;
+  transition: border-color 0.2s, background-color 0.2s;
+
+  &:hover:not(:focus) {
+    border-color: ${({ theme }) => theme.color.black};
+  }
+
+  &:focus {
+    background-color: ${({ theme }) => theme.color.alto};
+    border-color: ${({ theme }) => theme.color.alto};
+  }
 
   &::placeholder {
     color: ${({ theme }) => theme.color.lightGray};
@@ -41,9 +51,9 @@ const Error = styled.div`
 `;
 
 const TextArea = ({
-  children,
   className,
   error,
+  label,
   value,
   placeholder = 'Write here something…',
   ...props
@@ -52,7 +62,7 @@ const TextArea = ({
 
   return (
     <Label className={className}>
-      {children && <LabelText>{children}</LabelText>}
+      {label && <LabelText>{label}</LabelText>}
       <TextAreaField
         isError={isError}
         value={value}
@@ -66,4 +76,4 @@ const TextArea = ({
 
 TextArea.TextAreaField = TextAreaField;
 
-export default TextArea;
+export { TextArea };

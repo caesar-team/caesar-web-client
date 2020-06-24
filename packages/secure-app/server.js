@@ -68,8 +68,8 @@ fastify.register(fastifyStatic, {
   root: path.join(__dirname, 'public'),
   prefix: '/public/', // optional: default '/'
 });
-fastify.listen(APP_PORT, err => {
+fastify.listen(APP_PORT, '::', (err, address) => {
   if (err) throw err;
   // eslint-disable-next-line no-console
-  console.log(`> Ready on ${APP_URI}:${APP_PORT}`);
+  console.log(`> Ready on ${address}`);
 });

@@ -1,5 +1,5 @@
 import { createTransform } from 'redux-persist';
-import * as localForage from 'localforage';
+import localForage from 'localforage';
 
 const itemTransform = createTransform(
   inboundState => ({
@@ -9,6 +9,7 @@ const itemTransform = createTransform(
       byId: Object.keys(inboundState.item.byId).reduce(
         (accumulator, itemId) => {
           const { data, ...item } = inboundState.item.byId[itemId];
+
           return { ...accumulator, [itemId]: item };
         },
         {},
@@ -22,6 +23,7 @@ const itemTransform = createTransform(
 const userTransform = createTransform(
   inboundState => {
     const { masterPassword, ...user } = inboundState;
+
     return user;
   },
   outboundState => outboundState,

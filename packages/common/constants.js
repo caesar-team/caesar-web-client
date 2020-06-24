@@ -15,6 +15,7 @@ export const {
   APP_TYPE,
   APP_VERSION,
   IS_PROD,
+  LOG_LEVEL,
 } = publicRuntimeConfig;
 
 export const PWA_WINDOW_SIZE = {

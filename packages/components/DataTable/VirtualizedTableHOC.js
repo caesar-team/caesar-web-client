@@ -61,6 +61,7 @@ const VirtualizedTableHOC = Component => {
             const nestedRows = isExpanded
               ? flattenPageRows(subRows, [...path, i])
               : [];
+
             return [
               {
                 row,

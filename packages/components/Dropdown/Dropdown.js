@@ -15,14 +15,13 @@ const Box = styled.div`
   top: ${({ withTriangleAtTop }) =>
     withTriangleAtTop ? 'calc(100% + 19px)' : 'calc(100% - 1px)'};
   right: 0;
-  z-index: 100;
+  z-index: ${({ theme }) => theme.zIndex.dropdown};
   border-radius: 3px;
   background-color: ${({ theme }) => theme.color.white};
   border: 1px solid ${({ theme }) => theme.color.gallery};
 
   &::before {
     position: absolute;
-    z-index: 1;
     display: ${({ withTriangleAtTop }) =>
       withTriangleAtTop ? 'block' : 'none'};
     width: 15px;
@@ -38,7 +37,6 @@ const Box = styled.div`
 
 const OptionsList = styled.div`
   position: relative;
-  z-index: 2;
   background-color: ${({ theme }) => theme.color.white};
   border-radius: 3px;
   overflow: hidden;

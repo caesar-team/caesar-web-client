@@ -56,7 +56,12 @@ const ButtonStyled = styled(Button)`
   }
 `;
 
-const SecureMessageContainerComponent = ({ notification, message }) => {
+
+const SecureMessageContainerComponent = ({
+  notification,
+  message,
+  password,
+}) => {
   const [decryptedMessage, setDecryptedMessage] = useState(null);
 
   const handleClickCopyText = () => {
@@ -94,6 +99,7 @@ const SecureMessageContainerComponent = ({ notification, message }) => {
       ) : (
         <PasswordStep
           message={message}
+          password={password}
           setDecryptedMessage={setDecryptedMessage}
         />
       )}

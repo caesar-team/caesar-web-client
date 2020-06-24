@@ -1,5 +1,12 @@
 import React, { Component } from 'react';
 import styled from 'styled-components';
+import {
+  TEAM_TYPE,
+  MOVE_ITEM_PERMISSION,
+  DELETE_PERMISSION,
+  UPDATE_PERMISSION,
+  SHARE_ITEM_PERMISSION,
+} from '@caesar/common/constants';
 import { formatDate } from '@caesar/common/utils/dateUtils';
 import { upperFirst } from '@caesar/common/utils/string';
 import { Icon } from '@caesar/components/Icon';
@@ -8,12 +15,7 @@ import { Avatar, AvatarsList } from '@caesar/components/Avatar';
 import { withOfflineDetection } from '@caesar/components/Offline';
 import { Dropdown } from '@caesar/components/Dropdown';
 import { Can, AbilityContext } from '@caesar/components/Ability';
-import {
-  MOVE_ITEM_PERMISSION,
-  DELETE_PERMISSION,
-  UPDATE_PERMISSION,
-  SHARE_ITEM_PERMISSION,
-} from '@caesar/common/constants';
+
 import { Row } from './Row';
 
 const StyledRow = styled(Row)`
@@ -185,13 +187,13 @@ const generateTeamOptions = (teams, currentTeamId) =>
     .filter(({ id }) => id !== currentTeamId)
     .map(team => ({
       value: team.id,
-      label: team.id === 'personal' ? 'personal' : team.name,
+      label: team.id === TEAM_TYPE.PERSONAL ? TEAM_TYPE.PERSONAL : team.name,
     }));
 
 const renderOption = teams => (value, label) => {
   // eslint-disable-next-line
   const team = teams.find(team => team.id === value);
-  const shouldShowAvatar = value !== 'personal';
+  const shouldShowAvatar = value !== TEAM_TYPE.PERSONAL;
 
   return (
     <Option>
@@ -212,7 +214,7 @@ class ItemHeader extends Component {
     const { teamsLists } = this.props;
 
     const currentTeam = teamsLists.find(team =>
-      teamId ? team.id === teamId : team.id === 'personal',
+      teamId ? team.id === teamId : team.id === TEAM_TYPE.PERSONAL,
     );
 
     const defaultList = currentTeam.lists.find(
@@ -312,7 +314,9 @@ class ItemHeader extends Component {
     const isOwner = user.id === ownerId;
 
     const currentTeam = teamsLists.find(team =>
-      currentTeamId ? team.id === currentTeamId : team.id === 'personal',
+      currentTeamId
+        ? team.id === currentTeamId
+        : team.id === TEAM_TYPE.PERSONAL,
     );
     const currentList = currentTeam.lists.find(
       list => list.id === currentListId,
@@ -331,7 +335,9 @@ class ItemHeader extends Component {
       listId !== currentListId || (teamId && teamId !== currentTeamId);
 
     const currentTeamTag =
-      currentTeam.id === 'personal' ? 'personal' : currentTeam.name;
+      currentTeam.id === TEAM_TYPE.PERSONAL
+        ? TEAM_TYPE.PERSONAL
+        : currentTeam.name;
 
     return (
       <>
@@ -345,7 +351,7 @@ class ItemHeader extends Component {
                     options={teamOptions}
                     optionRender={renderOption(teamsLists)}
                   >
-                    {currentTeam.id !== 'personal' && (
+                    {currentTeam.id !== TEAM_TYPE.PERSONAL && (
                       <TeamAvatar>
                         <TeamImg src={currentTeam.icon} />
                       </TeamAvatar>
@@ -355,7 +361,7 @@ class ItemHeader extends Component {
                   </DropdownStyled>
                 ) : (
                   <>
-                    {currentTeam.id !== 'personal' && (
+                    {currentTeam.id !== TEAM_TYPE.PERSONAL && (
                       <TeamAvatar>
                         <TeamImg src={currentTeam.icon} />
                       </TeamAvatar>

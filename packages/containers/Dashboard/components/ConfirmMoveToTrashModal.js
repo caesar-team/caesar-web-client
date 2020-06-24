@@ -63,7 +63,7 @@ export const ConfirmMoveToTrashModal = ({
     <ConfirmModal
       isOpen={isOpen}
       description="Are you sure you want to move the item(-s) to trash?"
-      onClickOk={handleMoveToTrash}
+      onClickConfirm={handleMoveToTrash}
       onClickCancel={handleCloseModal}
     />
   );

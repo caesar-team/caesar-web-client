@@ -30,7 +30,6 @@ export function configureWebStore(preloadedState) {
       applyMiddleware(sagaMiddleware, offlineMiddleware),
     ),
   );
-  // const persistor = persistStore(store);
 
   const sagaTask = sagaMiddleware.run(rootSaga);
 

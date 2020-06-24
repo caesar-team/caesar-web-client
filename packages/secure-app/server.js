@@ -10,10 +10,16 @@ if (require('fs').existsSync(envFile)) {
   });
 }
 const path = require('path');
+
 const APP_URI = process.env.APP_URI || 'http://localhost';
+const ENABLE_SERVER_LOGGER = process.env.ENABLE_SERVER_LOGGER || false;
+const LOG_LEVEL =
+  process.env.LOG_LEVEL || process.env.NODE_ENV === 'production'
+    ? 'error'
+    : 'debug';
 const fastify = require('fastify')({
   pluginTimeout: 10000 * 2,
-  logger: { level: 'error' },
+  logger: ENABLE_SERVER_LOGGER ? { level: LOG_LEVEL } : false,
 });
 const fastifyStatic = require('fastify-static');
 const Next = require('next');
@@ -42,18 +48,6 @@ fastify.register((fastify, opts, next) => {
         reply.sendFile('images/favicon/favicon-locked.ico'); // serving path.join(__dirname, 'public', 'myHtml.html') directly
       });
 
-      // fastify.get('/a', (req, reply) => {
-      //   return app.render(req.req, reply.res, '/a', req.query).then(() => {
-      //     reply.sent = true;
-      //   });
-      // });
-      //
-      // fastify.get('/b', (req, reply) => {
-      //   return app.render(req.req, reply.res, '/b', req.query).then(() => {
-      //     reply.sent = true;
-      //   });
-      // });
-
       fastify.all('/*', (req, reply) => {
         return handle(req.req, reply.res).then(() => {
           reply.sent = true;
@@ -74,8 +68,8 @@ fastify.register(fastifyStatic, {
   root: path.join(__dirname, 'public'),
   prefix: '/public/', // optional: default '/'
 });
-fastify.listen(APP_PORT, err => {
+fastify.listen(APP_PORT, '::', (err, address) => {
   if (err) throw err;
   // eslint-disable-next-line no-console
-  console.log(`> Ready on http://localhost:${APP_PORT}`);
+  console.log(`> Ready on ${address}`);
 });

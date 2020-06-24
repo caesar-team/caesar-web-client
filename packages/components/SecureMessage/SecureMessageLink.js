@@ -108,12 +108,6 @@ const SecureMessageLinkComponent = ({
   requests = null,
   onClickReturn,
 }) => {
-  logger.info({
-    password,
-    seconds,
-    requests,
-    messageId,
-  });
   useEffectOnce(() => {
     notification.hide();
   });

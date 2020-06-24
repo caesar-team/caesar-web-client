@@ -2,7 +2,6 @@ import React, { Component } from 'react';
 import styled from 'styled-components';
 import copy from 'copy-text-to-clipboard';
 import {
-  Icon,
   withNotification,
   AuthTitle,
   AuthDescription,
@@ -86,30 +85,11 @@ const Form = styled.form`
   margin-top: 50px;
 `;
 
-const Error = styled.div`
-  padding-top: 10px;
-  text-align: center;
-  font-size: 14px;
-  color: ${({ theme }) => theme.color.red};
-`;
-
 const CheckboxWrapper = styled.div`
   display: flex;
   justify-content: center;
   margin-top: 30px;
   margin-bottom: 30px;
-`;
-
-const IconStyled = styled(Icon)`
-  width: 20px;
-  height: 20px;
-  cursor: pointer;
-
-  fill: ${({ theme }) => theme.color.gray};
-
-  &:hover {
-    fill: ${({ theme }) => theme.color.black};
-  }
 `;
 
 class TwoFactorForm extends Component {

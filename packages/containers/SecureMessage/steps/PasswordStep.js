@@ -4,13 +4,16 @@ import { LockInput } from '@caesar/components';
 import { decryptByPassword } from '@caesar/common/utils/cipherUtils';
 import { schema } from '../schema';
 
-export const PasswordStep = ({ message, setDecryptedMessage }) => {
+export const PasswordStep = ({ message, password, setDecryptedMessage }) => {
   const handleSubmitPassword = async (
-    { password },
+    { messagePassword },
     { setSubmitting, setErrors },
   ) => {
     try {
-      const decryptedMessage = await decryptByPassword(message, password);
+      const decryptedMessage = await decryptByPassword(
+        message,
+        messagePassword,
+      );
       setDecryptedMessage(decryptedMessage);
       setSubmitting(false);
     } catch (error) {
@@ -30,7 +33,7 @@ export const PasswordStep = ({ message, setDecryptedMessage }) => {
     submitForm,
     resetForm,
   } = useFormik({
-    initialValues: { password: '' },
+    initialValues: { messagePassword: password },
     validationSchema: schema,
     onSubmit: handleSubmitPassword,
     validateOnChange: false,
@@ -40,8 +43,8 @@ export const PasswordStep = ({ message, setDecryptedMessage }) => {
     <form onSubmit={handleSubmit}>
       <LockInput
         autoFocus
-        name="password"
-        value={values.password}
+        name="messagePassword"
+        value={values.messagePassword}
         onChange={handleChange}
         onClick={submitForm}
         onBackspace={resetForm}

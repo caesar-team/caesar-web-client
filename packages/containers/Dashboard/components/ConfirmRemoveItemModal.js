@@ -39,7 +39,7 @@ export const ConfirmRemoveItemModal = ({ isOpen, handleCloseModal }) => {
     <ConfirmModal
       isOpen={isOpen}
       description="Are you sure you want to delete the item(-s)?"
-      onClickOk={handleRemoveItem}
+      onClickConfirm={handleRemoveItem}
       onClickCancel={handleCloseModal}
     />
   );

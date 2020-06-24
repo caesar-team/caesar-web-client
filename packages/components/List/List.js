@@ -4,7 +4,8 @@ import equal from 'fast-deep-equal';
 import memoize from 'memoize-one';
 import AutoSizer from 'react-virtualized-auto-sizer';
 import { FixedSizeList } from 'react-window';
-import { DASHBOARD_MODE } from '@caesar/common/constants';
+import { upperFirst } from '@caesar/common/utils/string';
+import { DASHBOARD_MODE, LIST_TYPES_ARRAY } from '@caesar/common/constants';
 import { Button } from '@caesar/components';
 import { FixedSizeItem } from './FixedSizeItem';
 import { ScrollbarVirtualList } from './ScrollbarVirtualList';
@@ -32,7 +33,6 @@ const ColumnHeader = styled.div`
 const ColumnTitle = styled.div`
   font-size: 16px;
   font-weight: bold;
-  text-transform: capitalize;
   color: ${({ theme }) => theme.color.black};
 `;
 
@@ -109,13 +109,17 @@ const ListComponent = ({
     );
   };
 
+  const itemTitle = LIST_TYPES_ARRAY.includes(workInProgressList.label)
+    ? upperFirst(workInProgressList.label)
+    : workInProgressList.label;
+
   return (
     <Wrapper isEmpty={isEmpty}>
       {!isMultiItem && (
         <ColumnHeader>
           <ColumnTitle>
             {isDashboardDefaultMode
-              ? workInProgressList.label
+              ? itemTitle
               : `Search results (${items.length} elements):`}
           </ColumnTitle>
           {/* TODO: Add sharing list functional; Set condition when to show this button */}

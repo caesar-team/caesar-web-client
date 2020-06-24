@@ -1,7 +1,8 @@
 import React, { memo } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import styled from 'styled-components';
-import { TEAM_TYPE } from '@caesar/common/constants';
+import { sortByName } from '@caesar/common/utils/utils';
+import { TEAM_TYPE, TEAM_TEXT_TYPE } from '@caesar/common/constants';
 import {
   userDataSelector,
   userTeamListSelector,
@@ -31,13 +32,25 @@ const StyledAvatar = styled(Avatar)`
   margin-right: 16px;
 `;
 
-const TeamsListComponent = ({ activeTeamId, handleToggle }) => {
+const TeamsListComponent = ({
+  activeTeamId,
+  handleToggle,
+  setIsListsOpened,
+}) => {
   const dispatch = useDispatch();
   const user = useSelector(userDataSelector);
-  const teamList = useSelector(userTeamListSelector);
   const currentTeam = useSelector(currentTeamSelector);
+  const teamList = useSelector(userTeamListSelector).sort((a, b) => {
+    if (a.title.toLowerCase() === TEAM_TYPE.DEFAULT) return 1;
+    if (b.title.toLowerCase() === TEAM_TYPE.DEFAULT) return -1;
 
-  const handleChangeTeamId = teamId => {
+    return sortByName(a.title, b.title);
+  });
+
+  const handleChangeTeam = teamId => {
+    handleToggle();
+    setIsListsOpened(true);
+
     if (currentTeam?.id !== teamId) {
       dispatch(setCurrentTeamId(teamId));
     }
@@ -45,11 +58,10 @@ const TeamsListComponent = ({ activeTeamId, handleToggle }) => {
 
   return (
     <>
-      {activeTeamId && (
+      {activeTeamId !== TEAM_TYPE.PERSONAL && (
         <Option
           onClick={() => {
-            handleToggle();
-            handleChangeTeamId(TEAM_TYPE.PERSONAL);
+            handleChangeTeam(TEAM_TYPE.PERSONAL);
           }}
         >
           <StyledAvatar {...user} isSmall />
@@ -61,12 +73,13 @@ const TeamsListComponent = ({ activeTeamId, handleToggle }) => {
           <Option
             key={team.id}
             onClick={() => {
-              handleToggle();
-              handleChangeTeamId(team.id);
+              handleChangeTeam(team.id);
             }}
           >
             <StyledAvatar avatar={team.icon} isSmall />
-            {team.title}
+            {team.title.toLowerCase() === TEAM_TYPE.DEFAULT
+              ? TEAM_TEXT_TYPE[TEAM_TYPE.DEFAULT]
+              : team.title}
           </Option>
         );
       })}

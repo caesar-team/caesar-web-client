@@ -48,7 +48,7 @@ const publicRuntimeConfig = {
   AUTHORIZATION_ENABLE: process.env.AUTHORIZATION_ENABLE !== 'false',
   APP_TYPE: process.env.APP_TYPE || 'general',
   APP_VERSION: process.env.APP_VERSION,
-  LOG_LEVEL: process.env.LOG_LEVEL || process.env.NODE_ENV === 'production' ? 'error' : 'info',
+  LOG_LEVEL: process.env.LOG_LEVEL || process.env.NODE_ENV === 'production' ? 'error' : 'debug',
 };
 
 const serverRuntimeConfig = {};

@@ -20,11 +20,10 @@ const MessagePage = ({ statusCode, message, password }) => (
 MessagePage.getInitialProps = async ({ query }) => {
   let { id } = query;
   let password;
-
   if (id.length > 0 && !UUID_REGEXP.test(id)) {
     const plObject = base64ToObject(id);
     if (!plObject || typeof plObject.messageId === 'undefined') {
-      logger.error('The messageId not found, args: %s,', JSON.stringify(query));
+      logger.error(`The messageId not found, args: %o`, query);
 
       return { statusCode: 404 };
     }
@@ -37,7 +36,10 @@ MessagePage.getInitialProps = async ({ query }) => {
 
     return { message: data.message, password };
   } catch (e) {
-    logger.error(JSON.stringify(e.data, null, 4));
+    logger.error(
+      'The error caused by the getSecureMessage, the error: %o',
+      e.data,
+    );
 
     return { statusCode: 404 };
   }

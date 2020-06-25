@@ -79,28 +79,29 @@ export const patchListSort = (listId, data) =>
 
 export const getUserBootstrap = () => callApi.get('/user/security/bootstrap');
 
-export const postCreateItem = data => callApi.post('/item', data);
+export const postCreateItem = data => callApi.post('/items', data);
 
-export const postCreateItemsBatch = data => callApi.post('/item/batch', data);
+export const postCreateItemsBatch = data => callApi.post('/items/batch', data);
 
-export const removeItem = itemId => callApi.delete(`/item/${itemId}`);
+export const removeItem = itemId => callApi.delete(`/items/${itemId}`);
 
-export const removeItemsBatch = query => callApi.delete(`/item/batch?${query}`);
+export const removeItemsBatch = query =>
+  callApi.delete(`/items/batch?${query}`);
 
 export const updateMoveItem = (itemId, data) =>
-  callApi.patch(`/item/${itemId}/move`, data);
+  callApi.patch(`/items/${itemId}/move`, data);
 
 export const updateMoveItemsBatch = (data, listId) =>
-  callApi.patch(`/item/batch/move/list/${listId}`, data);
+  callApi.patch(`/items/batch/move/list/${listId}`, data);
 
 export const updateItem = (itemId, data) =>
-  callApi.patch(`/item/${itemId}`, data);
+  callApi.patch(`/items/${itemId}`, data);
 
 export const postCreateChildItem = (itemId, data) =>
-  callApi.post(`/item/${itemId}/child_item`, data);
+  callApi.post(`/items/${itemId}/child_item`, data);
 
 export const postCreateChildItemBatch = data =>
-  callApi.post('item/batch/share', data);
+  callApi.post('/items/batch/share', data);
 
 export const patchChildAccess = (childItemId, data) =>
   callApi.patch(`/child_item/${childItemId}/access`, data);
@@ -109,10 +110,10 @@ export const patchChildItem = (childItemId, data) =>
   callApi.patch(`/child_item/${childItemId}`, data);
 
 export const acceptUpdateItem = itemId =>
-  callApi.post(`/item/${itemId}/accept_update`);
+  callApi.post(`/items/${itemId}/accept_update`);
 
 export const rejectUpdateItem = itemId =>
-  callApi.post(`/item/${itemId}/decline_update`);
+  callApi.post(`/items/${itemId}/decline_update`);
 
 export const deleteChildItem = childItemId =>
   callApi.delete(`/child_item/${childItemId}`);
@@ -125,7 +126,7 @@ export const patchList = (listId, data) =>
 
 export const removeList = listId => callApi.delete(`/list/${listId}`);
 
-export const toggleFavorite = id => callApi.post(`/item/${id}/favorite`);
+export const toggleFavorite = id => callApi.post(`/items/${id}/favorite`);
 
 export const getPublicKeyByEmailBatch = data =>
   callApi.post('/key/batch', data);

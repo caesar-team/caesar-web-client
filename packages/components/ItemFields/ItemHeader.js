@@ -1,5 +1,8 @@
 import React from 'react';
+import { useDispatch } from 'react-redux';
 import styled from 'styled-components';
+import { setWorkInProgressItem } from '@caesar/common/actions/workflow';
+import { toggleItemToFavoriteRequest } from '@caesar/common/actions/entities/item';
 import { Button } from '../Button';
 
 const ColumnHeader = styled.div`
@@ -22,7 +25,22 @@ const Delimeter = styled.span`
   margin: 0 16px;
 `;
 
+const ActionButton = styled(Button)`
+  margin-left: 16px;
+`;
+
 export const ItemHeader = ({ item }) => {
+  const dispatch = useDispatch();
+  const { id, favorite } = item;
+
+  const handleToggleFavorites = () => {
+    dispatch(toggleItemToFavoriteRequest(id));
+  };
+
+  const handleClickCloseItem = () => {
+    dispatch(setWorkInProgressItem(null));
+  };
+
   return (
     <ColumnHeader>
       <PathButton
@@ -35,6 +53,19 @@ export const ItemHeader = ({ item }) => {
         <Delimeter>|</Delimeter>
         Passwords
       </PathButton>
+      <ActionButton
+        icon="share"
+        color="white"
+        onClick={() => {
+          console.log('Share');
+        }}
+      />
+      <ActionButton
+        icon={favorite ? 'favorite-active' : 'favorite'}
+        color="white"
+        onClick={handleToggleFavorites}
+      />
+      <ActionButton icon="close" color="white" onClick={handleClickCloseItem} />
     </ColumnHeader>
   );
 };

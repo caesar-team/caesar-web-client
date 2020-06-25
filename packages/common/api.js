@@ -47,14 +47,7 @@ callApi.interceptors.response.use(
 
 // user
 export const getUserSelf = token =>
-  callApi.get('/user/self', {
-    headers: {
-      Authorization: token ? `Bearer ${token}` : '',
-    },
-  });
-
-export const getUsers = token =>
-  callApi.get('/user', {
+  callApi.get('/users/self', {
     headers: {
       Authorization: token ? `Bearer ${token}` : '',
     },

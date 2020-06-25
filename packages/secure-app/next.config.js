@@ -10,7 +10,7 @@ if (require('fs').existsSync(envFile)) {
     }`,
   });
 }
-
+const package = require('./package.json');
 const withPlugins = require('next-compose-plugins');
 const withWorkers = require('@zeit/next-workers');
 const withFonts = require('next-fonts');
@@ -47,7 +47,7 @@ const publicRuntimeConfig = {
   LENGTH_KEY: process.env.LENGTH_KEY || 2048,
   AUTHORIZATION_ENABLE: process.env.AUTHORIZATION_ENABLE !== 'false',
   APP_TYPE: process.env.APP_TYPE || 'general',
-  APP_VERSION: process.env.APP_VERSION,
+  APP_VERSION: process.env.APP_VERSION || package.version,
   LOG_LEVEL: process.env.LOG_LEVEL || process.env.NODE_ENV === 'production' ? 'error' : 'info',
 };
 

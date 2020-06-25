@@ -7,7 +7,7 @@ import { Icon } from '../Icon';
 const LogoLink = styled.a`
   display: block;
   transition: 0.3s;
-
+  z-index: 1;
   &:hover {
     opacity: 0.75;
   }

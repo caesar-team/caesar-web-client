@@ -1,6 +1,9 @@
 import React from 'react';
 import styled from 'styled-components';
+import { APP_VERSION } from '@caesar/common/constants';
 import LayoutConstructor from './LayoutConstructor';
+import { SecureHeader } from './SecureHeader';
+import { AppVersion } from './AppVersion';
 
 const LayoutConstructorStyled = styled(LayoutConstructor)`
   ${LayoutConstructor.TopWrapper} {
@@ -16,6 +19,12 @@ const LayoutConstructorStyled = styled(LayoutConstructor)`
   }
 `;
 
-const ErrorLayout = props => <LayoutConstructorStyled {...props} />;
+const ErrorLayout = props => (
+  <LayoutConstructorStyled
+    headerComponent={<SecureHeader />}
+    footerComponent={<AppVersion>{APP_VERSION}</AppVersion>}
+    {...props}
+  />
+);
 
 export default ErrorLayout;

@@ -4,6 +4,7 @@ import { media } from '@caesar/assets/styles/media';
 import { APP_VERSION } from '@caesar/common/constants';
 import LayoutConstructor from './LayoutConstructor';
 import { SecureHeader } from './SecureHeader';
+import { AppVersion } from './AppVersion';
 
 const LayoutConstructorStyled = styled(LayoutConstructor)`
   padding: 0;
@@ -74,11 +75,6 @@ const LayoutConstructorStyled = styled(LayoutConstructor)`
   }
 `;
 
-const AppVersion = styled.div`
-  font-size: ${({ theme }) => theme.font.size.xs};
-  line-height: ${({ theme }) => theme.font.lineHeight.xs};
-  color: ${({ theme }) => theme.color.gray};
-`;
 
 const SecureLayout = props => {
   return (

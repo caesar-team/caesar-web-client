@@ -1,6 +1,7 @@
 export { Attachments } from './Attachments';
 export { Input } from './Input';
 export { ItemHeader } from './ItemHeader';
+export { NewFilesModal } from './NewFilesModal';
 export { Note } from './Note';
 export { OwnerAndInvitation } from './OwnerAndInvitation';
 export { Row } from './Row';

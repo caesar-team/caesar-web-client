@@ -1,9 +1,10 @@
-import React from 'react';
+import React, { useState } from 'react';
 import styled from 'styled-components';
 import { downloadFile, downloadAsZip } from '@caesar/common/utils/file';
 import { Icon } from '../Icon';
 import { File } from '../File';
 import { Uploader } from '../Uploader';
+import { NewFilesModal } from './NewFilesModal';
 
 const Wrapper = styled.div``;
 
@@ -61,6 +62,9 @@ const AddNewAttach = styled.div`
 `;
 
 export const Attachments = ({ attachments }) => {
+  const [newFiles, setNewFiles] = useState([]);
+  const [isModalOpened, setIsModalOpened] = useState(false);
+
   const handleClickDownloadFile = attachment => {
     const { raw, name } = attachment;
 
@@ -75,8 +79,9 @@ export const Attachments = ({ attachments }) => {
     console.log('onClickRemove');
   };
 
-  const handleChange = () => {
-    console.log('handleChange');
+  const handleChange = (name, files) => {
+    setNewFiles(files);
+    setIsModalOpened(true);
   };
 
   return (
@@ -109,6 +114,9 @@ export const Attachments = ({ attachments }) => {
           )}
         </Uploader>
       </Inner>
+      {isModalOpened && (
+        <NewFilesModal files={newFiles} closeModal={() => setIsModalOpened()} />
+      )}
     </Wrapper>
   );
 };

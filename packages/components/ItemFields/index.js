@@ -1,3 +1,4 @@
+export { Attachments } from './Attachments';
 export { Input } from './Input';
 export { ItemHeader } from './ItemHeader';
 export { Note } from './Note';

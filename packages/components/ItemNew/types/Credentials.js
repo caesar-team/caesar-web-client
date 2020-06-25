@@ -6,11 +6,12 @@ import {
   Row,
   Input,
   Note,
+  Attachments,
 } from '../../ItemFields';
 
 export const Credentials = ({ item }) => {
   const {
-    data: { name, login, pass, website, note },
+    data: { name, login, pass, website, note, attachments = [] },
   } = item;
 
   return (
@@ -28,6 +29,9 @@ export const Credentials = ({ item }) => {
       </Row>
       <Row marginBottom={24}>
         <Note value={note} />
+      </Row>
+      <Row marginBottom={24}>
+        <Attachments attachments={attachments} />
       </Row>
     </Wrapper>
   );

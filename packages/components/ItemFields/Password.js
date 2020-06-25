@@ -27,6 +27,7 @@ export const Password = ({ value }) => {
     <Input
       label="Password"
       value={isVisible ? value : '********'}
+      valueToCopy={value}
       addonIcons={
         <HoldClickBehaviour
           onHoldStart={handleHoldStart}

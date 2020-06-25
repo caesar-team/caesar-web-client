@@ -76,6 +76,7 @@ const InputComponent = ({
   label,
   placeholder,
   value: propValue,
+  valueToCopy,
   withCopyButton = true,
   withEllipsis,
   notification,
@@ -91,7 +92,7 @@ const InputComponent = ({
   };
 
   const handleClickCopy = () => {
-    copyToClipboard(propValue);
+    copyToClipboard(valueToCopy || propValue);
     notification.show({
       text: `The ${label.toLowerCase()} has been copied.`,
     });

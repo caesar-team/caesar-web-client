@@ -20,16 +20,18 @@ const Label = styled.div`
 const ValueInner = styled.div`
   display: flex;
   align-items: center;
-  width: calc(100% - 68px);
   margin-right: auto;
-  flex: 1 1 auto;
   overflow: hidden;
 `;
 
 const Value = styled.div`
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  ${({ withEllipsis }) =>
+    withEllipsis &&
+    `
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  `}
 `;
 
 const StyledIcon = styled(Icon)`
@@ -75,6 +77,7 @@ const InputComponent = ({
   placeholder,
   value: propValue,
   withCopyButton = true,
+  withEllipsis,
   notification,
   className,
 }) => {
@@ -116,7 +119,7 @@ const InputComponent = ({
         <ValueWrapper>
           {label && <Label>{label}</Label>}
           <ValueInner>
-            <Value>{value}</Value>
+            <Value withEllipsis={withEllipsis}>{value}</Value>
             {withCopyButton && (
               <CopyIcon
                 name="copy"

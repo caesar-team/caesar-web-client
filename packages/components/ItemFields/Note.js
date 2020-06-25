@@ -49,6 +49,7 @@ const AddBtn = styled(Button)`
 
 export const Note = ({ value: propValue }) => {
   const [isEdit, setIsEdit] = useState(false);
+  const [isFocused, setIsFocused] = useState(false);
   const [value, setValue] = useState(propValue);
 
   const handleClickAdd = () => {
@@ -57,6 +58,7 @@ export const Note = ({ value: propValue }) => {
 
   const handleClickEdit = () => {
     setIsEdit(true);
+    setIsFocused(true);
   };
 
   const handleClickAcceptEdit = () => {
@@ -69,7 +71,7 @@ export const Note = ({ value: propValue }) => {
 
   return (
     <Wrapper>
-      {value || isEdit ? (
+      {propValue || isEdit ? (
         <>
           <StyledFormTextArea
             label="Notes"
@@ -79,6 +81,7 @@ export const Note = ({ value: propValue }) => {
             handleClickAcceptEdit={handleClickAcceptEdit}
             handleClickAway={() => setIsEdit(false)}
             handleClickClose={() => setIsEdit(false)}
+            isFocused={isFocused}
             isEdit={isEdit}
           />
           {!isEdit && (

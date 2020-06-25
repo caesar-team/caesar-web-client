@@ -25,7 +25,7 @@ export const Credentials = ({ item }) => {
         <Input label="Password" value={pass} />
       </Row>
       <Row>
-        <Input label="Website" value={website} />
+        <Input label="Website" value={website} withEllipsis />
       </Row>
       <Row marginBottom={24}>
         <Note value={note} />

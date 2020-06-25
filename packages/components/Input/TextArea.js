@@ -1,4 +1,5 @@
-import React from 'react';
+import React, { useRef } from 'react';
+import { useUpdateEffect } from 'react-use';
 import styled from 'styled-components';
 
 const Label = styled.label`
@@ -56,9 +57,17 @@ const TextArea = ({
   label,
   value,
   placeholder = 'Write here something…',
+  isFocused,
   ...props
 }) => {
+  const textareaRef = useRef(null);
   const isError = !!error;
+
+  useUpdateEffect(() => {
+    if (isFocused) {
+      return textareaRef?.current?.focus();
+    }
+  }, [isFocused]);
 
   return (
     <Label className={className}>
@@ -67,6 +76,7 @@ const TextArea = ({
         isError={isError}
         value={value}
         placeholder={placeholder}
+        ref={textareaRef}
         {...props}
       />
       {error && <Error>{error}</Error>}

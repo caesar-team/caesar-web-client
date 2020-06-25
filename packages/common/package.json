@@ -5,6 +5,7 @@
   "author": "<ave@caesar.team>",
   "license": "SEE LICENSE IN LICENSE",
   "dependencies": {
-    "@caesar/assets": "1.0.0"
+    "@caesar/assets": "1.0.0",
+    "pino-pretty": "^4.0.0"
   }
 }

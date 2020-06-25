@@ -60,8 +60,6 @@
     "object-sizeof": "^1.5.1",
     "openpgp": "^4.6.2",
     "papaparse": "^5.0.0",
-    "pino": "^6.3.2",
-    "pino-pretty": "^4.0.0",
     "polished": "^3.4.1",
     "prop-types": "^15.7.2",
     "react": "^16.8.6",

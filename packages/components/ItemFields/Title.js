@@ -17,8 +17,11 @@ const StyledInput = styled(Input)`
     border-bottom: 1px solid transparent;
   }
 
-  ${Input.Value} {
+  ${Input.ValueInner} {
     margin-right: unset;
+  }
+
+  ${Input.Value} {
     font-size: ${({ theme }) => theme.font.size.big};
     line-height: ${({ theme }) => theme.font.lineHeight.big};
   }

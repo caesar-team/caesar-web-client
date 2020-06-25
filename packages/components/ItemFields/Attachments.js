@@ -88,13 +88,15 @@ export const Attachments = ({ attachments }) => {
     <Wrapper>
       <Title>
         Attachments ({attachments.length})
-        <DownloadIcon
-          name="download"
-          width={16}
-          height={16}
-          color="gray"
-          onClick={handleClickDownloadAll}
-        />
+        {attachments.length > 0 && (
+          <DownloadIcon
+            name="download"
+            width={16}
+            height={16}
+            color="gray"
+            onClick={handleClickDownloadAll}
+          />
+        )}
       </Title>
       <Inner>
         {attachments.map(attach => (

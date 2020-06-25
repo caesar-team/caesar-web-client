@@ -79,6 +79,7 @@ const InputComponent = ({
   withCopyButton = true,
   withEllipsis,
   notification,
+  addonIcons,
   className,
 }) => {
   const [isEdit, setIsEdit] = useState(false);
@@ -90,9 +91,9 @@ const InputComponent = ({
   };
 
   const handleClickCopy = () => {
-    copyToClipboard(value);
+    copyToClipboard(propValue);
     notification.show({
-      text: `The ${label} has been copied.`,
+      text: `The ${label.toLowerCase()} has been copied.`,
     });
   };
 
@@ -119,8 +120,8 @@ const InputComponent = ({
         <ValueWrapper>
           {label && <Label>{label}</Label>}
           <ValueInner>
-            <Value withEllipsis={withEllipsis}>{value}</Value>
-            {withCopyButton && (
+            <Value withEllipsis={withEllipsis}>{propValue}</Value>
+            {withCopyButton && propValue && (
               <CopyIcon
                 name="copy"
                 width={20}
@@ -130,6 +131,7 @@ const InputComponent = ({
               />
             )}
           </ValueInner>
+          {addonIcons}
           <PencilIcon
             name="pencil"
             width={20}
@@ -146,6 +148,7 @@ const InputComponent = ({
 const Input = withNotification(InputComponent);
 
 Input.ValueWrapper = ValueWrapper;
+Input.ValueInner = ValueInner;
 Input.Value = Value;
 Input.PencilIcon = PencilIcon;
 Input.InputField = FormInput.InputField;

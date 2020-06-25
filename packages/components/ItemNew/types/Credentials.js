@@ -5,6 +5,8 @@ import {
   OwnerAndInvitation,
   Row,
   Input,
+  Password,
+  Website,
   Note,
   Attachments,
 } from '../../ItemFields';
@@ -22,10 +24,10 @@ export const Credentials = ({ item }) => {
         <Input label="Login" value={login} />
       </Row>
       <Row>
-        <Input label="Password" value={pass} />
+        <Password value={pass} />
       </Row>
       <Row>
-        <Input label="Website" value={website} withEllipsis />
+        <Website value={website} />
       </Row>
       <Row marginBottom={24}>
         <Note value={note} />

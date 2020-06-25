@@ -2,6 +2,7 @@ export const SECURE_MESSAGE_FORM_STEP = 'SECURE_MESSAGE_FORM_STEP';
 export const SECURE_MESSAGE_LINK_STEP = 'SECURE_MESSAGE_LINK_STEP';
 
 export const ONE_SIXTH_HOUR = 60 * 10;
+export const ONE_MINUTE = 60;
 export const ONE_HOUR = 60 * 60;
 export const HALF_DAY = 60 * 60 * 12;
 export const DAY = 60 * 60 * 24;

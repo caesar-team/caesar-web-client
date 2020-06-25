@@ -1,19 +1,29 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import ContentEditable from 'react-contenteditable';
 
-class ReadOnlyContentEditable extends React.Component {
-  constructor(props) {
-    super(props);
-    this.contentEditable = React.createRef();
-    this.state = { html: props.html || '' };
-  }
+export const ContentEditableComponent = ({
+  html = '',
+  disabled = false,
+  handleFocus = () => {},
+  handleClick = () => {},
+}) => {
+  const [getHtml, setHtml] = useState(html);
+  const contentEditable = React.createRef();
 
-  handleChange = evt => {
-    this.setState({ html: evt.target.value });
+  const handleChange = e => {
+    setHtml(e.target.value);
   };
 
-  render = () => {
-    return (
+  const handleReadOnlyFocus = e => {
+    e.target.blur();
+  };
+
+  useEffect(() => {
+    setHtml(html);
+  });
+
+  return (
+    <>
       <ContentEditable
         style={{ outline: 'none' }}
         onCut={() => false}
@@ -21,13 +31,15 @@ class ReadOnlyContentEditable extends React.Component {
         onKeyDown={event => {
           return !event.metaKey ? event.preventDefault() : true;
         }}
-        innerRef={this.contentEditable}
-        html={this.state.html}
-        disabled={false}
-        onChange={this.handleChange}
+        innerRef={contentEditable}
+        html={getHtml}
+        disabled={disabled}
+        onChange={handleChange}
+        onClick={handleClick}
+        onFocus={disabled ? handleReadOnlyFocus : handleFocus}
       />
-    );
-  };
-}
+    </>
+  );
+};
 
-export default ReadOnlyContentEditable;
+export default ContentEditableComponent;

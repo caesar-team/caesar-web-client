@@ -6,6 +6,7 @@ import {
   encryptByPassword,
   decryptByPassword,
 } from '@caesar/common/utils/cipherUtils';
+import { logger } from '@caesar/common/utils/logger';
 import { generator } from '@caesar/common/utils/password';
 import { postSecureMessage } from '@caesar/common/fetch';
 import {
@@ -93,14 +94,14 @@ const SecureMessageComponent = ({
           });
         });
       } catch (error) {
-        console.log(error);
+        logger.error(error);
         setFieldError('form', error.message);
         notification.hide();
         setSubmitting(false);
       }
     };
 
-    submit();
+    submit().then();
   };
 
   const handleClickReturn = () => {
@@ -121,7 +122,7 @@ const SecureMessageComponent = ({
       ),
       SECURE_MESSAGE_LINK_STEP: (
         <SecureMessageLink
-          link={messageId}
+          messageId={messageId}
           password={password}
           seconds={seconds}
           requests={requests}

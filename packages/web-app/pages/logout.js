@@ -1,6 +1,6 @@
 import React from 'react';
-import { useDispatch } from 'react-redux';
 import { useIsomorphicLayoutEffect } from 'react-use';
+import { useDispatch } from 'react-redux';
 import { logout } from '@caesar/common/actions/user';
 
 export default () => {

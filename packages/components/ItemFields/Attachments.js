@@ -61,7 +61,7 @@ const AddNewAttach = styled.div`
   }
 `;
 
-export const Attachments = ({ attachments }) => {
+export const Attachments = ({ attachments, handleClickAcceptEdit }) => {
   const [newFiles, setNewFiles] = useState([]);
   const [isModalOpened, setIsModalOpened] = useState(false);
 
@@ -82,6 +82,8 @@ export const Attachments = ({ attachments }) => {
   const handleChange = (name, files) => {
     setNewFiles(files);
     setIsModalOpened(true);
+
+    handleClickAcceptEdit({ label: name, value: [...attachments, ...files] });
   };
 
   return (

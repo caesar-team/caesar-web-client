@@ -628,7 +628,7 @@ export function* updateItemSaga({ payload: { item } }) {
   }
 }
 
-export function* editItemSaga({ payload: { item }, meta: { setSubmitting } }) {
+export function* editItemSaga({ payload: { item } }) {
   try {
     const { listId, attachments, type, ...data } = item;
 
@@ -672,8 +672,6 @@ export function* editItemSaga({ payload: { item }, meta: { setSubmitting } }) {
       updateGlobalNotification(getServerErrorMessage(error), false, true),
     );
     yield put(editItemFailure());
-  } finally {
-    setSubmitting(false);
   }
 }
 

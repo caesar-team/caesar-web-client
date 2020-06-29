@@ -11,29 +11,39 @@ import {
   Attachments,
 } from '../../ItemFields';
 
-export const Credentials = ({ item }) => {
+export const Credentials = ({ item, handleClickAcceptEdit }) => {
   const {
     data: { name, login, pass, website, note, attachments = [] },
   } = item;
 
   return (
     <Wrapper>
-      <Title value={name} />
+      <Title value={name} handleClickAcceptEdit={handleClickAcceptEdit} />
       <OwnerAndInvitation />
       <Row>
-        <Input label="Login" value={login} />
+        <Input
+          label="Login"
+          value={login}
+          handleClickAcceptEdit={handleClickAcceptEdit}
+        />
       </Row>
       <Row>
-        <Password value={pass} />
+        <Password value={pass} handleClickAcceptEdit={handleClickAcceptEdit} />
       </Row>
       <Row>
-        <Website value={website} />
+        <Website
+          value={website}
+          handleClickAcceptEdit={handleClickAcceptEdit}
+        />
       </Row>
       <Row marginBottom={24}>
-        <Note value={note} />
+        <Note value={note} handleClickAcceptEdit={handleClickAcceptEdit} />
       </Row>
       <Row marginBottom={24}>
-        <Attachments attachments={attachments} />
+        <Attachments
+          attachments={attachments}
+          handleClickAcceptEdit={handleClickAcceptEdit}
+        />
       </Row>
     </Wrapper>
   );

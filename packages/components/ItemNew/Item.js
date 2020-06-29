@@ -1,8 +1,9 @@
 import React, { memo } from 'react';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import equal from 'fast-deep-equal';
 import { ITEM_TYPE } from '@caesar/common/constants';
 import { workInProgressItemSelector } from '@caesar/common/selectors/workflow';
+import { editItemRequest } from '@caesar/common/actions/entities/item';
 import { ItemHeader } from '../ItemFields';
 import { EmptyItem } from './EmptyItem';
 import { Credentials, Document } from './types';
@@ -13,17 +14,39 @@ const ItemComponent = ({
   onClickMoveToTrash = Function.prototype,
   onClickRemoveItem = Function.prototype,
 }) => {
+  const dispatch = useDispatch();
   const item = useSelector(workInProgressItemSelector);
 
   if (!item) {
     return <EmptyItem />;
   }
 
-  const { type } = item;
+  const { type, data, listId } = item;
+
+  const handleClickAcceptEdit = ({ label, value }) => {
+    const updatedData = { ...data, listId, [label]: value };
+
+    dispatch(editItemRequest(updatedData));
+    notification.show({
+      text: `The '${updatedData.name}' has been updated`,
+    });
+  };
 
   const renderedItem = {
-    [ITEM_TYPE.CREDENTIALS]: <Credentials item={item} />,
-    [ITEM_TYPE.DOCUMENT]: <Document item={item} />,
+    [ITEM_TYPE.CREDENTIALS]: (
+      <Credentials
+        notification={notification}
+        item={item}
+        handleClickAcceptEdit={handleClickAcceptEdit}
+      />
+    ),
+    [ITEM_TYPE.DOCUMENT]: (
+      <Document
+        notification={notification}
+        item={item}
+        handleClickAcceptEdit={handleClickAcceptEdit}
+      />
+    ),
   };
 
   return (

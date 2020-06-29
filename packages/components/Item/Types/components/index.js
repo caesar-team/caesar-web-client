@@ -1,7 +1,7 @@
 export { Wrapper } from './Wrapper';
 export { Form } from './Form';
 export { Row } from './Row';
-export { ItemHeader } from './ItemHeader';
+export { default as ItemHeader } from './ItemHeader';
 export { FieldWrapper } from './FieldWrapper';
 export { Field } from './Field';
 export { FieldValue } from './FieldValue';

@@ -58,7 +58,6 @@ const FormTextArea = ({
   const textareaRef = useRef(null);
 
   useClickAway(textareaRef, handleClickAway);
-  useKeyPressEvent('Enter', handleClickAcceptEdit);
   useKeyPressEvent('Escape', handleClickClose);
 
   return (

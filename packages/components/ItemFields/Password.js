@@ -13,7 +13,7 @@ const EyeIcon = styled(Icon)`
   }
 `;
 
-export const Password = ({ value }) => {
+export const Password = ({ value, handleClickAcceptEdit }) => {
   const [isVisible, setIsVisible] = useState(false);
 
   const handleHoldStart = () => {
@@ -26,8 +26,10 @@ export const Password = ({ value }) => {
   return (
     <Input
       label="Password"
+      apiLabel="pass"
       value={isVisible ? value : '********'}
       valueToCopy={value}
+      handleClickAcceptEdit={handleClickAcceptEdit}
       addonIcons={
         <HoldClickBehaviour
           onHoldStart={handleHoldStart}

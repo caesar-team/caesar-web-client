@@ -74,6 +74,7 @@ const ValueWrapper = styled.div`
 
 const InputComponent = ({
   label,
+  apiLabel,
   placeholder,
   value: propValue,
   valueToCopy,
@@ -81,15 +82,12 @@ const InputComponent = ({
   withEllipsis,
   notification,
   addonIcons,
+  handleClickAcceptEdit = Function.prototype,
   className,
 }) => {
   const [isEdit, setIsEdit] = useState(false);
   const [value, setValue] = useState(propValue);
   const [, copyToClipboard] = useCopyToClipboard();
-
-  const handleClickAcceptEdit = () => {
-    console.log('handleClickAcceptEdit: ');
-  };
 
   const handleClickCopy = () => {
     copyToClipboard(valueToCopy || propValue);
@@ -112,7 +110,13 @@ const InputComponent = ({
           placeholder={placeholder}
           isAcceptIconDisabled={!value}
           handleChange={e => setValue(e.target.value)}
-          handleClickAcceptEdit={handleClickAcceptEdit}
+          handleClickAcceptEdit={() => {
+            handleClickAcceptEdit({
+              label: apiLabel || label.toLowerCase(),
+              value,
+            });
+            setIsEdit(false);
+          }}
           handleClickClose={handleClickClose}
           handleClickAway={handleClickClose}
           withBorder

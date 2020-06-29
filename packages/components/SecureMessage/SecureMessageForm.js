@@ -80,7 +80,7 @@ const TextAreaStyled = styled(TextArea)`
 `;
 
 const Error = styled.div`
-  font-size: 14px;
+  font-size: ${({ theme }) => theme.font.size.small};
   color: ${({ theme }) => theme.color.red};
 `;
 

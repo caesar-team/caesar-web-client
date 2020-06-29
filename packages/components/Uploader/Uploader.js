@@ -1,7 +1,10 @@
 import React from 'react';
 import styled from 'styled-components';
 import Dropzone from 'react-dropzone';
-import { filesToBase64 } from '@caesar/common/utils/file';
+import {
+  filesToBase64,
+  splitFilesToUniqAndDuplicates,
+} from '@caesar/common/utils/file';
 import { useMedia } from '@caesar/common/hooks';
 import { TOTAL_MAX_UPLOADING_FILES_SIZES } from '@caesar/common/constants';
 import { Icon } from '../Icon';
@@ -52,27 +55,6 @@ const Error = styled.div`
   font-size: 14px;
   color: ${({ theme }) => theme.color.red};
 `;
-
-const splitFilesToUniqAndDuplicates = files => {
-  const uniqFiles = [];
-  const duplicatedFiles = [];
-
-  const map = new Map();
-
-  // eslint-disable-next-line no-restricted-syntax
-  for (const file of files) {
-    const checkLabel = `${file.name}_${file.raw.length}`;
-
-    if (!map.has(checkLabel)) {
-      map.set(checkLabel, true);
-      uniqFiles.push(file);
-    } else {
-      duplicatedFiles.push(file);
-    }
-  }
-
-  return { uniqFiles, duplicatedFiles };
-};
 
 const getNotificationText = files =>
   files.length > 1

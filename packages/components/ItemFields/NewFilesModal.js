@@ -53,7 +53,7 @@ export const NewFilesModal = ({ files, closeModal }) => {
     <Wrapper>
       <Header>
         <HeaderText>
-          {files.length} {files.length === 1 ? 'upload' : 'uploads'} complete
+          {files.length} {files.length === 1 ? 'upload' : 'uploads'}
         </HeaderText>
         <ArrowIcon
           name="arrow-triangle"
@@ -73,8 +73,8 @@ export const NewFilesModal = ({ files, closeModal }) => {
       </Header>
       {isDropdownOpened && (
         <Inner>
-          {files.map(({ name, raw }) => (
-            <File key={raw} name={name} raw={raw} />
+          {files.map(({ name, raw, error }) => (
+            <File key={raw} name={name} raw={raw} error={error} />
           ))}
         </Inner>
       )}

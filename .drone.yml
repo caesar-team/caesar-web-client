@@ -196,7 +196,7 @@ steps:
 - name: build feature
   <<: *stepFeatureBuild
   when:
-    branch: [ feature/* , hotfix/* ]
+    branch: [ feature/* ]
 
 - name: build develop
   <<: *stepDevelopBuild
@@ -226,5 +226,4 @@ trigger:
   - master
   - develop
   - feature/*
-  - hotfix/*
   

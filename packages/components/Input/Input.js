@@ -108,9 +108,9 @@ const Input = ({
   withBorder,
   onBlur,
   isAcceptIconDisabled,
-  handleClickAcceptEdit = Function.prototype,
-  handleClickClose = Function.prototype,
-  handleClickAway = Function.prototype,
+  handleClickAcceptEdit,
+  handleClickClose,
+  handleClickAway,
   children,
   className,
   ...props
@@ -155,7 +155,7 @@ const Input = ({
         onFocus={handleFocus}
         onBlur={handleBlur}
       />
-      {postfix && (
+      {(postfix || handleClickAcceptEdit || handleClickClose) && (
         <PostFix>
           {handleClickAcceptEdit && (
             <StyledIcon

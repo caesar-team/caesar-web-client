@@ -110,7 +110,7 @@ const InputComponent = ({
           value={value}
           placeholder={placeholder}
           isAcceptIconDisabled={!value}
-          handleChange={e => setValue(e.target.value)}
+          onChange={e => setValue(e.target.value)}
           handleClickAcceptEdit={() => {
             handleClickAcceptEdit({ name, value });
             setIsEdit(false);
@@ -150,9 +150,10 @@ const InputComponent = ({
 
 const InputField = withNotification(InputComponent);
 
-Input.ValueWrapper = ValueWrapper;
-Input.ValueInner = ValueInner;
-Input.Value = Value;
-Input.PencilIcon = PencilIcon;
+InputField.ValueWrapper = ValueWrapper;
+InputField.ValueInner = ValueInner;
+InputField.Value = Value;
+InputField.PencilIcon = PencilIcon;
+InputField.InputField = Input.InputField;
 
 export { InputField as Input };

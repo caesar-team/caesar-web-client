@@ -1,5 +1,6 @@
-import React, { memo } from 'react';
+import React, { memo, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
+import styled from 'styled-components';
 import equal from 'fast-deep-equal';
 import { ITEM_TYPE } from '@caesar/common/constants';
 import { workInProgressItemSelector } from '@caesar/common/selectors/workflow';
@@ -7,6 +8,14 @@ import { editItemRequest } from '@caesar/common/actions/entities/item';
 import { ItemHeader } from '../ItemFields';
 import { EmptyItem } from './EmptyItem';
 import { Credentials, Document } from './types';
+
+const Wrapper = styled.div`
+  ${({ isDisabled }) =>
+    isDisabled &&
+    `
+    pointer-events: none;
+  `}
+`;
 
 const ItemComponent = ({
   notification,
@@ -16,6 +25,7 @@ const ItemComponent = ({
 }) => {
   const dispatch = useDispatch();
   const item = useSelector(workInProgressItemSelector);
+  const [isSubmitting, setSubmitting] = useState(false);
 
   if (!item) {
     return <EmptyItem />;
@@ -24,36 +34,26 @@ const ItemComponent = ({
   const { type, data, listId } = item;
 
   const handleClickAcceptEdit = ({ name, value }) => {
+    setSubmitting(true);
     const updatedData = { ...data, listId, [name]: value };
 
-    dispatch(editItemRequest(updatedData));
-    notification.show({
-      text: `The '${updatedData.name}' has been updated`,
-    });
+    dispatch(editItemRequest(updatedData, setSubmitting, notification));
   };
 
   const renderedItem = {
     [ITEM_TYPE.CREDENTIALS]: (
-      <Credentials
-        notification={notification}
-        item={item}
-        handleClickAcceptEdit={handleClickAcceptEdit}
-      />
+      <Credentials item={item} handleClickAcceptEdit={handleClickAcceptEdit} />
     ),
     [ITEM_TYPE.DOCUMENT]: (
-      <Document
-        notification={notification}
-        item={item}
-        handleClickAcceptEdit={handleClickAcceptEdit}
-      />
+      <Document item={item} handleClickAcceptEdit={handleClickAcceptEdit} />
     ),
   };
 
   return (
-    <>
+    <Wrapper isDisabled={isSubmitting}>
       <ItemHeader item={item} />
       {renderedItem[type]}
-    </>
+    </Wrapper>
   );
 };
 

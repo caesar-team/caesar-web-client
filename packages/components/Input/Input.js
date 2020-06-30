@@ -110,7 +110,7 @@ const Input = ({
   isAcceptIconDisabled,
   handleClickAcceptEdit,
   handleClickClose,
-  handleClickAway,
+  handleClickAway = Function.prototype,
   children,
   className,
   ...props

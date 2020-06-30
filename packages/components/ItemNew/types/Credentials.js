@@ -12,7 +12,11 @@ import {
   RemoveButton,
 } from '../../ItemFields';
 
-export const Credentials = ({ item, handleClickAcceptEdit, onClickRemove }) => {
+export const Credentials = ({
+  item,
+  handleClickAcceptEdit,
+  onClickMoveToTrash,
+}) => {
   const {
     data: { name, login, pass, website, note, attachments = [] },
   } = item;
@@ -47,9 +51,11 @@ export const Credentials = ({ item, handleClickAcceptEdit, onClickRemove }) => {
           handleClickAcceptEdit={handleClickAcceptEdit}
         />
       </Row>
-      <Row>
-        <RemoveButton onClick={onClickRemove} />
-      </Row>
+      {onClickMoveToTrash && (
+        <Row>
+          <RemoveButton onClick={onClickMoveToTrash} />
+        </Row>
+      )}
     </Wrapper>
   );
 };

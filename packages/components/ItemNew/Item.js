@@ -8,7 +8,11 @@ import {
   trashListSelector,
   teamsTrashListsSelector,
 } from '@caesar/common/selectors/entities/list';
-import { editItemRequest } from '@caesar/common/actions/entities/item';
+import { setWorkInProgressItem } from '@caesar/common/actions/workflow';
+import {
+  moveItemRequest,
+  editItemRequest,
+} from '@caesar/common/actions/entities/item';
 import { ItemHeader } from '../ItemFields';
 import { EmptyItem } from './EmptyItem';
 import { Credentials, Document } from './types';
@@ -39,6 +43,11 @@ const ItemComponent = ({
 
   const { type, data, listId } = item;
 
+  const isTrashItem =
+    item &&
+    (item.listId === trashList.id ||
+      teamsTrashLists.map(({ id }) => id).includes(item.listId));
+
   const handleClickAcceptEdit = ({ name, value }) => {
     setSubmitting(true);
     const updatedData = { ...data, listId, [name]: value };
@@ -46,33 +55,35 @@ const ItemComponent = ({
     dispatch(editItemRequest(updatedData, setSubmitting, notification));
   };
 
-  const isTrashItem =
-    item &&
-    (item.listId === trashList.id ||
-      teamsTrashLists.map(({ id }) => id).includes(item.listId));
-
-  const onClickRemove = isTrashItem ? onClickRemoveItem : onClickMoveToTrash;
+  const handleClickRestoreItem = async () => {
+    dispatch(moveItemRequest(item.id, item.previousListId));
+    dispatch(setWorkInProgressItem(null));
+  };
 
   const renderedItem = {
     [ITEM_TYPE.CREDENTIALS]: (
       <Credentials
         item={item}
         handleClickAcceptEdit={handleClickAcceptEdit}
-        onClickRemove={onClickRemove}
+        onClickMoveToTrash={!isTrashItem && onClickMoveToTrash}
       />
     ),
     [ITEM_TYPE.DOCUMENT]: (
       <Document
         item={item}
         handleClickAcceptEdit={handleClickAcceptEdit}
-        onClickRemove={onClickRemove}
+        onClickMoveToTrash={!isTrashItem && onClickMoveToTrash}
       />
     ),
   };
 
   return (
     <Wrapper isDisabled={isSubmitting}>
-      <ItemHeader item={item} />
+      <ItemHeader
+        item={item}
+        onClickRestoreItem={handleClickRestoreItem}
+        onClickRemoveItem={onClickRemoveItem}
+      />
       {renderedItem[type]}
     </Wrapper>
   );

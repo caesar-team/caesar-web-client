@@ -82,7 +82,7 @@ export const Attachments = ({ attachments, handleClickAcceptEdit }) => {
   const onClickRemove = raw => {
     const updatedAttachments = attachments.filter(file => file.raw !== raw);
 
-    handleClickAcceptEdit({ label: 'attachments', value: updatedAttachments });
+    handleClickAcceptEdit({ name: 'attachments', value: updatedAttachments });
   };
 
   const handleChange = (name, files) => {
@@ -110,7 +110,7 @@ export const Attachments = ({ attachments, handleClickAcceptEdit }) => {
     setNewFiles(mappedFiles);
     setIsModalOpened(true);
 
-    handleClickAcceptEdit({ label: name, value: uniqFiles });
+    handleClickAcceptEdit({ name, value: uniqFiles });
   };
 
   return (

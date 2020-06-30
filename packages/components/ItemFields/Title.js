@@ -36,7 +36,7 @@ export const Title = ({ value, handleClickAcceptEdit }) => {
   return (
     <StyledInput
       value={value}
-      apiLabel="name"
+      name="name"
       placeholder="Enter the title"
       withCopyButton={false}
       handleClickAcceptEdit={handleClickAcceptEdit}

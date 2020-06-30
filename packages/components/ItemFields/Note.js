@@ -62,7 +62,7 @@ export const Note = ({ value: propValue, handleClickAcceptEdit }) => {
   };
 
   const handleDeleteNote = () => {
-    handleClickAcceptEdit({ label: 'note', value: '' });
+    handleClickAcceptEdit({ name: 'note', value: '' });
   };
 
   return (
@@ -75,7 +75,7 @@ export const Note = ({ value: propValue, handleClickAcceptEdit }) => {
             handleChange={e => setValue(e.target.value)}
             handleFocus={() => setIsEdit(true)}
             handleClickAcceptEdit={() => {
-              handleClickAcceptEdit({ label: 'note', value });
+              handleClickAcceptEdit({ name: 'note', value });
               setIsEdit(false);
             }}
             handleClickAway={() => setIsEdit(false)}

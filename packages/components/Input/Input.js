@@ -1,5 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
+import { useClickAway, useKeyPressEvent } from 'react-use';
 import styled from 'styled-components';
+import { Icon } from '../Icon';
 
 const Label = styled.label`
   display: block;
@@ -33,6 +35,8 @@ const InputField = styled.input`
       ? `1px solid ${theme.color.gallery}`
       : '1px solid transparent'};
   outline: none;
+
+  ${({ withIcons }) => withIcons && 'padding-right: 80px;'}
 
   &::placeholder {
     padding: 5px 0;
@@ -69,6 +73,23 @@ const PostFix = styled.div`
   right: 16px;
 `;
 
+const StyledIcon = styled(Icon)`
+  margin-left: 16px;
+  transition: color 0.2s, opacity 0.2s;
+  cursor: pointer;
+
+  ${({ isDisabled }) =>
+    isDisabled &&
+    `
+      pointer-events: none;
+      opacity: 0.2;
+    `}
+
+  &:hover {
+    color: ${({ theme }) => theme.color.black};
+  }
+`;
+
 const Error = styled.div`
   padding-left: 15px;
   margin-top: 8px;
@@ -76,7 +97,8 @@ const Error = styled.div`
   color: ${({ theme }) => theme.color.red};
 `;
 
-export const Input = ({
+const Input = ({
+  type = 'text',
   label,
   name,
   value,
@@ -85,10 +107,15 @@ export const Input = ({
   postfix,
   withBorder,
   onBlur,
-  className,
+  isAcceptIconDisabled,
+  handleClickAcceptEdit = Function.prototype,
+  handleClickClose = Function.prototype,
+  handleClickAway = Function.prototype,
   children,
+  className,
   ...props
 }) => {
+  const inputRef = useRef(null);
   const [isFocused, setIsFocused] = useState(false);
 
   const handleFocus = () => {
@@ -103,8 +130,12 @@ export const Input = ({
     }
   };
 
+  useClickAway(inputRef, handleClickAway);
+  useKeyPressEvent('Enter', handleClickAcceptEdit);
+  useKeyPressEvent('Escape', handleClickClose);
+
   return (
-    <Label className={className}>
+    <Label ref={inputRef} className={className}>
       {label && (
         <LabelText isFocused={isFocused} value={value}>
           {label}
@@ -114,15 +145,40 @@ export const Input = ({
       <InputField
         {...props}
         autoComplete="off"
-        onFocus={handleFocus}
-        onBlur={handleBlur}
+        type={type}
+        name={name}
+        value={value}
+        isError={!!error}
         isFocused={isFocused}
         withBorder={withBorder}
-        isError={!!error}
-        value={value}
-        name={name}
+        withIcons={handleClickAcceptEdit || handleClickClose}
+        onFocus={handleFocus}
+        onBlur={handleBlur}
       />
-      {postfix && <PostFix>{postfix}</PostFix>}
+      {postfix && (
+        <PostFix>
+          {handleClickAcceptEdit && (
+            <StyledIcon
+              name="checkmark"
+              width={16}
+              height={16}
+              color="gray"
+              isDisabled={isAcceptIconDisabled}
+              onClick={handleClickAcceptEdit}
+            />
+          )}
+          {handleClickClose && (
+            <StyledIcon
+              name="close"
+              width={16}
+              height={16}
+              color="gray"
+              onClick={handleClickClose}
+            />
+          )}
+          {postfix}
+        </PostFix>
+      )}
       {error && <Error>{error}</Error>}
     </Label>
   );
@@ -131,3 +187,5 @@ export const Input = ({
 Input.InputField = InputField;
 Input.Prefix = Prefix;
 Input.PostFix = PostFix;
+
+export { Input };

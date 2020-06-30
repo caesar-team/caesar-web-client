@@ -20,6 +20,7 @@ export const Website = ({ value, handleClickAcceptEdit }) => {
   return (
     <Input
       label="Website"
+      name="website"
       value={value}
       withEllipsis
       handleClickAcceptEdit={handleClickAcceptEdit}

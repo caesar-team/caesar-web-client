@@ -23,6 +23,7 @@ export const Credentials = ({ item, handleClickAcceptEdit }) => {
       <Row>
         <Input
           label="Login"
+          name="login"
           value={login}
           handleClickAcceptEdit={handleClickAcceptEdit}
         />

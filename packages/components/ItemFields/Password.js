@@ -26,7 +26,7 @@ export const Password = ({ value, handleClickAcceptEdit }) => {
   return (
     <Input
       label="Password"
-      apiLabel="pass"
+      name="pass"
       value={isVisible ? value : '********'}
       valueToCopy={value}
       handleClickAcceptEdit={handleClickAcceptEdit}

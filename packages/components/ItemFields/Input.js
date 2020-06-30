@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useCopyToClipboard } from 'react-use';
 import styled from 'styled-components';
-import { FormInput } from '../Input';
+import { Input } from '../Input';
 import { Icon } from '../Icon';
 import { withNotification } from '../Notification';
 
@@ -74,7 +74,7 @@ const ValueWrapper = styled.div`
 
 const InputComponent = ({
   label,
-  apiLabel,
+  name,
   placeholder,
   value: propValue,
   valueToCopy,
@@ -104,17 +104,15 @@ const InputComponent = ({
   return (
     <Wrapper withLabel={label} className={className}>
       {isEdit ? (
-        <FormInput
+        <Input
+          autoFocus
           label={label}
           value={value}
           placeholder={placeholder}
           isAcceptIconDisabled={!value}
           handleChange={e => setValue(e.target.value)}
           handleClickAcceptEdit={() => {
-            handleClickAcceptEdit({
-              label: apiLabel || label.toLowerCase(),
-              value,
-            });
+            handleClickAcceptEdit({ name, value });
             setIsEdit(false);
           }}
           handleClickClose={handleClickClose}
@@ -150,12 +148,11 @@ const InputComponent = ({
   );
 };
 
-const Input = withNotification(InputComponent);
+const InputField = withNotification(InputComponent);
 
 Input.ValueWrapper = ValueWrapper;
 Input.ValueInner = ValueInner;
 Input.Value = Value;
 Input.PencilIcon = PencilIcon;
-Input.InputField = FormInput.InputField;
 
-export { Input };
+export { InputField as Input };

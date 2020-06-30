@@ -23,8 +23,8 @@ const ItemComponent = ({
 
   const { type, data, listId } = item;
 
-  const handleClickAcceptEdit = ({ label, value }) => {
-    const updatedData = { ...data, listId, [label]: value };
+  const handleClickAcceptEdit = ({ name, value }) => {
+    const updatedData = { ...data, listId, [name]: value };
 
     dispatch(editItemRequest(updatedData));
     notification.show({

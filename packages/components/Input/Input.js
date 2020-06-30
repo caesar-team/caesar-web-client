@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { useState } from 'react';
 import styled from 'styled-components';
 
 const Label = styled.label`
@@ -76,71 +76,58 @@ const Error = styled.div`
   color: ${({ theme }) => theme.color.red};
 `;
 
-class Input extends Component {
-  state = {
-    isFocused: false,
+export const Input = ({
+  label,
+  name,
+  value,
+  error,
+  prefix,
+  postfix,
+  withBorder,
+  onBlur,
+  className,
+  children,
+  ...props
+}) => {
+  const [isFocused, setIsFocused] = useState(false);
+
+  const handleFocus = () => {
+    setIsFocused(true);
   };
 
-  onFocus = () => {
-    this.setState({
-      isFocused: true,
-    });
+  const handleBlur = () => {
+    setIsFocused(false);
+
+    if (onBlur) {
+      onBlur(name, true);
+    }
   };
 
-  onBlur = () => {
-    const { name, onBlur } = this.props;
-
-    this.setState(
-      {
-        isFocused: false,
-      },
-      () => onBlur && onBlur(name, true),
-    );
-  };
-
-  render() {
-    const { isFocused } = this.state;
-    const {
-      children,
-      label,
-      className,
-      error,
-      value,
-      prefix,
-      postfix,
-      withBorder,
-      ...props
-    } = this.props;
-
-    const isError = !!error;
-
-    return (
-      <Label className={className}>
-        {label && (
-          <LabelText isFocused={isFocused} value={value}>
-            {label}
-          </LabelText>
-        )}
-        {prefix && <Prefix>{prefix}</Prefix>}
-        <InputField
-          {...props}
-          autoComplete="off"
-          onFocus={this.onFocus}
-          onBlur={this.onBlur}
-          isFocused={isFocused}
-          withBorder={withBorder}
-          isError={isError}
-          value={value}
-        />
-        {postfix && <PostFix>{postfix}</PostFix>}
-        {error && <Error>{error}</Error>}
-      </Label>
-    );
-  }
-}
+  return (
+    <Label className={className}>
+      {label && (
+        <LabelText isFocused={isFocused} value={value}>
+          {label}
+        </LabelText>
+      )}
+      {prefix && <Prefix>{prefix}</Prefix>}
+      <InputField
+        {...props}
+        autoComplete="off"
+        onFocus={handleFocus}
+        onBlur={handleBlur}
+        isFocused={isFocused}
+        withBorder={withBorder}
+        isError={!!error}
+        value={value}
+        name={name}
+      />
+      {postfix && <PostFix>{postfix}</PostFix>}
+      {error && <Error>{error}</Error>}
+    </Label>
+  );
+};
 
 Input.InputField = InputField;
 Input.Prefix = Prefix;
 Input.PostFix = PostFix;
-
-export default Input;

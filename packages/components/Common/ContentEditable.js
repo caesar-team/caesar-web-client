@@ -18,7 +18,7 @@ class ReadOnlyContentEditable extends React.Component {
         style={{ outline: 'none' }}
         onCut={() => false}
         onPaste={() => false}
-        onKeyDown={() => {
+        onKeyDown={event => {
           return !event.metaKey ? event.preventDefault() : true;
         }}
         innerRef={this.contentEditable}

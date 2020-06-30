@@ -222,3 +222,5 @@ export const PERMISSIONS = {
 };
 
 export const UUID_REGEXP = /\b[0-9a-f]{8}\b-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-\b[0-9a-f]{12}\b/;
+
+export const TEAM_AVATAR_MAX_SIZE = 8 * 1024 * 1024;

@@ -64,14 +64,14 @@ const ItemComponent = ({
     [ITEM_TYPE.CREDENTIALS]: (
       <Credentials
         item={item}
-        handleClickAcceptEdit={handleClickAcceptEdit}
+        handleClickAcceptEdit={!isTrashItem && handleClickAcceptEdit}
         onClickMoveToTrash={!isTrashItem && onClickMoveToTrash}
       />
     ),
     [ITEM_TYPE.DOCUMENT]: (
       <Document
         item={item}
-        handleClickAcceptEdit={handleClickAcceptEdit}
+        handleClickAcceptEdit={!isTrashItem && handleClickAcceptEdit}
         onClickMoveToTrash={!isTrashItem && onClickMoveToTrash}
       />
     ),

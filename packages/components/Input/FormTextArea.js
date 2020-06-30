@@ -53,6 +53,7 @@ const FormTextArea = ({
   handleClickClose = Function.prototype,
   handleClickAway = Function.prototype,
   isFocused,
+  isDisabled,
   className,
 }) => {
   const textareaRef = useRef(null);
@@ -69,6 +70,7 @@ const FormTextArea = ({
         onChange={handleChange}
         onFocus={handleFocus}
         isFocused={isFocused}
+        isDisabled={isDisabled}
       />
       <IconsWrapper>
         <StyledIcon

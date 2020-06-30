@@ -73,7 +73,7 @@ export const Note = ({ value: propValue, handleClickAcceptEdit }) => {
             label="Notes"
             value={value}
             handleChange={e => setValue(e.target.value)}
-            handleFocus={() => setIsEdit(true)}
+            handleFocus={handleClickAcceptEdit && (() => setIsEdit(true))}
             handleClickAcceptEdit={() => {
               handleClickAcceptEdit({ name: 'note', value });
               setIsEdit(false);
@@ -82,8 +82,9 @@ export const Note = ({ value: propValue, handleClickAcceptEdit }) => {
             handleClickClose={() => setIsEdit(false)}
             isFocused={isFocused}
             isEdit={isEdit}
+            isDisabled={!handleClickAcceptEdit}
           />
-          {!isEdit && (
+          {!isEdit && handleClickAcceptEdit && (
             <>
               <IconsWrapper>
                 <StyledIcon
@@ -105,9 +106,11 @@ export const Note = ({ value: propValue, handleClickAcceptEdit }) => {
           )}
         </>
       ) : (
-        <AddBtn color="transparent" icon="plus" onClick={handleClickAdd}>
-          Add note
-        </AddBtn>
+        handleClickAcceptEdit && (
+          <AddBtn color="transparent" icon="plus" onClick={handleClickAdd}>
+            Add note
+          </AddBtn>
+        )
       )}
     </Wrapper>
   );

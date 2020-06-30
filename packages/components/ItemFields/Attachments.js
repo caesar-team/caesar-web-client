@@ -132,18 +132,27 @@ export const Attachments = ({ attachments, handleClickAcceptEdit }) => {
           <File
             key={attach.name}
             onClickDownload={() => handleClickDownloadFile(attach)}
-            onClickRemove={() => onClickRemove(attach.raw)}
+            onClickRemove={
+              handleClickAcceptEdit && (() => onClickRemove(attach.raw))
+            }
             {...attach}
           />
         ))}
-        <Uploader multiple asPreview name="attachments" onChange={handleChange}>
-          {({ getRootProps, getInputProps, isDragActive }) => (
-            <AddNewAttach {...getRootProps()} isDragActive={isDragActive}>
-              <input {...getInputProps()} />
-              <PlusIcon name="plus" width={16} height={16} color="gray" />
-            </AddNewAttach>
-          )}
-        </Uploader>
+        {handleClickAcceptEdit && (
+          <Uploader
+            multiple
+            asPreview
+            name="attachments"
+            onChange={handleChange}
+          >
+            {({ getRootProps, getInputProps, isDragActive }) => (
+              <AddNewAttach {...getRootProps()} isDragActive={isDragActive}>
+                <input {...getInputProps()} />
+                <PlusIcon name="plus" width={16} height={16} color="gray" />
+              </AddNewAttach>
+            )}
+          </Uploader>
+        )}
       </Inner>
       {isModalOpened && (
         <NewFilesModal files={newFiles} closeModal={() => setIsModalOpened()} />

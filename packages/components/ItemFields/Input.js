@@ -63,6 +63,8 @@ const ValueWrapper = styled.div`
   border-bottom: 1px solid ${({ theme }) => theme.color.gallery};
   transition: border-color 0.2s;
 
+  ${({ withMinHeight }) => withMinHeight && 'min-height: 43px;'}
+
   &:hover {
     border-bottom: 1px solid ${({ theme }) => theme.color.black};
 
@@ -82,7 +84,7 @@ const InputComponent = ({
   withEllipsis,
   notification,
   addonIcons,
-  handleClickAcceptEdit = Function.prototype,
+  handleClickAcceptEdit,
   className,
 }) => {
   const [isEdit, setIsEdit] = useState(false);
@@ -120,7 +122,7 @@ const InputComponent = ({
           withBorder
         />
       ) : (
-        <ValueWrapper>
+        <ValueWrapper withMinHeight={!value}>
           {label && <Label>{label}</Label>}
           <ValueInner>
             <Value withEllipsis={withEllipsis}>{propValue}</Value>
@@ -135,13 +137,15 @@ const InputComponent = ({
             )}
           </ValueInner>
           {addonIcons}
-          <PencilIcon
-            name="pencil"
-            width={20}
-            height={20}
-            color="gray"
-            onClick={() => setIsEdit(true)}
-          />
+          {handleClickAcceptEdit && (
+            <PencilIcon
+              name="pencil"
+              width={20}
+              height={20}
+              color="gray"
+              onClick={() => setIsEdit(true)}
+            />
+          )}
         </ValueWrapper>
       )}
     </Wrapper>

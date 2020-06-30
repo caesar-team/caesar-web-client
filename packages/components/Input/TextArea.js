@@ -58,6 +58,7 @@ const TextArea = ({
   value,
   placeholder = 'Write here something…',
   isFocused,
+  isDisabled,
   ...props
 }) => {
   const textareaRef = useRef(null);
@@ -77,6 +78,7 @@ const TextArea = ({
         value={value}
         placeholder={placeholder}
         ref={textareaRef}
+        disabled={isDisabled}
         {...props}
       />
       {error && <Error>{error}</Error>}

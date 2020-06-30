@@ -25,13 +25,15 @@ export const Website = ({ value, handleClickAcceptEdit }) => {
       withEllipsis
       handleClickAcceptEdit={handleClickAcceptEdit}
       addonIcons={
-        <EyeIcon
-          name="go-to"
-          color="gray"
-          width={20}
-          height={20}
-          onClick={handleclickGoTo}
-        />
+        value && (
+          <EyeIcon
+            name="go-to"
+            color="gray"
+            width={20}
+            height={20}
+            onClick={handleclickGoTo}
+          />
+        )
       }
     />
   );

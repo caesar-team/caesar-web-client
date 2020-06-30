@@ -18,7 +18,7 @@ export const ConfirmRemoveListModal = ({
 
   return (
     <ConfirmModal
-      isOpen={!!isOpenedPopup}
+      isOpened={!!isOpenedPopup}
       title={`You are going to remove «${label}» list`}
       // TODO: Full text when share list will be implemented
       // 'You delete 20 items and 15 people lose access'

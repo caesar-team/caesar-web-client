@@ -22,7 +22,7 @@ import { ConfirmModal } from '@caesar/components';
 
 export const ConfirmMoveToTrashModal = ({
   notification,
-  isOpen,
+  isOpened,
   handleCloseModal,
 }) => {
   const dispatch = useDispatch();
@@ -61,7 +61,7 @@ export const ConfirmMoveToTrashModal = ({
 
   return (
     <ConfirmModal
-      isOpen={isOpen}
+      isOpened={isOpened}
       description="Are you sure you want to move the item(-s) to trash?"
       onClickConfirm={handleMoveToTrash}
       onClickCancel={handleCloseModal}

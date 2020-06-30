@@ -191,7 +191,7 @@ class TeamListContainer extends Component {
           />
         )}
         <ConfirmModal
-          isOpen={modalVisibilities[REMOVE_TEAM_MODAL]}
+          isOpened={modalVisibilities[REMOVE_TEAM_MODAL]}
           description="Are you sure you want to remove team?"
           onClickConfirm={this.handleRemoveTeam}
           onClickCancel={this.handleCloseModal(REMOVE_TEAM_MODAL)}

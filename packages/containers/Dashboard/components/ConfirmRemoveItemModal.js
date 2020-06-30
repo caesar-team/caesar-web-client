@@ -15,7 +15,7 @@ import {
 } from '@caesar/common/actions/entities/item';
 import { ConfirmModal } from '@caesar/components';
 
-export const ConfirmRemoveItemModal = ({ isOpen, handleCloseModal }) => {
+export const ConfirmRemoveItemModal = ({ isOpened, handleCloseModal }) => {
   const dispatch = useDispatch();
   const workInProgressItemIds = useSelector(workInProgressItemIdsSelector);
   const workInProgressItem = useSelector(workInProgressItemSelector);
@@ -37,7 +37,7 @@ export const ConfirmRemoveItemModal = ({ isOpen, handleCloseModal }) => {
 
   return (
     <ConfirmModal
-      isOpen={isOpen}
+      isOpened={isOpened}
       description="Are you sure you want to delete the item(-s)?"
       onClickConfirm={handleRemoveItem}
       onClickCancel={handleCloseModal}

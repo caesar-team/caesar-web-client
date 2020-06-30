@@ -1,1 +1,1 @@
-export { default as AnonymousLink } from './AnonymousLink';
+export { AnonymousLink } from './AnonymousLink';

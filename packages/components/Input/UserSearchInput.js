@@ -20,14 +20,12 @@ const Wrapper = styled.div`
 
 const InputStyled = styled(Input)`
   width: 100%;
-  height: 50px;
 
   ${Input.InputField} {
-    height: 48px;
-    font-size: 16px;
-    padding: 15px 20px 15px 50px;
-    border: 1px solid ${({ theme }) => theme.color.gallery};
+    padding-left: 48px;
+    padding-right: 48px;
     background-color: ${({ theme }) => theme.color.white};
+    border: 1px solid ${({ theme }) => theme.color.gallery};
   }
 `;
 
@@ -56,15 +54,9 @@ const AddButton = styled.button`
   `};
 `;
 
-const IconStyled = styled(Icon)`
-  width: 14px;
-  height: 14px;
-  fill: ${({ theme }) => theme.color.white};
-`;
-
 const SearchedResultBox = styled.div`
   position: absolute;
-  top: 47px;
+  top: 42px;
   z-index: ${({ theme }) => theme.zIndex.basic};
   display: flex;
   flex-direction: column;
@@ -81,12 +73,6 @@ const IconWrapper = styled.div`
   justify-content: space-between;
 `;
 
-const SearchIcon = styled(Icon)`
-  width: 18px;
-  height: 18px;
-  fill: ${({ theme }) => theme.color.gallery};
-`;
-
 const SearchedUsersCount = styled.div`
   font-size: 12px;
   color: ${({ theme }) => theme.color.gray};
@@ -95,12 +81,9 @@ const SearchedUsersCount = styled.div`
 
 const CloseIcon = styled(Icon)`
   cursor: pointer;
-  width: 14px;
-  height: 14px;
-  fill: ${({ theme }) => theme.color.gray};
 
   &:hover {
-    fill: ${({ theme }) => theme.color.black};
+    color: ${({ theme }) => theme.color.black};
   }
 `;
 
@@ -127,7 +110,13 @@ class UserSearchInput extends Component {
           <SearchedUsersCount>
             {members.length} member{members.length === 1 ? '' : 's'}
           </SearchedUsersCount>
-          <CloseIcon name="close" onClick={this.handleClickReset} />
+          <CloseIcon
+            name="close"
+            width={16}
+            height={16}
+            color="gray"
+            onClick={this.handleClickReset}
+          />
         </IconWrapper>
       );
     }
@@ -142,7 +131,7 @@ class UserSearchInput extends Component {
 
       return (
         <AddButton disabled={isDisabled} onClick={this.handleAddNewMember}>
-          <IconStyled name="plus" />
+          <Icon name="plus" width={16} height={16} color="white" />
         </AddButton>
       );
     }
@@ -229,7 +218,7 @@ class UserSearchInput extends Component {
 
     const members = this.state.members.map(({ name, ...member }) => member);
 
-    const Prefix = <SearchIcon name="search" />;
+    const Prefix = <Icon name="search" width={16} height={16} color="gray" />;
     const Postfix = this.getPostfix();
 
     const shouldShowResultBox = !isLoading && members.length > 0 && filterText;
@@ -237,7 +226,7 @@ class UserSearchInput extends Component {
     return (
       <Wrapper className={className}>
         <InputStyled
-          placeholder="Enter personal email addresses…"
+          placeholder="Enter email addresses…"
           autoComplete="off"
           value={filterText}
           onChange={this.handleChange}
@@ -250,6 +239,7 @@ class UserSearchInput extends Component {
               members={members}
               onClickAdd={this.handleClick}
               controlType="add"
+              maxHeight={240}
             />
           </SearchedResultBox>
         )}

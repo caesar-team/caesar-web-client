@@ -23,7 +23,7 @@ const MemberWrapper = styled.div`
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 10px 20px;
+  padding: 8px 20px;
   cursor: pointer;
 
   &:hover {
@@ -76,8 +76,13 @@ const MemberList = ({
       renderControl(member),
     );
 
+  const clickFn = member =>
+    match(controlType, {
+      [ADD_CONTROL_TYPE]: onClickAdd(member),
+    });
+
   const renderedMembers = members.map(member => (
-    <MemberWrapper key={member.id}>
+    <MemberWrapper key={member.id} onClick={() => clickFn(member)}>
       <Member {...member} />
       <ControlWrapper>{renderControlFn(member)}</ControlWrapper>
     </MemberWrapper>

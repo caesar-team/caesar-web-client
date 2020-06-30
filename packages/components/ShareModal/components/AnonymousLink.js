@@ -123,4 +123,4 @@ const AnonymousLink = ({ link, isLoading, onToggle, onCopy, onUpdate }) => {
   );
 };
 
-export default AnonymousLink;
+export { AnonymousLink };

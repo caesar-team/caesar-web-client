@@ -49,14 +49,13 @@ const getPseudoStyles = ({ position = 'center', width = 2 }) => {
 };
 
 const TextWithLines = styled.div`
-  font-size: 14px;
-  font-weight: 600;
-  color: ${({ theme }) => theme.color.lightGray};
-  text-transform: uppercase;
   display: flex;
   width: 100%;
   justify-content: center;
   align-items: center;
+  font-size: ${({ theme }) => theme.font.size.small};
+  color: ${({ theme }) => theme.color.gray};
+  text-transform: uppercase;
   text-align: center;
 
   ${getPseudoStyles}

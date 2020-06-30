@@ -14,6 +14,8 @@ const Wrapper = styled.div`
   padding: 0;
   margin: 0;
   overflow: hidden;
+  font-size: ${({ isSmall, theme }) =>
+    isSmall ? theme.font.size.small : theme.font.size.main};
   color: ${({ theme }) => theme.color.white};
   white-space: nowrap;
   text-align: center;
@@ -50,7 +52,9 @@ export const Avatar = ({
       }
 
       default: {
-        const personLetters = name ? name.slice(0, 2).toUpperCase() : '';
+        const personLetters = name
+          ? name.slice(0, 2).toUpperCase()
+          : email.slice(0, 2).toUpperCase();
 
         return personLetters;
       }

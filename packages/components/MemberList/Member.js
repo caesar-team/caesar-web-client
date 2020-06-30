@@ -14,13 +14,13 @@ const MemberInfo = styled.div`
   justify-content: center;
 `;
 
-const MemberName = styled.div`
-  font-size: 16px;
+const MemberEmail = styled.div`
+  font-size: ${({ theme }) => theme.font.size.main};
   color: ${({ theme }) => theme.color.black};
 `;
 
-const MemberEmail = styled.div`
-  font-size: 14px;
+const MemberName = styled.div`
+  font-size: ${({ theme }) => theme.font.size.small};
   color: ${({ theme }) => theme.color.gray};
 `;
 
@@ -28,8 +28,8 @@ const Member = ({ name, email, avatar, className }) => (
   <Wrapper className={className}>
     <Avatar isSmall name={name} email={email} avatar={avatar} />
     <MemberInfo>
-      {name && <MemberName>{name}</MemberName>}
       {email && <MemberEmail>{email}</MemberEmail>}
+      {name && <MemberName>({name})</MemberName>}
     </MemberInfo>
   </Wrapper>
 );

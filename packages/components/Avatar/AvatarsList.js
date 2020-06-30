@@ -7,15 +7,8 @@ const Wrapper = styled.div`
 `;
 
 const StyledAvatar = styled(Avatar)`
-  margin-right: -10px;
-  border: 1px solid ${({ theme }) => theme.color.white};
-
-  &:last-child {
-    margin-right: 0;
-  }
-`;
-
-const AvatarNumberStyled = styled(Avatar)`
+  z-index: ${({ zIndex }) => zIndex};
+  margin-right: -8px;
   border: 1px solid ${({ theme }) => theme.color.white};
 `;
 
@@ -34,18 +27,20 @@ const AvatarsList = ({
   const renderedAvatars = visibleAvatars
     .map(({ name, email, avatar }, index) => (
       <StyledAvatar
+        hint={name || email}
         isSmall={isSmall}
         key={index}
         name={name}
         email={email}
         avatar={avatar}
+        zIndex={avatars.length - index}
       />
     ))
     .concat(
       shouldShowLast ? (
-        <AvatarNumberStyled isSmall={isSmall} key={visibleAvatars.length}>
+        <StyledAvatar isSmall={isSmall} key={visibleAvatars.length}>
           +{invisibleCount}
-        </AvatarNumberStyled>
+        </StyledAvatar>
       ) : null,
     );
 

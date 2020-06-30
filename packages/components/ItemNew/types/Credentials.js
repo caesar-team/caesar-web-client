@@ -15,6 +15,7 @@ import {
 export const Credentials = ({
   item,
   handleClickAcceptEdit,
+  onClickShare,
   onClickMoveToTrash,
 }) => {
   const {
@@ -24,7 +25,7 @@ export const Credentials = ({
   return (
     <Wrapper>
       <Title value={name} handleClickAcceptEdit={handleClickAcceptEdit} />
-      <OwnerAndInvitation />
+      <OwnerAndInvitation onClickShare={onClickShare} />
       <Row>
         <Input
           label="Login"

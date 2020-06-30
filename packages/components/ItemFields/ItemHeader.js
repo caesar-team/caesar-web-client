@@ -37,7 +37,12 @@ const ActionButton = styled(Button)`
   margin-left: 16px;
 `;
 
-export const ItemHeader = ({ item, onClickRestoreItem, onClickRemoveItem }) => {
+export const ItemHeader = ({
+  item,
+  onClickShare,
+  onClickRestoreItem,
+  onClickRemoveItem,
+}) => {
   const dispatch = useDispatch();
   const trashList = useSelector(trashListSelector);
   const teamsTrashLists = useSelector(teamsTrashListsSelector);
@@ -82,13 +87,7 @@ export const ItemHeader = ({ item, onClickRestoreItem, onClickRemoveItem }) => {
             <Delimeter>|</Delimeter>
             Passwords
           </PathButton>
-          <ActionButton
-            icon="share"
-            color="white"
-            onClick={() => {
-              console.log('Share');
-            }}
-          />
+          <ActionButton icon="share" color="white" onClick={onClickShare} />
           <ActionButton
             icon={favorite ? 'favorite-active' : 'favorite'}
             color="white"

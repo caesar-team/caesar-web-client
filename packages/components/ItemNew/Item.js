@@ -65,6 +65,7 @@ const ItemComponent = ({
       <Credentials
         item={item}
         handleClickAcceptEdit={!isTrashItem && handleClickAcceptEdit}
+        onClickShare={onClickShare}
         onClickMoveToTrash={!isTrashItem && onClickMoveToTrash}
       />
     ),
@@ -72,6 +73,7 @@ const ItemComponent = ({
       <Document
         item={item}
         handleClickAcceptEdit={!isTrashItem && handleClickAcceptEdit}
+        onClickShare={onClickShare}
         onClickMoveToTrash={!isTrashItem && onClickMoveToTrash}
       />
     ),
@@ -81,6 +83,7 @@ const ItemComponent = ({
     <Wrapper isDisabled={isSubmitting}>
       <ItemHeader
         item={item}
+        onClickShare={onClickShare}
         onClickRestoreItem={handleClickRestoreItem}
         onClickRemoveItem={onClickRemoveItem}
       />

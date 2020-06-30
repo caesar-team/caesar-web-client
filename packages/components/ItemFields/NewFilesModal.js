@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
+import { getPlural } from '@caesar/common/utils/string';
 import { File } from '../File';
 import { Icon } from '../Icon';
 
@@ -53,7 +54,7 @@ export const NewFilesModal = ({ files, closeModal }) => {
     <Wrapper>
       <Header>
         <HeaderText>
-          {files.length} {files.length === 1 ? 'upload' : 'uploads'}
+          {files.length} {getPlural(files.length, ['upload', 'uploads'])}
         </HeaderText>
         <ArrowIcon
           name="arrow-triangle"

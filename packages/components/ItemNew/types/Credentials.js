@@ -9,9 +9,10 @@ import {
   Website,
   Note,
   Attachments,
+  RemoveButton,
 } from '../../ItemFields';
 
-export const Credentials = ({ item, handleClickAcceptEdit }) => {
+export const Credentials = ({ item, handleClickAcceptEdit, onClickRemove }) => {
   const {
     data: { name, login, pass, website, note, attachments = [] },
   } = item;
@@ -45,6 +46,9 @@ export const Credentials = ({ item, handleClickAcceptEdit }) => {
           attachments={attachments}
           handleClickAcceptEdit={handleClickAcceptEdit}
         />
+      </Row>
+      <Row>
+        <RemoveButton onClick={onClickRemove} />
       </Row>
     </Wrapper>
   );

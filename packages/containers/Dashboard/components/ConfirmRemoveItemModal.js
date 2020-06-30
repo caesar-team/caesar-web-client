@@ -1,5 +1,6 @@
 import React from 'react';
 import { useSelector, useDispatch } from 'react-redux';
+import { getPlural } from '@caesar/common/utils/string';
 import {
   workInProgressItemSelector,
   workInProgressItemIdsSelector,
@@ -35,10 +36,24 @@ export const ConfirmRemoveItemModal = ({ isOpened, handleCloseModal }) => {
     handleCloseModal();
   };
 
+  const pluralItemText = getPlural(workInProgressItemIds?.length, [
+    'item',
+    'items',
+  ]);
+
   return (
     <ConfirmModal
       isOpened={isOpened}
-      description="Are you sure you want to delete the item(-s)?"
+      title={`You are going to delete ${
+        workInProgressItem
+          ? `'${workInProgressItem.data.name}'`
+          : pluralItemText
+      }`}
+      description={`Are you sure you want to delete the ${
+        workInProgressItem ? 'item' : pluralItemText
+      }?`}
+      icon="trash"
+      confirmBtnText="Delete"
       onClickConfirm={handleRemoveItem}
       onClickCancel={handleCloseModal}
     />

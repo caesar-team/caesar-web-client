@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useEffectOnce, useUpdateEffect, useCopyToClipboard } from 'react-use';
 import { useSelector } from 'react-redux';
 import styled from 'styled-components';
 import { userDataSelector } from '@caesar/common/selectors/user';
@@ -6,6 +7,8 @@ import { Modal, ModalTitle, ModalSubtitle } from '../Modal';
 import { UserSearchInput } from '../Input';
 import { MemberList } from '../MemberList';
 import { Button } from '../Button';
+import { AnonymousLink } from './components';
+import { getAnonymousLink } from './utils';
 
 const MemberListStyled = styled(MemberList)`
   margin-bottom: 40px;
@@ -32,10 +35,22 @@ const ButtonStyled = styled(Button)`
   margin-right: 16px;
 `;
 
-export const ShareModal = ({ sharedMembers, onShare, onCancel }) => {
+export const ShareModal = ({
+  notification,
+  sharedMembers,
+  withAnonymousLink,
+  anonymousLink = [],
+  onActivateLink,
+  onDeactivateLink,
+  onShare,
+  onCancel,
+}) => {
   const [members, setMembers] = useState([]);
   const [teamIds, setTeamIds] = useState([]);
+  const [link, setLink] = useState(null);
+  const [isGeneratingLink, setIsGeneratingLink] = useState(false);
   const user = useSelector(userDataSelector);
+  const [, copyToClipboard] = useCopyToClipboard();
 
   const handleAddMember = member => {
     setMembers([...members, member]);
@@ -48,6 +63,44 @@ export const ShareModal = ({ sharedMembers, onShare, onCancel }) => {
   const handleClickDone = () => {
     onShare(members, teamIds);
   };
+
+  const handleToggleAnonymousLink = () => {
+    if (link) {
+      onDeactivateLink();
+    } else {
+      setIsGeneratingLink(true);
+      onActivateLink();
+    }
+  };
+
+  const handleUpdateAnonymousLink = () => {
+    setIsGeneratingLink(true);
+    onActivateLink();
+  };
+
+  const handleCopy = () => {
+    copyToClipboard(link);
+
+    notification.show({
+      text: `The shared link has been copied`,
+    });
+  };
+
+  useEffectOnce(() => {
+    if (anonymousLink) {
+      setLink(getAnonymousLink(anonymousLink));
+    }
+  });
+
+  useUpdateEffect(() => {
+    if (isGeneratingLink) {
+      setIsGeneratingLink(false);
+    }
+  }, [link, setLink]);
+
+  useUpdateEffect(() => {
+    setLink(anonymousLink ? getAnonymousLink(anonymousLink) : null);
+  }, [anonymousLink]);
 
   const searchedBlackListMemberIds = [
     user.id,
@@ -77,6 +130,15 @@ export const ShareModal = ({ sharedMembers, onShare, onCancel }) => {
           members={members}
           controlType="remove"
           onClickRemove={handleRemoveMember}
+        />
+      )}
+      {withAnonymousLink && (
+        <AnonymousLink
+          link={link}
+          isLoading={isGeneratingLink}
+          onToggle={handleToggleAnonymousLink}
+          onCopy={handleCopy}
+          onUpdate={handleUpdateAnonymousLink}
         />
       )}
       <ButtonsWrapper>

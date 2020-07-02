@@ -3,7 +3,7 @@ import styled, { keyframes } from 'styled-components';
 import { Toggle } from '../../Toggle';
 import { Icon } from '../../Icon';
 import { Button } from '../../Button';
-import { hideLink, getAnonymousLink } from '../utils';
+import { hideLink } from '../utils';
 
 const spin = keyframes`
   0% {transform:rotate(0deg)}
@@ -80,7 +80,7 @@ const UpdateIconLoading = styled(UpdateIcon)`
 
 const AnonymousLink = ({ link, isLoading, onToggle, onCopy, onUpdate }) => {
   const isLinkActive = !!link;
-  const linkText = isLinkActive ? hideLink(getAnonymousLink(link)) : '';
+  const linkText = isLinkActive ? hideLink(link) : '';
 
   const isToggleLoading = !isLinkActive && isLoading;
 
@@ -115,7 +115,7 @@ const AnonymousLink = ({ link, isLoading, onToggle, onCopy, onUpdate }) => {
             disabled={isLoading}
             onClick={onCopy}
           >
-            COPY
+            Copy
           </Button>
         </BottomWrapper>
       )}

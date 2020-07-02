@@ -55,6 +55,7 @@ export const ShareModal = ({ notification, handleCloseModal }) => {
     handleCloseModal();
   };
 
+  // TODO: Investigate when it is used
   const handleRemoveShare = shareId => () => {
     dispatch(removeShareRequest(shareId));
   };
@@ -71,10 +72,10 @@ export const ShareModal = ({ notification, handleCloseModal }) => {
     <ShareModalComponent
       teams={availableTeamsForSharing}
       sharedMembers={workInProgressItemSharedMembers}
-      anonymousLink={workInProgressItem && workInProgressItem.shared}
+      anonymousLink={workInProgressItem?.shared}
       withAnonymousLink={!isMultiItem}
       onShare={handleShare}
-      onRemove={handleRemoveShare}
+      // onRemove={handleRemoveShare}
       onActivateLink={handleActivateLink}
       onDeactivateLink={handleDeactivateLink}
       onCancel={handleCloseModal}

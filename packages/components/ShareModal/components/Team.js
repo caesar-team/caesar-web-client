@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { forwardRef } from 'react';
 import styled from 'styled-components';
 import { Avatar } from '../../Avatar';
 
@@ -13,7 +13,8 @@ const Wrapper = styled.div`
 
 const Title = styled.div`
   align-self: center;
-  padding: 0 8px 0 48px;
+  padding: 0 16px 0 48px;
+  white-space: nowrap;
 `;
 
 const StyledAvatar = styled(Avatar)`
@@ -48,11 +49,11 @@ const MinusIcon = styled.div`
   }
 `;
 
-export const Team = ({ team, isActive, onClick, className }) => {
-  return (
-    <Wrapper onClick={onClick} className={className}>
+export const Team = forwardRef(
+  ({ team, isActive, onClick, className }, ref) => (
+    <Wrapper onClick={onClick} ref={ref} className={className}>
       {isActive ? <MinusIcon /> : <StyledAvatar avatar={team.icon} />}
       <Title>{team.title}</Title>
     </Wrapper>
-  );
-};
+  ),
+);

@@ -1,4 +1,4 @@
-import React, { Component, Children, cloneElement, createRef } from 'react';
+import React, { Children, cloneElement, useState, useRef } from 'react';
 import styled from 'styled-components';
 import { Icon } from '../Icon';
 
@@ -50,98 +50,69 @@ const InnerWrapper = styled.div`
 const LEFT_DIRECTION = 'left';
 const RIGHT_DIRECTION = 'right';
 
-const getWidth = element => (element.current ? element.current.offsetWidth : 0);
-
-const calculateWidth = elements =>
-  elements.reduce(
-    (accumulator, element) =>
-      element.current ? accumulator + getWidth(element) : accumulator,
-    0,
-  );
+const getOffsetWidth = element => element?.current?.offsetWidth || 0;
+const getScrollWidth = element => element?.current?.scrollWidth || 0;
 
 const getOffsetOrEdge = (currentOffset, width) =>
   Math.min(Math.max(currentOffset, -width), 0);
 
-class Carousel extends Component {
-  state = this.prepareInitialState();
-
-  wrapperRef = createRef();
-
-  references = Array(Children.count(this.props.children))
+const Carousel = ({ shiftPx = 250, children, className }) => {
+  const [currentShiftPx, setCurrentShiftPx] = useState(0);
+  const wrapperRef = useRef(null);
+  const references = Array(Children.count(children))
     .fill(0)
-    .map(() => createRef());
+    .map(() => useRef(null));
 
-  handleClickShift = direction => () => {
-    const { shiftPx = 250 } = this.props;
+  const wrapperWidth = getOffsetWidth(wrapperRef);
+  const referencesWidth = getScrollWidth(wrapperRef);
+  const isLeftArrowDisabled = currentShiftPx === 0;
+  const isRightArrowDisabled = referencesWidth <= wrapperWidth;
+
+  const handleClickShift = direction => () => {
     const rate = direction === LEFT_DIRECTION ? 1 : -1;
 
-    const width = calculateWidth(this.references);
-
-    this.setState(prevState => ({
-      currentShiftPx: getOffsetOrEdge(
-        prevState.currentShiftPx + rate * shiftPx,
-        width,
-      ),
-    }));
+    setCurrentShiftPx(
+      getOffsetOrEdge(currentShiftPx + rate * shiftPx, referencesWidth),
+    );
   };
 
-  prepareInitialState() {
-    return {
-      currentShiftPx: 0,
-    };
-  }
-
-  renderChildren() {
-    const { children } = this.props;
-
-    return Children.map(children, (child, index) =>
+  const renderChildren = () =>
+    Children.map(children, (child, index) =>
       cloneElement(child, {
         ...child.props,
-        ref: this.references[index],
+        ref: references[index],
       }),
     );
-  }
 
-  render() {
-    const { className } = this.props;
-    const { currentShiftPx } = this.state;
-
-    const wrapperWidth = getWidth(this.wrapperRef);
-    const referencesWidth = calculateWidth(this.references);
-
-    const isLeftArrowDisabled = currentShiftPx === 0;
-    const isRightArrowDisabled = referencesWidth <= wrapperWidth;
-
-    return (
-      <Wrapper className={className}>
-        <ArrowsWrapper>
-          <ArrowLeftIcon
-            name="arrow-triangle"
-            width={16}
-            height={16}
-            color="gray"
-            disabled={isLeftArrowDisabled}
-            onClick={this.handleClickShift(LEFT_DIRECTION)}
-          />
-          <ArrowRightIcon
-            name="arrow-triangle"
-            width={16}
-            height={16}
-            color="gray"
-            disabled={isRightArrowDisabled}
-            onClick={this.handleClickShift(RIGHT_DIRECTION)}
-          />
-        </ArrowsWrapper>
-        <OuterWrapper ref={this.wrapperRef}>
-          <InnerWrapper width={referencesWidth} shift={currentShiftPx}>
-            {this.renderChildren()}
-          </InnerWrapper>
-        </OuterWrapper>
-      </Wrapper>
-    );
-  }
-}
+  return (
+    <Wrapper className={className}>
+      <ArrowsWrapper>
+        <ArrowLeftIcon
+          name="arrow-triangle"
+          width={16}
+          height={16}
+          color="gray"
+          disabled={isLeftArrowDisabled}
+          onClick={handleClickShift(LEFT_DIRECTION)}
+        />
+        <ArrowRightIcon
+          name="arrow-triangle"
+          width={16}
+          height={16}
+          color="gray"
+          disabled={isRightArrowDisabled}
+          onClick={handleClickShift(RIGHT_DIRECTION)}
+        />
+      </ArrowsWrapper>
+      <OuterWrapper ref={wrapperRef}>
+        <InnerWrapper width={referencesWidth} shift={currentShiftPx}>
+          {renderChildren()}
+        </InnerWrapper>
+      </OuterWrapper>
+    </Wrapper>
+  );
+};
 
 Carousel.ArrowsWrapper = ArrowsWrapper;
 
-export default Carousel;
+export { Carousel };

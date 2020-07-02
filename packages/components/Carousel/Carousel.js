@@ -8,13 +8,13 @@ const Wrapper = styled.div`
 `;
 
 const ArrowIcon = styled(Icon)`
-  width: 6px;
-  height: 10px;
   cursor: ${({ disabled }) => (disabled ? 'default' : 'pointer')};
 `;
 
 const ArrowLeftIcon = styled(ArrowIcon)`
   transform: rotate(90deg);
+
+  ${({ disabled, theme }) => disabled && `color: ${theme.color.lightGray};`}
 `;
 
 const ArrowRightIcon = styled(ArrowIcon)`
@@ -22,20 +22,20 @@ const ArrowRightIcon = styled(ArrowIcon)`
 `;
 
 const ArrowsWrapper = styled.div`
+  position: absolute;
+  top: 0;
+  right: 0;
+  z-index: ${({ theme }) => theme.zIndex.basic};
   display: flex;
   align-items: center;
   justify-content: space-between;
   width: 48px;
-  position: absolute;
-  top: 0;
-  right: 0;
 `;
 
 const OuterWrapper = styled.div`
   position: relative;
   overflow: hidden;
   width: 100%;
-  margin-top: 30px;
 `;
 
 const InnerWrapper = styled.div`
@@ -117,11 +117,17 @@ class Carousel extends Component {
         <ArrowsWrapper>
           <ArrowLeftIcon
             name="arrow-triangle"
+            width={16}
+            height={16}
+            color="gray"
             disabled={isLeftArrowDisabled}
             onClick={this.handleClickShift(LEFT_DIRECTION)}
           />
           <ArrowRightIcon
             name="arrow-triangle"
+            width={16}
+            height={16}
+            color="gray"
             disabled={isRightArrowDisabled}
             onClick={this.handleClickShift(RIGHT_DIRECTION)}
           />

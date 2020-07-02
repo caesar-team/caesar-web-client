@@ -75,7 +75,13 @@ const UpdateIconLoading = styled(UpdateIcon)`
   animation-timing-function: linear;
 `;
 
-const AnonymousLink = ({ link, isLoading, onToggle, onCopy, onUpdate }) => {
+export const AnonymousLink = ({
+  link,
+  isLoading,
+  onToggle,
+  onCopy,
+  onUpdate,
+}) => {
   const isLinkActive = !!link;
   const linkText = isLinkActive ? hideLink(link) : '';
 
@@ -117,5 +123,3 @@ const AnonymousLink = ({ link, isLoading, onToggle, onCopy, onUpdate }) => {
     </AnonymousLinkWrapper>
   );
 };
-
-export { AnonymousLink };

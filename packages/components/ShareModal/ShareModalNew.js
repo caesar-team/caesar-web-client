@@ -8,7 +8,7 @@ import { UserSearchInput } from '../Input';
 import { Section } from '../Section';
 import { MemberList } from '../MemberList';
 import { Button } from '../Button';
-import { AnonymousLink } from './components';
+import { AnonymousLink, TeamList } from './components';
 import { getAnonymousLink } from './utils';
 
 const Row = styled.div`
@@ -40,6 +40,7 @@ const ButtonStyled = styled(Button)`
 export const ShareModal = ({
   notification,
   sharedMembers,
+  teams,
   withAnonymousLink,
   anonymousLink = [],
   onActivateLink,
@@ -113,6 +114,7 @@ export const ShareModal = ({
   ];
 
   const shouldShowAddedMembers = members.length > 0;
+  const shouldShowTeamsSection = teams.length > 0;
   const shouldShowSharedMembers = sharedMembers.length > 0;
 
   return (
@@ -139,6 +141,11 @@ export const ShareModal = ({
             controlType="remove"
             onClickRemove={handleRemoveMember}
           />
+        </Row>
+      )}
+      {shouldShowTeamsSection && (
+        <Row>
+          <TeamList teams={teams} teamIds={teamIds} setTeamIds={setTeamIds} />
         </Row>
       )}
       {shouldShowSharedMembers && (

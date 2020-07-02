@@ -9,12 +9,12 @@ const Wrapper = styled.div`
 
 const ArrowIcon = styled(Icon)`
   cursor: ${({ disabled }) => (disabled ? 'default' : 'pointer')};
+
+  ${({ disabled, theme }) => disabled && `color: ${theme.color.lightGray};`}
 `;
 
 const ArrowLeftIcon = styled(ArrowIcon)`
   transform: rotate(90deg);
-
-  ${({ disabled, theme }) => disabled && `color: ${theme.color.lightGray};`}
 `;
 
 const ArrowRightIcon = styled(ArrowIcon)`
@@ -59,20 +59,23 @@ const getOffsetOrEdge = (currentOffset, width) =>
 const Carousel = ({ shiftPx = 250, children, className }) => {
   const [currentShiftPx, setCurrentShiftPx] = useState(0);
   const wrapperRef = useRef(null);
+  const innerRef = useRef(null);
   const references = Array(Children.count(children))
     .fill(0)
     .map(() => useRef(null));
 
   const wrapperWidth = getOffsetWidth(wrapperRef);
-  const referencesWidth = getScrollWidth(wrapperRef);
+  const referencesWidth = getScrollWidth(innerRef);
+  const shiftWidth = referencesWidth - wrapperWidth;
+
   const isLeftArrowDisabled = currentShiftPx === 0;
-  const isRightArrowDisabled = referencesWidth <= wrapperWidth;
+  const isRightArrowDisabled = shiftWidth <= 0 || shiftWidth <= -currentShiftPx;
 
   const handleClickShift = direction => () => {
     const rate = direction === LEFT_DIRECTION ? 1 : -1;
 
     setCurrentShiftPx(
-      getOffsetOrEdge(currentShiftPx + rate * shiftPx, referencesWidth),
+      getOffsetOrEdge(currentShiftPx + rate * shiftPx, shiftWidth),
     );
   };
 
@@ -105,7 +108,11 @@ const Carousel = ({ shiftPx = 250, children, className }) => {
         />
       </ArrowsWrapper>
       <OuterWrapper ref={wrapperRef}>
-        <InnerWrapper width={referencesWidth} shift={currentShiftPx}>
+        <InnerWrapper
+          ref={innerRef}
+          width={referencesWidth}
+          shift={currentShiftPx}
+        >
           {renderChildren()}
         </InnerWrapper>
       </OuterWrapper>

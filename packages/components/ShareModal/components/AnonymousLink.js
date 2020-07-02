@@ -13,9 +13,9 @@ const spin = keyframes`
 const AnonymousLinkWrapper = styled.div`
   display: flex;
   flex-direction: column;
+  padding: 8px 16px;
+  background-color: ${({ theme }) => theme.color.alto};
   border-radius: 3px;
-  background-color: ${({ theme }) => theme.color.snow};
-  padding: 10px 20px;
 `;
 
 const ToggleWrapper = styled.div`
@@ -24,49 +24,46 @@ const ToggleWrapper = styled.div`
 `;
 
 const ToggleLabel = styled.div`
-  font-size: 14px;
+  font-size: ${({ theme }) => theme.font.size.small};
   color: ${({ isActive, theme }) =>
     isActive ? theme.color.black : theme.color.gray};
-  margin-left: 20px;
+  margin-left: 16px;
 `;
 
 const BottomWrapper = styled.div`
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-top: 10px;
+  margin-top: 8px;
 `;
 
 const LinkWrapper = styled.div`
-  margin-right: 20px;
   display: flex;
   align-items: center;
   justify-content: space-between;
+  width: 100%;
   height: 40px;
+  padding: 8px 16px;
+  margin-right: 16px;
+  background-color: ${({ theme }) => theme.color.white};
   border-radius: 3px;
   border: solid 1px ${({ theme }) => theme.color.gallery};
-  background-color: ${({ theme }) => theme.color.white};
-  padding: 10px 20px;
-  width: 100%;
 `;
 
 const LinkText = styled.div`
-  font-size: 14px;
+  width: 300px;
+  overflow: hidden;
+  font-size: ${({ theme }) => theme.font.size.small};
   color: ${({ theme }) => theme.color.emperor};
   text-overflow: ellipsis;
   white-space: nowrap;
-  overflow: hidden;
-  width: 300px;
 `;
 
 const UpdateIcon = styled(Icon)`
-  width: 20px;
-  height: 20px;
   cursor: pointer;
-  fill: ${({ theme }) => theme.color.emperor};
 
   &:hover {
-    fill: ${({ disabled, theme }) =>
+    color: ${({ disabled, theme }) =>
       disabled ? theme.color.emperor : theme.color.black};
   }
 `;
@@ -105,16 +102,14 @@ const AnonymousLink = ({ link, isLoading, onToggle, onCopy, onUpdate }) => {
             <LinkText>{linkText}</LinkText>
             <UpdateIconComponent
               name="update"
+              width={20}
+              height={20}
+              color="emperor"
               disabled={isLoading}
               onClick={onUpdate}
             />
           </LinkWrapper>
-          <Button
-            color="black"
-            icon="copy"
-            disabled={isLoading}
-            onClick={onCopy}
-          >
+          <Button icon="copy" disabled={isLoading} onClick={onCopy}>
             Copy
           </Button>
         </BottomWrapper>

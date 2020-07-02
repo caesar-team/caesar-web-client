@@ -11,7 +11,7 @@ const getPseudoStyles = ({ position = 'center', width = 2 }) => {
       &:after {
         content: '';
         border-top: ${width}px solid;
-        margin: 0 20px 0 20px;
+        margin: 0 16px 0 16px;
         flex: 1 0 20px;
       }
     `;
@@ -22,7 +22,7 @@ const getPseudoStyles = ({ position = 'center', width = 2 }) => {
       &:before {
         content: '';
         border-top: ${width}px solid;
-        margin: 0 20px 0 20px;
+        margin: 0 16px 0 16px;
         flex: 1 0 20px;
       }
     
@@ -38,12 +38,12 @@ const getPseudoStyles = ({ position = 'center', width = 2 }) => {
     &:after {
       content: '';
       border-top: ${width}px solid;
-      margin: 0 20px 0 0;
+      margin: 0 16px 0 0;
       flex: 1 0 20px;
     }
   
     &:after {
-      margin: 0 0 0 20px;
+      margin: 0 0 0 16px;
     }
   `;
 };

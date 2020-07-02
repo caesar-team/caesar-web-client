@@ -5,15 +5,17 @@ import styled from 'styled-components';
 import { userDataSelector } from '@caesar/common/selectors/user';
 import { Modal, ModalTitle, ModalSubtitle } from '../Modal';
 import { UserSearchInput } from '../Input';
+import { Section } from '../Section';
 import { MemberList } from '../MemberList';
 import { Button } from '../Button';
 import { AnonymousLink } from './components';
 import { getAnonymousLink } from './utils';
 
-const MemberListStyled = styled(MemberList)`
-  margin-bottom: 40px;
-  margin-top: 8px;
+const Row = styled.div`
+  margin-bottom: 20px;
+`;
 
+const StyledMemberList = styled(MemberList)`
   ${MemberList.Member} {
     background-color: ${({ theme }) => theme.color.alto};
     margin-bottom: 4px;
@@ -44,9 +46,11 @@ export const ShareModal = ({
   onDeactivateLink,
   onShare,
   onCancel,
+  onRevokeAccess,
 }) => {
   const [members, setMembers] = useState([]);
   const [teamIds, setTeamIds] = useState([]);
+  const [isOpenedInvited, setIsOpenedInvited] = useState(false);
   const [link, setLink] = useState(null);
   const [isGeneratingLink, setIsGeneratingLink] = useState(false);
   const user = useSelector(userDataSelector);
@@ -109,6 +113,7 @@ export const ShareModal = ({
   ];
 
   const shouldShowAddedMembers = members.length > 0;
+  const shouldShowSharedMembers = sharedMembers.length > 0;
 
   return (
     <Modal
@@ -120,26 +125,48 @@ export const ShareModal = ({
     >
       <ModalTitle>Share</ModalTitle>
       <ModalSubtitle>Share item with team</ModalSubtitle>
-      <UserSearchInput
-        blackList={searchedBlackListMemberIds}
-        onClickAdd={handleAddMember}
-      />
-      {shouldShowAddedMembers && (
-        <MemberListStyled
-          maxHeight={200}
-          members={members}
-          controlType="remove"
-          onClickRemove={handleRemoveMember}
+      <Row>
+        <UserSearchInput
+          blackList={searchedBlackListMemberIds}
+          onClickAdd={handleAddMember}
         />
+      </Row>
+      {shouldShowAddedMembers && (
+        <Row>
+          <StyledMemberList
+            maxHeight={200}
+            members={members}
+            controlType="remove"
+            onClickRemove={handleRemoveMember}
+          />
+        </Row>
+      )}
+      {shouldShowSharedMembers && (
+        <Row>
+          <Section
+            name={`Invited (${sharedMembers.length})`}
+            isOpened={isOpenedInvited}
+            onToggleSection={() => setIsOpenedInvited(!isOpenedInvited)}
+          >
+            <StyledMemberList
+              maxHeight={180}
+              members={sharedMembers}
+              controlType="revoke"
+              onClickRevokeAccess={onRevokeAccess}
+            />
+          </Section>
+        </Row>
       )}
       {withAnonymousLink && (
-        <AnonymousLink
-          link={link}
-          isLoading={isGeneratingLink}
-          onToggle={handleToggleAnonymousLink}
-          onCopy={handleCopy}
-          onUpdate={handleUpdateAnonymousLink}
-        />
+        <Row>
+          <AnonymousLink
+            link={link}
+            isLoading={isGeneratingLink}
+            onToggle={handleToggleAnonymousLink}
+            onCopy={handleCopy}
+            onUpdate={handleUpdateAnonymousLink}
+          />
+        </Row>
       )}
       <ButtonsWrapper>
         <ButtonStyled color="white" onClick={onCancel}>

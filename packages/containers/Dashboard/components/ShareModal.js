@@ -6,6 +6,7 @@ import {
   workInProgressItemSharedMembersSelector,
 } from '@caesar/common/selectors/workflow';
 import { userTeamListSelector } from '@caesar/common/selectors/user';
+import { childItemsByIdSelector } from '@caesar/common/selectors/entities/childItem';
 import { resetWorkInProgressItemIds } from '@caesar/common/actions/workflow';
 import {
   createAnonymousLinkRequest,
@@ -23,6 +24,7 @@ export const ShareModal = ({ notification, handleCloseModal }) => {
   const workInProgressItemSharedMembers = useSelector(
     workInProgressItemSharedMembersSelector,
   );
+  const childItemsById = useSelector(childItemsByIdSelector);
 
   const isTeamItem = workInProgressItem && workInProgressItem.teamId;
   const isMultiItem = workInProgressItemIds && workInProgressItemIds.length > 0;
@@ -55,9 +57,17 @@ export const ShareModal = ({ notification, handleCloseModal }) => {
     handleCloseModal();
   };
 
-  // TODO: Investigate when it is used
-  const handleRemoveShare = shareId => () => {
-    dispatch(removeShareRequest(shareId));
+  const handleRevokeAccess = member => {
+    const childItem = Object.values(childItemsById).filter(
+      item =>
+        item.originalItemId === workInProgressItem?.id &&
+        item.userId === member.id,
+    );
+    const childItemId = childItem[0]?.id;
+
+    if (childItemId) {
+      dispatch(removeShareRequest(childItemId));
+    }
   };
 
   const handleActivateLink = () => {
@@ -75,7 +85,7 @@ export const ShareModal = ({ notification, handleCloseModal }) => {
       anonymousLink={workInProgressItem?.shared}
       withAnonymousLink={!isMultiItem}
       onShare={handleShare}
-      // onRemove={handleRemoveShare}
+      onRevokeAccess={handleRevokeAccess}
       onActivateLink={handleActivateLink}
       onDeactivateLink={handleDeactivateLink}
       onCancel={handleCloseModal}

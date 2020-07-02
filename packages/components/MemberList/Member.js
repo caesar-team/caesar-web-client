@@ -19,18 +19,10 @@ const MemberEmail = styled.div`
   color: ${({ theme }) => theme.color.black};
 `;
 
-const MemberName = styled.div`
-  font-size: ${({ theme }) => theme.font.size.small};
-  color: ${({ theme }) => theme.color.gray};
-`;
-
 const Member = ({ name, email, avatar, className }) => (
   <Wrapper className={className}>
     <Avatar isSmall name={name} email={email} avatar={avatar} />
-    <MemberInfo>
-      {email && <MemberEmail>{email}</MemberEmail>}
-      {name && <MemberName>({name})</MemberName>}
-    </MemberInfo>
+    <MemberInfo>{email && <MemberEmail>{email}</MemberEmail>}</MemberInfo>
   </Wrapper>
 );
 

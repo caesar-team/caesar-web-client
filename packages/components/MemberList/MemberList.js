@@ -8,6 +8,7 @@ import {
   RemoveControl,
   ShareControl,
   InviteControl,
+  RevokeAccessControl,
 } from './components';
 
 const MAX_HEIGHT = 400;
@@ -40,6 +41,7 @@ const ControlWrapper = styled.div`
 
 const ADD_CONTROL_TYPE = 'add';
 const REMOVE_CONTROL_TYPE = 'remove';
+const REVOKE_CONTROL_TYPE = 'revoke';
 const SHARE_CONTROL_TYPE = 'share';
 const INVITE_CONTROL_TYPE = 'invite';
 
@@ -52,6 +54,7 @@ const MemberList = ({
   renderControl = Function.prototype,
   onClickAdd = Function.prototype,
   onClickRemove = Function.prototype,
+  onClickRevokeAccess = Function.prototype,
   onChangeRole = Function.prototype,
 }) => {
   const renderControlFn = member =>
@@ -61,6 +64,11 @@ const MemberList = ({
         [ADD_CONTROL_TYPE]: <AddControl onClick={onClickAdd(member)} />,
         [REMOVE_CONTROL_TYPE]: (
           <RemoveControl member={member} onClick={onClickRemove(member)} />
+        ),
+        [REVOKE_CONTROL_TYPE]: (
+          <RevokeAccessControl
+            onClickRevoke={() => onClickRevokeAccess(member)}
+          />
         ),
         [SHARE_CONTROL_TYPE]: <ShareControl member={member} />,
         [INVITE_CONTROL_TYPE]: (

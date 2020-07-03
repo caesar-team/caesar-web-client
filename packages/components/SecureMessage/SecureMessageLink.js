@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { useEffectOnce } from 'react-use';
 import copy from 'copy-text-to-clipboard';
 import { Button, Checkbox, withNotification } from '@caesar/components';
-import { ContentEditableComponent } from '@caesar/components/Common/ContentEditable';
 import { useMedia } from '@caesar/common/hooks';
 import { generateMessageLink, getSecureMessageText, stripHtml } from './common';
 import {

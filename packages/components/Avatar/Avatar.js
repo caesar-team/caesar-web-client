@@ -54,7 +54,7 @@ export const Avatar = ({
       default: {
         const personLetters = name
           ? name.slice(0, 2).toUpperCase()
-          : email.slice(0, 2).toUpperCase();
+          : email?.slice(0, 2).toUpperCase();
 
         return personLetters;
       }

@@ -13,7 +13,7 @@ import {
   moveItemRequest,
   editItemRequest,
 } from '@caesar/common/actions/entities/item';
-import { ItemHeader } from '../ItemFields';
+import { ItemHeader, MoveModal } from '../ItemFields';
 import { EmptyItem } from './EmptyItem';
 import { Credentials, Document } from './types';
 
@@ -36,6 +36,7 @@ const ItemComponent = ({
   const trashList = useSelector(trashListSelector);
   const teamsTrashLists = useSelector(teamsTrashListsSelector);
   const [isSubmitting, setSubmitting] = useState(false);
+  const [isMoveModalOpened, setIsMoveModalOpened] = useState(false);
 
   if (!item) {
     return <EmptyItem />;
@@ -84,10 +85,16 @@ const ItemComponent = ({
       <ItemHeader
         item={item}
         onClickShare={onClickShare}
+        onClickMove={() => setIsMoveModalOpened(true)}
         onClickRestoreItem={handleClickRestoreItem}
         onClickRemoveItem={onClickRemoveItem}
       />
       {renderedItem[type]}
+      <MoveModal
+        item={item}
+        isOpened={isMoveModalOpened}
+        closeModal={() => setIsMoveModalOpened(false)}
+      />
     </Wrapper>
   );
 };

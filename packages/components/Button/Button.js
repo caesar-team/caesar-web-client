@@ -172,4 +172,8 @@ const ButtonComponent = forwardRef(
   },
 );
 
-export const Button = withOfflineDetection(ButtonComponent);
+const Button = withOfflineDetection(ButtonComponent);
+
+Button.Text = Text;
+
+export { Button };

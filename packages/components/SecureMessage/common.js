@@ -25,8 +25,10 @@ URL: <strong>${generateMessageLink(
 Expire within: <strong>${getExpireDate(seconds)}</strong>
 - - - - - - - - - - - - - - - - - - - - - - - - - -
 Securely created with ${APP_URI}`;
+
 export const pluralizeWord = (count, noun, suffix = 's') =>
   `${count} ${noun}${count !== 1 ? suffix : ''}`;
+
 export const stripHtml = html => {
   const tmp = document.createElement('DIV');
   tmp.innerHTML = html;

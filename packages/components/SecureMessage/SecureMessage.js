@@ -37,19 +37,21 @@ const Wrapper = styled.div`
   `}
 `;
 
+const defaultState = {
+  step: SECURE_MESSAGE_FORM_STEP,
+  password: null,
+  messageId: null,
+  seconds: null,
+  requests: null,
+};
+
 const SecureMessageComponent = ({
   notification,
   withScroll = false,
   className,
 }) => {
   const [{ step, password, messageId, seconds, requests }, setState] = useState(
-    {
-      step: SECURE_MESSAGE_FORM_STEP,
-      password: null,
-      messageId: null,
-      seconds: null,
-      requests: null,
-    },
+    defaultState,
   );
 
   const handleSubmitForm = (

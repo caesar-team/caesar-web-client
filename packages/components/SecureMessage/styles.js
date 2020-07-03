@@ -1,10 +1,11 @@
 import { media } from '@caesar/assets/styles/media';
 import styled from 'styled-components';
 import { Button } from '../Button';
+import { ContentEditableComponent } from '../Common/ContentEditable';
 
 export const Text = styled.div`
   margin-bottom: 16px;
-  font-size: 16px;
+  font-size: ${({ theme }) => theme.font.size.main};
   font-weight: 600;
   color: ${({ theme }) => theme.color.black};
 `;
@@ -56,4 +57,28 @@ export const CreateNewButton = styled(Button)`
   ${media.mobile`
     grid-area: auto;
   `}
+`;
+
+export const Row = styled.div`
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 40px;
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+
+  ${media.desktop`
+    margin-bottom: 16px;
+  `}
+
+  ${media.mobile`
+    margin-bottom: 16px;
+  `}
+`;
+
+export const ContentEditableStyled = styled(ContentEditableComponent)`
+  font-size: ${({ theme }) => media.mobile ? theme.font.size.small : theme.font.size.main};
+  text-align: justify;
 `;

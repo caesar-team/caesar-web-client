@@ -2,7 +2,8 @@ import React, { useState } from 'react';
 import { useEffectOnce } from 'react-use';
 import copy from 'copy-text-to-clipboard';
 import { Button, Checkbox, withNotification } from '@caesar/components';
-import { ContentEditableComponent } from '../Common/ContentEditable';
+import { ContentEditableComponent } from '@caesar/components/Common/ContentEditable';
+import { useMedia } from '@caesar/common/hooks';
 import { generateMessageLink, getSecureMessageText, stripHtml } from './common';
 import {
   ButtonsWrapper,
@@ -10,6 +11,7 @@ import {
   CreateNewButton,
   Link,
   Text,
+  Row, ContentEditableStyled,
 } from './styles';
 
 const SecureMessageLinkComponent = ({
@@ -22,7 +24,7 @@ const SecureMessageLinkComponent = ({
   useEffectOnce(() => {
     notification.hide();
   });
-
+  const { isMobile } = useMedia();
   const [isPasswordLessPassword, setIsPasswordLess] = useState(false);
   const handleChangeCustomPassword = () => {
     setIsPasswordLess(!isPasswordLessPassword);
@@ -57,24 +59,26 @@ const SecureMessageLinkComponent = ({
     <>
       <Text>Use the temporary encrypted link below to retrieve the secret</Text>
       <Link>
-        <ContentEditableComponent
-          disabled
-          html={getSecureMessageText(
+        <ContentEditableStyled
+          disabled={isMobile}
+          content={getSecureMessageText(
             messageId,
             password,
             seconds,
             isPasswordLessPassword,
           )}
-          handleClick={handleCopyText}
+          handleClick={isMobile ? handleCopyText : Function.prototype}
         />
       </Link>
-      <Checkbox
-        checked={isPasswordLessPassword}
-        value={isPasswordLessPassword}
-        onChange={handleChangeCustomPassword}
-      >
-        Make a passwordless link
-      </Checkbox>
+      <Row>
+        <Checkbox
+          checked={isPasswordLessPassword}
+          value={isPasswordLessPassword}
+          onChange={handleChangeCustomPassword}
+        >
+          Make a passwordless link
+        </Checkbox>
+      </Row>
       <ButtonsWrapper>
         <CopyAllButton icon="copy" onClick={handleCopyText}>
           Copy the text
@@ -89,7 +93,7 @@ const SecureMessageLinkComponent = ({
             )
           }
         >
-          Copy the link
+          Copy the {isPasswordLessPassword ? `passwordless` : ``} link
         </Button>
         <CreateNewButton color="transparent" onClick={onClickReturn}>
           Create New Secure Message

@@ -13,6 +13,7 @@ import {
   moveItemRequest,
   editItemRequest,
 } from '@caesar/common/actions/entities/item';
+import { Error } from '../Error';
 import { ItemHeader, MoveModal } from '../ItemFields';
 import { EmptyItem } from './EmptyItem';
 import { Credentials, Document } from './types';
@@ -61,23 +62,15 @@ const ItemComponent = ({
     dispatch(setWorkInProgressItem(null));
   };
 
-  const renderedItem = {
-    [ITEM_TYPE.CREDENTIALS]: (
-      <Credentials
-        item={item}
-        handleClickAcceptEdit={!isTrashItem && handleClickAcceptEdit}
-        onClickShare={onClickShare}
-        onClickMoveToTrash={!isTrashItem && onClickMoveToTrash}
-      />
-    ),
-    [ITEM_TYPE.DOCUMENT]: (
-      <Document
-        item={item}
-        handleClickAcceptEdit={!isTrashItem && handleClickAcceptEdit}
-        onClickShare={onClickShare}
-        onClickMoveToTrash={!isTrashItem && onClickMoveToTrash}
-      />
-    ),
+  const ItemByType = props => {
+    switch (props.item.type) {
+      case ITEM_TYPE.CREDENTIALS:
+        return <Credentials {...props} />;
+      case ITEM_TYPE.DOCUMENT:
+        return <Document {...props} />;
+      default:
+        return <Error>Unknown type</Error>;
+    }
   };
 
   return (
@@ -89,7 +82,12 @@ const ItemComponent = ({
         onClickRestoreItem={handleClickRestoreItem}
         onClickRemoveItem={onClickRemoveItem}
       />
-      {renderedItem[type]}
+      <ItemByType
+        item={item}
+        handleClickAcceptEdit={!isTrashItem && handleClickAcceptEdit}
+        onClickShare={onClickShare}
+        onClickMoveToTrash={!isTrashItem && onClickMoveToTrash}
+      />
       <MoveModal
         item={item}
         isOpened={isMoveModalOpened}

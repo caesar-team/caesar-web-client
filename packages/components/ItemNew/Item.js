@@ -58,7 +58,7 @@ const ItemComponent = ({
   };
 
   const handleClickRestoreItem = async () => {
-    dispatch(moveItemRequest(item.id, item.previousListId));
+    dispatch(moveItemRequest(item.id, null, item.previousListId));
     dispatch(setWorkInProgressItem(null));
   };
 

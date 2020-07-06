@@ -40,10 +40,7 @@ export default createReducer(initialState, {
       ...state,
       isLoading: false,
       isError: false,
-      byId: {
-        ...state.byId,
-        ...payload.teamsById,
-      },
+      byId: payload.teamsById,
     };
   },
   [FETCH_TEAMS_FAILURE](state) {

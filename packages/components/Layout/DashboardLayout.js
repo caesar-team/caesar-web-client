@@ -71,7 +71,6 @@ export const DashboardLayout = ({
       headerComponent={
         <PrimaryHeader
           user={user}
-          team={team}
           searchedText={searchedText}
           onSearch={handleSearch}
           onClickReset={handleClickResetSearch}

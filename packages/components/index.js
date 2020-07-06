@@ -1,5 +1,6 @@
 export { AbilityProvider, Can, AbilityContext } from './Ability';
 export { AddItem } from './AddItem';
+export { AppVersion } from './AppVersion';
 export { AuthDescription } from './AuthDescription';
 export { AuthTitle } from './AuthTitle';
 export { AuthWrapper } from './AuthWrapper';

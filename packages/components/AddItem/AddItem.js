@@ -1,7 +1,9 @@
 import React from 'react';
+import { useRouter } from 'next/router';
 import styled from 'styled-components';
 import { useNavigatorOnline } from '@caesar/common/hooks';
 import {
+  ROUTES,
   ITEM_TYPE,
   ITEM_ICON_TYPE,
   CREATE_PERMISSION,
@@ -47,11 +49,14 @@ const renderAddItemOptions = (value, label) => (
   </AddItemOption>
 );
 
-export const AddItem = ({
-  workInProgressList,
-  onClickCreateItem,
-  className,
-}) => {
+export const AddItem = ({ workInProgressList, className }) => {
+  const { push } = useRouter();
+
+  const handleClickAddItem = (_, value) => {
+    console.log('create item with type: ', value);
+    push(ROUTES.CREATE);
+  };
+
   const isOnline = useNavigatorOnline();
 
   const itemSubject = {
@@ -65,7 +70,7 @@ export const AddItem = ({
     <Can I={CREATE_PERMISSION} of={itemSubject}>
       <Dropdown
         options={itemTypesOptions}
-        onClick={onClickCreateItem}
+        onClick={handleClickAddItem}
         optionRender={renderAddItemOptions}
         withTriangleAtTop
         ButtonElement={({ handleToggle }) => (

@@ -1,4 +1,4 @@
-import React, { Fragment } from 'react';
+import React from 'react';
 import styled from 'styled-components';
 import BgRightImg from '@caesar/assets/images/bg-right.jpg';
 import BgRightImg2x from '@caesar/assets/images/bg-right@2x.jpg';
@@ -59,7 +59,7 @@ const LayoutConstructor = ({
 }) => (
   <Wrapper className={className}>
     {withImages && (
-      <Fragment>
+      <>
         <BgRightImage
           src={BgRightImg}
           srcSet={`${BgRightImg} 1x, ${BgRightImg2x} 2x`}
@@ -68,7 +68,7 @@ const LayoutConstructor = ({
           src={BgRightImg}
           srcSet={`${BgLeftImg} 1x, ${BgLeftImg2x} 2x`}
         />
-      </Fragment>
+      </>
     )}
     {headerComponent && <TopWrapper>{headerComponent}</TopWrapper>}
     <MainWrapper>{children}</MainWrapper>

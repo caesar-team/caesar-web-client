@@ -131,13 +131,19 @@ export const ROUTES = {
   SETTINGS: '/settings',
   IMPORT: '/import',
   TEAM: '/team',
+  CREATE: '/create',
 };
 
 export const SHARED_ROUTES = [ROUTES.SHARE, ROUTES.INVITE];
 
 // require bootstrap
 // TODO: figure out better naming
-export const LOCKED_ROUTES = [ROUTES.DASHBOARD, ROUTES.IMPORT, ROUTES.TEAM];
+export const LOCKED_ROUTES = [
+  ROUTES.DASHBOARD,
+  ROUTES.IMPORT,
+  ROUTES.TEAM,
+  ROUTES.CREATE,
+];
 
 // don't require bootstrap routes
 // TODO: figure out better naming

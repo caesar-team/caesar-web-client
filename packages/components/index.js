@@ -41,6 +41,7 @@ export { Label } from './Label';
 export {
   AuthLayout,
   BootstrapLayout,
+  CreateLayout,
   DashboardLayout,
   ErrorLayout,
   PrimaryHeader,

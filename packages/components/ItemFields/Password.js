@@ -13,7 +13,7 @@ const EyeIcon = styled(Icon)`
   }
 `;
 
-export const Password = ({ value, handleClickAcceptEdit }) => {
+export const Password = ({ value, onClickAcceptEdit }) => {
   const [isVisible, setIsVisible] = useState(false);
 
   const handleHoldStart = () => {
@@ -29,7 +29,7 @@ export const Password = ({ value, handleClickAcceptEdit }) => {
       name="pass"
       value={isVisible ? value : '********'}
       valueToCopy={value}
-      handleClickAcceptEdit={handleClickAcceptEdit}
+      onClickAcceptEdit={onClickAcceptEdit}
       addonIcons={
         <HoldClickBehaviour
           onHoldStart={handleHoldStart}

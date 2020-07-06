@@ -47,19 +47,19 @@ const FormTextArea = ({
   value,
   placeholder,
   isAcceptIconDisabled,
-  handleChange = Function.prototype,
-  handleFocus = Function.prototype,
-  handleClickAcceptEdit = Function.prototype,
-  handleClickClose = Function.prototype,
-  handleClickAway = Function.prototype,
+  onChange = Function.prototype,
+  onFocus = Function.prototype,
+  onClickAcceptEdit = Function.prototype,
+  onClickClose = Function.prototype,
+  onClickAway = Function.prototype,
   isFocused,
   isDisabled,
   className,
 }) => {
   const textareaRef = useRef(null);
 
-  useClickAway(textareaRef, handleClickAway);
-  useKeyPressEvent('Escape', handleClickClose);
+  useClickAway(textareaRef, onClickAway);
+  useKeyPressEvent('Escape', onClickClose);
 
   return (
     <Wrapper ref={textareaRef} className={className}>
@@ -67,8 +67,8 @@ const FormTextArea = ({
         label={label}
         value={value}
         placeholder={placeholder}
-        onChange={handleChange}
-        onFocus={handleFocus}
+        onChange={onChange}
+        onFocus={onFocus}
         isFocused={isFocused}
         isDisabled={isDisabled}
       />
@@ -79,14 +79,14 @@ const FormTextArea = ({
           height={16}
           color="gray"
           isDisabled={isAcceptIconDisabled}
-          onClick={handleClickAcceptEdit}
+          onClick={onClickAcceptEdit}
         />
         <StyledIcon
           name="close"
           width={16}
           height={16}
           color="gray"
-          onClick={handleClickClose}
+          onClick={onClickClose}
         />
       </IconsWrapper>
     </Wrapper>

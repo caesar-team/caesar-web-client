@@ -84,7 +84,7 @@ const ItemComponent = ({
       />
       <ItemByType
         item={item}
-        handleClickAcceptEdit={!isTrashItem && handleClickAcceptEdit}
+        onClickAcceptEdit={!isTrashItem && handleClickAcceptEdit}
         onClickShare={onClickShare}
         onClickMoveToTrash={!isTrashItem && onClickMoveToTrash}
       />

@@ -47,7 +47,7 @@ const AddBtn = styled(Button)`
   font-size: ${({ theme }) => theme.font.size.main};
 `;
 
-export const Note = ({ value: propValue, handleClickAcceptEdit }) => {
+export const Note = ({ value: propValue, onClickAcceptEdit }) => {
   const [isEdit, setIsEdit] = useState(false);
   const [isFocused, setIsFocused] = useState(false);
   const [value, setValue] = useState(propValue);
@@ -62,7 +62,7 @@ export const Note = ({ value: propValue, handleClickAcceptEdit }) => {
   };
 
   const handleDeleteNote = () => {
-    handleClickAcceptEdit({ name: 'note', value: '' });
+    onClickAcceptEdit({ name: 'note', value: '' });
   };
 
   return (
@@ -72,19 +72,19 @@ export const Note = ({ value: propValue, handleClickAcceptEdit }) => {
           <StyledFormTextArea
             label="Notes"
             value={value}
-            handleChange={e => setValue(e.target.value)}
-            handleFocus={handleClickAcceptEdit && (() => setIsEdit(true))}
-            handleClickAcceptEdit={() => {
-              handleClickAcceptEdit({ name: 'note', value });
+            onChange={e => setValue(e.target.value)}
+            onFocus={onClickAcceptEdit && (() => setIsEdit(true))}
+            onClickAcceptEdit={() => {
+              onClickAcceptEdit({ name: 'note', value });
               setIsEdit(false);
             }}
-            handleClickAway={() => setIsEdit(false)}
-            handleClickClose={() => setIsEdit(false)}
+            onClickAway={() => setIsEdit(false)}
+            onClickClose={() => setIsEdit(false)}
             isFocused={isFocused}
             isEdit={isEdit}
-            isDisabled={!handleClickAcceptEdit}
+            isDisabled={!onClickAcceptEdit}
           />
-          {!isEdit && handleClickAcceptEdit && (
+          {!isEdit && onClickAcceptEdit && (
             <>
               <IconsWrapper>
                 <StyledIcon
@@ -106,7 +106,7 @@ export const Note = ({ value: propValue, handleClickAcceptEdit }) => {
           )}
         </>
       ) : (
-        handleClickAcceptEdit && (
+        onClickAcceptEdit && (
           <AddBtn color="transparent" icon="plus" onClick={handleClickAdd}>
             Add note
           </AddBtn>

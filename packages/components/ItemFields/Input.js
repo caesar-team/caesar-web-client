@@ -84,7 +84,7 @@ const InputComponent = ({
   withEllipsis,
   notification,
   addonIcons,
-  handleClickAcceptEdit,
+  onClickAcceptEdit,
   className,
 }) => {
   const [isEdit, setIsEdit] = useState(false);
@@ -113,12 +113,12 @@ const InputComponent = ({
           placeholder={placeholder}
           isAcceptIconDisabled={!value}
           onChange={e => setValue(e.target.value)}
-          handleClickAcceptEdit={() => {
-            handleClickAcceptEdit({ name, value });
+          onClickAcceptEdit={() => {
+            onClickAcceptEdit({ name, value });
             setIsEdit(false);
           }}
-          handleClickClose={handleClickClose}
-          handleClickAway={handleClickClose}
+          onClickClose={handleClickClose}
+          onClickAway={handleClickClose}
           withBorder
         />
       ) : (
@@ -137,7 +137,7 @@ const InputComponent = ({
             )}
           </ValueInner>
           {addonIcons}
-          {handleClickAcceptEdit && (
+          {onClickAcceptEdit && (
             <PencilIcon
               name="pencil"
               width={20}

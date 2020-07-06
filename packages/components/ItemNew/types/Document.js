@@ -11,7 +11,7 @@ import {
 
 export const Document = ({
   item,
-  handleClickAcceptEdit,
+  onClickAcceptEdit,
   onClickShare,
   onClickMoveToTrash,
 }) => {
@@ -21,15 +21,15 @@ export const Document = ({
 
   return (
     <Wrapper>
-      <Title value={name} handleClickAcceptEdit={handleClickAcceptEdit} />
+      <Title value={name} onClickAcceptEdit={onClickAcceptEdit} />
       <OwnerAndInvitation onClickShare={onClickShare} />
       <Row marginBottom={24}>
-        <Note value={note} handleClickAcceptEdit={handleClickAcceptEdit} />
+        <Note value={note} onClickAcceptEdit={onClickAcceptEdit} />
       </Row>
       <Row marginBottom={24}>
         <Attachments
           attachments={attachments}
-          handleClickAcceptEdit={handleClickAcceptEdit}
+          onClickAcceptEdit={onClickAcceptEdit}
         />
       </Row>
       {onClickMoveToTrash && (

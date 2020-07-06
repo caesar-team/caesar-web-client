@@ -108,9 +108,9 @@ const Input = ({
   withBorder,
   onBlur,
   isAcceptIconDisabled,
-  handleClickAcceptEdit,
-  handleClickClose,
-  handleClickAway = Function.prototype,
+  onClickAcceptEdit,
+  onClickClose,
+  onClickAway = Function.prototype,
   children,
   className,
   ...props
@@ -130,9 +130,9 @@ const Input = ({
     }
   };
 
-  useClickAway(inputRef, handleClickAway);
-  useKeyPressEvent('Enter', handleClickAcceptEdit);
-  useKeyPressEvent('Escape', handleClickClose);
+  useClickAway(inputRef, onClickAway);
+  useKeyPressEvent('Enter', onClickAcceptEdit);
+  useKeyPressEvent('Escape', onClickClose);
 
   return (
     <Label ref={inputRef} className={className}>
@@ -151,29 +151,29 @@ const Input = ({
         isError={!!error}
         isFocused={isFocused}
         withBorder={withBorder}
-        withIcons={handleClickAcceptEdit || handleClickClose}
+        withIcons={onClickAcceptEdit || onClickClose}
         onFocus={handleFocus}
         onBlur={handleBlur}
       />
-      {(postfix || handleClickAcceptEdit || handleClickClose) && (
+      {(postfix || onClickAcceptEdit || onClickClose) && (
         <PostFix>
-          {handleClickAcceptEdit && (
+          {onClickAcceptEdit && (
             <StyledIcon
               name="checkmark"
               width={16}
               height={16}
               color="gray"
               isDisabled={isAcceptIconDisabled}
-              onClick={handleClickAcceptEdit}
+              onClick={onClickAcceptEdit}
             />
           )}
-          {handleClickClose && (
+          {onClickClose && (
             <StyledIcon
               name="close"
               width={16}
               height={16}
               color="gray"
-              onClick={handleClickClose}
+              onClick={onClickClose}
             />
           )}
           {postfix}

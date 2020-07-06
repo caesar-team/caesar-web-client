@@ -14,7 +14,7 @@ import {
 
 export const Credentials = ({
   item,
-  handleClickAcceptEdit,
+  onClickAcceptEdit,
   onClickShare,
   onClickMoveToTrash,
 }) => {
@@ -24,32 +24,29 @@ export const Credentials = ({
 
   return (
     <Wrapper>
-      <Title value={name} handleClickAcceptEdit={handleClickAcceptEdit} />
+      <Title value={name} onClickAcceptEdit={onClickAcceptEdit} />
       <OwnerAndInvitation onClickShare={onClickShare} />
       <Row>
         <Input
           label="Login"
           name="login"
           value={login}
-          handleClickAcceptEdit={handleClickAcceptEdit}
+          onClickAcceptEdit={onClickAcceptEdit}
         />
       </Row>
       <Row>
-        <Password value={pass} handleClickAcceptEdit={handleClickAcceptEdit} />
+        <Password value={pass} onClickAcceptEdit={onClickAcceptEdit} />
       </Row>
       <Row>
-        <Website
-          value={website}
-          handleClickAcceptEdit={handleClickAcceptEdit}
-        />
+        <Website value={website} onClickAcceptEdit={onClickAcceptEdit} />
       </Row>
       <Row marginBottom={24}>
-        <Note value={note} handleClickAcceptEdit={handleClickAcceptEdit} />
+        <Note value={note} onClickAcceptEdit={onClickAcceptEdit} />
       </Row>
       <Row marginBottom={24}>
         <Attachments
           attachments={attachments}
-          handleClickAcceptEdit={handleClickAcceptEdit}
+          onClickAcceptEdit={onClickAcceptEdit}
         />
       </Row>
       {onClickMoveToTrash && (

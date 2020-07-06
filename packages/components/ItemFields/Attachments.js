@@ -65,7 +65,7 @@ const AddNewAttach = styled.div`
   }
 `;
 
-export const Attachments = ({ attachments, handleClickAcceptEdit }) => {
+export const Attachments = ({ attachments, onClickAcceptEdit }) => {
   const [newFiles, setNewFiles] = useState([]);
   const [isModalOpened, setIsModalOpened] = useState(false);
 
@@ -82,7 +82,7 @@ export const Attachments = ({ attachments, handleClickAcceptEdit }) => {
   const onClickRemove = raw => {
     const updatedAttachments = attachments.filter(file => file.raw !== raw);
 
-    handleClickAcceptEdit({ name: 'attachments', value: updatedAttachments });
+    onClickAcceptEdit({ name: 'attachments', value: updatedAttachments });
   };
 
   const handleChange = (name, files) => {
@@ -110,7 +110,7 @@ export const Attachments = ({ attachments, handleClickAcceptEdit }) => {
     setNewFiles(mappedFiles);
     setIsModalOpened(true);
 
-    handleClickAcceptEdit({ name, value: uniqFiles });
+    onClickAcceptEdit({ name, value: uniqFiles });
   };
 
   return (
@@ -133,12 +133,12 @@ export const Attachments = ({ attachments, handleClickAcceptEdit }) => {
             key={attach.name}
             onClickDownload={() => handleClickDownloadFile(attach)}
             onClickRemove={
-              handleClickAcceptEdit && (() => onClickRemove(attach.raw))
+              onClickAcceptEdit && (() => onClickRemove(attach.raw))
             }
             {...attach}
           />
         ))}
-        {handleClickAcceptEdit && (
+        {onClickAcceptEdit && (
           <Uploader
             multiple
             asPreview

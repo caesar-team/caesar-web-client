@@ -39,7 +39,7 @@ const reorder = (list, startIndex, endIndex) => {
 
 const fixSort = lists => lists.map((list, index) => ({ ...list, sort: index }));
 
-export function* createListSaga({ payload: { list }, meta: { notification, setIsCreatingMode } }) {
+export function* createListSaga({ payload: { list }, meta: { notification, setCreatingMode } }) {
   try {
     const {
       data: { id: listId },
@@ -47,7 +47,7 @@ export function* createListSaga({ payload: { list }, meta: { notification, setIs
       label: list.label,
     });
 
-    yield call(setIsCreatingMode, false);
+    yield call(setCreatingMode, false);
     yield put(
       createListSuccess(listId, {
         id: listId,
@@ -67,11 +67,11 @@ export function* createListSaga({ payload: { list }, meta: { notification, setIs
   }
 }
 
-export function* editListSaga({ payload: { list }, meta: { notification, setIsEditMode } }) {
+export function* editListSaga({ payload: { list }, meta: { notification, setEditMode } }) {
   try {
     yield call(patchList, list.id, { label: list.label });
 
-    yield call(setIsEditMode, false);
+    yield call(setEditMode, false);
     yield put(editListSuccess(list));
   } catch (error) {
     console.log(error);

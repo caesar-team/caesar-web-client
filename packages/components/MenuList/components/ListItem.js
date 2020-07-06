@@ -74,37 +74,37 @@ export const ListItem = ({
   handleClickMenuItem = Function.prototype,
   isCreatingMode,
   notification,
-  setIsCreatingMode,
+  setCreatingMode,
 }) => {
   const dispatch = useDispatch();
   const { id, label, children = [] } = item;
   const isDefault = label === 'default';
-  const [isEditMode, setIsEditMode] = useState(isCreatingMode);
-  const [isOpenedPopup, setIsOpenedPopup] = useState(false);
+  const [isEditMode, setEditMode] = useState(isCreatingMode);
+  const [isOpenedPopup, setOpenedPopup] = useState(false);
   const [value, setValue] = useState(label);
 
   const handleClickEdit = () => {
-    setIsEditMode(true);
+    setEditMode(true);
   };
 
   const handleClickRemove = () => {
-    setIsOpenedPopup(true);
+    setOpenedPopup(true);
   };
 
   const handleClickAcceptEdit = () => {
     if (isCreatingMode) {
-      dispatch(createListRequest({ label: value }, { notification, setIsCreatingMode }));
+      dispatch(createListRequest({ label: value }, { notification, setCreatingMode }));
     } else {
-      dispatch(editListRequest({ ...item, label: value }, { notification, setIsEditMode }));
+      dispatch(editListRequest({ ...item, label: value }, { notification, setEditMode }));
     }
   };
 
   const handleClickClose = () => {
     if (isCreatingMode) {
-      setIsCreatingMode(false);
+      setCreatingMode(false);
     }
 
-    setIsEditMode(false);
+    setEditMode(false);
     setValue(label);
   };
 
@@ -117,9 +117,9 @@ export const ListItem = ({
       {isEditMode ? (
         <ListItemInput
           isEditMode={isEditMode}
-          setIsEditMode={setIsEditMode}
+          setEditMode={setEditMode}
           isCreatingMode={isCreatingMode}
-          setIsCreatingMode={setIsCreatingMode}
+          setCreatingMode={setCreatingMode}
           value={value}
           setValue={setValue}
           label={label}
@@ -189,7 +189,7 @@ export const ListItem = ({
       <ConfirmRemoveListModal
         item={item}
         isOpenedPopup={isOpenedPopup}
-        setIsOpenedPopup={setIsOpenedPopup}
+        setOpenedPopup={setOpenedPopup}
       />
     </>
   );

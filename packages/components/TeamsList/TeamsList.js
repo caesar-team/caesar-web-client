@@ -35,7 +35,7 @@ const StyledAvatar = styled(Avatar)`
 const TeamsListComponent = ({
   activeTeamId,
   handleToggle,
-  setIsListsOpened,
+  setListsOpened,
 }) => {
   const dispatch = useDispatch();
   const user = useSelector(userDataSelector);
@@ -49,7 +49,7 @@ const TeamsListComponent = ({
 
   const handleChangeTeam = teamId => {
     handleToggle();
-    setIsListsOpened(true);
+    setListsOpened(true);
 
     if (currentTeam?.id !== teamId) {
       dispatch(setCurrentTeamId(teamId));

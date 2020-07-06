@@ -2,10 +2,10 @@ import { useState, useEffect } from 'react';
 import { isClient } from '@caesar/common/utils/isEnvironment';
 
 export const useNavigatorOnline = () => {
-  const [isOnline, setIsOnline] = useState(isClient ? navigator.onLine : true);
+  const [isOnline, setOnline] = useState(isClient ? navigator.onLine : true);
 
-  const handleOnlineEvent = () => setIsOnline(true);
-  const handleOfflineEvent = () => setIsOnline(false);
+  const handleOnlineEvent = () => setOnline(true);
+  const handleOfflineEvent = () => setOnline(false);
 
   useEffect(() => {
     window.addEventListener('online', handleOnlineEvent);

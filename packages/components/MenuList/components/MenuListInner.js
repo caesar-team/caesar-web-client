@@ -69,7 +69,7 @@ const MenuListInnerComponent = ({
   setSearchedText,
   setMode,
   isListsOpened,
-  setIsListsOpened,
+  setListsOpened,
   notification,
 }) => {
   const dispatch = useDispatch();
@@ -79,7 +79,7 @@ const MenuListInnerComponent = ({
   const teamLists = useSelector(currentTeamListsSelector);
   const workInProgressList = useSelector(workInProgressListSelector);
   const activeListId = workInProgressList && workInProgressList.id;
-  const [isCreatingMode, setIsCreatingMode] = useState(false);
+  const [isCreatingMode, setCreatingMode] = useState(false);
 
   const handleClickMenuItem = id => {
     dispatch(setWorkInProgressListId(id));
@@ -99,8 +99,8 @@ const MenuListInnerComponent = ({
 
   const handleClickAddList = event => {
     event.stopPropagation();
-    setIsListsOpened(true);
-    setIsCreatingMode(true);
+    setListsOpened(true);
+    setCreatingMode(true);
   };
 
   const handleDragEnd = ({ draggableId, source, destination }) => {
@@ -173,7 +173,7 @@ const MenuListInnerComponent = ({
               }
 
               return withChildren
-                ? setIsListsOpened(!isListsOpened)
+                ? setListsOpened(!isListsOpened)
                 : handleClickMenuItem(id);
             }}
           >
@@ -201,7 +201,7 @@ const MenuListInnerComponent = ({
               {id === 'lists' && isCreatingMode && (
                 <ListItem
                   isCreatingMode={isCreatingMode}
-                  setIsCreatingMode={setIsCreatingMode}
+                  setCreatingMode={setCreatingMode}
                   notification={notification}
                 />
               )}

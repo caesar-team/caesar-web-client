@@ -24,9 +24,9 @@ const SecureMessageLinkComponent = ({
     notification.hide();
   });
   const { isMobile } = useMedia();
-  const [isPasswordLessPassword, setIsPasswordLess] = useState(false);
+  const [isPasswordLessPassword, setPasswordLess] = useState(false);
   const handleChangeCustomPassword = () => {
-    setIsPasswordLess(!isPasswordLessPassword);
+    setPasswordLess(!isPasswordLessPassword);
   };
   const handleClickCopy = (data, notify) => {
     copy(data);

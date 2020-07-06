@@ -98,11 +98,11 @@ const PrimaryHeaderComponent = ({
   onClickCreateItem = Function.prototype,
 }) => {
   const dispatch = useDispatch();
-  const [isDropdownOpened, setIsDropdownOpened] = useState(false);
+  const [isDropdownOpened, setDropdownOpened] = useState(false);
   const userName = (user && (user.name || user.email)) || '';
 
   const handleToggleDropdown = () => {
-    setIsDropdownOpened(!isDropdownOpened);
+    setDropdownOpened(!isDropdownOpened);
   };
 
   const Options = (

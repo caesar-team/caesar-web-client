@@ -109,9 +109,9 @@ const ListComponent = ({
     );
   };
 
-  const itemTitle = LIST_TYPES_ARRAY.includes(workInProgressList.label)
-    ? upperFirst(workInProgressList.label)
-    : workInProgressList.label;
+  const itemTitle = LIST_TYPES_ARRAY.includes(workInProgressList?.label)
+    ? upperFirst(workInProgressList?.label)
+    : workInProgressList?.label;
 
   return (
     <Wrapper isEmpty={isEmpty}>

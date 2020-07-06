@@ -60,9 +60,6 @@ export const editListSuccess = list => ({
   payload: {
     list,
   },
-  meta: {
-    notification,
-  },
 });
 
 export const editListFailure = () => ({

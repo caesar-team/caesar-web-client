@@ -258,6 +258,7 @@ const SecureMessageFormComponent = ({ onSubmit, notification, isOnline }) => {
             onBlur={handleBlur}
             onChange={handleChange}
             error={checkError(touched, errors, 'text')}
+            disabled={isSubmitting}
           />
         ) : (
           <>

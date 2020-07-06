@@ -94,13 +94,9 @@ export const ListItem = ({
   const handleClickAcceptEdit = () => {
     if (isCreatingMode) {
       dispatch(createListRequest({ label: value }, { notification, setIsCreatingMode }));
-      //setIsCreatingMode(false);
     } else {
       dispatch(editListRequest({ ...item, label: value }, { notification, setIsEditMode }));
-      //setIsEditMode(false);
     }
-
-    //setIsEditMode(false);
   };
 
   const handleClickClose = () => {

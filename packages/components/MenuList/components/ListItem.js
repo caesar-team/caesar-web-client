@@ -73,6 +73,7 @@ export const ListItem = ({
   index,
   handleClickMenuItem = Function.prototype,
   isCreatingMode,
+  notification,
   setIsCreatingMode,
 }) => {
   const dispatch = useDispatch();
@@ -92,13 +93,14 @@ export const ListItem = ({
 
   const handleClickAcceptEdit = () => {
     if (isCreatingMode) {
-      dispatch(createListRequest({ label: value }));
-      setIsCreatingMode(false);
+      dispatch(createListRequest({ label: value }, { notification, setIsCreatingMode }));
+      //setIsCreatingMode(false);
     } else {
-      dispatch(editListRequest({ ...item, label: value }));
+      dispatch(editListRequest({ ...item, label: value }, { notification, setIsEditMode }));
+      //setIsEditMode(false);
     }
 
-    setIsEditMode(false);
+    //setIsEditMode(false);
   };
 
   const handleClickClose = () => {

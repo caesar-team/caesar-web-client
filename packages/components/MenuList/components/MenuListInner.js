@@ -7,6 +7,7 @@ import { currentTeamSelector } from '@caesar/common/selectors/user';
 import {
   personalListsByTypeSelector,
   currentTeamListsSelector,
+  serverErrorSelector,
 } from '@caesar/common/selectors/entities/list';
 import { workInProgressListSelector } from '@caesar/common/selectors/workflow';
 import {
@@ -15,6 +16,7 @@ import {
   resetWorkInProgressItemIds,
 } from '@caesar/common/actions/workflow';
 import { sortListRequest } from '@caesar/common/actions/entities/list';
+import { withNotification } from '@caesar/components/Notification';
 import { Icon } from '../../Icon';
 import { ListItem } from './ListItem';
 import { MenuItemInner } from './styledComponents';
@@ -68,6 +70,7 @@ const MenuListInnerComponent = ({
   setMode,
   isListsOpened,
   setIsListsOpened,
+  notification,
 }) => {
   const dispatch = useDispatch();
   const currentTeam = useSelector(currentTeamSelector);
@@ -199,6 +202,7 @@ const MenuListInnerComponent = ({
                 <ListItem
                   isCreatingMode={isCreatingMode}
                   setIsCreatingMode={setIsCreatingMode}
+                  notification={notification}
                 />
               )}
               {children && (
@@ -216,6 +220,7 @@ const MenuListInnerComponent = ({
                             item={item}
                             activeListId={activeListId}
                             index={index}
+                            notification={notification}
                             handleClickMenuItem={handleClickMenuItem}
                           />
                         ))}
@@ -233,4 +238,4 @@ const MenuListInnerComponent = ({
   });
 };
 
-export const MenuListInner = memo(MenuListInnerComponent);
+export const MenuListInner = memo(withNotification(MenuListInnerComponent));

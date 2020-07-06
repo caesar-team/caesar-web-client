@@ -25,11 +25,14 @@ export const REMOVE_ITEMS_BATCH_FROM_LIST =
 export const TOGGLE_ITEM_TO_FAVORITE_LIST =
   '@list/TOGGLE_ITEM_TO_FAVORITE_LIST';
 
-export const createListRequest = list => ({
+export const CLEAR_SERVER_ERRORS = '@list/CLEAR_SERVER_ERRORS';
+
+export const createListRequest = (list, meta) => ({
   type: CREATE_LIST_REQUEST,
   payload: {
     list,
   },
+  meta,
 });
 
 export const createListSuccess = (listId, list) => ({
@@ -44,17 +47,21 @@ export const createListFailure = () => ({
   type: CREATE_LIST_FAILURE,
 });
 
-export const editListRequest = list => ({
+export const editListRequest = (list, meta) => ({
   type: EDIT_LIST_REQUEST,
   payload: {
     list,
   },
+  meta,
 });
 
 export const editListSuccess = list => ({
   type: EDIT_LIST_SUCCESS,
   payload: {
     list,
+  },
+  meta: {
+    notification,
   },
 });
 
@@ -167,4 +174,8 @@ export const toggleItemToFavoriteList = (
     favoritesListId,
     isFavorite,
   },
+});
+
+export const clearServerErrors = () => ({
+  type: CLEAR_SERVER_ERRORS,
 });

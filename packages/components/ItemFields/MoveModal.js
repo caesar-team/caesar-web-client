@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, memo } from 'react';
 import { useUpdateEffect } from 'react-use';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import styled from 'styled-components';
 import {
   TEAM_TYPE,
@@ -19,12 +19,15 @@ import {
   listsByIdSelector,
   listsSelector,
 } from '@caesar/common/selectors/entities/list';
+import { moveItemRequest } from '@caesar/common/actions/entities/item';
+import { setWorkInProgressItem } from '@caesar/common/actions/workflow';
 import { Modal, ModalTitle } from '../Modal';
 import { Radio } from '../Radio';
 import { Button } from '../Button';
 import { Icon } from '../Icon';
 import { Avatar } from '../Avatar';
 import { SelectVisible } from '../SelectVisible';
+import { withNotification } from '../Notification';
 
 const ListsWrapper = styled.div`
   display: flex;
@@ -33,6 +36,7 @@ const ListsWrapper = styled.div`
 
 const StyledSelectVisible = styled(SelectVisible)`
   flex: 0 0 calc(50% - 20px);
+  width: calc(50% - 20px);
 `;
 
 const StyledRadio = styled(Radio)`
@@ -74,7 +78,8 @@ const ButtonStyled = styled(Button)`
   margin-right: 16px;
 `;
 
-export const MoveModal = ({ item, isOpened, closeModal }) => {
+const MoveModalComponent = ({ notification, item, isOpened, closeModal }) => {
+  const dispatch = useDispatch();
   const teamsById = useSelector(teamsByIdSelector);
   const listsById = useSelector(listsByIdSelector);
   const teams = useSelector(teamListSelector);
@@ -89,13 +94,20 @@ export const MoveModal = ({ item, isOpened, closeModal }) => {
     ? upperFirst(listsById[item.listId]?.label)
     : listsById[item.listId]?.label;
 
-  const [checkedTeam, setCheckedTeam] = useState(item.teamId);
+  const [checkedTeamId, setCheckedTeamId] = useState(item.teamId);
   const [searchTeamValue, setSearchTeamValue] = useState('');
-  const [checkedList, setCheckedList] = useState(item.listId);
+  const [checkedListId, setCheckedListId] = useState(item.listId);
   const [searchListValue, setSearchListValue] = useState('');
 
   const handleClickAccept = () => {
-    console.log('handleClickAccept: ');
+    dispatch(moveItemRequest(item.id, checkedTeamId, checkedListId));
+    dispatch(setWorkInProgressItem(null));
+
+    notification.show({
+      text: `The '${item.data.name}' has been moved.`,
+    });
+
+    closeModal();
   };
 
   useUpdateEffect(() => {
@@ -116,38 +128,38 @@ export const MoveModal = ({ item, isOpened, closeModal }) => {
       if (b.title.toLowerCase() === TEAM_TYPE.PERSONAL) return 1;
 
       return sortByName(a.title, b.title);
-    })
-    .map(team => (
-      <StyledRadio
-        key={team.id || team.title}
-        value={team.id || team.title}
-        label={
-          <>
-            <StyledTeamAvatar avatar={team.icon} email={team.email} />
-            <Name>{team.title}</Name>
-          </>
-        }
-        name="team"
-        onChange={() => setCheckedTeam(team.id)}
-      />
-    ));
-
+    });
   const listOptions = lists
     .filter(list => !DEFAULT_LIST_TYPES_ARRAY.includes(list.type))
-    .filter(list => list.teamId === checkedTeam)
+    .filter(list => list.teamId === checkedTeamId)
     .filter(list =>
       list?.label?.toLowerCase().includes(searchListValue?.toLowerCase()),
     )
-    .sort((a, b) => sortByName(a.label, b.label))
-    .map(list => (
-      <StyledRadio
-        key={list.id}
-        value={list.id}
-        label={<Name>{list.label}</Name>}
-        name="list"
-        onChange={() => setCheckedList(list.id)}
-      />
-    ));
+    .sort((a, b) => sortByName(a.label, b.label));
+
+  const teamOptionsRenderer = teamOptions.map(team => (
+    <StyledRadio
+      key={team.id || team.title}
+      value={team.id || team.title}
+      label={
+        <>
+          <StyledTeamAvatar avatar={team.icon} email={team.email} />
+          <Name>{team.title}</Name>
+        </>
+      }
+      name="team"
+      onChange={() => setCheckedTeamId(team.id)}
+    />
+  ));
+  const listOptionsRenderer = listOptions.map(list => (
+    <StyledRadio
+      key={list.id}
+      value={list.id}
+      label={<Name>{list.label}</Name>}
+      name="list"
+      onChange={() => setCheckedListId(list.id)}
+    />
+  ));
 
   return (
     <Modal
@@ -167,7 +179,7 @@ export const MoveModal = ({ item, isOpened, closeModal }) => {
               <Name>{teamTitle}</Name>
             </>
           }
-          options={teamOptions}
+          options={teamOptionsRenderer}
           searchPlaceholder="Search by teams…"
           searchValue={searchTeamValue}
           setSearchValue={setSearchTeamValue}
@@ -180,7 +192,7 @@ export const MoveModal = ({ item, isOpened, closeModal }) => {
               <Name>{listTitle}</Name>
             </>
           }
-          options={listOptions}
+          options={listOptionsRenderer}
           searchPlaceholder="Search by lists…"
           searchValue={searchListValue}
           setSearchValue={setSearchListValue}
@@ -190,8 +202,20 @@ export const MoveModal = ({ item, isOpened, closeModal }) => {
         <ButtonStyled color="white" onClick={closeModal}>
           Cancel
         </ButtonStyled>
-        <Button onClick={handleClickAccept}>Accept</Button>
+        <Button
+          onClick={handleClickAccept}
+          disabled={
+            checkedListId === item.listId ||
+            !listOptions.map(({ id }) => id).includes(checkedListId)
+          }
+        >
+          Accept
+        </Button>
       </ButtonsWrapper>
     </Modal>
   );
 };
+
+const MoveModal = memo(withNotification(MoveModalComponent));
+
+export { MoveModal };

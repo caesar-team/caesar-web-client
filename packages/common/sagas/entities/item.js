@@ -331,7 +331,7 @@ export function* toggleItemToFavoriteSaga({ payload: { itemId } }) {
   }
 }
 
-export function* moveItemSaga({ payload: { itemId, listId } }) {
+export function* moveItemSaga({ payload: { itemId, teamId, listId } }) {
   try {
     yield put(updateGlobalNotification(MOVING_IN_PROGRESS_NOTIFICATION, true));
 
@@ -339,11 +339,6 @@ export function* moveItemSaga({ payload: { itemId, listId } }) {
     const childItemIds = item.invited;
 
     const allTrashListIds = yield select(allTrashListIdsSelector);
-
-    const oldList = yield select(listSelector, {
-      listId: item.listId,
-    });
-    const newList = yield select(listSelector, { listId });
 
     yield call(updateMoveItem, item.id, {
       listId,
@@ -357,17 +352,17 @@ export function* moveItemSaga({ payload: { itemId, listId } }) {
       yield fork(toggleItemToFavoriteSaga, { payload: { itemId } });
     }
 
-    if (oldList.teamId !== newList.teamId) {
-      yield put(updateItemField(item.id, 'teamId', newList.teamId));
+    if (item.teamId !== teamId) {
+      yield put(updateItemField(item.id, 'teamId', teamId));
     }
 
-    if (!oldList.teamId && newList.teamId) {
+    if (!item.teamId && teamId) {
       yield fork(shareItemBatchSaga, {
         payload: {
           data: {
             itemIds: [item.id],
             members: [],
-            teamIds: [newList.teamId],
+            teamIds: [teamId],
           },
           options: {
             includeIniciator: false,
@@ -376,14 +371,14 @@ export function* moveItemSaga({ payload: { itemId, listId } }) {
       });
     }
 
-    if (oldList.teamId && !newList.teamId) {
+    if (item.teamId && !teamId) {
       yield put(removeChildItemsBatchFromItem(item.id, childItemIds));
       yield put(removeChildItemsBatch(childItemIds));
 
       yield put(updateGlobalNotification(NOOP_NOTIFICATION, false));
     }
 
-    if (oldList.teamId && newList.teamId && oldList.teamId !== newList.teamId) {
+    if (item.teamId && teamId && item.teamId !== teamId) {
       yield put(removeChildItemsBatchFromItem(item.id, childItemIds));
       yield put(removeChildItemsBatch(childItemIds));
 
@@ -392,7 +387,7 @@ export function* moveItemSaga({ payload: { itemId, listId } }) {
           data: {
             itemIds: [item.id],
             members: [],
-            teamIds: [newList.teamId],
+            teamIds: [teamId],
           },
           options: {
             includeIniciator: false,

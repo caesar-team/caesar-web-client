@@ -15,7 +15,7 @@ import {
 import { teamsByIdSelector } from '@caesar/common/selectors/entities/team';
 import { setWorkInProgressItem } from '@caesar/common/actions/workflow';
 import { toggleItemToFavoriteRequest } from '@caesar/common/actions/entities/item';
-import { Button } from '../Button';
+import { Button } from '../../Button';
 
 const ColumnHeader = styled.div`
   display: flex;

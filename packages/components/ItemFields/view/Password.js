@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
-import { HoldClickBehaviour } from '../HoldClickBehaviour';
-import { Icon } from '../Icon';
+import { HoldClickBehaviour } from '../../HoldClickBehaviour';
+import { Icon } from '../../Icon';
 import { Input } from './Input';
 
 const EyeIcon = styled(Icon)`

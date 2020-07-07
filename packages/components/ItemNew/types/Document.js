@@ -1,13 +1,6 @@
 import React from 'react';
-import {
-  Wrapper,
-  Title,
-  OwnerAndInvitation,
-  Row,
-  Note,
-  Attachments,
-  RemoveButton,
-} from '../../ItemFields';
+import { Title, Note, Attachments } from '../../ItemFields/view';
+import { Wrapper, OwnerAndInvitation, Row, RemoveButton } from '../components';
 
 export const Document = ({
   item,

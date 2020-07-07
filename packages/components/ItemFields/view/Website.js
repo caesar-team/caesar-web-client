@@ -1,6 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
-import { Icon } from '../Icon';
+import { Icon } from '../../Icon';
 import { Input } from './Input';
 
 const EyeIcon = styled(Icon)`

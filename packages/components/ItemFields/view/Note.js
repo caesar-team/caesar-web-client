@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
-import { Icon } from '../Icon';
-import { FormTextArea } from '../Input';
-import { Button } from '../Button';
+import { Icon } from '../../Icon';
+import { FormTextArea } from '../../Input';
+import { Button } from '../../Button';
 
 const Wrapper = styled.div`
   position: relative;

@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
 import { getPlural } from '@caesar/common/utils/string';
-import { File } from '../File';
-import { Icon } from '../Icon';
+import { File } from '../../File';
+import { Icon } from '../../Icon';
 
 const Wrapper = styled.div`
   position: fixed;

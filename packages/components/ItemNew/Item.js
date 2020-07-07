@@ -14,8 +14,8 @@ import {
   editItemRequest,
 } from '@caesar/common/actions/entities/item';
 import { Error } from '../Error';
-import { ItemHeader, MoveModal } from '../ItemFields';
 import { EmptyItem } from './EmptyItem';
+import { ItemHeader, MoveModal } from './components';
 import { Credentials, Document } from './types';
 
 const Wrapper = styled.div`

@@ -1,16 +1,13 @@
 import React from 'react';
 import {
-  Wrapper,
   Title,
-  OwnerAndInvitation,
-  Row,
   Input,
   Password,
   Website,
   Note,
   Attachments,
-  RemoveButton,
-} from '../../ItemFields';
+} from '../../ItemFields/view';
+import { Wrapper, OwnerAndInvitation, Row, RemoveButton } from '../components';
 
 export const Credentials = ({
   item,

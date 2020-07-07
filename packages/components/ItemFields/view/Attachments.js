@@ -5,9 +5,9 @@ import {
   downloadAsZip,
   splitFilesToUniqAndDuplicates,
 } from '@caesar/common/utils/file';
-import { Icon } from '../Icon';
-import { File } from '../File';
-import { Uploader } from '../Uploader';
+import { Icon } from '../../Icon';
+import { File } from '../../File';
+import { Uploader } from '../../Uploader';
 import { NewFilesModal } from './NewFilesModal';
 
 const Wrapper = styled.div``;

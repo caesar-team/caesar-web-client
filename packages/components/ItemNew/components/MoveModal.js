@@ -21,13 +21,13 @@ import {
 } from '@caesar/common/selectors/entities/list';
 import { moveItemRequest } from '@caesar/common/actions/entities/item';
 import { setWorkInProgressItem } from '@caesar/common/actions/workflow';
-import { Modal, ModalTitle } from '../Modal';
-import { Radio } from '../Radio';
-import { Button } from '../Button';
-import { Icon } from '../Icon';
-import { Avatar } from '../Avatar';
-import { SelectVisible } from '../SelectVisible';
-import { withNotification } from '../Notification';
+import { Modal, ModalTitle } from '../../Modal';
+import { Radio } from '../../Radio';
+import { Button } from '../../Button';
+import { Icon } from '../../Icon';
+import { Avatar } from '../../Avatar';
+import { SelectVisible } from '../../SelectVisible';
+import { withNotification } from '../../Notification';
 
 const ListsWrapper = styled.div`
   display: flex;

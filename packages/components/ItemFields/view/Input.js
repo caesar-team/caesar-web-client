@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import { useCopyToClipboard } from 'react-use';
 import styled from 'styled-components';
-import { Input } from '../Input';
-import { Icon } from '../Icon';
-import { withNotification } from '../Notification';
+import { Input } from '../../Input';
+import { Icon } from '../../Icon';
+import { withNotification } from '../../Notification';
 
 const Wrapper = styled.div`
   ${({ withLabel }) => withLabel && 'padding-top: 20px;'}

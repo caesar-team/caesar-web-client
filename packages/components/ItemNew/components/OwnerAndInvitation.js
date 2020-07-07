@@ -7,8 +7,8 @@ import {
   workInProgressItemChildItemsSelector,
 } from '@caesar/common/selectors/workflow';
 import { membersByIdSelector } from '@caesar/common/selectors/entities/member';
-import { Avatar, AvatarsList } from '../Avatar';
-import { Icon } from '../Icon';
+import { Avatar, AvatarsList } from '../../Avatar';
+import { Icon } from '../../Icon';
 
 const Wrapper = styled.div`
   display: flex;
@@ -112,7 +112,10 @@ export const OwnerAndInvitation = ({ onClickShare }) => {
           <Icon name="members" width={16} height={16} color="lightGray" />
         </NoMembers>
       )}
-      <ShareButton onClick={onClickShare}>
+      <ShareButton
+        // disabled={!isOnline}
+        onClick={onClickShare}
+      >
         <Icon withOfflineCheck name="plus" width={16} height={16} />
       </ShareButton>
     </Wrapper>

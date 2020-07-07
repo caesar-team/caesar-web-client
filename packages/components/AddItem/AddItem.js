@@ -1,5 +1,6 @@
 import React from 'react';
 import { useRouter } from 'next/router';
+import { useSelector } from 'react-redux';
 import styled from 'styled-components';
 import { useNavigatorOnline } from '@caesar/common/hooks';
 import {
@@ -9,6 +10,8 @@ import {
   CREATE_PERMISSION,
   ENTITY_TYPE,
 } from '@caesar/common/constants';
+import { workInProgressListSelector } from '@caesar/common/selectors/workflow';
+import { currentTeamSelector } from '@caesar/common/selectors/user';
 import { Button } from '../Button';
 import { Icon } from '../Icon';
 import { Dropdown } from '../Dropdown';
@@ -49,12 +52,17 @@ const renderAddItemOptions = (value, label) => (
   </AddItemOption>
 );
 
-export const AddItem = ({ workInProgressList, className }) => {
+export const AddItem = ({ className }) => {
   const { push } = useRouter();
+  const currentTeam = useSelector(currentTeamSelector);
+  const workInProgressList = useSelector(workInProgressListSelector);
 
   const handleClickAddItem = (_, value) => {
-    console.log('create item with type: ', value);
-    push(ROUTES.CREATE);
+    push(
+      `${ROUTES.CREATE}?type=${value}${
+        currentTeam ? `&teamId=${currentTeam?.id}` : ''
+      }&listId=${workInProgressList?.id}`,
+    );
   };
 
   const isOnline = useNavigatorOnline();

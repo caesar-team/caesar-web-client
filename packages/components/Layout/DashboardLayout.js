@@ -4,7 +4,6 @@ import styled from 'styled-components';
 import ScrollLock from 'react-scrolllock';
 import { DASHBOARD_MODE } from '@caesar/common/constants';
 import { userDataSelector } from '@caesar/common/selectors/user';
-import { workInProgressListSelector } from '@caesar/common/selectors/workflow';
 import {
   setWorkInProgressItem,
   setWorkInProgressListId,
@@ -27,7 +26,6 @@ export const DashboardLayout = ({
 }) => {
   const dispatch = useDispatch();
   const user = useSelector(userDataSelector);
-  const workInProgressList = useSelector(workInProgressListSelector);
 
   const handleSearch = event => {
     event.preventDefault();
@@ -59,7 +57,6 @@ export const DashboardLayout = ({
           searchedText={searchedText}
           onSearch={handleSearch}
           onClickReset={handleClickResetSearch}
-          workInProgressList={workInProgressList}
         />
       }
       {...props}

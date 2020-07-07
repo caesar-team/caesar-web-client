@@ -21,7 +21,13 @@ const MemberEmail = styled.div`
 
 const Member = ({ name, email, avatar, className }) => (
   <Wrapper className={className}>
-    <Avatar isSmall name={name} email={email} avatar={avatar} />
+    <Avatar
+      size={32}
+      fontSize="small"
+      name={name}
+      email={email}
+      avatar={avatar}
+    />
     <MemberInfo>{email && <MemberEmail>{email}</MemberEmail>}</MemberInfo>
   </Wrapper>
 );

@@ -64,7 +64,7 @@ const TeamsListComponent = ({
             handleChangeTeam(TEAM_TYPE.PERSONAL);
           }}
         >
-          <StyledAvatar {...user} isSmall />
+          <StyledAvatar {...user} size={32} fontSize="small" />
           Personal
         </Option>
       )}
@@ -76,7 +76,7 @@ const TeamsListComponent = ({
               handleChangeTeam(team.id);
             }}
           >
-            <StyledAvatar avatar={team.icon} isSmall />
+            <StyledAvatar avatar={team.icon} size={32} fontSize="small" />
             {team.title.toLowerCase() === TEAM_TYPE.DEFAULT
               ? TEAM_TEXT_TYPE[TEAM_TYPE.DEFAULT]
               : team.title}

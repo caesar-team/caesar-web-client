@@ -16,6 +16,7 @@ const Box = styled.div`
     withTriangleAtTop ? 'calc(100% + 19px)' : 'calc(100% - 1px)'};
   right: 0;
   z-index: ${({ theme }) => theme.zIndex.dropdown};
+  width: 100%;
   border-radius: 3px;
   background-color: ${({ theme }) => theme.color.white};
   border: 1px solid ${({ theme }) => theme.color.gallery};
@@ -43,7 +44,8 @@ const OptionsList = styled.div`
 `;
 
 const Option = styled.button`
-  padding: 10px 30px;
+  padding: 8px 16px;
+  font-size: ${({ theme }) => theme.font.size.main};
   border: none;
   background: none;
   cursor: pointer;
@@ -55,10 +57,11 @@ const Option = styled.button`
 `;
 
 const Button = styled.button`
+  padding: 8px 16px;
+  font-size: ${({ theme }) => theme.font.size.main};
   border: none;
   background-color: transparent;
   outline: none;
-  padding: 0;
   cursor: pointer;
 `;
 
@@ -138,5 +141,7 @@ const Dropdown = memo(DropdownComponent);
 
 Dropdown.Button = Button;
 Dropdown.Box = Box;
+Dropdown.OptionsList = OptionsList;
+Dropdown.Option = Option;
 
 export { Dropdown };

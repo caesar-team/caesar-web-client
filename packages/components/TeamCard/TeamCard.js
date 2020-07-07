@@ -97,7 +97,8 @@ const TeamCard = ({
       <AvatarsWrapper>
         {areMembersAvailable && (
           <AvatarsList
-            isSmall
+            size={32}
+            fontSize="small"
             avatars={getMembers(users, members)}
             visibleCount={10}
           />

@@ -8,14 +8,14 @@ const Wrapper = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
-  width: ${({ isSmall }) => (isSmall ? '32px' : '40px')};
-  min-width: ${({ isSmall }) => (isSmall ? '32px' : '40px')};
-  height: ${({ isSmall }) => (isSmall ? '32px' : '40px')};
+  width: ${({ size }) => size}px;
+  min-width: ${({ size }) => size}px;
+  flex: 0 0 ${({ size }) => size}px;
+  height: ${({ size }) => size}px;
   padding: 0;
   margin: 0;
   overflow: hidden;
-  font-size: ${({ isSmall, theme }) =>
-    isSmall ? theme.font.size.small : theme.font.size.main};
+  font-size: ${({ fontSize, theme }) => theme.font.size[fontSize]};
   color: ${({ theme }) => theme.color.white};
   white-space: nowrap;
   text-align: center;
@@ -34,7 +34,8 @@ export const Avatar = ({
   email,
   avatar,
   children,
-  isSmall,
+  size = 40,
+  fontSize = 'main',
   hint = '',
   ...props
 }) => {
@@ -63,7 +64,7 @@ export const Avatar = ({
 
   return (
     <Hint text={hint}>
-      <Wrapper isSmall={isSmall} {...props}>
+      <Wrapper size={size} fontSize={fontSize} {...props}>
         {renderInner()}
       </Wrapper>
     </Hint>

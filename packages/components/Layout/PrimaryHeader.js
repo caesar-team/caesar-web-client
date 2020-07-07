@@ -94,7 +94,6 @@ const PrimaryHeaderComponent = ({
   searchedText,
   onSearch,
   onClickReset,
-  workInProgressList = {},
 }) => {
   const dispatch = useDispatch();
   const [isDropdownOpened, setIsDropdownOpened] = useState(false);
@@ -132,7 +131,7 @@ const PrimaryHeaderComponent = ({
                 onClickReset={onClickReset}
               />
             )}
-            <AddItemButton workInProgressList={workInProgressList} />
+            <AddItemButton />
             <UserSection>
               <StyledDropdown
                 renderOverlay={() => Options}

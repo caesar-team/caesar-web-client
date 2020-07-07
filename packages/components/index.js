@@ -15,6 +15,7 @@ export { Checkbox } from './Checkbox';
 export { CodeInput } from './CodeInput';
 export { ReadOnlyContentEditable } from './Common';
 export { ConfirmModal } from './ConfirmModal';
+export { CreateForm } from './CreateForm';
 export { DataTable, VirtualizedTableHOC } from './DataTable';
 export { DottedMenu } from './DottedMenu';
 export { Dropdown } from './Dropdown';

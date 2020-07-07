@@ -6,7 +6,6 @@ import AutoSizer from 'react-virtualized-auto-sizer';
 import { FixedSizeList } from 'react-window';
 import { upperFirst } from '@caesar/common/utils/string';
 import { DASHBOARD_MODE, LIST_TYPES_ARRAY } from '@caesar/common/constants';
-import { Button } from '@caesar/components';
 import { FixedSizeItem } from './FixedSizeItem';
 import { ScrollbarVirtualList } from './ScrollbarVirtualList';
 import { EmptyList } from './EmptyList';

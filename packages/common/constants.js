@@ -149,6 +149,8 @@ export const UNLOCKED_ROUTES = [
   ROUTES.INVITE,
 ];
 
+export const TECH_ROUTES = [ROUTES.LOGOUT];
+
 export const ENTITY_TYPE = {
   CHILD_ITEM: 'ChildItem',
   ITEM: 'Item',

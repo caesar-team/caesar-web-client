@@ -11,6 +11,7 @@ const Wrapper = styled.div`
   bottom: 0;
   left: 0;
   padding: 24px;
+  background-color: ${({ theme }) => theme.color.white};
 `;
 
 const StyledAppVersion = styled(AppVersion)`

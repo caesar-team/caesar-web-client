@@ -1,2 +1,2 @@
 export { default as Error } from './Error';
-export { TexError } from './TexError';
+export { TextError } from './TextError';

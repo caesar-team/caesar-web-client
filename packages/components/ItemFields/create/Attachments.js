@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import { downloadFile } from '@caesar/common/utils/file';
 import { Uploader } from '../../Uploader';
 import { File } from '../../File';
-import { TexError } from '../../Error';
+import { TextError } from '../../Error';
 
 const Title = styled.div`
   display: flex;
@@ -59,7 +59,7 @@ const renderAttachments = (
         {...attachment}
       />
       {checkAttachmentsError(errors, index) && (
-        <TexError>{errors[index].raw}</TexError>
+        <TextError>{errors[index].raw}</TextError>
       )}
     </FileRow>
   ));

@@ -6,4 +6,4 @@ const Wrapper = styled.div`
   color: ${({ theme }) => theme.color.red};
 `;
 
-export const TexError = ({ text }) => <Wrapper>{text}</Wrapper>;
+export const TextError = ({ text }) => <Wrapper>{text}</Wrapper>;

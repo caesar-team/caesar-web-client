@@ -13,7 +13,7 @@ import {
   moveItemRequest,
   editItemRequest,
 } from '@caesar/common/actions/entities/item';
-import { Error } from '../Error';
+import { TextError } from '../Error';
 import { EmptyItem } from './EmptyItem';
 import { ItemHeader, MoveModal } from './components';
 import { Credentials, Document } from './types';
@@ -43,7 +43,7 @@ const ItemComponent = ({
     return <EmptyItem />;
   }
 
-  const { type, data, listId } = item;
+  const { data, listId } = item;
 
   const isTrashItem =
     item &&
@@ -69,7 +69,7 @@ const ItemComponent = ({
       case ITEM_TYPE.DOCUMENT:
         return <Document {...props} />;
       default:
-        return <Error>Unknown type</Error>;
+        return <TextError>Unknown type</TextError>;
     }
   };
 

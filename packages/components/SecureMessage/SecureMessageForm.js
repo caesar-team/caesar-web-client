@@ -14,7 +14,7 @@ import { Button } from '../Button';
 import { withNotification } from '../Notification';
 import { withOfflineDetection } from '../Offline';
 import { Hint } from '../Hint';
-import { TexError } from '../Error';
+import { TextError } from '../Error';
 import {
   initialValues,
   requestsLimitOptions,
@@ -205,7 +205,7 @@ const renderAttachments = (
         {...attachment}
       />
       {checkAttachmentsError(errors, index) && (
-        <TexError>{errors[index].raw}</TexError>
+        <TextError>{errors[index].raw}</TextError>
       )}
     </FileRow>
   ));
@@ -338,14 +338,14 @@ const SecureMessageFormComponent = ({ onSubmit, notification, isOnline }) => {
             disabled={isSubmitting}
           />
           {checkError(touched, errors, 'password') && (
-            <TexError>{checkError(touched, errors, 'password')}</TexError>
+            <TextError>{checkError(touched, errors, 'password')}</TextError>
           )}
         </Row>
       )}
       {errors?.form && (
         <>
-          <TexError>Oops… Something went wrong</TexError>
-          <TexError>Please, click again on Create secure message</TexError>
+          <TextError>Oops… Something went wrong</TextError>
+          <TextError>Please, click again on Create secure message</TextError>
         </>
       )}
       <ButtonWrapper>

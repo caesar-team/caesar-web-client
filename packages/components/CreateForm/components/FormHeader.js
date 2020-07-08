@@ -28,8 +28,13 @@ const StyledDropdown = styled(Dropdown)`
     display: flex;
     align-items: center;
     height: 100%;
+    padding: 8px 16px;
     border: 1px solid ${({ theme }) => theme.color.gallery};
     border-radius: 3px;
+  }
+
+  ${Dropdown.Box} {
+    width: 100%;
   }
 
   ${Dropdown.OptionsList} {
@@ -41,6 +46,7 @@ const StyledDropdown = styled(Dropdown)`
     display: flex;
     align-items: center;
     width: 100%;
+    padding: 8px 16px;
     overflow: hidden;
   }
 `;

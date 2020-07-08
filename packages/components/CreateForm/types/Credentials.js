@@ -52,7 +52,7 @@ export const Credentials = ({ formik }) => {
           withBorder
         />
       </Row>
-      <Row marginBottom={32}>
+      <Row marginBottom={24}>
         <TextArea
           name="note"
           label="Notes"

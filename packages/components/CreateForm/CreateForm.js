@@ -2,8 +2,10 @@ import React from 'react';
 import { useRouter } from 'next/router';
 import { useFormik } from 'formik';
 import styled from 'styled-components';
+import { ITEM_TYPE } from '@caesar/common/constants';
+import { TextError } from '../Error';
 import { FormHeader, FormFooter } from './components';
-import { Credentials } from './types';
+import { Credentials, Document } from './types';
 
 const Form = styled.form`
   padding: 8px 0 88px;
@@ -57,6 +59,17 @@ export const CreateForm = () => {
     }
   };
 
+  const FormByType = props => {
+    switch (props.type) {
+      case ITEM_TYPE.CREDENTIALS:
+        return <Credentials {...props} />;
+      case ITEM_TYPE.DOCUMENT:
+        return <Document {...props} />;
+      default:
+        return <TextError>Unknown type</TextError>;
+    }
+  };
+
   return (
     <Form onSubmit={handleSubmit}>
       <StyledFormHeader
@@ -64,7 +77,7 @@ export const CreateForm = () => {
         listId={query.listId}
         onChangePath={handleChangePath}
       />
-      <Credentials formik={formik} />
+      <FormByType type={query.type} formik={formik} />
       <FormFooter onSubmit={handleSubmit} />
     </Form>
   );

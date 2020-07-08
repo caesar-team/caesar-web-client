@@ -19,7 +19,7 @@ export { CreateForm } from './CreateForm';
 export { DataTable, VirtualizedTableHOC } from './DataTable';
 export { DottedMenu } from './DottedMenu';
 export { Dropdown } from './Dropdown';
-export { Error, TexError } from './Error';
+export { Error, TextError } from './Error';
 export { File } from './File';
 export { Head } from './Head';
 export { Hint } from './Hint';

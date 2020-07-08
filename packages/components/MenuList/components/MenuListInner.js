@@ -7,6 +7,7 @@ import { currentTeamSelector } from '@caesar/common/selectors/user';
 import {
   personalListsByTypeSelector,
   currentTeamListsSelector,
+  serverErrorSelector,
 } from '@caesar/common/selectors/entities/list';
 import { workInProgressListSelector } from '@caesar/common/selectors/workflow';
 import {
@@ -15,6 +16,7 @@ import {
   resetWorkInProgressItemIds,
 } from '@caesar/common/actions/workflow';
 import { sortListRequest } from '@caesar/common/actions/entities/list';
+import { withNotification } from '@caesar/components/Notification';
 import { Icon } from '../../Icon';
 import { ListItem } from './ListItem';
 import { MenuItemInner } from './styledComponents';
@@ -67,7 +69,8 @@ const MenuListInnerComponent = ({
   setSearchedText,
   setMode,
   isListsOpened,
-  setIsListsOpened,
+  setListsOpened,
+  notification,
 }) => {
   const dispatch = useDispatch();
   const currentTeam = useSelector(currentTeamSelector);
@@ -76,7 +79,7 @@ const MenuListInnerComponent = ({
   const teamLists = useSelector(currentTeamListsSelector);
   const workInProgressList = useSelector(workInProgressListSelector);
   const activeListId = workInProgressList && workInProgressList.id;
-  const [isCreatingMode, setIsCreatingMode] = useState(false);
+  const [isCreatingMode, setCreatingMode] = useState(false);
 
   const handleClickMenuItem = id => {
     dispatch(setWorkInProgressListId(id));
@@ -96,8 +99,8 @@ const MenuListInnerComponent = ({
 
   const handleClickAddList = event => {
     event.stopPropagation();
-    setIsListsOpened(true);
-    setIsCreatingMode(true);
+    setListsOpened(true);
+    setCreatingMode(true);
   };
 
   const handleDragEnd = ({ draggableId, source, destination }) => {
@@ -170,7 +173,7 @@ const MenuListInnerComponent = ({
               }
 
               return withChildren
-                ? setIsListsOpened(!isListsOpened)
+                ? setListsOpened(!isListsOpened)
                 : handleClickMenuItem(id);
             }}
           >
@@ -198,7 +201,8 @@ const MenuListInnerComponent = ({
               {id === 'lists' && isCreatingMode && (
                 <ListItem
                   isCreatingMode={isCreatingMode}
-                  setIsCreatingMode={setIsCreatingMode}
+                  setCreatingMode={setCreatingMode}
+                  notification={notification}
                 />
               )}
               {children && (
@@ -216,6 +220,7 @@ const MenuListInnerComponent = ({
                             item={item}
                             activeListId={activeListId}
                             index={index}
+                            notification={notification}
                             handleClickMenuItem={handleClickMenuItem}
                           />
                         ))}
@@ -233,4 +238,4 @@ const MenuListInnerComponent = ({
   });
 };
 
-export const MenuListInner = memo(MenuListInnerComponent);
+export const MenuListInner = memo(withNotification(MenuListInnerComponent));

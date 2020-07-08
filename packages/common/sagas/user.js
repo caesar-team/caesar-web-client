@@ -77,7 +77,8 @@ export function* logoutSaga() {
   try {
     yield call([localStorage, localStorage.clear]);
     yield call(removeCookieValue, 'token');
-    yield call(Router.push, ROUTES.LOGOUT);
+    yield call(removeCookieValue, 'share');
+    yield call(Router.push, ROUTES.SIGN_IN);
   } catch (error) {
     console.log('error', error);
   }

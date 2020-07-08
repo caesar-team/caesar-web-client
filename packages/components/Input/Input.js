@@ -11,7 +11,7 @@ const Label = styled.label`
 
 const LabelText = styled.div`
   position: absolute;
-  top: ${({ isFocused, value }) => (isFocused || value ? '-20px' : '5px')};
+  top: ${({ isFocused, value }) => (isFocused || value ? '-20px' : '9px')};
   left: 16px;
   z-index: ${({ theme }) => theme.zIndex.basic};
   font-size: ${({ isFocused, value, theme }) =>

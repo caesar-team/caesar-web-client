@@ -146,7 +146,7 @@ export const chosenListItemsSelector = createSelector(
       ? listsById[workInProgressListId].children.reduce(
         (accumulator, itemId) =>
           itemsById[itemId]?.data
-            ? accumulator.concat(itemsById[itemId])
+            ? [...accumulator, itemsById[itemId]]
             : accumulator,
         [],
       )

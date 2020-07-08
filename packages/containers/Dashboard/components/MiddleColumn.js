@@ -16,7 +16,6 @@ import {
 } from '@caesar/common/selectors/workflow';
 import { itemsByIdSelector } from '@caesar/common/selectors/entities/item';
 import {
-  favoritesSelector,
   trashListSelector,
   teamsTrashListsSelector,
 } from '@caesar/common/selectors/entities/list';
@@ -43,7 +42,6 @@ const MiddleColumnComponent = ({
   const workInProgressItem = useSelector(workInProgressItemSelector);
   const visibleListItems = useSelector(visibleListItemsSelector);
   const trashList = useSelector(trashListSelector);
-  const favoriteList = useSelector(favoritesSelector);
   const teamsTrashLists = useSelector(teamsTrashListsSelector);
   const itemsById = useSelector(itemsByIdSelector);
 
@@ -52,12 +50,8 @@ const MiddleColumnComponent = ({
   const isTrashList =
     (workInProgressList?.id === trashList.id ||
       teamsTrashLists.map(({ id }) => id).includes(workInProgressList?.id));
-  const isFavoriteList = workInProgressList?.id === favoriteList.id;
 
   const searchedItems = filter(Object.values(itemsById), searchedText);
-  const filteredVisibleListItems = isFavoriteList
-    ? visibleListItems.filter(item => item.listId !== trashList.id)
-    : visibleListItems;
 
   const areAllItemsSelected =
     mode === DASHBOARD_MODE.SEARCH
@@ -164,7 +158,7 @@ const MiddleColumnComponent = ({
         workInProgressItem={workInProgressItem}
         workInProgressItemIds={workInProgressItemIds}
         items={
-          mode === DASHBOARD_MODE.DEFAULT ? filteredVisibleListItems : searchedItems
+          mode === DASHBOARD_MODE.DEFAULT ? visibleListItems : searchedItems
         }
         onClickItem={handleClickItem}
       />

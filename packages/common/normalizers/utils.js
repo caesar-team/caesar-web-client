@@ -1,7 +1,7 @@
 import { uuid4 } from '@caesar/common/utils/uuid4';
 import { LIST_TYPE } from '@caesar/common/constants';
 
-export const getFavoritesList = (itemsById, trashListId) => {console.log(itemsById);
+export const getFavoritesList = (itemsById, trashListId) => {
   const favoriteListId = uuid4();
   const favorites = Object.values(itemsById)
     .filter(({ favorite, listId }) => favorite && listId !== trashListId)

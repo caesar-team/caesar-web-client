@@ -2,7 +2,6 @@ import React, { memo, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import styled from 'styled-components';
 import equal from 'fast-deep-equal';
-import { ITEM_TYPE } from '@caesar/common/constants';
 import { workInProgressItemSelector } from '@caesar/common/selectors/workflow';
 import {
   trashListSelector,
@@ -13,10 +12,9 @@ import {
   moveItemRequest,
   editItemRequest,
 } from '@caesar/common/actions/entities/item';
-import { TextError } from '../Error';
 import { EmptyItem } from './EmptyItem';
+import { ItemByType } from './ItemByType';
 import { ItemHeader, MoveModal } from './components';
-import { Credentials, Document } from './types';
 
 const Wrapper = styled.div`
   ${({ isDisabled }) =>
@@ -60,17 +58,6 @@ const ItemComponent = ({
   const handleClickRestoreItem = async () => {
     dispatch(moveItemRequest(item.id, null, item.previousListId));
     dispatch(setWorkInProgressItem(null));
-  };
-
-  const ItemByType = props => {
-    switch (props.item.type) {
-      case ITEM_TYPE.CREDENTIALS:
-        return <Credentials {...props} />;
-      case ITEM_TYPE.DOCUMENT:
-        return <Document {...props} />;
-      default:
-        return <TextError>Unknown type</TextError>;
-    }
   };
 
   return (

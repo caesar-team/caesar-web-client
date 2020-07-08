@@ -15,9 +15,9 @@ export const Credentials = ({ formik }) => {
     <>
       <Row marginBottom={40}>
         <Title
-          name="title"
+          name="name"
           placeholder="Enter the title"
-          value={values.title}
+          value={values.name}
           onChange={handleChange}
           onBlur={handleBlur}
         />

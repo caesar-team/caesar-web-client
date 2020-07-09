@@ -1,7 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
 import { media } from '@caesar/assets/styles/media';
-import { APP_VERSION } from '@caesar/common/constants';
+import { AppVersion } from '../AppVersion';
 import LayoutConstructor from './LayoutConstructor';
 import { SecureHeader } from './SecureHeader';
 
@@ -74,17 +74,11 @@ const LayoutConstructorStyled = styled(LayoutConstructor)`
   }
 `;
 
-const AppVersion = styled.div`
-  font-size: ${({ theme }) => theme.font.size.xs};
-  line-height: ${({ theme }) => theme.font.lineHeight.xs};
-  color: ${({ theme }) => theme.color.gray};
-`;
-
 const SecureLayout = props => {
   return (
     <LayoutConstructorStyled
       headerComponent={<SecureHeader />}
-      footerComponent={<AppVersion>{APP_VERSION}</AppVersion>}
+      footerComponent={<AppVersion />}
       {...props}
     />
   );

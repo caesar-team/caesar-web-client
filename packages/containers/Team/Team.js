@@ -289,7 +289,7 @@ class TeamContainer extends Component {
       width: columnWidths.name,
       Cell: ({ original }) => (
         <NameField>
-          <Avatar isSmall {...original} />
+          <Avatar size={32} fontSize="small" {...original} />
           <Name>{original.name}</Name>
         </NameField>
       ),

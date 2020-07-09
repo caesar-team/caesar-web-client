@@ -1,3 +1,4 @@
+import Router from 'next/router';
 import {
   put,
   call,
@@ -142,6 +143,7 @@ import {
   MOVING_IN_PROGRESS_NOTIFICATION,
   REMOVING_IN_PROGRESS_NOTIFICATION,
   NOOP_NOTIFICATION,
+  ROUTES,
 } from '@caesar/common/constants';
 import { generateSharingUrl } from '@caesar/common/utils/sharing';
 import { createMemberSaga } from './member';
@@ -506,6 +508,8 @@ export function* createItemSaga({
         yield put(updateWorkInProgressItem());
       }
     }
+
+    yield call(Router.push, ROUTES.DASHBOARD);
   } catch (error) {
     console.log(error);
     yield put(

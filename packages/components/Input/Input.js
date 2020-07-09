@@ -11,7 +11,7 @@ const Label = styled.label`
 
 const LabelText = styled.div`
   position: absolute;
-  top: ${({ isFocused, value }) => (isFocused || value ? '-20px' : '5px')};
+  top: ${({ isFocused, value }) => (isFocused || value ? '-20px' : '9px')};
   left: 16px;
   z-index: ${({ theme }) => theme.zIndex.basic};
   font-size: ${({ isFocused, value, theme }) =>
@@ -69,10 +69,11 @@ const Prefix = styled.div`
 const PostFix = styled.div`
   position: absolute;
   top: 50%;
-  transform: translateY(-50%);
-  line-height: 0;
   right: 16px;
-  background-color: ${({ theme }) => theme.color.white};
+  display: flex;
+  align-items: center;
+  line-height: 0;
+  transform: translateY(-50%);
 `;
 
 const StyledIcon = styled(Icon)`
@@ -104,15 +105,16 @@ const Input = ({
   label,
   name,
   value,
+  autoComplete = 'chrome-off',
   error,
   prefix,
   postfix,
   withBorder,
   onBlur,
   isAcceptIconDisabled,
-  handleClickAcceptEdit,
-  handleClickClose,
-  handleClickAway = Function.prototype,
+  onClickAcceptEdit,
+  onClickClose,
+  onClickAway = Function.prototype,
   children,
   className,
   ...props
@@ -132,9 +134,9 @@ const Input = ({
     }
   };
 
-  useClickAway(inputRef, handleClickAway);
-  useKeyPressEvent('Enter', handleClickAcceptEdit);
-  useKeyPressEvent('Escape', handleClickClose);
+  useClickAway(inputRef, onClickAway);
+  useKeyPressEvent('Enter', onClickAcceptEdit);
+  useKeyPressEvent('Escape', onClickClose);
 
   return (
     <Label ref={inputRef} className={className}>
@@ -146,39 +148,39 @@ const Input = ({
       {prefix && <Prefix>{prefix}</Prefix>}
       <InputField
         {...props}
-        autoComplete="off"
+        autoComplete={autoComplete}
         type={type}
         name={name}
         value={value}
         isError={!!error}
         isFocused={isFocused}
         withBorder={withBorder}
-        withIcons={handleClickAcceptEdit || handleClickClose}
+        withIcons={onClickAcceptEdit || onClickClose}
         onFocus={handleFocus}
         onBlur={handleBlur}
       />
-      {(postfix || handleClickAcceptEdit || handleClickClose) && (
+      {(postfix || onClickAcceptEdit || onClickClose) && (
         <PostFix>
-          {handleClickAcceptEdit && (
+          {postfix}
+          {onClickAcceptEdit && (
             <StyledIcon
               name="checkmark"
               width={16}
               height={16}
               color="gray"
               isDisabled={isAcceptIconDisabled}
-              onClick={handleClickAcceptEdit}
+              onClick={onClickAcceptEdit}
             />
           )}
-          {handleClickClose && (
+          {onClickClose && (
             <StyledIcon
               name="close"
               width={16}
               height={16}
               color="gray"
-              onClick={handleClickClose}
+              onClick={onClickClose}
             />
           )}
-          {postfix}
         </PostFix>
       )}
       {error && <Error>{error}</Error>}

@@ -1,5 +1,6 @@
 export { AbilityProvider, Can, AbilityContext } from './Ability';
 export { AddItem } from './AddItem';
+export { AppVersion } from './AppVersion';
 export { AuthDescription } from './AuthDescription';
 export { AuthTitle } from './AuthTitle';
 export { AuthWrapper } from './AuthWrapper';
@@ -14,10 +15,11 @@ export { Checkbox } from './Checkbox';
 export { CodeInput } from './CodeInput';
 export { ContentEditable } from './Common';
 export { ConfirmModal } from './ConfirmModal';
+export { CreateForm } from './CreateForm';
 export { DataTable, VirtualizedTableHOC } from './DataTable';
 export { DottedMenu } from './DottedMenu';
 export { Dropdown } from './Dropdown';
-export { Error } from './Error';
+export { Error, TextError } from './Error';
 export { File } from './File';
 export { Head } from './Head';
 export { Hint } from './Hint';
@@ -40,6 +42,7 @@ export { Label } from './Label';
 export {
   AuthLayout,
   BootstrapLayout,
+  CreateLayout,
   DashboardLayout,
   ErrorLayout,
   PrimaryHeader,

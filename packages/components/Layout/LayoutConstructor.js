@@ -13,8 +13,10 @@ const Wrapper = styled.div`
   overflow: auto;
   min-height: 100vh;
   height: 100%;
-  
-  ${({ withImages }) => withImages && `
+
+  ${({ withImages }) =>
+    withImages &&
+    `
     background-image: url('/images/secure-bg-right.png'),
       url('/images/secure-bg-btn.png');
     background-size: 217px 300px, 279px 200px;

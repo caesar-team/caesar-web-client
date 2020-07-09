@@ -46,14 +46,15 @@ export const LIST_TYPE = {
   FAVORITES: 'favorites',
 };
 
-export const LIST_TYPES_ARRAY = [
+export const DEFAULT_LIST_TYPES_ARRAY = [
   LIST_TYPE.ROOT,
   LIST_TYPE.INBOX,
-  LIST_TYPE.LIST,
   LIST_TYPE.TRASH,
   LIST_TYPE.DEFAULT,
   LIST_TYPE.FAVORITES,
 ];
+
+export const LIST_TYPES_ARRAY = [...DEFAULT_LIST_TYPES_ARRAY, LIST_TYPE.LIST];
 
 export const TEAM_TYPE = {
   DEFAULT: 'default',
@@ -71,6 +72,7 @@ export const DASHBOARD_MODE = {
   TOOL: 'SECURE_MESSAGE_MODE',
 };
 
+// TODO: Get rid of this object (redundant)
 export const ITEM_MODE = {
   REVIEW: 'review',
   WORKFLOW_EDIT: 'edit',
@@ -129,13 +131,19 @@ export const ROUTES = {
   SETTINGS: '/settings',
   IMPORT: '/import',
   TEAM: '/team',
+  CREATE: '/create',
 };
 
 export const SHARED_ROUTES = [ROUTES.SHARE, ROUTES.INVITE];
 
 // require bootstrap
 // TODO: figure out better naming
-export const LOCKED_ROUTES = [ROUTES.DASHBOARD, ROUTES.IMPORT, ROUTES.TEAM];
+export const LOCKED_ROUTES = [
+  ROUTES.DASHBOARD,
+  ROUTES.IMPORT,
+  ROUTES.TEAM,
+  ROUTES.CREATE,
+];
 
 // don't require bootstrap routes
 // TODO: figure out better naming

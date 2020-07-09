@@ -1,20 +1,19 @@
 import React from 'react';
 import {
-  Wrapper,
   Title,
-  OwnerAndInvitation,
-  Row,
   Input,
   Password,
   Website,
   Note,
   Attachments,
-  RemoveButton,
-} from '../../ItemFields';
+} from '../../ItemFields/view';
+import { Row } from '../../ItemFields/common';
+import { Wrapper, OwnerAndInvitation, RemoveButton } from '../components';
 
 export const Credentials = ({
   item,
-  handleClickAcceptEdit,
+  onClickAcceptEdit,
+  onClickShare,
   onClickMoveToTrash,
 }) => {
   const {
@@ -23,32 +22,29 @@ export const Credentials = ({
 
   return (
     <Wrapper>
-      <Title value={name} handleClickAcceptEdit={handleClickAcceptEdit} />
-      <OwnerAndInvitation />
+      <Title value={name} onClickAcceptEdit={onClickAcceptEdit} />
+      <OwnerAndInvitation onClickShare={onClickShare} />
       <Row>
         <Input
           label="Login"
           name="login"
           value={login}
-          handleClickAcceptEdit={handleClickAcceptEdit}
+          onClickAcceptEdit={onClickAcceptEdit}
         />
       </Row>
       <Row>
-        <Password value={pass} handleClickAcceptEdit={handleClickAcceptEdit} />
+        <Password value={pass} onClickAcceptEdit={onClickAcceptEdit} />
       </Row>
       <Row>
-        <Website
-          value={website}
-          handleClickAcceptEdit={handleClickAcceptEdit}
-        />
+        <Website value={website} onClickAcceptEdit={onClickAcceptEdit} />
       </Row>
       <Row marginBottom={24}>
-        <Note value={note} handleClickAcceptEdit={handleClickAcceptEdit} />
+        <Note value={note} onClickAcceptEdit={onClickAcceptEdit} />
       </Row>
       <Row marginBottom={24}>
         <Attachments
           attachments={attachments}
-          handleClickAcceptEdit={handleClickAcceptEdit}
+          onClickAcceptEdit={onClickAcceptEdit}
         />
       </Row>
       {onClickMoveToTrash && (

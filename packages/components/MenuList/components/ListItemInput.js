@@ -37,8 +37,8 @@ export const ListItemInput = ({
   value,
   setValue,
   label,
-  handleClickAcceptEdit,
-  handleClickClose,
+  onClickAcceptEdit,
+  onClickClose,
 }) => {
   const inputRef = useRef(null);
 
@@ -64,8 +64,8 @@ export const ListItemInput = ({
     setValue(newValue.slice(0, MAX_LIST_LABEL_LENGTH));
   };
 
-  useKeyPressEvent('Enter', handleClickAcceptEdit);
-  useKeyPressEvent('Escape', handleClickClose);
+  useKeyPressEvent('Enter', onClickAcceptEdit);
+  useKeyPressEvent('Escape', onClickClose);
 
   return (
     <div ref={inputRef}>
@@ -81,14 +81,14 @@ export const ListItemInput = ({
               height={16}
               color="gray"
               isDisabled={!value || value === label}
-              onClick={handleClickAcceptEdit}
+              onClick={onClickAcceptEdit}
             />
             <StyledIcon
               name="close"
               width={16}
               height={16}
               color="gray"
-              onClick={handleClickClose}
+              onClick={onClickClose}
             />
           </>
         }

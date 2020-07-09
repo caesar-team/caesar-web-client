@@ -123,8 +123,8 @@ export const ListItem = ({
           value={value}
           setValue={setValue}
           label={label}
-          handleClickAcceptEdit={handleClickAcceptEdit}
-          handleClickClose={handleClickClose}
+          onClickAcceptEdit={handleClickAcceptEdit}
+          onClickClose={handleClickClose}
         />
       ) : (
         <>

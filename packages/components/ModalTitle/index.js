@@ -1,1 +1,0 @@
-export { ModalTitle } from './ModalTitle';

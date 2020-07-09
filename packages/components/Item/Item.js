@@ -104,7 +104,7 @@ const ItemComponent = ({
       teamsTrashLists.map(({ id }) => id).includes(item.listId));
 
   const handleClickMoveItem = (teamId, listId) => {
-    dispatch(moveItemRequest(item.id, listId));
+    dispatch(moveItemRequest(item.id, null, listId));
     dispatch(setWorkInProgressItem(null));
 
     notification.show({
@@ -142,7 +142,7 @@ const ItemComponent = ({
   };
 
   const handleClickRestoreItem = async () => {
-    dispatch(moveItemRequest(item.id, item.previousListId));
+    dispatch(moveItemRequest(item.id, null, item.previousListId));
     dispatch(setWorkInProgressItem(null));
   };
 

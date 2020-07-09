@@ -94,8 +94,6 @@ const PrimaryHeaderComponent = ({
   searchedText,
   onSearch,
   onClickReset,
-  workInProgressList,
-  onClickCreateItem = Function.prototype,
 }) => {
   const dispatch = useDispatch();
   const [isDropdownOpened, setDropdownOpened] = useState(false);
@@ -126,15 +124,16 @@ const PrimaryHeaderComponent = ({
         </LeftWrapper>
         {!!user && (
           <RightWrapper>
-            <SearchInput
-              searchedText={searchedText}
-              onChange={onSearch}
-              onClickReset={onClickReset}
-            />
-            <AddItemButton
-              workInProgressList={workInProgressList}
-              onClickCreateItem={onClickCreateItem}
-            />
+            {onSearch && (
+              <SearchInput
+                name="search"
+                autoComplete="nope"
+                searchedText={searchedText}
+                onChange={onSearch}
+                onClickReset={onClickReset}
+              />
+            )}
+            <AddItemButton />
             <UserSection>
               <StyledDropdown
                 renderOverlay={() => Options}

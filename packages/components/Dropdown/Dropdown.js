@@ -43,7 +43,8 @@ const OptionsList = styled.div`
 `;
 
 const Option = styled.button`
-  padding: 10px 30px;
+  padding: 0;
+  font-size: ${({ theme }) => theme.font.size.main};
   border: none;
   background: none;
   cursor: pointer;
@@ -55,10 +56,11 @@ const Option = styled.button`
 `;
 
 const Button = styled.button`
+  padding: 0;
+  font-size: ${({ theme }) => theme.font.size.main};
   border: none;
   background-color: transparent;
   outline: none;
-  padding: 0;
   cursor: pointer;
 `;
 
@@ -138,5 +140,7 @@ const Dropdown = memo(DropdownComponent);
 
 Dropdown.Button = Button;
 Dropdown.Box = Box;
+Dropdown.OptionsList = OptionsList;
+Dropdown.Option = Option;
 
 export { Dropdown };

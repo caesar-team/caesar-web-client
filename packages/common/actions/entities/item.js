@@ -122,10 +122,11 @@ export const removeItemsBatchFailure = () => ({
   type: REMOVE_ITEMS_BATCH_FAILURE,
 });
 
-export const moveItemRequest = (itemId, listId) => ({
+export const moveItemRequest = (itemId, teamId, listId) => ({
   type: MOVE_ITEM_REQUEST,
   payload: {
     itemId,
+    teamId,
     listId,
   },
 });

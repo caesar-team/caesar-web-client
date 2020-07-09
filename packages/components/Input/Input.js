@@ -40,7 +40,7 @@ const InputField = styled.input`
 
   &::placeholder {
     padding: 5px 0;
-    color: ${({ theme }) => theme.color.gray};
+    color: ${({ theme }) => theme.color.lightGray};
     letter-spacing: inherit;
   }
 

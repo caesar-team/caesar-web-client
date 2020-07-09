@@ -51,7 +51,7 @@ export const ConfirmMoveToTrashModal = ({
         ])} been removed`,
       });
     } else {
-      dispatch(moveItemRequest(workInProgressItem.id, trashListId));
+      dispatch(moveItemRequest(workInProgressItem.id, null, trashListId));
       dispatch(setWorkInProgressItem(null));
 
       notification.show({

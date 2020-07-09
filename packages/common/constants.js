@@ -46,14 +46,15 @@ export const LIST_TYPE = {
   FAVORITES: 'favorites',
 };
 
-export const LIST_TYPES_ARRAY = [
+export const DEFAULT_LIST_TYPES_ARRAY = [
   LIST_TYPE.ROOT,
   LIST_TYPE.INBOX,
-  LIST_TYPE.LIST,
   LIST_TYPE.TRASH,
   LIST_TYPE.DEFAULT,
   LIST_TYPE.FAVORITES,
 ];
+
+export const LIST_TYPES_ARRAY = [...DEFAULT_LIST_TYPES_ARRAY, LIST_TYPE.LIST];
 
 export const TEAM_TYPE = {
   DEFAULT: 'default',
@@ -71,6 +72,7 @@ export const DASHBOARD_MODE = {
   TOOL: 'SECURE_MESSAGE_MODE',
 };
 
+// TODO: Get rid of this object (redundant)
 export const ITEM_MODE = {
   REVIEW: 'review',
   WORKFLOW_EDIT: 'edit',

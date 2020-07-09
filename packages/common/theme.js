@@ -3,7 +3,7 @@ const theme = {
     black: '#000',
     emperor: '#505050',
     gray: '#888',
-    lightGray: '#cccccc',
+    lightGray: '#ccc',
     gallery: '#eaeaea',
     alto: '#f5f5f5',
     snow: '#fbf9f9',

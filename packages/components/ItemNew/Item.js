@@ -13,7 +13,8 @@ import {
   moveItemRequest,
   editItemRequest,
 } from '@caesar/common/actions/entities/item';
-import { ItemHeader } from '../ItemFields';
+import { Error } from '../Error';
+import { ItemHeader, MoveModal } from '../ItemFields';
 import { EmptyItem } from './EmptyItem';
 import { Credentials, Document } from './types';
 
@@ -36,6 +37,7 @@ const ItemComponent = ({
   const trashList = useSelector(trashListSelector);
   const teamsTrashLists = useSelector(teamsTrashListsSelector);
   const [isSubmitting, setSubmitting] = useState(false);
+  const [isMoveModalOpened, setIsMoveModalOpened] = useState(false);
 
   if (!item) {
     return <EmptyItem />;
@@ -56,27 +58,19 @@ const ItemComponent = ({
   };
 
   const handleClickRestoreItem = async () => {
-    dispatch(moveItemRequest(item.id, item.previousListId));
+    dispatch(moveItemRequest(item.id, null, item.previousListId));
     dispatch(setWorkInProgressItem(null));
   };
 
-  const renderedItem = {
-    [ITEM_TYPE.CREDENTIALS]: (
-      <Credentials
-        item={item}
-        handleClickAcceptEdit={!isTrashItem && handleClickAcceptEdit}
-        onClickShare={onClickShare}
-        onClickMoveToTrash={!isTrashItem && onClickMoveToTrash}
-      />
-    ),
-    [ITEM_TYPE.DOCUMENT]: (
-      <Document
-        item={item}
-        handleClickAcceptEdit={!isTrashItem && handleClickAcceptEdit}
-        onClickShare={onClickShare}
-        onClickMoveToTrash={!isTrashItem && onClickMoveToTrash}
-      />
-    ),
+  const ItemByType = props => {
+    switch (props.item.type) {
+      case ITEM_TYPE.CREDENTIALS:
+        return <Credentials {...props} />;
+      case ITEM_TYPE.DOCUMENT:
+        return <Document {...props} />;
+      default:
+        return <Error>Unknown type</Error>;
+    }
   };
 
   return (
@@ -84,10 +78,21 @@ const ItemComponent = ({
       <ItemHeader
         item={item}
         onClickShare={onClickShare}
+        onClickMove={() => setIsMoveModalOpened(true)}
         onClickRestoreItem={handleClickRestoreItem}
         onClickRemoveItem={onClickRemoveItem}
       />
-      {renderedItem[type]}
+      <ItemByType
+        item={item}
+        handleClickAcceptEdit={!isTrashItem && handleClickAcceptEdit}
+        onClickShare={onClickShare}
+        onClickMoveToTrash={!isTrashItem && onClickMoveToTrash}
+      />
+      <MoveModal
+        item={item}
+        isOpened={isMoveModalOpened}
+        closeModal={() => setIsMoveModalOpened(false)}
+      />
     </Wrapper>
   );
 };

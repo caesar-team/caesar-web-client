@@ -150,7 +150,7 @@ export const Item = ({
       )}
       {shouldShowMembers && (
         <Addon>
-          <Icon name="group" width={16} height={16} />
+          <Icon name="members" width={16} height={16} />
           <AddonText>{invited.length}</AddonText>
         </Addon>
       )}

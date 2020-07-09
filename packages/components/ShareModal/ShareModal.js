@@ -8,9 +8,10 @@ import { TextWithLines } from '../TextWithLines';
 import { Carousel } from '../Carousel';
 import { MemberList } from '../MemberList';
 import { Button } from '../Button';
-import { INVITED_SECTION } from './constants';
 import { AnonymousLink } from './components';
 import { getAnonymousLink } from './utils';
+
+export const INVITED_SECTION = 'Invited';
 
 const Wrapper = styled.div`
   position: relative;

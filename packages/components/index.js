@@ -53,9 +53,8 @@ export { List, ListItem } from './List';
 export { Loader, CircleLoader, FullScreenLoader, LogoLoader } from './Loader';
 export { MemberList } from './MemberList';
 export { MenuList } from './MenuList';
-export { Modal } from './Modal';
-export { ModalTitle } from './ModalTitle';
-// export { MoveModal } from './MoveModal';
+export { Modal, ModalTitle, ModalSubtitle } from './Modal';
+export { MoveModal } from './MoveModal';
 export { NavigationPanel } from './NavigationPanel';
 export { NewTeamModal } from './NewTeamModal'; // Delete ??
 export {
@@ -69,7 +68,7 @@ export {
   OfflineNotification,
   withOfflineDetection,
 } from './Offline';
-// export { PasswordGenerator } from './PasswordGenerator';
+export { PasswordGenerator } from './PasswordGenerator';
 export { PasswordIndicator } from './PasswordIndicator';
 export { ProgressBar } from './ProgressBar';
 export { RadioGroup, Radio } from './Radio';
@@ -91,6 +90,3 @@ export { Toggle } from './Toggle';
 export { Tooltip } from './Tooltip';
 export { Uploader } from './Uploader';
 export { WrapperAlignTop } from './WrapperAlignTop';
-// TODO: Move higher by alphabet; now is impossible to create styled-component for undefined
-export { MoveModal } from './MoveModal';
-export { PasswordGenerator } from './PasswordGenerator';

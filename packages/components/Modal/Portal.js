@@ -39,7 +39,7 @@ const ContentWrapper = styled.div`
 
 class Portal extends Component {
   state = {
-    isOpen: false,
+    isOpened: false,
     afterOpen: false,
     beforeClose: false,
   };
@@ -49,7 +49,7 @@ class Portal extends Component {
   contentRef = createRef();
 
   componentDidMount() {
-    if (this.props.isOpen) {
+    if (this.props.isOpened) {
       this.open();
     }
 
@@ -59,13 +59,13 @@ class Portal extends Component {
   }
 
   componentDidUpdate(prevProps, prevState) {
-    if (this.props.isOpen && !prevProps.isOpen) {
+    if (this.props.isOpened && !prevProps.isOpened) {
       this.open();
-    } else if (!this.props.isOpen && prevProps.isOpen) {
+    } else if (!this.props.isOpened && prevProps.isOpened) {
       this.close();
     }
 
-    if (this.state.isOpen && !prevState.isOpen) {
+    if (this.state.isOpened && !prevState.isOpened) {
       this.focus();
     }
   }
@@ -90,10 +90,10 @@ class Portal extends Component {
     if (this.state.afterOpen && this.state.beforeClose) {
       this.setState({ beforeClose: false });
     } else {
-      this.setState({ isOpen: true }, () => {
+      this.setState({ isOpened: true }, () => {
         this.setState({ afterOpen: true });
 
-        if (this.props.isOpen && this.props.onAfterOpen) {
+        if (this.props.isOpened && this.props.onAfterOpen) {
           this.props.onAfterOpen();
         }
       });
@@ -104,7 +104,7 @@ class Portal extends Component {
     this.setState(
       {
         beforeClose: false,
-        isOpen: false,
+        isOpened: false,
         afterOpen: false,
       },
       this.afterClose,
@@ -178,10 +178,10 @@ class Portal extends Component {
   }
 
   render() {
-    const { isOpen, beforeClose } = this.state;
+    const { isOpened, beforeClose } = this.state;
     const { children, onRequestClose, shouldCloseOnEsc, ...props } = this.props;
 
-    const shouldBeClosed = !isOpen && !beforeClose;
+    const shouldBeClosed = !isOpened && !beforeClose;
 
     if (shouldBeClosed) {
       return null;

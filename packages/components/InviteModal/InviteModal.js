@@ -85,7 +85,7 @@ class InviteModal extends Component {
 
     return (
       <Modal
-        isOpen
+        isOpened
         width={640}
         onRequestClose={onCancel}
         shouldCloseOnEsc

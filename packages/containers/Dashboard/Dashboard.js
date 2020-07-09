@@ -157,11 +157,11 @@ const DashboardComponent = ({ notification }) => {
       )}
       <ConfirmMoveToTrashModal
         notification={notification}
-        isOpen={openedModal === MODAL.MOVE_TO_TRASH}
+        isOpened={openedModal === MODAL.MOVE_TO_TRASH}
         handleCloseModal={handleCloseModal}
       />
       <ConfirmRemoveItemModal
-        isOpen={openedModal === MODAL.REMOVE_ITEM}
+        isOpened={openedModal === MODAL.REMOVE_ITEM}
         handleCloseModal={handleCloseModal}
       />
     </>

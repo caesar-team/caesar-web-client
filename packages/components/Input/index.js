@@ -1,6 +1,6 @@
 export { FormInput } from './FormInput';
 export { FormTextArea } from './FormTextArea';
-export { default as Input } from './Input';
+export { Input } from './Input';
 export { default as LockInput } from './LockInput';
 export { default as MasterPasswordInput } from './MasterPasswordInput';
 export { default as PasswordInput } from './PasswordInput';

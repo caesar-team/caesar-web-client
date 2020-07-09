@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import debounce from 'lodash.debounce';
 import { getSearchUser } from '@caesar/common/api';
 import { uuid4 } from '@caesar/common/utils/uuid4';
-import Input from './Input';
+import { Input } from './Input';
 import { Icon } from '../Icon';
 import { CircleLoader } from '../Loader';
 import { MemberList } from '../MemberList';

@@ -1,5 +1,7 @@
-import React, { Component } from 'react';
+import React, { useState, useRef } from 'react';
+import { useClickAway, useKeyPressEvent } from 'react-use';
 import styled from 'styled-components';
+import { Icon } from '../Icon';
 
 const Label = styled.label`
   display: block;
@@ -33,6 +35,8 @@ const InputField = styled.input`
       ? `1px solid ${theme.color.gallery}`
       : '1px solid transparent'};
   outline: none;
+
+  ${({ withIcons }) => withIcons && 'padding-right: 80px;'}
 
   &::placeholder {
     padding: 5px 0;
@@ -71,6 +75,23 @@ const PostFix = styled.div`
   background-color: ${({ theme }) => theme.color.white};
 `;
 
+const StyledIcon = styled(Icon)`
+  margin-left: 16px;
+  transition: color 0.2s, opacity 0.2s;
+  cursor: pointer;
+
+  ${({ isDisabled }) =>
+    isDisabled &&
+    `
+      pointer-events: none;
+      opacity: 0.2;
+    `}
+
+  &:hover {
+    color: ${({ theme }) => theme.color.black};
+  }
+`;
+
 const Error = styled.div`
   padding-left: 15px;
   margin-top: 8px;
@@ -78,71 +99,95 @@ const Error = styled.div`
   color: ${({ theme }) => theme.color.red};
 `;
 
-class Input extends Component {
-  state = {
-    isFocused: false,
+const Input = ({
+  type = 'text',
+  label,
+  name,
+  value,
+  error,
+  prefix,
+  postfix,
+  withBorder,
+  onBlur,
+  isAcceptIconDisabled,
+  handleClickAcceptEdit,
+  handleClickClose,
+  handleClickAway = Function.prototype,
+  children,
+  className,
+  ...props
+}) => {
+  const inputRef = useRef(null);
+  const [isFocused, setIsFocused] = useState(false);
+
+  const handleFocus = () => {
+    setIsFocused(true);
   };
 
-  onFocus = () => {
-    this.setState({
-      isFocused: true,
-    });
+  const handleBlur = () => {
+    setIsFocused(false);
+
+    if (onBlur) {
+      onBlur(name, true);
+    }
   };
 
-  onBlur = () => {
-    const { name, onBlur } = this.props;
+  useClickAway(inputRef, handleClickAway);
+  useKeyPressEvent('Enter', handleClickAcceptEdit);
+  useKeyPressEvent('Escape', handleClickClose);
 
-    this.setState(
-      {
-        isFocused: false,
-      },
-      () => onBlur && onBlur(name, true),
-    );
-  };
-
-  render() {
-    const { isFocused } = this.state;
-    const {
-      children,
-      label,
-      className,
-      error,
-      value,
-      prefix,
-      postfix,
-      withBorder,
-      ...props
-    } = this.props;
-
-    const isError = !!error;
-
-    return (
-      <Label className={className}>
-        {label && (
-          <LabelText isFocused={isFocused} value={value}>
-            {label}
-          </LabelText>
-        )}
-        {prefix && <Prefix>{prefix}</Prefix>}
-        <InputField
-          {...props}
-          autoComplete="off"
-          onFocus={this.onFocus}
-          onBlur={this.onBlur}
-          isFocused={isFocused}
-          withBorder={withBorder}
-          isError={isError}
-          value={value}
-        />
-        {postfix && <PostFix>{postfix}</PostFix>}
-        {error && <Error>{error}</Error>}
-      </Label>
-    );
-  }
-}
+  return (
+    <Label ref={inputRef} className={className}>
+      {label && (
+        <LabelText isFocused={isFocused} value={value}>
+          {label}
+        </LabelText>
+      )}
+      {prefix && <Prefix>{prefix}</Prefix>}
+      <InputField
+        {...props}
+        autoComplete="off"
+        type={type}
+        name={name}
+        value={value}
+        isError={!!error}
+        isFocused={isFocused}
+        withBorder={withBorder}
+        withIcons={handleClickAcceptEdit || handleClickClose}
+        onFocus={handleFocus}
+        onBlur={handleBlur}
+      />
+      {(postfix || handleClickAcceptEdit || handleClickClose) && (
+        <PostFix>
+          {handleClickAcceptEdit && (
+            <StyledIcon
+              name="checkmark"
+              width={16}
+              height={16}
+              color="gray"
+              isDisabled={isAcceptIconDisabled}
+              onClick={handleClickAcceptEdit}
+            />
+          )}
+          {handleClickClose && (
+            <StyledIcon
+              name="close"
+              width={16}
+              height={16}
+              color="gray"
+              onClick={handleClickClose}
+            />
+          )}
+          {postfix}
+        </PostFix>
+      )}
+      {error && <Error>{error}</Error>}
+    </Label>
+  );
+};
 
 Input.InputField = InputField;
 Input.Prefix = Prefix;
 Input.PostFix = PostFix;
 
-export default Input;
+export { Input };

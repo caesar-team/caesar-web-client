@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useCopyToClipboard } from 'react-use';
 import styled from 'styled-components';
-import { FormInput } from '../Input';
+import { Input } from '../Input';
 import { Icon } from '../Icon';
 import { withNotification } from '../Notification';
 
@@ -63,6 +63,8 @@ const ValueWrapper = styled.div`
   border-bottom: 1px solid ${({ theme }) => theme.color.gallery};
   transition: border-color 0.2s;
 
+  ${({ withMinHeight }) => withMinHeight && 'min-height: 43px;'}
+
   &:hover {
     border-bottom: 1px solid ${({ theme }) => theme.color.black};
 
@@ -74,6 +76,7 @@ const ValueWrapper = styled.div`
 
 const InputComponent = ({
   label,
+  name,
   placeholder,
   value: propValue,
   valueToCopy,
@@ -81,15 +84,12 @@ const InputComponent = ({
   withEllipsis,
   notification,
   addonIcons,
+  handleClickAcceptEdit,
   className,
 }) => {
   const [isEdit, setIsEdit] = useState(false);
   const [value, setValue] = useState(propValue);
   const [, copyToClipboard] = useCopyToClipboard();
-
-  const handleClickAcceptEdit = () => {
-    console.log('handleClickAcceptEdit: ');
-  };
 
   const handleClickCopy = () => {
     copyToClipboard(valueToCopy || propValue);
@@ -106,19 +106,23 @@ const InputComponent = ({
   return (
     <Wrapper withLabel={label} className={className}>
       {isEdit ? (
-        <FormInput
+        <Input
+          autoFocus
           label={label}
           value={value}
           placeholder={placeholder}
           isAcceptIconDisabled={!value}
-          handleChange={e => setValue(e.target.value)}
-          handleClickAcceptEdit={handleClickAcceptEdit}
+          onChange={e => setValue(e.target.value)}
+          handleClickAcceptEdit={() => {
+            handleClickAcceptEdit({ name, value });
+            setIsEdit(false);
+          }}
           handleClickClose={handleClickClose}
           handleClickAway={handleClickClose}
           withBorder
         />
       ) : (
-        <ValueWrapper>
+        <ValueWrapper withMinHeight={!value}>
           {label && <Label>{label}</Label>}
           <ValueInner>
             <Value withEllipsis={withEllipsis}>{propValue}</Value>
@@ -133,25 +137,27 @@ const InputComponent = ({
             )}
           </ValueInner>
           {addonIcons}
-          <PencilIcon
-            name="pencil"
-            width={20}
-            height={20}
-            color="gray"
-            onClick={() => setIsEdit(true)}
-          />
+          {handleClickAcceptEdit && (
+            <PencilIcon
+              name="pencil"
+              width={20}
+              height={20}
+              color="gray"
+              onClick={() => setIsEdit(true)}
+            />
+          )}
         </ValueWrapper>
       )}
     </Wrapper>
   );
 };
 
-const Input = withNotification(InputComponent);
+const InputField = withNotification(InputComponent);
 
-Input.ValueWrapper = ValueWrapper;
-Input.ValueInner = ValueInner;
-Input.Value = Value;
-Input.PencilIcon = PencilIcon;
-Input.InputField = FormInput.InputField;
+InputField.ValueWrapper = ValueWrapper;
+InputField.ValueInner = ValueInner;
+InputField.Value = Value;
+InputField.PencilIcon = PencilIcon;
+InputField.InputField = Input.InputField;
 
-export { Input };
+export { InputField as Input };

@@ -75,10 +75,17 @@ const FileSize = styled.div`
   color: ${({ theme }) => theme.color.gray};
 `;
 
-const ErrorWrapper = styled.div`
+const ErrorWrapper = styled.div``;
+
+const ErrorInner = styled.div`
   position: relative;
   display: flex;
   padding-right: 28px;
+`;
+
+const Error = styled.div`
+  font-size: ${({ theme }) => theme.font.size.small};
+  color: ${({ theme }) => theme.color.red};
 `;
 
 const CloseIcon = styled(Icon)`
@@ -140,6 +147,7 @@ const File = ({
   status = UPLOADED_STATUS,
   name,
   raw,
+  error,
   onClickRemove,
   onClickDownload,
   ...props
@@ -166,15 +174,18 @@ const File = ({
     closeIconComponent,
   );
 
-  if (status === ERROR_STATUS) {
+  if (status === ERROR_STATUS || error) {
     return (
       <ErrorWrapper>
-        <ErrorStatus />
-        <Details>
-          <FileName>{filename}</FileName>
-          <FileSize>{size}</FileSize>
-        </Details>
-        {onClickRemove && hoverableCloseIcon}
+        <ErrorInner>
+          <ErrorStatus />
+          <Details>
+            <FileName>{filename}</FileName>
+            <FileSize>{size}</FileSize>
+          </Details>
+          {onClickRemove && hoverableCloseIcon}
+        </ErrorInner>
+        <Error>{error}</Error>
       </ErrorWrapper>
     );
   }

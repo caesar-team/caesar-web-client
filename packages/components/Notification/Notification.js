@@ -23,6 +23,10 @@ const Text = styled.div`
   color: ${({ theme }) => theme.color.white};
 `;
 
+const TextItem = styled.div`
+  margin-bottom: 4px;
+`;
+
 const ActionLink = styled.a`
   text-transform: uppercase;
   font-size: 16px;
@@ -80,11 +84,14 @@ class Notification extends PureComponent {
 
   render() {
     const { text, actionText, icon } = this.props;
+    const content = Array.isArray(text)
+      ? text.map(item => <TextItem>{item}</TextItem>)
+      : text;
 
     return (
       <Wrapper>
         {icon && <StyledIcon name={icon} width={20} height={20} />}
-        <Text>{text}</Text>
+        <Text>{content}</Text>
         {actionText && (
           <ActionLink
             onClick={this.handleActionClick}

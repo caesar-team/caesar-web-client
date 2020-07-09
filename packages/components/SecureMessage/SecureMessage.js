@@ -6,14 +6,14 @@ import {
   encryptByPassword,
   decryptByPassword,
 } from '@caesar/common/utils/cipherUtils';
+import { logger } from '@caesar/common/utils/logger';
+import { generator } from '@caesar/common/utils/password';
 import { postSecureMessage } from '@caesar/common/fetch';
 import {
   ENCRYPTING_ITEM_NOTIFICATION,
   SAVE_NOTIFICATION,
-  VERIFICATION_IN_PROGRESS_NOTIFICATION,
 } from '@caesar/common/constants';
 import { Scrollbar, withNotification } from '@caesar/components';
-import { passwordGenerator } from '@caesar/common/utils/passwordGenerator';
 import { SecureMessageForm } from './SecureMessageForm';
 import { SecureMessageLink } from './SecureMessageLink';
 import {
@@ -37,16 +37,22 @@ const Wrapper = styled.div`
   `}
 `;
 
+const defaultState = {
+  step: SECURE_MESSAGE_FORM_STEP,
+  password: null,
+  messageId: null,
+  seconds: null,
+  requests: null,
+};
+
 const SecureMessageComponent = ({
   notification,
   withScroll = false,
   className,
 }) => {
-  const [{ step, password, link }, setState] = useState({
-    step: SECURE_MESSAGE_FORM_STEP,
-    password: null,
-    link: null,
-  });
+  const [{ step, password, messageId, seconds, requests }, setState] = useState(
+    defaultState,
+  );
 
   const handleSubmitForm = (
     { secondsLimit, requestsLimit, password: passwordValue, ...secret },
@@ -62,17 +68,9 @@ const SecureMessageComponent = ({
             position: 'bottom-right',
           },
         });
-        const pwd = passwordValue || passwordGenerator();
+        const pwd = passwordValue || generator();
 
         const encryptedMessage = await encryptByPassword(secret, pwd);
-
-        notification.show({
-          text: VERIFICATION_IN_PROGRESS_NOTIFICATION,
-          options: {
-            position: 'bottom-right',
-          },
-        });
-
         await decryptByPassword(encryptedMessage, pwd);
 
         notification.show({
@@ -92,18 +90,20 @@ const SecureMessageComponent = ({
           setState({
             step: SECURE_MESSAGE_LINK_STEP,
             password: pwd,
-            link: id,
+            seconds: secondsLimit,
+            requests: requestsLimit,
+            messageId: id,
           });
         });
       } catch (error) {
-        console.log(error);
+        logger.error(error);
         setFieldError('form', error.message);
         notification.hide();
         setSubmitting(false);
       }
     };
 
-    submit();
+    submit().then();
   };
 
   const handleClickReturn = () => {
@@ -111,6 +111,8 @@ const SecureMessageComponent = ({
       step: SECURE_MESSAGE_FORM_STEP,
       password: null,
       link: null,
+      seconds: null,
+      requests: null,
     });
   };
 
@@ -122,8 +124,10 @@ const SecureMessageComponent = ({
       ),
       SECURE_MESSAGE_LINK_STEP: (
         <SecureMessageLink
-          link={link}
+          messageId={messageId}
           password={password}
+          seconds={seconds}
+          requests={requests}
           onClickReturn={handleClickReturn}
         />
       ),

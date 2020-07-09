@@ -68,12 +68,12 @@ const MenuListComponent = ({ mode, setSearchedText, setMode }) => {
   const currentTeam = useSelector(currentTeamSelector);
   const user = useSelector(userDataSelector);
   const teamList = useSelector(teamsByIdSelector);
-  const [isDropdownOpened, setIsDropdownOpened] = useState(false);
-  const [isListsOpened, setIsListsOpened] = useState(true);
+  const [isDropdownOpened, setDropdownOpened] = useState(false);
+  const [isListsOpened, setListsOpened] = useState(true);
   const activeTeamId = currentTeam?.id || TEAM_TYPE.PERSONAL;
 
   const handleToggleDropdown = isOpened => {
-    setIsDropdownOpened(isOpened);
+    setDropdownOpened(isOpened);
   };
 
   const getColumnTitle = () => {
@@ -94,7 +94,7 @@ const MenuListComponent = ({ mode, setSearchedText, setMode }) => {
           <TeamsList
             activeTeamId={activeTeamId}
             handleToggle={handleToggle}
-            setIsListsOpened={setIsListsOpened}
+            setListsOpened={setListsOpened}
           />
         )}
         onToggle={handleToggleDropdown}
@@ -120,7 +120,7 @@ const MenuListComponent = ({ mode, setSearchedText, setMode }) => {
             setSearchedText={setSearchedText}
             setMode={setMode}
             isListsOpened={isListsOpened}
-            setIsListsOpened={setIsListsOpened}
+            setListsOpened={setListsOpened}
           />
           <AppVersion>{APP_VERSION}</AppVersion>
         </Menu>

@@ -63,6 +63,7 @@ const Prefix = styled.div`
   transform: translateY(-50%);
   line-height: 0;
   left: 16px;
+  background-color: ${({ theme }) => theme.color.white};
 `;
 
 const PostFix = styled.div`
@@ -71,6 +72,24 @@ const PostFix = styled.div`
   transform: translateY(-50%);
   line-height: 0;
   right: 16px;
+  background-color: ${({ theme }) => theme.color.white};
+`;
+
+const StyledIcon = styled(Icon)`
+  margin-left: 16px;
+  transition: color 0.2s, opacity 0.2s;
+  cursor: pointer;
+
+  ${({ isDisabled }) =>
+    isDisabled &&
+    `
+      pointer-events: none;
+      opacity: 0.2;
+    `}
+
+  &:hover {
+    color: ${({ theme }) => theme.color.black};
+  }
 `;
 
 const StyledIcon = styled(Icon)`

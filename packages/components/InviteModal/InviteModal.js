@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import styled from 'styled-components';
-import { Modal, ModalTitle, UserSearchInput } from '@caesar/components';
+import { Modal, ModalTitle } from '../Modal';
+import { UserSearchInput } from '../Input';
 import { MemberList } from '../MemberList';
 import { Button } from '../Button';
 
@@ -85,7 +86,7 @@ class InviteModal extends Component {
 
     return (
       <Modal
-        isOpen
+        isOpened
         width={640}
         onRequestClose={onCancel}
         shouldCloseOnEsc

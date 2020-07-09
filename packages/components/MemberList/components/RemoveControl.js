@@ -9,8 +9,8 @@ const Wrapper = styled.div`
 `;
 
 const CloseIcon = styled(Icon)`
-  width: 10px;
-  height: 10px;
+  width: 16px;
+  height: 16px;
   fill: ${({ theme }) => theme.color.gray};
   cursor: pointer;
   margin-left: 20px;

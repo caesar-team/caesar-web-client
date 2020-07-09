@@ -85,8 +85,8 @@ export const ListItemInput = ({
             />
             <StyledIcon
               name="close"
-              width={12}
-              height={12}
+              width={16}
+              height={16}
               color="gray"
               onClick={handleClickClose}
             />

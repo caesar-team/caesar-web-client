@@ -61,7 +61,7 @@ const NewTeamModal = ({ onSubmit, onCancel = Function.prototype }) => {
 
   return (
     <Modal
-      isOpen
+      isOpened
       shouldCloseOnEsc
       shouldCloseOnOverlayClick
       width="560"

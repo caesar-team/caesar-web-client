@@ -621,7 +621,10 @@ export function* updateItemSaga({ payload: { item } }) {
   }
 }
 
-export function* editItemSaga({ payload: { item }, meta: { setSubmitting } }) {
+export function* editItemSaga({
+  payload: { item },
+  meta: { setSubmitting, notification },
+}) {
   try {
     const { listId, attachments, type, ...data } = item;
 
@@ -659,6 +662,9 @@ export function* editItemSaga({ payload: { item }, meta: { setSubmitting } }) {
     }
 
     yield put(updateWorkInProgressItem(editedItem.id, ITEM_MODE.REVIEW));
+    yield call(notification.show, {
+      text: `The '${item.name}' has been updated`,
+    });
   } catch (error) {
     console.log(error);
     yield put(

@@ -1,12 +1,10 @@
 import styled from 'styled-components';
-import { Input } from '../Input';
+import { Input } from './Input';
 
-const FormInput = styled(Input)`
+export const FormInput = styled(Input)`
   ${Input.InputField} {
     position: relative;
-    padding: 5px 15px;
+    padding: 4px 16px;
     color: ${({ theme }) => theme.color.black};
   }
 `;
-
-export default FormInput;

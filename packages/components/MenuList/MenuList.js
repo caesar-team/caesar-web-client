@@ -27,7 +27,8 @@ const StyledDropdown = styled(Dropdown)`
 
 const ColumnHeader = styled.div`
   position: relative;
-  z-index: ${({ theme }) => theme.zIndex.dropdown};
+  z-index: ${({ isDropdownOpened, theme }) =>
+    isDropdownOpened && theme.zIndex.dropdown};
   display: flex;
   align-items: center;
   height: 56px;
@@ -98,7 +99,10 @@ const MenuListComponent = ({ mode, setSearchedText, setMode }) => {
         )}
         onToggle={handleToggleDropdown}
       >
-        <ColumnHeader bgColor={isDropdownOpened ? 'white' : 'alto'}>
+        <ColumnHeader
+          bgColor={isDropdownOpened ? 'white' : 'alto'}
+          isDropdownOpened={isDropdownOpened}
+        >
           <Avatar avatar={teamList[activeTeamId]?.icon} {...user} isSmall />
           <ColumnTitle>{getColumnTitle()}</ColumnTitle>
           <DropdownIcon

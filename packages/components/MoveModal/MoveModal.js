@@ -1,16 +1,13 @@
 import React, { Component } from 'react';
 import styled from 'styled-components';
 import memoize from 'memoize-one';
-import {
-  Modal,
-  ModalTitle,
-  Button,
-  Select,
-  TextWithLines,
-  ListItem,
-  Scrollbar,
-} from '@caesar/components';
 import { upperFirst } from '@caesar/common/utils/string';
+import { Modal, ModalTitle } from '../Modal';
+import { Button } from '../Button';
+import { Select } from '../Select';
+import { ListItem } from '../List';
+import { Scrollbar } from '../Scrollbar';
+import { TextWithLines } from '../TextWithLines';
 
 const ModalDescription = styled.div`
   padding-bottom: 20px;
@@ -137,7 +134,7 @@ class MoveModal extends Component {
 
     return (
       <Modal
-        isOpen
+        isOpened
         width={640}
         onRequestClose={onCancel}
         shouldCloseOnEsc

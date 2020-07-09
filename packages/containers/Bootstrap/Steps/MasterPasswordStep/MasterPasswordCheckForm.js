@@ -70,7 +70,7 @@ const MasterPasswordCheckForm = ({ user, onSubmit }) => {
       <Header>
         <StyledLogo name="logo-caesar-4xxi" width={151} height={32}/>
         <User>
-          <StyledAvatar {...user} isSmall />
+          <StyledAvatar {...user} width={32} fontSize="small" />
           <UserName>{user.name}</UserName>
           <Button color="gray" onClick={() => dispatch(logout())}>
             Log out

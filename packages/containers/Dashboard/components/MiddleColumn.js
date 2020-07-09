@@ -49,7 +49,7 @@ const MiddleColumnComponent = ({
   const isInboxList = workInProgressList?.type === LIST_TYPE.INBOX;
   const isTrashList =
     (workInProgressList?.id === trashList?.id ||
-      teamsTrashLists.map(({ id }) => id).includes(workInProgressList?.id));
+      teamsTrashLists?.map(({ id }) => id).includes(workInProgressList?.id));
 
   const searchedItems = filter(Object.values(itemsById), searchedText);
 

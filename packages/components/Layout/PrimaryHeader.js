@@ -126,6 +126,8 @@ const PrimaryHeaderComponent = ({
           <RightWrapper>
             {onSearch && (
               <SearchInput
+                name="search"
+                autoComplete="nope"
                 searchedText={searchedText}
                 onChange={onSearch}
                 onClickReset={onClickReset}

@@ -1,6 +1,7 @@
 import React from 'react';
 import { Title, Note, Attachments } from '../../ItemFields/view';
-import { Wrapper, OwnerAndInvitation, Row, RemoveButton } from '../components';
+import { Row } from '../../ItemFields/common';
+import { Wrapper, OwnerAndInvitation, RemoveButton } from '../components';
 
 export const Document = ({
   item,

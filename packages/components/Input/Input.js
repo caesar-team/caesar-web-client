@@ -11,7 +11,7 @@ const Label = styled.label`
 
 const LabelText = styled.div`
   position: absolute;
-  top: ${({ isFocused, value }) => (isFocused || value ? '-20px' : '5px')};
+  top: ${({ isFocused, value }) => (isFocused || value ? '-20px' : '9px')};
   left: 16px;
   z-index: ${({ theme }) => theme.zIndex.basic};
   font-size: ${({ isFocused, value, theme }) =>
@@ -68,9 +68,11 @@ const Prefix = styled.div`
 const PostFix = styled.div`
   position: absolute;
   top: 50%;
-  transform: translateY(-50%);
-  line-height: 0;
   right: 16px;
+  display: flex;
+  align-items: center;
+  line-height: 0;
+  transform: translateY(-50%);
 `;
 
 const StyledIcon = styled(Icon)`
@@ -102,6 +104,7 @@ const Input = ({
   label,
   name,
   value,
+  autoComplete = 'chrome-off',
   error,
   prefix,
   postfix,
@@ -144,7 +147,7 @@ const Input = ({
       {prefix && <Prefix>{prefix}</Prefix>}
       <InputField
         {...props}
-        autoComplete="off"
+        autoComplete={autoComplete}
         type={type}
         name={name}
         value={value}
@@ -157,6 +160,7 @@ const Input = ({
       />
       {(postfix || onClickAcceptEdit || onClickClose) && (
         <PostFix>
+          {postfix}
           {onClickAcceptEdit && (
             <StyledIcon
               name="checkmark"
@@ -176,7 +180,6 @@ const Input = ({
               onClick={onClickClose}
             />
           )}
-          {postfix}
         </PostFix>
       )}
       {error && <Error>{error}</Error>}

@@ -23,26 +23,28 @@ export const Password = ({ value, onClickAcceptEdit }) => {
     setIsVisible(false);
   };
 
+  const eyeIcon = (
+    <HoldClickBehaviour onHoldStart={handleHoldStart} onHoldEnd={handleHoldEnd}>
+      <EyeIcon
+        name={isVisible ? 'eye-off' : 'eye-on'}
+        color="gray"
+        width={20}
+        height={20}
+      />
+    </HoldClickBehaviour>
+  );
+
   return (
     <Input
+      type={isVisible ? 'text' : 'password'}
       label="Password"
       name="pass"
+      autoComplete="new-password"
       value={isVisible ? value : '********'}
-      valueToCopy={value}
+      originalValue={value}
       onClickAcceptEdit={onClickAcceptEdit}
-      addonIcons={
-        <HoldClickBehaviour
-          onHoldStart={handleHoldStart}
-          onHoldEnd={handleHoldEnd}
-        >
-          <EyeIcon
-            name={isVisible ? 'eye-off' : 'eye-on'}
-            color="gray"
-            width={20}
-            height={20}
-          />
-        </HoldClickBehaviour>
-      }
+      addonPostfix={eyeIcon}
+      addonIcons={eyeIcon}
     />
   );
 };

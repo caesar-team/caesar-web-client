@@ -16,7 +16,6 @@ const Box = styled.div`
     withTriangleAtTop ? 'calc(100% + 19px)' : 'calc(100% - 1px)'};
   right: 0;
   z-index: ${({ theme }) => theme.zIndex.dropdown};
-  width: 100%;
   border-radius: 3px;
   background-color: ${({ theme }) => theme.color.white};
   border: 1px solid ${({ theme }) => theme.color.gallery};
@@ -44,7 +43,7 @@ const OptionsList = styled.div`
 `;
 
 const Option = styled.button`
-  padding: 8px 16px;
+  padding: 0;
   font-size: ${({ theme }) => theme.font.size.main};
   border: none;
   background: none;
@@ -57,7 +56,7 @@ const Option = styled.button`
 `;
 
 const Button = styled.button`
-  padding: 8px 16px;
+  padding: 0;
   font-size: ${({ theme }) => theme.font.size.main};
   border: none;
   background-color: transparent;

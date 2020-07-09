@@ -75,24 +75,27 @@ const ValueWrapper = styled.div`
 `;
 
 const InputComponent = ({
+  type,
   label,
   name,
   placeholder,
   value: propValue,
-  valueToCopy,
+  originalValue,
+  autoComplete,
   withCopyButton = true,
   withEllipsis,
   notification,
   addonIcons,
+  addonPostfix,
   onClickAcceptEdit,
   className,
 }) => {
   const [isEdit, setIsEdit] = useState(false);
-  const [value, setValue] = useState(propValue);
+  const [value, setValue] = useState(originalValue || propValue);
   const [, copyToClipboard] = useCopyToClipboard();
 
   const handleClickCopy = () => {
-    copyToClipboard(valueToCopy || propValue);
+    copyToClipboard(originalValue || propValue);
     notification.show({
       text: `The ${label.toLowerCase()} has been copied.`,
     });
@@ -108,9 +111,11 @@ const InputComponent = ({
       {isEdit ? (
         <Input
           autoFocus
+          type={type}
           label={label}
           value={value}
           placeholder={placeholder}
+          autoComplete={autoComplete}
           isAcceptIconDisabled={!value}
           onChange={e => setValue(e.target.value)}
           onClickAcceptEdit={() => {
@@ -120,6 +125,7 @@ const InputComponent = ({
           onClickClose={handleClickClose}
           onClickAway={handleClickClose}
           withBorder
+          postfix={addonPostfix}
         />
       ) : (
         <ValueWrapper withMinHeight={!value}>

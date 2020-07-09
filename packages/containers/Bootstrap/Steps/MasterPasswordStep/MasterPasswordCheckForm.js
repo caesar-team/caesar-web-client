@@ -1,7 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
 import { media } from '@caesar/assets/styles/media';
-import { Formik, FastField } from 'formik';
+import { useFormik } from 'formik';
 import { useDispatch } from 'react-redux';
 import { Button, Head, Icon, LockInput } from '@caesar/components';
 import { Avatar } from '@caesar/components/Avatar';
@@ -63,6 +63,24 @@ const FormWrapper = styled.div`
 
 const MasterPasswordCheckForm = ({ user, onSubmit }) => {
   const dispatch = useDispatch();
+  const {
+    dirty,
+    values,
+    errors,
+    touched,
+    isSubmitting,
+    isValid,
+    handleChange,
+    handleSubmit,
+    setFieldValue,
+    submitForm,
+    resetForm,
+  } = useFormik({
+    initialValues: { password: '' },
+    onSubmit,
+    validationSchema: passwordSchema,
+    validateOnChange: false,
+  });
 
   return (
     <Wrapper>
@@ -79,29 +97,18 @@ const MasterPasswordCheckForm = ({ user, onSubmit }) => {
       </Header>
       <FormWrapper>
         <Title>Enter your master password</Title>
-        <Formik
-          initialValues={{ password: '' }}
-          validationSchema={passwordSchema}
-          onSubmit={onSubmit}
-          validateOnChange={false}
-        >
-          {({ errors, handleSubmit, submitForm, resetForm }) => (
-            <form onSubmit={handleSubmit}>
-              <FastField name="password">
-                {({ field }) => (
-                  <LockInput
-                    {...field}
-                    autoFocus
-                    maxLength={24}
-                    onClick={submitForm}
-                    onBackspace={resetForm}
-                    isError={errors && Object.keys(errors).length !== 0}
-                  />
-                )}
-              </FastField>
-            </form>
-          )}
-        </Formik>
+          <form onSubmit={handleSubmit}>
+            <LockInput
+              name="password"
+              value={values.password}
+              autoFocus
+              maxLength={24}
+              onChange={handleChange}
+              onClick={submitForm}
+              onBackspace={resetForm}
+              isError={errors && Object.keys(errors).length !== 0}
+            />
+          </form>
        </FormWrapper>
       </Wrapper>
     );

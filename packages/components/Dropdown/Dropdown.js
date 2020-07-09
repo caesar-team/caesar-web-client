@@ -76,10 +76,10 @@ const DropdownComponent = ({
   onToggle,
   className,
 }) => {
-  const [isOpened, setIsOpened] = useState(false);
+  const [isOpened, setOpened] = useState(false);
 
   const handleToggle = () => {
-    setIsOpened(!isOpened);
+    setOpened(!isOpened);
   };
 
   const handleClick = value => () => {
@@ -115,7 +115,7 @@ const DropdownComponent = ({
 
   const dropdownRef = useRef(null);
   useClickAway(dropdownRef, () => {
-    setIsOpened(false);
+    setOpened(false);
   });
 
   return (

@@ -39,12 +39,6 @@ app.prepare().then(() => {
     express.static(path.join(__dirname, '.next', 'service-worker.js')),
   );
 
-  server.get('/logout', (req, res) => {
-    res.clearCookie('token');
-    res.clearCookie('share');
-    res.redirect('/signin');
-  });
-
   // BE endpoint
   // eslint-disable-next-line no-shadow
   server.get('/api/srp_login_confirm', (req, res, next) => {

@@ -212,7 +212,7 @@ const renderAttachments = (
 
 const SecureMessageFormComponent = ({ onSubmit, notification, isOnline }) => {
   const { isMobile } = useMedia();
-  const [isCustomPassword, setIsCustomPassword] = useState(false);
+  const [isCustomPassword, setCustomPassword] = useState(false);
 
   const {
     values,
@@ -233,7 +233,7 @@ const SecureMessageFormComponent = ({ onSubmit, notification, isOnline }) => {
   const dirty = values.text || values.attachments.length;
 
   const handleChangeCustomPassword = () => {
-    setIsCustomPassword(!isCustomPassword);
+    setCustomPassword(!isCustomPassword);
 
     if (isCustomPassword) {
       setFieldValue('password', '');
@@ -251,6 +251,7 @@ const SecureMessageFormComponent = ({ onSubmit, notification, isOnline }) => {
             onBlur={handleBlur}
             onChange={handleChange}
             error={checkError(touched, errors, 'text')}
+            disabled={isSubmitting}
           />
         ) : (
           <>

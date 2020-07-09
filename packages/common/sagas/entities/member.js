@@ -26,7 +26,7 @@ import {
 } from '@caesar/common/utils/cipherUtils';
 import { ENTITY_TYPE, ROLE_ANONYMOUS_USER } from '@caesar/common/constants';
 
-const setIsNewFlag = (members, isNew) =>
+const setNewFlag = (members, isNew) =>
   members.map(member => ({
     ...member,
     isNew,
@@ -195,8 +195,8 @@ export function* getOrCreateMemberBatchSaga({ payload: { emailRolePairs } }) {
 
     // TODO: change userId to id on BE side
     return [
-      ...setIsNewFlag(renameUserId(existedMembers), false),
-      ...setIsNewFlag(renameUserId(newMembers), true),
+      ...setNewFlag(renameUserId(existedMembers), false),
+      ...setNewFlag(renameUserId(newMembers), true),
     ];
   } catch (e) {
     console.log(e);

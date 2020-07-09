@@ -27,6 +27,7 @@ import {
   patchList,
 } from '@caesar/common/api';
 import { ENTITY_TYPE, LIST_TYPE } from '@caesar/common/constants';
+import { getServerErrorByNames } from '@caesar/common/utils/error';
 
 const reorder = (list, startIndex, endIndex) => {
   const result = Array.from(list);
@@ -38,7 +39,7 @@ const reorder = (list, startIndex, endIndex) => {
 
 const fixSort = lists => lists.map((list, index) => ({ ...list, sort: index }));
 
-export function* createListSaga({ payload: { list } }) {
+export function* createListSaga({ payload: { list }, meta: { notification, setCreatingMode } }) {
   try {
     const {
       data: { id: listId },
@@ -46,6 +47,7 @@ export function* createListSaga({ payload: { list } }) {
       label: list.label,
     });
 
+    yield call(setCreatingMode, false);
     yield put(
       createListSuccess(listId, {
         id: listId,
@@ -58,19 +60,25 @@ export function* createListSaga({ payload: { list } }) {
       }),
     );
   } catch (error) {
-    console.log(error);
     yield put(createListFailure());
+    yield call(notification.show, {
+      text: getServerErrorByNames(error),
+    });
   }
 }
 
-export function* editListSaga({ payload: { list } }) {
+export function* editListSaga({ payload: { list }, meta: { notification, setEditMode } }) {
   try {
     yield call(patchList, list.id, { label: list.label });
 
+    yield call(setEditMode, false);
     yield put(editListSuccess(list));
   } catch (error) {
     console.log(error);
     yield put(editListFailure());
+    yield call(notification.show, {
+      text: getServerErrorByNames(error),
+    });
   }
 }
 

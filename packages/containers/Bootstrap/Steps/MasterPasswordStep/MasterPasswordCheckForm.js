@@ -64,15 +64,10 @@ const FormWrapper = styled.div`
 const MasterPasswordCheckForm = ({ user, onSubmit }) => {
   const dispatch = useDispatch();
   const {
-    dirty,
     values,
     errors,
-    touched,
-    isSubmitting,
-    isValid,
     handleChange,
     handleSubmit,
-    setFieldValue,
     submitForm,
     resetForm,
   } = useFormik({

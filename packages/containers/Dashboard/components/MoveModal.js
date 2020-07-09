@@ -24,7 +24,7 @@ export const MoveModal = ({
     dispatch(resetWorkInProgressItemIds());
 
     notification.show({
-      text: 'The items have moved.',
+      text: 'The items have been moved.',
     });
 
     handleCloseModal();

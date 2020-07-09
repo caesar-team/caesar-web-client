@@ -90,7 +90,6 @@ import {
 import {
   favoritesSelector,
   listSelector,
-  allTrashListIdsSelector,
 } from '@caesar/common/selectors/entities/list';
 import {
   itemsBatchSelector,

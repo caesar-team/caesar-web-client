@@ -31,9 +31,9 @@ const MAX_LIST_LABEL_LENGTH = 75;
 
 export const ListItemInput = ({
   isEditMode,
-  setIsEditMode,
+  setEditMode,
   isCreatingMode,
-  setIsCreatingMode,
+  setCreatingMode,
   value,
   setValue,
   label,
@@ -44,10 +44,10 @@ export const ListItemInput = ({
 
   useClickAway(inputRef, () => {
     if (isEditMode) {
-      setIsEditMode(false);
+      setEditMode(false);
 
       if (isCreatingMode) {
-        setIsCreatingMode(false);
+        setCreatingMode(false);
       }
     }
   });

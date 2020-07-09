@@ -106,9 +106,9 @@ const Uploader = ({
       onDrop={handleDrop}
       {...props}
     >
-      {({ getRootProps, getInputProps, isDragActive }) =>
+      {({ getRootProps, getInputProps, isDragActive, rejectedFiles }) =>
         children ? (
-          children({ getRootProps, getInputProps, isDragActive })
+          children({ getRootProps, getInputProps, isDragActive, rejectedFiles })
         ) : (
           <Container
             {...getRootProps()}

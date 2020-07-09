@@ -10,7 +10,7 @@ import {
 } from '@caesar/common/utils/key';
 import { waitIdle } from '@caesar/common/utils/utils';
 import { setFaviconTag } from '@caesar/common/utils/domUtils';
-import { Head, BootstrapLayout } from '@caesar/components';
+import { Head, BootstrapLayout, withNotification } from '@caesar/components';
 import { NavigationPanelStyled } from '../../components';
 import {
   MASTER_PASSWORD_CHECK,
@@ -139,7 +139,12 @@ class MasterPasswordStep extends Component {
         masterPassword: password,
         step: MASTER_PASSWORD_CONFIRM,
       },
-      () => copy(password),
+      () => {
+        copy(password);
+        this.props.notification.show({
+          text: 'Master Password has been copied to clipboard!',
+        })
+      },
     );
   };
 
@@ -258,4 +263,4 @@ class MasterPasswordStep extends Component {
   }
 }
 
-export default MasterPasswordStep;
+export default withNotification(MasterPasswordStep);

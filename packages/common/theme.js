@@ -15,6 +15,7 @@ const theme = {
     blue: '#3385ff',
     lightBlue: '#f5f6f7',
     lightRed: 'rgba(255, 51, 85, 0.1)',
+    lighterGray: 'rgba(136, 136, 136, 0.3)',
   },
   font: {
     size: {

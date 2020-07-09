@@ -1,16 +1,16 @@
 import React from 'react';
 import styled from 'styled-components';
+import { media } from '@caesar/assets/styles/media';
 import { Formik, FastField } from 'formik';
 import { useDispatch } from 'react-redux';
 import { Button, Head, Icon, LockInput } from '@caesar/components';
 import { Avatar } from '@caesar/components/Avatar';
-import { passwordSchema } from './schema';
 import { logout } from '@caesar/common/actions/user';
+import { passwordSchema } from './schema';
 
 const Wrapper = styled.div`
   display: flex;
   flex-direction: column;
-  justify-content: center;
   align-items: center;
   width: 100vw;
   height: 100vh;
@@ -21,6 +21,9 @@ const Header = styled.div`
     display: flex;
     justify-content: space-between;
     align-items: center;
+    width: 100%;
+    padding: 12px 24px 12px 0;
+    border-bottom: 1px solid ${({ theme }) => theme.color.lighterGray};
 `;
 
 const User = styled.div`
@@ -28,19 +31,34 @@ const User = styled.div`
     align-items: center;
 `;
 
+const StyledAvatar = styled(Avatar)`
+  margin-right: 16px;
+`;
+
 const UserName = styled.div`
+    margin-right: 24px;
     color: ${({ theme }) => theme.color.white};
+    ${media.wideMobile`
+      display: none;
+    `};
 `;
 
 const Title = styled.div`
   font-size: 18px;
   color: ${({ theme }) => theme.color.lightGray};
   margin-bottom: 36px;
-  margin-top: 140px;
 `;
 
 const StyledLogo = styled(Icon)`
   fill: ${({ theme }) => theme.color.lightGray};
+`;
+
+const FormWrapper = styled.div`
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
 `;
 
 const MasterPasswordCheckForm = ({ user, onSubmit }) => {
@@ -52,14 +70,15 @@ const MasterPasswordCheckForm = ({ user, onSubmit }) => {
       <Header>
         <StyledLogo name="logo-caesar-4xxi" width={151} height={32}/>
         <User>
-          <Avatar {...user} />
+          <StyledAvatar {...user} isSmall />
           <UserName>{user.name}</UserName>
-          <Button onClick={() => dispatch(logout())}>
+          <Button color="gray" onClick={() => dispatch(logout())}>
             Log out
           </Button>
         </User>
       </Header>
-      <Title>Enter your master password</Title>
+      <FormWrapper>
+        <Title>Enter your master password</Title>
         <Formik
           initialValues={{ password: '' }}
           validationSchema={passwordSchema}
@@ -83,6 +102,7 @@ const MasterPasswordCheckForm = ({ user, onSubmit }) => {
             </form>
           )}
         </Formik>
+       </FormWrapper>
       </Wrapper>
     );
 };

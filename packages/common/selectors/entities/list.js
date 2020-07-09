@@ -127,7 +127,7 @@ export const inboxSelector = createSelector(
   lists => lists.find(({ type }) => type === LIST_TYPE.INBOX) || {},
 );
 
-const trashSelector = createSelector(
+export const trashSelector = createSelector(
   personalListsSelector,
   lists => lists.find(({ type }) => type === LIST_TYPE.TRASH) || {},
 );

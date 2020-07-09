@@ -15,6 +15,7 @@ import './icon-eye-off.svg?sprite';
 import './icon-eye-on.svg?sprite';
 import './icon-favorite-active.svg?sprite';
 import './icon-favorite.svg?sprite';
+import './icon-go-to.svg?sprite';
 import './icon-google.svg?sprite';
 import './icon-group.svg?sprite';
 import './icon-history.svg?sprite';

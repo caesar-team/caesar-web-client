@@ -95,7 +95,7 @@ const UploadedWrapper = styled.div`
   padding: 8px 28px 8px 8px;
   border-radius: 4px;
   cursor: pointer;
-  transition: color, background-color 0.2s;
+  transition: color 0.2s, background-color 0.2s;
 
   &:hover {
     background-color: ${({ theme }) => theme.color.snow};
@@ -156,8 +156,8 @@ const File = ({
   const closeIconComponent = (
     <CloseIcon
       name="close"
-      width={12}
-      height={12}
+      width={16}
+      height={16}
       onClick={handleClickCloseIcon}
     />
   );

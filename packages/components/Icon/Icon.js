@@ -8,6 +8,7 @@ const Svg = styled.svg`
   vertical-align: middle;
   color: ${({ color, theme }) => theme.color[color]};
   fill: currentColor;
+  transition: color 0.2s;
 
   ${({ disabled }) => disabled && `opacity: 0.5`}
 `;

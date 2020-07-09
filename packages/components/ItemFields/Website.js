@@ -12,7 +12,7 @@ const EyeIcon = styled(Icon)`
   }
 `;
 
-export const Website = ({ value }) => {
+export const Website = ({ value, handleClickAcceptEdit }) => {
   const handleclickGoTo = () => {
     window.open(value, '_blank');
   };
@@ -20,16 +20,20 @@ export const Website = ({ value }) => {
   return (
     <Input
       label="Website"
+      name="website"
       value={value}
       withEllipsis
+      handleClickAcceptEdit={handleClickAcceptEdit}
       addonIcons={
-        <EyeIcon
-          name="go-to"
-          color="gray"
-          width={20}
-          height={20}
-          onClick={handleclickGoTo}
-        />
+        value && (
+          <EyeIcon
+            name="go-to"
+            color="gray"
+            width={20}
+            height={20}
+            onClick={handleclickGoTo}
+          />
+        )
       }
     />
   );

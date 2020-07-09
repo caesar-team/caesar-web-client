@@ -47,7 +47,7 @@ const AddBtn = styled(Button)`
   font-size: ${({ theme }) => theme.font.size.main};
 `;
 
-export const Note = ({ value: propValue }) => {
+export const Note = ({ value: propValue, handleClickAcceptEdit }) => {
   const [isEdit, setIsEdit] = useState(false);
   const [isFocused, setIsFocused] = useState(false);
   const [value, setValue] = useState(propValue);
@@ -61,12 +61,8 @@ export const Note = ({ value: propValue }) => {
     setIsFocused(true);
   };
 
-  const handleClickAcceptEdit = () => {
-    console.log('handleClickAcceptEdit');
-  };
-
   const handleDeleteNote = () => {
-    console.log('handleDeleteNote');
+    handleClickAcceptEdit({ name: 'note', value: '' });
   };
 
   return (
@@ -77,14 +73,18 @@ export const Note = ({ value: propValue }) => {
             label="Notes"
             value={value}
             handleChange={e => setValue(e.target.value)}
-            handleFocus={() => setIsEdit(true)}
-            handleClickAcceptEdit={handleClickAcceptEdit}
+            handleFocus={handleClickAcceptEdit && (() => setIsEdit(true))}
+            handleClickAcceptEdit={() => {
+              handleClickAcceptEdit({ name: 'note', value });
+              setIsEdit(false);
+            }}
             handleClickAway={() => setIsEdit(false)}
             handleClickClose={() => setIsEdit(false)}
             isFocused={isFocused}
             isEdit={isEdit}
+            isDisabled={!handleClickAcceptEdit}
           />
-          {!isEdit && (
+          {!isEdit && handleClickAcceptEdit && (
             <>
               <IconsWrapper>
                 <StyledIcon
@@ -106,9 +106,11 @@ export const Note = ({ value: propValue }) => {
           )}
         </>
       ) : (
-        <AddBtn color="transparent" icon="plus" onClick={handleClickAdd}>
-          Add note
-        </AddBtn>
+        handleClickAcceptEdit && (
+          <AddBtn color="transparent" icon="plus" onClick={handleClickAdd}>
+            Add note
+          </AddBtn>
+        )
       )}
     </Wrapper>
   );

@@ -1,6 +1,10 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
-import { downloadFile, downloadAsZip } from '@caesar/common/utils/file';
+import {
+  downloadFile,
+  downloadAsZip,
+  splitFilesToUniqAndDuplicates,
+} from '@caesar/common/utils/file';
 import { Icon } from '../Icon';
 import { File } from '../File';
 import { Uploader } from '../Uploader';
@@ -61,7 +65,7 @@ const AddNewAttach = styled.div`
   }
 `;
 
-export const Attachments = ({ attachments }) => {
+export const Attachments = ({ attachments, handleClickAcceptEdit }) => {
   const [newFiles, setNewFiles] = useState([]);
   const [isModalOpened, setIsModalOpened] = useState(false);
 
@@ -75,13 +79,38 @@ export const Attachments = ({ attachments }) => {
     downloadAsZip(attachments);
   };
 
-  const onClickRemove = () => {
-    console.log('onClickRemove');
+  const onClickRemove = raw => {
+    const updatedAttachments = attachments.filter(file => file.raw !== raw);
+
+    handleClickAcceptEdit({ name: 'attachments', value: updatedAttachments });
   };
 
   const handleChange = (name, files) => {
-    setNewFiles(files);
+    const { uniqFiles, duplicatedFiles } = splitFilesToUniqAndDuplicates([
+      ...attachments,
+      ...files,
+    ]);
+
+    const mappedFiles = files.map(file => {
+      for (let i = 0; i < duplicatedFiles.length; i++) {
+        if (
+          file.name === duplicatedFiles[i].name &&
+          file.raw === duplicatedFiles[i].raw
+        ) {
+          return {
+            ...file,
+            error: 'The file was already added',
+          };
+        }
+      }
+
+      return file;
+    });
+
+    setNewFiles(mappedFiles);
     setIsModalOpened(true);
+
+    handleClickAcceptEdit({ name, value: uniqFiles });
   };
 
   return (
@@ -103,18 +132,27 @@ export const Attachments = ({ attachments }) => {
           <File
             key={attach.name}
             onClickDownload={() => handleClickDownloadFile(attach)}
-            onClickRemove={onClickRemove}
+            onClickRemove={
+              handleClickAcceptEdit && (() => onClickRemove(attach.raw))
+            }
             {...attach}
           />
         ))}
-        <Uploader multiple asPreview name="attachments" onChange={handleChange}>
-          {({ getRootProps, getInputProps, isDragActive }) => (
-            <AddNewAttach {...getRootProps()} isDragActive={isDragActive}>
-              <input {...getInputProps()} />
-              <PlusIcon name="plus" width={16} height={16} color="gray" />
-            </AddNewAttach>
-          )}
-        </Uploader>
+        {handleClickAcceptEdit && (
+          <Uploader
+            multiple
+            asPreview
+            name="attachments"
+            onChange={handleChange}
+          >
+            {({ getRootProps, getInputProps, isDragActive }) => (
+              <AddNewAttach {...getRootProps()} isDragActive={isDragActive}>
+                <input {...getInputProps()} />
+                <PlusIcon name="plus" width={16} height={16} color="gray" />
+              </AddNewAttach>
+            )}
+          </Uploader>
+        )}
       </Inner>
       {isModalOpened && (
         <NewFilesModal files={newFiles} closeModal={() => setIsModalOpened()} />

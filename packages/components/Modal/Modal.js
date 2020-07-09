@@ -24,9 +24,9 @@ class Modal extends PureComponent {
   }
 
   componentDidUpdate(prevProps) {
-    const { isOpen } = this.props;
+    const { isOpened } = this.props;
 
-    if (!prevProps.isOpen && !isOpen) {
+    if (!prevProps.isOpened && !isOpened) {
       // eslint-disable-next-line
       return;
     }

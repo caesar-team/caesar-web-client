@@ -320,11 +320,11 @@ export default createReducer(initialState, {
   [REMOVE_SHARE_SUCCESS](state, { payload }) {
     return {
       ...state,
-      itemsById: {
-        ...state.itemsById,
+      byId: {
+        ...state.byId,
         [payload.itemId]: {
-          ...state.itemsById[payload.itemId],
-          invited: state.itemsById[payload.itemId].invited.filter(
+          ...state.byId[payload.itemId],
+          invited: state.byId[payload.itemId].invited.filter(
             invite => invite.id !== payload.shareId,
           ),
         },

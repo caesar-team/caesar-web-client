@@ -6,17 +6,23 @@ import Icon from '../Icon/Icon';
 const Wrapper = styled.div`
   display: flex;
   flex-direction: column;
-  margin-bottom: 48px;
+`;
+
+const ArrowIcon = styled(Icon)`
+  transform: ${({ isOpened }) => (isOpened ? 'scaleY(-1)' : 'scaleY(1)')};
+  transition: transform 0.2s, color 0.2s;
 `;
 
 const SectionName = styled.div`
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 24px;
+  cursor: pointer;
 
   &:hover {
-    cursor: pointer;
+    ${ArrowIcon} {
+      color: ${({ theme }) => theme.color.black};
+    }
   }
 `;
 
@@ -27,32 +33,19 @@ const IconImage = styled.img`
   margin-right: 10px;
 `;
 
-const ArrowIcon = styled(Icon)`
-  width: 16px;
-  height: 8px;
-  margin-left: 20px;
-  fill: ${({ theme }) => theme.color.lightGray};
-  transform: ${({ isOpened }) => (isOpened ? 'scaleY(-1)' : 'scaleY(1)')};
-  transition: transform 0.2s;
-`;
-
-const TextWithLinesStyled = styled(TextWithLines)`
-  font-size: 12px;
-  font-weight: initial;
-`;
-
 const ContentWrapper = styled.div`
   display: flex;
   flex-direction: column;
+  margin-top: 20px;
 `;
 
 const Section = ({
   name,
-  isOpened = false,
   icon,
+  isOpened = false,
+  onToggleSection = Function.prototype,
   children,
   className,
-  onToggleSection = Function.prototype,
 }) => {
   const onToggleEvent = name ? onToggleSection : Function.prototype;
 
@@ -60,14 +53,16 @@ const Section = ({
     <Wrapper className={className}>
       {name && (
         <SectionName onClick={onToggleEvent}>
-          <TextWithLinesStyled position="left" width={1}>
+          <TextWithLines position="left" width={1}>
             {icon && <IconImage src={icon} />}
             {name}
-          </TextWithLinesStyled>
+          </TextWithLines>
           <ArrowIcon
             name="arrow-triangle"
+            width={16}
+            height={16}
+            color="gray"
             isOpened={isOpened}
-            color="lightGray"
           />
         </SectionName>
       )}
@@ -76,6 +71,6 @@ const Section = ({
   );
 };
 
-Section.Name = TextWithLinesStyled;
+Section.Name = TextWithLines;
 
 export default Section;

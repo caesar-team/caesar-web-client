@@ -173,8 +173,8 @@ class SelectInner extends Component {
             {isCancellable && selectedLabel && (
               <IconCloseStyled
                 name="close"
-                width={12}
-                height={12}
+                width={16}
+                height={16}
                 onClick={this.handleClickCancel}
               />
             )}

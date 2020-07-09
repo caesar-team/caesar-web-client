@@ -18,7 +18,6 @@ const CloseButton = styled.button`
 
 const CloseIcon = styled(Icon)`
   color: ${({ theme }) => theme.color.gray};
-  transition: color 0.2s;
 
   &:hover {
     color: ${({ theme }) => theme.color.black};

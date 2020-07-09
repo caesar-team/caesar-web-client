@@ -55,6 +55,7 @@ const MiddleColumnWrapper = styled.div`
 const RightColumnWrapper = styled.div`
   position: relative;
   flex-grow: 1;
+  max-width: calc(100% - 287px - 431px);
 `;
 
 const DashboardComponent = ({ notification }) => {

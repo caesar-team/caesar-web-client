@@ -9,13 +9,11 @@ const Label = styled.label`
 
 const LabelText = styled.div`
   position: absolute;
-  top: ${({ isFocused, value }) => (isFocused || value ? '-25px' : '5px')};
-  left: 15px;
+  top: ${({ isFocused, value }) => (isFocused || value ? '-20px' : '5px')};
+  left: 16px;
   z-index: ${({ theme }) => theme.zIndex.basic};
-  margin-bottom: ${({ isFocused }) => (isFocused ? '0' : '5px')};
-  font-size: ${({ isFocused, value }) =>
-    isFocused || value ? '14px' : '18px'};
-  line-height: 1.5;
+  font-size: ${({ isFocused, value, theme }) =>
+    isFocused || value ? theme.font.size.small : theme.font.size.main};
   color: ${({ theme }) => theme.color.gray};
   transition: all 0.2s;
 `;
@@ -24,8 +22,9 @@ const InputField = styled.input`
   padding: 9px 16px;
   display: block;
   width: 100%;
-  font-size: 16px;
-  line-height: 1;
+  font-size: ${({ theme }) => theme.font.size.main};
+  line-height: ${({ theme }) => theme.font.lineHeight.main};
+  letter-spacing: inherit;
   background-color: ${({ theme, isFocused }) =>
     isFocused ? theme.color.snow : theme.color.white};
   border: none;
@@ -38,6 +37,7 @@ const InputField = styled.input`
   &::placeholder {
     padding: 5px 0;
     color: ${({ theme }) => theme.color.gray};
+    letter-spacing: inherit;
   }
 
   &:-webkit-autofill,

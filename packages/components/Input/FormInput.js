@@ -1,8 +1,8 @@
 import React, { useRef } from 'react';
 import { useClickAway, useKeyPressEvent } from 'react-use';
 import styled from 'styled-components';
-import { Icon } from '../../Icon';
-import { Input } from '../../Input';
+import { Icon } from '../Icon';
+import Input from './Input';
 
 const StyledInput = styled(Input)`
   ${Input.InputField} {
@@ -27,52 +27,32 @@ const StyledIcon = styled(Icon)`
   }
 `;
 
-const MAX_LIST_LABEL_LENGTH = 75;
-
-export const ListItemInput = ({
-  isEditMode,
-  setEditMode,
-  isCreatingMode,
-  setCreatingMode,
-  value,
-  setValue,
+const FormInput = ({
   label,
-  handleClickAcceptEdit,
-  handleClickClose,
+  value,
+  placeholder,
+  isAcceptIconDisabled,
+  handleChange = Function.prototype,
+  handleClickAcceptEdit = Function.prototype,
+  handleClickClose = Function.prototype,
+  handleClickAway = Function.prototype,
+  withBorder,
+  className,
 }) => {
   const inputRef = useRef(null);
 
-  useClickAway(inputRef, () => {
-    if (isEditMode) {
-      setEditMode(false);
-
-      if (isCreatingMode) {
-        setCreatingMode(false);
-      }
-    }
-  });
-
-  const handleInputChange = e => {
-    const newValue = e.target.value;
-
-    if (
-      value?.length >= MAX_LIST_LABEL_LENGTH &&
-      newValue.length >= MAX_LIST_LABEL_LENGTH
-    )
-      return;
-
-    setValue(newValue.slice(0, MAX_LIST_LABEL_LENGTH));
-  };
-
+  useClickAway(inputRef, handleClickAway);
   useKeyPressEvent('Enter', handleClickAcceptEdit);
   useKeyPressEvent('Escape', handleClickClose);
 
   return (
-    <div ref={inputRef}>
+    <div ref={inputRef} className={className}>
       <StyledInput
         autoFocus
+        label={label}
         value={value}
-        onChange={handleInputChange}
+        placeholder={placeholder}
+        onChange={handleChange}
         postfix={
           <>
             <StyledIcon
@@ -80,7 +60,7 @@ export const ListItemInput = ({
               width={16}
               height={16}
               color="gray"
-              isDisabled={!value || value === label}
+              isDisabled={isAcceptIconDisabled}
               onClick={handleClickAcceptEdit}
             />
             <StyledIcon
@@ -92,7 +72,12 @@ export const ListItemInput = ({
             />
           </>
         }
+        withBorder={withBorder}
       />
     </div>
   );
 };
+
+FormInput.InputField = Input.InputField;
+
+export { FormInput };

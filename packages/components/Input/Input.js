@@ -92,23 +92,6 @@ const StyledIcon = styled(Icon)`
   }
 `;
 
-const StyledIcon = styled(Icon)`
-  margin-left: 16px;
-  transition: color 0.2s, opacity 0.2s;
-  cursor: pointer;
-
-  ${({ isDisabled }) =>
-    isDisabled &&
-    `
-      pointer-events: none;
-      opacity: 0.2;
-    `}
-
-  &:hover {
-    color: ${({ theme }) => theme.color.black};
-  }
-`;
-
 const Error = styled.div`
   padding-left: 15px;
   margin-top: 8px;

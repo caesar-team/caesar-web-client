@@ -38,6 +38,7 @@ const StyledAvatar = styled(Avatar)`
 const UserName = styled.div`
     margin-right: 24px;
     color: ${({ theme }) => theme.color.white};
+
     ${media.wideMobile`
       display: none;
     `};

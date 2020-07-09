@@ -4,6 +4,7 @@ const theme = {
     emperor: '#505050',
     gray: '#888',
     lightGray: '#cccccc',
+    lighterGray: 'rgba(136, 136, 136, 0.3)',
     gallery: '#eaeaea',
     alto: '#f5f5f5',
     snow: '#fbf9f9',
@@ -15,7 +16,6 @@ const theme = {
     blue: '#3385ff',
     lightBlue: '#f5f6f7',
     lightRed: 'rgba(255, 51, 85, 0.1)',
-    lighterGray: 'rgba(136, 136, 136, 0.3)',
   },
   font: {
     size: {

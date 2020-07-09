@@ -1,17 +1,11 @@
 import React from 'react';
-import {
-  Wrapper,
-  Title,
-  OwnerAndInvitation,
-  Row,
-  Note,
-  Attachments,
-  RemoveButton,
-} from '../../ItemFields';
+import { Title, Note, Attachments } from '../../ItemFields/view';
+import { Row } from '../../ItemFields/common';
+import { Wrapper, OwnerAndInvitation, RemoveButton } from '../components';
 
 export const Document = ({
   item,
-  handleClickAcceptEdit,
+  onClickAcceptEdit,
   onClickShare,
   onClickMoveToTrash,
 }) => {
@@ -21,15 +15,15 @@ export const Document = ({
 
   return (
     <Wrapper>
-      <Title value={name} handleClickAcceptEdit={handleClickAcceptEdit} />
+      <Title value={name} onClickAcceptEdit={onClickAcceptEdit} />
       <OwnerAndInvitation onClickShare={onClickShare} />
       <Row marginBottom={24}>
-        <Note value={note} handleClickAcceptEdit={handleClickAcceptEdit} />
+        <Note value={note} onClickAcceptEdit={onClickAcceptEdit} />
       </Row>
       <Row marginBottom={24}>
         <Attachments
           attachments={attachments}
-          handleClickAcceptEdit={handleClickAcceptEdit}
+          onClickAcceptEdit={onClickAcceptEdit}
         />
       </Row>
       {onClickMoveToTrash && (

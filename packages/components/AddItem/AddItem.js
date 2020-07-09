@@ -1,12 +1,17 @@
 import React from 'react';
+import { useRouter } from 'next/router';
+import { useSelector } from 'react-redux';
 import styled from 'styled-components';
 import { useNavigatorOnline } from '@caesar/common/hooks';
 import {
+  ROUTES,
   ITEM_TYPE,
   ITEM_ICON_TYPE,
   CREATE_PERMISSION,
   ENTITY_TYPE,
 } from '@caesar/common/constants';
+import { workInProgressListSelector } from '@caesar/common/selectors/workflow';
+import { currentTeamSelector } from '@caesar/common/selectors/user';
 import { Button } from '../Button';
 import { Icon } from '../Icon';
 import { Dropdown } from '../Dropdown';
@@ -47,11 +52,19 @@ const renderAddItemOptions = (value, label) => (
   </AddItemOption>
 );
 
-export const AddItem = ({
-  workInProgressList,
-  onClickCreateItem,
-  className,
-}) => {
+export const AddItem = ({ className }) => {
+  const { push } = useRouter();
+  const currentTeam = useSelector(currentTeamSelector);
+  const workInProgressList = useSelector(workInProgressListSelector);
+
+  const handleClickAddItem = (_, value) => {
+    push(
+      `${ROUTES.CREATE}?type=${value}${
+        currentTeam ? `&teamId=${currentTeam?.id}` : ''
+      }&listId=${workInProgressList?.id}`,
+    );
+  };
+
   const isOnline = useNavigatorOnline();
 
   const itemSubject = {
@@ -65,7 +78,7 @@ export const AddItem = ({
     <Can I={CREATE_PERMISSION} of={itemSubject}>
       <Dropdown
         options={itemTypesOptions}
-        onClick={onClickCreateItem}
+        onClick={handleClickAddItem}
         optionRender={renderAddItemOptions}
         withTriangleAtTop
         ButtonElement={({ handleToggle }) => (

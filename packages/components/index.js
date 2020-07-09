@@ -77,6 +77,7 @@ export { Scrollbar } from './Scrollbar';
 export { Section } from './Section';
 export { SecureMessage } from './SecureMessage';
 export { Select } from './Select';
+export { SelectVisible } from './SelectVisible';
 export { SessionChecker } from './SessionChecker';
 export { SettingsSidebar } from './SettingsSidebar';
 export { ShareModal } from './ShareModal';

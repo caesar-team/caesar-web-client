@@ -96,8 +96,9 @@ export const OwnerAndInvitation = ({ onClickShare }) => {
     <Wrapper>
       <OwnerWrapper>
         <Avatar
-          name={owner ? owner.name : ''}
-          avatar={owner ? owner.avatar : ''}
+          name={owner?.name || ''}
+          email={owner?.email || ''}
+          avatar={owner?.avatar || ''}
         />
         <Owner>
           <OwnerName>{owner ? owner.name : ''}</OwnerName>

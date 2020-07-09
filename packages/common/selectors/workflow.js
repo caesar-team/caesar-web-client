@@ -144,21 +144,20 @@ export const chosenListItemsSelector = createSelector(
   (listsById, itemsById, workInProgressListId) =>
     listsById && workInProgressListId && listsById[workInProgressListId]
       ? listsById[workInProgressListId].children.reduce(
-        (accumulator, itemId) =>
-          itemsById[itemId]?.data
-            ? [...accumulator, itemsById[itemId]]
-            : accumulator,
-        [],
-      )
-      : []
+          (accumulator, itemId) =>
+            itemsById[itemId]?.data
+              ? [...accumulator, itemsById[itemId]]
+              : accumulator,
+          [],
+        )
+      : [],
 );
 
 export const favoriteListItemsSelector = createSelector(
   chosenListItemsSelector,
   trashListSelector,
-  (visibleItems, trashList) => visibleItems.filter(
-    item => item.listId !== trashList.id,
-  ),
+  (visibleItems, trashList) =>
+    visibleItems.filter(item => item.listId !== trashList.id),
 );
 
 export const visibleListItemsSelector = createSelector(
@@ -169,7 +168,7 @@ export const visibleListItemsSelector = createSelector(
   (chosenItems, favoriteItems, workInProgressListId, favoriteList) => {
     const isFavoriteList = workInProgressListId === favoriteList.id;
 
-    switch(true) {
+    switch (true) {
       case isFavoriteList:
         return favoriteItems;
       default:

@@ -12,7 +12,7 @@ export { Button } from './Button';
 export { Carousel } from './Carousel';
 export { Checkbox } from './Checkbox';
 export { CodeInput } from './CodeInput';
-export { ReadOnlyContentEditable } from './Common';
+export { ContentEditable } from './Common';
 export { ConfirmModal } from './ConfirmModal';
 export { DataTable, VirtualizedTableHOC } from './DataTable';
 export { DottedMenu } from './DottedMenu';

@@ -90,7 +90,6 @@ import {
 import {
   favoritesSelector,
   listSelector,
-  allTrashListIdsSelector,
 } from '@caesar/common/selectors/entities/list';
 import {
   itemsBatchSelector,
@@ -338,8 +337,6 @@ export function* moveItemSaga({ payload: { itemId, listId } }) {
     const item = yield select(itemSelector, { itemId });
     const childItemIds = item.invited;
 
-    const allTrashListIds = yield select(allTrashListIdsSelector);
-
     const oldList = yield select(listSelector, {
       listId: item.listId,
     });
@@ -352,10 +349,6 @@ export function* moveItemSaga({ payload: { itemId, listId } }) {
     yield put(moveItemToList(item.id, item.listId, listId));
 
     yield put(updateGlobalNotification(NOOP_NOTIFICATION, false));
-
-    if (item.favorite && allTrashListIds.includes(listId)) {
-      yield fork(toggleItemToFavoriteSaga, { payload: { itemId } });
-    }
 
     if (oldList.teamId !== newList.teamId) {
       yield put(updateItemField(item.id, 'teamId', newList.teamId));

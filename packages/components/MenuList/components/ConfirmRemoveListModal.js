@@ -7,14 +7,14 @@ import { ConfirmModal } from '@caesar/components';
 export const ConfirmRemoveListModal = ({
   item,
   isOpenedPopup,
-  setIsOpenedPopup,
+  setOpenedPopup,
 }) => {
   const dispatch = useDispatch();
   const { id, label, children = [] } = item;
 
   const handleClickConfirmRemove = () => {
     dispatch(removeListRequest(id));
-    setIsOpenedPopup(false);
+    setOpenedPopup(false);
   };
 
   return (
@@ -30,7 +30,7 @@ export const ConfirmRemoveListModal = ({
       icon="trash"
       confirmBtnText="Remove"
       onClickConfirm={handleClickConfirmRemove}
-      onClickCancel={() => setIsOpenedPopup(false)}
+      onClickCancel={() => setOpenedPopup(false)}
     />
   );
 };

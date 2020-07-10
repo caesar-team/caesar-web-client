@@ -7,7 +7,9 @@ import { currentTeamSelector } from '@caesar/common/selectors/user';
 import {
   personalListsByTypeSelector,
   currentTeamListsSelector,
-  serverErrorSelector,
+  inboxSelector,
+  favoritesSelector,
+  trashSelector,
 } from '@caesar/common/selectors/entities/list';
 import { workInProgressListSelector } from '@caesar/common/selectors/workflow';
 import {
@@ -24,8 +26,15 @@ import { MenuItemInner } from './styledComponents';
 const MenuItem = styled.div``;
 
 const MenuItemTitle = styled.div`
+  display: flex;
+  align-items: center;
+  flex-grow: 1;
   padding-left: 16px;
   margin-right: auto;
+`;
+
+const MenuItemCounter = styled.span`
+  margin-left: auto;
 `;
 
 const ListAddIcon = styled(Icon)`
@@ -78,6 +87,9 @@ const MenuListInnerComponent = ({
   const personalLists = useSelector(personalListsByTypeSelector);
   const teamLists = useSelector(currentTeamListsSelector);
   const workInProgressList = useSelector(workInProgressListSelector);
+  const inbox = useSelector(inboxSelector);
+  const favorites = useSelector(favoritesSelector);
+  const trash = useSelector(trashSelector);
   const activeListId = workInProgressList && workInProgressList.id;
   const [isCreatingMode, setCreatingMode] = useState(false);
 
@@ -120,13 +132,15 @@ const MenuListInnerComponent = ({
 
   const menuList = [
     {
-      id: isPersonal ? personalLists.inbox?.id : '',
+      id: isPersonal ? personalLists.inbox?.id : null,
       title: 'Inbox',
+      length: isPersonal ? inbox?.children?.length : null,
       icon: 'inbox',
     },
     {
       id: isPersonal ? personalLists.favorites?.id : teamLists.favorites?.id,
       title: 'Favorites',
+      length: isPersonal ? favorites?.children?.length : null,
       icon: 'favorite',
     },
     {
@@ -144,6 +158,7 @@ const MenuListInnerComponent = ({
     {
       id: isPersonal ? personalLists.trash?.id : teamLists.trash?.id,
       title: 'Trash',
+      length: isPersonal ? trash?.children?.length : null,
       icon: 'trash',
     },
     {
@@ -153,7 +168,7 @@ const MenuListInnerComponent = ({
     },
   ];
 
-  return menuList.map(({ id, icon, title, children }) => {
+  return menuList.map(({ id, icon, title, length, children }) => {
     const withChildren = id === 'lists';
 
     return (
@@ -178,7 +193,12 @@ const MenuListInnerComponent = ({
             }}
           >
             <Icon name={icon} width={16} height={16} />
-            <MenuItemTitle>{title}</MenuItemTitle>
+            <MenuItemTitle>
+              {title}
+              {typeof length === 'number' && (
+                <MenuItemCounter>{length}</MenuItemCounter>
+              )}
+            </MenuItemTitle>
             {withChildren && (
               <>
                 <ListAddIcon

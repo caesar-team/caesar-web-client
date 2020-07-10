@@ -1,7 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
 import { Formik, FastField } from 'formik';
-import { Head, Icon, LockInput } from '@caesar/components';
+import { Head, LogoCaesarDomain, LockInput } from '@caesar/components';
 import { passwordSchema } from './schema';
 
 const Wrapper = styled.div`
@@ -21,14 +21,10 @@ const Title = styled.div`
   margin-top: 140px;
 `;
 
-const StyledLogo = styled(Icon)`
-  fill: ${({ theme }) => theme.color.lightGray};
-`;
-
 const MasterPasswordCheckForm = ({ onSubmit }) => (
   <Wrapper>
     <Head title="[LOCKED] Caesar" />
-    <StyledLogo name="logo-caesar-4xxi" width={210} height={45} />
+    <LogoCaesarDomain color="lightGray" width={146} height={45} />
     <Title>Enter your master password</Title>
     <Formik
       initialValues={{ password: '' }}

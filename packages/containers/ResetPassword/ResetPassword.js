@@ -2,7 +2,12 @@ import React, { Component } from 'react';
 import styled from 'styled-components';
 import Router from 'next/router';
 import { ROUTES } from '@caesar/common/constants';
-import { AuthTitle, AuthLayout, Icon, Button } from '@caesar/components';
+import {
+  AuthTitle,
+  AuthLayout,
+  LogoCaesarDomain,
+  Button,
+} from '@caesar/components';
 import { changePassword } from '@caesar/common/utils/authUtils';
 import ResetPasswordForm from './ResetPasswordForm';
 
@@ -40,7 +45,7 @@ class ResetPasswordContainer extends Component {
     return (
       <>
         <IconWrapper>
-          <Icon name="logo-caesar-4xxi" height={40} width={142} />
+          <LogoCaesarDomain width={146} height={45} />
         </IconWrapper>
         <StyledButton onClick={() => router.push(ROUTES.SIGN_IN)}>
           Sign In

@@ -126,11 +126,11 @@ const Input = ({
     setIsFocused(true);
   };
 
-  const handleBlur = () => {
+  const handleBlur = e => {
     setIsFocused(false);
 
     if (onBlur) {
-      onBlur(name, true);
+      onBlur(e);
     }
   };
 

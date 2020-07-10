@@ -33,8 +33,9 @@ const StyledButton = styled(Button)`
   margin-right: 16px;
 `;
 
-export const FormFooter = ({ onSubmit }) => {
+export const FormFooter = ({ formik }) => {
   const { push } = useRouter();
+  const { dirty, isValid, isSubmitting, handleSubmit } = formik;
 
   const handleClickCancel = () => {
     push(ROUTES.DASHBOARD);
@@ -47,7 +48,12 @@ export const FormFooter = ({ onSubmit }) => {
         <StyledButton color="white" onClick={handleClickCancel}>
           Cancel
         </StyledButton>
-        <Button onClick={onSubmit}>Create</Button>
+        <Button
+          disabled={!dirty || !isValid || isSubmitting}
+          onClick={handleSubmit}
+        >
+          Create
+        </Button>
       </ButtonsWrapper>
     </Wrapper>
   );

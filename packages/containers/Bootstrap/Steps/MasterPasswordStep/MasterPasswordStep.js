@@ -251,7 +251,10 @@ class MasterPasswordStep extends Component {
       <Fragment>
         <Head title="Master Password" />
         {step === MASTER_PASSWORD_CHECK ? (
-          <MasterPasswordCheckForm onSubmit={this.handleSubmitCheckPassword} />
+          <MasterPasswordCheckForm
+            user={user}
+            onSubmit={this.handleSubmitCheckPassword}
+          />
         ) : (
           <BootstrapLayout user={user}>
             <NavigationPanelStyled currentStep={step} steps={navigationSteps} />

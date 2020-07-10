@@ -63,7 +63,6 @@ const Prefix = styled.div`
   transform: translateY(-50%);
   line-height: 0;
   left: 16px;
-  background-color: ${({ theme }) => theme.color.white};
 `;
 
 const PostFix = styled.div`

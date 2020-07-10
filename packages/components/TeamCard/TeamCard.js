@@ -82,7 +82,7 @@ const TeamCard = ({
   onClick = Function.prototype,
   onClickRemoveTeam = Function.prototype,
 }) => {
-  const { id, title, icon, users } = team;
+  const { id, icon, users } = team;
   const areMembersAvailable = users && users.length > 0;
 
   return (

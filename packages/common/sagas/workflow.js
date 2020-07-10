@@ -34,7 +34,7 @@ import { getFavoritesList } from '@caesar/common/normalizers/utils';
 import { fetchTeamSuccess } from '@caesar/common/actions/entities/team';
 import { getServerErrorMessage } from '@caesar/common/utils/error';
 
-function* initPersonal(withDecryption) {
+function* initPersonal(withDecryption) {console.log('Inir personal');
   try {
     const { data: lists } = yield call(getLists);
 
@@ -58,6 +58,8 @@ function* initPersonal(withDecryption) {
       }
     }
 
+    //yield put(setCurrentTeamId(TEAM_TYPE.PERSONAL));
+
     const trashList = yield select(trashListSelector);
     const favoritesList = getFavoritesList(itemsById, trashList?.id);
 
@@ -70,6 +72,7 @@ function* initPersonal(withDecryption) {
     yield put(addChildItemsBatch(childItemsById));
 
     const favoriteList = yield select(favoriteListSelector);
+
     yield put(setWorkInProgressListId(favoriteList.id));
 
     yield put(finishIsLoading());
@@ -84,8 +87,11 @@ function* initPersonal(withDecryption) {
 function* initTeam(team, withDecryption) {
   try {
     yield put(fetchTeamSuccess(team));
-
+    console.log('5');
     const currentTeamId = yield select(currentTeamIdSelector);
+
+    // const favoriteList = yield select(favoriteListSelector);
+    // console.log(favoriteList.id);
 
     if (currentTeamId === TEAM_TYPE.PERSONAL) {
       return;
@@ -129,10 +135,15 @@ function* initTeam(team, withDecryption) {
   }
 }
 
-function* initTeams(withDecryption) {
+function* initTeams(withDecryption) {console.log('Init teams');
   try {
     const { data: teams } = yield call(getTeams);
 
+    //yield put(setCurrentTeamId(TEAM_TYPE.PERSONAL));
+    const favoriteList = yield select(favoriteListSelector);
+
+   console.log(favoriteList.id);
+    //yield put(setWorkInProgressListId(favoriteList.id));
     yield all(teams.map(team => call(initTeam, team, withDecryption)));
   } catch (error) {
     console.log(error);

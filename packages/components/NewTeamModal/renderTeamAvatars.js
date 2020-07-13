@@ -139,7 +139,7 @@ export const renderTeamAvatars = ({ icon }, setFieldValue) => {
   const shouldShowUploader =
     (icon && IMAGE_BASE64_LIST.includes(icon.raw)) || !icon;
 
-  const showErrors = rejectedFiles => {console.log(rejectedFiles);
+  const showErrors = rejectedFiles => {
     if (rejectedFiles.length > 0) {
       let error = null;
 

@@ -19,7 +19,7 @@ function getChildrenErrors(children) {
   }, []);
 }
 
-export function getServerErrorByNames(error) {console.log(error);
+export function getServerErrorByNames(error) {
   const children = error?.data?.errors?.children;
 
   if (!children) {

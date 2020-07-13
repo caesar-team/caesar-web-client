@@ -139,11 +139,21 @@ export const renderTeamAvatars = ({ icon }, setFieldValue) => {
   const shouldShowUploader =
     (icon && IMAGE_BASE64_LIST.includes(icon.raw)) || !icon;
 
-  const showErrors = rejectedFiles => {
+  const showErrors = rejectedFiles => {console.log(rejectedFiles);
     if (rejectedFiles.length > 0) {
+      let error = null;
+
       if (rejectedFiles[0].size > TEAM_AVATAR_MAX_SIZE) {
-        return <Error>{ERROR.FILE_SIZE(`${Math.round(TEAM_AVATAR_MAX_SIZE / 1024 / 1024)}MB`)}</Error>;
+        error = ERROR.FILE_SIZE(
+        `${Math.round(TEAM_AVATAR_MAX_SIZE / 1024 / 1024)}MB`,
+        );
       }
+
+      if (!rejectedFiles[0].type.includes('image/')) {
+        error = ERROR.IMAGE_UPLOAD;
+      }
+
+      return error && <Error>{error}</Error>;
     }
 
     return null;

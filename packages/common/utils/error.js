@@ -12,14 +12,14 @@ function getChildrenErrors(children) {
   return Object.keys(children).reduce((acc, key) => {
     if (children[key].children) {
       acc.push(getChildrenErrors(children[key].children));
-    } else {
-      acc.push(children[key].errors[0]);
+    } else if (children[key]?.errors) {
+      acc.push(children[key]?.errors[0]);
     }
     return acc;
   }, []);
 }
 
-export function getServerErrorByNames(error) {
+export function getServerErrorByNames(error) {console.log(error);
   const children = error?.data?.errors?.children;
 
   if (!children) {

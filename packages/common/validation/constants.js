@@ -9,4 +9,5 @@ export const ERROR = {
     'The field can not be empty. Please enter at least 1 character',
   FILE_SIZE: (maxFileSize = MAX_UPLOADING_FILE_SIZE) => `Maximum file size is ${maxFileSize}`,
   FILE_SIZES: `All attachments cannot be over ${TOTAL_MAX_UPLOADING_FILES_SIZES}`,
+  IMAGE_UPLOAD: 'Please upload an image',
 };

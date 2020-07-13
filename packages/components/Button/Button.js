@@ -14,6 +14,11 @@ const getButtonStyles = ({ color, theme }) => {
       color: ${theme.color.emperor};
       border: 1px solid ${theme.color.gallery};
     `,
+    gray: `
+      color: ${theme.color.white};
+      background-color: transparent;
+      border: 1px solid ${theme.color.gray};
+    `,
     transparent: `
       height: 22px;
       padding: 0;

@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import { media } from '@caesar/assets/styles/media';
 import { useFormik } from 'formik';
 import { useDispatch } from 'react-redux';
-import { Button, Head, Icon, LockInput } from '@caesar/components';
+import { Button, Head, LogoCaesarDomain, LockInput } from '@caesar/components';
 import { Avatar } from '@caesar/components/Avatar';
 import { logout } from '@caesar/common/actions/user';
 import { passwordSchema } from './schema';
@@ -18,17 +18,17 @@ const Wrapper = styled.div`
 `;
 
 const Header = styled.div`
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    width: 100%;
-    padding: 12px 24px 12px 0;
-    border-bottom: 1px solid ${({ theme }) => theme.color.lighterGray};
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  padding: 12px 24px;
+  border-bottom: 1px solid ${({ theme }) => theme.color.lighterGray};
 `;
 
 const User = styled.div`
-    display: flex;
-    align-items: center;
+  display: flex;
+  align-items: center;
 `;
 
 const StyledAvatar = styled(Avatar)`
@@ -36,10 +36,10 @@ const StyledAvatar = styled(Avatar)`
 `;
 
 const UserName = styled.div`
-    margin-right: 24px;
-    color: ${({ theme }) => theme.color.white};
+  margin-right: 24px;
+  color: ${({ theme }) => theme.color.white};
 
-    ${media.wideMobile`
+  ${media.wideMobile`
       display: none;
     `};
 `;
@@ -48,10 +48,6 @@ const Title = styled.div`
   font-size: 18px;
   color: ${({ theme }) => theme.color.lightGray};
   margin-bottom: 36px;
-`;
-
-const StyledLogo = styled(Icon)`
-  fill: ${({ theme }) => theme.color.lightGray};
 `;
 
 const FormWrapper = styled.div`
@@ -80,9 +76,9 @@ const MasterPasswordCheckForm = ({ user, onSubmit }) => {
 
   return (
     <Wrapper>
-      <Head title="[LOCKED] Caesar"/>
+      <Head title="[LOCKED] Caesar" />
       <Header>
-        <StyledLogo name="logo-caesar-4xxi" width={151} height={32}/>
+        <LogoCaesarDomain color="lightGray" />
         <User>
           <StyledAvatar {...user} width={32} fontSize="small" />
           <UserName>{user.name}</UserName>
@@ -93,21 +89,21 @@ const MasterPasswordCheckForm = ({ user, onSubmit }) => {
       </Header>
       <FormWrapper>
         <Title>Enter your master password</Title>
-          <form onSubmit={handleSubmit}>
-            <LockInput
-              name="password"
-              value={values.password}
-              autoFocus
-              maxLength={24}
-              onChange={handleChange}
-              onClick={submitForm}
-              onBackspace={resetForm}
-              isError={errors && Object.keys(errors).length !== 0}
-            />
-          </form>
-       </FormWrapper>
-      </Wrapper>
-    );
+        <form onSubmit={handleSubmit}>
+          <LockInput
+            name="password"
+            value={values.password}
+            autoFocus
+            maxLength={24}
+            onChange={handleChange}
+            onClick={submitForm}
+            onBackspace={resetForm}
+            isError={errors && Object.keys(errors).length !== 0}
+          />
+        </form>
+      </FormWrapper>
+    </Wrapper>
+  );
 };
 
 export default MasterPasswordCheckForm;

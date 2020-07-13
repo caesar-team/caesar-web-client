@@ -4,6 +4,7 @@ const theme = {
     emperor: '#505050',
     gray: '#888',
     lightGray: '#ccc',
+    lighterGray: 'rgba(136, 136, 136, 0.3)',
     gallery: '#eaeaea',
     alto: '#f5f5f5',
     snow: '#fbf9f9',

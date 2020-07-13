@@ -54,6 +54,7 @@ export {
 export { Link } from './Link';
 export { List, ListItem } from './List';
 export { Loader, CircleLoader, FullScreenLoader, LogoLoader } from './Loader';
+export { LogoCaesarDomain } from './LogoCaesarDomain';
 export { MemberList } from './MemberList';
 export { MenuList } from './MenuList';
 export { Modal, ModalTitle, ModalSubtitle } from './Modal';

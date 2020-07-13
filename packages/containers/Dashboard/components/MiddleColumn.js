@@ -48,7 +48,7 @@ const MiddleColumnComponent = ({
   const isMultiItem = workInProgressItemIds?.length > 0;
   const isInboxList = workInProgressList?.type === LIST_TYPE.INBOX;
   const isTrashList =
-    (workInProgressList?.id === trashList.id ||
+    (workInProgressList?.id === trashList?.id ||
       teamsTrashLists.map(({ id }) => id).includes(workInProgressList?.id));
 
   const searchedItems = filter(Object.values(itemsById), searchedText);

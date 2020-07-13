@@ -1,8 +1,11 @@
 import React from 'react';
 import styled from 'styled-components';
 import { ErrorLayout } from '@caesar/components';
-import ErrorImg from '@caesar/assets/images/error.jpg';
-import ErrorImg2x from '@caesar/assets/images/error@2x.jpg';
+
+// import ErrorLeftImg from '@caesar/assets/images/error-left.png';
+// import ErrorRightImg from '@caesar/assets/images/error-right.png';
+// import ErrorLeftImg2x from '@caesar/assets/images/error-left@2x.png';
+// import ErrorRightImg2x from '@caesar/assets/images/error-right@2x.png';
 
 const Image = styled.img`
   object-fit: contain;
@@ -33,7 +36,6 @@ const Description = styled.div`
 
 const Error = ({ statusCode }) => (
   <ErrorLayout>
-    <Image src={ErrorImg} srcSet={`${ErrorImg} 1x, ${ErrorImg2x} 2x`} />
     <TextWrapper>
       <StatusCode>{statusCode}</StatusCode>
       <Description>Oops… Something went wrong</Description>

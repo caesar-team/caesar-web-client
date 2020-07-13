@@ -54,13 +54,11 @@ const BootstrapHeader = ({ user, ...props }) => (
   </Wrapper>
 );
 
-const mapStateToProps = () => ({});
-
 const mapDispatchToProps = {
   logout,
 };
 
 export default connect(
-  mapStateToProps,
+  null,
   mapDispatchToProps,
 )(BootstrapHeader);

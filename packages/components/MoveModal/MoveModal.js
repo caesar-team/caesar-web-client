@@ -160,7 +160,9 @@ class MoveModal extends Component {
             />
           </SelectWrapper>
         )}
-        <TextWithLines>Selected ({items.length})</TextWithLines>
+        <TextWithLines position="left" width={1}>
+          Selected items ({items.length})
+        </TextWithLines>
         <ListWrapper>
           <Scrollbar autoHeight autoHeightMax={400}>
             {renderedItems}

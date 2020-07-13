@@ -2,10 +2,6 @@ import React from 'react';
 import styled from 'styled-components';
 import { ErrorLayout } from '@caesar/components';
 
-const Image = styled.img`
-  object-fit: contain;
-`;
-
 const TextWrapper = styled.div`
   position: absolute;
   left: 0;

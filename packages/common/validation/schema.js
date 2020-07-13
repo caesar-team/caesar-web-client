@@ -3,6 +3,7 @@ import { ERROR } from './constants';
 import { checkFileSize, checkAllFileSizes } from './utils';
 
 const STRING_MAX_LENGTH = 100;
+const WEBSITE_MAX_LENGTH = 2048;
 
 const attachmentsSchema = yup
   .array(
@@ -27,5 +28,9 @@ export const SCHEMA = {
       .string()
       .trim()
       .max(max, ERROR.MAX_LENGTH(max)),
+  WEBSITE: yup
+    .string()
+    .url(ERROR.WEBSITE)
+    .max(WEBSITE_MAX_LENGTH, ERROR.MAX_LENGTH(WEBSITE_MAX_LENGTH)),
   ATTACHMENTS: attachmentsSchema,
 };

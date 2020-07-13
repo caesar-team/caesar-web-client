@@ -11,4 +11,5 @@ export const ERROR = {
   FILE_SIZE: (maxFileSize = MAX_UPLOADING_FILE_SIZE) =>
     `Maximum file size is ${maxFileSize}`,
   FILE_SIZES: `All attachments cannot be over ${TOTAL_MAX_UPLOADING_FILES_SIZES}`,
+  WEBSITE: 'Must be an url',
 };

@@ -1,4 +1,5 @@
 import React from 'react';
+import { SCHEMA } from '@caesar/common/validation';
 import {
   Title,
   Input,
@@ -22,21 +23,34 @@ export const Credentials = ({
 
   return (
     <Wrapper>
-      <Title value={name} onClickAcceptEdit={onClickAcceptEdit} />
+      <Title
+        value={name}
+        schema={SCHEMA.REQUIRED_LIMITED_STRING()}
+        onClickAcceptEdit={onClickAcceptEdit}
+      />
       <OwnerAndInvitation onClickShare={onClickShare} />
       <Row>
         <Input
           label="Login"
           name="login"
           value={login}
+          schema={SCHEMA.REQUIRED_LIMITED_STRING()}
           onClickAcceptEdit={onClickAcceptEdit}
         />
       </Row>
       <Row>
-        <Password value={pass} onClickAcceptEdit={onClickAcceptEdit} />
+        <Password
+          value={pass}
+          schema={SCHEMA.REQUIRED_LIMITED_STRING()}
+          onClickAcceptEdit={onClickAcceptEdit}
+        />
       </Row>
       <Row>
-        <Website value={website} onClickAcceptEdit={onClickAcceptEdit} />
+        <Website
+          value={website}
+          schema={SCHEMA.WEBSITE}
+          onClickAcceptEdit={onClickAcceptEdit}
+        />
       </Row>
       <Row marginBottom={24}>
         <Note value={note} onClickAcceptEdit={onClickAcceptEdit} />

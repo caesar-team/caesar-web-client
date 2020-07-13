@@ -482,12 +482,9 @@ class TeamContainer extends Component {
 
     const isDefaultTeam = team.type === TEAM_TYPE.DEFAULT;
 
-    const teamUsers = team.users
-      ? team.users.filter(({ id }) => id !== user.id)
-      : [];
-    const members = this.getMemberList(teamUsers, membersById);
+    const members = this.getMemberList(team.users, membersById);
     const filteredMembersList = this.filterMemberList(
-      teamUsers,
+      team.users,
       filter,
       membersById,
     );

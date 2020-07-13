@@ -141,19 +141,23 @@ export const renderTeamAvatars = ({ icon }, setFieldValue) => {
 
   const showErrors = rejectedFiles => {
     if (rejectedFiles.length > 0) {
-      let error = null;
+      const errors = [];
+
+      if (!rejectedFiles[0].type.includes('image/')) {
+        errors.push(<Error>{ERROR.IMAGE_UPLOAD}</Error>);
+      }
 
       if (rejectedFiles[0].size > TEAM_AVATAR_MAX_SIZE) {
-        error = ERROR.FILE_SIZE(
-        `${Math.round(TEAM_AVATAR_MAX_SIZE / 1024 / 1024)}MB`,
+        errors.push(
+          <Error>
+            {ERROR.FILE_SIZE(
+              `${Math.round(TEAM_AVATAR_MAX_SIZE / 1024 / 1024)}MB`,
+            )}
+          </Error>
         );
       }
 
-      if (!rejectedFiles[0].type.includes('image/')) {
-        error = ERROR.IMAGE_UPLOAD;
-      }
-
-      return error && <Error>{error}</Error>;
+      return errors.length && <Error>{errors}</Error>;
     }
 
     return null;

@@ -12,7 +12,7 @@ const EyeIcon = styled(Icon)`
   }
 `;
 
-export const Website = ({ value, onClickAcceptEdit }) => {
+export const Website = ({ value, schema, onClickAcceptEdit }) => {
   const handleclickGoTo = () => {
     window.open(value, '_blank');
   };
@@ -22,6 +22,7 @@ export const Website = ({ value, onClickAcceptEdit }) => {
       label="Website"
       name="website"
       value={value}
+      schema={schema}
       withEllipsis
       onClickAcceptEdit={onClickAcceptEdit}
       addonIcons={

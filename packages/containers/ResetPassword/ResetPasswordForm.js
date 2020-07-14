@@ -74,21 +74,14 @@ const ResetPasswordForm = ({ onSubmit }) => (
     initialValues={{ password: '', confirmPassword: '' }}
     validationSchema={schema}
   >
-    {({
-      errors,
-      touched,
-      handleSubmit,
-      setFieldTouched,
-      isSubmitting,
-      isValid,
-    }) => (
+    {({ errors, touched, handleSubmit, handleBlur, isSubmitting, isValid }) => (
       <Form onSubmit={handleSubmit}>
         <Row>
           <FastField name="password">
             {({ field }) => (
               <StyledPasswordInput
                 {...field}
-                onBlur={setFieldTouched}
+                onBlur={handleBlur}
                 placeholder="Password"
                 prefix={PasswordInputPrefix}
               />
@@ -103,7 +96,7 @@ const ResetPasswordForm = ({ onSubmit }) => (
             {({ field }) => (
               <StyledPasswordInput
                 {...field}
-                onBlur={setFieldTouched}
+                onBlur={handleBlur}
                 placeholder="Confirm Password"
                 prefix={PasswordInputPrefix}
               />

@@ -7,7 +7,7 @@ import IconTeam3 from '@caesar/assets/icons/svg/icon-team-ava-3.svg';
 import IconTeam4 from '@caesar/assets/icons/svg/icon-team-ava-4.svg';
 import IconTeam5 from '@caesar/assets/icons/svg/icon-team-ava-5.svg';
 import { TEAM_AVATAR_MAX_SIZE } from '@caesar/common/constants';
-import { ERROR } from '@caesar/common/validation/constants';
+import { ERROR } from '@caesar/common/validation';
 
 const IMAGE_BASE64_LIST = [
   IconTeam1,

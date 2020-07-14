@@ -6,7 +6,7 @@ export const getInitialValues = (type, listId) => {
       return {
         type,
         listId,
-        title: '',
+        name: '',
         login: '',
         pass: '',
         website: '',
@@ -17,7 +17,7 @@ export const getInitialValues = (type, listId) => {
       return {
         type,
         listId,
-        title: '',
+        name: '',
         note: '',
         attachments: [],
       };

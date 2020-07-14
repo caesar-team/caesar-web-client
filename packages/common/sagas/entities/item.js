@@ -339,8 +339,6 @@ export function* moveItemSaga({ payload: { itemId, teamId, listId } }) {
     const item = yield select(itemSelector, { itemId });
     const childItemIds = item.invited;
 
-    const allTrashListIds = yield select(allTrashListIdsSelector);
-
     yield call(updateMoveItem, item.id, {
       listId,
     });
@@ -348,10 +346,6 @@ export function* moveItemSaga({ payload: { itemId, teamId, listId } }) {
     yield put(moveItemToList(item.id, item.listId, listId));
 
     yield put(updateGlobalNotification(NOOP_NOTIFICATION, false));
-
-    if (item.favorite && allTrashListIds.includes(listId)) {
-      yield fork(toggleItemToFavoriteSaga, { payload: { itemId } });
-    }
 
     if (item.teamId !== teamId) {
       yield put(updateItemField(item.id, 'teamId', teamId));

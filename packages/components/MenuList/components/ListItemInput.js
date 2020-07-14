@@ -31,23 +31,23 @@ const MAX_LIST_LABEL_LENGTH = 75;
 
 export const ListItemInput = ({
   isEditMode,
-  setIsEditMode,
+  setEditMode,
   isCreatingMode,
-  setIsCreatingMode,
+  setCreatingMode,
   value,
   setValue,
   label,
-  handleClickAcceptEdit,
-  handleClickClose,
+  onClickAcceptEdit,
+  onClickClose,
 }) => {
   const inputRef = useRef(null);
 
   useClickAway(inputRef, () => {
     if (isEditMode) {
-      setIsEditMode(false);
+      setEditMode(false);
 
       if (isCreatingMode) {
-        setIsCreatingMode(false);
+        setCreatingMode(false);
       }
     }
   });
@@ -64,8 +64,8 @@ export const ListItemInput = ({
     setValue(newValue.slice(0, MAX_LIST_LABEL_LENGTH));
   };
 
-  useKeyPressEvent('Enter', handleClickAcceptEdit);
-  useKeyPressEvent('Escape', handleClickClose);
+  useKeyPressEvent('Enter', onClickAcceptEdit);
+  useKeyPressEvent('Escape', onClickClose);
 
   return (
     <div ref={inputRef}>
@@ -81,14 +81,14 @@ export const ListItemInput = ({
               height={16}
               color="gray"
               isDisabled={!value || value === label}
-              onClick={handleClickAcceptEdit}
+              onClick={onClickAcceptEdit}
             />
             <StyledIcon
               name="close"
-              width={12}
-              height={12}
+              width={16}
+              height={16}
               color="gray"
-              onClick={handleClickClose}
+              onClick={onClickClose}
             />
           </>
         }

@@ -1,34 +1,36 @@
 import React from 'react';
 import { useDispatch } from 'react-redux';
+import { getPlural } from '@caesar/common/utils/string';
 import { removeListRequest } from '@caesar/common/actions/entities/list';
 import { ConfirmModal } from '@caesar/components';
 
 export const ConfirmRemoveListModal = ({
   item,
   isOpenedPopup,
-  setIsOpenedPopup,
+  setOpenedPopup,
 }) => {
   const dispatch = useDispatch();
   const { id, label, children = [] } = item;
 
   const handleClickConfirmRemove = () => {
     dispatch(removeListRequest(id));
-    setIsOpenedPopup(false);
+    setOpenedPopup(false);
   };
 
   return (
     <ConfirmModal
-      isOpen={!!isOpenedPopup}
+      isOpened={!!isOpenedPopup}
       title={`You are going to remove «${label}» list`}
       // TODO: Full text when share list will be implemented
       // 'You delete 20 items and 15 people lose access'
-      description={`You will delete ${children?.length} item${
-        children?.length === 1 ? '' : 's'
-      }`}
+      description={`You will delete ${children?.length} ${getPlural(
+        children?.length,
+        ['item', 'items'],
+      )} `}
       icon="trash"
       confirmBtnText="Remove"
       onClickConfirm={handleClickConfirmRemove}
-      onClickCancel={() => setIsOpenedPopup(false)}
+      onClickCancel={() => setOpenedPopup(false)}
     />
   );
 };

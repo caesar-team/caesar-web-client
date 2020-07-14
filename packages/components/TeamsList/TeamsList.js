@@ -35,7 +35,7 @@ const StyledAvatar = styled(Avatar)`
 const TeamsListComponent = ({
   activeTeamId,
   handleToggle,
-  setIsListsOpened,
+  setListsOpened,
 }) => {
   const dispatch = useDispatch();
   const user = useSelector(userDataSelector);
@@ -49,7 +49,7 @@ const TeamsListComponent = ({
 
   const handleChangeTeam = teamId => {
     handleToggle();
-    setIsListsOpened(true);
+    setListsOpened(true);
 
     if (currentTeam?.id !== teamId) {
       dispatch(setCurrentTeamId(teamId));
@@ -64,7 +64,7 @@ const TeamsListComponent = ({
             handleChangeTeam(TEAM_TYPE.PERSONAL);
           }}
         >
-          <StyledAvatar {...user} isSmall />
+          <StyledAvatar {...user} size={32} fontSize="small" />
           Personal
         </Option>
       )}
@@ -76,7 +76,7 @@ const TeamsListComponent = ({
               handleChangeTeam(team.id);
             }}
           >
-            <StyledAvatar avatar={team.icon} isSmall />
+            <StyledAvatar avatar={team.icon} size={32} fontSize="small" />
             {team.title.toLowerCase() === TEAM_TYPE.DEFAULT
               ? TEAM_TEXT_TYPE[TEAM_TYPE.DEFAULT]
               : team.title}

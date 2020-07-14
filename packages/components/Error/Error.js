@@ -7,6 +7,7 @@ import ErrorImg2x from '@caesar/assets/images/error@2x.jpg';
 const Image = styled.img`
   object-fit: contain;
 `;
+import { ErrorLayout } from '@caesar/components';
 
 const TextWrapper = styled.div`
   position: absolute;

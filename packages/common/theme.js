@@ -3,7 +3,8 @@ const theme = {
     black: '#000',
     emperor: '#505050',
     gray: '#888',
-    lightGray: '#cccccc',
+    lightGray: '#ccc',
+    lighterGray: 'rgba(136, 136, 136, 0.3)',
     gallery: '#eaeaea',
     alto: '#f5f5f5',
     snow: '#fbf9f9',
@@ -32,12 +33,12 @@ const theme = {
   },
   zIndex: {
     hidden: -1,
-    basic: 1,
-    upBasic: 2,
-    overlay: 3,
-    dropdown: 4,
-    modal: 5,
-    notification: 6,
+    basic: 11,
+    upBasic: 12,
+    overlay: 13,
+    dropdown: 14,
+    modal: 15,
+    notification: 16,
   },
 };
 

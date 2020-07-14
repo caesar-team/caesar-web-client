@@ -96,21 +96,14 @@ const SignInForm = ({ onSubmit }) => (
     initialValues={{ email: '', password: '' }}
     validationSchema={schema}
   >
-    {({
-      errors,
-      touched,
-      handleSubmit,
-      setFieldTouched,
-      isSubmitting,
-      isValid,
-    }) => (
+    {({ errors, touched, handleSubmit, handleBlur, isSubmitting, isValid }) => (
       <Form onSubmit={handleSubmit}>
         <Row>
           <FastField name="email">
             {({ field }) => (
               <StyledEmailInput
                 {...field}
-                onBlur={setFieldTouched}
+                onBlur={handleBlur}
                 placeholder="Email"
                 prefix={EmailInputPrefix}
               />
@@ -125,7 +118,7 @@ const SignInForm = ({ onSubmit }) => (
             {({ field }) => (
               <StyledPasswordInput
                 {...field}
-                onBlur={setFieldTouched}
+                onBlur={handleBlur}
                 placeholder="Password"
                 prefix={PasswordInputPrefix}
               />

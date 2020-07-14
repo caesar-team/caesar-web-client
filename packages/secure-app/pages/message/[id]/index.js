@@ -20,13 +20,16 @@ const MessagePage = ({ statusCode, message, password }) => (
 MessagePage.getInitialProps = async ({ query }) => {
   let { id } = query;
   let password;
+
   if (id.length > 0 && !UUID_REGEXP.test(id)) {
     const plObject = base64ToObject(id);
+
     if (!plObject || typeof plObject.messageId === 'undefined') {
       logger.error(`The messageId not found, args: %o`, query);
 
       return { statusCode: 404 };
     }
+
     id = plObject.messageId;
     password = plObject.password;
   }

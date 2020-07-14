@@ -289,7 +289,7 @@ class TeamContainer extends Component {
       width: columnWidths.name,
       Cell: ({ original }) => (
         <NameField>
-          <Avatar isSmall {...original} />
+          <Avatar size={32} fontSize="small" {...original} />
           <Name>{original.name}</Name>
         </NameField>
       ),
@@ -482,12 +482,9 @@ class TeamContainer extends Component {
 
     const isDefaultTeam = team.type === TEAM_TYPE.DEFAULT;
 
-    const teamUsers = team.users
-      ? team.users.filter(({ id }) => id !== user.id)
-      : [];
-    const members = this.getMemberList(teamUsers, membersById);
+    const members = this.getMemberList(team.users, membersById);
     const filteredMembersList = this.filterMemberList(
-      teamUsers,
+      team.users,
       filter,
       membersById,
     );

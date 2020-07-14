@@ -35,7 +35,7 @@ const StyledButton = styled(Button)`
 `;
 
 const ConfirmModal = ({
-  isOpen,
+  isOpened,
   title = 'Warning',
   description,
   icon,
@@ -44,7 +44,7 @@ const ConfirmModal = ({
   onClickCancel,
 }) => (
   <Modal
-    isOpen={isOpen}
+    isOpened={isOpened}
     shouldCloseOnEsc
     shouldCloseOnOverlayClick
     onRequestClose={onClickCancel}

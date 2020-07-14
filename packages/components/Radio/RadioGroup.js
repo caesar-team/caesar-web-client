@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import styled from 'styled-components';
-import Radio from './Radio';
+import { Radio } from './Radio';
 
 const RadioGroupStyled = styled.div`
   display: flex;
@@ -30,6 +30,7 @@ class RadioGroup extends Component {
             key: value,
             name,
             value,
+            label,
             data,
             checked: value === valueFromProps,
             disabled,
@@ -40,11 +41,7 @@ class RadioGroup extends Component {
             return renderer({ ...radioProps });
           }
 
-          return (
-            <Radio type="radio" {...radioProps}>
-              {label}
-            </Radio>
-          );
+          return <Radio type="radio" {...radioProps} />;
         })}
       </RadioGroupStyled>
     );
@@ -53,4 +50,4 @@ class RadioGroup extends Component {
 
 RadioGroup.Radio = RadioGroup;
 
-export default RadioGroup;
+export { RadioGroup };

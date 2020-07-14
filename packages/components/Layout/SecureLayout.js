@@ -1,7 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
 import { media } from '@caesar/assets/styles/media';
-import { APP_VERSION } from '@caesar/common/constants';
+import { AppVersion } from '../AppVersion';
 import LayoutConstructor from './LayoutConstructor';
 import { SecureHeader } from './SecureHeader';
 import { AppVersion } from './AppVersion';
@@ -80,7 +80,7 @@ const SecureLayout = props => {
   return (
     <LayoutConstructorStyled
       headerComponent={<SecureHeader />}
-      footerComponent={<AppVersion>{APP_VERSION}</AppVersion>}
+      footerComponent={<AppVersion />}
       {...props}
     />
   );

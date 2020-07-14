@@ -1,10 +1,10 @@
 import { uuid4 } from '@caesar/common/utils/uuid4';
 import { LIST_TYPE } from '@caesar/common/constants';
 
-export const getFavoritesList = itemsById => {
+export const getFavoritesList = (itemsById, trashListId) => {
   const favoriteListId = uuid4();
   const favorites = Object.values(itemsById)
-    .filter(({ favorite }) => favorite)
+    .filter(({ favorite, listId }) => favorite && listId !== trashListId)
     .map(({ id }) => id);
 
   return {

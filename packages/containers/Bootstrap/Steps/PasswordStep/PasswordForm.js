@@ -75,21 +75,14 @@ const PasswordForm = ({ onSubmit }) => (
     initialValues={initialValues}
     validationSchema={schema}
   >
-    {({
-      errors,
-      touched,
-      handleSubmit,
-      setFieldTouched,
-      isSubmitting,
-      isValid,
-    }) => (
+    {({ errors, touched, handleSubmit, handleBlur, isSubmitting, isValid }) => (
       <Form onSubmit={handleSubmit}>
         <Row>
           <FastField name="password">
             {({ field }) => (
               <StyledPasswordInput
                 {...field}
-                onBlur={setFieldTouched}
+                onBlur={handleBlur}
                 placeholder="Password"
                 prefix={PasswordInputPrefix}
               />
@@ -104,7 +97,7 @@ const PasswordForm = ({ onSubmit }) => (
             {({ field }) => (
               <StyledPasswordInput
                 {...field}
-                onBlur={setFieldTouched}
+                onBlur={handleBlur}
                 placeholder="Confirm password"
                 prefix={PasswordInputPrefix}
               />

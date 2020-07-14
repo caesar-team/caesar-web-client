@@ -45,13 +45,11 @@ const MiddleColumnComponent = ({
   const teamsTrashLists = useSelector(teamsTrashListsSelector);
   const itemsById = useSelector(itemsByIdSelector);
 
-  const isMultiItem = workInProgressItemIds && workInProgressItemIds.length > 0;
-  const isInboxList =
-    workInProgressList && workInProgressList.type === LIST_TYPE.INBOX;
+  const isMultiItem = workInProgressItemIds?.length > 0;
+  const isInboxList = workInProgressList?.type === LIST_TYPE.INBOX;
   const isTrashList =
-    workInProgressList &&
-    (workInProgressList.id === trashList.id ||
-      teamsTrashLists.map(({ id }) => id).includes(workInProgressList.id));
+    (workInProgressList?.id === trashList?.id ||
+      teamsTrashLists?.map(({ id }) => id).includes(workInProgressList?.id));
 
   const searchedItems = filter(Object.values(itemsById), searchedText);
 

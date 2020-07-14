@@ -1,0 +1,1 @@
+export { LogoCaesarDomain } from './LogoCaesarDomain';

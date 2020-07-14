@@ -7,6 +7,9 @@ import { currentTeamSelector } from '@caesar/common/selectors/user';
 import {
   personalListsByTypeSelector,
   currentTeamListsSelector,
+  inboxSelector,
+  favoritesSelector,
+  trashSelector,
 } from '@caesar/common/selectors/entities/list';
 import { workInProgressListSelector } from '@caesar/common/selectors/workflow';
 import {
@@ -15,6 +18,7 @@ import {
   resetWorkInProgressItemIds,
 } from '@caesar/common/actions/workflow';
 import { sortListRequest } from '@caesar/common/actions/entities/list';
+import { withNotification } from '@caesar/components/Notification';
 import { Icon } from '../../Icon';
 import { ListItem } from './ListItem';
 import { MenuItemInner } from './styledComponents';
@@ -22,8 +26,15 @@ import { MenuItemInner } from './styledComponents';
 const MenuItem = styled.div``;
 
 const MenuItemTitle = styled.div`
+  display: flex;
+  align-items: center;
+  flex-grow: 1;
   padding-left: 16px;
   margin-right: auto;
+`;
+
+const MenuItemCounter = styled.span`
+  margin-left: auto;
 `;
 
 const ListAddIcon = styled(Icon)`
@@ -67,7 +78,8 @@ const MenuListInnerComponent = ({
   setSearchedText,
   setMode,
   isListsOpened,
-  setIsListsOpened,
+  setListsOpened,
+  notification,
 }) => {
   const dispatch = useDispatch();
   const currentTeam = useSelector(currentTeamSelector);
@@ -75,8 +87,11 @@ const MenuListInnerComponent = ({
   const personalLists = useSelector(personalListsByTypeSelector);
   const teamLists = useSelector(currentTeamListsSelector);
   const workInProgressList = useSelector(workInProgressListSelector);
+  const inbox = useSelector(inboxSelector);
+  const favorites = useSelector(favoritesSelector);
+  const trash = useSelector(trashSelector);
   const activeListId = workInProgressList && workInProgressList.id;
-  const [isCreatingMode, setIsCreatingMode] = useState(false);
+  const [isCreatingMode, setCreatingMode] = useState(false);
 
   const handleClickMenuItem = id => {
     dispatch(setWorkInProgressListId(id));
@@ -96,8 +111,8 @@ const MenuListInnerComponent = ({
 
   const handleClickAddList = event => {
     event.stopPropagation();
-    setIsListsOpened(true);
-    setIsCreatingMode(true);
+    setListsOpened(true);
+    setCreatingMode(true);
   };
 
   const handleDragEnd = ({ draggableId, source, destination }) => {
@@ -117,13 +132,15 @@ const MenuListInnerComponent = ({
 
   const menuList = [
     {
-      id: isPersonal ? personalLists.inbox?.id : '',
+      id: isPersonal ? personalLists.inbox?.id : null,
       title: 'Inbox',
+      length: isPersonal ? inbox?.children?.length : null,
       icon: 'inbox',
     },
     {
       id: isPersonal ? personalLists.favorites?.id : teamLists.favorites?.id,
       title: 'Favorites',
+      length: isPersonal ? favorites?.children?.length : null,
       icon: 'favorite',
     },
     {
@@ -141,6 +158,7 @@ const MenuListInnerComponent = ({
     {
       id: isPersonal ? personalLists.trash?.id : teamLists.trash?.id,
       title: 'Trash',
+      length: isPersonal ? trash?.children?.length : null,
       icon: 'trash',
     },
     {
@@ -150,7 +168,7 @@ const MenuListInnerComponent = ({
     },
   ];
 
-  return menuList.map(({ id, icon, title, children }) => {
+  return menuList.map(({ id, icon, title, length, children }) => {
     const withChildren = id === 'lists';
 
     return (
@@ -170,12 +188,17 @@ const MenuListInnerComponent = ({
               }
 
               return withChildren
-                ? setIsListsOpened(!isListsOpened)
+                ? setListsOpened(!isListsOpened)
                 : handleClickMenuItem(id);
             }}
           >
             <Icon name={icon} width={16} height={16} />
-            <MenuItemTitle>{title}</MenuItemTitle>
+            <MenuItemTitle>
+              {title}
+              {typeof length === 'number' && (
+                <MenuItemCounter>{length}</MenuItemCounter>
+              )}
+            </MenuItemTitle>
             {withChildren && (
               <>
                 <ListAddIcon
@@ -198,7 +221,8 @@ const MenuListInnerComponent = ({
               {id === 'lists' && isCreatingMode && (
                 <ListItem
                   isCreatingMode={isCreatingMode}
-                  setIsCreatingMode={setIsCreatingMode}
+                  setCreatingMode={setCreatingMode}
+                  notification={notification}
                 />
               )}
               {children && (
@@ -216,6 +240,7 @@ const MenuListInnerComponent = ({
                             item={item}
                             activeListId={activeListId}
                             index={index}
+                            notification={notification}
                             handleClickMenuItem={handleClickMenuItem}
                           />
                         ))}
@@ -233,4 +258,4 @@ const MenuListInnerComponent = ({
   });
 };
 
-export const MenuListInner = memo(MenuListInnerComponent);
+export const MenuListInner = memo(withNotification(MenuListInnerComponent));

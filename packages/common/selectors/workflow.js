@@ -2,6 +2,8 @@ import { createSelector } from 'reselect';
 import {
   listsByIdSelector,
   extendedSortedCustomizableListsSelector,
+  favoritesSelector,
+  trashListSelector,
 } from '@caesar/common/selectors/entities/list';
 import { itemsByIdSelector } from '@caesar/common/selectors/entities/item';
 import { childItemsByIdSelector } from '@caesar/common/selectors/entities/childItem';
@@ -135,7 +137,7 @@ export const shouldLoadNodesSelector = createSelector(
   lists => !lists.length,
 );
 
-export const visibleListItemsSelector = createSelector(
+export const chosenListItemsSelector = createSelector(
   listsByIdSelector,
   itemsByIdSelector,
   workInProgressListIdSelector,
@@ -143,10 +145,34 @@ export const visibleListItemsSelector = createSelector(
     listsById && workInProgressListId && listsById[workInProgressListId]
       ? listsById[workInProgressListId].children.reduce(
           (accumulator, itemId) =>
-            itemsById[itemId] && itemsById[itemId].data
-              ? accumulator.concat(itemsById[itemId])
+            itemsById[itemId]?.data
+              ? [...accumulator, itemsById[itemId]]
               : accumulator,
           [],
         )
       : [],
+);
+
+export const favoriteListItemsSelector = createSelector(
+  chosenListItemsSelector,
+  trashListSelector,
+  (visibleItems, trashList) =>
+    visibleItems.filter(item => item.listId !== trashList.id),
+);
+
+export const visibleListItemsSelector = createSelector(
+  chosenListItemsSelector,
+  favoriteListItemsSelector,
+  workInProgressListIdSelector,
+  favoritesSelector,
+  (chosenItems, favoriteItems, workInProgressListId, favoriteList) => {
+    const isFavoriteList = workInProgressListId === favoriteList.id;
+
+    switch (true) {
+      case isFavoriteList:
+        return favoriteItems;
+      default:
+        return chosenItems;
+    }
+  },
 );

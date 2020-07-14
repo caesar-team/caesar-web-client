@@ -1,3 +1,4 @@
+import Router from 'next/router';
 import {
   put,
   call,
@@ -90,7 +91,6 @@ import {
 import {
   favoritesSelector,
   listSelector,
-  allTrashListIdsSelector,
 } from '@caesar/common/selectors/entities/list';
 import {
   itemsBatchSelector,
@@ -143,6 +143,7 @@ import {
   MOVING_IN_PROGRESS_NOTIFICATION,
   REMOVING_IN_PROGRESS_NOTIFICATION,
   NOOP_NOTIFICATION,
+  ROUTES,
 } from '@caesar/common/constants';
 import { generateSharingUrl } from '@caesar/common/utils/sharing';
 import { createMemberSaga } from './member';
@@ -331,19 +332,12 @@ export function* toggleItemToFavoriteSaga({ payload: { itemId } }) {
   }
 }
 
-export function* moveItemSaga({ payload: { itemId, listId } }) {
+export function* moveItemSaga({ payload: { itemId, teamId, listId } }) {
   try {
     yield put(updateGlobalNotification(MOVING_IN_PROGRESS_NOTIFICATION, true));
 
     const item = yield select(itemSelector, { itemId });
     const childItemIds = item.invited;
-
-    const allTrashListIds = yield select(allTrashListIdsSelector);
-
-    const oldList = yield select(listSelector, {
-      listId: item.listId,
-    });
-    const newList = yield select(listSelector, { listId });
 
     yield call(updateMoveItem, item.id, {
       listId,
@@ -353,21 +347,17 @@ export function* moveItemSaga({ payload: { itemId, listId } }) {
 
     yield put(updateGlobalNotification(NOOP_NOTIFICATION, false));
 
-    if (item.favorite && allTrashListIds.includes(listId)) {
-      yield fork(toggleItemToFavoriteSaga, { payload: { itemId } });
+    if (item.teamId !== teamId) {
+      yield put(updateItemField(item.id, 'teamId', teamId));
     }
 
-    if (oldList.teamId !== newList.teamId) {
-      yield put(updateItemField(item.id, 'teamId', newList.teamId));
-    }
-
-    if (!oldList.teamId && newList.teamId) {
+    if (!item.teamId && teamId) {
       yield fork(shareItemBatchSaga, {
         payload: {
           data: {
             itemIds: [item.id],
             members: [],
-            teamIds: [newList.teamId],
+            teamIds: [teamId],
           },
           options: {
             includeIniciator: false,
@@ -376,14 +366,14 @@ export function* moveItemSaga({ payload: { itemId, listId } }) {
       });
     }
 
-    if (oldList.teamId && !newList.teamId) {
+    if (item.teamId && !teamId) {
       yield put(removeChildItemsBatchFromItem(item.id, childItemIds));
       yield put(removeChildItemsBatch(childItemIds));
 
       yield put(updateGlobalNotification(NOOP_NOTIFICATION, false));
     }
 
-    if (oldList.teamId && newList.teamId && oldList.teamId !== newList.teamId) {
+    if (item.teamId && teamId && item.teamId !== teamId) {
       yield put(removeChildItemsBatchFromItem(item.id, childItemIds));
       yield put(removeChildItemsBatch(childItemIds));
 
@@ -392,7 +382,7 @@ export function* moveItemSaga({ payload: { itemId, listId } }) {
           data: {
             itemIds: [item.id],
             members: [],
-            teamIds: [newList.teamId],
+            teamIds: [teamId],
           },
           options: {
             includeIniciator: false,
@@ -512,6 +502,8 @@ export function* createItemSaga({
         yield put(updateWorkInProgressItem());
       }
     }
+
+    yield call(Router.push, ROUTES.DASHBOARD);
   } catch (error) {
     console.log(error);
     yield put(
@@ -628,7 +620,10 @@ export function* updateItemSaga({ payload: { item } }) {
   }
 }
 
-export function* editItemSaga({ payload: { item }, meta: { setSubmitting } }) {
+export function* editItemSaga({
+  payload: { item },
+  meta: { setSubmitting, notification },
+}) {
   try {
     const { listId, attachments, type, ...data } = item;
 
@@ -666,6 +661,9 @@ export function* editItemSaga({ payload: { item }, meta: { setSubmitting } }) {
     }
 
     yield put(updateWorkInProgressItem(editedItem.id, ITEM_MODE.REVIEW));
+    yield call(notification.show, {
+      text: `The '${item.name}' has been updated`,
+    });
   } catch (error) {
     console.log(error);
     yield put(

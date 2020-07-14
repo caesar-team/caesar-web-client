@@ -1,9 +1,11 @@
+export { FormInput } from './FormInput';
+export { FormTextArea } from './FormTextArea';
+export { Input } from './Input';
 export { default as LockInput } from './LockInput';
-export { default as Input } from './Input';
-export { default as PasswordInput } from './PasswordInput';
 export { default as MasterPasswordInput } from './MasterPasswordInput';
-export { default as TextArea } from './TextArea';
-export { default as ShareInput } from './ShareInput';
+export { default as PasswordInput } from './PasswordInput';
 export { default as SearchInput } from './SearchInput';
+export { default as ShareInput } from './ShareInput';
 export { default as StrengthIndicator } from './StrengthIndicator';
+export { TextArea } from './TextArea';
 export { default as UserSearchInput } from './UserSearchInput';

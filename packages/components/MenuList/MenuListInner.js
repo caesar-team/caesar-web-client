@@ -92,7 +92,7 @@ const MenuListInnerComponent = ({ mode, setSearchedText, setMode }) => {
   const teamLists = useSelector(currentTeamListsSelector);
   const workInProgressList = useSelector(workInProgressListSelector);
   const activeListId = workInProgressList && workInProgressList.id;
-  const [isListsOpened, setIsListsOpened] = useState(true);
+  const [isListsOpened, setListsOpened] = useState(true);
 
   const handleClickMenuItem = id => {
     dispatch(setWorkInProgressListId(id));
@@ -163,7 +163,7 @@ const MenuListInnerComponent = ({ mode, setSearchedText, setMode }) => {
               }
 
               return children
-                ? setIsListsOpened(!isListsOpened)
+                ? setListsOpened(!isListsOpened)
                 : handleClickMenuItem(id);
             }}
           >

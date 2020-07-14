@@ -43,7 +43,8 @@ const OptionsList = styled.div`
 `;
 
 const Option = styled.button`
-  padding: 10px 30px;
+  padding: 0;
+  font-size: ${({ theme }) => theme.font.size.main};
   border: none;
   background: none;
   cursor: pointer;
@@ -55,10 +56,11 @@ const Option = styled.button`
 `;
 
 const Button = styled.button`
+  padding: 0;
+  font-size: ${({ theme }) => theme.font.size.main};
   border: none;
   background-color: transparent;
   outline: none;
-  padding: 0;
   cursor: pointer;
 `;
 
@@ -74,10 +76,10 @@ const DropdownComponent = ({
   onToggle,
   className,
 }) => {
-  const [isOpened, setIsOpened] = useState(false);
+  const [isOpened, setOpened] = useState(false);
 
   const handleToggle = () => {
-    setIsOpened(!isOpened);
+    setOpened(!isOpened);
   };
 
   const handleClick = value => () => {
@@ -113,7 +115,7 @@ const DropdownComponent = ({
 
   const dropdownRef = useRef(null);
   useClickAway(dropdownRef, () => {
-    setIsOpened(false);
+    setOpened(false);
   });
 
   return (
@@ -138,5 +140,7 @@ const Dropdown = memo(DropdownComponent);
 
 Dropdown.Button = Button;
 Dropdown.Box = Box;
+Dropdown.OptionsList = OptionsList;
+Dropdown.Option = Option;
 
 export { Dropdown };

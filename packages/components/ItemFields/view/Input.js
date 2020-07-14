@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useCopyToClipboard } from 'react-use';
+import { useCopyToClipboard, useAsync } from 'react-use';
 import styled from 'styled-components';
 import { Input } from '../../Input';
 import { Icon } from '../../Icon';
@@ -80,6 +80,7 @@ const InputComponent = ({
   name,
   placeholder,
   value: propValue,
+  schema,
   originalValue,
   autoComplete,
   withCopyButton = true,
@@ -106,6 +107,14 @@ const InputComponent = ({
     setIsEdit(false);
   };
 
+  const validationState = useAsync(async () => {
+    if (!schema) return null;
+
+    const result = await schema.validate(value);
+
+    return result;
+  }, [value, schema]);
+
   return (
     <Wrapper withLabel={label} className={className}>
       {isEdit ? (
@@ -114,9 +123,10 @@ const InputComponent = ({
           type={type}
           label={label}
           value={value}
+          error={validationState?.error?.message}
           placeholder={placeholder}
           autoComplete={autoComplete}
-          isAcceptIconDisabled={!value}
+          isAcceptIconDisabled={!value || validationState?.error?.message}
           onChange={e => setValue(e.target.value)}
           onClickAcceptEdit={() => {
             onClickAcceptEdit({ name, value });

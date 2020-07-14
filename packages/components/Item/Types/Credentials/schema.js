@@ -1,6 +1,5 @@
 import * as yup from 'yup';
-import { ERROR } from '@caesar/common/validation/constants';
-import { attachmentsSchema } from '@caesar/common/validation/schema';
+import { SCHEMA, ERROR } from '@caesar/common/validation';
 
 const URL_REGEXP = /(http(s)?:\/\/.)?(www\.)?[-a-zA-Z0-9@:%._+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_+.~#?&//=]*)/;
 
@@ -13,5 +12,5 @@ export const schema = yup.object({
     message: 'Incorrect format for website',
   }),
   note: yup.string(),
-  attachments: attachmentsSchema,
+  attachments: SCHEMA.ATTACHMENTS,
 });

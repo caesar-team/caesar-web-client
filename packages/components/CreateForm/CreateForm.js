@@ -5,7 +5,7 @@ import { useFormik } from 'formik';
 import styled from 'styled-components';
 import { createItemRequest } from '@caesar/common/actions/entities/item';
 import { FormByType, FormHeader, FormFooter } from './components';
-import { getInitialValues } from './utils';
+import { getInitialValues, getValidationSchema } from './utils';
 
 const Form = styled.form`
   padding: 8px 0 88px;
@@ -25,6 +25,7 @@ export const CreateForm = () => {
 
   const formik = useFormik({
     initialValues: getInitialValues(query.type, query.listId),
+    validationSchema: getValidationSchema(query.type),
     onSubmit: handleCreate,
   });
   const { values, setFieldValue, handleSubmit } = formik;
@@ -43,7 +44,7 @@ export const CreateForm = () => {
         onChangePath={handleChangePath}
       />
       <FormByType type={query.type} formik={formik} />
-      <FormFooter onSubmit={handleSubmit} />
+      <FormFooter formik={formik} />
     </Form>
   );
 };

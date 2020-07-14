@@ -39,7 +39,9 @@ const SecureAppLogo = ({ href }) => {
 
 const MainAppLogo = ({ href, width, height }) => (
   <Link passHref href={href}>
-    <LogoCaesarDomain width={width} height={height} />
+    <LogoLink>
+      <LogoCaesarDomain width={width} height={height} />
+    </LogoLink>
   </Link>
 );
 

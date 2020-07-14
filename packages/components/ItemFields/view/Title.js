@@ -32,10 +32,11 @@ const StyledInput = styled(Input)`
   }
 `;
 
-export const Title = ({ value, onClickAcceptEdit }) => {
+export const Title = ({ value, schema, onClickAcceptEdit }) => {
   return (
     <StyledInput
       value={value}
+      schema={schema}
       name="name"
       placeholder="Enter the title"
       withCopyButton={false}

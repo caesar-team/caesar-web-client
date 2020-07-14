@@ -35,7 +35,7 @@ const ItemComponent = ({
   const trashList = useSelector(trashListSelector);
   const teamsTrashLists = useSelector(teamsTrashListsSelector);
   const [isSubmitting, setSubmitting] = useState(false);
-  const [isMoveModalOpened, setIsMoveModalOpened] = useState(false);
+  const [isMoveModalOpened, setMoveModalOpened] = useState(false);
 
   if (!item) {
     return <EmptyItem />;
@@ -65,7 +65,7 @@ const ItemComponent = ({
       <ItemHeader
         item={item}
         onClickShare={onClickShare}
-        onClickMove={() => setIsMoveModalOpened(true)}
+        onClickMove={() => setMoveModalOpened(true)}
         onClickRestoreItem={handleClickRestoreItem}
         onClickRemoveItem={onClickRemoveItem}
       />
@@ -78,7 +78,7 @@ const ItemComponent = ({
       <MoveModal
         item={item}
         isOpened={isMoveModalOpened}
-        closeModal={() => setIsMoveModalOpened(false)}
+        closeModal={() => setMoveModalOpened(false)}
       />
     </Wrapper>
   );

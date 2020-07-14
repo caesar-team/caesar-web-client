@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { useCopyToClipboard, useAsync } from 'react-use';
+import { useAsync } from 'react-use';
+import copy from 'copy-text-to-clipboard';
 import styled from 'styled-components';
 import { Input } from '../../Input';
 import { Icon } from '../../Icon';
@@ -93,10 +94,9 @@ const InputComponent = ({
 }) => {
   const [isEdit, setIsEdit] = useState(false);
   const [value, setValue] = useState(originalValue || propValue);
-  const [, copyToClipboard] = useCopyToClipboard();
 
   const handleClickCopy = () => {
-    copyToClipboard(originalValue || propValue);
+    copy(originalValue || propValue);
     notification.show({
       text: `The ${label.toLowerCase()} has been copied.`,
     });

@@ -110,6 +110,8 @@ class MoveModal extends Component {
         isClosable
         key={item.id}
         onClickClose={this.handleCloseItem(item.id)}
+        hasHover={false}
+        isInModal
         {...item}
       />
     ));

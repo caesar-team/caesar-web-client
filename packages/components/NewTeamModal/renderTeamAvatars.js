@@ -157,7 +157,7 @@ export const renderTeamAvatars = ({ icon }, setFieldValue) => {
         );
       }
 
-      return errors.length && <Error>{errors}</Error>;
+      return errors;
     }
 
     return null;

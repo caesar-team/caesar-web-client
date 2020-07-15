@@ -12,9 +12,10 @@ import {
   moveItemRequest,
   editItemRequest,
 } from '@caesar/common/actions/entities/item';
+import { MoveModal } from '@caesar/components';
 import { EmptyItem } from './EmptyItem';
 import { ItemByType } from './ItemByType';
-import { ItemHeader, MoveModal } from './components';
+import { ItemHeader } from './components';
 
 const Wrapper = styled.div`
   ${({ isDisabled }) =>

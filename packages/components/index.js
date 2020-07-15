@@ -37,7 +37,7 @@ export {
   UserSearchInput,
 } from './Input';
 export { InviteModal } from './InviteModal';
-export { Item, MultiItem, Credentials, Document } from './ItemNew';
+export { Item, MultiItem, Credentials, Document } from './Item';
 export { Label } from './Label';
 export {
   AuthLayout,
@@ -60,7 +60,7 @@ export { MenuList } from './MenuList';
 export { Modal, ModalTitle, ModalSubtitle } from './Modal';
 export { MoveModal } from './MoveModal';
 export { NavigationPanel } from './NavigationPanel';
-export { NewTeamModal } from './NewTeamModal'; // Delete ??
+export { NewTeamModal } from './NewTeamModal'; // TODO: Delete ??
 export {
   GlobalNotification,
   NotificationConsumer,

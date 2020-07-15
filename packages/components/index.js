@@ -1,4 +1,4 @@
-export { AbilityProvider, Can, AbilityContext } from './Ability';
+export { AbilityProvider, Can } from './Ability';
 export { AddItem } from './AddItem';
 export { AppVersion } from './AppVersion';
 export { AuthDescription } from './AuthDescription';

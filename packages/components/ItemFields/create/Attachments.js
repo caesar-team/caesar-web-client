@@ -42,10 +42,10 @@ const renderAttachments = (
   attachments = [],
   errors = [],
   setFieldValue,
-  isSubmitting,
+  disabled,
 ) =>
   attachments.map((attachment, index) => (
-    <FileRow key={index} disabled={isSubmitting}>
+    <FileRow key={index} disabled={disabled}>
       <File
         key={index}
         status={checkAttachmentsError(errors, index) ? 'error' : 'uploaded'}
@@ -64,27 +64,26 @@ const renderAttachments = (
     </FileRow>
   ));
 
-export const Attachments = ({ value, error, setFieldValue }) => {
-  return (
-    <>
-      <Title>Attachments</Title>
-      <StyledUploader
-        multiple
-        asPreview
-        name="attachments"
-        files={value}
-        error={typeof error === 'string' ? error : ''}
-        onChange={setFieldValue}
-        // disabled={isSubmitting}
-      />
-      <AttachmentsRow>
-        {renderAttachments(
-          value,
-          error,
-          setFieldValue,
-          // isSubmitting,
-        )}
-      </AttachmentsRow>
-    </>
-  );
-};
+export const Attachments = ({
+  name,
+  value,
+  error,
+  setFieldValue,
+  disabled,
+}) => (
+  <>
+    <Title>Attachments</Title>
+    <StyledUploader
+      multiple
+      asPreview
+      name={name}
+      files={value}
+      error={typeof error === 'string' ? error : ''}
+      onChange={setFieldValue}
+      disabled={disabled}
+    />
+    <AttachmentsRow>
+      {renderAttachments(value, error, setFieldValue, disabled)}
+    </AttachmentsRow>
+  </>
+);

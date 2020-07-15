@@ -7,6 +7,7 @@ const Label = styled.label`
   display: block;
   position: relative;
   width: 100%;
+  ${({ isError }) => isError && 'margin-bottom: 24px;'}
 `;
 
 const LabelText = styled.div`
@@ -93,8 +94,10 @@ const StyledIcon = styled(Icon)`
 `;
 
 const Error = styled.div`
-  padding-left: 15px;
-  margin-top: 8px;
+  position: absolute;
+  top: 100%;
+  left: 0;
+  padding-left: 16px;
   font-size: 14px;
   color: ${({ theme }) => theme.color.red};
 `;
@@ -125,11 +128,11 @@ const Input = ({
     setIsFocused(true);
   };
 
-  const handleBlur = () => {
+  const handleBlur = e => {
     setIsFocused(false);
 
     if (onBlur) {
-      onBlur(name, true);
+      onBlur(e);
     }
   };
 
@@ -138,7 +141,7 @@ const Input = ({
   useKeyPressEvent('Escape', onClickClose);
 
   return (
-    <Label ref={inputRef} className={className}>
+    <Label ref={inputRef} isError={!!error} className={className}>
       {label && (
         <LabelText isFocused={isFocused} value={value}>
           {label}

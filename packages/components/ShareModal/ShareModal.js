@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
-import { useEffectOnce, useUpdateEffect, useCopyToClipboard } from 'react-use';
+import { useEffectOnce, useUpdateEffect } from 'react-use';
 import { useSelector } from 'react-redux';
+import copy from 'copy-text-to-clipboard';
 import styled from 'styled-components';
 import { userDataSelector } from '@caesar/common/selectors/user';
 import { Modal, ModalTitle, ModalSubtitle } from '../Modal';
@@ -55,7 +56,6 @@ export const ShareModal = ({
   const [link, setLink] = useState(null);
   const [isGeneratingLink, setIsGeneratingLink] = useState(false);
   const user = useSelector(userDataSelector);
-  const [, copyToClipboard] = useCopyToClipboard();
 
   const handleAddMember = member => {
     setMembers([...members, member]);
@@ -84,7 +84,7 @@ export const ShareModal = ({
   };
 
   const handleCopy = () => {
-    copyToClipboard(link);
+    copy(link);
 
     notification.show({
       text: `The shared link has been copied`,

@@ -21,21 +21,29 @@ const Row = styled.div`
     isActive ? theme.color.white : 'transparent'};
   border-top: 1px solid transparent;
   border-bottom: 1px solid transparent;
-  cursor: pointer;
   transition: all 0.2s;
 
-    &:hover {
-      background: ${({ theme }) => theme.color.white};
-      border-top-color: ${({ theme }) => theme.color.gallery};
-      border-bottom-color: ${({ theme }) => theme.color.gallery};
-    }
-
-  ${({ isMultiItem, isActive, theme }) =>
-    isActive &&
-    isMultiItem &&
+  ${({ hasHover, theme }) => 
+    hasHover && 
     `
-      background: ${theme.color.gallery};
+      cursor: pointer;
+
+      &:hover {
+        background: ${theme.color.white};
+        border-top-color: ${theme.color.gallery};
+        border-bottom-color: ${theme.color.gallery};
+      }
     `}
+
+  ${({ isMultiItem, isActive, isInModal, theme }) => {
+    if (isActive && isMultiItem) {
+      return `background: ${theme.color.gallery};`; 
+    }
+  
+    if (isInModal) {
+      return `background: ${theme.color.snow};`;
+    }
+  }}
 
   ${({ isActive, theme }) =>
     isActive &&
@@ -82,6 +90,12 @@ const Addon = styled.div`
   align-items: center;
   margin-left: 16px;
   color: ${({ theme }) => theme.color.gray};
+
+  ${({ isInModal }) => isInModal && `
+    &:last-of-type {
+      margin-right: 60px;
+    }
+  `};
 `;
 
 const AddonText = styled.div`
@@ -89,16 +103,18 @@ const AddonText = styled.div`
   font-size: ${({ theme }) => theme.font.size.small};
 `;
 
-const Favorite = styled(Icon)`
-  position: absolute;
-  top: 4px;
-  right: 4px;
-`;
-
 const CloseIcon = styled(Icon)`
   position: absolute;
-  top: 4px;
-  right: 4px;
+  top: 0;
+  right: 28px;
+  bottom: 0;
+  margin: auto;
+  fill: ${({ theme }) => theme.color.gray};
+  cursor: pointer;
+
+  &:hover {
+    fill: ${({ theme }) => theme.color.black};
+  }
 `;
 
 const ItemTypeIcon = ({ type }) => {
@@ -115,6 +131,8 @@ export const Item = ({
   isMultiItem = false,
   isActive = false,
   isClosable = false,
+  hasHover = true,
+  isInModal = false,
   favorite,
   style,
   onClickClose = Function.prototype,
@@ -132,6 +150,8 @@ export const Item = ({
       onClick={onClickItem(id)}
       isActive={isActive}
       isMultiItem={isMultiItem}
+      hasHover={hasHover}
+      isInModal={isInModal}
       {...props}
     >
       <TypeIconWrapper>
@@ -143,27 +163,29 @@ export const Item = ({
       </TypeIconWrapper>
       <Title>{name}</Title>
       {shouldShowAttachments && (
-        <Addon>
+        <Addon isInModal={isInModal}>
           <Icon name="clip" width={16} height={16} />
           <AddonText>{attachments.length}</AddonText>
         </Addon>
       )}
       {shouldShowMembers && (
-        <Addon>
+        <Addon isInModal={isInModal}>
           <Icon name="members" width={16} height={16} />
           <AddonText>{invited.length}</AddonText>
         </Addon>
       )}
       {shouldShowFavoriteIcon && (
-        <Favorite
-          name="favorite-active"
-          width={16}
-          height={16}
-          color="emperor"
-        />
+        <Addon>
+          <Icon
+            name="favorite-active"
+            width={16}
+            height={16}
+            color="emperor"
+          />
+        </Addon>
       )}
       {isClosable && (
-        <CloseIcon name="close" width={16} height={16} onClick={onClickClose} />
+        <CloseIcon name="close" width={10} height={10} onClick={onClickClose} />
       )}
     </Row>
   );

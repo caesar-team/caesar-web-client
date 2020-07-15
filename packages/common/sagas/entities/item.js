@@ -396,11 +396,11 @@ export function* moveItemSaga({ payload: { itemId, teamId, listId } }) {
   }
 }
 
-export function* moveItemsBatchSaga({ payload: { itemIds, listId } }) {
+export function* moveItemsBatchSaga({ payload: { itemIds, teamId, listId } }) {
   try {
     yield all(
       itemIds.map(itemId =>
-        call(moveItemSaga, { payload: { itemId, listId } }),
+        call(moveItemSaga, { payload: { itemId, teamId, listId } }),
       ),
     );
   } catch (error) {

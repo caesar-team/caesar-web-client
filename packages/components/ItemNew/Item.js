@@ -12,9 +12,10 @@ import {
   moveItemRequest,
   editItemRequest,
 } from '@caesar/common/actions/entities/item';
+import { MoveModal } from '@caesar/components';
 import { EmptyItem } from './EmptyItem';
 import { ItemByType } from './ItemByType';
-import { ItemHeader, MoveModal } from './components';
+import { ItemHeader } from './components';
 
 const Wrapper = styled.div`
   ${({ isDisabled }) =>
@@ -35,7 +36,7 @@ const ItemComponent = ({
   const trashList = useSelector(trashListSelector);
   const teamsTrashLists = useSelector(teamsTrashListsSelector);
   const [isSubmitting, setSubmitting] = useState(false);
-  const [isMoveModalOpened, setIsMoveModalOpened] = useState(false);
+  const [isMoveModalOpened, setMoveModalOpened] = useState(false);
 
   if (!item) {
     return <EmptyItem />;
@@ -65,7 +66,7 @@ const ItemComponent = ({
       <ItemHeader
         item={item}
         onClickShare={onClickShare}
-        onClickMove={() => setIsMoveModalOpened(true)}
+        onClickMove={() => setMoveModalOpened(true)}
         onClickRestoreItem={handleClickRestoreItem}
         onClickRemoveItem={onClickRemoveItem}
       />
@@ -78,7 +79,7 @@ const ItemComponent = ({
       <MoveModal
         item={item}
         isOpened={isMoveModalOpened}
-        closeModal={() => setIsMoveModalOpened(false)}
+        closeModal={() => setMoveModalOpened(false)}
       />
     </Wrapper>
   );

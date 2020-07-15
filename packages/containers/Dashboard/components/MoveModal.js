@@ -1,12 +1,11 @@
 import React from 'react';
-import { useSelector, useDispatch } from 'react-redux';
-import { selectableTeamsListsSelector } from '@caesar/common/selectors/entities/list';
+import { useSelector } from 'react-redux';
 import {
   workInProgressItemIdsSelector,
   workInProgressItemsSelector,
+  workInProgressListIdSelector,
 } from '@caesar/common/selectors/workflow';
-import { moveItemsBatchRequest } from '@caesar/common/actions/entities/item';
-import { resetWorkInProgressItemIds } from '@caesar/common/actions/workflow';
+import { currentTeamSelector } from '@caesar/common/selectors/user';
 import { MoveModal as MoveModalComponent } from '@caesar/components';
 
 export const MoveModal = ({
@@ -14,28 +13,21 @@ export const MoveModal = ({
   handleCloseModal,
   handleCtrlSelectionItemBehaviour,
 }) => {
-  const dispatch = useDispatch();
-  const selectableTeamsLists = useSelector(selectableTeamsListsSelector);
   const workInProgressItems = useSelector(workInProgressItemsSelector);
   const workInProgressItemIds = useSelector(workInProgressItemIdsSelector);
-
-  const handleClickMoveItems = listId => {
-    dispatch(moveItemsBatchRequest(workInProgressItemIds, listId));
-    dispatch(resetWorkInProgressItemIds());
-
-    notification.show({
-      text: 'The items have been moved.',
-    });
-
-    handleCloseModal();
-  };
+  const workInProgressListId = useSelector(workInProgressListIdSelector);
+  const currentTeam = useSelector(currentTeamSelector);
 
   return (
     <MoveModalComponent
-      teamsLists={selectableTeamsLists}
       items={workInProgressItems}
-      onMove={handleClickMoveItems}
-      onCancel={handleCloseModal}
+      currentTeamId={currentTeam?.id}
+      currentListId={workInProgressListId}
+      workInProgressItemIds={workInProgressItemIds}
+      notification={notification}
+      isMultiMode
+      isOpened
+      closeModal={handleCloseModal}
       onRemove={handleCtrlSelectionItemBehaviour}
     />
   );

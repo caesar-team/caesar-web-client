@@ -168,11 +168,17 @@ class TeamListContainer extends Component {
 
     const renderedTeamCards = this.renderTeamCards();
 
+    const caslSubject = {
+      __typename: 'team',
+      // eslint-disable-next-line camelcase
+      team_create: !!this.props.user?._links?.team_create,
+    };
+
     return (
       <Wrapper>
         <TopWrapper>
           <Title>Teams</Title>
-          <Can I={CREATE_PERMISSION} of={ENTITY_TYPE.TEAM}>
+          <Can I="create" a={caslSubject}>
             <Button
               withOfflineCheck
               onClick={this.handleOpenModal(NEW_TEAM_MODAL)}

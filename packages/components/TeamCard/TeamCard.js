@@ -85,6 +85,12 @@ const TeamCard = ({
   const { id, icon, users } = team;
   const areMembersAvailable = users && users.length > 0;
 
+  const caslSubject = {
+    __typename: 'team',
+    // eslint-disable-next-line camelcase
+    team_delete: !!team?._links?.team_delete,
+  };
+
   return (
     <Wrapper className={className} onClick={onClick}>
       <Link
@@ -114,7 +120,7 @@ const TeamCard = ({
           />
         )}
         {isRemoveButtonVisible && (
-          <Can I={DELETE_PERMISSION} of={team}>
+          <Can I="delete" a={caslSubject}>
             <Button color="white" onClick={onClickRemoveTeam}>
               Remove
             </Button>

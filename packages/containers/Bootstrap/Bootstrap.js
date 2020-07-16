@@ -209,7 +209,7 @@ class Bootstrap extends Component {
 
     const shouldShowGlobalNotification =
       isLoadingGlobalNotification || isErrorGlobalNotification;
-console.log(shouldShowGlobalNotification);
+
     if (TWO_FACTOR_STEPS.includes(currentStep)) {
       return (
         <BootstrapLayout user={this.user}>

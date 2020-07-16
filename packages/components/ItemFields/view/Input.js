@@ -95,7 +95,7 @@ const InputComponent = ({
   onClickAcceptEdit,
   className,
 }) => {
-  const [isEdit, setIsEdit] = useState(false);
+  const [isEdit, setEdit] = useState(false);
   const [value, setValue] = useState(originalValue || propValue);
 
   const handleClickCopy = () => {
@@ -107,7 +107,7 @@ const InputComponent = ({
 
   const handleClickClose = () => {
     setValue(propValue);
-    setIsEdit(false);
+    setEdit(false);
   };
 
   const validationState = useAsync(async () => {
@@ -133,7 +133,7 @@ const InputComponent = ({
           onChange={e => setValue(e.target.value)}
           onClickAcceptEdit={() => {
             onClickAcceptEdit({ name, value });
-            setIsEdit(false);
+            setEdit(false);
           }}
           onClickClose={handleClickClose}
           onClickAway={handleClickClose}
@@ -163,7 +163,7 @@ const InputComponent = ({
                 width={20}
                 height={20}
                 color="gray"
-                onClick={() => setIsEdit(true)}
+                onClick={() => setEdit(true)}
               />
             )}
           </Can>

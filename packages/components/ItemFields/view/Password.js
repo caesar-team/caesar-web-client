@@ -20,13 +20,13 @@ const EyeIcon = styled(Icon)`
 `;
 
 export const Password = ({ value, itemSubject, schema, onClickAcceptEdit }) => {
-  const [isVisible, setIsVisible] = useState(false);
+  const [isVisible, setVisible] = useState(false);
 
   const handleHoldStart = () => {
-    setIsVisible(true);
+    setVisible(true);
   };
   const handleHoldEnd = () => {
-    setIsVisible(false);
+    setVisible(false);
   };
 
   const eyeIcon = (

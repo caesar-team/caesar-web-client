@@ -50,17 +50,17 @@ const AddBtn = styled(Button)`
 `;
 
 export const Note = ({ value: propValue, itemSubject, onClickAcceptEdit }) => {
-  const [isEdit, setIsEdit] = useState(false);
-  const [isFocused, setIsFocused] = useState(false);
+  const [isEdit, setEdit] = useState(false);
+  const [isFocused, setFocused] = useState(false);
   const [value, setValue] = useState(propValue);
 
   const handleClickAdd = () => {
-    setIsEdit(true);
+    setEdit(true);
   };
 
   const handleClickEdit = () => {
-    setIsEdit(true);
-    setIsFocused(true);
+    setEdit(true);
+    setFocused(true);
   };
 
   const handleDeleteNote = () => {
@@ -76,13 +76,13 @@ export const Note = ({ value: propValue, itemSubject, onClickAcceptEdit }) => {
               label="Notes"
               value={value}
               onChange={e => setValue(e.target.value)}
-              onFocus={onClickAcceptEdit && (() => setIsEdit(true))}
+              onFocus={onClickAcceptEdit && (() => setEdit(true))}
               onClickAcceptEdit={() => {
                 onClickAcceptEdit({ name: 'note', value });
-                setIsEdit(false);
+                setEdit(false);
               }}
-              onClickAway={() => setIsEdit(false)}
-              onClickClose={() => setIsEdit(false)}
+              onClickAway={() => setEdit(false)}
+              onClickClose={() => setEdit(false)}
               isFocused={isFocused}
               isEdit={isEdit}
               isDisabled={!onClickAcceptEdit}

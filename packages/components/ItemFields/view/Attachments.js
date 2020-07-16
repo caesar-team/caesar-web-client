@@ -73,7 +73,7 @@ export const Attachments = ({
   onClickAcceptEdit,
 }) => {
   const [newFiles, setNewFiles] = useState([]);
-  const [isModalOpened, setIsModalOpened] = useState(false);
+  const [isModalOpened, setModalOpened] = useState(false);
 
   const handleClickDownloadFile = attachment => {
     const { raw, name } = attachment;
@@ -114,7 +114,7 @@ export const Attachments = ({
     });
 
     setNewFiles(mappedFiles);
-    setIsModalOpened(true);
+    setModalOpened(true);
 
     onClickAcceptEdit({ name, value: uniqFiles });
   };
@@ -164,7 +164,10 @@ export const Attachments = ({
         </Can>
       </Inner>
       {isModalOpened && (
-        <NewFilesModal files={newFiles} closeModal={() => setIsModalOpened()} />
+        <NewFilesModal
+          files={newFiles}
+          closeModal={() => setModalOpened(false)}
+        />
       )}
     </Wrapper>
   );

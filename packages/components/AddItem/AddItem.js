@@ -80,7 +80,7 @@ export const AddItem = ({ className }) => {
       };
 
   return (
-    <Can I={PERMISSION.CREATE} of={itemSubject}>
+    <Can I={PERMISSION.CREATE} an={itemSubject}>
       <Dropdown
         options={itemTypesOptions}
         onClick={handleClickAddItem}

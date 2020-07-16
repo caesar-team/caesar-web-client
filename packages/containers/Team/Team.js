@@ -506,7 +506,7 @@ class TeamContainer extends Component {
         <TopWrapper>
           <Title>{team.title}</Title>
           {!isDefaultTeam && (
-            <Can I={PERMISSION.ADD} of={teamSubject}>
+            <Can I={PERMISSION.ADD} a={teamSubject}>
               <ButtonsWrapper>
                 <ButtonStyled
                   withOfflineCheck

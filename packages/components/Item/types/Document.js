@@ -1,20 +1,15 @@
 import React from 'react';
 import { Title, Note, Attachments } from '../../ItemFields/view';
 import { Row } from '../../ItemFields/common';
-import { Wrapper, OwnerAndInvitation, RemoveButton } from '../components';
+import { OwnerAndInvitation } from '../components';
 
-export const Document = ({
-  item,
-  onClickAcceptEdit,
-  onClickShare,
-  onClickMoveToTrash,
-}) => {
+export const Document = ({ item, onClickAcceptEdit, onClickShare }) => {
   const {
     data: { name, note, attachments = [] },
   } = item;
 
   return (
-    <Wrapper>
+    <>
       <Title value={name} onClickAcceptEdit={onClickAcceptEdit} />
       <OwnerAndInvitation onClickShare={onClickShare} />
       <Row marginBottom={24}>
@@ -26,11 +21,6 @@ export const Document = ({
           onClickAcceptEdit={onClickAcceptEdit}
         />
       </Row>
-      {onClickMoveToTrash && (
-        <Row>
-          <RemoveButton onClick={onClickMoveToTrash} />
-        </Row>
-      )}
-    </Wrapper>
+    </>
   );
 };

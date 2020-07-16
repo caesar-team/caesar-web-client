@@ -1,7 +1,8 @@
+/* eslint-disable camelcase */
 import React, { memo, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import styled from 'styled-components';
-import equal from 'fast-deep-equal';
+import { PERMISSION, PERMISSION_ENTITY } from '@caesar/common/constants';
 import { workInProgressItemSelector } from '@caesar/common/selectors/workflow';
 import {
   trashListSelector,
@@ -12,10 +13,12 @@ import {
   moveItemRequest,
   editItemRequest,
 } from '@caesar/common/actions/entities/item';
-import { MoveModal } from '@caesar/components';
+import { Can } from '../Ability';
+import { MoveModal } from '../MoveModal';
+import { Row } from '../ItemFields/common';
 import { EmptyItem } from './EmptyItem';
 import { ItemByType } from './ItemByType';
-import { ItemHeader } from './components';
+import { ItemHeader, InnerWrapper, RemoveButton } from './components';
 
 const Wrapper = styled.div`
   ${({ isDisabled }) =>
@@ -61,6 +64,18 @@ const ItemComponent = ({
     dispatch(setWorkInProgressItem(null));
   };
 
+  const itemSubject = item.teamId
+    ? {
+        __typename: PERMISSION_ENTITY.TEAM_ITEM,
+        team_move_item: !!item._links?.team_move_item,
+        team_delete_item: !!item._links?.team_delete_item,
+      }
+    : {
+        __typename: PERMISSION_ENTITY.ITEM,
+        move_item: !!item._links?.move_item,
+        delete_item: !!item._links?.delete_item,
+      };
+
   return (
     <Wrapper isDisabled={isSubmitting}>
       <ItemHeader
@@ -70,12 +85,20 @@ const ItemComponent = ({
         onClickRestoreItem={handleClickRestoreItem}
         onClickRemoveItem={onClickRemoveItem}
       />
-      <ItemByType
-        item={item}
-        onClickAcceptEdit={!isTrashItem && handleClickAcceptEdit}
-        onClickShare={onClickShare}
-        onClickMoveToTrash={!isTrashItem && onClickMoveToTrash}
-      />
+      <InnerWrapper>
+        <ItemByType
+          item={item}
+          onClickAcceptEdit={!isTrashItem && handleClickAcceptEdit}
+          onClickShare={onClickShare}
+        />
+        <Can I={PERMISSION.TRASH} an={itemSubject}>
+          {!isTrashItem && (
+            <Row>
+              <RemoveButton onClick={onClickMoveToTrash} />
+            </Row>
+          )}
+        </Can>
+      </InnerWrapper>
       <MoveModal
         item={item}
         isOpened={isMoveModalOpened}
@@ -85,10 +108,4 @@ const ItemComponent = ({
   );
 };
 
-export const Item = memo(ItemComponent, (prevProps, nextProps) => {
-  return (
-    equal(prevProps.item, nextProps.item) &&
-    equal(prevProps.members, nextProps.members) &&
-    equal(prevProps.notification, nextProps.notification)
-  );
-});
+export const Item = memo(ItemComponent);

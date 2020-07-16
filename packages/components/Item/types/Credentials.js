@@ -9,20 +9,15 @@ import {
   Attachments,
 } from '../../ItemFields/view';
 import { Row } from '../../ItemFields/common';
-import { Wrapper, OwnerAndInvitation, RemoveButton } from '../components';
+import { OwnerAndInvitation } from '../components';
 
-export const Credentials = ({
-  item,
-  onClickAcceptEdit,
-  onClickShare,
-  onClickMoveToTrash,
-}) => {
+export const Credentials = ({ item, onClickAcceptEdit, onClickShare }) => {
   const {
     data: { name, login, pass, website, note, attachments = [] },
   } = item;
 
   return (
-    <Wrapper>
+    <>
       <Title
         value={name}
         schema={SCHEMA.REQUIRED_LIMITED_STRING()}
@@ -61,11 +56,6 @@ export const Credentials = ({
           onClickAcceptEdit={onClickAcceptEdit}
         />
       </Row>
-      {onClickMoveToTrash && (
-        <Row>
-          <RemoveButton onClick={onClickMoveToTrash} />
-        </Row>
-      )}
-    </Wrapper>
+    </>
   );
 };

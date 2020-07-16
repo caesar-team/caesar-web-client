@@ -185,6 +185,11 @@ export const PERMISSION = {
   EDIT: 'edit',
   DELETE: 'delete',
   SORT: 'sort',
+  MOVE: 'move',
+  SHARE: 'share',
+  FAVORITE: 'favorite',
+  TRASH: 'trash',
+  RESTORE: 'restore',
 };
 
 export const PERMISSION_ENTITY = {

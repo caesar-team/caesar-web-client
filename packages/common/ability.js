@@ -47,7 +47,36 @@ export const ability = defineAbility({ subjectName }, can => {
   can(PERMISSION.CREATE, PERMISSION_ENTITY.ITEM, {
     create_item: true,
   });
+  can(PERMISSION.MOVE, PERMISSION_ENTITY.ITEM, {
+    move_item: true,
+  });
+  can(PERMISSION.SHARE, PERMISSION_ENTITY.ITEM, {
+    batch_share_item: true,
+  });
+  can(PERMISSION.FAVORITE, PERMISSION_ENTITY.ITEM, {
+    favorite_item_toggle: true,
+  });
+  can([PERMISSION.TRASH, PERMISSION.RESTORE], PERMISSION_ENTITY.ITEM, {
+    move_item: true,
+    delete_item: true,
+  });
+  can(PERMISSION.DELETE, PERMISSION_ENTITY.ITEM, {
+    delete_item: true,
+  });
   can(PERMISSION.CREATE, PERMISSION_ENTITY.TEAM_ITEM, {
     team_create_item: true,
+  });
+  can(PERMISSION.MOVE, PERMISSION_ENTITY.TEAM_ITEM, {
+    team_move_item: true,
+  });
+  can(PERMISSION.SHARE, PERMISSION_ENTITY.TEAM_ITEM, {
+    team_batch_share_item: true,
+  });
+  can([PERMISSION.TRASH, PERMISSION.RESTORE], PERMISSION_ENTITY.TEAM_ITEM, {
+    team_move_item: true,
+    team_delete_item: true,
+  });
+  can(PERMISSION.DELETE, PERMISSION_ENTITY.TEAM_ITEM, {
+    team_delete_item: true,
   });
 });

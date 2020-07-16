@@ -11,7 +11,12 @@ import {
 import { Row } from '../../ItemFields/common';
 import { OwnerAndInvitation } from '../components';
 
-export const Credentials = ({ item, onClickAcceptEdit, onClickShare }) => {
+export const Credentials = ({
+  item,
+  itemSubject,
+  onClickAcceptEdit,
+  onClickShare,
+}) => {
   const {
     data: { name, login, pass, website, note, attachments = [] },
   } = item;
@@ -20,15 +25,20 @@ export const Credentials = ({ item, onClickAcceptEdit, onClickShare }) => {
     <>
       <Title
         value={name}
+        itemSubject={itemSubject}
         schema={SCHEMA.REQUIRED_LIMITED_STRING()}
         onClickAcceptEdit={onClickAcceptEdit}
       />
-      <OwnerAndInvitation onClickShare={onClickShare} />
+      <OwnerAndInvitation
+        itemSubject={itemSubject}
+        onClickShare={onClickShare}
+      />
       <Row>
         <Input
           label="Login"
           name="login"
           value={login}
+          itemSubject={itemSubject}
           schema={SCHEMA.REQUIRED_LIMITED_STRING()}
           onClickAcceptEdit={onClickAcceptEdit}
         />
@@ -36,6 +46,7 @@ export const Credentials = ({ item, onClickAcceptEdit, onClickShare }) => {
       <Row>
         <Password
           value={pass}
+          itemSubject={itemSubject}
           schema={SCHEMA.REQUIRED_LIMITED_STRING()}
           onClickAcceptEdit={onClickAcceptEdit}
         />
@@ -43,16 +54,22 @@ export const Credentials = ({ item, onClickAcceptEdit, onClickShare }) => {
       <Row>
         <Website
           value={website}
+          itemSubject={itemSubject}
           schema={SCHEMA.WEBSITE}
           onClickAcceptEdit={onClickAcceptEdit}
         />
       </Row>
       <Row marginBottom={24}>
-        <Note value={note} onClickAcceptEdit={onClickAcceptEdit} />
+        <Note
+          value={note}
+          itemSubject={itemSubject}
+          onClickAcceptEdit={onClickAcceptEdit}
+        />
       </Row>
       <Row marginBottom={24}>
         <Attachments
           attachments={attachments}
+          itemSubject={itemSubject}
           onClickAcceptEdit={onClickAcceptEdit}
         />
       </Row>

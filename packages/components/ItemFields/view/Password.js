@@ -19,7 +19,7 @@ const EyeIcon = styled(Icon)`
   }
 `;
 
-export const Password = ({ value, schema, onClickAcceptEdit }) => {
+export const Password = ({ value, itemSubject, schema, onClickAcceptEdit }) => {
   const [isVisible, setIsVisible] = useState(false);
 
   const handleHoldStart = () => {
@@ -47,6 +47,7 @@ export const Password = ({ value, schema, onClickAcceptEdit }) => {
       name="pass"
       autoComplete="new-password"
       value={isVisible ? value : '********'}
+      itemSubject={itemSubject}
       schema={schema}
       originalValue={value}
       onClickAcceptEdit={onClickAcceptEdit}

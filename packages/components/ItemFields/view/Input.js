@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { useAsync } from 'react-use';
 import copy from 'copy-text-to-clipboard';
 import styled from 'styled-components';
+import { PERMISSION } from '@caesar/common/constants';
+import { Can } from '../../Ability';
 import { Input } from '../../Input';
 import { Icon } from '../../Icon';
 import { withNotification } from '../../Notification';
@@ -81,6 +83,7 @@ const InputComponent = ({
   name,
   placeholder,
   value: propValue,
+  itemSubject,
   schema,
   originalValue,
   autoComplete,
@@ -115,7 +118,7 @@ const InputComponent = ({
     return result;
   }, [value, schema]);
 
-  return (
+  const RenderedComponent = () => (
     <Wrapper withLabel={label} className={className}>
       {isEdit ? (
         <Input
@@ -153,18 +156,28 @@ const InputComponent = ({
             )}
           </ValueInner>
           {addonIcons}
-          {onClickAcceptEdit && (
-            <PencilIcon
-              name="pencil"
-              width={20}
-              height={20}
-              color="gray"
-              onClick={() => setIsEdit(true)}
-            />
-          )}
+          <Can I={PERMISSION.EDIT} an={itemSubject}>
+            {onClickAcceptEdit && (
+              <PencilIcon
+                name="pencil"
+                width={20}
+                height={20}
+                color="gray"
+                onClick={() => setIsEdit(true)}
+              />
+            )}
+          </Can>
         </ValueWrapper>
       )}
     </Wrapper>
+  );
+
+  return !value ? (
+    <Can I={PERMISSION.EDIT} an={itemSubject}>
+      <RenderedComponent />
+    </Can>
+  ) : (
+    <RenderedComponent />
   );
 };
 

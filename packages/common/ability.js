@@ -47,6 +47,9 @@ export const ability = defineAbility({ subjectName }, can => {
   can(PERMISSION.CREATE, PERMISSION_ENTITY.ITEM, {
     create_item: true,
   });
+  can(PERMISSION.EDIT, PERMISSION_ENTITY.ITEM, {
+    edit_item: true,
+  });
   can(PERMISSION.MOVE, PERMISSION_ENTITY.ITEM, {
     move_item: true,
   });
@@ -65,6 +68,9 @@ export const ability = defineAbility({ subjectName }, can => {
   });
   can(PERMISSION.CREATE, PERMISSION_ENTITY.TEAM_ITEM, {
     team_create_item: true,
+  });
+  can(PERMISSION.EDIT, PERMISSION_ENTITY.TEAM_ITEM, {
+    team_edit_item: true,
   });
   can(PERMISSION.MOVE, PERMISSION_ENTITY.TEAM_ITEM, {
     team_move_item: true,

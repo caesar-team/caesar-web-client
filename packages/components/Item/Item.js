@@ -18,7 +18,12 @@ import { MoveModal } from '../MoveModal';
 import { Row } from '../ItemFields/common';
 import { EmptyItem } from './EmptyItem';
 import { ItemByType } from './ItemByType';
-import { ItemHeader, InnerWrapper, RemoveButton } from './components';
+import {
+  ItemHeader,
+  InnerWrapper,
+  RemoveButton,
+  ReadOnlyBanner,
+} from './components';
 
 const Wrapper = styled.div`
   ${({ isDisabled }) =>
@@ -67,12 +72,16 @@ const ItemComponent = ({
   const itemSubject = item.teamId
     ? {
         __typename: PERMISSION_ENTITY.TEAM_ITEM,
+        team_edit_item: !!item._links?.team_edit_item,
         team_move_item: !!item._links?.team_move_item,
+        team_batch_share_item: !!item._links?.team_batch_share_item,
         team_delete_item: !!item._links?.team_delete_item,
       }
     : {
         __typename: PERMISSION_ENTITY.ITEM,
+        edit_item: !!item._links?.edit_item,
         move_item: !!item._links?.move_item,
+        batch_share_item: !!item._links?.batch_share_item,
         delete_item: !!item._links?.delete_item,
       };
 
@@ -85,9 +94,13 @@ const ItemComponent = ({
         onClickRestoreItem={handleClickRestoreItem}
         onClickRemoveItem={onClickRemoveItem}
       />
+      <Can not I={PERMISSION.EDIT} an={itemSubject}>
+        <ReadOnlyBanner />
+      </Can>
       <InnerWrapper>
         <ItemByType
           item={item}
+          itemSubject={itemSubject}
           onClickAcceptEdit={!isTrashItem && handleClickAcceptEdit}
           onClickShare={onClickShare}
         />

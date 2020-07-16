@@ -5,6 +5,8 @@ import {
   downloadAsZip,
   splitFilesToUniqAndDuplicates,
 } from '@caesar/common/utils/file';
+import { PERMISSION } from '@caesar/common/constants';
+import { Can } from '../../Ability';
 import { Icon } from '../../Icon';
 import { File } from '../../File';
 import { Uploader } from '../../Uploader';
@@ -65,7 +67,11 @@ const AddNewAttach = styled.div`
   }
 `;
 
-export const Attachments = ({ attachments, onClickAcceptEdit }) => {
+export const Attachments = ({
+  attachments,
+  itemSubject,
+  onClickAcceptEdit,
+}) => {
   const [newFiles, setNewFiles] = useState([]);
   const [isModalOpened, setIsModalOpened] = useState(false);
 
@@ -113,7 +119,7 @@ export const Attachments = ({ attachments, onClickAcceptEdit }) => {
     onClickAcceptEdit({ name, value: uniqFiles });
   };
 
-  return (
+  const AttachmentsComponent = () => (
     <Wrapper>
       <Title>
         Attachments ({attachments.length})
@@ -131,6 +137,7 @@ export const Attachments = ({ attachments, onClickAcceptEdit }) => {
         {attachments.map(attach => (
           <File
             key={attach.name}
+            itemSubject={itemSubject}
             onClickDownload={() => handleClickDownloadFile(attach)}
             onClickRemove={
               onClickAcceptEdit && (() => onClickRemove(attach.raw))
@@ -138,25 +145,35 @@ export const Attachments = ({ attachments, onClickAcceptEdit }) => {
             {...attach}
           />
         ))}
-        {onClickAcceptEdit && (
-          <Uploader
-            multiple
-            asPreview
-            name="attachments"
-            onChange={handleChange}
-          >
-            {({ getRootProps, getInputProps, isDragActive }) => (
-              <AddNewAttach {...getRootProps()} isDragActive={isDragActive}>
-                <input {...getInputProps()} />
-                <PlusIcon name="plus" width={16} height={16} color="gray" />
-              </AddNewAttach>
-            )}
-          </Uploader>
-        )}
+        <Can I={PERMISSION.EDIT} an={itemSubject}>
+          {onClickAcceptEdit && (
+            <Uploader
+              multiple
+              asPreview
+              name="attachments"
+              onChange={handleChange}
+            >
+              {({ getRootProps, getInputProps, isDragActive }) => (
+                <AddNewAttach {...getRootProps()} isDragActive={isDragActive}>
+                  <input {...getInputProps()} />
+                  <PlusIcon name="plus" width={16} height={16} color="gray" />
+                </AddNewAttach>
+              )}
+            </Uploader>
+          )}
+        </Can>
       </Inner>
       {isModalOpened && (
         <NewFilesModal files={newFiles} closeModal={() => setIsModalOpened()} />
       )}
     </Wrapper>
+  );
+
+  return attachments.length === 0 ? (
+    <Can I={PERMISSION.EDIT} an={itemSubject}>
+      <AttachmentsComponent />
+    </Can>
+  ) : (
+    <AttachmentsComponent />
   );
 };

@@ -181,6 +181,7 @@ export const DEFAULT_ERROR_MESSAGE = 'Something wrong. Please try again';
 
 export const PERMISSION = {
   CREATE: 'create',
+  ADD: 'add',
   EDIT: 'edit',
   DELETE: 'delete',
   SORT: 'sort',
@@ -188,6 +189,7 @@ export const PERMISSION = {
 
 export const PERMISSION_ENTITY = {
   TEAM: 'team',
+  TEAM_MEMBER: 'team_member',
   LIST: 'list',
   TEAM_LIST: 'team_list',
   ITEM: 'item',

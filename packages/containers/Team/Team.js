@@ -14,7 +14,12 @@ import {
   InviteModal,
   Can,
 } from '@caesar/components';
-import { COMMANDS_ROLES, TEAM_TYPE } from '@caesar/common/constants';
+import {
+  COMMANDS_ROLES,
+  TEAM_TYPE,
+  PERMISSION,
+  PERMISSION_ENTITY,
+} from '@caesar/common/constants';
 
 const LogoWrapper = styled.div`
   display: flex;
@@ -490,8 +495,8 @@ class TeamContainer extends Component {
       membersById,
     );
 
-    const caslSubject = {
-      __typename: 'team',
+    const teamSubject = {
+      __typename: PERMISSION_ENTITY.TEAM_MEMBER,
       // eslint-disable-next-line camelcase
       team_member_add: !!team?._links?.team_member_add,
     };
@@ -501,7 +506,7 @@ class TeamContainer extends Component {
         <TopWrapper>
           <Title>{team.title}</Title>
           {!isDefaultTeam && (
-            <Can I="add_member" of={caslSubject}>
+            <Can I={PERMISSION.ADD} of={teamSubject}>
               <ButtonsWrapper>
                 <ButtonStyled
                   withOfflineCheck

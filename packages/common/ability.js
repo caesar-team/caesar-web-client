@@ -17,6 +17,9 @@ export const ability = defineAbility({ subjectName }, can => {
   can(PERMISSION.DELETE, PERMISSION_ENTITY.TEAM, {
     team_delete: true,
   });
+  can(PERMISSION.ADD, PERMISSION_ENTITY.TEAM_MEMBER, {
+    team_member_add: true,
+  });
   can(PERMISSION.CREATE, PERMISSION_ENTITY.LIST, {
     list_create: true,
   });

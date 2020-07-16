@@ -1,4 +1,3 @@
-/* eslint-disable camelcase */
 import React, { memo, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { DragDropContext, Droppable } from 'react-beautiful-dnd';
@@ -181,10 +180,12 @@ const MenuListInnerComponent = ({
   const listSubject = currentTeam
     ? {
         __typename: PERMISSION_ENTITY.TEAM_LIST,
-        team_create_list: !!currentTeam?._links?.team_create_list,
+        // eslint-disable-next-line camelcase
+        team_create_list: !!currentTeam._links?.team_create_list,
       }
     : {
         __typename: PERMISSION_ENTITY.LIST,
+        // eslint-disable-next-line camelcase
         list_create: !!user?._links?.list_create,
       };
 

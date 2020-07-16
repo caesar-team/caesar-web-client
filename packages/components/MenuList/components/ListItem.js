@@ -128,15 +128,15 @@ export const ListItem = ({
   const listSubject = teamId
     ? {
         __typename: PERMISSION_ENTITY.TEAM_LIST,
-        edit_list: !!list?._links?.edit_list,
-        sort_list: !!list?._links?.sort_list,
-        delete_list: !!list?._links?.delete_list,
-      }
-    : {
-        __typename: PERMISSION_ENTITY.LIST,
         team_edit_list: !!list?._links?.team_edit_list,
         team_sort_list: !!list?._links?.team_sort_list,
         team_delete_list: !!list?._links?.team_delete_list,
+      }
+    : {
+        __typename: PERMISSION_ENTITY.LIST,
+        edit_list: !!list?._links?.edit_list,
+        sort_list: !!list?._links?.sort_list,
+        delete_list: !!list?._links?.delete_list,
       };
 
   const renderInner = () => (

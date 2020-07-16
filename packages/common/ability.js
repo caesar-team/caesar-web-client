@@ -2,12 +2,12 @@
 import { defineAbility } from '@casl/ability';
 import { PERMISSION, PERMISSION_ENTITY } from './constants';
 
-const subjectName = item => {
-  if (!item || typeof item === 'string') {
-    return item;
+const subjectName = subject => {
+  if (!subject || typeof subject === 'string') {
+    return subject;
   }
 
-  return item.__typename;
+  return subject.__typename;
 };
 
 export const ability = defineAbility({ subjectName }, can => {
@@ -43,5 +43,11 @@ export const ability = defineAbility({ subjectName }, can => {
   });
   can(PERMISSION.DELETE, PERMISSION_ENTITY.TEAM_LIST, {
     team_delete_list: true,
+  });
+  can(PERMISSION.CREATE, PERMISSION_ENTITY.ITEM, {
+    create_item: true,
+  });
+  can(PERMISSION.CREATE, PERMISSION_ENTITY.TEAM_ITEM, {
+    team_create_item: true,
   });
 });

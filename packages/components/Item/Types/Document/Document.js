@@ -1,4 +1,5 @@
 import React from 'react';
+import { styled } from 'styled-components';
 import { Label, Can } from '@caesar/components';
 import { DELETE_PERMISSION } from '@caesar/common/constants';
 import {
@@ -11,6 +12,9 @@ import {
   RemoveButtonWrapper,
   RemoveButton,
 } from '../components';
+
+const Meta = styled.div`
+`;
 
 export const Document = props => {
   const {
@@ -25,14 +29,15 @@ export const Document = props => {
 
   const {
     data: { note, attachments = [] },
+    lastUpdated,
   } = item;
 
   const shouldShowNote = !!note;
-  const shouldShowAttachments = attachments && attachments.length > 0;
+  const shouldShowAttachments = attachments?.length > 0;
   const shouldShowRemove = !isSharedItem && !isTrashItem;
 
   return (
-    <Wrapper>
+    <Wrapper>11111
       <ItemHeader
         isReadOnly={isReadOnly}
         allLists={allLists}
@@ -48,6 +53,9 @@ export const Document = props => {
         )}
       </FieldWrapper>
       {shouldShowAttachments && <Attachments attachments={attachments} />}
+      <Meta>
+        Last updated {lastUpdated}
+      </Meta>
       {shouldShowRemove && (
         <Can I={DELETE_PERMISSION} of={item}>
           <RemoveButtonWrapper>

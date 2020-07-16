@@ -32,6 +32,7 @@ import {
   MasterPasswordStep,
   SharedItemsStep,
 } from './Steps';
+import { updateGlobalNotification } from '@caesar/common/actions/application';
 
 const TWO_FACTOR_STEPS = [TWO_FACTOR_CREATE, TWO_FACTOR_CHECK];
 const PASSWORD_STEPS = [PASSWORD_CHANGE];
@@ -192,6 +193,7 @@ class Bootstrap extends Component {
       component: PageComponent,
       router,
       shared = {},
+      updateGlobalNotification,
       ...props
     } = this.props;
     const {
@@ -205,6 +207,9 @@ class Bootstrap extends Component {
       return <FullScreenLoader />;
     }
 
+    const shouldShowGlobalNotification =
+      isLoadingGlobalNotification || isErrorGlobalNotification;
+console.log(shouldShowGlobalNotification);
     if (TWO_FACTOR_STEPS.includes(currentStep)) {
       return (
         <BootstrapLayout user={this.user}>
@@ -243,16 +248,26 @@ class Bootstrap extends Component {
 
     if (SHARED_ITEMS_STEPS.includes(currentStep)) {
       return (
-        <BootstrapLayout user={this.user}>
-          <SharedItemsStep
-            navigationSteps={this.navigationPanelSteps}
-            oldKeyPair={oldKeyPair}
-            currentKeyPair={currentKeyPair}
-            oldMasterPassword={shared.mp}
-            currentMasterPassword={masterPassword}
-            onFinish={this.handleFinishSharedItems}
-          />
-        </BootstrapLayout>
+        <>
+          <BootstrapLayout user={this.user}>
+            <SharedItemsStep
+              navigationSteps={this.navigationPanelSteps}
+              oldKeyPair={oldKeyPair}
+              currentKeyPair={currentKeyPair}
+              oldMasterPassword={shared.mp}
+              currentMasterPassword={masterPassword}
+              onFinish={this.handleFinishSharedItems}
+              updateGlobalNotification={updateGlobalNotification}
+            />
+          </BootstrapLayout>
+          {shouldShowGlobalNotification && (
+            <GlobalNotification
+              text={globalNotificationText}
+              isError={isErrorGlobalNotification}
+              onClose={this.handleCloseNotification}
+            />
+          )}
+        </>
       );
     }
 
@@ -268,9 +283,6 @@ class Bootstrap extends Component {
         />
       );
     }
-
-    const shouldShowGlobalNotification =
-      isLoadingGlobalNotification || isErrorGlobalNotification;
 
     // TODO: during refactoring to rename:
     // TODO: - password to masterPassword

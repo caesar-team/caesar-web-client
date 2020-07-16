@@ -45,7 +45,7 @@ const LayoutConstructorStyled = styled(LayoutConstructor)`
       }
     `}
     
-    ${media.wideMobile`
+    ${media.tablet`
       &:before {
         width: 610px;
         height: 400px;
@@ -53,7 +53,7 @@ const LayoutConstructorStyled = styled(LayoutConstructor)`
       }
     `}
     
-    ${media.middleMobile`
+    ${media.wideMobile`
       &:before {
         width: 432px;
         height: 487px;
@@ -62,7 +62,7 @@ const LayoutConstructorStyled = styled(LayoutConstructor)`
       }
     `}
     
-    ${media.narrowMobile`
+    ${media.mobile`
       &:before {
         width: 288px;
         height: 418px;

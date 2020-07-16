@@ -17,25 +17,21 @@ const TextWrapper = styled.div`
 `;
 
 const StatusCode = styled.div`
-  font-size: 36px;
+  font-size: ${({ theme }) => theme.font.size.large};
   text-align: center;
   margin-bottom: 10px;
 
   ${media.desktop`
-    font-size: 30px;
+    font-size: ${({ theme }) => theme.font.size.big};
   `}
   
-  ${media.narrowMobile`
-    font-size: 24px;
+  ${media.mobile`
+    font-size: ${({ theme }) => theme.font.size.middle};
   `}
 `;
 
 const Description = styled.div`
-  font-size: 18px;
-
-  ${media.desktop`
-    font-size: 16px;
-  `}
+  font-size: ${({ theme }) => theme.font.size.main};
 `;
 
 const Error = ({ statusCode }) => (

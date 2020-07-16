@@ -21,8 +21,11 @@ import { convertNodesToEntities } from '@caesar/common/normalizers/normalizers';
 import { objectToArray } from '@caesar/common/utils/utils';
 import { sortItemsByFavorites } from '@caesar/common/utils/workflow';
 import { getLists, getTeamLists, getTeams } from '@caesar/common/api';
-import { TEAM_TYPE, ITEM_MODE } from '@caesar/common/constants';
-import { favoriteListSelector, trashListSelector } from '@caesar/common/selectors/entities/list';
+import { TEAM_TYPE } from '@caesar/common/constants';
+import {
+  favoriteListSelector,
+  trashListSelector,
+} from '@caesar/common/selectors/entities/list';
 import {
   keyPairSelector,
   masterPasswordSelector,
@@ -148,9 +151,7 @@ export function* initWorkflow({ payload: { withDecryption = true } }) {
   yield fork(initTeams, withDecryption);
 }
 
-export function* updateWorkInProgressItemSaga({
-  payload: { itemId, mode = ITEM_MODE.REVIEW },
-}) {
+export function* updateWorkInProgressItemSaga({ payload: { itemId } }) {
   let id = null;
 
   if (!itemId) {
@@ -166,7 +167,7 @@ export function* updateWorkInProgressItemSaga({
   if (id) {
     const item = yield select(itemSelector, { itemId: id });
 
-    yield put(setWorkInProgressItem(item, mode));
+    yield put(setWorkInProgressItem(item));
   }
 }
 

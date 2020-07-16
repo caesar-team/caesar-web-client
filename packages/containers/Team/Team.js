@@ -14,13 +14,7 @@ import {
   InviteModal,
   Can,
 } from '@caesar/components';
-import {
-  COMMANDS_ROLES,
-  TEAM_TYPE,
-  CHANGE_TEAM_MEMBER_ROLE_PERMISSION,
-  JOIN_MEMBER_TO_TEAM,
-  LEAVE_MEMBER_FROM_TEAM,
-} from '@caesar/common/constants';
+import { COMMANDS_ROLES, TEAM_TYPE } from '@caesar/common/constants';
 
 const LogoWrapper = styled.div`
   display: flex;

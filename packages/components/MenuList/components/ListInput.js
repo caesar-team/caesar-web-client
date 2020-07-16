@@ -29,7 +29,7 @@ const StyledIcon = styled(Icon)`
 
 const MAX_LIST_LABEL_LENGTH = 75;
 
-export const ListItemInput = ({
+export const ListInput = ({
   isEditMode,
   setEditMode,
   isCreatingMode,

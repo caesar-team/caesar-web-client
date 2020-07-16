@@ -7,7 +7,6 @@ import {
   ROUTES,
   ITEM_TYPE,
   ITEM_ICON_TYPE,
-  CREATE_PERMISSION,
   ENTITY_TYPE,
 } from '@caesar/common/constants';
 import { workInProgressListSelector } from '@caesar/common/selectors/workflow';
@@ -75,24 +74,24 @@ export const AddItem = ({ className }) => {
   };
 
   return (
-    <Can I={CREATE_PERMISSION} of={itemSubject}>
-      <Dropdown
-        options={itemTypesOptions}
-        onClick={handleClickAddItem}
-        optionRender={renderAddItemOptions}
-        withTriangleAtTop
-        ButtonElement={({ handleToggle }) => (
-          <Button
-            withOfflineCheck
-            isOnline={isOnline}
-            icon="plus"
-            onClick={handleToggle}
-          >
-            Add item
-          </Button>
-        )}
-        className={className}
-      />
-    </Can>
+    // <Can I={CREATE_PERMISSION} of={itemSubject}>
+    <Dropdown
+      options={itemTypesOptions}
+      onClick={handleClickAddItem}
+      optionRender={renderAddItemOptions}
+      withTriangleAtTop
+      ButtonElement={({ handleToggle }) => (
+        <Button
+          withOfflineCheck
+          isOnline={isOnline}
+          icon="plus"
+          onClick={handleToggle}
+        >
+          Add item
+        </Button>
+      )}
+      className={className}
+    />
+    // </Can>
   );
 };

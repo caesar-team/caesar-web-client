@@ -4,14 +4,18 @@ import { useDispatch } from 'react-redux';
 import { Draggable } from 'react-beautiful-dnd';
 import styled from 'styled-components';
 import { upperFirst } from '@caesar/common/utils/string';
-import { LIST_TYPES_ARRAY } from '@caesar/common/constants';
+import {
+  LIST_TYPES_ARRAY,
+  PERMISSION,
+  PERMISSION_ENTITY,
+} from '@caesar/common/constants';
 import {
   createListRequest,
   editListRequest,
 } from '@caesar/common/actions/entities/list';
 import { Can } from '../../Ability';
 import { Icon } from '../../Icon';
-import { ListItemInput } from './ListItemInput';
+import { ListInput } from './ListInput';
 import { ConfirmRemoveListModal } from './ConfirmRemoveListModal';
 import { MenuItemInner } from './styledComponents';
 
@@ -35,11 +39,11 @@ const StyledIcon = styled(Icon)`
   }
 `;
 
-const ItemIcon = styled(StyledIcon)`
+const ActionIcon = styled(StyledIcon)`
   display: none;
 `;
 
-const DnDIcon = styled(ItemIcon)`
+const DnDIcon = styled(ActionIcon)`
   position: absolute;
   top: 50%;
   left: 24px;
@@ -60,7 +64,7 @@ const Wrapper = styled(MenuItemInner)`
     ${Counter} {
       ${({ isDefault }) => !isDefault && `display: none;`}
     }
-    ${ItemIcon} {
+    ${ActionIcon} {
       display: block;
     }
     ${DnDIcon} {
@@ -70,17 +74,16 @@ const Wrapper = styled(MenuItemInner)`
 `;
 
 export const ListItem = ({
-  item = {},
+  list = {},
   activeListId,
   index,
-  handleClickMenuItem = Function.prototype,
+  onClickMenuItem = Function.prototype,
   isCreatingMode,
   notification,
   setCreatingMode,
 }) => {
   const dispatch = useDispatch();
-  const { id, label, children = [] } = item;
-  console.log('item: ', item);
+  const { id, label, children = [], teamId } = list;
   const isDefault = label === 'default';
   const [isEditMode, setEditMode] = useState(isCreatingMode);
   const [isOpenedPopup, setOpenedPopup] = useState(false);
@@ -102,7 +105,7 @@ export const ListItem = ({
     } else {
       dispatch(
         editListRequest(
-          { ...item, label: value },
+          { ...list, label: value },
           { notification, setEditMode },
         ),
       );
@@ -118,21 +121,28 @@ export const ListItem = ({
     setValue(label);
   };
 
-  const itemTitle = LIST_TYPES_ARRAY.includes(label)
+  const listTitle = LIST_TYPES_ARRAY.includes(label)
     ? upperFirst(label)
     : label;
 
-  const caslSubject = {
-    __typename: 'list',
-    edit_list: !!item?._links?.edit_list,
-    sort_list: !!item?._links?.sort_list,
-    delete_list: !!item?._links?.delete_list,
-  };
+  const listSubject = teamId
+    ? {
+        __typename: PERMISSION_ENTITY.TEAM_LIST,
+        edit_list: !!list?._links?.edit_list,
+        sort_list: !!list?._links?.sort_list,
+        delete_list: !!list?._links?.delete_list,
+      }
+    : {
+        __typename: PERMISSION_ENTITY.LIST,
+        team_edit_list: !!list?._links?.team_edit_list,
+        team_sort_list: !!list?._links?.team_sort_list,
+        team_delete_list: !!list?._links?.team_delete_list,
+      };
 
   const renderInner = () => (
     <>
       {isEditMode ? (
-        <ListItemInput
+        <ListInput
           isEditMode={isEditMode}
           setEditMode={setEditMode}
           isCreatingMode={isCreatingMode}
@@ -145,13 +155,13 @@ export const ListItem = ({
         />
       ) : (
         <>
-          <Can I="sort" a={caslSubject}>
+          <Can I={PERMISSION.SORT} a={listSubject}>
             <DnDIcon name="drag-n-drop" width={16} height={16} color="gray" />
           </Can>
-          <Title>{itemTitle}</Title>
+          <Title>{listTitle}</Title>
           <Counter>{children.length}</Counter>
-          <Can I="edit" a={caslSubject}>
-            <ItemIcon
+          <Can I={PERMISSION.EDIT} a={listSubject}>
+            <ActionIcon
               name="pencil"
               width={16}
               height={16}
@@ -159,8 +169,8 @@ export const ListItem = ({
               onClick={handleClickEdit}
             />
           </Can>
-          <Can I="delete" a={caslSubject}>
-            <ItemIcon
+          <Can I={PERMISSION.DELETE} a={listSubject}>
+            <ActionIcon
               name="trash"
               width={16}
               height={16}
@@ -177,7 +187,7 @@ export const ListItem = ({
   return isCreatingMode ? (
     <Wrapper
       isActive={activeListId === id && !isEditMode}
-      onClick={() => handleClickMenuItem(id)}
+      onClick={() => onClickMenuItem(id)}
       isEdit={isEditMode}
       isDefault={isDefault}
     >
@@ -194,7 +204,7 @@ export const ListItem = ({
         {provided => (
           <Wrapper
             isActive={activeListId === id && !isEditMode}
-            onClick={() => handleClickMenuItem(id)}
+            onClick={() => onClickMenuItem(id)}
             isEdit={isEditMode}
             isDefault={isDefault}
             ref={provided.innerRef}
@@ -206,7 +216,7 @@ export const ListItem = ({
         )}
       </Draggable>
       <ConfirmRemoveListModal
-        item={item}
+        list={list}
         isOpenedPopup={isOpenedPopup}
         setOpenedPopup={setOpenedPopup}
       />

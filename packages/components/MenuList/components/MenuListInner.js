@@ -3,7 +3,11 @@ import React, { memo, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { DragDropContext, Droppable } from 'react-beautiful-dnd';
 import styled from 'styled-components';
-import { DASHBOARD_MODE } from '@caesar/common/constants';
+import {
+  DASHBOARD_MODE,
+  PERMISSION,
+  PERMISSION_ENTITY,
+} from '@caesar/common/constants';
 import {
   userDataSelector,
   currentTeamSelector,
@@ -174,13 +178,13 @@ const MenuListInnerComponent = ({
     },
   ];
 
-  const caslSubject = currentTeam
+  const listSubject = currentTeam
     ? {
-        __typename: 'team_list',
+        __typename: PERMISSION_ENTITY.TEAM_LIST,
         team_create_list: !!currentTeam?._links?.team_create_list,
       }
     : {
-        __typename: 'list',
+        __typename: PERMISSION_ENTITY.LIST,
         list_create: !!user?._links?.list_create,
       };
 
@@ -217,7 +221,7 @@ const MenuListInnerComponent = ({
             </MenuItemTitle>
             {withChildren && (
               <>
-                <Can I="create" a={caslSubject}>
+                <Can I={PERMISSION.CREATE} a={listSubject}>
                   <ListAddIcon
                     name="plus"
                     width={16}
@@ -252,14 +256,14 @@ const MenuListInnerComponent = ({
                   >
                     {provided => (
                       <div ref={provided.innerRef} {...provided.droppableProps}>
-                        {children.map((item, index) => (
+                        {children.map((list, index) => (
                           <ListItem
-                            key={item.id}
-                            item={item}
+                            key={list.id}
+                            list={list}
                             activeListId={activeListId}
                             index={index}
                             notification={notification}
-                            handleClickMenuItem={handleClickMenuItem}
+                            onClickMenuItem={handleClickMenuItem}
                           />
                         ))}
                         {provided.placeholder}

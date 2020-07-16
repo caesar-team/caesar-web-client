@@ -9,7 +9,7 @@ import {
   Attachments,
 } from '../../ItemFields/view';
 import { Row } from '../../ItemFields/common';
-import { Wrapper, OwnerAndInvitation, RemoveButton } from '../components';
+import { Wrapper, OwnerAndInvitation, RemoveButton, Meta } from '../components';
 
 export const Credentials = ({
   item,
@@ -61,6 +61,7 @@ export const Credentials = ({
           onClickAcceptEdit={onClickAcceptEdit}
         />
       </Row>
+      <Meta item={item} />
       {onClickMoveToTrash && (
         <Row>
           <RemoveButton onClick={onClickMoveToTrash} />

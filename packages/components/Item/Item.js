@@ -46,7 +46,7 @@ const ItemComponent = ({
 
   const isTrashItem =
     item &&
-    (item.listId === trashList.id ||
+    (item.listId === trashList?.id ||
       teamsTrashLists.map(({ id }) => id).includes(item.listId));
 
   const handleClickAcceptEdit = ({ name, value }) => {

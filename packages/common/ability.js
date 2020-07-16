@@ -31,4 +31,19 @@ export const ability = defineAbility({ subjectName }, can => {
   can('create', 'list', {
     list_create: true,
   });
+  can('edit', 'list', {
+    edit_list: true,
+  });
+  can('sort', 'list', {
+    sort_list: true,
+  });
+  can('delete', 'list', {
+    delete_list: true,
+  });
+  can('create', 'team_list', {
+    team_create_list: true,
+  });
+  // can('get', 'team_list', {
+  //   team_get_lists: true,
+  // });
 });

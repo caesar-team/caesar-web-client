@@ -80,7 +80,7 @@ export const ItemHeader = ({
 
   const isTrashItem =
     item &&
-    (item.listId === trashList.id ||
+    (item.listId === trashList?.id ||
       teamsTrashLists.map(({ id: listId }) => listId).includes(item.listId));
 
   const handleToggleFavorites = () => {

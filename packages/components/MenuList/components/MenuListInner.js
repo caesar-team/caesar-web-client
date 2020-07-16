@@ -1,9 +1,13 @@
+/* eslint-disable camelcase */
 import React, { memo, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { DragDropContext, Droppable } from 'react-beautiful-dnd';
 import styled from 'styled-components';
 import { DASHBOARD_MODE } from '@caesar/common/constants';
-import { currentTeamSelector } from '@caesar/common/selectors/user';
+import {
+  userDataSelector,
+  currentTeamSelector,
+} from '@caesar/common/selectors/user';
 import {
   personalListsByTypeSelector,
   currentTeamListsSelector,
@@ -19,6 +23,7 @@ import {
 } from '@caesar/common/actions/workflow';
 import { sortListRequest } from '@caesar/common/actions/entities/list';
 import { withNotification } from '@caesar/components/Notification';
+import { Can } from '../../Ability';
 import { Icon } from '../../Icon';
 import { ListItem } from './ListItem';
 import { MenuItemInner } from './styledComponents';
@@ -82,6 +87,7 @@ const MenuListInnerComponent = ({
   notification,
 }) => {
   const dispatch = useDispatch();
+  const user = useSelector(userDataSelector);
   const currentTeam = useSelector(currentTeamSelector);
   const isPersonal = !currentTeam;
   const personalLists = useSelector(personalListsByTypeSelector);
@@ -168,6 +174,16 @@ const MenuListInnerComponent = ({
     },
   ];
 
+  const caslSubject = currentTeam
+    ? {
+        __typename: 'team_list',
+        team_create_list: !!currentTeam?._links?.team_create_list,
+      }
+    : {
+        __typename: 'list',
+        list_create: !!user?._links?.list_create,
+      };
+
   return menuList.map(({ id, icon, title, length, children }) => {
     const withChildren = id === 'lists';
 
@@ -201,12 +217,14 @@ const MenuListInnerComponent = ({
             </MenuItemTitle>
             {withChildren && (
               <>
-                <ListAddIcon
-                  name="plus"
-                  width={16}
-                  height={16}
-                  onClick={handleClickAddList}
-                />
+                <Can I="create" a={caslSubject}>
+                  <ListAddIcon
+                    name="plus"
+                    width={16}
+                    height={16}
+                    onClick={handleClickAddList}
+                  />
+                </Can>
                 <ListToggleIcon
                   name="arrow-triangle"
                   width={16}

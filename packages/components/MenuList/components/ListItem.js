@@ -1,3 +1,4 @@
+/* eslint-disable camelcase */
 import React, { useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { Draggable } from 'react-beautiful-dnd';
@@ -8,6 +9,7 @@ import {
   createListRequest,
   editListRequest,
 } from '@caesar/common/actions/entities/list';
+import { Can } from '../../Ability';
 import { Icon } from '../../Icon';
 import { ListItemInput } from './ListItemInput';
 import { ConfirmRemoveListModal } from './ConfirmRemoveListModal';
@@ -78,6 +80,7 @@ export const ListItem = ({
 }) => {
   const dispatch = useDispatch();
   const { id, label, children = [] } = item;
+  console.log('item: ', item);
   const isDefault = label === 'default';
   const [isEditMode, setEditMode] = useState(isCreatingMode);
   const [isOpenedPopup, setOpenedPopup] = useState(false);
@@ -93,9 +96,16 @@ export const ListItem = ({
 
   const handleClickAcceptEdit = () => {
     if (isCreatingMode) {
-      dispatch(createListRequest({ label: value }, { notification, setCreatingMode }));
+      dispatch(
+        createListRequest({ label: value }, { notification, setCreatingMode }),
+      );
     } else {
-      dispatch(editListRequest({ ...item, label: value }, { notification, setEditMode }));
+      dispatch(
+        editListRequest(
+          { ...item, label: value },
+          { notification, setEditMode },
+        ),
+      );
     }
   };
 
@@ -111,6 +121,13 @@ export const ListItem = ({
   const itemTitle = LIST_TYPES_ARRAY.includes(label)
     ? upperFirst(label)
     : label;
+
+  const caslSubject = {
+    __typename: 'list',
+    edit_list: !!item?._links?.edit_list,
+    sort_list: !!item?._links?.sort_list,
+    delete_list: !!item?._links?.delete_list,
+  };
 
   const renderInner = () => (
     <>
@@ -128,27 +145,29 @@ export const ListItem = ({
         />
       ) : (
         <>
-          <DnDIcon name="drag-n-drop" width={16} height={16} color="gray" />
+          <Can I="sort" a={caslSubject}>
+            <DnDIcon name="drag-n-drop" width={16} height={16} color="gray" />
+          </Can>
           <Title>{itemTitle}</Title>
           <Counter>{children.length}</Counter>
-          {!isDefault && (
-            <>
-              <ItemIcon
-                name="pencil"
-                width={16}
-                height={16}
-                color="gray"
-                onClick={handleClickEdit}
-              />
-              <ItemIcon
-                name="trash"
-                width={16}
-                height={16}
-                color="gray"
-                onClick={handleClickRemove}
-              />
-            </>
-          )}
+          <Can I="edit" a={caslSubject}>
+            <ItemIcon
+              name="pencil"
+              width={16}
+              height={16}
+              color="gray"
+              onClick={handleClickEdit}
+            />
+          </Can>
+          <Can I="delete" a={caslSubject}>
+            <ItemIcon
+              name="trash"
+              width={16}
+              height={16}
+              color="gray"
+              onClick={handleClickRemove}
+            />
+          </Can>
         </>
       )}
       <DnDIcon name="drag-n-drop" width={16} height={16} color="gray" />

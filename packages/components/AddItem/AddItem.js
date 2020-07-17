@@ -7,8 +7,8 @@ import {
   ROUTES,
   ITEM_TYPE,
   ITEM_ICON_TYPE,
-  CREATE_PERMISSION,
-  ENTITY_TYPE,
+  PERMISSION,
+  PERMISSION_ENTITY,
 } from '@caesar/common/constants';
 import { workInProgressListSelector } from '@caesar/common/selectors/workflow';
 import { currentTeamSelector } from '@caesar/common/selectors/user';
@@ -67,15 +67,20 @@ export const AddItem = ({ className }) => {
 
   const isOnline = useNavigatorOnline();
 
-  const itemSubject = {
-    __type: ENTITY_TYPE.ITEM,
-    listType: workInProgressList?.type,
-    teamId: workInProgressList?.teamId,
-    userRole: workInProgressList?.userRole,
-  };
+  const itemSubject = currentTeam
+    ? {
+        __typename: PERMISSION_ENTITY.TEAM_ITEM,
+        // eslint-disable-next-line camelcase
+        team_create_item: !!workInProgressList?._links?.team_create_item,
+      }
+    : {
+        __typename: PERMISSION_ENTITY.ITEM,
+        // eslint-disable-next-line camelcase
+        create_item: !!workInProgressList?._links?.create_item,
+      };
 
   return (
-    <Can I={CREATE_PERMISSION} of={itemSubject}>
+    <Can I={PERMISSION.CREATE} an={itemSubject}>
       <Dropdown
         options={itemTypesOptions}
         onClick={handleClickAddItem}

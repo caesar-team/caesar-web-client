@@ -1,12 +1,14 @@
 import React from 'react';
 import { useSelector } from 'react-redux';
 import styled from 'styled-components';
+import { PERMISSION } from '@caesar/common/constants';
 import { userDataSelector } from '@caesar/common/selectors/user';
 import {
   workInProgressItemOwnerSelector,
   workInProgressItemChildItemsSelector,
 } from '@caesar/common/selectors/workflow';
 import { membersByIdSelector } from '@caesar/common/selectors/entities/member';
+import { Can } from '../../Ability';
 import { Avatar, AvatarsList } from '../../Avatar';
 import { Icon } from '../../Icon';
 
@@ -70,7 +72,7 @@ const ShareButton = styled.button`
   `}
 `;
 
-export const OwnerAndInvitation = ({ onClickShare }) => {
+export const OwnerAndInvitation = ({ itemSubject, onClickShare }) => {
   const user = useSelector(userDataSelector);
   const owner = useSelector(workInProgressItemOwnerSelector);
   const childItems = useSelector(workInProgressItemChildItemsSelector);
@@ -112,12 +114,14 @@ export const OwnerAndInvitation = ({ onClickShare }) => {
           <Icon name="members" width={16} height={16} color="lightGray" />
         </NoMembers>
       )}
-      <ShareButton
-        // disabled={!isOnline}
-        onClick={onClickShare}
-      >
-        <Icon withOfflineCheck name="plus" width={16} height={16} />
-      </ShareButton>
+      <Can I={PERMISSION.SHARE} an={itemSubject}>
+        <ShareButton
+          // disabled={!isOnline}
+          onClick={onClickShare}
+        >
+          <Icon withOfflineCheck name="plus" width={16} height={16} />
+        </ShareButton>
+      </Can>
     </Wrapper>
   );
 };

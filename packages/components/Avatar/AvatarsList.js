@@ -4,6 +4,7 @@ import { Avatar } from './Avatar';
 
 const Wrapper = styled.div`
   display: flex;
+  z-index: ${({ theme }) => theme.zIndex.basic};
 `;
 
 const StyledAvatar = styled(Avatar)`

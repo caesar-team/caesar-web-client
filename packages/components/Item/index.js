@@ -1,3 +1,3 @@
 export { Item } from './Item';
 export { MultiItem } from './MultiItem';
-export { Credentials, Document } from './Types';
+export { Credentials, Document } from './types';

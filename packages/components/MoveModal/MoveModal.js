@@ -99,6 +99,7 @@ const ModalDescription = styled.div`
 const TextWithLinesStyled = styled(TextWithLines)`
   &::after {
     margin-right: 0;
+  }
 `;
 
 const Items = styled.div`
@@ -143,14 +144,18 @@ const MoveModalComponent = ({
     teamOptions,
     listOptions,
   } = useItemTeamAndListOptions({
-    teamId: teamId,
-    listId: listId,
+    teamId,
+    listId,
   });
 
   const handleClickAccept = () => {
     if (isMultiMode) {
       dispatch(
-        moveItemsBatchRequest(workInProgressItemIds, checkedTeamId, checkedListId)
+        moveItemsBatchRequest(
+          workInProgressItemIds,
+          checkedTeamId,
+          checkedListId,
+        ),
       );
       dispatch(resetWorkInProgressItemIds());
 
@@ -216,15 +221,14 @@ const MoveModalComponent = ({
       shouldCloseOnEsc
       shouldCloseOnOverlayClick
     >
-      {isMultiMode ?
-        (
-          <>
-            <ModalTitle>Move</ModalTitle>
-            <ModalDescription>Move selected items</ModalDescription>
-          </>
-        )
-        : <ModalTitle>Move item to another team or list </ModalTitle>
-      }
+      {isMultiMode ? (
+        <>
+          <ModalTitle>Move</ModalTitle>
+          <ModalDescription>Move selected items</ModalDescription>
+        </>
+      ) : (
+        <ModalTitle>Move item to another team or list </ModalTitle>
+      )}
       <ListsWrapper>
         <StyledSelectVisible
           label="Team"

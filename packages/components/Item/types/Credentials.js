@@ -9,31 +9,36 @@ import {
   Attachments,
 } from '../../ItemFields/view';
 import { Row } from '../../ItemFields/common';
-import { Wrapper, OwnerAndInvitation, RemoveButton } from '../components';
+import { OwnerAndInvitation } from '../components';
 
 export const Credentials = ({
   item,
+  itemSubject,
   onClickAcceptEdit,
   onClickShare,
-  onClickMoveToTrash,
 }) => {
   const {
     data: { name, login, pass, website, note, attachments = [] },
   } = item;
 
   return (
-    <Wrapper>
+    <>
       <Title
         value={name}
+        itemSubject={itemSubject}
         schema={SCHEMA.REQUIRED_LIMITED_STRING()}
         onClickAcceptEdit={onClickAcceptEdit}
       />
-      <OwnerAndInvitation onClickShare={onClickShare} />
+      <OwnerAndInvitation
+        itemSubject={itemSubject}
+        onClickShare={onClickShare}
+      />
       <Row>
         <Input
           label="Login"
           name="login"
           value={login}
+          itemSubject={itemSubject}
           schema={SCHEMA.REQUIRED_LIMITED_STRING()}
           onClickAcceptEdit={onClickAcceptEdit}
         />
@@ -41,6 +46,7 @@ export const Credentials = ({
       <Row>
         <Password
           value={pass}
+          itemSubject={itemSubject}
           schema={SCHEMA.REQUIRED_LIMITED_STRING()}
           onClickAcceptEdit={onClickAcceptEdit}
         />
@@ -48,24 +54,25 @@ export const Credentials = ({
       <Row>
         <Website
           value={website}
+          itemSubject={itemSubject}
           schema={SCHEMA.WEBSITE}
           onClickAcceptEdit={onClickAcceptEdit}
         />
       </Row>
       <Row marginBottom={24}>
-        <Note value={note} onClickAcceptEdit={onClickAcceptEdit} />
+        <Note
+          value={note}
+          itemSubject={itemSubject}
+          onClickAcceptEdit={onClickAcceptEdit}
+        />
       </Row>
       <Row marginBottom={24}>
         <Attachments
           attachments={attachments}
+          itemSubject={itemSubject}
           onClickAcceptEdit={onClickAcceptEdit}
         />
       </Row>
-      {onClickMoveToTrash && (
-        <Row>
-          <RemoveButton onClick={onClickMoveToTrash} />
-        </Row>
-      )}
-    </Wrapper>
+    </>
   );
 };

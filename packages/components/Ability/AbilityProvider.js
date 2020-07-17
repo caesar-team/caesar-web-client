@@ -1,30 +1,8 @@
-import React, { PureComponent, createContext } from 'react';
-import { connect } from 'react-redux';
-import { createAbility } from '@caesar/common/ability';
-import { caslUserDataSelector } from '@caesar/common/selectors/user';
-import { createStructuredSelector } from 'reselect';
+import React, { createContext } from 'react';
+import { ability } from '@caesar/common/ability';
 
-const Context = createContext({});
-const { Provider, Consumer } = Context;
+export const AbilityContext = createContext();
 
-class AbilityProvider extends PureComponent {
-  render() {
-    const { userData, children } = this.props;
-
-    const ability = createAbility(userData);
-
-    return <Provider value={ability}>{children}</Provider>;
-  }
-}
-
-const mapStateToProps = createStructuredSelector({
-  userData: caslUserDataSelector,
-});
-
-export const AbilityContext = Context;
-export const AbilityConsumer = Consumer;
-
-export default connect(
-  mapStateToProps,
-  null,
-)(AbilityProvider);
+export const AbilityProvider = ({ children }) => (
+  <AbilityContext.Provider value={ability}>{children}</AbilityContext.Provider>
+);

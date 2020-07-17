@@ -5,12 +5,12 @@ import { removeListRequest } from '@caesar/common/actions/entities/list';
 import { ConfirmModal } from '@caesar/components';
 
 export const ConfirmRemoveListModal = ({
-  item,
+  list,
   isOpenedPopup,
   setOpenedPopup,
 }) => {
   const dispatch = useDispatch();
-  const { id, label, children = [] } = item;
+  const { id, label, children = [] } = list;
 
   const handleClickConfirmRemove = () => {
     dispatch(removeListRequest(id));

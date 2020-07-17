@@ -193,12 +193,12 @@ class SharedItemsStep extends Component {
 
     const { items, selectedIds, user } = this.state;
 
-    const personalItems = items.personal.filter(({ id }) =>
+    const personalItems = items.personal?.filter(({ id }) =>
       selectedIds.includes(id),
     );
     const personalItemIds = personalItems.map(({ id }) => ({ id }));
 
-    const teamsItems = items.teams.reduce(
+    const teamsItems = items.teams?.reduce(
       (accumulator, { items: teamItems }) => [...accumulator, ...teamItems],
       [],
     );

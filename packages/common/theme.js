@@ -33,12 +33,12 @@ const theme = {
   },
   zIndex: {
     hidden: -1,
-    basic: 11,
-    upBasic: 12,
-    overlay: 13,
-    dropdown: 14,
-    modal: 15,
-    notification: 16,
+    basic: 1,
+    upBasic: 2,
+    overlay: 3,
+    dropdown: 4,
+    modal: 5,
+    notification: 6,
   },
 };
 

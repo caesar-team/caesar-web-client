@@ -1,36 +1,39 @@
 import React from 'react';
 import { Title, Note, Attachments } from '../../ItemFields/view';
 import { Row } from '../../ItemFields/common';
-import { Wrapper, OwnerAndInvitation, RemoveButton } from '../components';
+import { OwnerAndInvitation } from '../components';
 
 export const Document = ({
   item,
+  itemSubject,
   onClickAcceptEdit,
   onClickShare,
-  onClickMoveToTrash,
 }) => {
   const {
     data: { name, note, attachments = [] },
   } = item;
 
   return (
-    <Wrapper>
+    <>
       <Title value={name} onClickAcceptEdit={onClickAcceptEdit} />
-      <OwnerAndInvitation onClickShare={onClickShare} />
+      <OwnerAndInvitation
+        itemSubject={itemSubject}
+        onClickShare={onClickShare}
+      />
       <Row marginBottom={24}>
-        <Note value={note} onClickAcceptEdit={onClickAcceptEdit} />
+        <Note
+          value={note}
+          itemSubject={itemSubject}
+          onClickAcceptEdit={onClickAcceptEdit}
+        />
       </Row>
       <Row marginBottom={24}>
         <Attachments
           attachments={attachments}
+          itemSubject={itemSubject}
           onClickAcceptEdit={onClickAcceptEdit}
         />
       </Row>
-      {onClickMoveToTrash && (
-        <Row>
-          <RemoveButton onClick={onClickMoveToTrash} />
-        </Row>
-      )}
-    </Wrapper>
+    </>
   );
 };

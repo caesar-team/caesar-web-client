@@ -161,6 +161,7 @@ const MiddleColumnComponent = ({
           mode === DASHBOARD_MODE.DEFAULT ? visibleListItems : searchedItems
         }
         onClickItem={handleClickItem}
+        onSelectItem={handleCtrlSelectionItemBehaviour}
       />
     </>
   );

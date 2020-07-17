@@ -12,6 +12,32 @@ const Title = styled.div`
   white-space: nowrap;
 `;
 
+const CheckboxStyled = styled(Checkbox)`
+  ${Checkbox.Box} {
+    background-color: ${({ theme }) => theme.color.emperor};
+    border: 1px solid ${({ theme }) => theme.color.emperor};
+
+    ${({ checked }) => `
+      > svg {
+        display: ${checked ? 'block' : 'none'};
+      }
+    `}
+  }
+
+  ${Checkbox.Input}:checked + ${Checkbox.Box} {
+    background-color: ${({ theme }) => theme.color.emperor};
+    border-color: ${({ theme }) => theme.color.emperor};
+  }
+`;
+
+const ItemTypeIcon = ({ type }) => {
+  const icon = ITEM_ICON_TYPE[type] || ITEM_ICON_TYPE[ITEM_TYPE.CREDENTIALS];
+
+  return <Icon name={icon} width={20} height={20} color="white" />;
+};
+
+const IconWrapper = styled.span``;
+
 const Row = styled.div`
   position: relative;
   display: flex;
@@ -32,6 +58,14 @@ const Row = styled.div`
         background: ${theme.color.white};
         border-top-color: ${theme.color.gallery};
         border-bottom-color: ${theme.color.gallery};
+        
+        ${CheckboxStyled} {
+          display: flex;
+        }
+
+        ${IconWrapper} {
+          display: none;
+        }
       }
     `}
 
@@ -55,6 +89,14 @@ const Row = styled.div`
   ${Title} {
     font-weight: ${({ isActive }) => (isActive ? 600 : 400)};
   }
+  
+  ${CheckboxStyled} {
+    display: ${({ isMultiItem }) => isMultiItem ? 'flex' : 'none'};
+  }
+  
+  ${IconWrapper} {
+    display: ${({ isMultiItem }) => isMultiItem ? 'none' : 'inline-block'};
+  }
 `;
 
 const TypeIconWrapper = styled.div`
@@ -65,24 +107,6 @@ const TypeIconWrapper = styled.div`
   height: 40px;
   background: ${({ theme }) => theme.color.gray};
   border-radius: 4px;
-`;
-
-const CheckboxStyled = styled(Checkbox)`
-  ${Checkbox.Box} {
-    background-color: ${({ theme }) => theme.color.emperor};
-    border: 1px solid ${({ theme }) => theme.color.emperor};
-
-    ${({ checked }) => `
-      > svg {
-        display: ${checked ? 'block' : 'none'};
-      }
-    `}
-  }
-
-  ${Checkbox.Input}:checked + ${Checkbox.Box} {
-    background-color: ${({ theme }) => theme.color.emperor};
-    border-color: ${({ theme }) => theme.color.emperor};
-  }
 `;
 
 const Addon = styled.div`
@@ -117,12 +141,6 @@ const CloseIcon = styled(Icon)`
   }
 `;
 
-const ItemTypeIcon = ({ type }) => {
-  const icon = ITEM_ICON_TYPE[type] || ITEM_ICON_TYPE[ITEM_TYPE.CREDENTIALS];
-
-  return <Icon name={icon} width={20} height={20} color="white" />;
-};
-
 export const Item = ({
   id,
   data: { name, attachments },
@@ -137,8 +155,9 @@ export const Item = ({
   style,
   onClickClose = Function.prototype,
   onClickItem = Function.prototype,
+  onSelectItem = Function.prototype,
   ...props
-}) => {
+}) => {console.log(isMultiItem);
   const shouldShowMembers = !!invited.length;
   const shouldShowAttachments = attachments && attachments.length > 0;
   const shouldShowFavoriteIcon = favorite && !isClosable;
@@ -154,12 +173,11 @@ export const Item = ({
       isInModal={isInModal}
       {...props}
     >
-      <TypeIconWrapper>
-        {isMultiItem ? (
-          <CheckboxStyled checked={isActive} onChange={Function.prototype} />
-        ) : (
+      <TypeIconWrapper onClick={e => { e.stopPropagation(); }}>
+        <CheckboxStyled checked={isActive} onChange={() => { onSelectItem(id)}} />
+        <IconWrapper>
           <ItemTypeIcon type={type} />
-        )}
+        </IconWrapper>
       </TypeIconWrapper>
       <Title>{name}</Title>
       {shouldShowAttachments && (

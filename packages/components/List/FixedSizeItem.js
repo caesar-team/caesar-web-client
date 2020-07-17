@@ -9,12 +9,11 @@ const FixedSizeItemComponent = ({ data, index, style }) => {
     workInProgressItemIds,
     workInProgressItem,
     onClickItem,
+    onSelectItem,
   } = data;
   const item = items[index];
 
-  const isActive = isMultiItem
-    ? workInProgressItemIds.includes(item.id)
-    : workInProgressItem && workInProgressItem.id === item.id;
+  const isActive = isMultiItem && workInProgressItemIds.includes(item.id);
 
   return (
     <Item
@@ -24,6 +23,7 @@ const FixedSizeItemComponent = ({ data, index, style }) => {
       isMultiItem={isMultiItem}
       isActive={isActive}
       onClickItem={onClickItem}
+      onSelectItem={onSelectItem}
       {...item}
     />
   );

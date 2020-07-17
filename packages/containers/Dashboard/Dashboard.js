@@ -78,7 +78,7 @@ const DashboardComponent = ({ notification }) => {
     setOpenedModal(null);
   };
 
-  const handleCtrlSelectionItemBehaviour = itemId => {
+  const handleCtrlSelectionItemBehaviour = itemId => {console.log(itemId);
     const ids = workInProgressItemIds.includes(itemId)
       ? workInProgressItemIds.filter(id => id !== itemId)
       : [...workInProgressItemIds, itemId];

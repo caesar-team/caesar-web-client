@@ -1,4 +1,5 @@
-import React, { memo } from 'react';
+import React, { memo, useRef } from 'react';
+import { useClickAway } from 'react-use';
 import styled from 'styled-components';
 import equal from 'fast-deep-equal';
 import memoize from 'memoize-one';
@@ -44,12 +45,14 @@ const createItemData = memoize(
     workInProgressItemIds,
     workInProgressItem,
     onClickItem,
+    onSelectItem,
   ) => ({
     items,
     isMultiItem,
     workInProgressItemIds,
     workInProgressItem,
     onClickItem,
+    onSelectItem,
   }),
 );
 
@@ -61,8 +64,14 @@ const ListComponent = ({
   workInProgressItemIds,
   items = [],
   onClickItem = Function.prototype,
+  onSelectItem = Function.prototype,
 }) => {
   const isDashboardDefaultMode = mode === DASHBOARD_MODE.DEFAULT;
+  const ref = useRef(null);
+
+  useClickAway(ref, () => {
+    console.log('Click away');
+  });
 
   if (
     isDashboardDefaultMode &&
@@ -88,11 +97,13 @@ const ListComponent = ({
       workInProgressItemIds,
       workInProgressItem,
       onClickItem,
+      onSelectItem,
     );
 
     return (
       <AutoSizer>
         {({ height, width }) => (
+          <div  ref={ref} style={{ height: '300px', width: '100%' }}>
           <FixedSizeList
             height={height}
             itemCount={items.length}
@@ -103,6 +114,7 @@ const ListComponent = ({
           >
             {FixedSizeItem}
           </FixedSizeList>
+          </div>
         )}
       </AutoSizer>
     );

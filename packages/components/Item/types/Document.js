@@ -1,7 +1,7 @@
 import React from 'react';
 import { Title, Note, Attachments } from '../../ItemFields/view';
 import { Row } from '../../ItemFields/common';
-import { OwnerAndInvitation } from '../components';
+import { Meta, OwnerAndInvitation } from '../components';
 
 export const Document = ({
   item,
@@ -34,6 +34,7 @@ export const Document = ({
           onClickAcceptEdit={onClickAcceptEdit}
         />
       </Row>
+      <Meta item={item} />
     </>
   );
 };

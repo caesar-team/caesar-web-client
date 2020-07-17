@@ -32,7 +32,7 @@ const DownloadIcon = styled(Icon)`
 
 const Inner = styled.div`
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr);
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
   grid-gap: 16px 40px;
 `;
 

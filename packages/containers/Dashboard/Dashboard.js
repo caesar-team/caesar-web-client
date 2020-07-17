@@ -58,6 +58,13 @@ const RightColumnWrapper = styled.div`
   max-width: calc(100% - 287px - 431px);
 `;
 
+const StyledSecureMessage = styled(SecureMessage)`
+  max-width: 848px;
+  padding-right: 24px;
+  padding-left: 24px;
+  margin: 0 auto;
+`;
+
 const DashboardComponent = ({ notification }) => {
   const dispatch = useDispatch();
   const [mode, setMode] = useState(DASHBOARD_MODE.DEFAULT);
@@ -113,7 +120,7 @@ const DashboardComponent = ({ notification }) => {
             />
           </Sidebar>
           {mode === DASHBOARD_MODE.TOOL ? (
-            <SecureMessage withScroll />
+            <StyledSecureMessage withScroll />
           ) : (
             <>
               <MiddleColumnWrapper>

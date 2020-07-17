@@ -7,7 +7,7 @@ import {
   Document,
   withNotification,
 } from '@caesar/components';
-import { LIST_TYPE, ITEM_TYPE, ITEM_MODE } from '@caesar/common/constants';
+import { LIST_TYPE, ITEM_TYPE } from '@caesar/common/constants';
 import {
   getPrivateKeyObj,
   decryptItem,
@@ -37,7 +37,7 @@ class Sharing extends Component {
     const decryptedSecret = await decryptItem(item.secret, privateKeyObj);
 
     this.setState({
-      item: { ...item, data: decryptedSecret, mode: ITEM_MODE.REVIEW },
+      item: { ...item, data: decryptedSecret },
     });
   }
 

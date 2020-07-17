@@ -44,10 +44,10 @@ const Inner = styled.div`
 `;
 
 export const NewFilesModal = ({ files, closeModal }) => {
-  const [isDropdownOpened, setIsDropdownOpened] = useState(true);
+  const [isDropdownOpened, setDropdownOpened] = useState(true);
 
   const handleToggleDropdown = () => {
-    setIsDropdownOpened(!isDropdownOpened);
+    setDropdownOpened(!isDropdownOpened);
   };
 
   return (

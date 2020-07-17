@@ -26,15 +26,15 @@ export const ShareModal = ({ notification, handleCloseModal }) => {
   );
   const childItemsById = useSelector(childItemsByIdSelector);
 
-  const isTeamItem = workInProgressItem && workInProgressItem.teamId;
-  const isMultiItem = workInProgressItemIds && workInProgressItemIds.length > 0;
+  const isTeamItem = workInProgressItem?.teamId;
+  const isMultiItem = workInProgressItemIds?.length > 0;
   const availableTeamsForSharing = isTeamItem
-    ? userTeamList.filter(({ id }) => id !== workInProgressItem.teamId)
+    ? userTeamList.filter(({ id }) => id !== workInProgressItem?.teamId)
     : userTeamList;
 
   const handleShare = (members, teamIds) => {
     if (members.length > 0 || teamIds.length > 0) {
-      if (workInProgressItemIds && workInProgressItemIds.length > 0) {
+      if (workInProgressItemIds?.length > 0) {
         dispatch(
           shareItemBatchRequest({
             itemIds: workInProgressItemIds,
@@ -46,7 +46,7 @@ export const ShareModal = ({ notification, handleCloseModal }) => {
       } else {
         dispatch(
           shareItemBatchRequest({
-            itemIds: [workInProgressItem.id],
+            itemIds: [workInProgressItem?.id],
             members,
             teamIds,
           }),

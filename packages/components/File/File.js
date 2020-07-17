@@ -2,7 +2,8 @@ import React from 'react';
 import { useHover } from 'react-use';
 import styled from 'styled-components';
 import DownloadIconSvg from '@caesar/assets/icons/svg/icon-download-white.svg';
-import CloseIconSvg from '@caesar/assets/icons/svg/icon-close-white.svg';
+import { PERMISSION } from '@caesar/common/constants';
+import { Can } from '../Ability';
 import { Icon } from '../Icon';
 
 const FileExt = styled.div`
@@ -148,6 +149,7 @@ const File = ({
   name,
   raw,
   error,
+  itemSubject,
   onClickRemove,
   onClickDownload,
   ...props
@@ -201,7 +203,13 @@ const File = ({
         <FileName>{filename}</FileName>
         <FileSize>{size}</FileSize>
       </Details>
-      {onClickRemove && hoverableCloseIcon}
+      {itemSubject ? (
+        <Can I={PERMISSION.EDIT} an={itemSubject}>
+          {onClickRemove && hoverableCloseIcon}
+        </Can>
+      ) : (
+        onClickRemove && hoverableCloseIcon
+      )}
     </UploadedWrapper>
   );
 };

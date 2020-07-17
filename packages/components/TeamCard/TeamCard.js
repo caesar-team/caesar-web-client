@@ -4,10 +4,11 @@ import Link from 'next/link';
 import memoizeOne from 'memoize-one';
 import { Button, AvatarsList, Can } from '@caesar/components';
 import {
-  DELETE_PERMISSION,
   ROUTES,
   TEAM_TYPE,
   TEAM_TEXT_TYPE,
+  PERMISSION,
+  PERMISSION_ENTITY,
 } from '@caesar/common/constants';
 
 const Wrapper = styled.div`
@@ -85,6 +86,12 @@ const TeamCard = ({
   const { id, icon, users } = team;
   const areMembersAvailable = users && users.length > 0;
 
+  const teamSubject = {
+    __typename: PERMISSION_ENTITY.TEAM,
+    // eslint-disable-next-line camelcase
+    team_delete: !!team?._links?.team_delete,
+  };
+
   return (
     <Wrapper className={className} onClick={onClick}>
       <Link
@@ -114,7 +121,7 @@ const TeamCard = ({
           />
         )}
         {isRemoveButtonVisible && (
-          <Can I={DELETE_PERMISSION} of={team}>
+          <Can I={PERMISSION.DELETE} a={teamSubject}>
             <Button color="white" onClick={onClickRemoveTeam}>
               Remove
             </Button>

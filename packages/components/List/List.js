@@ -10,6 +10,7 @@ import { DASHBOARD_MODE, LIST_TYPES_ARRAY } from '@caesar/common/constants';
 import { FixedSizeItem } from './FixedSizeItem';
 import { ScrollbarVirtualList } from './ScrollbarVirtualList';
 import { EmptyList } from './EmptyList';
+import { Scrollbar } from '../Scrollbar';
 
 const Wrapper = styled.div`
   position: relative;
@@ -65,12 +66,13 @@ const ListComponent = ({
   items = [],
   onClickItem = Function.prototype,
   onSelectItem = Function.prototype,
+  onClearItems = Function.prototype,
 }) => {
   const isDashboardDefaultMode = mode === DASHBOARD_MODE.DEFAULT;
   const ref = useRef(null);
 
   useClickAway(ref, () => {
-    console.log('Click away');
+    onClearItems();
   });
 
   if (
@@ -103,7 +105,6 @@ const ListComponent = ({
     return (
       <AutoSizer>
         {({ height, width }) => (
-          <div  ref={ref} style={{ height: '300px', width: '100%' }}>
           <FixedSizeList
             height={height}
             itemCount={items.length}
@@ -114,7 +115,6 @@ const ListComponent = ({
           >
             {FixedSizeItem}
           </FixedSizeList>
-          </div>
         )}
       </AutoSizer>
     );
@@ -125,7 +125,7 @@ const ListComponent = ({
     : workInProgressList?.label;
 
   return (
-    <Wrapper isEmpty={isEmpty}>
+    <Wrapper isEmpty={isEmpty} ref={ref}>
       {!isMultiItem && (
         <ColumnHeader>
           <ColumnTitle>

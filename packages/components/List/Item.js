@@ -1,8 +1,15 @@
 import React from 'react';
 import styled from 'styled-components';
-import { ITEM_TYPE, ITEM_ICON_TYPE } from '@caesar/common/constants';
+import {
+  ITEM_TYPE,
+  ITEM_ICON_TYPE,
+  PERMISSION_ENTITY,
+  PERMISSION,
+  PERMISSION_MESSAGES,
+} from '@caesar/common/constants';
 import { Icon } from '../Icon';
 import { Checkbox } from '../Checkbox';
+import { Can } from '../Ability';
 
 const Title = styled.div`
   margin-right: auto;
@@ -38,6 +45,34 @@ const ItemTypeIcon = ({ type }) => {
 
 const IconWrapper = styled.span``;
 
+const Tooltip = styled.div`
+  display: none;
+  position: absolute;
+  top: -40px;
+  left: 0;
+  padding: 4px 8px;
+  background-color: ${({ theme }) => theme.color.black};
+  color: ${({ theme }) => theme.color.white};
+  border-radius: 4px;
+  font-size: ${({ theme }) => theme.font.size.xs};
+  white-space: nowrap;
+  transform: translate(-50%, 0);
+  z-index: 1000;
+`;
+
+const NotEditIconWrapper = styled.div`
+  position: relative;
+
+  &:hover {
+    ${Tooltip} {
+      display: flex;
+    }
+  }
+`;
+
+const NotEditIcon = styled(Icon)`
+`;
+
 const Row = styled.div`
   position: relative;
   display: flex;
@@ -59,7 +94,7 @@ const Row = styled.div`
         border-top-color: ${theme.color.gallery};
         border-bottom-color: ${theme.color.gallery};
         
-        ${CheckboxStyled} {
+        ${CheckboxStyled}, ${NotEditIcon} {
           display: flex;
         }
 
@@ -90,12 +125,16 @@ const Row = styled.div`
     font-weight: ${({ isActive }) => (isActive ? 600 : 400)};
   }
   
-  ${CheckboxStyled} {
+  ${CheckboxStyled}, ${NotEditIcon} {
     display: ${({ isMultiItem }) => isMultiItem ? 'flex' : 'none'};
   }
   
   ${IconWrapper} {
     display: ${({ isMultiItem }) => isMultiItem ? 'none' : 'inline-block'};
+  }
+  
+  ${Tooltip} {
+    display: none;
   }
 `;
 
@@ -153,14 +192,34 @@ export const Item = ({
   isInModal = false,
   favorite,
   style,
+  teamId,
+  _links,
   onClickClose = Function.prototype,
   onClickItem = Function.prototype,
   onSelectItem = Function.prototype,
   ...props
-}) => {console.log(isMultiItem);
+}) => {
   const shouldShowMembers = !!invited.length;
   const shouldShowAttachments = attachments && attachments.length > 0;
   const shouldShowFavoriteIcon = favorite && !isClosable;
+  const itemSubject = teamId
+    ? {
+      __typename: PERMISSION_ENTITY.TEAM_ITEM,
+      team_move_item: !!_links?.team_move_item,
+      team_batch_share_item: !!_links?.team_batch_share_item,
+      team_delete_item: !!_links?.team_delete_item,
+    }
+    : {
+      __typename: PERMISSION_ENTITY.ITEM,
+      move_item: !!_links?.move_item,
+      batch_share_item: !!_links?.batch_share_item,
+      delete_item: !!_links?.delete_item,
+    };
+  const possiblePermissions = [
+    PERMISSION.MOVE,
+    PERMISSION.SHARE,
+    PERMISSION.TRASH,
+  ];
 
   return (
     <Row
@@ -174,10 +233,24 @@ export const Item = ({
       {...props}
     >
       <TypeIconWrapper onClick={e => { e.stopPropagation(); }}>
-        <CheckboxStyled checked={isActive} onChange={() => { onSelectItem(id)}} />
-        <IconWrapper>
-          <ItemTypeIcon type={type} />
-        </IconWrapper>
+        <Can I={possiblePermissions} an={itemSubject}>
+          <CheckboxStyled
+            checked={isActive}
+            onChange={() => { onSelectItem(id)}}
+          />
+          <IconWrapper>
+            <ItemTypeIcon type={type} />
+          </IconWrapper>
+        </Can>
+        <Can not I={possiblePermissions} an={itemSubject}>
+          <NotEditIconWrapper>
+            <NotEditIcon name="not-edit" width={20} height={20} color="white" />
+            <Tooltip>{PERMISSION_MESSAGES.FORBIDDEN_SELECT}</Tooltip>
+          </NotEditIconWrapper>
+          <IconWrapper>
+            <ItemTypeIcon type={type} />
+          </IconWrapper>
+        </Can>
       </TypeIconWrapper>
       <Title>{name}</Title>
       {shouldShowAttachments && (

@@ -5,6 +5,6 @@ const StyledWrapper = styled.div`
   padding: 24px 40px;
 `;
 
-export const Wrapper = ({ children }) => {
+export const InnerWrapper = ({ children }) => {
   return <StyledWrapper>{children}</StyledWrapper>;
 };

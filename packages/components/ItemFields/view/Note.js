@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
+import { PERMISSION } from '@caesar/common/constants';
+import { Can } from '../../Ability';
 import { Icon } from '../../Icon';
 import { FormTextArea } from '../../Input';
 import { Button } from '../../Button';
@@ -47,18 +49,18 @@ const AddBtn = styled(Button)`
   font-size: ${({ theme }) => theme.font.size.main};
 `;
 
-export const Note = ({ value: propValue, onClickAcceptEdit }) => {
-  const [isEdit, setIsEdit] = useState(false);
-  const [isFocused, setIsFocused] = useState(false);
+export const Note = ({ value: propValue, itemSubject, onClickAcceptEdit }) => {
+  const [isEdit, setEdit] = useState(false);
+  const [isFocused, setFocused] = useState(false);
   const [value, setValue] = useState(propValue);
 
   const handleClickAdd = () => {
-    setIsEdit(true);
+    setEdit(true);
   };
 
   const handleClickEdit = () => {
-    setIsEdit(true);
-    setIsFocused(true);
+    setEdit(true);
+    setFocused(true);
   };
 
   const handleDeleteNote = () => {
@@ -69,48 +71,57 @@ export const Note = ({ value: propValue, onClickAcceptEdit }) => {
     <Wrapper>
       {propValue || isEdit ? (
         <>
-          <StyledFormTextArea
-            label="Notes"
-            value={value}
-            onChange={e => setValue(e.target.value)}
-            onFocus={onClickAcceptEdit && (() => setIsEdit(true))}
-            onClickAcceptEdit={() => {
-              onClickAcceptEdit({ name: 'note', value });
-              setIsEdit(false);
-            }}
-            onClickAway={() => setIsEdit(false)}
-            onClickClose={() => setIsEdit(false)}
-            isFocused={isFocused}
-            isEdit={isEdit}
-            isDisabled={!onClickAcceptEdit}
-          />
-          {!isEdit && onClickAcceptEdit && (
-            <>
-              <IconsWrapper>
-                <StyledIcon
-                  name="pencil"
-                  width={16}
-                  height={16}
-                  color="gray"
-                  onClick={handleClickEdit}
-                />
-                <StyledIcon
-                  name="trash"
-                  width={16}
-                  height={16}
-                  color="gray"
-                  onClick={handleDeleteNote}
-                />
-              </IconsWrapper>
-            </>
-          )}
+          <Can I={PERMISSION.EDIT} an={itemSubject}>
+            <StyledFormTextArea
+              label="Notes"
+              value={value}
+              onChange={e => setValue(e.target.value)}
+              onFocus={onClickAcceptEdit && (() => setEdit(true))}
+              onClickAcceptEdit={() => {
+                onClickAcceptEdit({ name: 'note', value });
+                setEdit(false);
+              }}
+              onClickAway={() => setEdit(false)}
+              onClickClose={() => setEdit(false)}
+              isFocused={isFocused}
+              isEdit={isEdit}
+              isDisabled={!onClickAcceptEdit}
+            />
+          </Can>
+          <Can not I={PERMISSION.EDIT} an={itemSubject}>
+            <StyledFormTextArea label="Notes" value={value} />
+          </Can>
+          <Can I={PERMISSION.EDIT} an={itemSubject}>
+            {!isEdit && onClickAcceptEdit && (
+              <>
+                <IconsWrapper>
+                  <StyledIcon
+                    name="pencil"
+                    width={16}
+                    height={16}
+                    color="gray"
+                    onClick={handleClickEdit}
+                  />
+                  <StyledIcon
+                    name="trash"
+                    width={16}
+                    height={16}
+                    color="gray"
+                    onClick={handleDeleteNote}
+                  />
+                </IconsWrapper>
+              </>
+            )}
+          </Can>
         </>
       ) : (
-        onClickAcceptEdit && (
-          <AddBtn color="transparent" icon="plus" onClick={handleClickAdd}>
-            Add note
-          </AddBtn>
-        )
+        <Can I={PERMISSION.EDIT} an={itemSubject}>
+          {onClickAcceptEdit && (
+            <AddBtn color="transparent" icon="plus" onClick={handleClickAdd}>
+              Add note
+            </AddBtn>
+          )}
+        </Can>
       )}
     </Wrapper>
   );

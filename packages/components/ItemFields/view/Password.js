@@ -19,14 +19,14 @@ const EyeIcon = styled(Icon)`
   }
 `;
 
-export const Password = ({ value, schema, onClickAcceptEdit }) => {
-  const [isVisible, setIsVisible] = useState(false);
+export const Password = ({ value, itemSubject, schema, onClickAcceptEdit }) => {
+  const [isVisible, setVisible] = useState(false);
 
   const handleHoldStart = () => {
-    setIsVisible(true);
+    setVisible(true);
   };
   const handleHoldEnd = () => {
-    setIsVisible(false);
+    setVisible(false);
   };
 
   const eyeIcon = (
@@ -47,6 +47,7 @@ export const Password = ({ value, schema, onClickAcceptEdit }) => {
       name="pass"
       autoComplete="new-password"
       value={isVisible ? value : '********'}
+      itemSubject={itemSubject}
       schema={schema}
       originalValue={value}
       onClickAcceptEdit={onClickAcceptEdit}

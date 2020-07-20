@@ -132,7 +132,6 @@ import { objectToBase64 } from '@caesar/common/utils/base64';
 import { chunk } from '@caesar/common/utils/utils';
 import {
   ROLE_ANONYMOUS_USER,
-  ITEM_MODE,
   PERMISSION_READ,
   SHARE_TYPE,
   ENTITY_TYPE,
@@ -459,7 +458,7 @@ export function* createItemSaga({
 
     yield put(createItemSuccess(newItem));
     yield put(addItemToList(newItem));
-    yield put(updateWorkInProgressItem(itemId, ITEM_MODE.REVIEW));
+    yield put(updateWorkInProgressItem(itemId));
 
     if (list.teamId) {
       yield put(
@@ -660,7 +659,7 @@ export function* editItemSaga({
       }
     }
 
-    yield put(updateWorkInProgressItem(editedItem.id, ITEM_MODE.REVIEW));
+    yield put(updateWorkInProgressItem(editedItem.id));
     yield call(notification.show, {
       text: `The '${item.name}' has been updated`,
     });

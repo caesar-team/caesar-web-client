@@ -42,6 +42,7 @@ const ColumnTitle = styled.div`
 `;
 
 const DropdownIcon = styled(Icon)`
+  flex: 0 0 16px;
   margin-left: auto;
   transform: ${({ isDropdownOpened }) =>
     isDropdownOpened ? 'scaleY(-1)' : 'scaleY(1)'};
@@ -107,8 +108,8 @@ const MenuListComponent = ({ mode, setSearchedText, setMode }) => {
           <ColumnTitle>{getColumnTitle()}</ColumnTitle>
           <DropdownIcon
             name="arrow-triangle"
-            width={12}
-            height={12}
+            width={16}
+            height={16}
             isDropdownOpened={isDropdownOpened}
           />
         </ColumnHeader>

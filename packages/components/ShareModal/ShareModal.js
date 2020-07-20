@@ -52,9 +52,9 @@ export const ShareModal = ({
 }) => {
   const [members, setMembers] = useState([]);
   const [teamIds, setTeamIds] = useState([]);
-  const [isOpenedInvited, setIsOpenedInvited] = useState(false);
+  const [isOpenedInvited, setOpenedInvited] = useState(false);
   const [link, setLink] = useState(null);
-  const [isGeneratingLink, setIsGeneratingLink] = useState(false);
+  const [isGeneratingLink, setGeneratingLink] = useState(false);
   const user = useSelector(userDataSelector);
 
   const handleAddMember = member => {
@@ -73,13 +73,13 @@ export const ShareModal = ({
     if (link) {
       onDeactivateLink();
     } else {
-      setIsGeneratingLink(true);
+      setGeneratingLink(true);
       onActivateLink();
     }
   };
 
   const handleUpdateAnonymousLink = () => {
-    setIsGeneratingLink(true);
+    setGeneratingLink(true);
     onActivateLink();
   };
 
@@ -99,7 +99,7 @@ export const ShareModal = ({
 
   useUpdateEffect(() => {
     if (isGeneratingLink) {
-      setIsGeneratingLink(false);
+      setGeneratingLink(false);
     }
   }, [link, setLink]);
 
@@ -153,7 +153,7 @@ export const ShareModal = ({
           <Section
             name={`Invited (${sharedMembers.length})`}
             isOpened={isOpenedInvited}
-            onToggleSection={() => setIsOpenedInvited(!isOpenedInvited)}
+            onToggleSection={() => setOpenedInvited(!isOpenedInvited)}
           >
             <StyledMemberList
               maxHeight={180}

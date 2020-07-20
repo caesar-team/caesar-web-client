@@ -23,7 +23,11 @@ import {
   getUserTeams,
   patchAcceptTeamItems,
 } from '@caesar/common/api';
-import { ITEM_TYPE } from '@caesar/common/constants';
+import {
+  ITEM_TYPE,
+  DECRYPTING_ITEM_NOTIFICATION,
+  NOOP_NOTIFICATION,
+} from '@caesar/common/constants';
 import { NavigationPanelStyled } from '../../components';
 import { SHARED_ITEMS_CHECK } from '../../constants';
 
@@ -135,7 +139,10 @@ class SharedItemsStep extends Component {
       currentKeyPair,
       oldMasterPassword,
       currentMasterPassword,
+      updateGlobalNotification,
     } = this.props;
+
+    updateGlobalNotification(DECRYPTING_ITEM_NOTIFICATION, true);
 
     const privateKeyObj = await getPrivateKeyObj(
       oldKeyPair.encryptedPrivateKey || currentKeyPair.encryptedPrivateKey,
@@ -171,6 +178,8 @@ class SharedItemsStep extends Component {
     } catch (e) {
       console.log(e);
     }
+
+    updateGlobalNotification(NOOP_NOTIFICATION, false);
   }
 
   handleSelectRow = itemId => () => {
@@ -188,20 +197,23 @@ class SharedItemsStep extends Component {
       oldMasterPassword,
       currentMasterPassword,
       onFinish = Function.prototype,
+      updateGlobalNotification,
     } = this.props;
     this.setState({ isLoading: true });
 
     const { items, selectedIds, user } = this.state;
 
-    const personalItems = items.personal.filter(({ id }) =>
+    const personalItems = items.personal?.filter(({ id }) =>
       selectedIds.includes(id),
     );
     const personalItemIds = personalItems.map(({ id }) => ({ id }));
 
-    const teamsItems = items.teams.reduce(
+    const teamsItems = items.teams?.reduce(
       (accumulator, { items: teamItems }) => [...accumulator, ...teamItems],
       [],
     );
+
+    updateGlobalNotification(DECRYPTING_ITEM_NOTIFICATION, true);
 
     try {
       if (personalItemIds.length > 0) {
@@ -250,6 +262,8 @@ class SharedItemsStep extends Component {
     } catch (e) {
       console.log(e);
     }
+
+    updateGlobalNotification(NOOP_NOTIFICATION, false);
   };
 
   prepareInitialState() {

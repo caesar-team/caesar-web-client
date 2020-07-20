@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
 import styled from 'styled-components';
-import { ITEM_MODE } from '@caesar-utils/constants';
 import {
   Lists,
   ListOption,
@@ -91,10 +90,7 @@ class Dashboard extends Component {
     event.preventDefault();
     event.stopPropagation();
 
-    this.props.setWorkInProgressItem(
-      this.props.itemsById[itemId],
-      ITEM_MODE.REVIEW,
-    );
+    this.props.setWorkInProgressItem(this.props.itemsById[itemId]);
   };
 
   prepareInitialState() {

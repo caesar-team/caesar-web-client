@@ -1124,17 +1124,17 @@
     lodash "^4.17.13"
     to-fast-properties "^2.0.0"
 
-"@casl/ability@^3.1.2":
-  version "3.4.0"
-  resolved "https://registry.yarnpkg.com/@casl/ability/-/ability-3.4.0.tgz#06c9f2df0bbb257b3deecb05885e731420cca780"
-  integrity sha512-aJodlkXamBRNnb25m0xuibU6StiyWZzz7EFivqLKO5kmfLDAwrIklysa1w4K/Exi1mRt+lfOp7pSb4QtuAXx+A==
+"@casl/ability@^4.1.5":
+  version "4.1.5"
+  resolved "https://registry.yarnpkg.com/@casl/ability/-/ability-4.1.5.tgz#c34fedc1fd7e631f9f70309eecd5c8a2a7550ead"
+  integrity sha512-9nY2ear3CfCi0ckRZ4V6dRiy+f0wxj/aUPkelmGrZuEJusXfhROKahRHFGxXf5xLi3oA10SS/vbSLK4RAy7ttA==
   dependencies:
-    sift "^9.0.4"
+    sift "^13.0.0"
 
-"@casl/react@^1.0.2":
-  version "1.0.4"
-  resolved "https://registry.yarnpkg.com/@casl/react/-/react-1.0.4.tgz#7e3adad4c811c51b787e8573aa747c60bfa18cfe"
-  integrity sha512-vdFkjlqFM7FaBPja8LZ/E8/jYiln/r/ol9eARwSR2NkT358Q8SdvVLg9TkIm3kOh17P1irOcT8U5za+VscNRHA==
+"@casl/react@^2.1.1":
+  version "2.1.1"
+  resolved "https://registry.yarnpkg.com/@casl/react/-/react-2.1.1.tgz#8c2d886e3147a25b99a2cb84860c8cb4f2564dd3"
+  integrity sha512-DD0j40OZ+dcQopRdt1tsFaAZ79a1+HGCuMWvExdRcqrbjXFVnFi2kN26KMtwQuzL5FFiH4fmCADCxW3Xjxhs9A==
 
 "@emotion/is-prop-valid@^0.8.1":
   version "0.8.8"
@@ -9650,10 +9650,10 @@ shebang-regex@^3.0.0:
   resolved "https://registry.yarnpkg.com/shebang-regex/-/shebang-regex-3.0.0.tgz#ae16f1644d873ecad843b0307b143362d4c42172"
   integrity sha512-7++dFhtcx3353uBaq8DDR4NuxBetBzC7ZQOhmTQInHEd6bSrXdiEyzCvG07Z44UYdLShWUyXt5M/yhz8ekcb1A==
 
-sift@^9.0.4:
-  version "9.0.7"
-  resolved "https://registry.yarnpkg.com/sift/-/sift-9.0.7.tgz#7b6e10466d9c3d580f87bef8670b26da9acc7786"
-  integrity sha512-q8Wvt15s0UJfIgVBEupXwITi8AKoHwCZbIO/bz+YMgEZRPh5qj/gjvYtqhKjHWe9srbuq5DyYeRyWPVjkOihPg==
+sift@^13.0.0:
+  version "13.1.10"
+  resolved "https://registry.yarnpkg.com/sift/-/sift-13.1.10.tgz#53cd1052c0214dc5d28a931e154191cce5cba942"
+  integrity sha512-Z+7ZMTbnmbuVCwER+8jNerXpuJNYsxFSZf1er8VUqF/qYdgTrG5o5TQ7C6nWDycQY/TA1pczVCj58y5RvrUtrA==
 
 signal-exit@^3.0.0, signal-exit@^3.0.2:
   version "3.0.3"

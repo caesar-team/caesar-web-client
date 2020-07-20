@@ -33,24 +33,6 @@ const ColumnTitle = styled.div`
   color: ${({ theme }) => theme.color.black};
 `;
 
-const ITEM_HEIGHT = 56;
-
-const createItemData = memoize(
-  (
-    items,
-    isMultiItem,
-    workInProgressItemIds,
-    workInProgressItem,
-    onClickItem,
-  ) => ({
-    items,
-    isMultiItem,
-    workInProgressItemIds,
-    workInProgressItem,
-    onClickItem,
-  }),
-);
-
 const ListComponent = ({
   mode,
   isMultiItem = false,

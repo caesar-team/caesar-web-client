@@ -179,11 +179,12 @@ export function* setCurrentTeamIdWatchSaga() {
 
     const currentTeamId = yield select(currentTeamIdSelector);
 
-    if (!currentTeamId || currentTeamId === TEAM_TYPE.PERSONAL) {
-      return;
-    }
+    if (!currentTeamId) return;
 
-    const { data } = yield call(getTeamLists, currentTeamId);
+    const { data } =
+      currentTeamId === TEAM_TYPE.PERSONAL
+        ? yield call(getLists)
+        : yield call(getTeamLists, currentTeamId);
 
     const { listsById, itemsById, childItemsById } = convertNodesToEntities(
       data,

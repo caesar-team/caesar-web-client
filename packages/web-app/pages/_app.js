@@ -9,7 +9,11 @@ import { Provider } from 'react-redux';
 import withRedux from 'next-redux-wrapper';
 import withReduxSaga from 'next-redux-saga';
 import { configureWebStore } from '@caesar/common/root/store';
-import { UNLOCKED_ROUTES, SHARED_ROUTES, TECH_ROUTES } from '@caesar/common/constants';
+import {
+  UNLOCKED_ROUTES,
+  SHARED_ROUTES,
+  TECH_ROUTES,
+} from '@caesar/common/constants';
 import { Bootstrap } from '@caesar/containers';
 import {
   NotificationProvider,

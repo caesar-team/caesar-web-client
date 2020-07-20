@@ -157,7 +157,7 @@ export const favoriteListItemsSelector = createSelector(
   chosenListItemsSelector,
   trashListSelector,
   (visibleItems, trashList) =>
-    visibleItems.filter(item => item.listId !== trashList.id),
+    visibleItems.filter(item => item.listId !== trashList?.id),
 );
 
 export const visibleListItemsSelector = createSelector(
@@ -166,7 +166,7 @@ export const visibleListItemsSelector = createSelector(
   workInProgressListIdSelector,
   favoritesSelector,
   (chosenItems, favoriteItems, workInProgressListId, favoriteList) => {
-    const isFavoriteList = workInProgressListId === favoriteList.id;
+    const isFavoriteList = workInProgressListId === favoriteList?.id;
 
     switch (true) {
       case isFavoriteList:

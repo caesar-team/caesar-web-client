@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import { ITEM_TYPE } from '@caesar-utils/constants';
 import { matchStrict } from '@caesar-utils/utils/match';
 import { Scrollbar } from '@caesar-ui';
-import EmptyItem from './EmptyItem';
+import { EmptyItem } from './EmptyItem';
 import { Credentials, Document } from './Types';
 
 const Wrapper = styled.div`

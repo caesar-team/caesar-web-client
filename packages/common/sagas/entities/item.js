@@ -89,7 +89,7 @@ import {
   workInProgressItemIdsSelector,
 } from '@caesar/common/selectors/workflow';
 import {
-  favoritesSelector,
+  favoriteListSelector,
   listSelector,
 } from '@caesar/common/selectors/entities/list';
 import {
@@ -167,7 +167,7 @@ export function* removeItemSaga({ payload: { itemId, listId } }) {
     }
 
     if (item.favorite) {
-      const favoriteList = yield select(favoritesSelector);
+      const favoriteList = yield select(favoriteListSelector);
       yield put(removeItemFromList(itemId, favoriteList.id));
     }
 
@@ -311,7 +311,7 @@ export function* removeShareSaga({ payload: { shareId } }) {
 
 export function* toggleItemToFavoriteSaga({ payload: { itemId } }) {
   try {
-    const favoritesList = yield select(favoritesSelector);
+    const favoritesList = yield select(favoriteListSelector);
 
     const {
       data: { favorite: isFavorite },

@@ -14,9 +14,6 @@ import {
 import {
   personalListsByTypeSelector,
   currentTeamListsSelector,
-  inboxSelector,
-  favoritesSelector,
-  trashSelector,
 } from '@caesar/common/selectors/entities/list';
 import { workInProgressListSelector } from '@caesar/common/selectors/workflow';
 import {
@@ -96,9 +93,6 @@ const MenuListInnerComponent = ({
   const personalLists = useSelector(personalListsByTypeSelector);
   const teamLists = useSelector(currentTeamListsSelector);
   const workInProgressList = useSelector(workInProgressListSelector);
-  const inbox = useSelector(inboxSelector);
-  const favorites = useSelector(favoritesSelector);
-  const trash = useSelector(trashSelector);
   const activeListId = workInProgressList && workInProgressList.id;
   const [isCreatingMode, setCreatingMode] = useState(false);
 
@@ -143,13 +137,13 @@ const MenuListInnerComponent = ({
     {
       id: isPersonal ? personalLists.inbox?.id : null,
       title: 'Inbox',
-      length: isPersonal ? inbox?.children?.length : null,
+      length: isPersonal ? personalLists.inbox?.children?.length : null,
       icon: 'inbox',
     },
     {
       id: isPersonal ? personalLists.favorites?.id : teamLists.favorites?.id,
       title: 'Favorites',
-      length: isPersonal ? favorites?.children?.length : null,
+      length: isPersonal ? personalLists.favorites?.children?.length : null,
       icon: 'favorite',
     },
     {
@@ -167,7 +161,7 @@ const MenuListInnerComponent = ({
     {
       id: isPersonal ? personalLists.trash?.id : teamLists.trash?.id,
       title: 'Trash',
-      length: isPersonal ? trash?.children?.length : null,
+      length: isPersonal ? personalLists.trash?.children?.length : null,
       icon: 'trash',
     },
     {

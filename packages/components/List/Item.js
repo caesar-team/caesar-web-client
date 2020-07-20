@@ -23,8 +23,8 @@ const Row = styled.div`
   border-bottom: 1px solid transparent;
   transition: all 0.2s;
 
-  ${({ hasHover, theme }) => 
-    hasHover && 
+  ${({ hasHover, theme }) =>
+    hasHover &&
     `
       cursor: pointer;
 
@@ -37,9 +37,9 @@ const Row = styled.div`
 
   ${({ isMultiItem, isActive, isInModal, theme }) => {
     if (isActive && isMultiItem) {
-      return `background: ${theme.color.gallery};`; 
+      return `background: ${theme.color.gallery};`;
     }
-  
+
     if (isInModal) {
       return `background: ${theme.color.snow};`;
     }
@@ -91,7 +91,9 @@ const Addon = styled.div`
   margin-left: 16px;
   color: ${({ theme }) => theme.color.gray};
 
-  ${({ isInModal }) => isInModal && `
+  ${({ isInModal }) =>
+    isInModal &&
+    `
     &:last-of-type {
       margin-right: 60px;
     }
@@ -129,7 +131,6 @@ export const Item = ({
   type,
   invited,
   isMultiItem = false,
-  isActive = false,
   isClosable = false,
   hasHover = true,
   isInModal = false,
@@ -137,11 +138,17 @@ export const Item = ({
   style,
   onClickClose = Function.prototype,
   onClickItem = Function.prototype,
+  workInProgressItemIds,
+  workInProgressItem,
   ...props
 }) => {
   const shouldShowMembers = !!invited.length;
   const shouldShowAttachments = attachments && attachments.length > 0;
   const shouldShowFavoriteIcon = favorite && !isClosable;
+
+  const isActive = isMultiItem
+    ? workInProgressItemIds.includes(id)
+    : workInProgressItem?.id === id;
 
   return (
     <Row
@@ -176,12 +183,7 @@ export const Item = ({
       )}
       {shouldShowFavoriteIcon && (
         <Addon>
-          <Icon
-            name="favorite-active"
-            width={16}
-            height={16}
-            color="emperor"
-          />
+          <Icon name="favorite-active" width={16} height={16} color="emperor" />
         </Addon>
       )}
       {isClosable && (

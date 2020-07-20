@@ -25,6 +25,7 @@ import { sortListRequest } from '@caesar/common/actions/entities/list';
 import { withNotification } from '@caesar/components/Notification';
 import { Can } from '../../Ability';
 import { Icon } from '../../Icon';
+import { Scrollbar } from '../../Scrollbar';
 import { ListItem } from './ListItem';
 import { MenuItemInner } from './styledComponents';
 
@@ -183,96 +184,103 @@ const MenuListInnerComponent = ({
         list_create: !!user?._links?.list_create,
       };
 
-  return menuList.map(({ id, icon, title, length, children }) => {
-    const withChildren = id === 'lists';
+  return (
+    <Scrollbar>
+      {menuList.map(({ id, icon, title, length, children }) => {
+        const withChildren = id === 'lists';
 
-    return (
-      id && (
-        <MenuItem key={id}>
-          <StyledMenuItemInner
-            isActive={
-              id === SECURE_MESSAGE_MODE
-                ? mode === SECURE_MESSAGE_MODE
-                : activeListId === id
-            }
-            fontWeight={id === SECURE_MESSAGE_MODE ? 600 : 400}
-            withChildren={withChildren}
-            onClick={() => {
-              if (id === SECURE_MESSAGE_MODE) {
-                return handleClickSecureMessage();
-              }
+        return (
+          id && (
+            <MenuItem key={id}>
+              <StyledMenuItemInner
+                isActive={
+                  id === SECURE_MESSAGE_MODE
+                    ? mode === SECURE_MESSAGE_MODE
+                    : activeListId === id
+                }
+                fontWeight={id === SECURE_MESSAGE_MODE ? 600 : 400}
+                withChildren={withChildren}
+                onClick={() => {
+                  if (id === SECURE_MESSAGE_MODE) {
+                    return handleClickSecureMessage();
+                  }
 
-              return withChildren
-                ? setListsOpened(!isListsOpened)
-                : handleClickMenuItem(id);
-            }}
-          >
-            <Icon name={icon} width={16} height={16} />
-            <MenuItemTitle>
-              {title}
-              {typeof length === 'number' && (
-                <MenuItemCounter>{length}</MenuItemCounter>
+                  return withChildren
+                    ? setListsOpened(!isListsOpened)
+                    : handleClickMenuItem(id);
+                }}
+              >
+                <Icon name={icon} width={16} height={16} />
+                <MenuItemTitle>
+                  {title}
+                  {typeof length === 'number' && (
+                    <MenuItemCounter>{length}</MenuItemCounter>
+                  )}
+                </MenuItemTitle>
+                {withChildren && (
+                  <>
+                    <Can I={PERMISSION.CREATE} a={listSubject}>
+                      <ListAddIcon
+                        name="plus"
+                        width={16}
+                        height={16}
+                        onClick={handleClickAddList}
+                      />
+                    </Can>
+                    <ListToggleIcon
+                      name="arrow-triangle"
+                      width={16}
+                      height={16}
+                      isListsOpened={isListsOpened}
+                    />
+                  </>
+                )}
+              </StyledMenuItemInner>
+              {isListsOpened && (
+                <>
+                  {id === 'lists' && isCreatingMode && (
+                    <ListItem
+                      isCreatingMode={isCreatingMode}
+                      setCreatingMode={setCreatingMode}
+                      notification={notification}
+                    />
+                  )}
+                  {children && (
+                    <DragDropContext onDragEnd={handleDragEnd}>
+                      <Droppable
+                        droppableId="droppable"
+                        type="lists"
+                        key={children.length}
+                      >
+                        {provided => (
+                          <div
+                            ref={provided.innerRef}
+                            {...provided.droppableProps}
+                          >
+                            {children.map((list, index) => (
+                              <ListItem
+                                key={list.id}
+                                list={list}
+                                activeListId={activeListId}
+                                index={index}
+                                notification={notification}
+                                onClickMenuItem={handleClickMenuItem}
+                              />
+                            ))}
+                            {provided.placeholder}
+                          </div>
+                        )}
+                      </Droppable>
+                    </DragDropContext>
+                  )}
+                </>
               )}
-            </MenuItemTitle>
-            {withChildren && (
-              <>
-                <Can I={PERMISSION.CREATE} a={listSubject}>
-                  <ListAddIcon
-                    name="plus"
-                    width={16}
-                    height={16}
-                    onClick={handleClickAddList}
-                  />
-                </Can>
-                <ListToggleIcon
-                  name="arrow-triangle"
-                  width={16}
-                  height={16}
-                  isListsOpened={isListsOpened}
-                />
-              </>
-            )}
-          </StyledMenuItemInner>
-          {isListsOpened && (
-            <>
-              {id === 'lists' && isCreatingMode && (
-                <ListItem
-                  isCreatingMode={isCreatingMode}
-                  setCreatingMode={setCreatingMode}
-                  notification={notification}
-                />
-              )}
-              {children && (
-                <DragDropContext onDragEnd={handleDragEnd}>
-                  <Droppable
-                    droppableId="droppable"
-                    type="lists"
-                    key={children.length}
-                  >
-                    {provided => (
-                      <div ref={provided.innerRef} {...provided.droppableProps}>
-                        {children.map((list, index) => (
-                          <ListItem
-                            key={list.id}
-                            list={list}
-                            activeListId={activeListId}
-                            index={index}
-                            notification={notification}
-                            onClickMenuItem={handleClickMenuItem}
-                          />
-                        ))}
-                        {provided.placeholder}
-                      </div>
-                    )}
-                  </Droppable>
-                </DragDropContext>
-              )}
-            </>
-          )}
-        </MenuItem>
-      )
-    );
-  });
+            </MenuItem>
+          )
+        );
+      })}
+    </Scrollbar>
+  );
 };
 
 export const MenuListInner = memo(withNotification(MenuListInnerComponent));

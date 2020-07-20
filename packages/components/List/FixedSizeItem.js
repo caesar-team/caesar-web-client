@@ -14,7 +14,7 @@ const FixedSizeItemComponent = ({ data, index, style }) => {
 
   const isActive = isMultiItem
     ? workInProgressItemIds.includes(item.id)
-    : workInProgressItem && workInProgressItem.id === item.id;
+    : workInProgressItem?.id === item.id;
 
   return (
     <Item

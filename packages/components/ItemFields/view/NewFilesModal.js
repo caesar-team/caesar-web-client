@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
 import { getPlural } from '@caesar/common/utils/string';
+import { Scrollbar } from '../../Scrollbar';
 import { File } from '../../File';
 import { Icon } from '../../Icon';
 
@@ -8,6 +9,7 @@ const Wrapper = styled.div`
   position: fixed;
   right: 40px;
   bottom: 24px;
+  z-index: ${({ theme }) => theme.zIndex.basic};
   width: 320px;
   overflow: hidden;
   border-radius: 3px;
@@ -74,9 +76,11 @@ export const NewFilesModal = ({ files, closeModal }) => {
       </Header>
       {isDropdownOpened && (
         <Inner>
-          {files.map(({ name, raw, error }) => (
-            <File key={raw} name={name} raw={raw} error={error} />
-          ))}
+          <Scrollbar autoHeight autoHeightMax={300}>
+            {files.map(({ name, raw, error }) => (
+              <File key={raw} name={name} raw={raw} error={error} />
+            ))}
+          </Scrollbar>
         </Inner>
       )}
     </Wrapper>

@@ -8,7 +8,7 @@ const Wrapper = styled.div`
   justify-content: center;
   align-items: center;
   background-image: url('/images/empty-item.png');
-  background-size: calc(100% - 48px) auto;
+  background-size: 672px auto;
   background-position: center center;
   background-repeat: no-repeat;
 

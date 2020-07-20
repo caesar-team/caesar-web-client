@@ -53,17 +53,6 @@ export const currentTeamListsSelector = createSelector(
   }),
 );
 
-export const favoriteListSelector = createSelector(
-  personalListsSelector,
-  lists =>
-    lists.find(({ label }) => label.toLocaleLowerCase() === 'favorites') || {},
-);
-
-export const trashListSelector = createSelector(
-  personalListsSelector,
-  lists => lists.find(list => list.type === LIST_TYPE.TRASH),
-);
-
 export const selectableListsSelector = createSelector(
   personalListsSelector,
   lists => [
@@ -122,19 +111,31 @@ export const extendedSortedCustomizableListsSelector = createSelector(
     })),
 );
 
-export const inboxSelector = createSelector(
+export const inboxListSelector = createSelector(
   personalListsSelector,
   lists => lists.find(({ type }) => type === LIST_TYPE.INBOX) || {},
 );
 
-export const trashSelector = createSelector(
+export const trashListSelector = createSelector(
   personalListsSelector,
   lists => lists.find(({ type }) => type === LIST_TYPE.TRASH) || {},
 );
 
-export const favoritesSelector = createSelector(
+export const favoriteListSelector = createSelector(
   personalListsSelector,
-  lists => lists.find(({ type }) => type === LIST_TYPE.FAVORITES) || {},
+  trashListSelector,
+  itemsByIdSelector,
+  (lists, trash, items) => {
+    const favoriteList =
+      lists.find(({ id, type }) => type === LIST_TYPE.FAVORITES) || {};
+
+    return {
+      ...favoriteList,
+      children: favoriteList.children?.filter(
+        itemId => items[itemId]?.listId !== trash.id,
+      ),
+    };
+  },
 );
 
 const nestedListsSelector = createSelector(
@@ -151,10 +152,10 @@ const nestedListsSelector = createSelector(
 );
 
 export const personalListsByTypeSelector = createSelector(
-  inboxSelector,
+  inboxListSelector,
   nestedListsSelector,
-  favoritesSelector,
-  trashSelector,
+  favoriteListSelector,
+  trashListSelector,
   (inbox, lists, favorites, trash) => ({
     inbox,
     list: lists,

@@ -3,14 +3,11 @@ import { useClickAway } from 'react-use';
 import styled from 'styled-components';
 import equal from 'fast-deep-equal';
 import memoize from 'memoize-one';
-import AutoSizer from 'react-virtualized-auto-sizer';
-import { FixedSizeList } from 'react-window';
 import { upperFirst } from '@caesar/common/utils/string';
 import { DASHBOARD_MODE, LIST_TYPES_ARRAY } from '@caesar/common/constants';
-import { FixedSizeItem } from './FixedSizeItem';
-import { ScrollbarVirtualList } from './ScrollbarVirtualList';
-import { EmptyList } from './EmptyList';
 import { Scrollbar } from '../Scrollbar';
+import { EmptyList } from './EmptyList';
+import { Item } from './Item';
 
 const Wrapper = styled.div`
   position: relative;
@@ -36,26 +33,6 @@ const ColumnTitle = styled.div`
   font-weight: bold;
   color: ${({ theme }) => theme.color.black};
 `;
-
-const ITEM_HEIGHT = 56;
-
-const createItemData = memoize(
-  (
-    items,
-    isMultiItem,
-    workInProgressItemIds,
-    workInProgressItem,
-    onClickItem,
-    onSelectItem,
-  ) => ({
-    items,
-    isMultiItem,
-    workInProgressItemIds,
-    workInProgressItem,
-    onClickItem,
-    onSelectItem,
-  }),
-);
 
 const ListComponent = ({
   mode,
@@ -88,35 +65,26 @@ const ListComponent = ({
   }
 
   const isEmpty = items.length === 0;
+
   const renderedList = () => {
     if (isEmpty) {
       return <EmptyList />;
     }
 
-    const itemData = createItemData(
-      items,
-      isMultiItem,
-      workInProgressItemIds,
-      workInProgressItem,
-      onClickItem,
-      onSelectItem,
-    );
-
+    // TODO: Need to check a long list with items. Mayby beetter to return AutoSizer, but need to fix Scrolling
     return (
-      <AutoSizer>
-        {({ height, width }) => (
-          <FixedSizeList
-            height={height}
-            itemCount={items.length}
-            itemData={itemData}
-            itemSize={ITEM_HEIGHT}
-            width={width}
-            outerElementType={ScrollbarVirtualList}
-          >
-            {FixedSizeItem}
-          </FixedSizeList>
-        )}
-      </AutoSizer>
+      <Scrollbar>
+        {items.map(item => (
+          <Item
+            key={item.id}
+            isMultiItem={isMultiItem}
+            onClickItem={onClickItem}
+            workInProgressItemIds={workInProgressItemIds}
+            workInProgressItem={workInProgressItem}
+            {...item}
+          />
+        ))}
+      </Scrollbar>
     );
   };
 

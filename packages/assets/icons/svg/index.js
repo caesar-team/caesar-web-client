@@ -29,6 +29,7 @@ import './icon-lock.svg?sprite';
 import './icon-login.svg?sprite';
 import './icon-logo-caesar-company.svg?sprite';
 import './icon-logo-caesar-secure.svg?sprite';
+import './icon-logo-caesar-team.svg?sprite';
 import './icon-logo-caesar.svg?sprite';
 import './icon-logo-secure-message.svg?sprite';
 import './icon-mail.svg?sprite';

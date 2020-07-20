@@ -14,6 +14,7 @@ import {
   editItemRequest,
 } from '@caesar/common/actions/entities/item';
 import { Can } from '../Ability';
+import { Scrollbar } from '../Scrollbar';
 import { MoveModal } from '../MoveModal';
 import { Row } from '../ItemFields/common';
 import { EmptyItem } from './EmptyItem';
@@ -26,6 +27,8 @@ import {
 } from './components';
 
 const Wrapper = styled.div`
+  height: 100%;
+
   ${({ isDisabled }) =>
     isDisabled &&
     `
@@ -98,19 +101,21 @@ const ItemComponent = ({
         <ReadOnlyBanner />
       </Can>
       <InnerWrapper>
-        <ItemByType
-          item={item}
-          itemSubject={itemSubject}
-          onClickAcceptEdit={!isTrashItem && handleClickAcceptEdit}
-          onClickShare={onClickShare}
-        />
-        <Can I={PERMISSION.TRASH} an={itemSubject}>
-          {!isTrashItem && (
-            <Row>
-              <RemoveButton onClick={onClickMoveToTrash} />
-            </Row>
-          )}
-        </Can>
+        <Scrollbar>
+          <ItemByType
+            item={item}
+            itemSubject={itemSubject}
+            onClickAcceptEdit={!isTrashItem && handleClickAcceptEdit}
+            onClickShare={onClickShare}
+          />
+          <Can I={PERMISSION.TRASH} an={itemSubject}>
+            {!isTrashItem && (
+              <Row>
+                <RemoveButton onClick={onClickMoveToTrash} />
+              </Row>
+            )}
+          </Can>
+        </Scrollbar>
       </InnerWrapper>
       <MoveModal
         item={item}

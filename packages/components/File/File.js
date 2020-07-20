@@ -94,7 +94,13 @@ const CloseIcon = styled(Icon)`
   top: 8px;
   right: 8px;
   color: ${({ theme }) => theme.color.gray};
+  opacity: 0;
+  transition: color 0.2s, opacity 0.2s;
   cursor: pointer;
+
+  &:hover {
+    color: ${({ theme }) => theme.color.black};
+  }
 `;
 
 const UploadedWrapper = styled.div`
@@ -125,7 +131,7 @@ const UploadedWrapper = styled.div`
     }
 
     ${CloseIcon} {
-      color: ${({ theme }) => theme.color.black};
+      opacity: 1;
     }
   }
 `;

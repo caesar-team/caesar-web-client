@@ -19,7 +19,9 @@ const theme = {
   },
   font: {
     size: {
+      large: '36px',
       big: '30px',
+      middle: '24px',
       main: '16px',
       small: '14px',
       xs: '12px',

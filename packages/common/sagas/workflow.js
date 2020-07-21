@@ -61,8 +61,6 @@ function* initPersonal(withDecryption) {console.log('Inir personal');
       }
     }
 
-    //yield put(setCurrentTeamId(TEAM_TYPE.PERSONAL));
-
     const trashList = yield select(trashListSelector);
     const favoritesList = getFavoritesList(itemsById, trashList?.id);
 
@@ -90,11 +88,8 @@ function* initPersonal(withDecryption) {console.log('Inir personal');
 function* initTeam(team, withDecryption) {
   try {
     yield put(fetchTeamSuccess(team));
-    console.log('5');
-    const currentTeamId = yield select(currentTeamIdSelector);
 
-    // const favoriteList = yield select(favoriteListSelector);
-    // console.log(favoriteList.id);
+    const currentTeamId = yield select(currentTeamIdSelector);
 
     if (currentTeamId === TEAM_TYPE.PERSONAL) {
       return;
@@ -142,11 +137,6 @@ function* initTeams(withDecryption) {console.log('Init teams');
   try {
     const { data: teams } = yield call(getTeams);
 
-    //yield put(setCurrentTeamId(TEAM_TYPE.PERSONAL));
-    const favoriteList = yield select(favoriteListSelector);
-
-   console.log(favoriteList.id);
-    //yield put(setWorkInProgressListId(favoriteList.id));
     yield all(teams.map(team => call(initTeam, team, withDecryption)));
   } catch (error) {
     console.log(error);

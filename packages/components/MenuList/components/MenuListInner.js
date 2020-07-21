@@ -181,7 +181,7 @@ const MenuListInnerComponent = ({
     : {
         __typename: PERMISSION_ENTITY.LIST,
         // eslint-disable-next-line camelcase
-        list_create: !!user?._links?.list_create,
+        create_list: !!user?._links?.create_list,
       };
 
   return (

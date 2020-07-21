@@ -181,7 +181,7 @@ const MenuListInnerComponent = ({
     : {
         __typename: PERMISSION_ENTITY.LIST,
         // eslint-disable-next-line camelcase
-        list_create: !!user?._links?.list_create,
+        create_list: !!user?._links?.create_list,
       };
 
   return (
@@ -245,34 +245,47 @@ const MenuListInnerComponent = ({
                       notification={notification}
                     />
                   )}
-                  {children && (
-                    <DragDropContext onDragEnd={handleDragEnd}>
-                      <Droppable
-                        droppableId="droppable"
-                        type="lists"
-                        key={children.length}
-                      >
-                        {provided => (
-                          <div
-                            ref={provided.innerRef}
-                            {...provided.droppableProps}
-                          >
-                            {children.map((list, index) => (
-                              <ListItem
-                                key={list.id}
-                                list={list}
-                                activeListId={activeListId}
-                                index={index}
-                                notification={notification}
-                                onClickMenuItem={handleClickMenuItem}
-                              />
-                            ))}
-                            {provided.placeholder}
-                          </div>
-                        )}
-                      </Droppable>
-                    </DragDropContext>
-                  )}
+                  {children &&
+                    (children.length <= 1 ? (
+                      children.map((list, index) => (
+                        <ListItem
+                          key={list.id}
+                          list={list}
+                          activeListId={activeListId}
+                          index={index}
+                          notification={notification}
+                          onClickMenuItem={handleClickMenuItem}
+                        />
+                      ))
+                    ) : (
+                      <DragDropContext onDragEnd={handleDragEnd}>
+                        <Droppable
+                          droppableId="droppable"
+                          type="lists"
+                          key={children.length}
+                        >
+                          {provided => (
+                            <div
+                              ref={provided.innerRef}
+                              {...provided.droppableProps}
+                            >
+                              {children.map((list, index) => (
+                                <ListItem
+                                  key={list.id}
+                                  list={list}
+                                  activeListId={activeListId}
+                                  index={index}
+                                  isDraggable
+                                  notification={notification}
+                                  onClickMenuItem={handleClickMenuItem}
+                                />
+                              ))}
+                              {provided.placeholder}
+                            </div>
+                          )}
+                        </Droppable>
+                      </DragDropContext>
+                    ))}
                 </>
               )}
             </MenuItem>

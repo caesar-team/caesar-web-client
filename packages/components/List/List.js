@@ -1,7 +1,6 @@
 import React, { memo } from 'react';
 import styled from 'styled-components';
 import equal from 'fast-deep-equal';
-import memoize from 'memoize-one';
 import { upperFirst } from '@caesar/common/utils/string';
 import { DASHBOARD_MODE, LIST_TYPES_ARRAY } from '@caesar/common/constants';
 import { Scrollbar } from '../Scrollbar';

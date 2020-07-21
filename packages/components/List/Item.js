@@ -39,9 +39,9 @@ const CheckboxStyled = styled(Checkbox)`
   }
 
   ${Checkbox.Input}:checked + ${Checkbox.Box} {
+    color: ${({ theme }) => theme.color.white};
     background-color: ${({ theme }) => theme.color.emperor};
     border-color: ${({ theme }) => theme.color.emperor};
-    color: ${({ theme }) => theme.color.white};
   }
 `;
 
@@ -65,7 +65,7 @@ const Tooltip = styled.div`
   border-radius: 4px;
   font-size: ${({ theme }) => theme.font.size.xs};
   white-space: nowrap;
-  z-index: 1000;
+  z-index: ${({ theme }) => theme.zIndex.basic};
 `;
 
 const NotEditIconWrapper = styled.div`
@@ -152,8 +152,8 @@ const TypeIconWrapper = styled.div`
   flex: 0 0 40px;
   height: 40px;
   background: 
-    ${({ isLightGray, theme }) => 
-      (isLightGray ? theme.color.lightGray : theme.color.gray)};
+    ${({ isForbiddenMultiItem, theme }) => 
+      (isForbiddenMultiItem ? theme.color.lightGray : theme.color.gray)};
   border-radius: 4px;
 `;
 
@@ -245,7 +245,7 @@ export const Item = ({
         {allowed => (
           <TypeIconWrapper
             onClick={e => { e.stopPropagation(); }}
-            isLightGray={!allowed && isMultiItem}
+            isForbiddenMultiItem={!allowed && isMultiItem}
           >
             {allowed ? (
               <CheckboxStyled

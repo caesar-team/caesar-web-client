@@ -57,12 +57,6 @@ const MiddleColumnComponent = ({
   const handleClickItem = itemId => event => {
     const item = itemsById[itemId];
 
-    const itemSubject = {
-      ...item,
-      listType: workInProgressList && workInProgressList.type,
-      userRole: workInProgressList && workInProgressList.userRole,
-    };
-
     handleDefaultSelectionItemBehaviour(itemId);
   };
 

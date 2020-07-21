@@ -7,7 +7,6 @@ const FixedSizeItemComponent = ({ data, index, style }) => {
     items,
     isMultiItem,
     workInProgressItemIds,
-    workInProgressItem,
     onClickItem,
     onSelectItem,
   } = data;

@@ -1,5 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
+import { media } from '@caesar/assets/styles/media';
 import { ErrorLayout } from '@caesar/components';
 
 const TextWrapper = styled.div`
@@ -16,20 +17,28 @@ const TextWrapper = styled.div`
 `;
 
 const StatusCode = styled.div`
-  font-size: 36px;
+  font-size: ${({ theme }) => theme.font.size.large};
   text-align: center;
   margin-bottom: 10px;
+
+  ${media.desktop`
+    font-size: ${({ theme }) => theme.font.size.big};
+  `}
+  
+  ${media.mobile`
+    font-size: ${({ theme }) => theme.font.size.middle};
+  `}
 `;
 
 const Description = styled.div`
-  font-size: 18px;
+  font-size: ${({ theme }) => theme.font.size.main};
 `;
 
 const Error = ({ statusCode }) => (
   <ErrorLayout>
     <TextWrapper>
       <StatusCode>{statusCode}</StatusCode>
-      <Description>Oops… Something went wrong</Description>
+      <Description>Ooops… Something went wrong</Description>
     </TextWrapper>
   </ErrorLayout>
 );

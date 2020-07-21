@@ -1,5 +1,4 @@
-import React, { memo, useRef } from 'react';
-import { useClickAway } from 'react-use';
+import React, { memo } from 'react';
 import styled from 'styled-components';
 import equal from 'fast-deep-equal';
 import memoize from 'memoize-one';
@@ -42,14 +41,8 @@ const ListComponent = ({
   items = [],
   onClickItem = Function.prototype,
   onSelectItem = Function.prototype,
-  onClearItems = Function.prototype,
 }) => {
   const isDashboardDefaultMode = mode === DASHBOARD_MODE.DEFAULT;
-  const ref = useRef(null);
-
-  useClickAway(ref, () => {
-    onClearItems();
-  });
 
   if (
     isDashboardDefaultMode &&
@@ -73,7 +66,6 @@ const ListComponent = ({
     // TODO: Need to check a long list with items. Mayby beetter to return AutoSizer, but need to fix Scrolling
     return (
       <Scrollbar>
-        <div>
         {items.map((item, index) => (
           <Item
             key={item.id}
@@ -85,7 +77,6 @@ const ListComponent = ({
             {...item}
           />
         ))}
-        </div>
       </Scrollbar>
     );
   };
@@ -95,7 +86,7 @@ const ListComponent = ({
     : workInProgressList?.label;
 
   return (
-    <Wrapper isEmpty={isEmpty} ref={ref}>
+    <Wrapper isEmpty={isEmpty}>
       {!isMultiItem && (
         <ColumnHeader>
           <ColumnTitle>

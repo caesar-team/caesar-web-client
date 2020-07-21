@@ -1,4 +1,5 @@
-import React, { memo } from 'react';
+import React, { memo, useRef } from 'react';
+import { useClickAway } from 'react-use';
 import { useSelector, useDispatch } from 'react-redux';
 import { DASHBOARD_MODE, LIST_TYPE } from '@caesar/common/constants';
 import {
@@ -48,6 +49,13 @@ const MiddleColumnComponent = ({
     mode === DASHBOARD_MODE.SEARCH
       ? searchedItems.length === workInProgressItemIds.length
       : visibleListItems.length === workInProgressItemIds.length;
+  const ref = useRef(null);
+
+  useClickAway(ref, () => {
+    if (isMultiItem) {
+      dispatch(setWorkInProgressItemIds([]));
+    }
+  });
 
   const handleDefaultSelectionItemBehaviour = itemId => {
     dispatch(resetWorkInProgressItemIds());
@@ -55,8 +63,6 @@ const MiddleColumnComponent = ({
   };
 
   const handleClickItem = itemId => event => {
-    const item = itemsById[itemId];
-
     handleDefaultSelectionItemBehaviour(itemId);
   };
 
@@ -80,12 +86,8 @@ const MiddleColumnComponent = ({
     }
   };
 
-  const clearItems = () => {
-    dispatch(setWorkInProgressItemIds([]));
-  };
-
   return (
-    <>
+    <div ref={ref}>
       {isMultiItem && (
         <MultiItem
           isInboxItems={isInboxList}
@@ -110,9 +112,8 @@ const MiddleColumnComponent = ({
         }
         onClickItem={handleClickItem}
         onSelectItem={handleCtrlSelectionItemBehaviour}
-        onClearItems={clearItems}
       />
-    </>
+    </div>
   );
 };
 

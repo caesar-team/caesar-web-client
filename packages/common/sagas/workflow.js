@@ -146,6 +146,7 @@ function* initTeams(withDecryption) {
 }
 
 export function* initWorkflow({ payload: { withDecryption = true } }) {
+  yield put(setCurrentTeamId(TEAM_TYPE.PERSONAL))
   yield fork(fetchMembersSaga);
   yield fork(initPersonal, withDecryption);
   yield fork(initTeams, withDecryption);

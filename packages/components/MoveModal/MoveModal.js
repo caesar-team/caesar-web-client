@@ -99,7 +99,7 @@ const Items = styled.div`
   margin-top: 16px;
 `;
 
-const ModalTitleStyled = styled(ModalTitle)`
+const StyledModalTitle = styled(ModalTitle)`
   justify-content: flex-start;
 `;
 
@@ -218,12 +218,12 @@ const MoveModalComponent = ({
       shouldCloseOnEsc
       shouldCloseOnOverlayClick
     >
-      <ModalTitleStyled>
+      <StyledModalTitle>
         {isMultiMode
           ? 'Move selected items to another vault or list'
           : 'Move item to another vault or list'
         }
-      </ModalTitleStyled>
+      </StyledModalTitle>
       <ListsWrapper>
         <StyledSelectVisible
           label="Vault"

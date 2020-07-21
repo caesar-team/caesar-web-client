@@ -37,7 +37,7 @@ import { getFavoritesList } from '@caesar/common/normalizers/utils';
 import { fetchTeamSuccess } from '@caesar/common/actions/entities/team';
 import { getServerErrorMessage } from '@caesar/common/utils/error';
 
-function* initPersonal(withDecryption) {console.log('Inir personal');
+function* initPersonal(withDecryption) {
   try {
     const { data: lists } = yield call(getLists);
 
@@ -73,7 +73,6 @@ function* initPersonal(withDecryption) {console.log('Inir personal');
     yield put(addChildItemsBatch(childItemsById));
 
     const favoriteList = yield select(favoriteListSelector);
-
     yield put(setWorkInProgressListId(favoriteList.id));
 
     yield put(finishIsLoading());
@@ -133,7 +132,7 @@ function* initTeam(team, withDecryption) {
   }
 }
 
-function* initTeams(withDecryption) {console.log('Init teams');
+function* initTeams(withDecryption) {
   try {
     const { data: teams } = yield call(getTeams);
 

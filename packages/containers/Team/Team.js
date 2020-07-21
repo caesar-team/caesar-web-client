@@ -1,3 +1,4 @@
+/* eslint-disable camelcase */
 import React, { Component, createRef } from 'react';
 import { withRouter } from 'next/router';
 import memoizeOne from 'memoize-one';
@@ -268,7 +269,7 @@ class TeamContainer extends Component {
     users.reduce(
       (accumulator, user) => [
         ...accumulator,
-        { ...membersById[user.id], role: user.role },
+        { ...membersById[user.id], role: user.role, _links: user._links },
       ],
       [],
     ),
@@ -329,12 +330,11 @@ class TeamContainer extends Component {
       ),
     };
 
-    // TODO: Implement change member role on backend, then here
-    // const caslSubject = {
-    //   __typename: 'team',
-    //   // eslint-disable-next-line camelcase
-    //   team_edit: !!this.props.user?._links?.team_edit,
-    // };
+    const getMemberSubject = member => ({
+      __typename: PERMISSION_ENTITY.TEAM_MEMBER,
+      team_member_edit: !!member?._links?.team_member_edit,
+      team_member_remove: !!member?._links?.team_member_remove,
+    });
 
     const roleColumn = {
       id: 'role',
@@ -344,17 +344,17 @@ class TeamContainer extends Component {
       width: columnWidths.role,
       Cell: ({ original }) => (
         <RoleField>
-          {/* <Can I="edit" of={caslSubject}> */}
-          <SelectStyled
-            name="role"
-            value={original.role}
-            options={OPTIONS}
-            onChange={this.handleChangeRole(original.id)}
-          />
-          {/* </Can> */}
-          {/* <Can not I="edit" of={caslSubject}>
+          <Can I={PERMISSION.EDIT} of={getMemberSubject(original)}>
+            <SelectStyled
+              name="role"
+              value={original.role}
+              options={OPTIONS}
+              onChange={this.handleChangeRole(original.id)}
+            />
+          </Can>
+          <Can not I={PERMISSION.EDIT} of={getMemberSubject(original)}>
             {original.role}
-          </Can> */}
+          </Can>
         </RoleField>
       ),
       Header: (
@@ -369,28 +369,28 @@ class TeamContainer extends Component {
       resizable: false,
       width: columnWidths.menu,
       Cell: ({ original }) => (
-        // <Can I={LEAVE_MEMBER_FROM_TEAM} of={team}>
         <MenuField>
-          <DottedMenu
-            tooltipProps={{
-              textBoxWidth: '100px',
-              arrowAlign: 'start',
-              position: 'left center',
-              padding: '0px 0px',
-              flat: true,
-            }}
-          >
-            <MenuWrapper>
-              <MenuButton
-                color="white"
-                onClick={this.handleRemoveMember(original.id)}
-              >
-                Remove
-              </MenuButton>
-            </MenuWrapper>
-          </DottedMenu>
+          <Can I={PERMISSION.DELETE} a={getMemberSubject(original)}>
+            <DottedMenu
+              tooltipProps={{
+                textBoxWidth: '100px',
+                arrowAlign: 'start',
+                position: 'left center',
+                padding: '0px 0px',
+                flat: true,
+              }}
+            >
+              <MenuWrapper>
+                <MenuButton
+                  color="white"
+                  onClick={this.handleRemoveMember(original.id)}
+                >
+                  Remove
+                </MenuButton>
+              </MenuWrapper>
+            </DottedMenu>
+          </Can>
         </MenuField>
-        // </Can>
       ),
       Header: <HeaderField />,
     };
@@ -497,7 +497,6 @@ class TeamContainer extends Component {
 
     const teamSubject = {
       __typename: PERMISSION_ENTITY.TEAM_MEMBER,
-      // eslint-disable-next-line camelcase
       team_member_add: !!team?._links?.team_member_add,
     };
 

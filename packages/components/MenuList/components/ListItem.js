@@ -3,12 +3,8 @@ import React, { useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { Draggable } from 'react-beautiful-dnd';
 import styled from 'styled-components';
-import { upperFirst } from '@caesar/common/utils/string';
-import {
-  LIST_TYPES_ARRAY,
-  PERMISSION,
-  PERMISSION_ENTITY,
-} from '@caesar/common/constants';
+import { transformListTitle } from '@caesar/common/utils/string';
+import { PERMISSION, PERMISSION_ENTITY } from '@caesar/common/constants';
 import {
   createListRequest,
   editListRequest,
@@ -122,9 +118,7 @@ export const ListItem = ({
     setValue(label);
   };
 
-  const listTitle = LIST_TYPES_ARRAY.includes(label)
-    ? upperFirst(label)
-    : label;
+  const listTitle = transformListTitle(label);
 
   const listSubject = teamId
     ? {

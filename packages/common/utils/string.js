@@ -1,3 +1,5 @@
+import { LIST_TYPES_ARRAY } from '@caesar/common/constants';
+
 export function upperFirst(str) {
   return str.charAt(0).toUpperCase() + str.slice(1);
 }
@@ -16,3 +18,6 @@ export function textSize(text) {
 
 export const getPlural = (counter, [single, plural]) =>
   counter === 1 ? single : plural;
+
+export const transformListTitle = title =>
+  LIST_TYPES_ARRAY.includes(title) ? upperFirst(title) : title;

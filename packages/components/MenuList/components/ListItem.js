@@ -79,6 +79,7 @@ export const ListItem = ({
   index,
   onClickMenuItem = Function.prototype,
   isCreatingMode,
+  isDraggable,
   notification,
   setCreatingMode,
 }) => {
@@ -139,7 +140,7 @@ export const ListItem = ({
         delete_list: !!list?._links?.delete_list,
       };
 
-  const renderInner = () => (
+  const renderInner = dragHandleProps => (
     <>
       {isEditMode ? (
         <ListInput
@@ -155,9 +156,11 @@ export const ListItem = ({
         />
       ) : (
         <>
-          <Can I={PERMISSION.SORT} a={listSubject}>
-            <DnDIcon name="drag-n-drop" width={16} height={16} color="gray" />
-          </Can>
+          <div {...dragHandleProps}>
+            <Can I={PERMISSION.SORT} a={listSubject}>
+              <DnDIcon name="drag-n-drop" width={16} height={16} color="gray" />
+            </Can>
+          </div>
           <Title>{listTitle}</Title>
           <Counter>{children.length}</Counter>
           <Can I={PERMISSION.EDIT} a={listSubject}>
@@ -180,11 +183,10 @@ export const ListItem = ({
           </Can>
         </>
       )}
-      <DnDIcon name="drag-n-drop" width={16} height={16} color="gray" />
     </>
   );
 
-  return isCreatingMode ? (
+  return isCreatingMode || !isDraggable ? (
     <Wrapper
       isActive={activeListId === id && !isEditMode}
       onClick={() => onClickMenuItem(id)}
@@ -209,9 +211,8 @@ export const ListItem = ({
             isDefault={isDefault}
             ref={provided.innerRef}
             {...provided.draggableProps}
-            {...provided.dragHandleProps}
           >
-            {renderInner()}
+            {renderInner(provided.dragHandleProps)}
           </Wrapper>
         )}
       </Draggable>

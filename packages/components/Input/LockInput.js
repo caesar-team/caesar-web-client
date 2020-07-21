@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import styled from 'styled-components';
 import { KEY_CODES } from '@caesar/common/constants';
 import { media } from '@caesar/assets/styles/media';
-import Input from './Input';
+import { Input } from './Input';
 import { Icon } from '../Icon';
 
 const Wrapper = styled.div`

@@ -1,12 +1,17 @@
 import React from 'react';
+import { useRouter } from 'next/router';
+import { useSelector } from 'react-redux';
 import styled from 'styled-components';
 import { useNavigatorOnline } from '@caesar/common/hooks';
 import {
+  ROUTES,
   ITEM_TYPE,
   ITEM_ICON_TYPE,
-  CREATE_PERMISSION,
-  ENTITY_TYPE,
+  PERMISSION,
+  PERMISSION_ENTITY,
 } from '@caesar/common/constants';
+import { workInProgressListSelector } from '@caesar/common/selectors/workflow';
+import { currentTeamSelector } from '@caesar/common/selectors/user';
 import { Button } from '../Button';
 import { Icon } from '../Icon';
 import { Dropdown } from '../Dropdown';
@@ -47,25 +52,38 @@ const renderAddItemOptions = (value, label) => (
   </AddItemOption>
 );
 
-export const AddItem = ({
-  workInProgressList,
-  onClickCreateItem,
-  className,
-}) => {
-  const isOnline = useNavigatorOnline();
+export const AddItem = ({ className }) => {
+  const { push } = useRouter();
+  const currentTeam = useSelector(currentTeamSelector);
+  const workInProgressList = useSelector(workInProgressListSelector);
 
-  const itemSubject = {
-    __type: ENTITY_TYPE.ITEM,
-    listType: workInProgressList?.type,
-    teamId: workInProgressList?.teamId,
-    userRole: workInProgressList?.userRole,
+  const handleClickAddItem = (_, value) => {
+    push(
+      `${ROUTES.CREATE}?type=${value}${
+        currentTeam ? `&teamId=${currentTeam?.id}` : ''
+      }&listId=${workInProgressList?.id}`,
+    );
   };
 
+  const isOnline = useNavigatorOnline();
+
+  const itemSubject = currentTeam
+    ? {
+        __typename: PERMISSION_ENTITY.TEAM_ITEM,
+        // eslint-disable-next-line camelcase
+        team_create_item: !!workInProgressList?._links?.team_create_item,
+      }
+    : {
+        __typename: PERMISSION_ENTITY.ITEM,
+        // eslint-disable-next-line camelcase
+        create_item: !!workInProgressList?._links?.create_item,
+      };
+
   return (
-    <Can I={CREATE_PERMISSION} of={itemSubject}>
+    <Can I={PERMISSION.CREATE} an={itemSubject}>
       <Dropdown
         options={itemTypesOptions}
-        onClick={onClickCreateItem}
+        onClick={handleClickAddItem}
         optionRender={renderAddItemOptions}
         withTriangleAtTop
         ButtonElement={({ handleToggle }) => (

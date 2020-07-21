@@ -17,9 +17,8 @@ import {
 import {
   COMMANDS_ROLES,
   TEAM_TYPE,
-  CHANGE_TEAM_MEMBER_ROLE_PERMISSION,
-  JOIN_MEMBER_TO_TEAM,
-  LEAVE_MEMBER_FROM_TEAM,
+  PERMISSION,
+  PERMISSION_ENTITY,
 } from '@caesar/common/constants';
 
 const LogoWrapper = styled.div`
@@ -289,7 +288,7 @@ class TeamContainer extends Component {
       width: columnWidths.name,
       Cell: ({ original }) => (
         <NameField>
-          <Avatar isSmall {...original} />
+          <Avatar size={32} fontSize="small" {...original} />
           <Name>{original.name}</Name>
         </NameField>
       ),
@@ -330,6 +329,13 @@ class TeamContainer extends Component {
       ),
     };
 
+    // TODO: Implement change member role on backend, then here
+    // const caslSubject = {
+    //   __typename: 'team',
+    //   // eslint-disable-next-line camelcase
+    //   team_edit: !!this.props.user?._links?.team_edit,
+    // };
+
     const roleColumn = {
       id: 'role',
       accessor: 'role',
@@ -338,17 +344,17 @@ class TeamContainer extends Component {
       width: columnWidths.role,
       Cell: ({ original }) => (
         <RoleField>
-          <Can I={CHANGE_TEAM_MEMBER_ROLE_PERMISSION} of={team}>
-            <SelectStyled
-              name="role"
-              value={original.role}
-              options={OPTIONS}
-              onChange={this.handleChangeRole(original.id)}
-            />
-          </Can>
-          <Can not I={CHANGE_TEAM_MEMBER_ROLE_PERMISSION} of={team}>
+          {/* <Can I="edit" of={caslSubject}> */}
+          <SelectStyled
+            name="role"
+            value={original.role}
+            options={OPTIONS}
+            onChange={this.handleChangeRole(original.id)}
+          />
+          {/* </Can> */}
+          {/* <Can not I="edit" of={caslSubject}>
             {original.role}
-          </Can>
+          </Can> */}
         </RoleField>
       ),
       Header: (
@@ -363,28 +369,28 @@ class TeamContainer extends Component {
       resizable: false,
       width: columnWidths.menu,
       Cell: ({ original }) => (
-        <Can I={LEAVE_MEMBER_FROM_TEAM} of={team}>
-          <MenuField>
-            <DottedMenu
-              tooltipProps={{
-                textBoxWidth: '100px',
-                arrowAlign: 'start',
-                position: 'left center',
-                padding: '0px 0px',
-                flat: true,
-              }}
-            >
-              <MenuWrapper>
-                <MenuButton
-                  color="white"
-                  onClick={this.handleRemoveMember(original.id)}
-                >
-                  Remove
-                </MenuButton>
-              </MenuWrapper>
-            </DottedMenu>
-          </MenuField>
-        </Can>
+        // <Can I={LEAVE_MEMBER_FROM_TEAM} of={team}>
+        <MenuField>
+          <DottedMenu
+            tooltipProps={{
+              textBoxWidth: '100px',
+              arrowAlign: 'start',
+              position: 'left center',
+              padding: '0px 0px',
+              flat: true,
+            }}
+          >
+            <MenuWrapper>
+              <MenuButton
+                color="white"
+                onClick={this.handleRemoveMember(original.id)}
+              >
+                Remove
+              </MenuButton>
+            </MenuWrapper>
+          </DottedMenu>
+        </MenuField>
+        // </Can>
       ),
       Header: <HeaderField />,
     };
@@ -482,22 +488,25 @@ class TeamContainer extends Component {
 
     const isDefaultTeam = team.type === TEAM_TYPE.DEFAULT;
 
-    const teamUsers = team.users
-      ? team.users.filter(({ id }) => id !== user.id)
-      : [];
-    const members = this.getMemberList(teamUsers, membersById);
+    const members = this.getMemberList(team.users, membersById);
     const filteredMembersList = this.filterMemberList(
-      teamUsers,
+      team.users,
       filter,
       membersById,
     );
+
+    const teamSubject = {
+      __typename: PERMISSION_ENTITY.TEAM_MEMBER,
+      // eslint-disable-next-line camelcase
+      team_member_add: !!team?._links?.team_member_add,
+    };
 
     return (
       <Wrapper ref={this.wrapperRef}>
         <TopWrapper>
           <Title>{team.title}</Title>
           {!isDefaultTeam && (
-            <Can I={JOIN_MEMBER_TO_TEAM} of={team}>
+            <Can I={PERMISSION.ADD} a={teamSubject}>
               <ButtonsWrapper>
                 <ButtonStyled
                   withOfflineCheck
@@ -505,7 +514,7 @@ class TeamContainer extends Component {
                   icon="plus"
                   color="black"
                 >
-                  ADD MEMBER
+                  Add member
                 </ButtonStyled>
               </ButtonsWrapper>
             </Can>

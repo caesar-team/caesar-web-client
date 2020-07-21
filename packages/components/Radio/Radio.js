@@ -1,68 +1,81 @@
 import React from 'react';
 import styled from 'styled-components';
 
-const Label = styled.label`
-  position: relative;
-  padding-left: 20px;
-  min-height: 20px;
-  cursor: ${({ disabled }) => (disabled ? 'not-allowed' : 'pointer')};
-  font-size: 14px;
-  color: ${({ theme }) => theme.color.black};
-
-  &:hover {
-    user-select: none;
-  }
-
-  &::after {
-    position: absolute;
-    top: 0;
-    left: 0;
-    content: '';
-    width: 20px;
-    height: 20px;
-    background-color: #fff;
-    border: 1px solid ${({ theme }) => theme.color.black};
-    border-radius: 50%;
-  }
+const DefaultRadio = styled.input`
+  display: none;
 `;
 
 const RadioIcon = styled.div`
-  position: absolute;
-  top: 3px;
-  left: 3px;
-  z-index: ${({ theme }) => theme.zIndex.basic};
-  width: 14px;
-  height: 14px;
-  background-color: ${({ theme, checked }) =>
-    checked ? theme.color.black : theme.color.white};
+  position: relative;
+  flex: 0 0 16px;
+  width: 16px;
+  height: 16px;
+  background-color: ${({ theme }) => theme.color.white};
+  border: 1px solid ${({ theme }) => theme.color.lightGray};
   border-radius: 50%;
+
+  &::after {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    display: none;
+    width: 12px;
+    height: 12px;
+    content: '';
+    background-color: ${({ theme }) => theme.color.black};
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+  }
+
+  ${DefaultRadio}:checked + & {
+    &::after {
+      display: block;
+    }
+  }
 `;
 
-const StyledInput = styled.input`
-  height: 0;
-  width: 0;
-  opacity: 0;
-  overflow: hidden;
-  position: absolute;
+const Label = styled.div`
+  display: flex;
+  align-items: center;
+  margin-left: 16px;
+  transition: all 0.2s;
+
+  ${DefaultRadio}:checked ~ & {
+    font-weight: 600;
+  }
 `;
 
-const Radio = ({ children, disabled, checked, className, value, onChange }) => {
-  return (
-    <Label className={className} disabled={disabled}>
-      {children}
-      <StyledInput
-        type="radio"
-        value={value}
-        disabled={disabled}
-        checked={checked}
-        onChange={onChange}
-      />
-      <RadioIcon disabled={disabled} checked={checked} />
-    </Label>
-  );
-};
+const Wrapper = styled.label`
+  position: relative;
+  display: flex;
+  align-items: center;
+  padding: 8px 16px;
+  cursor: ${({ disabled }) => (disabled ? 'not-allowed' : 'pointer')};
+
+  &:hover {
+    user-select: none;
+
+    ${Label} {
+      font-weight: 600;
+    }
+  }
+`;
+
+const Radio = ({ label, disabled, className, value, name, onChange }) => (
+  <Wrapper disabled={disabled} className={className}>
+    <DefaultRadio
+      type="radio"
+      name={name}
+      value={value}
+      disabled={disabled}
+      onChange={onChange}
+    />
+    <RadioIcon disabled={disabled} />
+    <Label>{label}</Label>
+  </Wrapper>
+);
 
 Radio.Label = Label;
 Radio.RadioIcon = RadioIcon;
 
-export default Radio;
+export { Radio };

@@ -13,3 +13,6 @@ export function truncate(str, length, ending = '...') {
 export function textSize(text) {
   return new TextEncoder('utf-8').encode(text).length;
 }
+
+export const getPlural = (counter, [single, plural]) =>
+  counter === 1 ? single : plural;

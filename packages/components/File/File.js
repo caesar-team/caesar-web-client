@@ -2,7 +2,8 @@ import React from 'react';
 import { useHover } from 'react-use';
 import styled from 'styled-components';
 import DownloadIconSvg from '@caesar/assets/icons/svg/icon-download-white.svg';
-import CloseIconSvg from '@caesar/assets/icons/svg/icon-close-white.svg';
+import { PERMISSION } from '@caesar/common/constants';
+import { Can } from '../Ability';
 import { Icon } from '../Icon';
 
 const FileExt = styled.div`
@@ -75,10 +76,17 @@ const FileSize = styled.div`
   color: ${({ theme }) => theme.color.gray};
 `;
 
-const ErrorWrapper = styled.div`
+const ErrorWrapper = styled.div``;
+
+const ErrorInner = styled.div`
   position: relative;
   display: flex;
   padding-right: 28px;
+`;
+
+const Error = styled.div`
+  font-size: ${({ theme }) => theme.font.size.small};
+  color: ${({ theme }) => theme.color.red};
 `;
 
 const CloseIcon = styled(Icon)`
@@ -86,7 +94,13 @@ const CloseIcon = styled(Icon)`
   top: 8px;
   right: 8px;
   color: ${({ theme }) => theme.color.gray};
+  opacity: 0;
+  transition: color 0.2s, opacity 0.2s;
   cursor: pointer;
+
+  &:hover {
+    color: ${({ theme }) => theme.color.black};
+  }
 `;
 
 const UploadedWrapper = styled.div`
@@ -95,7 +109,7 @@ const UploadedWrapper = styled.div`
   padding: 8px 28px 8px 8px;
   border-radius: 4px;
   cursor: pointer;
-  transition: color, background-color 0.2s;
+  transition: color 0.2s, background-color 0.2s;
 
   &:hover {
     background-color: ${({ theme }) => theme.color.snow};
@@ -117,7 +131,7 @@ const UploadedWrapper = styled.div`
     }
 
     ${CloseIcon} {
-      color: ${({ theme }) => theme.color.black};
+      opacity: 1;
     }
   }
 `;
@@ -140,6 +154,8 @@ const File = ({
   status = UPLOADED_STATUS,
   name,
   raw,
+  error,
+  itemSubject,
   onClickRemove,
   onClickDownload,
   ...props
@@ -156,8 +172,8 @@ const File = ({
   const closeIconComponent = (
     <CloseIcon
       name="close"
-      width={12}
-      height={12}
+      width={16}
+      height={16}
       onClick={handleClickCloseIcon}
     />
   );
@@ -166,15 +182,18 @@ const File = ({
     closeIconComponent,
   );
 
-  if (status === ERROR_STATUS) {
+  if (status === ERROR_STATUS || error) {
     return (
       <ErrorWrapper>
-        <ErrorStatus />
-        <Details>
-          <FileName>{filename}</FileName>
-          <FileSize>{size}</FileSize>
-        </Details>
-        {onClickRemove && hoverableCloseIcon}
+        <ErrorInner>
+          <ErrorStatus />
+          <Details>
+            <FileName>{filename}</FileName>
+            <FileSize>{size}</FileSize>
+          </Details>
+          {onClickRemove && hoverableCloseIcon}
+        </ErrorInner>
+        <Error>{error}</Error>
       </ErrorWrapper>
     );
   }
@@ -190,7 +209,13 @@ const File = ({
         <FileName>{filename}</FileName>
         <FileSize>{size}</FileSize>
       </Details>
-      {onClickRemove && hoverableCloseIcon}
+      {itemSubject ? (
+        <Can I={PERMISSION.EDIT} an={itemSubject}>
+          {onClickRemove && hoverableCloseIcon}
+        </Can>
+      ) : (
+        onClickRemove && hoverableCloseIcon
+      )}
     </UploadedWrapper>
   );
 };

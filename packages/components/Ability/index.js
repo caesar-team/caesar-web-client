@@ -1,6 +1,2 @@
-export { default as Can } from './Can';
-export {
-  default as AbilityProvider,
-  AbilityConsumer,
-  AbilityContext,
-} from './AbilityProvider';
+export { Can } from './Can';
+export { AbilityProvider } from './AbilityProvider';

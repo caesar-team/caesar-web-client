@@ -55,6 +55,14 @@ const MiddleColumnWrapper = styled.div`
 const RightColumnWrapper = styled.div`
   position: relative;
   flex-grow: 1;
+  max-width: calc(100% - 287px - 431px);
+`;
+
+const StyledSecureMessage = styled(SecureMessage)`
+  max-width: 848px;
+  padding-right: 24px;
+  padding-left: 24px;
+  margin: 0 auto;
 `;
 
 const DashboardComponent = ({ notification }) => {
@@ -112,7 +120,7 @@ const DashboardComponent = ({ notification }) => {
             />
           </Sidebar>
           {mode === DASHBOARD_MODE.TOOL ? (
-            <SecureMessage withScroll />
+            <StyledSecureMessage withScroll />
           ) : (
             <>
               <MiddleColumnWrapper>
@@ -156,11 +164,11 @@ const DashboardComponent = ({ notification }) => {
       )}
       <ConfirmMoveToTrashModal
         notification={notification}
-        isOpen={openedModal === MODAL.MOVE_TO_TRASH}
+        isOpened={openedModal === MODAL.MOVE_TO_TRASH}
         handleCloseModal={handleCloseModal}
       />
       <ConfirmRemoveItemModal
-        isOpen={openedModal === MODAL.REMOVE_ITEM}
+        isOpened={openedModal === MODAL.REMOVE_ITEM}
         handleCloseModal={handleCloseModal}
       />
     </>

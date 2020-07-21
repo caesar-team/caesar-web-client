@@ -24,26 +24,11 @@ const SecureHeaderComponent = ({
   router,
   isButtonShow = IS_AUTHORIZATION_ENABLE,
 }) => {
-  const { isMobile, isWideDesktop } = useMedia();
-  const getLogoParams = () => {
-    switch (true) {
-      case !IS_AUTHORIZATION_ENABLE:
-        return { name: 'logo-caesar-secure', width: isWideDesktop ? 200 : 170 };
-      case isMobile:
-        return { name: 'caesar', width: 25 };
-      default:
-        return { name: 'logo-caesar-4xxi', width: isWideDesktop ? 130 : 107 };
-    }
-  };
+  const { isMobile } = useMedia();
 
   return (
     <Wrapper>
-      <Logo
-        href={ROUTES.MAIN}
-        width={getLogoParams().width}
-        height={isWideDesktop ? 40 : 30}
-        iconName={getLogoParams().name}
-      />
+      <Logo href={ROUTES.MAIN} />
       {isButtonShow && (
         <>
           {isMobile ? (

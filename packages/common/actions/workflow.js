@@ -30,19 +30,17 @@ export const finishIsLoading = () => ({
   type: FINISH_IS_LOADING,
 });
 
-export const setWorkInProgressItem = (item, mode) => ({
+export const setWorkInProgressItem = item => ({
   type: SET_WORK_IN_PROGRESS_ITEM,
   payload: {
     item,
-    mode,
   },
 });
 
-export const updateWorkInProgressItem = (itemId, mode) => ({
+export const updateWorkInProgressItem = itemId => ({
   type: UPDATE_WORK_IN_PROGRESS_ITEM,
   payload: {
     itemId,
-    mode,
   },
 });
 

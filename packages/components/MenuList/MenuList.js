@@ -1,11 +1,7 @@
 import React, { memo, useState } from 'react';
 import { useSelector } from 'react-redux';
 import styled from 'styled-components';
-import {
-  APP_VERSION,
-  TEAM_TYPE,
-  TEAM_TEXT_TYPE,
-} from '@caesar/common/constants';
+import { TEAM_TYPE, TEAM_TEXT_TYPE } from '@caesar/common/constants';
 import {
   userDataSelector,
   currentTeamSelector,
@@ -16,6 +12,7 @@ import { Dropdown } from '../Dropdown';
 import { Avatar } from '../Avatar';
 import { Icon } from '../Icon';
 import { TeamsList } from '../TeamsList';
+import { AppVersion } from '../AppVersion';
 import { Overlay } from '../Modal';
 import { MenuListInner } from './components/MenuListInner';
 
@@ -27,7 +24,8 @@ const StyledDropdown = styled(Dropdown)`
 
 const ColumnHeader = styled.div`
   position: relative;
-  z-index: ${({ theme }) => theme.zIndex.dropdown};
+  z-index: ${({ isDropdownOpened, theme }) =>
+    isDropdownOpened && theme.zIndex.dropdown};
   display: flex;
   align-items: center;
   height: 56px;
@@ -44,6 +42,7 @@ const ColumnTitle = styled.div`
 `;
 
 const DropdownIcon = styled(Icon)`
+  flex: 0 0 16px;
   margin-left: auto;
   transform: ${({ isDropdownOpened }) =>
     isDropdownOpened ? 'scaleY(-1)' : 'scaleY(1)'};
@@ -53,14 +52,12 @@ const DropdownIcon = styled(Icon)`
 const Menu = styled.div`
   display: flex;
   flex-direction: column;
+  height: calc(100% - 56px);
 `;
 
-const AppVersion = styled.div`
+const StyledAppVersion = styled(AppVersion)`
   padding: 8px 24px;
   margin-top: auto;
-  font-size: ${({ theme }) => theme.font.size.xs};
-  line-height: ${({ theme }) => theme.font.lineHeight.xs};
-  color: ${({ theme }) => theme.color.gray};
 `;
 
 const MenuListComponent = ({ mode, setSearchedText, setMode }) => {
@@ -98,13 +95,21 @@ const MenuListComponent = ({ mode, setSearchedText, setMode }) => {
         )}
         onToggle={handleToggleDropdown}
       >
-        <ColumnHeader bgColor={isDropdownOpened ? 'white' : 'alto'}>
-          <Avatar avatar={teamList[activeTeamId]?.icon} {...user} isSmall />
+        <ColumnHeader
+          bgColor={isDropdownOpened ? 'white' : 'alto'}
+          isDropdownOpened={isDropdownOpened}
+        >
+          <Avatar
+            avatar={teamList[activeTeamId]?.icon}
+            {...user}
+            size={32}
+            fontSize="small"
+          />
           <ColumnTitle>{getColumnTitle()}</ColumnTitle>
           <DropdownIcon
             name="arrow-triangle"
-            width={12}
-            height={12}
+            width={16}
+            height={16}
             isDropdownOpened={isDropdownOpened}
           />
         </ColumnHeader>
@@ -118,7 +123,7 @@ const MenuListComponent = ({ mode, setSearchedText, setMode }) => {
             isListsOpened={isListsOpened}
             setListsOpened={setListsOpened}
           />
-          <AppVersion>{APP_VERSION}</AppVersion>
+          <StyledAppVersion />
         </Menu>
       </Scrollbar>
       {isDropdownOpened && <Overlay />}

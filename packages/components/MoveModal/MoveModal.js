@@ -1,50 +1,80 @@
-import React, { Component } from 'react';
+import React, { useState, memo } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
 import styled from 'styled-components';
-import memoize from 'memoize-one';
 import {
-  Modal,
-  ModalTitle,
-  Button,
-  Select,
-  TextWithLines,
-  ListItem,
-  Scrollbar,
-} from '@caesar/components';
+  TEAM_TYPE,
+  TEAM_TEXT_TYPE,
+  LIST_TYPES_ARRAY,
+} from '@caesar/common/constants';
 import { upperFirst } from '@caesar/common/utils/string';
+import { userDataSelector } from '@caesar/common/selectors/user';
+import { teamsByIdSelector } from '@caesar/common/selectors/entities/team';
+import { listsByIdSelector } from '@caesar/common/selectors/entities/list';
+import {
+  moveItemRequest,
+  moveItemsBatchRequest,
+} from '@caesar/common/actions/entities/item';
+import {
+  setWorkInProgressItem,
+  resetWorkInProgressItemIds,
+} from '@caesar/common/actions/workflow';
+import { useItemTeamAndListOptions } from '@caesar/common/hooks';
+import { Modal, ModalTitle } from '../Modal';
+import { Radio } from '../Radio';
+import { Button } from '../Button';
+import { Icon } from '../Icon';
+import { Avatar } from '../Avatar';
+import { SelectVisible } from '../SelectVisible';
+import { withNotification } from '../Notification';
+import { ListItem } from '../List';
+import { Scrollbar } from '../Scrollbar';
+import { TextWithLines } from '../TextWithLines';
 
-const ModalDescription = styled.div`
-  padding-bottom: 20px;
-  text-align: center;
-  font-size: 14px;
-  color: ${({ theme }) => theme.color.black};
+const ListsWrapper = styled.div`
+  display: flex;
+  justify-content: space-between;
+`;
+
+const StyledSelectVisible = styled(SelectVisible)`
+  flex: 0 0 calc(50% - 20px);
+  width: calc(50% - 20px);
+`;
+
+const StyledRadio = styled(Radio)`
+  ${Radio.Label} {
+    max-width: 100%;
+    overflow: hidden;
+  }
+`;
+
+const StyledTeamAvatar = styled(Avatar)`
+  margin-right: 16px;
+`;
+
+const Name = styled.span`
+  display: inline-block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+`;
+
+const ListIcon = styled(Icon)`
+  flex: 0 0 16px;
+  margin-right: 16px;
 `;
 
 const ButtonsWrapper = styled.div`
   display: flex;
+  align-items: center;
   justify-content: flex-end;
+  margin-top: 16px;
 `;
 
-const StyledButton = styled(Button)`
-  margin-left: 20px;
-  text-transform: uppercase;
+const ButtonStyled = styled(Button)`
+  margin-right: 16px;
 `;
 
-const SelectStyled = styled(Select)`
-  border: 1px solid ${({ theme }) => theme.color.gallery};
-  border-radius: 3px;
-  height: 48px;
-`;
-
-const SelectWrapper = styled.div`
-  display: flex;
-  margin: 15px 0 35px;
-
-  & > * {
-    width: 100%;
-  }
-`;
-
-const ListWrapper = styled.div`
+const ListItemsWrapper = styled.div`
   display: flex;
   flex-direction: column;
   margin: 10px 0 20px;
@@ -59,131 +89,218 @@ const ListItemStyled = styled(ListItem)`
   }
 `;
 
-const getTeamOptions = memoize((teams, currentTeamId) =>
-  teams.map(({ value, label }) => ({
-    value,
-    label: upperFirst(label),
-    isDisabled: value === currentTeamId,
-  })),
-);
+const ModalDescription = styled.div`
+  padding-bottom: 20px;
+  text-align: center;
+  font-size: 14px;
+  color: ${({ theme }) => theme.color.black};
+`;
 
-const getListOptions = memoize((lists, currentListId) =>
-  lists.map(({ value, label }) => ({
-    value,
-    label: upperFirst(label),
-    isDisabled: value === currentListId,
-  })),
-);
-
-class MoveModal extends Component {
-  state = this.prepareInitialState();
-
-  handleChangeTeamId = (_, value) => {
-    this.setState({
-      currentTeamId: value,
-    });
-  };
-
-  handleChangeListId = (_, value) => {
-    this.setState({
-      currentListId: value,
-    });
-  };
-
-  handleCloseItem = itemId => () => {
-    this.props.onRemove(itemId);
-  };
-
-  handleClickMove = () => {
-    this.props.onMove(this.state.currentListId);
-  };
-
-  prepareInitialState() {
-    return {
-      currentTeamId: null,
-      currentListId: null,
-    };
+const TextWithLinesStyled = styled(TextWithLines)`
+  &::after {
+    margin-right: 0;
   }
+`;
 
-  renderItems() {
-    const { items } = this.props;
+const Items = styled.div`
+  margin-top: 16px;
+`;
 
-    return items.map(item => (
-      <ListItemStyled
-        isClosable
-        key={item.id}
-        onClickClose={this.handleCloseItem(item.id)}
-        {...item}
+const MoveModalComponent = ({
+  notification,
+  item,
+  items,
+  currentTeamId,
+  currentListId,
+  workInProgressItemIds,
+  isOpened,
+  isMultiMode = false,
+  closeModal,
+  onRemove = Function.prototype,
+}) => {
+  const dispatch = useDispatch();
+  const teamsById = useSelector(teamsByIdSelector);
+  const listsById = useSelector(listsByIdSelector);
+  const user = useSelector(userDataSelector);
+  const teamId = isMultiMode ? currentTeamId : item.teamId;
+  const listId = isMultiMode ? currentListId : item.listId;
+
+  const teamAvatar = teamId && teamsById[teamId]?.icon;
+  const teamTitle = teamId
+    ? teamsById[teamId]?.title
+    : TEAM_TEXT_TYPE[TEAM_TYPE.PERSONAL];
+  const listTitle = LIST_TYPES_ARRAY.includes(listsById[listId]?.label)
+    ? upperFirst(listsById[listId]?.label)
+    : listsById[listId]?.label;
+
+  const [searchTeamValue, setSearchTeamValue] = useState('');
+  const [searchListValue, setSearchListValue] = useState('');
+
+  const {
+    checkedTeamId,
+    checkedListId,
+    setCheckedTeamId,
+    setCheckedListId,
+    teamOptions,
+    listOptions,
+  } = useItemTeamAndListOptions({
+    teamId,
+    listId,
+  });
+
+  const handleClickAccept = () => {
+    if (isMultiMode) {
+      dispatch(
+        moveItemsBatchRequest(
+          workInProgressItemIds,
+          checkedTeamId,
+          checkedListId,
+        ),
+      );
+      dispatch(resetWorkInProgressItemIds());
+
+      notification.show({
+        text: 'The items have been moved.',
+      });
+    } else {
+      dispatch(moveItemRequest(item.id, checkedTeamId, checkedListId));
+      dispatch(setWorkInProgressItem(null));
+
+      notification.show({
+        text: `The '${item.data.name}' has been moved.`,
+      });
+    }
+
+    closeModal();
+  };
+  const handleCloseItem = itemId => () => {
+    onRemove(itemId);
+  };
+  const teamOptionsRenderer = teamOptions
+    .filter(team =>
+      team?.title?.toLowerCase().includes(searchTeamValue?.toLowerCase()),
+    )
+    .map(team => (
+      <StyledRadio
+        key={team.id || team.title}
+        value={team.id || team.title}
+        label={
+          <>
+            <StyledTeamAvatar
+              avatar={team.icon}
+              email={team.email}
+              size={24}
+              fontSize="xs"
+            />
+            <Name>{team.title}</Name>
+          </>
+        }
+        name="team"
+        onChange={() => setCheckedTeamId(team.id)}
       />
     ));
-  }
+  const listOptionsRenderer = listOptions
+    .filter(list =>
+      list?.label?.toLowerCase().includes(searchListValue?.toLowerCase()),
+    )
+    .map(list => (
+      <StyledRadio
+        key={list.id}
+        value={list.id}
+        label={<Name>{list.label}</Name>}
+        name="list"
+        onChange={() => setCheckedListId(list.id)}
+      />
+    ));
 
-  render() {
-    const { teamsLists, items, onCancel } = this.props;
-    const { currentTeamId, currentListId } = this.state;
+  return (
+    <Modal
+      isOpened={isOpened}
+      width={640}
+      onRequestClose={closeModal}
+      shouldCloseOnEsc
+      shouldCloseOnOverlayClick
+    >
+      {isMultiMode ? (
+        <>
+          <ModalTitle>Move</ModalTitle>
+          <ModalDescription>Move selected items</ModalDescription>
+        </>
+      ) : (
+        <ModalTitle>Move item to another team or list </ModalTitle>
+      )}
+      <ListsWrapper>
+        <StyledSelectVisible
+          label="Team"
+          active={
+            <>
+              <StyledTeamAvatar
+                size={24}
+                fontSize="xs"
+                avatar={teamAvatar}
+                {...user}
+              />
+              <Name>{teamTitle}</Name>
+            </>
+          }
+          options={teamOptionsRenderer}
+          searchPlaceholder="Search by teams…"
+          searchValue={searchTeamValue}
+          setSearchValue={setSearchTeamValue}
+        />
+        <StyledSelectVisible
+          label="List"
+          active={
+            <>
+              <ListIcon name="list" width={16} height={16} color="white" />
+              <Name>{listTitle}</Name>
+            </>
+          }
+          options={listOptionsRenderer}
+          searchPlaceholder="Search by lists…"
+          searchValue={searchListValue}
+          setSearchValue={setSearchListValue}
+        />
+      </ListsWrapper>
+      {isMultiMode && (
+        <Items>
+          <TextWithLinesStyled position="left" width={1}>
+            Selected items ({items.length})
+          </TextWithLinesStyled>
+          <ListItemsWrapper>
+            <Scrollbar autoHeight autoHeightMax={400}>
+              {items.map(listItem => (
+                <ListItemStyled
+                  isClosable
+                  key={listItem.id}
+                  onClickClose={handleCloseItem(listItem.id)}
+                  hasHover={false}
+                  isInModal
+                  {...listItem}
+                />
+              ))}
+            </Scrollbar>
+          </ListItemsWrapper>
+        </Items>
+      )}
+      <ButtonsWrapper>
+        <ButtonStyled color="white" onClick={closeModal}>
+          Cancel
+        </ButtonStyled>
+        <Button
+          onClick={handleClickAccept}
+          disabled={
+            checkedListId === listId ||
+            !listOptions.map(({ id }) => id).includes(checkedListId)
+          }
+        >
+          Accept
+        </Button>
+      </ButtonsWrapper>
+    </Modal>
+  );
+};
 
-    const isButtonDisabled = !items.length || !currentListId;
-    const renderedItems = this.renderItems();
-
-    const teams = teamsLists.map(({ id, name }) => ({
-      value: id,
-      label: name,
-    }));
-    const currentTeam = teamsLists.find(({ id }) => id === currentTeamId);
-
-    const lists = currentTeam
-      ? currentTeam.lists.map(({ id, label }) => ({ value: id, label }))
-      : [];
-
-    return (
-      <Modal
-        isOpen
-        width={640}
-        onRequestClose={onCancel}
-        shouldCloseOnEsc
-        shouldCloseOnOverlayClick
-      >
-        <ModalTitle>Move</ModalTitle>
-        <ModalDescription>Move selected items</ModalDescription>
-        <SelectWrapper>
-          <SelectStyled
-            placeholder="Choose a team where to move…"
-            options={getTeamOptions(teams, currentTeamId)}
-            value={currentTeamId}
-            onChange={this.handleChangeTeamId}
-          />
-        </SelectWrapper>
-        {currentTeamId && (
-          <SelectWrapper>
-            <SelectStyled
-              placeholder="Choose a list where to move…"
-              options={getListOptions(lists, currentListId)}
-              value={currentListId}
-              onChange={this.handleChangeListId}
-            />
-          </SelectWrapper>
-        )}
-        <TextWithLines>Selected ({items.length})</TextWithLines>
-        <ListWrapper>
-          <Scrollbar autoHeight autoHeightMax={400}>
-            {renderedItems}
-          </Scrollbar>
-        </ListWrapper>
-        <ButtonsWrapper>
-          <StyledButton color="white" onClick={onCancel}>
-            Cancel
-          </StyledButton>
-          <StyledButton
-            color="black"
-            onClick={this.handleClickMove}
-            disabled={isButtonDisabled}
-          >
-            Move
-          </StyledButton>
-        </ButtonsWrapper>
-      </Modal>
-    );
-  }
-}
+const MoveModal = memo(withNotification(MoveModalComponent));
 
 export default MoveModal;

@@ -10,8 +10,8 @@ import {
 } from '@caesar/components';
 import {
   TEAM_TYPE,
-  CREATE_PERMISSION,
-  ENTITY_TYPE,
+  PERMISSION,
+  PERMISSION_ENTITY,
 } from '@caesar/common/constants';
 
 const LogoWrapper = styled.div`
@@ -168,11 +168,17 @@ class TeamListContainer extends Component {
 
     const renderedTeamCards = this.renderTeamCards();
 
+    const teamSubject = {
+      __typename: PERMISSION_ENTITY.TEAM,
+      // eslint-disable-next-line camelcase
+      team_create: !!this.props.user?._links?.team_create,
+    };
+
     return (
       <Wrapper>
         <TopWrapper>
           <Title>Teams</Title>
-          <Can I={CREATE_PERMISSION} of={ENTITY_TYPE.TEAM}>
+          <Can I={PERMISSION.CREATE} a={teamSubject}>
             <Button
               withOfflineCheck
               onClick={this.handleOpenModal(NEW_TEAM_MODAL)}
@@ -191,7 +197,7 @@ class TeamListContainer extends Component {
           />
         )}
         <ConfirmModal
-          isOpen={modalVisibilities[REMOVE_TEAM_MODAL]}
+          isOpened={modalVisibilities[REMOVE_TEAM_MODAL]}
           description="Are you sure you want to remove team?"
           onClickConfirm={this.handleRemoveTeam}
           onClickCancel={this.handleCloseModal(REMOVE_TEAM_MODAL)}

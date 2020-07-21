@@ -9,7 +9,7 @@ import {
 import { fetchMembersRequest } from '@caesar/common/actions/entities/member';
 import {
   teamsByIdSelector,
-  teamListSelector,
+  teamSortedListSelector,
   isLoadingSelector,
 } from '@caesar/common/selectors/entities/team';
 import {
@@ -25,7 +25,7 @@ import TeamList from './TeamList';
 const mapStateToProps = createStructuredSelector({
   isLoading: isLoadingSelector,
   teamsById: teamsByIdSelector,
-  teams: teamListSelector,
+  teams: teamSortedListSelector,
   user: userDataSelector,
   userTeamList: userTeamListSelector,
   members: memberListSelector,

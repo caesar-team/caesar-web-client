@@ -2,8 +2,7 @@ import { createSelector } from 'reselect';
 import {
   listsByIdSelector,
   extendedSortedCustomizableListsSelector,
-  favoritesSelector,
-  trashListSelector,
+  favoriteListSelector,
 } from '@caesar/common/selectors/entities/list';
 import { itemsByIdSelector } from '@caesar/common/selectors/entities/item';
 import { childItemsByIdSelector } from '@caesar/common/selectors/entities/childItem';
@@ -137,43 +136,33 @@ export const shouldLoadNodesSelector = createSelector(
   lists => !lists.length,
 );
 
-export const chosenListItemsSelector = createSelector(
+const createListItemsList = (children, itemsById) =>
+  children.reduce(
+    (accumulator, itemId) =>
+      itemsById[itemId]?.data
+        ? [...accumulator, itemsById[itemId]]
+        : accumulator,
+    [],
+  ) || [];
+
+export const visibleListItemsSelector = createSelector(
   listsByIdSelector,
   itemsByIdSelector,
   workInProgressListIdSelector,
-  (listsById, itemsById, workInProgressListId) =>
-    listsById && workInProgressListId && listsById[workInProgressListId]
-      ? listsById[workInProgressListId].children.reduce(
-        (accumulator, itemId) =>
-          itemsById[itemId]?.data
-            ? [...accumulator, itemsById[itemId]]
-            : accumulator,
-        [],
-      )
-      : []
-);
+  favoriteListSelector,
+  (listsById, itemsById, workInProgressListId, favoriteList) => {
+    const isFavoriteList = workInProgressListId === favoriteList?.id;
 
-export const favoriteListItemsSelector = createSelector(
-  chosenListItemsSelector,
-  trashListSelector,
-  (visibleItems, trashList) => visibleItems.filter(
-    item => item.listId !== trashList.id,
-  ),
-);
-
-export const visibleListItemsSelector = createSelector(
-  chosenListItemsSelector,
-  favoriteListItemsSelector,
-  workInProgressListIdSelector,
-  favoritesSelector,
-  (chosenItems, favoriteItems, workInProgressListId, favoriteList) => {
-    const isFavoriteList = workInProgressListId === favoriteList.id;
-
-    switch(true) {
+    switch (true) {
       case isFavoriteList:
-        return favoriteItems;
+        return createListItemsList(favoriteList.children, itemsById);
+      case !!listsById[workInProgressListId]:
+        return createListItemsList(
+          listsById[workInProgressListId].children,
+          itemsById,
+        );
       default:
-        return chosenItems;
+        return [];
     }
   },
 );

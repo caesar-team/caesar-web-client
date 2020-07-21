@@ -1,13 +1,6 @@
 import React, { memo } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import {
-  DASHBOARD_MODE,
-  ITEM_MODE,
-  LIST_TYPE,
-  MOVE_ITEM_PERMISSION,
-  SHARE_ITEM_PERMISSION,
-  DELETE_PERMISSION,
-} from '@caesar/common/constants';
+import { DASHBOARD_MODE, LIST_TYPE } from '@caesar/common/constants';
 import {
   workInProgressItemSelector,
   workInProgressItemIdsSelector,
@@ -48,8 +41,8 @@ const MiddleColumnComponent = ({
   const isMultiItem = workInProgressItemIds?.length > 0;
   const isInboxList = workInProgressList?.type === LIST_TYPE.INBOX;
   const isTrashList =
-    (workInProgressList?.id === trashList?.id ||
-      teamsTrashLists.map(({ id }) => id).includes(workInProgressList?.id));
+    workInProgressList?.id === trashList?.id ||
+    teamsTrashLists?.map(({ id }) => id).includes(workInProgressList?.id);
 
   const searchedItems = filter(Object.values(itemsById), searchedText);
 
@@ -60,7 +53,7 @@ const MiddleColumnComponent = ({
 
   const handleDefaultSelectionItemBehaviour = itemId => {
     dispatch(resetWorkInProgressItemIds());
-    dispatch(setWorkInProgressItem(itemsById[itemId], ITEM_MODE.REVIEW));
+    dispatch(setWorkInProgressItem(itemsById[itemId]));
   };
 
   const handleCtrlShiftSelectionItemBehaviour = itemId => {
@@ -95,15 +88,9 @@ const MiddleColumnComponent = ({
       userRole: workInProgressList && workInProgressList.userRole,
     };
 
-    // TODO:
-    // const teamItemGuard =
-    //   this.context.can(MOVE_ITEM_PERMISSION, itemSubject) &&
-    //   this.context.can(SHARE_ITEM_PERMISSION, itemSubject) &&
-    //   this.context.can(DELETE_PERMISSION, itemSubject);
-
-    // if (itemSubject.teamId && !teamItemGuard) {
     if (itemSubject.teamId) {
       handleDefaultSelectionItemBehaviour(itemId);
+
       return;
     }
 

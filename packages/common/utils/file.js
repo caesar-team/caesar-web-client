@@ -70,3 +70,24 @@ export function downloadAsZip(files) {
     .generateAsync({ type: 'blob' })
     .then(blob => saveAs(blob, `attachments${Date.now()}.zip`));
 }
+
+export const splitFilesToUniqAndDuplicates = files => {
+  const uniqFiles = [];
+  const duplicatedFiles = [];
+
+  const map = new Map();
+
+  // eslint-disable-next-line no-restricted-syntax
+  for (const file of files) {
+    const checkLabel = `${file.name}_${file.raw.length}`;
+
+    if (!map.has(checkLabel)) {
+      map.set(checkLabel, true);
+      uniqFiles.push(file);
+    } else {
+      duplicatedFiles.push(file);
+    }
+  }
+
+  return { uniqFiles, duplicatedFiles };
+};

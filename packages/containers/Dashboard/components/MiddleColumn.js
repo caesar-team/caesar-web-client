@@ -25,6 +25,7 @@ import { filter } from '../utils';
 const MiddleColumnComponent = ({
   mode,
   searchedText,
+  hasOpenedModal = false,
   handleOpenModal,
   handleCtrlSelectionItemBehaviour,
 }) => {
@@ -52,7 +53,7 @@ const MiddleColumnComponent = ({
   const ref = useRef(null);
 
   useClickAway(ref, () => {
-    if (isMultiItem) {
+    if (isMultiItem && !hasOpenedModal) {
       dispatch(setWorkInProgressItemIds([]));
     }
   });

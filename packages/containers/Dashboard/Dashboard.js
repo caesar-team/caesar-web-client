@@ -123,6 +123,7 @@ const DashboardComponent = ({ notification }) => {
                 <MiddleColumn
                   mode={mode}
                   searchedText={searchedText}
+                  hasOpenedModal={openedModal}
                   handleOpenModal={handleOpenModal}
                   handleCtrlSelectionItemBehaviour={
                     handleCtrlSelectionItemBehaviour

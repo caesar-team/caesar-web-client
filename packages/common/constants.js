@@ -191,6 +191,7 @@ export const PERMISSION = {
   FAVORITE: 'favorite',
   TRASH: 'trash',
   RESTORE: 'restore',
+  MULTISELECT: 'multiselect',
 };
 
 export const PERMISSION_ENTITY = {

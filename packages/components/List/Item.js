@@ -23,6 +23,13 @@ const CheckboxStyled = styled(Checkbox)`
   ${Checkbox.Box} {
     background-color: ${({ theme }) => theme.color.emperor};
     border: 1px solid ${({ theme }) => theme.color.emperor};
+    color: ${({ theme }) => theme.color.gray};
+
+    &:hover {
+      > svg {
+        display: block;
+      }
+    }
 
     ${({ checked }) => `
       > svg {
@@ -34,6 +41,7 @@ const CheckboxStyled = styled(Checkbox)`
   ${Checkbox.Input}:checked + ${Checkbox.Box} {
     background-color: ${({ theme }) => theme.color.emperor};
     border-color: ${({ theme }) => theme.color.emperor};
+    color: ${({ theme }) => theme.color.white};
   }
 `;
 
@@ -48,15 +56,15 @@ const IconWrapper = styled.span``;
 const Tooltip = styled.div`
   display: none;
   position: absolute;
-  top: -40px;
-  left: 0;
+  top: ${({ isTop }) => isTop ? 'auto' : '-40px'};
+  bottom: ${({ isTop }) => isTop ? '-40px' : 'auto'};
+  left: -10px;
   padding: 4px 8px;
   background-color: ${({ theme }) => theme.color.black};
   color: ${({ theme }) => theme.color.white};
   border-radius: 4px;
   font-size: ${({ theme }) => theme.font.size.xs};
   white-space: nowrap;
-  transform: translate(-50%, 0);
   z-index: 1000;
 `;
 
@@ -70,8 +78,7 @@ const NotEditIconWrapper = styled.div`
   }
 `;
 
-const NotEditIcon = styled(Icon)`
-`;
+const NotEditIcon = styled(Icon)``;
 
 const Row = styled.div`
   position: relative;
@@ -144,7 +151,9 @@ const TypeIconWrapper = styled.div`
   align-items: center;
   flex: 0 0 40px;
   height: 40px;
-  background: ${({ theme }) => theme.color.gray};
+  background: 
+    ${({ isLightGray, theme }) => 
+      (isLightGray ? theme.color.lightGray : theme.color.gray)};
   border-radius: 4px;
 `;
 
@@ -195,16 +204,18 @@ export const Item = ({
   style,
   teamId,
   _links,
+  index,
   onClickClose = Function.prototype,
   onClickItem = Function.prototype,
-  workInProgressItemIds,
-  workInProgressItem,
   onSelectItem = Function.prototype,
+  workInProgressItemIds,
   ...props
 }) => {
   const shouldShowMembers = !!invited.length;
   const shouldShowAttachments = attachments && attachments.length > 0;
   const shouldShowFavoriteIcon = favorite && !isClosable;
+  const isActive = isMultiItem && workInProgressItemIds.includes(id);
+  const isTop = index === 0;
   const itemSubject = teamId
     ? {
       __typename: PERMISSION_ENTITY.TEAM_ITEM,
@@ -218,15 +229,6 @@ export const Item = ({
       batch_share_item: !!_links?.batch_share_item,
       delete_item: !!_links?.delete_item,
     };
-  const possiblePermissions = [
-    PERMISSION.MOVE,
-    PERMISSION.SHARE,
-    PERMISSION.TRASH,
-  ];
-
-  const isActive = isMultiItem
-    ? workInProgressItemIds.includes(id)
-    : workInProgressItem?.id === id;
 
   return (
     <Row
@@ -239,26 +241,36 @@ export const Item = ({
       isInModal={isInModal}
       {...props}
     >
-      <TypeIconWrapper onClick={e => { e.stopPropagation(); }}>
-        <Can I={possiblePermissions} an={itemSubject}>
-          <CheckboxStyled
-            checked={isActive}
-            onChange={() => { onSelectItem(id)}}
-          />
-          <IconWrapper>
-            <ItemTypeIcon type={type} />
-          </IconWrapper>
-        </Can>
-        <Can not I={possiblePermissions} an={itemSubject}>
-          <NotEditIconWrapper>
-            <NotEditIcon name="not-edit" width={20} height={20} color="white" />
-            <Tooltip>{PERMISSION_MESSAGES.FORBIDDEN_SELECT}</Tooltip>
-          </NotEditIconWrapper>
-          <IconWrapper>
-            <ItemTypeIcon type={type} />
-          </IconWrapper>
-        </Can>
-      </TypeIconWrapper>
+      <Can I={PERMISSION.MULTISELECT} an={itemSubject} passThrough>
+        {allowed => (
+          <TypeIconWrapper
+            onClick={e => { e.stopPropagation(); }}
+            isLightGray={!allowed && isMultiItem}
+          >
+            {allowed ? (
+              <CheckboxStyled
+                checked={isActive}
+                onChange={() => { onSelectItem(id)}}
+              />
+            ) : (
+              <NotEditIconWrapper>
+                <NotEditIcon
+                  name="not-edit"
+                  width={20}
+                  height={20}
+                  color="white"
+                />
+                <Tooltip isTop={isTop}>
+                  {PERMISSION_MESSAGES.FORBIDDEN_SELECT}
+                </Tooltip>
+              </NotEditIconWrapper>
+            )}
+            <IconWrapper>
+              <ItemTypeIcon type={type} />
+            </IconWrapper>
+          </TypeIconWrapper>
+        )}
+      </Can>
       <Title>{name}</Title>
       {shouldShowAttachments && (
         <Addon isInModal={isInModal}>

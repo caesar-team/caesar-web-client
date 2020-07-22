@@ -173,6 +173,23 @@ export const teamsTrashListsSelector = createSelector(
   lists => lists.filter(({ type }) => type === LIST_TYPE.TRASH) || [],
 );
 
+export const teamsFavoriteListSelector = createSelector(
+  teamListsSelector,
+  teamsTrashListsSelector,
+  itemsByIdSelector,
+  (lists, trash, items) => {
+    const favoriteList =
+      lists.find(({ id, type }) => type === LIST_TYPE.FAVORITES) || {};
+
+    return {
+      ...favoriteList,
+      children: favoriteList.children?.filter(
+        itemId => items[itemId]?.listId !== trash.id,
+      ),
+    };
+  },
+);
+
 export const allTrashListIdsSelector = createSelector(
   trashListSelector,
   teamsTrashListsSelector,

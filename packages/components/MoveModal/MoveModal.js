@@ -1,7 +1,6 @@
 import React, { useState, memo } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import styled from 'styled-components';
-import { TEAM_TYPE, TEAM_TEXT_TYPE } from '@caesar/common/constants';
 import { userDataSelector } from '@caesar/common/selectors/user';
 import { teamsByIdSelector } from '@caesar/common/selectors/entities/team';
 import {

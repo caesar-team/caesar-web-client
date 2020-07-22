@@ -1,10 +1,11 @@
 /* eslint-disable camelcase */
 import React, { useState } from 'react';
-import { useDispatch } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import { Draggable } from 'react-beautiful-dnd';
 import styled from 'styled-components';
 import { transformListTitle } from '@caesar/common/utils/string';
 import { PERMISSION, PERMISSION_ENTITY } from '@caesar/common/constants';
+import { currentTeamSelector } from '@caesar/common/selectors/user';
 import {
   createListRequest,
   editListRequest,
@@ -80,6 +81,7 @@ export const ListItem = ({
   setCreatingMode,
 }) => {
   const dispatch = useDispatch();
+  const currentTeam = useSelector(currentTeamSelector);
   const { id, label, children = [], teamId } = list;
   const isDefault = label === 'default';
   const [isEditMode, setEditMode] = useState(isCreatingMode);
@@ -97,12 +99,15 @@ export const ListItem = ({
   const handleClickAcceptEdit = () => {
     if (isCreatingMode) {
       dispatch(
-        createListRequest({ label: value }, { notification, setCreatingMode }),
+        createListRequest(
+          { label: value, teamId: currentTeam?.id || null },
+          { notification, setCreatingMode },
+        ),
       );
     } else {
       dispatch(
         editListRequest(
-          { ...list, label: value },
+          { ...list, label: value, teamId: currentTeam?.id || null },
           { notification, setEditMode },
         ),
       );
@@ -211,6 +216,7 @@ export const ListItem = ({
         )}
       </Draggable>
       <ConfirmRemoveListModal
+        currentTeam={currentTeam}
         list={list}
         isOpenedPopup={isOpenedPopup}
         setOpenedPopup={setOpenedPopup}

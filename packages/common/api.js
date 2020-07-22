@@ -194,6 +194,15 @@ export const postAddTeamMember = ({ teamId, userId, role }) =>
 
 export const getTeamLists = teamId => callApi.get(`/teams/${teamId}/lists`);
 
+export const postCreateTeamList = (teamId, data) =>
+  callApi.post(`/teams/${teamId}/lists`, data);
+
+export const patchTeamList = (teamId, listId, data) =>
+  callApi.patch(`/teams/${teamId}/lists/${listId}`, data);
+
+export const removeTeamList = (teamId, listId) =>
+  callApi.delete(`/teams/${teamId}/lists/${listId}`);
+
 export const getSearchUser = text => callApi.get(`/users/search/${text}`);
 
 export const getMembers = () => callApi.get('/users');

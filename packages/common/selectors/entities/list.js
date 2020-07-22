@@ -69,10 +69,14 @@ export const selectableListsWithoutChildrenSelector = createSelector(
 
 export const customizableListsSelector = createSelector(
   personalListsSelector,
-  lists =>
-    lists.filter(
+  currentTeamListsSelector,
+  (personalLists, teamLists) => {
+    const lists = personalLists.length ? personalLists : teamLists.list;
+
+    return lists.filter(
       list => list.type === LIST_TYPE.LIST && list.label !== 'default',
-    ),
+    );
+  },
 );
 
 export const sortedCustomizableListsSelector = createSelector(

@@ -2,7 +2,7 @@ import { DEFAULT_ERROR_MESSAGE } from '@caesar/common/constants';
 
 export function getServerErrorMessage(error) {
   if ([400, 403, 404].includes(error?.data?.error?.code)) {
-    return message = error?.data?.error?.message ?? DEFAULT_ERROR_MESSAGE;
+    return error?.data?.error?.message ?? DEFAULT_ERROR_MESSAGE;
   }
 
   return DEFAULT_ERROR_MESSAGE;

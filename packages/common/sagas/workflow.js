@@ -146,6 +146,7 @@ function* initTeams(withDecryption) {
 }
 
 export function* initWorkflow({ payload: { withDecryption = true } }) {
+  yield put(setCurrentTeamId(TEAM_TYPE.PERSONAL))
   yield fork(fetchMembersSaga);
   yield fork(initPersonal, withDecryption);
   yield fork(initTeams, withDecryption);
@@ -179,11 +180,12 @@ export function* setCurrentTeamIdWatchSaga() {
 
     const currentTeamId = yield select(currentTeamIdSelector);
 
-    if (!currentTeamId || currentTeamId === TEAM_TYPE.PERSONAL) {
-      return;
-    }
+    if (!currentTeamId) return;
 
-    const { data } = yield call(getTeamLists, currentTeamId);
+    const { data } =
+      currentTeamId === TEAM_TYPE.PERSONAL
+        ? yield call(getLists)
+        : yield call(getTeamLists, currentTeamId);
 
     const { listsById, itemsById, childItemsById } = convertNodesToEntities(
       data,

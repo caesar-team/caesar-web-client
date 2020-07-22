@@ -202,3 +202,5 @@ export const getDefaultTeamMembers = () =>
   callApi.get('/teams/default/members');
 
 export const patchAcceptTeamItems = () => callApi.patch('/accept_teams_items');
+
+export const getMovableLists = () => callApi.get(`/lists/movable`);

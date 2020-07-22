@@ -15,6 +15,7 @@ import {
 } from '@caesar/common/actions/entities/list';
 import { removeItemsBatch } from '@caesar/common/actions/entities/item';
 import { removeChildItemsBatch } from '@caesar/common/actions/entities/childItem';
+import { updateGlobalNotification } from '@caesar/common/actions/application';
 import {
   listSelector,
   sortedCustomizableListsSelector,
@@ -27,7 +28,7 @@ import {
   patchList,
 } from '@caesar/common/api';
 import { ENTITY_TYPE, LIST_TYPE } from '@caesar/common/constants';
-import { getServerErrorByNames } from '@caesar/common/utils/error';
+import { getServerErrorByNames, getServerErrorMessage } from '@caesar/common/utils/error';
 
 const reorder = (list, startIndex, endIndex) => {
   const result = Array.from(list);
@@ -61,9 +62,9 @@ export function* createListSaga({ payload: { list }, meta: { notification, setCr
     );
   } catch (error) {
     yield put(createListFailure());
-    yield call(notification.show, {
-      text: getServerErrorByNames(error),
-    });
+    yield put(
+      updateGlobalNotification(getServerErrorByNames(error), false, true),
+    );
   }
 }
 
@@ -76,9 +77,9 @@ export function* editListSaga({ payload: { list }, meta: { notification, setEdit
   } catch (error) {
     console.log(error);
     yield put(editListFailure());
-    yield call(notification.show, {
-      text: getServerErrorByNames(error),
-    });
+    yield put(
+      updateGlobalNotification(getServerErrorByNames(error), false, true),
+    );
   }
 }
 

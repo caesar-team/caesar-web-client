@@ -31,13 +31,13 @@ const Text = styled.div`
   max-width: 400px;
 `;
 
-const IconStyled = styled(Icon)`
+const StyledIcon = styled(Icon)`
   width: 20px;
   height: 20px;
-  fill: ${({ theme }) => theme.color.white};
+  fill: ${({ theme }) => theme.color.red};
 `;
 
-const CloseIcon = styled(IconStyled)`
+const CloseIcon = styled(StyledIcon)`
   margin-left: 16px;
   cursor: pointer;
   width: 16px;
@@ -53,7 +53,7 @@ const GlobalNotification = ({
   <Wrapper className={className}>
     <InnerWrapper>
       {isError ? (
-        <IconStyled name="loader-error" />
+        <StyledIcon name="loader-error" />
       ) : (
         <CircleLoader size={16} color="white" />
       )}

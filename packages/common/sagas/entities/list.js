@@ -28,7 +28,7 @@ import {
   patchList,
 } from '@caesar/common/api';
 import { ENTITY_TYPE, LIST_TYPE } from '@caesar/common/constants';
-import { getServerErrorByNames, getServerErrorMessage } from '@caesar/common/utils/error';
+import { getServerErrorByNames } from '@caesar/common/utils/error';
 
 const reorder = (list, startIndex, endIndex) => {
   const result = Array.from(list);

@@ -1,8 +1,8 @@
 import React, { memo } from 'react';
 import styled from 'styled-components';
 import equal from 'fast-deep-equal';
-import { upperFirst } from '@caesar/common/utils/string';
-import { DASHBOARD_MODE, LIST_TYPES_ARRAY } from '@caesar/common/constants';
+import { transformListTitle } from '@caesar/common/utils/string';
+import { DASHBOARD_MODE } from '@caesar/common/constants';
 import { Scrollbar } from '../Scrollbar';
 import { EmptyList } from './EmptyList';
 import { Item } from './Item';
@@ -79,9 +79,7 @@ const ListComponent = ({
     );
   };
 
-  const itemTitle = LIST_TYPES_ARRAY.includes(workInProgressList?.label)
-    ? upperFirst(workInProgressList?.label)
-    : workInProgressList?.label;
+  const listTitle = transformListTitle(workInProgressList?.label);
 
   return (
     <Wrapper isEmpty={isEmpty}>
@@ -89,7 +87,7 @@ const ListComponent = ({
         <ColumnHeader>
           <ColumnTitle>
             {isDashboardDefaultMode
-              ? itemTitle
+              ? listTitle
               : `Search results (${items.length} elements):`}
           </ColumnTitle>
           {/* TODO: Add sharing list functional; Set condition when to show this button */}

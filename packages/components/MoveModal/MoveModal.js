@@ -1,15 +1,9 @@
 import React, { useState, memo } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import styled from 'styled-components';
-import {
-  TEAM_TYPE,
-  TEAM_TEXT_TYPE,
-  LIST_TYPES_ARRAY,
-} from '@caesar/common/constants';
-import { upperFirst } from '@caesar/common/utils/string';
+import { TEAM_TYPE, TEAM_TEXT_TYPE } from '@caesar/common/constants';
 import { userDataSelector } from '@caesar/common/selectors/user';
 import { teamsByIdSelector } from '@caesar/common/selectors/entities/team';
-import { listsByIdSelector } from '@caesar/common/selectors/entities/list';
 import {
   moveItemRequest,
   moveItemsBatchRequest,
@@ -117,25 +111,18 @@ const MoveModalComponent = ({
 }) => {
   const dispatch = useDispatch();
   const teamsById = useSelector(teamsByIdSelector);
-  const listsById = useSelector(listsByIdSelector);
   const user = useSelector(userDataSelector);
   const teamId = isMultiMode ? currentTeamId : item.teamId;
   const listId = isMultiMode ? currentListId : item.listId;
-
-  const teamAvatar = teamId && teamsById[teamId]?.icon;
-  const teamTitle = teamId
-    ? teamsById[teamId]?.title
-    : TEAM_TEXT_TYPE[TEAM_TYPE.PERSONAL];
-  const listTitle = LIST_TYPES_ARRAY.includes(listsById[listId]?.label)
-    ? upperFirst(listsById[listId]?.label)
-    : listsById[listId]?.label;
 
   const [searchTeamValue, setSearchTeamValue] = useState('');
   const [searchListValue, setSearchListValue] = useState('');
 
   const {
     checkedTeamId,
+    checkedTeamTitle,
     checkedListId,
+    checkedListLabel,
     setCheckedTeamId,
     setCheckedListId,
     teamOptions,
@@ -170,9 +157,13 @@ const MoveModalComponent = ({
 
     closeModal();
   };
+
   const handleCloseItem = itemId => () => {
     onRemove(itemId);
   };
+
+  const teamAvatar = checkedTeamId && teamsById[checkedTeamId]?.icon;
+
   const teamOptionsRenderer = teamOptions
     .filter(team =>
       team?.title?.toLowerCase().includes(searchTeamValue?.toLowerCase()),
@@ -229,13 +220,12 @@ const MoveModalComponent = ({
           label="Vault"
           active={
             <>
-              <StyledTeamAvatar
-                size={24}
-                fontSize="xs"
-                avatar={teamAvatar}
-                {...user}
-              />
-              <Name>{teamTitle}</Name>
+              {checkedTeamId ? (
+                <StyledTeamAvatar size={24} fontSize="xs" avatar={teamAvatar} />
+              ) : (
+                <StyledTeamAvatar size={24} fontSize="xs" {...user} />
+              )}
+              <Name>{checkedTeamTitle}</Name>
             </>
           }
           options={teamOptionsRenderer}
@@ -248,7 +238,7 @@ const MoveModalComponent = ({
           active={
             <>
               <ListIcon name="list" width={16} height={16} color="white" />
-              <Name>{listTitle}</Name>
+              <Name>{checkedListLabel}</Name>
             </>
           }
           options={listOptionsRenderer}

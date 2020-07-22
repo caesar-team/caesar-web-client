@@ -5,11 +5,10 @@ import styled from 'styled-components';
 import {
   TEAM_TYPE,
   TEAM_TEXT_TYPE,
-  LIST_TYPES_ARRAY,
   PERMISSION,
   PERMISSION_ENTITY,
 } from '@caesar/common/constants';
-import { upperFirst } from '@caesar/common/utils/string';
+import { transformListTitle } from '@caesar/common/utils/string';
 import {
   listsByIdSelector,
   trashListSelector,
@@ -82,9 +81,7 @@ export const ItemHeader = ({
     ? teamsById[item.teamId]?.title
     : TEAM_TEXT_TYPE[TEAM_TYPE.PERSONAL];
 
-  const listTitle = LIST_TYPES_ARRAY.includes(listsById[item.listId]?.label)
-    ? upperFirst(listsById[item.listId]?.label)
-    : listsById[item.listId]?.label;
+  const listTitle = transformListTitle(listsById[item.listId]?.label);
 
   const isTrashItem =
     item &&

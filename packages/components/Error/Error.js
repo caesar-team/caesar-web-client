@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import Router from 'next/router';
 import { media } from '@caesar/assets/styles/media';
 import { ErrorLayout, Button } from '@caesar/components';
-import { ROUTES, DOMAIN_SECURE_ROUTE } from '@caesar/common/constants';
+import { DOMAIN_SECURE_ROUTE } from '@caesar/common/constants';
 
 const TextWrapper = styled.div`
   position: absolute;

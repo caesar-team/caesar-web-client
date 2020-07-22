@@ -1,7 +1,9 @@
 import React from 'react';
 import styled from 'styled-components';
+import Router from 'next/router';
 import { media } from '@caesar/assets/styles/media';
-import { ErrorLayout } from '@caesar/components';
+import { ErrorLayout, Button } from '@caesar/components';
+import { ROUTES, DOMAIN_SECURE_ROUTE } from '@caesar/common/constants';
 
 const TextWrapper = styled.div`
   position: absolute;
@@ -34,11 +36,26 @@ const Description = styled.div`
   font-size: ${({ theme }) => theme.font.size.main};
 `;
 
+const StyledButton = styled(Button)`
+  margin-top: 40px;
+
+  ${media.tablet`
+    margin-top: 24px;
+  `}
+
+  ${media.mobile`
+    margin-top: 16px;
+  `}
+`;
+
 const Error = ({ statusCode }) => (
   <ErrorLayout>
     <TextWrapper>
       <StatusCode>{statusCode}</StatusCode>
       <Description>Ooops… Something went wrong</Description>
+      <StyledButton onClick={() => Router.push(DOMAIN_SECURE_ROUTE)}>
+        Create secure message
+      </StyledButton>
     </TextWrapper>
   </ErrorLayout>
 );

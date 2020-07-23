@@ -1,28 +1,46 @@
 import { useState } from 'react';
-import { useEffectOnce } from 'react-use';
+import { useEffectOnce, useUpdateEffect } from 'react-use';
 import { useSelector } from 'react-redux';
-import { TEAM_TYPE, TEAM_TEXT_TYPE, LIST_TYPE } from '@caesar/common/constants';
+import { TEAM_TYPE, TEAM_TEXT_TYPE } from '@caesar/common/constants';
 import { sortByName } from '@caesar/common/utils/utils';
+import { transformListTitle } from '@caesar/common/utils/string';
 import { userDataSelector } from '@caesar/common/selectors/user';
-import { teamListSelector } from '@caesar/common/selectors/entities/team';
-import { listsSelector } from '@caesar/common/selectors/entities/list';
+import {
+  teamListSelector,
+  teamsByIdSelector,
+} from '@caesar/common/selectors/entities/team';
+import { getMovableLists } from '../api';
 
-const LIST_TYPES_ARRAY = [
-  LIST_TYPE.ROOT,
-  LIST_TYPE.INBOX,
-  LIST_TYPE.TRASH,
-  LIST_TYPE.FAVORITES,
-];
+const getTeamTitle = (checkedTeamId, teams) => {
+  switch (true) {
+    case !!checkedTeamId &&
+      teams[checkedTeamId]?.title.toLowerCase() === TEAM_TYPE.DEFAULT:
+      return TEAM_TEXT_TYPE[TEAM_TYPE.DEFAULT];
+    case !!checkedTeamId:
+      return teams[checkedTeamId]?.title;
+    case !checkedTeamId:
+      return TEAM_TEXT_TYPE[TEAM_TYPE.PERSONAL];
+    default:
+      return '';
+  }
+};
+
+const getListTitle = (listId, lists) =>
+  transformListTitle(lists.find(list => list.id === listId)?.label);
 
 export const useItemTeamAndListOptions = ({ teamId = null, listId }) => {
   const user = useSelector(userDataSelector);
   const teams = useSelector(teamListSelector);
-  const lists = useSelector(listsSelector);
-
+  const teamsById = useSelector(teamsByIdSelector);
+  const [lists, setLists] = useState([]);
   const [checkedTeamId, setCheckedTeamId] = useState(teamId);
   const [checkedListId, setCheckedListId] = useState(listId);
 
   useEffectOnce(() => {
+    getMovableLists().then(({ data }) => {
+      setLists(data);
+    });
+
     if (teams[0].id !== null) {
       teams.splice(0, 0, {
         id: null,
@@ -31,6 +49,14 @@ export const useItemTeamAndListOptions = ({ teamId = null, listId }) => {
       });
     }
   }, [teams]);
+
+  useUpdateEffect(() => {
+    const defaultTeamListId = lists.find(
+      list => list.teamId === checkedTeamId && list.label === 'default',
+    )?.id;
+
+    setCheckedListId(defaultTeamListId);
+  }, [checkedTeamId]);
 
   const teamOptions = teams
     .sort((a, b) => {
@@ -49,13 +75,15 @@ export const useItemTeamAndListOptions = ({ teamId = null, listId }) => {
     );
 
   const listOptions = lists
-    .filter(list => !LIST_TYPES_ARRAY.includes(list.type))
     .filter(list => list.teamId === checkedTeamId)
-    .sort((a, b) => sortByName(a.label, b.label));
+    .sort((a, b) => sortByName(a.label, b.label))
+    .map(list => ({ ...list, label: transformListTitle(list.label) }));
 
   return {
     checkedTeamId,
+    checkedTeamTitle: getTeamTitle(checkedTeamId, teamsById),
     checkedListId,
+    checkedListLabel: getListTitle(checkedListId, lists),
     setCheckedTeamId,
     setCheckedListId,
     teamOptions,

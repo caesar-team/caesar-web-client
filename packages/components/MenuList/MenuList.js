@@ -99,12 +99,15 @@ const MenuListComponent = ({ mode, setSearchedText, setMode }) => {
           bgColor={isDropdownOpened ? 'white' : 'alto'}
           isDropdownOpened={isDropdownOpened}
         >
-          <Avatar
-            avatar={teamList[activeTeamId]?.icon}
-            {...user}
-            size={32}
-            fontSize="small"
-          />
+          {activeTeamId === TEAM_TYPE.PERSONAL ? (
+            <Avatar {...user} size={32} fontSize="small" />
+          ) : (
+            <Avatar
+              avatar={teamList[activeTeamId]?.icon}
+              size={32}
+              fontSize="small"
+            />
+          )}
           <ColumnTitle>{getColumnTitle()}</ColumnTitle>
           <DropdownIcon
             name="arrow-triangle"

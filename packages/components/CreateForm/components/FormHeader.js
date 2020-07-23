@@ -2,16 +2,9 @@ import React, { useState } from 'react';
 import { useUpdateEffect } from 'react-use';
 import { useSelector } from 'react-redux';
 import styled from 'styled-components';
-import {
-  TEAM_TYPE,
-  TEAM_TEXT_TYPE,
-  LIST_TYPES_ARRAY,
-} from '@caesar/common/constants';
-import { upperFirst } from '@caesar/common/utils/string';
 import { useItemTeamAndListOptions } from '@caesar/common/hooks';
 import { userDataSelector } from '@caesar/common/selectors/user';
 import { teamsByIdSelector } from '@caesar/common/selectors/entities/team';
-import { listsByIdSelector } from '@caesar/common/selectors/entities/list';
 import { Dropdown } from '../../Dropdown';
 import { Avatar } from '../../Avatar';
 import { Icon } from '../../Icon';
@@ -81,10 +74,11 @@ export const FormHeader = ({ teamId, listId, onChangePath, className }) => {
   const [isListDropdownOpened, setListDropdownOpened] = useState(false);
   const user = useSelector(userDataSelector);
   const teamsById = useSelector(teamsByIdSelector);
-  const listsById = useSelector(listsByIdSelector);
   const {
     checkedTeamId,
+    checkedTeamTitle,
     checkedListId,
+    checkedListLabel,
     setCheckedTeamId,
     setCheckedListId,
     teamOptions,
@@ -120,22 +114,6 @@ export const FormHeader = ({ teamId, listId, onChangePath, className }) => {
     }));
 
   const teamAvatar = teamsById[checkedTeamId]?.icon;
-  const getTeamTitle = () => {
-    switch (true) {
-      case !!checkedTeamId &&
-        teamsById[checkedTeamId]?.title.toLowerCase() === TEAM_TYPE.DEFAULT:
-        return TEAM_TEXT_TYPE[TEAM_TYPE.DEFAULT];
-      case !!checkedTeamId:
-        return teamsById[checkedTeamId]?.title;
-      case !checkedTeamId:
-        return TEAM_TEXT_TYPE[TEAM_TYPE.PERSONAL];
-      default:
-        return '';
-    }
-  };
-  const listTitle = LIST_TYPES_ARRAY.includes(listsById[checkedListId]?.label)
-    ? upperFirst(listsById[checkedListId]?.label)
-    : listsById[checkedListId]?.label;
 
   return (
     <Wrapper className={className}>
@@ -145,13 +123,12 @@ export const FormHeader = ({ teamId, listId, onChangePath, className }) => {
         onToggle={() => setTeamDropdownOpened(!isTeamDropdownOpened)}
         onClick={(name, value) => setCheckedTeamId(value)}
       >
-        <StyledTeamAvatar
-          size={24}
-          fontSize="xs"
-          avatar={teamAvatar}
-          {...user}
-        />
-        <Name>{getTeamTitle()}</Name>
+        {checkedTeamId ? (
+          <StyledTeamAvatar size={24} fontSize="xs" avatar={teamAvatar} />
+        ) : (
+          <StyledTeamAvatar size={24} fontSize="xs" {...user} />
+        )}
+        <Name>{checkedTeamTitle}</Name>
         <ArrowIcon
           name="arrow-triangle"
           width={16}
@@ -167,7 +144,7 @@ export const FormHeader = ({ teamId, listId, onChangePath, className }) => {
         onClick={(name, value) => setCheckedListId(value)}
       >
         <ListIcon name="list" width={16} height={16} color="black" />
-        <Name>{listTitle}</Name>
+        <Name>{checkedListLabel}</Name>
         <ArrowIcon
           name="arrow-triangle"
           width={16}

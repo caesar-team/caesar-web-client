@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
+import Link from 'next/link';
 import styled from 'styled-components';
 import copy from 'copy-text-to-clipboard';
 import { Icon, Button, withNotification } from '@caesar/components';
 import { downloadAsZip } from '@caesar/common/utils/file';
 import { media } from '@caesar/assets/styles/media';
+import { DOMAIN_SECURE_ROUTE } from '@caesar/common/constants';
 import { MessageStep, PasswordStep } from './steps';
 
 const Wrapper = styled.div`
@@ -56,6 +58,15 @@ const ButtonStyled = styled(Button)`
   }
 `;
 
+const Footer = styled.div`
+  margin-top: auto;
+`;
+
+const StyledLink = styled(Link)`
+  font-size: ${({ theme }) => theme.font.size.small};
+  color: ${({ theme }) => theme.color.white};
+  text-decoration: none;
+`;
 
 const SecureMessageContainerComponent = ({
   notification,
@@ -125,6 +136,11 @@ const SecureMessageContainerComponent = ({
           )}
         </ButtonsWrapper>
       )}
+      <Footer>
+        <StyledLink href={DOMAIN_SECURE_ROUTE}>
+          Create Your Own Secure Message
+        </StyledLink>
+      </Footer>
     </Wrapper>
   );
 };

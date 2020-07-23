@@ -54,7 +54,7 @@ const Error = ({ statusCode }) => (
       <StatusCode>{statusCode}</StatusCode>
       <Description>Ooops… Something went wrong</Description>
       <StyledButton onClick={() => Router.push(DOMAIN_SECURE_ROUTE)}>
-        Create secure message
+        Create a secure message
       </StyledButton>
     </TextWrapper>
   </ErrorLayout>

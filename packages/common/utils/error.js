@@ -1,11 +1,11 @@
 import { DEFAULT_ERROR_MESSAGE } from '@caesar/common/constants';
 
 export function getServerErrorMessage(error) {
-  try {
-    return error.data.error.message;
-  } catch (e) {
-    return DEFAULT_ERROR_MESSAGE;
+  if ([400, 403, 404].includes(error?.data?.error?.code)) {
+    return error?.data?.error?.message ?? DEFAULT_ERROR_MESSAGE;
   }
+
+  return DEFAULT_ERROR_MESSAGE;
 }
 
 function getChildrenErrors(children) {

@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useUpdateEffect } from 'react-use';
 import styled from 'styled-components';
 import { PERMISSION } from '@caesar/common/constants';
 import { Can } from '../../Ability';
@@ -53,6 +54,12 @@ export const Note = ({ value: propValue, itemSubject, onClickAcceptEdit }) => {
   const [isEdit, setEdit] = useState(false);
   const [isFocused, setFocused] = useState(false);
   const [value, setValue] = useState(propValue);
+
+  useUpdateEffect(() => {
+    if (propValue !== value) {
+      setValue(propValue);
+    }
+  }, [propValue]);
 
   const handleClickAdd = () => {
     setEdit(true);

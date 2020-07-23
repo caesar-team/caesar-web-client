@@ -5,11 +5,10 @@ import styled from 'styled-components';
 import {
   TEAM_TYPE,
   TEAM_TEXT_TYPE,
-  LIST_TYPES_ARRAY,
   PERMISSION,
   PERMISSION_ENTITY,
 } from '@caesar/common/constants';
-import { upperFirst } from '@caesar/common/utils/string';
+import { transformListTitle } from '@caesar/common/utils/string';
 import {
   listsByIdSelector,
   trashListSelector,
@@ -82,9 +81,7 @@ export const ItemHeader = ({
     ? teamsById[item.teamId]?.title
     : TEAM_TEXT_TYPE[TEAM_TYPE.PERSONAL];
 
-  const listTitle = LIST_TYPES_ARRAY.includes(listsById[item.listId]?.label)
-    ? upperFirst(listsById[item.listId]?.label)
-    : listsById[item.listId]?.label;
+  const listTitle = transformListTitle(listsById[item.listId]?.label);
 
   const isTrashItem =
     item &&
@@ -92,7 +89,7 @@ export const ItemHeader = ({
       teamsTrashLists.map(({ id: listId }) => listId).includes(item.listId));
 
   const handleToggleFavorites = () => {
-    dispatch(toggleItemToFavoriteRequest(id));
+    dispatch(toggleItemToFavoriteRequest(item));
   };
 
   const handleClickCloseItem = () => {
@@ -104,6 +101,7 @@ export const ItemHeader = ({
         __typename: PERMISSION_ENTITY.TEAM_ITEM,
         team_move_item: !!item._links?.team_move_item,
         team_batch_share_item: !!item._links?.team_batch_share_item,
+        team_favorite_item_toggle: !!item._links?.team_favorite_item_toggle,
         team_delete_item: !!item._links?.team_delete_item,
       }
     : {

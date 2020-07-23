@@ -23,8 +23,8 @@ import { sortItemsByFavorites } from '@caesar/common/utils/workflow';
 import { getLists, getTeamLists, getTeams } from '@caesar/common/api';
 import { TEAM_TYPE } from '@caesar/common/constants';
 import {
-  favoriteListSelector,
   trashListSelector,
+  teamsTrashListsSelector,
 } from '@caesar/common/selectors/entities/list';
 import {
   keyPairSelector,
@@ -71,9 +71,7 @@ function* initPersonal(withDecryption) {
       }),
     );
     yield put(addChildItemsBatch(childItemsById));
-
-    const favoriteList = yield select(favoriteListSelector);
-    yield put(setWorkInProgressListId(favoriteList.id));
+    yield put(setWorkInProgressListId(favoritesList.id));
 
     yield put(finishIsLoading());
   } catch (error) {
@@ -103,8 +101,21 @@ function* initTeam(team, withDecryption) {
         lists,
       );
 
-      yield put(addListsBatch(listsById));
+      const trashList = yield select(teamsTrashListsSelector);
+      const favoritesList = getFavoritesList(
+        itemsById,
+        trashList?.id,
+        currentTeamId,
+      );
+
+      yield put(
+        addListsBatch({
+          ...listsById,
+          [favoritesList.id]: favoritesList,
+        }),
+      );
       yield put(addChildItemsBatch(childItemsById));
+      yield put(setWorkInProgressListId(favoritesList.id));
 
       if (currentTeamId === team.id && withDecryption) {
         const keyPair = yield select(keyPairSelector);
@@ -146,7 +157,7 @@ function* initTeams(withDecryption) {
 }
 
 export function* initWorkflow({ payload: { withDecryption = true } }) {
-  yield put(setCurrentTeamId(TEAM_TYPE.PERSONAL))
+  yield put(setCurrentTeamId(TEAM_TYPE.PERSONAL));
   yield fork(fetchMembersSaga);
   yield fork(initPersonal, withDecryption);
   yield fork(initTeams, withDecryption);
@@ -191,7 +202,19 @@ export function* setCurrentTeamIdWatchSaga() {
       data,
     );
 
-    yield put(addListsBatch(listsById));
+    const trashList = yield select(teamsTrashListsSelector);
+    const favoritesList = getFavoritesList(
+      itemsById,
+      trashList?.id,
+      currentTeamId,
+    );
+
+    yield put(
+      addListsBatch({
+        ...listsById,
+        [favoritesList.id]: favoritesList,
+      }),
+    );
     yield put(addChildItemsBatch(childItemsById));
 
     const keyPair = yield select(keyPairSelector);

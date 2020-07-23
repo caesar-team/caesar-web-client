@@ -22,10 +22,13 @@ import {
 } from '@caesar/common/selectors/entities/list';
 import { itemsBatchSelector } from '@caesar/common/selectors/entities/item';
 import {
-  removeList,
   postCreateList,
-  patchListSort,
   patchList,
+  patchListSort,
+  removeList,
+  postCreateTeamList,
+  patchTeamList,
+  removeTeamList,
 } from '@caesar/common/api';
 import { ENTITY_TYPE, LIST_TYPE } from '@caesar/common/constants';
 import { getServerErrorByNames } from '@caesar/common/utils/error';
@@ -40,13 +43,20 @@ const reorder = (list, startIndex, endIndex) => {
 
 const fixSort = lists => lists.map((list, index) => ({ ...list, sort: index }));
 
-export function* createListSaga({ payload: { list }, meta: { notification, setCreatingMode } }) {
+export function* createListSaga({
+  payload: { list },
+  meta: { notification, setCreatingMode },
+}) {
   try {
     const {
       data: { id: listId },
-    } = yield call(postCreateList, {
-      label: list.label,
-    });
+    } = list.teamId
+      ? yield call(postCreateTeamList, list.teamId, {
+          label: list.label,
+        })
+      : yield call(postCreateList, {
+          label: list.label,
+        });
 
     yield call(setCreatingMode, false);
     yield put(
@@ -68,9 +78,14 @@ export function* createListSaga({ payload: { list }, meta: { notification, setCr
   }
 }
 
-export function* editListSaga({ payload: { list }, meta: { notification, setEditMode } }) {
+export function* editListSaga({
+  payload: { list },
+  meta: { notification, setEditMode },
+}) {
   try {
-    yield call(patchList, list.id, { label: list.label });
+    list.teamId
+      ? yield call(patchTeamList, list.teamId, list.id, { label: list.label })
+      : yield call(patchList, list.id, { label: list.label });
 
     yield call(setEditMode, false);
     yield put(editListSuccess(list));
@@ -83,9 +98,11 @@ export function* editListSaga({ payload: { list }, meta: { notification, setEdit
   }
 }
 
-export function* removeListSaga({ payload: { listId } }) {
+export function* removeListSaga({ payload: { teamId, listId } }) {
   try {
-    yield call(removeList, listId);
+    teamId
+      ? yield call(removeTeamList, teamId, listId)
+      : yield call(removeList, listId);
 
     const list = yield select(listSelector, { listId });
     const listItemIds = list.children;

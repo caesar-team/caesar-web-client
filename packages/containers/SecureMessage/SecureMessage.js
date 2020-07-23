@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import Link from 'next/link';
 import styled from 'styled-components';
 import copy from 'copy-text-to-clipboard';
 import { Icon, Button, withNotification } from '@caesar/components';
@@ -59,10 +58,11 @@ const ButtonStyled = styled(Button)`
 `;
 
 const Footer = styled.div`
-  margin-top: auto;
+  position: absolute;
+  bottom: 16px;
 `;
 
-const StyledLink = styled(Link)`
+const StyledLink = styled.a`
   font-size: ${({ theme }) => theme.font.size.small};
   color: ${({ theme }) => theme.color.white};
   text-decoration: none;

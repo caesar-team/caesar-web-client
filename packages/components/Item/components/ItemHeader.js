@@ -89,7 +89,7 @@ export const ItemHeader = ({
       teamsTrashLists.map(({ id: listId }) => listId).includes(item.listId));
 
   const handleToggleFavorites = () => {
-    dispatch(toggleItemToFavoriteRequest(id));
+    dispatch(toggleItemToFavoriteRequest(item));
   };
 
   const handleClickCloseItem = () => {
@@ -101,6 +101,7 @@ export const ItemHeader = ({
         __typename: PERMISSION_ENTITY.TEAM_ITEM,
         team_move_item: !!item._links?.team_move_item,
         team_batch_share_item: !!item._links?.team_batch_share_item,
+        team_favorite_item_toggle: !!item._links?.team_favorite_item_toggle,
         team_delete_item: !!item._links?.team_delete_item,
       }
     : {

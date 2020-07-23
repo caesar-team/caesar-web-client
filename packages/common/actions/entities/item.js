@@ -282,10 +282,10 @@ export const rejectItemUpdateFailure = () => ({
   type: REJECT_ITEM_UPDATE_FAILURE,
 });
 
-export const toggleItemToFavoriteRequest = itemId => ({
+export const toggleItemToFavoriteRequest = item => ({
   type: TOGGLE_ITEM_TO_FAVORITE_REQUEST,
   payload: {
-    itemId,
+    item,
   },
 });
 

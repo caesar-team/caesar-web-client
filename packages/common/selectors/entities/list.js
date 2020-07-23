@@ -69,10 +69,14 @@ export const selectableListsWithoutChildrenSelector = createSelector(
 
 export const customizableListsSelector = createSelector(
   personalListsSelector,
-  lists =>
-    lists.filter(
+  currentTeamListsSelector,
+  (personalLists, teamLists) => {
+    const lists = personalLists.length ? personalLists : teamLists.list;
+
+    return lists.filter(
       list => list.type === LIST_TYPE.LIST && list.label !== 'default',
-    ),
+    );
+  },
 );
 
 export const sortedCustomizableListsSelector = createSelector(
@@ -167,6 +171,23 @@ export const personalListsByTypeSelector = createSelector(
 export const teamsTrashListsSelector = createSelector(
   teamListsSelector,
   lists => lists.filter(({ type }) => type === LIST_TYPE.TRASH) || [],
+);
+
+export const teamsFavoriteListSelector = createSelector(
+  teamListsSelector,
+  teamsTrashListsSelector,
+  itemsByIdSelector,
+  (lists, trash, items) => {
+    const favoriteList =
+      lists.find(({ id, type }) => type === LIST_TYPE.FAVORITES) || {};
+
+    return {
+      ...favoriteList,
+      children: favoriteList.children?.filter(
+        itemId => items[itemId]?.listId !== trash.id,
+      ),
+    };
+  },
 );
 
 export const allTrashListIdsSelector = createSelector(

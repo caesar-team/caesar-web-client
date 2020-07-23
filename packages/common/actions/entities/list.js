@@ -66,9 +66,10 @@ export const editListFailure = () => ({
   type: EDIT_LIST_FAILURE,
 });
 
-export const removeListRequest = listId => ({
+export const removeListRequest = (teamId, listId) => ({
   type: REMOVE_LIST_REQUEST,
   payload: {
+    teamId,
     listId,
   },
 });

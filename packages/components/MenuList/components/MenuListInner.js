@@ -144,7 +144,9 @@ const MenuListInnerComponent = ({
     {
       id: isPersonal ? personalLists.favorites?.id : teamLists.favorites?.id,
       title: 'Favorites',
-      length: isPersonal ? personalLists.favorites?.children?.length : null,
+      length: isPersonal
+        ? personalLists.favorites?.children?.length
+        : teamLists.favorites?.children?.length,
       icon: 'favorite',
     },
     {
@@ -162,7 +164,9 @@ const MenuListInnerComponent = ({
     {
       id: isPersonal ? personalLists.trash?.id : teamLists.trash?.id,
       title: 'Trash',
-      length: isPersonal ? personalLists.trash?.children?.length : null,
+      length: isPersonal
+        ? personalLists.trash?.children?.length
+        : teamLists.trash?.children?.length,
       icon: 'trash',
     },
     {

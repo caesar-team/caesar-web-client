@@ -89,6 +89,9 @@ export const ability = defineAbility({ subjectName }, can => {
   can(PERMISSION.SHARE, PERMISSION_ENTITY.TEAM_ITEM, {
     team_batch_share_item: true,
   });
+  can(PERMISSION.FAVORITE, PERMISSION_ENTITY.TEAM_ITEM, {
+    team_favorite_item_toggle: true,
+  });
   can([PERMISSION.TRASH, PERMISSION.RESTORE], PERMISSION_ENTITY.TEAM_ITEM, {
     team_move_item: true,
     team_delete_item: true,

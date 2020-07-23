@@ -127,6 +127,8 @@ export const ROUTES = {
   CREATE: '/create',
 };
 
+export const DOMAIN_SECURE_ROUTE = IS_SECURE_APP ? ROUTES.MAIN : ROUTES.SECURE;
+
 export const SHARED_ROUTES = [ROUTES.SHARE, ROUTES.INVITE];
 
 // require bootstrap

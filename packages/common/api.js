@@ -57,7 +57,8 @@ export const postKeys = data => callApi.post('/keys', data);
 
 export const getKeys = () => callApi.get('/keys');
 
-export const updateKey = email => callApi.post(`/keys/${email}`)
+export const updateKey = (email, data) =>
+  callApi.post(`/keys/${email}`, data);
 
 export const getQrCode = () => callApi.get('/auth/2fa');
 

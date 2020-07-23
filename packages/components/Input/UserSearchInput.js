@@ -56,7 +56,7 @@ const AddButton = styled.button`
 const SearchedResultBox = styled.div`
   position: absolute;
   top: 42px;
-  z-index: ${({ theme }) => theme.zIndex.basic};
+  z-index: ${({ theme }) => theme.zIndex.upBasic};
   display: flex;
   flex-direction: column;
   width: 100%;

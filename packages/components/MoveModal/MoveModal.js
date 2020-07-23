@@ -83,13 +83,6 @@ const ListItemStyled = styled(ListItem)`
   }
 `;
 
-const ModalDescription = styled.div`
-  padding-bottom: 20px;
-  text-align: center;
-  font-size: 14px;
-  color: ${({ theme }) => theme.color.black};
-`;
-
 const TextWithLinesStyled = styled(TextWithLines)`
   &::after {
     margin-right: 0;
@@ -98,6 +91,10 @@ const TextWithLinesStyled = styled(TextWithLines)`
 
 const Items = styled.div`
   margin-top: 16px;
+`;
+
+const StyledModalTitle = styled(ModalTitle)`
+  justify-content: flex-start;
 `;
 
 const MoveModalComponent = ({
@@ -212,17 +209,15 @@ const MoveModalComponent = ({
       shouldCloseOnEsc
       shouldCloseOnOverlayClick
     >
-      {isMultiMode ? (
-        <>
-          <ModalTitle>Move</ModalTitle>
-          <ModalDescription>Move selected items</ModalDescription>
-        </>
-      ) : (
-        <ModalTitle>Move item to another team or list </ModalTitle>
-      )}
+      <StyledModalTitle>
+        {isMultiMode
+          ? 'Move selected items to another vault or list'
+          : 'Move item to another vault or list'
+        }
+      </StyledModalTitle>
       <ListsWrapper>
         <StyledSelectVisible
-          label="Team"
+          label="Vault"
           active={
             <>
               {checkedTeamId ? (
@@ -234,7 +229,7 @@ const MoveModalComponent = ({
             </>
           }
           options={teamOptionsRenderer}
-          searchPlaceholder="Search by teams…"
+          searchPlaceholder="Search vault…"
           searchValue={searchTeamValue}
           setSearchValue={setSearchTeamValue}
         />
@@ -247,7 +242,7 @@ const MoveModalComponent = ({
             </>
           }
           options={listOptionsRenderer}
-          searchPlaceholder="Search by lists…"
+          searchPlaceholder="Search list…"
           searchValue={searchListValue}
           setSearchValue={setSearchListValue}
         />

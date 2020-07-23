@@ -30,7 +30,7 @@ const getListTitle = (listId, lists) =>
 
 export const useItemTeamAndListOptions = ({ teamId = null, listId }) => {
   const user = useSelector(userDataSelector);
-  const teams = useSelector(teamListSelector);
+  const teams = useSelector(teamListSelector) || [];
   const teamsById = useSelector(teamsByIdSelector);
   const [lists, setLists] = useState([]);
   const [checkedTeamId, setCheckedTeamId] = useState(teamId);
@@ -41,14 +41,14 @@ export const useItemTeamAndListOptions = ({ teamId = null, listId }) => {
       setLists(data);
     });
 
-    if (teams[0].id !== null) {
+    if (teams[0]?.id !== null) {
       teams.splice(0, 0, {
         id: null,
         title: TEAM_TEXT_TYPE[TEAM_TYPE.PERSONAL],
         email: user.email,
       });
     }
-  }, [teams]);
+  });
 
   useUpdateEffect(() => {
     const defaultTeamListId = lists.find(

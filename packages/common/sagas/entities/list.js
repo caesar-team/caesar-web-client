@@ -15,6 +15,7 @@ import {
 } from '@caesar/common/actions/entities/list';
 import { removeItemsBatch } from '@caesar/common/actions/entities/item';
 import { removeChildItemsBatch } from '@caesar/common/actions/entities/childItem';
+import { updateGlobalNotification } from '@caesar/common/actions/application';
 import {
   listSelector,
   sortedCustomizableListsSelector,
@@ -71,9 +72,9 @@ export function* createListSaga({
     );
   } catch (error) {
     yield put(createListFailure());
-    yield call(notification.show, {
-      text: getServerErrorByNames(error),
-    });
+    yield put(
+      updateGlobalNotification(getServerErrorByNames(error), false, true),
+    );
   }
 }
 
@@ -91,9 +92,9 @@ export function* editListSaga({
   } catch (error) {
     console.log(error);
     yield put(editListFailure());
-    yield call(notification.show, {
-      text: getServerErrorByNames(error),
-    });
+    yield put(
+      updateGlobalNotification(getServerErrorByNames(error), false, true),
+    );
   }
 }
 

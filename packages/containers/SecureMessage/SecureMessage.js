@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import Link from 'next/link';
 import styled from 'styled-components';
+import Link from 'next/link';
 import copy from 'copy-text-to-clipboard';
 import { Icon, Button, withNotification } from '@caesar/components';
 import { downloadAsZip } from '@caesar/common/utils/file';
@@ -59,10 +59,11 @@ const ButtonStyled = styled(Button)`
 `;
 
 const Footer = styled.div`
-  margin-top: auto;
+  position: absolute;
+  bottom: 16px;
 `;
 
-const StyledLink = styled(Link)`
+const StyledLink = styled.a`
   font-size: ${({ theme }) => theme.font.size.small};
   color: ${({ theme }) => theme.color.white};
   text-decoration: none;
@@ -137,9 +138,11 @@ const SecureMessageContainerComponent = ({
         </ButtonsWrapper>
       )}
       <Footer>
-        <StyledLink href={DOMAIN_SECURE_ROUTE}>
-          Create Your Own Secure Message
-        </StyledLink>
+        <Link passHref href={DOMAIN_SECURE_ROUTE}>
+          <StyledLink>
+            Create Your Own Secure Message
+          </StyledLink>
+        </Link>
       </Footer>
     </Wrapper>
   );

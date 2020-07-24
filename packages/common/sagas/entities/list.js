@@ -49,7 +49,7 @@ export function* createListSaga({
 }) {
   try {
     const {
-      data: { id: listId },
+      data: { id: listId, _links },
     } = list.teamId
       ? yield call(postCreateTeamList, list.teamId, {
           label: list.label,
@@ -67,6 +67,7 @@ export function* createListSaga({
         sort: 0,
         parentId: null,
         __type: ENTITY_TYPE.LIST,
+        _links,
         ...list,
       }),
     );

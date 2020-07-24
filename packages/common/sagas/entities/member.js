@@ -1,4 +1,4 @@
-import { call, put, takeLatest } from 'redux-saga/effects';
+import { call, put, takeLatest, all } from 'redux-saga/effects';
 import {
   CREATE_MEMBER_BATCH_REQUEST,
   CREATE_MEMBER_REQUEST,
@@ -17,6 +17,7 @@ import {
   getTeamMembers,
   postNewUser,
   postNewUserBatch,
+  updateKey,
 } from '@caesar/common/api';
 import { convertMembersToEntity } from '@caesar/common/normalizers/normalizers';
 import {
@@ -181,6 +182,25 @@ export function* getOrCreateMemberBatchSaga({ payload: { emailRolePairs } }) {
     const notExistedMemberEmails = emails.filter(
       email => !existedMemberEmails.includes(email),
     );
+    const existedMembersWithoutKeysEmails = existedMembers
+      .filter(member => !member.publicKey)
+      .map(({ email }) => email);
+
+    if (existedMembersWithoutKeysEmails.length) {
+      const generatedUsers = yield call(
+        generateUsersBatch,
+        existedMembersWithoutKeysEmails,
+      );
+
+      yield all(
+        generatedUsers.map(({ email, publicKey, privateKey }) =>
+          call(updateKey, email, {
+            publicKey,
+            encryptedPrivateKey: privateKey,
+          }),
+        ),
+      );
+    }
 
     const newMemberEmailRolePairs = notExistedMemberEmails.map(email => ({
       email,

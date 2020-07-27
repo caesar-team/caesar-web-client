@@ -18,7 +18,7 @@ import { removeChildItemsBatch } from '@caesar/common/actions/entities/childItem
 import { updateGlobalNotification } from '@caesar/common/actions/application';
 import {
   listSelector,
-  sortedCustomizableListsSelector,
+  personalListsByTypeSelector,
 } from '@caesar/common/selectors/entities/list';
 import { itemsBatchSelector } from '@caesar/common/selectors/entities/item';
 import {
@@ -128,14 +128,12 @@ export function* sortListSaga({
   payload: { listId, sourceIndex, destinationIndex },
 }) {
   try {
-    const sortedCustomizableLists = yield select(
-      sortedCustomizableListsSelector,
-    );
+    const personalListsByType = yield select(personalListsByTypeSelector);
 
     yield put(
       sortListSuccess(
         fixSort(
-          reorder(sortedCustomizableLists, sourceIndex, destinationIndex),
+          reorder(personalListsByType?.list, sourceIndex, destinationIndex),
         ).reduce((acc, list) => ({ ...acc, [list.id]: list }), {}),
       ),
     );

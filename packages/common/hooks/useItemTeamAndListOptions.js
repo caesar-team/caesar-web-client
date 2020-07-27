@@ -4,11 +4,11 @@ import { useSelector } from 'react-redux';
 import { TEAM_TYPE, TEAM_TEXT_TYPE } from '@caesar/common/constants';
 import { sortByName } from '@caesar/common/utils/utils';
 import { transformListTitle } from '@caesar/common/utils/string';
-import { userDataSelector } from '@caesar/common/selectors/user';
 import {
-  teamListSelector,
-  teamsByIdSelector,
-} from '@caesar/common/selectors/entities/team';
+  userDataSelector,
+  userTeamListSelector,
+} from '@caesar/common/selectors/user';
+import { teamsByIdSelector } from '@caesar/common/selectors/entities/team';
 import { getMovableLists } from '../api';
 
 const getTeamTitle = (checkedTeamId, teams) => {
@@ -30,7 +30,7 @@ const getListTitle = (listId, lists) =>
 
 export const useItemTeamAndListOptions = ({ teamId = null, listId }) => {
   const user = useSelector(userDataSelector);
-  const teams = useSelector(teamListSelector) || [];
+  const teams = useSelector(userTeamListSelector) || [];
   const teamsById = useSelector(teamsByIdSelector);
   const [lists, setLists] = useState([]);
   const [checkedTeamId, setCheckedTeamId] = useState(teamId);
@@ -76,7 +76,6 @@ export const useItemTeamAndListOptions = ({ teamId = null, listId }) => {
 
   const listOptions = lists
     .filter(list => list.teamId === checkedTeamId)
-    .sort((a, b) => sortByName(a.label, b.label))
     .map(list => ({ ...list, label: transformListTitle(list.label) }));
 
   return {

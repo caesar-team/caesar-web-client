@@ -132,7 +132,8 @@ export const favoriteListSelector = createSelector(
   (lists, trash, items) => {
     const favoriteList =
       lists.find(({ id, type }) => type === LIST_TYPE.FAVORITES) || {};
-
+//console.log(favoriteList);
+//console.log(items);
     return {
       ...favoriteList,
       children: favoriteList.children?.filter(

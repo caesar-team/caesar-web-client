@@ -436,7 +436,7 @@ export function* createItemSaga({
     yield put(updateGlobalNotification(CREATING_ITEM_NOTIFICATION, true));
 
     const {
-      data: { id: itemId, lastUpdated },
+      data: { id: itemId, lastUpdated, _links },
     } = yield call(postCreateItem, {
       listId,
       type,
@@ -456,6 +456,7 @@ export function* createItemSaga({
       ownerId: user.id,
       secret: encryptedItem,
       data: { attachments, ...data },
+      _links,
       __type: ENTITY_TYPE.ITEM,
     };
 

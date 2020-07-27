@@ -13,6 +13,7 @@
     "build-extension": "$(yarn bin)/cross-env NODE_ENV=production webpack --config extension/webpack.prod.config.js"
   },
   "dependencies": {
+    "@babel/helper-compilation-targets": "^7.10.4",
     "@caesar/assets": "1.0.0",
     "@caesar/common": "1.0.0",
     "@caesar/containers": "1.0.0",
@@ -57,7 +58,7 @@
     "next-transpile-modules": "^3.2.0",
     "normalizr": "^3.4.0",
     "object-sizeof": "^1.5.1",
-    "openpgp": "^4.6.2",
+    "openpgp": "^4.10.7",
     "papaparse": "^5.0.0",
     "polished": "^3.4.1",
     "prop-types": "^15.7.2",

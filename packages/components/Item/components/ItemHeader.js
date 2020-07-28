@@ -75,7 +75,6 @@ export const ItemHeader = ({
   const teamsTrashLists = useSelector(teamsTrashListsSelector);
   const teamsById = useSelector(teamsByIdSelector);
   const listsById = useSelector(listsByIdSelector);
-  const { id, favorite } = item;
 
   const teamTitle = item.teamId
     ? teamsById[item.teamId]?.title
@@ -151,7 +150,7 @@ export const ItemHeader = ({
           </Can>
           <Can I={PERMISSION.FAVORITE} an={itemSubject}>
             <ActionButton
-              icon={favorite ? 'favorite-active' : 'favorite'}
+              icon={item.favorite ? 'favorite-active' : 'favorite'}
               color="white"
               onClick={handleToggleFavorites}
             />

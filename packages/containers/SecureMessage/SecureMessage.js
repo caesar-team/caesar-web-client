@@ -28,6 +28,7 @@ const Title = styled.div`
 `;
 
 const StyledLogo = styled(Icon)`
+  margin-top: auto;
   fill: ${({ theme }) => theme.color.white};
 `;
 
@@ -59,8 +60,11 @@ const ButtonStyled = styled(Button)`
 `;
 
 const Footer = styled.div`
-  position: absolute;
-  bottom: 16px;
+  margin-top: auto;
+
+  ${media.wideMobile`
+    margin-top: 24px;
+  `}
 `;
 
 const StyledLink = styled.a`
@@ -138,11 +142,13 @@ const SecureMessageContainerComponent = ({
         </ButtonsWrapper>
       )}
       <Footer>
-        <Link passHref href={DOMAIN_SECURE_ROUTE}>
-          <StyledLink>
-            Create Your Own Secure Message
-          </StyledLink>
-        </Link>
+        {shouldShowButtons && (
+          <Link passHref href={DOMAIN_SECURE_ROUTE}>
+            <StyledLink>
+              Create Your Own Secure Message
+            </StyledLink>
+          </Link>
+        )}
       </Footer>
     </Wrapper>
   );

@@ -79,7 +79,7 @@ function* initPersonal(withDecryption) {
     yield put(setWorkInProgressListId(favoritesList.id));
     yield put(finishIsLoading());
   } catch (error) {
-    // console.log(error);
+    console.log(error);
     yield put(
       updateGlobalNotification(getServerErrorMessage(error), false, true),
     );
@@ -96,7 +96,7 @@ function* initTeam(team, withDecryption) {
       return;
     }
 
-    if (!currentTeamId && team.type === TEAM_TYPE.DEFAULT) {// console.log('initTeam 5');
+    if (!currentTeamId && team.type === TEAM_TYPE.DEFAULT) {
       yield put(setCurrentTeamId(team.id));
     } else {
       const { data: lists } = yield call(getTeamLists, team.id);
@@ -140,7 +140,7 @@ function* initTeam(team, withDecryption) {
       }
     }
   } catch (error) {
-    // console.log(error);
+    console.log(error);
     yield put(
       updateGlobalNotification(getServerErrorMessage(error), false, true),
     );
@@ -153,7 +153,7 @@ function* initTeams(withDecryption) {
 
     yield all(teams.map(team => call(initTeam, team, withDecryption)));
   } catch (error) {
-    // console.log(error);
+    console.log(error);
     yield put(
       updateGlobalNotification(getServerErrorMessage(error), false, true),
     );
@@ -242,7 +242,7 @@ export function* setCurrentTeamIdWatchSaga() {
       );
     }
   } catch (error) {
-    // console.log(error);
+    console.log(error);
     yield put(
       updateGlobalNotification(getServerErrorMessage(error), false, true),
     );

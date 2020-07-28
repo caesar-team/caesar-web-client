@@ -24,6 +24,7 @@ export const transformListTitle = title =>
 
 const LESS_THAN = '&#60;';
 const GREATER_THAN = '&#62;';
+
 export const unescapeHTML = escapedHTML => {
   return escapedHTML.replace(/LESS_THAN/g, '<').replace(/GREATER_THAN/g, '>');
 };

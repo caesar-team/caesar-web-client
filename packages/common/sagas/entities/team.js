@@ -213,18 +213,29 @@ export function* addTeamMembersBatchSaga({ payload: { teamId, members } }) {
       role: COMMANDS_ROLES.USER_ROLE_MEMBER,
     }));
 
-    // TODO: change it on batch
-    yield all(
-      invitedMembersWithCommandRole.map(({ id: userId, role }) =>
-        call(postAddTeamMember, { teamId, userId, role }),
-      ),
+    const promises = invitedMembersWithCommandRole.map(({ id: userId, role }) =>
+      postAddTeamMember({ teamId, userId, role }),
     );
+
+    const invitedMembersWithLinks = [];
+
+    yield Promise.all(promises).then(result => {
+      result.map(({ data }) => {
+        invitedMembersWithLinks.push({
+          email: data.email,
+          id: data.id,
+          isNew: false,
+          publicKey: data.publicKey,
+          role: data.role,
+          teamId,
+          _links: data._links,
+        });
+      });
+    });
 
     // TODO: add invite for members new or not new i dunno
 
-    yield put(
-      addTeamMembersBatchSuccess(teamId, invitedMembersWithCommandRole),
-    );
+    yield put(addTeamMembersBatchSuccess(teamId, invitedMembersWithLinks));
     yield put(addTeamToMembersBatch(teamId, invitedMemberIds));
 
     if (itemUserPairs.length > 0) {

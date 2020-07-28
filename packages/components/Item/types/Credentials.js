@@ -9,7 +9,7 @@ import {
   Attachments,
 } from '../../ItemFields/view';
 import { Row } from '../../ItemFields/common';
-import { Meta, OwnerAndInvitation } from '../components';
+import { OwnerAndInvitation } from '../components';
 
 export const Credentials = ({
   item,
@@ -73,7 +73,6 @@ export const Credentials = ({
           onClickAcceptEdit={onClickAcceptEdit}
         />
       </Row>
-      <Meta item={item} />
     </>
   );
 };

@@ -1,7 +1,7 @@
 const DEFAULT_OPTIONS = {
   symbols: {
     digits: '1234567890',
-    specials: '!@#$%^&*()+-{}_:=',
+    specials: '!@#$%^&*()+-{}</>_:=',
     lowerCase: 'abcdefghijklmnopqrstuvwxyz',
     upperCase: 'ABCDEFGHIJKLMNOPQRSTUVWXYZ',
   },

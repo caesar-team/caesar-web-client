@@ -2,6 +2,7 @@ import React from 'react';
 import styled from 'styled-components';
 import { File, Scrollbar } from '@caesar/components';
 import { downloadFile } from '@caesar/common/utils/file';
+import { escapeHTML } from '@caesar/common/utils/string';
 
 const MessageWrapper = styled.div`
   display: flex;
@@ -82,7 +83,7 @@ export const MessageStep = ({ decryptedMessage }) => {
 
   const text = String.raw`${decryptedMessage.text}`;
   const result = `${text.replace(/\n/g, '<br/>')}`;
-
+  // TODO: Maybe we should remove dangerouslySetInnerHTML?
   return (
     <MessageWrapper>
       {shouldShowText && (
@@ -90,7 +91,7 @@ export const MessageStep = ({ decryptedMessage }) => {
           <Message
             withAttach={shouldShowAttachments}
             dangerouslySetInnerHTML={{
-              __html: result,
+              __html: escapeHTML(result),
             }}
           />
         </Scrollbar>

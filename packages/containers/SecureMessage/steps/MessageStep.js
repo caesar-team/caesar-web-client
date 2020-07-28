@@ -83,7 +83,7 @@ export const MessageStep = ({ decryptedMessage }) => {
 
   const text = String.raw`${decryptedMessage.text}`;
   const result = `${text.replace(/\n/g, '<br/>')}`;
-  // TODO: Maybe we should remove dangerouslySetInnerHTML?
+  // TODO: Should we remove dangerouslySetInnerHTML?
   return (
     <MessageWrapper>
       {shouldShowText && (

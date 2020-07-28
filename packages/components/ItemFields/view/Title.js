@@ -40,6 +40,7 @@ export const Title = ({ value, itemSubject, schema, onClickAcceptEdit }) => {
       schema={schema}
       name="name"
       placeholder="Enter the title"
+      withEllipsis
       withCopyButton={false}
       onClickAcceptEdit={onClickAcceptEdit}
     />

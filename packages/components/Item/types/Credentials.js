@@ -16,6 +16,7 @@ export const Credentials = ({
   itemSubject,
   onClickAcceptEdit,
   onClickShare,
+  isSharedItem,
 }) => {
   const {
     data: { name, login, pass, website, note, attachments = [] },
@@ -29,10 +30,12 @@ export const Credentials = ({
         schema={SCHEMA.REQUIRED_LIMITED_STRING()}
         onClickAcceptEdit={onClickAcceptEdit}
       />
-      <OwnerAndInvitation
-        itemSubject={itemSubject}
-        onClickShare={onClickShare}
-      />
+      {!isSharedItem && (
+        <OwnerAndInvitation
+          itemSubject={itemSubject}
+          onClickShare={onClickShare}
+        />
+      )}
       <Row>
         <Input
           label="Login"

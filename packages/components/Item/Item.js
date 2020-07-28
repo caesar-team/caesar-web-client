@@ -24,6 +24,7 @@ import {
   InnerWrapper,
   RemoveButton,
   ReadOnlyBanner,
+  Meta,
 } from './components';
 
 const Wrapper = styled.div`
@@ -108,6 +109,7 @@ const ItemComponent = ({
             onClickAcceptEdit={!isTrashItem && handleClickAcceptEdit}
             onClickShare={onClickShare}
           />
+          <Meta item={item} />
           <Can I={PERMISSION.TRASH} an={itemSubject}>
             {!isTrashItem && (
               <Row>

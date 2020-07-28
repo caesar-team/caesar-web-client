@@ -118,7 +118,6 @@ function* initTeam(team, withDecryption) {
       );
 
       yield put(addChildItemsBatch(childItemsById));
-
       yield put(setWorkInProgressListId(favoritesList.id));
 
       if (currentTeamId === team.id && withDecryption) {
@@ -167,26 +166,24 @@ export function* initWorkflow({ payload: { withDecryption = true } }) {
   yield fork(initTeams, withDecryption);
 }
 
-export function* updateWorkInProgressItemSaga({ payload: { itemId } }) {// console.log('updateWorkInProgressItemSaga');
+export function* updateWorkInProgressItemSaga({ payload: { itemId } }) {
   let id = null;
-  // console.log('updateWorkInProgressItemSaga 1');
-  if (!itemId) {// console.log('updateWorkInProgressItemSaga 2');
+
+  if (!itemId) {
     const workInProgressItem = yield select(workInProgressItemSelector);
-    // console.log('updateWorkInProgressItemSaga 3');
-    if (workInProgressItem) {// console.log('updateWorkInProgressItemSaga 4');
+
+    if (workInProgressItem) {
       id = workInProgressItem.id;
-    }// console.log('updateWorkInProgressItemSaga 5');
-  } else {// console.log('updateWorkInProgressItemSaga 6');
+    }
+  } else {
     id = itemId;
   }
-  // console.log('updateWorkInProgressItemSaga 7');
-  if (id) {// console.log('updateWorkInProgressItemSaga 8');
+
+  if (id) {
     const item = yield select(itemSelector, { itemId: id });
-    // console.log('updateWorkInProgressItemSaga 9');
+
     yield put(setWorkInProgressItem(item));
-    // console.log('updateWorkInProgressItemSaga 10');
   }
-  // console.log('updateWorkInProgressItemSaga 11');
 }
 
 export function* setCurrentTeamIdWatchSaga() {

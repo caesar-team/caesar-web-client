@@ -25,6 +25,7 @@ import { TEAM_TYPE } from '@caesar/common/constants';
 import {
   trashListSelector,
   teamsTrashListsSelector,
+  favoriteListSelector,
 } from '@caesar/common/selectors/entities/list';
 import {
   keyPairSelector,
@@ -37,20 +38,19 @@ import { getFavoritesList } from '@caesar/common/normalizers/utils';
 import { fetchTeamSuccess } from '@caesar/common/actions/entities/team';
 import { getServerErrorMessage } from '@caesar/common/utils/error';
 
-function* initPersonal(withDecryption) {console.log('initPersonal');
+function* initPersonal(withDecryption) {
   try {
     const { data: lists } = yield call(getLists);
-    console.log('initPersonal 1');
     const { listsById, itemsById, childItemsById } = convertNodesToEntities(
       lists,
     );
-    console.log('initPersonal 2');
-    if (withDecryption) {console.log('initPersonal 3');
+
+    if (withDecryption) {
       const keyPair = yield select(keyPairSelector);
       const masterPassword = yield select(masterPasswordSelector);
       const items = sortItemsByFavorites(objectToArray(itemsById));
-      console.log('initPersonal 4');
-      if (items && items.length > 0) {console.log('initPersonal 5');
+
+      if (items && items.length > 0) {
         yield put(
           decryption({
             items,
@@ -60,60 +60,55 @@ function* initPersonal(withDecryption) {console.log('initPersonal');
         );
       }
     }
-    console.log('initPersonal 6');
+
     const trashList = yield select(trashListSelector);
-    console.log('initPersonal 7');
-    const favoritesList = getFavoritesList(itemsById, trashList?.id);
-    console.log('initPersonal 8');
+    let favoritesList = yield select(favoriteListSelector);
+
+    if (!favoritesList?.id) {
+      favoritesList = getFavoritesList(itemsById, trashList?.id);
+    }
+
     yield put(
       addListsBatch({
         ...listsById,
         [favoritesList.id]: favoritesList,
       }),
     );
-    console.log('initPersonal 9');
     yield put(addChildItemsBatch(childItemsById));
-    console.log('initPersonal 10');
+
     yield put(setWorkInProgressListId(favoritesList.id));
-    console.log('initPersonal 11');
     yield put(finishIsLoading());
   } catch (error) {
-    console.log(error);
+    // console.log(error);
     yield put(
       updateGlobalNotification(getServerErrorMessage(error), false, true),
     );
   }
 }
 
-function* initTeam(team, withDecryption) {console.log('initTeam');
+function* initTeam(team, withDecryption) {
   try {
-    console.log('initTeam 1');
     yield put(fetchTeamSuccess(team));
-    console.log('initTeam 2');
+
     const currentTeamId = yield select(currentTeamIdSelector);
-    console.log('initTeam 3');
+
     if (currentTeamId === TEAM_TYPE.PERSONAL) {
       return;
     }
-    console.log('initTeam 4');
-    if (!currentTeamId && team.type === TEAM_TYPE.DEFAULT) {console.log('initTeam 5');
+
+    if (!currentTeamId && team.type === TEAM_TYPE.DEFAULT) {// console.log('initTeam 5');
       yield put(setCurrentTeamId(team.id));
-      console.log('initTeam 6');
-    } else {console.log('initTeam 7');
+    } else {
       const { data: lists } = yield call(getTeamLists, team.id);
-      console.log('initTeam 8');
       const { listsById, itemsById, childItemsById } = convertNodesToEntities(
         lists,
       );
-      console.log('initTeam 9');
       const trashList = yield select(teamsTrashListsSelector);
-      console.log('initTeam 10');
       const favoritesList = getFavoritesList(
         itemsById,
         trashList?.id,
         currentTeamId,
       );
-      console.log('initTeam 11');
 
       yield put(
         addListsBatch({
@@ -121,17 +116,17 @@ function* initTeam(team, withDecryption) {console.log('initTeam');
           [favoritesList.id]: favoritesList,
         }),
       );
-      console.log('initTeam 12');
+
       yield put(addChildItemsBatch(childItemsById));
-      console.log('initTeam 13');
+
       yield put(setWorkInProgressListId(favoritesList.id));
-      console.log('initTeam 14');
-      if (currentTeamId === team.id && withDecryption) {console.log('initTeam 15');
+
+      if (currentTeamId === team.id && withDecryption) {
         const keyPair = yield select(keyPairSelector);
         const masterPassword = yield select(masterPasswordSelector);
         const items = objectToArray(itemsById);
-        console.log('initTeam 16');
-        if (items && items.length > 0) {console.log('initTeam 17');
+
+        if (items && items.length > 0) {
           yield put(
             decryption({
               items,
@@ -139,107 +134,105 @@ function* initTeam(team, withDecryption) {console.log('initTeam');
               masterPassword,
             }),
           );
-          console.log('initTeam 18');
         }
-      } else {console.log('initTeam 19');
+      } else {
         yield put(addItemsBatch(itemsById));
-        console.log('initTeam 20');
       }
     }
   } catch (error) {
-    console.log(error);
+    // console.log(error);
     yield put(
       updateGlobalNotification(getServerErrorMessage(error), false, true),
     );
   }
 }
 
-function* initTeams(withDecryption) {console.log('initTeams');
-  try {console.log('initTeams 1');
+function* initTeams(withDecryption) {
+  try {
     const { data: teams } = yield call(getTeams);
-    console.log('initTeams 2');
+
     yield all(teams.map(team => call(initTeam, team, withDecryption)));
-    console.log('initTeams 3');
   } catch (error) {
-    console.log(error);
+    // console.log(error);
     yield put(
       updateGlobalNotification(getServerErrorMessage(error), false, true),
     );
   }
 }
 
-export function* initWorkflow({ payload: { withDecryption = true } }) {console.log('initWorkflow');
-  yield put(setCurrentTeamId(TEAM_TYPE.PERSONAL));console.log('initWorkflow 1');
-  yield fork(fetchMembersSaga);console.log('initWorkflow 2');
-  yield fork(initPersonal, withDecryption);console.log('initWorkflow 3');
-  yield fork(initTeams, withDecryption);console.log('initWorkflow 4');
+export function* initWorkflow({ payload: { withDecryption = true } }) {
+  yield put(setCurrentTeamId(TEAM_TYPE.PERSONAL));
+  yield fork(fetchMembersSaga);
+  yield fork(initPersonal, withDecryption);
+  yield fork(initTeams, withDecryption);
 }
 
-export function* updateWorkInProgressItemSaga({ payload: { itemId } }) {console.log('updateWorkInProgressItemSaga');
+export function* updateWorkInProgressItemSaga({ payload: { itemId } }) {// console.log('updateWorkInProgressItemSaga');
   let id = null;
-  console.log('updateWorkInProgressItemSaga 1');
-  if (!itemId) {console.log('updateWorkInProgressItemSaga 2');
+  // console.log('updateWorkInProgressItemSaga 1');
+  if (!itemId) {// console.log('updateWorkInProgressItemSaga 2');
     const workInProgressItem = yield select(workInProgressItemSelector);
-    console.log('updateWorkInProgressItemSaga 3');
-    if (workInProgressItem) {console.log('updateWorkInProgressItemSaga 4');
+    // console.log('updateWorkInProgressItemSaga 3');
+    if (workInProgressItem) {// console.log('updateWorkInProgressItemSaga 4');
       id = workInProgressItem.id;
-    }console.log('updateWorkInProgressItemSaga 5');
-  } else {console.log('updateWorkInProgressItemSaga 6');
+    }// console.log('updateWorkInProgressItemSaga 5');
+  } else {// console.log('updateWorkInProgressItemSaga 6');
     id = itemId;
   }
-  console.log('updateWorkInProgressItemSaga 7');
-  if (id) {console.log('updateWorkInProgressItemSaga 8');
+  // console.log('updateWorkInProgressItemSaga 7');
+  if (id) {// console.log('updateWorkInProgressItemSaga 8');
     const item = yield select(itemSelector, { itemId: id });
-    console.log('updateWorkInProgressItemSaga 9');
+    // console.log('updateWorkInProgressItemSaga 9');
     yield put(setWorkInProgressItem(item));
-    console.log('updateWorkInProgressItemSaga 10');
+    // console.log('updateWorkInProgressItemSaga 10');
   }
-  console.log('updateWorkInProgressItemSaga 11');
+  // console.log('updateWorkInProgressItemSaga 11');
 }
 
-export function* setCurrentTeamIdWatchSaga() {console.log('setCurrentTeamIdWatchSaga');
-  try {console.log('setCurrentTeamIdWatchSaga 1');
+export function* setCurrentTeamIdWatchSaga() {
+  try {
     yield put(setWorkInProgressItem(null));
-    console.log('setCurrentTeamIdWatchSaga 2');
     yield put(resetWorkInProgressItemIds(null));
-    console.log('setCurrentTeamIdWatchSaga 3');
     yield put(setWorkInProgressListId(null));
-    console.log('setCurrentTeamIdWatchSaga 4');
+
     const currentTeamId = yield select(currentTeamIdSelector);
-    console.log('setCurrentTeamIdWatchSaga 5');
+
     if (!currentTeamId) return;
-    console.log('setCurrentTeamIdWatchSaga 6');
+
     const { data } =
       currentTeamId === TEAM_TYPE.PERSONAL
         ? yield call(getLists)
         : yield call(getTeamLists, currentTeamId);
-    console.log('setCurrentTeamIdWatchSaga 7');
+
     const { listsById, itemsById, childItemsById } = convertNodesToEntities(
       data,
     );
-    console.log('setCurrentTeamIdWatchSaga 8');
+
     const trashList = yield select(teamsTrashListsSelector);
-    console.log('setCurrentTeamIdWatchSaga 9');
-    const favoritesList = getFavoritesList(
-      itemsById,
-      trashList?.id,
-      currentTeamId,
-    );
-    console.log('setCurrentTeamIdWatchSaga 10');
+
+    let favoritesList = yield select(favoriteListSelector);
+
+    if (!favoritesList?.id) {
+     favoritesList = getFavoritesList(
+        itemsById,
+        trashList?.id,
+        currentTeamId,
+      );
+    }
+
     yield put(
       addListsBatch({
         ...listsById,
         [favoritesList.id]: favoritesList,
       }),
     );
-    console.log('setCurrentTeamIdWatchSaga 11');
     yield put(addChildItemsBatch(childItemsById));
-    console.log('setCurrentTeamIdWatchSaga 12');
+
     const keyPair = yield select(keyPairSelector);
     const masterPassword = yield select(masterPasswordSelector);
     const items = objectToArray(itemsById);
-    console.log('setCurrentTeamIdWatchSaga 13');
-    if (items && items.length > 0) {console.log('setCurrentTeamIdWatchSaga 14');
+
+    if (items && items.length > 0) {
       yield put(
         decryption({
           items,
@@ -247,11 +240,9 @@ export function* setCurrentTeamIdWatchSaga() {console.log('setCurrentTeamIdWatch
           masterPassword,
         }),
       );
-      console.log('setCurrentTeamIdWatchSaga 15');
     }
-    console.log('setCurrentTeamIdWatchSaga 16');
   } catch (error) {
-    console.log(error);
+    // console.log(error);
     yield put(
       updateGlobalNotification(getServerErrorMessage(error), false, true),
     );

@@ -21,3 +21,14 @@ export const getPlural = (counter, [single, plural]) =>
 
 export const transformListTitle = title =>
   LIST_TYPES_ARRAY.includes(title) ? upperFirst(title) : title;
+
+const LESS_THAN = '&#60;';
+const GREATER_THAN = '&#62;';
+
+export const unescapeHTML = escapedHTML => {
+  return escapedHTML.replace(/LESS_THAN/g, '<').replace(/GREATER_THAN/g, '>');
+};
+
+export const escapeHTML = unescapedHTML => {
+  return unescapedHTML.replace(/</g, LESS_THAN).replace(/>/g, GREATER_THAN);
+};

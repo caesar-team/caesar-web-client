@@ -13,14 +13,16 @@ import {
   sortListSuccess,
   sortListFailure,
 } from '@caesar/common/actions/entities/list';
-import { removeItemsBatch } from '@caesar/common/actions/entities/item';
-import { removeChildItemsBatch } from '@caesar/common/actions/entities/childItem';
+
 import { updateGlobalNotification } from '@caesar/common/actions/application';
 import {
   listSelector,
   personalListsByTypeSelector,
+  currentTeamTrashListSelector,
+  trashListSelector,
 } from '@caesar/common/selectors/entities/list';
 import { itemsBatchSelector } from '@caesar/common/selectors/entities/item';
+import { moveItemsBatchSaga } from '@caesar/common/sagas/entities/item';
 import {
   postCreateList,
   patchList,
@@ -101,22 +103,27 @@ export function* editListSaga({
 
 export function* removeListSaga({ payload: { teamId, listId } }) {
   try {
-    teamId
-      ? yield call(removeTeamList, teamId, listId)
-      : yield call(removeList, listId);
-
     const list = yield select(listSelector, { listId });
     const listItemIds = list.children;
-    const listItems = yield select(itemsBatchSelector, {
-      itemIds: listItemIds,
-    });
-    const childItemIds = listItems.reduce(
-      (accumulator, item) => [...accumulator, ...item.invited],
-      [],
-    );
 
-    yield put(removeChildItemsBatch(childItemIds));
-    yield put(removeItemsBatch(listItemIds));
+    const trashList = teamId
+      ? yield select(currentTeamTrashListSelector)
+      : yield select(trashListSelector);
+
+    yield call(moveItemsBatchSaga, {
+      payload: {
+        itemIds: listItemIds,
+        teamId: teamId || null,
+        listId: trashList?.id,
+      },
+    });
+
+    if (teamId) {
+      yield call(removeTeamList, teamId, listId);
+    } else {
+      yield call(removeList, listId);
+    }
+
     yield put(removeListSuccess(listId));
   } catch (error) {
     console.log(error);

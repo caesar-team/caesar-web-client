@@ -125,6 +125,11 @@ export const trashListSelector = createSelector(
   lists => lists.find(({ type }) => type === LIST_TYPE.TRASH) || {},
 );
 
+export const defaultListSelector = createSelector(
+  personalListsSelector,
+  lists => lists.find(({ label }) => label === LIST_TYPE.DEFAULT) || {},
+);
+
 export const favoriteListSelector = createSelector(
   personalListsSelector,
   trashListSelector,
@@ -168,18 +173,28 @@ export const personalListsByTypeSelector = createSelector(
   }),
 );
 
+export const currentTeamTrashListSelector = createSelector(
+  currentTeamListsSelector,
+  lists => lists.trash,
+);
+
 export const teamsTrashListsSelector = createSelector(
   teamListsSelector,
   lists => lists.filter(({ type }) => type === LIST_TYPE.TRASH) || [],
 );
 
+export const currentTeamDefaultListSelector = createSelector(
+  currentTeamListsSelector,
+  lists => lists.list?.find(({ label }) => label === LIST_TYPE.DEFAULT) || {},
+);
+
 export const teamsFavoriteListSelector = createSelector(
   teamListsSelector,
-  teamsTrashListsSelector,
+  currentTeamTrashListSelector,
   itemsByIdSelector,
   (lists, trash, items) => {
     const favoriteList =
-      lists.find(({ id, type }) => type === LIST_TYPE.FAVORITES) || {};
+      lists.find(({ type }) => type === LIST_TYPE.FAVORITES) || {};
 
     return {
       ...favoriteList,

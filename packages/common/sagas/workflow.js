@@ -25,7 +25,7 @@ import { TEAM_TYPE } from '@caesar/common/constants';
 import {
   favoriteListSelector,
   trashListSelector,
-  teamsTrashListsSelector,
+  currentTeamTrashListSelector,
 } from '@caesar/common/selectors/entities/list';
 import {
   keyPairSelector,
@@ -125,7 +125,7 @@ function* initTeam(team, withDecryption) {
     const { listsById, itemsById, childItemsById } = convertNodesToEntities(
       lists,
     );
-    const trashList = yield select(teamsTrashListsSelector);
+    const trashList = yield select(currentTeamTrashListSelector);
     const favoritesList = getFavoritesList(
       itemsById,
       trashList?.id,

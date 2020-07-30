@@ -93,7 +93,7 @@ import {
 import {
   listSelector,
   favoriteListSelector,
-  teamsFavoriteListSelector,
+  currentTeamFavoriteListSelector,
   defaultListSelector,
   currentTeamDefaultListSelector,
 } from '@caesar/common/selectors/entities/list';
@@ -319,7 +319,7 @@ export function* removeShareSaga({ payload: { shareId } }) {
 export function* toggleItemToFavoriteSaga({ payload: { item } }) {
   try {
     const favoritesList = item.teamId
-      ? yield select(teamsFavoriteListSelector)
+      ? yield select(currentTeamFavoriteListSelector)
       : yield select(favoriteListSelector);
 
     const {

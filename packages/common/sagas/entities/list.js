@@ -21,7 +21,6 @@ import {
   currentTeamTrashListSelector,
   trashListSelector,
 } from '@caesar/common/selectors/entities/list';
-import { itemsBatchSelector } from '@caesar/common/selectors/entities/item';
 import { moveItemsBatchSaga } from '@caesar/common/sagas/entities/item';
 import {
   postCreateList,

@@ -26,13 +26,13 @@ export const teamListSelector = createSelector(
 
 export const teamSortedListSelector = createSelector(
   teamListSelector,
-  teams =>
-    teams.length
-      ? [
-          teams.find(team => team.type === TEAM_TYPE.DEFAULT),
-          ...teams.filter(team => team.type !== TEAM_TYPE.DEFAULT),
-        ]
-      : [],
+  teams => {
+    const defaultTeam = teams.find(team => team.type === TEAM_TYPE.DEFAULT);
+
+    return defaultTeam
+      ? [defaultTeam, ...teams.filter(team => team.type !== TEAM_TYPE.DEFAULT)]
+      : teams;
+  },
 );
 
 const teamIdPropSelector = (_, props) => props.teamId;

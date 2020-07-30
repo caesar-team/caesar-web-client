@@ -70,6 +70,7 @@ import {
   CREATE_CHILD_ITEM_BATCH_FINISHED_EVENT,
   removeChildItemsBatch,
 } from '@caesar/common/actions/entities/childItem';
+import { setCurrentTeamId } from '@caesar/common/actions/user';
 import { updateGlobalNotification } from '@caesar/common/actions/application';
 import {
   createChildItemBatchSaga,
@@ -83,6 +84,7 @@ import { inviteNewMemberBatchSaga } from '@caesar/common/sagas/common/invite';
 import {
   setWorkInProgressItem,
   updateWorkInProgressItem,
+  setWorkInProgressListId,
 } from '@caesar/common/actions/workflow';
 import {
   workInProgressItemSelector,
@@ -102,6 +104,7 @@ import {
   keyPairSelector,
   masterPasswordSelector,
   userDataSelector,
+  currentTeamIdSelector,
 } from '@caesar/common/selectors/user';
 import {
   teamSelector,
@@ -144,6 +147,7 @@ import {
   REMOVING_IN_PROGRESS_NOTIFICATION,
   NOOP_NOTIFICATION,
   ROUTES,
+  TEAM_TYPE,
 } from '@caesar/common/constants';
 import { generateSharingUrl } from '@caesar/common/utils/sharing';
 import { createMemberSaga } from './member';
@@ -421,9 +425,8 @@ export function* createItemSaga({
   try {
     yield put(updateGlobalNotification(ENCRYPTING_ITEM_NOTIFICATION, true));
 
-    const { listId, attachments, type, ...data } = item;
+    const { teamId, listId, attachments, type, ...data } = item;
 
-    const list = yield select(listSelector, { listId });
     const keyPair = yield select(keyPairSelector);
     const user = yield select(userDataSelector);
 
@@ -436,7 +439,7 @@ export function* createItemSaga({
     yield put(updateGlobalNotification(CREATING_ITEM_NOTIFICATION, true));
 
     const {
-      data: { id: itemId, lastUpdated },
+      data: { id: itemId, lastUpdated, _links },
     } = yield call(postCreateItem, {
       listId,
       type,
@@ -452,23 +455,31 @@ export function* createItemSaga({
       invited: [],
       shared: null,
       tags: [],
-      teamId: list.teamId,
+      teamId,
       ownerId: user.id,
       secret: encryptedItem,
       data: { attachments, ...data },
+      _links,
       __type: ENTITY_TYPE.ITEM,
     };
 
     yield put(createItemSuccess(newItem));
-    yield put(addItemToList(newItem));
-    yield put(updateWorkInProgressItem(itemId));
 
-    if (list.teamId) {
+    const currentTeamId = yield select(currentTeamIdSelector);
+
+    if (
+      currentTeamId === teamId ||
+      (!teamId && currentTeamId === TEAM_TYPE.PERSONAL)
+    ) {
+      yield put(addItemToList(newItem));
+    }
+
+    if (teamId) {
       yield put(
         updateGlobalNotification(SHARING_IN_PROGRESS_NOTIFICATION, true),
       );
 
-      const team = yield select(teamSelector, { teamId: list.teamId });
+      const team = yield select(teamSelector, { teamId });
       const memberIds = team.users.map(({ id }) => id);
       const members = yield select(membersBatchSelector, { memberIds });
 
@@ -476,7 +487,7 @@ export function* createItemSaga({
         .filter(({ id }) => id !== user.id)
         .map(({ id, publicKey }) => ({
           item: { id: itemId, data: newItem.data },
-          user: { id, publicKey, teamId: list.teamId },
+          user: { id, publicKey, teamId },
         }));
 
       if (itemUserPairs.length > 0) {
@@ -504,6 +515,10 @@ export function* createItemSaga({
         yield put(updateWorkInProgressItem());
       }
     }
+
+    yield put(setCurrentTeamId(teamId || TEAM_TYPE.PERSONAL));
+    yield put(setWorkInProgressListId(listId));
+    yield put(setWorkInProgressItem(newItem));
 
     yield call(Router.push, ROUTES.DASHBOARD);
   } catch (error) {

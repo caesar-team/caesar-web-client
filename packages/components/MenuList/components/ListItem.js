@@ -161,7 +161,12 @@ export const ListItem = ({
             </Can>
           </div>
           <Title>{listTitle}</Title>
-          <Counter>{children.length}</Counter>
+          <Can I={PERMISSION.EDIT} a={listSubject}>
+            <Counter>{children.length}</Counter>
+          </Can>
+          <Can not I={PERMISSION.EDIT} a={listSubject}>
+            <div>{children.length}</div>
+          </Can>
           <Can I={PERMISSION.EDIT} a={listSubject}>
             <ActionIcon
               name="pencil"

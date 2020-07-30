@@ -1,13 +1,14 @@
 import React from 'react';
 import { Title, Note, Attachments } from '../../ItemFields/view';
 import { Row } from '../../ItemFields/common';
-import { Meta, OwnerAndInvitation } from '../components';
+import { OwnerAndInvitation } from '../components';
 
 export const Document = ({
   item,
   itemSubject,
   onClickAcceptEdit,
   onClickShare,
+  isSharedItem,
 }) => {
   const {
     data: { name, note, attachments = [] },
@@ -16,10 +17,12 @@ export const Document = ({
   return (
     <>
       <Title value={name} onClickAcceptEdit={onClickAcceptEdit} />
-      <OwnerAndInvitation
-        itemSubject={itemSubject}
-        onClickShare={onClickShare}
-      />
+      {!isSharedItem && (
+        <OwnerAndInvitation
+          itemSubject={itemSubject}
+          onClickShare={onClickShare}
+        />
+      )}
       <Row marginBottom={24}>
         <Note
           value={note}
@@ -34,7 +37,6 @@ export const Document = ({
           onClickAcceptEdit={onClickAcceptEdit}
         />
       </Row>
-      <Meta item={item} />
     </>
   );
 };

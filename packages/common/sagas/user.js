@@ -15,6 +15,7 @@ import {
 } from '@caesar/common/actions/user';
 import { addTeamsBatch } from '@caesar/common/actions/entities/team';
 import { addMembersBatch } from '@caesar/common/actions/entities/member';
+import { membersByIdSelector } from '@caesar/common/selectors/entities/member';
 import { currentTeamIdSelector } from '@caesar/common/selectors/user';
 import { convertTeamsToEntity } from '@caesar/common/normalizers/normalizers';
 import { getUserSelf, getKeys, getUserTeams } from '@caesar/common/api';
@@ -24,9 +25,11 @@ import { ROUTES } from '@caesar/common/constants';
 export function* fetchUserSelfSaga() {
   try {
     const { data: user } = yield call(getUserSelf);
+    const membersById = yield select(membersByIdSelector);
 
     // TODO: added teamIds on BE side
     const fixedUser = {
+      ...membersById[user.id],
       ...user,
       teamIds: user.teamIds || [],
     };

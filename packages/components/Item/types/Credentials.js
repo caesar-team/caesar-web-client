@@ -9,13 +9,14 @@ import {
   Attachments,
 } from '../../ItemFields/view';
 import { Row } from '../../ItemFields/common';
-import { Meta, OwnerAndInvitation } from '../components';
+import { OwnerAndInvitation } from '../components';
 
 export const Credentials = ({
   item,
   itemSubject,
   onClickAcceptEdit,
   onClickShare,
+  isSharedItem,
 }) => {
   const {
     data: { name, login, pass, website, note, attachments = [] },
@@ -29,10 +30,12 @@ export const Credentials = ({
         schema={SCHEMA.REQUIRED_LIMITED_STRING()}
         onClickAcceptEdit={onClickAcceptEdit}
       />
-      <OwnerAndInvitation
-        itemSubject={itemSubject}
-        onClickShare={onClickShare}
-      />
+      {!isSharedItem && (
+        <OwnerAndInvitation
+          itemSubject={itemSubject}
+          onClickShare={onClickShare}
+        />
+      )}
       <Row>
         <Input
           label="Login"
@@ -73,7 +76,6 @@ export const Credentials = ({
           onClickAcceptEdit={onClickAcceptEdit}
         />
       </Row>
-      <Meta item={item} />
     </>
   );
 };

@@ -77,6 +77,7 @@ export const ITEM_TYPE = {
   CREDENTIALS: 'credentials',
   CREDIT_CARD: 'card',
   DOCUMENT: 'document',
+  SYSTEM: 'system',
 };
 
 export const ITEM_TYPES_ARRAY = [

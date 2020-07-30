@@ -42,6 +42,7 @@ import {
 import {
   removeChildItemsBatchFromItems,
   addChildItemsBatchToItems,
+  createItemRequest,
 } from '@caesar/common/actions/entities/item';
 import {
   CREATE_CHILD_ITEM_BATCH_FINISHED_EVENT,
@@ -55,7 +56,11 @@ import {
 import { teamSelector } from '@caesar/common/selectors/entities/team';
 import { teamItemListSelector } from '@caesar/common/selectors/entities/item';
 import {
+  personalDefaultListSelector,
+} from '@caesar/common/selectors/entities/list';
+import {
   currentTeamIdSelector,
+  keyPairSelector,
   userDataSelector,
   userTeamIdsSelector,
 } from '@caesar/common/selectors/user';
@@ -74,6 +79,7 @@ import {
   COMMANDS_ROLES,
   ENTITY_TYPE,
   NOOP_NOTIFICATION,
+  ITEM_TYPE,
 } from '@caesar/common/constants';
 import {
   prepareUsersForSharing,
@@ -82,6 +88,9 @@ import {
 import { inviteNewMemberBatchSaga } from '@caesar/common/sagas/common/invite';
 import { createChildItemsFilterSelector } from '@caesar/common/selectors/entities/childItem';
 import { updateGlobalNotification } from '@caesar/common/actions/application';
+import { generateKeys } from '@caesar/common/utils/key';
+import { passwordGenerator } from '@caesar/common/utils/passwordGenerator';
+import { getDomainName } from '@caesar/common/utils/getDomainName';
 
 export function* fetchTeamsSaga() {
   try {
@@ -128,11 +137,36 @@ export function* createTeamSaga({ payload: { title, icon } }) {
     const { data } = yield call(postCreateTeam, { title, icon });
 
     const user = yield select(userDataSelector);
-
+    const keyPair = yield select(keyPairSelector);
+    const defaultList = yield select(personalDefaultListSelector);
+    const masterPassword = yield call(passwordGenerator);
+    const teamEmail = `team.${title}@caesar.team`;
+    const generatedKeys = yield call(generateKeys, masterPassword, [teamEmail]);
+console.log(generatedKeys);
     yield put(createTeamSuccess({ ...data, __type: ENTITY_TYPE.TEAM }));
     yield put(addTeamToMember(data.id, user.id));
     yield put(addTeamMember(data.id, user.id, COMMANDS_ROLES.USER_ROLE_ADMIN));
     yield put(joinTeam(data.id));
+
+    const systemItemData = {
+      type: ITEM_TYPE.SYSTEM,
+      listId: defaultList.id,
+      attachments: [
+        {
+          name: 'publicKey',
+          raw: generatedKeys.publicKey,
+        },
+        {
+          name: 'privateKey',
+          raw: generatedKeys.privateKey,
+        },
+      ],
+      pass: masterPassword,
+      name: `team.${title}`,
+    };
+    console.log(systemItemData);
+
+    yield put(createItemRequest(systemItemData, {}))
   } catch (error) {
     console.log(error);
     yield put(

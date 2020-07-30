@@ -420,7 +420,7 @@ export function* createItemSaga({
 }) {
   try {
     yield put(updateGlobalNotification(ENCRYPTING_ITEM_NOTIFICATION, true));
-
+console.log(item);
     const { listId, attachments, type, ...data } = item;
 
     const list = yield select(listSelector, { listId });

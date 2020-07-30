@@ -1,5 +1,5 @@
 import { uuid4 } from '@caesar/common/utils/uuid4';
-import { LIST_TYPE } from '@caesar/common/constants';
+import { TEAM_TYPE, LIST_TYPE } from '@caesar/common/constants';
 
 export const getFavoritesList = (itemsById, trashListId, teamId) => {
   const favoriteListId = uuid4();
@@ -12,6 +12,6 @@ export const getFavoritesList = (itemsById, trashListId, teamId) => {
     type: LIST_TYPE.FAVORITES,
     label: 'Favorites',
     children: favorites,
-    teamId: teamId === 'personal' ? null : teamId,
+    teamId: teamId === TEAM_TYPE.PERSONAL ? null : teamId,
   };
 };

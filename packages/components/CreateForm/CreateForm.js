@@ -24,13 +24,17 @@ export const CreateForm = () => {
   };
 
   const formik = useFormik({
-    initialValues: getInitialValues(query.type, query.listId),
+    initialValues: getInitialValues(query.type, query.teamId, query.listId),
     validationSchema: getValidationSchema(query.type),
     onSubmit: handleCreate,
   });
   const { values, setFieldValue, handleSubmit } = formik;
 
   const handleChangePath = (teamId, listId) => {
+    if (teamId !== values.teamId) {
+      setFieldValue('teamId', teamId);
+    }
+
     if (listId !== values.listId) {
       setFieldValue('listId', listId);
     }

@@ -16,7 +16,11 @@ export const Document = ({
 
   return (
     <>
-      <Title value={name} onClickAcceptEdit={onClickAcceptEdit} />
+      <Title
+        value={name}
+        onClickAcceptEdit={onClickAcceptEdit}
+        marginBottom={isSharedItem ? 24 : 0}
+      />
       {!isSharedItem && (
         <OwnerAndInvitation
           itemSubject={itemSubject}

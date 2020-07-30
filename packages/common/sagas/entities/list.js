@@ -19,6 +19,7 @@ import { updateGlobalNotification } from '@caesar/common/actions/application';
 import {
   listSelector,
   personalListsByTypeSelector,
+  currentTeamListsSelector,
 } from '@caesar/common/selectors/entities/list';
 import { itemsBatchSelector } from '@caesar/common/selectors/entities/item';
 import {
@@ -129,12 +130,17 @@ export function* sortListSaga({
 }) {
   try {
     const personalListsByType = yield select(personalListsByTypeSelector);
+    const currentTeamLists = yield select(currentTeamListsSelector);
+    const lists = personalListsByType.list.length
+      ? personalListsByType.list
+      : currentTeamLists.list;
 
     yield put(
       sortListSuccess(
-        fixSort(
-          reorder(personalListsByType?.list, sourceIndex, destinationIndex),
-        ).reduce((acc, list) => ({ ...acc, [list.id]: list }), {}),
+        fixSort(reorder(lists, sourceIndex, destinationIndex)).reduce(
+          (acc, list) => ({ ...acc, [list.id]: list }),
+          {},
+        ),
       ),
     );
 

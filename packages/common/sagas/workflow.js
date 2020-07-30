@@ -23,6 +23,7 @@ import { sortItemsByFavorites } from '@caesar/common/utils/workflow';
 import { getLists, getTeamLists, getTeams } from '@caesar/common/api';
 import { TEAM_TYPE } from '@caesar/common/constants';
 import {
+  favoriteListSelector,
   trashListSelector,
   teamsTrashListsSelector,
 } from '@caesar/common/selectors/entities/list';
@@ -71,7 +72,10 @@ function* initPersonal(withDecryption) {
     }
 
     const trashList = yield select(trashListSelector);
-    const favoritesList = getFavoritesList(itemsById, trashList?.id);
+    let favoritesList = yield select(favoriteListSelector);
+    if (!favoritesList?.id) {
+      favoritesList = getFavoritesList(itemsById, trashList?.id);
+    }
 
     yield put(
       addListsBatch({

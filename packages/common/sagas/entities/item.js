@@ -91,9 +91,11 @@ import {
   workInProgressItemIdsSelector,
 } from '@caesar/common/selectors/workflow';
 import {
-  favoriteListSelector,
-  teamsFavoriteListSelector,
   listSelector,
+  favoriteListSelector,
+  currentTeamFavoriteListSelector,
+  defaultListSelector,
+  currentTeamDefaultListSelector,
 } from '@caesar/common/selectors/entities/list';
 import {
   itemsBatchSelector,
@@ -317,7 +319,7 @@ export function* removeShareSaga({ payload: { shareId } }) {
 export function* toggleItemToFavoriteSaga({ payload: { item } }) {
   try {
     const favoritesList = item.teamId
-      ? yield select(teamsFavoriteListSelector)
+      ? yield select(currentTeamFavoriteListSelector)
       : yield select(favoriteListSelector);
 
     const {
@@ -342,14 +344,22 @@ export function* moveItemSaga({ payload: { itemId, teamId, listId } }) {
   try {
     yield put(updateGlobalNotification(MOVING_IN_PROGRESS_NOTIFICATION, true));
 
+    const list = yield select(listSelector, { listId });
+
+    const defaultList = teamId
+      ? yield select(currentTeamDefaultListSelector)
+      : yield select(defaultListSelector);
+
+    const newListId = list ? listId : defaultList?.id;
+
     const item = yield select(itemSelector, { itemId });
     const childItemIds = item.invited;
 
     yield call(updateMoveItem, item.id, {
-      listId,
+      listId: newListId,
     });
-    yield put(moveItemSuccess(item.id, item.listId, listId));
-    yield put(moveItemToList(item.id, item.listId, listId));
+    yield put(moveItemSuccess(item.id, item.listId, newListId));
+    yield put(moveItemToList(item.id, item.listId, newListId));
 
     yield put(updateGlobalNotification(NOOP_NOTIFICATION, false));
 

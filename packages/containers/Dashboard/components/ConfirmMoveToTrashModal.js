@@ -33,7 +33,7 @@ export const ConfirmMoveToTrashModal = ({
   const trashList = useSelector(trashListSelector);
 
   const handleMoveToTrash = () => {
-    const isTeamList = workInProgressList && !!workInProgressList.teamId;
+    const isTeamList = !!workInProgressList?.teamId;
     const trashListId = isTeamList
       ? teamsTrashLists.find(
           ({ teamId }) => teamId === workInProgressList.teamId,
@@ -51,7 +51,13 @@ export const ConfirmMoveToTrashModal = ({
         ])} been removed`,
       });
     } else {
-      dispatch(moveItemRequest(workInProgressItem.id, null, trashListId));
+      dispatch(
+        moveItemRequest(
+          workInProgressItem.id,
+          workInProgressItem.teamId || null,
+          trashListId,
+        ),
+      );
       dispatch(setWorkInProgressItem(null));
 
       notification.show({

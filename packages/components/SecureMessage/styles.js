@@ -79,6 +79,7 @@ export const Row = styled.div`
 `;
 
 export const ContentEditableStyled = styled(ContentEditableComponent)`
-  font-size: ${({ theme }) => media.mobile ? theme.font.size.small : theme.font.size.main};
+  font-size: ${({ theme }) =>
+    media.mobile ? theme.font.size.small : theme.font.size.main};
   text-align: justify;
 `;

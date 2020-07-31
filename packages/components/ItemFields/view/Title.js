@@ -14,6 +14,7 @@ const StyledInput = styled(Input)`
   ${Input.ValueWrapper} {
     justify-content: flex-start;
     padding: 0;
+    margin-bottom: ${({ marginBottom }) => marginBottom}px;
     border-bottom: 1px solid transparent;
   }
 
@@ -32,7 +33,13 @@ const StyledInput = styled(Input)`
   }
 `;
 
-export const Title = ({ value, itemSubject, schema, onClickAcceptEdit }) => {
+export const Title = ({
+  value,
+  itemSubject,
+  schema,
+  onClickAcceptEdit,
+  marginBottom = 0,
+}) => {
   return (
     <StyledInput
       value={value}
@@ -40,8 +47,10 @@ export const Title = ({ value, itemSubject, schema, onClickAcceptEdit }) => {
       schema={schema}
       name="name"
       placeholder="Enter the title"
+      withEllipsis
       withCopyButton={false}
       onClickAcceptEdit={onClickAcceptEdit}
+      marginBottom={marginBottom}
     />
   );
 };

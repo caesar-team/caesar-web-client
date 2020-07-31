@@ -70,6 +70,7 @@ import {
   CREATE_CHILD_ITEM_BATCH_FINISHED_EVENT,
   removeChildItemsBatch,
 } from '@caesar/common/actions/entities/childItem';
+import { setCurrentTeamId } from '@caesar/common/actions/user';
 import { updateGlobalNotification } from '@caesar/common/actions/application';
 import {
   createChildItemBatchSaga,
@@ -83,15 +84,18 @@ import { inviteNewMemberBatchSaga } from '@caesar/common/sagas/common/invite';
 import {
   setWorkInProgressItem,
   updateWorkInProgressItem,
+  setWorkInProgressListId,
 } from '@caesar/common/actions/workflow';
 import {
   workInProgressItemSelector,
   workInProgressItemIdsSelector,
 } from '@caesar/common/selectors/workflow';
 import {
-  favoriteListSelector,
-  teamsFavoriteListSelector,
   listSelector,
+  favoriteListSelector,
+  currentTeamFavoriteListSelector,
+  defaultListSelector,
+  currentTeamDefaultListSelector,
 } from '@caesar/common/selectors/entities/list';
 import {
   itemsBatchSelector,
@@ -102,6 +106,7 @@ import {
   keyPairSelector,
   masterPasswordSelector,
   userDataSelector,
+  currentTeamIdSelector,
 } from '@caesar/common/selectors/user';
 import {
   teamSelector,
@@ -144,6 +149,7 @@ import {
   REMOVING_IN_PROGRESS_NOTIFICATION,
   NOOP_NOTIFICATION,
   ROUTES,
+  TEAM_TYPE,
 } from '@caesar/common/constants';
 import { generateSharingUrl } from '@caesar/common/utils/sharing';
 import { createMemberSaga } from './member';
@@ -313,7 +319,7 @@ export function* removeShareSaga({ payload: { shareId } }) {
 export function* toggleItemToFavoriteSaga({ payload: { item } }) {
   try {
     const favoritesList = item.teamId
-      ? yield select(teamsFavoriteListSelector)
+      ? yield select(currentTeamFavoriteListSelector)
       : yield select(favoriteListSelector);
 
     const {
@@ -338,14 +344,22 @@ export function* moveItemSaga({ payload: { itemId, teamId, listId } }) {
   try {
     yield put(updateGlobalNotification(MOVING_IN_PROGRESS_NOTIFICATION, true));
 
+    const list = yield select(listSelector, { listId });
+
+    const defaultList = teamId
+      ? yield select(currentTeamDefaultListSelector)
+      : yield select(defaultListSelector);
+
+    const newListId = list ? listId : defaultList?.id;
+
     const item = yield select(itemSelector, { itemId });
     const childItemIds = item.invited;
 
     yield call(updateMoveItem, item.id, {
-      listId,
+      listId: newListId,
     });
-    yield put(moveItemSuccess(item.id, item.listId, listId));
-    yield put(moveItemToList(item.id, item.listId, listId));
+    yield put(moveItemSuccess(item.id, item.listId, newListId));
+    yield put(moveItemToList(item.id, item.listId, newListId));
 
     yield put(updateGlobalNotification(NOOP_NOTIFICATION, false));
 
@@ -421,9 +435,8 @@ export function* createItemSaga({
   try {
     yield put(updateGlobalNotification(ENCRYPTING_ITEM_NOTIFICATION, true));
 
-    const { listId, attachments, type, ...data } = item;
+    const { teamId, listId, attachments, type, ...data } = item;
 
-    const list = yield select(listSelector, { listId });
     const keyPair = yield select(keyPairSelector);
     const user = yield select(userDataSelector);
 
@@ -452,7 +465,7 @@ export function* createItemSaga({
       invited: [],
       shared: null,
       tags: [],
-      teamId: list.teamId,
+      teamId,
       ownerId: user.id,
       secret: encryptedItem,
       data: { attachments, ...data },
@@ -461,15 +474,22 @@ export function* createItemSaga({
     };
 
     yield put(createItemSuccess(newItem));
-    yield put(addItemToList(newItem));
-    yield put(updateWorkInProgressItem(itemId));
 
-    if (list.teamId) {
+    const currentTeamId = yield select(currentTeamIdSelector);
+
+    if (
+      currentTeamId === teamId ||
+      (!teamId && currentTeamId === TEAM_TYPE.PERSONAL)
+    ) {
+      yield put(addItemToList(newItem));
+    }
+
+    if (teamId) {
       yield put(
         updateGlobalNotification(SHARING_IN_PROGRESS_NOTIFICATION, true),
       );
 
-      const team = yield select(teamSelector, { teamId: list.teamId });
+      const team = yield select(teamSelector, { teamId });
       const memberIds = team.users.map(({ id }) => id);
       const members = yield select(membersBatchSelector, { memberIds });
 
@@ -477,7 +497,7 @@ export function* createItemSaga({
         .filter(({ id }) => id !== user.id)
         .map(({ id, publicKey }) => ({
           item: { id: itemId, data: newItem.data },
-          user: { id, publicKey, teamId: list.teamId },
+          user: { id, publicKey, teamId },
         }));
 
       if (itemUserPairs.length > 0) {
@@ -505,6 +525,10 @@ export function* createItemSaga({
         yield put(updateWorkInProgressItem());
       }
     }
+
+    yield put(setCurrentTeamId(teamId || TEAM_TYPE.PERSONAL));
+    yield put(setWorkInProgressListId(listId));
+    yield put(setWorkInProgressItem(newItem));
 
     yield call(Router.push, ROUTES.DASHBOARD);
   } catch (error) {
@@ -607,9 +631,15 @@ export function* updateItemSaga({ payload: { item } }) {
       keyPair.publicKey,
     );
 
-    yield call(updateItem, item.id, { item: { secret: encryptedItemSecret } });
+    const {
+      data: { lastUpdated },
+    } = yield call(updateItem, item.id, {
+      item: { secret: encryptedItemSecret },
+    });
 
-    yield put(updateItemSuccess({ ...item, secret: encryptedItemSecret }));
+    yield put(
+      updateItemSuccess({ ...item, lastUpdated, secret: encryptedItemSecret }),
+    );
 
     yield put(updateWorkInProgressItem());
 

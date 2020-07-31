@@ -8,6 +8,7 @@ export const Document = ({
   itemSubject,
   onClickAcceptEdit,
   onClickShare,
+  isSharedItem,
 }) => {
   const {
     data: { name, note, attachments = [] },
@@ -15,11 +16,17 @@ export const Document = ({
 
   return (
     <>
-      <Title value={name} onClickAcceptEdit={onClickAcceptEdit} />
-      <OwnerAndInvitation
-        itemSubject={itemSubject}
-        onClickShare={onClickShare}
+      <Title
+        value={name}
+        onClickAcceptEdit={onClickAcceptEdit}
+        marginBottom={isSharedItem ? 24 : 0}
       />
+      {!isSharedItem && (
+        <OwnerAndInvitation
+          itemSubject={itemSubject}
+          onClickShare={onClickShare}
+        />
+      )}
       <Row marginBottom={24}>
         <Note
           value={note}

@@ -3,7 +3,8 @@ import styled from 'styled-components';
 import { Icon } from '../../Icon';
 import { Input } from './Input';
 
-const EyeIcon = styled(Icon)`
+const GoToIcon = styled(Icon)`
+  flex: 0 0 16px;
   margin-left: 16px;
   cursor: pointer;
 
@@ -28,7 +29,7 @@ export const Website = ({ value, itemSubject, schema, onClickAcceptEdit }) => {
       onClickAcceptEdit={onClickAcceptEdit}
       addonIcons={
         value && (
-          <EyeIcon
+          <GoToIcon
             name="go-to"
             color="gray"
             width={20}

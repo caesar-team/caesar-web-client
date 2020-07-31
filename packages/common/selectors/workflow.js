@@ -3,6 +3,7 @@ import {
   listsByIdSelector,
   extendedSortedCustomizableListsSelector,
   favoriteListSelector,
+  currentTeamFavoriteListSelector,
 } from '@caesar/common/selectors/entities/list';
 import { itemsByIdSelector } from '@caesar/common/selectors/entities/item';
 import { childItemsByIdSelector } from '@caesar/common/selectors/entities/childItem';
@@ -150,7 +151,18 @@ export const visibleListItemsSelector = createSelector(
   itemsByIdSelector,
   workInProgressListIdSelector,
   favoriteListSelector,
-  (listsById, itemsById, workInProgressListId, favoriteList) => {
+  currentTeamFavoriteListSelector,
+  (
+    listsById,
+    itemsById,
+    workInProgressListId,
+    personalFavoriteList,
+    teamFavoriteList,
+  ) => {
+    const favoriteList = personalFavoriteList.id
+      ? personalFavoriteList
+      : teamFavoriteList;
+
     const isFavoriteList = workInProgressListId === favoriteList?.id;
 
     switch (true) {

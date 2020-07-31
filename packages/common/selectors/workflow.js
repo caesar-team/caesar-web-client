@@ -1,4 +1,5 @@
 import { createSelector } from 'reselect';
+import { sortByDate } from '@caesar/common/utils/dateUtils';
 import {
   listsByIdSelector,
   extendedSortedCustomizableListsSelector,
@@ -138,13 +139,15 @@ export const shouldLoadNodesSelector = createSelector(
 );
 
 const createListItemsList = (children, itemsById) =>
-  children.reduce(
-    (accumulator, itemId) =>
-      itemsById[itemId]?.data
-        ? [...accumulator, itemsById[itemId]]
-        : accumulator,
-    [],
-  ) || [];
+  children
+    .reduce(
+      (accumulator, itemId) =>
+        itemsById[itemId]?.data
+          ? [...accumulator, itemsById[itemId]]
+          : accumulator,
+      [],
+    )
+    .sort((a, b) => sortByDate(a.lastUpdated, b.lastUpdated, 'DESC')) || [];
 
 export const visibleListItemsSelector = createSelector(
   listsByIdSelector,

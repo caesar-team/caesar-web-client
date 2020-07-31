@@ -631,9 +631,15 @@ export function* updateItemSaga({ payload: { item } }) {
       keyPair.publicKey,
     );
 
-    yield call(updateItem, item.id, { item: { secret: encryptedItemSecret } });
+    const {
+      data: { lastUpdated },
+    } = yield call(updateItem, item.id, {
+      item: { secret: encryptedItemSecret },
+    });
 
-    yield put(updateItemSuccess({ ...item, secret: encryptedItemSecret }));
+    yield put(
+      updateItemSuccess({ ...item, lastUpdated, secret: encryptedItemSecret }),
+    );
 
     yield put(updateWorkInProgressItem());
 

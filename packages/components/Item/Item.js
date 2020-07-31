@@ -69,7 +69,9 @@ const ItemComponent = ({
   };
 
   const handleClickRestoreItem = async () => {
-    dispatch(moveItemRequest(item.id, null, item.previousListId));
+    dispatch(
+      moveItemRequest(item.id, item.teamId || null, item.previousListId),
+    );
     dispatch(setWorkInProgressItem(null));
   };
 
@@ -119,11 +121,13 @@ const ItemComponent = ({
           </Can>
         </Scrollbar>
       </InnerWrapper>
-      <MoveModal
-        item={item}
-        isOpened={isMoveModalOpened}
-        closeModal={() => setMoveModalOpened(false)}
-      />
+      {!isTrashItem && (
+        <MoveModal
+          item={item}
+          isOpened={isMoveModalOpened}
+          closeModal={() => setMoveModalOpened(false)}
+        />
+      )}
     </Wrapper>
   );
 };

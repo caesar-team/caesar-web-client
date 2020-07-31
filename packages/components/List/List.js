@@ -36,10 +36,10 @@ const ListComponent = ({
   mode,
   isMultiItem = false,
   workInProgressList = null,
-  workInProgressItem,
   workInProgressItemIds,
   items = [],
   onClickItem = Function.prototype,
+  onSelectItem = Function.prototype,
 }) => {
   const isDashboardDefaultMode = mode === DASHBOARD_MODE.DEFAULT;
 
@@ -65,13 +65,14 @@ const ListComponent = ({
     // TODO: Need to check a long list with items. Mayby beetter to return AutoSizer, but need to fix Scrolling
     return (
       <Scrollbar>
-        {items.map(item => (
+        {items.map((item, index) => (
           <Item
             key={item.id}
+            index={index}
             isMultiItem={isMultiItem}
             onClickItem={onClickItem}
+            onSelectItem={onSelectItem}
             workInProgressItemIds={workInProgressItemIds}
-            workInProgressItem={workInProgressItem}
             {...item}
           />
         ))}

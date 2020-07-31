@@ -21,7 +21,6 @@ export const listsSelector = createSelector(
   listsByIdSelector,
   listsById => Object.values(listsById) || [],
 );
-
 const listIdPropSelector = (_, props) => props.listId;
 
 export const listSelector = createSelector(
@@ -135,7 +134,6 @@ export const currentTeamDefaultListSelector = createSelector(
         teamId === currentTeamId && label === LIST_TYPE.DEFAULT,
     ) || {},
 );
-
 export const currentTeamTrashListSelector = createSelector(
   teamListsSelector,
   currentTeamIdSelector,

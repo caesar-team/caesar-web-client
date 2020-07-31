@@ -1,231 +1,159 @@
-import { createSelector } from 'reselect';
-import { LIST_TYPE, TEAM_TYPE } from '@caesar/common/constants';
-import { itemsByIdSelector } from '@caesar/common/selectors/entities/item';
-import { childItemsByIdSelector } from '@caesar/common/selectors/entities/childItem';
-import { teamListSelector } from '@caesar/common/selectors/entities/team';
-import { currentTeamIdSelector } from '@caesar/common/selectors/user';
-export const entitiesSelector = state => state.entities;
-export const listEntitySelector = createSelector(
-  entitiesSelector,
-  entities => entities.list,
-);
-export const listsByIdSelector = createSelector(
-  listEntitySelector,
-  listEntity => listEntity.byId,
-);
-export const listsSelector = createSelector(
-  listsByIdSelector,
-  listsById => Object.values(listsById) || [],
-);
-const listIdPropSelector = (_, props) => props.listId;
-export const listSelector = createSelector(
-  listsByIdSelector,
-  listIdPropSelector,
-  (listsById, listId) => listsById[listId],
-);
-export const personalListsSelector = createSelector(
-  listsSelector,
-  lists => lists.filter(list => !list.teamId),
-);
-export const selectableListsSelector = createSelector(
-  personalListsSelector,
-  lists => [
-    ...lists.filter(list => list.type === LIST_TYPE.INBOX),
-    ...lists.filter(list => list.type === LIST_TYPE.TRASH),
-    ...lists.filter(list => list.type === LIST_TYPE.LIST),
-  ],
-);
-export const selectableListsWithoutChildrenSelector = createSelector(
-  selectableListsSelector,
-  lists => lists.map(({ children, ...rest }) => rest),
-);
-export const inboxListSelector = createSelector(
-  personalListsSelector,
-  lists => lists.find(({ type }) => type === LIST_TYPE.INBOX) || {},
-);
-export const defaultListSelector = createSelector(
-  personalListsSelector,
-  lists => lists.find(({ label }) => label === LIST_TYPE.DEFAULT) || {},
-);
-export const trashListSelector = createSelector(
-  personalListsSelector,
-  lists => lists.find(({ type }) => type === LIST_TYPE.TRASH) || {},
-);
-export const favoriteListSelector = createSelector(
-  personalListsSelector,
-  trashListSelector,
-  itemsByIdSelector,
-  (lists, trash, items) => {
-    const favoriteList =
-      lists.find(({ type }) => type === LIST_TYPE.FAVORITES) || {};
-    return {
-      ...favoriteList,
-      children: favoriteList.children?.filter(
-        itemId => items[itemId]?.listId !== trash.id,
-      ),
-    };
-  },
-);
-const nestedListsSelector = createSelector(
-  personalListsSelector,
-  lists =>
-    lists
-      .filter(
-        ({ type }) =>
-          ![LIST_TYPE.INBOX, LIST_TYPE.FAVORITES, LIST_TYPE.TRASH].includes(
-            type,
-          ),
-      )
-      .sort((a, b) => a.sort - b.sort),
-);
-export const personalListsByTypeSelector = createSelector(
-  inboxListSelector,
-  nestedListsSelector,
-  favoriteListSelector,
-  trashListSelector,
-  (inbox, lists, favorites, trash) => ({
-    inbox,
-    list: lists,
-    favorites,
-    trash,
-  }),
-);
-export const teamListsSelector = createSelector(
-  listsSelector,
-  lists => lists.filter(list => list.teamId),
-);
-export const teamsTrashListsSelector = createSelector(
-  teamListsSelector,
-  lists => lists.filter(({ type }) => type === LIST_TYPE.TRASH) || [],
-);
-export const allTrashListIdsSelector = createSelector(
-  trashListSelector,
-  teamsTrashListsSelector,
-  (trashList, teamsTrashLists) => [
-    trashList.id,
-    ...teamsTrashLists.map(({ id }) => id),
-  ],
-);
-export const currentTeamDefaultListSelector = createSelector(
-  teamListsSelector,
-  currentTeamIdSelector,
-  (lists, currentTeamId) =>
-    lists.list?.find(
-      ({ teamId, label }) =>
-        teamId === currentTeamId && label === LIST_TYPE.DEFAULT,
-    ) || {},
-);
-export const currentTeamTrashListSelector = createSelector(
-  teamListsSelector,
-  currentTeamIdSelector,
-  (lists, currentTeamId) =>
-    lists.find(
-      ({ teamId, label }) =>
-        teamId === currentTeamId && label === LIST_TYPE.TRASH,
-    ) || {},
-);
-export const currentTeamFavoriteListSelector = createSelector(
-  teamListsSelector,
-  currentTeamIdSelector,
+import { put, call, takeLatest, select } from 'redux-saga/effects';
+import {
+  CREATE_LIST_REQUEST,
+  EDIT_LIST_REQUEST,
+  REMOVE_LIST_REQUEST,
+  SORT_LIST_REQUEST,
+  createListSuccess,
+  createListFailure,
+  editListSuccess,
+  editListFailure,
+  removeListSuccess,
+  removeListFailure,
+  sortListSuccess,
+  sortListFailure,
+} from '@caesar/common/actions/entities/list';
+
+import { updateGlobalNotification } from '@caesar/common/actions/application';
+import {
+  listSelector,
+  personalListsByTypeSelector,
   currentTeamTrashListSelector,
-  itemsByIdSelector,
-  (lists, currentTeamId, trash, items) => {
-    const favoriteList =
-      lists.find(
-        ({ type, teamId }) =>
-          teamId === currentTeamId && type === LIST_TYPE.FAVORITES,
-      ) || {};
-    return {
-      ...favoriteList,
-      children: favoriteList.children?.filter(
-        itemId => items[itemId]?.listId !== trash.id,
-      ),
-    };
-  },
-);
-export const currentTeamListsSelector = createSelector(
-  teamListsSelector,
-  currentTeamIdSelector,
-  currentTeamFavoriteListSelector,
-  currentTeamTrashListSelector,
-  (teamLists, currentTeamId, favorites, trash) => ({
-    list: teamLists
-      .filter(
-        list =>
-          list.teamId === currentTeamId &&
-          ![LIST_TYPE.FAVORITES, LIST_TYPE.TRASH].includes(list.type),
-      )
-      .sort((a, b) => a.sort - b.sort),
-    favorites,
-    trash,
-  }),
-);
-export const selectableTeamsListsSelector = createSelector(
-  teamListSelector,
-  personalListsSelector,
-  teamListsSelector,
-  (teamList, personalLists, teamLists) => {
-    const filterLists = lists =>
-      lists.filter(
-        ({ type }) => ![LIST_TYPE.FAVORITES, LIST_TYPE.TRASH].includes(type),
-      );
-    return [
-      {
-        id: TEAM_TYPE.PERSONAL,
-        name: TEAM_TYPE.PERSONAL,
-        icon: null,
-        lists: filterLists(personalLists),
-      },
-      ...teamList.map(team => ({
-        id: team.id,
-        name: team.title,
-        icon: team.icon,
-        lists: filterLists(teamLists.filter(list => list.teamId === team.id)),
-      })),
-    ];
-  },
-);
-export const customizableListsSelector = createSelector(
-  personalListsSelector,
-  currentTeamListsSelector,
-  (personalLists, teamLists) => {
-    const lists = personalLists.length ? personalLists : teamLists.list;
-    return lists.filter(
-      list => list.type === LIST_TYPE.LIST && list.label !== 'default',
+  trashListSelector,
+} from '@caesar/common/selectors/entities/list';
+import { moveItemsBatchSaga } from '@caesar/common/sagas/entities/item';
+import {
+  postCreateList,
+  patchList,
+  patchListSort,
+  removeList,
+  postCreateTeamList,
+  patchTeamList,
+  removeTeamList,
+} from '@caesar/common/api';
+import { ENTITY_TYPE, LIST_TYPE } from '@caesar/common/constants';
+import { getServerErrorByNames } from '@caesar/common/utils/error';
+
+const reorder = (list, startIndex, endIndex) => {
+  const result = Array.from(list);
+  const [removed] = result.splice(startIndex, 1);
+  result.splice(endIndex, 0, removed);
+
+  return result;
+};
+
+const fixSort = lists => lists.map((list, index) => ({ ...list, sort: index }));
+
+export function* createListSaga({
+  payload: { list },
+  meta: { notification, setCreatingMode },
+}) {
+  try {
+    const {
+      data: { id: listId, _links },
+    } = list.teamId
+      ? yield call(postCreateTeamList, list.teamId, {
+          label: list.label,
+        })
+      : yield call(postCreateList, {
+          label: list.label,
+        });
+
+    yield call(setCreatingMode, false);
+    yield put(
+      createListSuccess(listId, {
+        id: listId,
+        type: LIST_TYPE.LIST,
+        children: [],
+        sort: 0,
+        parentId: null,
+        __type: ENTITY_TYPE.LIST,
+        _links,
+        ...list,
+      }),
     );
-  },
-);
-export const sortedCustomizableListsSelector = createSelector(
-  customizableListsSelector,
-  lists => lists.sort((a, b) => a.sort - b.sort),
-);
-export const extendedSortedCustomizableListsSelector = createSelector(
-  sortedCustomizableListsSelector,
-  itemsByIdSelector,
-  childItemsByIdSelector,
-  (lists, itemsById, childItemsById) =>
-    lists.map(({ children, ...data }) => ({
-      ...data,
-      count: children.length,
-      invited: [
-        ...new Set(
-          children.reduce(
-            (accumulator, itemId) =>
-              itemsById[itemId]
-                ? [
-                    ...accumulator,
-                    ...itemsById[itemId].invited.reduce(
-                      (acc, childItemId) =>
-                        childItemsById[childItemId]
-                          ? [...acc, childItemsById[childItemId]]
-                          : acc,
-                      [],
-                    ),
-                  ]
-                : accumulator,
-            [],
-          ),
-        ),
-      ],
-    })),
-);
+  } catch (error) {
+    yield put(createListFailure());
+    yield put(
+      updateGlobalNotification(getServerErrorByNames(error), false, true),
+    );
+  }
+}
+
+export function* editListSaga({
+  payload: { list },
+  meta: { notification, setEditMode },
+}) {
+  try {
+    list.teamId
+      ? yield call(patchTeamList, list.teamId, list.id, { label: list.label })
+      : yield call(patchList, list.id, { label: list.label });
+
+    yield call(setEditMode, false);
+    yield put(editListSuccess(list));
+  } catch (error) {
+    console.log(error);
+    yield put(editListFailure());
+    yield put(
+      updateGlobalNotification(getServerErrorByNames(error), false, true),
+    );
+  }
+}
+
+export function* removeListSaga({ payload: { teamId, listId } }) {
+  try {
+    const list = yield select(listSelector, { listId });
+    const listItemIds = list.children;
+
+    const trashList = teamId
+      ? yield select(currentTeamTrashListSelector)
+      : yield select(trashListSelector);
+
+    yield call(moveItemsBatchSaga, {
+      payload: {
+        itemIds: listItemIds,
+        teamId: teamId || null,
+        listId: trashList?.id,
+      },
+    });
+
+    if (teamId) {
+      yield call(removeTeamList, teamId, listId);
+    } else {
+      yield call(removeList, listId);
+    }
+
+    yield put(removeListSuccess(listId));
+  } catch (error) {
+    console.log(error);
+    yield put(removeListFailure());
+  }
+}
+
+export function* sortListSaga({
+  payload: { listId, sourceIndex, destinationIndex },
+}) {
+  try {
+    const personalListsByType = yield select(personalListsByTypeSelector);
+
+    yield put(
+      sortListSuccess(
+        fixSort(
+          reorder(personalListsByType?.list, sourceIndex, destinationIndex),
+        ).reduce((acc, list) => ({ ...acc, [list.id]: list }), {}),
+      ),
+    );
+
+    yield call(patchListSort, listId, { sort: destinationIndex });
+  } catch (error) {
+    console.log(error);
+    yield put(sortListFailure());
+  }
+}
+
+export default function* listSagas() {
+  yield takeLatest(CREATE_LIST_REQUEST, createListSaga);
+  yield takeLatest(EDIT_LIST_REQUEST, editListSaga);
+  yield takeLatest(REMOVE_LIST_REQUEST, removeListSaga);
+  yield takeLatest(SORT_LIST_REQUEST, sortListSaga);
+}

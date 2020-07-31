@@ -13,7 +13,6 @@ import {
   sortListSuccess,
   sortListFailure,
 } from '@caesar/common/actions/entities/list';
-
 import { updateGlobalNotification } from '@caesar/common/actions/application';
 import {
   listSelector,
@@ -45,6 +44,32 @@ const reorder = (list, startIndex, endIndex) => {
 
 const fixSort = lists => lists.map((list, index) => ({ ...list, sort: index }));
 
+export function* sortListSaga({
+  payload: { listId, sourceIndex, destinationIndex },
+}) {
+  try {
+    const personalListsByType = yield select(personalListsByTypeSelector);
+    const currentTeamLists = yield select(currentTeamListsSelector);
+    const lists = personalListsByType.list.length
+      ? personalListsByType.list
+      : currentTeamLists.list;
+
+    yield put(
+      sortListSuccess(
+        fixSort(reorder(lists, sourceIndex, destinationIndex)).reduce(
+          (acc, list) => ({ ...acc, [list.id]: list }),
+          {},
+        ),
+      ),
+    );
+
+    yield call(patchListSort, listId, { sort: destinationIndex });
+  } catch (error) {
+    console.log(error);
+    yield put(sortListFailure());
+  }
+}
+
 export function* createListSaga({
   payload: { list },
   meta: { notification, setCreatingMode },
@@ -67,12 +92,31 @@ export function* createListSaga({
         type: LIST_TYPE.LIST,
         children: [],
         sort: 0,
-        parentId: null,
         __type: ENTITY_TYPE.LIST,
         _links,
         ...list,
       }),
     );
+
+    const personalListsByType = yield select(personalListsByTypeSelector);
+    const currentTeamLists = yield select(currentTeamListsSelector);
+    const lists = personalListsByType.list.length
+      ? personalListsByType.list
+      : currentTeamLists.list;
+
+    const firstListInOrder = lists.find(
+      ({ id, sort }) => sort === 0 && id !== listId,
+    );
+
+    if (firstListInOrder) {
+      yield call(sortListSaga, {
+        payload: {
+          listId: firstListInOrder.id,
+          sourceIndex: 0,
+          destinationIndex: 1,
+        },
+      });
+    }
   } catch (error) {
     yield put(createListFailure());
     yield put(
@@ -86,9 +130,11 @@ export function* editListSaga({
   meta: { notification, setEditMode },
 }) {
   try {
-    list.teamId
-      ? yield call(patchTeamList, list.teamId, list.id, { label: list.label })
-      : yield call(patchList, list.id, { label: list.label });
+    if (list.teamId) {
+      yield call(patchTeamList, list.teamId, list.id, { label: list.label });
+    } else {
+      yield call(patchList, list.id, { label: list.label });
+    }
 
     yield call(setEditMode, false);
     yield put(editListSuccess(list));
@@ -128,32 +174,6 @@ export function* removeListSaga({ payload: { teamId, listId } }) {
   } catch (error) {
     console.log(error);
     yield put(removeListFailure());
-  }
-}
-
-export function* sortListSaga({
-  payload: { listId, sourceIndex, destinationIndex },
-}) {
-  try {
-    const personalListsByType = yield select(personalListsByTypeSelector);
-    const currentTeamLists = yield select(currentTeamListsSelector);
-    const lists = personalListsByType.list.length
-      ? personalListsByType.list
-      : currentTeamLists.list;
-
-    yield put(
-      sortListSuccess(
-        fixSort(reorder(lists, sourceIndex, destinationIndex)).reduce(
-          (acc, list) => ({ ...acc, [list.id]: list }),
-          {},
-        ),
-      ),
-    );
-
-    yield call(patchListSort, listId, { sort: destinationIndex });
-  } catch (error) {
-    console.log(error);
-    yield put(sortListFailure());
   }
 }
 

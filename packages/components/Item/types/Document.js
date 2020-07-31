@@ -1,4 +1,5 @@
 import React from 'react';
+import { SCHEMA } from '@caesar/common/validation';
 import { Title, Note, Attachments } from '../../ItemFields/view';
 import { Row } from '../../ItemFields/common';
 import { OwnerAndInvitation } from '../components';
@@ -18,6 +19,8 @@ export const Document = ({
     <>
       <Title
         value={name}
+        itemSubject={itemSubject}
+        schema={SCHEMA.REQUIRED_LIMITED_STRING()}
         onClickAcceptEdit={onClickAcceptEdit}
         marginBottom={isSharedItem ? 24 : 0}
       />

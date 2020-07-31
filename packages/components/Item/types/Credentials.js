@@ -29,6 +29,7 @@ export const Credentials = ({
         itemSubject={itemSubject}
         schema={SCHEMA.REQUIRED_LIMITED_STRING()}
         onClickAcceptEdit={onClickAcceptEdit}
+        marginBottom={isSharedItem ? 24 : 0}
       />
       {!isSharedItem && (
         <OwnerAndInvitation

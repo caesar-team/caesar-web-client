@@ -449,7 +449,7 @@ export function* createItemSaga({
     yield put(updateGlobalNotification(CREATING_ITEM_NOTIFICATION, true));
 
     const {
-      data: { id: itemId, lastUpdated, _links },
+      data: { id: itemId, lastUpdated, invited, _links },
     } = yield call(postCreateItem, {
       listId,
       type,
@@ -462,7 +462,7 @@ export function* createItemSaga({
       lastUpdated,
       type,
       favorite: false,
-      invited: [],
+      invited: invited || [],
       shared: null,
       tags: [],
       teamId,

@@ -26,8 +26,8 @@ export const ContentEditableComponent = ({
   return (
     <ContentEditable
       style={{ outline: 'none' }}
-      onCut={() => false}
-      onPaste={() => false}
+      onCut={event => event.preventDefault()}
+      onPaste={event => event.preventDefault()}
       onKeyDown={event => {
         return !event.metaKey ? event.preventDefault() : true;
       }}

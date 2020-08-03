@@ -24,6 +24,7 @@ import {
   InnerWrapper,
   RemoveButton,
   ReadOnlyBanner,
+  Meta,
 } from './components';
 
 const Wrapper = styled.div`
@@ -68,7 +69,9 @@ const ItemComponent = ({
   };
 
   const handleClickRestoreItem = async () => {
-    dispatch(moveItemRequest(item.id, null, item.previousListId));
+    dispatch(
+      moveItemRequest(item.id, item.teamId || null, item.previousListId),
+    );
     dispatch(setWorkInProgressItem(null));
   };
 
@@ -108,6 +111,7 @@ const ItemComponent = ({
             onClickAcceptEdit={!isTrashItem && handleClickAcceptEdit}
             onClickShare={onClickShare}
           />
+          <Meta item={item} />
           <Can I={PERMISSION.TRASH} an={itemSubject}>
             {!isTrashItem && (
               <Row>
@@ -117,11 +121,13 @@ const ItemComponent = ({
           </Can>
         </Scrollbar>
       </InnerWrapper>
-      <MoveModal
-        item={item}
-        isOpened={isMoveModalOpened}
-        closeModal={() => setMoveModalOpened(false)}
-      />
+      {!isTrashItem && (
+        <MoveModal
+          item={item}
+          isOpened={isMoveModalOpened}
+          closeModal={() => setMoveModalOpened(false)}
+        />
+      )}
     </Wrapper>
   );
 };

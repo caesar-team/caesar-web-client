@@ -72,6 +72,11 @@ export const ability = defineAbility({ subjectName }, can => {
   can(PERMISSION.DELETE, PERMISSION_ENTITY.ITEM, {
     delete_item: true,
   });
+  can(PERMISSION.MULTISELECT, PERMISSION_ENTITY.ITEM, {
+    batch_share_item: true,
+    move_item: true,
+    delete_item: true,
+  });
   can(PERMISSION.CREATE, PERMISSION_ENTITY.TEAM_ITEM, {
     team_create_item: true,
   });
@@ -92,6 +97,11 @@ export const ability = defineAbility({ subjectName }, can => {
     team_delete_item: true,
   });
   can(PERMISSION.DELETE, PERMISSION_ENTITY.TEAM_ITEM, {
+    team_delete_item: true,
+  });
+  can(PERMISSION.MULTISELECT, PERMISSION_ENTITY.TEAM_ITEM, {
+    team_batch_share_item: true,
+    team_move_item: true,
     team_delete_item: true,
   });
 });

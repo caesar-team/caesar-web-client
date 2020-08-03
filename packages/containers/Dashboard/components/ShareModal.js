@@ -26,11 +26,10 @@ export const ShareModal = ({ notification, handleCloseModal }) => {
   );
   const childItemsById = useSelector(childItemsByIdSelector);
 
-  const isTeamItem = workInProgressItem?.teamId;
   const isMultiItem = workInProgressItemIds?.length > 0;
-  const availableTeamsForSharing = isTeamItem
-    ? userTeamList.filter(({ id }) => id !== workInProgressItem?.teamId)
-    : userTeamList;
+  const availableTeamsForSharing = userTeamList.filter(
+    ({ id }) => id !== workInProgressItem?.teamId && id !== null,
+  );
 
   const handleShare = (members, teamIds) => {
     if (members.length > 0 || teamIds.length > 0) {

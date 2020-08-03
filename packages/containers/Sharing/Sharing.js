@@ -1,13 +1,8 @@
 import React, { Component } from 'react';
 import { getLists } from '@caesar/common/api';
-import { matchStrict } from '@caesar/common/utils/match';
-import {
-  SharingLayout,
-  Credentials,
-  Document,
-  withNotification,
-} from '@caesar/components';
-import { LIST_TYPE, ITEM_TYPE } from '@caesar/common/constants';
+import { SharingLayout, withNotification } from '@caesar/components';
+import { ItemByType } from '@caesar/components/Item/ItemByType';
+import { LIST_TYPE, PERMISSION_ENTITY } from '@caesar/common/constants';
 import {
   getPrivateKeyObj,
   decryptItem,
@@ -44,7 +39,6 @@ class Sharing extends Component {
   prepareInitialState() {
     return {
       item: null,
-      user: null,
     };
   }
 
@@ -56,20 +50,20 @@ class Sharing extends Component {
       return null;
     }
 
-    const renderedItem = matchStrict(
-      item.type,
-      {
-        [ITEM_TYPE.CREDENTIALS]: (
-          <Credentials isSharedItem item={item} notification={notification} />
-        ),
-        [ITEM_TYPE.DOCUMENT]: (
-          <Document isSharedItem item={item} notification={notification} />
-        ),
-      },
-      null,
-    );
+    const itemSubject = {
+      __typename: PERMISSION_ENTITY.ITEM,
+    };
 
-    return <SharingLayout>{renderedItem}</SharingLayout>;
+    return (
+      <SharingLayout>
+        <ItemByType
+          item={item}
+          itemSubject={itemSubject}
+          notification={notification}
+          isSharedItem
+        />
+      </SharingLayout>
+    );
   }
 }
 

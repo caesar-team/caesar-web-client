@@ -10,7 +10,8 @@ import {
   CreateNewButton,
   Link,
   Text,
-  Row, ContentEditableStyled,
+  Row,
+  ContentEditableStyled,
 } from './styles';
 
 const SecureMessageLinkComponent = ({

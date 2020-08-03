@@ -24,7 +24,7 @@ const StyledTeam = styled(Team)`
 `;
 
 export const TeamList = ({ teams, teamIds, setTeamIds }) => {
-  const handleclickTeam = teamId =>
+  const handleClickTeam = teamId =>
     setTeamIds(
       teamIds.includes(teamId)
         ? teamIds.filter(id => id !== teamId)
@@ -42,7 +42,7 @@ export const TeamList = ({ teams, teamIds, setTeamIds }) => {
             key={team.id}
             team={team}
             isActive={teamIds.includes(team.id)}
-            onClick={() => handleclickTeam(team.id)}
+            onClick={() => handleClickTeam(team.id)}
           />
         ))}
       </StyledCarousel>

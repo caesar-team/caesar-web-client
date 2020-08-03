@@ -2,14 +2,10 @@ version: '3'
 
 services:
   web:
+    image: caesarteam/caesar-web-client:develop
     build:
       dockerfile: ./Dockerfile
       context: ./
-      args:
-        API_URI: ${API_URI}
-        APP_URI: ${APP_URI}
-    environment:
-      - API_URI
-      - APP_URI
+    env_file: .env.development
     ports:
       - "${EXTERNAL_PORT}:3000"

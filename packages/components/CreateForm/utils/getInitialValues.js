@@ -1,10 +1,11 @@
 import { ITEM_TYPE } from '@caesar/common/constants';
 
-export const getInitialValues = (type, listId) => {
+export const getInitialValues = (type, teamId, listId) => {
   switch (type) {
     case ITEM_TYPE.CREDENTIALS:
       return {
         type,
+        teamId,
         listId,
         name: '',
         login: '',
@@ -16,6 +17,7 @@ export const getInitialValues = (type, listId) => {
     case ITEM_TYPE.DOCUMENT:
       return {
         type,
+        teamId,
         listId,
         name: '',
         note: '',

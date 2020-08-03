@@ -14,3 +14,27 @@ export function datesDiff(first, second) {
 export function dateDiffNow(date) {
   return DateTime.fromISO(date).diffNow('hours');
 }
+
+export function sortByDate(first, second, flow = 'ASC') {
+  const firstTimeStamp = DateTime.fromISO(first).ts;
+  const secondTimeStamp = DateTime.fromISO(second).ts;
+
+  if (flow === 'ASC') {
+    if (firstTimeStamp < secondTimeStamp) {
+      return -1;
+    }
+    if (firstTimeStamp > secondTimeStamp) {
+      return 1;
+    }
+  }
+
+  if (firstTimeStamp < secondTimeStamp) {
+    return 1;
+  }
+
+  if (firstTimeStamp > secondTimeStamp) {
+    return -1;
+  }
+
+  return 0;
+}

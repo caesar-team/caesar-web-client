@@ -33,7 +33,12 @@ const RightWrapper = styled.div`
   padding: 0 24px;
 `;
 
+const StyledSearchInput = styled(SearchInput)`
+  margin-right: auto;
+`;
+
 const AddItemButton = styled(AddItem)`
+  margin-left: auto;
   margin-right: 10px;
 `;
 
@@ -41,7 +46,6 @@ const UserSection = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-left: auto;
 `;
 
 const UserName = styled.div`
@@ -125,7 +129,7 @@ const PrimaryHeaderComponent = ({
         {!!user && (
           <RightWrapper>
             {onSearch && (
-              <SearchInput
+              <StyledSearchInput
                 name="search"
                 autoComplete="nope"
                 searchedText={searchedText}

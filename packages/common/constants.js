@@ -193,6 +193,7 @@ export const PERMISSION = {
   FAVORITE: 'favorite',
   TRASH: 'trash',
   RESTORE: 'restore',
+  MULTISELECT: 'multiselect',
 };
 
 export const PERMISSION_ENTITY = {
@@ -225,4 +226,8 @@ export const DOMAIN_ROLES = {
   ROLE_ADMIN,
   ROLE_READ_ONLY_USER,
   ROLE_ANONYMOUS_USER,
+};
+
+export const PERMISSION_MESSAGES = {
+  FORBIDDEN_SELECT: 'You don\'t have permissions to select the item',
 };

@@ -1,5 +1,6 @@
 import { APP_URI } from '@caesar/common/constants';
 import { objectToBase64 } from '@caesar/common/utils/base64';
+import { escapeHTML } from '@caesar/common/utils/string';
 import {
   DAY,
   HALF_DAY,
@@ -20,7 +21,7 @@ URL: <strong>${generateMessageLink(
   password,
   isPasswordLess,
 )}</strong>${
-  !isPasswordLess ? `\nPassword: <strong>${encodeURI(password)}</strong>` : ``
+  !isPasswordLess ? `\nPassword: <strong>${escapeHTML(password)}</strong>` : ``
 }
 Expire within: <strong>${getExpireDate(seconds)}</strong>
 - - - - - - - - - - - - - - - - - - - - - - - - - -

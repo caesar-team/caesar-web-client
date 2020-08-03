@@ -37,6 +37,14 @@ const OwnerStatus = styled.div`
   color: ${({ theme }) => theme.color.gray};
 `;
 
+const InvitedMembersWrapper = styled.div`
+  ${({ resetMargin }) =>
+    resetMargin &&
+    `
+    transform: translateX(-8px);
+  `}
+`;
+
 const NoMembers = styled.div`
   position: relative;
   z-index: ${({ theme }) => theme.zIndex.basic};
@@ -107,13 +115,19 @@ export const OwnerAndInvitation = ({ itemSubject, onClickShare }) => {
           <OwnerStatus>owner</OwnerStatus>
         </Owner>
       </OwnerWrapper>
-      {hasInvited ? (
-        <AvatarsList avatars={avatars} />
-      ) : (
-        <NoMembers>
-          <Icon name="members" width={16} height={16} color="lightGray" />
-        </NoMembers>
-      )}
+      <Can I={PERMISSION.SHARE} an={itemSubject} passThrough>
+        {allowed => (
+          <InvitedMembersWrapper resetMargin={!allowed}>
+            {hasInvited ? (
+              <AvatarsList avatars={avatars} />
+            ) : (
+              <NoMembers>
+                <Icon name="members" width={16} height={16} color="lightGray" />
+              </NoMembers>
+            )}
+          </InvitedMembersWrapper>
+        )}
+      </Can>
       <Can I={PERMISSION.SHARE} an={itemSubject}>
         <ShareButton
           // disabled={!isOnline}

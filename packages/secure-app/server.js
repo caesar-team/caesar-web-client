@@ -9,6 +9,13 @@ if (require('fs').existsSync(envFile)) {
     }`,
   });
 }
+
+if(!process.env.API_URI) {
+  console.error(`Fatal: Can't find API_URI env in process.env;`);
+  console.error(`Check is ${envFile} exists;`);
+  return process.exit(1);
+}
+
 const path = require('path');
 
 const APP_URI = process.env.APP_URI || 'http://localhost';
@@ -23,6 +30,7 @@ const fastify = require('fastify')({
 });
 const fastifyStatic = require('fastify-static');
 const Next = require('next');
+const { exit } = require('process');
 
 const APP_PORT = parseInt(process.env.APP_PORT, 10) || 3000;
 const IS_DEV = process.env.NODE_ENV !== 'production';

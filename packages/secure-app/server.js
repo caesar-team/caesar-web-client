@@ -1,3 +1,11 @@
+/* eslint-disable no-param-reassign */
+/* eslint-disable no-console */
+import { exit } from 'process';
+
+import { join } from 'path';
+import fastifyStatic from 'fastify-static';
+import Next from 'next';
+
 const envFile = `.env.${
   process.env.NODE_ENV !== 'production' ? 'development' : 'production'
 }`;
@@ -10,15 +18,13 @@ if (require('fs').existsSync(envFile)) {
   });
 }
 
-if(!process.env.API_URI) {
+if (!process.env.API_URI) {
   console.error(`Fatal: Can't find API_URI env in process.env;`);
   console.error(`Check is ${envFile} exists;`);
-  return process.exit(1);
+
+  return exit(1);
 }
 
-const path = require('path');
-
-const APP_URI = process.env.APP_URI || 'http://localhost';
 const ENABLE_SERVER_LOGGER = process.env.ENABLE_SERVER_LOGGER || false;
 const LOG_LEVEL =
   process.env.LOG_LEVEL || process.env.NODE_ENV === 'production'
@@ -28,41 +34,38 @@ const fastify = require('fastify')({
   pluginTimeout: 10000 * 2,
   logger: ENABLE_SERVER_LOGGER ? { level: LOG_LEVEL } : false,
 });
-const fastifyStatic = require('fastify-static');
-const Next = require('next');
-const { exit } = require('process');
 
 const APP_PORT = parseInt(process.env.APP_PORT, 10) || 3000;
 const IS_DEV = process.env.NODE_ENV !== 'production';
 
-fastify.register((fastify, opts, next) => {
+fastify.register((fastifyApp, opts, next) => {
   const app = Next({ dev: IS_DEV });
   const handle = app.getRequestHandler();
   app
     .prepare()
     .then(() => {
       if (IS_DEV) {
-        fastify.get('/_next/*', (req, reply) => {
+        fastifyApp.get('/_next/*', (req, reply) => {
           return handle(req.req, reply.res).then(() => {
             reply.sent = true;
           });
         });
       }
 
-      fastify.get('/favicon.ico', (req, reply) => {
+      fastifyApp.get('/favicon.ico', (req, reply) => {
         reply.sendFile('images/favicon/favicon.ico'); // serving path.join(__dirname, 'public', 'myHtml.html') directly
       });
-      fastify.get('/favicon-locked.ico', (req, reply) => {
+      fastifyApp.get('/favicon-locked.ico', (req, reply) => {
         reply.sendFile('images/favicon/favicon-locked.ico'); // serving path.join(__dirname, 'public', 'myHtml.html') directly
       });
 
-      fastify.all('/*', (req, reply) => {
+      fastifyApp.all('/*', (req, reply) => {
         return handle(req.req, reply.res).then(() => {
           reply.sent = true;
         });
       });
 
-      fastify.setNotFoundHandler((request, reply) => {
+      fastifyApp.setNotFoundHandler((request, reply) => {
         return app.render404(request.req, reply.res).then(() => {
           reply.sent = true;
         });
@@ -73,7 +76,7 @@ fastify.register((fastify, opts, next) => {
     .catch(err => next(err));
 });
 fastify.register(fastifyStatic, {
-  root: path.join(__dirname, 'public'),
+  root: join(__dirname, 'public'),
   prefix: '/public/', // optional: default '/'
 });
 fastify.listen(APP_PORT, '::', (err, address) => {

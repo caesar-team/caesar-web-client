@@ -227,4 +227,3 @@ trigger:
   - develop
   - feature/*
   - hotfix/*
-  

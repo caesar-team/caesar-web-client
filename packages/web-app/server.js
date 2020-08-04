@@ -1,3 +1,6 @@
+/* eslint-disable consistent-return */
+/* eslint-disable no-console */
+/* eslint-disable consistent-return */
 const envFile = `.env.${
   process.env.NODE_ENV !== 'production' ? 'development' : 'production'
 }`;
@@ -8,6 +11,15 @@ if (require('fs').existsSync(envFile)) {
       process.env.NODE_ENV !== 'production' ? 'development' : 'production'
     }`,
   });
+} else {
+  require('dotenv').config();
+}
+
+if (!process.env.API_URI) {
+  console.error(`Fatal: Can't find API_URI env in process.env;`);
+  console.error(`Check is ${envFile} exists;`);
+
+  return process.exit(1);
 }
 
 const APP_URI = process.env.APP_URI || 'http://localhost';

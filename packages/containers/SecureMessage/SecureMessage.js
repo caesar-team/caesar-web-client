@@ -94,7 +94,7 @@ const SecureMessageContainerComponent = ({
 
   const title = decryptedMessage
     ? 'It’s your secret'
-    : 'Enter password to access';
+    : 'Enter the password to access the message';
   const shouldShowButtons = !!decryptedMessage;
   const shouldShowDownloadButton =
     decryptedMessage &&
@@ -144,9 +144,7 @@ const SecureMessageContainerComponent = ({
       <Footer>
         {shouldShowButtons && (
           <Link passHref href={DOMAIN_SECURE_ROUTE}>
-            <StyledLink>
-              Create Your Own Secure Message
-            </StyledLink>
+            <StyledLink>Create Your Own Secure Message</StyledLink>
           </Link>
         )}
       </Footer>

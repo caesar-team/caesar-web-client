@@ -455,7 +455,7 @@ export function* createItemSaga({
     const encryptedItem = yield call(
       encryptItem,
       { attachments, ...data },
-      teamId ? publicKey,
+      publicKey,
     );
 
     if (!isSystemItem) {

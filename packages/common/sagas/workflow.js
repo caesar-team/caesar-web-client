@@ -37,7 +37,6 @@ import {
 import {
   itemSelector,
   itemsByIdSelector,
-  teamSystemItemSelector,
 } from '@caesar/common/selectors/entities/item';
 import {
   workInProgressListIdSelector,

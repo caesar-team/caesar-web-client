@@ -440,6 +440,7 @@ export function* createItemSaga({
     const isSystemItem = type === ITEM_TYPE.SYSTEM;
     const keyPair = yield select(keyPairSelector);
     const user = yield select(userDataSelector);
+    let publicKey = keyPair.publicKey;
 
     if (!isSystemItem) {
       yield put(updateGlobalNotification(ENCRYPTING_ITEM_NOTIFICATION, true));
@@ -448,12 +449,13 @@ export function* createItemSaga({
     if (teamId) {
       const team = yield select(teamSelector, { teamId });
       const teamSystemItem = yield select(teamKeysSelector, { teamName: team.title });
+      publicKey = teamSystemItem.publicKey;
     }
 
     const encryptedItem = yield call(
       encryptItem,
       { attachments, ...data },
-      teamId ? teamSystemItem.publicKey : keyPair.publicKey,
+      teamId ? publicKey,
     );
 
     if (!isSystemItem) {

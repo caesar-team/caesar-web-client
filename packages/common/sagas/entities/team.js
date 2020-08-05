@@ -55,13 +55,9 @@ import {
 } from '@caesar/common/actions/user';
 import { teamSelector } from '@caesar/common/selectors/entities/team';
 import { teamItemListSelector } from '@caesar/common/selectors/entities/item';
-import {
-  personalListsSelector,
-  defaultListSelector,
-} from '@caesar/common/selectors/entities/list';
+import { defaultListSelector } from '@caesar/common/selectors/entities/list';
 import {
   currentTeamIdSelector,
-  keyPairSelector,
   userDataSelector,
   userTeamIdsSelector,
 } from '@caesar/common/selectors/user';
@@ -142,7 +138,6 @@ export function* createTeamSaga({ payload: { title, icon } }) {
     const { data } = yield call(postCreateTeam, { title, icon });
 
     const user = yield select(userDataSelector);
-    const keyPair = yield select(keyPairSelector);
     const defaultList = yield select(defaultListSelector);
     const masterPassword = yield call(passwordGenerator);
     const systemTeamEmail = yield call(generateSystemItemEmail, title);
@@ -251,7 +246,6 @@ export function* addTeamMembersBatchSaga({ payload: { teamId, members } }) {
       items: teamItemList,
       members: teamMembers,
     });
-    console.log(itemUserPairs);
 
     const invitedMemberIds = teamMembers.map(({ id }) => id);
     const invitedMembersWithCommandRole = teamMembers.map(member => ({

@@ -1,7 +1,4 @@
-import {
-  MAX_UPLOADING_FILE_SIZE,
-  TOTAL_MAX_UPLOADING_FILES_SIZES,
-} from '@caesar/common/constants';
+import { MAX_UPLOADING_FILE_SIZE } from '@caesar/common/constants';
 
 export const ERROR = {
   REQUIRED: 'This field is required',
@@ -10,7 +7,8 @@ export const ERROR = {
   MAX_LENGTH: max => `No more than ${max} characters.`,
   FILE_SIZE: (currentSize = 0, maxFileSize = MAX_UPLOADING_FILE_SIZE) =>
     `Maximum file size is ${maxFileSize}, current filesize is ${currentSize}.`,
-  FILE_SIZES: `All attachments cannot be over ${TOTAL_MAX_UPLOADING_FILES_SIZES}.`,
+  FILE_SIZES: (currentSize = 0, maxFilesSize = MAX_UPLOADING_FILE_SIZE) =>
+    `All attachments cannot be over ${maxFilesSize}, current attachment size is ${currentSize}.`,
   WEBSITE: 'Must be an url.',
   IMAGE_UPLOAD: 'Please upload an image.',
 };

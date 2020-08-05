@@ -68,10 +68,6 @@ const StyledSecureMessage = styled(SecureMessage)`
 const DashboardComponent = ({ notification }) => {
   const dispatch = useDispatch();
   const [mode, setMode] = useState(DASHBOARD_MODE.DEFAULT);
-  const [
-    startCtrlShiftSelectionItemId,
-    setStartCtrlShiftSelectionItemId,
-  ] = useState(null);
   const [searchedText, setSearchedText] = useState('');
   const [openedModal, setOpenedModal] = useState(null);
   const isLoading = useSelector(isLoadingSelector);
@@ -127,11 +123,8 @@ const DashboardComponent = ({ notification }) => {
                 <MiddleColumn
                   mode={mode}
                   searchedText={searchedText}
+                  hasOpenedModal={openedModal}
                   handleOpenModal={handleOpenModal}
-                  startCtrlShiftSelectionItemId={startCtrlShiftSelectionItemId}
-                  setStartCtrlShiftSelectionItemId={
-                    setStartCtrlShiftSelectionItemId
-                  }
                   handleCtrlSelectionItemBehaviour={
                     handleCtrlSelectionItemBehaviour
                   }

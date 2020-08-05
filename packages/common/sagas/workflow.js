@@ -1,4 +1,4 @@
-import { put, call, fork, takeLatest, select, all, delay } from 'redux-saga/effects';
+import { put, call, fork, takeLatest, select, all } from 'redux-saga/effects';
 import {
   INIT_WORKFLOW,
   UPDATE_WORK_IN_PROGRESS_ITEM,
@@ -25,8 +25,9 @@ import { sortItemsByFavorites } from '@caesar/common/utils/workflow';
 import { getLists, getTeamLists, getTeams } from '@caesar/common/api';
 import { ITEM_TYPE, TEAM_TYPE } from '@caesar/common/constants';
 import {
+  favoriteListSelector,
   trashListSelector,
-  teamsTrashListsSelector,
+  currentTeamTrashListSelector,
 } from '@caesar/common/selectors/entities/list';
 import {
   keyPairSelector,
@@ -78,7 +79,10 @@ function* initPersonal(withDecryption) {
     }
 
     const trashList = yield select(trashListSelector);
-    const favoritesList = getFavoritesList(itemsById, trashList?.id);
+    let favoritesList = yield select(favoriteListSelector);
+    if (!favoritesList?.id) {
+      favoritesList = getFavoritesList(itemsById, trashList?.id);
+    }
 
     yield put(
       addListsBatch({
@@ -128,8 +132,7 @@ function* initTeam(team, withDecryption) {
     const { listsById, itemsById, childItemsById } = convertNodesToEntities(
       lists,
     );
-
-    const trashList = yield select(teamsTrashListsSelector);
+    const trashList = yield select(currentTeamTrashListSelector);
     const favoritesList = getFavoritesList(
       itemsById,
       trashList?.id,

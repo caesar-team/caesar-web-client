@@ -117,8 +117,8 @@ export const ROUTES = {
   SIGN_UP: '/signup',
   LOGOUT: '/logout',
   RESETTING: '/resetting',
-  MESSAGE: '/message',
   SECURE: '/secure',
+  SECURE_MESSAGE: '/secure/message/[id]',
   SHARE: '/share',
   INVITE: '/invite',
   DASHBOARD: '/',
@@ -147,7 +147,7 @@ export const UNLOCKED_ROUTES = [
   ROUTES.SIGN_IN,
   ROUTES.SIGN_UP,
   ROUTES.RESETTING,
-  ROUTES.MESSAGE,
+  ROUTES.SECURE_MESSAGE,
   ROUTES.SECURE,
   ROUTES.SHARE,
   ROUTES.INVITE,
@@ -194,6 +194,7 @@ export const PERMISSION = {
   FAVORITE: 'favorite',
   TRASH: 'trash',
   RESTORE: 'restore',
+  MULTISELECT: 'multiselect',
 };
 
 export const PERMISSION_ENTITY = {
@@ -226,4 +227,8 @@ export const DOMAIN_ROLES = {
   ROLE_ADMIN,
   ROLE_READ_ONLY_USER,
   ROLE_ANONYMOUS_USER,
+};
+
+export const PERMISSION_MESSAGES = {
+  FORBIDDEN_SELECT: 'You don\'t have permissions to select the item',
 };

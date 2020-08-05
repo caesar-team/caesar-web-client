@@ -35,6 +35,7 @@ import './icon-logo-secure-message.svg?sprite';
 import './icon-mail.svg?sprite';
 import './icon-members.svg?sprite';
 import './icon-more.svg?sprite';
+import './icon-not-edit.svg?sprite';
 import './icon-pencil.svg?sprite';
 import './icon-plus.svg?sprite';
 import './icon-print.svg?sprite';

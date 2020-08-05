@@ -31,7 +31,9 @@ export const decryptItem = async (secretArmored, privateKeyObj) => {
 
 export const encryptItem = async (data, key) => {
   const encrypted = await openpgp.encrypt({
-    message: openpgp.message.fromText(JSON.stringify(data)),
+    message: openpgp.message.fromBinary(
+      openpgp.util.str_to_Uint8Array(JSON.stringify(data)),
+    ),
     publicKeys: (await openpgp.key.readArmored(key)).keys,
   });
 
@@ -45,7 +47,9 @@ export const encryptItemsBatch = async (dataSet, key) => {
 
 export const encryptByPassword = async (data, password) => {
   const encrypted = await openpgp.encrypt({
-    message: openpgp.message.fromText(JSON.stringify(data)),
+    message: openpgp.message.fromBinary(
+      openpgp.util.str_to_Uint8Array(JSON.stringify(data)),
+    ),
     passwords: [password],
   });
 

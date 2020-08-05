@@ -15,6 +15,8 @@ import {
 // import OpenPGPWorker from 'openpgp/dist/openpgp.worker';
 import OpenPGPWorker from 'worker-loader!openpgp/dist/openpgp.worker';
 import { isClient } from '@caesar/common/utils/isEnvironment';
+import { updateGlobalNotification } from '@caesar/common/actions/application';
+import { logger } from '@caesar/common/utils/logger';
 import { getBootstrapStates, getNavigationPanelSteps } from './utils';
 import {
   TWO_FACTOR_CHECK,
@@ -32,7 +34,6 @@ import {
   MasterPasswordStep,
   SharedItemsStep,
 } from './Steps';
-import { updateGlobalNotification } from '@caesar/common/actions/application';
 
 const TWO_FACTOR_STEPS = [TWO_FACTOR_CREATE, TWO_FACTOR_CHECK];
 const PASSWORD_STEPS = [PASSWORD_CHANGE];
@@ -48,7 +49,6 @@ class Bootstrap extends Component {
 
   constructor(props) {
     super(props);
-
     // we don't need initialize it in componentDidMound
     // because openpgp must be initialized before children component will be
     // initialized via componentDidMount
@@ -60,16 +60,20 @@ class Bootstrap extends Component {
   async componentDidMount() {
     this.props.initCoresCount();
 
-    const { data: bootstrap } = await getUserBootstrap();
-    const { data: user } = await getUserSelf();
+    try {
+      const { data: bootstrap } = await getUserBootstrap();
+      const { data: user } = await getUserSelf();
 
-    this.bootstrap = getBootstrapStates(bootstrap);
-    this.navigationPanelSteps = getNavigationPanelSteps(this.bootstrap);
-    this.user = user;
+      this.bootstrap = getBootstrapStates(bootstrap);
+      this.navigationPanelSteps = getNavigationPanelSteps(this.bootstrap);
+      this.user = user;
 
-    this.setState({
-      currentStep: this.currentStepResolver(bootstrap),
-    });
+      this.setState({
+        currentStep: this.currentStepResolver(bootstrap),
+      });
+    } catch (e) {
+      logger.error(`Bootstrap failure`);
+    }
   }
 
   handleFinishTwoFactor = () => {

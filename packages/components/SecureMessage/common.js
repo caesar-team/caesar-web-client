@@ -1,4 +1,4 @@
-import { APP_URI } from '@caesar/common/constants';
+import { APP_URI, IS_GENERAL_APP } from '@caesar/common/constants';
 import { objectToBase64 } from '@caesar/common/utils/base64';
 import { escapeHTML } from '@caesar/common/utils/string';
 import {
@@ -8,6 +8,9 @@ import {
   ONE_MINUTE,
   ONE_SIXTH_HOUR,
 } from './constants';
+
+export const getDefaultSecureMessageRoute = () =>
+  `${APP_URI}/${IS_GENERAL_APP ? 'secure/message' : 'message'}`;
 
 export const getSecureMessageText = (
   messageId,
@@ -37,17 +40,18 @@ export const stripHtml = html => {
   return tmp.textContent || tmp.innerText || '';
 };
 
+
 export const makePasswordlessLink = (messageId, password) => {
   const encodedObject = objectToBase64({
     messageId,
     password,
   });
 
-  return `${APP_URI}/message/${encodedObject}`;
+  return `${getDefaultSecureMessageRoute()}/${encodedObject}`;
 };
 
 export const makeMessageLink = messageId => {
-  return `${APP_URI}/message/${messageId}`;
+  return `${getDefaultSecureMessageRoute()}/${messageId}`;
 };
 
 export const getExpireDate = seconds => {

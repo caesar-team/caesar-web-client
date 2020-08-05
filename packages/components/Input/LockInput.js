@@ -62,7 +62,7 @@ class LockInput extends Component {
   onKeyDown = e => {
     const { isError, onBackspace } = this.props;
 
-    if (isError && e.keyCode === KEY_CODES.BACKSPACE) {
+    if (isError && e.keyCode === KEY_CODES.BACKSPACE && onBackspace) {
       onBackspace();
     }
   };
@@ -81,6 +81,7 @@ class LockInput extends Component {
             isError={isError}
             onKeyDown={this.onKeyDown}
             type="password"
+            autocomplete="off"
           />
           <StyledArrowIcon
             name="arrow"

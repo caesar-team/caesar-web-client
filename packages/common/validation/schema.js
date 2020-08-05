@@ -1,6 +1,11 @@
 import * as yup from 'yup';
 import { ERROR } from './constants';
-import { checkFileSize, checkAllFileSizes } from './utils';
+import {
+  checkFileSize,
+  checkAllFileSizes,
+  getSizesForFile,
+  humanizeSize,
+} from './utils';
 
 const STRING_MAX_LENGTH = 100;
 const WEBSITE_MAX_LENGTH = 2048;
@@ -9,7 +14,13 @@ const attachmentsSchema = yup
   .array(
     yup.object({
       name: yup.string().required(),
-      raw: yup.string().test('fileSize', ERROR.FILE_SIZE(), checkFileSize),
+      raw: yup
+        .string()
+        .test(
+          'fileSize',
+          file => ERROR.FILE_SIZE(humanizeSize(getSizesForFile(file), true)),
+          checkFileSize,
+        ),
     }),
   )
   .test('fileSizes', ERROR.FILE_SIZES, checkAllFileSizes);

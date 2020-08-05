@@ -13,14 +13,15 @@ import {
   sortListSuccess,
   sortListFailure,
 } from '@caesar/common/actions/entities/list';
-import { removeItemsBatch } from '@caesar/common/actions/entities/item';
-import { removeChildItemsBatch } from '@caesar/common/actions/entities/childItem';
 import { updateGlobalNotification } from '@caesar/common/actions/application';
 import {
   listSelector,
   personalListsByTypeSelector,
+  currentTeamListsSelector,
+  currentTeamTrashListSelector,
+  trashListSelector,
 } from '@caesar/common/selectors/entities/list';
-import { itemsBatchSelector } from '@caesar/common/selectors/entities/item';
+import { moveItemsBatchSaga } from '@caesar/common/sagas/entities/item';
 import {
   postCreateList,
   patchList,
@@ -42,6 +43,32 @@ const reorder = (list, startIndex, endIndex) => {
 };
 
 const fixSort = lists => lists.map((list, index) => ({ ...list, sort: index }));
+
+export function* sortListSaga({
+  payload: { listId, sourceIndex, destinationIndex },
+}) {
+  try {
+    const personalListsByType = yield select(personalListsByTypeSelector);
+    const currentTeamLists = yield select(currentTeamListsSelector);
+    const lists = personalListsByType.list.length
+      ? personalListsByType.list
+      : currentTeamLists.list;
+
+    yield put(
+      sortListSuccess(
+        fixSort(reorder(lists, sourceIndex, destinationIndex)).reduce(
+          (acc, list) => ({ ...acc, [list.id]: list }),
+          {},
+        ),
+      ),
+    );
+
+    yield call(patchListSort, listId, { sort: destinationIndex });
+  } catch (error) {
+    console.log(error);
+    yield put(sortListFailure());
+  }
+}
 
 export function* createListSaga({
   payload: { list },
@@ -65,12 +92,31 @@ export function* createListSaga({
         type: LIST_TYPE.LIST,
         children: [],
         sort: 0,
-        parentId: null,
         __type: ENTITY_TYPE.LIST,
         _links,
         ...list,
       }),
     );
+
+    const personalListsByType = yield select(personalListsByTypeSelector);
+    const currentTeamLists = yield select(currentTeamListsSelector);
+    const lists = personalListsByType.list.length
+      ? personalListsByType.list
+      : currentTeamLists.list;
+
+    const firstListInOrder = lists.find(
+      ({ id, sort }) => sort === 0 && id !== listId,
+    );
+
+    if (firstListInOrder) {
+      yield call(sortListSaga, {
+        payload: {
+          listId: firstListInOrder.id,
+          sourceIndex: 0,
+          destinationIndex: 1,
+        },
+      });
+    }
   } catch (error) {
     yield put(createListFailure());
     yield put(
@@ -84,9 +130,11 @@ export function* editListSaga({
   meta: { notification, setEditMode },
 }) {
   try {
-    list.teamId
-      ? yield call(patchTeamList, list.teamId, list.id, { label: list.label })
-      : yield call(patchList, list.id, { label: list.label });
+    if (list.teamId) {
+      yield call(patchTeamList, list.teamId, list.id, { label: list.label });
+    } else {
+      yield call(patchList, list.id, { label: list.label });
+    }
 
     yield call(setEditMode, false);
     yield put(editListSuccess(list));
@@ -101,47 +149,31 @@ export function* editListSaga({
 
 export function* removeListSaga({ payload: { teamId, listId } }) {
   try {
-    teamId
-      ? yield call(removeTeamList, teamId, listId)
-      : yield call(removeList, listId);
-
     const list = yield select(listSelector, { listId });
     const listItemIds = list.children;
-    const listItems = yield select(itemsBatchSelector, {
-      itemIds: listItemIds,
-    });
-    const childItemIds = listItems.reduce(
-      (accumulator, item) => [...accumulator, ...item.invited],
-      [],
-    );
 
-    yield put(removeChildItemsBatch(childItemIds));
-    yield put(removeItemsBatch(listItemIds));
+    const trashList = teamId
+      ? yield select(currentTeamTrashListSelector)
+      : yield select(trashListSelector);
+
+    yield call(moveItemsBatchSaga, {
+      payload: {
+        itemIds: listItemIds,
+        teamId: teamId || null,
+        listId: trashList?.id,
+      },
+    });
+
+    if (teamId) {
+      yield call(removeTeamList, teamId, listId);
+    } else {
+      yield call(removeList, listId);
+    }
+
     yield put(removeListSuccess(listId));
   } catch (error) {
     console.log(error);
     yield put(removeListFailure());
-  }
-}
-
-export function* sortListSaga({
-  payload: { listId, sourceIndex, destinationIndex },
-}) {
-  try {
-    const personalListsByType = yield select(personalListsByTypeSelector);
-
-    yield put(
-      sortListSuccess(
-        fixSort(
-          reorder(personalListsByType?.list, sourceIndex, destinationIndex),
-        ).reduce((acc, list) => ({ ...acc, [list.id]: list }), {}),
-      ),
-    );
-
-    yield call(patchListSort, listId, { sort: destinationIndex });
-  } catch (error) {
-    console.log(error);
-    yield put(sortListFailure());
   }
 }
 

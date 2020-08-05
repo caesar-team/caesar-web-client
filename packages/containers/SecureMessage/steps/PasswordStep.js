@@ -2,6 +2,7 @@ import React from 'react';
 import { useFormik } from 'formik';
 import { LockInput } from '@caesar/components';
 import { decryptByPassword } from '@caesar/common/utils/cipherUtils';
+import { logger } from '@caesar/common/utils/logger';
 import { schema } from '../schema';
 
 export const PasswordStep = ({ message, password, setDecryptedMessage }) => {
@@ -14,10 +15,10 @@ export const PasswordStep = ({ message, password, setDecryptedMessage }) => {
         message,
         messagePassword,
       );
-      setDecryptedMessage(decryptedMessage);
       setSubmitting(false);
+      setDecryptedMessage(decryptedMessage);
     } catch (error) {
-      console.log('error: ', error);
+      logger.error('error: ', error);
       setErrors({
         password: 'Sorry, but the password is wrong :(',
       });
@@ -31,7 +32,7 @@ export const PasswordStep = ({ message, password, setDecryptedMessage }) => {
     handleChange,
     handleSubmit,
     submitForm,
-    resetForm,
+    setErrors,
   } = useFormik({
     initialValues: { messagePassword: password },
     validationSchema: schema,
@@ -45,9 +46,11 @@ export const PasswordStep = ({ message, password, setDecryptedMessage }) => {
         autoFocus
         name="messagePassword"
         value={values.messagePassword}
-        onChange={handleChange}
+        onChange={e => {
+          if (Object.keys(errors).length) setErrors({});
+          handleChange(e);
+        }}
         onClick={submitForm}
-        onBackspace={resetForm}
         isError={Object.keys(errors).length !== 0}
       />
     </form>

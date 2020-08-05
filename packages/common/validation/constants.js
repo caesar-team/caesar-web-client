@@ -1,7 +1,4 @@
-import {
-  MAX_UPLOADING_FILE_SIZE,
-  TOTAL_MAX_UPLOADING_FILES_SIZES,
-} from '@caesar/common/constants';
+import { MAX_UPLOADING_FILE_SIZE } from '@caesar/common/constants';
 
 export const ERROR = {
   REQUIRED: 'This field is required',

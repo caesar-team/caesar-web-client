@@ -56,7 +56,8 @@ import {
 import { teamSelector } from '@caesar/common/selectors/entities/team';
 import { teamItemListSelector } from '@caesar/common/selectors/entities/item';
 import {
-  personalDefaultListSelector,
+  personalListsSelector,
+  defaultListSelector,
 } from '@caesar/common/selectors/entities/list';
 import {
   currentTeamIdSelector,
@@ -90,7 +91,11 @@ import { createChildItemsFilterSelector } from '@caesar/common/selectors/entitie
 import { updateGlobalNotification } from '@caesar/common/actions/application';
 import { generateKeys } from '@caesar/common/utils/key';
 import { passwordGenerator } from '@caesar/common/utils/passwordGenerator';
-import { getDomainName } from '@caesar/common/utils/getDomainName';
+import {
+  generateSystemItemEmail,
+  generateSystemItemName,
+} from '@caesar/common/utils/item';
+import { teamKeysSelector } from '../../selectors/keyStore';
 
 export function* fetchTeamsSaga() {
   try {
@@ -138,11 +143,15 @@ export function* createTeamSaga({ payload: { title, icon } }) {
 
     const user = yield select(userDataSelector);
     const keyPair = yield select(keyPairSelector);
-    const defaultList = yield select(personalDefaultListSelector);
+    const defaultList = yield select(defaultListSelector);
     const masterPassword = yield call(passwordGenerator);
-    const teamEmail = `team.${title}@caesar.team`;
-    const generatedKeys = yield call(generateKeys, masterPassword, [teamEmail]);
-console.log(generatedKeys);
+    const systemTeamEmail = yield call(generateSystemItemEmail, title);
+
+    const {
+      publicKey,
+      privateKey,
+    } = yield call(generateKeys, masterPassword, [systemTeamEmail]);
+
     yield put(createTeamSuccess({ ...data, __type: ENTITY_TYPE.TEAM }));
     yield put(addTeamToMember(data.id, user.id));
     yield put(addTeamMember(data.id, user.id, COMMANDS_ROLES.USER_ROLE_ADMIN));
@@ -154,19 +163,18 @@ console.log(generatedKeys);
       attachments: [
         {
           name: 'publicKey',
-          raw: generatedKeys.publicKey,
+          raw: publicKey,
         },
         {
           name: 'privateKey',
-          raw: generatedKeys.privateKey,
+          raw: privateKey,
         },
       ],
       pass: masterPassword,
-      name: `team.${title}`,
+      name: generateSystemItemName(title),
     };
-    console.log(systemItemData);
 
-    yield put(createItemRequest(systemItemData, {}))
+    yield put(createItemRequest(systemItemData));
   } catch (error) {
     console.log(error);
     yield put(
@@ -235,11 +243,15 @@ export function* addTeamMembersBatchSaga({ payload: { teamId, members } }) {
     }
 
     const teamItemList = yield select(teamItemListSelector, { teamId });
-
+    const team = yield select(teamSelector, { teamId });
+    const teamSystemItem = yield select(teamKeysSelector, { teamName: team.title });
+console.log(teamSystemItem);
+    teamItemList.push(teamSystemItem.raw);
     const itemUserPairs = yield call(getItemUserPairs, {
       items: teamItemList,
       members: teamMembers,
     });
+    console.log(itemUserPairs);
 
     const invitedMemberIds = teamMembers.map(({ id }) => id);
     const invitedMembersWithCommandRole = teamMembers.map(member => ({

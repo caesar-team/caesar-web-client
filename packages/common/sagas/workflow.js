@@ -1,7 +1,8 @@
-import { put, call, fork, takeLatest, select, all } from 'redux-saga/effects';
+import { put, call, fork, takeLatest, select, all, delay } from 'redux-saga/effects';
 import {
   INIT_WORKFLOW,
   UPDATE_WORK_IN_PROGRESS_ITEM,
+  DECRYPTION_END,
   finishIsLoading,
   setWorkInProgressListId,
   setWorkInProgressItem,
@@ -15,13 +16,14 @@ import {
   SET_CURRENT_TEAM_ID,
   setCurrentTeamId,
 } from '@caesar/common/actions/user';
+import { addTeamsKeyPair } from '@caesar/common/actions/keyStore';
 import { addChildItemsBatch } from '@caesar/common/actions/entities/childItem';
 import { fetchMembersSaga } from '@caesar/common/sagas/entities/member';
 import { convertNodesToEntities } from '@caesar/common/normalizers/normalizers';
 import { objectToArray } from '@caesar/common/utils/utils';
 import { sortItemsByFavorites } from '@caesar/common/utils/workflow';
 import { getLists, getTeamLists, getTeams } from '@caesar/common/api';
-import { TEAM_TYPE } from '@caesar/common/constants';
+import { ITEM_TYPE, TEAM_TYPE } from '@caesar/common/constants';
 import {
   trashListSelector,
   teamsTrashListsSelector,
@@ -31,11 +33,16 @@ import {
   masterPasswordSelector,
   currentTeamIdSelector,
 } from '@caesar/common/selectors/user';
-import { itemSelector } from '@caesar/common/selectors/entities/item';
+import {
+  itemSelector,
+  itemsByIdSelector,
+  teamSystemItemSelector,
+} from '@caesar/common/selectors/entities/item';
 import {
   workInProgressListIdSelector,
   workInProgressItemSelector,
 } from '@caesar/common/selectors/workflow';
+import { teamKeysSelector } from '@caesar/common/selectors/keyStore';
 import { getFavoritesList } from '@caesar/common/normalizers/utils';
 import { fetchTeamSuccess } from '@caesar/common/actions/entities/team';
 import { getServerErrorMessage } from '@caesar/common/utils/error';
@@ -121,6 +128,7 @@ function* initTeam(team, withDecryption) {
     const { listsById, itemsById, childItemsById } = convertNodesToEntities(
       lists,
     );
+
     const trashList = yield select(teamsTrashListsSelector);
     const favoritesList = getFavoritesList(
       itemsById,
@@ -153,19 +161,31 @@ function* initTeam(team, withDecryption) {
 
     yield put(resetWorkInProgressItemIds(null));
 
+    const teamSystemItem = yield select(teamKeysSelector, { teamName: team.title });
+
     if (currentTeamId === team.id && withDecryption) {
       const keyPair = yield select(keyPairSelector);
       const masterPassword = yield select(masterPasswordSelector);
       const items = objectToArray(itemsById);
 
       if (items && items.length > 0) {
-        yield put(
-          decryption({
-            items,
-            key: keyPair.privateKey,
-            masterPassword,
-          }),
-        );
+        if (teamSystemItem) {
+          yield put(
+            decryption({
+              items,
+              key: teamSystemItem.privateKey,
+              masterPassword: teamSystemItem.pass,
+            }),
+          );
+        } else {
+          yield put(
+            decryption({
+              items,
+              key: keyPair.privateKey,
+              masterPassword,
+            }),
+          );
+        }
       }
     } else {
       yield put(addItemsBatch(itemsById));
@@ -241,8 +261,27 @@ export function* setCurrentTeamIdWatchSaga() {
   }
 }
 
+export function* decryptionEndWatchSaga() {
+  try {
+    const items = yield select(itemsByIdSelector);
+
+    const systemItems =
+      Object
+        .values(items)
+        .filter(({ type }) => type === ITEM_TYPE.SYSTEM);
+
+    if (systemItems.length > 0) {
+      yield put(addTeamsKeyPair(systemItems));
+    }
+
+  } catch(error) {
+    console.log(error);
+  }
+}
+
 export default function* workflowSagas() {
   yield takeLatest(INIT_WORKFLOW, initWorkflow);
   yield takeLatest(UPDATE_WORK_IN_PROGRESS_ITEM, updateWorkInProgressItemSaga);
   yield takeLatest(SET_CURRENT_TEAM_ID, setCurrentTeamIdWatchSaga);
+  yield takeLatest(DECRYPTION_END, decryptionEndWatchSaga);
 }

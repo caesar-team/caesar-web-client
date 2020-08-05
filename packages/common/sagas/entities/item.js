@@ -110,6 +110,7 @@ import {
   teamSelector,
   teamsMembersSelector,
 } from '@caesar/common/selectors/entities/team';
+import { addTeamsKeyPair } from '@caesar/common/actions/keyStore';
 import {
   acceptUpdateItem,
   patchChildItem,
@@ -148,9 +149,11 @@ import {
   NOOP_NOTIFICATION,
   ROUTES,
   TEAM_TYPE,
+  ITEM_TYPE,
 } from '@caesar/common/constants';
 import { generateSharingUrl } from '@caesar/common/utils/sharing';
 import { createMemberSaga } from './member';
+import { teamKeysSelector } from '../../selectors/keyStore';
 
 const ITEMS_CHUNK_SIZE = 50;
 
@@ -420,23 +423,32 @@ export function* moveItemsBatchSaga({ payload: { itemIds, teamId, listId } }) {
 
 export function* createItemSaga({
   payload: { item },
-  meta: { setSubmitting },
+  meta: { setSubmitting = Function.prototype },
 }) {
   try {
-    yield put(updateGlobalNotification(ENCRYPTING_ITEM_NOTIFICATION, true));
-
     const { teamId, listId, attachments, type, ...data } = item;
-
+    const isSystemItem = type === ITEM_TYPE.SYSTEM;
     const keyPair = yield select(keyPairSelector);
     const user = yield select(userDataSelector);
+
+    if (!isSystemItem) {
+      yield put(updateGlobalNotification(ENCRYPTING_ITEM_NOTIFICATION, true));
+    }
+
+    if (teamId) {
+      const team = yield select(teamSelector, { teamId });
+      const teamSystemItem = yield select(teamKeysSelector, { teamName: team.title });
+    }
 
     const encryptedItem = yield call(
       encryptItem,
       { attachments, ...data },
-      keyPair.publicKey,
+      teamId ? teamSystemItem.publicKey : keyPair.publicKey,
     );
 
-    yield put(updateGlobalNotification(CREATING_ITEM_NOTIFICATION, true));
+    if (!isSystemItem) {
+      yield put(updateGlobalNotification(CREATING_ITEM_NOTIFICATION, true));
+    }
 
     const {
       data: { id: itemId, lastUpdated, _links },
@@ -474,7 +486,7 @@ export function* createItemSaga({
       yield put(addItemToList(newItem));
     }
 
-    if (teamId) {
+    if (teamId && !isSystemItem) {
       yield put(
         updateGlobalNotification(SHARING_IN_PROGRESS_NOTIFICATION, true),
       );
@@ -517,8 +529,13 @@ export function* createItemSaga({
     }
 
     yield put(setCurrentTeamId(teamId || TEAM_TYPE.PERSONAL));
-    yield put(setWorkInProgressListId(listId));
-    yield put(setWorkInProgressItem(newItem));
+
+    if (isSystemItem) {
+      yield put(addTeamsKeyPair([newItem]));
+    } else {
+      yield put(setWorkInProgressListId(listId));
+      yield put(setWorkInProgressItem(newItem));
+    }
 
     yield call(Router.push, ROUTES.DASHBOARD);
   } catch (error) {

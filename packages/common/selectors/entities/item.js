@@ -1,5 +1,7 @@
 import { createSelector } from 'reselect';
 import { childItemsByIdSelector } from '@caesar/common/selectors/entities/childItem';
+import { currentTeamSelector } from '@caesar/common/selectors/user';
+import { ITEM_TYPE } from '@caesar/common/constants';
 
 export const entitiesSelector = state => state.entities;
 
@@ -63,4 +65,11 @@ export const itemsChildItemsBatchSelector = createSelector(
       ];
     }, []);
   },
+);
+
+export const teamSystemItemSelector = createSelector(
+  itemsByIdSelector,
+  currentTeamSelector,
+  (items, currentTeam) => items.find(({ type, name }) =>
+    type === ITEM_TYPE.SYSTEM && name === `team.${currentTeam.name}`) || {},
 );

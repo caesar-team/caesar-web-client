@@ -95,7 +95,7 @@ import {
   generateSystemItemEmail,
   generateSystemItemName,
 } from '@caesar/common/utils/item';
-import { teamKeysSelector } from '../../selectors/keyStore';
+import { teamKeysSelector } from '@caesar/common/selectors/keyStore';
 
 export function* fetchTeamsSaga() {
   try {
@@ -245,7 +245,7 @@ export function* addTeamMembersBatchSaga({ payload: { teamId, members } }) {
     const teamItemList = yield select(teamItemListSelector, { teamId });
     const team = yield select(teamSelector, { teamId });
     const teamSystemItem = yield select(teamKeysSelector, { teamName: team.title });
-console.log(teamSystemItem);
+
     teamItemList.push(teamSystemItem.raw);
     const itemUserPairs = yield call(getItemUserPairs, {
       items: teamItemList,

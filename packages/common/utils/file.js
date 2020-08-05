@@ -1,7 +1,7 @@
 import { saveAs } from 'file-saver';
 import JSZip from 'jszip';
 
-export function fileToBase64(file) {
+export const fileToBase64 = file => {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
 
@@ -10,19 +10,19 @@ export function fileToBase64(file) {
     reader.onload = () => resolve(reader.result);
     reader.onerror = error => reject(error);
   });
-}
+};
 
-export function filesToBase64(files) {
+export const filesToBase64 = files => {
   const promises = files.map(fileToBase64);
 
   return Promise.all(promises);
-}
+};
 
-export function base64toBlob(
+export const base64toBlob = (
   b64Data,
   mime = 'application/octet-stream',
   sliceSize = 512,
-) {
+) => {
   const byteCharacters = atob(b64Data);
   const byteArrays = [];
 
@@ -40,36 +40,36 @@ export function base64toBlob(
   }
 
   return new Blob(byteArrays, { type: mime });
-}
+};
 
-export function parseBase64(url) {
+export const parseBase64 = url => {
   const [mime, data] = url.split(',');
 
   return {
     data,
     mime: mime.match(/:(.*?);/)[1],
   };
-}
+};
 
-export function downloadFile(url, filename) {
+export const downloadFile = (url, filename) => {
   const { data, mime } = parseBase64(url);
   const blob = base64toBlob(data, mime);
 
-  saveAs(blob, filename);
-}
+  saveAs(blob, decodeURIComponent(filename));
+};
 
-export function downloadAsZip(files) {
+export const downloadAsZip = files => {
   const zip = new JSZip();
 
   files.forEach(({ name, raw }) => {
     const { data } = parseBase64(raw);
-    zip.file(name, data, { base64: true });
+    zip.file(decodeURIComponent(name), data, { base64: true });
   });
 
   zip
     .generateAsync({ type: 'blob' })
     .then(blob => saveAs(blob, `attachments${Date.now()}.zip`));
-}
+};
 
 export const splitFilesToUniqAndDuplicates = files => {
   const uniqFiles = [];
@@ -90,4 +90,16 @@ export const splitFilesToUniqAndDuplicates = files => {
   }
 
   return { uniqFiles, duplicatedFiles };
+};
+
+export const extactExtFromFilename = fname => {
+  const extPosition = fname.lastIndexOf('.');
+
+  return fname.substr(extPosition + 1);
+};
+
+export const getFilenameWithoutExt = fname => {
+  const extPosition = fname.lastIndexOf('.');
+
+  return fname.substring(0, extPosition);
 };

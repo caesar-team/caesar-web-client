@@ -80,7 +80,7 @@ const Uploader = ({
   const handleDrop = async acceptedFiles => {
     const previews = await filesToBase64(acceptedFiles);
     const files = acceptedFiles.map(({ name: fileName }, index) => ({
-      name: fileName,
+      name: encodeURIComponent(fileName),
       raw: previews[index],
     }));
 
@@ -124,8 +124,10 @@ const Uploader = ({
                 height={16}
                 isDragActive={isDragActive}
               />
-              <Link>Upload File</Link>
-              {!isWideMobile && !isMobile && ' or drag and drop your file here'}
+              <Link>Upload files</Link>
+              {!isWideMobile &&
+                !isMobile &&
+                ' or drag and drop your files here'}
             </Text>
             <HintText>{hintText}</HintText>
             {error && <Error>{error}</Error>}

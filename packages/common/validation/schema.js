@@ -3,8 +3,9 @@ import { ERROR } from './constants';
 import {
   checkFileSize,
   checkAllFileSizes,
-  getSizesForFile,
+  getRealFileSizeForBase64enc,
   humanizeSize,
+  getRealFileSizesForBase64enc,
 } from './utils';
 
 const STRING_MAX_LENGTH = 100;
@@ -14,16 +15,29 @@ const attachmentsSchema = yup
   .array(
     yup.object({
       name: yup.string().required(),
-      raw: yup
-        .string()
-        .test(
-          'fileSize',
-          file => ERROR.FILE_SIZE(humanizeSize(getSizesForFile(file), true)),
-          checkFileSize,
-        ),
+      raw: yup.string().test(
+        'fileSize',
+        file => {
+          return ERROR.FILE_SIZE(
+            humanizeSize(
+              file.value ? getRealFileSizeForBase64enc(file.value.length) : 0,
+              true,
+            ),
+          );
+        },
+        checkFileSize,
+      ),
     }),
   )
-  .test('fileSizes', ERROR.FILE_SIZES, checkAllFileSizes);
+  .test(
+    'fileSizes',
+    raw => {
+      return ERROR.FILE_SIZE(
+        humanizeSize(getRealFileSizesForBase64enc(raw.value), true),
+      );
+    },
+    checkAllFileSizes,
+  );
 
 export const SCHEMA = {
   REQUIRED_FIELD: yup.string().required(ERROR.REQUIRED),

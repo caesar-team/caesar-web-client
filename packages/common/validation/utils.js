@@ -19,24 +19,33 @@ export const checkFileSize = raw =>
   raw.length * BASE_64_LENGTH_BYTE_RATE <=
   convertSizeNameToNumber(MAX_UPLOADING_FILE_SIZE);
 
-export const getSizesForFile = file => {
-  return file ? file.value.length * BASE_64_LENGTH_BYTE_RATE : 0;
+export const isBase64Encoded = dataString => {
+  return dataString.indexOf(';base64') !== -1;
 };
 
-export const getSizesForFiles = files => {
+export const getRealFileSizeForBase64enc = length => {
+  return length ? length * BASE_64_LENGTH_BYTE_RATE : 0;
+};
+
+export const getRealFileSizesForBase64enc = files => {
   return files
-    ? files.reduce((acc, { raw }) => acc + raw.length, 0) *
-        BASE_64_LENGTH_BYTE_RATE
+    ? files.reduce((acc, { raw }) => {
+        if (isBase64Encoded(raw.substr(0, 50))) {
+          return acc + raw.length;
+        }
+
+        return acc + getRealFileSizeForBase64enc(raw.length);
+      }, 0)
     : 0;
 };
 
 export const checkAllFileSizes = files =>
   files
-    ? getSizesForFiles(files) <=
+    ? getRealFileSizesForBase64enc(files) <=
       convertSizeNameToNumber(TOTAL_MAX_UPLOADING_FILES_SIZES)
     : true;
 
-export const humanizeSize = (bytes, si = false, dp = 1) => {
+export const humanizeSize = (bytes, si = true, dp = 1) => {
   const thresh = si ? 1000 : 1024;
 
   if (Math.abs(bytes) < thresh) {

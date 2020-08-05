@@ -1,11 +1,11 @@
 /* eslint-disable consistent-return */
 /* eslint-disable no-param-reassign */
 /* eslint-disable no-console */
-import { exit } from 'process';
 
-import { join } from 'path';
-import fastifyStatic from 'fastify-static';
-import Next from 'next';
+const exit = require('process');
+const path = require('path');
+const fastifyStatic = require('fastify-static');
+const Next = require('next');
 
 const envFile = `.env.${
   process.env.NODE_ENV !== 'production' ? 'development' : 'production'
@@ -77,7 +77,7 @@ fastify.register((fastifyApp, opts, next) => {
     .catch(err => next(err));
 });
 fastify.register(fastifyStatic, {
-  root: join(__dirname, 'public'),
+  root: path.join(__dirname, 'public'),
   prefix: '/public/', // optional: default '/'
 });
 fastify.listen(APP_PORT, '::', (err, address) => {

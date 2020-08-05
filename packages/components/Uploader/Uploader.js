@@ -1,7 +1,10 @@
 import React from 'react';
 import styled from 'styled-components';
 import Dropzone from 'react-dropzone';
-import { filesToBase64 } from '@caesar/common/utils/file';
+import {
+  filesToBase64,
+  splitFilesToUniqAndDuplicates,
+} from '@caesar/common/utils/file';
 import { useMedia } from '@caesar/common/hooks';
 import { TOTAL_MAX_UPLOADING_FILES_SIZES } from '@caesar/common/constants';
 import { Icon } from '../Icon';
@@ -53,27 +56,6 @@ const Error = styled.div`
   color: ${({ theme }) => theme.color.red};
 `;
 
-const splitFilesToUniqAndDuplicates = files => {
-  const uniqFiles = [];
-  const duplicatedFiles = [];
-
-  const map = new Map();
-
-  // eslint-disable-next-line no-restricted-syntax
-  for (const file of files) {
-    const checkLabel = `${file.name}_${file.raw.length}`;
-
-    if (!map.has(checkLabel)) {
-      map.set(checkLabel, true);
-      uniqFiles.push(file);
-    } else {
-      duplicatedFiles.push(file);
-    }
-  }
-
-  return { uniqFiles, duplicatedFiles };
-};
-
 const getNotificationText = files =>
   files.length > 1
     ? `${files.map(({ name }) => name).join(', ')} have already added`
@@ -124,9 +106,9 @@ const Uploader = ({
       onDrop={handleDrop}
       {...props}
     >
-      {({ getRootProps, getInputProps, isDragActive }) =>
+      {({ getRootProps, getInputProps, isDragActive, rejectedFiles }) =>
         children ? (
-          children({ getRootProps, getInputProps, isDragActive })
+          children({ getRootProps, getInputProps, isDragActive, rejectedFiles })
         ) : (
           <Container
             {...getRootProps()}

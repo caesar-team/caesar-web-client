@@ -46,14 +46,15 @@ export const LIST_TYPE = {
   FAVORITES: 'favorites',
 };
 
-export const LIST_TYPES_ARRAY = [
+export const DEFAULT_LIST_TYPES_ARRAY = [
   LIST_TYPE.ROOT,
   LIST_TYPE.INBOX,
-  LIST_TYPE.LIST,
   LIST_TYPE.TRASH,
   LIST_TYPE.DEFAULT,
   LIST_TYPE.FAVORITES,
 ];
+
+export const LIST_TYPES_ARRAY = [...DEFAULT_LIST_TYPES_ARRAY, LIST_TYPE.LIST];
 
 export const TEAM_TYPE = {
   DEFAULT: 'default',
@@ -69,12 +70,6 @@ export const DASHBOARD_MODE = {
   DEFAULT: 'DEFAULT_MODE',
   SEARCH: 'SEARCH_MODE',
   TOOL: 'SECURE_MESSAGE_MODE',
-};
-
-export const ITEM_MODE = {
-  REVIEW: 'review',
-  WORKFLOW_EDIT: 'edit',
-  WORKFLOW_CREATE: 'create',
 };
 
 // mb some types are not included here, don't have enough information
@@ -121,21 +116,29 @@ export const ROUTES = {
   SIGN_UP: '/signup',
   LOGOUT: '/logout',
   RESETTING: '/resetting',
-  MESSAGE: '/message',
   SECURE: '/secure',
+  SECURE_MESSAGE: '/secure/message/[id]',
   SHARE: '/share',
   INVITE: '/invite',
   DASHBOARD: '/',
   SETTINGS: '/settings',
   IMPORT: '/import',
   TEAM: '/team',
+  CREATE: '/create',
 };
+
+export const DOMAIN_SECURE_ROUTE = IS_SECURE_APP ? ROUTES.MAIN : ROUTES.SECURE;
 
 export const SHARED_ROUTES = [ROUTES.SHARE, ROUTES.INVITE];
 
 // require bootstrap
 // TODO: figure out better naming
-export const LOCKED_ROUTES = [ROUTES.DASHBOARD, ROUTES.IMPORT, ROUTES.TEAM];
+export const LOCKED_ROUTES = [
+  ROUTES.DASHBOARD,
+  ROUTES.IMPORT,
+  ROUTES.TEAM,
+  ROUTES.CREATE,
+];
 
 // don't require bootstrap routes
 // TODO: figure out better naming
@@ -143,21 +146,24 @@ export const UNLOCKED_ROUTES = [
   ROUTES.SIGN_IN,
   ROUTES.SIGN_UP,
   ROUTES.RESETTING,
-  ROUTES.MESSAGE,
+  ROUTES.SECURE_MESSAGE,
   ROUTES.SECURE,
   ROUTES.SHARE,
   ROUTES.INVITE,
 ];
 
+export const TECH_ROUTES = [ROUTES.LOGOUT];
+
 export const ENTITY_TYPE = {
-  CHILD_ITEM: 'ChildItem',
-  ITEM: 'Item',
-  LIST: 'List',
-  TEAM: 'Team',
-  MEMBER: 'Member',
+  CHILD_ITEM: 'childItem',
+  ITEM: 'item',
+  LIST: 'list',
+  TEAM: 'team',
+  MEMBER: 'member',
 };
 
 export const ENCRYPTING_ITEM_NOTIFICATION = 'Encryption in progress...';
+export const DECRYPTING_ITEM_NOTIFICATION = 'Decryption in progress...';
 export const VERIFICATION_IN_PROGRESS_NOTIFICATION =
   'Verification in progress...';
 export const CREATING_ITEM_NOTIFICATION = 'The item is being created...';
@@ -169,6 +175,35 @@ export const REMOVING_IN_PROGRESS_NOTIFICATION = 'Removing in progress...';
 export const REDIRECT_NOTIFICATION = 'Redirecting...';
 export const SAVE_NOTIFICATION = 'Saving...';
 export const NOOP_NOTIFICATION = '';
+
+export const UUID_REGEXP = /\b[0-9a-f]{8}\b-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-\b[0-9a-f]{12}\b/;
+
+export const TEAM_AVATAR_MAX_SIZE = 8 * 1024 * 1024;
+
+export const DEFAULT_ERROR_MESSAGE = 'Something wrong. Please try again';
+
+export const PERMISSION = {
+  CREATE: 'create',
+  ADD: 'add',
+  EDIT: 'edit',
+  DELETE: 'delete',
+  SORT: 'sort',
+  MOVE: 'move',
+  SHARE: 'share',
+  FAVORITE: 'favorite',
+  TRASH: 'trash',
+  RESTORE: 'restore',
+  MULTISELECT: 'multiselect',
+};
+
+export const PERMISSION_ENTITY = {
+  TEAM: 'team',
+  TEAM_MEMBER: 'team_member',
+  LIST: 'list',
+  TEAM_LIST: 'team_list',
+  ITEM: 'item',
+  TEAM_ITEM: 'team_item',
+};
 
 export const PERMISSION_READ = 'read';
 export const PERMISSION_WRITE = 'write';
@@ -193,32 +228,6 @@ export const DOMAIN_ROLES = {
   ROLE_ANONYMOUS_USER,
 };
 
-// casl permissions
-export const CRUD_PERMISSION = 'crud';
-export const CREATE_PERMISSION = 'create';
-export const READ_PERMISSION = 'read';
-export const UPDATE_PERMISSION = 'update';
-export const DELETE_PERMISSION = 'delete';
-
-// custom permissions
-export const CHANGE_TEAM_MEMBER_ROLE_PERMISSION = 'changeRole';
-export const JOIN_MEMBER_TO_TEAM = 'joinMember';
-export const LEAVE_MEMBER_FROM_TEAM = 'leaveMember';
-export const MOVE_ITEM_PERMISSION = 'moveItem';
-export const SHARE_ITEM_PERMISSION = 'share';
-
-export const PERMISSIONS = {
-  CRUD_PERMISSION,
-  CREATE_PERMISSION,
-  READ_PERMISSION,
-  UPDATE_PERMISSION,
-  DELETE_PERMISSION,
-
-  CHANGE_TEAM_MEMBER_ROLE_PERMISSION,
-  MOVE_ITEM_PERMISSION,
-  JOIN_MEMBER_TO_TEAM,
-  LEAVE_MEMBER_FROM_TEAM,
-  SHARE_ITEM_PERMISSION,
+export const PERMISSION_MESSAGES = {
+  FORBIDDEN_SELECT: 'You don\'t have permissions to select the item',
 };
-
-export const UUID_REGEXP = /\b[0-9a-f]{8}\b-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-\b[0-9a-f]{12}\b/;

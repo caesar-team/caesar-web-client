@@ -15,6 +15,8 @@ import {
 // import OpenPGPWorker from 'openpgp/dist/openpgp.worker';
 import OpenPGPWorker from 'worker-loader!openpgp/dist/openpgp.worker';
 import { isClient } from '@caesar/common/utils/isEnvironment';
+import { updateGlobalNotification } from '@caesar/common/actions/application';
+import { logger } from '@caesar/common/utils/logger';
 import { getBootstrapStates, getNavigationPanelSteps } from './utils';
 import {
   TWO_FACTOR_CHECK,
@@ -47,7 +49,6 @@ class Bootstrap extends Component {
 
   constructor(props) {
     super(props);
-
     // we don't need initialize it in componentDidMound
     // because openpgp must be initialized before children component will be
     // initialized via componentDidMount
@@ -59,16 +60,20 @@ class Bootstrap extends Component {
   async componentDidMount() {
     this.props.initCoresCount();
 
-    const { data: bootstrap } = await getUserBootstrap();
-    const { data: user } = await getUserSelf();
+    try {
+      const { data: bootstrap } = await getUserBootstrap();
+      const { data: user } = await getUserSelf();
 
-    this.bootstrap = getBootstrapStates(bootstrap);
-    this.navigationPanelSteps = getNavigationPanelSteps(this.bootstrap);
-    this.user = user;
+      this.bootstrap = getBootstrapStates(bootstrap);
+      this.navigationPanelSteps = getNavigationPanelSteps(this.bootstrap);
+      this.user = user;
 
-    this.setState({
-      currentStep: this.currentStepResolver(bootstrap),
-    });
+      this.setState({
+        currentStep: this.currentStepResolver(bootstrap),
+      });
+    } catch (e) {
+      logger.error(`Bootstrap failure`);
+    }
   }
 
   handleFinishTwoFactor = () => {
@@ -192,6 +197,7 @@ class Bootstrap extends Component {
       component: PageComponent,
       router,
       shared = {},
+      updateGlobalNotification,
       ...props
     } = this.props;
     const {
@@ -204,6 +210,9 @@ class Bootstrap extends Component {
     if (!currentStep) {
       return <FullScreenLoader />;
     }
+
+    const shouldShowGlobalNotification =
+      isLoadingGlobalNotification || isErrorGlobalNotification;
 
     if (TWO_FACTOR_STEPS.includes(currentStep)) {
       return (
@@ -243,16 +252,26 @@ class Bootstrap extends Component {
 
     if (SHARED_ITEMS_STEPS.includes(currentStep)) {
       return (
-        <BootstrapLayout user={this.user}>
-          <SharedItemsStep
-            navigationSteps={this.navigationPanelSteps}
-            oldKeyPair={oldKeyPair}
-            currentKeyPair={currentKeyPair}
-            oldMasterPassword={shared.mp}
-            currentMasterPassword={masterPassword}
-            onFinish={this.handleFinishSharedItems}
-          />
-        </BootstrapLayout>
+        <>
+          <BootstrapLayout user={this.user}>
+            <SharedItemsStep
+              navigationSteps={this.navigationPanelSteps}
+              oldKeyPair={oldKeyPair}
+              currentKeyPair={currentKeyPair}
+              oldMasterPassword={shared.mp}
+              currentMasterPassword={masterPassword}
+              onFinish={this.handleFinishSharedItems}
+              updateGlobalNotification={updateGlobalNotification}
+            />
+          </BootstrapLayout>
+          {shouldShowGlobalNotification && (
+            <GlobalNotification
+              text={globalNotificationText}
+              isError={isErrorGlobalNotification}
+              onClose={this.handleCloseNotification}
+            />
+          )}
+        </>
       );
     }
 
@@ -268,9 +287,6 @@ class Bootstrap extends Component {
         />
       );
     }
-
-    const shouldShowGlobalNotification =
-      isLoadingGlobalNotification || isErrorGlobalNotification;
 
     // TODO: during refactoring to rename:
     // TODO: - password to masterPassword

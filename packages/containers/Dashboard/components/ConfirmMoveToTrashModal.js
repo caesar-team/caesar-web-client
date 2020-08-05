@@ -1,6 +1,6 @@
 import React from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { ITEM_TEXT_TYPE } from '@caesar/common/constants';
+import { getPlural } from '@caesar/common/utils/string';
 import {
   workInProgressItemSelector,
   workInProgressItemIdsSelector,
@@ -22,7 +22,7 @@ import { ConfirmModal } from '@caesar/components';
 
 export const ConfirmMoveToTrashModal = ({
   notification,
-  isOpen,
+  isOpened,
   handleCloseModal,
 }) => {
   const dispatch = useDispatch();
@@ -33,7 +33,7 @@ export const ConfirmMoveToTrashModal = ({
   const trashList = useSelector(trashListSelector);
 
   const handleMoveToTrash = () => {
-    const isTeamList = workInProgressList && !!workInProgressList.teamId;
+    const isTeamList = !!workInProgressList?.teamId;
     const trashListId = isTeamList
       ? teamsTrashLists.find(
           ({ teamId }) => teamId === workInProgressList.teamId,
@@ -45,24 +45,47 @@ export const ConfirmMoveToTrashModal = ({
       dispatch(resetWorkInProgressItemIds());
 
       notification.show({
-        text: `The items have been removed`,
+        text: `The ${getPlural(workInProgressItemIds?.length, [
+          'item has',
+          'items have',
+        ])} been removed`,
       });
     } else {
-      dispatch(moveItemRequest(workInProgressItem.id, trashListId));
+      dispatch(
+        moveItemRequest(
+          workInProgressItem.id,
+          workInProgressItem.teamId || null,
+          trashListId,
+        ),
+      );
       dispatch(setWorkInProgressItem(null));
 
       notification.show({
-        text: `The ${ITEM_TEXT_TYPE[workInProgressItem.type]} has been removed`,
+        text: `The '${workInProgressItem.data.name}' has been removed`,
       });
     }
 
     handleCloseModal();
   };
 
+  const pluralItemText = getPlural(workInProgressItemIds?.length, [
+    'item',
+    'items',
+  ]);
+
   return (
     <ConfirmModal
-      isOpen={isOpen}
-      description="Are you sure you want to move the item(-s) to trash?"
+      isOpened={isOpened}
+      title={`You are going to remove ${
+        workInProgressItem
+          ? `'${workInProgressItem.data.name}'`
+          : pluralItemText
+      }`}
+      description={`Are you sure you want to move the ${
+        workInProgressItem ? 'item' : pluralItemText
+      } to trash?`}
+      icon="trash"
+      confirmBtnText="Remove"
       onClickConfirm={handleMoveToTrash}
       onClickCancel={handleCloseModal}
     />

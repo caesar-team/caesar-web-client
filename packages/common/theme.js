@@ -3,7 +3,8 @@ const theme = {
     black: '#000',
     emperor: '#505050',
     gray: '#888',
-    lightGray: '#cccccc',
+    lightGray: '#ccc',
+    lighterGray: 'rgba(136, 136, 136, 0.3)',
     gallery: '#eaeaea',
     alto: '#f5f5f5',
     snow: '#fbf9f9',
@@ -18,7 +19,9 @@ const theme = {
   },
   font: {
     size: {
+      large: '36px',
       big: '30px',
+      middle: '24px',
       main: '16px',
       small: '14px',
       xs: '12px',

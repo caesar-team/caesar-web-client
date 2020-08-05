@@ -8,7 +8,7 @@ import {
 import {
   isLoadingSelector,
   userListsSelector,
-  favoritesSelector,
+  favoriteListSelector,
   itemsByIdSelector,
   workInProgressListSelector,
   workInProgressItemSelector,
@@ -20,7 +20,7 @@ import Dashboard from './Dashboard';
 const mapStateToProps = createStructuredSelector({
   isLoading: isLoadingSelector,
   lists: userListsSelector,
-  favoritesList: favoritesSelector,
+  favoritesList: favoriteListSelector,
   itemsById: itemsByIdSelector,
   visibleListItems: visibleListItemsSelector,
   workInProgressList: workInProgressListSelector,

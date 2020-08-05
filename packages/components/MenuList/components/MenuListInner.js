@@ -2,8 +2,15 @@ import React, { memo, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { DragDropContext, Droppable } from 'react-beautiful-dnd';
 import styled from 'styled-components';
-import { DASHBOARD_MODE } from '@caesar/common/constants';
-import { currentTeamSelector } from '@caesar/common/selectors/user';
+import {
+  DASHBOARD_MODE,
+  PERMISSION,
+  PERMISSION_ENTITY,
+} from '@caesar/common/constants';
+import {
+  userDataSelector,
+  currentTeamSelector,
+} from '@caesar/common/selectors/user';
 import {
   personalListsByTypeSelector,
   currentTeamListsSelector,
@@ -15,15 +22,25 @@ import {
   resetWorkInProgressItemIds,
 } from '@caesar/common/actions/workflow';
 import { sortListRequest } from '@caesar/common/actions/entities/list';
+import { withNotification } from '@caesar/components/Notification';
+import { Can } from '../../Ability';
 import { Icon } from '../../Icon';
+import { Scrollbar } from '../../Scrollbar';
 import { ListItem } from './ListItem';
 import { MenuItemInner } from './styledComponents';
 
 const MenuItem = styled.div``;
 
 const MenuItemTitle = styled.div`
+  display: flex;
+  align-items: center;
+  flex-grow: 1;
   padding-left: 16px;
   margin-right: auto;
+`;
+
+const MenuItemCounter = styled.span`
+  margin-left: auto;
 `;
 
 const ListAddIcon = styled(Icon)`
@@ -67,16 +84,18 @@ const MenuListInnerComponent = ({
   setSearchedText,
   setMode,
   isListsOpened,
-  setIsListsOpened,
+  setListsOpened,
+  notification,
 }) => {
   const dispatch = useDispatch();
+  const user = useSelector(userDataSelector);
   const currentTeam = useSelector(currentTeamSelector);
   const isPersonal = !currentTeam;
   const personalLists = useSelector(personalListsByTypeSelector);
   const teamLists = useSelector(currentTeamListsSelector);
   const workInProgressList = useSelector(workInProgressListSelector);
   const activeListId = workInProgressList && workInProgressList.id;
-  const [isCreatingMode, setIsCreatingMode] = useState(false);
+  const [isCreatingMode, setCreatingMode] = useState(false);
 
   const handleClickMenuItem = id => {
     dispatch(setWorkInProgressListId(id));
@@ -96,8 +115,8 @@ const MenuListInnerComponent = ({
 
   const handleClickAddList = event => {
     event.stopPropagation();
-    setIsListsOpened(true);
-    setIsCreatingMode(true);
+    setListsOpened(true);
+    setCreatingMode(true);
   };
 
   const handleDragEnd = ({ draggableId, source, destination }) => {
@@ -117,13 +136,17 @@ const MenuListInnerComponent = ({
 
   const menuList = [
     {
-      id: isPersonal ? personalLists.inbox?.id : '',
+      id: isPersonal ? personalLists.inbox?.id : null,
       title: 'Inbox',
+      length: isPersonal ? personalLists.inbox?.children?.length : null,
       icon: 'inbox',
     },
     {
       id: isPersonal ? personalLists.favorites?.id : teamLists.favorites?.id,
       title: 'Favorites',
+      length: isPersonal
+        ? personalLists.favorites?.children?.length
+        : teamLists.favorites?.children?.length,
       icon: 'favorite',
     },
     {
@@ -141,6 +164,9 @@ const MenuListInnerComponent = ({
     {
       id: isPersonal ? personalLists.trash?.id : teamLists.trash?.id,
       title: 'Trash',
+      length: isPersonal
+        ? personalLists.trash?.children?.length
+        : teamLists.trash?.children?.length,
       icon: 'trash',
     },
     {
@@ -150,87 +176,128 @@ const MenuListInnerComponent = ({
     },
   ];
 
-  return menuList.map(({ id, icon, title, children }) => {
-    const withChildren = id === 'lists';
+  const listSubject = currentTeam
+    ? {
+        __typename: PERMISSION_ENTITY.TEAM_LIST,
+        // eslint-disable-next-line camelcase
+        team_create_list: !!currentTeam._links?.team_create_list,
+      }
+    : {
+        __typename: PERMISSION_ENTITY.LIST,
+        // eslint-disable-next-line camelcase
+        create_list: !!user?._links?.create_list,
+      };
 
-    return (
-      id && (
-        <MenuItem key={id}>
-          <StyledMenuItemInner
-            isActive={
-              id === SECURE_MESSAGE_MODE
-                ? mode === SECURE_MESSAGE_MODE
-                : activeListId === id
-            }
-            fontWeight={id === SECURE_MESSAGE_MODE ? 600 : 400}
-            withChildren={withChildren}
-            onClick={() => {
-              if (id === SECURE_MESSAGE_MODE) {
-                return handleClickSecureMessage();
-              }
+  return (
+    <Scrollbar>
+      {menuList.map(({ id, icon, title, length, children }) => {
+        const withChildren = id === 'lists';
 
-              return withChildren
-                ? setIsListsOpened(!isListsOpened)
-                : handleClickMenuItem(id);
-            }}
-          >
-            <Icon name={icon} width={16} height={16} />
-            <MenuItemTitle>{title}</MenuItemTitle>
-            {withChildren && (
-              <>
-                <ListAddIcon
-                  name="plus"
-                  width={16}
-                  height={16}
-                  onClick={handleClickAddList}
-                />
-                <ListToggleIcon
-                  name="arrow-triangle"
-                  width={16}
-                  height={16}
-                  isListsOpened={isListsOpened}
-                />
-              </>
-            )}
-          </StyledMenuItemInner>
-          {isListsOpened && (
-            <>
-              {id === 'lists' && isCreatingMode && (
-                <ListItem
-                  isCreatingMode={isCreatingMode}
-                  setIsCreatingMode={setIsCreatingMode}
-                />
+        return (
+          id && (
+            <MenuItem key={id}>
+              <StyledMenuItemInner
+                isActive={
+                  id === SECURE_MESSAGE_MODE
+                    ? mode === SECURE_MESSAGE_MODE
+                    : activeListId === id
+                }
+                fontWeight={id === SECURE_MESSAGE_MODE ? 600 : 400}
+                withChildren={withChildren}
+                onClick={() => {
+                  if (id === SECURE_MESSAGE_MODE) {
+                    return handleClickSecureMessage();
+                  }
+
+                  return withChildren
+                    ? setListsOpened(!isListsOpened)
+                    : handleClickMenuItem(id);
+                }}
+              >
+                <Icon name={icon} width={16} height={16} />
+                <MenuItemTitle>
+                  {title}
+                  {typeof length === 'number' && (
+                    <MenuItemCounter>{length}</MenuItemCounter>
+                  )}
+                </MenuItemTitle>
+                {withChildren && (
+                  <>
+                    <Can I={PERMISSION.CREATE} a={listSubject}>
+                      <ListAddIcon
+                        name="plus"
+                        width={16}
+                        height={16}
+                        onClick={handleClickAddList}
+                      />
+                    </Can>
+                    <ListToggleIcon
+                      name="arrow-triangle"
+                      width={16}
+                      height={16}
+                      isListsOpened={isListsOpened}
+                    />
+                  </>
+                )}
+              </StyledMenuItemInner>
+              {isListsOpened && (
+                <>
+                  {id === 'lists' && isCreatingMode && (
+                    <ListItem
+                      isCreatingMode={isCreatingMode}
+                      setCreatingMode={setCreatingMode}
+                      notification={notification}
+                    />
+                  )}
+                  {children &&
+                    (children.length <= 1 ? (
+                      children.map((list, index) => (
+                        <ListItem
+                          key={list.id}
+                          list={list}
+                          activeListId={activeListId}
+                          index={index}
+                          notification={notification}
+                          onClickMenuItem={handleClickMenuItem}
+                        />
+                      ))
+                    ) : (
+                      <DragDropContext onDragEnd={handleDragEnd}>
+                        <Droppable
+                          droppableId="droppable"
+                          type="lists"
+                          key={children.length}
+                        >
+                          {provided => (
+                            <div
+                              ref={provided.innerRef}
+                              {...provided.droppableProps}
+                            >
+                              {children.map((list, index) => (
+                                <ListItem
+                                  key={list.id}
+                                  list={list}
+                                  activeListId={activeListId}
+                                  index={index}
+                                  isDraggable
+                                  notification={notification}
+                                  onClickMenuItem={handleClickMenuItem}
+                                />
+                              ))}
+                              {provided.placeholder}
+                            </div>
+                          )}
+                        </Droppable>
+                      </DragDropContext>
+                    ))}
+                </>
               )}
-              {children && (
-                <DragDropContext onDragEnd={handleDragEnd}>
-                  <Droppable
-                    droppableId="droppable"
-                    type="lists"
-                    key={children.length}
-                  >
-                    {provided => (
-                      <div ref={provided.innerRef} {...provided.droppableProps}>
-                        {children.map((item, index) => (
-                          <ListItem
-                            key={item.id}
-                            item={item}
-                            activeListId={activeListId}
-                            index={index}
-                            handleClickMenuItem={handleClickMenuItem}
-                          />
-                        ))}
-                        {provided.placeholder}
-                      </div>
-                    )}
-                  </Droppable>
-                </DragDropContext>
-              )}
-            </>
-          )}
-        </MenuItem>
-      )
-    );
-  });
+            </MenuItem>
+          )
+        );
+      })}
+    </Scrollbar>
+  );
 };
 
-export const MenuListInner = memo(MenuListInnerComponent);
+export const MenuListInner = memo(withNotification(MenuListInnerComponent));

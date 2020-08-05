@@ -1,15 +1,11 @@
 import React, { memo } from 'react';
 import styled from 'styled-components';
 import equal from 'fast-deep-equal';
-import memoize from 'memoize-one';
-import AutoSizer from 'react-virtualized-auto-sizer';
-import { FixedSizeList } from 'react-window';
-import { upperFirst } from '@caesar/common/utils/string';
-import { DASHBOARD_MODE, LIST_TYPES_ARRAY } from '@caesar/common/constants';
-import { Button } from '@caesar/components';
-import { FixedSizeItem } from './FixedSizeItem';
-import { ScrollbarVirtualList } from './ScrollbarVirtualList';
+import { transformListTitle } from '@caesar/common/utils/string';
+import { DASHBOARD_MODE } from '@caesar/common/constants';
+import { Scrollbar } from '../Scrollbar';
 import { EmptyList } from './EmptyList';
+import { Item } from './Item';
 
 const Wrapper = styled.div`
   position: relative;
@@ -36,32 +32,14 @@ const ColumnTitle = styled.div`
   color: ${({ theme }) => theme.color.black};
 `;
 
-const ITEM_HEIGHT = 56;
-
-const createItemData = memoize(
-  (
-    items,
-    isMultiItem,
-    workInProgressItemIds,
-    workInProgressItem,
-    onClickItem,
-  ) => ({
-    items,
-    isMultiItem,
-    workInProgressItemIds,
-    workInProgressItem,
-    onClickItem,
-  }),
-);
-
 const ListComponent = ({
   mode,
   isMultiItem = false,
   workInProgressList = null,
-  workInProgressItem,
   workInProgressItemIds,
   items = [],
   onClickItem = Function.prototype,
+  onSelectItem = Function.prototype,
 }) => {
   const isDashboardDefaultMode = mode === DASHBOARD_MODE.DEFAULT;
 
@@ -78,40 +56,31 @@ const ListComponent = ({
   }
 
   const isEmpty = items.length === 0;
+
   const renderedList = () => {
     if (isEmpty) {
       return <EmptyList />;
     }
 
-    const itemData = createItemData(
-      items,
-      isMultiItem,
-      workInProgressItemIds,
-      workInProgressItem,
-      onClickItem,
-    );
-
+    // TODO: Need to check a long list with items. Mayby beetter to return AutoSizer, but need to fix Scrolling
     return (
-      <AutoSizer>
-        {({ height, width }) => (
-          <FixedSizeList
-            height={height}
-            itemCount={items.length}
-            itemData={itemData}
-            itemSize={ITEM_HEIGHT}
-            width={width}
-            outerElementType={ScrollbarVirtualList}
-          >
-            {FixedSizeItem}
-          </FixedSizeList>
-        )}
-      </AutoSizer>
+      <Scrollbar>
+        {items.map((item, index) => (
+          <Item
+            key={item.id}
+            index={index}
+            isMultiItem={isMultiItem}
+            onClickItem={onClickItem}
+            onSelectItem={onSelectItem}
+            workInProgressItemIds={workInProgressItemIds}
+            {...item}
+          />
+        ))}
+      </Scrollbar>
     );
   };
 
-  const itemTitle = LIST_TYPES_ARRAY.includes(workInProgressList?.label)
-    ? upperFirst(workInProgressList?.label)
-    : workInProgressList?.label;
+  const listTitle = transformListTitle(workInProgressList?.label);
 
   return (
     <Wrapper isEmpty={isEmpty}>
@@ -119,7 +88,7 @@ const ListComponent = ({
         <ColumnHeader>
           <ColumnTitle>
             {isDashboardDefaultMode
-              ? itemTitle
+              ? listTitle
               : `Search results (${items.length} elements):`}
           </ColumnTitle>
           {/* TODO: Add sharing list functional; Set condition when to show this button */}

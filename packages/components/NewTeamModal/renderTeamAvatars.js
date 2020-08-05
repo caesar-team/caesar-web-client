@@ -6,6 +6,8 @@ import IconTeam2 from '@caesar/assets/icons/svg/icon-team-ava-2.svg';
 import IconTeam3 from '@caesar/assets/icons/svg/icon-team-ava-3.svg';
 import IconTeam4 from '@caesar/assets/icons/svg/icon-team-ava-4.svg';
 import IconTeam5 from '@caesar/assets/icons/svg/icon-team-ava-5.svg';
+import { TEAM_AVATAR_MAX_SIZE } from '@caesar/common/constants';
+import { ERROR } from '@caesar/common/validation';
 
 const IMAGE_BASE64_LIST = [
   IconTeam1,
@@ -27,6 +29,7 @@ const AvatarsWrapper = styled.div`
   display: flex;
   align-items: center;
   justify-content: space-between;
+  flex-wrap: wrap;
   margin-top: 16px;
 `;
 
@@ -107,6 +110,12 @@ const IconPlus = styled(Icon)`
   height: 20px;
 `;
 
+const Error = styled.div`
+  width: 100%;
+  margin-top: 8px;
+  color: ${({ theme }) => theme.color.red};
+`;
+
 export const renderTeamAvatars = ({ icon }, setFieldValue) => {
   const renderedAvatars = Object.keys(IMAGE_NAME_BASE64_MAP).map(name => {
     const currentIcon = IMAGE_NAME_BASE64_MAP[name];
@@ -130,6 +139,30 @@ export const renderTeamAvatars = ({ icon }, setFieldValue) => {
   const shouldShowUploader =
     (icon && IMAGE_BASE64_LIST.includes(icon.raw)) || !icon;
 
+  const showErrors = rejectedFiles => {
+    if (rejectedFiles.length > 0) {
+      const errors = [];
+
+      if (!rejectedFiles[0].type.includes('image/')) {
+        errors.push(<Error>{ERROR.IMAGE_UPLOAD}</Error>);
+      }
+
+      if (rejectedFiles[0].size > TEAM_AVATAR_MAX_SIZE) {
+        errors.push(
+          <Error>
+            {ERROR.FILE_SIZE(
+              `${Math.round(TEAM_AVATAR_MAX_SIZE / 1024 / 1024)}MB`,
+            )}
+          </Error>
+        );
+      }
+
+      return errors;
+    }
+
+    return null;
+  };
+
   return (
     <AvatarsWrapper>
       {renderedAvatars}
@@ -137,14 +170,19 @@ export const renderTeamAvatars = ({ icon }, setFieldValue) => {
         <Uploader
           asPreview
           name="icon"
+          accept="image/*"
+          maxSize={TEAM_AVATAR_MAX_SIZE}
           files={icon ? [icon] : []}
           onChange={(_, file) => setFieldValue('icon', file)}
         >
-          {({ getRootProps, getInputProps, isDragActive }) => (
-            <UploaderWrapper {...getRootProps()} isDragActive={isDragActive}>
-              <input {...getInputProps()} />
-              <IconPlus name="plus" />
-            </UploaderWrapper>
+          {({ getRootProps, getInputProps, isDragActive, rejectedFiles }) => (
+            <>
+              <UploaderWrapper {...getRootProps()} isDragActive={isDragActive}>
+                <input {...getInputProps()} />
+                <IconPlus name="plus" />
+              </UploaderWrapper>
+              {showErrors(rejectedFiles)}
+            </>
           )}
         </Uploader>
       ) : (

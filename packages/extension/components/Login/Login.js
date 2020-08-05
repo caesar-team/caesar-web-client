@@ -1,6 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
-import { Icon, Button } from '@caesar-ui';
+import { LogoCaesarDomain, Button } from '@caesar-ui';
 
 const Wrapper = styled.div`
   display: flex;
@@ -20,10 +20,6 @@ const InnerWrapper = styled.div`
   width: 282px;
 `;
 
-const StyledLogo = styled(Icon)`
-  fill: ${({ theme }) => theme.color.white};
-`;
-
 const ButtonStyled = styled(Button)`
   font-size: 18px;
   padding: 18px 30px;
@@ -32,20 +28,18 @@ const ButtonStyled = styled(Button)`
   color: ${({ theme }) => theme.color.emperor};
 `;
 
-const Login = () => {
-  return (
-    <Wrapper>
-      <InnerWrapper>
-        <StyledLogo name="logo-caesar-4xxi" width={210} height={45} />
-        <ButtonStyled
-          color="white"
-          onClick={() => chrome.tabs.create({ url: process.env.APP_URI })}
-        >
-          Login
-        </ButtonStyled>
-      </InnerWrapper>
-    </Wrapper>
-  );
-};
+const Login = () => (
+  <Wrapper>
+    <InnerWrapper>
+      <LogoCaesarDomain color="white" width={146} height={45} />
+      <ButtonStyled
+        color="white"
+        onClick={() => chrome.tabs.create({ url: process.env.APP_URI })}
+      >
+        Login
+      </ButtonStyled>
+    </InnerWrapper>
+  </Wrapper>
+);
 
 export default Login;

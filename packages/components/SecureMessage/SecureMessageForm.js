@@ -2,21 +2,19 @@ import React, { useState } from 'react';
 import styled from 'styled-components';
 import { useFormik } from 'formik';
 import { media } from '@caesar/assets/styles/media';
-import {
-  Checkbox,
-  TextArea,
-  PasswordInput,
-  File,
-  Button,
-  withNotification,
-  withOfflineDetection,
-  Hint,
-} from '@caesar/components';
 import { Select } from '@caesar/components/Select';
 import { checkError } from '@caesar/common/utils/formikUtils';
 import { downloadFile } from '@caesar/common/utils/file';
 import { useMedia } from '@caesar/common/hooks';
+import { Checkbox } from '../Checkbox';
+import { TextArea, PasswordInput } from '../Input';
+import { File } from '../File';
 import { Uploader } from '../Uploader';
+import { Button } from '../Button';
+import { withNotification } from '../Notification';
+import { withOfflineDetection } from '../Offline';
+import { Hint } from '../Hint';
+import { TextError } from '../Error';
 import {
   initialValues,
   requestsLimitOptions,
@@ -77,11 +75,6 @@ const TextAreaStyled = styled(TextArea)`
   ${TextArea.TextAreaField} {
     background: ${({ theme }) => theme.color.white};
   }
-`;
-
-const Error = styled.div`
-  font-size: 14px;
-  color: ${({ theme }) => theme.color.red};
 `;
 
 const AttachmentsSection = styled.div`
@@ -212,14 +205,14 @@ const renderAttachments = (
         {...attachment}
       />
       {checkAttachmentsError(errors, index) && (
-        <Error>{errors[index].raw}</Error>
+        <TextError>{errors[index].raw}</TextError>
       )}
     </FileRow>
   ));
 
 const SecureMessageFormComponent = ({ onSubmit, notification, isOnline }) => {
   const { isMobile } = useMedia();
-  const [isCustomPassword, setIsCustomPassword] = useState(false);
+  const [isCustomPassword, setCustomPassword] = useState(false);
 
   const {
     values,
@@ -240,7 +233,7 @@ const SecureMessageFormComponent = ({ onSubmit, notification, isOnline }) => {
   const dirty = values.text || values.attachments.length;
 
   const handleChangeCustomPassword = () => {
-    setIsCustomPassword(!isCustomPassword);
+    setCustomPassword(!isCustomPassword);
 
     if (isCustomPassword) {
       setFieldValue('password', '');
@@ -258,6 +251,7 @@ const SecureMessageFormComponent = ({ onSubmit, notification, isOnline }) => {
             onBlur={handleBlur}
             onChange={handleChange}
             error={checkError(touched, errors, 'text')}
+            disabled={isSubmitting}
           />
         ) : (
           <>
@@ -345,14 +339,14 @@ const SecureMessageFormComponent = ({ onSubmit, notification, isOnline }) => {
             disabled={isSubmitting}
           />
           {checkError(touched, errors, 'password') && (
-            <Error>{checkError(touched, errors, 'password')}</Error>
+            <TextError>{checkError(touched, errors, 'password')}</TextError>
           )}
         </Row>
       )}
       {errors?.form && (
         <>
-          <Error>Oops… Something went wrong</Error>
-          <Error>Please, click again on Create secure message</Error>
+          <TextError>Oops… Something went wrong</TextError>
+          <TextError>Please, click again on Create secure message</TextError>
         </>
       )}
       <ButtonWrapper>

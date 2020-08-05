@@ -1,12 +1,9 @@
 import React from 'react';
 import styled from 'styled-components';
-import { ErrorLayout } from '@caesar/components';
-import ErrorImg from '@caesar/assets/images/error.jpg';
-import ErrorImg2x from '@caesar/assets/images/error@2x.jpg';
-
-const Image = styled.img`
-  object-fit: contain;
-`;
+import Router from 'next/router';
+import { media } from '@caesar/assets/styles/media';
+import { ErrorLayout, Button } from '@caesar/components';
+import { DOMAIN_SECURE_ROUTE } from '@caesar/common/constants';
 
 const TextWrapper = styled.div`
   position: absolute;
@@ -22,21 +19,43 @@ const TextWrapper = styled.div`
 `;
 
 const StatusCode = styled.div`
-  font-size: 36px;
+  font-size: ${({ theme }) => theme.font.size.large};
   text-align: center;
   margin-bottom: 10px;
+
+  ${media.desktop`
+    font-size: ${({ theme }) => theme.font.size.big};
+  `}
+  
+  ${media.mobile`
+    font-size: ${({ theme }) => theme.font.size.middle};
+  `}
 `;
 
 const Description = styled.div`
-  font-size: 18px;
+  font-size: ${({ theme }) => theme.font.size.main};
+`;
+
+const StyledButton = styled(Button)`
+  margin-top: 40px;
+
+  ${media.tablet`
+    margin-top: 24px;
+  `}
+
+  ${media.mobile`
+    margin-top: 16px;
+  `}
 `;
 
 const Error = ({ statusCode }) => (
   <ErrorLayout>
-    <Image src={ErrorImg} srcSet={`${ErrorImg} 1x, ${ErrorImg2x} 2x`} />
     <TextWrapper>
       <StatusCode>{statusCode}</StatusCode>
-      <Description>Oops… Something went wrong</Description>
+      <Description>Ooops… Something went wrong</Description>
+      <StyledButton onClick={() => Router.push(DOMAIN_SECURE_ROUTE)}>
+        Create a secure message
+      </StyledButton>
     </TextWrapper>
   </ErrorLayout>
 );

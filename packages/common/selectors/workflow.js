@@ -1,7 +1,10 @@
 import { createSelector } from 'reselect';
+import { sortByDate } from '@caesar/common/utils/dateUtils';
 import {
   listsByIdSelector,
   extendedSortedCustomizableListsSelector,
+  favoriteListSelector,
+  currentTeamFavoriteListSelector,
 } from '@caesar/common/selectors/entities/list';
 import { itemsByIdSelector } from '@caesar/common/selectors/entities/item';
 import { childItemsByIdSelector } from '@caesar/common/selectors/entities/childItem';
@@ -135,18 +138,46 @@ export const shouldLoadNodesSelector = createSelector(
   lists => !lists.length,
 );
 
+const createListItemsList = (children, itemsById) =>
+  children
+    .reduce(
+      (accumulator, itemId) =>
+        itemsById[itemId]?.data
+          ? [...accumulator, itemsById[itemId]]
+          : accumulator,
+      [],
+    )
+    .sort((a, b) => sortByDate(a.lastUpdated, b.lastUpdated, 'DESC')) || [];
+
 export const visibleListItemsSelector = createSelector(
   listsByIdSelector,
   itemsByIdSelector,
   workInProgressListIdSelector,
-  (listsById, itemsById, workInProgressListId) =>
-    listsById && workInProgressListId && listsById[workInProgressListId]
-      ? listsById[workInProgressListId].children.reduce(
-          (accumulator, itemId) =>
-            itemsById[itemId] && itemsById[itemId].data
-              ? accumulator.concat(itemsById[itemId])
-              : accumulator,
-          [],
-        )
-      : [],
+  favoriteListSelector,
+  currentTeamFavoriteListSelector,
+  (
+    listsById,
+    itemsById,
+    workInProgressListId,
+    personalFavoriteList,
+    teamFavoriteList,
+  ) => {
+    const favoriteList = personalFavoriteList.id
+      ? personalFavoriteList
+      : teamFavoriteList;
+
+    const isFavoriteList = workInProgressListId === favoriteList?.id;
+
+    switch (true) {
+      case isFavoriteList:
+        return createListItemsList(favoriteList.children, itemsById);
+      case !!listsById[workInProgressListId]:
+        return createListItemsList(
+          listsById[workInProgressListId].children,
+          itemsById,
+        );
+      default:
+        return [];
+    }
+  },
 );

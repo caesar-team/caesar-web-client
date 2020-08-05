@@ -1,3 +1,4 @@
+import Router from 'next/router';
 import {
   put,
   call,
@@ -69,6 +70,7 @@ import {
   CREATE_CHILD_ITEM_BATCH_FINISHED_EVENT,
   removeChildItemsBatch,
 } from '@caesar/common/actions/entities/childItem';
+import { setCurrentTeamId } from '@caesar/common/actions/user';
 import { updateGlobalNotification } from '@caesar/common/actions/application';
 import {
   createChildItemBatchSaga,
@@ -82,15 +84,18 @@ import { inviteNewMemberBatchSaga } from '@caesar/common/sagas/common/invite';
 import {
   setWorkInProgressItem,
   updateWorkInProgressItem,
+  setWorkInProgressListId,
 } from '@caesar/common/actions/workflow';
 import {
   workInProgressItemSelector,
   workInProgressItemIdsSelector,
 } from '@caesar/common/selectors/workflow';
 import {
-  favoritesSelector,
   listSelector,
-  allTrashListIdsSelector,
+  favoriteListSelector,
+  currentTeamFavoriteListSelector,
+  defaultListSelector,
+  currentTeamDefaultListSelector,
 } from '@caesar/common/selectors/entities/list';
 import {
   itemsBatchSelector,
@@ -101,6 +106,7 @@ import {
   keyPairSelector,
   masterPasswordSelector,
   userDataSelector,
+  currentTeamIdSelector,
 } from '@caesar/common/selectors/user';
 import {
   teamSelector,
@@ -132,7 +138,6 @@ import { objectToBase64 } from '@caesar/common/utils/base64';
 import { chunk } from '@caesar/common/utils/utils';
 import {
   ROLE_ANONYMOUS_USER,
-  ITEM_MODE,
   PERMISSION_READ,
   SHARE_TYPE,
   ENTITY_TYPE,
@@ -143,6 +148,8 @@ import {
   MOVING_IN_PROGRESS_NOTIFICATION,
   REMOVING_IN_PROGRESS_NOTIFICATION,
   NOOP_NOTIFICATION,
+  ROUTES,
+  TEAM_TYPE,
 } from '@caesar/common/constants';
 import { generateSharingUrl } from '@caesar/common/utils/sharing';
 import { createMemberSaga } from './member';
@@ -167,7 +174,7 @@ export function* removeItemSaga({ payload: { itemId, listId } }) {
     }
 
     if (item.favorite) {
-      const favoriteList = yield select(favoritesSelector);
+      const favoriteList = yield select(favoriteListSelector);
       yield put(removeItemFromList(itemId, favoriteList.id));
     }
 
@@ -309,19 +316,21 @@ export function* removeShareSaga({ payload: { shareId } }) {
   }
 }
 
-export function* toggleItemToFavoriteSaga({ payload: { itemId } }) {
+export function* toggleItemToFavoriteSaga({ payload: { item } }) {
   try {
-    const favoritesList = yield select(favoritesSelector);
+    const favoritesList = item.teamId
+      ? yield select(currentTeamFavoriteListSelector)
+      : yield select(favoriteListSelector);
 
     const {
       data: { favorite: isFavorite },
-    } = yield call(toggleFavorite, itemId);
+    } = yield call(toggleFavorite, item.id);
 
     yield put(
-      toggleItemToFavoriteSuccess(itemId, favoritesList.id, isFavorite),
+      toggleItemToFavoriteSuccess(item.id, favoritesList.id, isFavorite),
     );
-    yield put(toggleItemToFavoriteList(itemId, favoritesList.id, isFavorite));
-    yield put(updateWorkInProgressItem(itemId));
+    yield put(toggleItemToFavoriteList(item.id, favoritesList.id, isFavorite));
+    yield put(updateWorkInProgressItem(item.id));
   } catch (error) {
     console.log(error);
     yield put(
@@ -331,43 +340,40 @@ export function* toggleItemToFavoriteSaga({ payload: { itemId } }) {
   }
 }
 
-export function* moveItemSaga({ payload: { itemId, listId } }) {
+export function* moveItemSaga({ payload: { itemId, teamId, listId } }) {
   try {
     yield put(updateGlobalNotification(MOVING_IN_PROGRESS_NOTIFICATION, true));
+
+    const list = yield select(listSelector, { listId });
+
+    const defaultList = teamId
+      ? yield select(currentTeamDefaultListSelector)
+      : yield select(defaultListSelector);
+
+    const newListId = list ? listId : defaultList?.id;
 
     const item = yield select(itemSelector, { itemId });
     const childItemIds = item.invited;
 
-    const allTrashListIds = yield select(allTrashListIdsSelector);
-
-    const oldList = yield select(listSelector, {
-      listId: item.listId,
-    });
-    const newList = yield select(listSelector, { listId });
-
     yield call(updateMoveItem, item.id, {
-      listId,
+      listId: newListId,
     });
-    yield put(moveItemSuccess(item.id, item.listId, listId));
-    yield put(moveItemToList(item.id, item.listId, listId));
+    yield put(moveItemSuccess(item.id, item.listId, newListId));
+    yield put(moveItemToList(item.id, item.listId, newListId));
 
     yield put(updateGlobalNotification(NOOP_NOTIFICATION, false));
 
-    if (item.favorite && allTrashListIds.includes(listId)) {
-      yield fork(toggleItemToFavoriteSaga, { payload: { itemId } });
+    if (item.teamId !== teamId) {
+      yield put(updateItemField(item.id, 'teamId', teamId));
     }
 
-    if (oldList.teamId !== newList.teamId) {
-      yield put(updateItemField(item.id, 'teamId', newList.teamId));
-    }
-
-    if (!oldList.teamId && newList.teamId) {
+    if (!item.teamId && teamId) {
       yield fork(shareItemBatchSaga, {
         payload: {
           data: {
             itemIds: [item.id],
             members: [],
-            teamIds: [newList.teamId],
+            teamIds: [teamId],
           },
           options: {
             includeIniciator: false,
@@ -376,14 +382,14 @@ export function* moveItemSaga({ payload: { itemId, listId } }) {
       });
     }
 
-    if (oldList.teamId && !newList.teamId) {
+    if (item.teamId && !teamId) {
       yield put(removeChildItemsBatchFromItem(item.id, childItemIds));
       yield put(removeChildItemsBatch(childItemIds));
 
       yield put(updateGlobalNotification(NOOP_NOTIFICATION, false));
     }
 
-    if (oldList.teamId && newList.teamId && oldList.teamId !== newList.teamId) {
+    if (item.teamId && teamId && item.teamId !== teamId) {
       yield put(removeChildItemsBatchFromItem(item.id, childItemIds));
       yield put(removeChildItemsBatch(childItemIds));
 
@@ -392,7 +398,7 @@ export function* moveItemSaga({ payload: { itemId, listId } }) {
           data: {
             itemIds: [item.id],
             members: [],
-            teamIds: [newList.teamId],
+            teamIds: [teamId],
           },
           options: {
             includeIniciator: false,
@@ -406,11 +412,11 @@ export function* moveItemSaga({ payload: { itemId, listId } }) {
   }
 }
 
-export function* moveItemsBatchSaga({ payload: { itemIds, listId } }) {
+export function* moveItemsBatchSaga({ payload: { itemIds, teamId, listId } }) {
   try {
     yield all(
       itemIds.map(itemId =>
-        call(moveItemSaga, { payload: { itemId, listId } }),
+        call(moveItemSaga, { payload: { itemId, teamId, listId } }),
       ),
     );
   } catch (error) {
@@ -429,9 +435,8 @@ export function* createItemSaga({
   try {
     yield put(updateGlobalNotification(ENCRYPTING_ITEM_NOTIFICATION, true));
 
-    const { listId, attachments, type, ...data } = item;
+    const { teamId, listId, attachments, type, ...data } = item;
 
-    const list = yield select(listSelector, { listId });
     const keyPair = yield select(keyPairSelector);
     const user = yield select(userDataSelector);
 
@@ -444,7 +449,7 @@ export function* createItemSaga({
     yield put(updateGlobalNotification(CREATING_ITEM_NOTIFICATION, true));
 
     const {
-      data: { id: itemId, lastUpdated },
+      data: { id: itemId, lastUpdated, invited, _links },
     } = yield call(postCreateItem, {
       listId,
       type,
@@ -457,26 +462,34 @@ export function* createItemSaga({
       lastUpdated,
       type,
       favorite: false,
-      invited: [],
+      invited: invited || [],
       shared: null,
       tags: [],
-      teamId: list.teamId,
+      teamId,
       ownerId: user.id,
       secret: encryptedItem,
       data: { attachments, ...data },
+      _links,
       __type: ENTITY_TYPE.ITEM,
     };
 
     yield put(createItemSuccess(newItem));
-    yield put(addItemToList(newItem));
-    yield put(updateWorkInProgressItem(itemId, ITEM_MODE.REVIEW));
 
-    if (list.teamId) {
+    const currentTeamId = yield select(currentTeamIdSelector);
+
+    if (
+      currentTeamId === teamId ||
+      (!teamId && currentTeamId === TEAM_TYPE.PERSONAL)
+    ) {
+      yield put(addItemToList(newItem));
+    }
+
+    if (teamId) {
       yield put(
         updateGlobalNotification(SHARING_IN_PROGRESS_NOTIFICATION, true),
       );
 
-      const team = yield select(teamSelector, { teamId: list.teamId });
+      const team = yield select(teamSelector, { teamId });
       const memberIds = team.users.map(({ id }) => id);
       const members = yield select(membersBatchSelector, { memberIds });
 
@@ -484,7 +497,7 @@ export function* createItemSaga({
         .filter(({ id }) => id !== user.id)
         .map(({ id, publicKey }) => ({
           item: { id: itemId, data: newItem.data },
-          user: { id, publicKey, teamId: list.teamId },
+          user: { id, publicKey, teamId },
         }));
 
       if (itemUserPairs.length > 0) {
@@ -512,6 +525,12 @@ export function* createItemSaga({
         yield put(updateWorkInProgressItem());
       }
     }
+
+    yield put(setCurrentTeamId(teamId || TEAM_TYPE.PERSONAL));
+    yield put(setWorkInProgressListId(listId));
+    yield put(setWorkInProgressItem(newItem));
+
+    yield call(Router.push, ROUTES.DASHBOARD);
   } catch (error) {
     console.log(error);
     yield put(
@@ -612,9 +631,15 @@ export function* updateItemSaga({ payload: { item } }) {
       keyPair.publicKey,
     );
 
-    yield call(updateItem, item.id, { item: { secret: encryptedItemSecret } });
+    const {
+      data: { lastUpdated },
+    } = yield call(updateItem, item.id, {
+      item: { secret: encryptedItemSecret },
+    });
 
-    yield put(updateItemSuccess({ ...item, secret: encryptedItemSecret }));
+    yield put(
+      updateItemSuccess({ ...item, lastUpdated, secret: encryptedItemSecret }),
+    );
 
     yield put(updateWorkInProgressItem());
 
@@ -628,7 +653,10 @@ export function* updateItemSaga({ payload: { item } }) {
   }
 }
 
-export function* editItemSaga({ payload: { item }, meta: { setSubmitting } }) {
+export function* editItemSaga({
+  payload: { item },
+  meta: { setSubmitting, notification },
+}) {
   try {
     const { listId, attachments, type, ...data } = item;
 
@@ -665,7 +693,10 @@ export function* editItemSaga({ payload: { item }, meta: { setSubmitting } }) {
       }
     }
 
-    yield put(updateWorkInProgressItem(editedItem.id, ITEM_MODE.REVIEW));
+    yield put(updateWorkInProgressItem(editedItem.id));
+    yield call(notification.show, {
+      text: `The '${item.name}' has been updated`,
+    });
   } catch (error) {
     console.log(error);
     yield put(

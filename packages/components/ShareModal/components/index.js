@@ -1,1 +1,2 @@
-export { default as AnonymousLink } from './AnonymousLink';
+export { AnonymousLink } from './AnonymousLink';
+export { TeamList } from './TeamList';

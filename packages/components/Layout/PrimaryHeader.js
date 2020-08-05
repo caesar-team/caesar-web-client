@@ -33,7 +33,12 @@ const RightWrapper = styled.div`
   padding: 0 24px;
 `;
 
+const StyledSearchInput = styled(SearchInput)`
+  margin-right: auto;
+`;
+
 const AddItemButton = styled(AddItem)`
+  margin-left: auto;
   margin-right: 10px;
 `;
 
@@ -41,7 +46,6 @@ const UserSection = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-left: auto;
 `;
 
 const UserName = styled.div`
@@ -94,15 +98,13 @@ const PrimaryHeaderComponent = ({
   searchedText,
   onSearch,
   onClickReset,
-  workInProgressList,
-  onClickCreateItem = Function.prototype,
 }) => {
   const dispatch = useDispatch();
-  const [isDropdownOpened, setIsDropdownOpened] = useState(false);
+  const [isDropdownOpened, setDropdownOpened] = useState(false);
   const userName = (user && (user.name || user.email)) || '';
 
   const handleToggleDropdown = () => {
-    setIsDropdownOpened(!isDropdownOpened);
+    setDropdownOpened(!isDropdownOpened);
   };
 
   const Options = (
@@ -126,15 +128,16 @@ const PrimaryHeaderComponent = ({
         </LeftWrapper>
         {!!user && (
           <RightWrapper>
-            <SearchInput
-              searchedText={searchedText}
-              onChange={onSearch}
-              onClickReset={onClickReset}
-            />
-            <AddItemButton
-              workInProgressList={workInProgressList}
-              onClickCreateItem={onClickCreateItem}
-            />
+            {onSearch && (
+              <StyledSearchInput
+                name="search"
+                autoComplete="nope"
+                searchedText={searchedText}
+                onChange={onSearch}
+                onClickReset={onClickReset}
+              />
+            )}
+            <AddItemButton />
             <UserSection>
               <StyledDropdown
                 renderOverlay={() => Options}

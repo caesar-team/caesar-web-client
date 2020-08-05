@@ -1,13 +1,7 @@
-import React, { memo } from 'react';
+import React, { memo, useRef } from 'react';
+import { useClickAway } from 'react-use';
 import { useSelector, useDispatch } from 'react-redux';
-import {
-  DASHBOARD_MODE,
-  ITEM_MODE,
-  LIST_TYPE,
-  MOVE_ITEM_PERMISSION,
-  SHARE_ITEM_PERMISSION,
-  DELETE_PERMISSION,
-} from '@caesar/common/constants';
+import { DASHBOARD_MODE, LIST_TYPE } from '@caesar/common/constants';
 import {
   workInProgressItemSelector,
   workInProgressItemIdsSelector,
@@ -31,9 +25,8 @@ import { filter } from '../utils';
 const MiddleColumnComponent = ({
   mode,
   searchedText,
+  hasOpenedModal = false,
   handleOpenModal,
-  startCtrlShiftSelectionItemId,
-  setStartCtrlShiftSelectionItemId,
   handleCtrlSelectionItemBehaviour,
 }) => {
   const dispatch = useDispatch();
@@ -45,13 +38,11 @@ const MiddleColumnComponent = ({
   const teamsTrashLists = useSelector(teamsTrashListsSelector);
   const itemsById = useSelector(itemsByIdSelector);
 
-  const isMultiItem = workInProgressItemIds && workInProgressItemIds.length > 0;
-  const isInboxList =
-    workInProgressList && workInProgressList.type === LIST_TYPE.INBOX;
+  const isMultiItem = workInProgressItemIds?.length > 0;
+  const isInboxList = workInProgressList?.type === LIST_TYPE.INBOX;
   const isTrashList =
-    workInProgressList &&
-    (workInProgressList.id === trashList.id ||
-      teamsTrashLists.map(({ id }) => id).includes(workInProgressList.id));
+    workInProgressList?.id === trashList?.id ||
+    teamsTrashLists?.map(({ id }) => id).includes(workInProgressList?.id);
 
   const searchedItems = filter(Object.values(itemsById), searchedText);
 
@@ -59,63 +50,21 @@ const MiddleColumnComponent = ({
     mode === DASHBOARD_MODE.SEARCH
       ? searchedItems.length === workInProgressItemIds.length
       : visibleListItems.length === workInProgressItemIds.length;
+  const ref = useRef(null);
+
+  useClickAway(ref, () => {
+    if (isMultiItem && !hasOpenedModal) {
+      dispatch(setWorkInProgressItemIds([]));
+    }
+  });
 
   const handleDefaultSelectionItemBehaviour = itemId => {
     dispatch(resetWorkInProgressItemIds());
-    dispatch(setWorkInProgressItem(itemsById[itemId], ITEM_MODE.REVIEW));
-  };
-
-  const handleCtrlShiftSelectionItemBehaviour = itemId => {
-    if (!startCtrlShiftSelectionItemId) {
-      setStartCtrlShiftSelectionItemId(itemId);
-
-      dispatch(setWorkInProgressItem(null));
-      dispatch(setWorkInProgressItemIds([itemId]));
-    } else {
-      setStartCtrlShiftSelectionItemId(null);
-
-      const startIndex = visibleListItems.findIndex(
-        ({ id }) => id === startCtrlShiftSelectionItemId,
-      );
-      const endIndex = visibleListItems.findIndex(({ id }) => id === itemId);
-
-      const slicedItems = visibleListItems.slice(
-        Math.min(startIndex, endIndex),
-        Math.max(startIndex, endIndex) + 1,
-      );
-
-      dispatch(setWorkInProgressItemIds(slicedItems.map(({ id }) => id)));
-    }
+    dispatch(setWorkInProgressItem(itemsById[itemId]));
   };
 
   const handleClickItem = itemId => event => {
-    const item = itemsById[itemId];
-
-    const itemSubject = {
-      ...item,
-      listType: workInProgressList && workInProgressList.type,
-      userRole: workInProgressList && workInProgressList.userRole,
-    };
-
-    // TODO:
-    // const teamItemGuard =
-    //   this.context.can(MOVE_ITEM_PERMISSION, itemSubject) &&
-    //   this.context.can(SHARE_ITEM_PERMISSION, itemSubject) &&
-    //   this.context.can(DELETE_PERMISSION, itemSubject);
-
-    // if (itemSubject.teamId && !teamItemGuard) {
-    if (itemSubject.teamId) {
-      handleDefaultSelectionItemBehaviour(itemId);
-      return;
-    }
-
-    if ((event.ctrlKey || event.metaKey) && event.shiftKey) {
-      handleCtrlShiftSelectionItemBehaviour(itemId);
-    } else if (event.ctrlKey || event.metaKey) {
-      handleCtrlSelectionItemBehaviour(itemId);
-    } else {
-      handleDefaultSelectionItemBehaviour(itemId);
-    }
+    handleDefaultSelectionItemBehaviour(itemId);
   };
 
   const handleSelectAllListItems = event => {
@@ -139,7 +88,7 @@ const MiddleColumnComponent = ({
   };
 
   return (
-    <>
+    <div ref={ref}>
       {isMultiItem && (
         <MultiItem
           isInboxItems={isInboxList}
@@ -163,8 +112,9 @@ const MiddleColumnComponent = ({
           mode === DASHBOARD_MODE.DEFAULT ? visibleListItems : searchedItems
         }
         onClickItem={handleClickItem}
+        onSelectItem={handleCtrlSelectionItemBehaviour}
       />
-    </>
+    </div>
   );
 };
 

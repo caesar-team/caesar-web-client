@@ -1,11 +1,8 @@
 import React from 'react';
 import styled from 'styled-components';
-import Router from 'next/router';
-import { ROUTES } from '@caesar/common/constants';
 import LayoutConstructor from './LayoutConstructor';
 import Footer from './Footer';
-import { Icon } from '../Icon';
-import { Link } from '../Link';
+import { LogoCaesarDomain } from '../LogoCaesarDomain';
 
 const LayoutConstructorStyled = styled(LayoutConstructor)`
   padding: 0;
@@ -19,7 +16,8 @@ const LayoutConstructorStyled = styled(LayoutConstructor)`
 
   ${LayoutConstructor.MainWrapper} {
     width: 100%;
-    max-width: 800px;
+    max-width: 848px;
+    padding: 24px;
     margin: 0 auto;
   }
 
@@ -28,18 +26,9 @@ const LayoutConstructorStyled = styled(LayoutConstructor)`
   }
 `;
 
-const Header = () => (
-  <>
-    <Icon name="logo-caesar-4xxi" width={106} height={30} />
-    <Link href="/logout" onClick={() => Router.push(ROUTES.LOGOUT)}>
-      Log out
-    </Link>
-  </>
-);
-
 const SharingLayout = props => (
   <LayoutConstructorStyled
-    headerComponent={<Header />}
+    headerComponent={<LogoCaesarDomain width={97} height={30} />}
     footerComponent={Footer}
     {...props}
   />

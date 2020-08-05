@@ -40,10 +40,7 @@ export default createReducer(initialState, {
       ...state,
       isLoading: false,
       isError: false,
-      byId: {
-        ...state.byId,
-        ...payload.teamsById,
-      },
+      byId: payload.teamsById,
     };
   },
   [FETCH_TEAMS_FAILURE](state) {
@@ -134,7 +131,11 @@ export default createReducer(initialState, {
           ...state.byId[payload.teamId],
           users: [
             ...state.byId[payload.teamId].users,
-            ...payload.members.map(({ id, role }) => ({ id, role })),
+            ...payload.members.map(({ id, role, _links }) => ({
+              id,
+              role,
+              _links,
+            })),
           ],
         },
       },

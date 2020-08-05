@@ -6,6 +6,7 @@ import {
   workInProgressItemSharedMembersSelector,
 } from '@caesar/common/selectors/workflow';
 import { userTeamListSelector } from '@caesar/common/selectors/user';
+import { childItemsByIdSelector } from '@caesar/common/selectors/entities/childItem';
 import { resetWorkInProgressItemIds } from '@caesar/common/actions/workflow';
 import {
   createAnonymousLinkRequest,
@@ -23,16 +24,16 @@ export const ShareModal = ({ notification, handleCloseModal }) => {
   const workInProgressItemSharedMembers = useSelector(
     workInProgressItemSharedMembersSelector,
   );
+  const childItemsById = useSelector(childItemsByIdSelector);
 
-  const isTeamItem = workInProgressItem && workInProgressItem.teamId;
-  const isMultiItem = workInProgressItemIds && workInProgressItemIds.length > 0;
-  const availableTeamsForSharing = isTeamItem
-    ? userTeamList.filter(({ id }) => id !== workInProgressItem.teamId)
-    : userTeamList;
+  const isMultiItem = workInProgressItemIds?.length > 0;
+  const availableTeamsForSharing = userTeamList.filter(
+    ({ id }) => id !== workInProgressItem?.teamId && id !== null,
+  );
 
   const handleShare = (members, teamIds) => {
     if (members.length > 0 || teamIds.length > 0) {
-      if (workInProgressItemIds && workInProgressItemIds.length > 0) {
+      if (workInProgressItemIds?.length > 0) {
         dispatch(
           shareItemBatchRequest({
             itemIds: workInProgressItemIds,
@@ -44,7 +45,7 @@ export const ShareModal = ({ notification, handleCloseModal }) => {
       } else {
         dispatch(
           shareItemBatchRequest({
-            itemIds: [workInProgressItem.id],
+            itemIds: [workInProgressItem?.id],
             members,
             teamIds,
           }),
@@ -55,8 +56,17 @@ export const ShareModal = ({ notification, handleCloseModal }) => {
     handleCloseModal();
   };
 
-  const handleRemoveShare = shareId => () => {
-    dispatch(removeShareRequest(shareId));
+  const handleRevokeAccess = member => {
+    const childItem = Object.values(childItemsById).filter(
+      item =>
+        item.originalItemId === workInProgressItem?.id &&
+        item.userId === member.id,
+    );
+    const childItemId = childItem[0]?.id;
+
+    if (childItemId) {
+      dispatch(removeShareRequest(childItemId));
+    }
   };
 
   const handleActivateLink = () => {
@@ -71,10 +81,10 @@ export const ShareModal = ({ notification, handleCloseModal }) => {
     <ShareModalComponent
       teams={availableTeamsForSharing}
       sharedMembers={workInProgressItemSharedMembers}
-      anonymousLink={workInProgressItem && workInProgressItem.shared}
+      anonymousLink={workInProgressItem?.shared}
       withAnonymousLink={!isMultiItem}
       onShare={handleShare}
-      onRemove={handleRemoveShare}
+      onRevokeAccess={handleRevokeAccess}
       onActivateLink={handleActivateLink}
       onDeactivateLink={handleDeactivateLink}
       onCancel={handleCloseModal}

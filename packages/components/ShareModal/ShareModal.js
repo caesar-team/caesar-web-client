@@ -1,78 +1,24 @@
-import React, { Component, Fragment } from 'react';
-import styled from 'styled-components';
+import React, { useState } from 'react';
+import { useEffectOnce, useUpdateEffect } from 'react-use';
+import { useSelector } from 'react-redux';
 import copy from 'copy-text-to-clipboard';
-import { Modal, ModalTitle, UserSearchInput } from '@caesar/components';
-import { TeamTag } from '../TeamTag';
+import styled from 'styled-components';
+import { userDataSelector } from '@caesar/common/selectors/user';
+import { Modal, ModalTitle, ModalSubtitle } from '../Modal';
+import { UserSearchInput } from '../Input';
 import { Section } from '../Section';
-import { TextWithLines } from '../TextWithLines';
-import { Carousel } from '../Carousel';
 import { MemberList } from '../MemberList';
 import { Button } from '../Button';
-import { INVITED_SECTION } from './constants';
-import { AnonymousLink } from './components';
+import { AnonymousLink, TeamList } from './components';
 import { getAnonymousLink } from './utils';
 
-const Wrapper = styled.div`
-  position: relative;
+const Row = styled.div`
+  margin-bottom: 20px;
 `;
 
-const TextWithLinesStyled = styled(TextWithLines)`
-  font-size: 14px;
-  font-weight: normal;
-  color: ${({ theme }) => theme.color.emperor};
-`;
-
-const TextWithLinesAbsolute = styled(TextWithLinesStyled)`
-  position: absolute;
-`;
-
-const TeamsWrapper = styled.div`
-  display: flex;
-  flex-direction: column;
-  margin-bottom: 40px;
-`;
-
-const CarouselStyled = styled(Carousel)`
-  ${Carousel.ArrowsWrapper} {
-    background-color: ${({ theme }) => theme.color.white};
-    width: 55px;
-    top: 4px;
-
-    > *:first-child {
-      margin-left: 20px;
-    }
-  }
-`;
-
-const TeamTagStyled = styled(TeamTag)`
-  margin-right: 20px;
-
-  ${({ isActive, theme }) =>
-    isActive &&
-    `
-    border: 1px solid ${theme.color.gray};
-  `};
-
-  &:last-of-type {
-    margin-right: 0;
-  }
-`;
-
-const SectionStyled = styled(Section)`
-  margin-bottom: 30px;
-
-  ${Section.Name} {
-    font-size: 14px;
-    color: ${({ theme }) => theme.color.emperor};
-  }
-`;
-
-const MemberListStyled = styled(MemberList)`
-  margin-bottom: 30px;
-  margin-top: 10px;
-
+const StyledMemberList = styled(MemberList)`
   ${MemberList.Member} {
-    background-color: ${({ theme }) => theme.color.lightBlue};
+    background-color: ${({ theme }) => theme.color.alto};
     margin-bottom: 4px;
 
     &:last-of-type {
@@ -89,211 +35,152 @@ const ButtonsWrapper = styled.div`
 `;
 
 const ButtonStyled = styled(Button)`
-  margin-right: 20px;
+  margin-right: 16px;
 `;
 
-class ShareModal extends Component {
-  state = this.prepareInitialState();
+export const ShareModal = ({
+  notification,
+  sharedMembers,
+  teams,
+  withAnonymousLink,
+  anonymousLink = [],
+  onActivateLink,
+  onDeactivateLink,
+  onShare,
+  onCancel,
+  onRevokeAccess,
+}) => {
+  const [members, setMembers] = useState([]);
+  const [teamIds, setTeamIds] = useState([]);
+  const [isOpenedInvited, setOpenedInvited] = useState(false);
+  const [link, setLink] = useState(null);
+  const [isGeneratingLink, setGeneratingLink] = useState(false);
+  const user = useSelector(userDataSelector);
 
-  componentDidUpdate(prevProps) {
-    const shouldUpdateLoading =
-      getAnonymousLink(prevProps.anonymousLink) !==
-      getAnonymousLink(this.props.anonymousLink);
-
-    if (shouldUpdateLoading) {
-      // eslint-disable-next-line
-      this.setState({
-        isGeneratingLink: false,
-      });
-    }
-  }
-
-  handleToggleSection = sectionName => () => {
-    this.setState(prevState => ({
-      ...prevState,
-      openedSections: prevState.openedSections.includes(sectionName)
-        ? prevState.openedSections.filter(name => name !== sectionName)
-        : [...prevState.openedSections, sectionName],
-    }));
+  const handleAddMember = member => {
+    setMembers([...members, member]);
   };
 
-  handleAddMember = member => {
-    this.setState(prevState => ({
-      ...prevState,
-      members: [...prevState.members, member],
-    }));
+  const handleRemoveMember = member => () => {
+    setMembers(members.filter(({ id }) => id !== member.id));
   };
 
-  handleRemoveMember = member => () => {
-    this.setState(prevState => ({
-      ...prevState,
-      members: prevState.members.filter(({ id }) => id !== member.id),
-    }));
-  };
-
-  handleToggleTeam = teamId => () => {
-    this.setState(prevState => ({
-      ...prevState,
-      teamIds: prevState.teamIds.includes(teamId)
-        ? prevState.teamIds.filter(id => id !== teamId)
-        : [...prevState.teamIds, teamId],
-    }));
-  };
-
-  handleToggleAnonymousLink = () => {
-    const { anonymousLink, onActivateLink, onDeactivateLink } = this.props;
-
-    const link = getAnonymousLink(anonymousLink);
-    const action = link ? onDeactivateLink : onActivateLink;
-
-    this.setState(
-      {
-        isGeneratingLink: !link,
-      },
-      action,
-    );
-  };
-
-  handleUpdateAnonymousLink = async () => {
-    this.setState(
-      {
-        isGeneratingLink: true,
-      },
-      this.props.onActivateLink,
-    );
-  };
-
-  handleCopy = () => {
-    const { notification, anonymousLink = [] } = this.props;
-
-    copy(getAnonymousLink(anonymousLink));
-
-    notification.show({
-      text: `The shared link has been copied.`,
-    });
-  };
-
-  handleClickDone = () => {
-    const { onShare } = this.props;
-    const { members, teamIds } = this.state;
-
+  const handleClickDone = () => {
     onShare(members, teamIds);
   };
 
-  prepareInitialState() {
-    return {
-      members: [],
-      teamIds: [],
-      openedSections: [],
-      isGeneratingLink: false,
-    };
-  }
+  const handleToggleAnonymousLink = () => {
+    if (link) {
+      onDeactivateLink();
+    } else {
+      setGeneratingLink(true);
+      onActivateLink();
+    }
+  };
 
-  renderTeamTags() {
-    const { teamIds } = this.state;
-    const { teams } = this.props;
+  const handleUpdateAnonymousLink = () => {
+    setGeneratingLink(true);
+    onActivateLink();
+  };
 
-    const renderedTeams = teams.map(({ id, title, ...props }) => {
-      const isActive = teamIds.includes(id);
+  const handleCopy = () => {
+    copy(link);
 
-      return (
-        <TeamTagStyled
-          isActive={isActive}
-          key={id}
-          name={title}
-          onClick={this.handleToggleTeam(id)}
-          {...props}
-        />
-      );
+    notification.show({
+      text: `The shared link has been copied`,
     });
+  };
 
-    return <CarouselStyled>{renderedTeams}</CarouselStyled>;
-  }
+  useEffectOnce(() => {
+    if (anonymousLink) {
+      setLink(getAnonymousLink(anonymousLink));
+    }
+  });
 
-  render() {
-    const {
-      teams,
-      sharedMembers,
-      anonymousLink,
-      withAnonymousLink,
-      onCancel,
-    } = this.props;
-    const { openedSections, members, isGeneratingLink } = this.state;
+  useUpdateEffect(() => {
+    if (isGeneratingLink) {
+      setGeneratingLink(false);
+    }
+  }, [link, setLink]);
 
-    const shouldShowTeamsSection = teams.length > 0;
-    const shouldShowAddedMembers = members.length > 0;
-    const shouldShowSharedMembers = sharedMembers.length > 0;
+  useUpdateEffect(() => {
+    setLink(anonymousLink ? getAnonymousLink(anonymousLink) : null);
+  }, [anonymousLink]);
 
-    const renderedTeamTags = this.renderTeamTags();
+  const searchedBlackListMemberIds = [
+    user.id,
+    ...members.map(({ id }) => id),
+    ...sharedMembers.map(({ id }) => id),
+  ];
 
-    const searchedBlackListMemberIds = [
-      ...members.map(({ id }) => id),
-      ...sharedMembers.map(({ id }) => id),
-    ];
+  const shouldShowAddedMembers = members.length > 0;
+  const shouldShowTeamsSection = teams.length > 0;
+  const shouldShowSharedMembers = sharedMembers.length > 0;
 
-    return (
-      <Modal
-        isOpen
-        width={640}
-        onRequestClose={onCancel}
-        shouldCloseOnEsc
-        shouldCloseOnOverlayClick
-      >
-        <Wrapper>
-          <ModalTitle>Share</ModalTitle>
-          <UserSearchInput
-            blackList={searchedBlackListMemberIds}
-            onClickAdd={this.handleAddMember}
+  return (
+    <Modal
+      isOpened
+      width={640}
+      onRequestClose={onCancel}
+      shouldCloseOnEsc
+      shouldCloseOnOverlayClick
+    >
+      <ModalTitle>Share</ModalTitle>
+      <ModalSubtitle>Share item with team</ModalSubtitle>
+      <Row>
+        <UserSearchInput
+          blackList={searchedBlackListMemberIds}
+          onClickAdd={handleAddMember}
+        />
+      </Row>
+      {shouldShowAddedMembers && (
+        <Row>
+          <StyledMemberList
+            maxHeight={200}
+            members={members}
+            controlType="remove"
+            onClickRemove={handleRemoveMember}
           />
-          {shouldShowAddedMembers && (
-            <Fragment>
-              <TextWithLinesStyled position="left" width={1}>
-                Personal
-              </TextWithLinesStyled>
-              <MemberListStyled
-                maxHeight={200}
-                members={members}
-                controlType="remove"
-                onClickRemove={this.handleRemoveMember}
-              />
-            </Fragment>
-          )}
-          {shouldShowTeamsSection && (
-            <Fragment>
-              <TextWithLinesAbsolute position="left" width={1}>
-                Teams ({teams.length})
-              </TextWithLinesAbsolute>
-              <TeamsWrapper>{renderedTeamTags}</TeamsWrapper>
-            </Fragment>
-          )}
-          {shouldShowSharedMembers && (
-            <SectionStyled
-              name={INVITED_SECTION}
-              isOpened={openedSections.includes(INVITED_SECTION)}
-              onToggleSection={this.handleToggleSection(INVITED_SECTION)}
-            >
-              <MemberList members={sharedMembers} />
-            </SectionStyled>
-          )}
-          {withAnonymousLink && (
-            <AnonymousLink
-              link={anonymousLink}
-              isLoading={isGeneratingLink}
-              onToggle={this.handleToggleAnonymousLink}
-              onCopy={this.handleCopy}
-              onUpdate={this.handleUpdateAnonymousLink}
+        </Row>
+      )}
+      {shouldShowTeamsSection && (
+        <Row>
+          <TeamList teams={teams} teamIds={teamIds} setTeamIds={setTeamIds} />
+        </Row>
+      )}
+      {shouldShowSharedMembers && (
+        <Row>
+          <Section
+            name={`Invited (${sharedMembers.length})`}
+            isOpened={isOpenedInvited}
+            onToggleSection={() => setOpenedInvited(!isOpenedInvited)}
+          >
+            <StyledMemberList
+              maxHeight={180}
+              members={sharedMembers}
+              controlType="revoke"
+              onClickRevokeAccess={onRevokeAccess}
             />
-          )}
-          <ButtonsWrapper>
-            <ButtonStyled color="white" onClick={onCancel}>
-              CANCEL
-            </ButtonStyled>
-            <Button onClick={this.handleClickDone}>DONE</Button>
-          </ButtonsWrapper>
-        </Wrapper>
-      </Modal>
-    );
-  }
-}
-
-export default ShareModal;
+          </Section>
+        </Row>
+      )}
+      {withAnonymousLink && (
+        <Row>
+          <AnonymousLink
+            link={link}
+            isLoading={isGeneratingLink}
+            onToggle={handleToggleAnonymousLink}
+            onCopy={handleCopy}
+            onUpdate={handleUpdateAnonymousLink}
+          />
+        </Row>
+      )}
+      <ButtonsWrapper>
+        <ButtonStyled color="white" onClick={onCancel}>
+          Cancel
+        </ButtonStyled>
+        <Button onClick={handleClickDone}>Done</Button>
+      </ButtonsWrapper>
+    </Modal>
+  );
+};

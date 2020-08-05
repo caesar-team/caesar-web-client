@@ -64,6 +64,9 @@ export const postKeys = data => callApi.post('/keys', data);
 
 export const getKeys = () => callApi.get('/keys');
 
+export const updateKey = (email, data) =>
+  callApi.post(`/keys/${email}`, data);
+
 export const getQrCode = () => callApi.get('/auth/2fa');
 
 export const getBackupCodes = () => callApi.get('/auth/2fa/backups');
@@ -200,6 +203,15 @@ export const postAddTeamMember = ({ teamId, userId, role }) =>
 
 export const getTeamLists = teamId => callApi.get(`/teams/${teamId}/lists`);
 
+export const postCreateTeamList = (teamId, data) =>
+  callApi.post(`/teams/${teamId}/lists`, data);
+
+export const patchTeamList = (teamId, listId, data) =>
+  callApi.patch(`/teams/${teamId}/lists/${listId}`, data);
+
+export const removeTeamList = (teamId, listId) =>
+  callApi.delete(`/teams/${teamId}/lists/${listId}`);
+
 export const getSearchUser = text => callApi.get(`/users/search/${text}`);
 
 export const getMembers = () => callApi.get('/users');
@@ -208,3 +220,5 @@ export const getDefaultTeamMembers = () =>
   callApi.get('/teams/default/members');
 
 export const patchAcceptTeamItems = () => callApi.patch('/accept_teams_items');
+
+export const getMovableLists = () => callApi.get(`/lists/movable`);

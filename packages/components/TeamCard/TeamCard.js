@@ -3,7 +3,13 @@ import styled from 'styled-components';
 import Link from 'next/link';
 import memoizeOne from 'memoize-one';
 import { Button, AvatarsList, Can } from '@caesar/components';
-import { DELETE_PERMISSION, ROUTES } from '@caesar/common/constants';
+import {
+  ROUTES,
+  TEAM_TYPE,
+  TEAM_TEXT_TYPE,
+  PERMISSION,
+  PERMISSION_ENTITY,
+} from '@caesar/common/constants';
 
 const Wrapper = styled.div`
   display: flex;
@@ -64,6 +70,11 @@ const getMembers = memoizeOne((users, members) =>
   }, []),
 );
 
+const getTeamTitle = team =>
+  team.type === TEAM_TYPE.DEFAULT
+    ? TEAM_TEXT_TYPE[TEAM_TYPE.DEFAULT]
+    : team.title;
+
 const TeamCard = ({
   className,
   team,
@@ -72,8 +83,14 @@ const TeamCard = ({
   onClick = Function.prototype,
   onClickRemoveTeam = Function.prototype,
 }) => {
-  const { id, title, icon, users } = team;
+  const { id, icon, users } = team;
   const areMembersAvailable = users && users.length > 0;
+
+  const teamSubject = {
+    __typename: PERMISSION_ENTITY.TEAM,
+    // eslint-disable-next-line camelcase
+    team_delete: !!team?._links?.team_delete,
+  };
 
   return (
     <Wrapper className={className} onClick={onClick}>
@@ -86,7 +103,7 @@ const TeamCard = ({
           <TeamDetails>
             <TeamIcon src={icon} />
             <TeamInfo>
-              <TeamName>{title}</TeamName>
+              <TeamName>{getTeamTitle(team)}</TeamName>
               {areMembersAvailable && (
                 <TeamMembers>{users.length} members</TeamMembers>
               )}
@@ -97,13 +114,14 @@ const TeamCard = ({
       <AvatarsWrapper>
         {areMembersAvailable && (
           <AvatarsList
-            isSmall
+            size={32}
+            fontSize="small"
             avatars={getMembers(users, members)}
             visibleCount={10}
           />
         )}
         {isRemoveButtonVisible && (
-          <Can I={DELETE_PERMISSION} of={team}>
+          <Can I={PERMISSION.DELETE} a={teamSubject}>
             <Button color="white" onClick={onClickRemoveTeam}>
               Remove
             </Button>

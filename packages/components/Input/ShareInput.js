@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import styled from 'styled-components';
 import { KEY_CODES } from '@caesar/common/constants';
-import Input from './Input';
+import { Input } from './Input';
 import Icon from '../Icon/Icon';
 
 const StyledIcon = styled(Icon)`

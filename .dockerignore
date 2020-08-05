@@ -2,5 +2,6 @@
 /.next
 .env.production
 .env.development
+.env.dist
 yarn-error.log
 /node_modules

@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
+import Link from 'next/link';
 import copy from 'copy-text-to-clipboard';
 import { Icon, Button, withNotification } from '@caesar/components';
 import { downloadAsZip } from '@caesar/common/utils/file';
 import { media } from '@caesar/assets/styles/media';
+import { DOMAIN_SECURE_ROUTE } from '@caesar/common/constants';
 import { MessageStep, PasswordStep } from './steps';
 
 const Wrapper = styled.div`
@@ -26,6 +28,7 @@ const Title = styled.div`
 `;
 
 const StyledLogo = styled(Icon)`
+  margin-top: auto;
   fill: ${({ theme }) => theme.color.white};
 `;
 
@@ -56,6 +59,19 @@ const ButtonStyled = styled(Button)`
   }
 `;
 
+const Footer = styled.div`
+  margin-top: auto;
+
+  ${media.wideMobile`
+    margin-top: 24px;
+  `}
+`;
+
+const StyledLink = styled.a`
+  font-size: ${({ theme }) => theme.font.size.small};
+  color: ${({ theme }) => theme.color.white};
+  text-decoration: none;
+`;
 
 const SecureMessageContainerComponent = ({
   notification,
@@ -78,7 +94,7 @@ const SecureMessageContainerComponent = ({
 
   const title = decryptedMessage
     ? 'It’s your secret'
-    : 'Enter password to access';
+    : 'Enter the password to access the message';
   const shouldShowButtons = !!decryptedMessage;
   const shouldShowDownloadButton =
     decryptedMessage &&
@@ -125,6 +141,13 @@ const SecureMessageContainerComponent = ({
           )}
         </ButtonsWrapper>
       )}
+      <Footer>
+        {shouldShowButtons && (
+          <Link passHref href={DOMAIN_SECURE_ROUTE}>
+            <StyledLink>Create Your Own Secure Message</StyledLink>
+          </Link>
+        )}
+      </Footer>
     </Wrapper>
   );
 };

@@ -1,15 +1,18 @@
+/* eslint-disable camelcase */
 import React, { useState } from 'react';
-import { useDispatch } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import { Draggable } from 'react-beautiful-dnd';
 import styled from 'styled-components';
-import { upperFirst } from '@caesar/common/utils/string';
-import { LIST_TYPES_ARRAY } from '@caesar/common/constants';
+import { transformListTitle } from '@caesar/common/utils/string';
+import { PERMISSION, PERMISSION_ENTITY } from '@caesar/common/constants';
+import { currentTeamSelector } from '@caesar/common/selectors/user';
 import {
   createListRequest,
   editListRequest,
 } from '@caesar/common/actions/entities/list';
+import { Can } from '../../Ability';
 import { Icon } from '../../Icon';
-import { ListItemInput } from './ListItemInput';
+import { ListInput } from './ListInput';
 import { ConfirmRemoveListModal } from './ConfirmRemoveListModal';
 import { MenuItemInner } from './styledComponents';
 
@@ -33,11 +36,11 @@ const StyledIcon = styled(Icon)`
   }
 `;
 
-const ItemIcon = styled(StyledIcon)`
+const ActionIcon = styled(StyledIcon)`
   display: none;
 `;
 
-const DnDIcon = styled(ItemIcon)`
+const DnDIcon = styled(ActionIcon)`
   position: absolute;
   top: 50%;
   left: 24px;
@@ -58,7 +61,7 @@ const Wrapper = styled(MenuItemInner)`
     ${Counter} {
       ${({ isDefault }) => !isDefault && `display: none;`}
     }
-    ${ItemIcon} {
+    ${ActionIcon} {
       display: block;
     }
     ${DnDIcon} {
@@ -68,99 +71,129 @@ const Wrapper = styled(MenuItemInner)`
 `;
 
 export const ListItem = ({
-  item = {},
+  list = {},
   activeListId,
   index,
-  handleClickMenuItem = Function.prototype,
+  onClickMenuItem = Function.prototype,
   isCreatingMode,
-  setIsCreatingMode,
+  isDraggable,
+  notification,
+  setCreatingMode,
 }) => {
   const dispatch = useDispatch();
-  const { id, label, children = [] } = item;
+  const currentTeam = useSelector(currentTeamSelector);
+  const { id, label, children = [], teamId } = list;
   const isDefault = label === 'default';
-  const [isEditMode, setIsEditMode] = useState(isCreatingMode);
-  const [isOpenedPopup, setIsOpenedPopup] = useState(false);
+  const [isEditMode, setEditMode] = useState(isCreatingMode);
+  const [isOpenedPopup, setOpenedPopup] = useState(false);
   const [value, setValue] = useState(label);
 
   const handleClickEdit = () => {
-    setIsEditMode(true);
+    setEditMode(true);
   };
 
   const handleClickRemove = () => {
-    setIsOpenedPopup(true);
+    setOpenedPopup(true);
   };
 
   const handleClickAcceptEdit = () => {
     if (isCreatingMode) {
-      dispatch(createListRequest({ label: value }));
-      setIsCreatingMode(false);
+      dispatch(
+        createListRequest(
+          { label: value, teamId: currentTeam?.id || null },
+          { notification, setCreatingMode },
+        ),
+      );
     } else {
-      dispatch(editListRequest({ ...item, label: value }));
+      dispatch(
+        editListRequest(
+          { ...list, label: value, teamId: currentTeam?.id || null },
+          { notification, setEditMode },
+        ),
+      );
     }
-
-    setIsEditMode(false);
   };
 
   const handleClickClose = () => {
     if (isCreatingMode) {
-      setIsCreatingMode(false);
+      setCreatingMode(false);
     }
 
-    setIsEditMode(false);
+    setEditMode(false);
     setValue(label);
   };
 
-  const itemTitle = LIST_TYPES_ARRAY.includes(label)
-    ? upperFirst(label)
-    : label;
+  const listTitle = transformListTitle(label);
 
-  const renderInner = () => (
+  const listSubject = teamId
+    ? {
+        __typename: PERMISSION_ENTITY.TEAM_LIST,
+        team_edit_list: !!list?._links?.team_edit_list,
+        team_sort_list: !!list?._links?.team_sort_list,
+        team_delete_list: !!list?._links?.team_delete_list,
+      }
+    : {
+        __typename: PERMISSION_ENTITY.LIST,
+        edit_list: !!list?._links?.edit_list,
+        sort_list: !!list?._links?.sort_list,
+        delete_list: !!list?._links?.delete_list,
+      };
+
+  const renderInner = dragHandleProps => (
     <>
       {isEditMode ? (
-        <ListItemInput
+        <ListInput
           isEditMode={isEditMode}
-          setIsEditMode={setIsEditMode}
+          setEditMode={setEditMode}
           isCreatingMode={isCreatingMode}
-          setIsCreatingMode={setIsCreatingMode}
+          setCreatingMode={setCreatingMode}
           value={value}
           setValue={setValue}
           label={label}
-          handleClickAcceptEdit={handleClickAcceptEdit}
-          handleClickClose={handleClickClose}
+          onClickAcceptEdit={handleClickAcceptEdit}
+          onClickClose={handleClickClose}
         />
       ) : (
         <>
-          <DnDIcon name="drag-n-drop" width={16} height={16} color="gray" />
-          <Title>{itemTitle}</Title>
-          <Counter>{children.length}</Counter>
-          {!isDefault && (
-            <>
-              <ItemIcon
-                name="pencil"
-                width={16}
-                height={16}
-                color="gray"
-                onClick={handleClickEdit}
-              />
-              <ItemIcon
-                name="trash"
-                width={16}
-                height={16}
-                color="gray"
-                onClick={handleClickRemove}
-              />
-            </>
-          )}
+          <div {...dragHandleProps}>
+            <Can I={PERMISSION.SORT} a={listSubject}>
+              <DnDIcon name="drag-n-drop" width={16} height={16} color="gray" />
+            </Can>
+          </div>
+          <Title>{listTitle}</Title>
+          <Can I={PERMISSION.EDIT} a={listSubject}>
+            <Counter>{children.length}</Counter>
+          </Can>
+          <Can not I={PERMISSION.EDIT} a={listSubject}>
+            <div>{children.length}</div>
+          </Can>
+          <Can I={PERMISSION.EDIT} a={listSubject}>
+            <ActionIcon
+              name="pencil"
+              width={16}
+              height={16}
+              color="gray"
+              onClick={handleClickEdit}
+            />
+          </Can>
+          <Can I={PERMISSION.DELETE} a={listSubject}>
+            <ActionIcon
+              name="trash"
+              width={16}
+              height={16}
+              color="gray"
+              onClick={handleClickRemove}
+            />
+          </Can>
         </>
       )}
-      <DnDIcon name="drag-n-drop" width={16} height={16} color="gray" />
     </>
   );
 
-  return isCreatingMode ? (
+  return isCreatingMode || !isDraggable ? (
     <Wrapper
       isActive={activeListId === id && !isEditMode}
-      onClick={() => handleClickMenuItem(id)}
+      onClick={() => onClickMenuItem(id)}
       isEdit={isEditMode}
       isDefault={isDefault}
     >
@@ -177,21 +210,21 @@ export const ListItem = ({
         {provided => (
           <Wrapper
             isActive={activeListId === id && !isEditMode}
-            onClick={() => handleClickMenuItem(id)}
+            onClick={() => onClickMenuItem(id)}
             isEdit={isEditMode}
             isDefault={isDefault}
             ref={provided.innerRef}
             {...provided.draggableProps}
-            {...provided.dragHandleProps}
           >
-            {renderInner()}
+            {renderInner(provided.dragHandleProps)}
           </Wrapper>
         )}
       </Draggable>
       <ConfirmRemoveListModal
-        item={item}
+        currentTeam={currentTeam}
+        list={list}
         isOpenedPopup={isOpenedPopup}
-        setIsOpenedPopup={setIsOpenedPopup}
+        setOpenedPopup={setOpenedPopup}
       />
     </>
   );

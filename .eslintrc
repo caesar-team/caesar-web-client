@@ -40,7 +40,8 @@
     "no-underscore-dangle": 0,
     "class-methods-use-this": 0,
     "camelcase": ["error", { "properties": "always" } ],
-    "newline-before-return": 1
+    "newline-before-return": 1,
+    "max-lines": ["error", { "max": 300 }]
   },
   "env": {
     "browser": true,

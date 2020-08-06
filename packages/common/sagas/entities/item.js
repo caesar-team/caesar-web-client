@@ -10,23 +10,15 @@ import {
 } from 'redux-saga/effects';
 import deepequal from 'fast-deep-equal';
 import {
-  ACCEPT_ITEM_UPDATE_REQUEST,
   CREATE_ITEM_REQUEST,
   CREATE_ITEMS_BATCH_REQUEST,
   EDIT_ITEM_REQUEST,
   UPDATE_ITEM_REQUEST,
   MOVE_ITEM_REQUEST,
   MOVE_ITEMS_BATCH_REQUEST,
-  REJECT_ITEM_UPDATE_REQUEST,
   REMOVE_ITEM_REQUEST,
   REMOVE_ITEMS_BATCH_REQUEST,
   TOGGLE_ITEM_TO_FAVORITE_REQUEST,
-  CREATE_ANONYMOUS_LINK_REQUEST,
-  REMOVE_ANONYMOUS_LINK_REQUEST,
-  SHARE_ITEM_BATCH_REQUEST,
-  REMOVE_SHARE_REQUEST,
-  acceptItemUpdateSuccess,
-  acceptItemUpdateFailure,
   createItemSuccess,
   createItemFailure,
   createItemsBatchSuccess,
@@ -37,24 +29,14 @@ import {
   moveItemSuccess,
   moveItemFailure,
   moveItemsBatchFailure,
-  rejectItemUpdateSuccess,
-  rejectItemUpdateFailure,
   removeItemSuccess,
   removeItemFailure,
   removeItemsBatchSuccess,
   removeItemsBatchFailure,
   toggleItemToFavoriteSuccess,
   toggleItemToFavoriteFailure,
-  createAnonymousLinkSuccess,
-  createAnonymousLinkFailure,
-  removeAnonymousLinkSuccess,
-  removeAnonymousLinkFailure,
   removeChildItemFromItem,
   removeChildItemsBatchFromItem,
-  shareItemBatchSuccess,
-  shareItemBatchFailure,
-  removeShareSuccess,
-  removeShareFailure,
   updateItemField,
 } from '@caesar/common/actions/entities/item';
 import {
@@ -111,12 +93,10 @@ import {
 } from '@caesar/common/selectors/entities/team';
 import { addTeamKeyPair } from '@caesar/common/actions/keyStore';
 import {
-  acceptUpdateItem,
   patchChildItem,
   postCreateChildItem,
   postCreateItem,
   postCreateItemsBatch,
-  rejectUpdateItem,
   deleteChildItem,
   removeItem,
   removeItemsBatch,
@@ -142,7 +122,6 @@ import {
   COMMON_PROGRESS_NOTIFICATION,
   CREATING_ITEM_NOTIFICATION,
   CREATING_ITEMS_NOTIFICATION,
-  SHARING_IN_PROGRESS_NOTIFICATION,
   ENCRYPTING_ITEM_NOTIFICATION,
   MOVING_IN_PROGRESS_NOTIFICATION,
   REMOVING_IN_PROGRESS_NOTIFICATION,
@@ -224,99 +203,6 @@ export function* removeItemsBatchSaga({ payload: { listId } }) {
       updateGlobalNotification(getServerErrorMessage(error), false, true),
     );
     yield put(removeItemsBatchFailure());
-  }
-}
-
-export function* shareItemBatchSaga({
-  payload: {
-    data: { itemIds = [], members = [], teamIds = [] },
-    options: { includeIniciator = true },
-  },
-}) {
-  try {
-    yield put(updateGlobalNotification(SHARING_IN_PROGRESS_NOTIFICATION, true));
-
-    const user = yield select(userDataSelector);
-    const items = yield select(itemsBatchSelector, { itemIds });
-
-    const preparedMembers = yield call(prepareUsersForSharing, members);
-
-    const newMembers = preparedMembers.filter(({ isNew }) => isNew);
-
-    const directMembers = preparedMembers.map(member => ({
-      ...member,
-      teamId: null,
-    }));
-
-    const teamsMembers = yield select(teamsMembersSelector, { teamIds });
-
-    const preparedTeamsMembers = includeIniciator
-      ? teamsMembers
-      : teamsMembers.filter(member => member.id !== user.id);
-
-    const allMembers = [...directMembers, ...preparedTeamsMembers];
-
-    const itemUserPairs = yield call(getItemUserPairs, {
-      items,
-      members: allMembers,
-    });
-
-    if (newMembers.length > 0) {
-      yield fork(inviteNewMemberBatchSaga, {
-        payload: { members: newMembers },
-      });
-    }
-
-    if (itemUserPairs.length > 0) {
-      yield fork(createChildItemBatchSaga, { payload: { itemUserPairs } });
-
-      const {
-        payload: { childItems },
-      } = yield take(CREATE_CHILD_ITEM_BATCH_FINISHED_EVENT);
-
-      const shares = childItems.reduce(
-        (accumulator, item) => [
-          ...accumulator,
-          {
-            itemId: item.originalItemId,
-            childItemIds: item.items.map(({ id }) => id),
-          },
-        ],
-        [],
-      );
-
-      yield put(shareItemBatchSuccess(shares));
-
-      yield put(updateWorkInProgressItem());
-    }
-
-    yield put(updateGlobalNotification(NOOP_NOTIFICATION, false));
-  } catch (error) {
-    console.log(error);
-    yield put(
-      updateGlobalNotification(getServerErrorMessage(error), false, true),
-    );
-    yield put(shareItemBatchFailure());
-  }
-}
-
-export function* removeShareSaga({ payload: { shareId } }) {
-  try {
-    const workInProgressItem = yield select(workInProgressItemSelector);
-
-    yield call(deleteChildItem, shareId);
-
-    yield put(removeChildItemFromItem(workInProgressItem.id, shareId));
-    yield put(removeShareSuccess(workInProgressItem.id, shareId));
-    yield put(updateWorkInProgressItem());
-
-    yield put(updateGlobalNotification(NOOP_NOTIFICATION, false));
-  } catch (error) {
-    console.log(error);
-    yield put(
-      updateGlobalNotification(getServerErrorMessage(error), false, true),
-    );
-    yield put(removeShareFailure());
   }
 }
 
@@ -687,146 +573,6 @@ export function* editItemSaga({
   }
 }
 
-export function* acceptItemSaga({ payload: { id } }) {
-  try {
-    const keyPair = yield select(personalKeyPairSelector);
-    const masterPassword = yield select(masterPasswordSelector);
-
-    const {
-      data: { secret, ...itemData },
-    } = yield call(acceptUpdateItem, id);
-
-    const privateKeyObj = yield call(
-      getPrivateKeyObj,
-      keyPair.privateKey,
-      masterPassword,
-    );
-
-    const decryptedItemSecret = yield decryptItem(secret, privateKeyObj);
-
-    const newItem = {
-      ...itemData,
-      secret,
-      data: decryptedItemSecret,
-      invited: itemData.invited.map(({ id: childId }) => childId),
-    };
-
-    yield put(acceptItemUpdateSuccess(newItem));
-    yield put(updateWorkInProgressItem());
-  } catch (error) {
-    console.error(error);
-    yield put(
-      updateGlobalNotification(getServerErrorMessage(error), false, true),
-    );
-    yield put(acceptItemUpdateFailure(error));
-  }
-}
-
-export function* rejectItemSaga({ payload: { id } }) {
-  try {
-    yield call(rejectUpdateItem, id);
-
-    yield put(rejectItemUpdateSuccess(id));
-    yield put(updateWorkInProgressItem());
-  } catch (error) {
-    console.log(error);
-    yield put(
-      updateGlobalNotification(getServerErrorMessage(error), false, true),
-    );
-    yield put(rejectItemUpdateFailure(error));
-  }
-}
-
-export function* createAnonymousLinkSaga() {
-  try {
-    const workInProgressItem = yield select(workInProgressItemSelector);
-
-    const email = generateAnonymousEmail();
-
-    const {
-      id: userId,
-      name,
-      password,
-      masterPassword,
-      publicKey,
-    } = yield call(createMemberSaga, {
-      payload: {
-        email,
-        role: ROLE_ANONYMOUS_USER,
-      },
-    });
-
-    const encryptedSecret = yield call(
-      encryptItem,
-      workInProgressItem.data,
-      publicKey,
-    );
-
-    const {
-      data: { items },
-    } = yield call(postCreateChildItem, workInProgressItem.id, {
-      items: [
-        {
-          userId,
-          secret: encryptedSecret,
-          cause: SHARE_TYPE,
-          access: PERMISSION_READ,
-        },
-      ],
-    });
-
-    const link = generateSharingUrl(
-      items[0].id,
-      objectToBase64({
-        e: email,
-        p: password,
-        mp: masterPassword,
-      }),
-    );
-
-    yield call(patchChildItem, workInProgressItem.id, {
-      items: [{ userId, link, secret: encryptedSecret }],
-    });
-
-    const share = {
-      id: items[0].id,
-      userId,
-      email,
-      name,
-      link,
-      publicKey,
-      isAccepted: false,
-      roles: [ROLE_ANONYMOUS_USER],
-    };
-
-    yield put(createAnonymousLinkSuccess(workInProgressItem.id, share));
-    yield put(updateWorkInProgressItem());
-  } catch (error) {
-    console.log(error);
-    yield put(
-      updateGlobalNotification(getServerErrorMessage(error), false, true),
-    );
-    yield put(createAnonymousLinkFailure());
-  }
-}
-
-export function* removeAnonymousLinkSaga() {
-  try {
-    const workInProgressItem = yield select(workInProgressItemSelector);
-
-    yield call(deleteChildItem, workInProgressItem.shared.id);
-
-    yield put(removeAnonymousLinkSuccess(workInProgressItem.id));
-    yield put(updateWorkInProgressItem());
-  } catch (error) {
-    console.log(error);
-    yield put(
-      updateGlobalNotification(getServerErrorMessage(error), false, true),
-    );
-    yield put(removeAnonymousLinkFailure());
-  }
-}
-
 export default function* itemSagas() {
   yield takeLatest(REMOVE_ITEM_REQUEST, removeItemSaga);
   yield takeLatest(REMOVE_ITEMS_BATCH_REQUEST, removeItemsBatchSaga);
@@ -836,11 +582,5 @@ export default function* itemSagas() {
   yield takeLatest(CREATE_ITEMS_BATCH_REQUEST, createItemsBatchSaga);
   yield takeLatest(EDIT_ITEM_REQUEST, editItemSaga);
   yield takeLatest(UPDATE_ITEM_REQUEST, updateItemSaga);
-  yield takeLatest(ACCEPT_ITEM_UPDATE_REQUEST, acceptItemSaga);
-  yield takeLatest(REJECT_ITEM_UPDATE_REQUEST, rejectItemSaga);
   yield takeLatest(TOGGLE_ITEM_TO_FAVORITE_REQUEST, toggleItemToFavoriteSaga);
-  yield takeLatest(CREATE_ANONYMOUS_LINK_REQUEST, createAnonymousLinkSaga);
-  yield takeLatest(REMOVE_ANONYMOUS_LINK_REQUEST, removeAnonymousLinkSaga);
-  yield takeLatest(SHARE_ITEM_BATCH_REQUEST, shareItemBatchSaga);
-  yield takeLatest(REMOVE_SHARE_REQUEST, removeShareSaga);
 }

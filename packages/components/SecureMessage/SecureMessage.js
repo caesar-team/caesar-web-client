@@ -97,6 +97,8 @@ const SecureMessageComponent = ({
               requests: requestsLimit,
               messageId: id,
             });
+
+            return true;
           })
           .catch(error => {
             logger.error('Error: %o', error);

@@ -5,7 +5,6 @@ import {
   takeLatest,
   select,
   fork,
-  take,
   all,
 } from 'redux-saga/effects';
 import deepequal from 'fast-deep-equal';
@@ -35,7 +34,6 @@ import {
   removeItemsBatchFailure,
   toggleItemToFavoriteSuccess,
   toggleItemToFavoriteFailure,
-  removeChildItemFromItem,
   removeChildItemsBatchFromItem,
   updateItemField,
 } from '@caesar/common/actions/entities/item';
@@ -47,20 +45,12 @@ import {
   removeItemsBatchFromList,
   toggleItemToFavoriteList,
 } from '@caesar/common/actions/entities/list';
-import {
-  CREATE_CHILD_ITEM_BATCH_FINISHED_EVENT,
-  removeChildItemsBatch,
-} from '@caesar/common/actions/entities/childItem';
+import { removeChildItemsBatch } from '@caesar/common/actions/entities/childItem';
 import { setCurrentTeamId } from '@caesar/common/actions/user';
 import { updateGlobalNotification } from '@caesar/common/actions/application';
 import {
-  createChildItemBatchSaga,
   updateChildItemsBatchSaga,
 } from '@caesar/common/sagas/entities/childItem';
-import {
-  prepareUsersForSharing,
-  getItemUserPairs,
-} from '@caesar/common/sagas/common/share';
 import { inviteNewMemberBatchSaga } from '@caesar/common/sagas/common/invite';
 import {
   setWorkInProgressItem,
@@ -78,26 +68,18 @@ import {
   defaultListSelector,
   currentTeamDefaultListSelector,
 } from '@caesar/common/selectors/entities/list';
+import { itemSelector } from '@caesar/common/selectors/entities/item';
 import {
-  itemsBatchSelector,
-  itemSelector,
-} from '@caesar/common/selectors/entities/item';
-import {
-  masterPasswordSelector,
   userDataSelector,
   currentTeamIdSelector,
 } from '@caesar/common/selectors/user';
 import {
   teamSelector,
-  teamsMembersSelector,
 } from '@caesar/common/selectors/entities/team';
 import { addTeamKeyPair } from '@caesar/common/actions/keyStore';
 import {
-  patchChildItem,
-  postCreateChildItem,
   postCreateItem,
   postCreateItemsBatch,
-  deleteChildItem,
   removeItem,
   removeItemsBatch,
   toggleFavorite,
@@ -105,19 +87,12 @@ import {
   updateMoveItem,
 } from '@caesar/common/api';
 import {
-  decryptItem,
   encryptItem,
   encryptItemsBatch,
-  generateAnonymousEmail,
-  getPrivateKeyObj,
 } from '@caesar/common/utils/cipherUtils';
 import { getServerErrorMessage } from '@caesar/common/utils/error';
-import { objectToBase64 } from '@caesar/common/utils/base64';
 import { chunk } from '@caesar/common/utils/utils';
 import {
-  ROLE_ANONYMOUS_USER,
-  PERMISSION_READ,
-  SHARE_TYPE,
   ENTITY_TYPE,
   COMMON_PROGRESS_NOTIFICATION,
   CREATING_ITEM_NOTIFICATION,
@@ -130,8 +105,6 @@ import {
   TEAM_TYPE,
   ITEM_TYPE,
 } from '@caesar/common/constants';
-import { generateSharingUrl } from '@caesar/common/utils/sharing';
-import { createMemberSaga } from './member';
 import {
   personalKeyPairSelector,
   teamKeyPairSelector,

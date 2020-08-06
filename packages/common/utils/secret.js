@@ -47,7 +47,6 @@ export const decryptSecretRaws = (secret, passphrase) => {
 
 export const encryptSecret = async (secret, passphrase) => {
   const secretMessage = buildSecretMessage(secret);
-
   const encryptedMessagePromise = encryptByPassword(
     secretMessage.message,
     passphrase,

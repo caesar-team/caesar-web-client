@@ -10,7 +10,6 @@ import {
   SAVE_NOTIFICATION,
   DEFAULT_ERROR_MESSAGE,
 } from '@caesar/common/constants';
-import { encryptByPassword } from '@caesar/common/utils/cipherUtils';
 import { passwordGenerator } from '@caesar/common/utils/passwordGenerator';
 import { Scrollbar, withNotification } from '@caesar/components';
 import { SecureMessageForm } from './SecureMessageForm';

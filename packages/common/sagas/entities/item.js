@@ -502,48 +502,6 @@ export function* createItemSaga({
       yield put(addItemToList(newItem));
     }
 
-    if (teamId && !isSystemItem) {
-      yield put(
-        updateGlobalNotification(SHARING_IN_PROGRESS_NOTIFICATION, true),
-      );
-
-      const team = yield select(teamSelector, { teamId });
-      const memberIds = team.users.map(({ id }) => id);
-      const members = yield select(membersBatchSelector, { memberIds });
-
-      const itemUserPairs = members
-        .filter(({ id }) => id !== user.id)
-        .map(({ id, publicKey }) => ({
-          item: { id: itemId, data: newItem.data },
-          user: { id, publicKey, teamId },
-        }));
-
-      if (itemUserPairs.length > 0) {
-        yield fork(createChildItemBatchSaga, {
-          payload: { itemUserPairs },
-        });
-
-        const {
-          payload: { childItems },
-        } = yield take(CREATE_CHILD_ITEM_BATCH_FINISHED_EVENT);
-
-        const shares = childItems.reduce(
-          // eslint-disable-next-line
-          (accumulator, item) => [
-            ...accumulator,
-            {
-              itemId: item.originalItemId,
-              childItemIds: item.items.map(({ id }) => id),
-            },
-          ],
-          [],
-        );
-
-        yield put(addChildItemsBatchToItems(shares));
-        yield put(updateWorkInProgressItem());
-      }
-    }
-
     yield put(setCurrentTeamId(teamId || TEAM_TYPE.PERSONAL));
 
     if (isSystemItem) {

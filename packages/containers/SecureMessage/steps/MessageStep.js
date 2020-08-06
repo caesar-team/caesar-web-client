@@ -1,7 +1,10 @@
 import React from 'react';
 import styled from 'styled-components';
 import { File, Scrollbar } from '@caesar/components';
-import { downloadFile } from '@caesar/common/utils/file';
+import {
+  downloadFile,
+  makeFileFromAttachment,
+} from '@caesar/common/utils/file';
 import { escapeHTML } from '@caesar/common/utils/string';
 
 const MessageWrapper = styled.div`
@@ -61,24 +64,29 @@ const FileStyled = styled(File)`
   }
 `;
 
-export const MessageStep = ({ decryptedMessage }) => {
+export const MessageStep = ({ decryptedMessage, decryptedRaws }) => {
   const shouldShowText = !!decryptedMessage.text;
   const shouldShowAttachments = decryptedMessage.attachments.length > 0;
 
   const handleClickDownloadFile = index => () => {
-    const { raw, name } = decryptedMessage.attachments[index];
+    const file = makeFileFromAttachment({
+      ...decryptedMessage.attachments[index],
+      raw: decryptedRaws[index],
+    });
 
-    downloadFile(raw, name);
+    downloadFile(file.raw, file.name);
   };
 
   const renderedAttachments = decryptedMessage.attachments.map(
-    (attachment, index) => (
-      <FileStyled
-        key={index}
-        onClickDownload={handleClickDownloadFile(index)}
-        {...attachment}
-      />
-    ),
+    (attachment, index) => {
+      return (
+        <FileStyled
+          key={index}
+          onClickDownload={handleClickDownloadFile(index)}
+          attachment={attachment}
+        />
+      );
+    },
   );
 
   const text = String.raw`${decryptedMessage.text}`;

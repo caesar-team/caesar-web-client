@@ -1,7 +1,6 @@
 import * as openpgp from 'openpgp';
 import { generateKeys } from '@caesar/common/utils/key';
 import { randomId } from '@caesar/common/utils/uuid4';
-import { logger } from '@caesar/common/utils/logger';
 import { createSrp } from './srp';
 import { passwordGenerator } from './passwordGenerator';
 
@@ -24,7 +23,8 @@ export const decryptItem = async (secretArmored, privateKeyObj) => {
 
     return JSON.parse(data);
   } catch (error) {
-    logger.error('decryption error %s', error);
+    // eslint-disable-next-line no-console
+    console.error('decryption error %s', error);
 
     return null;
   }

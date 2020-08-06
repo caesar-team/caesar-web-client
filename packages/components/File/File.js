@@ -147,7 +147,7 @@ const ERROR_STATUS = 'error';
 
 const File = ({
   status = UPLOADED_STATUS,
-  name,
+  attachment,
   raw,
   error,
   itemSubject,
@@ -155,9 +155,9 @@ const File = ({
   onClickDownload,
   ...props
 }) => {
-  const ext = extactExtFromFilename(name);
-  const filename = decodeURIComponent(getFilenameWithoutExt(name));
-  const size = humanizeSize(getRealFileSizeForBase64enc(raw.length), true);
+  const { ext } = attachment;
+  const name = decodeURIComponent(attachment.name);
+  const size = humanizeSize(attachment.size);
 
   const handleClickCloseIcon = e => {
     e.stopPropagation();
@@ -183,7 +183,7 @@ const File = ({
         <ErrorInner>
           <ErrorStatus />
           <Details>
-            <FileName>{filename}</FileName>
+            <FileName>{name}</FileName>
             <FileSize>{size}</FileSize>
           </Details>
           {onClickRemove && hoverableCloseIcon}
@@ -201,7 +201,7 @@ const File = ({
     >
       <FileExt>{ext}</FileExt>
       <Details>
-        <FileName>{filename}</FileName>
+        <FileName>{name}</FileName>
         <FileSize>{size}</FileSize>
       </Details>
       {itemSubject ? (

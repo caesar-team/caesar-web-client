@@ -10,7 +10,7 @@ import {
   SAVE_NOTIFICATION,
   DEFAULT_ERROR_MESSAGE,
 } from '@caesar/common/constants';
-
+import { encryptByPassword } from '@caesar/common/utils/cipherUtils';
 import { passwordGenerator } from '@caesar/common/utils/passwordGenerator';
 import { Scrollbar, withNotification } from '@caesar/components';
 import { SecureMessageForm } from './SecureMessageForm';
@@ -67,8 +67,11 @@ const SecureMessageComponent = ({
             position: 'bottom-right',
           },
         });
-        const pwd = passwordValue || passwordGenerator();
-        const encryptedData = await encryptSecret(secret);
+        const passphrase = passwordValue || passwordGenerator();
+        const { encryptedMessage, encryptedRaws } = await encryptSecret(
+          secret,
+          passphrase,
+        );
 
         notification.show({
           text: SAVE_NOTIFICATION,
@@ -78,7 +81,7 @@ const SecureMessageComponent = ({
         });
 
         postSecureMessage({
-          message: JSON.stringify(encryptedData),
+          message: JSON.stringify({ encryptedMessage, encryptedRaws }),
           secondsLimit,
           requestsLimit,
         })
@@ -92,7 +95,7 @@ const SecureMessageComponent = ({
             }
             setState({
               step: SECURE_MESSAGE_LINK_STEP,
-              password: pwd,
+              password: passphrase,
               seconds: secondsLimit,
               requests: requestsLimit,
               messageId: id,

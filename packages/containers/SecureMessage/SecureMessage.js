@@ -79,6 +79,7 @@ const SecureMessageContainerComponent = ({
   password,
 }) => {
   const [decryptedMessage, setDecryptedMessage] = useState(null);
+  const [decryptedRaws, setDecryptedRaws] = useState(null);
 
   const handleClickCopyText = () => {
     copy(decryptedMessage.text);
@@ -89,7 +90,15 @@ const SecureMessageContainerComponent = ({
   };
 
   const handleClickDownloadFiles = () => {
-    downloadAsZip(decryptedMessage.attachments);
+    const attachments = decryptedMessage.attachments.map(
+      (attachment, index) => {
+        return {
+          raw: decryptedRaws[index],
+          name: `${attachment.name}.${attachment.ext}`,
+        };
+      },
+    );
+    downloadAsZip(attachments);
   };
 
   const title = decryptedMessage
@@ -111,12 +120,16 @@ const SecureMessageContainerComponent = ({
       <StyledLogo name="logo-secure-message" width={214} height={60} />
       <Title>{title}</Title>
       {decryptedMessage ? (
-        <MessageStep decryptedMessage={decryptedMessage} />
+        <MessageStep
+          decryptedMessage={decryptedMessage}
+          decryptedRaws={decryptedRaws}
+        />
       ) : (
         <PasswordStep
           message={message}
           password={password}
           setDecryptedMessage={setDecryptedMessage}
+          setDecryptedRaws={setDecryptedRaws}
         />
       )}
       {shouldShowButtons && (

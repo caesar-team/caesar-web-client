@@ -49,11 +49,11 @@ export const encryptSecret = async (secret, passphrase) => {
   const secretMessage = buildSecretMessage(secret);
 
   const encryptedMessagePromise = encryptByPassword(
-    JSON.stringify(secretMessage.message),
+    secretMessage.message,
     passphrase,
   );
   const encryptedRawsPromise = encryptByPassword(
-    JSON.stringify(secretMessage.raws),
+    secretMessage.raws,
     passphrase,
   );
 
@@ -63,7 +63,7 @@ export const encryptSecret = async (secret, passphrase) => {
   ]);
 
   return {
-    encryptedMessage,
-    encryptedRaws,
+    encryptedMessage: await encryptedMessage,
+    encryptedRaws: await encryptedRaws,
   };
 };

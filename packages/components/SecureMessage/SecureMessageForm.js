@@ -4,7 +4,10 @@ import { useFormik } from 'formik';
 import { media } from '@caesar/assets/styles/media';
 import { Select } from '@caesar/components/Select';
 import { checkError } from '@caesar/common/utils/formikUtils';
-import { downloadFile } from '@caesar/common/utils/file';
+import {
+  downloadFile,
+  makeAttachemntFromFile,
+} from '@caesar/common/utils/file';
 import { useMedia } from '@caesar/common/hooks';
 import { Checkbox } from '../Checkbox';
 import { TextArea, PasswordInput } from '../Input';
@@ -189,26 +192,27 @@ const renderAttachments = (
   errors = [],
   setFieldValue,
   isSubmitting,
-) =>
-  attachments.map((attachment, index) => (
+) => {
+  return attachments.map((file, index) => (
     <FileRow key={index} disabled={isSubmitting}>
       <File
         key={index}
         status={checkAttachmentsError(errors, index) ? 'error' : 'uploaded'}
-        onClickDownload={() => handleClickDownloadFile(attachment)}
+        onClickDownload={() => handleClickDownloadFile(file)}
         onClickRemove={() =>
           setFieldValue(
             'attachments',
             attachments.filter((_, fileIndex) => index !== fileIndex),
           )
         }
-        {...attachment}
+        attachment={makeAttachemntFromFile(file)}
       />
       {checkAttachmentsError(errors, index) && (
         <TextError>{errors[index].raw}</TextError>
       )}
     </FileRow>
   ));
+};
 
 const SecureMessageFormComponent = ({ onSubmit, notification, isOnline }) => {
   const { isMobile } = useMedia();

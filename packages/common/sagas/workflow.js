@@ -16,7 +16,7 @@ import {
   SET_CURRENT_TEAM_ID,
   setCurrentTeamId,
 } from '@caesar/common/actions/user';
-import { addTeamsKeyPair } from '@caesar/common/actions/keyStore';
+import { addTeamKeyPair } from '@caesar/common/actions/keyStore';
 import { addChildItemsBatch } from '@caesar/common/actions/entities/childItem';
 import { fetchMembersSaga } from '@caesar/common/sagas/entities/member';
 import { convertNodesToEntities } from '@caesar/common/normalizers/normalizers';
@@ -42,7 +42,7 @@ import {
   workInProgressListIdSelector,
   workInProgressItemSelector,
 } from '@caesar/common/selectors/workflow';
-import { teamKeysSelector } from '@caesar/common/selectors/keyStore';
+import { teamKeyPairSelector } from '@caesar/common/selectors/keyStore';
 import { getFavoritesList } from '@caesar/common/normalizers/utils';
 import { fetchTeamSuccess } from '@caesar/common/actions/entities/team';
 import { getServerErrorMessage } from '@caesar/common/utils/error';
@@ -163,7 +163,7 @@ function* initTeam(team, withDecryption) {
 
     yield put(resetWorkInProgressItemIds(null));
 
-    const teamSystemItem = yield select(teamKeysSelector, { teamName: team.title });
+    const teamSystemItem = yield select(teamKeyPairSelector, { teamName: team.title });
 
     if (currentTeamId === team.id && withDecryption) {
       const keyPair = yield select(keyPairSelector);
@@ -273,7 +273,7 @@ export function* decryptionEndWatchSaga() {
         .filter(({ type }) => type === ITEM_TYPE.SYSTEM);
 
     if (systemItems.length > 0) {
-      yield put(addTeamsKeyPair(systemItems));
+      yield all(systemItems => put(addTeamKeyPair(item)));
     }
 
   } catch(error) {

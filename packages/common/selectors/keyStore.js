@@ -1,5 +1,6 @@
 import { createSelector } from 'reselect';
 import { generateSystemItemName } from '@caesar/common/utils/item';
+import { KEY_TYPE } from '../constants';
 
 export const keyStoreSelector = state => state.keyStore;
 
@@ -10,9 +11,19 @@ export const keyStoreDataSelector = createSelector(
   keyStore => keyStore.data,
 );
 
-export const teamKeysSelector = createSelector(
+export const personalKeyPairSelector = createSelector(
+  keyStoreSelector,
+  keyStore => keyStore[KEY_TYPE.PERSONAL] || {},
+);
+
+export const teamKeyPairSelector = createSelector(
   keyStoreDataSelector,
   teamNamePropSelector,
   (data, teamName) =>
-    Object.values(data).find(({ name }) => name === generateSystemItemName(teamName)) || {},
+    Object.values(data[KEY_TYPE.TEAM]).find(({ name }) => name === generateSystemItemName(teamName)) || {},
+);
+
+export const anonymousKeyPairSelector = createSelector(
+  keyStoreDataSelector,
+  (data, teamName) => Object.values(data[KEY_TYPE.ANONYMOUS]) || {},
 );

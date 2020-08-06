@@ -112,7 +112,7 @@ import {
   teamSelector,
   teamsMembersSelector,
 } from '@caesar/common/selectors/entities/team';
-import { addTeamsKeyPair } from '@caesar/common/actions/keyStore';
+import { addTeamKeyPair } from '@caesar/common/actions/keyStore';
 import {
   acceptUpdateItem,
   patchChildItem,
@@ -155,7 +155,7 @@ import {
 } from '@caesar/common/constants';
 import { generateSharingUrl } from '@caesar/common/utils/sharing';
 import { createMemberSaga } from './member';
-import { teamKeysSelector } from '../../selectors/keyStore';
+import { teamKeyPairSelector } from '@caesar/common/selectors/keyStore';
 
 const ITEMS_CHUNK_SIZE = 50;
 
@@ -448,7 +448,7 @@ export function* createItemSaga({
 
     if (teamId) {
       const team = yield select(teamSelector, { teamId });
-      const teamSystemItem = yield select(teamKeysSelector, { teamName: team.title });
+      const teamSystemItem = yield select(teamKeyPairSelector, { teamName: team.title });
       publicKey = teamSystemItem.publicKey;
     }
 
@@ -543,7 +543,7 @@ export function* createItemSaga({
     yield put(setCurrentTeamId(teamId || TEAM_TYPE.PERSONAL));
 
     if (isSystemItem) {
-      yield put(addTeamsKeyPair([newItem]));
+      yield put(addTeamKeyPair(newItem));
     } else {
       yield put(setWorkInProgressListId(listId));
       yield put(setWorkInProgressItem(newItem));

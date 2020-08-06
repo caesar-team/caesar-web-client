@@ -232,3 +232,9 @@ export const DOMAIN_ROLES = {
 export const PERMISSION_MESSAGES = {
   FORBIDDEN_SELECT: 'You don\'t have permissions to select the item',
 };
+
+export const KEY_TYPE = {
+  PERSONAL: 'personal',
+  TEAM: 'team',
+  ANONYMOUS: 'anonymous',
+};

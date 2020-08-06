@@ -55,7 +55,6 @@ import {
   shareItemBatchFailure,
   removeShareSuccess,
   removeShareFailure,
-  addChildItemsBatchToItems,
   updateItemField,
 } from '@caesar/common/actions/entities/item';
 import {
@@ -101,7 +100,6 @@ import {
   itemsBatchSelector,
   itemSelector,
 } from '@caesar/common/selectors/entities/item';
-import { membersBatchSelector } from '@caesar/common/selectors/entities/member';
 import {
   masterPasswordSelector,
   userDataSelector,

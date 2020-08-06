@@ -1,8 +1,7 @@
 import * as yup from 'yup';
-import {
-  BASE_64_LENGTH_BYTE_RATE,
-  convertSizeNameToNumber,
-} from '@caesar/common/validation/utils';
+import { convertSizeNameToNumber } from '@caesar/common/validation/utils';
+
+import { BASE_64_LENGTH_BYTE_RATE } from '@caesar/common/utils/file';
 
 const MAX_SIZE = '8MB';
 

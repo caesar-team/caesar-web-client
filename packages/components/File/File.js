@@ -4,13 +4,10 @@ import styled from 'styled-components';
 import DownloadIconSvg from '@caesar/assets/icons/svg/icon-download-white.svg';
 import { PERMISSION } from '@caesar/common/constants';
 import {
-  getRealFileSizeForBase64enc,
-  humanizeSize,
-} from '@caesar/common/validation/utils';
-
-import {
   extactExtFromFilename,
   getFilenameWithoutExt,
+  getRealFileSizeForBase64enc,
+  humanizeSize,
 } from '@caesar/common/utils/file';
 import { Can } from '../Ability';
 import { Icon } from '../Icon';

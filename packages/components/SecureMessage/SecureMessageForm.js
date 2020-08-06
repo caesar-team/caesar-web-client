@@ -346,7 +346,9 @@ const SecureMessageFormComponent = ({ onSubmit, notification, isOnline }) => {
       {errors?.form && (
         <>
           <TextError>Oops… Something went wrong</TextError>
-          <TextError>Please, click again on Create secure message</TextError>
+          <TextError>
+            Please, click again on the Create secure message button
+          </TextError>
         </>
       )}
       <ButtonWrapper>

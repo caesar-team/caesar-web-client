@@ -2,17 +2,16 @@ import React, { useState, Fragment } from 'react';
 import styled from 'styled-components';
 import { media } from '@caesar/assets/styles/media';
 import { match } from '@caesar/common/utils/match';
-import {
-  encryptByPassword,
-  decryptByPassword,
-} from '@caesar/common/utils/cipherUtils';
 import { logger } from '@caesar/common/utils/logger';
-import { generator } from '@caesar/common/utils/password';
 import { postSecureMessage } from '@caesar/common/fetch';
+import { encryptSecret } from '@caesar/common/utils/secret';
 import {
   ENCRYPTING_ITEM_NOTIFICATION,
   SAVE_NOTIFICATION,
+  DEFAULT_ERROR_MESSAGE,
 } from '@caesar/common/constants';
+
+import { passwordGenerator } from '@caesar/common/utils/passwordGenerator';
 import { Scrollbar, withNotification } from '@caesar/components';
 import { SecureMessageForm } from './SecureMessageForm';
 import { SecureMessageLink } from './SecureMessageLink';
@@ -68,33 +67,40 @@ const SecureMessageComponent = ({
             position: 'bottom-right',
           },
         });
-        const pwd = passwordValue || generator();
-
-        const encryptedMessage = await encryptByPassword(secret, pwd);
-        await decryptByPassword(encryptedMessage, pwd);
+        const pwd = passwordValue || passwordGenerator();
+        const encryptedData = await encryptSecret(secret);
 
         notification.show({
           text: SAVE_NOTIFICATION,
           options: {
-            timeout: 0,
             position: 'bottom-right',
           },
         });
 
         postSecureMessage({
-          message: encryptedMessage,
+          ...encryptedData,
           secondsLimit,
           requestsLimit,
-        }).then(({ id }) => {
-          setSubmitting(false);
-          setState({
-            step: SECURE_MESSAGE_LINK_STEP,
-            password: pwd,
-            seconds: secondsLimit,
-            requests: requestsLimit,
-            messageId: id,
+        })
+          .then(({ id }) => {
+            setSubmitting(false);
+            if (!id) {
+              setFieldError('form', DEFAULT_ERROR_MESSAGE);
+              notification.hide();
+
+              return false;
+            }
+            setState({
+              step: SECURE_MESSAGE_LINK_STEP,
+              password: pwd,
+              seconds: secondsLimit,
+              requests: requestsLimit,
+              messageId: id,
+            });
+          })
+          .catch(error => {
+            logger.error('Error: %o', error);
           });
-        });
       } catch (error) {
         logger.error(error);
         setFieldError('form', error.message);

@@ -141,6 +141,7 @@ import {
   PERMISSION_READ,
   SHARE_TYPE,
   ENTITY_TYPE,
+  COMMON_PROGRESS_NOTIFICATION,
   CREATING_ITEM_NOTIFICATION,
   CREATING_ITEMS_NOTIFICATION,
   SHARING_IN_PROGRESS_NOTIFICATION,
@@ -442,11 +443,12 @@ export function* createItemSaga({
     const isSystemItem = type === ITEM_TYPE.SYSTEM;
     const keyPair = yield select(personalKeyPairSelector);
     const user = yield select(userDataSelector);
+    const notificationText = isSystemItem ?
+      COMMON_PROGRESS_NOTIFICATION
+      : ENCRYPTING_ITEM_NOTIFICATION;
     let publicKey = keyPair.publicKey;
 
-    if (!isSystemItem) {
-      yield put(updateGlobalNotification(ENCRYPTING_ITEM_NOTIFICATION, true));
-    }
+    yield put(updateGlobalNotification(notificationText, true));
 
     if (teamId) {
       const team = yield select(teamSelector, { teamId });

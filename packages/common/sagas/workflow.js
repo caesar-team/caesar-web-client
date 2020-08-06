@@ -42,7 +42,7 @@ import {
   workInProgressItemSelector,
 } from '@caesar/common/selectors/workflow';
 import {
-  personalpersonalKeyPairSelector,
+  personalKeyPairSelector,
   teamKeyPairSelector,
 } from '@caesar/common/selectors/keyStore';
 import { getFavoritesList } from '@caesar/common/normalizers/utils';
@@ -165,7 +165,7 @@ function* initTeam(team, withDecryption) {
 
     yield put(resetWorkInProgressItemIds(null));
 
-    const teamSystemItem = yield select(teampersonalKeyPairSelector, { teamName: team.title });
+    const teamSystemItem = yield select(teamKeyPairSelector, { teamName: team.title });
 
     if (currentTeamId === team.id && withDecryption) {
       const keyPair = yield select(personalKeyPairSelector);

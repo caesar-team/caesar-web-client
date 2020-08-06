@@ -7,7 +7,6 @@ import {
   LOGOUT,
   fetchUserSelfSuccess,
   fetchUserSelfFailure,
-  fetchKeyPairSuccess,
   fetchKeyPairFailure,
   fetchUserTeamsSuccess,
   fetchUserTeamsFailure,

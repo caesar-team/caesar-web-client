@@ -163,6 +163,7 @@ export const ENTITY_TYPE = {
   MEMBER: 'member',
 };
 
+export const COMMON_PROGRESS_NOTIFICATION = 'In progress...';
 export const ENCRYPTING_ITEM_NOTIFICATION = 'Encryption in progress...';
 export const DECRYPTING_ITEM_NOTIFICATION = 'Decryption in progress...';
 export const VERIFICATION_IN_PROGRESS_NOTIFICATION =

@@ -2,6 +2,7 @@
 ![Version](https://img.shields.io/badge/version-1.4.1-blue.svg?cacheSeconds=2592000)
 ![Prerequisite](https://img.shields.io/badge/node-%3E%3D10-blue.svg)
 [![Code quality: A](https://img.shields.io/lgtm/grade/javascript/github/caesar-team/caesar-web-client?label=Code%20quality&logo=lgtm)](https://lgtm.com/projects/g/caesar-team/caesar-web-client/context:javascript)
+![CodeQL](https://github.com/caesar-team/caesar-web-client/workflows/CodeQL/badge.svg)
 [![Documentation](https://img.shields.io/badge/documentation-yes-green.svg)](https://docs.caesar.team)
 [![License: PolyForm Internal Use](https://img.shields.io/badge/license-Polyform%20Internal%20Use-yellow)](https://polyformproject.org/licenses/internal-use/1.0.0/)
 [![Twitter: CaesarTeamApp](https://img.shields.io/twitter/follow/CaesarTeamApp.svg?style=social)](https://twitter.com/CaesarTeamApp)

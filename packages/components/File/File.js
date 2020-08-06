@@ -3,6 +3,15 @@ import { useHover } from 'react-use';
 import styled from 'styled-components';
 import DownloadIconSvg from '@caesar/assets/icons/svg/icon-download-white.svg';
 import { PERMISSION } from '@caesar/common/constants';
+import {
+  getRealFileSizeForBase64enc,
+  humanizeSize,
+} from '@caesar/common/validation/utils';
+
+import {
+  extactExtFromFilename,
+  getFilenameWithoutExt,
+} from '@caesar/common/utils/file';
 import { Can } from '../Ability';
 import { Icon } from '../Icon';
 
@@ -136,17 +145,6 @@ const UploadedWrapper = styled.div`
   }
 `;
 
-const units = ['bytes', 'KB', 'MB'];
-
-const formatBytes = x => {
-  let l = 0;
-  let n = parseInt(x, 10) || 0;
-
-  while (n >= 1024 && ++l) n /= 1024;
-
-  return `${n.toFixed(n < 10 && l > 0 ? 1 : 0)} ${units[l]}`;
-};
-
 const UPLOADED_STATUS = 'uploaded';
 const ERROR_STATUS = 'error';
 
@@ -160,9 +158,9 @@ const File = ({
   onClickDownload,
   ...props
 }) => {
-  const ext = name.split('.').pop();
-  const filename = name.replace(/\.[^/.]+$/, '');
-  const size = formatBytes(Math.round((raw.length * 3) / 4));
+  const ext = extactExtFromFilename(name);
+  const filename = decodeURIComponent(getFilenameWithoutExt(name));
+  const size = humanizeSize(getRealFileSizeForBase64enc(raw.length), true);
 
   const handleClickCloseIcon = e => {
     e.stopPropagation();

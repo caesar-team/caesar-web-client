@@ -1,7 +1,7 @@
 import React from 'react';
 import { useFormik } from 'formik';
 import { LockInput } from '@caesar/components';
-import { decryptByPassword } from '@caesar/common/utils/cipherUtils';
+import { decryptSecretMessage } from '@caesar/common/utils/secret';
 import { logger } from '@caesar/common/utils/logger';
 import { schema } from '../schema';
 
@@ -11,7 +11,7 @@ export const PasswordStep = ({ message, password, setDecryptedMessage }) => {
     { setSubmitting, setErrors },
   ) => {
     try {
-      const decryptedMessage = await decryptByPassword(
+      const decryptedMessage = await decryptSecretMessage(
         message,
         messagePassword,
       );

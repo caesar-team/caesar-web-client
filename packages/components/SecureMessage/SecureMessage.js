@@ -78,7 +78,7 @@ const SecureMessageComponent = ({
         });
 
         postSecureMessage({
-          ...encryptedData,
+          message: JSON.stringify(encryptedData),
           secondsLimit,
           requestsLimit,
         })

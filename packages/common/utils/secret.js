@@ -8,11 +8,11 @@ import {
   decryptByPassword,
 } from '@caesar/common/utils/cipherUtils';
 
-export const makeMetaData = secret => {
+export const buildSecretMessage = secret => {
   let attachments;
-  let raw = {};
+  let raws = [];
   if (secret.attachments) {
-    raw = secret.attachments.map(attach => attach.raw);
+    raws = secret.attachments.map(attach => attach.raw);
     attachments = secret.attachments.map(attach => {
       return {
         name: getFilenameWithoutExt(attach.name),
@@ -23,46 +23,47 @@ export const makeMetaData = secret => {
   }
 
   return {
-    ...secret,
-    metadata: {
+    message: {
+      text: secret.text,
       attachments,
     },
-    attachments: raw,
+    raws,
   };
 };
 
-export const addMetaToSecret = secret => makeMetaData(secret);
-export const buildSecretMessage = secret => {
-  const message = {
-    message: {
-      text: secret.text,
-      metadata: secret.metadata,
-    },
-    attachments: secret.attachments,
-  };
+export const decryptSecretMessage = (secret, passphrase) => {
+  return decryptByPassword(
+    (typeof secret === 'string' ? JSON.parse(secret) : secret).encryptedMessage,
+    passphrase,
+  );
+};
 
-  return message;
+export const decryptSecretRaws = (secret, passphrase) => {
+  return decryptByPassword(
+    (typeof secret === 'string' ? JSON.parse(secret) : secret).encryptedRaws,
+    passphrase,
+  );
 };
 
 export const encryptSecret = async (secret, passphrase) => {
   const secretMessage = buildSecretMessage(secret);
 
   const encryptedMessagePromise = encryptByPassword(
-    secretMessage.message,
+    JSON.stringify(secretMessage.message),
     passphrase,
   );
-  const encryptedAttachmentsPromise = encryptByPassword(
-    secretMessage.attachments,
+  const encryptedRawsPromise = encryptByPassword(
+    JSON.stringify(secretMessage.raws),
     passphrase,
   );
 
-  const [encryptedMessage, encryptedAttachments] = await Promise.all([
+  const [encryptedMessage, encryptedRaws] = await Promise.all([
     encryptedMessagePromise,
-    encryptedAttachmentsPromise,
+    encryptedRawsPromise,
   ]);
 
   return {
     encryptedMessage,
-    encryptedAttachments,
+    encryptedRaws,
   };
 };

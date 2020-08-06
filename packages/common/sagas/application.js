@@ -3,7 +3,8 @@ import { decryption } from '@caesar/common/sagas/common/decryption';
 import { REHYDRATE_STORE } from '@caesar/common/actions/application';
 import { isOnlineSelector } from '@caesar/common/selectors/application';
 import { itemListSelector } from '@caesar/common/selectors/entities/item';
-import { keyPairSelector, masterPasswordSelector } from '../selectors/user';
+import { masterPasswordSelector } from '@caesar/common/selectors/user';
+import { personalKeyPairSelector } from '@caesar/common/selectors/keyStore';
 
 export function* rehydrateStoreSaga() {
   try {
@@ -11,7 +12,7 @@ export function* rehydrateStoreSaga() {
 
     if (!isOnline) {
       const items = yield select(itemListSelector);
-      const keyPair = yield select(keyPairSelector);
+      const keyPair = yield select(personalKeyPairSelector);
       const masterPassword = yield select(masterPasswordSelector);
 
       yield fork(decryption, {

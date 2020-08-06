@@ -103,7 +103,6 @@ import {
 } from '@caesar/common/selectors/entities/item';
 import { membersBatchSelector } from '@caesar/common/selectors/entities/member';
 import {
-  keyPairSelector,
   masterPasswordSelector,
   userDataSelector,
   currentTeamIdSelector,
@@ -155,7 +154,10 @@ import {
 } from '@caesar/common/constants';
 import { generateSharingUrl } from '@caesar/common/utils/sharing';
 import { createMemberSaga } from './member';
-import { teamKeyPairSelector } from '@caesar/common/selectors/keyStore';
+import {
+  personalKeyPairSelector,
+  teamKeyPairSelector,
+} from '@caesar/common/selectors/keyStore';
 
 const ITEMS_CHUNK_SIZE = 50;
 
@@ -438,7 +440,7 @@ export function* createItemSaga({
   try {
     const { teamId, listId, attachments, type, ...data } = item;
     const isSystemItem = type === ITEM_TYPE.SYSTEM;
-    const keyPair = yield select(keyPairSelector);
+    const keyPair = yield select(personalKeyPairSelector);
     const user = yield select(userDataSelector);
     let publicKey = keyPair.publicKey;
 
@@ -570,7 +572,7 @@ export function* createItemsBatchSaga({
     yield put(updateGlobalNotification(CREATING_ITEMS_NOTIFICATION, true));
 
     const list = yield select(listSelector, { listId });
-    const keyPair = yield select(keyPairSelector);
+    const keyPair = yield select(personalKeyPairSelector);
     const user = yield select(userDataSelector);
 
     const preparedForEncryptingItems = items.map(
@@ -642,7 +644,7 @@ export function* updateItemSaga({ payload: { item } }) {
   try {
     yield put(updateGlobalNotification(ENCRYPTING_ITEM_NOTIFICATION, true));
 
-    const keyPair = yield select(keyPairSelector);
+    const keyPair = yield select(personalKeyPairSelector);
 
     const encryptedItemSecret = yield call(
       encryptItem,
@@ -729,7 +731,7 @@ export function* editItemSaga({
 
 export function* acceptItemSaga({ payload: { id } }) {
   try {
-    const keyPair = yield select(keyPairSelector);
+    const keyPair = yield select(personalKeyPairSelector);
     const masterPassword = yield select(masterPasswordSelector);
 
     const {

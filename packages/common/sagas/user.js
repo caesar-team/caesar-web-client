@@ -13,6 +13,7 @@ import {
   fetchUserTeamsFailure,
   setCurrentTeamId,
 } from '@caesar/common/actions/user';
+import { addPersonalKeyPair } from '@caesar/common/actions/keyStore';
 import { addTeamsBatch } from '@caesar/common/actions/entities/team';
 import { addMembersBatch } from '@caesar/common/actions/entities/member';
 import { membersByIdSelector } from '@caesar/common/selectors/entities/member';
@@ -47,7 +48,7 @@ export function* fetchKeyPairSaga() {
     const { data } = yield call(getKeys);
 
     yield put(
-      fetchKeyPairSuccess({
+      addPersonalKeyPair({
         privateKey: data.encryptedPrivateKey,
         publicKey: data.publicKey,
       }),

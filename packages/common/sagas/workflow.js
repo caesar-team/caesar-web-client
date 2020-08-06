@@ -30,7 +30,6 @@ import {
   currentTeamTrashListSelector,
 } from '@caesar/common/selectors/entities/list';
 import {
-  keyPairSelector,
   masterPasswordSelector,
   currentTeamIdSelector,
 } from '@caesar/common/selectors/user';
@@ -42,7 +41,10 @@ import {
   workInProgressListIdSelector,
   workInProgressItemSelector,
 } from '@caesar/common/selectors/workflow';
-import { teamKeyPairSelector } from '@caesar/common/selectors/keyStore';
+import {
+  personalpersonalKeyPairSelector,
+  teamKeyPairSelector,
+} from '@caesar/common/selectors/keyStore';
 import { getFavoritesList } from '@caesar/common/normalizers/utils';
 import { fetchTeamSuccess } from '@caesar/common/actions/entities/team';
 import { getServerErrorMessage } from '@caesar/common/utils/error';
@@ -62,7 +64,7 @@ function* initPersonal(withDecryption) {
     );
 
     if (withDecryption) {
-      const keyPair = yield select(keyPairSelector);
+      const keyPair = yield select(personalKeyPairSelector);
       const masterPassword = yield select(masterPasswordSelector);
       const items = sortItemsByFavorites(objectToArray(itemsById));
 
@@ -163,10 +165,10 @@ function* initTeam(team, withDecryption) {
 
     yield put(resetWorkInProgressItemIds(null));
 
-    const teamSystemItem = yield select(teamKeyPairSelector, { teamName: team.title });
+    const teamSystemItem = yield select(teampersonalKeyPairSelector, { teamName: team.title });
 
     if (currentTeamId === team.id && withDecryption) {
-      const keyPair = yield select(keyPairSelector);
+      const keyPair = yield select(personalKeyPairSelector);
       const masterPassword = yield select(masterPasswordSelector);
       const items = objectToArray(itemsById);
 

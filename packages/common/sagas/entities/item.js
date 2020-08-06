@@ -51,7 +51,6 @@ import { updateGlobalNotification } from '@caesar/common/actions/application';
 import {
   updateChildItemsBatchSaga,
 } from '@caesar/common/sagas/entities/childItem';
-import { inviteNewMemberBatchSaga } from '@caesar/common/sagas/common/invite';
 import {
   setWorkInProgressItem,
   updateWorkInProgressItem,

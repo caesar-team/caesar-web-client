@@ -12,7 +12,7 @@ export const keyStoreDataSelector = createSelector(
 );
 
 export const personalKeyPairSelector = createSelector(
-  keyStoreSelector,
+  keyStoreDataSelector,
   keyStore => keyStore[KEY_TYPE.PERSONAL] || {},
 );
 

@@ -55,7 +55,7 @@
     "next-transpile-modules": "^4.0.2",
     "normalizr": "^3.4.0",
     "object-sizeof": "^1.5.1",
-    "openpgp": "^4.6.2",
+    "openpgp": "^4.10.7",
     "papaparse": "^5.0.0",
     "polished": "^3.4.1",
     "prop-types": "^15.7.2",
@@ -134,6 +134,6 @@
     "write-file-webpack-plugin": "4.5.1"
   },
   "engines": {
-    "node": ">=10"
+    "node": ">=12.13"
   }
 }

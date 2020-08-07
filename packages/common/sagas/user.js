@@ -45,7 +45,7 @@ export function* fetchUserSelfSaga() {
 export function* fetchKeyPairSaga() {
   try {
     const { data } = yield call(getKeys);
-console.log(data);
+
     yield put(
       addPersonalKeyPair({
         privateKey: data.encryptedPrivateKey,

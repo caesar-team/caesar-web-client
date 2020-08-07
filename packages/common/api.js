@@ -110,7 +110,7 @@ export const postCreateChildItem = (itemId, data) =>
   callApi.post(`/items/${itemId}/child_item`, data);
 
 export const postCreateChildItemBatch = data =>
-  callApi.post('item/batch/share', data);
+  callApi.post('/items/batch/share', data);
 
 export const patchChildAccess = (childItemId, data) =>
   callApi.patch(`/child_item/${childItemId}/access`, data);

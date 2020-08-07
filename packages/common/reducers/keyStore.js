@@ -19,7 +19,7 @@ const initialState = {
 };
 
 export default createReducer(initialState, {
-  [ADD_PERSONAL_KEY_PAIR](state, { payload }) {
+  [ADD_PERSONAL_KEY_PAIR](state, { payload }) {console.log(payload);
     return {
       ...state,
       data: {

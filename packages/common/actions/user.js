@@ -34,7 +34,7 @@ export const fetchUserSelfFailure = () => ({
   type: FETCH_USER_SELF_FAILURE,
 });
 
-export const fetchKeyPairRequest = () => {
+export const fetchKeyPairRequest = () => {console.log('Action');
   return {
     type: FETCH_KEY_PAIR_REQUEST,
   };

@@ -8,7 +8,6 @@ import {
   AuthTitle,
   AuthDescription,
   MasterPasswordInput,
-  Link,
   Button,
   PasswordIndicator,
   Icon,

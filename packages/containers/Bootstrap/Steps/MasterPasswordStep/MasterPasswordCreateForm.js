@@ -69,13 +69,6 @@ const StyledButton = styled(Button)`
   margin-top: 45px;
 `;
 
-const BottomWrapper = styled.div`
-  margin-top: 40px;
-  text-align: center;
-  font-size: 18px;
-  color: ${({ theme }) => theme.color.gray};
-`;
-
 const DiceIcon = styled(Icon)`
   cursor: pointer;
   position: absolute;
@@ -173,7 +166,7 @@ class MasterPasswordCreateForm extends PureComponent {
               <PasswordIndicatorStyled score={zxcvbn(values.password).score} />
             )}
             <TipText>
-              Please copy & save the master password in a safe place. Relogin
+              Please, copy & save the master password in a safe place. Relogin
               will not be possible without this password.
             </TipText>
             <StyledButton htmlType="submit" disabled={isSubmitting || !isValid}>

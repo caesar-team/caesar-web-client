@@ -29,6 +29,7 @@ const ColumnHeader = styled.div`
   display: flex;
   align-items: center;
   height: 56px;
+  flex: 0 0 56px;
   padding: 8px 24px;
   background-color: ${({ bgColor, theme }) =>
     bgColor ? theme.color[bgColor] : theme.color.alto};

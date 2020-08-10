@@ -65,6 +65,7 @@ class Bootstrap extends Component {
       const { data: bootstrap } = await getUserBootstrap();
       const { data: user } = await getUserSelf();
 
+      // TODO: Add namespaces into JWT token to avoid this dirty hack
       if (user?.email.includes('anonymous') && !shared?.mp) {
         logout();
       }

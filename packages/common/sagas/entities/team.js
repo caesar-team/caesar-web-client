@@ -140,7 +140,7 @@ export function* createTeamSaga({ payload: { title, icon } }) {
     const user = yield select(userDataSelector);
     const defaultList = yield select(defaultListSelector);
     const masterPassword = yield call(passwordGenerator);
-    const systemTeamEmail = yield call(generateSystemItemEmail, title);
+    const systemTeamEmail = yield call(generateSystemItemEmail, data.id);
 
     const {
       publicKey,
@@ -166,7 +166,7 @@ export function* createTeamSaga({ payload: { title, icon } }) {
         },
       ],
       pass: masterPassword,
-      name: generateSystemItemName(title),
+      name: generateSystemItemName(data.id),
     };
 
     yield put(createItemRequest(systemItemData));
@@ -238,8 +238,7 @@ export function* addTeamMembersBatchSaga({ payload: { teamId, members } }) {
     }
 
     const teamItemList = yield select(teamItemListSelector, { teamId });
-    const team = yield select(teamSelector, { teamId });
-    const teamSystemItem = yield select(teamKeyPairSelector, { teamName: team.title });
+    const teamSystemItem = yield select(teamKeyPairSelector, { teamId });
 
     teamItemList.push(teamSystemItem.raw);
     const itemUserPairs = yield call(getItemUserPairs, {

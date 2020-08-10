@@ -165,7 +165,7 @@ function* initTeam(team, withDecryption) {
 
     yield put(resetWorkInProgressItemIds(null));
 
-    const teamSystemItem = yield select(teamKeyPairSelector, { teamName: team.title });
+    const teamSystemItem = yield select(teamKeyPairSelector, { teamId: team.id });
 
     if (currentTeamId === team.id && withDecryption) {
       const keyPair = yield select(personalKeyPairSelector);

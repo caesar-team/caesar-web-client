@@ -19,12 +19,12 @@ export function checkItemsAfterDecryption(items) {
   );
 }
 
-export function generateSystemItemName(teamName) {
-  return `team+${encodeURIComponent(teamName.toLowerCase())}`;
+export function generateSystemItemName(teamId) {
+  return `team-${teamId}`;
 }
 
-export function generateSystemItemEmail(teamName) {
-  return `${generateSystemItemName(teamName)}@${location.hostname}`;
+export function generateSystemItemEmail(teamId) {
+  return `${generateSystemItemName(teamId)}@${location.hostname}`;
 }
 
 export function extractKeysFromSystemItem(item) {

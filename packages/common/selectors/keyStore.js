@@ -4,7 +4,7 @@ import { KEY_TYPE } from '../constants';
 
 export const keyStoreSelector = state => state.keyStore;
 
-const teamNamePropSelector = (_, props) => props.teamName;
+const teamIdPropSelector = (_, props) => props.teamId;
 
 export const keyStoreDataSelector = createSelector(
   keyStoreSelector,
@@ -18,9 +18,9 @@ export const personalKeyPairSelector = createSelector(
 
 export const teamKeyPairSelector = createSelector(
   keyStoreDataSelector,
-  teamNamePropSelector,
+  teamIdPropSelector,
   (data, teamName) =>
-    Object.values(data[KEY_TYPE.TEAM]).find(({ name }) => name === generateSystemItemName(teamName)) || {},
+    Object.values(data[KEY_TYPE.TEAM]).find(({ name }) => name === generateSystemItemName(teamId)) || {},
 );
 
 export const anonymousKeyPairSelector = createSelector(

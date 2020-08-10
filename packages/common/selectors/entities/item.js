@@ -72,5 +72,5 @@ export const teamSystemItemSelector = createSelector(
   itemsByIdSelector,
   currentTeamSelector,
   (items, currentTeam) => items.find(({ type, name }) =>
-    type === ITEM_TYPE.SYSTEM && name === generateSystemItemName(currentTeam.name)) || {},
+    type === ITEM_TYPE.SYSTEM && name === generateSystemItemName(currentTeam.id)) || {},
 );

@@ -72,9 +72,6 @@ import {
   userDataSelector,
   currentTeamIdSelector,
 } from '@caesar/common/selectors/user';
-import {
-  teamSelector,
-} from '@caesar/common/selectors/entities/team';
 import { addTeamKeyPair } from '@caesar/common/actions/keyStore';
 import {
   postCreateItem,
@@ -307,8 +304,7 @@ export function* createItemSaga({
     yield put(updateGlobalNotification(notificationText, true));
 
     if (teamId) {
-      const team = yield select(teamSelector, { teamId });
-      const teamSystemItem = yield select(teamKeyPairSelector, { teamName: team.title });
+      const teamSystemItem = yield select(teamKeyPairSelector, { teamId: teamId });
       publicKey = teamSystemItem.publicKey;
     }
 

@@ -79,12 +79,6 @@ const FileSize = styled.div`
 
 const ErrorWrapper = styled.div``;
 
-const ErrorInner = styled.div`
-  position: relative;
-  display: flex;
-  padding-right: 28px;
-`;
-
 const Error = styled.div`
   font-size: ${({ theme }) => theme.font.size.small};
   color: ${({ theme }) => theme.color.red};
@@ -175,14 +169,14 @@ const File = ({
   if (status === ERROR_STATUS || error) {
     return (
       <ErrorWrapper>
-        <ErrorInner>
+        <UploadedWrapper isHoveringCloseIcon={isHoveringCloseIcon}>
           <ErrorStatus />
           <Details>
             <FileName>{name}</FileName>
             <FileSize>{size}</FileSize>
           </Details>
           {onClickRemove && hoverableCloseIcon}
-        </ErrorInner>
+        </UploadedWrapper>
         <Error>{error}</Error>
       </ErrorWrapper>
     );

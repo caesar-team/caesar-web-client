@@ -1,14 +1,19 @@
 // TODO: Rewrite all this requests with fetch 'packages/common/fetch.js'
 import Router from 'next/router';
 import axios from 'axios';
-import { removeCookieValue } from './utils/token';
-import { API_URI, API_BASE_PATH, IS_EXTENSION_APP, ROUTES } from './constants';
+import { removeCookieValue, getCookieValue } from './utils/token';
+import {
+  API_URI,
+  API_BASE_PATH,
+  IS_EXTENSION_APP,
+  ROUTES,
+  LOCKED_ROUTES,
+} from './constants';
 import { isClient } from './utils/isEnvironment';
 
 const softExit = () => {
   if (isClient) {
     removeCookieValue('token');
-
     if (Router.router.pathname !== ROUTES.SIGN_IN) {
       Router.push(ROUTES.SIGN_IN);
     }
@@ -19,6 +24,16 @@ const callApi = axios.create({
   baseURL: `${API_URI || process.env.API_URI}/${API_BASE_PATH ||
     process.env.API_BASE_PATH}`,
   withCredentials: true,
+});
+
+callApi.interceptors.request.use(config => {
+  if (LOCKED_ROUTES.includes(config.url)) {
+    const token = `Bearer ${getCookieValue('token')}`;
+    // eslint-disable-next-line no-param-reassign
+    config.headers.Authorization = token;
+  }
+
+  return config;
 });
 
 callApi.interceptors.response.use(
@@ -64,8 +79,7 @@ export const postKeys = data => callApi.post('/keys', data);
 
 export const getKeys = () => callApi.get('/keys');
 
-export const updateKey = (email, data) =>
-  callApi.post(`/keys/${email}`, data);
+export const updateKey = (email, data) => callApi.post(`/keys/${email}`, data);
 
 export const getQrCode = () => callApi.get('/auth/2fa');
 
@@ -95,7 +109,8 @@ export const postCreateItemsBatch = data => callApi.post('/items/batch', data);
 
 export const removeItem = itemId => callApi.delete(`/items/${itemId}`);
 
-export const removeItemsBatch = query => callApi.delete(`/items/batch?${query}`);
+export const removeItemsBatch = query =>
+  callApi.delete(`/items/batch?${query}`);
 
 export const updateMoveItem = (itemId, data) =>
   callApi.patch(`/items/${itemId}/move`, data);

@@ -66,6 +66,7 @@ const SecureMessageComponent = ({
             position: 'bottom-right',
           },
         });
+
         const passphrase = passwordValue || passwordGenerator();
         const { encryptedMessage, encryptedRaws } = await encryptSecret(
           secret,

@@ -8,6 +8,8 @@ import {
   decryptByPassword,
 } from '@caesar/common/utils/cipherUtils';
 
+export const cleanMessageBeforeEncode = message => message.trim();
+
 export const buildSecretMessage = secret => {
   let attachments;
   let raws = [];
@@ -24,25 +26,28 @@ export const buildSecretMessage = secret => {
 
   return {
     message: {
-      text: secret.text,
+      text: encodeURIComponent(cleanMessageBeforeEncode(secret.text)),
       attachments,
     },
     raws,
   };
 };
 
+export const getDecodedSecret = secret => {
+  return {
+    ...secret,
+    text: decodeURIComponent(secret.text),
+  };
+};
+export const getEncryptedRawsFromSecret = secret =>
+  JSON.parse(secret).encryptedRaws;
+
 export const decryptSecretMessage = (secret, passphrase) => {
-  return decryptByPassword(
-    (typeof secret === 'string' ? JSON.parse(secret) : secret).encryptedMessage,
-    passphrase,
-  );
+  return decryptByPassword(JSON.parse(secret).encryptedMessage, passphrase);
 };
 
 export const decryptSecretRaws = (secret, passphrase) => {
-  return decryptByPassword(
-    (typeof secret === 'string' ? JSON.parse(secret) : secret).encryptedRaws,
-    passphrase,
-  );
+  return decryptByPassword(JSON.parse(secret).encryptedRaws, passphrase);
 };
 
 export const encryptSecret = async (secret, passphrase) => {

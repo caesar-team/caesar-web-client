@@ -3,26 +3,23 @@ import { useFormik } from 'formik';
 import { LockInput } from '@caesar/components';
 import {
   decryptSecretMessage,
-  decryptSecretRaws,
+  getEncryptedRawsFromSecret,
+  getDecodedSecret,
 } from '@caesar/common/utils/secret';
 
 import { logger } from '@caesar/common/utils/logger';
 import { schema } from '../schema';
 
-export const PasswordStep = ({
-  message,
-  password,
-  setDecryptedMessage,
-  setDecryptedRaws,
-}) => {
+export const PasswordStep = ({ message, password, setDecryptedMessage }) => {
   const handleSubmitPassword = async (
     { messagePassword },
     { setSubmitting, setErrors },
   ) => {
     try {
       setSubmitting(false);
-      setDecryptedMessage(await decryptSecretMessage(message, messagePassword));
-      setDecryptedRaws(await decryptSecretRaws(message, messagePassword));
+      setDecryptedMessage(
+        getDecodedSecret(await decryptSecretMessage(message, messagePassword)),
+      );
     } catch (error) {
       logger.error('error: ', error);
       setSubmitting(false);

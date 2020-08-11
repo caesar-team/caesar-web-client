@@ -125,6 +125,8 @@ export const ROUTES = {
   IMPORT: '/import',
   TEAM: '/team',
   CREATE: '/create',
+  BOOTSTRAP: '/user/security/bootstrap',
+  TWOFA: '/auth/2fa',
 };
 
 export const DOMAIN_SECURE_ROUTE = IS_SECURE_APP ? ROUTES.MAIN : ROUTES.SECURE;
@@ -138,6 +140,8 @@ export const LOCKED_ROUTES = [
   ROUTES.IMPORT,
   ROUTES.TEAM,
   ROUTES.CREATE,
+  ROUTES.BOOTSTRAP,
+  ROUTES.TWOFA,
 ];
 
 // don't require bootstrap routes
@@ -229,5 +233,5 @@ export const DOMAIN_ROLES = {
 };
 
 export const PERMISSION_MESSAGES = {
-  FORBIDDEN_SELECT: 'You don\'t have permissions to select the item',
+  FORBIDDEN_SELECT: "You don't have permissions to select the item",
 };

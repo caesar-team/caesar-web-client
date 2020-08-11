@@ -110,6 +110,7 @@ class TwoFactorForm extends Component {
 
   render() {
     const { qr, code, onSubmit } = this.props;
+
     return (
       <Wrapper>
         <AuthTitle>Two Factor Authentication</AuthTitle>
@@ -160,7 +161,7 @@ class TwoFactorForm extends Component {
                 <FastField name="fpCheck">
                   {({ field }) => (
                     <Checkbox {...field} checked={field.value}>
-                      Remember device
+                      Remember current device
                     </Checkbox>
                   )}
                 </FastField>

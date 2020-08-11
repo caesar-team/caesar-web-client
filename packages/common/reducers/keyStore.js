@@ -78,7 +78,10 @@ export default createReducer(initialState, {
       ...state,
       data: {
         ...state.data,
-        [KEY_TYPE.PERSONAL]: {},
+        [KEY_TYPE.TEAM]: {
+          ...state.datap[KEY_TYPE.TEAM],
+          [payload.teamId]: undefined,
+        },
       },
     };
   },
@@ -87,7 +90,7 @@ export default createReducer(initialState, {
       ...state,
       data: {
         ...state.data,
-        [KEY_TYPE.PERSONAL]: {},
+        [KEY_TYPE.ANONYMOUS]: {},
       },
     };
   },

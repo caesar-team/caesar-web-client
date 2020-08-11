@@ -28,6 +28,7 @@ import {
   DECRYPTING_ITEM_NOTIFICATION,
   NOOP_NOTIFICATION,
 } from '@caesar/common/constants';
+import { getPlural } from '@caesar/common/utils/string';
 import { NavigationPanelStyled } from '../../components';
 import { SHARED_ITEMS_CHECK } from '../../constants';
 
@@ -328,7 +329,8 @@ class SharedItemsStep extends Component {
           <TeamDetails>
             <TeamName>{team.title}</TeamName>
             <TeamItemsWrapper>
-              {filteredTeamItems.length} item(-s)
+              {filteredTeamItems.length}{' '}
+              {getPlural(filteredTeamItems.length, ['item', 'items'])}
             </TeamItemsWrapper>
           </TeamDetails>
         </TeamRow>

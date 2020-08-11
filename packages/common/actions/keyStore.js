@@ -30,10 +30,10 @@ export const removePersonalKeyPair = () => ({
   type: REMOVE_PERSONAL_KEY_PAIR,
 });
 
-export const removeTeamKeyPair = teamName => ({
+export const removeTeamKeyPair = teamId => ({
   type: REMOVE_TEAM_KEY_PAIR,
   payload: {
-    teamName,
+    teamId,
   },
 });
 

@@ -49,7 +49,7 @@ import { getFavoritesList } from '@caesar/common/normalizers/utils';
 import { fetchTeamSuccess } from '@caesar/common/actions/entities/team';
 import { getServerErrorMessage } from '@caesar/common/utils/error';
 
-function* initPersonal(withDecryption) {console.log('Personal');
+function* initPersonal(withDecryption) {
   try {
     const currentTeamId = yield select(currentTeamIdSelector);
 

@@ -64,9 +64,7 @@ export function* rejectItemSaga({ payload: { id } }) {
   }
 }
 
-
 export function* acceptRejectItemSagas() {
   yield takeLatest(ACCEPT_ITEM_UPDATE_REQUEST, acceptItemSaga);
   yield takeLatest(REJECT_ITEM_UPDATE_REQUEST, rejectItemSaga);
-
 }

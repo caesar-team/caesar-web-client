@@ -26,10 +26,17 @@ const IconStyled = styled(Icon)`
   fill: ${({ theme }) => theme.color.white};
 `;
 
-const AddControl = ({ className, onClick }) => (
-  <AddButton className={className} onClick={onClick}>
-    <IconStyled name="plus" />
-  </AddButton>
-);
+const AddControl = ({ className, onClick }) => {
+  const handleClick = e => {
+    e.stopPropagation();
+    onClick();
+  };
+
+  return (
+    <AddButton className={className} onClick={handleClick}>
+      <IconStyled name="plus" />
+    </AddButton>
+  );
+};
 
 export default AddControl;

@@ -1,6 +1,5 @@
 import './icon-arrow-triangle.svg?sprite';
 import './icon-arrow.svg?sprite';
-import './icon-bitmap.svg?sprite';
 import './icon-caesar.svg?sprite';
 import './icon-checkmark.svg?sprite';
 import './icon-clip.svg?sprite';

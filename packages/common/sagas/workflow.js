@@ -23,7 +23,7 @@ import { convertNodesToEntities } from '@caesar/common/normalizers/normalizers';
 import { objectToArray } from '@caesar/common/utils/utils';
 import { sortItemsByFavorites } from '@caesar/common/utils/workflow';
 import { getLists, getTeamLists, getTeams } from '@caesar/common/api';
-import { ITEM_TYPE, TEAM_TYPE } from '@caesar/common/constants';
+import { TEAM_TYPE } from '@caesar/common/constants';
 import {
   favoriteListSelector,
   trashListSelector,
@@ -35,7 +35,6 @@ import {
 } from '@caesar/common/selectors/user';
 import {
   itemSelector,
-  itemsByIdSelector,
   systemItemsSelector,
 } from '@caesar/common/selectors/entities/item';
 import {

@@ -64,8 +64,7 @@ export const postKeys = data => callApi.post('/keys', data);
 
 export const getKeys = () => callApi.get('/keys');
 
-export const updateKey = (email, data) =>
-  callApi.post(`/keys/${email}`, data);
+export const updateKey = (email, data) => callApi.post(`/keys/${email}`, data);
 
 export const getQrCode = () => callApi.get('/auth/2fa');
 
@@ -95,7 +94,8 @@ export const postCreateItemsBatch = data => callApi.post('/items/batch', data);
 
 export const removeItem = itemId => callApi.delete(`/items/${itemId}`);
 
-export const removeItemsBatch = query => callApi.delete(`/items/batch?${query}`);
+export const removeItemsBatch = query =>
+  callApi.delete(`/items/batch?${query}`);
 
 export const updateMoveItem = (itemId, data) =>
   callApi.patch(`/items/${itemId}/move`, data);
@@ -110,7 +110,7 @@ export const postCreateChildItem = (itemId, data) =>
   callApi.post(`/items/${itemId}/child_item`, data);
 
 export const postCreateChildItemBatch = data =>
-  callApi.post('item/batch/share', data);
+  callApi.post('/items/batch/share', data);
 
 export const patchChildAccess = (childItemId, data) =>
   callApi.patch(`/child_item/${childItemId}/access`, data);

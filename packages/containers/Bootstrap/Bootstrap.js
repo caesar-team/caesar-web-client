@@ -61,8 +61,14 @@ class Bootstrap extends Component {
     this.props.initCoresCount();
 
     try {
+      const { shared = {}, logout } = this.props;
       const { data: bootstrap } = await getUserBootstrap();
       const { data: user } = await getUserSelf();
+
+      // TODO: Add namespaces into JWT token to avoid this dirty hack
+      if (user?.email.includes('anonymous') && !shared?.mp) {
+        logout();
+      }
 
       this.bootstrap = getBootstrapStates(bootstrap);
       this.navigationPanelSteps = getNavigationPanelSteps(this.bootstrap);

@@ -63,7 +63,7 @@ const MiddleColumnComponent = ({
     dispatch(setWorkInProgressItem(itemsById[itemId]));
   };
 
-  const handleClickItem = itemId => event => {
+  const handleClickItem = itemId => () => {
     handleDefaultSelectionItemBehaviour(itemId);
   };
 

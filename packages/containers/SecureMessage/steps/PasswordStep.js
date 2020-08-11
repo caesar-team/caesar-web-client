@@ -3,7 +3,6 @@ import { useFormik } from 'formik';
 import { LockInput } from '@caesar/components';
 import {
   decryptSecretMessage,
-  getEncryptedRawsFromSecret,
   getDecodedSecret,
 } from '@caesar/common/utils/secret';
 

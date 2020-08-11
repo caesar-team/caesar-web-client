@@ -3,12 +3,7 @@ import { useHover } from 'react-use';
 import styled from 'styled-components';
 import DownloadIconSvg from '@caesar/assets/icons/svg/icon-download-white.svg';
 import { PERMISSION } from '@caesar/common/constants';
-import {
-  extactExtFromFilename,
-  getFilenameWithoutExt,
-  getRealFileSizeForBase64enc,
-  humanizeSize,
-} from '@caesar/common/utils/file';
+import { humanizeSize } from '@caesar/common/utils/file';
 import { Can } from '../Ability';
 import { Icon } from '../Icon';
 

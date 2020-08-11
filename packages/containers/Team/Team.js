@@ -17,7 +17,6 @@ import {
 } from '@caesar/components';
 import {
   COMMANDS_ROLES,
-  TEAM_TYPE,
   PERMISSION,
   PERMISSION_ENTITY,
 } from '@caesar/common/constants';

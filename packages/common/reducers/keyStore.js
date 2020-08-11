@@ -90,7 +90,7 @@ export default createReducer(initialState, {
       ...state,
       data: {
         ...state.data,
-        [KEY_TYPE.ANONYMOUS]: {},
+        [KEY_TYPE.ANONYMOUS]: [],
       },
     };
   },

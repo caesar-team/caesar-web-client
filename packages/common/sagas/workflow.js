@@ -36,6 +36,7 @@ import {
 import {
   itemSelector,
   itemsByIdSelector,
+  systemItemsSelector,
 } from '@caesar/common/selectors/entities/item';
 import {
   workInProgressListIdSelector,
@@ -267,12 +268,7 @@ export function* setCurrentTeamIdWatchSaga() {
 
 export function* decryptionEndWatchSaga() {
   try {
-    const items = yield select(itemsByIdSelector);
-
-    const systemItems =
-      Object
-        .values(items)
-        .filter(({ type }) => type === ITEM_TYPE.SYSTEM);
+    const systemItems = yield select(systemItemsSelector);
 
     if (systemItems.length > 0) {
       yield all(systemItems => put(addTeamKeyPair(item)));

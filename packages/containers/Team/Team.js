@@ -275,7 +275,6 @@ class TeamContainer extends Component {
   );
 
   getColumns() {
-    const { team } = this.props;
     const { filter } = this.state;
 
     const columnWidths = this.calculateColumnWidths();
@@ -341,21 +340,26 @@ class TeamContainer extends Component {
       sortable: false,
       resizable: false,
       width: columnWidths.role,
-      Cell: ({ original }) => (
-        <RoleField>
-          <Can I={PERMISSION.EDIT} of={getMemberSubject(original)}>
-            <SelectStyled
-              name="role"
-              value={original.role}
-              options={OPTIONS}
-              onChange={this.handleChangeRole(original.id)}
-            />
-          </Can>
-          <Can not I={PERMISSION.EDIT} of={getMemberSubject(original)}>
-            {original.role}
-          </Can>
-        </RoleField>
-      ),
+      Cell: ({ original, pageSize, viewIndex }) => {
+        const isLastTwoInList = pageSize - viewIndex <= 2;
+
+        return (
+          <RoleField>
+            <Can I={PERMISSION.EDIT} of={getMemberSubject(original)}>
+              <SelectStyled
+                name="role"
+                value={original.role}
+                options={OPTIONS}
+                onChange={this.handleChangeRole(original.id)}
+                boxDirection={isLastTwoInList ? 'up' : 'down'}
+              />
+            </Can>
+            <Can not I={PERMISSION.EDIT} of={getMemberSubject(original)}>
+              {original.role}
+            </Can>
+          </RoleField>
+        );
+      },
       Header: (
         <HeaderField>
           <HeaderFieldName>ROLE</HeaderFieldName>

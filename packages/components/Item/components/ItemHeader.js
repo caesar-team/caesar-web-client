@@ -25,6 +25,7 @@ const ColumnHeader = styled.div`
   justify-content: space-between;
   align-items: center;
   height: 56px;
+  flex: 0 0 56px;
   padding: 8px 24px;
   background-color: ${({ theme }) => theme.color.alto};
   border-bottom: 1px solid ${({ theme }) => theme.color.gallery};

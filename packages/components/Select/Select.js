@@ -78,7 +78,7 @@ const ArrowIcon = styled(Icon)`
 
 const BOX_DIRECTION_DOWN = 'down';
 
-const DEFAULT_TOP_OFFSET = 48;
+const DEFAULT_TOP_OFFSET = 36;
 const DEFAULT_OPTION_SIZE = 36;
 
 class SelectInner extends Component {
@@ -163,7 +163,7 @@ class SelectInner extends Component {
     const topOffset =
       boxDirection === BOX_DIRECTION_DOWN
         ? boxOffset
-        : (options.length + 1) * DEFAULT_OPTION_SIZE * -1;
+        : (options.length + 0.5) * DEFAULT_OPTION_SIZE * -1;
 
     return (
       <Wrapper>

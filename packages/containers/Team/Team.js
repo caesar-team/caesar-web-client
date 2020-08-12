@@ -17,7 +17,6 @@ import {
 } from '@caesar/components';
 import {
   COMMANDS_ROLES,
-  TEAM_TYPE,
   PERMISSION,
   PERMISSION_ENTITY,
 } from '@caesar/common/constants';
@@ -490,8 +489,6 @@ class TeamContainer extends Component {
       );
     }
 
-    const isDefaultTeam = team.type === TEAM_TYPE.DEFAULT;
-
     const members = this.getMemberList(team.users, membersById);
     const filteredMembersList = this.filterMemberList(
       team.users,
@@ -508,20 +505,18 @@ class TeamContainer extends Component {
       <Wrapper ref={this.wrapperRef}>
         <TopWrapper>
           <Title>{team.title}</Title>
-          {!isDefaultTeam && (
-            <Can I={PERMISSION.ADD} a={teamSubject}>
-              <ButtonsWrapper>
-                <ButtonStyled
-                  withOfflineCheck
-                  onClick={this.handleOpenModal(INVITE_MEMBER_MODAL)}
-                  icon="plus"
-                  color="black"
-                >
-                  Add member
-                </ButtonStyled>
-              </ButtonsWrapper>
-            </Can>
-          )}
+          <Can I={PERMISSION.ADD} a={teamSubject}>
+            <ButtonsWrapper>
+              <ButtonStyled
+                withOfflineCheck
+                onClick={this.handleOpenModal(INVITE_MEMBER_MODAL)}
+                icon="plus"
+                color="black"
+              >
+                Add the member
+              </ButtonStyled>
+            </ButtonsWrapper>
+          </Can>
         </TopWrapper>
         <DataTableStyled
           noDataText={null}

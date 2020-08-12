@@ -2,13 +2,14 @@ import React, { memo } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import styled from 'styled-components';
 import { sortByName } from '@caesar/common/utils/utils';
-import { TEAM_TYPE, TEAM_TEXT_TYPE } from '@caesar/common/constants';
+import { TEAM_TYPE } from '@caesar/common/constants';
 import {
   userDataSelector,
   userTeamListSelector,
   currentTeamSelector,
 } from '@caesar/common/selectors/user';
 import { setCurrentTeamId } from '@caesar/common/actions/user';
+import { getTeamTitle } from '@caesar/common/utils/team';
 import { Avatar } from '../Avatar';
 
 const Option = styled.div`
@@ -77,9 +78,7 @@ const TeamsListComponent = ({
             }}
           >
             <StyledAvatar avatar={team.icon} size={32} fontSize="small" />
-            {team.title.toLowerCase() === TEAM_TYPE.DEFAULT
-              ? TEAM_TEXT_TYPE[TEAM_TYPE.DEFAULT]
-              : team.title}
+            {getTeamTitle(team)}
           </Option>
         );
       })}

@@ -5,6 +5,7 @@ import styled from 'styled-components';
 import { useItemTeamAndListOptions } from '@caesar/common/hooks';
 import { userDataSelector } from '@caesar/common/selectors/user';
 import { teamsByIdSelector } from '@caesar/common/selectors/entities/team';
+import { getTeamTitle } from '@caesar/common/utils/team';
 import { Dropdown } from '../../Dropdown';
 import { Avatar } from '../../Avatar';
 import { Icon } from '../../Icon';
@@ -101,7 +102,7 @@ export const FormHeader = ({ teamId, listId, onChangePath, className }) => {
             size={24}
             fontSize="xs"
           />
-          <Name>{team.title}</Name>
+          <Name>{getTeamTitle(team)}</Name>
         </>
       ),
     }));

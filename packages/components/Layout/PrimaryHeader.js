@@ -97,6 +97,7 @@ const ArrowIcon = styled(Icon)`
 const PrimaryHeaderComponent = ({
   user,
   searchedText,
+  showAddItemButton,
   onSearch,
   onClickReset,
 }) => {
@@ -138,7 +139,7 @@ const PrimaryHeaderComponent = ({
                 onClickReset={onClickReset}
               />
             )}
-            <AddItemButton />
+            {showAddItemButton && <AddItemButton />}
             <UserSection>
               <StyledDropdown
                 renderOverlay={() => Options}

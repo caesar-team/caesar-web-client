@@ -41,7 +41,6 @@ const generateFingerPrint = () => {
 
 export const getTrustedDeviceToken = generate => {
   if (isServer) return null;
-
   const token = window.localStorage.getItem('trustedDevice');
 
   if (!token && generate) {
@@ -54,4 +53,14 @@ export const getTrustedDeviceToken = generate => {
   }
 
   return token;
+};
+
+export const removeTrustedDevice = () => {
+  if (isServer) return null;
+
+  return window.localStorage.removeItem('trustedDevice');
+};
+
+export const clearStorage = () => {
+  return window.localStorage ? window.localStorage.clear() : false;
 };

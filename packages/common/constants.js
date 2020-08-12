@@ -135,6 +135,7 @@ export const SHARED_ROUTES = [ROUTES.SHARE, ROUTES.INVITE];
 
 // require bootstrap
 // TODO: figure out better naming
+
 export const LOCKED_ROUTES = [
   ROUTES.DASHBOARD,
   ROUTES.IMPORT,

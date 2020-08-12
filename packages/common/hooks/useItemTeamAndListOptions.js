@@ -9,21 +9,12 @@ import {
   userTeamListSelector,
 } from '@caesar/common/selectors/user';
 import { teamsByIdSelector } from '@caesar/common/selectors/entities/team';
+import { getTeamTitle } from '@caesar/common/utils/team';
 import { getMovableLists } from '../api';
 
-const getTeamTitle = (checkedTeamId, teams) => {
-  switch (true) {
-    case !!checkedTeamId &&
-      teams[checkedTeamId]?.title.toLowerCase() === TEAM_TYPE.DEFAULT:
-      return TEAM_TEXT_TYPE[TEAM_TYPE.DEFAULT];
-    case !!checkedTeamId:
-      return teams[checkedTeamId]?.title;
-    case !checkedTeamId:
-      return TEAM_TEXT_TYPE[TEAM_TYPE.PERSONAL];
-    default:
-      return '';
-  }
-};
+const getCheckedTeamTitle = (checkedTeamId, teams) => !checkedTeamId
+  ? TEAM_TEXT_TYPE[TEAM_TYPE.PERSONAL]
+  : getTeamTitle(teams[checkedTeamId]);
 
 const getListTitle = (listId, lists) =>
   transformListTitle(lists.find(list => list.id === listId)?.label);
@@ -80,7 +71,7 @@ export const useItemTeamAndListOptions = ({ teamId = null, listId }) => {
 
   return {
     checkedTeamId,
-    checkedTeamTitle: getTeamTitle(checkedTeamId, teamsById),
+    checkedTeamTitle: getCheckedTeamTitle(checkedTeamId, teamsById),
     checkedListId,
     checkedListLabel: getListTitle(checkedListId, lists),
     setCheckedTeamId,

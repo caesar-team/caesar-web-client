@@ -9,6 +9,7 @@ import {
   PERMISSION_ENTITY,
 } from '@caesar/common/constants';
 import { transformListTitle } from '@caesar/common/utils/string';
+import { getTeamTitle } from '@caesar/common/utils/team';
 import {
   listsByIdSelector,
   trashListSelector,
@@ -25,6 +26,7 @@ const ColumnHeader = styled.div`
   justify-content: space-between;
   align-items: center;
   height: 56px;
+  flex: 0 0 56px;
   padding: 8px 24px;
   background-color: ${({ theme }) => theme.color.alto};
   border-bottom: 1px solid ${({ theme }) => theme.color.gallery};
@@ -77,7 +79,7 @@ export const ItemHeader = ({
   const listsById = useSelector(listsByIdSelector);
 
   const teamTitle = item.teamId
-    ? teamsById[item.teamId]?.title
+    ? getTeamTitle(teamsById[item.teamId])
     : TEAM_TEXT_TYPE[TEAM_TYPE.PERSONAL];
 
   const listTitle = transformListTitle(listsById[item.listId]?.label);

@@ -1,6 +1,10 @@
 import { connect } from 'react-redux';
 import { createStructuredSelector } from 'reselect';
-import { setMasterPassword, setKeyPair } from '@caesar/common/actions/user';
+import {
+  setMasterPassword,
+  setKeyPair,
+  logout,
+} from '@caesar/common/actions/user';
 import { resetWorkflowStore } from '@caesar/common/actions/workflow';
 import {
   initCoresCount,
@@ -29,6 +33,7 @@ const mapDispatchToProps = {
   removeItemsData,
   initCoresCount,
   updateGlobalNotification,
+  logout,
 };
 
 export default connect(

@@ -62,6 +62,7 @@ class Bootstrap extends Component {
     initCoresCount();
 
     try {
+      const { shared = {}, logout } = this.props;
       const { data: bootstrap } = await getUserBootstrap();
       const { data: user } = await getUserSelf();
 

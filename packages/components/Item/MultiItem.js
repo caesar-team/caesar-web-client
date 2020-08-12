@@ -64,10 +64,12 @@ export const MultiItem = ({
     <Wrapper>
       <CheckboxStyled checked={areAllItemsSelected} onChange={onSelectAll} />
       <Title>{workInProgressItemIds.length} items</Title>
-      <ButtonStyled withOfflineCheck color="white" onClick={onClickMove}>
-        MOVE
-      </ButtonStyled>
-      {!isInboxItems && (
+      {!isTrashItems && (
+        <ButtonStyled withOfflineCheck color="white" onClick={onClickMove}>
+          Move
+        </ButtonStyled>
+      )}
+      {!isInboxItems && !isTrashItems && (
         <ButtonStyled
           withOfflineCheck
           color="white"

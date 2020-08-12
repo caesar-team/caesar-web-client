@@ -134,18 +134,15 @@ class MasterPasswordStep extends Component {
   };
 
   handleSubmitCreatePassword = ({ password }) => {
-    this.setState(
-      {
-        masterPassword: password,
-        step: MASTER_PASSWORD_CONFIRM,
-      },
-      () => {
-        copy(password);
-        this.props.notification.show({
-          text: 'Master Password has been copied to clipboard!',
-        })
-      },
-    );
+    copy(password);
+    this.props.notification.show({
+      text: 'Master Password has been copied to clipboard!',
+    });
+
+    this.setState({
+      masterPassword: password,
+      step: MASTER_PASSWORD_CONFIRM,
+    });
   };
 
   handleSubmitConfirmPassword = async (

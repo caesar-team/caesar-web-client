@@ -42,14 +42,17 @@ class TwoFactorStep extends Component {
     }
   }
 
-  handleSubmit = async ({ code, fpCheck }, { setSubmitting, setErrors }) => {
+  handleSubmit = async (
+    { code, fpCheck, rememberDevice },
+    { setSubmitting, setErrors },
+  ) => {
     const { initialStep, onFinish } = this.props;
 
     const isCreateFlow = initialStep === TWO_FACTOR_CREATE;
 
     const post = { authCode: code };
 
-    if (fpCheck) {
+    if (fpCheck || rememberDevice) {
       post.fingerprint = await getTrustedDeviceToken(true);
     }
 

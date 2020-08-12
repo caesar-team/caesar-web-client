@@ -58,11 +58,10 @@ class Bootstrap extends Component {
   }
 
   async componentDidMount() {
-    const { logout, initCoresCount } = this.props;
+    const { logout, initCoresCount, shared = {} } = this.props;
     initCoresCount();
 
     try {
-      const { shared = {}, logout } = this.props;
       const { data: bootstrap } = await getUserBootstrap();
       const { data: user } = await getUserSelf();
 

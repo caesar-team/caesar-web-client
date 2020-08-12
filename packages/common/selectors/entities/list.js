@@ -127,13 +127,9 @@ export const allTrashListIdsSelector = createSelector(
 
 export const currentTeamDefaultListSelector = createSelector(
   teamListsSelector,
-  currentTeamIdSelector,
-  (lists, currentTeamId) =>
-    lists.list?.find(
-      ({ teamId, label }) =>
-        teamId === currentTeamId && label === LIST_TYPE.DEFAULT,
-    ) || {},
+  lists => lists.find(({ type }) => type === LIST_TYPE.DEFAULT) || {},
 );
+
 export const currentTeamTrashListSelector = createSelector(
   teamListsSelector,
   currentTeamIdSelector,

@@ -514,7 +514,7 @@ class TeamContainer extends Component {
                 icon="plus"
                 color="black"
               >
-                Add the member
+                Add a member
               </ButtonStyled>
             </ButtonsWrapper>
           </Can>

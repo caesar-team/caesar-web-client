@@ -20,6 +20,7 @@ import {
   PERMISSION,
   PERMISSION_ENTITY,
 } from '@caesar/common/constants';
+import { getTeamTitle } from '@caesar/common/utils/team';
 
 const LogoWrapper = styled.div`
   display: flex;
@@ -504,7 +505,7 @@ class TeamContainer extends Component {
     return (
       <Wrapper ref={this.wrapperRef}>
         <TopWrapper>
-          <Title>{team.title}</Title>
+          <Title>{getTeamTitle(team)}</Title>
           <Can I={PERMISSION.ADD} a={teamSubject}>
             <ButtonsWrapper>
               <ButtonStyled

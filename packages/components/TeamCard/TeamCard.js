@@ -5,11 +5,10 @@ import memoizeOne from 'memoize-one';
 import { Button, AvatarsList, Can } from '@caesar/components';
 import {
   ROUTES,
-  TEAM_TYPE,
-  TEAM_TEXT_TYPE,
   PERMISSION,
   PERMISSION_ENTITY,
 } from '@caesar/common/constants';
+import { getTeamTitle } from '@caesar/common/utils/team';
 
 const Wrapper = styled.div`
   display: flex;
@@ -69,11 +68,6 @@ const getMembers = memoizeOne((users, members) =>
     return member ? [...accumulator, member] : accumulator;
   }, []),
 );
-
-const getTeamTitle = team =>
-  team.type === TEAM_TYPE.DEFAULT
-    ? TEAM_TEXT_TYPE[TEAM_TYPE.DEFAULT]
-    : team.title;
 
 const TeamCard = ({
   className,

@@ -96,7 +96,9 @@ function* initPersonal(withDecryption) {
 
     const workInProgressItem = yield select(workInProgressItemSelector);
 
-    if (!workInProgressItem || workInProgressItem?.teamId !== currentTeamId) {
+    if (!workInProgressItem
+      || ![currentTeamId, null].includes(workInProgressItem?.teamId)
+    ) {
       yield put(setWorkInProgressItem(null));
     }
 

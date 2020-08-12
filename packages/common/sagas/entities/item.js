@@ -465,7 +465,7 @@ export function* createItemSaga({
       invited: invited || [],
       shared: null,
       tags: [],
-      teamId,
+      teamId: teamId || null,
       ownerId: user.id,
       secret: encryptedItem,
       data: { attachments, ...data },

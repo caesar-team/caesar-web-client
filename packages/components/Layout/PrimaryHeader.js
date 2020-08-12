@@ -46,6 +46,7 @@ const UserSection = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
+  margin-left: auto;
 `;
 
 const UserName = styled.div`

@@ -13,9 +13,9 @@ import {
   GlobalNotification,
 } from '@caesar/components';
 // import OpenPGPWorker from 'openpgp/dist/openpgp.worker';
+// eslint-disable-next-line import/no-webpack-loader-syntax
 import OpenPGPWorker from 'worker-loader!openpgp/dist/openpgp.worker';
 import { isClient } from '@caesar/common/utils/isEnvironment';
-import { updateGlobalNotification } from '@caesar/common/actions/application';
 import { logger } from '@caesar/common/utils/logger';
 import { getBootstrapStates, getNavigationPanelSteps } from './utils';
 import {
@@ -58,11 +58,17 @@ class Bootstrap extends Component {
   }
 
   async componentDidMount() {
-    this.props.initCoresCount();
+    const { logout, initCoresCount } = this.props;
+    initCoresCount();
 
     try {
       const { data: bootstrap } = await getUserBootstrap();
       const { data: user } = await getUserSelf();
+
+      // TODO: Add namespaces into JWT token to avoid this dirty hack
+      if (!user || (user?.email.includes('anonymous') && !shared?.mp)) {
+        logout();
+      }
 
       this.bootstrap = getBootstrapStates(bootstrap);
       this.navigationPanelSteps = getNavigationPanelSteps(this.bootstrap);
@@ -72,7 +78,7 @@ class Bootstrap extends Component {
         currentStep: this.currentStepResolver(bootstrap),
       });
     } catch (e) {
-      logger.error(`Bootstrap failure`);
+      logger.error(`Bootstrap failure`, e);
     }
   }
 
@@ -143,6 +149,7 @@ class Bootstrap extends Component {
   initOpenPGP() {
     const worker = new OpenPGPWorker();
 
+    // eslint-disable-next-line camelcase
     openpgp.config.aead_protect = false;
     openpgp.initWorker({ workers: [worker] });
   }

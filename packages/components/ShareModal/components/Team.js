@@ -1,5 +1,6 @@
 import React, { forwardRef } from 'react';
 import styled from 'styled-components';
+import { getTeamTitle } from '@caesar/common/utils/team';
 import { Avatar } from '../../Avatar';
 
 const Wrapper = styled.div`
@@ -53,7 +54,7 @@ export const Team = forwardRef(
   ({ team, isActive, onClick, className }, ref) => (
     <Wrapper onClick={onClick} ref={ref} className={className}>
       {isActive ? <MinusIcon /> : <StyledAvatar avatar={team.icon} />}
-      <Title>{team.title}</Title>
+      <Title>{getTeamTitle(team)}</Title>
     </Wrapper>
   ),
 );

@@ -7,6 +7,7 @@ import {
   currentTeamSelector,
 } from '@caesar/common/selectors/user';
 import { teamsByIdSelector } from '@caesar/common/selectors/entities/team';
+import { getTeamTitle } from '@caesar/common/utils/team';
 import { Scrollbar } from '../Scrollbar';
 import { Dropdown } from '../Dropdown';
 import { Avatar } from '../Avatar';
@@ -73,16 +74,10 @@ const MenuListComponent = ({ mode, setSearchedText, setMode }) => {
     setDropdownOpened(isOpened);
   };
 
-  const getColumnTitle = () => {
-    switch (true) {
-      case activeTeamId === TEAM_TYPE.PERSONAL:
-        return TEAM_TEXT_TYPE[TEAM_TYPE.PERSONAL];
-      case teamList[activeTeamId].title.toLowerCase() === TEAM_TYPE.DEFAULT:
-        return TEAM_TEXT_TYPE[TEAM_TYPE.DEFAULT];
-      default:
-        return teamList[activeTeamId].title;
-    }
-  };
+  const getColumnTitle = () =>
+    activeTeamId === TEAM_TYPE.PERSONAL
+      ? TEAM_TEXT_TYPE[TEAM_TYPE.PERSONAL]
+      : getTeamTitle(teamList[activeTeamId]);
 
   return (
     <>

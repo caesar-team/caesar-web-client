@@ -2,7 +2,7 @@ import { call, select, all, takeLatest } from '@redux-saga/core/effects';
 import { getOrCreateMemberBatchSaga } from '@caesar/common/sagas/entities/member';
 import { itemChildItemsSelector, itemsBatchSelector } from '@caesar/common/selectors/entities/item';
 import { masterPasswordSelector, userDataSelector } from '@caesar/common/selectors/user';
-import { personalKeyPairSelector } from '@caesar/common/selectors/keyStore';
+import { actualKeyPairSelector } from '@caesar/common/selectors/keyStore';
 import {
   decryptItem,
   getPrivateKeyObj,
@@ -71,7 +71,7 @@ function* getItemUserPairCombinations(item, members = [], privateKeyObj) {
 }
 
 export function* getItemUserPairs({ items, members }) {
-  const keyPair = yield select(personalKeyPairSelector);
+  const keyPair = yield select(actualKeyPairSelector);
   const masterPassword = yield select(masterPasswordSelector);
 
   const privateKeyObj = yield call(

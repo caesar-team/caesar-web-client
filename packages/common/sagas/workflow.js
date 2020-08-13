@@ -97,7 +97,7 @@ function* initPersonal(withDecryption) {
 
     if (
       !workInProgressListId ||
-      listsById[workInProgressListId]?.teamId !== currentTeamId
+      ![currentTeamId, null].includes(listsById[workInProgressListId]?.teamId)
     ) {
       yield put(setWorkInProgressListId(favoritesList.id));
     }

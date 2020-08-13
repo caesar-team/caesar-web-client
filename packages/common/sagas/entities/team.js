@@ -135,22 +135,22 @@ export function* fetchTeamSaga({ payload: { teamId } }) {
 
 export function* createTeamSaga({ payload: { title, icon } }) {
   try {
-    const { data } = yield call(postCreateTeam, { title, icon });
+    const { data: team } = yield call(postCreateTeam, { title, icon });
 
     const user = yield select(userDataSelector);
     const defaultList = yield select(defaultListSelector);
     const masterPassword = yield call(passwordGenerator);
-    const systemTeamEmail = yield call(generateSystemItemEmail, data.id);
+    const systemTeamEmail = yield call(generateSystemItemEmail, team.id);
 
     const {
       publicKey,
       privateKey,
     } = yield call(generateKeys, masterPassword, [systemTeamEmail]);
 
-    yield put(createTeamSuccess({ ...data, __type: ENTITY_TYPE.TEAM }));
-    yield put(addTeamToMember(data.id, user.id));
-    yield put(addTeamMember(data.id, user.id, COMMANDS_ROLES.USER_ROLE_ADMIN));
-    yield put(joinTeam(data.id));
+    yield put(createTeamSuccess({ ...team, __type: ENTITY_TYPE.TEAM }));
+    yield put(addTeamToMember(team.id, user.id));
+    yield put(addTeamMember(team.id, user.id, COMMANDS_ROLES.USER_ROLE_ADMIN));
+    yield put(joinTeam(team.id));
 
     const systemItemData = {
       type: ITEM_TYPE.SYSTEM,
@@ -166,7 +166,7 @@ export function* createTeamSaga({ payload: { title, icon } }) {
         },
       ],
       pass: masterPassword,
-      name: generateSystemItemName(data.id),
+      name: generateSystemItemName(team.id),
     };
 
     yield put(createItemRequest(systemItemData));

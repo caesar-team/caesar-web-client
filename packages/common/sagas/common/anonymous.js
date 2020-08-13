@@ -54,6 +54,7 @@ export function* createAnonymousLinkSaga() {
       publicKey,
     );
 
+    // @Deprecated
     const {
       data: { items },
     } = yield call(postCreateChildItem, workInProgressItem.id, {
@@ -67,6 +68,7 @@ export function* createAnonymousLinkSaga() {
       ],
     });
 
+    // TODO: Make shorted link
     const link = generateSharingUrl(
       items[0].id,
       objectToBase64({

@@ -1,3 +1,4 @@
+// @Deprecated
 import { put, call, takeLatest, select } from 'redux-saga/effects';
 import {
   ACCEPT_ITEM_UPDATE_REQUEST,

@@ -1,3 +1,5 @@
+import { getHostName } from '@caesar/common/utils/getDomainName';
+
 function isValidItem(item) {
   // TODO: strengthen checks
   if (!item.data) {
@@ -24,7 +26,7 @@ export function generateSystemItemName(teamId) {
 }
 
 export function generateSystemItemEmail(teamId) {
-  return `${generateSystemItemName(teamId)}@${location.hostname}`;
+  return `${generateSystemItemName(teamId)}@${getHostName()}`;
 }
 
 export function extractKeysFromSystemItem(item) {

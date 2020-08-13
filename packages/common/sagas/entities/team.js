@@ -64,7 +64,7 @@ import {
   deleteTeam,
   getTeam,
   updateTeamMember,
-  postaddMemberToTeamList,
+  postAddTeamMember,
   deleteTeamMember,
 } from '@caesar/common/api';
 import { getServerErrorMessage } from '@caesar/common/utils/error';
@@ -251,7 +251,7 @@ export function* addMemberToTeamListsBatchSaga({ payload: { teamId, members } })
     }));
 
     const promises = invitedMembersWithCommandRole.map(({ id: userId, role }) =>
-      postaddMemberToTeamList({ teamId, userId, role }),
+      postAddTeamMember({ teamId, userId, role }),
     );
 
     const invitedMembersWithLinks = [];

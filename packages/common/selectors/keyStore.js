@@ -1,6 +1,14 @@
 import { createSelector } from 'reselect';
+import {
+  currentTeamIdSelector,
+  isUserAnonymousSelector,
+  userIdSelector,
+} from '@caesar/common/selectors/user';
 import { generateSystemItemName } from '@caesar/common/utils/item';
-import { KEY_TYPE } from '../constants';
+import { KEY_TYPE, TEAM_TYPE } from '@caesar/common/constants';
+
+const findTeamItemByName = (data, teamId) =>
+  Object.values(data[KEY_TYPE.TEAM]).find(({ name }) => name === generateSystemItemName(teamId)) || {};
 
 export const keyStoreSelector = state => state.keyStore;
 
@@ -19,11 +27,29 @@ export const personalKeyPairSelector = createSelector(
 export const teamKeyPairSelector = createSelector(
   keyStoreDataSelector,
   teamIdPropSelector,
-  (data, teamName) =>
-    Object.values(data[KEY_TYPE.TEAM]).find(({ name }) => name === generateSystemItemName(teamId)) || {},
+  (data, teamId) => findTeamItemByName(data, teamId),
 );
 
 export const anonymousKeyPairSelector = createSelector(
   keyStoreDataSelector,
   (data, teamName) => Object.values(data[KEY_TYPE.ANONYMOUS]) || {},
+);
+
+export const actualKeyPairSelector = createSelector(
+  keyStoreDataSelector,
+  currentTeamIdSelector,
+  personalKeyPairSelector,
+  isUserAnonymousSelector,
+  userIdSelector,
+  (data, currentTeamId, personalKeyPair, isAnonymous, userId) => {
+    if (isAnonymous) {
+      return Object.values(data[KEY_TYPE.ANONYMOUS]).find(({ id }) => userId) || {};
+    }
+
+    if (currentTeamId !== TEAM_TYPE.PERSONAL) {
+      return findTeamItemByName(data, currentTeamId);
+    }
+
+    return personalKeyPair;
+  },
 );

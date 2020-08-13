@@ -70,7 +70,7 @@ export const itemsChildItemsBatchSelector = createSelector(
 
 export const systemItemsSelector = createSelector(
   itemsByIdSelector,
-  items => items.find(({ type }) => type === ITEM_TYPE.SYSTEM) || {},
+  items => Object.values(items).find(({ type }) => type === ITEM_TYPE.SYSTEM) || {},
 );
 
 export const teamSystemItemSelector = createSelector(

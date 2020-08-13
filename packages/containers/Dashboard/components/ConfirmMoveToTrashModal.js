@@ -41,7 +41,13 @@ export const ConfirmMoveToTrashModal = ({
       : trashList.id;
 
     if (workInProgressItemIds.length > 0) {
-      dispatch(moveItemsBatchRequest(workInProgressItemIds, trashListId));
+      dispatch(
+        moveItemsBatchRequest(
+          workInProgressItemIds,
+          workInProgressList?.teamId || null,
+          trashListId,
+        ),
+      );
       dispatch(resetWorkInProgressItemIds());
 
       notification.show({

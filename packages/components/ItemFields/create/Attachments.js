@@ -43,8 +43,8 @@ const renderAttachments = (
   errors = [],
   setFieldValue,
   disabled,
-) =>
-  attachments.map((attachment, index) => (
+) => {
+  return attachments.map((attachment, index) => (
     <FileRow key={index} disabled={disabled}>
       <File
         key={index}
@@ -56,13 +56,14 @@ const renderAttachments = (
             attachments.filter((_, fileIndex) => index !== fileIndex),
           )
         }
-        {...attachment}
+        attachment={attachment}
       />
       {checkAttachmentsError(errors, index) && (
         <TextError>{errors[index].raw}</TextError>
       )}
     </FileRow>
   ));
+};
 
 export const Attachments = ({
   name,

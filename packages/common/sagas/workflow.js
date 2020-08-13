@@ -104,6 +104,7 @@ function* initPersonal(withDecryption) {
 
     yield put(finishIsLoading());
   } catch (error) {
+    // eslint-disable-next-line no-console
     console.log(error);
     yield put(
       updateGlobalNotification(getServerErrorMessage(error), false, true),
@@ -177,6 +178,7 @@ function* initTeam(team, withDecryption) {
 
     yield put(finishIsLoading());
   } catch (error) {
+    // eslint-disable-next-line no-console
     console.log(error);
     yield put(
       updateGlobalNotification(getServerErrorMessage(error), false, true),
@@ -190,6 +192,7 @@ function* initTeams(withDecryption) {
 
     yield all(teams.map(team => call(initTeam, team, withDecryption)));
   } catch (error) {
+    // eslint-disable-next-line no-console
     console.log(error);
     yield put(
       updateGlobalNotification(getServerErrorMessage(error), false, true),
@@ -238,6 +241,7 @@ export function* setCurrentTeamIdWatchSaga() {
       yield call(initTeams, true);
     }
   } catch (error) {
+    // eslint-disable-next-line no-console
     console.log(error);
     yield put(
       updateGlobalNotification(getServerErrorMessage(error), false, true),

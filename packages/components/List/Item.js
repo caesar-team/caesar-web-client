@@ -1,3 +1,4 @@
+/* eslint-disable camelcase */
 import React from 'react';
 import styled from 'styled-components';
 import {
@@ -56,8 +57,8 @@ const IconWrapper = styled.span``;
 const Tooltip = styled.div`
   display: none;
   position: absolute;
-  top: ${({ isTop }) => isTop ? 'auto' : '-40px'};
-  bottom: ${({ isTop }) => isTop ? '-40px' : 'auto'};
+  top: ${({ isTop }) => (isTop ? 'auto' : '-40px')};
+  bottom: ${({ isTop }) => (isTop ? '-40px' : 'auto')};
   left: -10px;
   padding: 4px 8px;
   background-color: ${({ theme }) => theme.color.black};
@@ -119,6 +120,8 @@ const Row = styled.div`
     if (isInModal) {
       return `background: ${theme.color.snow};`;
     }
+
+    return '';
   }}
 
   ${({ isActive, theme }) =>
@@ -133,11 +136,11 @@ const Row = styled.div`
   }
   
   ${CheckboxStyled}, ${NotEditIcon} {
-    display: ${({ isMultiItem }) => isMultiItem ? 'flex' : 'none'};
+    display: ${({ isMultiItem }) => (isMultiItem ? 'flex' : 'none')};
   }
   
   ${IconWrapper} {
-    display: ${({ isMultiItem }) => isMultiItem ? 'none' : 'inline-block'};
+    display: ${({ isMultiItem }) => (isMultiItem ? 'none' : 'inline-block')};
   }
   
   ${Tooltip} {
@@ -151,9 +154,8 @@ const TypeIconWrapper = styled.div`
   align-items: center;
   flex: 0 0 40px;
   height: 40px;
-  background: 
-    ${({ isForbiddenMultiItem, theme }) => 
-      (isForbiddenMultiItem ? theme.color.lightGray : theme.color.gray)};
+  background: ${({ isForbiddenMultiItem, theme }) =>
+    isForbiddenMultiItem ? theme.color.lightGray : theme.color.gray};
   border-radius: 4px;
 `;
 
@@ -212,23 +214,24 @@ export const Item = ({
   ...props
 }) => {
   const shouldShowMembers = !!invited.length;
-  const shouldShowAttachments = attachments && attachments.length > 0;
+  const shouldShowAttachments =
+    attachments && Array.isArray(attachments) && attachments.length > 0;
   const shouldShowFavoriteIcon = favorite && !isClosable;
   const isActive = isMultiItem && workInProgressItemIds.includes(id);
   const isTop = index === 0;
   const itemSubject = teamId
     ? {
-      __typename: PERMISSION_ENTITY.TEAM_ITEM,
-      team_move_item: !!_links?.team_move_item,
-      team_batch_share_item: !!_links?.team_batch_share_item,
-      team_delete_item: !!_links?.team_delete_item,
-    }
+        __typename: PERMISSION_ENTITY.TEAM_ITEM,
+        team_move_item: !!_links?.team_move_item,
+        team_batch_share_item: !!_links?.team_batch_share_item,
+        team_delete_item: !!_links?.team_delete_item,
+      }
     : {
-      __typename: PERMISSION_ENTITY.ITEM,
-      move_item: !!_links?.move_item,
-      batch_share_item: !!_links?.batch_share_item,
-      delete_item: !!_links?.delete_item,
-    };
+        __typename: PERMISSION_ENTITY.ITEM,
+        move_item: !!_links?.move_item,
+        batch_share_item: !!_links?.batch_share_item,
+        delete_item: !!_links?.delete_item,
+      };
 
   return (
     <Row
@@ -244,13 +247,17 @@ export const Item = ({
       <Can I={PERMISSION.MULTISELECT} an={itemSubject} passThrough>
         {allowed => (
           <TypeIconWrapper
-            onClick={e => { e.stopPropagation(); }}
+            onClick={e => {
+              e.stopPropagation();
+            }}
             isForbiddenMultiItem={!allowed && isMultiItem}
           >
             {allowed ? (
               <CheckboxStyled
                 checked={isActive}
-                onChange={() => { onSelectItem(id)}}
+                onChange={() => {
+                  onSelectItem(id);
+                }}
               />
             ) : (
               <NotEditIconWrapper>

@@ -57,7 +57,6 @@ const ListComponent = ({
   }
 
   const isEmpty = items.length === 0;
-
   const renderedList = () => {
     if (isEmpty) {
       return <EmptyList />;

@@ -64,7 +64,6 @@ const ItemComponent = ({
   const handleClickAcceptEdit = ({ name, value }) => {
     setSubmitting(true);
     const updatedData = { ...data, listId, [name]: value };
-
     dispatch(editItemRequest(updatedData, setSubmitting, notification));
   };
 

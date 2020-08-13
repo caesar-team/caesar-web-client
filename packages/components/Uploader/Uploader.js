@@ -5,6 +5,7 @@ import {
   filesToBase64,
   splitFilesToUniqAndDuplicates,
 } from '@caesar/common/utils/file';
+import { makeAttachemntFromFile } from '@caesar/common/utils/attachment';
 import { useMedia } from '@caesar/common/hooks';
 import { TOTAL_MAX_UPLOADING_FILES_SIZES } from '@caesar/common/constants';
 import { Icon } from '../Icon';
@@ -79,10 +80,12 @@ const Uploader = ({
 
   const handleDrop = async acceptedFiles => {
     const previews = await filesToBase64(acceptedFiles);
-    const files = acceptedFiles.map(({ name: fileName }, index) => ({
-      name: encodeURIComponent(fileName),
-      raw: previews[index],
-    }));
+    const files = acceptedFiles.map(({ name: fileName }, index) =>
+      makeAttachemntFromFile({
+        name: encodeURIComponent(fileName),
+        raw: previews[index],
+      }),
+    );
 
     const preparedFiles = splitFilesToUniqAndDuplicates([
       ...previousFiles,

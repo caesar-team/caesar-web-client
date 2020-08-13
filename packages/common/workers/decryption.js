@@ -17,6 +17,7 @@ const decryption = {
   },
   async decrypt(item) {
     const data = await decryptItem(item.secret, state.privateKeyObject);
+
     return { id: item.id, data };
   },
   async decryptAll(items) {
@@ -24,6 +25,7 @@ const decryption = {
     return await Promise.all(
       items.map(async item => {
         const data = await decryptItem(item.secret, state.privateKeyObject);
+
         return { id: item.id, data };
       }),
     );

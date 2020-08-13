@@ -4,10 +4,8 @@ import { useFormik } from 'formik';
 import { media } from '@caesar/assets/styles/media';
 import { Select } from '@caesar/components/Select';
 import { checkError } from '@caesar/common/utils/formikUtils';
-import {
-  downloadFile,
-  makeAttachemntFromFile,
-} from '@caesar/common/utils/file';
+import { downloadFile } from '@caesar/common/utils/file';
+import { makeAttachemntFromFile } from '@caesar/common/utils/attachment';
 import { useMedia } from '@caesar/common/hooks';
 import { Checkbox } from '../Checkbox';
 import { TextArea, PasswordInput } from '../Input';

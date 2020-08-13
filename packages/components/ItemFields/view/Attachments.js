@@ -96,7 +96,7 @@ export const Attachments = ({
       ...attachments,
       ...files,
     ]);
-
+    // Todo: Refactor to the one dictionary or use the new Set
     const mappedFiles = files.map(file => {
       for (let i = 0; i < duplicatedFiles.length; i++) {
         if (
@@ -122,29 +122,32 @@ export const Attachments = ({
   const AttachmentsComponent = () => (
     <Wrapper>
       <Title>
-        Attachments ({attachments.length})
-        {attachments.length > 0 && (
-          <DownloadIcon
-            name="download"
-            width={16}
-            height={16}
-            color="gray"
-            onClick={handleClickDownloadAll}
-          />
-        )}
+        Attachments ({Array.isArray(attachments) ? attachments.length : 0})
+        {Array.isArray(attachments) &&
+          attachments &&
+          attachments.length > 0 && (
+            <DownloadIcon
+              name="download"
+              width={16}
+              height={16}
+              color="gray"
+              onClick={handleClickDownloadAll}
+            />
+          )}
       </Title>
       <Inner>
-        {attachments.map(attach => (
-          <File
-            key={attach.name}
-            itemSubject={itemSubject}
-            onClickDownload={() => handleClickDownloadFile(attach)}
-            onClickRemove={
-              onClickAcceptEdit && (() => onClickRemove(attach.raw))
-            }
-            {...attach}
-          />
-        ))}
+        {Array.isArray(attachments) &&
+          attachments.map(attachment => (
+            <File
+              key={attachment.name}
+              itemSubject={itemSubject}
+              onClickDownload={() => handleClickDownloadFile(attachment)}
+              onClickRemove={
+                onClickAcceptEdit && (() => onClickRemove(attachment.raw))
+              }
+              attachment={attachment}
+            />
+          ))}
         <Can I={PERMISSION.EDIT} an={itemSubject}>
           {onClickAcceptEdit && (
             <Uploader
@@ -172,7 +175,7 @@ export const Attachments = ({
     </Wrapper>
   );
 
-  return attachments.length === 0 ? (
+  return Array.isArray(attachments) && attachments.length === 0 ? (
     <Can I={PERMISSION.EDIT} an={itemSubject}>
       <AttachmentsComponent />
     </Can>

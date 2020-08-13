@@ -77,8 +77,8 @@ export const NewFilesModal = ({ files, closeModal }) => {
       {isDropdownOpened && (
         <Inner>
           <Scrollbar autoHeight autoHeightMax={300}>
-            {files.map(({ name, raw, error }) => (
-              <File key={raw} name={name} raw={raw} error={error} />
+            {files.map((file, key) => (
+              <File key={`modal-attachment-${key}`} attachment={file} />
             ))}
           </Scrollbar>
         </Inner>

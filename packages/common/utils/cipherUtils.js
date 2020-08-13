@@ -3,6 +3,7 @@ import { generateKeys } from '@caesar/common/utils/key';
 import { randomId } from '@caesar/common/utils/uuid4';
 import { createSrp } from './srp';
 import { passwordGenerator } from './passwordGenerator';
+import { escapeObjectValues, unEscapeObjectValues } from './item';
 
 const srp = createSrp();
 
@@ -21,7 +22,7 @@ export const decryptItem = async (secretArmored, privateKeyObj) => {
       privateKeys: [privateKeyObj],
     });
 
-    return JSON.parse(data);
+    return unEscapeObjectValues(JSON.parse(data));
   } catch (error) {
     // eslint-disable-next-line no-console
     console.error('decryption error %s', error);
@@ -33,7 +34,7 @@ export const decryptItem = async (secretArmored, privateKeyObj) => {
 export const encryptItem = async (data, key) => {
   const encrypted = await openpgp.encrypt({
     message: openpgp.message.fromBinary(
-      openpgp.util.str_to_Uint8Array(JSON.stringify(data)),
+      openpgp.util.str_to_Uint8Array(JSON.stringify(escapeObjectValues(data))),
     ),
     publicKeys: (await openpgp.key.readArmored(key)).keys,
   });
@@ -49,7 +50,7 @@ export const encryptItemsBatch = async (dataSet, key) => {
 export const encryptByPassword = async (data, password) => {
   const encrypted = await openpgp.encrypt({
     message: openpgp.message.fromBinary(
-      openpgp.util.str_to_Uint8Array(JSON.stringify(data)),
+      openpgp.util.str_to_Uint8Array(JSON.stringify(escapeObjectValues(data))),
     ),
     passwords: [password],
   });
@@ -65,7 +66,7 @@ export const decryptByPassword = async (secretArmored, password) => {
     passwords: [password],
   });
 
-  return JSON.parse(data);
+  return unEscapeObjectValues(JSON.parse(data));
 };
 
 export const generateUser = async email => {

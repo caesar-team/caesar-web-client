@@ -78,7 +78,6 @@ export const splitFilesToUniqAndDuplicates = files => {
   const duplicatedFiles = [];
 
   const map = new Map();
-
   // eslint-disable-next-line no-restricted-syntax
   for (const file of files) {
     const checkLabel = `${file.name}_${file.raw.length}`;
@@ -126,16 +125,11 @@ export const getRealFileSizesForBase64enc = files => {
     : 0;
 };
 
-export const makeAttachemntFromFile = file => ({
-  name: getFilenameWithoutExt(file.name),
-  ext: extactExtFromFilename(file.name),
-  size: getRealFileSizeForBase64enc(file.raw.length),
-  raw: file.raw,
-});
 export const makeFileFromAttachment = attachment => ({
   name: `${attachment.name}.${attachment.ext}`,
   raw: attachment.raw,
 });
+
 export const humanizeSize = (bytes, si = true, dp = 1) => {
   const thresh = si ? 1000 : 1024;
 

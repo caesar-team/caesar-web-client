@@ -166,15 +166,17 @@ export const moveItemsBatchFailure = () => ({
   type: MOVE_ITEMS_BATCH_FAILURE,
 });
 
-export const createItemRequest = (item, setSubmitting) => ({
-  type: CREATE_ITEM_REQUEST,
-  payload: {
-    item,
-  },
-  meta: {
-    setSubmitting,
-  },
-});
+export const createItemRequest = (item, setSubmitting) => {
+  return {
+    type: CREATE_ITEM_REQUEST,
+    payload: {
+      item,
+    },
+    meta: {
+      setSubmitting,
+    },
+  };
+};
 
 export const createItemSuccess = item => ({
   type: CREATE_ITEM_SUCCESS,

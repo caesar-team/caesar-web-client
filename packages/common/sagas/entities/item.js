@@ -136,6 +136,7 @@ import {
 import { getServerErrorMessage } from '@caesar/common/utils/error';
 import { objectToBase64 } from '@caesar/common/utils/base64';
 import { chunk } from '@caesar/common/utils/utils';
+import { splitAttachmentFromRaw } from '@caesar/common/utils/attachment';
 import {
   ROLE_ANONYMOUS_USER,
   PERMISSION_READ,
@@ -181,6 +182,7 @@ export function* removeItemSaga({ payload: { itemId, listId } }) {
     yield put(setWorkInProgressItem(null));
     yield put(updateGlobalNotification(NOOP_NOTIFICATION, false));
   } catch (error) {
+    // eslint-disable-next-line no-console
     console.log(error);
     yield put(
       updateGlobalNotification(getServerErrorMessage(error), false, true),
@@ -215,6 +217,7 @@ export function* removeItemsBatchSaga({ payload: { listId } }) {
 
     yield put(updateGlobalNotification(NOOP_NOTIFICATION, false));
   } catch (error) {
+    // eslint-disable-next-line no-console
     console.log(error);
     yield put(
       updateGlobalNotification(getServerErrorMessage(error), false, true),
@@ -288,6 +291,7 @@ export function* shareItemBatchSaga({
 
     yield put(updateGlobalNotification(NOOP_NOTIFICATION, false));
   } catch (error) {
+    // eslint-disable-next-line no-console
     console.log(error);
     yield put(
       updateGlobalNotification(getServerErrorMessage(error), false, true),
@@ -308,6 +312,7 @@ export function* removeShareSaga({ payload: { shareId } }) {
 
     yield put(updateGlobalNotification(NOOP_NOTIFICATION, false));
   } catch (error) {
+    // eslint-disable-next-line no-console
     console.log(error);
     yield put(
       updateGlobalNotification(getServerErrorMessage(error), false, true),
@@ -332,6 +337,7 @@ export function* toggleItemToFavoriteSaga({ payload: { item } }) {
     yield put(toggleItemToFavoriteList(item.id, favoritesList.id, isFavorite));
     yield put(updateWorkInProgressItem(item.id));
   } catch (error) {
+    // eslint-disable-next-line no-console
     console.log(error);
     yield put(
       updateGlobalNotification(getServerErrorMessage(error), false, true),
@@ -407,6 +413,7 @@ export function* moveItemSaga({ payload: { itemId, teamId, listId } }) {
       });
     }
   } catch (error) {
+    // eslint-disable-next-line no-console
     console.log(error);
     yield put(moveItemFailure());
   }
@@ -420,6 +427,7 @@ export function* moveItemsBatchSaga({ payload: { itemIds, teamId, listId } }) {
       ),
     );
   } catch (error) {
+    // eslint-disable-next-line no-console
     console.log(error);
     yield put(
       updateGlobalNotification(getServerErrorMessage(error), false, true),
@@ -532,6 +540,7 @@ export function* createItemSaga({
 
     yield call(Router.push, ROUTES.DASHBOARD);
   } catch (error) {
+    // eslint-disable-next-line no-console
     console.log(error);
     yield put(
       updateGlobalNotification(getServerErrorMessage(error), false, true),
@@ -609,6 +618,7 @@ export function* createItemsBatchSaga({
       yield put(updateGlobalNotification(NOOP_NOTIFICATION, false));
     }
   } catch (error) {
+    // eslint-disable-next-line no-console
     console.log(error);
     yield put(
       updateGlobalNotification(getServerErrorMessage(error), false, true),
@@ -627,7 +637,7 @@ export function* updateItemSaga({ payload: { item } }) {
 
     const encryptedItemSecret = yield call(
       encryptItem,
-      item.data,
+      splitAttachmentFromRaw(item.data),
       keyPair.publicKey,
     );
 
@@ -645,6 +655,7 @@ export function* updateItemSaga({ payload: { item } }) {
 
     yield put(updateGlobalNotification(NOOP_NOTIFICATION, false));
   } catch (error) {
+    // eslint-disable-next-line no-console
     console.log(error);
     yield put(
       updateGlobalNotification(getServerErrorMessage(error), false, true),
@@ -698,6 +709,7 @@ export function* editItemSaga({
       text: `The '${item.name}' has been updated`,
     });
   } catch (error) {
+    // eslint-disable-next-line no-console
     console.log(error);
     yield put(
       updateGlobalNotification(getServerErrorMessage(error), false, true),
@@ -735,7 +747,8 @@ export function* acceptItemSaga({ payload: { id } }) {
     yield put(acceptItemUpdateSuccess(newItem));
     yield put(updateWorkInProgressItem());
   } catch (error) {
-    console.error(error);
+    // eslint-disable-next-line no-console
+    console.log(error);
     yield put(
       updateGlobalNotification(getServerErrorMessage(error), false, true),
     );
@@ -750,6 +763,7 @@ export function* rejectItemSaga({ payload: { id } }) {
     yield put(rejectItemUpdateSuccess(id));
     yield put(updateWorkInProgressItem());
   } catch (error) {
+    // eslint-disable-next-line no-console
     console.log(error);
     yield put(
       updateGlobalNotification(getServerErrorMessage(error), false, true),
@@ -823,6 +837,7 @@ export function* createAnonymousLinkSaga() {
     yield put(createAnonymousLinkSuccess(workInProgressItem.id, share));
     yield put(updateWorkInProgressItem());
   } catch (error) {
+    // eslint-disable-next-line no-console
     console.log(error);
     yield put(
       updateGlobalNotification(getServerErrorMessage(error), false, true),
@@ -840,6 +855,7 @@ export function* removeAnonymousLinkSaga() {
     yield put(removeAnonymousLinkSuccess(workInProgressItem.id));
     yield put(updateWorkInProgressItem());
   } catch (error) {
+    // eslint-disable-next-line no-console
     console.log(error);
     yield put(
       updateGlobalNotification(getServerErrorMessage(error), false, true),

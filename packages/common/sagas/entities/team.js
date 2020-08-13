@@ -24,8 +24,8 @@ import {
   removeTeamFailure,
   updateTeamMemberRoleSuccess,
   updateTeamMemberRoleFailure,
-  addMemberToTeamListsBatchSuccess,
-  addMemberToTeamListsBatchFailure,
+  addTeamMembersBatchSuccess,
+  addTeamMembersBatchFailure,
   removeTeamMemberSuccess,
   removeTeamMemberFailure,
   addMemberToTeamList,
@@ -272,7 +272,7 @@ export function* addMemberToTeamListsBatchSaga({ payload: { teamId, members } })
 
     // TODO: add invite for members new or not new i dunno
 
-    yield put(addMemberToTeamListsBatchSuccess(teamId, invitedMembersWithLinks));
+    yield put(addTeamMembersBatchSuccess(teamId, invitedMembersWithLinks));
     yield put(addTeamToMembersTeamsListBatch(teamId, invitedMemberIds));
 
     if (itemUserPairs.length > 0) {
@@ -287,7 +287,7 @@ export function* addMemberToTeamListsBatchSaga({ payload: { teamId, members } })
     yield put(
       updateGlobalNotification(getServerErrorMessage(error), false, true),
     );
-    yield put(addMemberToTeamListsBatchFailure());
+    yield put(addTeamMembersBatchFailure());
   }
 }
 

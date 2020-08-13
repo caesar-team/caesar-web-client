@@ -343,6 +343,7 @@ class TeamContainer extends Component {
       width: columnWidths.role,
       Cell: ({ original, pageSize, viewIndex }) => {
         const isLastTwoInList = pageSize - viewIndex <= 2;
+        const isDropdownUp = pageSize >= 4 && isLastTwoInList;
 
         return (
           <RoleField>
@@ -352,7 +353,7 @@ class TeamContainer extends Component {
                 value={original.role}
                 options={OPTIONS}
                 onChange={this.handleChangeRole(original.id)}
-                boxDirection={isLastTwoInList ? 'up' : 'down'}
+                boxDirection={isDropdownUp ? 'up' : 'down'}
               />
             </Can>
             <Can not I={PERMISSION.EDIT} of={getMemberSubject(original)}>
@@ -514,7 +515,7 @@ class TeamContainer extends Component {
                 icon="plus"
                 color="black"
               >
-                Add the member
+                Add a member
               </ButtonStyled>
             </ButtonsWrapper>
           </Can>

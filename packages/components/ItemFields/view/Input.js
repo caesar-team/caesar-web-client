@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useAsync } from 'react-use';
+import { useAsync, useUpdateEffect } from 'react-use';
 import copy from 'copy-text-to-clipboard';
 import styled from 'styled-components';
 import { PERMISSION } from '@caesar/common/constants';
@@ -97,6 +97,12 @@ const InputComponent = ({
 }) => {
   const [isEdit, setEdit] = useState(false);
   const [value, setValue] = useState(originalValue || propValue);
+
+  useUpdateEffect(() => {
+    if (propValue !== value) {
+      setValue(propValue);
+    }
+  }, [propValue]);
 
   const handleClickCopy = () => {
     copy(originalValue || propValue);

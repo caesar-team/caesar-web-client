@@ -55,6 +55,7 @@ export const DashboardLayout = ({
         <PrimaryHeader
           user={user}
           searchedText={searchedText}
+          showAddItemButton
           onSearch={handleSearch}
           onClickReset={handleClickResetSearch}
         />

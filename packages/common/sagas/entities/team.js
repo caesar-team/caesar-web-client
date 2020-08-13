@@ -45,7 +45,6 @@ import {
   createItemRequest,
 } from '@caesar/common/actions/entities/item';
 import {
-  CREATE_CHILD_ITEM_BATCH_FINISHED_EVENT,
   removeChildItemsBatch,
 } from '@caesar/common/actions/entities/childItem';
 import {
@@ -77,6 +76,7 @@ import {
   ENTITY_TYPE,
   NOOP_NOTIFICATION,
   ITEM_TYPE,
+  TEAM_TYPE,
 } from '@caesar/common/constants';
 import {
   prepareUsersForSharing,
@@ -192,7 +192,7 @@ export function* removeTeamSaga({ payload: { teamId } }) {
     }
 
     if (teamId === currentTeamId) {
-      yield setCurrentTeamId(null);
+      yield setCurrentTeamId(TEAM_TYPE.PERSONAL);
     }
 
     yield put(removeTeamSuccess(teamId));
@@ -281,24 +281,6 @@ export function* addTeamMembersBatchSaga({ payload: { teamId, members } }) {
       yield fork(createChildItemBatchSaga, {
         payload: { itemUserPairs },
       });
-
-      const {
-        payload: { childItems },
-      } = yield take(CREATE_CHILD_ITEM_BATCH_FINISHED_EVENT);
-
-      const itemIdsWithChildItemIdsSet = childItems.reduce(
-        // eslint-disable-next-line
-        (accumulator, item) => [
-          ...accumulator,
-          {
-            itemId: item.originalItemId,
-            childItemIds: item.items.map(({ id }) => id),
-          },
-        ],
-        [],
-      );
-
-      yield put(addChildItemsBatchToItems(itemIdsWithChildItemIdsSet));
     }
 
     yield put(updateGlobalNotification(NOOP_NOTIFICATION, false));

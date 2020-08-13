@@ -1,3 +1,4 @@
+import { logger } from '@caesar/common/utils/logger';
 import { API_URI, API_BASE_PATH } from './constants';
 
 const baseURL = `${API_URI || process.env.API_URI}/${API_BASE_PATH ||
@@ -15,7 +16,7 @@ const fetchApi = (url, options) =>
   })
     .then(response => response.json())
     .catch(error => {
-      console.error('Error:', error);
+      logger.error('fetchApi error:', error);
     });
 
 export const postSecureMessage = data =>

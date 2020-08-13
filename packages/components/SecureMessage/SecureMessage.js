@@ -73,6 +73,7 @@ const SecureMessageComponent = ({
         const encryptedMessage = await encryptByPassword(secret, pwd);
         await decryptByPassword(encryptedMessage, pwd);
 
+        notification.hide();
         notification.show({
           text: SAVE_NOTIFICATION,
           options: {
@@ -87,6 +88,17 @@ const SecureMessageComponent = ({
           requestsLimit,
         }).then(({ id }) => {
           setSubmitting(false);
+
+          if (!id) {
+            notification.hide();
+            setFieldError(
+              'form',
+              'No connection to server. Please try again later.',
+            );
+
+            return;
+          }
+
           setState({
             step: SECURE_MESSAGE_LINK_STEP,
             password: pwd,

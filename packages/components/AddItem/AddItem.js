@@ -93,7 +93,7 @@ export const AddItem = ({ className }) => {
             icon="plus"
             onClick={handleToggle}
           >
-            Add item
+            Add an item
           </Button>
         )}
         className={className}

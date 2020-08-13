@@ -13,7 +13,7 @@ import {
   SET_KEY_PAIR,
   SET_CURRENT_TEAM_ID,
   LEAVE_TEAM,
-  JOIN_TEAM,
+  ADD_MEMBER_TO_TEAM,
 } from '@caesar/common/actions/user';
 
 const initialState = {
@@ -71,7 +71,7 @@ export default createReducer(initialState, {
   [SET_CURRENT_TEAM_ID](state, { payload }) {
     return { ...state, currentTeamId: payload.teamId };
   },
-  [JOIN_TEAM](state, { payload }) {
+  [ADD_MEMBER_TO_TEAM](state, { payload }) {
     return { ...state, teamIds: [...state.teamIds, payload.teamId] };
   },
   [LEAVE_TEAM](state, { payload }) {

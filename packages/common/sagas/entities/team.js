@@ -24,17 +24,17 @@ import {
   removeTeamFailure,
   updateTeamMemberRoleSuccess,
   updateTeamMemberRoleFailure,
-  addTeamMembersBatchSuccess,
-  addTeamMembersBatchFailure,
+  addMemberToTeamListsBatchSuccess,
+  addMemberToTeamListsBatchFailure,
   removeTeamMemberSuccess,
   removeTeamMemberFailure,
-  addTeamMember,
+  addMemberToTeamList,
 } from '@caesar/common/actions/entities/team';
 import { createChildItemBatchSaga } from '@caesar/common/sagas/entities/childItem';
 import { fetchTeamMembersSaga } from '@caesar/common/sagas/entities/member';
 import {
-  addTeamToMember,
-  addTeamToMembersBatch,
+  addTeamToMemberTeamsList,
+  addTeamToMembersTeamsListBatch,
   removeTeamFromMember,
   removeTeamFromMembersBatch,
 } from '@caesar/common/actions/entities/member';
@@ -48,7 +48,7 @@ import {
 import {
   setCurrentTeamId,
   leaveTeam,
-  joinTeam,
+  addMemberToTeam,
 } from '@caesar/common/actions/user';
 import { teamSelector } from '@caesar/common/selectors/entities/team';
 import { teamItemListSelector } from '@caesar/common/selectors/entities/item';
@@ -64,7 +64,7 @@ import {
   deleteTeam,
   getTeam,
   updateTeamMember,
-  postAddTeamMember,
+  postaddMemberToTeamList,
   deleteTeamMember,
 } from '@caesar/common/api';
 import { getServerErrorMessage } from '@caesar/common/utils/error';
@@ -146,9 +146,9 @@ export function* createTeamSaga({ payload: { title, icon } }) {
     } = yield call(generateKeys, masterPassword, [systemTeamEmail]);
 
     yield put(createTeamSuccess({ ...team, __type: ENTITY_TYPE.TEAM }));
-    yield put(addTeamToMember(team.id, user.id));
-    yield put(addTeamMember(team.id, user.id, COMMANDS_ROLES.USER_ROLE_ADMIN));
-    yield put(joinTeam(team.id));
+    yield put(addTeamToMemberTeamsList(team.id, user.id));
+    yield put(addMemberToTeamList(team.id, user.id, COMMANDS_ROLES.USER_ROLE_ADMIN));
+    yield put(addMemberToTeam(team.id));
 
     const systemItemData = {
       type: ITEM_TYPE.SYSTEM,
@@ -222,7 +222,7 @@ export function* updateTeamMemberRoleSaga({
   }
 }
 
-export function* addTeamMembersBatchSaga({ payload: { teamId, members } }) {
+export function* addMemberToTeamListsBatchSaga({ payload: { teamId, members } }) {
   try {
     const preparedMembers = yield call(prepareUsersForSharing, members);
 
@@ -251,7 +251,7 @@ export function* addTeamMembersBatchSaga({ payload: { teamId, members } }) {
     }));
 
     const promises = invitedMembersWithCommandRole.map(({ id: userId, role }) =>
-      postAddTeamMember({ teamId, userId, role }),
+      postaddMemberToTeamList({ teamId, userId, role }),
     );
 
     const invitedMembersWithLinks = [];
@@ -272,8 +272,8 @@ export function* addTeamMembersBatchSaga({ payload: { teamId, members } }) {
 
     // TODO: add invite for members new or not new i dunno
 
-    yield put(addTeamMembersBatchSuccess(teamId, invitedMembersWithLinks));
-    yield put(addTeamToMembersBatch(teamId, invitedMemberIds));
+    yield put(addMemberToTeamListsBatchSuccess(teamId, invitedMembersWithLinks));
+    yield put(addTeamToMembersTeamsListBatch(teamId, invitedMemberIds));
 
     if (itemUserPairs.length > 0) {
       yield fork(createChildItemBatchSaga, {
@@ -287,7 +287,7 @@ export function* addTeamMembersBatchSaga({ payload: { teamId, members } }) {
     yield put(
       updateGlobalNotification(getServerErrorMessage(error), false, true),
     );
-    yield put(addTeamMembersBatchFailure());
+    yield put(addMemberToTeamListsBatchFailure());
   }
 }
 
@@ -329,6 +329,6 @@ export default function* teamSagas() {
   yield takeLatest(CREATE_TEAM_REQUEST, createTeamSaga);
   yield takeLatest(REMOVE_TEAM_REQUEST, removeTeamSaga);
   yield takeLatest(UPDATE_TEAM_MEMBER_ROLE_REQUEST, updateTeamMemberRoleSaga);
-  yield takeLatest(ADD_TEAM_MEMBERS_BATCH_REQUEST, addTeamMembersBatchSaga);
+  yield takeLatest(ADD_TEAM_MEMBERS_BATCH_REQUEST, addMemberToTeamListsBatchSaga);
   yield takeLatest(REMOVE_TEAM_MEMBER_REQUEST, removeTeamMemberSaga);
 }

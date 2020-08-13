@@ -11,6 +11,7 @@ import {
   setWorkInProgressItem,
   resetWorkInProgressItemIds,
 } from '@caesar/common/actions/workflow';
+import { getTeamTitle } from '@caesar/common/utils/team';
 import { useItemTeamAndListOptions } from '@caesar/common/hooks';
 import { Modal, ModalTitle } from '../Modal';
 import { Radio } from '../Radio';
@@ -170,7 +171,7 @@ const MoveModalComponent = ({
     .map(team => (
       <StyledRadio
         key={team.id || team.title}
-        value={team.id || team.title}
+        value={team.id || getTeamTitle(team)}
         label={
           <>
             <StyledTeamAvatar
@@ -179,7 +180,7 @@ const MoveModalComponent = ({
               size={24}
               fontSize="xs"
             />
-            <Name>{team.title}</Name>
+            <Name>{getTeamTitle(team)}</Name>
           </>
         }
         name="team"

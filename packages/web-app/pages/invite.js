@@ -27,8 +27,6 @@ InvitePage.getInitialProps = async ({
 }) => {
   const shared = base64ToObject(encryption);
 
-  console.log('shared', shared);
-
   if (!shared || !validateFields(shared, validFields)) {
     return { statusCode: 404 };
   }

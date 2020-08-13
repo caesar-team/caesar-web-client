@@ -185,7 +185,7 @@ class TeamListContainer extends Component {
               icon="plus"
               color="black"
             >
-              Add team
+              Add a team
             </Button>
           </Can>
         </TopWrapper>

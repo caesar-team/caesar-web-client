@@ -62,13 +62,16 @@ export const teamsMembersSelector = createSelector(
   membersByIdSelector,
   (teams, membersById) => {
     return teams.reduce(
-      (accumulator, team) => [
-        ...accumulator,
-        ...team.users.map(({ id }) => ({
-          ...membersById[id],
-          teamId: team.id,
-        })),
-      ],
+      (accumulator, team) =>
+        team
+          ? [
+              ...accumulator,
+              ...team.users.map(({ id }) => ({
+                ...membersById[id],
+                teamId: team.id,
+              })),
+            ]
+          : accumulator,
       [],
     );
   },

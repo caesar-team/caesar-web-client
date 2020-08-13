@@ -46,6 +46,7 @@ const UserSection = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
+  margin-left: auto;
 `;
 
 const UserName = styled.div`
@@ -96,6 +97,7 @@ const ArrowIcon = styled(Icon)`
 const PrimaryHeaderComponent = ({
   user,
   searchedText,
+  showAddItemButton,
   onSearch,
   onClickReset,
 }) => {
@@ -137,7 +139,7 @@ const PrimaryHeaderComponent = ({
                 onClickReset={onClickReset}
               />
             )}
-            <AddItemButton />
+            {showAddItemButton && <AddItemButton />}
             <UserSection>
               <StyledDropdown
                 renderOverlay={() => Options}

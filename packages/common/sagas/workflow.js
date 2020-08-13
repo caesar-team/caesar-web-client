@@ -89,14 +89,16 @@ function* initPersonal(withDecryption) {
 
     if (
       !workInProgressListId ||
-      listsById[workInProgressListId]?.teamId !== currentTeamId
+      ![currentTeamId, null].includes(listsById[workInProgressListId]?.teamId)
     ) {
       yield put(setWorkInProgressListId(favoritesList.id));
     }
 
     const workInProgressItem = yield select(workInProgressItemSelector);
 
-    if (!workInProgressItem || workInProgressItem?.teamId !== currentTeamId) {
+    if (!workInProgressItem
+      || ![currentTeamId, null].includes(workInProgressItem?.teamId)
+    ) {
       yield put(setWorkInProgressItem(null));
     }
 
@@ -203,9 +205,9 @@ function* initTeams(withDecryption) {
 export function* initWorkflow({ payload: { withDecryption = true } }) {
   const currentTeamId = yield select(currentTeamIdSelector);
 
-  yield put(setCurrentTeamId(currentTeamId || TEAM_TYPE.PERSONAL));
-  yield fork(initPersonal, withDecryption);
-  yield fork(initTeams, withDecryption);
+  yield put(
+    setCurrentTeamId(currentTeamId || TEAM_TYPE.PERSONAL, withDecryption),
+  );
   yield fork(fetchMembersSaga);
 }
 
@@ -229,16 +231,18 @@ export function* updateWorkInProgressItemSaga({ payload: { itemId } }) {
   }
 }
 
-export function* setCurrentTeamIdWatchSaga() {
+export function* setCurrentTeamIdWatchSaga({
+  payload: { withDecryption = true },
+}) {
   try {
     const currentTeamId = yield select(currentTeamIdSelector);
 
     if (!currentTeamId) return;
 
     if (currentTeamId === TEAM_TYPE.PERSONAL) {
-      yield call(initPersonal, true);
+      yield call(initPersonal, withDecryption);
     } else {
-      yield call(initTeams, true);
+      yield call(initTeams, withDecryption);
     }
   } catch (error) {
     // eslint-disable-next-line no-console

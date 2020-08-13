@@ -17,10 +17,10 @@ import {
 } from '@caesar/components';
 import {
   COMMANDS_ROLES,
-  TEAM_TYPE,
   PERMISSION,
   PERMISSION_ENTITY,
 } from '@caesar/common/constants';
+import { getTeamTitle } from '@caesar/common/utils/team';
 
 const LogoWrapper = styled.div`
   display: flex;
@@ -343,6 +343,7 @@ class TeamContainer extends Component {
       width: columnWidths.role,
       Cell: ({ original, pageSize, viewIndex }) => {
         const isLastTwoInList = pageSize - viewIndex <= 2;
+        const isDropdownUp = pageSize >= 4 && isLastTwoInList;
 
         return (
           <RoleField>
@@ -352,7 +353,7 @@ class TeamContainer extends Component {
                 value={original.role}
                 options={OPTIONS}
                 onChange={this.handleChangeRole(original.id)}
-                boxDirection={isLastTwoInList ? 'up' : 'down'}
+                boxDirection={isDropdownUp ? 'up' : 'down'}
               />
             </Can>
             <Can not I={PERMISSION.EDIT} of={getMemberSubject(original)}>
@@ -490,8 +491,6 @@ class TeamContainer extends Component {
       );
     }
 
-    const isDefaultTeam = team.type === TEAM_TYPE.DEFAULT;
-
     const members = this.getMemberList(team.users, membersById);
     const filteredMembersList = this.filterMemberList(
       team.users,
@@ -507,21 +506,19 @@ class TeamContainer extends Component {
     return (
       <Wrapper ref={this.wrapperRef}>
         <TopWrapper>
-          <Title>{team.title}</Title>
-          {!isDefaultTeam && (
-            <Can I={PERMISSION.ADD} a={teamSubject}>
-              <ButtonsWrapper>
-                <ButtonStyled
-                  withOfflineCheck
-                  onClick={this.handleOpenModal(INVITE_MEMBER_MODAL)}
-                  icon="plus"
-                  color="black"
-                >
-                  Add member
-                </ButtonStyled>
-              </ButtonsWrapper>
-            </Can>
-          )}
+          <Title>{getTeamTitle(team)}</Title>
+          <Can I={PERMISSION.ADD} a={teamSubject}>
+            <ButtonsWrapper>
+              <ButtonStyled
+                withOfflineCheck
+                onClick={this.handleOpenModal(INVITE_MEMBER_MODAL)}
+                icon="plus"
+                color="black"
+              >
+                Add a member
+              </ButtonStyled>
+            </ButtonsWrapper>
+          </Can>
         </TopWrapper>
         <DataTableStyled
           noDataText={null}

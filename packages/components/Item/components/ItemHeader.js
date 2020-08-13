@@ -9,6 +9,7 @@ import {
   PERMISSION_ENTITY,
 } from '@caesar/common/constants';
 import { transformListTitle } from '@caesar/common/utils/string';
+import { getTeamTitle } from '@caesar/common/utils/team';
 import {
   listsByIdSelector,
   trashListSelector,
@@ -78,7 +79,7 @@ export const ItemHeader = ({
   const listsById = useSelector(listsByIdSelector);
 
   const teamTitle = item.teamId
-    ? teamsById[item.teamId]?.title
+    ? getTeamTitle(teamsById[item.teamId])
     : TEAM_TEXT_TYPE[TEAM_TYPE.PERSONAL];
 
   const listTitle = transformListTitle(listsById[item.listId]?.label);

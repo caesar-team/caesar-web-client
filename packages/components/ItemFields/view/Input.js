@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
-import { useAsync } from 'react-use';
+import React, { useState, memo } from 'react';
+import { useAsync, useUpdateEffect } from 'react-use';
 import copy from 'copy-text-to-clipboard';
+import equal from 'fast-deep-equal';
 import styled from 'styled-components';
 import { PERMISSION } from '@caesar/common/constants';
 import { Can } from '../../Ability';
@@ -98,6 +99,12 @@ const InputComponent = ({
   const [isEdit, setEdit] = useState(false);
   const [value, setValue] = useState(originalValue || propValue);
 
+  useUpdateEffect(() => {
+    if (propValue !== value) {
+      setValue(propValue);
+    }
+  }, [propValue]);
+
   const handleClickCopy = () => {
     copy(originalValue || propValue);
     notification.show({
@@ -118,7 +125,7 @@ const InputComponent = ({
     return result;
   }, [value, schema]);
 
-  const RenderedComponent = () => (
+  return (
     <Wrapper withLabel={label} className={className}>
       {isEdit ? (
         <Input
@@ -171,17 +178,21 @@ const InputComponent = ({
       )}
     </Wrapper>
   );
-
-  return !value ? (
-    <Can I={PERMISSION.EDIT} an={itemSubject}>
-      <RenderedComponent />
-    </Can>
-  ) : (
-    <RenderedComponent />
-  );
 };
 
-const InputField = withNotification(InputComponent);
+const InputWithPermissions = ({ value, itemSubject, ...props }) =>
+  value ? (
+    <InputComponent value={value} itemSubject={itemSubject} {...props} />
+  ) : (
+    <Can I={PERMISSION.EDIT} an={itemSubject}>
+      <InputComponent value={value} itemSubject={itemSubject} {...props} />
+    </Can>
+  );
+
+const InputField = memo(
+  withNotification(InputWithPermissions),
+  (prevProps, nextProps) => equal(prevProps, nextProps),
+);
 
 InputField.ValueWrapper = ValueWrapper;
 InputField.ValueInner = ValueInner;

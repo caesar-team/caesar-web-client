@@ -73,6 +73,7 @@ const SecureMessageComponent = ({
           passphrase,
         );
 
+        notification.hide();
         notification.show({
           text: SAVE_NOTIFICATION,
           options: {

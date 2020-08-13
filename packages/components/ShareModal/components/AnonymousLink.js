@@ -99,7 +99,7 @@ export const AnonymousLink = ({
           onChange={onToggle}
         />
         <ToggleLabel isActive={isLinkActive}>
-          Share via a anonymous link:
+          Share via an anonymous link:
         </ToggleLabel>
       </ToggleWrapper>
       {isLinkActive && (

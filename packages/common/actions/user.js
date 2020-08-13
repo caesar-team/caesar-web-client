@@ -80,10 +80,11 @@ export const setKeyPair = keyPair => ({
   },
 });
 
-export const setCurrentTeamId = teamId => ({
+export const setCurrentTeamId = (teamId, withDecryption) => ({
   type: SET_CURRENT_TEAM_ID,
   payload: {
     teamId,
+    withDecryption,
   },
 });
 

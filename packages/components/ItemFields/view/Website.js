@@ -15,7 +15,9 @@ const GoToIcon = styled(Icon)`
 
 export const Website = ({ value, itemSubject, schema, onClickAcceptEdit }) => {
   const handleclickGoTo = () => {
-    window.open(value, '_blank');
+    const url = value.match(/^https?:/) ? value : `//${value}`;
+
+    window.open(url, '_blank');
   };
 
   return (

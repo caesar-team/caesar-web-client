@@ -42,14 +42,15 @@ export const actualKeyPairSelector = createSelector(
   isUserAnonymousSelector,
   userIdSelector,
   (data, currentTeamId, personalKeyPair, isAnonymous, userId) => {
-    if (isAnonymous) {
-      return Object.values(data[KEY_TYPE.ANONYMOUS]).find(({ id }) => userId) || {};
+    switch (true) {
+      case isAnonymous:
+        return Object.values(data[KEY_TYPE.ANONYMOUS]).find(({ id }) => userId) || {};
+      case currentTeamId !== TEAM_TYPE.PERSONAL:
+        return findTeamItemByName(data, currentTeamId);
+      case currentTeamId === TEAM_TYPE.PERSONAL:
+        return personalKeyPair;
+      default:
+        return null;
     }
-
-    if (currentTeamId !== TEAM_TYPE.PERSONAL) {
-      return findTeamItemByName(data, currentTeamId);
-    }
-
-    return personalKeyPair;
   },
 );

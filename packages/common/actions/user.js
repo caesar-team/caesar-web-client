@@ -14,7 +14,7 @@ export const SET_MASTER_PASSWORD = '@user/SET_MASTER_PASSWORD';
 export const SET_KEY_PAIR = '@user/SET_KEY_PAIR';
 export const SET_CURRENT_TEAM_ID = '@user/SET_CURRENT_TEAM_ID';
 
-export const JOIN_TEAM = '@user/JOIN_TEAM';
+export const ADD_MEMBER_TO_TEAM = '@user/ADD_MEMBER_TO_TEAM';
 export const LEAVE_TEAM = '@user/LEAVE_TEAM';
 
 export const LOGOUT = '@user/LOGOUT';
@@ -34,11 +34,9 @@ export const fetchUserSelfFailure = () => ({
   type: FETCH_USER_SELF_FAILURE,
 });
 
-export const fetchKeyPairRequest = () => {
-  return {
+export const fetchKeyPairRequest = () => ({
     type: FETCH_KEY_PAIR_REQUEST,
-  };
-};
+});
 
 export const fetchKeyPairSuccess = keyPair => ({
   type: FETCH_KEY_PAIR_SUCCESS,
@@ -88,8 +86,8 @@ export const setCurrentTeamId = (teamId, withDecryption) => ({
   },
 });
 
-export const joinTeam = teamId => ({
-  type: JOIN_TEAM,
+export const addMemberToTeam = teamId => ({
+  type: ADD_MEMBER_TO_TEAM,
   payload: {
     teamId,
   },

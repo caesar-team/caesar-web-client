@@ -7,13 +7,13 @@ import {
 } from '@caesar/common/actions/user';
 import { createStructuredSelector } from 'reselect';
 import { selectableTeamsListsSelector } from '@caesar/common/selectors/entities/list';
-import { keyPairSelector } from '@caesar/common/selectors/user';
+import { personalKeyPairSelector } from '@caesar/common/selectors/keyStore';
 import { isLoadingSelector } from '@caesar/common/selectors/workflow';
 import Import from './Import';
 
 const mapStateToProps = createStructuredSelector({
   teamsLists: selectableTeamsListsSelector,
-  keyPair: keyPairSelector,
+  keyPair: personalKeyPairSelector,
   isLoading: isLoadingSelector,
 });
 

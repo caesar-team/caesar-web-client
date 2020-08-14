@@ -174,7 +174,7 @@ export const addTeamsBatch = teamsById => ({
   },
 });
 
-export const addTeamMember = (teamId, userId, role) => ({
+export const addMemberToTeamList = (teamId, userId, role) => ({
   type: ADD_TEAM_MEMBER,
   payload: {
     teamId,

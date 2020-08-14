@@ -28,6 +28,7 @@ import {
   DECRYPTING_ITEM_NOTIFICATION,
   NOOP_NOTIFICATION,
 } from '@caesar/common/constants';
+import { getPlural } from '@caesar/common/utils/string';
 import { NavigationPanelStyled } from '../../components';
 import { SHARED_ITEMS_CHECK } from '../../constants';
 
@@ -165,10 +166,11 @@ class SharedItemsStep extends Component {
 
       this.setState({
         items: {
-          personal: personalItems.map((item, index) => ({
-            ...item,
-            secret: decryptedItems[index],
-          })),
+          personal: personalItems
+            .map((item, index) => ({
+              ...item,
+              secret: decryptedItems[index],
+            })),
           teams: teamsItems,
         },
         selectedIds: personalItems.map(({ id }) => id),
@@ -222,9 +224,9 @@ class SharedItemsStep extends Component {
 
       await patchAcceptTeamItems();
 
-      if (oldKeyPair) {
+      if (oldKeyPair || currentKeyPair) {
         const privateKeyObj = await getPrivateKeyObj(
-          oldKeyPair.encryptedPrivateKey || currentKeyPair.encryptedPrivateKey,
+          oldKeyPair?.encryptedPrivateKey || currentKeyPair?.encryptedPrivateKey,
           oldMasterPassword || currentMasterPassword,
         );
 
@@ -318,13 +320,18 @@ class SharedItemsStep extends Component {
 
     return items.teams.map(({ id, items: teamItems }) => {
       const team = teams.find(({ id: teamId }) => teamId === id);
+      const filteredTeamItems =
+        teamItems.filter(item => item.type !== ITEM_TYPE.SYSTEM);
 
       return (
         <TeamRow key={id}>
           <Avatar avatar={team.icon} />
           <TeamDetails>
             <TeamName>{team.title}</TeamName>
-            <TeamItemsWrapper>{teamItems.length} item(-s)</TeamItemsWrapper>
+            <TeamItemsWrapper>
+              {filteredTeamItems.length}{' '}
+              {getPlural(filteredTeamItems.length, ['item', 'items'])}
+            </TeamItemsWrapper>
           </TeamDetails>
         </TeamRow>
       );

@@ -10,6 +10,9 @@ import {
   teamSagas,
 } from '@caesar/common/sagas';
 import { jobLoadBalancerSaga } from '@caesar/common/sagas/common/job';
+import { shareItemSagas } from '@caesar/common/sagas/common/share';
+import { acceptRejectItemSagas } from '@caesar/common/sagas/common/acceptReject';
+import { anonymousSagas } from '@caesar/common/sagas/common/anonymous';
 import { isClient } from '@caesar/common/utils/isEnvironment';
 
 const sagas = [
@@ -21,6 +24,9 @@ const sagas = [
   itemSagas,
   childItemSagas,
   teamSagas,
+  shareItemSagas,
+  acceptRejectItemSagas,
+  anonymousSagas,
 ];
 
 export function* rootSaga() {

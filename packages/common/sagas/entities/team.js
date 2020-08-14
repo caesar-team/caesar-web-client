@@ -5,7 +5,6 @@ import {
   select,
   all,
   fork,
-  take,
 } from 'redux-saga/effects';
 import {
   FETCH_TEAMS_REQUEST,
@@ -29,31 +28,31 @@ import {
   addTeamMembersBatchFailure,
   removeTeamMemberSuccess,
   removeTeamMemberFailure,
-  addTeamMember,
+  addMemberToTeamList,
 } from '@caesar/common/actions/entities/team';
 import { createChildItemBatchSaga } from '@caesar/common/sagas/entities/childItem';
 import { fetchTeamMembersSaga } from '@caesar/common/sagas/entities/member';
 import {
-  addTeamToMember,
-  addTeamToMembersBatch,
+  addTeamToMemberTeamsList,
+  addTeamToMembersTeamsListBatch,
   removeTeamFromMember,
   removeTeamFromMembersBatch,
 } from '@caesar/common/actions/entities/member';
 import {
   removeChildItemsBatchFromItems,
-  addChildItemsBatchToItems,
+  createItemRequest,
 } from '@caesar/common/actions/entities/item';
 import {
-  CREATE_CHILD_ITEM_BATCH_FINISHED_EVENT,
   removeChildItemsBatch,
 } from '@caesar/common/actions/entities/childItem';
 import {
   setCurrentTeamId,
   leaveTeam,
-  joinTeam,
+  addMemberToTeam,
 } from '@caesar/common/actions/user';
 import { teamSelector } from '@caesar/common/selectors/entities/team';
 import { teamItemListSelector } from '@caesar/common/selectors/entities/item';
+import { defaultListSelector } from '@caesar/common/selectors/entities/list';
 import {
   currentTeamIdSelector,
   userDataSelector,
@@ -74,6 +73,8 @@ import {
   COMMANDS_ROLES,
   ENTITY_TYPE,
   NOOP_NOTIFICATION,
+  ITEM_TYPE,
+  TEAM_TYPE,
 } from '@caesar/common/constants';
 import {
   prepareUsersForSharing,
@@ -82,6 +83,13 @@ import {
 import { inviteNewMemberBatchSaga } from '@caesar/common/sagas/common/invite';
 import { createChildItemsFilterSelector } from '@caesar/common/selectors/entities/childItem';
 import { updateGlobalNotification } from '@caesar/common/actions/application';
+import { generateKeys } from '@caesar/common/utils/key';
+import { passwordGenerator } from '@caesar/common/utils/passwordGenerator';
+import {
+  generateSystemItemEmail,
+  generateSystemItemName,
+} from '@caesar/common/utils/item';
+import { teamKeyPairSelector } from '@caesar/common/selectors/keyStore';
 
 export function* fetchTeamsSaga() {
   try {
@@ -125,14 +133,41 @@ export function* fetchTeamSaga({ payload: { teamId } }) {
 
 export function* createTeamSaga({ payload: { title, icon } }) {
   try {
-    const { data } = yield call(postCreateTeam, { title, icon });
+    const { data: team } = yield call(postCreateTeam, { title, icon });
 
     const user = yield select(userDataSelector);
+    const defaultList = yield select(defaultListSelector);
+    const masterPassword = yield call(passwordGenerator);
+    const systemTeamEmail = yield call(generateSystemItemEmail, team.id);
 
-    yield put(createTeamSuccess({ ...data, __type: ENTITY_TYPE.TEAM }));
-    yield put(addTeamToMember(data.id, user.id));
-    yield put(addTeamMember(data.id, user.id, COMMANDS_ROLES.USER_ROLE_ADMIN));
-    yield put(joinTeam(data.id));
+    const {
+      publicKey,
+      privateKey,
+    } = yield call(generateKeys, masterPassword, [systemTeamEmail]);
+
+    yield put(createTeamSuccess({ ...team, __type: ENTITY_TYPE.TEAM }));
+    yield put(addTeamToMemberTeamsList(team.id, user.id));
+    yield put(addMemberToTeamList(team.id, user.id, COMMANDS_ROLES.USER_ROLE_ADMIN));
+    yield put(addMemberToTeam(team.id));
+
+    const systemItemData = {
+      type: ITEM_TYPE.SYSTEM,
+      listId: defaultList.id,
+      attachments: [
+        {
+          name: 'publicKey',
+          raw: publicKey,
+        },
+        {
+          name: 'privateKey',
+          raw: privateKey,
+        },
+      ],
+      pass: masterPassword,
+      name: generateSystemItemName(team.id),
+    };
+
+    yield put(createItemRequest(systemItemData));
   } catch (error) {
     console.log(error);
     yield put(
@@ -155,7 +190,7 @@ export function* removeTeamSaga({ payload: { teamId } }) {
     }
 
     if (teamId === currentTeamId) {
-      yield setCurrentTeamId(null);
+      yield setCurrentTeamId(TEAM_TYPE.PERSONAL);
     }
 
     yield put(removeTeamSuccess(teamId));
@@ -187,7 +222,7 @@ export function* updateTeamMemberRoleSaga({
   }
 }
 
-export function* addTeamMembersBatchSaga({ payload: { teamId, members } }) {
+export function* addMemberToTeamListsBatchSaga({ payload: { teamId, members } }) {
   try {
     const preparedMembers = yield call(prepareUsersForSharing, members);
 
@@ -201,7 +236,9 @@ export function* addTeamMembersBatchSaga({ payload: { teamId, members } }) {
     }
 
     const teamItemList = yield select(teamItemListSelector, { teamId });
+    const teamSystemItem = yield select(teamKeyPairSelector, { teamId });
 
+    teamItemList.push(teamSystemItem.raw);
     const itemUserPairs = yield call(getItemUserPairs, {
       items: teamItemList,
       members: teamMembers,
@@ -236,30 +273,12 @@ export function* addTeamMembersBatchSaga({ payload: { teamId, members } }) {
     // TODO: add invite for members new or not new i dunno
 
     yield put(addTeamMembersBatchSuccess(teamId, invitedMembersWithLinks));
-    yield put(addTeamToMembersBatch(teamId, invitedMemberIds));
+    yield put(addTeamToMembersTeamsListBatch(teamId, invitedMemberIds));
 
     if (itemUserPairs.length > 0) {
       yield fork(createChildItemBatchSaga, {
         payload: { itemUserPairs },
       });
-
-      const {
-        payload: { childItems },
-      } = yield take(CREATE_CHILD_ITEM_BATCH_FINISHED_EVENT);
-
-      const itemIdsWithChildItemIdsSet = childItems.reduce(
-        // eslint-disable-next-line
-        (accumulator, item) => [
-          ...accumulator,
-          {
-            itemId: item.originalItemId,
-            childItemIds: item.items.map(({ id }) => id),
-          },
-        ],
-        [],
-      );
-
-      yield put(addChildItemsBatchToItems(itemIdsWithChildItemIdsSet));
     }
 
     yield put(updateGlobalNotification(NOOP_NOTIFICATION, false));
@@ -310,6 +329,6 @@ export default function* teamSagas() {
   yield takeLatest(CREATE_TEAM_REQUEST, createTeamSaga);
   yield takeLatest(REMOVE_TEAM_REQUEST, removeTeamSaga);
   yield takeLatest(UPDATE_TEAM_MEMBER_ROLE_REQUEST, updateTeamMemberRoleSaga);
-  yield takeLatest(ADD_TEAM_MEMBERS_BATCH_REQUEST, addTeamMembersBatchSaga);
+  yield takeLatest(ADD_TEAM_MEMBERS_BATCH_REQUEST, addMemberToTeamListsBatchSaga);
   yield takeLatest(REMOVE_TEAM_MEMBER_REQUEST, removeTeamMemberSaga);
 }

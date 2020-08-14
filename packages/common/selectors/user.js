@@ -59,8 +59,8 @@ export const currentTeamSelector = createSelector(
 );
 
 export const isUserAnonymousSelector = createSelector(
-  userSelector,
-  user => user.roles.includes(ROLE_ANONYMOUS_USER),
+  userDataSelector,
+  data => data.roles.includes(ROLE_ANONYMOUS_USER),
 );
 
 export const userIdSelector = createSelector(

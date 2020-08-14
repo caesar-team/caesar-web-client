@@ -1,12 +1,5 @@
 import Router from 'next/router';
-import {
-  put,
-  call,
-  takeLatest,
-  select,
-  fork,
-  all,
-} from 'redux-saga/effects';
+import { put, call, takeLatest, select, fork, all } from 'redux-saga/effects';
 import deepequal from 'fast-deep-equal';
 import {
   CREATE_ITEM_REQUEST,
@@ -48,9 +41,8 @@ import {
 import { removeChildItemsBatch } from '@caesar/common/actions/entities/childItem';
 import { setCurrentTeamId } from '@caesar/common/actions/user';
 import { updateGlobalNotification } from '@caesar/common/actions/application';
-import {
-  updateChildItemsBatchSaga,
-} from '@caesar/common/sagas/entities/childItem';
+import { updateChildItemsBatchSaga } from '@caesar/common/sagas/entities/childItem';
+import { shareItemBatchSaga } from '@caesar/common/sagas/common/share';
 import {
   setWorkInProgressItem,
   updateWorkInProgressItem,
@@ -296,15 +288,17 @@ export function* createItemSaga({
     const isSystemItem = type === ITEM_TYPE.SYSTEM;
     const keyPair = yield select(personalKeyPairSelector);
     const user = yield select(userDataSelector);
-    const notificationText = isSystemItem ?
-      COMMON_PROGRESS_NOTIFICATION
+    const notificationText = isSystemItem
+      ? COMMON_PROGRESS_NOTIFICATION
       : ENCRYPTING_ITEM_NOTIFICATION;
-    let publicKey = keyPair.publicKey;
+    let { publicKey } = keyPair;
 
     yield put(updateGlobalNotification(notificationText, true));
 
     if (teamId) {
-      const teamSystemItem = yield select(teamKeyPairSelector, { teamId: teamId });
+      const teamSystemItem = yield select(teamKeyPairSelector, {
+        teamId,
+      });
       publicKey = teamSystemItem.publicKey;
     }
 
@@ -361,9 +355,8 @@ export function* createItemSaga({
     } else {
       yield put(setWorkInProgressListId(listId));
       yield put(setWorkInProgressItem(newItem));
+      yield call(Router.push, ROUTES.DASHBOARD);
     }
-
-    yield call(Router.push, ROUTES.DASHBOARD);
   } catch (error) {
     console.log(error);
     yield put(

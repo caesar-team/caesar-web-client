@@ -2,6 +2,7 @@ import React from 'react';
 import { useHover } from 'react-use';
 import styled from 'styled-components';
 import DownloadIconSvg from '@caesar/assets/icons/svg/icon-download-white.svg';
+import { media } from '@caesar/assets/styles/media';
 import { PERMISSION } from '@caesar/common/constants';
 import {
   getRealFileSizeForBase64enc,
@@ -104,6 +105,10 @@ const CloseIcon = styled(Icon)`
   &:hover {
     color: ${({ theme }) => theme.color.black};
   }
+
+  ${media.tablet`
+    opacity: 1;
+  `}
 `;
 
 const UploadedWrapper = styled.div`
@@ -121,16 +126,15 @@ const UploadedWrapper = styled.div`
       ${({ isHoveringCloseIcon, theme }) =>
         !isHoveringCloseIcon &&
         `
-          background: ${theme.color.black};
-          color: ${theme.color.white};
           font-size: 0;
           background: url(${DownloadIconSvg})
             no-repeat center ${theme.color.black};
-
-          &:before {
-            background: ${theme.color.black};
-          }
         `}
+
+      ${media.tablet`
+        font-size: 14px;
+        background: ${({ theme }) => theme.color.black};
+      `}
     }
 
     ${CloseIcon} {

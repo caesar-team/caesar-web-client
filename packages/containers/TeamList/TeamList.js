@@ -30,7 +30,7 @@ const Wrapper = styled.div`
   flex-direction: column;
   background: ${({ theme }) => theme.color.lightBlue};
   width: 100%;
-  padding: 60px;
+  padding: 40px;
   position: relative;
 `;
 
@@ -48,19 +48,13 @@ const Title = styled.div`
 
 const TeamListWrapper = styled.div`
   display: flex;
-  padding: 30px;
+  justify-content: space-between;
   flex-wrap: wrap;
-
-  > {
-    &:nth-child(2n + 1) {
-      margin-right: 60px;
-    }
-  }
 `;
 
 const TeamCardStyled = styled(TeamCard)`
-  width: calc((100% - 60px) / 2);
-  margin-bottom: 30px;
+  width: calc((100% - 24px) / 2);
+  margin-bottom: 24px;
   cursor: pointer;
 `;
 

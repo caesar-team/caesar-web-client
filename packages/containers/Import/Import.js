@@ -19,7 +19,7 @@ const Wrapper = styled.div`
   flex-direction: column;
   background: ${({ theme }) => theme.color.lightBlue};
   width: 100%;
-  padding: 60px;
+  padding: 40px;
 `;
 
 const LogoWrapper = styled.div`

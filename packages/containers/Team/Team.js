@@ -39,7 +39,7 @@ const Wrapper = styled.div`
   background: ${({ theme }) => theme.color.lightBlue};
   width: 100%;
   max-width: calc(100vw - 300px);
-  padding: 60px;
+  padding: 40px;
   position: relative;
 `;
 
@@ -506,7 +506,9 @@ class TeamContainer extends Component {
     return (
       <Wrapper ref={this.wrapperRef}>
         <TopWrapper>
-          <Title>{getTeamTitle(team)}</Title>
+          <Title>
+            {getTeamTitle(team)} ({filteredMembersList.length})
+          </Title>
           <Can I={PERMISSION.ADD} a={teamSubject}>
             <ButtonsWrapper>
               <ButtonStyled

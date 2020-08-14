@@ -270,7 +270,7 @@ export function* setCurrentTeamIdWatchSaga({
 export function* decryptionEndWatchSaga() {
   try {
     const systemItems = yield select(systemItemsSelector);
-console.log(systemItems);
+
     if (systemItems.length > 0) {
       yield all(systemItems => put(addTeamKeyPair(item)));
     }

@@ -8,11 +8,7 @@ import {
   ConfirmModal,
   Can,
 } from '@caesar/components';
-import {
-  TEAM_TYPE,
-  PERMISSION,
-  PERMISSION_ENTITY,
-} from '@caesar/common/constants';
+import { PERMISSION, PERMISSION_ENTITY } from '@caesar/common/constants';
 
 const LogoWrapper = styled.div`
   display: flex;
@@ -142,7 +138,6 @@ class TeamListContainer extends Component {
         key={team.id}
         team={team}
         members={members}
-        isRemoveButtonVisible={team.type !== TEAM_TYPE.DEFAULT}
         onClickRemoveTeam={this.handleClickRemoveTeam(team.id)}
       />
     ));

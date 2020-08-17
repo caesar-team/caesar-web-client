@@ -196,6 +196,7 @@ export const PERMISSION = {
   TRASH: 'trash',
   RESTORE: 'restore',
   MULTISELECT: 'multiselect',
+  CRUD: 'crud',
 };
 
 export const PERMISSION_ENTITY = {
@@ -231,7 +232,7 @@ export const DOMAIN_ROLES = {
 };
 
 export const PERMISSION_MESSAGES = {
-  FORBIDDEN_SELECT: 'You don\'t have permissions to select the item',
+  FORBIDDEN_SELECT: "You don't have permissions to select the item",
 };
 
 export const KEY_TYPE = {

@@ -79,3 +79,8 @@ export const teamSystemItemSelector = createSelector(
   (items, currentTeam) => items.find(({ name }) =>
     name === generateSystemItemName(currentTeam.id)) || {},
 );
+
+export const visibleItemsSelector = createSelector(
+  itemsBatchSelector,
+  items => items.filter(({ type }) => type !== ITEM_TYPE.SYSTEM) || [],
+);

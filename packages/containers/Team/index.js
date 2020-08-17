@@ -5,6 +5,7 @@ import {
   addTeamMembersBatchRequest,
   removeTeamMemberRequest,
   updateTeamMemberRoleRequest,
+  removeTeamRequest,
 } from '@caesar/common/actions/entities/team';
 import { initWorkflow } from '@caesar/common/actions/workflow';
 import {
@@ -28,6 +29,7 @@ const mapDispatchToProps = {
   removeTeamMemberRequest,
   updateTeamMemberRoleRequest,
   initWorkflow,
+  removeTeamRequest,
 };
 
 export default withRouter(

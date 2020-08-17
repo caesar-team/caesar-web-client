@@ -32,7 +32,7 @@ const Description = styled.div`
 const Codes = styled.div`
   display: flex;
   flex-wrap: wrap;
-  background: ${({ theme }) => theme.color.lightBlue};
+  background: ${({ theme }) => theme.color.alto};
   border-radius: 4px;
   margin: 50px 0 30px;
 `;

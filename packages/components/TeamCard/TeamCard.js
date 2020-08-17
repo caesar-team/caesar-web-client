@@ -28,7 +28,7 @@ const TeamWrapper = styled.div`
   justify-content: space-between;
   margin-bottom: 20px;
   padding-bottom: 20px;
-  border-bottom: 1px solid ${({ theme }) => theme.color.lightBlue};
+  border-bottom: 1px solid ${({ theme }) => theme.color.gallery};
 `;
 
 const StyledDottedMenu = styled(DottedMenu)`
@@ -126,7 +126,7 @@ const TeamCard = ({
             position: 'left top',
             padding: '0px 0px',
             flat: true,
-            zIndex: 1,
+            zIndex: '1',
           }}
         >
           <MenuWrapper>

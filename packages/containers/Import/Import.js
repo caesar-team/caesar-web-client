@@ -17,7 +17,7 @@ import {
 const Wrapper = styled.div`
   display: flex;
   flex-direction: column;
-  background: ${({ theme }) => theme.color.lightBlue};
+  background: ${({ theme }) => theme.color.alto};
   width: 100%;
   padding: 40px;
 `;
@@ -25,7 +25,7 @@ const Wrapper = styled.div`
 const LogoWrapper = styled.div`
   display: flex;
   flex-direction: column;
-  background: ${({ theme }) => theme.color.lightBlue};
+  background: ${({ theme }) => theme.color.alto};
   width: 100%;
   position: relative;
   height: calc(100vh - 55px);

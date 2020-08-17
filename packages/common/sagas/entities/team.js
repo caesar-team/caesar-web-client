@@ -84,18 +84,18 @@ import { teamKeyPairSelector } from '@caesar/common/selectors/keyStore';
 
 export function* fetchTeamsSaga() {
   try {
-    const { data } = yield call(getTeams);
+    const { data: teamList } = yield call(getTeams);
 
-    yield put(fetchTeamsSuccess(convertTeamsToEntity(data)));
+    yield put(fetchTeamsSuccess(convertTeamsToEntity(teamList)));
 
     const currentTeamId = yield select(currentTeamIdSelector);
 
-    if (data.length && !currentTeamId) {
-      yield put(setCurrentTeamId(data[0].id));
+    if (teamList.length && !currentTeamId) {
+      yield put(setCurrentTeamId(teamList[0].id));
     }
 
     yield all(
-      data.map(team =>
+      teamList.map(team =>
         call(fetchTeamMembersSaga, { payload: { teamId: team.id } }),
       ),
     );

@@ -25,7 +25,7 @@ import { fetchMembersSaga } from '@caesar/common/sagas/entities/member';
 import { convertNodesToEntities } from '@caesar/common/normalizers/normalizers';
 import { objectToArray } from '@caesar/common/utils/utils';
 import { sortItemsByFavorites } from '@caesar/common/utils/workflow';
-import { getLists, getPublicKeyByEmailBatch, getTeamLists, getTeams } from '@caesar/common/api';
+import { getLists, getTeamLists, getTeams } from '@caesar/common/api';
 import { TEAM_TYPE } from '@caesar/common/constants';
 import {
   favoriteListSelector,

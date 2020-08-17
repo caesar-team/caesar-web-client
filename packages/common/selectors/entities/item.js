@@ -82,5 +82,5 @@ export const teamSystemItemSelector = createSelector(
 
 export const visibleItemsSelector = createSelector(
   itemsBatchSelector,
-  items => items.filter(item => item.type !== ITEM_TYPE.SYSTEM) || [],
+  items => items.filter(({ type }) => type !== ITEM_TYPE.SYSTEM) || [],
 );

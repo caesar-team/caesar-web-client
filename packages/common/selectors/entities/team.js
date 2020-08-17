@@ -1,6 +1,6 @@
 import { createSelector } from 'reselect';
 import { membersByIdSelector } from '@caesar/common/selectors/entities/member';
-import { TEAM_TYPE } from '@caesar/common/constants';
+import { TEAM_TYPE, USER_ROLE_ADMIN } from '@caesar/common/constants';
 
 export const entitiesSelector = state => state.entities;
 
@@ -75,4 +75,11 @@ export const teamsMembersSelector = createSelector(
       [],
     );
   },
+);
+
+export const teamAdminUsersSelector = createSelector(
+  teamSelector,
+  team => team
+    .users?.filter(user => user.role === USER_ROLE_ADMIN)
+    .map(user => user.id) || [],
 );

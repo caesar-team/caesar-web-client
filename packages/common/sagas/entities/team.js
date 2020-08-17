@@ -52,11 +52,11 @@ import {
 } from '@caesar/common/actions/user';
 import { teamSelector } from '@caesar/common/selectors/entities/team';
 import { teamItemListSelector } from '@caesar/common/selectors/entities/item';
-import { defaultListSelector } from '@caesar/common/selectors/entities/list';
 import {
   currentTeamIdSelector,
   userDataSelector,
   userTeamIdsSelector,
+  userPersonalDefaultListIdSelector,
 } from '@caesar/common/selectors/user';
 import {
   getTeams,
@@ -90,6 +90,36 @@ import {
   generateSystemItemName,
 } from '@caesar/common/utils/item';
 import { teamKeyPairSelector } from '@caesar/common/selectors/keyStore';
+
+export function* generateTeamSystemItem(teamId) {
+  const userPersonalDefaultListId = yield select(userPersonalDefaultListIdSelector);
+  const masterPassword = yield call(passwordGenerator);
+  const systemTeamEmail = yield call(generateSystemItemEmail, teamId);
+
+  const {
+    publicKey,
+    privateKey,
+  } = yield call(generateKeys, masterPassword, [systemTeamEmail]);
+
+  const systemItemData = {
+    type: ITEM_TYPE.SYSTEM,
+    listId: userPersonalDefaultListId,
+    attachments: [
+      {
+        name: 'publicKey',
+        raw: publicKey,
+      },
+      {
+        name: 'privateKey',
+        raw: privateKey,
+      },
+    ],
+    pass: masterPassword,
+    name: generateSystemItemName(teamId),
+  };
+
+  return systemItemData;
+}
 
 export function* fetchTeamsSaga() {
   try {
@@ -136,36 +166,12 @@ export function* createTeamSaga({ payload: { title, icon } }) {
     const { data: team } = yield call(postCreateTeam, { title, icon });
 
     const user = yield select(userDataSelector);
-    const defaultList = yield select(defaultListSelector);
-    const masterPassword = yield call(passwordGenerator);
-    const systemTeamEmail = yield call(generateSystemItemEmail, team.id);
-
-    const {
-      publicKey,
-      privateKey,
-    } = yield call(generateKeys, masterPassword, [systemTeamEmail]);
-
     yield put(createTeamSuccess({ ...team, __type: ENTITY_TYPE.TEAM }));
     yield put(addTeamToMemberTeamsList(team.id, user.id));
     yield put(addMemberToTeamList(team.id, user.id, COMMANDS_ROLES.USER_ROLE_ADMIN));
     yield put(addMemberToTeam(team.id));
 
-    const systemItemData = {
-      type: ITEM_TYPE.SYSTEM,
-      listId: defaultList.id,
-      attachments: [
-        {
-          name: 'publicKey',
-          raw: publicKey,
-        },
-        {
-          name: 'privateKey',
-          raw: privateKey,
-        },
-      ],
-      pass: masterPassword,
-      name: generateSystemItemName(team.id),
-    };
+    const systemItemData = generateTeamSystemItem(team.id);
 
     yield put(createItemRequest(systemItemData));
   } catch (error) {

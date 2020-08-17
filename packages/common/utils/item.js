@@ -26,7 +26,7 @@ export function generateSystemItemName(teamId) {
 }
 
 export function generateSystemItemEmail(teamId) {
-  return `${generateSystemItemName(teamId)}@${getHostName()}`;
+  return `${generateSystemItemName(teamId)}@${getHostName()}.com`;
 }
 
 export function extractKeysFromSystemItem(item) {

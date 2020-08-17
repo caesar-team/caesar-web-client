@@ -64,6 +64,11 @@ export const isUserAnonymousSelector = createSelector(
 );
 
 export const userIdSelector = createSelector(
+  userDataSelector,
+  data => data.id,
+);
+
+export const userPersonalDefaultListIdSelector = createSelector(
   userSelector,
-  user => user.id,
+  user => user.personalDefaultListId,
 );

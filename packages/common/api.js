@@ -2,7 +2,7 @@
 import Router from 'next/router';
 import axios from 'axios';
 import { removeCookieValue, getCookieValue } from './utils/token';
-import { API_URI, API_BASE_PATH, ROUTES, UNLOCKED_ROUTES } from './constants';
+import { API_URI, API_BASE_PATH, ROUTES, DENY_JWT_ROUTES } from './constants';
 import { isClient } from './utils/isEnvironment';
 
 const softExit = () => {
@@ -21,7 +21,7 @@ const callApi = axios.create({
 });
 
 callApi.interceptors.request.use(config => {
-  if (!UNLOCKED_ROUTES.includes(config.url)) {
+  if (getCookieValue('token')) {
     const token = `Bearer ${getCookieValue('token')}`;
     // eslint-disable-next-line no-param-reassign
     config.headers.Authorization = token;

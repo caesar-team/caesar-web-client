@@ -1,3 +1,9 @@
+import {
+  getFilenameWithoutExt,
+  extactExtFromFilename,
+  getRealFileSizeForBase64enc,
+} from './file';
+
 function isValidItem(item) {
   // TODO: strengthen checks
   if (!item.data) {
@@ -34,10 +40,23 @@ export function checkItemsAfterDecryption(items) {
   );
 }
 
-export const buildSecretItem = item => {
-  const { data } = item;
+export const splitItemAttachments = item => {
+  let attachments;
+  let raws = [];
+  if (item.attachments) {
+    raws = item.attachments.map(attach => attach.raw);
+    attachments = item.attachments.map(attach => {
+      return {
+        name: getFilenameWithoutExt(attach.name),
+        ext: extactExtFromFilename(attach.ext),
+        size: getRealFileSizeForBase64enc(attach.raw.length),
+      };
+    });
+  }
 
   return {
     ...item,
+    attachments,
+    raws,
   };
 };

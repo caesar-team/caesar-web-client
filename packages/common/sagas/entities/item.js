@@ -153,6 +153,7 @@ import {
   TEAM_TYPE,
 } from '@caesar/common/constants';
 import { generateSharingUrl } from '@caesar/common/utils/sharing';
+import { splitItemAttachments } from '@caesar/common/utils/item';
 import { createMemberSaga } from './member';
 
 const ITEMS_CHUNK_SIZE = 50;
@@ -447,7 +448,12 @@ export function* createItemSaga({
 
     const keyPair = yield select(keyPairSelector);
     const user = yield select(userDataSelector);
+    // if (user) {
+    //   console.log(item);
+    //   console.log(splitItemAttachments(item));
 
+    //   return false;
+    // }
     const encryptedItem = yield call(
       encryptItem,
       { attachments, ...data },

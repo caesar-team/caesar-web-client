@@ -1,6 +1,8 @@
 import React from 'react';
+import { useSelector } from 'react-redux';
 import styled from 'styled-components';
 import { useFormik } from 'formik';
+import { teamSelector } from '@caesar/common/selectors/entities/team';
 import { Modal, FormInput, Button, Label } from '@caesar/components';
 import { checkError } from '@caesar/common/utils/formikUtils';
 import { renderTeamAvatars } from './renderTeamAvatars';
@@ -37,9 +39,18 @@ const ButtonWrapper = styled.div`
   justify-content: center;
 `;
 
-const initialValues = { title: '', icon: undefined };
+const getInitialValues = team => ({
+  title: team?.title || '',
+  icon: { raw: team?.icon } || undefined,
+});
 
-const NewTeamModal = ({ onSubmit, onCancel = Function.prototype }) => {
+const TeamModal = ({
+  teamId,
+  onCreateSubmit,
+  onEditSubmit,
+  onCancel = Function.prototype,
+}) => {
+  const team = useSelector(state => teamSelector(state, { teamId })) || null;
   const {
     dirty,
     values,
@@ -52,10 +63,11 @@ const NewTeamModal = ({ onSubmit, onCancel = Function.prototype }) => {
     handleSubmit,
     setFieldValue,
   } = useFormik({
-    initialValues,
-    onSubmit: ({ title, icon }) => {
-      onSubmit({ title, icon: icon.raw });
-    },
+    initialValues: getInitialValues(team),
+    onSubmit: ({ title, icon }) =>
+      teamId
+        ? onEditSubmit({ teamId, title, icon: icon.raw })
+        : onCreateSubmit({ title, icon: icon.raw }),
     validationSchema: schema,
   });
 
@@ -67,7 +79,7 @@ const NewTeamModal = ({ onSubmit, onCancel = Function.prototype }) => {
       width="560"
       onRequestClose={onCancel}
     >
-      <FormTitle>Add Team</FormTitle>
+      <FormTitle>{teamId ? 'Edit' : 'Add'} team</FormTitle>
       <form onSubmit={handleSubmit}>
         <Label>Group name</Label>
         <FormInput
@@ -92,7 +104,7 @@ const NewTeamModal = ({ onSubmit, onCancel = Function.prototype }) => {
             color="black"
             onClick={handleSubmit}
           >
-            Create
+            {teamId ? 'Edit' : 'Create'}
           </Button>
         </ButtonWrapper>
       </form>
@@ -100,4 +112,4 @@ const NewTeamModal = ({ onSubmit, onCancel = Function.prototype }) => {
   );
 };
 
-export default NewTeamModal;
+export default TeamModal;

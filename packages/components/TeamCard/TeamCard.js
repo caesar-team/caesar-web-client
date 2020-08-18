@@ -29,6 +29,7 @@ const TeamWrapper = styled.div`
   margin-bottom: 20px;
   padding-bottom: 20px;
   border-bottom: 1px solid ${({ theme }) => theme.color.gallery};
+  cursor: pointer;
 `;
 
 const StyledDottedMenu = styled(DottedMenu)`
@@ -105,6 +106,7 @@ const TeamCard = ({
   team,
   members,
   onClick = Function.prototype,
+  onClickEditTeam = Function.prototype,
   onClickRemoveTeam = Function.prototype,
 }) => {
   const { id, icon, users } = team;
@@ -131,7 +133,7 @@ const TeamCard = ({
         >
           <MenuWrapper>
             <Can I={PERMISSION.EDIT} a={teamSubject}>
-              <MenuButton color="white" onClick={onClickRemoveTeam}>
+              <MenuButton color="white" onClick={onClickEditTeam}>
                 Edit
               </MenuButton>
             </Can>

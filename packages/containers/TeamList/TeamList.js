@@ -4,7 +4,7 @@ import {
   Button,
   TeamCard,
   LogoLoader,
-  NewTeamModal,
+  TeamModal,
   ConfirmModal,
   Can,
 } from '@caesar/components';
@@ -48,10 +48,9 @@ const TeamListWrapper = styled.div`
   flex-wrap: wrap;
 `;
 
-const TeamCardStyled = styled(TeamCard)`
+const StyledTeamCard = styled(TeamCard)`
   width: calc((100% - 24px) / 2);
   margin-bottom: 24px;
-  cursor: pointer;
 `;
 
 const NEW_TEAM_MODAL = 'newTeamModal';
@@ -71,6 +70,12 @@ class TeamListContainer extends Component {
     this.handleCloseModal(NEW_TEAM_MODAL)();
   };
 
+  handleEditSubmit = ({ teamId, title, icon }) => {
+    this.props.editTeamRequest(teamId, title, icon);
+
+    this.handleCloseModal(NEW_TEAM_MODAL)();
+  };
+
   handleOpenModal = modal => () => {
     this.setState(prevState => ({
       ...prevState,
@@ -84,11 +89,24 @@ class TeamListContainer extends Component {
   handleCloseModal = modal => () => {
     this.setState(prevState => ({
       ...prevState,
+      selectedTeamId: null,
       modalVisibilities: {
         ...prevState.modalVisibilities,
         [modal]: false,
       },
     }));
+  };
+
+  handleClickEditTeam = teamId => event => {
+    event.preventDefault();
+    event.stopPropagation();
+
+    this.setState(
+      {
+        selectedTeamId: teamId,
+      },
+      this.handleOpenModal(NEW_TEAM_MODAL),
+    );
   };
 
   handleClickRemoveTeam = teamId => event => {
@@ -134,10 +152,11 @@ class TeamListContainer extends Component {
     const { teams, members } = this.props;
 
     return teams.map(team => (
-      <TeamCardStyled
+      <StyledTeamCard
         key={team.id}
         team={team}
         members={members}
+        onClickEditTeam={this.handleClickEditTeam(team.id)}
         onClickRemoveTeam={this.handleClickRemoveTeam(team.id)}
       />
     ));
@@ -180,8 +199,10 @@ class TeamListContainer extends Component {
         </TopWrapper>
         <TeamListWrapper>{renderedTeamCards}</TeamListWrapper>
         {modalVisibilities[NEW_TEAM_MODAL] && (
-          <NewTeamModal
-            onSubmit={this.handleCreateSubmit}
+          <TeamModal
+            teamId={this.state.selectedTeamId}
+            onCreateSubmit={this.handleCreateSubmit}
+            onEditSubmit={this.handleEditSubmit}
             onCancel={this.handleCloseModal(NEW_TEAM_MODAL)}
           />
         )}

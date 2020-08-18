@@ -3,6 +3,7 @@ import {
   FETCH_TEAMS_REQUEST,
   FETCH_TEAM_REQUEST,
   CREATE_TEAM_REQUEST,
+  EDIT_TEAM_REQUEST,
   REMOVE_TEAM_REQUEST,
   UPDATE_TEAM_MEMBER_ROLE_REQUEST,
   ADD_TEAM_MEMBERS_BATCH_REQUEST,
@@ -13,6 +14,8 @@ import {
   fetchTeamFailure,
   createTeamSuccess,
   createTeamFailure,
+  editTeamSuccess,
+  editTeamFailure,
   removeTeamSuccess,
   removeTeamFailure,
   updateTeamMemberRoleSuccess,
@@ -52,6 +55,7 @@ import {
 import {
   getTeams,
   postCreateTeam,
+  editTeam,
   deleteTeam,
   getTeam,
   updateTeamMember,
@@ -166,6 +170,20 @@ export function* createTeamSaga({ payload: { title, icon } }) {
       updateGlobalNotification(getServerErrorMessage(error), false, true),
     );
     yield put(createTeamFailure());
+  }
+}
+
+export function* editTeamSaga({ payload: { teamId, title, icon } }) {
+  try {
+    const { data: team } = yield call(editTeam, teamId, { title, icon });
+
+    yield put(editTeamSuccess({ ...team, __type: ENTITY_TYPE.TEAM }));
+  } catch (error) {
+    console.log(error);
+    yield put(
+      updateGlobalNotification(getServerErrorMessage(error), false, true),
+    );
+    yield put(editTeamFailure());
   }
 }
 
@@ -321,6 +339,7 @@ export default function* teamSagas() {
   yield takeLatest(FETCH_TEAMS_REQUEST, fetchTeamsSaga);
   yield takeLatest(FETCH_TEAM_REQUEST, fetchTeamSaga);
   yield takeLatest(CREATE_TEAM_REQUEST, createTeamSaga);
+  yield takeLatest(EDIT_TEAM_REQUEST, editTeamSaga);
   yield takeLatest(REMOVE_TEAM_REQUEST, removeTeamSaga);
   yield takeLatest(UPDATE_TEAM_MEMBER_ROLE_REQUEST, updateTeamMemberRoleSaga);
   yield takeLatest(

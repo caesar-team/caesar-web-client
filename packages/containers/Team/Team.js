@@ -21,6 +21,7 @@ import {
   PERMISSION_ENTITY,
 } from '@caesar/common/constants';
 import { getTeamTitle } from '@caesar/common/utils/team';
+import { sortByName } from '@caesar/common/utils/utils';
 
 const LogoWrapper = styled.div`
   display: flex;
@@ -496,7 +497,7 @@ class TeamContainer extends Component {
       team.users,
       filter,
       membersById,
-    );
+    ).sort((a, b) => sortByName(a.name, b.name));
 
     const teamSubject = {
       __typename: PERMISSION_ENTITY.TEAM_MEMBER,

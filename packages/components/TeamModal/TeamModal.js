@@ -9,7 +9,7 @@ import { renderTeamAvatars } from './renderTeamAvatars';
 import { schema } from './schema';
 
 const FormTitle = styled.div`
-  padding-bottom: 25px;
+  padding-bottom: 24px;
   text-align: center;
   font-size: 18px;
   font-weight: 700;

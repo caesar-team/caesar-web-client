@@ -30,6 +30,7 @@ import {
   removeChildItemsBatchFromItem,
   updateItemField,
 } from '@caesar/common/actions/entities/item';
+import { shareItemBatchSaga } from '@caesar/common/sagas/common/share';
 import {
   addItemToList,
   addItemsBatchToList,
@@ -355,6 +356,10 @@ export function* createItemSaga({
     } else {
       yield put(setWorkInProgressListId(listId));
       yield put(setWorkInProgressItem(newItem));
+      yield call(Router.push, ROUTES.DASHBOARD);
+    }
+
+    if (!isSystemItem) {
       yield call(Router.push, ROUTES.DASHBOARD);
     }
   } catch (error) {

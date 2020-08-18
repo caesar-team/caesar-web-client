@@ -43,7 +43,6 @@ import { removeChildItemsBatch } from '@caesar/common/actions/entities/childItem
 import { setCurrentTeamId } from '@caesar/common/actions/user';
 import { updateGlobalNotification } from '@caesar/common/actions/application';
 import { updateChildItemsBatchSaga } from '@caesar/common/sagas/entities/childItem';
-import { shareItemBatchSaga } from '@caesar/common/sagas/common/share';
 import {
   setWorkInProgressItem,
   updateWorkInProgressItem,

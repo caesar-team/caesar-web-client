@@ -26,7 +26,7 @@ export const buildSecretMessage = secret => {
 
   return {
     message: {
-      text: encodeURIComponent(cleanMessageBeforeEncode(secret.text)),
+      text: cleanMessageBeforeEncode(secret.text),
       attachments,
     },
     raws,
@@ -36,7 +36,7 @@ export const buildSecretMessage = secret => {
 export const getDecodedSecret = secret => {
   return {
     ...secret,
-    text: decodeURIComponent(secret.text),
+    text: secret.text,
   };
 };
 export const getEncryptedRawsFromSecret = secret =>

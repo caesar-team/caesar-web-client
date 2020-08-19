@@ -57,7 +57,7 @@ export const downloadFile = (url, filename) => {
   const { data, mime } = parseBase64(url);
   const blob = base64toBlob(data, mime);
 
-  saveAs(blob, decodeURIComponent(filename));
+  saveAs(blob, filename);
 };
 
 export const downloadAsZip = files => {
@@ -65,7 +65,7 @@ export const downloadAsZip = files => {
 
   files.forEach(({ name, raw }) => {
     const { data } = parseBase64(raw);
-    zip.file(decodeURIComponent(name), data, { base64: true });
+    zip.file(name, data, { base64: true });
   });
 
   zip
@@ -80,7 +80,7 @@ export const splitFilesToUniqAndDuplicates = files => {
   const map = new Map();
   // eslint-disable-next-line no-restricted-syntax
   for (const file of files) {
-    const checkLabel = `${file.name}_${file.raw.length}`;
+    const checkLabel = `${file.name}_${file.raw?.length}`;
 
     if (!map.has(checkLabel)) {
       map.set(checkLabel, true);

@@ -98,7 +98,9 @@ module.exports = withPlugins(
       },
     },
     webpack: (config, { isServer }) => {
-      config.output.globalObject = 'this';
+      if (isServer) {
+        config.output.globalObject = `typeof self !== 'undefined' ? self : this`;
+      }
 
       config.plugins.push(new ThreadsPlugin());
       config.externals['tiny-worker'] = 'tiny-worker';

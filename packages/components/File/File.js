@@ -148,8 +148,7 @@ const File = ({
   onClickDownload,
   ...props
 }) => {
-  const { ext } = attachment;
-  const name = decodeURIComponent(attachment.name);
+  const { ext, name } = attachment;
   const size = humanizeSize(attachment.size);
 
   const handleClickCloseIcon = e => {

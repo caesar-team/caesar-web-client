@@ -19,20 +19,6 @@ function isValidItem(item) {
   return true;
 }
 
-export const escapeObjectValues = item =>
-  Object.fromEntries(
-    Object.entries(item).map(([key, value]) =>
-      typeof value === 'string' ? [key, encodeURIComponent(value)] : value,
-    ),
-  );
-
-export const unEscapeObjectValues = item =>
-  Object.fromEntries(
-    Object.entries(item).map(([key, value]) =>
-      typeof value === 'string' ? [key, decodeURIComponent(value)] : value,
-    ),
-  );
-
 export function checkItemsAfterDecryption(items) {
   return items.reduce(
     (accumulator, item) =>
@@ -48,8 +34,8 @@ export const splitItemAttachments = item => {
     raws = item.attachments.map(attach => attach.raw);
     attachments = item.attachments.map(attach => {
       return {
-        name: getFilenameWithoutExt(attach.name),
-        ext: extactExtFromFilename(attach.ext),
+        name: getFilenameWithoutExt(attach.name) || attach.name,
+        ext: extactExtFromFilename(attach.ext) || attach.ext,
         size: getRealFileSizeForBase64enc(attach.raw.length),
       };
     });

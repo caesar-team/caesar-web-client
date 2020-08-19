@@ -61,9 +61,9 @@ const ItemComponent = ({
     (item.listId === trashList?.id ||
       teamsTrashLists.map(({ id }) => id).includes(item.listId));
 
-  const handleClickAcceptEdit = ({ name, value }) => {
+  const handleClickAcceptEdit = patchData => {
     setSubmitting(true);
-    const updatedData = { ...data, listId, [name]: value };
+    const updatedData = { ...data, listId, ...patchData };
     dispatch(editItemRequest(updatedData, setSubmitting, notification));
   };
 

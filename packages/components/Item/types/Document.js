@@ -12,7 +12,7 @@ export const Document = ({
   isSharedItem,
 }) => {
   const {
-    data: { name, note, attachments = [] },
+    data: { name, note, attachments = [], raws = [] },
   } = item;
 
   return (
@@ -40,6 +40,7 @@ export const Document = ({
       <Row marginBottom={24}>
         <Attachments
           attachments={attachments}
+          raws={raws}
           itemSubject={itemSubject}
           onClickAcceptEdit={onClickAcceptEdit}
         />

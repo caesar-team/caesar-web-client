@@ -6,6 +6,7 @@ import {
   splitFilesToUniqAndDuplicates,
 } from '@caesar/common/utils/file';
 import { PERMISSION } from '@caesar/common/constants';
+import { makeObject } from '@caesar/common/utils/object';
 import { Can } from '../../Ability';
 import { Icon } from '../../Icon';
 import { File } from '../../File';
@@ -69,31 +70,39 @@ const AddNewAttach = styled.div`
 
 export const Attachments = ({
   attachments,
+  raws,
   itemSubject,
   onClickAcceptEdit,
 }) => {
   const [newFiles, setNewFiles] = useState([]);
   const [isModalOpened, setModalOpened] = useState(false);
 
-  const handleClickDownloadFile = attachment => {
-    const { raw, name } = attachment;
+  const handleClickDownloadFile = (attachment, index) => {
+    const { name, ext } = attachment;
+    const raw = raws[index];
 
-    downloadFile(raw, name);
+    return typeof raw !== 'undefined'
+      ? downloadFile(raw, `${name}.${ext}`)
+      : false;
   };
 
   const handleClickDownloadAll = () => {
     downloadAsZip(attachments);
   };
 
-  const onClickRemove = raw => {
-    const updatedAttachments = attachments.filter(file => file.raw !== raw);
-
-    onClickAcceptEdit({ name: 'attachments', value: updatedAttachments });
+  const onClickRemove = index => {
+    // const updatedAttachments = attachments.filter(file => file.raw !== raw);
+    const updatedAttachments = attachments.splice(index, 1);
+    const updatedRaws = raws.splice(index, 1);
+    onClickAcceptEdit({
+      attachments: updatedAttachments,
+      raws: updatedRaws,
+    });
   };
 
   const handleChange = (name, files) => {
     const { uniqFiles, duplicatedFiles } = splitFilesToUniqAndDuplicates([
-      ...attachments,
+      ...attachments.map((e, i) => (raws[i] ? { ...e, raw: raws[i] } : e)),
       ...files,
     ]);
     // Todo: Refactor to the one dictionary or use the new Set
@@ -115,8 +124,7 @@ export const Attachments = ({
 
     setNewFiles(mappedFiles);
     setModalOpened(true);
-
-    onClickAcceptEdit({ name, value: uniqFiles });
+    onClickAcceptEdit(makeObject(name, uniqFiles));
   };
 
   const AttachmentsComponent = () => (
@@ -137,13 +145,13 @@ export const Attachments = ({
       </Title>
       <Inner>
         {Array.isArray(attachments) &&
-          attachments.map(attachment => (
+          attachments.map((attachment, index) => (
             <File
               key={attachment.name}
               itemSubject={itemSubject}
-              onClickDownload={() => handleClickDownloadFile(attachment)}
+              onClickDownload={() => handleClickDownloadFile(attachment, index)}
               onClickRemove={
-                onClickAcceptEdit && (() => onClickRemove(attachment.raw))
+                onClickAcceptEdit && (() => onClickRemove(raws[index]))
               }
               attachment={attachment}
             />

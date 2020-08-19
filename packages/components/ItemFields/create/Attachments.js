@@ -31,7 +31,6 @@ const AttachmentsRow = styled.div`
 
 const handleClickDownloadFile = attachment => {
   const { raw, name } = attachment;
-
   downloadFile(raw, name);
 };
 
@@ -40,6 +39,7 @@ const checkAttachmentsError = (errors, index) =>
 
 const renderAttachments = (
   attachments = [],
+  raws = [],
   errors = [],
   setFieldValue,
   disabled,

@@ -98,6 +98,7 @@ import {
   personalKeyPairSelector,
   teamKeyPairSelector,
 } from '@caesar/common/selectors/keyStore';
+import { splitItemAttachments } from '@caesar/common/utils/item';
 
 const ITEMS_CHUNK_SIZE = 50;
 
@@ -290,7 +291,14 @@ export function* createItemSaga({
   meta: { setSubmitting = Function.prototype },
 }) {
   try {
-    const { teamId, listId, attachments, type, ...data } = item;
+    const {
+      teamId,
+      listId,
+      attachments,
+      raws,
+      type,
+      ...data
+    } = splitItemAttachments(item);
     const isSystemItem = type === ITEM_TYPE.SYSTEM;
     const keyPair = yield select(personalKeyPairSelector);
     const user = yield select(userDataSelector);
@@ -312,7 +320,7 @@ export function* createItemSaga({
     // }
     const encryptedItem = yield call(
       encryptItem,
-      { attachments, ...data },
+      { attachments, raws, ...data },
       publicKey,
     );
 
@@ -467,7 +475,7 @@ export function* updateItemSaga({ payload: { item } }) {
 
     const encryptedItemSecret = yield call(
       encryptItem,
-      splitAttachmentFromRaw(item.data),
+      item.data,
       keyPair.publicKey,
     );
 

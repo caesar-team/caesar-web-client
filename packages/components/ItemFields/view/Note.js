@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useUpdateEffect } from 'react-use';
 import styled from 'styled-components';
 import { PERMISSION } from '@caesar/common/constants';
+import { makeObject } from '@caesar/common/utils/object';
 import { Can } from '../../Ability';
 import { Icon } from '../../Icon';
 import { FormTextArea } from '../../Input';
@@ -71,7 +72,7 @@ export const Note = ({ value: propValue, itemSubject, onClickAcceptEdit }) => {
   };
 
   const handleDeleteNote = () => {
-    onClickAcceptEdit({ name: 'note', value: '' });
+    onClickAcceptEdit(makeObject('note', ''));
   };
 
   return (
@@ -85,7 +86,7 @@ export const Note = ({ value: propValue, itemSubject, onClickAcceptEdit }) => {
               onChange={e => setValue(e.target.value)}
               onFocus={onClickAcceptEdit && (() => setEdit(true))}
               onClickAcceptEdit={() => {
-                onClickAcceptEdit({ name: 'note', value });
+                onClickAcceptEdit(makeObject('note', value));
                 setEdit(false);
               }}
               onClickAway={() => setEdit(false)}

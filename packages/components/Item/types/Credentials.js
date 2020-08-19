@@ -19,7 +19,7 @@ export const Credentials = ({
   isSharedItem,
 }) => {
   const {
-    data: { name, login, pass, website, note, attachments = [] },
+    data: { name, login, pass, website, note, attachments = [], raws = [] },
   } = item;
 
   return (
@@ -73,6 +73,7 @@ export const Credentials = ({
       <Row marginBottom={24}>
         <Attachments
           attachments={attachments}
+          raws={raws}
           itemSubject={itemSubject}
           onClickAcceptEdit={onClickAcceptEdit}
         />

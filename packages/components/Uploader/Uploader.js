@@ -82,7 +82,7 @@ const Uploader = ({
     const previews = await filesToBase64(acceptedFiles);
     const files = acceptedFiles.map(({ name: fileName }, index) =>
       makeAttachemntFromFile({
-        name: encodeURIComponent(fileName),
+        name: fileName,
         raw: previews[index],
       }),
     );

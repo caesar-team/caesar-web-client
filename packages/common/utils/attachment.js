@@ -20,7 +20,7 @@ export const splitAttachmentFromRaw = data => {
       return {
         name: getFilenameWithoutExt(attach.name),
         ext: extactExtFromFilename(attach.name),
-        size: getRealFileSizeForBase64enc(attach.raw.length),
+        size: getRealFileSizeForBase64enc(attach.raw?.length),
       };
     });
   }

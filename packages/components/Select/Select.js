@@ -60,14 +60,15 @@ const Option = styled.div`
   font-size: 16px;
   font-weight: ${({ isActive }) => (isActive ? 'bold' : 'normal')};
   color: ${({ theme, isDisabled }) =>
-    isDisabled ? theme.color.lightGray : theme.color.emperor};
-  background-color: ${({ theme, isActive }) =>
-    isActive ? theme.color.snow : theme.color.white};
+    isDisabled ? theme.color.lightGray : theme.color.black};
+  background-color: ${({ theme }) => theme.color.white};
   cursor: ${({ isDisabled }) => (isDisabled ? 'default' : 'pointer')};
+  transition: background-color 0.2s;
 
   &:hover {
     color: ${({ theme, isDisabled }) =>
       isDisabled ? theme.color.lightGray : theme.color.black};
+    background-color: ${({ theme }) => theme.color.snow};
   }
 `;
 

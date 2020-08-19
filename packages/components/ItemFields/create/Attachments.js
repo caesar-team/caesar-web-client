@@ -3,7 +3,6 @@ import styled from 'styled-components';
 import { downloadFile } from '@caesar/common/utils/file';
 import { Uploader } from '../../Uploader';
 import { File } from '../../File';
-import { TextError } from '../../Error';
 
 const Title = styled.div`
   display: flex;

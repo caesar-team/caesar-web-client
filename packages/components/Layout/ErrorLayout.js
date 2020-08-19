@@ -19,7 +19,7 @@ const LayoutConstructorStyled = styled(LayoutConstructor)`
     align-items: center;
     justify-content: center;
 
-    &:before {
+    &::before {
       display: block;
       content: '';
       width: 844px;
@@ -31,14 +31,14 @@ const LayoutConstructorStyled = styled(LayoutConstructor)`
     }
     
     @media (min-resolution: 144dpi) and (min-resolution: 1.5dppx) {
-      &:before {
+      &::before {
         background-image: url('/images/error-left@2x.png'),
           url('/images/error-right@2x.png');
       }  
     }
     
     ${media.desktop`
-      &:before {
+      &::before {
         width: 732px;
         height: 480px;
         background-size: 256px 470px, 270px 381px;
@@ -46,7 +46,7 @@ const LayoutConstructorStyled = styled(LayoutConstructor)`
     `}
     
     ${media.tablet`
-      &:before {
+      &::before {
         width: 610px;
         height: 400px;
         background-size: 216px 396px, 220px 310px;
@@ -54,7 +54,7 @@ const LayoutConstructorStyled = styled(LayoutConstructor)`
     `}
     
     ${media.wideMobile`
-      &:before {
+      &::before {
         width: 432px;
         height: 487px;
         background-size: 190px 357px, 170px 240px;
@@ -63,7 +63,7 @@ const LayoutConstructorStyled = styled(LayoutConstructor)`
     `}
     
     ${media.mobile`
-      &:before {
+      &::before {
         width: 288px;
         height: 418px;
         background-size: 140px 256px, 120px 169px;

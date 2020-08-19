@@ -6,7 +6,10 @@ import {
   splitFilesToUniqAndDuplicates,
 } from '@caesar/common/utils/file';
 import { useMedia } from '@caesar/common/hooks';
-import { TOTAL_MAX_UPLOADING_FILES_SIZES } from '@caesar/common/constants';
+import {
+  TOTAL_MAX_UPLOADING_FILES_SIZES,
+  MAX_UPLOADING_FILE_SIZE,
+} from '@caesar/common/constants';
 import { Icon } from '../Icon';
 
 const Container = styled.div`
@@ -51,7 +54,6 @@ const StyledIcon = styled(Icon)`
 `;
 
 const Error = styled.div`
-  margin-top: 8px;
   font-size: 14px;
   color: ${({ theme }) => theme.color.red};
 `;
@@ -66,7 +68,7 @@ const Uploader = ({
   multiple = false,
   accept,
   onChange,
-  hintText = `Not more than ${TOTAL_MAX_UPLOADING_FILES_SIZES}`,
+  hintText = `${TOTAL_MAX_UPLOADING_FILES_SIZES} for all files, ${MAX_UPLOADING_FILE_SIZE} for one file`,
   error,
   files: previousFiles = [],
   notification,
@@ -129,8 +131,7 @@ const Uploader = ({
                 !isMobile &&
                 ' or drag and drop your files here'}
             </Text>
-            <HintText>{hintText}</HintText>
-            {error && <Error>{error}</Error>}
+            {error ? <Error>{error}</Error> : <HintText>{hintText}</HintText>}
           </Container>
         )
       }

@@ -42,7 +42,7 @@ const IconWrapper = styled.div`
   height: 62px;
 
   &:hover {
-    &:after {
+    &::after {
       content: '';
       border: 2px solid ${({ theme }) => theme.color.black};
       height: 62px;

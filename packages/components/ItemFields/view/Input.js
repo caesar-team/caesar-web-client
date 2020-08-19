@@ -47,14 +47,14 @@ const StyledIcon = styled(Icon)`
 `;
 
 const PencilIcon = styled(StyledIcon)`
-  flex: 0 0 20px;
-  margin-left: 16px;
-`;
-
-const CopyIcon = styled(StyledIcon)`
   margin-left: 8px;
   opacity: 0;
   transition: opacity 0.2s, color 0.2s;
+`;
+
+const CopyIcon = styled(StyledIcon)`
+  flex: 0 0 20px;
+  margin-left: 16px;
 `;
 
 const ValueWrapper = styled.div`
@@ -72,7 +72,7 @@ const ValueWrapper = styled.div`
   &:hover {
     border-bottom: 1px solid ${({ theme }) => theme.color.black};
 
-    ${CopyIcon} {
+    ${PencilIcon} {
       opacity: 1;
     }
   }
@@ -152,28 +152,28 @@ const InputComponent = ({
           {label && <Label>{label}</Label>}
           <ValueInner>
             <Value withEllipsis={withEllipsis}>{propValue}</Value>
-            {withCopyButton && propValue && (
-              <CopyIcon
-                name="copy"
-                width={20}
-                height={20}
-                color="gray"
-                onClick={handleClickCopy}
-              />
-            )}
+            <Can I={PERMISSION.EDIT} an={itemSubject}>
+              {onClickAcceptEdit && (
+                <PencilIcon
+                  name="pencil"
+                  width={20}
+                  height={20}
+                  color="gray"
+                  onClick={() => setEdit(true)}
+                />
+              )}
+            </Can>
           </ValueInner>
           {addonIcons}
-          <Can I={PERMISSION.EDIT} an={itemSubject}>
-            {onClickAcceptEdit && (
-              <PencilIcon
-                name="pencil"
-                width={20}
-                height={20}
-                color="gray"
-                onClick={() => setEdit(true)}
-              />
-            )}
-          </Can>
+          {withCopyButton && propValue && (
+            <CopyIcon
+              name="copy"
+              width={20}
+              height={20}
+              color="gray"
+              onClick={handleClickCopy}
+            />
+          )}
         </ValueWrapper>
       )}
     </Wrapper>

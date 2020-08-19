@@ -16,7 +16,7 @@ const RangeBase = styled.div`
   border: 1px solid ${({ theme }) => theme.color.gallery};
   background-color: ${({ theme }) => theme.color.white};
 
-  &:before {
+  &::before {
     content: '${({ minValue }) => minValue}';
     position: absolute;
     top: 15px;
@@ -26,7 +26,7 @@ const RangeBase = styled.div`
     font-weight: 600;
   }
 
-  &:after {
+  &::after {
     content: '${({ maxValue }) => maxValue}';
     position: absolute;
     top: 15px;

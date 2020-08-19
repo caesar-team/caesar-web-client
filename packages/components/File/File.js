@@ -16,7 +16,7 @@ import {
 import { Can } from '../Ability';
 import { Icon } from '../Icon';
 
-const FileExt = styled.div`
+const FileIcon = styled.div`
   position: relative;
   display: flex;
   align-items: center;
@@ -24,42 +24,40 @@ const FileExt = styled.div`
   flex: 0 0 40px;
   width: 40px;
   height: 40px;
-  font-size: 14px;
-  color: ${({ theme }) => theme.color.white};
-  background-color: ${({ theme }) => theme.color.black};
   border-radius: 3px 0 3px 3px;
   transition: all 0.2s;
 
-  &:before {
+  &::before {
     content: '';
     position: absolute;
     top: 0;
     right: 0;
     display: block;
     width: 0;
-    background: ${({ theme }) => theme.color.gray};
     border-style: solid;
     border-width: 4px;
+    border-radius: 0 0 0 3px;
     border-color: ${({ theme }) =>
       `${theme.color.white} ${theme.color.white} transparent transparent`};
-    border-radius: 0 0 0 3px;
   }
 `;
 
-const ErrorStatus = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex: 0 0 40px;
-  width: 40px;
-  height: 40px;
-  border: 3px solid ${({ theme }) => theme.color.red};
-  border-radius: 50%;
+const FileExt = styled(FileIcon)`
+  font-size: ${({ theme }) => theme.font.size.small};
+  color: ${({ theme }) => theme.color.white};
+  background-color: ${({ theme }) => theme.color.black};
 
-  &:after {
-    content: '!';
-    position: absolute;
-    color: ${({ theme }) => theme.color.red};
+  &::before {
+    background: ${({ theme }) => theme.color.gray};
+  }
+`;
+
+const ErrorStatus = styled(FileIcon)`
+  color: ${({ theme }) => theme.color.red};
+  background-color: ${({ theme }) => theme.color.gallery};
+
+  &::before {
+    background: ${({ theme }) => theme.color.lightGray};
   }
 `;
 
@@ -71,26 +69,41 @@ const Details = styled.div`
 `;
 
 const FileName = styled.div`
-  font-size: 16px;
-  line-height: 18px;
-  color: ${({ theme }) => theme.color.black};
-  margin-bottom: 5px;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 `;
 
 const FileSize = styled.div`
-  font-size: 14px;
-  line-height: 14px;
-  color: ${({ theme }) => theme.color.gray};
+  font-size: ${({ theme }) => theme.font.size.small};
+  color: ${({ isError, theme }) =>
+    isError ? theme.color.red : theme.color.gray};
+
+  ${media.tablet`
+    ${({ isError }) => isError && 'display: none;'}
+  `}
 `;
 
-const ErrorWrapper = styled.div``;
-
 const Error = styled.div`
+  display: none;
   font-size: ${({ theme }) => theme.font.size.small};
   color: ${({ theme }) => theme.color.red};
+
+  ${media.tablet`
+    display: block;
+  `}
+`;
+
+const ErrorWrapper = styled.div`
+  &:hover {
+    ${FileSize} {
+      display: none;
+    }
+
+    ${Error} {
+      display: block;
+    }
+  }
 `;
 
 const CloseIcon = styled(Icon)`
@@ -114,6 +127,7 @@ const CloseIcon = styled(Icon)`
 const UploadedWrapper = styled.div`
   position: relative;
   display: flex;
+  align-items: center;
   padding: 8px 28px 8px 8px;
   border-radius: 4px;
   cursor: pointer;
@@ -121,6 +135,13 @@ const UploadedWrapper = styled.div`
 
   &:hover {
     background-color: ${({ theme }) => theme.color.snow};
+
+    ${FileIcon} {
+      &::before {
+        border-color: ${({ theme }) =>
+          `${theme.color.snow} ${theme.color.snow} transparent transparent`};
+      }
+    }
 
     ${FileExt} {
       ${({ isHoveringCloseIcon, theme }) =>
@@ -132,7 +153,7 @@ const UploadedWrapper = styled.div`
         `}
 
       ${media.tablet`
-        font-size: 14px;
+        font-size: ${({ theme }) => theme.font.size.small};
         background: ${({ theme }) => theme.color.black};
       `}
     }
@@ -143,11 +164,7 @@ const UploadedWrapper = styled.div`
   }
 `;
 
-const UPLOADED_STATUS = 'uploaded';
-const ERROR_STATUS = 'error';
-
 const File = ({
-  status = UPLOADED_STATUS,
   name,
   raw,
   error,
@@ -178,18 +195,18 @@ const File = ({
     closeIconComponent,
   );
 
-  if (status === ERROR_STATUS || error) {
+  if (error) {
     return (
       <ErrorWrapper>
         <UploadedWrapper isHoveringCloseIcon={isHoveringCloseIcon}>
-          <ErrorStatus />
+          <ErrorStatus>!</ErrorStatus>
           <Details>
             <FileName>{filename}</FileName>
-            <FileSize>{size}</FileSize>
+            <FileSize isError>{size}</FileSize>
+            <Error>{error}</Error>
           </Details>
           {onClickRemove && hoverableCloseIcon}
         </UploadedWrapper>
-        <Error>{error}</Error>
       </ErrorWrapper>
     );
   }

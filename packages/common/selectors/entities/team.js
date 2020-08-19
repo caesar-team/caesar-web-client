@@ -29,15 +29,11 @@ export const teamSortedListSelector = createSelector(
   teamListSelector,
   teams => {
     const defaultTeam = teams.find(team => team.type === TEAM_TYPE.DEFAULT);
+    const otherTeams = teams
+      .filter(team => team.type !== TEAM_TYPE.DEFAULT)
+      .sort((a, b) => sortByName(a.title, b.title));
 
-    return defaultTeam
-      ? [
-          defaultTeam,
-          ...teams
-            .filter(team => team.type !== TEAM_TYPE.DEFAULT)
-            .sort((a, b) => sortByName(a.title, b.title)),
-        ]
-      : teams;
+    return defaultTeam ? [defaultTeam, ...otherTeams] : otherTeams;
   },
 );
 

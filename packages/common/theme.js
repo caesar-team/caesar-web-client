@@ -10,12 +10,9 @@ const theme = {
     snow: '#fbf9f9',
     white: '#fff',
     red: '#ff3355',
+    lightRed: 'rgba(255, 51, 85, 0.1)',
     // TODO: The below colors are redundant. Need to get rid of them
     darkGray: '#363636',
-    middleGray: '#979797',
-    blue: '#3385ff',
-    lightBlue: '#f5f6f7',
-    lightRed: 'rgba(255, 51, 85, 0.1)',
   },
   font: {
     size: {

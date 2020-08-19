@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import styled from 'styled-components';
 // TODO: Replace with import {useClickAway} from 'react-use';
 import enhanceWithClickOutside from 'react-click-outside';
+import { Icon } from '../Icon';
 import { Tooltip } from '../Tooltip';
 
 const Wrapper = styled.div`
@@ -9,34 +10,22 @@ const Wrapper = styled.div`
   height: 16px;
 `;
 
+const MoreIcon = styled(Icon)``;
+
 const DottedWrapper = styled.button`
   display: flex;
   flex-direction: column;
-  width: 14px;
-  height: 14px;
   justify-content: center;
   align-items: center;
   padding: 0;
   cursor: pointer;
   background: none;
   border: none;
-  transition: 0.3s;
   user-select: none;
 
   &:hover {
-    opacity: 0.75;
-  }
-
-  span {
-    display: block;
-    width: 2px;
-    height: 2px;
-    background-color: ${({ theme }) => theme.color.gray};
-    border-radius: 50%;
-
-    &:nth-child(2) {
-      margin-top: 4px;
-      margin-bottom: 4px;
+    ${MoreIcon} {
+      color: ${({ theme }) => theme.color.black};
     }
   }
 `;
@@ -70,9 +59,7 @@ class DottedMenu extends Component {
     return (
       <Wrapper className={className}>
         <DottedWrapper onClick={this.handleToggle}>
-          <span />
-          <span />
-          <span />
+          <MoreIcon name="more" color="gray" width={16} height={16} />
         </DottedWrapper>
         <Tooltip {...tooltipProps} show={isOpened}>
           {children}

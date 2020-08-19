@@ -151,7 +151,7 @@ const PrimaryHeaderComponent = ({
                   name="arrow-triangle"
                   width={16}
                   height={16}
-                  color="middleGray"
+                  color="black"
                   isDropdownOpened={isDropdownOpened}
                 />
               </StyledDropdown>

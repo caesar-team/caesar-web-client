@@ -8,7 +8,9 @@ import { generateSystemItemName } from '@caesar/common/utils/item';
 import { KEY_TYPE, TEAM_TYPE } from '@caesar/common/constants';
 
 const findTeamItemByName = (data, teamId) =>
-  Object.values(data[KEY_TYPE.TEAM]).find(({ name }) => name === generateSystemItemName('team', teamId)) || {};
+  Object.values(data[KEY_TYPE.TEAM]).find(
+    ({ name }) => name === generateSystemItemName(teamId),
+  ) || {};
 
 export const keyStoreSelector = state => state.keyStore;
 
@@ -44,7 +46,9 @@ export const actualKeyPairSelector = createSelector(
   (data, currentTeamId, personalKeyPair, isAnonymous, userId) => {
     switch (true) {
       case isAnonymous:
-        return Object.values(data[KEY_TYPE.ANONYMOUS]).find(({ id }) => userId) || {};
+        return (
+          Object.values(data[KEY_TYPE.ANONYMOUS]).find(({ id }) => userId) || {}
+        );
       case currentTeamId !== TEAM_TYPE.PERSONAL:
         return findTeamItemByName(data, currentTeamId);
       case currentTeamId === TEAM_TYPE.PERSONAL:

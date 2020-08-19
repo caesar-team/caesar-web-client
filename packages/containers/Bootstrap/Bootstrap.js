@@ -59,6 +59,7 @@ class Bootstrap extends Component {
 
   async componentDidMount() {
     const { logout, initCoresCount, shared = {} } = this.props;
+
     initCoresCount();
 
     try {

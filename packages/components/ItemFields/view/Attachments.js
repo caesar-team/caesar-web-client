@@ -70,7 +70,7 @@ const AddNewAttach = styled.div`
 
 export const Attachments = ({
   attachments,
-  raws,
+  raws = [],
   itemSubject,
   onClickAcceptEdit,
 }) => {

@@ -22,7 +22,7 @@ const itemTransform = createTransform(
 
 const userTransform = createTransform(
   inboundState => {
-    const { masterPassword, ...user } = inboundState;
+    const { masterPassword, keyPair, ...user } = inboundState;
 
     return user;
   },

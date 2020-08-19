@@ -1,5 +1,8 @@
 import { createSelector } from 'reselect';
 import { childItemsByIdSelector } from '@caesar/common/selectors/entities/childItem';
+import { currentTeamSelector } from '@caesar/common/selectors/user';
+import { generateSystemItemName } from '@caesar/common/utils/item';
+import { ITEM_TYPE } from '@caesar/common/constants';
 
 export const entitiesSelector = state => state.entities;
 
@@ -63,4 +66,21 @@ export const itemsChildItemsBatchSelector = createSelector(
       ];
     }, []);
   },
+);
+
+export const systemItemsSelector = createSelector(
+  itemsByIdSelector,
+  items => Object.values(items).find(({ type }) => type === ITEM_TYPE.SYSTEM) || {},
+);
+
+export const teamSystemItemSelector = createSelector(
+  systemItemsSelector,
+  currentTeamSelector,
+  (items, currentTeam) => items.find(({ name }) =>
+    name === generateSystemItemName(currentTeam.id)) || {},
+);
+
+export const visibleItemsSelector = createSelector(
+  itemsBatchSelector,
+  items => items.filter(({ type }) => type !== ITEM_TYPE.SYSTEM) || [],
 );

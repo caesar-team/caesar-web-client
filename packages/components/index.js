@@ -60,7 +60,7 @@ export { MenuList } from './MenuList';
 export { Modal, ModalTitle, ModalSubtitle } from './Modal';
 export { MoveModal } from './MoveModal';
 export { NavigationPanel } from './NavigationPanel';
-export { NewTeamModal } from './NewTeamModal'; // TODO: Delete ??
+export { TeamModal } from './TeamModal';
 export {
   GlobalNotification,
   NotificationConsumer,

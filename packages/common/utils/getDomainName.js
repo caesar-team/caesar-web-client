@@ -1,3 +1,5 @@
+export const getHostName = () => location.hostname;
+
 export const getDomainName = hostname => {
   if (!hostname) return '';
 

@@ -1,5 +1,6 @@
 import * as openpgp from 'openpgp';
 import { generateKeys } from '@caesar/common/utils/key';
+import { getHostName } from '@caesar/common/utils/getDomainName';
 import { randomId } from '@caesar/common/utils/uuid4';
 import { createSrp } from './srp';
 import { passwordGenerator } from './passwordGenerator';
@@ -93,7 +94,7 @@ export const generateUsersBatch = async emails => {
 };
 
 export const generateAnonymousEmail = () =>
-  `anonymous_${randomId()}@caesar.team`;
+  `anonymous_${randomId()}@${getHostName()}`;
 
 export const generateSeedAndVerifier = (email, password) => {
   const seed = srp.getRandomSeed();

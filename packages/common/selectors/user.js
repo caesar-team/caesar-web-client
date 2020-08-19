@@ -1,5 +1,6 @@
 import { createSelector } from 'reselect';
 import { teamsByIdSelector } from '@caesar/common/selectors/entities/team';
+import { ROLE_ANONYMOUS_USER } from '@caesar/common/constants';
 
 export const userSelector = state => state.user;
 
@@ -55,4 +56,19 @@ export const currentTeamSelector = createSelector(
   currentTeamIdSelector,
   teamsByIdSelector,
   (currentTeamId, teamsById) => teamsById[currentTeamId],
+);
+
+export const isUserAnonymousSelector = createSelector(
+  userDataSelector,
+  data => data.roles.includes(ROLE_ANONYMOUS_USER),
+);
+
+export const userIdSelector = createSelector(
+  userDataSelector,
+  data => data.id,
+);
+
+export const userPersonalDefaultListIdSelector = createSelector(
+  userSelector,
+  user => user.personalDefaultListId,
 );

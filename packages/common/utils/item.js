@@ -1,3 +1,4 @@
+import { getHostName } from '@caesar/common/utils/getDomainName';
 import {
   getFilenameWithoutExt,
   extactExtFromFilename,
@@ -60,3 +61,22 @@ export const splitItemAttachments = item => {
     raws,
   };
 };
+export function generateSystemItemName(teamId) {
+  return `team-${teamId}`;
+}
+
+export function generateSystemItemEmail(teamId) {
+  return `${generateSystemItemName(teamId)}@${getHostName()}.com`;
+}
+
+export function extractKeysFromSystemItem(item) {
+  const publicKey = item.attachments?.find(({ name }) => name === 'publicKey')
+    ?.raw;
+  const privateKey = item.attachments?.find(({ name }) => name === 'privateKey')
+    ?.raw;
+
+  return {
+    publicKey,
+    privateKey,
+  };
+}

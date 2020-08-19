@@ -14,18 +14,21 @@ import {
   Icon,
   InviteModal,
   Can,
+  ConfirmModal,
 } from '@caesar/components';
 import {
   COMMANDS_ROLES,
   PERMISSION,
   PERMISSION_ENTITY,
+  ROUTES,
 } from '@caesar/common/constants';
 import { getTeamTitle } from '@caesar/common/utils/team';
+import { sortByName } from '@caesar/common/utils/utils';
 
 const LogoWrapper = styled.div`
   display: flex;
   flex-direction: column;
-  background: ${({ theme }) => theme.color.lightBlue};
+  background: ${({ theme }) => theme.color.alto};
   width: 100%;
   position: relative;
   height: calc(100vh - 55px);
@@ -36,33 +39,27 @@ const LogoWrapper = styled.div`
 const Wrapper = styled.div`
   display: flex;
   flex-direction: column;
-  background: ${({ theme }) => theme.color.lightBlue};
+  background: ${({ theme }) => theme.color.alto};
   width: 100%;
   max-width: calc(100vw - 300px);
-  padding: 60px;
+  padding: 40px;
   position: relative;
 `;
 
 const TopWrapper = styled.div`
   display: flex;
   align-items: center;
-  justify-content: space-between;
   margin-bottom: 30px;
 `;
 
 const Title = styled.div`
-  font-size: 36px;
+  margin-right: auto;
+  font-size: ${({ theme }) => theme.font.size.large};
   color: ${({ theme }) => theme.color.black};
 `;
 
-const ButtonsWrapper = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-`;
-
 const ButtonStyled = styled(Button)`
-  margin-right: 20px;
+  margin-right: 24px;
 `;
 
 const DataTableStyled = styled(DataTable)`
@@ -88,8 +85,8 @@ const DataTableStyled = styled(DataTable)`
 
   .rt-tr-group {
     margin-bottom: 10px;
-    height: 50px;
-    max-height: 50px;
+    height: 56px;
+    max-height: 56px;
   }
 
   .rt-thead.-header {
@@ -123,20 +120,18 @@ const Field = styled.div`
   justify-content: flex-start;
   width: 100%;
   background-color: ${({ theme }) => theme.color.white};
-  height: 50px;
+  height: 56px;
 `;
 
 const NameField = styled(Field)`
-  padding-left: 20px;
+  padding-left: 24px;
 `;
 
 const Name = styled.div`
-  font-size: 18px;
-  margin-left: 20px;
+  margin-left: 24px;
 `;
 
 const Email = styled.div`
-  font-size: 16px;
   color: ${({ theme }) => theme.color.gray};
 `;
 
@@ -145,9 +140,9 @@ const HeaderField = styled.div`
   align-items: center;
   justify-content: flex-start;
   width: 100%;
-  height: 50px;
+  height: 32px;
   border-bottom: 1px solid ${({ theme }) => theme.color.black};
-  background-color: ${({ theme }) => theme.color.lightBlue};
+  background-color: ${({ theme }) => theme.color.alto};
 `;
 
 const NameHeaderField = styled(HeaderField)`
@@ -155,9 +150,9 @@ const NameHeaderField = styled(HeaderField)`
 `;
 
 const HeaderFieldName = styled.div`
-  font-size: 14px;
-  font-weight: 500;
-  color: ${({ theme }) => theme.color.gray};
+  font-size: ${({ theme }) => theme.font.size.small};
+  color: ${({ theme }) => theme.color.lightGray};
+  text-transform: uppercase;
 `;
 
 const RoleField = styled(Field)``;
@@ -165,18 +160,18 @@ const RoleField = styled(Field)``;
 const MenuField = styled(Field)`
   position: relative;
   justify-content: flex-end;
-  padding-right: 20px;
+  padding-right: 24px;
 `;
 
 const MenuWrapper = styled.div`
   width: 100%;
-  height: 50px;
+  height: 32px;
   position: absolute;
 `;
 
 const MenuButton = styled(Button)`
   width: 100%;
-  height: 50px;
+  height: 32px;
 `;
 
 const SelectStyled = styled(Select)`
@@ -187,29 +182,27 @@ const SelectStyled = styled(Select)`
 `;
 
 const InputStyled = styled(Input)`
-  width: 100%;
-  height: 50px;
-  border-bottom: 1px solid ${({ theme }) => theme.color.black};
-  padding: 0;
   display: flex;
   align-items: center;
   justify-content: center;
+  width: 100%;
+  height: 32px;
+  padding: 0;
+  border-bottom: 1px solid ${({ theme }) => theme.color.black};
 
   ${Input.Prefix} {
     position: relative;
-    margin-right: 10px;
-    height: 50px;
-    line-height: 50px;
     left: 0;
+    height: 32px;
+    margin-right: 8px;
+    line-height: 32px;
   }
 
   ${Input.InputField} {
+    padding: 0;
+    font-size: ${({ theme }) => theme.font.size.small};
+    background-color: transparent;
     border-bottom: none;
-    padding: 15px 0;
-    font-size: 14px;
-    font-weight: 500;
-    color: ${({ theme }) => theme.color.gray};
-    background-color: ${({ theme }) => theme.color.lightBlue};
   }
 `;
 
@@ -220,10 +213,11 @@ const SearchIcon = styled(Icon)`
 `;
 
 const INVITE_MEMBER_MODAL = 'inviteMemberModal';
+const REMOVE_TEAM_MODAL = 'removeTeamModal';
 
-const ROW_HEIGHT = 50;
+const ROW_HEIGHT = 56;
 const WRAPPER_PADDING = 60 * 2;
-const WIDTH_COEFFS = {
+const WIDTH_RATIO = {
   name: 0.35,
   email: 0.35,
   role: 0.2,
@@ -329,7 +323,7 @@ class TeamContainer extends Component {
       ),
     };
 
-    const getMemberSubject = member => ({
+    const getTeamMemberSubject = member => ({
       __typename: PERMISSION_ENTITY.TEAM_MEMBER,
       team_member_edit: !!member?._links?.team_member_edit,
       team_member_remove: !!member?._links?.team_member_remove,
@@ -347,7 +341,7 @@ class TeamContainer extends Component {
 
         return (
           <RoleField>
-            <Can I={PERMISSION.EDIT} of={getMemberSubject(original)}>
+            <Can I={PERMISSION.EDIT} of={getTeamMemberSubject(original)}>
               <SelectStyled
                 name="role"
                 value={original.role}
@@ -356,7 +350,7 @@ class TeamContainer extends Component {
                 boxDirection={isDropdownUp ? 'up' : 'down'}
               />
             </Can>
-            <Can not I={PERMISSION.EDIT} of={getMemberSubject(original)}>
+            <Can not I={PERMISSION.EDIT} of={getTeamMemberSubject(original)}>
               {original.role}
             </Can>
           </RoleField>
@@ -364,7 +358,7 @@ class TeamContainer extends Component {
       },
       Header: (
         <HeaderField>
-          <HeaderFieldName>ROLE</HeaderFieldName>
+          <HeaderFieldName>Role</HeaderFieldName>
         </HeaderField>
       ),
     };
@@ -375,7 +369,7 @@ class TeamContainer extends Component {
       width: columnWidths.menu,
       Cell: ({ original }) => (
         <MenuField>
-          <Can I={PERMISSION.DELETE} a={getMemberSubject(original)}>
+          <Can I={PERMISSION.DELETE} a={getTeamMemberSubject(original)}>
             <DottedMenu
               tooltipProps={{
                 textBoxWidth: '100px',
@@ -413,10 +407,10 @@ class TeamContainer extends Component {
     const wrapperWidth = this.calculateWrapperWidth();
 
     return {
-      name: wrapperWidth * WIDTH_COEFFS.name,
-      email: wrapperWidth * WIDTH_COEFFS.email,
-      role: wrapperWidth * WIDTH_COEFFS.role,
-      menu: wrapperWidth * WIDTH_COEFFS.menu,
+      name: wrapperWidth * WIDTH_RATIO.name,
+      email: wrapperWidth * WIDTH_RATIO.email,
+      role: wrapperWidth * WIDTH_RATIO.role,
+      menu: wrapperWidth * WIDTH_RATIO.menu,
     };
   };
 
@@ -467,6 +461,10 @@ class TeamContainer extends Component {
     this.handleCloseModal(INVITE_MEMBER_MODAL)();
   };
 
+  handleRemoveTeam = () => {
+    this.props.removeTeamRequest(this.props.team.id);
+  };
+
   prepareInitialState() {
     return {
       filter: {
@@ -491,14 +489,25 @@ class TeamContainer extends Component {
       );
     }
 
+    if (!team) {
+      this.props.router.push(ROUTES.SETTINGS + ROUTES.TEAM);
+
+      return null;
+    }
+
     const members = this.getMemberList(team.users, membersById);
     const filteredMembersList = this.filterMemberList(
       team.users,
       filter,
       membersById,
-    );
+    ).sort((a, b) => sortByName(a.name, b.name));
 
     const teamSubject = {
+      __typename: PERMISSION_ENTITY.TEAM,
+      team_delete: !!team?._links?.team_delete,
+    };
+
+    const teamMemberSubject = {
       __typename: PERMISSION_ENTITY.TEAM_MEMBER,
       team_member_add: !!team?._links?.team_member_add,
     };
@@ -506,18 +515,28 @@ class TeamContainer extends Component {
     return (
       <Wrapper ref={this.wrapperRef}>
         <TopWrapper>
-          <Title>{getTeamTitle(team)}</Title>
-          <Can I={PERMISSION.ADD} a={teamSubject}>
-            <ButtonsWrapper>
-              <ButtonStyled
-                withOfflineCheck
-                onClick={this.handleOpenModal(INVITE_MEMBER_MODAL)}
-                icon="plus"
-                color="black"
-              >
-                Add a member
-              </ButtonStyled>
-            </ButtonsWrapper>
+          <Title>
+            {getTeamTitle(team)} ({filteredMembersList.length})
+          </Title>
+          <Can I={PERMISSION.DELETE} a={teamSubject}>
+            <ButtonStyled
+              withOfflineCheck
+              icon="trash"
+              color="white"
+              onClick={this.handleOpenModal(REMOVE_TEAM_MODAL)}
+            >
+              Remove
+            </ButtonStyled>
+          </Can>
+          <Can I={PERMISSION.ADD} a={teamMemberSubject}>
+            <ButtonStyled
+              withOfflineCheck
+              onClick={this.handleOpenModal(INVITE_MEMBER_MODAL)}
+              icon="plus"
+              color="black"
+            >
+              Add a member
+            </ButtonStyled>
           </Can>
         </TopWrapper>
         <DataTableStyled
@@ -541,6 +560,12 @@ class TeamContainer extends Component {
             onSubmit={this.handleInvite}
           />
         )}
+        <ConfirmModal
+          isOpened={modalVisibilities[REMOVE_TEAM_MODAL]}
+          description="Are you sure you want to remove team?"
+          onClickConfirm={this.handleRemoveTeam}
+          onClickCancel={this.handleCloseModal(REMOVE_TEAM_MODAL)}
+        />
       </Wrapper>
     );
   }

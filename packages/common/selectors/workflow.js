@@ -10,6 +10,7 @@ import { itemsByIdSelector } from '@caesar/common/selectors/entities/item';
 import { childItemsByIdSelector } from '@caesar/common/selectors/entities/childItem';
 import { membersByIdSelector } from '@caesar/common/selectors/entities/member';
 import { teamsByIdSelector } from '@caesar/common/selectors/entities/team';
+import { ITEM_TYPE } from '../constants';
 
 export const workflowSelector = state => state.workflow;
 
@@ -142,7 +143,7 @@ const createListItemsList = (children, itemsById) =>
   children
     .reduce(
       (accumulator, itemId) =>
-        itemsById[itemId]?.data
+        itemsById[itemId]?.data && itemsById[itemId].type !== ITEM_TYPE.SYSTEM
           ? [...accumulator, itemsById[itemId]]
           : accumulator,
       [],

@@ -13,10 +13,10 @@ import {
   FETCH_TEAM_MEMBERS_SUCCESS,
   FETCH_TEAM_MEMBERS_FAILURE,
   ADD_MEMBERS_BATCH,
-  ADD_TEAM_TO_MEMBER,
+  ADD_TEAM_TO_MEMBER_TEAMS_LIST,
   REMOVE_TEAM_FROM_MEMBER,
   REMOVE_TEAM_FROM_MEMBERS_BATCH,
-  ADD_TEAM_TO_MEMBERS_BATCH,
+  ADD_TEAM_TO_MEMBERS_TEAMS_LIST_BATCH,
 } from '@caesar/common/actions/entities/member';
 
 const initialState = {
@@ -100,7 +100,7 @@ export default createReducer(initialState, {
       },
     };
   },
-  [ADD_TEAM_TO_MEMBER](state, { payload }) {
+  [ADD_TEAM_TO_MEMBER_TEAMS_LIST](state, { payload }) {
     return {
       ...state,
       byId: {
@@ -112,7 +112,7 @@ export default createReducer(initialState, {
       },
     };
   },
-  [ADD_TEAM_TO_MEMBERS_BATCH](state, { payload }) {
+  [ADD_TEAM_TO_MEMBERS_TEAMS_LIST_BATCH](state, { payload }) {
     return {
       ...state,
       byId: {

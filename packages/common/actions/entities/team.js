@@ -10,6 +10,10 @@ export const CREATE_TEAM_REQUEST = '@team/CREATE_TEAM_REQUEST';
 export const CREATE_TEAM_SUCCESS = '@team/CREATE_TEAM_SUCCESS';
 export const CREATE_TEAM_FAILURE = '@team/CREATE_TEAM_FAILURE';
 
+export const EDIT_TEAM_REQUEST = '@team/EDIT_TEAM_REQUEST';
+export const EDIT_TEAM_SUCCESS = '@team/EDIT_TEAM_SUCCESS';
+export const EDIT_TEAM_FAILURE = '@team/EDIT_TEAM_FAILURE';
+
 export const REMOVE_TEAM_REQUEST = '@team/REMOVE_TEAM_REQUEST';
 export const REMOVE_TEAM_SUCCESS = '@team/REMOVE_TEAM_SUCCESS';
 export const REMOVE_TEAM_FAILURE = '@team/REMOVE_TEAM_FAILURE';
@@ -85,6 +89,26 @@ export const createTeamSuccess = team => ({
 
 export const createTeamFailure = () => ({
   type: CREATE_TEAM_FAILURE,
+});
+
+export const editTeamRequest = (teamId, title, icon) => ({
+  type: EDIT_TEAM_REQUEST,
+  payload: {
+    teamId,
+    title,
+    icon,
+  },
+});
+
+export const editTeamSuccess = team => ({
+  type: EDIT_TEAM_SUCCESS,
+  payload: {
+    team,
+  },
+});
+
+export const editTeamFailure = () => ({
+  type: EDIT_TEAM_FAILURE,
 });
 
 export const removeTeamRequest = teamId => ({
@@ -174,7 +198,7 @@ export const addTeamsBatch = teamsById => ({
   },
 });
 
-export const addTeamMember = (teamId, userId, role) => ({
+export const addMemberToTeamList = (teamId, userId, role) => ({
   type: ADD_TEAM_MEMBER,
   payload: {
     teamId,

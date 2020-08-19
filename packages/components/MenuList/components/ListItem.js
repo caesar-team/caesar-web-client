@@ -10,6 +10,7 @@ import {
   createListRequest,
   editListRequest,
 } from '@caesar/common/actions/entities/list';
+import { visibleItemsSelector } from '@caesar/common/selectors/entities/item';
 import { Can } from '../../Ability';
 import { Icon } from '../../Icon';
 import { ListInput } from './ListInput';
@@ -83,6 +84,7 @@ export const ListItem = ({
   const dispatch = useDispatch();
   const currentTeam = useSelector(currentTeamSelector);
   const { id, label, children = [], teamId } = list;
+  const visibleItems = useSelector(state => visibleItemsSelector(state, { itemIds: children }));
   const isDefault = label === 'default';
   const [isEditMode, setEditMode] = useState(isCreatingMode);
   const [isOpenedPopup, setOpenedPopup] = useState(false);
@@ -162,10 +164,10 @@ export const ListItem = ({
           </div>
           <Title>{listTitle}</Title>
           <Can I={PERMISSION.EDIT} a={listSubject}>
-            <Counter>{children.length}</Counter>
+            <Counter>{visibleItems.length}</Counter>
           </Can>
           <Can not I={PERMISSION.EDIT} a={listSubject}>
-            <div>{children.length}</div>
+            <div>{visibleItems.length}</div>
           </Can>
           <Can I={PERMISSION.EDIT} a={listSubject}>
             <ActionIcon

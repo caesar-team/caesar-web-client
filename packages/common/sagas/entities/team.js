@@ -257,7 +257,7 @@ export function* addMemberToTeamListsBatchSaga({
 
     const teamItemList = yield select(teamItemListSelector, { teamId });
     const teamSystemItem = yield select(teamKeyPairSelector, { teamId });
-console.log(teamSystemItem);
+
     teamItemList.push(teamSystemItem.raw);
     const itemUserPairs = yield call(getItemUserPairs, {
       items: teamItemList,

@@ -53,8 +53,8 @@ const IconWrapper = styled.div`
 `;
 
 const IconStyled = styled(Icon)`
-  width: 60px;
-  height: 60px;
+  width: 56px;
+  height: 56px;
   cursor: pointer;
   position: absolute;
 `;
@@ -78,42 +78,85 @@ const SelectedIconWrapper = styled.div`
   background-color: ${({ theme }) => theme.color.black};
 `;
 
+const AddImgIcon = styled(Icon)`
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+`;
+
 const UploaderWrapper = styled.div`
+  position: absolute;
+  top: 0;
+  left: 0;
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 100%;
-  width: 60px;
-  height: 60px;
-  border: 1px solid ${({ theme }) => theme.color.gallery};
+  width: 56px;
+  height: 56px;
+  border: 1px dashed ${({ theme }) => theme.color.gallery};
+  border-radius: 50%;
   cursor: pointer;
+  transition: border-color 0.2s;
+
+  &:hover {
+    border-color: ${({ theme }) => theme.color.black};
+
+    ${AddImgIcon} {
+      color: ${({ theme }) => theme.color.black};
+    }
+  }
 `;
 
 const UploadedImageWrapper = styled.div`
+  position: absolute;
+  top: 0;
+  left: 0;
   display: flex;
-  position: relative;
   align-items: center;
   justify-content: center;
-  width: 60px;
-  height: 60px;
+  width: 56px;
+  height: 56px;
 `;
 
 const UploadedImage = styled.img`
-  width: 60px;
-  height: 60px;
+  width: 56px;
+  height: 56px;
   object-fit: cover;
   border-radius: 50%;
-`;
-
-const IconPlus = styled(Icon)`
-  width: 20px;
-  height: 20px;
 `;
 
 const Error = styled.div`
   width: 100%;
   margin-top: 8px;
   color: ${({ theme }) => theme.color.red};
+`;
+
+const UploaderHoverableWrapper = styled.div`
+  position: relative;
+  width: 56px;
+  height: 56px;
+
+  ${UploaderWrapper} {
+    display: ${({ shouldShowUploader }) =>
+      shouldShowUploader ? 'block' : 'none'};
+  }
+
+  ${UploadedImageWrapper} {
+    ${({ shouldShowUploader }) => shouldShowUploader && 'display: none;'}
+  }
+
+  &:hover {
+    ${UploaderWrapper} {
+      display: ${({ shouldShowUploader, shouldShowEdit }) =>
+        shouldShowUploader || shouldShowEdit ? 'flex' : 'none'};
+    }
+
+    ${UploadedImageWrapper} {
+      display: ${({ shouldShowUploader, shouldShowEdit }) =>
+        shouldShowUploader || shouldShowEdit ? 'none' : 'flex'};
+    }
+  }
 `;
 
 export const renderTeamAvatars = ({ icon }, setFieldValue) => {
@@ -135,9 +178,6 @@ export const renderTeamAvatars = ({ icon }, setFieldValue) => {
       </IconWrapper>
     );
   });
-
-  const shouldShowUploader =
-    (icon && IMAGE_BASE64_LIST.includes(icon.raw)) || !icon;
 
   const showErrors = rejectedFiles => {
     if (rejectedFiles.length > 0) {
@@ -163,10 +203,17 @@ export const renderTeamAvatars = ({ icon }, setFieldValue) => {
     return null;
   };
 
+  const isDefaultIcon = icon && IMAGE_BASE64_LIST.includes(icon.raw);
+  const isCustomIcon = icon && !isDefaultIcon;
+  const shouldShowUploader = isDefaultIcon || !icon;
+
   return (
     <AvatarsWrapper>
       {renderedAvatars}
-      {shouldShowUploader ? (
+      <UploaderHoverableWrapper
+        shouldShowUploader={shouldShowUploader}
+        shouldShowEdit={isCustomIcon}
+      >
         <Uploader
           asPreview
           name="icon"
@@ -179,20 +226,33 @@ export const renderTeamAvatars = ({ icon }, setFieldValue) => {
             <>
               <UploaderWrapper {...getRootProps()} isDragActive={isDragActive}>
                 <input {...getInputProps()} />
-                <IconPlus name="plus" />
+                {isCustomIcon ? (
+                  <AddImgIcon
+                    name="pencil"
+                    color="emperor"
+                    width={16}
+                    height={16}
+                  />
+                ) : (
+                  <AddImgIcon
+                    name="plus"
+                    color="emperor"
+                    width={16}
+                    height={16}
+                  />
+                )}
               </UploaderWrapper>
               {showErrors(rejectedFiles)}
             </>
           )}
         </Uploader>
-      ) : (
         <UploadedImageWrapper>
           <UploadedImage src={icon.raw} />
           <SelectedIconWrapper>
             <TopIconStyled name="checkmark" />
           </SelectedIconWrapper>
         </UploadedImageWrapper>
-      )}
+      </UploaderHoverableWrapper>
     </AvatarsWrapper>
   );
 };

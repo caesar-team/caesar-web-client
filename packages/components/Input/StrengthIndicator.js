@@ -22,7 +22,7 @@ const HelperText = styled(({ isActive, ...props }) => <div {...props} />)`
     margin-bottom: 0;
   }
 
-  &:before {
+  &::before {
     content: '\\A';
     width: 10px;
     height: 10px;

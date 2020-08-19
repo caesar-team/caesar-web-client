@@ -1,4 +1,7 @@
 import { getHostName } from '@caesar/common/utils/getDomainName';
+import { generateKeys } from '@caesar/common/utils/key';
+import { passwordGenerator } from '@caesar/common/utils/passwordGenerator';
+import { ITEM_TYPE } from '@caesar/common/constants';
 
 function isValidItem(item) {
   // TODO: strengthen checks
@@ -21,12 +24,12 @@ export function checkItemsAfterDecryption(items) {
   );
 }
 
-export function generateSystemItemName(teamId) {
-  return `team-${teamId}`;
+export function generateSystemItemName(entity, id) {
+  return `${entity}-${id}`;
 }
 
-export function generateSystemItemEmail(teamId) {
-  return `${generateSystemItemName(teamId)}@${getHostName()}.com`;
+export function generateSystemItemEmail(entity, id) {
+  return `${generateSystemItemName(entity, id)}@${getHostName()}.com`;
 }
 
 export function extractKeysFromSystemItem(item) {
@@ -37,4 +40,33 @@ export function extractKeysFromSystemItem(item) {
     publicKey,
     privateKey,
   };
+}
+
+export function generateSystemItem(entity, listId, entityId) {
+  const masterPassword = passwordGenerator();
+  const systemItemEmail = generateSystemItemEmail(entity, entityId);
+
+  const {
+    publicKey,
+    privateKey,
+  } = generateKeys(masterPassword, [systemItemEmail]);
+
+  const systemItemData = {
+    type: ITEM_TYPE.SYSTEM,
+    listId,
+    attachments: [
+      {
+        name: 'publicKey',
+        raw: publicKey,
+      },
+      {
+        name: 'privateKey',
+        raw: privateKey,
+      },
+    ],
+    pass: masterPassword,
+    name: generateSystemItemName(entity, entityId),
+  };
+
+  return systemItemData;
 }

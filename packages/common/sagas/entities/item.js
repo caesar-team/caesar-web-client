@@ -35,7 +35,7 @@ import {
   toggleItemToFavoriteSuccess,
   toggleItemToFavoriteFailure,
   removeChildItemsBatchFromItem,
-  updateItemField,
+  updateItemField, createItemRequest,
 } from '@caesar/common/actions/entities/item';
 import { shareItemBatchSaga } from '@caesar/common/sagas/common/share';
 import {
@@ -72,6 +72,7 @@ import { itemSelector } from '@caesar/common/selectors/entities/item';
 import {
   userDataSelector,
   currentTeamIdSelector,
+  userPersonalDefaultListIdSelector,
 } from '@caesar/common/selectors/user';
 import { addTeamKeyPair } from '@caesar/common/actions/keyStore';
 import {
@@ -106,6 +107,7 @@ import {
   personalKeyPairSelector,
   teamKeyPairSelector,
 } from '@caesar/common/selectors/keyStore';
+import { generateSystemItem } from '@caesar/common/utils/item';
 
 const ITEMS_CHUNK_SIZE = 50;
 
@@ -297,8 +299,10 @@ export function* createItemSaga({
     const isSystemItem = type === ITEM_TYPE.SYSTEM;
     const keyPair = yield select(personalKeyPairSelector);
     const user = yield select(userDataSelector);
-    const notificationText = isSystemItem ?
-      COMMON_PROGRESS_NOTIFICATION
+    const userPersonalDefaultListId =
+      yield select(userPersonalDefaultListIdSelector);
+    const notificationText = isSystemItem
+      ? COMMON_PROGRESS_NOTIFICATION
       : ENCRYPTING_ITEM_NOTIFICATION;
     let publicKey = keyPair.publicKey;
 
@@ -365,6 +369,13 @@ export function* createItemSaga({
     }
 
     if (!isSystemItem) {
+      if (!teamId && currentTeamId === TEAM_TYPE.PERSONAL) {
+        const systemItemData =
+          yield call(generateSystemItem, 'item', userPersonalDefaultListId, itemId);
+
+        yield put(createItemRequest(systemItemData));
+      }
+
       yield call(Router.push, ROUTES.DASHBOARD);
     }
   } catch (error) {

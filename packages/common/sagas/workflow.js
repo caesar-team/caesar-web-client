@@ -37,6 +37,7 @@ import {
   masterPasswordSelector,
   currentTeamIdSelector,
   userIdSelector,
+  userPersonalDefaultListIdSelector,
 } from '@caesar/common/selectors/user';
 import {
   itemSelector,
@@ -53,7 +54,7 @@ import {
 import { getFavoritesList } from '@caesar/common/normalizers/utils';
 import { fetchTeamSuccess } from '@caesar/common/actions/entities/team';
 import { getServerErrorMessage } from '@caesar/common/utils/error';
-import { generateTeamSystemItem } from '@caesar/common/sagas/entities/team';
+import { generateSystemItem } from '@caesar/common/utils/item';
 import { extractKeysFromSystemItem } from '@caesar/common/utils/item';
 import { teamAdminUsersSelector } from '@caesar/common/selectors/entities/team';
 import { setPersonalDefaultListId } from '@caesar/common/actions/user';
@@ -184,7 +185,11 @@ function* initTeam(team, withDecryption) {
     let teamKeyPair = yield select(teamKeyPairSelector, { teamId: team.id });
 
     if (!teamKeyPair.privateKey && isCurrentUserTeamAdmin) {
-      const teamSystemItem = yield call(generateTeamSystemItem, team.id);
+      const userPersonalDefaultListId =
+        yield select(userPersonalDefaultListIdSelector);
+      const teamSystemItem =
+        yield call(generateSystemItem, 'team', userPersonalDefaultListId, team.id);
+
       teamKeyPair = {
         ...extractKeysFromSystemItem(teamSystemItem),
         pass: teamSystemItem.pass,
@@ -197,7 +202,7 @@ function* initTeam(team, withDecryption) {
     if (currentTeamId === team.id && withDecryption) {
       const items = objectToArray(itemsById);
 
-      if (items && items.length > 0 && teamKeyPair.privateKey) {
+      if (items?.length > 0 && teamKeyPair.privateKey) {
         yield put(
           decryption({
             items,

@@ -83,43 +83,8 @@ import {
 import { inviteNewMemberBatchSaga } from '@caesar/common/sagas/common/invite';
 import { createChildItemsFilterSelector } from '@caesar/common/selectors/entities/childItem';
 import { updateGlobalNotification } from '@caesar/common/actions/application';
-import { generateKeys } from '@caesar/common/utils/key';
-import { passwordGenerator } from '@caesar/common/utils/passwordGenerator';
-import {
-  generateSystemItemEmail,
-  generateSystemItemName,
-} from '@caesar/common/utils/item';
+import { generateSystemItem } from '@caesar/common/utils/item';
 import { teamKeyPairSelector } from '@caesar/common/selectors/keyStore';
-
-export function* generateTeamSystemItem(teamId) {
-  const userPersonalDefaultListId = yield select(userPersonalDefaultListIdSelector);
-  const masterPassword = yield call(passwordGenerator);
-  const systemTeamEmail = yield call(generateSystemItemEmail, teamId);
-
-  const {
-    publicKey,
-    privateKey,
-  } = yield call(generateKeys, masterPassword, [systemTeamEmail]);
-
-  const systemItemData = {
-    type: ITEM_TYPE.SYSTEM,
-    listId: userPersonalDefaultListId,
-    attachments: [
-      {
-        name: 'publicKey',
-        raw: publicKey,
-      },
-      {
-        name: 'privateKey',
-        raw: privateKey,
-      },
-    ],
-    pass: masterPassword,
-    name: generateSystemItemName(teamId),
-  };
-
-  return systemItemData;
-}
 
 export function* fetchTeamsSaga() {
   try {
@@ -166,12 +131,14 @@ export function* createTeamSaga({ payload: { title, icon } }) {
     const { data: team } = yield call(postCreateTeam, { title, icon });
 
     const user = yield select(userDataSelector);
+    const userPersonalDefaultListId = yield select(userPersonalDefaultListIdSelector);
     yield put(createTeamSuccess({ ...team, __type: ENTITY_TYPE.TEAM }));
     yield put(addTeamToMemberTeamsList(team.id, user.id));
     yield put(addMemberToTeamList(team.id, user.id, COMMANDS_ROLES.USER_ROLE_ADMIN));
     yield put(addMemberToTeam(team.id));
 
-    const systemItemData = generateTeamSystemItem(team.id);
+    const systemItemData =
+      yield call(generateSystemItem,'team', userPersonalDefaultListId, team.id);
 
     yield put(createItemRequest(systemItemData));
   } catch (error) {

@@ -51,7 +51,6 @@ const StyledIcon = styled(Icon)`
 `;
 
 const Error = styled.div`
-  margin-top: 8px;
   font-size: 14px;
   color: ${({ theme }) => theme.color.red};
 `;
@@ -129,8 +128,7 @@ const Uploader = ({
                 !isMobile &&
                 ' or drag and drop your files here'}
             </Text>
-            <HintText>{hintText}</HintText>
-            {error && <Error>{error}</Error>}
+            {error ? <Error>{error}</Error> : <HintText>{hintText}</HintText>}
           </Container>
         )
       }

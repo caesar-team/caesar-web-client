@@ -1,11 +1,4 @@
-import {
-  put,
-  call,
-  takeLatest,
-  select,
-  all,
-  fork,
-} from 'redux-saga/effects';
+import { put, call, takeLatest, select, all, fork } from 'redux-saga/effects';
 import {
   FETCH_TEAMS_REQUEST,
   FETCH_TEAM_REQUEST,
@@ -42,9 +35,7 @@ import {
   removeChildItemsBatchFromItems,
   createItemRequest,
 } from '@caesar/common/actions/entities/item';
-import {
-  removeChildItemsBatch,
-} from '@caesar/common/actions/entities/childItem';
+import { removeChildItemsBatch } from '@caesar/common/actions/entities/childItem';
 import {
   setCurrentTeamId,
   leaveTeam,
@@ -92,14 +83,15 @@ import {
 import { teamKeyPairSelector } from '@caesar/common/selectors/keyStore';
 
 export function* generateTeamSystemItem(teamId) {
-  const userPersonalDefaultListId = yield select(userPersonalDefaultListIdSelector);
+  const userPersonalDefaultListId = yield select(
+    userPersonalDefaultListIdSelector,
+  );
   const masterPassword = yield call(passwordGenerator);
   const systemTeamEmail = yield call(generateSystemItemEmail, teamId);
 
-  const {
-    publicKey,
-    privateKey,
-  } = yield call(generateKeys, masterPassword, [systemTeamEmail]);
+  const { publicKey, privateKey } = yield call(generateKeys, masterPassword, [
+    systemTeamEmail,
+  ]);
 
   const systemItemData = {
     type: ITEM_TYPE.SYSTEM,
@@ -168,7 +160,9 @@ export function* createTeamSaga({ payload: { title, icon } }) {
     const user = yield select(userDataSelector);
     yield put(createTeamSuccess({ ...team, __type: ENTITY_TYPE.TEAM }));
     yield put(addTeamToMemberTeamsList(team.id, user.id));
-    yield put(addMemberToTeamList(team.id, user.id, COMMANDS_ROLES.USER_ROLE_ADMIN));
+    yield put(
+      addMemberToTeamList(team.id, user.id, COMMANDS_ROLES.USER_ROLE_ADMIN),
+    );
     yield put(addMemberToTeam(team.id));
 
     const systemItemData = generateTeamSystemItem(team.id);
@@ -228,7 +222,9 @@ export function* updateTeamMemberRoleSaga({
   }
 }
 
-export function* addMemberToTeamListsBatchSaga({ payload: { teamId, members } }) {
+export function* addMemberToTeamListsBatchSaga({
+  payload: { teamId, members },
+}) {
   try {
     const preparedMembers = yield call(prepareUsersForSharing, members);
 
@@ -335,6 +331,9 @@ export default function* teamSagas() {
   yield takeLatest(CREATE_TEAM_REQUEST, createTeamSaga);
   yield takeLatest(REMOVE_TEAM_REQUEST, removeTeamSaga);
   yield takeLatest(UPDATE_TEAM_MEMBER_ROLE_REQUEST, updateTeamMemberRoleSaga);
-  yield takeLatest(ADD_TEAM_MEMBERS_BATCH_REQUEST, addMemberToTeamListsBatchSaga);
+  yield takeLatest(
+    ADD_TEAM_MEMBERS_BATCH_REQUEST,
+    addMemberToTeamListsBatchSaga,
+  );
   yield takeLatest(REMOVE_TEAM_MEMBER_REQUEST, removeTeamMemberSaga);
 }

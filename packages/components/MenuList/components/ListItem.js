@@ -84,7 +84,9 @@ export const ListItem = ({
   const dispatch = useDispatch();
   const currentTeam = useSelector(currentTeamSelector);
   const { id, label, children = [], teamId } = list;
-  const visibleItems = useSelector(state => visibleItemsSelector(state, { itemIds: children }));
+  const visibleItems = useSelector(state =>
+    visibleItemsSelector(state, { itemIds: children }),
+  );
   const isDefault = label === 'default';
   const [isEditMode, setEditMode] = useState(isCreatingMode);
   const [isOpenedPopup, setOpenedPopup] = useState(false);

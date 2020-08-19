@@ -42,7 +42,7 @@ const IconWrapper = styled.div`
   height: 62px;
 
   &:hover {
-    &:after {
+    &::after {
       content: '';
       border: 2px solid ${({ theme }) => theme.color.black};
       height: 62px;
@@ -153,7 +153,7 @@ export const renderTeamAvatars = ({ icon }, setFieldValue) => {
             {ERROR.FILE_SIZE(
               `${Math.round(TEAM_AVATAR_MAX_SIZE / 1024 / 1024)}MB`,
             )}
-          </Error>
+          </Error>,
         );
       }
 

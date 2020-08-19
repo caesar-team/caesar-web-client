@@ -3,12 +3,12 @@ import styled from 'styled-components';
 const getPseudoStyles = ({ position = 'center', width = 2 }) => {
   if (position === 'left') {
     return `
-      &:before {
+      &::before {
         content: '';
         flex: 0;
       }
 
-      &:after {
+      &::after {
         content: '';
         border-top: ${width}px solid;
         margin: 0 16px 0 16px;
@@ -19,14 +19,14 @@ const getPseudoStyles = ({ position = 'center', width = 2 }) => {
 
   if (position === 'right') {
     return `
-      &:before {
+      &::before {
         content: '';
         border-top: ${width}px solid;
         margin: 0 16px 0 16px;
         flex: 1 0 20px;
       }
     
-      &:after {
+      &::after {
         content: '';
         flex: 0;
       }
@@ -34,15 +34,15 @@ const getPseudoStyles = ({ position = 'center', width = 2 }) => {
   }
 
   return `
-    &:before,
-    &:after {
+    &::before,
+    &::after {
       content: '';
       border-top: ${width}px solid;
       margin: 0 16px 0 0;
       flex: 1 0 20px;
     }
   
-    &:after {
+    &::after {
       margin: 0 0 0 16px;
     }
   `;

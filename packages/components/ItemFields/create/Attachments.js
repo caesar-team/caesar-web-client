@@ -48,7 +48,7 @@ const renderAttachments = (
     <FileRow key={index} disabled={disabled}>
       <File
         key={index}
-        status={checkAttachmentsError(errors, index) ? 'error' : 'uploaded'}
+        error={checkAttachmentsError(errors, index)}
         onClickDownload={() => handleClickDownloadFile(attachment)}
         onClickRemove={() =>
           setFieldValue(
@@ -58,9 +58,6 @@ const renderAttachments = (
         }
         {...attachment}
       />
-      {checkAttachmentsError(errors, index) && (
-        <TextError>{errors[index].raw}</TextError>
-      )}
     </FileRow>
   ));
 

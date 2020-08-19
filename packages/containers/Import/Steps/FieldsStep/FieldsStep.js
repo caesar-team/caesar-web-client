@@ -57,7 +57,7 @@ const Box = styled.div`
   ${({ isRequired }) =>
     isRequired &&
     `
-    &:before {
+    &::before {
       content: '●';
       position: absolute;
       top: 0;
@@ -79,7 +79,7 @@ const RequiredText = styled.div`
   position: relative;
   padding-left: 20px;
 
-  &:before {
+  &::before {
     content: '●';
     position: absolute;
     top: 0;

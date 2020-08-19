@@ -4,20 +4,16 @@ import {
   Button,
   TeamCard,
   LogoLoader,
-  NewTeamModal,
+  TeamModal,
   ConfirmModal,
   Can,
 } from '@caesar/components';
-import {
-  TEAM_TYPE,
-  PERMISSION,
-  PERMISSION_ENTITY,
-} from '@caesar/common/constants';
+import { PERMISSION, PERMISSION_ENTITY } from '@caesar/common/constants';
 
 const LogoWrapper = styled.div`
   display: flex;
   flex-direction: column;
-  background: ${({ theme }) => theme.color.lightBlue};
+  background: ${({ theme }) => theme.color.alto};
   width: 100%;
   position: relative;
   height: calc(100vh - 55px);
@@ -28,9 +24,9 @@ const LogoWrapper = styled.div`
 const Wrapper = styled.div`
   display: flex;
   flex-direction: column;
-  background: ${({ theme }) => theme.color.lightBlue};
+  background: ${({ theme }) => theme.color.alto};
   width: 100%;
-  padding: 60px;
+  padding: 40px;
   position: relative;
 `;
 
@@ -48,20 +44,13 @@ const Title = styled.div`
 
 const TeamListWrapper = styled.div`
   display: flex;
-  padding: 30px;
+  justify-content: space-between;
   flex-wrap: wrap;
-
-  > {
-    &:nth-child(2n + 1) {
-      margin-right: 60px;
-    }
-  }
 `;
 
-const TeamCardStyled = styled(TeamCard)`
-  width: calc((100% - 60px) / 2);
-  margin-bottom: 30px;
-  cursor: pointer;
+const StyledTeamCard = styled(TeamCard)`
+  width: calc((100% - 24px) / 2);
+  margin-bottom: 24px;
 `;
 
 const NEW_TEAM_MODAL = 'newTeamModal';
@@ -77,7 +66,11 @@ class TeamListContainer extends Component {
 
   handleCreateSubmit = ({ title, icon }) => {
     this.props.createTeamRequest(title, icon);
+    this.handleCloseModal(NEW_TEAM_MODAL)();
+  };
 
+  handleEditSubmit = ({ teamId, title, icon }) => {
+    this.props.editTeamRequest(teamId, title, icon);
     this.handleCloseModal(NEW_TEAM_MODAL)();
   };
 
@@ -94,11 +87,24 @@ class TeamListContainer extends Component {
   handleCloseModal = modal => () => {
     this.setState(prevState => ({
       ...prevState,
+      selectedTeamId: null,
       modalVisibilities: {
         ...prevState.modalVisibilities,
         [modal]: false,
       },
     }));
+  };
+
+  handleClickEditTeam = teamId => event => {
+    event.preventDefault();
+    event.stopPropagation();
+
+    this.setState(
+      {
+        selectedTeamId: teamId,
+      },
+      this.handleOpenModal(NEW_TEAM_MODAL),
+    );
   };
 
   handleClickRemoveTeam = teamId => event => {
@@ -144,11 +150,11 @@ class TeamListContainer extends Component {
     const { teams, members } = this.props;
 
     return teams.map(team => (
-      <TeamCardStyled
+      <StyledTeamCard
         key={team.id}
         team={team}
         members={members}
-        isRemoveButtonVisible={team.type !== TEAM_TYPE.DEFAULT}
+        onClickEditTeam={this.handleClickEditTeam(team.id)}
         onClickRemoveTeam={this.handleClickRemoveTeam(team.id)}
       />
     ));
@@ -191,8 +197,10 @@ class TeamListContainer extends Component {
         </TopWrapper>
         <TeamListWrapper>{renderedTeamCards}</TeamListWrapper>
         {modalVisibilities[NEW_TEAM_MODAL] && (
-          <NewTeamModal
-            onSubmit={this.handleCreateSubmit}
+          <TeamModal
+            teamId={this.state.selectedTeamId}
+            onCreateSubmit={this.handleCreateSubmit}
+            onEditSubmit={this.handleEditSubmit}
             onCancel={this.handleCloseModal(NEW_TEAM_MODAL)}
           />
         )}

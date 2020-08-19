@@ -134,7 +134,7 @@ export const FormHeader = ({ teamId, listId, onChangePath, className }) => {
           name="arrow-triangle"
           width={16}
           height={16}
-          color="middleGray"
+          color="black"
           isDropdownOpened={isTeamDropdownOpened}
         />
       </StyledDropdown>
@@ -150,7 +150,7 @@ export const FormHeader = ({ teamId, listId, onChangePath, className }) => {
           name="arrow-triangle"
           width={16}
           height={16}
-          color="middleGray"
+          color="black"
           isDropdownOpened={isListDropdownOpened}
         />
       </StyledDropdown>

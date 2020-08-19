@@ -184,6 +184,9 @@ export const getTeamMembers = teamId => callApi.get(`/teams/${teamId}/members`);
 
 export const postCreateTeam = data => callApi.post('/teams', data);
 
+export const editTeam = (teamId, data) =>
+  callApi.patch(`/teams/${teamId}`, data);
+
 export const deleteTeam = teamId => callApi.delete(`/teams/${teamId}`);
 
 export const getTeam = teamId => callApi.get(`/teams/${teamId}`);

@@ -34,7 +34,7 @@ const itemIdsPropSelector = (_, props) => props.itemIds;
 export const itemsBatchSelector = createSelector(
   itemsByIdSelector,
   itemIdsPropSelector,
-  (itemsById, itemIds) => itemIds.map(itemId => itemsById[itemId]),
+  (itemsById, itemIds) => itemIds.map(itemId => itemsById[itemId] || {}),
 );
 
 const teamIdPropSelector = (_, prop) => prop.teamId;

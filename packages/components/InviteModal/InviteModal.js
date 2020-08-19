@@ -13,7 +13,7 @@ const MemberListStyled = styled(MemberList)`
   margin-bottom: 30px;
 
   ${MemberList.Member} {
-    background-color: ${({ theme }) => theme.color.lightBlue};
+    background-color: ${({ theme }) => theme.color.snow};
     margin-bottom: 4px;
 
     &:last-of-type {

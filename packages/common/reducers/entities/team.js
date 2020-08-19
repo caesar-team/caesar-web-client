@@ -9,6 +9,9 @@ import {
   CREATE_TEAM_REQUEST,
   CREATE_TEAM_SUCCESS,
   CREATE_TEAM_FAILURE,
+  EDIT_TEAM_REQUEST,
+  EDIT_TEAM_SUCCESS,
+  EDIT_TEAM_FAILURE,
   REMOVE_TEAM_REQUEST,
   REMOVE_TEAM_SUCCESS,
   REMOVE_TEAM_FAILURE,
@@ -83,6 +86,21 @@ export default createReducer(initialState, {
     };
   },
   [CREATE_TEAM_FAILURE](state) {
+    return state;
+  },
+  [EDIT_TEAM_REQUEST](state) {
+    return state;
+  },
+  [EDIT_TEAM_SUCCESS](state, { payload }) {
+    return {
+      ...state,
+      byId: {
+        ...state.byId,
+        [payload.team.id]: payload.team,
+      },
+    };
+  },
+  [EDIT_TEAM_FAILURE](state) {
     return state;
   },
   [REMOVE_TEAM_REQUEST](state) {

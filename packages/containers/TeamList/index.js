@@ -4,6 +4,7 @@ import { fetchKeyPairRequest } from '@caesar/common/actions/user';
 import {
   fetchTeamsRequest,
   createTeamRequest,
+  editTeamRequest,
   removeTeamRequest,
 } from '@caesar/common/actions/entities/team';
 import { fetchMembersRequest } from '@caesar/common/actions/entities/member';
@@ -37,6 +38,7 @@ const mapDispatchToProps = {
   fetchMembersRequest,
   fetchTeamsRequest,
   createTeamRequest,
+  editTeamRequest,
   removeTeamRequest,
 };
 

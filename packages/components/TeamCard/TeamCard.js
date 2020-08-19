@@ -1,16 +1,21 @@
+/* eslint-disable camelcase */
 import React from 'react';
 import styled from 'styled-components';
 import Link from 'next/link';
 import memoizeOne from 'memoize-one';
-import { Button, AvatarsList, Can } from '@caesar/components';
 import {
   ROUTES,
   PERMISSION,
   PERMISSION_ENTITY,
 } from '@caesar/common/constants';
 import { getTeamTitle } from '@caesar/common/utils/team';
+import { Button } from '../Button';
+import { AvatarsList } from '../Avatar';
+import { Can } from '../Ability';
+import { DottedMenu } from '../DottedMenu';
 
 const Wrapper = styled.div`
+  position: relative;
   display: flex;
   flex-direction: column;
   padding: 20px;
@@ -23,7 +28,34 @@ const TeamWrapper = styled.div`
   justify-content: space-between;
   margin-bottom: 20px;
   padding-bottom: 20px;
-  border-bottom: 1px solid ${({ theme }) => theme.color.lightBlue};
+  border-bottom: 1px solid ${({ theme }) => theme.color.gallery};
+  cursor: pointer;
+`;
+
+const StyledDottedMenu = styled(DottedMenu)`
+  position: absolute;
+  top: 16px;
+  right: 16px;
+`;
+
+const MenuWrapper = styled.div`
+  position: absolute;
+  width: 100%;
+  height: 82px;
+  border: 1px solid ${({ theme }) => theme.color.gallery};
+  border-radius: 3px;
+`;
+
+const MenuButton = styled(Button)`
+  width: 100%;
+  color: ${({ theme }) => theme.color.black};
+  border: none;
+  transition: background-color 0.2s;
+
+  &:hover {
+    background-color: ${({ theme }) => theme.color.snow};
+    border: none;
+  }
 `;
 
 const TeamDetails = styled.div`
@@ -73,8 +105,8 @@ const TeamCard = ({
   className,
   team,
   members,
-  isRemoveButtonVisible = false,
   onClick = Function.prototype,
+  onClickEditTeam = Function.prototype,
   onClickRemoveTeam = Function.prototype,
 }) => {
   const { id, icon, users } = team;
@@ -82,12 +114,37 @@ const TeamCard = ({
 
   const teamSubject = {
     __typename: PERMISSION_ENTITY.TEAM,
-    // eslint-disable-next-line camelcase
+    team_edit: !!team?._links?.team_edit,
     team_delete: !!team?._links?.team_delete,
   };
 
   return (
     <Wrapper className={className} onClick={onClick}>
+      <Can I={PERMISSION.CRUD} a={teamSubject}>
+        <StyledDottedMenu
+          tooltipProps={{
+            textBoxWidth: '100px',
+            arrowAlign: 'start',
+            position: 'left top',
+            padding: '0px 0px',
+            flat: true,
+            zIndex: '1',
+          }}
+        >
+          <MenuWrapper>
+            <Can I={PERMISSION.EDIT} a={teamSubject}>
+              <MenuButton color="white" onClick={onClickEditTeam}>
+                Edit
+              </MenuButton>
+            </Can>
+            <Can I={PERMISSION.DELETE} a={teamSubject}>
+              <MenuButton color="white" onClick={onClickRemoveTeam}>
+                Remove
+              </MenuButton>
+            </Can>
+          </MenuWrapper>
+        </StyledDottedMenu>
+      </Can>
       <Link
         key={id}
         href={`${ROUTES.SETTINGS}${ROUTES.TEAM}/[id]`}
@@ -113,13 +170,6 @@ const TeamCard = ({
             avatars={getMembers(users, members)}
             visibleCount={10}
           />
-        )}
-        {isRemoveButtonVisible && (
-          <Can I={PERMISSION.DELETE} a={teamSubject}>
-            <Button color="white" onClick={onClickRemoveTeam}>
-              Remove
-            </Button>
-          </Can>
         )}
       </AvatarsWrapper>
     </Wrapper>

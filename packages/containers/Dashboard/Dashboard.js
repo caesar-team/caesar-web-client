@@ -48,7 +48,7 @@ const MiddleColumnWrapper = styled.div`
   display: flex;
   flex-direction: column;
   flex: 0 0 431px;
-  background: ${({ theme }) => theme.color.lightBlue};
+  background: ${({ theme }) => theme.color.alto};
   border-right: 1px solid ${({ theme }) => theme.color.gallery};
 `;
 

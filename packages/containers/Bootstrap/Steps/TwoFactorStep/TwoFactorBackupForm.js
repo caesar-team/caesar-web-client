@@ -78,12 +78,12 @@ const TwoFactorBackupForm = ({ codes, onSubmit }) => (
       validationSchema={agreeSchema}
       onSubmit={onSubmit}
     >
-      {({ handleSubmit, isSubmitting, isValid }) => (
+      {({ dirty, handleSubmit, isSubmitting, isValid }) => (
         <Form onSubmit={handleSubmit}>
           <AuthTitle>Save your backup codes</AuthTitle>
           <Description>
-            Backup codes let you access your account if you lose your phone. Keep
-            these codes somewhere safe but accessible.
+            Backup codes let you access your account if you lose your phone.
+            Keep these codes somewhere safe but accessible.
           </Description>
           <Codes id="codes">
             {codes.map((code, index) => (
@@ -96,21 +96,21 @@ const TwoFactorBackupForm = ({ codes, onSubmit }) => (
               icon="copy"
               onClick={() => copy(formatNumbersByColumns(codes, 4))}
             >
-              COPY
+              Copy
             </StyledButton>
             <StyledButton
               color="white"
               icon="download"
               onClick={() => downloadTextData(formatNumbersByColumns(codes, 4))}
             >
-              DOWNLOAD
+              Download
             </StyledButton>
             <StyledButton
               color="white"
               icon="print"
               onClick={() => printData(formatNumbersByColumns(codes, 4))}
             >
-              PRINT
+              Print
             </StyledButton>
           </ButtonsWrapper>
           <FastField name="agreeCheck">
@@ -120,7 +120,10 @@ const TwoFactorBackupForm = ({ codes, onSubmit }) => (
               </StyledCheckbox>
             )}
           </FastField>
-          <NextButton htmlType="submit" disabled={isSubmitting || !isValid}>
+          <NextButton
+            htmlType="submit"
+            disabled={isSubmitting || !isValid || !dirty}
+          >
             Continue
           </NextButton>
         </Form>

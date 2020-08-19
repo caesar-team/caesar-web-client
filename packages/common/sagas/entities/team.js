@@ -169,7 +169,7 @@ export function* createTeamSaga({ payload: { title, icon } }) {
     );
     yield put(addMemberToTeam(team.id));
 
-    const systemItemData = generateTeamSystemItem(team.id);
+    const systemItemData = yield call(generateTeamSystemItem, team.id);
 
     yield put(createItemRequest(systemItemData));
   } catch (error) {
@@ -257,7 +257,7 @@ export function* addMemberToTeamListsBatchSaga({
 
     const teamItemList = yield select(teamItemListSelector, { teamId });
     const teamSystemItem = yield select(teamKeyPairSelector, { teamId });
-
+console.log(teamSystemItem);
     teamItemList.push(teamSystemItem.raw);
     const itemUserPairs = yield call(getItemUserPairs, {
       items: teamItemList,

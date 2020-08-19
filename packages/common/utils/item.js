@@ -1,3 +1,5 @@
+import { getHostName } from '@caesar/common/utils/getDomainName';
+
 function isValidItem(item) {
   // TODO: strengthen checks
   if (!item.data) {
@@ -17,4 +19,22 @@ export function checkItemsAfterDecryption(items) {
       isValidItem(item) ? [...accumulator, item] : accumulator,
     [],
   );
+}
+
+export function generateSystemItemName(teamId) {
+  return `team-${teamId}`;
+}
+
+export function generateSystemItemEmail(teamId) {
+  return `${generateSystemItemName(teamId)}@${getHostName()}.com`;
+}
+
+export function extractKeysFromSystemItem(item) {
+  const publicKey = item.attachments?.find(({ name }) => name === 'publicKey')?.raw;
+  const privateKey = item.attachments?.find(({ name }) => name === 'privateKey')?.raw;
+
+  return {
+    publicKey,
+    privateKey,
+  };
 }

@@ -2,6 +2,7 @@ import { put, call, fork, takeLatest, select, all } from 'redux-saga/effects';
 import {
   INIT_WORKFLOW,
   UPDATE_WORK_IN_PROGRESS_ITEM,
+  DECRYPTION_END,
   finishIsLoading,
   setWorkInProgressListId,
   setWorkInProgressItem,
@@ -9,12 +10,16 @@ import {
   decryption,
 } from '@caesar/common/actions/workflow';
 import { addListsBatch } from '@caesar/common/actions/entities/list';
-import { addItemsBatch } from '@caesar/common/actions/entities/item';
+import {
+  addItemsBatch,
+  createItemRequest,
+} from '@caesar/common/actions/entities/item';
 import { updateGlobalNotification } from '@caesar/common/actions/application';
 import {
   SET_CURRENT_TEAM_ID,
   setCurrentTeamId,
 } from '@caesar/common/actions/user';
+import { addTeamKeyPair } from '@caesar/common/actions/keyStore';
 import { addChildItemsBatch } from '@caesar/common/actions/entities/childItem';
 import { fetchMembersSaga } from '@caesar/common/sagas/entities/member';
 import { convertNodesToEntities } from '@caesar/common/normalizers/normalizers';
@@ -26,20 +31,32 @@ import {
   favoriteListSelector,
   trashListSelector,
   currentTeamTrashListSelector,
+  defaultListSelector,
 } from '@caesar/common/selectors/entities/list';
 import {
-  keyPairSelector,
   masterPasswordSelector,
   currentTeamIdSelector,
+  userIdSelector,
 } from '@caesar/common/selectors/user';
-import { itemSelector } from '@caesar/common/selectors/entities/item';
+import {
+  itemSelector,
+  systemItemsSelector,
+} from '@caesar/common/selectors/entities/item';
 import {
   workInProgressListIdSelector,
   workInProgressItemSelector,
 } from '@caesar/common/selectors/workflow';
+import {
+  personalKeyPairSelector,
+  teamKeyPairSelector,
+} from '@caesar/common/selectors/keyStore';
 import { getFavoritesList } from '@caesar/common/normalizers/utils';
 import { fetchTeamSuccess } from '@caesar/common/actions/entities/team';
 import { getServerErrorMessage } from '@caesar/common/utils/error';
+import { generateTeamSystemItem } from '@caesar/common/sagas/entities/team';
+import { extractKeysFromSystemItem } from '@caesar/common/utils/item';
+import { teamAdminUsersSelector } from '@caesar/common/selectors/entities/team';
+import { setPersonalDefaultListId } from '@caesar/common/actions/user';
 
 function* initPersonal(withDecryption) {
   try {
@@ -56,7 +73,7 @@ function* initPersonal(withDecryption) {
     );
 
     if (withDecryption) {
-      const keyPair = yield select(keyPairSelector);
+      const keyPair = yield select(personalKeyPairSelector);
       const masterPassword = yield select(masterPasswordSelector);
       const items = sortItemsByFavorites(objectToArray(itemsById));
 
@@ -71,12 +88,14 @@ function* initPersonal(withDecryption) {
       }
     }
 
+    const defaultList = yield select(defaultListSelector);
     const trashList = yield select(trashListSelector);
     let favoritesList = yield select(favoriteListSelector);
     if (!favoritesList?.id) {
       favoritesList = getFavoritesList(itemsById, trashList?.id);
     }
 
+    yield put(setPersonalDefaultListId(defaultList.id));
     yield put(
       addListsBatch({
         ...listsById,
@@ -123,6 +142,9 @@ function* initTeam(team, withDecryption) {
       return;
     }
 
+    const teamAdmins = yield select(teamAdminUsersSelector, { teamId: team.id });
+    const currentUserId = yield select(userIdSelector);
+    const isCurrentUserTeamAdmin = teamAdmins.includes(currentUserId);
     const { data: lists } = yield call(getTeamLists, team.id);
     const { listsById, itemsById, childItemsById } = convertNodesToEntities(
       lists,
@@ -159,17 +181,28 @@ function* initTeam(team, withDecryption) {
 
     yield put(resetWorkInProgressItemIds(null));
 
+    let teamKeyPair = yield select(teamKeyPairSelector, { teamId: team.id });
+
+    if (!teamKeyPair.privateKey && isCurrentUserTeamAdmin) {
+      const teamSystemItem = yield call(generateTeamSystemItem, team.id);
+      teamKeyPair = {
+        ...extractKeysFromSystemItem(teamSystemItem),
+        pass: teamSystemItem.pass,
+      };
+
+      yield put(addTeamKeyPair(teamSystemItem));
+      yield put(createItemRequest(teamSystemItem));
+    }
+
     if (currentTeamId === team.id && withDecryption) {
-      const keyPair = yield select(keyPairSelector);
-      const masterPassword = yield select(masterPasswordSelector);
       const items = objectToArray(itemsById);
 
-      if (items && items.length > 0) {
+      if (items && items.length > 0 && teamKeyPair.privateKey) {
         yield put(
           decryption({
             items,
-            key: keyPair.privateKey,
-            masterPassword,
+            key: teamKeyPair.privateKey,
+            masterPassword: teamKeyPair.pass,
           }),
         );
       }
@@ -249,8 +282,22 @@ export function* setCurrentTeamIdWatchSaga({
   }
 }
 
+export function* decryptionEndWatchSaga() {
+  try {
+    const systemItems = yield select(systemItemsSelector);
+
+    if (systemItems.length > 0) {
+      yield all(systemItems => put(addTeamKeyPair(item)));
+    }
+
+  } catch(error) {
+    console.log(error);
+  }
+}
+
 export default function* workflowSagas() {
   yield takeLatest(INIT_WORKFLOW, initWorkflow);
   yield takeLatest(UPDATE_WORK_IN_PROGRESS_ITEM, updateWorkInProgressItemSaga);
   yield takeLatest(SET_CURRENT_TEAM_ID, setCurrentTeamIdWatchSaga);
+  yield takeLatest(DECRYPTION_END, decryptionEndWatchSaga);
 }

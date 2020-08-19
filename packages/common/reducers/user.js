@@ -13,7 +13,8 @@ import {
   SET_KEY_PAIR,
   SET_CURRENT_TEAM_ID,
   LEAVE_TEAM,
-  JOIN_TEAM,
+  ADD_MEMBER_TO_TEAM,
+  SET_PERSONAL_DEFAULT_LIST_ID,
 } from '@caesar/common/actions/user';
 
 const initialState = {
@@ -23,6 +24,7 @@ const initialState = {
   masterPassword: null,
   teamIds: [],
   currentTeamId: null,
+  personalDefaultListId: null,
   data: null,
 };
 
@@ -71,13 +73,19 @@ export default createReducer(initialState, {
   [SET_CURRENT_TEAM_ID](state, { payload }) {
     return { ...state, currentTeamId: payload.teamId };
   },
-  [JOIN_TEAM](state, { payload }) {
+  [ADD_MEMBER_TO_TEAM](state, { payload }) {
     return { ...state, teamIds: [...state.teamIds, payload.teamId] };
   },
   [LEAVE_TEAM](state, { payload }) {
     return {
       ...state,
       teamIds: state.teamIds.filter(teamId => teamId !== payload.teamId),
+    };
+  },
+  [SET_PERSONAL_DEFAULT_LIST_ID](state, { payload }) {
+    return {
+      ...state,
+      personalDefaultListId: payload.listId,
     };
   },
 });

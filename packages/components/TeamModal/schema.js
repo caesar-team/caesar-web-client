@@ -1,4 +1,5 @@
 import * as yup from 'yup';
+import { SCHEMA } from '@caesar/common/validation/schema';
 import {
   BASE_64_LENGTH_BYTE_RATE,
   convertSizeNameToNumber,
@@ -11,9 +12,8 @@ const checkFileSize = raw =>
   raw.length * BASE_64_LENGTH_BYTE_RATE <= convertSizeNameToNumber(MAX_SIZE);
 
 export const schema = yup.object({
-  title: yup.string().required(),
+  title: SCHEMA.REQUIRED_FIELD,
   icon: yup.object({
-    name: yup.string().required(),
     raw: yup
       .string()
       .test('fileSize', `Maximum file size is ${MAX_SIZE}`, checkFileSize),

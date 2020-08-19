@@ -117,6 +117,10 @@ export function* shareItemBatchSaga({
       const items = yield select(itemsBatchSelector, { itemIds });
     }
 
+    if (teamIds.length) {
+
+    }
+
     const preparedMembers = yield call(prepareUsersForSharing, members);
 
     const newMembers = preparedMembers.filter(({ isNew }) => isNew);
@@ -197,7 +201,6 @@ export function* removeShareSaga({ payload: { shareId } }) {
     yield put(removeShareFailure());
   }
 }
-
 
 export function* shareItemSagas() {
   yield takeLatest(SHARE_ITEM_BATCH_REQUEST, shareItemBatchSaga);

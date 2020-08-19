@@ -126,7 +126,9 @@ export function* createTeamSaga({ payload: { title, icon } }) {
     const { data: team } = yield call(postCreateTeam, { title, icon });
 
     const user = yield select(userDataSelector);
-    const userPersonalDefaultListId = yield select(userPersonalDefaultListIdSelector);
+    const userPersonalDefaultListId = yield select(
+      userPersonalDefaultListIdSelector,
+    );
     yield put(createTeamSuccess({ ...team, __type: ENTITY_TYPE.TEAM }));
     yield put(addTeamToMemberTeamsList(team.id, user.id));
     yield put(
@@ -134,8 +136,12 @@ export function* createTeamSaga({ payload: { title, icon } }) {
     );
     yield put(addMemberToTeam(team.id));
 
-    const systemItemData =
-      yield call(generateSystemItem,'team', userPersonalDefaultListId, team.id);
+    const systemItemData = yield call(
+      generateSystemItem,
+      'team',
+      userPersonalDefaultListId,
+      team.id,
+    );
 
     yield put(createItemRequest(systemItemData));
   } catch (error) {

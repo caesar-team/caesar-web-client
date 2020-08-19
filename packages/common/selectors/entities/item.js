@@ -77,21 +77,25 @@ export const systemItemsSelector = createSelector(
 export const systemItemsBatchSelector = createSelector(
   systemItemsSelector,
   itemIdsPropSelector,
-  (systemItems, itemIds) => itemIds.map(
-    itemId => systemItems.find(({ name }) =>
-      name === generateSystemItemName('item', itemId)) || {},
-  ),
+  (systemItems, itemIds) =>
+    itemIds.map(
+      itemId =>
+        systemItems.find(
+          ({ name }) => name === generateSystemItemName('item', itemId),
+        ) || {},
+    ),
 );
 
 export const teamSystemItemSelector = createSelector(
   systemItemsSelector,
   currentTeamSelector,
   (items, currentTeam) =>
-  (items, currentTeam) => items.find(({ name }) =>
-    name === generateSystemItemName('team', currentTeam.id)) || {},
+    items.find(
+      ({ name }) => name === generateSystemItemName('team', currentTeam.id),
+    ) || {},
 );
 
 export const visibleItemsSelector = createSelector(
   itemsBatchSelector,
-  items => items.filter(({ type }) => type !== ITEM_TYPE.SYSTEM) || []  ,
+  items => items.filter(({ type }) => type !== ITEM_TYPE.SYSTEM) || [],
 );

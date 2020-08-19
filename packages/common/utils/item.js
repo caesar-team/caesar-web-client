@@ -33,8 +33,10 @@ export function generateSystemItemEmail(entity, id) {
 }
 
 export function extractKeysFromSystemItem(item) {
-  const publicKey = item.attachments?.find(({ name }) => name === 'publicKey')?.raw;
-  const privateKey = item.attachments?.find(({ name }) => name === 'privateKey')?.raw;
+  const publicKey = item.attachments?.find(({ name }) => name === 'publicKey')
+    ?.raw;
+  const privateKey = item.attachments?.find(({ name }) => name === 'privateKey')
+    ?.raw;
 
   return {
     publicKey,
@@ -46,10 +48,9 @@ export function generateSystemItem(entity, listId, entityId) {
   const masterPassword = passwordGenerator();
   const systemItemEmail = generateSystemItemEmail(entity, entityId);
 
-  const {
-    publicKey,
-    privateKey,
-  } = generateKeys(masterPassword, [systemItemEmail]);
+  const { publicKey, privateKey } = generateKeys(masterPassword, [
+    systemItemEmail,
+  ]);
 
   const systemItemData = {
     type: ITEM_TYPE.SYSTEM,

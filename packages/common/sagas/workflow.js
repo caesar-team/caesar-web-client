@@ -116,8 +116,9 @@ function* initPersonal(withDecryption) {
 
     const workInProgressItem = yield select(workInProgressItemSelector);
 
-    if (!workInProgressItem
-      || ![currentTeamId, null].includes(workInProgressItem?.teamId)
+    if (
+      !workInProgressItem ||
+      ![currentTeamId, null].includes(workInProgressItem?.teamId)
     ) {
       yield put(setWorkInProgressItem(null));
     }
@@ -143,7 +144,9 @@ function* initTeam(team, withDecryption) {
       return;
     }
 
-    const teamAdmins = yield select(teamAdminUsersSelector, { teamId: team.id });
+    const teamAdmins = yield select(teamAdminUsersSelector, {
+      teamId: team.id,
+    });
     const currentUserId = yield select(userIdSelector);
     const isCurrentUserTeamAdmin = teamAdmins.includes(currentUserId);
     const { data: lists } = yield call(getTeamLists, team.id);
@@ -185,10 +188,15 @@ function* initTeam(team, withDecryption) {
     let teamKeyPair = yield select(teamKeyPairSelector, { teamId: team.id });
 
     if (!teamKeyPair.privateKey && isCurrentUserTeamAdmin) {
-      const userPersonalDefaultListId =
-        yield select(userPersonalDefaultListIdSelector);
-      const teamSystemItem =
-        yield call(generateSystemItem, 'team', userPersonalDefaultListId, team.id);
+      const userPersonalDefaultListId = yield select(
+        userPersonalDefaultListIdSelector,
+      );
+      const teamSystemItem = yield call(
+        generateSystemItem,
+        'team',
+        userPersonalDefaultListId,
+        team.id,
+      );
 
       teamKeyPair = {
         ...extractKeysFromSystemItem(teamSystemItem),
@@ -294,8 +302,7 @@ export function* decryptionEndWatchSaga() {
     if (systemItems.length > 0) {
       yield all(systemItems => put(addTeamKeyPair(item)));
     }
-
-  } catch(error) {
+  } catch (error) {
     console.log(error);
   }
 }

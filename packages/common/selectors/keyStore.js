@@ -9,7 +9,7 @@ import { KEY_TYPE, TEAM_TYPE } from '@caesar/common/constants';
 
 const findTeamItemByName = (data, teamId) =>
   Object.values(data[KEY_TYPE.TEAM]).find(
-    ({ name }) => name === generateSystemItemName(teamId),
+    ({ name }) => name === generateSystemItemName('team', teamId),
   ) || {};
 
 export const keyStoreSelector = state => state.keyStore;

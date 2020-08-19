@@ -291,8 +291,9 @@ export function* createItemSaga({
     const isSystemItem = type === ITEM_TYPE.SYSTEM;
     const keyPair = yield select(personalKeyPairSelector);
     const user = yield select(userDataSelector);
-    const userPersonalDefaultListId =
-      yield select(userPersonalDefaultListIdSelector);
+    const userPersonalDefaultListId = yield select(
+      userPersonalDefaultListIdSelector,
+    );
     const notificationText = isSystemItem
       ? COMMON_PROGRESS_NOTIFICATION
       : ENCRYPTING_ITEM_NOTIFICATION;
@@ -302,7 +303,7 @@ export function* createItemSaga({
 
     if (teamId) {
       const teamSystemItem = yield select(teamKeyPairSelector, {
-        teamId,
+        teamId: teamId,
       });
       publicKey = teamSystemItem.publicKey;
     }
@@ -365,8 +366,12 @@ export function* createItemSaga({
 
     if (!isSystemItem) {
       if (!teamId && currentTeamId === TEAM_TYPE.PERSONAL) {
-        const systemItemData =
-          yield call(generateSystemItem, 'item', userPersonalDefaultListId, itemId);
+        const systemItemData = yield call(
+          generateSystemItem,
+          'item',
+          userPersonalDefaultListId,
+          itemId,
+        );
 
         yield put(createItemRequest(systemItemData));
       }

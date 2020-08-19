@@ -82,8 +82,8 @@ const TwoFactorBackupForm = ({ codes, onSubmit }) => (
         <Form onSubmit={handleSubmit}>
           <AuthTitle>Save your backup codes</AuthTitle>
           <Description>
-            Backup codes let you access your account if you lose your phone. Keep
-            these codes somewhere safe but accessible.
+            Backup codes let you access your account if you lose your phone.
+            Keep these codes somewhere safe but accessible.
           </Description>
           <Codes id="codes">
             {codes.map((code, index) => (

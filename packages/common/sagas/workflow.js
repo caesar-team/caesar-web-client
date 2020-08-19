@@ -18,6 +18,7 @@ import { updateGlobalNotification } from '@caesar/common/actions/application';
 import {
   SET_CURRENT_TEAM_ID,
   setCurrentTeamId,
+  setPersonalDefaultListId,
 } from '@caesar/common/actions/user';
 import { addTeamKeyPair } from '@caesar/common/actions/keyStore';
 import { addChildItemsBatch } from '@caesar/common/actions/entities/childItem';
@@ -56,7 +57,6 @@ import { getServerErrorMessage } from '@caesar/common/utils/error';
 import { generateTeamSystemItem } from '@caesar/common/sagas/entities/team';
 import { extractKeysFromSystemItem } from '@caesar/common/utils/item';
 import { teamAdminUsersSelector } from '@caesar/common/selectors/entities/team';
-import { setPersonalDefaultListId } from '@caesar/common/actions/user';
 
 function* initPersonal(withDecryption) {
   try {
@@ -115,8 +115,9 @@ function* initPersonal(withDecryption) {
 
     const workInProgressItem = yield select(workInProgressItemSelector);
 
-    if (!workInProgressItem
-      || ![currentTeamId, null].includes(workInProgressItem?.teamId)
+    if (
+      !workInProgressItem ||
+      ![currentTeamId, null].includes(workInProgressItem?.teamId)
     ) {
       yield put(setWorkInProgressItem(null));
     }
@@ -143,7 +144,9 @@ function* initTeam(team, withDecryption) {
       return;
     }
 
-    const teamAdmins = yield select(teamAdminUsersSelector, { teamId: team.id });
+    const teamAdmins = yield select(teamAdminUsersSelector, {
+      teamId: team.id,
+    });
     const currentUserId = yield select(userIdSelector);
     const isCurrentUserTeamAdmin = teamAdmins.includes(currentUserId);
     const { data: lists } = yield call(getTeamLists, team.id);
@@ -293,8 +296,7 @@ export function* decryptionEndWatchSaga() {
     if (systemItems.length > 0) {
       yield all(systemItems => put(addTeamKeyPair(item)));
     }
-
-  } catch(error) {
+  } catch (error) {
     console.log(error);
   }
 }

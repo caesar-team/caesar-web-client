@@ -316,13 +316,13 @@ export function* createItemSaga({
       publicKey = teamSystemItem.publicKey;
     }
 
-    //   return false;
-    // }
     const encryptedItem = yield call(
       encryptItem,
-      { attachments, raws, ...data },
+      { data: { attachments, ...data } },
       publicKey,
     );
+
+    const encryptedItemRaws = yield call(encryptItem, raws, publicKey);
 
     if (!isSystemItem) {
       yield put(updateGlobalNotification(CREATING_ITEM_NOTIFICATION, true));
@@ -333,9 +333,13 @@ export function* createItemSaga({
     } = yield call(postCreateItem, {
       listId,
       type,
-      secret: encryptedItem,
+      secret: JSON.stringify({
+        data: encryptedItem,
+        raws: encryptedItemRaws,
+      }),
     });
 
+    // TODO: Make the class of the item instead of the direct object
     const newItem = {
       id: itemId,
       listId,
@@ -347,8 +351,11 @@ export function* createItemSaga({
       tags: [],
       teamId: teamId || null,
       ownerId: user.id,
-      secret: encryptedItem,
-      data: { attachments, ...data },
+      secret: JSON.stringify({
+        data: encryptedItem,
+        raws: encryptedItemRaws,
+      }),
+      data: { attachments, raws, ...data },
       _links,
       __type: ENTITY_TYPE.ITEM,
     };
@@ -402,8 +409,9 @@ export function* createItemsBatchSaga({
     const user = yield select(userDataSelector);
 
     const preparedForEncryptingItems = items.map(
-      ({ attachments, type, ...data }) => ({
+      ({ attachments, raws, type, ...data }) => ({
         attachments,
+        raws,
         ...data,
       }),
     );

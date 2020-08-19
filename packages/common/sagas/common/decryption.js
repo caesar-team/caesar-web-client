@@ -61,6 +61,7 @@ export function* decryption({ items, key, masterPassword, coresCount }) {
           break;
       }
     } catch (error) {
+      // eslint-disable-next-line no-console
       console.log(error);
     }
   }

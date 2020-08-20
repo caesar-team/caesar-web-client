@@ -149,6 +149,10 @@ class TeamListContainer extends Component {
   renderTeamCards() {
     const { teams, members } = this.props;
 
+    if (!teams.length) {
+      return <div>No teams</div>;
+    }
+
     return teams.map(team => (
       <StyledTeamCard
         key={team.id}

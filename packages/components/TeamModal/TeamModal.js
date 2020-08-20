@@ -41,7 +41,7 @@ const ButtonWrapper = styled.div`
 
 const getInitialValues = team => ({
   title: team?.title || '',
-  icon: { raw: team?.icon },
+  icon: { raw: team?.icon || null },
 });
 
 const TeamModal = ({

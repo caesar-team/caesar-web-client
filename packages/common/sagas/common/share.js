@@ -1,4 +1,4 @@
-import { call, select, all, takeLatest, put } from '@redux-saga/core/effects';
+import { call, select, all, takeLatest, put, fork, take } from '@redux-saga/core/effects';
 import { getOrCreateMemberBatchSaga } from '@caesar/common/sagas/entities/member';
 import {
   itemChildItemsSelector,
@@ -112,9 +112,9 @@ export function* shareItemBatchSaga({
     let items = yield select(itemsBatchSelector, { itemIds });
 
     if (currentTeamId === TEAM_TYPE.PERSONAL) {
-      const systemItems = yield select(systemItemsBatchSelector, { itemIds });
-      console.log(systemItems);
-      items = systemItems.map(item => item.raw);
+      const items = yield select(systemItemsBatchSelector, { itemIds });
+      console.log(items);
+      //items = systemItems.map(item => item.raw);
     }
 
     const preparedMembers = yield call(prepareUsersForSharing, members);

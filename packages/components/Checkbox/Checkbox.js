@@ -25,7 +25,7 @@ const Box = styled.span`
   border: 1px solid ${({ theme }) => theme.color.gallery};
   border-radius: 2px;
   background-color: ${({ theme }) => theme.color.white};
-  transition: 0.3s;
+  transition: 0.2s;
   ${({ isFocused, theme }) =>
     isFocused && `border-color: ${theme.color.black}`};
 

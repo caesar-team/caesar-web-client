@@ -229,17 +229,12 @@ export const renderTeamAvatars = ({ icon }, setFieldValue) => {
                 {isCustomIcon ? (
                   <AddImgIcon
                     name="pencil"
-                    color="emperor"
+                    color="gray"
                     width={16}
                     height={16}
                   />
                 ) : (
-                  <AddImgIcon
-                    name="plus"
-                    color="emperor"
-                    width={16}
-                    height={16}
-                  />
+                  <AddImgIcon name="plus" color="gray" width={16} height={16} />
                 )}
               </UploaderWrapper>
               {showErrors(rejectedFiles)}

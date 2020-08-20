@@ -20,12 +20,6 @@ const AddButton = styled.button`
   }
 `;
 
-const IconStyled = styled(Icon)`
-  width: 14px;
-  height: 14px;
-  fill: ${({ theme }) => theme.color.white};
-`;
-
 const AddControl = ({ className, onClick }) => {
   const handleClick = e => {
     e.stopPropagation();
@@ -34,7 +28,7 @@ const AddControl = ({ className, onClick }) => {
 
   return (
     <AddButton className={className} onClick={handleClick}>
-      <IconStyled name="plus" />
+      <Icon name="plus" color="white" width={14} height={14} />
     </AddButton>
   );
 };

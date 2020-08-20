@@ -41,7 +41,7 @@ const Wrapper = styled.div`
   flex-direction: column;
   background: ${({ theme }) => theme.color.alto};
   width: 100%;
-  max-width: calc(100vw - 300px);
+  max-width: calc(100vw - 56px);
   padding: 40px;
   position: relative;
 `;
@@ -63,6 +63,7 @@ const ButtonStyled = styled(Button)`
 `;
 
 const DataTableStyled = styled(DataTable)`
+  height: 100%;
   border: none;
 
   .rt-table,

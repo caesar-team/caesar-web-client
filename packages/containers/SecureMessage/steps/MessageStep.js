@@ -26,7 +26,6 @@ export const MessageStep = ({ decryptedMessage, onFileClick = () => {} }) => {
   );
 
   const text = String.raw`${decryptedMessage.text}`;
-  // TODO: Should we remove dangerouslySetInnerHTML?
   const result = escapeHTML(decodeURIComponent(text));
 
   return (

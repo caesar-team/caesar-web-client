@@ -171,7 +171,7 @@ export function* createTeamSaga({ payload: { title, icon } }) {
     );
     yield put(addMemberToTeam(team.id));
 
-    const systemItemData = generateTeamSystemItem(team.id);
+    const systemItemData = yield call(generateTeamSystemItem, team.id);
 
     yield put(createItemRequest(systemItemData));
   } catch (error) {

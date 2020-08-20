@@ -195,7 +195,7 @@ const renderAttachments = (
     <FileRow key={index} disabled={isSubmitting}>
       <File
         key={index}
-        status={checkAttachmentsError(errors, index) ? 'error' : 'uploaded'}
+        error={checkAttachmentsError(errors, index)}
         onClickDownload={() => handleClickDownloadFile(file)}
         onClickRemove={() =>
           setFieldValue(
@@ -205,9 +205,6 @@ const renderAttachments = (
         }
         attachment={makeAttachemntFromFile(file)}
       />
-      {checkAttachmentsError(errors, index) && (
-        <TextError>{errors[index].raw}</TextError>
-      )}
     </FileRow>
   ));
 };

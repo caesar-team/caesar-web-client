@@ -13,16 +13,19 @@ export const Wrapper = styled.div`
   padding: 24px 16px;
   background-color: ${({ theme }) => theme.color.emperor};
 `;
+
 export const Title = styled.div`
   font-size: 18px;
   color: ${({ theme }) => theme.color.lightGray};
   margin-bottom: 23px;
   margin-top: 50px;
 `;
+
 export const StyledLogo = styled(Icon)`
   margin-top: auto;
   fill: ${({ theme }) => theme.color.white};
 `;
+
 export const ButtonsWrapper = styled.div`
   display: flex;
   justify-content: center;
@@ -34,6 +37,7 @@ export const ButtonsWrapper = styled.div`
     width: 100%;
   `}
 `;
+
 export const ButtonStyled = styled(Button)`
   ${media.mobile`
     width: 100%;
@@ -48,6 +52,7 @@ export const ButtonStyled = styled(Button)`
   `}
   }
 `;
+
 export const Footer = styled.div`
   margin-top: auto;
 
@@ -55,6 +60,7 @@ export const Footer = styled.div`
     margin-top: 24px;
   `}
 `;
+
 export const StyledLink = styled.a`
   font-size: ${({ theme }) => theme.font.size.small};
   color: ${({ theme }) => theme.color.white};

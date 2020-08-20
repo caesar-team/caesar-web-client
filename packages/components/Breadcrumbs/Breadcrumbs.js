@@ -12,7 +12,7 @@ const Item = styled.div`
   color: ${({ isFirst, theme }) =>
     isFirst ? theme.color.black : theme.color.gray};
 
-  &:after {
+  &::after {
     content: '—';
     margin: 0 8px;
     color: ${({ theme }) => theme.color.gallery};

@@ -9,6 +9,7 @@ export const MessageWrapper = styled.div`
   padding: 22px 24px 24px;
   background: ${({ theme }) => theme.color.darkGray};
 `;
+
 export const Message = styled(ContentEditable)`
   width: 100%;
   height: 100%;
@@ -20,14 +21,17 @@ export const Message = styled(ContentEditable)`
   white-space: pre-wrap;
   ${({ withAttach }) => withAttach && 'margin-bottom: 20px;'};
 `;
+
 export const Separator = styled.div`
   width: 100%;
   height: 1px;
   background: ${({ theme }) => theme.color.emperor};
 `;
+
 export const Attachments = styled.div`
   ${({ withText }) => withText && 'margin-top: 24px;'}
 `;
+
 export const FileStyled = styled(File)`
   ${File.FileName} {
     color: ${({ theme }) => theme.color.white};

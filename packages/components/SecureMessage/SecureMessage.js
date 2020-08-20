@@ -77,6 +77,7 @@ const SecureMessageComponent = ({
         notification.show({
           text: SAVE_NOTIFICATION,
           options: {
+            timeout: 0,
             position: 'bottom-right',
           },
         });
@@ -88,12 +89,17 @@ const SecureMessageComponent = ({
         })
           .then(({ id }) => {
             setSubmitting(false);
-            if (!id) {
-              setFieldError('form', DEFAULT_ERROR_MESSAGE);
-              notification.hide();
 
-              return false;
+            if (!id) {
+              notification.hide();
+              setFieldError(
+                'form',
+                'No connection to server. Please try again later.',
+              );
+
+              return;
             }
+
             setState({
               step: SECURE_MESSAGE_LINK_STEP,
               password: passphrase,
@@ -101,8 +107,6 @@ const SecureMessageComponent = ({
               requests: requestsLimit,
               messageId: id,
             });
-
-            return true;
           })
           .catch(error => {
             logger.error('Error: %o', error);

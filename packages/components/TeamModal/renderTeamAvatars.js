@@ -219,7 +219,7 @@ export const renderTeamAvatars = ({ icon }, setFieldValue) => {
           name="icon"
           accept="image/*"
           maxSize={TEAM_AVATAR_MAX_SIZE}
-          files={icon ? [icon] : []}
+          files={icon?.raw ? [icon] : []}
           onChange={(_, file) => setFieldValue('icon', file)}
         >
           {({ getRootProps, getInputProps, isDragActive, rejectedFiles }) => (

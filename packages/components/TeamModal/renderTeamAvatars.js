@@ -203,9 +203,9 @@ export const renderTeamAvatars = ({ icon }, setFieldValue) => {
     return null;
   };
 
-  const isDefaultIcon = icon && IMAGE_BASE64_LIST.includes(icon.raw);
-  const isCustomIcon = icon && !isDefaultIcon;
-  const shouldShowUploader = isDefaultIcon || !icon;
+  const isDefaultIcon = icon.raw && IMAGE_BASE64_LIST.includes(icon.raw);
+  const isCustomIcon = icon.raw && !isDefaultIcon;
+  const shouldShowUploader = isDefaultIcon || !icon.raw;
 
   return (
     <AvatarsWrapper>

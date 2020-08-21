@@ -171,7 +171,6 @@ function* initPersonal(withDecryption) {
 
 function* initTeam(team, withDecryption) {
   try {
-    console.log('Init team');
     yield put(fetchTeamSuccess(team));
 
     const currentTeamId = yield select(currentTeamIdSelector);

@@ -26,12 +26,14 @@ export function generateSystemItemName(teamId) {
 }
 
 export function generateSystemItemEmail(teamId) {
-  return `${generateSystemItemName(teamId)}@${getHostName()}.com`;
+  return `${generateSystemItemName(teamId)}@${getHostName()}`;
 }
 
 export function extractKeysFromSystemItem(item) {
-  const publicKey = item.attachments?.find(({ name }) => name === 'publicKey')?.raw;
-  const privateKey = item.attachments?.find(({ name }) => name === 'privateKey')?.raw;
+  const publicKey = item.attachments?.find(({ name }) => name === 'publicKey')
+    ?.raw;
+  const privateKey = item.attachments?.find(({ name }) => name === 'privateKey')
+    ?.raw;
 
   return {
     publicKey,

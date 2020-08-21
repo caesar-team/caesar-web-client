@@ -3,6 +3,7 @@ import React, { memo, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import styled from 'styled-components';
 import { PERMISSION, PERMISSION_ENTITY } from '@caesar/common/constants';
+import { splitItemAttachments } from '@caesar/common/utils/item';
 import { workInProgressItemSelector } from '@caesar/common/selectors/workflow';
 import {
   trashListSelector,
@@ -63,7 +64,19 @@ const ItemComponent = ({
 
   const handleClickAcceptEdit = patchData => {
     setSubmitting(true);
-    const updatedData = { ...data, listId, ...patchData };
+
+    const { attachments, raws } = splitItemAttachments(patchData);
+
+    const updatedData = {
+      ...item,
+      data: {
+        ...data,
+        attachments: patchData?.attachments || attachments,
+        raws: patchData?.raws || raws,
+      },
+      listId,
+    };
+
     dispatch(editItemRequest(updatedData, setSubmitting, notification));
   };
 

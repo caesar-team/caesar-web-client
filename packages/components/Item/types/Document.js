@@ -12,7 +12,7 @@ export const Document = ({
   isSharedItem,
 }) => {
   const {
-    data: { name, note, attachments = [], raws = [] },
+    data: { name, note, attachments, raws },
   } = item;
 
   return (

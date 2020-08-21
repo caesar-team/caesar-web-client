@@ -19,7 +19,7 @@ export const Credentials = ({
   isSharedItem,
 }) => {
   const {
-    data: { name, login, pass, website, note, attachments = [], raws = [] },
+    data: { name, login, pass, website, note, attachments, raws },
   } = item;
 
   return (

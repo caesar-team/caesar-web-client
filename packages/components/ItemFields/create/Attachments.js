@@ -38,7 +38,6 @@ const checkAttachmentsError = (errors, index) =>
 
 const renderAttachments = (
   attachments = [],
-  raws = [],
   errors = [],
   setFieldValue,
   disabled,

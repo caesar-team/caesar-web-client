@@ -69,7 +69,7 @@ const AddNewAttach = styled.div`
 `;
 
 export const Attachments = ({
-  attachments,
+  attachments = [],
   raws = [],
   itemSubject,
   onClickAcceptEdit,
@@ -87,16 +87,21 @@ export const Attachments = ({
   };
 
   const handleClickDownloadAll = () => {
-    downloadAsZip(attachments);
+    const files = attachments.map((attachment, index) => ({
+      raw: raws[index],
+      name: `${attachment.name}.${attachment.ext}`,
+    }));
+
+    downloadAsZip(files);
   };
 
   const onClickRemove = index => {
-    // const updatedAttachments = attachments.filter(file => file.raw !== raw);
-    const updatedAttachments = attachments.splice(index, 1);
-    const updatedRaws = raws.splice(index, 1);
+    attachments.splice(index, 1);
+    raws.splice(index, 1);
+
     onClickAcceptEdit({
-      attachments: updatedAttachments,
-      raws: updatedRaws,
+      attachments,
+      raws,
     });
   };
 
@@ -150,9 +155,7 @@ export const Attachments = ({
               key={attachment.name}
               itemSubject={itemSubject}
               onClickDownload={() => handleClickDownloadFile(attachment, index)}
-              onClickRemove={
-                onClickAcceptEdit && (() => onClickRemove(raws[index]))
-              }
+              onClickRemove={onClickAcceptEdit && (() => onClickRemove(index))}
               attachment={attachment}
             />
           ))}

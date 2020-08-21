@@ -2,6 +2,7 @@ import { put, call, fork, takeLatest, select, all } from 'redux-saga/effects';
 import {
   INIT_WORKFLOW,
   UPDATE_WORK_IN_PROGRESS_ITEM,
+  SET_WORK_IN_PROGRESS_ITEM,
   DECRYPTION_END,
   finishIsLoading,
   setWorkInProgressListId,
@@ -77,7 +78,7 @@ function* initPersonal(withDecryption) {
       const masterPassword = yield select(masterPasswordSelector);
       const items = sortItemsByFavorites(objectToArray(itemsById));
 
-      if (items && items.length > 0) {
+      if (items?.length > 0) {
         yield put(
           decryption({
             items,
@@ -91,6 +92,7 @@ function* initPersonal(withDecryption) {
     const defaultList = yield select(defaultListSelector);
     const trashList = yield select(trashListSelector);
     let favoritesList = yield select(favoriteListSelector);
+
     if (!favoritesList?.id) {
       favoritesList = getFavoritesList(itemsById, trashList?.id);
     }
@@ -201,7 +203,7 @@ function* initTeam(team, withDecryption) {
     if (currentTeamId === team.id && withDecryption) {
       const items = objectToArray(itemsById);
 
-      if (items && items.length > 0 && teamKeyPair.privateKey) {
+      if (items?.length > 0 && teamKeyPair.privateKey) {
         yield put(
           decryption({
             items,
@@ -301,9 +303,33 @@ export function* decryptionEndWatchSaga() {
   }
 }
 
+function* setWorkInProgressItemSaga({ payload: { item } }) {
+  try {
+    if (!item) return;
+
+    const { raws } = JSON.parse(item.secret);
+
+    if (raws) {
+      const keyPair = yield select(personalKeyPairSelector);
+      const masterPassword = yield select(masterPasswordSelector);
+
+      yield put(
+        decryption({
+          raws,
+          key: keyPair.privateKey,
+          masterPassword,
+        }),
+      );
+    }
+  } catch (error) {
+    console.log('error: ', error);
+  }
+}
+
 export default function* workflowSagas() {
   yield takeLatest(INIT_WORKFLOW, initWorkflow);
   yield takeLatest(UPDATE_WORK_IN_PROGRESS_ITEM, updateWorkInProgressItemSaga);
   yield takeLatest(SET_CURRENT_TEAM_ID, setCurrentTeamIdWatchSaga);
   yield takeLatest(DECRYPTION_END, decryptionEndWatchSaga);
+  yield takeLatest(SET_WORK_IN_PROGRESS_ITEM, setWorkInProgressItemSaga);
 }

@@ -80,7 +80,7 @@ import {
 } from '@caesar/common/utils/cipherUtils';
 import { getServerErrorMessage } from '@caesar/common/utils/error';
 import { chunk } from '@caesar/common/utils/utils';
-import { splitAttachmentFromRaw } from '@caesar/common/utils/attachment';
+import { splitItemAttachments } from '@caesar/common/utils/item';
 import {
   ENTITY_TYPE,
   COMMON_PROGRESS_NOTIFICATION,
@@ -98,7 +98,6 @@ import {
   personalKeyPairSelector,
   teamKeyPairSelector,
 } from '@caesar/common/selectors/keyStore';
-import { splitItemAttachments } from '@caesar/common/utils/item';
 
 const ITEMS_CHUNK_SIZE = 50;
 
@@ -299,9 +298,9 @@ export function* createItemSaga({
       type,
       ...data
     } = splitItemAttachments(item);
+
     const isSystemItem = type === ITEM_TYPE.SYSTEM;
     const keyPair = yield select(personalKeyPairSelector);
-    const user = yield select(userDataSelector);
     const notificationText = isSystemItem
       ? COMMON_PROGRESS_NOTIFICATION
       : ENCRYPTING_ITEM_NOTIFICATION;
@@ -316,47 +315,30 @@ export function* createItemSaga({
       publicKey = teamSystemItem.publicKey;
     }
 
-    const encryptedItem = yield call(
+    const encryptedItemData = yield call(
       encryptItem,
       { data: { attachments, ...data } },
       publicKey,
     );
-
     const encryptedItemRaws = yield call(encryptItem, raws, publicKey);
+    const encryptedItem = {
+      data: encryptedItemData,
+      raws: encryptedItemRaws,
+    };
 
     if (!isSystemItem) {
       yield put(updateGlobalNotification(CREATING_ITEM_NOTIFICATION, true));
     }
-
-    const {
-      data: { id: itemId, lastUpdated, invited, _links },
-    } = yield call(postCreateItem, {
+    const { data: itemData } = yield call(postCreateItem, {
       listId,
       type,
-      secret: JSON.stringify({
-        data: encryptedItem,
-        raws: encryptedItemRaws,
-      }),
+      secret: JSON.stringify(encryptedItem),
     });
 
     // TODO: Make the class of the item instead of the direct object
     const newItem = {
-      id: itemId,
-      listId,
-      lastUpdated,
-      type,
-      favorite: false,
-      invited: invited || [],
-      shared: null,
-      tags: [],
-      teamId: teamId || null,
-      ownerId: user.id,
-      secret: JSON.stringify({
-        data: encryptedItem,
-        raws: encryptedItemRaws,
-      }),
+      ...itemData,
       data: { attachments, raws, ...data },
-      _links,
       __type: ENTITY_TYPE.ITEM,
     };
 
@@ -477,15 +459,30 @@ export function* createItemsBatchSaga({
 
 export function* updateItemSaga({ payload: { item } }) {
   try {
+    const {
+      teamId,
+      listId,
+      attachments,
+      raws,
+      type,
+      ...data
+    } = splitItemAttachments(item);
+
     yield put(updateGlobalNotification(ENCRYPTING_ITEM_NOTIFICATION, true));
 
     const keyPair = yield select(personalKeyPairSelector);
 
-    const encryptedItemSecret = yield call(
+    const encryptedItemData = yield call(
       encryptItem,
-      item.data,
+      { data: { attachments, ...data } },
       keyPair.publicKey,
     );
+    const encryptedItemRaws = yield call(encryptItem, raws, keyPair.publicKey);
+    const encryptedItem = {
+      data: encryptedItemData,
+      raws: encryptedItemRaws,
+    };
+    const encryptedItemSecret = JSON.stringify(encryptedItem);
 
     const {
       data: { lastUpdated },
@@ -515,25 +512,11 @@ export function* editItemSaga({
   meta: { setSubmitting, notification },
 }) {
   try {
-    const { listId, attachments, type, ...data } = item;
+    const { listId } = item;
 
     const workInProgressItem = yield select(workInProgressItemSelector);
-    const originalItem = yield select(itemSelector, {
-      itemId: workInProgressItem.id,
-    });
 
-    const editedItemData = {
-      attachments,
-      ...data,
-    };
-
-    const editedItem = {
-      ...originalItem,
-      listId,
-      data: editedItemData,
-    };
-
-    const isDataChanged = !deepequal(workInProgressItem.data, editedItemData);
+    const isDataChanged = !deepequal(workInProgressItem.data, item.data);
     const isListIdChanged = listId !== workInProgressItem.listId;
 
     if (isListIdChanged) {
@@ -541,16 +524,10 @@ export function* editItemSaga({
     }
 
     if (isDataChanged) {
-      yield call(updateItemSaga, { payload: { item: editedItem } });
-
-      if (originalItem.invited.length) {
-        yield call(updateChildItemsBatchSaga, {
-          payload: { item: editedItem },
-        });
-      }
+      yield call(updateItemSaga, { payload: { item } });
     }
 
-    yield put(updateWorkInProgressItem(editedItem.id));
+    yield put(updateWorkInProgressItem(item.id));
     yield call(notification.show, {
       text: `The '${item.name}' has been updated`,
     });

@@ -28,17 +28,18 @@ export function checkItemsAfterDecryption(items) {
 }
 
 export const splitItemAttachments = item => {
+  const itemAttachments = item.attachments || item.data.attachments;
+
   let attachments;
   let raws = [];
-  if (item.attachments) {
-    raws = item.attachments.map(attach => attach.raw);
-    attachments = item.attachments.map(attach => {
-      return {
-        name: getFilenameWithoutExt(attach.name) || attach.name,
-        ext: extactExtFromFilename(attach.ext) || attach.ext,
-        size: getRealFileSizeForBase64enc(attach.raw.length),
-      };
-    });
+
+  if (itemAttachments) {
+    raws = itemAttachments.map(attach => attach.raw);
+    attachments = itemAttachments.map(attach => ({
+      name: getFilenameWithoutExt(attach.name) || attach.name,
+      ext: extactExtFromFilename(attach.ext) || attach.ext,
+      size: getRealFileSizeForBase64enc(attach.raw?.length),
+    }));
   }
 
   return {
@@ -47,6 +48,7 @@ export const splitItemAttachments = item => {
     raws,
   };
 };
+
 export function generateSystemItemName(teamId) {
   return `team-${teamId}`;
 }

@@ -59,13 +59,12 @@ const SecureMessageContainerComponent = ({
   const handleClickDownloadFiles = async () => {
     const raws = await getRaws();
     const attachments = decryptedMessage.attachments.map(
-      (attachment, index) => {
-        return {
-          raw: raws[index],
-          name: `${attachment.name}.${attachment.ext}`,
-        };
-      },
+      (attachment, index) => ({
+        raw: raws[index],
+        name: `${attachment.name}.${attachment.ext}`,
+      }),
     );
+
     downloadAsZip(attachments);
   };
 

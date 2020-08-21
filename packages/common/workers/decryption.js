@@ -31,10 +31,10 @@ const decryption = {
       }),
     );
   },
-  async decryptRaws(item) {
-    const raws = await decryptItem(item.raws, state.privateKeyObject);
+  async decryptRaws(raws) {
+    const decryptedRaws = await decryptItem(raws, state.privateKeyObject);
 
-    return { id: item.id, raws };
+    return decryptedRaws;
   },
 };
 

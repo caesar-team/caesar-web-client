@@ -71,14 +71,14 @@ export const itemsChildItemsBatchSelector = createSelector(
 export const systemItemsSelector = createSelector(
   itemsByIdSelector,
   items =>
-    Object.values(items).find(({ type }) => type === ITEM_TYPE.SYSTEM) || {},
+    Object.values(items).filter(({ type }) => type === ITEM_TYPE.SYSTEM) || [],
 );
 
 export const teamSystemItemSelector = createSelector(
   systemItemsSelector,
   currentTeamSelector,
   (items, currentTeam) =>
-    items.find(({ name }) => name === generateSystemItemName(currentTeam.id)) ||
+    items.find(({ data }) => data.name === generateSystemItemName(currentTeam.id)) ||
     {},
 );
 

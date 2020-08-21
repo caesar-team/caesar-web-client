@@ -30,10 +30,7 @@ export default createReducer(initialState, {
   },
   [ADD_TEAM_KEY_PAIR](state, { payload }) {
     const { id, data } = payload.data;
-    const {
-      publicKey,
-      privateKey,
-    } = extractKeysFromSystemItem(data);
+    const { publicKey, privateKey } = extractKeysFromSystemItem(data);
 
     return {
       ...state,
@@ -44,6 +41,7 @@ export default createReducer(initialState, {
           [id]: {
             id,
             name: data.name,
+            pass: data.pass,
             publicKey,
             privateKey,
             raw: payload.data,
@@ -57,10 +55,7 @@ export default createReducer(initialState, {
       ...state,
       data: {
         ...state.data,
-        [KEY_TYPE.ANONYMOUS]: [
-          ...state.data[KEY_TYPE.ANONYMOUS],
-          payload.data,
-        ],
+        [KEY_TYPE.ANONYMOUS]: [...state.data[KEY_TYPE.ANONYMOUS], payload.data],
       },
     };
   },

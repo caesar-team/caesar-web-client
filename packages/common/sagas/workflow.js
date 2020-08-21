@@ -25,8 +25,13 @@ import { fetchMembersSaga } from '@caesar/common/sagas/entities/member';
 import { convertNodesToEntities } from '@caesar/common/normalizers/normalizers';
 import { objectToArray } from '@caesar/common/utils/utils';
 import { sortItemsByFavorites } from '@caesar/common/utils/workflow';
-import { getLists, getTeamLists, getTeams } from '@caesar/common/api';
-import { TEAM_TYPE } from '@caesar/common/constants';
+import {
+  getLists,
+  getTeamLists,
+  getTeams,
+  getUserItems,
+} from '@caesar/common/api';
+import { ITEM_TYPE, TEAM_TYPE } from '@caesar/common/constants';
 import {
   favoriteListSelector,
   trashListSelector,
@@ -58,6 +63,37 @@ import { extractKeysFromSystemItem } from '@caesar/common/utils/item';
 import { teamAdminUsersSelector } from '@caesar/common/selectors/entities/team';
 import { setPersonalDefaultListId } from '@caesar/common/actions/user';
 
+function* initKeyStore() {
+  try {
+    const keyPair = yield select(personalKeyPairSelector);
+    const masterPassword = yield select(masterPasswordSelector);
+
+    const { data: userItems } = yield call(getUserItems);
+    const systemItems = userItems.teams.reduce(
+      (acc, { items }) => [
+        ...acc,
+        ...items.filter(item => item.type === ITEM_TYPE.SYSTEM),
+      ],
+      [],
+    );
+
+    if (systemItems?.length > 0) {
+      yield put(
+        decryption({
+          items: systemItems,
+          key: keyPair.privateKey,
+          masterPassword,
+        }),
+      );
+    }
+  } catch (error) {
+    console.log(error);
+    yield put(
+      updateGlobalNotification(getServerErrorMessage(error), false, true),
+    );
+  }
+}
+
 function* initPersonal(withDecryption) {
   try {
     const currentTeamId = yield select(currentTeamIdSelector);
@@ -77,7 +113,7 @@ function* initPersonal(withDecryption) {
       const masterPassword = yield select(masterPasswordSelector);
       const items = sortItemsByFavorites(objectToArray(itemsById));
 
-      if (items && items.length > 0) {
+      if (items?.length > 0) {
         yield put(
           decryption({
             items,
@@ -115,8 +151,9 @@ function* initPersonal(withDecryption) {
 
     const workInProgressItem = yield select(workInProgressItemSelector);
 
-    if (!workInProgressItem
-      || ![currentTeamId, null].includes(workInProgressItem?.teamId)
+    if (
+      !workInProgressItem ||
+      ![currentTeamId, null].includes(workInProgressItem?.teamId)
     ) {
       yield put(setWorkInProgressItem(null));
     }
@@ -134,6 +171,7 @@ function* initPersonal(withDecryption) {
 
 function* initTeam(team, withDecryption) {
   try {
+    console.log('Init team');
     yield put(fetchTeamSuccess(team));
 
     const currentTeamId = yield select(currentTeamIdSelector);
@@ -142,13 +180,16 @@ function* initTeam(team, withDecryption) {
       return;
     }
 
-    const teamAdmins = yield select(teamAdminUsersSelector, { teamId: team.id });
+    const teamAdmins = yield select(teamAdminUsersSelector, {
+      teamId: team.id,
+    });
     const currentUserId = yield select(userIdSelector);
     const isCurrentUserTeamAdmin = teamAdmins.includes(currentUserId);
     const { data: lists } = yield call(getTeamLists, team.id);
     const { listsById, itemsById, childItemsById } = convertNodesToEntities(
       lists,
     );
+
     const trashList = yield select(currentTeamTrashListSelector);
     const favoritesList = getFavoritesList(
       itemsById,
@@ -197,7 +238,7 @@ function* initTeam(team, withDecryption) {
     if (currentTeamId === team.id && withDecryption) {
       const items = objectToArray(itemsById);
 
-      if (items && items.length > 0 && teamKeyPair.privateKey) {
+      if (items?.length > 0 && teamKeyPair.privateKey) {
         yield put(
           decryption({
             items,
@@ -233,6 +274,7 @@ function* initTeams(withDecryption) {
 }
 
 export function* initWorkflow({ payload: { withDecryption = true } }) {
+  yield call(initKeyStore);
   const currentTeamId = yield select(currentTeamIdSelector);
 
   yield put(
@@ -287,10 +329,9 @@ export function* decryptionEndWatchSaga() {
     const systemItems = yield select(systemItemsSelector);
 
     if (systemItems.length > 0) {
-      yield all(systemItems => put(addTeamKeyPair(item)));
+      yield all(systemItems.map(item => put(addTeamKeyPair(item))));
     }
-
-  } catch(error) {
+  } catch (error) {
     console.log(error);
   }
 }

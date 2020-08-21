@@ -23,13 +23,6 @@ const AddButton = styled.button`
   cursor: pointer;
 `;
 
-const IconStyled = styled(Icon)`
-  width: 14px;
-  height: 14px;
-  fill: ${({ theme }) => theme.color.black};
-  cursor: pointer;
-`;
-
 const SelectStyled = styled(Select)`
   width: 200px;
   height: 40px;
@@ -59,11 +52,17 @@ const InviteControl = ({
         className={className}
         onChange={onChange}
       />
-      <IconStyled name="close" onClick={onClickRemove} />
+      <Icon
+        name="close"
+        color="black"
+        width={14}
+        height={14}
+        onClick={onClickRemove}
+      />
     </Wrapper>
   ) : (
     <AddButton className={className} onClick={onClickAdd}>
-      <IconStyled name="plus" />
+      <Icon name="plus" color="black" width={14} height={14} />
     </AddButton>
   );
 

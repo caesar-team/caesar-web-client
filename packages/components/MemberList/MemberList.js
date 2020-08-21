@@ -6,7 +6,6 @@ import Member from './Member';
 import {
   AddControl,
   RemoveControl,
-  ShareControl,
   InviteControl,
   RevokeAccessControl,
 } from './components';
@@ -42,7 +41,6 @@ const ControlWrapper = styled.div`
 const ADD_CONTROL_TYPE = 'add';
 const REMOVE_CONTROL_TYPE = 'remove';
 const REVOKE_CONTROL_TYPE = 'revoke';
-const SHARE_CONTROL_TYPE = 'share';
 const INVITE_CONTROL_TYPE = 'invite';
 
 const MemberList = ({
@@ -70,7 +68,6 @@ const MemberList = ({
             onClickRevoke={() => onClickRevokeAccess(member)}
           />
         ),
-        [SHARE_CONTROL_TYPE]: <ShareControl member={member} />,
         [INVITE_CONTROL_TYPE]: (
           <InviteControl
             teamId={teamId}

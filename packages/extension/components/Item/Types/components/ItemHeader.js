@@ -94,7 +94,7 @@ const FavoriteButton = styled.button`
   background: none;
   border: none;
   outline: none;
-  transition: 0.3s;
+  transition: 0.2s;
 
   &:hover {
     opacity: 0.75;

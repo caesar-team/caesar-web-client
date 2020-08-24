@@ -7,10 +7,6 @@ import { Icon } from '../../Icon';
 import { FormTextArea } from '../../Input';
 import { Button } from '../../Button';
 
-const Wrapper = styled.div`
-  position: relative;
-`;
-
 const StyledFormTextArea = styled(FormTextArea)`
   ${FormTextArea.IconsWrapper} {
     ${({ isEdit }) => !isEdit && 'display: none;'}
@@ -22,7 +18,7 @@ const IconsWrapper = styled.div`
   right: 1px;
   bottom: 1px;
   left: 1px;
-  display: flex;
+  display: none;
   justify-content: flex-end;
   padding: 8px 16px;
   background: rgba(245, 245, 245, 0.96);
@@ -48,6 +44,16 @@ const StyledIcon = styled(Icon)`
 const AddBtn = styled(Button)`
   margin-left: auto;
   font-size: ${({ theme }) => theme.font.size.main};
+`;
+
+const Wrapper = styled.div`
+  position: relative;
+
+  &:hover {
+    ${IconsWrapper} {
+      display: flex;
+    }
+  }
 `;
 
 export const Note = ({ value: propValue, itemSubject, onClickAcceptEdit }) => {

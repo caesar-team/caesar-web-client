@@ -59,7 +59,7 @@ const Slider = styled.span`
   ${({ isLoading, theme }) =>
     !isLoading &&
     `
-    &:before {
+    &::before {
       position: relative;
       border-radius: 50%;
       content: '';

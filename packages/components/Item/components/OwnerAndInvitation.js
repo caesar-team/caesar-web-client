@@ -62,7 +62,7 @@ const ShareButton = styled.button`
   width: 40px;
   height: 40px;
   padding: 0;
-  color: ${({ theme }) => theme.color.emperor};
+  color: ${({ theme }) => theme.color.gray};
   background-color: ${({ theme }) => theme.color.white};
   border: 1px dashed ${({ theme }) => theme.color.gallery};
   border-radius: 50%;

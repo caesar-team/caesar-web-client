@@ -32,9 +32,9 @@ const attachmentsSchema = yup
     }),
   )
   .test(
-    'fileSizes',
+    'allFilesSize',
     raw => {
-      return ERROR.FILE_SIZE(
+      return ERROR.ALL_FILES_SIZE(
         humanizeSize(getRealFileSizesForBase64enc(raw.value), true),
       );
     },

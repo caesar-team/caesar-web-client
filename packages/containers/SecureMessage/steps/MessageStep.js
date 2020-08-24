@@ -48,7 +48,7 @@ const FileStyled = styled(File)`
   ${File.FileExt} {
     margin-bottom: 0;
 
-    &:before {
+    &::before {
       border-color: ${({ theme }) =>
         `${theme.color.darkGray} ${theme.color.darkGray} transparent transparent`};
     }

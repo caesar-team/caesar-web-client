@@ -27,7 +27,7 @@ const decryption = {
         const { data } = JSON.parse(item.secret);
         const itemData = await decryptItem(data, state.privateKeyObject);
 
-        return { id: item.id, ...itemData };
+        return { id: item.id, data: itemData };
       }),
     );
   },

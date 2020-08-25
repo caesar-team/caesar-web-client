@@ -99,7 +99,6 @@ const Uploader = ({
         text: getNotificationText(preparedFiles.duplicatedFiles),
       });
     }
-
     onChange(name, multiple ? preparedFiles.uniqFiles : files[0]);
   };
 

@@ -42,16 +42,12 @@ import {
 import { removeChildItemsBatch } from '@caesar/common/actions/entities/childItem';
 import { setCurrentTeamId } from '@caesar/common/actions/user';
 import { updateGlobalNotification } from '@caesar/common/actions/application';
-import { updateChildItemsBatchSaga } from '@caesar/common/sagas/entities/childItem';
 import {
   setWorkInProgressItem,
   updateWorkInProgressItem,
   setWorkInProgressListId,
 } from '@caesar/common/actions/workflow';
-import {
-  workInProgressItemSelector,
-  workInProgressItemIdsSelector,
-} from '@caesar/common/selectors/workflow';
+import { workInProgressItemIdsSelector } from '@caesar/common/selectors/workflow';
 import {
   listSelector,
   favoriteListSelector,
@@ -290,14 +286,7 @@ export function* createItemSaga({
   meta: { setSubmitting = Function.prototype },
 }) {
   try {
-    const {
-      teamId,
-      listId,
-      attachments,
-      raws,
-      type,
-      ...data
-    } = splitItemAttachments(item);
+    const { teamId, listId, attachments = [], raws = {}, type, ...data } = item;
 
     const isSystemItem = type === ITEM_TYPE.SYSTEM;
     const keyPair = yield select(personalKeyPairSelector);
@@ -314,18 +303,17 @@ export function* createItemSaga({
       });
       publicKey = teamSystemItem.publicKey;
     }
-
     const encryptedItemData = yield call(
       encryptItem,
       { data: { attachments, ...data } },
       publicKey,
     );
     const encryptedItemRaws = yield call(encryptItem, raws, publicKey);
+
     const encryptedItem = {
       data: encryptedItemData,
       raws: encryptedItemRaws,
     };
-
     if (!isSystemItem) {
       yield put(updateGlobalNotification(CREATING_ITEM_NOTIFICATION, true));
     }
@@ -338,7 +326,7 @@ export function* createItemSaga({
     // TODO: Make the class of the item instead of the direct object
     const newItem = {
       ...itemData,
-      data: { attachments, raws, ...data },
+      ...{ data: { attachments, raws, ...data } },
       __type: ENTITY_TYPE.ITEM,
     };
 
@@ -378,7 +366,7 @@ export function* createItemSaga({
     setSubmitting(false);
   }
 }
-
+// TODO: Need to be updated to the sepated raws feature
 export function* createItemsBatchSaga({
   payload: { items, listId },
   meta: { setSubmitting },
@@ -459,24 +447,12 @@ export function* createItemsBatchSaga({
 
 export function* updateItemSaga({ payload: { item } }) {
   try {
-    const {
-      teamId,
-      listId,
-      attachments,
-      raws,
-      type,
-      ...data
-    } = splitItemAttachments(item);
-
+    const { raws = {}, ...data } = item.data;
     yield put(updateGlobalNotification(ENCRYPTING_ITEM_NOTIFICATION, true));
 
     const keyPair = yield select(personalKeyPairSelector);
+    const encryptedItemData = yield call(encryptItem, data, keyPair.publicKey);
 
-    const encryptedItemData = yield call(
-      encryptItem,
-      { data: { attachments, ...data } },
-      keyPair.publicKey,
-    );
     const encryptedItemRaws = yield call(encryptItem, raws, keyPair.publicKey);
     const encryptedItem = {
       data: encryptedItemData,
@@ -513,11 +489,17 @@ export function* editItemSaga({
 }) {
   try {
     const { listId } = item;
+    // const workInProgressItem = yield select(itemByIdSelector);
+    const itemInState = yield select(itemSelector, { itemId: item.id });
+    const isDataChanged = !deepequal(itemInState.data, item.data);
 
-    const workInProgressItem = yield select(workInProgressItemSelector);
+    if (!isDataChanged) {
+      setSubmitting(false);
 
-    const isDataChanged = !deepequal(workInProgressItem.data, item.data);
-    const isListIdChanged = listId !== workInProgressItem.listId;
+      return;
+    }
+
+    const isListIdChanged = listId !== itemInState.listId;
 
     if (isListIdChanged) {
       yield call(moveItemSaga, { payload: { listId } });
@@ -529,7 +511,7 @@ export function* editItemSaga({
 
     yield put(updateWorkInProgressItem(item.id));
     yield call(notification.show, {
-      text: `The '${item.name}' has been updated`,
+      text: `The '${item.data.name}' has been updated`,
     });
   } catch (error) {
     // eslint-disable-next-line no-console

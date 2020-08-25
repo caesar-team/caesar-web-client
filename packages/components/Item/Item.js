@@ -55,8 +55,6 @@ const ItemComponent = ({
     return <EmptyItem />;
   }
 
-  const { data, listId } = item;
-
   const isTrashItem =
     item &&
     (item.listId === trashList?.id ||
@@ -65,18 +63,15 @@ const ItemComponent = ({
   const handleClickAcceptEdit = patchData => {
     setSubmitting(true);
 
-    const { attachments, raws } = splitItemAttachments(patchData);
-
     const updatedData = {
       ...item,
-      data: {
-        ...data,
-        attachments: patchData?.attachments || attachments,
-        raws: patchData?.raws || raws,
+      ...{
+        data: {
+          ...item.data,
+          ...patchData,
+        },
       },
-      listId,
     };
-
     dispatch(editItemRequest(updatedData, setSubmitting, notification));
   };
 

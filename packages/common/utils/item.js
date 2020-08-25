@@ -1,9 +1,5 @@
 import { getHostName } from '@caesar/common/utils/getDomainName';
-import {
-  getFilenameWithoutExt,
-  extactExtFromFilename,
-  getRealFileSizeForBase64enc,
-} from './file';
+import { processUploadedFiles } from './attachment';
 
 function isValidItem(item) {
   // TODO: strengthen checks
@@ -28,24 +24,12 @@ export function checkItemsAfterDecryption(items) {
 }
 
 export const splitItemAttachments = item => {
-  const itemAttachments = item.attachments || item.data.attachments;
-
-  let attachments;
-  let raws = [];
-
-  if (itemAttachments) {
-    raws = itemAttachments.map(attach => attach.raw);
-    attachments = itemAttachments.map(attach => ({
-      name: getFilenameWithoutExt(attach.name) || attach.name,
-      ext: extactExtFromFilename(attach.ext) || attach.ext,
-      size: getRealFileSizeForBase64enc(attach.raw?.length),
-    }));
-  }
+  const itemAttachments = item?.attachments || item.data?.attachments;
+  if (!itemAttachments) return item;
 
   return {
     ...item,
-    attachments,
-    raws,
+    ...processUploadedFiles(itemAttachments),
   };
 };
 

@@ -3,10 +3,11 @@ import styled from 'styled-components';
 import {
   downloadFile,
   downloadAsZip,
-  splitFilesToUniqAndDuplicates,
+  getUniqueAndDublicates,
 } from '@caesar/common/utils/file';
 import { PERMISSION } from '@caesar/common/constants';
-import { makeObject } from '@caesar/common/utils/object';
+import { isIterable } from '@caesar/common/utils/utils';
+import { processUploadedFiles } from '@caesar/common/utils/attachment';
 import { Can } from '../../Ability';
 import { Icon } from '../../Icon';
 import { File } from '../../File';
@@ -70,16 +71,18 @@ const AddNewAttach = styled.div`
 
 export const Attachments = ({
   attachments = [],
-  raws = [],
+  raws = {},
   itemSubject,
   onClickAcceptEdit,
 }) => {
   const [newFiles, setNewFiles] = useState([]);
+  const [itemRaws, setItemRaws] = useState(raws);
+  const [itemAttachments, setItemAttachments] = useState(attachments);
   const [isModalOpened, setModalOpened] = useState(false);
 
-  const handleClickDownloadFile = (attachment, index) => {
+  const handleClickDownloadFile = attachment => {
     const { name, ext } = attachment;
-    const raw = raws[index];
+    const raw = itemRaws.get(attachment.id);
 
     return typeof raw !== 'undefined'
       ? downloadFile(raw, `${name}.${ext}`)
@@ -87,17 +90,17 @@ export const Attachments = ({
   };
 
   const handleClickDownloadAll = () => {
-    const files = attachments.map((attachment, index) => ({
-      raw: raws[index],
+    const files = itemAttachments.map(attachment => ({
+      raw: raws.get(attachment.id),
       name: `${attachment.name}.${attachment.ext}`,
     }));
 
     downloadAsZip(files);
   };
 
-  const onClickRemove = index => {
-    attachments.splice(index, 1);
-    raws.splice(index, 1);
+  const onClickRemove = attachment => {
+    setItemAttachments(itemAttachments.remove(attachment.id));
+    setItemRaws(itemRaws.remove(attachment.id));
 
     onClickAcceptEdit({
       attachments,
@@ -106,56 +109,63 @@ export const Attachments = ({
   };
 
   const handleChange = (name, files) => {
-    const { uniqFiles, duplicatedFiles } = splitFilesToUniqAndDuplicates([
-      ...attachments.map((e, i) => (raws[i] ? { ...e, raw: raws[i] } : e)),
-      ...files,
-    ]);
-    // Todo: Refactor to the one dictionary or use the new Set
-    const mappedFiles = files.map(file => {
-      for (let i = 0; i < duplicatedFiles.length; i++) {
-        if (
-          file.name === duplicatedFiles[i].name &&
-          file.raw === duplicatedFiles[i].raw
-        ) {
-          return {
-            ...file,
-            error: 'The file was already added',
-          };
-        }
-      }
+    const splitedFiles = processUploadedFiles(files);
 
-      return file;
-    });
+    const { uniqFiles, duplicatedFiles } = getUniqueAndDublicates(
+      [...splitedFiles.attachments],
+      [...itemAttachments],
+    );
 
-    setNewFiles(mappedFiles);
+    const uploadedDuplicatedFiles = duplicatedFiles.map(file => ({
+      ...file,
+      error: 'The file already exists',
+    }));
+
+    const uniqRaws = Object.fromEntries(
+      uniqFiles.map(file => [file.id, splitedFiles.raws[file.id]]),
+    );
+
+    const allAttachments = [...itemAttachments, ...uniqFiles];
+    const allRaws = { ...itemRaws, ...uniqRaws };
+
+    const updatedItem = {
+      attachments: allAttachments,
+      raws: allRaws,
+    };
+
+    setNewFiles([...uploadedDuplicatedFiles, ...uniqFiles]);
+
+    setItemRaws(allRaws);
+    setItemAttachments(allAttachments);
+
     setModalOpened(true);
-    onClickAcceptEdit(makeObject(name, uniqFiles));
+    onClickAcceptEdit(updatedItem);
   };
 
   const AttachmentsComponent = () => (
     <Wrapper>
       <Title>
-        Attachments ({Array.isArray(attachments) ? attachments.length : 0})
-        {Array.isArray(attachments) &&
-          attachments &&
-          attachments.length > 0 && (
-            <DownloadIcon
-              name="download"
-              width={16}
-              height={16}
-              color="gray"
-              onClick={handleClickDownloadAll}
-            />
-          )}
+        Attachments ({attachments?.length ? attachments.length : 0})
+        {(attachments?.length ? attachments.length : 0) > 0 && (
+          <DownloadIcon
+            name="download"
+            width={16}
+            height={16}
+            color="gray"
+            onClick={handleClickDownloadAll}
+          />
+        )}
       </Title>
       <Inner>
-        {Array.isArray(attachments) &&
-          attachments.map((attachment, index) => (
+        {isIterable(itemAttachments) &&
+          itemAttachments.map(attachment => (
             <File
               key={attachment.name}
               itemSubject={itemSubject}
-              onClickDownload={() => handleClickDownloadFile(attachment, index)}
-              onClickRemove={onClickAcceptEdit && (() => onClickRemove(index))}
+              onClickDownload={() => handleClickDownloadFile(attachment)}
+              onClickRemove={
+                onClickAcceptEdit && (() => onClickRemove(attachment))
+              }
               attachment={attachment}
             />
           ))}
@@ -186,7 +196,7 @@ export const Attachments = ({
     </Wrapper>
   );
 
-  return Array.isArray(attachments) && attachments.length === 0 ? (
+  return Array.isArray(itemAttachments) && itemAttachments.length === 0 ? (
     <Can I={PERMISSION.EDIT} an={itemSubject}>
       <AttachmentsComponent />
     </Can>

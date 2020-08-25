@@ -1,5 +1,6 @@
 import { saveAs } from 'file-saver';
 import JSZip from 'jszip';
+import deepequal from 'fast-deep-equal';
 
 export const BASE_64_LENGTH_BYTE_RATE = 3 / 4;
 
@@ -73,6 +74,29 @@ export const downloadAsZip = files => {
     .then(blob => saveAs(blob, `attachments${Date.now()}.zip`));
 };
 
+export const getUniqueAndDublicates = (newFiles = [], existFiles = []) => {
+  if (existFiles.length <= 0) {
+    return { uniqFiles: [...newFiles], duplicatedFiles: [] };
+  }
+  const mergedFiles = [...newFiles, ...existFiles];
+
+  const uniqFilesSet = new Set(
+    mergedFiles.map(file => `${file.name}_${file.size}`),
+  );
+  const existFilesSet = new Set(
+    existFiles.map(file => `${file.name}_${file.size}`),
+  );
+
+  const duplicatedFiles = newFiles.filter(file =>
+    existFilesSet.has(`${file.name}_${file.size}`),
+  );
+  const uniqFiles = mergedFiles.filter(file =>
+    uniqFilesSet.has(`${file.name}_${file.size}`),
+  );
+
+  return { uniqFiles, duplicatedFiles };
+};
+
 export const splitFilesToUniqAndDuplicates = files => {
   const uniqFiles = [];
   const duplicatedFiles = [];
@@ -80,7 +104,7 @@ export const splitFilesToUniqAndDuplicates = files => {
   const map = new Map();
   // eslint-disable-next-line no-restricted-syntax
   for (const file of files) {
-    const checkLabel = `${file.name}_${file.raw?.length}`;
+    const checkLabel = `${file.name}_${file.size}`;
 
     if (!map.has(checkLabel)) {
       map.set(checkLabel, true);

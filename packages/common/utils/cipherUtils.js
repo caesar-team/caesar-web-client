@@ -1,8 +1,8 @@
 import * as openpgp from 'openpgp';
-import { generateKeys } from '@caesar/common/utils/key';
-import { getHostName } from '@caesar/common/utils/getDomainName';
-import { randomId } from '@caesar/common/utils/uuid4';
-import { objectToBase64, base64ToObject } from '@caesar/common/utils/base64';
+import { generateKeys } from './key';
+import { getHostName } from './getDomainName';
+import { randomId } from './uuid4';
+import { objectToBase64, base64ToObject } from './base64';
 import { createSrp } from './srp';
 import { passwordGenerator } from './passwordGenerator';
 

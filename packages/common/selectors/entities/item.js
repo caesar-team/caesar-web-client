@@ -100,3 +100,7 @@ export const visibleItemsSelector = createSelector(
   itemsBatchSelector,
   items => items.filter(({ type }) => type !== ITEM_TYPE.SYSTEM) || [],
 );
+
+export const ownItemsSelector = createSelector(
+
+);

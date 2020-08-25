@@ -19,7 +19,7 @@ import {
   SET_CURRENT_TEAM_ID,
   setCurrentTeamId,
 } from '@caesar/common/actions/user';
-import { addTeamKeyPair } from '@caesar/common/actions/keyStore';
+import { addEntityKeyPair } from '@caesar/common/actions/keyStore';
 import { addChildItemsBatch } from '@caesar/common/actions/entities/childItem';
 import { fetchMembersSaga } from '@caesar/common/sagas/entities/member';
 import { convertNodesToEntities } from '@caesar/common/normalizers/normalizers';
@@ -55,6 +55,7 @@ import {
 import {
   personalKeyPairSelector,
   teamKeyPairSelector,
+  itemsKeyPairSelector,
 } from '@caesar/common/selectors/keyStore';
 import { getFavoritesList } from '@caesar/common/normalizers/utils';
 import { fetchTeamSuccess } from '@caesar/common/actions/entities/team';
@@ -70,7 +71,8 @@ function* initKeyStore() {
     const masterPassword = yield select(masterPasswordSelector);
 
     const { data: userItems } = yield call(getUserItems);
-    const systemItems = userItems.teams.reduce(
+    console.log(userItems);
+    const systemItems = [...userItems.teams, {items: userItems.personal}].reduce(
       (acc, { items }) => [
         ...acc,
         ...items.filter(item => item.type === ITEM_TYPE.SYSTEM),
@@ -110,18 +112,44 @@ function* initPersonal(withDecryption) {
     );
 
     if (withDecryption) {
+      const currentUserId = yield select(userIdSelector);
       const keyPair = yield select(personalKeyPairSelector);
       const masterPassword = yield select(masterPasswordSelector);
       const items = sortItemsByFavorites(objectToArray(itemsById));
+      const ownItems = [];
+      const notOwnItems = [];
 
-      if (items?.length > 0) {
+      items.forEach(item => {
+        if (item.ownerId === currentUserId) {
+          ownItems.push(item);
+        } else {
+          notOwnItems.push(item);
+        }
+      });
+
+      if (ownItems?.length > 0) {
         yield put(
           decryption({
-            items,
+            items: ownItems,
             key: keyPair.privateKey,
             masterPassword,
           }),
         );
+      }
+
+      if (notOwnItems?.length > 0) {
+        const keyPairs = yield select(
+          itemsKeyPairSelector,
+          { itemIds: notOwnItems.map(({ id }) => id) },
+        );
+
+        yield all(keyPairs.map((pair, index) => put(
+          decryption({
+            items: [ownItems[index]],
+            key: pair.privateKey,
+            masterPassword: pair.pass,
+          }),
+        )));
       }
     }
 
@@ -240,7 +268,7 @@ function* initTeam(team, withDecryption) {
         pass: teamSystemItem.pass,
       };
 
-      yield put(addTeamKeyPair(teamSystemItem));
+      yield put(addEntityKeyPair(teamSystemItem));
       yield put(createItemRequest(teamSystemItem));
     }
 
@@ -338,7 +366,7 @@ export function* decryptionEndWatchSaga() {
     const systemItems = yield select(systemItemsSelector);
 
     if (systemItems.length > 0) {
-      yield all(systemItems.map(item => put(addTeamKeyPair(item))));
+      yield all(systemItems.map(item => put(addEntityKeyPair(item))));
     }
   } catch (error) {
     console.log(error);

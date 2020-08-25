@@ -114,7 +114,7 @@ export const ShareModal = ({
   ];
 
   const shouldShowAddedMembers = members.length > 0;
-  const shouldShowTeamsSection = teams.length > 0;
+  const shouldShowTeamsSection = false;
   const shouldShowSharedMembers = sharedMembers.length > 0;
 
   return (

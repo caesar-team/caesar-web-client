@@ -125,6 +125,7 @@ function* initPersonal(withDecryption) {
           notOwnItems.push(item);
         }
       });
+      console.log(notOwnItems);
 
       if (ownItems?.length > 0) {
         yield put(
@@ -141,10 +142,10 @@ function* initPersonal(withDecryption) {
           itemsKeyPairSelector,
           { itemIds: notOwnItems.map(({ id }) => id) },
         );
-
+        console.log(keyPairs);
         yield all(keyPairs.map((pair, index) => put(
           decryption({
-            items: [ownItems[index]],
+            items: [notOwnItems[index]],
             key: pair.privateKey,
             masterPassword: pair.pass,
           }),

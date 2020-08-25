@@ -1,7 +1,4 @@
 import { getHostName } from '@caesar/common/utils/getDomainName';
-import { generateKeys } from '@caesar/common/utils/key';
-import { passwordGenerator } from '@caesar/common/utils/passwordGenerator';
-import { ITEM_TYPE } from '@caesar/common/constants';
 
 function isValidItem(item) {
   // TODO: strengthen checks

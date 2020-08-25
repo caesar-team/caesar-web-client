@@ -30,7 +30,7 @@ export default createReducer(initialState, {
     return {
       ...state,
       [KEY_TYPE.ENTITY]: {
-        ...state.data[KEY_TYPE.ENTITY],
+        ...state[KEY_TYPE.ENTITY],
         [id]: {
           id,
           name: data.name,
@@ -45,7 +45,7 @@ export default createReducer(initialState, {
   [ADD_ANONYMOUS_KEY_PAIR](state, { payload }) {
     return {
       ...state,
-      [KEY_TYPE.ANONYMOUS]: [...state.data[KEY_TYPE.ANONYMOUS], payload.data],
+      [KEY_TYPE.ANONYMOUS]: [...state[KEY_TYPE.ANONYMOUS], payload.data],
     };
   },
   [REMOVE_PERSONAL_KEY_PAIR](state) {
@@ -58,8 +58,8 @@ export default createReducer(initialState, {
     return {
       ...state,
       [KEY_TYPE.ENTITY]: {
-        ...state.datap[KEY_TYPE.ENTITY],
-        [payload.teamId]: undefined,
+        ...state[KEY_TYPE.ENTITY],
+        [payload.entityId]: undefined,
       },
     };
   },

@@ -71,7 +71,6 @@ function* initKeyStore() {
     const masterPassword = yield select(masterPasswordSelector);
 
     const { data: userItems } = yield call(getUserItems);
-    console.log(userItems);
     const systemItems = [...userItems.teams, {items: userItems.personal}].reduce(
       (acc, { items }) => [
         ...acc,

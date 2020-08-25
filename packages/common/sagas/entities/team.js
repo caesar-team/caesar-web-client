@@ -68,7 +68,6 @@ import {
   COMMANDS_ROLES,
   ENTITY_TYPE,
   NOOP_NOTIFICATION,
-  ITEM_TYPE,
   TEAM_TYPE,
 } from '@caesar/common/constants';
 import {

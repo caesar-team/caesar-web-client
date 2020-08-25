@@ -99,9 +99,41 @@ import {
   personalKeyPairSelector,
   teamKeyPairSelector,
 } from '@caesar/common/selectors/keyStore';
-import { generateSystemItem } from '@caesar/common/utils/item';
+import { generateSystemItemEmail, generateSystemItemName } from '@caesar/common/utils/item';
+import { passwordGenerator } from '@caesar/common/utils/passwordGenerator';
+import { generateKeys } from '@caesar/common/utils/key';
 
 const ITEMS_CHUNK_SIZE = 50;
+
+export function* generateSystemItem(entity, listId, entityId) {
+  const masterPassword = yield call(passwordGenerator);
+  const systemItemEmail = yield call(generateSystemItemEmail, entity, entityId);
+
+  const { publicKey, privateKey } = yield call(
+    generateKeys,
+    masterPassword,
+    [systemItemEmail],
+  );
+
+  const systemItemData = {
+    type: ITEM_TYPE.SYSTEM,
+    listId,
+    attachments: [
+      {
+        name: 'publicKey',
+        raw: publicKey,
+      },
+      {
+        name: 'privateKey',
+        raw: privateKey,
+      },
+    ],
+    pass: masterPassword,
+    name: yield call(generateSystemItemName, entity, entityId),
+  };
+
+  return systemItemData;
+}
 
 export function* removeItemSaga({ payload: { itemId, listId } }) {
   try {

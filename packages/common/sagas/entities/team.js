@@ -77,7 +77,7 @@ import {
 import { inviteNewMemberBatchSaga } from '@caesar/common/sagas/common/invite';
 import { createChildItemsFilterSelector } from '@caesar/common/selectors/entities/childItem';
 import { updateGlobalNotification } from '@caesar/common/actions/application';
-import { generateSystemItem } from '@caesar/common/utils/item';
+import { generateSystemItem } from '@caesar/common/sagas/entities/item';
 import { teamKeyPairSelector } from '@caesar/common/selectors/keyStore';
 
 export function* fetchTeamsSaga() {
@@ -137,7 +137,7 @@ export function* createTeamSaga({ payload: { title, icon } }) {
 
     const systemItemData = yield call(
       generateSystemItem,
-      'team',
+      ENTITY_TYPE.TEAM,
       userPersonalDefaultListId,
       team.id,
     );

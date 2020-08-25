@@ -29,7 +29,7 @@ export function generateSystemItemName(entity, id) {
 }
 
 export function generateSystemItemEmail(entity, id) {
-  return `${generateSystemItemName(entity, id)}@${getHostName()}.com`;
+  return `${generateSystemItemName(entity, id)}@${getHostName()}`;
 }
 
 export function extractKeysFromSystemItem(item) {
@@ -42,32 +42,4 @@ export function extractKeysFromSystemItem(item) {
     publicKey,
     privateKey,
   };
-}
-
-export function generateSystemItem(entity, listId, entityId) {
-  const masterPassword = passwordGenerator();
-  const systemItemEmail = generateSystemItemEmail(entity, entityId);
-
-  const { publicKey, privateKey } = generateKeys(masterPassword, [
-    systemItemEmail,
-  ]);
-
-  const systemItemData = {
-    type: ITEM_TYPE.SYSTEM,
-    listId,
-    attachments: [
-      {
-        name: 'publicKey',
-        raw: publicKey,
-      },
-      {
-        name: 'privateKey',
-        raw: privateKey,
-      },
-    ],
-    pass: masterPassword,
-    name: generateSystemItemName(entity, entityId),
-  };
-
-  return systemItemData;
 }

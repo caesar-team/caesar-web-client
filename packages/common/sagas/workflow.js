@@ -60,7 +60,7 @@ import {
 import { getFavoritesList } from '@caesar/common/normalizers/utils';
 import { fetchTeamSuccess } from '@caesar/common/actions/entities/team';
 import { getServerErrorMessage } from '@caesar/common/utils/error';
-import { generateSystemItem } from '@caesar/common/utils/item';
+import { generateSystemItem } from '@caesar/common/sagas/entities/item';
 import { extractKeysFromSystemItem } from '@caesar/common/utils/item';
 import { teamAdminUsersSelector } from '@caesar/common/selectors/entities/team';
 import { setPersonalDefaultListId } from '@caesar/common/actions/user';
@@ -250,7 +250,7 @@ function* initTeam(team, withDecryption) {
     yield put(resetWorkInProgressItemIds(null));
 
     let teamKeyPair = yield select(teamKeyPairSelector, { teamId: team.id });
-
+console.log(teamKeyPair);
     if (!teamKeyPair.privateKey && isCurrentUserTeamAdmin) {
       const userPersonalDefaultListId = yield select(
         userPersonalDefaultListIdSelector,

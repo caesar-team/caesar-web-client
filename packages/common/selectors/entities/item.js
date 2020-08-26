@@ -2,7 +2,7 @@ import { createSelector } from 'reselect';
 import { childItemsByIdSelector } from '@caesar/common/selectors/entities/childItem';
 import { currentTeamSelector } from '@caesar/common/selectors/user';
 import { generateSystemItemName } from '@caesar/common/utils/item';
-import { ITEM_TYPE } from '@caesar/common/constants';
+import { ENTITY_TYPE, ITEM_TYPE } from '@caesar/common/constants';
 
 export const entitiesSelector = state => state.entities;
 
@@ -80,9 +80,10 @@ export const systemItemsBatchSelector = createSelector(
   (systemItems, itemIds) =>
     itemIds.map(
       itemId => {
-        console.log(systemItems);
+//        console.log(systemItems);
+ //       console.log(itemId);
        return systemItems.find(
-          ({ data }) => data.name === generateSystemItemName('item', itemId),
+          ({ data }) => data.name === generateSystemItemName(ENTITY_TYPE.ITEM, itemId),
         ) || {};
       }),
 );
@@ -92,7 +93,7 @@ export const teamSystemItemSelector = createSelector(
   currentTeamSelector,
   (items, currentTeam) =>
     items.find(
-      ({ data }) => data.name === generateSystemItemName('team', currentTeam.id),
+      ({ data }) => data.name === generateSystemItemName(ENTITY_TYPE.TEAM, currentTeam.id),
     ) || {},
 );
 

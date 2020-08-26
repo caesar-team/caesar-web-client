@@ -319,7 +319,7 @@ export function* createItemSaga({
   meta: { setSubmitting = Function.prototype },
 }) {
   try {
-    const { teamId, listId, attachments, type, ...data } = item;
+    const { teamId, listId, attachments, type, relatedItem, ...data } = item;
     const isSystemItem = type === ITEM_TYPE.SYSTEM;
     const keyPair = yield select(personalKeyPairSelector);
     const user = yield select(userDataSelector);
@@ -356,6 +356,7 @@ export function* createItemSaga({
       listId,
       type,
       secret: encryptedItem,
+      relatedItem,
     });
 
     const newItem = {
@@ -370,6 +371,7 @@ export function* createItemSaga({
       teamId: teamId || null,
       ownerId: user.id,
       secret: encryptedItem,
+      relatedItem,
       data: { attachments, ...data },
       _links,
       __type: ENTITY_TYPE.ITEM,
@@ -400,10 +402,13 @@ export function* createItemSaga({
       if (!teamId && currentTeamId === TEAM_TYPE.PERSONAL) {
         const systemItemData = yield call(
           generateSystemItem,
-          'item',
+          ENTITY_TYPE.ITEM,
           userPersonalDefaultListId,
           itemId,
         );
+        systemItemData.relatedItem = itemId;
+        console.log('System data');
+        console.log(systemItemData);
 
         yield put(createItemRequest(systemItemData));
       }

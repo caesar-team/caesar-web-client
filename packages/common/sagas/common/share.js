@@ -112,9 +112,7 @@ export function* shareItemBatchSaga({
     let items = yield select(itemsBatchSelector, { itemIds });
 
     if (currentTeamId === TEAM_TYPE.PERSONAL) {
-      const items = yield select(systemItemsBatchSelector, { itemIds });
-      console.log(items);
-      //items = systemItems.map(item => item.raw);
+      items = yield select(systemItemsBatchSelector, { itemIds });
     }
 
     const preparedMembers = yield call(prepareUsersForSharing, members);

@@ -22,7 +22,10 @@ import {
 import { addEntityKeyPair } from '@caesar/common/actions/keyStore';
 import { addChildItemsBatch } from '@caesar/common/actions/entities/childItem';
 import { fetchMembersSaga } from '@caesar/common/sagas/entities/member';
-import { convertNodesToEntities } from '@caesar/common/normalizers/normalizers';
+import {
+  convertNodesToEntities,
+  extractRelatedItems,
+} from '@caesar/common/normalizers/normalizers';
 import { objectToArray } from '@caesar/common/utils/utils';
 import { sortItemsByFavorites } from '@caesar/common/utils/workflow';
 import {
@@ -104,8 +107,8 @@ function* initPersonal(withDecryption) {
       return;
     }
 
-    const { data: lists } = yield call(getLists);
-
+    const { data: rawLists } = yield call(getLists);
+    const lists = extractRelatedItems(rawLists);
     const { listsById, itemsById, childItemsById } = convertNodesToEntities(
       lists,
     );
@@ -125,7 +128,6 @@ function* initPersonal(withDecryption) {
           notOwnItems.push(item);
         }
       });
-      console.log(notOwnItems);
 
       if (ownItems?.length > 0) {
         yield put(
@@ -142,7 +144,7 @@ function* initPersonal(withDecryption) {
           itemsKeyPairSelector,
           { itemIds: notOwnItems.map(({ id }) => id) },
         );
-        console.log(keyPairs);
+
         yield all(keyPairs.map((pair, index) => put(
           decryption({
             items: [notOwnItems[index]],
@@ -251,7 +253,7 @@ function* initTeam(team, withDecryption) {
     yield put(resetWorkInProgressItemIds(null));
 
     let teamKeyPair = yield select(teamKeyPairSelector, { teamId: team.id });
-console.log(teamKeyPair);
+
     if (!teamKeyPair.privateKey && isCurrentUserTeamAdmin) {
       const userPersonalDefaultListId = yield select(
         userPersonalDefaultListIdSelector,

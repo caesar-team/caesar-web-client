@@ -3,7 +3,6 @@ import React, { memo, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import styled from 'styled-components';
 import { PERMISSION, PERMISSION_ENTITY } from '@caesar/common/constants';
-import { splitItemAttachments } from '@caesar/common/utils/item';
 import { workInProgressItemSelector } from '@caesar/common/selectors/workflow';
 import {
   trashListSelector,
@@ -45,11 +44,11 @@ const ItemComponent = ({
   onClickRemoveItem = Function.prototype,
 }) => {
   const dispatch = useDispatch();
-  const item = useSelector(workInProgressItemSelector);
   const trashList = useSelector(trashListSelector);
   const teamsTrashLists = useSelector(teamsTrashListsSelector);
   const [isSubmitting, setSubmitting] = useState(false);
   const [isMoveModalOpened, setMoveModalOpened] = useState(false);
+  const [item, setItem] = useState(useSelector(workInProgressItemSelector));
 
   if (!item) {
     return <EmptyItem />;
@@ -62,7 +61,6 @@ const ItemComponent = ({
 
   const handleClickAcceptEdit = patchData => {
     setSubmitting(true);
-
     const updatedData = {
       ...item,
       ...{
@@ -73,6 +71,7 @@ const ItemComponent = ({
       },
     };
     dispatch(editItemRequest(updatedData, setSubmitting, notification));
+    setItem(updatedData);
   };
 
   const handleClickRestoreItem = async () => {

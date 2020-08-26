@@ -24,17 +24,18 @@ const decryption = {
     // eslint-disable-next-line no-return-await
     return await Promise.all(
       items.map(async item => {
-        const { data } = JSON.parse(item.secret);
-        const itemData = await decryptItem(data, state.privateKeyObject);
+        const { data: encryptedData } = JSON.parse(item.secret);
+        const data = await decryptItem(encryptedData, state.privateKeyObject);
 
-        return { id: item.id, data: itemData };
+        return { id: item.id, data };
       }),
     );
   },
   async decryptRaws(raws) {
-    const decryptedRaws = await decryptItem(raws, state.privateKeyObject);
-
-    return decryptedRaws;
+    if (!raws) return {};
+    const result = await decryptItem(raws, state.privateKeyObject);
+    console.log('decryptRaws');
+    return result;
   },
 };
 

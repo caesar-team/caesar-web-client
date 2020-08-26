@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import {
   downloadFile,
@@ -79,10 +79,20 @@ export const Attachments = ({
   const [itemRaws, setItemRaws] = useState(raws);
   const [itemAttachments, setItemAttachments] = useState(attachments);
   const [isModalOpened, setModalOpened] = useState(false);
+  const syncStateWithServer = newItemData => {
+    onClickAcceptEdit(newItemData);
+  };
 
+  useEffect(() => {
+    if (Object.keys(raws).length > 0) {
+      setItemRaws(raws);
+    }
+  }, [raws, setItemRaws]); // This will only run when one of those variables change
+
+  // TODO: Add loader if raws are not ready
   const handleClickDownloadFile = attachment => {
     const { name, ext } = attachment;
-    const raw = itemRaws.get(attachment.id);
+    const raw = itemRaws[attachment.id];
 
     return typeof raw !== 'undefined'
       ? downloadFile(raw, `${name}.${ext}`)
@@ -91,27 +101,33 @@ export const Attachments = ({
 
   const handleClickDownloadAll = () => {
     const files = itemAttachments.map(attachment => ({
-      raw: raws.get(attachment.id),
+      raw: raws[attachment.id],
       name: `${attachment.name}.${attachment.ext}`,
     }));
 
     downloadAsZip(files);
   };
 
-  const onClickRemove = attachment => {
-    setItemAttachments(itemAttachments.remove(attachment.id));
-    setItemRaws(itemRaws.remove(attachment.id));
+  const onClickRemove = handleAttachment => {
+    const attachmentIndex = itemAttachments.findIndex(
+      attachment => attachment.id === handleAttachment.id,
+    );
 
-    onClickAcceptEdit({
-      attachments,
-      raws,
+    itemAttachments.splice(attachmentIndex, 1);
+    delete itemRaws[handleAttachment.id];
+
+    setItemAttachments(itemAttachments);
+    setItemRaws(itemRaws);
+    syncStateWithServer({
+      attachments: itemAttachments,
+      raws: itemRaws,
     });
   };
 
   const handleChange = (name, files) => {
     const splitedFiles = processUploadedFiles(files);
 
-    const { uniqFiles, duplicatedFiles } = getUniqueAndDublicates(
+    const { uniqNewFiles, duplicatedFiles } = getUniqueAndDublicates(
       [...splitedFiles.attachments],
       [...itemAttachments],
     );
@@ -121,25 +137,23 @@ export const Attachments = ({
       error: 'The file already exists',
     }));
 
-    const uniqRaws = Object.fromEntries(
-      uniqFiles.map(file => [file.id, splitedFiles.raws[file.id]]),
+    const uniqNewRaws = Object.fromEntries(
+      uniqNewFiles.map(file => [file.id, splitedFiles.raws[file.id]]),
     );
 
-    const allAttachments = [...itemAttachments, ...uniqFiles];
-    const allRaws = { ...itemRaws, ...uniqRaws };
+    const allAttachments = [...itemAttachments, ...uniqNewFiles];
+    const allRaws = { ...itemRaws, ...uniqNewRaws };
 
-    const updatedItem = {
-      attachments: allAttachments,
-      raws: allRaws,
-    };
-
-    setNewFiles([...uploadedDuplicatedFiles, ...uniqFiles]);
+    setNewFiles([...uploadedDuplicatedFiles, ...uniqNewFiles]);
 
     setItemRaws(allRaws);
     setItemAttachments(allAttachments);
 
     setModalOpened(true);
-    onClickAcceptEdit(updatedItem);
+    syncStateWithServer({
+      attachments: allAttachments,
+      raws: allRaws,
+    });
   };
 
   const AttachmentsComponent = () => (
@@ -166,7 +180,7 @@ export const Attachments = ({
               onClickRemove={
                 onClickAcceptEdit && (() => onClickRemove(attachment))
               }
-              attachment={attachment}
+              {...attachment}
             />
           ))}
         <Can I={PERMISSION.EDIT} an={itemSubject}>

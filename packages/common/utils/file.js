@@ -1,6 +1,9 @@
 import { saveAs } from 'file-saver';
 import JSZip from 'jszip';
-import deepequal from 'fast-deep-equal';
+import {
+  MAX_UPLOADING_FILE_SIZE,
+  TOTAL_MAX_UPLOADING_FILES_SIZES,
+} from '../constants';
 
 export const BASE_64_LENGTH_BYTE_RATE = 3 / 4;
 
@@ -57,7 +60,6 @@ export const parseBase64 = url => {
 export const downloadFile = (url, filename) => {
   const { data, mime } = parseBase64(url);
   const blob = base64toBlob(data, mime);
-
   saveAs(blob, filename);
 };
 
@@ -76,25 +78,26 @@ export const downloadAsZip = files => {
 
 export const getUniqueAndDublicates = (newFiles = [], existFiles = []) => {
   if (existFiles.length <= 0) {
-    return { uniqFiles: [...newFiles], duplicatedFiles: [] };
+    return { uniqNewFiles: [...newFiles], duplicatedFiles: [] };
   }
-  const mergedFiles = [...newFiles, ...existFiles];
 
-  const uniqFilesSet = new Set(
-    mergedFiles.map(file => `${file.name}_${file.size}`),
-  );
   const existFilesSet = new Set(
     existFiles.map(file => `${file.name}_${file.size}`),
   );
 
-  const duplicatedFiles = newFiles.filter(file =>
-    existFilesSet.has(`${file.name}_${file.size}`),
-  );
-  const uniqFiles = mergedFiles.filter(file =>
-    uniqFilesSet.has(`${file.name}_${file.size}`),
-  );
+  const uniqNewFiles = [];
+  const duplicatedFiles = [];
 
-  return { uniqFiles, duplicatedFiles };
+  newFiles.forEach(file => {
+    const label = `${file.name}_${file.size}`;
+    if (!existFilesSet.has(label)) {
+      uniqNewFiles.push(file);
+    } else {
+      duplicatedFiles.push(file);
+    }
+  });
+
+  return { uniqNewFiles, duplicatedFiles };
 };
 
 export const splitFilesToUniqAndDuplicates = files => {
@@ -133,15 +136,15 @@ export const isBase64Encoded = dataString => {
   return dataString.indexOf(';base64') !== -1;
 };
 
-export const getRealFileSizeForBase64enc = length => {
-  return length ? length * BASE_64_LENGTH_BYTE_RATE : 0;
+export const getRealFileSizeForBase64enc = size => {
+  return size ? size * BASE_64_LENGTH_BYTE_RATE : 0;
 };
 
 export const getRealFileSizesForBase64enc = files => {
   return files
-    ? files.reduce((acc, { raw }) => {
-        if (isBase64Encoded(raw.substr(0, 50))) {
-          return acc + raw.length;
+    ? files.reduce((acc, { raw, size }) => {
+        if (typeof raw === 'undefined' && size) {
+          return acc + size;
         }
 
         return acc + getRealFileSizeForBase64enc(raw.length);
@@ -178,3 +181,24 @@ export const humanizeSize = (bytes, si = true, dp = 1) => {
 
   return `${formatedBytes.toFixed(dp)} ${units[u]}`;
 };
+
+export const SIZE_NAME_RATE_MAP = {
+  B: 1,
+  KB: 1024,
+  MB: 1024 * 1024,
+};
+
+export const convertSizeNameToNumber = sizeName =>
+  sizeName.replace(/(\d+)(B|KB|MB)/, (match, size, type) =>
+    size && type ? Number(size) * SIZE_NAME_RATE_MAP[type] : 0,
+  );
+
+export const checkFileSize = size =>
+  size * BASE_64_LENGTH_BYTE_RATE <=
+  convertSizeNameToNumber(MAX_UPLOADING_FILE_SIZE);
+
+export const checkAllFileSizes = files =>
+  files
+    ? getRealFileSizesForBase64enc(files) <=
+      convertSizeNameToNumber(TOTAL_MAX_UPLOADING_FILES_SIZES)
+    : true;

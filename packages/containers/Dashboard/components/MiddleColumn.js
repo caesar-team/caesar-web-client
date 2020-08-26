@@ -60,7 +60,12 @@ const MiddleColumnComponent = ({
 
   const handleDefaultSelectionItemBehaviour = itemId => {
     dispatch(resetWorkInProgressItemIds());
-    dispatch(setWorkInProgressItem(itemsById[itemId]));
+    // Todo: Remote the Hack for caching raws :(
+    if (
+      !workInProgressItem ||
+      Object.keys(workInProgressItem.data?.raws).length === 0
+    )
+      dispatch(setWorkInProgressItem(itemsById[itemId]));
   };
 
   const handleClickItem = itemId => () => {

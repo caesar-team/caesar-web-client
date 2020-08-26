@@ -177,6 +177,8 @@ export const CREATING_ITEM_NOTIFICATION = 'The item is being created...';
 export const SHARING_IN_PROGRESS_NOTIFICATION = 'Sharing in progress...';
 export const CREATING_ITEMS_NOTIFICATION =
   'Import in progress. The items are being created...';
+export const FEATURE_IS_UNDER_DEVELOPMENT =
+  'Caution! This feature is under development';
 export const MOVING_IN_PROGRESS_NOTIFICATION = 'Moving in progress...';
 export const REMOVING_IN_PROGRESS_NOTIFICATION = 'Removing in progress...';
 export const REDIRECT_NOTIFICATION = 'Redirecting...';

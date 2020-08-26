@@ -26,7 +26,7 @@ const itemIdPropSelector = (_, props) => props.itemId;
 export const itemSelector = createSelector(
   itemsByIdSelector,
   itemIdPropSelector,
-  (itemsById, itemId) => itemsById[itemId],
+  (itemsById, itemId) => itemsById[itemId] || null,
 );
 
 const itemIdsPropSelector = (_, props) => props.itemIds;

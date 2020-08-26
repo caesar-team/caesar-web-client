@@ -78,7 +78,7 @@ export const NewFilesModal = ({ files, closeModal }) => {
         <Inner>
           <Scrollbar autoHeight autoHeightMax={300}>
             {files.map((file, key) => (
-              <File key={`modal-attachment-${key}`} attachment={file} />
+              <File key={`modal-attachment-${key}`} {...file} />
             ))}
           </Scrollbar>
         </Inner>

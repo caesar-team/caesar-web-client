@@ -4,6 +4,7 @@ import { processUploadedFiles } from './attachment';
 function isValidItem(item) {
   // TODO: strengthen checks
   if (!item.data) {
+    console.log(item);
     // eslint-disable-next-line no-console
     console.error(
       `The item with ID: ${item.id} is broken. It doesn't contain item credentials after decryption.`,

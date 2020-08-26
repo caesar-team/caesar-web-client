@@ -306,7 +306,6 @@ export function* decryptionEndWatchSaga() {
 function* setWorkInProgressItemSaga({ payload: { item } }) {
   try {
     if (!item) return;
-
     const { raws } = JSON.parse(item.secret);
 
     if (raws) {

@@ -15,16 +15,15 @@ import {
 
 const taskAction = (items, raws, key, masterPassword) => async task => {
   await task.init(key, masterPassword);
+  let result = [];
 
   if (items) {
-    // eslint-disable-next-line no-return-await
-    return await task.decryptAll(items);
+    result = await task.decryptAll(items);
+  } else if (raws) {
+    result = await task.decryptRaws(raws);
   }
 
-  if (raws) {
-    // eslint-disable-next-line no-return-await
-    return await task.decryptRaws(raws);
-  }
+  return result;
 };
 
 export function* decryption({ items, raws, key, masterPassword, coresCount }) {

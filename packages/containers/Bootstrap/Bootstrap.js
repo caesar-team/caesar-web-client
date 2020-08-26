@@ -34,6 +34,7 @@ import {
   MasterPasswordStep,
   SharedItemsStep,
 } from './Steps';
+import { setMasterPassword } from '@caesar/common/actions/user';
 
 const TWO_FACTOR_STEPS = [TWO_FACTOR_CREATE, TWO_FACTOR_CHECK];
 const PASSWORD_STEPS = [PASSWORD_CHANGE];
@@ -59,15 +60,14 @@ class Bootstrap extends Component {
 
   async componentDidMount() {
     const { logout, initCoresCount, shared = {} } = this.props;
-
     initCoresCount();
 
     try {
       const { data: bootstrap } = await getUserBootstrap();
       const { data: user } = await getUserSelf();
 
-      // TODO: Add namespaces into JWT token to avoid this dirty hack
       if (!user || (user?.email.includes('anonymous') && !shared?.mp)) {
+        // TODO: Add namespaces into JWT token to avoid this dirty hack
         logout();
       }
 

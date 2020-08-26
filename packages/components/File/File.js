@@ -157,17 +157,15 @@ const UploadedWrapper = styled.div`
 `;
 
 const File = ({
-  attachment,
-  raw,
+  size,
+  name,
+  ext,
   error,
   itemSubject,
   onClickRemove,
   onClickDownload,
   ...props
 }) => {
-  const { ext, name } = attachment;
-  const size = humanizeSize(attachment.size);
-
   const handleClickCloseIcon = e => {
     e.stopPropagation();
     onClickRemove();
@@ -193,7 +191,7 @@ const File = ({
           <ErrorStatus>!</ErrorStatus>
           <Details>
             <FileName>{name}</FileName>
-            <FileSize isError>{size}</FileSize>
+            <FileSize isError>{humanizeSize(size)}</FileSize>
             <Error>{error}</Error>
           </Details>
           {onClickRemove && hoverableCloseIcon}
@@ -211,7 +209,7 @@ const File = ({
       <FileExt>{ext}</FileExt>
       <Details>
         <FileName>{name}</FileName>
-        <FileSize>{size}</FileSize>
+        <FileSize>{humanizeSize(size)}</FileSize>
       </Details>
       {itemSubject ? (
         <Can I={PERMISSION.EDIT} an={itemSubject}>

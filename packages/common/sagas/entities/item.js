@@ -41,7 +41,10 @@ import {
 } from '@caesar/common/actions/entities/list';
 import { removeChildItemsBatch } from '@caesar/common/actions/entities/childItem';
 import { setCurrentTeamId } from '@caesar/common/actions/user';
-import { updateGlobalNotification } from '@caesar/common/actions/application';
+import {
+  updateGlobalNotification,
+  UPDATE_GLOBAL_NOTIFICATION,
+} from '@caesar/common/actions/application';
 import {
   setWorkInProgressItem,
   updateWorkInProgressItem,
@@ -82,6 +85,7 @@ import {
   COMMON_PROGRESS_NOTIFICATION,
   CREATING_ITEM_NOTIFICATION,
   CREATING_ITEMS_NOTIFICATION,
+  FEATURE_IS_UNDER_DEVELOPMENT,
   ENCRYPTING_ITEM_NOTIFICATION,
   MOVING_IN_PROGRESS_NOTIFICATION,
   REMOVING_IN_PROGRESS_NOTIFICATION,
@@ -286,8 +290,12 @@ export function* createItemSaga({
   meta: { setSubmitting = Function.prototype },
 }) {
   try {
-    const { teamId, listId, attachments = [], raws = {}, type, ...data } = item;
-
+    const {
+      teamId,
+      listId,
+      type,
+      data: { raws, ...data },
+    } = item;
     const isSystemItem = type === ITEM_TYPE.SYSTEM;
     const keyPair = yield select(personalKeyPairSelector);
     const notificationText = isSystemItem
@@ -303,20 +311,19 @@ export function* createItemSaga({
       });
       publicKey = teamSystemItem.publicKey;
     }
-    const encryptedItemData = yield call(
-      encryptItem,
-      { data: { attachments, ...data } },
-      publicKey,
-    );
-    const encryptedItemRaws = yield call(encryptItem, raws, publicKey);
+    const encryptedItemData = yield call(encryptItem, data, publicKey);
 
     const encryptedItem = {
       data: encryptedItemData,
-      raws: encryptedItemRaws,
+      raws: Object.keys(raws).length
+        ? yield call(encryptItem, raws, publicKey)
+        : null,
     };
+
     if (!isSystemItem) {
       yield put(updateGlobalNotification(CREATING_ITEM_NOTIFICATION, true));
     }
+
     const { data: itemData } = yield call(postCreateItem, {
       listId,
       type,
@@ -325,8 +332,9 @@ export function* createItemSaga({
 
     // TODO: Make the class of the item instead of the direct object
     const newItem = {
+      ...item,
       ...itemData,
-      ...{ data: { attachments, raws, ...data } },
+      data,
       __type: ENTITY_TYPE.ITEM,
     };
 
@@ -372,16 +380,15 @@ export function* createItemsBatchSaga({
   meta: { setSubmitting },
 }) {
   try {
-    yield put(updateGlobalNotification(CREATING_ITEMS_NOTIFICATION, true));
+    yield put(updateGlobalNotification(UPDATE_GLOBAL_NOTIFICATION, true));
 
     const list = yield select(listSelector, { listId });
     const keyPair = yield select(personalKeyPairSelector);
     const user = yield select(userDataSelector);
 
     const preparedForEncryptingItems = items.map(
-      ({ attachments, raws, type, ...data }) => ({
+      ({ attachments, type, ...data }) => ({
         attachments,
-        raws,
         ...data,
       }),
     );
@@ -395,7 +402,10 @@ export function* createItemsBatchSaga({
     const preparedForRequestItems = items.map(({ type }, index) => ({
       type,
       listId,
-      secret: encryptedItems[index],
+      secret: JSON.stringify({
+        data: encryptedItems[index],
+        raws: null,
+      }),
     }));
 
     const { data } = yield call(postCreateItemsBatch, {
@@ -447,17 +457,21 @@ export function* createItemsBatchSaga({
 
 export function* updateItemSaga({ payload: { item } }) {
   try {
-    const { raws = {}, ...data } = item.data;
+    const {
+      data: { raws = {}, ...data },
+    } = item;
     yield put(updateGlobalNotification(ENCRYPTING_ITEM_NOTIFICATION, true));
 
     const keyPair = yield select(personalKeyPairSelector);
-    const encryptedItemData = yield call(encryptItem, data, keyPair.publicKey);
 
-    const encryptedItemRaws = yield call(encryptItem, raws, keyPair.publicKey);
+    const encryptedItemData = yield call(encryptItem, data, keyPair.publicKey);
     const encryptedItem = {
       data: encryptedItemData,
-      raws: encryptedItemRaws,
+      raws: Object.keys(raws).length
+        ? yield call(encryptItem, raws, keyPair.publicKey)
+        : null,
     };
+
     const encryptedItemSecret = JSON.stringify(encryptedItem);
 
     const {
@@ -467,7 +481,11 @@ export function* updateItemSaga({ payload: { item } }) {
     });
 
     yield put(
-      updateItemSuccess({ ...item, lastUpdated, secret: encryptedItemSecret }),
+      updateItemSuccess({
+        ...item,
+        lastUpdated,
+        secret: encryptedItemSecret,
+      }),
     );
 
     yield put(updateWorkInProgressItem());
@@ -493,8 +511,11 @@ export function* editItemSaga({
     const itemInState = yield select(itemSelector, { itemId: item.id });
     const isDataChanged = !deepequal(itemInState.data, item.data);
 
-    if (!isDataChanged) {
+    if (!!isDataChanged) {
       setSubmitting(false);
+      yield call(notification.show, {
+        text: `The '${item.data.name}' has NOT been updated`,
+      });
 
       return;
     }

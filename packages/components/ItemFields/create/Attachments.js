@@ -54,7 +54,7 @@ const renderAttachments = (
             attachments.filter((_, fileIndex) => index !== fileIndex),
           )
         }
-        attachment={attachment}
+        {...attachment}
       />
     </FileRow>
   ));

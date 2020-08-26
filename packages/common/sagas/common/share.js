@@ -1,7 +1,15 @@
-import { call, select, all, takeLatest, put } from '@redux-saga/core/effects';
+import { call, select, all, takeLatest, put, fork, take } from '@redux-saga/core/effects';
 import { getOrCreateMemberBatchSaga } from '@caesar/common/sagas/entities/member';
-import { itemChildItemsSelector, itemsBatchSelector } from '@caesar/common/selectors/entities/item';
-import { masterPasswordSelector, userDataSelector } from '@caesar/common/selectors/user';
+import {
+  itemChildItemsSelector,
+  itemsBatchSelector,
+  systemItemsBatchSelector,
+} from '@caesar/common/selectors/entities/item';
+import {
+  masterPasswordSelector,
+  userDataSelector,
+  currentTeamIdSelector,
+} from '@caesar/common/selectors/user';
 import { actualKeyPairSelector } from '@caesar/common/selectors/keyStore';
 import {
   decryptItem,
@@ -11,6 +19,7 @@ import {
   NOOP_NOTIFICATION,
   ROLE_USER,
   SHARING_IN_PROGRESS_NOTIFICATION,
+  TEAM_TYPE,
 } from '@caesar/common/constants';
 import {
   shareItemBatchSuccess,
@@ -99,7 +108,12 @@ export function* shareItemBatchSaga({
     yield put(updateGlobalNotification(SHARING_IN_PROGRESS_NOTIFICATION, true));
 
     const user = yield select(userDataSelector);
-    const items = yield select(itemsBatchSelector, { itemIds });
+    const currentTeamId = yield select(currentTeamIdSelector);
+    let items = yield select(itemsBatchSelector, { itemIds });
+
+    if (currentTeamId === TEAM_TYPE.PERSONAL) {
+      items = yield select(systemItemsBatchSelector, { itemIds });
+    }
 
     const preparedMembers = yield call(prepareUsersForSharing, members);
 
@@ -181,7 +195,6 @@ export function* removeShareSaga({ payload: { shareId } }) {
     yield put(removeShareFailure());
   }
 }
-
 
 export function* shareItemSagas() {
   yield takeLatest(SHARE_ITEM_BATCH_REQUEST, shareItemBatchSaga);

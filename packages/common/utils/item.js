@@ -21,17 +21,19 @@ export function checkItemsAfterDecryption(items) {
   );
 }
 
-export function generateSystemItemName(teamId) {
-  return `team-${teamId}`;
+export function generateSystemItemName(entity, id) {
+  return `${entity}-${id}`;
 }
 
-export function generateSystemItemEmail(teamId) {
-  return `${generateSystemItemName(teamId)}@${getHostName()}`;
+export function generateSystemItemEmail(entity, id) {
+  return `${generateSystemItemName(entity, id)}@${getHostName()}.com`;
 }
 
 export function extractKeysFromSystemItem(item) {
-  const publicKey = item.attachments?.find(({ name }) => name === 'publicKey')?.raw;
-  const privateKey = item.attachments?.find(({ name }) => name === 'privateKey')?.raw;
+  const publicKey = item.attachments?.find(({ name }) => name === 'publicKey')
+    ?.raw;
+  const privateKey = item.attachments?.find(({ name }) => name === 'privateKey')
+    ?.raw;
 
   return {
     publicKey,

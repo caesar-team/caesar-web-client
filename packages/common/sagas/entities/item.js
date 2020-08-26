@@ -29,6 +29,7 @@ import {
   toggleItemToFavoriteFailure,
   removeChildItemsBatchFromItem,
   updateItemField,
+  createItemRequest,
 } from '@caesar/common/actions/entities/item';
 import { shareItemBatchSaga } from '@caesar/common/sagas/common/share';
 import {
@@ -63,8 +64,9 @@ import { itemSelector } from '@caesar/common/selectors/entities/item';
 import {
   userDataSelector,
   currentTeamIdSelector,
+  userPersonalDefaultListIdSelector,
 } from '@caesar/common/selectors/user';
-import { addTeamKeyPair } from '@caesar/common/actions/keyStore';
+import { addEntityKeyPair } from '@caesar/common/actions/keyStore';
 import {
   postCreateItem,
   postCreateItemsBatch,
@@ -97,8 +99,41 @@ import {
   personalKeyPairSelector,
   teamKeyPairSelector,
 } from '@caesar/common/selectors/keyStore';
+import { generateSystemItemEmail, generateSystemItemName } from '@caesar/common/utils/item';
+import { passwordGenerator } from '@caesar/common/utils/passwordGenerator';
+import { generateKeys } from '@caesar/common/utils/key';
 
 const ITEMS_CHUNK_SIZE = 50;
+
+export function* generateSystemItem(entity, listId, entityId) {
+  const masterPassword = yield call(passwordGenerator);
+  const systemItemEmail = yield call(generateSystemItemEmail, entity, entityId);
+
+  const { publicKey, privateKey } = yield call(
+    generateKeys,
+    masterPassword,
+    [systemItemEmail],
+  );
+
+  const systemItemData = {
+    type: ITEM_TYPE.SYSTEM,
+    listId,
+    attachments: [
+      {
+        name: 'publicKey',
+        raw: publicKey,
+      },
+      {
+        name: 'privateKey',
+        raw: privateKey,
+      },
+    ],
+    pass: masterPassword,
+    name: yield call(generateSystemItemName, entity, entityId),
+  };
+
+  return systemItemData;
+}
 
 export function* removeItemSaga({ payload: { itemId, listId } }) {
   try {
@@ -284,10 +319,13 @@ export function* createItemSaga({
   meta: { setSubmitting = Function.prototype },
 }) {
   try {
-    const { teamId, listId, attachments, type, ...data } = item;
+    const { teamId, listId, attachments, type, relatedItem, ...data } = item;
     const isSystemItem = type === ITEM_TYPE.SYSTEM;
     const keyPair = yield select(personalKeyPairSelector);
     const user = yield select(userDataSelector);
+    const userPersonalDefaultListId = yield select(
+      userPersonalDefaultListIdSelector,
+    );
     const notificationText = isSystemItem
       ? COMMON_PROGRESS_NOTIFICATION
       : ENCRYPTING_ITEM_NOTIFICATION;
@@ -297,7 +335,7 @@ export function* createItemSaga({
 
     if (teamId) {
       const teamSystemItem = yield select(teamKeyPairSelector, {
-        teamId,
+        teamId: teamId,
       });
       publicKey = teamSystemItem.publicKey;
     }
@@ -318,6 +356,7 @@ export function* createItemSaga({
       listId,
       type,
       secret: encryptedItem,
+      relatedItem,
     });
 
     const newItem = {
@@ -332,6 +371,7 @@ export function* createItemSaga({
       teamId: teamId || null,
       ownerId: user.id,
       secret: encryptedItem,
+      relatedItem,
       data: { attachments, ...data },
       _links,
       __type: ENTITY_TYPE.ITEM,
@@ -351,7 +391,7 @@ export function* createItemSaga({
     yield put(setCurrentTeamId(teamId || TEAM_TYPE.PERSONAL));
 
     if (isSystemItem) {
-      yield put(addTeamKeyPair(newItem));
+      yield put(addEntityKeyPair(newItem));
     } else {
       yield put(setWorkInProgressListId(listId));
       yield put(setWorkInProgressItem(newItem));
@@ -359,7 +399,19 @@ export function* createItemSaga({
     }
 
     if (!isSystemItem) {
-      yield call(Router.push, ROUTES.DASHBOARD);
+      if (!teamId && currentTeamId === TEAM_TYPE.PERSONAL) {
+        const systemItemData = yield call(
+          generateSystemItem,
+          ENTITY_TYPE.ITEM,
+          userPersonalDefaultListId,
+          itemId,
+        );
+        systemItemData.relatedItem = itemId;
+        console.log('System data');
+        console.log(systemItemData);
+
+        yield put(createItemRequest(systemItemData));
+      }
     }
   } catch (error) {
     console.log(error);

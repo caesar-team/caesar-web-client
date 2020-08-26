@@ -237,6 +237,6 @@ export const PERMISSION_MESSAGES = {
 
 export const KEY_TYPE = {
   PERSONAL: 'personal',
-  TEAM: 'team',
+  ENTITY: 'entity',
   ANONYMOUS: 'anonymous',
 };

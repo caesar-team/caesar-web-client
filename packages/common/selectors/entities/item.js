@@ -2,7 +2,7 @@ import { createSelector } from 'reselect';
 import { childItemsByIdSelector } from '@caesar/common/selectors/entities/childItem';
 import { currentTeamSelector } from '@caesar/common/selectors/user';
 import { generateSystemItemName } from '@caesar/common/utils/item';
-import { ITEM_TYPE } from '@caesar/common/constants';
+import { ENTITY_TYPE, ITEM_TYPE } from '@caesar/common/constants';
 
 export const entitiesSelector = state => state.entities;
 
@@ -71,18 +71,37 @@ export const itemsChildItemsBatchSelector = createSelector(
 export const systemItemsSelector = createSelector(
   itemsByIdSelector,
   items =>
-    Object.values(items).find(({ type }) => type === ITEM_TYPE.SYSTEM) || {},
+    Object.values(items).filter(({ type }) => type === ITEM_TYPE.SYSTEM) || [],
+);
+
+export const systemItemsBatchSelector = createSelector(
+  systemItemsSelector,
+  itemIdsPropSelector,
+  (systemItems, itemIds) =>
+    itemIds.map(
+      itemId => {
+//        console.log(systemItems);
+ //       console.log(itemId);
+       return systemItems.find(
+          ({ data }) => data.name === generateSystemItemName(ENTITY_TYPE.ITEM, itemId),
+        ) || {};
+      }),
 );
 
 export const teamSystemItemSelector = createSelector(
   systemItemsSelector,
   currentTeamSelector,
   (items, currentTeam) =>
-    items.find(({ name }) => name === generateSystemItemName(currentTeam.id)) ||
-    {},
+    items.find(
+      ({ data }) => data.name === generateSystemItemName(ENTITY_TYPE.TEAM, currentTeam.id),
+    ) || {},
 );
 
 export const visibleItemsSelector = createSelector(
   itemsBatchSelector,
   items => items.filter(({ type }) => type !== ITEM_TYPE.SYSTEM) || [],
+);
+
+export const ownItemsSelector = createSelector(
+
 );

@@ -5,40 +5,63 @@ import {
   userIdSelector,
 } from '@caesar/common/selectors/user';
 import { generateSystemItemName } from '@caesar/common/utils/item';
-import { KEY_TYPE, TEAM_TYPE } from '@caesar/common/constants';
+import { KEY_TYPE, TEAM_TYPE, ENTITY_TYPE } from '@caesar/common/constants';
 
-const findTeamItemByName = (data, teamId) =>
-  Object.values(data[KEY_TYPE.TEAM]).find(
-    ({ name }) => name === generateSystemItemName(teamId),
+const findEntityItemsByType = (data, entityType) =>
+  Object.values(data[KEY_TYPE.ENTITY]).filter(
+    ({ name }) => name.includes(entityType)
+  ) || [];
+
+const findTeamItemByName = (items, teamId) =>
+  items.find(
+    ({ name }) => name === generateSystemItemName(ENTITY_TYPE.TEAM, teamId),
   ) || {};
+
+const findItemsByNames = (items, itemIds) =>
+  itemIds.map(itemId => items.find(
+    ({ name }) => name === generateSystemItemName(ENTITY_TYPE.ITEM, itemId),
+  ) || {});
 
 export const keyStoreSelector = state => state.keyStore;
 
 const teamIdPropSelector = (_, props) => props.teamId;
 
-export const keyStoreDataSelector = createSelector(
+const itemIdsPropSelector = (_, props) => props.itemIds;
+
+export const entityTeamSelector = createSelector(
   keyStoreSelector,
-  keyStore => keyStore.data,
+  data => findEntityItemsByType(data, ENTITY_TYPE.TEAM),
+);
+
+export const entityItemSelector = createSelector(
+  keyStoreSelector,
+  data => findEntityItemsByType(data, ENTITY_TYPE.ITEM),
 );
 
 export const personalKeyPairSelector = createSelector(
-  keyStoreDataSelector,
+  keyStoreSelector,
   keyStore => keyStore[KEY_TYPE.PERSONAL] || {},
 );
 
 export const teamKeyPairSelector = createSelector(
-  keyStoreDataSelector,
+  entityTeamSelector,
   teamIdPropSelector,
   (data, teamId) => findTeamItemByName(data, teamId),
 );
 
+export const itemsKeyPairSelector = createSelector(
+  entityItemSelector,
+  itemIdsPropSelector,
+  (data, itemIds) => findItemsByNames(data, itemIds),
+);
+
 export const anonymousKeyPairSelector = createSelector(
-  keyStoreDataSelector,
-  (data, teamName) => Object.values(data[KEY_TYPE.ANONYMOUS]) || {},
+  keyStoreSelector,
+  data => Object.values(data[KEY_TYPE.ANONYMOUS]) || {},
 );
 
 export const actualKeyPairSelector = createSelector(
-  keyStoreDataSelector,
+  keyStoreSelector,
   currentTeamIdSelector,
   personalKeyPairSelector,
   isUserAnonymousSelector,

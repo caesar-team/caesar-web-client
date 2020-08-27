@@ -79,13 +79,10 @@ import {
 } from '@caesar/common/utils/cipherUtils';
 import { getServerErrorMessage } from '@caesar/common/utils/error';
 import { chunk } from '@caesar/common/utils/utils';
-import { splitItemAttachments } from '@caesar/common/utils/item';
 import {
   ENTITY_TYPE,
   COMMON_PROGRESS_NOTIFICATION,
   CREATING_ITEM_NOTIFICATION,
-  CREATING_ITEMS_NOTIFICATION,
-  FEATURE_IS_UNDER_DEVELOPMENT,
   ENCRYPTING_ITEM_NOTIFICATION,
   MOVING_IN_PROGRESS_NOTIFICATION,
   REMOVING_IN_PROGRESS_NOTIFICATION,
@@ -291,11 +288,12 @@ export function* createItemSaga({
 }) {
   try {
     const {
-      teamId,
+      teamId = null,
       listId,
       type,
       data: { raws, ...data },
     } = item;
+
     const isSystemItem = type === ITEM_TYPE.SYSTEM;
     const keyPair = yield select(personalKeyPairSelector);
     const notificationText = isSystemItem
@@ -458,8 +456,10 @@ export function* createItemsBatchSaga({
 export function* updateItemSaga({ payload: { item } }) {
   try {
     const {
-      data: { raws = {}, ...data },
+      id: itemId,
+      data: { raws, ...data },
     } = item;
+
     yield put(updateGlobalNotification(ENCRYPTING_ITEM_NOTIFICATION, true));
 
     const keyPair = yield select(personalKeyPairSelector);
@@ -476,20 +476,18 @@ export function* updateItemSaga({ payload: { item } }) {
 
     const {
       data: { lastUpdated },
-    } = yield call(updateItem, item.id, {
+    } = yield call(updateItem, itemId, {
       item: { secret: encryptedItemSecret },
     });
-
-    yield put(
-      updateItemSuccess({
-        ...item,
-        lastUpdated,
-        secret: encryptedItemSecret,
-      }),
-    );
+    const updatedItem = {
+      ...item,
+      lastUpdated,
+      secret: encryptedItemSecret,
+    };
+    yield put(updateItemSuccess(updatedItem));
 
     yield put(updateWorkInProgressItem());
-
+    yield put(setWorkInProgressItem(updatedItem));
     yield put(updateGlobalNotification(NOOP_NOTIFICATION, false));
   } catch (error) {
     // eslint-disable-next-line no-console
@@ -506,16 +504,24 @@ export function* editItemSaga({
   meta: { setSubmitting, notification },
 }) {
   try {
-    const { listId } = item;
-    // const workInProgressItem = yield select(itemByIdSelector);
-    const itemInState = yield select(itemSelector, { itemId: item.id });
-    const isDataChanged = !deepequal(itemInState.data, item.data);
+    const {
+      id: itemId,
+      listId,
+      data: { raws, ...data },
+    } = item;
 
-    if (!!isDataChanged) {
+    const itemInState = yield select(itemSelector, { itemId });
+    const isDataChanged = !deepequal(itemInState.data, data);
+
+    if (!isDataChanged) {
       setSubmitting(false);
-      yield call(notification.show, {
-        text: `The '${item.data.name}' has NOT been updated`,
-      });
+      yield put(
+        updateGlobalNotification(
+          `The '${item.data.name}' has not been updated`,
+          false,
+          true,
+        ),
+      );
 
       return;
     }

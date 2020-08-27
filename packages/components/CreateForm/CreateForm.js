@@ -21,21 +21,33 @@ export const CreateForm = () => {
   const { query } = useRouter();
 
   const handleCreate = (
-    { attachments: uploadedFiles, name, note, ...values },
+    {
+      name = null,
+      note = null,
+      pass = null,
+      website = null,
+      login = null,
+      attachments: uploadedFiles = null,
+      ...itemForm
+    },
     { setSubmitting },
   ) => {
-    const { attachments, raws } = processUploadedFiles(uploadedFiles);
+    const { attachments = [], raws = {} } = processUploadedFiles(uploadedFiles);
+    const data = {
+      name,
+      note,
+      pass,
+      website,
+      login,
+      attachments,
+      raws,
+    };
 
     dispatch(
       createItemRequest(
         {
-          ...values,
-          data: {
-            name,
-            note,
-            attachments,
-            raws,
-          },
+          ...itemForm,
+          data,
         },
         setSubmitting,
       ),

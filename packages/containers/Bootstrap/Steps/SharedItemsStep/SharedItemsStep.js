@@ -166,11 +166,10 @@ class SharedItemsStep extends Component {
 
       this.setState({
         items: {
-          personal: personalItems
-            .map((item, index) => ({
-              ...item,
-              secret: decryptedItems[index],
-            })),
+          personal: personalItems.map((item, index) => ({
+            ...item,
+            secret: decryptedItems[index],
+          })),
           teams: teamsItems,
         },
         selectedIds: personalItems.map(({ id }) => id),
@@ -226,7 +225,8 @@ class SharedItemsStep extends Component {
 
       if (oldKeyPair || currentKeyPair) {
         const privateKeyObj = await getPrivateKeyObj(
-          oldKeyPair?.encryptedPrivateKey || currentKeyPair?.encryptedPrivateKey,
+          oldKeyPair?.encryptedPrivateKey ||
+            currentKeyPair?.encryptedPrivateKey,
           oldMasterPassword || currentMasterPassword,
         );
 
@@ -320,8 +320,9 @@ class SharedItemsStep extends Component {
 
     return items.teams.map(({ id, items: teamItems }) => {
       const team = teams.find(({ id: teamId }) => teamId === id);
-      const filteredTeamItems =
-        teamItems.filter(item => item.type !== ITEM_TYPE.SYSTEM);
+      const filteredTeamItems = teamItems.filter(
+        item => item.type !== ITEM_TYPE.SYSTEM,
+      );
 
       return (
         <TeamRow key={id}>

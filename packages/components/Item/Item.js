@@ -44,11 +44,12 @@ const ItemComponent = ({
   onClickRemoveItem = Function.prototype,
 }) => {
   const dispatch = useDispatch();
+  const item = useSelector(workInProgressItemSelector);
   const trashList = useSelector(trashListSelector);
   const teamsTrashLists = useSelector(teamsTrashListsSelector);
   const [isSubmitting, setSubmitting] = useState(false);
   const [isMoveModalOpened, setMoveModalOpened] = useState(false);
-  const [item, setItem] = useState(useSelector(workInProgressItemSelector));
+  // const [item, setItem] = useState(useSelector(workInProgressItemSelector));
 
   if (!item) {
     return <EmptyItem />;
@@ -63,15 +64,12 @@ const ItemComponent = ({
     setSubmitting(true);
     const updatedData = {
       ...item,
-      ...{
-        data: {
-          ...item.data,
-          ...patchData,
-        },
+      data: {
+        ...item.data,
+        ...patchData,
       },
     };
     dispatch(editItemRequest(updatedData, setSubmitting, notification));
-    setItem(updatedData);
   };
 
   const handleClickRestoreItem = async () => {

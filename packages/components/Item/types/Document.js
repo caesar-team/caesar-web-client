@@ -11,9 +11,7 @@ export const Document = ({
   onClickShare,
   isSharedItem,
 }) => {
-  const {
-    data: { name, note, attachments, raws },
-  } = item;
+  const { name, note, attachments, raws } = item.data;
 
   return (
     <>

@@ -1,4 +1,4 @@
-import React, { memo, useRef } from 'react';
+import React, { memo, useRef, useState } from 'react';
 import { useClickAway } from 'react-use';
 import { useSelector, useDispatch } from 'react-redux';
 import { DASHBOARD_MODE, LIST_TYPE } from '@caesar/common/constants';
@@ -60,12 +60,7 @@ const MiddleColumnComponent = ({
 
   const handleDefaultSelectionItemBehaviour = itemId => {
     dispatch(resetWorkInProgressItemIds());
-    // Todo: Remote the Hack for caching raws :(
-    if (
-      !workInProgressItem ||
-      Object.keys(workInProgressItem.data?.raws).length === 0
-    )
-      dispatch(setWorkInProgressItem(itemsById[itemId]));
+    dispatch(setWorkInProgressItem(itemsById[itemId]));
   };
 
   const handleClickItem = itemId => () => {

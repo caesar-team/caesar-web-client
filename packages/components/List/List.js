@@ -43,7 +43,6 @@ const ListComponent = ({
   onSelectItem = Function.prototype,
 }) => {
   const isDashboardDefaultMode = mode === DASHBOARD_MODE.DEFAULT;
-
   if (
     isDashboardDefaultMode &&
     !workInProgressList &&

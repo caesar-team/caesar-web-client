@@ -12,9 +12,10 @@ import { teamsByIdSelector } from '@caesar/common/selectors/entities/team';
 import { getTeamTitle } from '@caesar/common/utils/team';
 import { getMovableLists } from '../api';
 
-const getCheckedTeamTitle = (checkedTeamId, teams) => !checkedTeamId
-  ? TEAM_TEXT_TYPE[TEAM_TYPE.PERSONAL]
-  : getTeamTitle(teams[checkedTeamId]);
+const getCheckedTeamTitle = (checkedTeamId, teams) =>
+  !checkedTeamId
+    ? TEAM_TEXT_TYPE[TEAM_TYPE.PERSONAL]
+    : getTeamTitle(teams[checkedTeamId]);
 
 const getListTitle = (listId, lists) =>
   transformListTitle(lists.find(list => list.id === listId)?.label);

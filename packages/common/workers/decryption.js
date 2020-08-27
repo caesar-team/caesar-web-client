@@ -1,8 +1,6 @@
 import { expose } from 'threads/worker';
-import {
-  decryptItem,
-  getPrivateKeyObj,
-} from '@caesar/common/utils/cipherUtils';
+import { decryptItem, getPrivateKeyObj } from '../utils/cipherUtils';
+import { ITEM_TYPE } from '../constants';
 
 // eslint-disable-next-line
 self.window = self;
@@ -10,32 +8,56 @@ self.window = self;
 const state = {
   privateKeyObject: null,
 };
+const decryptItemData = async (item, privateKeyObject) => {
+  const { data: encryptedData, raws: encryptedRaws } = JSON.parse(item.secret);
+  const promises = [];
+  promises.push(decryptItem(encryptedData, privateKeyObject));
 
+  if (item.type === ITEM_TYPE.SYSTEM) {
+    promises.push(decryptItem(encryptedRaws, privateKeyObject));
+  }
+
+  const [data, raws = {}] = await Promise.all(promises);
+
+  return {
+    data: {
+      ...data,
+      raws,
+    },
+  };
+};
 const decryption = {
   async init(key, masterPassword) {
     state.privateKeyObject = await getPrivateKeyObj(key, masterPassword);
   },
   async decrypt(item) {
-    const data = await decryptItem(item, state.privateKeyObject);
+    const decryptedData = await decryptItemData(item, state.privateKeyObject);
 
-    return { id: item.id, data };
+    return {
+      ...item,
+      ...decryptedData,
+    };
   },
   async decryptAll(items) {
+    const { privateKeyObject } = state;
     // eslint-disable-next-line no-return-await
-    return await Promise.all(
+    const result = await Promise.all(
       items.map(async item => {
-        const { data: encryptedData } = JSON.parse(item.secret);
-        const data = await decryptItem(encryptedData, state.privateKeyObject);
-
-        return { id: item.id, data };
+        return {
+          ...item,
+          ...(await decryptItemData(item, privateKeyObject)),
+        };
       }),
     );
-  },
-  async decryptRaws(raws) {
-    if (!raws) return {};
-    const result = await decryptItem(raws, state.privateKeyObject);
-    console.log('decryptRaws');
+
     return result;
+  },
+
+  async decryptRaws(encryptedRaws) {
+    if (!encryptedRaws) return {};
+    const raws = await decryptItem(encryptedRaws, state.privateKeyObject);
+
+    return raws;
   },
 };
 

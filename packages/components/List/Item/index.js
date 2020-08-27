@@ -45,6 +45,7 @@ export const Item = ({
   const shouldShowMembers = !!invited.length;
   const shouldShowAttachments =
     attachments && Array.isArray(attachments) && attachments.length > 0;
+
   const shouldShowFavoriteIcon = favorite && !isClosable;
   const isActive = isMultiItem && workInProgressItemIds.includes(id);
   const isTop = index === 0;

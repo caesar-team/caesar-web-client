@@ -1,5 +1,6 @@
 import React from 'react';
 import { SCHEMA } from '@caesar/common/validation';
+
 import {
   Title,
   Input,
@@ -18,9 +19,7 @@ export const Credentials = ({
   onClickShare,
   isSharedItem,
 }) => {
-  const {
-    data: { name, login, pass, website, note, attachments, raws },
-  } = item;
+  const { name, login, pass, website, note, attachments, raws } = item.data;
 
   return (
     <>

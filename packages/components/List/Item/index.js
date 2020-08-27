@@ -40,6 +40,7 @@ export const Item = ({
   onClickItem = Function.prototype,
   onSelectItem = Function.prototype,
   workInProgressItemIds,
+  workInProgressItem,
   ...props
 }) => {
   const shouldShowMembers = !!invited.length;
@@ -47,7 +48,10 @@ export const Item = ({
     attachments && Array.isArray(attachments) && attachments.length > 0;
 
   const shouldShowFavoriteIcon = favorite && !isClosable;
-  const isActive = isMultiItem && workInProgressItemIds.includes(id);
+  const isActive =
+    workInProgressItem?.id === id ||
+    (isMultiItem && workInProgressItemIds.includes(id));
+
   const isTop = index === 0;
   const itemSubject = teamId
     ? {

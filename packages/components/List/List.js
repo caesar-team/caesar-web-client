@@ -38,6 +38,7 @@ const ListComponent = ({
   isMultiItem = false,
   workInProgressList = null,
   workInProgressItemIds,
+  workInProgressItem,
   items = [],
   onClickItem = Function.prototype,
   onSelectItem = Function.prototype,
@@ -72,6 +73,7 @@ const ListComponent = ({
             onClickItem={onClickItem}
             onSelectItem={onSelectItem}
             workInProgressItemIds={workInProgressItemIds}
+            workInProgressItem={workInProgressItem}
             {...item}
           />
         ))}

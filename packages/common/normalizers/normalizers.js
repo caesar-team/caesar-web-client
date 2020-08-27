@@ -1,15 +1,18 @@
 import { normalize } from 'normalizr';
 import { listSchema, memberSchema, teamSchema } from './schemas';
 
-export const extractRelatedItems = lists =>
-  lists.map(({ children, ...rest }) => {
-    const relatedItems = children.map(item => item.relatedItem || null);
+export const extractRelatedItems = lists => {
+  const result = lists.map(({ children, ...rest }) => {
+    const relatedItems = children.filter(item => item && item.relatedItem);
 
     return {
       ...rest,
       children: [...children, ...relatedItems],
     };
   });
+
+  return result;
+};
 
 export const convertNodesToEntities = nodes => {
   const normalized = normalize(nodes, [listSchema]);

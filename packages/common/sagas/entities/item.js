@@ -429,7 +429,7 @@ export function* createItemsBatchSaga({
   meta: { setSubmitting },
 }) {
   try {
-    yield put(updateGlobalNotification(UPDATE_GLOBAL_NOTIFICATION, true));
+    yield put(updateGlobalNotification(ENCRYPTING_ITEM_NOTIFICATION, true));
 
     const list = yield select(listSelector, { listId });
     const keyPair = yield select(personalKeyPairSelector);
@@ -462,33 +462,27 @@ export function* createItemsBatchSaga({
     });
 
     const preparedForStoreItems = data.map((item, index) => ({
-      id: item.id,
-      listId,
-      lastUpdated: item.lastUpdated,
-      favorite: false,
-      invited: [],
-      shared: null,
-      tags: [],
-      owner: user.id,
+      ...item,
       data: preparedForEncryptingItems[index],
-      type: items[index].type,
     }));
 
     yield put(createItemsBatchSuccess(preparedForStoreItems));
     yield put(addItemsBatchToList(data.map(({ id }) => id), listId));
+    yield put(updateGlobalNotification(NOOP_NOTIFICATION, false));
 
     if (list.teamId) {
-      yield fork(shareItemBatchSaga, {
-        payload: {
-          data: {
-            itemIds: data.map(({ id }) => id),
-            teamIds: [list.teamId],
-          },
-          options: {
-            includeIniciator: false,
-          },
-        },
-      });
+      // TODO: [Import] create system items for team
+      // yield fork(shareItemBatchSaga, {
+      //   payload: {
+      //     data: {
+      //       itemIds: data.map(({ id }) => id),
+      //       teamIds: [list.teamId],
+      //     },
+      //     options: {
+      //       includeIniciator: false,
+      //     },
+      //   },
+      // });
     } else {
       yield put(updateGlobalNotification(NOOP_NOTIFICATION, false));
     }

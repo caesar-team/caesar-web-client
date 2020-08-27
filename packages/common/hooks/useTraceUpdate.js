@@ -26,12 +26,8 @@ export const useTraceUpdate = props => {
       const prevProp = prev.current[key];
       const incomingProp = props[key];
 
-      if (
-        !isFunc(prevProp) &&
-        !isFunc(incomingProp) &&
-        !deepequal(prevProp, incomingProp)
-      ) {
-        changes[key] = new Prop(prevProp, incomingProp);
+      if (!deepequal(prevProp, incomingProp)) {
+        changes[key] = Prop(prevProp, incomingProp);
       }
     });
 

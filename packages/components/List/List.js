@@ -1,4 +1,4 @@
-import React, { memo } from 'react';
+debuggingimport React, { memo } from 'react';
 import styled from 'styled-components';
 import equal from 'fast-deep-equal';
 import { transformListTitle } from '@caesar/common/utils/string';
@@ -6,6 +6,7 @@ import { DASHBOARD_MODE } from '@caesar/common/constants';
 import { Scrollbar } from '../Scrollbar';
 import { EmptyList } from './EmptyList';
 import { Item } from './Item';
+import { useTraceUpdate } from '@caesar/common/hooks/useTraceUpdate';
 
 const Wrapper = styled.div`
   position: relative;

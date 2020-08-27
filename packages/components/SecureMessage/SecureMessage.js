@@ -8,7 +8,6 @@ import { encryptSecret } from '@caesar/common/utils/secret';
 import {
   ENCRYPTING_ITEM_NOTIFICATION,
   SAVE_NOTIFICATION,
-  DEFAULT_ERROR_MESSAGE,
 } from '@caesar/common/constants';
 import { passwordGenerator } from '@caesar/common/utils/passwordGenerator';
 import { Scrollbar, withNotification } from '@caesar/components';

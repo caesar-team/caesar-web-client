@@ -17,7 +17,6 @@ import {
 import OpenPGPWorker from 'worker-loader!openpgp/dist/openpgp.worker';
 import { isClient } from '@caesar/common/utils/isEnvironment';
 import { logger } from '@caesar/common/utils/logger';
-import { setMasterPassword } from '@caesar/common/actions/user';
 import { getBootstrapStates, getNavigationPanelSteps } from './utils';
 import {
   TWO_FACTOR_CHECK,

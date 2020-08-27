@@ -1,4 +1,4 @@
-import React, { memo, useRef, useState } from 'react';
+import React, { memo, useRef } from 'react';
 import { useClickAway } from 'react-use';
 import { useSelector, useDispatch } from 'react-redux';
 import { DASHBOARD_MODE, LIST_TYPE } from '@caesar/common/constants';

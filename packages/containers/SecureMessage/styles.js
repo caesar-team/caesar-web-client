@@ -31,6 +31,7 @@ export const ButtonsWrapper = styled.div`
   justify-content: center;
   padding: 0 24px;
   margin-top: 24px;
+  margin-bottom: 24px;
 
   ${media.mobile`
     flex-direction: column;
@@ -55,10 +56,6 @@ export const ButtonStyled = styled(Button)`
 
 export const Footer = styled.div`
   margin-top: auto;
-
-  ${media.wideMobile`
-    margin-top: 24px;
-  `}
 `;
 
 export const StyledLink = styled.a`

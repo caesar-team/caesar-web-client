@@ -20,31 +20,35 @@ const initialValues = {
   file: undefined,
 };
 
-const FileStep = ({ onSubmit }) => (
-  <Formik
-    key="fileStep"
-    initialValues={initialValues}
-    onSubmit={onSubmit}
-    validationSchema={createSchema('csv')}
-  >
-    {({ values, errors, setFieldValue, handleSubmit, submitForm }) => (
-      <Wrapper>
-        <Form onSubmit={handleSubmit}>
-          <Title>Upload your CSV file</Title>
-          <Uploader
-            name="file"
-            files={values.file}
-            extText="*.csv file"
-            error={errors.file ? errors.file.name || errors.file.raw : null}
-            onChange={(name, file) => {
-              setFieldValue('file', file);
-              submitForm().then();
-            }}
-          />
-        </Form>
-      </Wrapper>
-    )}
-  </Formik>
-);
+const FileStep = ({ onSubmit, ...props }) => {
+  return (
+    <Formik
+      key="fileStep"
+      initialValues={initialValues}
+      onSubmit={onSubmit}
+      validationSchema={createSchema('csv')}
+    >
+      {({ values, errors, setFieldValue, handleSubmit, submitForm }) => {
+        return (
+          <Wrapper>
+            <Form onSubmit={handleSubmit}>
+              <Title>Upload your CSV file</Title>
+              <Uploader
+                name="file"
+                files={values.file}
+                extText="*.csv file"
+                error={errors.file ? errors.file.name || errors.file.raw : null}
+                onChange={(name, file) => {
+                  setFieldValue('file', file);
+                  submitForm().then();
+                }}
+              />
+            </Form>
+          </Wrapper>
+        );
+      }}
+    </Formik>
+  );
+};
 
 export default FileStep;

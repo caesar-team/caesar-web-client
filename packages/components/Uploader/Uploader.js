@@ -90,7 +90,7 @@ const Uploader = ({
     );
 
     const preparedFiles = splitFilesToUniqAndDuplicates([
-      ...previousFiles,
+      ...(Array.isArray(previousFiles) ? previousFiles : [previousFiles]),
       ...files,
     ]);
 

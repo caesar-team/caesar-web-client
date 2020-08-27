@@ -212,8 +212,7 @@ const MoveModalComponent = ({
       <StyledModalTitle>
         {isMultiMode
           ? 'Move selected items to another vault or list'
-          : 'Move item to another vault or list'
-        }
+          : 'Move item to another vault or list'}
       </StyledModalTitle>
       <ListsWrapper>
         <StyledSelectVisible

@@ -87,6 +87,7 @@ export function* createMemberSaga({ payload: { email, role } }) {
     return { ...data, name: email, masterPassword, id: userId, password };
   } catch (error) {
     yield put(createMemberFailure());
+
     return null;
   }
 }
@@ -160,6 +161,7 @@ export function* createMemberBatchSaga({ payload: { emailRolePairs } }) {
     });
   } catch (error) {
     yield put(createMemberBatchFailure());
+
     return null;
   }
 }
@@ -221,6 +223,7 @@ export function* getOrCreateMemberBatchSaga({ payload: { emailRolePairs } }) {
     ];
   } catch (e) {
     console.log(e);
+
     return [];
   }
 }

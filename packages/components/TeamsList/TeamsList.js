@@ -33,11 +33,7 @@ const StyledAvatar = styled(Avatar)`
   margin-right: 16px;
 `;
 
-const TeamsListComponent = ({
-  activeTeamId,
-  handleToggle,
-  setListsOpened,
-}) => {
+const TeamsListComponent = ({ activeTeamId, handleToggle, setListsOpened }) => {
   const dispatch = useDispatch();
   const user = useSelector(userDataSelector);
   const currentTeam = useSelector(currentTeamSelector);

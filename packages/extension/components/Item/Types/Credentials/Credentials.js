@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import styled from 'styled-components';
 import { copyToClipboard } from '@caesar-utils/utils/clipboard';
-import { Icon, Label } from '@caesar-ui';
 import {
   Wrapper,
   Row,
@@ -10,6 +9,7 @@ import {
   FieldValue,
   Title,
 } from '@caesar/components';
+import { Icon, Label } from '@caesar-ui';
 
 const StyledEyeIcon = styled(Icon)`
   margin-right: 20px;

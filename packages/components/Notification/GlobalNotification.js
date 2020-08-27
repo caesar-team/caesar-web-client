@@ -10,7 +10,9 @@ const Wrapper = styled.div`
   bottom: 10px;
   right: 60px;
   z-index: ${({ theme }) => theme.zIndex.notification};
-  ${({ isError, theme }) => isError && `
+  ${({ isError, theme }) =>
+    isError &&
+    `
     border: 1px solid ${theme.color.gallery}
   `};
   border-radius: 3px;
@@ -27,7 +29,7 @@ const InnerWrapper = styled.div`
 const Text = styled.div`
   font-size: 14px;
   font-weight: 600;
-  color: ${({ isError, theme }) => 
+  color: ${({ isError, theme }) =>
     isError ? theme.color.red : theme.color.white};
   margin-left: 20px;
   text-overflow: ellipsis;

@@ -1,11 +1,9 @@
 import React from 'react';
 import styled from 'styled-components';
-import {
-  ITEM_TYPE,
-  ITEM_ICON_TYPE
-} from '@caesar/common/constants';
+import { ITEM_TYPE, ITEM_ICON_TYPE } from '@caesar/common/constants';
 import { Icon } from '../../Icon';
 import { Checkbox } from '../../Checkbox';
+
 export const Title = styled.div`
   margin-right: auto;
   margin-left: 16px;
@@ -73,12 +71,14 @@ export const Row = styled.div`
   display: flex;
   align-items: center;
   padding: 8px 23px;
-  background: ${({ isActive, theme }) => isActive ? theme.color.white : 'transparent'};
+  background: ${({ isActive, theme }) =>
+    isActive ? theme.color.white : 'transparent'};
   border-top: 1px solid transparent;
   border-bottom: 1px solid transparent;
   transition: all 0.2s;
 
-  ${({ hasHover, theme }) => hasHover &&
+  ${({ hasHover, theme }) =>
+    hasHover &&
     `
       cursor: pointer;
 
@@ -109,7 +109,8 @@ export const Row = styled.div`
     return '';
   }}
 
-  ${({ isActive, theme }) => isActive &&
+  ${({ isActive, theme }) =>
+    isActive &&
     `
       border-top-color: ${theme.color.gallery};
       border-bottom-color: ${theme.color.gallery};
@@ -137,7 +138,8 @@ export const TypeIconWrapper = styled.div`
   align-items: center;
   flex: 0 0 40px;
   height: 40px;
-  background: ${({ isForbiddenMultiItem, theme }) => isForbiddenMultiItem ? theme.color.lightGray : theme.color.gray};
+  background: ${({ isForbiddenMultiItem, theme }) =>
+    isForbiddenMultiItem ? theme.color.lightGray : theme.color.gray};
   border-radius: 4px;
 `;
 export const Addon = styled.div`
@@ -146,7 +148,8 @@ export const Addon = styled.div`
   margin-left: 16px;
   color: ${({ theme }) => theme.color.gray};
 
-  ${({ isInModal }) => isInModal &&
+  ${({ isInModal }) =>
+    isInModal &&
     `
     &:last-of-type {
       margin-right: 60px;

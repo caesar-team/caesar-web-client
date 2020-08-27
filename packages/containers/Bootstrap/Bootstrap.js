@@ -17,6 +17,7 @@ import {
 import OpenPGPWorker from 'worker-loader!openpgp/dist/openpgp.worker';
 import { isClient } from '@caesar/common/utils/isEnvironment';
 import { logger } from '@caesar/common/utils/logger';
+import { setMasterPassword } from '@caesar/common/actions/user';
 import { getBootstrapStates, getNavigationPanelSteps } from './utils';
 import {
   TWO_FACTOR_CHECK,
@@ -34,7 +35,6 @@ import {
   MasterPasswordStep,
   SharedItemsStep,
 } from './Steps';
-import { setMasterPassword } from '@caesar/common/actions/user';
 
 const TWO_FACTOR_STEPS = [TWO_FACTOR_CREATE, TWO_FACTOR_CHECK];
 const PASSWORD_STEPS = [PASSWORD_CHANGE];

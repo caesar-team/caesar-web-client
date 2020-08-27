@@ -26,7 +26,7 @@ const StatusCode = styled.div`
   ${media.desktop`
     font-size: ${({ theme }) => theme.font.size.big};
   `}
-  
+
   ${media.mobile`
     font-size: ${({ theme }) => theme.font.size.middle};
   `}

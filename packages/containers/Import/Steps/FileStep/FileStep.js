@@ -20,7 +20,7 @@ const initialValues = {
   file: undefined,
 };
 
-const FileStep = ({ onSubmit, ...props }) => {
+const FileStep = ({ onSubmit }) => {
   return (
     <Formik
       key="fileStep"

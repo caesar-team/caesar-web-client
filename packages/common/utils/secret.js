@@ -1,32 +1,15 @@
-import {
-  extactExtFromFilename,
-  getFilenameWithoutExt,
-  getRealFileSizeForBase64enc,
-} from '@caesar/common/utils/file';
-import {
-  encryptByPassword,
-  decryptByPassword,
-} from '@caesar/common/utils/cipherUtils';
+import {} from './file';
+import { extractRawFromAttachment } from './attachment';
+import { encryptByPassword, decryptByPassword } from './cipherUtils';
 
 export const cleanMessageBeforeEncode = message => message.trim();
 
-export const buildSecretMessage = secret => {
-  let attachments;
-  let raws = [];
-  if (secret.attachments) {
-    raws = secret.attachments.map(attach => attach.raw);
-    attachments = secret.attachments.map(attach => {
-      return {
-        name: getFilenameWithoutExt(attach.name),
-        ext: extactExtFromFilename(attach.name),
-        size: getRealFileSizeForBase64enc(attach.raw.length),
-      };
-    });
-  }
+export const buildSecretMessage = ({ attachments: files, text }) => {
+  const { raws = {}, attachments = [] } = extractRawFromAttachment(files);
 
   return {
     message: {
-      text: cleanMessageBeforeEncode(secret.text),
+      text: cleanMessageBeforeEncode(text),
       attachments,
     },
     raws,
@@ -51,15 +34,10 @@ export const decryptSecretRaws = (secret, passphrase) => {
 };
 
 export const encryptSecret = async (secret, passphrase) => {
-  const secretMessage = buildSecretMessage(secret);
-  const encryptedMessagePromise = encryptByPassword(
-    secretMessage.message,
-    passphrase,
-  );
-  const encryptedRawsPromise = encryptByPassword(
-    secretMessage.raws,
-    passphrase,
-  );
+  const { message, raws = {} } = buildSecretMessage(secret);
+
+  const encryptedMessagePromise = encryptByPassword(message, passphrase);
+  const encryptedRawsPromise = encryptByPassword(raws, passphrase);
 
   const [encryptedMessage, encryptedRaws] = await Promise.all([
     encryptedMessagePromise,

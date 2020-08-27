@@ -47,23 +47,23 @@ const SecureMessageContainerComponent = ({
 
   const handleClickDownloadFile = index => async () => {
     const raws = await getRaws();
+    const attachment = decryptedMessage.attachments[index];
+    if (attachment) {
+      const file = makeFileFromAttachment({
+        ...attachment,
+        raw: raws[attachment.id],
+      });
 
-    const file = makeFileFromAttachment({
-      ...decryptedMessage.attachments[index],
-      raw: raws[index],
-    });
-
-    downloadFile(file.raw, file.name);
+      downloadFile(file.raw, file.name);
+    }
   };
 
   const handleClickDownloadFiles = async () => {
     const raws = await getRaws();
-    const attachments = decryptedMessage.attachments.map(
-      (attachment, index) => ({
-        raw: raws[index],
-        name: `${attachment.name}.${attachment.ext}`,
-      }),
-    );
+    const attachments = decryptedMessage.attachments.map(attachment => ({
+      ...makeFileFromAttachment(attachment),
+      raw: raws[attachment.id],
+    }));
 
     downloadAsZip(attachments);
   };

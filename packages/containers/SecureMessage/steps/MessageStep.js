@@ -19,7 +19,7 @@ export const MessageStep = ({ decryptedMessage, onFileClick = () => {} }) => {
         <FileStyled
           key={index}
           onClickDownload={onFileClick(index)}
-          attachment={attachment}
+          {...attachment}
         />
       );
     },

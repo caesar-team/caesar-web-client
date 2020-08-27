@@ -154,7 +154,7 @@ export const getRealFileSizesForBase64enc = files => {
 
 export const makeFileFromAttachment = attachment => ({
   name: `${attachment.name}.${attachment.ext}`,
-  raw: attachment.raw,
+  raw: attachment?.raw || '',
 });
 
 export const humanizeSize = (bytes, si = true, dp = 1) => {

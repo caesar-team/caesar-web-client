@@ -407,8 +407,6 @@ export function* createItemSaga({
           itemId,
         );
         systemItemData.relatedItem = itemId;
-        console.log('System data');
-        console.log(systemItemData);
 
         yield put(createItemRequest(systemItemData));
       }

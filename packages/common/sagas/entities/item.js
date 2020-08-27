@@ -42,10 +42,7 @@ import {
 } from '@caesar/common/actions/entities/list';
 import { removeChildItemsBatch } from '@caesar/common/actions/entities/childItem';
 import { setCurrentTeamId } from '@caesar/common/actions/user';
-import {
-  updateGlobalNotification,
-  UPDATE_GLOBAL_NOTIFICATION,
-} from '@caesar/common/actions/application';
+import { updateGlobalNotification } from '@caesar/common/actions/application';
 import {
   setWorkInProgressItem,
   updateWorkInProgressItem,
@@ -61,7 +58,6 @@ import {
 } from '@caesar/common/selectors/entities/list';
 import { itemSelector } from '@caesar/common/selectors/entities/item';
 import {
-  userDataSelector,
   currentTeamIdSelector,
   userPersonalDefaultListIdSelector,
 } from '@caesar/common/selectors/user';
@@ -433,7 +429,6 @@ export function* createItemsBatchSaga({
 
     const list = yield select(listSelector, { listId });
     const keyPair = yield select(personalKeyPairSelector);
-    const user = yield select(userDataSelector);
 
     const preparedForEncryptingItems = items.map(
       ({ attachments, type, ...data }) => ({

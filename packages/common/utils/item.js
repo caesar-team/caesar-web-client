@@ -36,12 +36,12 @@ export const splitItemAttachments = item => {
   };
 };
 
-export function generateSystemItemName(teamId) {
-  return `team-${teamId}`;
+export function generateSystemItemName(entity, id) {
+  return `${entity}-${id}`;
 }
 
-export function generateSystemItemEmail(teamId) {
-  return `${generateSystemItemName(teamId)}@${getHostName()}`;
+export function generateSystemItemEmail(entity, id) {
+  return `${generateSystemItemName(entity, id)}@${getHostName()}.com`;
 }
 
 export function extractKeysFromSystemItem(item) {

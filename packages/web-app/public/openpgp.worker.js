@@ -109,6 +109,7 @@ function seedRandom(buffer) {
 function delegate(id, method, options) {
   if (typeof openpgp[method] !== 'function') {
     response({ id, event: 'method-return', err: 'Unknown Worker Event' });
+
     return;
   }
   // construct ReadableStreams from MessagePorts

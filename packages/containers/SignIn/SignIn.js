@@ -78,6 +78,7 @@ class SignInContainer extends Component {
 
   generateGoogleAuthUrl = async () => {
     const deviceToken = await getTrustedDeviceToken(true);
+
     return `${API_URI}/${AUTH_ENDPOINT}?redirect_uri=${APP_URI}/${REDIRECT_AUTH_ENDPOINT}&fingerprint=${deviceToken}`;
   };
 

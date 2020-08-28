@@ -38,13 +38,13 @@ const ListComponent = ({
   isMultiItem = false,
   workInProgressList = null,
   workInProgressItemIds,
+  workInProgressItem,
   items = [],
   teamMembersCount = 1,
   onClickItem = Function.prototype,
   onSelectItem = Function.prototype,
 }) => {
   const isDashboardDefaultMode = mode === DASHBOARD_MODE.DEFAULT;
-
   if (
     isDashboardDefaultMode &&
     !workInProgressList &&
@@ -58,7 +58,6 @@ const ListComponent = ({
   }
 
   const isEmpty = items.length === 0;
-
   const renderedList = () => {
     if (isEmpty) {
       return <EmptyList />;
@@ -75,6 +74,7 @@ const ListComponent = ({
             onClickItem={onClickItem}
             onSelectItem={onSelectItem}
             workInProgressItemIds={workInProgressItemIds}
+            workInProgressItem={workInProgressItem}
             teamMembersCount={teamMembersCount}
             {...item}
           />

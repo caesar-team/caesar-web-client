@@ -1,14 +1,13 @@
 // TODO: Rewrite all this requests with fetch 'packages/common/fetch.js'
 import Router from 'next/router';
 import axios from 'axios';
-import { removeCookieValue } from './utils/token';
-import { API_URI, API_BASE_PATH, IS_EXTENSION_APP, ROUTES } from './constants';
+import { removeCookieValue, getCookieValue } from './utils/token';
+import { API_URI, API_BASE_PATH, ROUTES } from './constants';
 import { isClient } from './utils/isEnvironment';
 
 const softExit = () => {
   if (isClient) {
     removeCookieValue('token');
-
     if (Router.router.pathname !== ROUTES.SIGN_IN) {
       Router.push(ROUTES.SIGN_IN);
     }
@@ -21,6 +20,16 @@ const callApi = axios.create({
   withCredentials: true,
 });
 
+callApi.interceptors.request.use(config => {
+  if (getCookieValue('token')) {
+    const token = `Bearer ${getCookieValue('token')}`;
+    // eslint-disable-next-line no-param-reassign
+    config.headers.Authorization = token;
+  }
+
+  return config;
+});
+
 callApi.interceptors.response.use(
   config => config,
   error => {
@@ -28,7 +37,6 @@ callApi.interceptors.response.use(
       switch (error.response.status) {
         case 401:
           if (
-            !IS_EXTENSION_APP &&
             error.response.config.url !== '/auth/2fa' &&
             error.response.config.url !== '/auth/2fa/activate'
           ) {
@@ -46,19 +54,9 @@ callApi.interceptors.response.use(
 );
 
 // user
-export const getUserSelf = token =>
-  callApi.get('/users/self', {
-    headers: {
-      Authorization: token ? `Bearer ${token}` : '',
-    },
-  });
+export const getUserSelf = () => callApi.get('/users/self');
 
-export const getUsers = token =>
-  callApi.get('/user', {
-    headers: {
-      Authorization: token ? `Bearer ${token}` : '',
-    },
-  });
+export const getUsers = () => callApi.get('/user');
 
 export const postKeys = data => callApi.post('/keys', data);
 
@@ -76,12 +74,7 @@ export const postActivateTwoFactor = data =>
 export const postCheckTwoFactor = data => callApi.post('/auth/2fa', data);
 
 // post
-export const getLists = token =>
-  callApi.get('/list', {
-    headers: {
-      Authorization: token ? `Bearer ${token}` : '',
-    },
-  });
+export const getLists = () => callApi.get('/list');
 
 export const patchListSort = (listId, data) =>
   callApi.patch(`/list/${listId}/sort`, data);

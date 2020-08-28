@@ -15,6 +15,7 @@ function getChildrenErrors(children) {
     } else if (children[key]?.errors) {
       acc.push(children[key]?.errors[0]);
     }
+
     return acc;
   }, []);
 }

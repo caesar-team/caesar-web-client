@@ -126,6 +126,8 @@ export const ROUTES = {
   IMPORT: '/import',
   TEAM: '/team',
   CREATE: '/create',
+  BOOTSTRAP: '/user/security/bootstrap',
+  TWOFA: '/auth/2fa',
 };
 
 export const DOMAIN_SECURE_ROUTE = IS_SECURE_APP ? ROUTES.MAIN : ROUTES.SECURE;
@@ -134,11 +136,14 @@ export const SHARED_ROUTES = [ROUTES.SHARE, ROUTES.INVITE];
 
 // require bootstrap
 // TODO: figure out better naming
+
 export const LOCKED_ROUTES = [
   ROUTES.DASHBOARD,
   ROUTES.IMPORT,
   ROUTES.TEAM,
   ROUTES.CREATE,
+  ROUTES.BOOTSTRAP,
+  ROUTES.TWOFA,
 ];
 
 // don't require bootstrap routes
@@ -172,6 +177,8 @@ export const CREATING_ITEM_NOTIFICATION = 'The item is being created...';
 export const SHARING_IN_PROGRESS_NOTIFICATION = 'Sharing in progress...';
 export const CREATING_ITEMS_NOTIFICATION =
   'Import in progress. The items are being created...';
+export const FEATURE_IS_UNDER_DEVELOPMENT =
+  'Caution! This feature is under development';
 export const MOVING_IN_PROGRESS_NOTIFICATION = 'Moving in progress...';
 export const REMOVING_IN_PROGRESS_NOTIFICATION = 'Removing in progress...';
 export const REDIRECT_NOTIFICATION = 'Redirecting...';

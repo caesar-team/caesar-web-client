@@ -1,7 +1,8 @@
 import * as openpgp from 'openpgp';
-import { generateKeys } from '@caesar/common/utils/key';
-import { getHostName } from '@caesar/common/utils/getDomainName';
-import { randomId } from '@caesar/common/utils/uuid4';
+import { generateKeys } from './key';
+import { getHostName } from './getDomainName';
+import { randomId } from './uuid4';
+import { objectToBase64, base64ToObject } from './base64';
 import { createSrp } from './srp';
 import { passwordGenerator } from './passwordGenerator';
 
@@ -22,9 +23,10 @@ export const decryptItem = async (secretArmored, privateKeyObj) => {
       privateKeys: [privateKeyObj],
     });
 
-    return JSON.parse(data);
+    return base64ToObject(data);
   } catch (error) {
-    console.log('decryption error', error);
+    // eslint-disable-next-line no-console
+    console.error('decryption error %s', error);
 
     return null;
   }
@@ -33,7 +35,7 @@ export const decryptItem = async (secretArmored, privateKeyObj) => {
 export const encryptItem = async (data, key) => {
   const encrypted = await openpgp.encrypt({
     message: openpgp.message.fromBinary(
-      openpgp.util.str_to_Uint8Array(JSON.stringify(data)),
+      openpgp.util.str_to_Uint8Array(objectToBase64(data)),
     ),
     publicKeys: (await openpgp.key.readArmored(key)).keys,
   });
@@ -49,7 +51,7 @@ export const encryptItemsBatch = async (dataSet, key) => {
 export const encryptByPassword = async (data, password) => {
   const encrypted = await openpgp.encrypt({
     message: openpgp.message.fromBinary(
-      openpgp.util.str_to_Uint8Array(JSON.stringify(data)),
+      openpgp.util.str_to_Uint8Array(objectToBase64(data)),
     ),
     passwords: [password],
   });
@@ -65,7 +67,7 @@ export const decryptByPassword = async (secretArmored, password) => {
     passwords: [password],
   });
 
-  return JSON.parse(data);
+  return base64ToObject(data);
 };
 
 export const generateUser = async email => {

@@ -4,6 +4,7 @@ import copy from 'copy-text-to-clipboard';
 import equal from 'fast-deep-equal';
 import styled from 'styled-components';
 import { PERMISSION } from '@caesar/common/constants';
+import { makeObject } from '@caesar/common/utils/object';
 import { Can } from '../../Ability';
 import { Input } from '../../Input';
 import { Icon } from '../../Icon';
@@ -139,7 +140,7 @@ const InputComponent = ({
           isAcceptIconDisabled={!value || validationState?.error?.message}
           onChange={e => setValue(e.target.value)}
           onClickAcceptEdit={() => {
-            onClickAcceptEdit({ name, value });
+            onClickAcceptEdit(makeObject(name, value));
             setEdit(false);
           }}
           onClickClose={handleClickClose}

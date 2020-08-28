@@ -4,6 +4,7 @@ import { default as NextDocument, Head, Main, NextScript } from 'next/document';
 import styled, { ServerStyleSheet } from 'styled-components';
 import { PORTAL_ID } from '@caesar/common/constants';
 import sprite from 'svg-sprite-loader/runtime/sprite.build';
+
 const Body = styled.body``;
 
 export default class Document extends NextDocument {

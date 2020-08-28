@@ -5,6 +5,8 @@ export const FINISH_IS_LOADING = '@workflow/FINISH_IS_LOADING';
 export const SET_WORK_IN_PROGRESS_ITEM = '@workflow/SET_WORK_IN_PROGRESS_ITEM';
 export const UPDATE_WORK_IN_PROGRESS_ITEM =
   '@workflow/UPDATE_WORK_IN_PROGRESS_ITEM';
+export const UPDATE_WORK_IN_PROGRESS_ITEM_RAWS =
+  '@workflow/UPDATE_WORK_IN_PROGRESS_ITEM_RAWS';
 export const SET_WORK_IN_PROGRESS_ITEM_IDS =
   '@workflow/SET_WORK_IN_PROGRESS_ITEM_IDS';
 export const SET_WORK_IN_PROGRESS_LIST_ID =
@@ -44,6 +46,13 @@ export const updateWorkInProgressItem = itemId => ({
   },
 });
 
+export const updateWorkInProgressItemRaws = raws => ({
+  type: UPDATE_WORK_IN_PROGRESS_ITEM_RAWS,
+  payload: {
+    raws,
+  },
+});
+
 export const setWorkInProgressItemIds = itemIds => ({
   type: SET_WORK_IN_PROGRESS_ITEM_IDS,
   payload: {
@@ -66,10 +75,11 @@ export const resetWorkflowStore = () => ({
   type: RESET_WORKFLOW_STORE,
 });
 
-export const decryption = ({ items, key, masterPassword }) => ({
+export const decryption = ({ items, raws, key, masterPassword }) => ({
   type: DECRYPTION,
   payload: {
     items,
+    raws,
     key,
     masterPassword,
   },

@@ -20,6 +20,7 @@ export const getValidationSchema = type => {
         name: SCHEMA.REQUIRED_LIMITED_STRING(),
         note: yup.string(),
         attachments: SCHEMA.ATTACHMENTS,
+        raws: SCHEMA.RAWS,
       });
     default:
       return {};

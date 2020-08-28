@@ -136,7 +136,7 @@ export const TwoFactorCheckForm = ({ onSubmit }) => {
             name="rememberDevice"
             onChange={e => handleChangeCheckbox(e.target.checked)}
           >
-            Remember device
+            Remember current device
           </Checkbox>
         </CheckboxWrapper>
         <NextButton

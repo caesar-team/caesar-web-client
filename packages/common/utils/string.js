@@ -12,6 +12,8 @@ export function truncate(str, length, ending = '...') {
   return str;
 }
 
+export const newLineToHtml = string => string.replace(/\n/g, '<br/>');
+
 export function textSize(text) {
   return new TextEncoder('utf-8').encode(text).length;
 }

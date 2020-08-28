@@ -1,77 +1,25 @@
 import React, { useState } from 'react';
-import styled from 'styled-components';
 import Link from 'next/link';
 import copy from 'copy-text-to-clipboard';
-import { Icon, Button, withNotification } from '@caesar/components';
-import { downloadAsZip } from '@caesar/common/utils/file';
-import { media } from '@caesar/assets/styles/media';
+import { withNotification } from '@caesar/components';
+import {
+  downloadAsZip,
+  downloadFile,
+  makeFileFromAttachment,
+} from '@caesar/common/utils/file';
 import { DOMAIN_SECURE_ROUTE } from '@caesar/common/constants';
+import { decryptSecretRaws } from '@caesar/common/utils/secret';
 import { MessageStep, PasswordStep } from './steps';
 
-const Wrapper = styled.div`
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  width: 100vw;
-  height: 100%;
-  min-height: 100vh;
-  padding: 24px 16px;
-  background-color: ${({ theme }) => theme.color.emperor};
-`;
-
-const Title = styled.div`
-  font-size: 18px;
-  color: ${({ theme }) => theme.color.lightGray};
-  margin-bottom: 23px;
-  margin-top: 50px;
-`;
-
-const StyledLogo = styled(Icon)`
-  margin-top: auto;
-  fill: ${({ theme }) => theme.color.white};
-`;
-
-const ButtonsWrapper = styled.div`
-  display: flex;
-  justify-content: center;
-  padding: 0 24px;
-  margin-top: 24px;
-
-  ${media.mobile`
-    flex-direction: column;
-    width: 100%;
-  `}
-`;
-
-const ButtonStyled = styled(Button)`
-  ${media.mobile`
-    width: 100%;
-  `}
-
-  &:not(:first-child) {
-    margin-left: 24px;
-
-    ${media.mobile`
-    margin-left: 0;
-    margin-top: 24px;
-  `}
-  }
-`;
-
-const Footer = styled.div`
-  margin-top: auto;
-
-  ${media.wideMobile`
-    margin-top: 24px;
-  `}
-`;
-
-const StyledLink = styled.a`
-  font-size: ${({ theme }) => theme.font.size.small};
-  color: ${({ theme }) => theme.color.white};
-  text-decoration: none;
-`;
+import {
+  Wrapper,
+  StyledLogo,
+  Title,
+  ButtonsWrapper,
+  ButtonStyled,
+  Footer,
+  StyledLink,
+} from './styles';
 
 const SecureMessageContainerComponent = ({
   notification,
@@ -79,6 +27,15 @@ const SecureMessageContainerComponent = ({
   password,
 }) => {
   const [decryptedMessage, setDecryptedMessage] = useState(null);
+  // const [encryptedRaws, setEncryptedRaws] = useState(null);
+  const [decryptedRaws, setDecryptedRaws] = useState(null);
+
+  const getRaws = () => {
+    const raws = decryptedRaws || decryptSecretRaws(message, password);
+    if (!decryptedRaws) setDecryptedRaws(raws);
+
+    return raws;
+  };
 
   const handleClickCopyText = () => {
     copy(decryptedMessage.text);
@@ -88,8 +45,27 @@ const SecureMessageContainerComponent = ({
     });
   };
 
-  const handleClickDownloadFiles = () => {
-    downloadAsZip(decryptedMessage.attachments);
+  const handleClickDownloadFile = index => async () => {
+    const raws = await getRaws();
+    const attachment = decryptedMessage.attachments[index];
+    if (attachment) {
+      const file = makeFileFromAttachment({
+        ...attachment,
+        raw: raws[attachment.id],
+      });
+
+      downloadFile(file.raw, file.name);
+    }
+  };
+
+  const handleClickDownloadFiles = async () => {
+    const raws = await getRaws();
+    const attachments = decryptedMessage.attachments.map(attachment => ({
+      ...makeFileFromAttachment(attachment),
+      raw: raws[attachment.id],
+    }));
+
+    downloadAsZip(attachments);
   };
 
   const title = decryptedMessage
@@ -111,7 +87,10 @@ const SecureMessageContainerComponent = ({
       <StyledLogo name="logo-secure-message" width={214} height={60} />
       <Title>{title}</Title>
       {decryptedMessage ? (
-        <MessageStep decryptedMessage={decryptedMessage} />
+        <MessageStep
+          decryptedMessage={decryptedMessage}
+          onFileClick={handleClickDownloadFile}
+        />
       ) : (
         <PasswordStep
           message={message}
@@ -127,7 +106,7 @@ const SecureMessageContainerComponent = ({
               icon="copy"
               onClick={handleClickCopyText}
             >
-              Copy text
+              Copy the message
             </ButtonStyled>
           )}
           {shouldShowDownloadButton && (

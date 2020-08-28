@@ -189,8 +189,8 @@ const renderAttachments = (
   errors = [],
   setFieldValue,
   isSubmitting,
-) =>
-  attachments.map((attachment, index) => (
+) => {
+  return attachments.map((attachment, index) => (
     <FileRow key={index} disabled={isSubmitting}>
       <File
         key={index}
@@ -206,6 +206,7 @@ const renderAttachments = (
       />
     </FileRow>
   ));
+};
 
 const SecureMessageFormComponent = ({ onSubmit, notification, isOnline }) => {
   const { isMobile } = useMedia();
@@ -242,7 +243,7 @@ const SecureMessageFormComponent = ({ onSubmit, notification, isOnline }) => {
       <Row>
         {isMobile ? (
           <TextAreaStyled
-            placeholder="Text or attachments to encrypt and expire"
+            placeholder="A message or attachments to encrypt and expire"
             name="text"
             value={values.text}
             onBlur={handleBlur}
@@ -252,7 +253,7 @@ const SecureMessageFormComponent = ({ onSubmit, notification, isOnline }) => {
           />
         ) : (
           <>
-            <Label>Text or attachments to encrypt and expire</Label>
+            <Label>A message or attachments to encrypt and expire</Label>
             <TextAreaStyled
               placeholder="Divide et Impera"
               name="text"
@@ -343,11 +344,13 @@ const SecureMessageFormComponent = ({ onSubmit, notification, isOnline }) => {
       {errors?.form && (
         <>
           <TextError>Oops… Something went wrong</TextError>
-          <TextError>Please, click again on Create secure message</TextError>
+          <TextError>
+            Please, click again on the Create secure message button
+          </TextError>
         </>
       )}
       <ButtonWrapper>
-        <Hint text={!dirty ? 'Please, add text or attachments' : ''}>
+        <Hint text={!dirty ? 'Please, add a messages or attachments' : ''}>
           <StyledButton
             htmlType="submit"
             disabled={

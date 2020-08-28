@@ -1,12 +1,12 @@
 import * as yup from 'yup';
 import { ERROR } from './constants';
+import { checkFileSize, checkAllFileSizes } from './utils';
+
 import {
-  checkFileSize,
-  checkAllFileSizes,
   getRealFileSizeForBase64enc,
   humanizeSize,
   getRealFileSizesForBase64enc,
-} from './utils';
+} from '../utils/file';
 
 const STRING_MAX_LENGTH = 100;
 const WEBSITE_MAX_LENGTH = 2048;

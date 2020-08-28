@@ -2,26 +2,18 @@ import { normalize } from 'normalizr';
 import { LIST_TYPE } from '@caesar/common/constants';
 import { listSchema, memberSchema, teamSchema } from './schemas';
 
-export const extractRelatedItems = lists =>
-  lists.map(({ children, type, ...rest }) => {
-    if (type !== LIST_TYPE.INBOX) {
-      return {
-        ...rest,
-        type,
-        children,
-      };
-    }
+export const extractRelatedItems = lists => {
+  const result = lists.map(({ children, ...rest }) => {
+    const relatedItems = children.filter(item => item && item.relatedItem);
 
-    const relatedItems = children.map(item => item.relatedItem || null);
     return {
       ...rest,
-      type,
-      children: [
-        ...children,
-        ...relatedItems,
-      ],
+      children: [...children, ...relatedItems],
     };
   });
+
+  return result;
+};
 
 export const convertNodesToEntities = nodes => {
   const normalized = normalize(nodes, [listSchema]);

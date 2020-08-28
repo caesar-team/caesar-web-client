@@ -28,7 +28,7 @@ function getRequiredCoresCountFor(action) {
   const chunkSize =
     type === DECRYPTION ? DECRYPTION_CHUNK_SIZE : ENCRYPTION_CHUNK_SIZE;
 
-  return Math.ceil(payload.items.length / chunkSize);
+  return Math.ceil(payload.items?.length || 1 / chunkSize);
 }
 
 function canRunJobImmediately(availableCoresCount) {

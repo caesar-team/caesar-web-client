@@ -54,7 +54,7 @@ export default createReducer(initialState, {
       [KEY_TYPE.PERSONAL]: {},
     };
   },
-  [REMOVE_ENTITY_KEY_PAIR](state) {
+  [REMOVE_ENTITY_KEY_PAIR](state, { payload }) {
     return {
       ...state,
       [KEY_TYPE.ENTITY]: {

@@ -116,6 +116,7 @@ export function* createChildItemBatchSaga({ payload: { itemUserPairs } }) {
 
     yield put(createChildItemBatchFinishedEvent(shares));
   } catch (error) {
+    // eslint-disable-next-line no-console
     console.log(error);
     yield put(
       updateGlobalNotification(getServerErrorMessage(error), false, true),
@@ -165,6 +166,7 @@ export function* updateChildItemsBatchSaga({
 
     yield put(updateGlobalNotification(NOOP_NOTIFICATION, false));
   } catch (error) {
+    // eslint-disable-next-line no-console
     console.log(error);
     yield put(
       updateGlobalNotification(getServerErrorMessage(error), false, true),
@@ -182,6 +184,7 @@ export function* changeChildItemPermissionSaga({
     yield put(changeChildItemPermissionSuccess(childItemId, permission));
     yield put(updateWorkInProgressItem());
   } catch (error) {
+    // eslint-disable-next-line no-console
     console.log(error);
     yield put(
       updateGlobalNotification(getServerErrorMessage(error), false, true),

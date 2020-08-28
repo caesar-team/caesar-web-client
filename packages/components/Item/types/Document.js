@@ -11,9 +11,7 @@ export const Document = ({
   onClickShare,
   isSharedItem,
 }) => {
-  const {
-    data: { name, note, attachments = [] },
-  } = item;
+  const { name, note, attachments, raws } = item.data;
 
   return (
     <>
@@ -40,6 +38,7 @@ export const Document = ({
       <Row marginBottom={24}>
         <Attachments
           attachments={attachments}
+          raws={raws}
           itemSubject={itemSubject}
           onClickAcceptEdit={onClickAcceptEdit}
         />

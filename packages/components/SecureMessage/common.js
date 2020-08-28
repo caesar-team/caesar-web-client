@@ -40,7 +40,6 @@ export const stripHtml = html => {
   return tmp.textContent || tmp.innerText || '';
 };
 
-
 export const makePasswordlessLink = (messageId, password) => {
   const encodedObject = objectToBase64({
     messageId,

@@ -43,16 +43,12 @@ import {
 import { removeChildItemsBatch } from '@caesar/common/actions/entities/childItem';
 import { setCurrentTeamId } from '@caesar/common/actions/user';
 import { updateGlobalNotification } from '@caesar/common/actions/application';
-import { updateChildItemsBatchSaga } from '@caesar/common/sagas/entities/childItem';
 import {
   setWorkInProgressItem,
   updateWorkInProgressItem,
   setWorkInProgressListId,
 } from '@caesar/common/actions/workflow';
-import {
-  workInProgressItemSelector,
-  workInProgressItemIdsSelector,
-} from '@caesar/common/selectors/workflow';
+import { workInProgressItemIdsSelector } from '@caesar/common/selectors/workflow';
 import {
   listSelector,
   favoriteListSelector,
@@ -62,7 +58,6 @@ import {
 } from '@caesar/common/selectors/entities/list';
 import { itemSelector } from '@caesar/common/selectors/entities/item';
 import {
-  userDataSelector,
   currentTeamIdSelector,
   userPersonalDefaultListIdSelector,
 } from '@caesar/common/selectors/user';
@@ -86,7 +81,6 @@ import {
   ENTITY_TYPE,
   COMMON_PROGRESS_NOTIFICATION,
   CREATING_ITEM_NOTIFICATION,
-  CREATING_ITEMS_NOTIFICATION,
   ENCRYPTING_ITEM_NOTIFICATION,
   MOVING_IN_PROGRESS_NOTIFICATION,
   REMOVING_IN_PROGRESS_NOTIFICATION,
@@ -99,7 +93,10 @@ import {
   personalKeyPairSelector,
   teamKeyPairSelector,
 } from '@caesar/common/selectors/keyStore';
-import { generateSystemItemEmail, generateSystemItemName } from '@caesar/common/utils/item';
+import {
+  generateSystemItemEmail,
+  generateSystemItemName,
+} from '@caesar/common/utils/item';
 import { passwordGenerator } from '@caesar/common/utils/passwordGenerator';
 import { generateKeys } from '@caesar/common/utils/key';
 
@@ -109,11 +106,9 @@ export function* generateSystemItem(entity, listId, entityId) {
   const masterPassword = yield call(passwordGenerator);
   const systemItemEmail = yield call(generateSystemItemEmail, entity, entityId);
 
-  const { publicKey, privateKey } = yield call(
-    generateKeys,
-    masterPassword,
-    [systemItemEmail],
-  );
+  const { publicKey, privateKey } = yield call(generateKeys, masterPassword, [
+    systemItemEmail,
+  ]);
 
   const systemItemData = {
     type: ITEM_TYPE.SYSTEM,
@@ -160,6 +155,7 @@ export function* removeItemSaga({ payload: { itemId, listId } }) {
     yield put(setWorkInProgressItem(null));
     yield put(updateGlobalNotification(NOOP_NOTIFICATION, false));
   } catch (error) {
+    // eslint-disable-next-line no-console
     console.log(error);
     yield put(
       updateGlobalNotification(getServerErrorMessage(error), false, true),
@@ -194,6 +190,7 @@ export function* removeItemsBatchSaga({ payload: { listId } }) {
 
     yield put(updateGlobalNotification(NOOP_NOTIFICATION, false));
   } catch (error) {
+    // eslint-disable-next-line no-console
     console.log(error);
     yield put(
       updateGlobalNotification(getServerErrorMessage(error), false, true),
@@ -218,6 +215,7 @@ export function* toggleItemToFavoriteSaga({ payload: { item } }) {
     yield put(toggleItemToFavoriteList(item.id, favoritesList.id, isFavorite));
     yield put(updateWorkInProgressItem(item.id));
   } catch (error) {
+    // eslint-disable-next-line no-console
     console.log(error);
     yield put(
       updateGlobalNotification(getServerErrorMessage(error), false, true),
@@ -293,6 +291,7 @@ export function* moveItemSaga({ payload: { itemId, teamId, listId } }) {
       });
     }
   } catch (error) {
+    // eslint-disable-next-line no-console
     console.log(error);
     yield put(moveItemFailure());
   }
@@ -306,6 +305,7 @@ export function* moveItemsBatchSaga({ payload: { itemIds, teamId, listId } }) {
       ),
     );
   } catch (error) {
+    // eslint-disable-next-line no-console
     console.log(error);
     yield put(
       updateGlobalNotification(getServerErrorMessage(error), false, true),
@@ -319,10 +319,17 @@ export function* createItemSaga({
   meta: { setSubmitting = Function.prototype },
 }) {
   try {
-    const { teamId, listId, attachments, type, relatedItem, ...data } = item;
+    const {
+      id: itemId,
+      teamId = null,
+      listId,
+      type,
+      relatedItem,
+      data: { raws, ...data },
+    } = item;
+
     const isSystemItem = type === ITEM_TYPE.SYSTEM;
     const keyPair = yield select(personalKeyPairSelector);
-    const user = yield select(userDataSelector);
     const userPersonalDefaultListId = yield select(
       userPersonalDefaultListIdSelector,
     );
@@ -335,46 +342,35 @@ export function* createItemSaga({
 
     if (teamId) {
       const teamSystemItem = yield select(teamKeyPairSelector, {
-        teamId: teamId,
+        teamId,
       });
       publicKey = teamSystemItem.publicKey;
     }
+    const encryptedItemData = yield call(encryptItem, data, publicKey);
 
-    const encryptedItem = yield call(
-      encryptItem,
-      { attachments, ...data },
-      publicKey,
-    );
+    const encryptedItem = {
+      data: encryptedItemData,
+      raws: Object.keys(raws).length
+        ? yield call(encryptItem, raws, publicKey)
+        : null,
+    };
 
     if (!isSystemItem) {
       yield put(updateGlobalNotification(CREATING_ITEM_NOTIFICATION, true));
     }
 
-    const {
-      data: { id: itemId, lastUpdated, invited, _links },
-    } = yield call(postCreateItem, {
+    const { data: itemData } = yield call(postCreateItem, {
       listId,
       type,
-      secret: encryptedItem,
+      secret: JSON.stringify(encryptedItem),
       relatedItem,
     });
 
+    // TODO: Make the class of the item instead of the direct object
     const newItem = {
-      id: itemId,
-      listId,
-      lastUpdated,
-      type,
-      favorite: false,
-      invited: invited || [],
-      shared: null,
-      tags: [],
-      teamId: teamId || null,
-      ownerId: user.id,
-      secret: encryptedItem,
-      relatedItem,
-      data: { attachments, ...data },
-      _links,
-      __type: ENTITY_TYPE.ITEM,
+      ...item,
+      ...relatedItem,
+      ...itemData,
     };
 
     yield put(createItemSuccess(newItem));
@@ -407,13 +403,12 @@ export function* createItemSaga({
           itemId,
         );
         systemItemData.relatedItem = itemId;
-        console.log('System data');
-        console.log(systemItemData);
 
         yield put(createItemRequest(systemItemData));
       }
     }
   } catch (error) {
+    // eslint-disable-next-line no-console
     console.log(error);
     yield put(
       updateGlobalNotification(getServerErrorMessage(error), false, true),
@@ -424,17 +419,16 @@ export function* createItemSaga({
     setSubmitting(false);
   }
 }
-
+// TODO: Need to be updated to the sepated raws feature
 export function* createItemsBatchSaga({
   payload: { items, listId },
   meta: { setSubmitting },
 }) {
   try {
-    yield put(updateGlobalNotification(CREATING_ITEMS_NOTIFICATION, true));
+    yield put(updateGlobalNotification(ENCRYPTING_ITEM_NOTIFICATION, true));
 
     const list = yield select(listSelector, { listId });
     const keyPair = yield select(personalKeyPairSelector);
-    const user = yield select(userDataSelector);
 
     const preparedForEncryptingItems = items.map(
       ({ attachments, type, ...data }) => ({
@@ -452,7 +446,10 @@ export function* createItemsBatchSaga({
     const preparedForRequestItems = items.map(({ type }, index) => ({
       type,
       listId,
-      secret: encryptedItems[index],
+      secret: JSON.stringify({
+        data: encryptedItems[index],
+        raws: null,
+      }),
     }));
 
     const { data } = yield call(postCreateItemsBatch, {
@@ -460,37 +457,32 @@ export function* createItemsBatchSaga({
     });
 
     const preparedForStoreItems = data.map((item, index) => ({
-      id: item.id,
-      listId,
-      lastUpdated: item.lastUpdated,
-      favorite: false,
-      invited: [],
-      shared: null,
-      tags: [],
-      owner: user.id,
+      ...item,
       data: preparedForEncryptingItems[index],
-      type: items[index].type,
     }));
 
     yield put(createItemsBatchSuccess(preparedForStoreItems));
     yield put(addItemsBatchToList(data.map(({ id }) => id), listId));
+    yield put(updateGlobalNotification(NOOP_NOTIFICATION, false));
 
     if (list.teamId) {
-      yield fork(shareItemBatchSaga, {
-        payload: {
-          data: {
-            itemIds: data.map(({ id }) => id),
-            teamIds: [list.teamId],
-          },
-          options: {
-            includeIniciator: false,
-          },
-        },
-      });
+      // TODO: [Import] create system items for team
+      // yield fork(shareItemBatchSaga, {
+      //   payload: {
+      //     data: {
+      //       itemIds: data.map(({ id }) => id),
+      //       teamIds: [list.teamId],
+      //     },
+      //     options: {
+      //       includeIniciator: false,
+      //     },
+      //   },
+      // });
     } else {
       yield put(updateGlobalNotification(NOOP_NOTIFICATION, false));
     }
   } catch (error) {
+    // eslint-disable-next-line no-console
     console.log(error);
     yield put(
       updateGlobalNotification(getServerErrorMessage(error), false, true),
@@ -503,30 +495,42 @@ export function* createItemsBatchSaga({
 
 export function* updateItemSaga({ payload: { item } }) {
   try {
+    const {
+      id: itemId,
+      data: { raws, ...data },
+    } = item;
+
     yield put(updateGlobalNotification(ENCRYPTING_ITEM_NOTIFICATION, true));
 
     const keyPair = yield select(personalKeyPairSelector);
 
-    const encryptedItemSecret = yield call(
-      encryptItem,
-      item.data,
-      keyPair.publicKey,
-    );
+    const encryptedItemData = yield call(encryptItem, data, keyPair.publicKey);
+    const encryptedItem = {
+      data: encryptedItemData,
+      raws: Object.keys(raws).length
+        ? yield call(encryptItem, raws, keyPair.publicKey)
+        : null,
+    };
+
+    const encryptedItemSecret = JSON.stringify(encryptedItem);
 
     const {
       data: { lastUpdated },
-    } = yield call(updateItem, item.id, {
+    } = yield call(updateItem, itemId, {
       item: { secret: encryptedItemSecret },
     });
-
-    yield put(
-      updateItemSuccess({ ...item, lastUpdated, secret: encryptedItemSecret }),
-    );
+    const updatedItem = {
+      ...item,
+      lastUpdated,
+      secret: encryptedItemSecret,
+    };
+    yield put(updateItemSuccess(updatedItem));
 
     yield put(updateWorkInProgressItem());
-
+    yield put(setWorkInProgressItem(updatedItem));
     yield put(updateGlobalNotification(NOOP_NOTIFICATION, false));
   } catch (error) {
+    // eslint-disable-next-line no-console
     console.log(error);
     yield put(
       updateGlobalNotification(getServerErrorMessage(error), false, true),
@@ -540,46 +544,44 @@ export function* editItemSaga({
   meta: { setSubmitting, notification },
 }) {
   try {
-    const { listId, attachments, type, ...data } = item;
-
-    const workInProgressItem = yield select(workInProgressItemSelector);
-    const originalItem = yield select(itemSelector, {
-      itemId: workInProgressItem.id,
-    });
-
-    const editedItemData = {
-      attachments,
-      ...data,
-    };
-
-    const editedItem = {
-      ...originalItem,
+    const {
+      id: itemId,
       listId,
-      data: editedItemData,
-    };
+      data: { raws, ...data },
+    } = item;
 
-    const isDataChanged = !deepequal(workInProgressItem.data, editedItemData);
-    const isListIdChanged = listId !== workInProgressItem.listId;
+    const itemInState = yield select(itemSelector, { itemId });
+    const isDataChanged = !deepequal(itemInState.data, data);
+
+    if (!isDataChanged) {
+      setSubmitting(false);
+      yield put(
+        updateGlobalNotification(
+          `The '${item.data.name}' has not been updated`,
+          false,
+          true,
+        ),
+      );
+
+      return;
+    }
+
+    const isListIdChanged = listId !== itemInState.listId;
 
     if (isListIdChanged) {
       yield call(moveItemSaga, { payload: { listId } });
     }
 
     if (isDataChanged) {
-      yield call(updateItemSaga, { payload: { item: editedItem } });
-
-      if (originalItem.invited.length) {
-        yield call(updateChildItemsBatchSaga, {
-          payload: { item: editedItem },
-        });
-      }
+      yield call(updateItemSaga, { payload: { item } });
     }
 
-    yield put(updateWorkInProgressItem(editedItem.id));
+    yield put(updateWorkInProgressItem(item.id));
     yield call(notification.show, {
-      text: `The '${item.name}' has been updated`,
+      text: `The '${item.data.name}' has been updated`,
     });
   } catch (error) {
+    // eslint-disable-next-line no-console
     console.log(error);
     yield put(
       updateGlobalNotification(getServerErrorMessage(error), false, true),

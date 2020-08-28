@@ -1,11 +1,21 @@
 import { normalize } from 'normalizr';
+import { LIST_TYPE } from '@caesar/common/constants';
 import { listSchema, memberSchema, teamSchema } from './schemas';
 
 export const extractRelatedItems = lists =>
-  lists.map(({ children, ...rest }) => {
+  lists.map(({ children, type, ...rest }) => {
+    if (type !== LIST_TYPE.INBOX) {
+      return {
+        ...rest,
+        type,
+        children,
+      };
+    }
+
     const relatedItems = children.map(item => item.relatedItem || null);
     return {
       ...rest,
+      type,
       children: [
         ...children,
         ...relatedItems,

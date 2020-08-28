@@ -39,6 +39,7 @@ const ListComponent = ({
   workInProgressList = null,
   workInProgressItemIds,
   items = [],
+  teamMembersCount = 1,
   onClickItem = Function.prototype,
   onSelectItem = Function.prototype,
 }) => {
@@ -74,6 +75,7 @@ const ListComponent = ({
             onClickItem={onClickItem}
             onSelectItem={onSelectItem}
             workInProgressItemIds={workInProgressItemIds}
+            teamMembersCount={teamMembersCount}
             {...item}
           />
         ))}

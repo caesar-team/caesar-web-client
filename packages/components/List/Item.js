@@ -205,13 +205,15 @@ export const Item = ({
   teamId,
   _links,
   index,
+  teamMembersCount = 1,
   onClickClose = Function.prototype,
   onClickItem = Function.prototype,
   onSelectItem = Function.prototype,
   workInProgressItemIds,
   ...props
 }) => {
-  const shouldShowMembers = !!invited.length;
+  const sharedCount = invited.length + teamMembersCount - 1;
+  const shouldShowMembers = !!sharedCount;
   const shouldShowAttachments = attachments && attachments.length > 0;
   const shouldShowFavoriteIcon = favorite && !isClosable;
   const isActive = isMultiItem && workInProgressItemIds.includes(id);
@@ -281,7 +283,7 @@ export const Item = ({
       {shouldShowMembers && (
         <Addon isInModal={isInModal}>
           <Icon name="members" width={16} height={16} />
-          <AddonText>{invited.length}</AddonText>
+          <AddonText>{sharedCount}</AddonText>
         </Addon>
       )}
       {shouldShowFavoriteIcon && (

@@ -1,6 +1,7 @@
 import { Pool, spawn, Worker } from 'threads';
 import { call, put, take } from 'redux-saga/effects';
 import { addItemsBatch } from '@caesar/common/actions/entities/item';
+import { updateWorkInProgressItemRaws } from '@caesar/common/actions/workflow';
 import { arrayToObject, chunk, match } from '@caesar/common/utils/utils';
 import { checkItemsAfterDecryption } from '@caesar/common/utils/item';
 import { DECRYPTION_CHUNK_SIZE } from '@caesar/common/constants';
@@ -12,16 +13,21 @@ import {
   POOL_QUEUE_INITIALIZED_EVENT_TYPE,
 } from './constants';
 
-const taskAction = (items, key, masterPassword) => async task => {
+const taskAction = (items, raws, key, masterPassword) => async task => {
   await task.init(key, masterPassword);
+  let result = [];
 
-  // eslint-disable-next-line
-  return await task.decryptAll(items);
+  if (items) {
+    result = await task.decryptAll(items);
+  } else if (raws) {
+    result = await task.decryptRaws(raws);
+  }
+
+  return result;
 };
 
-export function* decryption({ items, key, masterPassword, coresCount }) {
-  const itemsById = arrayToObject(items);
-  const chunks = chunk(items, DECRYPTION_CHUNK_SIZE);
+export function* decryption({ items, raws, key, masterPassword, coresCount }) {
+  const itemsById = items ? arrayToObject(items) : {};
 
   const normalizerEvent = normalizeEvent(coresCount);
   const pool = Pool(() => spawn(new Worker('../../workers/decryption')), {
@@ -38,9 +44,17 @@ export function* decryption({ items, key, masterPassword, coresCount }) {
     }
   }
 
-  chunks.map(itemsChunk =>
-    pool.queue(taskAction(itemsChunk, key, masterPassword)),
-  );
+  if (items) {
+    const chunks = chunk(items, DECRYPTION_CHUNK_SIZE);
+
+    chunks.map(itemsChunk =>
+      pool.queue(taskAction(itemsChunk, null, key, masterPassword)),
+    );
+  }
+
+  if (raws) {
+    pool.queue(taskAction(null, raws, key, masterPassword));
+  }
 
   while (poolChannel) {
     try {
@@ -48,11 +62,17 @@ export function* decryption({ items, key, masterPassword, coresCount }) {
 
       switch (event.type) {
         case TASK_QUEUE_COMPLETED_EVENT_TYPE:
-          yield put(
-            addItemsBatch(
-              match(itemsById, checkItemsAfterDecryption(event.returnValue)),
-            ),
-          );
+          if (items) {
+            yield put(
+              addItemsBatch(
+                match(itemsById, checkItemsAfterDecryption(event.returnValue)),
+              ),
+            );
+          }
+
+          if (raws) {
+            yield put(updateWorkInProgressItemRaws(event.returnValue));
+          }
           break;
         case POOL_QUEUE_FINISHED_EVENT_TYPE:
           poolChannel.close();
@@ -61,6 +81,7 @@ export function* decryption({ items, key, masterPassword, coresCount }) {
           break;
       }
     } catch (error) {
+      // eslint-disable-next-line no-console
       console.log(error);
     }
   }

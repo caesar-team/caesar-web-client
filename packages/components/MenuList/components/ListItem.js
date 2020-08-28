@@ -4,7 +4,11 @@ import { useSelector, useDispatch } from 'react-redux';
 import { Draggable } from 'react-beautiful-dnd';
 import styled from 'styled-components';
 import { transformListTitle } from '@caesar/common/utils/string';
-import { PERMISSION, PERMISSION_ENTITY } from '@caesar/common/constants';
+import {
+  PERMISSION,
+  PERMISSION_ENTITY,
+  ITEM_TYPE,
+} from '@caesar/common/constants';
 import { currentTeamSelector } from '@caesar/common/selectors/user';
 import {
   createListRequest,
@@ -70,6 +74,8 @@ const Wrapper = styled(MenuItemInner)`
     }
   }
 `;
+const filterVisibleItems = items =>
+  items.filter(item => item && item?.type !== ITEM_TYPE.SYSTEM);
 
 export const ListItem = ({
   list = {},
@@ -84,9 +90,11 @@ export const ListItem = ({
   const dispatch = useDispatch();
   const currentTeam = useSelector(currentTeamSelector);
   const { id, label, children = [], teamId } = list;
+
   const visibleItems = useSelector(state =>
-    visibleItemsSelector(state, { itemIds: children }),
+    visibleItemsSelector(state, { itemIds: filterVisibleItems(children) }),
   );
+
   const isDefault = label === 'default';
   const [isEditMode, setEditMode] = useState(isCreatingMode);
   const [isOpenedPopup, setOpenedPopup] = useState(false);

@@ -10,7 +10,10 @@ import {
 } from '@caesar/common/actions/entities/item';
 import { masterPasswordSelector } from '@caesar/common/selectors/user';
 import { acceptUpdateItem, rejectUpdateItem } from '@caesar/common/api';
-import { decryptItem, getPrivateKeyObj } from '@caesar/common/utils/cipherUtils';
+import {
+  decryptItem,
+  getPrivateKeyObj,
+} from '@caesar/common/utils/cipherUtils';
 import { updateWorkInProgressItem } from '@caesar/common/actions/workflow';
 import { updateGlobalNotification } from '@caesar/common/actions/application';
 import { getServerErrorMessage } from '@caesar/common/utils/error';

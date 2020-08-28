@@ -39,9 +39,7 @@ const BootstrapWrapper = ({ children }) => (
       src={BgRightImg}
       srcSet={`${BgLeftImg} 1x, ${BgLeftImg2x} 2x`}
     />
-    <InnerWrapper>
-      {children}
-    </InnerWrapper>
+    <InnerWrapper>{children}</InnerWrapper>
   </AuthLayout>
 );
 

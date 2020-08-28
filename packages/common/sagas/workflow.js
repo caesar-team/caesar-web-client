@@ -2,6 +2,7 @@ import { put, call, fork, takeLatest, select, all } from 'redux-saga/effects';
 import {
   INIT_WORKFLOW,
   UPDATE_WORK_IN_PROGRESS_ITEM,
+  SET_WORK_IN_PROGRESS_ITEM,
   DECRYPTION_END,
   finishIsLoading,
   setWorkInProgressListId,
@@ -18,6 +19,7 @@ import { updateGlobalNotification } from '@caesar/common/actions/application';
 import {
   SET_CURRENT_TEAM_ID,
   setCurrentTeamId,
+  setPersonalDefaultListId,
 } from '@caesar/common/actions/user';
 import { addEntityKeyPair } from '@caesar/common/actions/keyStore';
 import { addChildItemsBatch } from '@caesar/common/actions/entities/childItem';
@@ -66,7 +68,6 @@ import { getServerErrorMessage } from '@caesar/common/utils/error';
 import { generateSystemItem } from '@caesar/common/sagas/entities/item';
 import { extractKeysFromSystemItem } from '@caesar/common/utils/item';
 import { teamAdminUsersSelector } from '@caesar/common/selectors/entities/team';
-import { setPersonalDefaultListId } from '@caesar/common/actions/user';
 
 function* initKeyStore() {
   try {
@@ -74,7 +75,10 @@ function* initKeyStore() {
     const masterPassword = yield select(masterPasswordSelector);
 
     const { data: userItems } = yield call(getUserItems);
-    const systemItems = [...userItems.teams, {items: userItems.personal}].reduce(
+    const systemItems = [
+      ...userItems.teams,
+      { items: userItems.personal },
+    ].reduce(
       (acc, { items }) => [
         ...acc,
         ...items.filter(item => item.type === ITEM_TYPE.SYSTEM),
@@ -140,24 +144,28 @@ function* initPersonal(withDecryption) {
       }
 
       if (notOwnItems?.length > 0) {
-        const keyPairs = yield select(
-          itemsKeyPairSelector,
-          { itemIds: notOwnItems.map(({ id }) => id) },
-        );
+        const keyPairs = yield select(itemsKeyPairSelector, {
+          itemIds: notOwnItems.map(({ id }) => id),
+        });
 
-        yield all(keyPairs.map((pair, index) => put(
-          decryption({
-            items: [notOwnItems[index]],
-            key: pair.privateKey,
-            masterPassword: pair.pass,
-          }),
-        )));
+        yield all(
+          keyPairs.map((pair, index) =>
+            put(
+              decryption({
+                items: [notOwnItems[index]],
+                key: pair.privateKey,
+                masterPassword: pair.pass,
+              }),
+            ),
+          ),
+        );
       }
     }
 
     const defaultList = yield select(defaultListSelector);
     const trashList = yield select(trashListSelector);
     let favoritesList = yield select(favoriteListSelector);
+
     if (!favoritesList?.id) {
       favoritesList = getFavoritesList(itemsById, trashList?.id);
     }
@@ -193,6 +201,7 @@ function* initPersonal(withDecryption) {
 
     yield put(finishIsLoading());
   } catch (error) {
+    // eslint-disable-next-line no-console
     console.log(error);
     yield put(
       updateGlobalNotification(getServerErrorMessage(error), false, true),
@@ -292,6 +301,7 @@ function* initTeam(team, withDecryption) {
 
     yield put(finishIsLoading());
   } catch (error) {
+    // eslint-disable-next-line no-console
     console.log(error);
     yield put(
       updateGlobalNotification(getServerErrorMessage(error), false, true),
@@ -305,6 +315,7 @@ function* initTeams(withDecryption) {
 
     yield all(teams.map(team => call(initTeam, team, withDecryption)));
   } catch (error) {
+    // eslint-disable-next-line no-console
     console.log(error);
     yield put(
       updateGlobalNotification(getServerErrorMessage(error), false, true),
@@ -356,6 +367,7 @@ export function* setCurrentTeamIdWatchSaga({
       yield call(initTeams, withDecryption);
     }
   } catch (error) {
+    // eslint-disable-next-line no-console
     console.log(error);
     yield put(
       updateGlobalNotification(getServerErrorMessage(error), false, true),
@@ -375,9 +387,32 @@ export function* decryptionEndWatchSaga() {
   }
 }
 
+function* setWorkInProgressItemSaga({ payload: { item } }) {
+  try {
+    if (!item) return;
+    const { raws } = JSON.parse(item.secret);
+
+    if (raws) {
+      const keyPair = yield select(personalKeyPairSelector);
+      const masterPassword = yield select(masterPasswordSelector);
+
+      yield put(
+        decryption({
+          raws,
+          key: keyPair.privateKey,
+          masterPassword,
+        }),
+      );
+    }
+  } catch (error) {
+    console.log('error: ', error);
+  }
+}
+
 export default function* workflowSagas() {
   yield takeLatest(INIT_WORKFLOW, initWorkflow);
   yield takeLatest(UPDATE_WORK_IN_PROGRESS_ITEM, updateWorkInProgressItemSaga);
   yield takeLatest(SET_CURRENT_TEAM_ID, setCurrentTeamIdWatchSaga);
   yield takeLatest(DECRYPTION_END, decryptionEndWatchSaga);
+  yield takeLatest(SET_WORK_IN_PROGRESS_ITEM, setWorkInProgressItemSaga);
 }

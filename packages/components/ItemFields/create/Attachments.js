@@ -30,7 +30,6 @@ const AttachmentsRow = styled.div`
 
 const handleClickDownloadFile = attachment => {
   const { raw, name } = attachment;
-
   downloadFile(raw, name);
 };
 
@@ -42,8 +41,8 @@ const renderAttachments = (
   errors = [],
   setFieldValue,
   disabled,
-) =>
-  attachments.map((attachment, index) => (
+) => {
+  return attachments.map((attachment, index) => (
     <FileRow key={index} disabled={disabled}>
       <File
         key={index}
@@ -59,6 +58,7 @@ const renderAttachments = (
       />
     </FileRow>
   ));
+};
 
 export const Attachments = ({
   name,

@@ -4,15 +4,7 @@ import styled from 'styled-components';
 import DownloadIconSvg from '@caesar/assets/icons/svg/icon-download-white.svg';
 import { media } from '@caesar/assets/styles/media';
 import { PERMISSION } from '@caesar/common/constants';
-import {
-  getRealFileSizeForBase64enc,
-  humanizeSize,
-} from '@caesar/common/validation/utils';
-
-import {
-  extactExtFromFilename,
-  getFilenameWithoutExt,
-} from '@caesar/common/utils/file';
+import { humanizeSize } from '@caesar/common/utils/file';
 import { Can } from '../Ability';
 import { Icon } from '../Icon';
 
@@ -165,18 +157,15 @@ const UploadedWrapper = styled.div`
 `;
 
 const File = ({
+  size,
   name,
-  raw,
+  ext,
   error,
   itemSubject,
   onClickRemove,
   onClickDownload,
   ...props
 }) => {
-  const ext = extactExtFromFilename(name);
-  const filename = decodeURIComponent(getFilenameWithoutExt(name));
-  const size = humanizeSize(getRealFileSizeForBase64enc(raw.length), true);
-
   const handleClickCloseIcon = e => {
     e.stopPropagation();
     onClickRemove();
@@ -201,8 +190,8 @@ const File = ({
         <UploadedWrapper isHoveringCloseIcon={isHoveringCloseIcon}>
           <ErrorStatus>!</ErrorStatus>
           <Details>
-            <FileName>{filename}</FileName>
-            <FileSize isError>{size}</FileSize>
+            <FileName>{name}</FileName>
+            <FileSize isError>{humanizeSize(size)}</FileSize>
             <Error>{error}</Error>
           </Details>
           {onClickRemove && hoverableCloseIcon}
@@ -219,8 +208,8 @@ const File = ({
     >
       <FileExt>{ext}</FileExt>
       <Details>
-        <FileName>{filename}</FileName>
-        <FileSize>{size}</FileSize>
+        <FileName>{name}</FileName>
+        <FileSize>{humanizeSize(size)}</FileSize>
       </Details>
       {itemSubject ? (
         <Can I={PERMISSION.EDIT} an={itemSubject}>

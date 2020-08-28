@@ -113,6 +113,7 @@ srp.prototype.hash = function(value) {
   }
 
   throw 'hash algorithm not supported';
+
   return null;
 };
 

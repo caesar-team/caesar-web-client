@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import Router from 'next/router';
 import { put, call, takeLatest, select } from 'redux-saga/effects';
 import {
@@ -19,7 +20,7 @@ import { membersByIdSelector } from '@caesar/common/selectors/entities/member';
 import { currentTeamIdSelector } from '@caesar/common/selectors/user';
 import { convertTeamsToEntity } from '@caesar/common/normalizers/normalizers';
 import { getUserSelf, getKeys, getUserTeams } from '@caesar/common/api';
-import { removeCookieValue } from '@caesar/common/utils/token';
+import { removeCookieValue, clearStorage } from '@caesar/common/utils/token';
 import { ROUTES } from '@caesar/common/constants';
 
 export function* fetchUserSelfSaga() {
@@ -37,7 +38,7 @@ export function* fetchUserSelfSaga() {
     yield put(fetchUserSelfSuccess(fixedUser));
     yield put(addMembersBatch({ [fixedUser.id]: fixedUser }));
   } catch (error) {
-    console.log('error', error);
+    console.error('error', error);
     yield put(fetchUserSelfFailure());
   }
 }
@@ -53,7 +54,7 @@ export function* fetchKeyPairSaga() {
       }),
     );
   } catch (error) {
-    console.log('error', error);
+    console.error('error', error);
     yield put(fetchKeyPairFailure());
   }
 }
@@ -71,19 +72,19 @@ export function* fetchUserTeamsSaga() {
       put(setCurrentTeamId(currentTeamId || data[0].id));
     }
   } catch (error) {
-    console.log('error', error);
+    console.error('error', error);
     yield put(fetchUserTeamsFailure());
   }
 }
 
 export function* logoutSaga() {
   try {
-    yield call([localStorage, localStorage.clear]);
     yield call(removeCookieValue, 'token');
     yield call(removeCookieValue, 'share');
+    yield call(clearStorage);
     yield call(Router.push, ROUTES.SIGN_IN);
   } catch (error) {
-    console.log('error', error);
+    console.error('error', error);
   }
 }
 

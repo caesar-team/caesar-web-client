@@ -4,6 +4,7 @@ import { useDispatch } from 'react-redux';
 import { useFormik } from 'formik';
 import styled from 'styled-components';
 import { createItemRequest } from '@caesar/common/actions/entities/item';
+import { processUploadedFiles } from '@caesar/common/utils/attachment';
 import { FormByType, FormHeader, FormFooter } from './components';
 import { getInitialValues, getValidationSchema } from './utils';
 
@@ -19,8 +20,38 @@ export const CreateForm = () => {
   const dispatch = useDispatch();
   const { query } = useRouter();
 
-  const handleCreate = (values, { setSubmitting }) => {
-    dispatch(createItemRequest(values, setSubmitting));
+  const handleCreate = (
+    {
+      name = null,
+      note = null,
+      pass = null,
+      website = null,
+      login = null,
+      attachments: uploadedFiles = null,
+      ...itemForm
+    },
+    { setSubmitting },
+  ) => {
+    const { attachments = [], raws = {} } = processUploadedFiles(uploadedFiles);
+    const data = {
+      name,
+      note,
+      pass,
+      website,
+      login,
+      attachments,
+      raws,
+    };
+
+    dispatch(
+      createItemRequest(
+        {
+          ...itemForm,
+          data,
+        },
+        setSubmitting,
+      ),
+    );
   };
 
   const formik = useFormik({

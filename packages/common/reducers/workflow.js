@@ -3,6 +3,7 @@ import {
   FINISH_IS_LOADING,
   RESET_WORK_IN_PROGRESS_ITEM_IDS,
   SET_WORK_IN_PROGRESS_ITEM,
+  UPDATE_WORK_IN_PROGRESS_ITEM_RAWS,
   SET_WORK_IN_PROGRESS_ITEM_IDS,
   SET_WORK_IN_PROGRESS_LIST_ID,
   RESET_WORKFLOW_STORE,
@@ -32,6 +33,18 @@ export default createReducer(initialState, {
             mode: payload.mode,
           }
         : null,
+    };
+  },
+  [UPDATE_WORK_IN_PROGRESS_ITEM_RAWS](state, { payload }) {
+    return {
+      ...state,
+      workInProgressItem: {
+        ...state.workInProgressItem,
+        data: {
+          ...state.workInProgressItem?.data,
+          raws: payload?.raws,
+        },
+      },
     };
   },
   [SET_WORK_IN_PROGRESS_LIST_ID](state, { payload }) {

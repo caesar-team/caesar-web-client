@@ -192,6 +192,7 @@ class MasterPasswordStep extends Component {
     } catch (error) {
       console.log('error', error);
       setErrors({ confirmPassword: 'Something wrong' });
+
       return setSubmitting(false);
     }
   };

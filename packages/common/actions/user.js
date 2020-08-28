@@ -14,7 +14,8 @@ export const SET_MASTER_PASSWORD = '@user/SET_MASTER_PASSWORD';
 export const SET_KEY_PAIR = '@user/SET_KEY_PAIR';
 export const SET_CURRENT_TEAM_ID = '@user/SET_CURRENT_TEAM_ID';
 
-export const SET_PERSONAL_DEFAULT_LIST_ID = '@user/SET_PERSONAL_DEFAULT_LIST_ID';
+export const SET_PERSONAL_DEFAULT_LIST_ID =
+  '@user/SET_PERSONAL_DEFAULT_LIST_ID';
 
 export const ADD_MEMBER_TO_TEAM = '@user/ADD_MEMBER_TO_TEAM';
 export const LEAVE_TEAM = '@user/LEAVE_TEAM';
@@ -37,7 +38,7 @@ export const fetchUserSelfFailure = () => ({
 });
 
 export const fetchKeyPairRequest = () => ({
-    type: FETCH_KEY_PAIR_REQUEST,
+  type: FETCH_KEY_PAIR_REQUEST,
 });
 
 export const fetchKeyPairSuccess = keyPair => ({

@@ -3,7 +3,11 @@ import {
   TOTAL_MAX_UPLOADING_FILES_SIZES,
 } from '@caesar/common/constants';
 
-export const BASE_64_LENGTH_BYTE_RATE = 3 / 4;
+import {
+  getRealFileSizesForBase64enc,
+  BASE_64_LENGTH_BYTE_RATE,
+} from '@caesar/common/utils/file';
+
 export const SIZE_NAME_RATE_MAP = {
   B: 1,
   KB: 1024,
@@ -18,26 +22,6 @@ export const convertSizeNameToNumber = sizeName =>
 export const checkFileSize = raw =>
   raw.length * BASE_64_LENGTH_BYTE_RATE <=
   convertSizeNameToNumber(MAX_UPLOADING_FILE_SIZE);
-
-export const isBase64Encoded = dataString => {
-  return dataString.indexOf(';base64') !== -1;
-};
-
-export const getRealFileSizeForBase64enc = length => {
-  return length ? length * BASE_64_LENGTH_BYTE_RATE : 0;
-};
-
-export const getRealFileSizesForBase64enc = files => {
-  return files
-    ? files.reduce((acc, { raw }) => {
-        if (isBase64Encoded(raw.substr(0, 50))) {
-          return acc + raw.length;
-        }
-
-        return acc + getRealFileSizeForBase64enc(raw.length);
-      }, 0)
-    : 0;
-};
 
 export const checkAllFileSizes = files =>
   files

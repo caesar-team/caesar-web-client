@@ -5,6 +5,7 @@ export default class ErrorPage extends React.Component {
   static getInitialProps({ res, err }) {
     // eslint-disable-next-line
     const statusCode = res ? res.statusCode : err ? err.statusCode : null;
+
     return { statusCode };
   }
 

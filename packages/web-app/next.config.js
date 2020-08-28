@@ -48,7 +48,10 @@ const publicRuntimeConfig = {
   AUTHORIZATION_ENABLE: process.env.AUTHORIZATION_ENABLE !== 'false',
   APP_TYPE: process.env.APP_TYPE || 'general',
   APP_VERSION: process.env.APP_VERSION,
-  LOG_LEVEL: process.env.LOG_LEVEL || process.env.NODE_ENV === 'production' ? 'error' : 'debug',
+  LOG_LEVEL:
+    process.env.LOG_LEVEL || process.env.NODE_ENV === 'production'
+      ? 'error'
+      : 'debug',
 };
 
 const serverRuntimeConfig = {};
@@ -95,15 +98,18 @@ module.exports = withPlugins(
       },
     },
     webpack: (config, { isServer }) => {
-      config.output.globalObject = 'this';
+      if (isServer) {
+        config.output.globalObject = `typeof self !== 'undefined' ? self : this`;
+      }
 
       config.plugins.push(new ThreadsPlugin());
+      config.externals['tiny-worker'] = 'tiny-worker';
 
       //FIX: https://github.com/vercel/next.js/issues/7755#issuecomment-508633125
       if (!isServer) {
         config.node = {
-          fs: 'empty'
-        }
+          fs: 'empty',
+        };
       }
 
       return config;

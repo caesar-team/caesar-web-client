@@ -8,8 +8,8 @@ import { generateSystemItemName } from '@caesar/common/utils/item';
 import { KEY_TYPE, TEAM_TYPE, ENTITY_TYPE } from '@caesar/common/constants';
 
 const findEntityItemsByType = (data, entityType) =>
-  Object.values(data[KEY_TYPE.ENTITY]).filter(
-    ({ name }) => name.includes(entityType)
+  Object.values(data[KEY_TYPE.ENTITY]).filter(({ name }) =>
+    name.includes(entityType),
   ) || [];
 
 const findTeamItemByName = (items, teamId) =>
@@ -18,9 +18,12 @@ const findTeamItemByName = (items, teamId) =>
   ) || {};
 
 const findItemsByNames = (items, itemIds) =>
-  itemIds.map(itemId => items.find(
-    ({ name }) => name === generateSystemItemName(ENTITY_TYPE.ITEM, itemId),
-  ) || {});
+  itemIds.map(
+    itemId =>
+      items.find(
+        ({ name }) => name === generateSystemItemName(ENTITY_TYPE.ITEM, itemId),
+      ) || {},
+  );
 
 export const keyStoreSelector = state => state.keyStore;
 

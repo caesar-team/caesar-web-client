@@ -98,6 +98,7 @@ export function* fetchTeamsSaga() {
       ),
     );
   } catch (error) {
+    // eslint-disable-next-line no-console
     console.log(error);
     yield put(
       updateGlobalNotification(getServerErrorMessage(error), false, true),
@@ -112,6 +113,7 @@ export function* fetchTeamSaga({ payload: { teamId } }) {
 
     yield put(fetchTeamSuccess(data));
   } catch (error) {
+    // eslint-disable-next-line no-console
     console.log(error);
     yield put(
       updateGlobalNotification(getServerErrorMessage(error), false, true),
@@ -144,6 +146,7 @@ export function* createTeamSaga({ payload: { title, icon } }) {
 
     yield put(createItemRequest(systemItemData));
   } catch (error) {
+    // eslint-disable-next-line no-console
     console.log(error);
     yield put(
       updateGlobalNotification(getServerErrorMessage(error), false, true),
@@ -187,6 +190,7 @@ export function* removeTeamSaga({ payload: { teamId } }) {
       removeTeamFromMembersBatch(teamId, team.users.map(({ id }) => id)),
     );
   } catch (error) {
+    // eslint-disable-next-line no-console
     console.log(error);
     yield put(
       updateGlobalNotification(getServerErrorMessage(error), false, true),
@@ -203,6 +207,7 @@ export function* updateTeamMemberRoleSaga({
 
     yield put(updateTeamMemberRoleSuccess(teamId, userId, role));
   } catch (error) {
+    // eslint-disable-next-line no-console
     console.log(error);
     yield put(
       updateGlobalNotification(getServerErrorMessage(error), false, true),
@@ -274,6 +279,7 @@ export function* addMemberToTeamListsBatchSaga({
 
     yield put(updateGlobalNotification(NOOP_NOTIFICATION, false));
   } catch (error) {
+    // eslint-disable-next-line no-console
     console.log(error);
     yield put(
       updateGlobalNotification(getServerErrorMessage(error), false, true),
@@ -306,6 +312,7 @@ export function* removeTeamMemberSaga({ payload: { teamId, userId } }) {
 
     yield put(updateGlobalNotification(NOOP_NOTIFICATION, false));
   } catch (error) {
+    // eslint-disable-next-line no-console
     console.log(error);
     yield put(
       updateGlobalNotification(getServerErrorMessage(error), false, true),

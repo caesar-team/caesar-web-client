@@ -49,22 +49,26 @@ const ItemComponent = ({
   const teamsTrashLists = useSelector(teamsTrashListsSelector);
   const [isSubmitting, setSubmitting] = useState(false);
   const [isMoveModalOpened, setMoveModalOpened] = useState(false);
+  // const [item, setItem] = useState(useSelector(workInProgressItemSelector));
 
   if (!item) {
     return <EmptyItem />;
   }
-
-  const { data, listId } = item;
 
   const isTrashItem =
     item &&
     (item.listId === trashList?.id ||
       teamsTrashLists.map(({ id }) => id).includes(item.listId));
 
-  const handleClickAcceptEdit = ({ name, value }) => {
+  const handleClickAcceptEdit = patchData => {
     setSubmitting(true);
-    const updatedData = { ...data, listId, [name]: value };
-
+    const updatedData = {
+      ...item,
+      data: {
+        ...item.data,
+        ...patchData,
+      },
+    };
     dispatch(editItemRequest(updatedData, setSubmitting, notification));
   };
 

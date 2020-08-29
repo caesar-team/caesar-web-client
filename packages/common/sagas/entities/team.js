@@ -52,6 +52,7 @@ import {
   userTeamIdsSelector,
   userPersonalDefaultListIdSelector,
 } from '@caesar/common/selectors/user';
+import { defaultListSelector } from '@caesar/common/selectors/entities/list';
 import {
   getTeams,
   postCreateTeam,
@@ -125,11 +126,18 @@ export function* fetchTeamSaga({ payload: { teamId } }) {
 export function* createTeamSaga({ payload: { title, icon } }) {
   try {
     const { data: team } = yield call(postCreateTeam, { title, icon });
+    let listId = null;
 
     const user = yield select(userDataSelector);
-    const userPersonalDefaultListId = yield select(
-      userPersonalDefaultListIdSelector,
-    );
+
+    listId = yield select(userPersonalDefaultListIdSelector);
+
+    if (!listId) {
+      // Catched a bug when userPersonalDefaultListId was empty
+      const defaultList = yield select(defaultListSelector);
+      listId = defaultList.id;
+    }
+
     yield put(createTeamSuccess({ ...team, __type: ENTITY_TYPE.TEAM }));
     yield put(addTeamToMemberTeamsList(team.id, user.id));
     yield put(
@@ -140,7 +148,7 @@ export function* createTeamSaga({ payload: { title, icon } }) {
     const systemItemData = yield call(
       generateSystemItem,
       ENTITY_TYPE.TEAM,
-      userPersonalDefaultListId,
+      listId,
       team.id,
     );
 

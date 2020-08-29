@@ -113,18 +113,26 @@ export function* generateSystemItem(entity, listId, entityId) {
   const systemItemData = {
     type: ITEM_TYPE.SYSTEM,
     listId,
-    attachments: [
-      {
-        name: 'publicKey',
-        raw: publicKey,
+    data: {
+      attachments: [
+        {
+          id: 'publicKey',
+          name: 'publicKey',
+          raw: publicKey,
+        },
+        {
+          id: 'privateKey',
+          name: 'privateKey',
+          raw: privateKey,
+        },
+      ],
+      raws: {
+        privateKey,
+        publicKey,
       },
-      {
-        name: 'privateKey',
-        raw: privateKey,
-      },
-    ],
-    pass: masterPassword,
-    name: yield call(generateSystemItemName, entity, entityId),
+      pass: masterPassword,
+      name: yield call(generateSystemItemName, entity, entityId),
+    },
   };
 
   return systemItemData;
@@ -325,7 +333,7 @@ export function* createItemSaga({
       listId,
       type,
       relatedItem,
-      data: { raws, ...data },
+      data: { raws = {}, ...data },
     } = item;
 
     const isSystemItem = type === ITEM_TYPE.SYSTEM;

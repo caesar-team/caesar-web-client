@@ -9,6 +9,8 @@ export const schema = yup.object({
   icon: yup.object({
     raw: yup
       .string()
-      .test('fileSize', `Maximum file size is ${MAX_SIZE}`, checkFileSize),
+      .test('fileSize', `Maximum file size is ${MAX_SIZE}`, raw =>
+        checkFileSize(raw.length),
+      ),
   }),
 });

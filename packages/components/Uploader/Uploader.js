@@ -1,5 +1,4 @@
 import React from 'react';
-import styled from 'styled-components';
 import Dropzone from 'react-dropzone';
 import {
   filesToBase64,
@@ -11,53 +10,8 @@ import {
   TOTAL_MAX_UPLOADING_FILES_SIZES,
   MAX_UPLOADING_FILE_SIZE,
 } from '@caesar/common/constants';
-import { Icon } from '../Icon';
 
-const Container = styled.div`
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  background-color: ${({ theme }) => theme.color.snow};
-  border: 1px dashed
-    ${({ theme, isDragActive }) =>
-      isDragActive ? theme.color.black : theme.color.gray};
-  width: 100%;
-  padding: 16px 5px;
-  cursor: ${({ isDisabled }) => (isDisabled ? 'not-allowed' : 'pointer')};
-  outline: none;
-  transition: all 0.2s;
-
-  ${({ isDisabled }) => isDisabled && `opacity: 0.3;`}
-`;
-
-const Text = styled.span`
-  margin-bottom: 5px;
-  font-size: 16px;
-  text-align: center;
-  color: ${({ theme }) => theme.color.emperor};
-`;
-
-const HintText = styled.div`
-  font-size: 14px;
-  color: ${({ theme }) => theme.color.gray};
-`;
-
-const Link = styled.a`
-  color: ${({ theme }) => theme.color.black};
-`;
-
-const StyledIcon = styled(Icon)`
-  fill: ${({ theme, isDragActive }) =>
-    isDragActive ? theme.color.gray : theme.color.black};
-  transition: all 0.2s;
-  margin-right: 15px;
-`;
-
-const Error = styled.div`
-  font-size: 14px;
-  color: ${({ theme }) => theme.color.red};
-`;
+import { Container, Text, HintText, Link, StyledIcon, Error } from './styles';
 
 const getNotificationText = files =>
   files.length > 1
@@ -99,6 +53,7 @@ const Uploader = ({
         text: getNotificationText(preparedFiles.duplicatedFiles),
       });
     }
+
     onChange(name, multiple ? preparedFiles.uniqFiles : files[0]);
   };
 

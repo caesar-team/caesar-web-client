@@ -45,9 +45,9 @@ export const processUploadedFiles = files => {
       raws[id] = attach.raw;
       attachments.push({
         id,
-        name: getFilenameWithoutExt(attach.name) || attach.name,
-        ext: extactExtFromFilename(attach.name) || attach.ext,
-        size: getRealFileSizeForBase64enc(attach.raw?.length) || attach.size,
+        name: attach.name || getFilenameWithoutExt(attach.name),
+        ext: attach.ext || extactExtFromFilename(attach.name),
+        size: attach.size || getRealFileSizeForBase64enc(attach.raw?.length),
       });
     });
   }

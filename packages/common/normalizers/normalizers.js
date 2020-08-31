@@ -1,5 +1,4 @@
 import { normalize } from 'normalizr';
-import { LIST_TYPE } from '@caesar/common/constants';
 import { listSchema, memberSchema, teamSchema } from './schemas';
 
 export const extractRelatedItems = lists => {

@@ -1,13 +1,17 @@
 import { normalize } from 'normalizr';
 import { listSchema, memberSchema, teamSchema } from './schemas';
+import { ITEM_TYPE } from '@caesar/common/constants';
 
-export const extractRelatedItems = lists => {
+export const extractRelatedAndNonSystemItems = lists => {
   const result = lists.map(({ children, ...rest }) => {
     const relatedItems = children.filter(item => item && item.relatedItem);
-
+    const nonSystemChildren = children.filter(
+      item => item?.type !== ITEM_TYPE.SYSTEM,
+    );
+    
     return {
       ...rest,
-      children: [...children, ...relatedItems],
+      children: [...nonSystemChildren, ...relatedItems],
     };
   });
 

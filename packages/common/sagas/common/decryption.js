@@ -1,10 +1,11 @@
 import { Pool, spawn, Worker } from 'threads';
 import { call, put, take } from 'redux-saga/effects';
 import { addItemsBatch } from '@caesar/common/actions/entities/item';
+import { addSystemItemsBatch } from '@caesar/common/actions/entities/system';
 import { updateWorkInProgressItemRaws } from '@caesar/common/actions/workflow';
 import { arrayToObject, chunk, match } from '@caesar/common/utils/utils';
 import { checkItemsAfterDecryption } from '@caesar/common/utils/item';
-import { DECRYPTION_CHUNK_SIZE } from '@caesar/common/constants';
+import { DECRYPTION_CHUNK_SIZE, ITEM_TYPE } from '@caesar/common/constants';
 import { createPoolChannel } from './channels';
 import { normalizeEvent } from './utils';
 import {
@@ -63,9 +64,25 @@ export function* decryption({ items, raws, key, masterPassword, coresCount }) {
       switch (event.type) {
         case TASK_QUEUE_COMPLETED_EVENT_TYPE:
           if (items) {
+            const systemItems = [];
+            const nonSystemItems = [];
+
+            itemsById.foreach(item => {
+              if (item.type === ITEM_TYPE.SYSTEM) {
+                systemItems.push(item);
+              } else {
+                nonSystemItems.push(item);
+              }
+            });
+            
+            yield put(
+              addSystemItemsBatch(
+                match(systemItems, checkItemsAfterDecryption(event.returnValue)),
+              ),
+            );
             yield put(
               addItemsBatch(
-                match(itemsById, checkItemsAfterDecryption(event.returnValue)),
+                match(nonSystemItems, checkItemsAfterDecryption(event.returnValue)),
               ),
             );
           }

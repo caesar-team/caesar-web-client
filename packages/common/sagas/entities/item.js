@@ -61,7 +61,7 @@ import {
   currentTeamIdSelector,
   userPersonalDefaultListIdSelector,
 } from '@caesar/common/selectors/user';
-import { addEntityKeyPair } from '@caesar/common/actions/keyStore';
+import { addShareKeyPair, addTeamKeyPair } from '@caesar/common/actions/keyStore';
 import {
   postCreateItem,
   postCreateItemsBatch,
@@ -395,7 +395,11 @@ export function* createItemSaga({
     yield put(setCurrentTeamId(teamId || TEAM_TYPE.PERSONAL));
 
     if (isSystemItem) {
-      yield put(addEntityKeyPair(newItem));
+      if (data.name.includes(ENTITY_TYPE.TEAM)) {
+        yield put(addTeamKeyPair(newItem));
+      } else {
+        yield put(addShareKeyPair(newItem));
+      }
     } else {
       yield put(setWorkInProgressListId(listId));
       yield put(setWorkInProgressItem(newItem));

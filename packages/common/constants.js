@@ -166,6 +166,7 @@ export const ENTITY_TYPE = {
   LIST: 'list',
   TEAM: 'team',
   MEMBER: 'member',
+  SHARE: 'SHARE',
 };
 
 export const COMMON_PROGRESS_NOTIFICATION = 'In progress...';
@@ -245,5 +246,7 @@ export const PERMISSION_MESSAGES = {
 export const KEY_TYPE = {
   PERSONAL: 'personal',
   ENTITY: 'entity',
+  TEAMS: 'teams',
+  SHARES: 'shares',
   ANONYMOUS: 'anonymous',
 };

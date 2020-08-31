@@ -21,14 +21,13 @@ import {
   setCurrentTeamId,
   setPersonalDefaultListId,
 } from '@caesar/common/actions/user';
-import { addEntityKeyPair } from '@caesar/common/actions/keyStore';
-import { addChildItemsBatch } from '@caesar/common/actions/entities/childItem';
+import { addTeamKeyPair, addShareKeyPair } from '@caesar/common/actions/keyStore';
 import { fetchMembersSaga } from '@caesar/common/sagas/entities/member';
 import {
   convertNodesToEntities,
-  extractRelatedItems,
+  extractRelatedAndNonSystemItems,
 } from '@caesar/common/normalizers/normalizers';
-import { objectToArray } from '@caesar/common/utils/utils';
+import { objectToArray, arrayToObject } from '@caesar/common/utils/utils';
 import { sortItemsByFavorites } from '@caesar/common/utils/workflow';
 import {
   getLists,
@@ -36,7 +35,7 @@ import {
   getTeams,
   getUserItems,
 } from '@caesar/common/api';
-import { ITEM_TYPE, TEAM_TYPE } from '@caesar/common/constants';
+import { ENTITY_TYPE, ITEM_TYPE, TEAM_TYPE } from '@caesar/common/constants';
 import {
   favoriteListSelector,
   trashListSelector,
@@ -49,10 +48,8 @@ import {
   userIdSelector,
   userPersonalDefaultListIdSelector,
 } from '@caesar/common/selectors/user';
-import {
-  itemSelector,
-  systemItemsSelector,
-} from '@caesar/common/selectors/entities/item';
+import { itemSelector } from '@caesar/common/selectors/entities/item';
+import { systemItemsSelector } from '@caesar/common/selectors/entities/system';
 import {
   workInProgressListIdSelector,
   workInProgressItemSelector,
@@ -60,7 +57,7 @@ import {
 import {
   personalKeyPairSelector,
   teamKeyPairSelector,
-  itemsKeyPairSelector,
+  sharesKeyPairSelector,
 } from '@caesar/common/selectors/keyStore';
 import { getFavoritesList } from '@caesar/common/normalizers/utils';
 import { fetchTeamSuccess } from '@caesar/common/actions/entities/team';
@@ -87,6 +84,7 @@ function* initKeyStore() {
     );
 
     if (systemItems?.length > 0) {
+      //yield put(addSystemItemsBatch(arrayToObject(systemItems)));
       yield put(
         decryption({
           items: systemItems,
@@ -112,8 +110,8 @@ function* initPersonal(withDecryption) {
     }
 
     const { data: rawLists } = yield call(getLists);
-    const lists = extractRelatedItems(rawLists);
-    const { listsById, itemsById, childItemsById } = convertNodesToEntities(
+    const lists = extractRelatedAndNonSystemItems(rawLists);
+    const { listsById, itemsById } = convertNodesToEntities(
       lists,
     );
 
@@ -144,8 +142,8 @@ function* initPersonal(withDecryption) {
       }
 
       if (notOwnItems?.length > 0) {
-        const keyPairs = yield select(itemsKeyPairSelector, {
-          itemIds: notOwnItems.map(({ id }) => id),
+        const keyPairs = yield select(sharesKeyPairSelector, {
+          shareIds: notOwnItems.map(({ id }) => id),
         });
 
         yield all(
@@ -177,7 +175,6 @@ function* initPersonal(withDecryption) {
         [favoritesList.id]: favoritesList,
       }),
     );
-    yield put(addChildItemsBatch(childItemsById));
 
     const workInProgressListId = yield select(workInProgressListIdSelector);
 
@@ -225,7 +222,7 @@ function* initTeam(team, withDecryption) {
     const currentUserId = yield select(userIdSelector);
     const isCurrentUserTeamAdmin = teamAdmins.includes(currentUserId);
     const { data: lists } = yield call(getTeamLists, team.id);
-    const { listsById, itemsById, childItemsById } = convertNodesToEntities(
+    const { listsById, itemsById } = convertNodesToEntities(
       lists,
     );
 
@@ -242,7 +239,6 @@ function* initTeam(team, withDecryption) {
         [favoritesList.id]: favoritesList,
       }),
     );
-    yield put(addChildItemsBatch(childItemsById));
 
     const workInProgressListId = yield select(workInProgressListIdSelector);
 
@@ -269,7 +265,7 @@ function* initTeam(team, withDecryption) {
       );
       const teamSystemItem = yield call(
         generateSystemItem,
-        'team',
+        ENTITY_TYPE.TEAM,
         userPersonalDefaultListId,
         team.id,
       );
@@ -279,7 +275,7 @@ function* initTeam(team, withDecryption) {
         pass: teamSystemItem.pass,
       };
 
-      yield put(addEntityKeyPair(teamSystemItem));
+      yield put(addTeamKeyPair(teamSystemItem));
       yield put(createItemRequest(teamSystemItem));
     }
 
@@ -380,7 +376,7 @@ export function* decryptionEndWatchSaga() {
     const systemItems = yield select(systemItemsSelector);
 
     if (systemItems.length > 0) {
-      yield all(systemItems.map(item => put(addEntityKeyPair(item))));
+      yield all(systemItems.map(item => item.data?.name?.includes(ENTITY_TYPE.TEAM) ? put(addTeamKeyPair(item)) : put(addShareKeyPair(item))));
     }
   } catch (error) {
     console.log(error);

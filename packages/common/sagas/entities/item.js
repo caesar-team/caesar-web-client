@@ -111,23 +111,26 @@ export function* generateSystemItem(entity, listId, entityId) {
     systemItemEmail,
   ]);
 
-  const keys = [
-    {
-      name: 'publicKey',
-      raw: publicKey,
-    },
-    {
-      name: 'privateKey',
-      raw: privateKey,
-    },
-  ];
-  const { attachments, rows } = processUploadedFiles(keys);
   const systemItemData = {
     type: ITEM_TYPE.SYSTEM,
     listId,
     data: {
-      attachments,
-      raws,
+      attachments: [
+        {
+          id: 'publicKey',
+          name: 'publicKey',
+          raw: publicKey,
+        },
+        {
+          id: 'privateKey',
+          name: 'privateKey',
+          raw: privateKey,
+        },
+      ],
+      raws: {
+        privateKey,
+        publicKey,
+      },
       pass: masterPassword,
       name: yield call(generateSystemItemName, entity, entityId),
     },

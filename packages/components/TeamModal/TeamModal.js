@@ -81,7 +81,7 @@ const TeamModal = ({
     >
       <FormTitle>{teamId ? 'Edit' : 'Add'} team</FormTitle>
       <form onSubmit={handleSubmit}>
-        <Label>Group name</Label>
+        <Label>Name</Label>
         <FormInput
           name="title"
           value={values.title}
@@ -92,7 +92,7 @@ const TeamModal = ({
           onBlur={handleBlur}
         />
         <GroupAvatarsWrapper>
-          <GroupAvatarsTitle>Group avatar</GroupAvatarsTitle>
+          <GroupAvatarsTitle>Avatar</GroupAvatarsTitle>
           <GroupAvatarsTip>
             Choose an avatar or upload (160x160 pixels, not more than 8 MB)
           </GroupAvatarsTip>

@@ -193,7 +193,7 @@ export const convertSizeNameToNumber = sizeName =>
     size && type ? Number(size) * SIZE_NAME_RATE_MAP[type] : 0,
   );
 
-export const checkFileSize = size =>
+export const checkFileSize = size => 
   size * BASE_64_LENGTH_BYTE_RATE <=
   convertSizeNameToNumber(MAX_UPLOADING_FILE_SIZE);
 

@@ -99,6 +99,7 @@ import {
 } from '@caesar/common/utils/item';
 import { passwordGenerator } from '@caesar/common/utils/passwordGenerator';
 import { generateKeys } from '@caesar/common/utils/key';
+import { processUploadedFiles } from '@caesar/common/utils/attachment';
 
 const ITEMS_CHUNK_SIZE = 50;
 
@@ -110,21 +111,26 @@ export function* generateSystemItem(entity, listId, entityId) {
     systemItemEmail,
   ]);
 
+  const keys = [
+    {
+      name: 'publicKey',
+      raw: publicKey,
+    },
+    {
+      name: 'privateKey',
+      raw: privateKey,
+    },
+  ];
+  const { attachments, rows } = processUploadedFiles(keys);
   const systemItemData = {
     type: ITEM_TYPE.SYSTEM,
     listId,
-    attachments: [
-      {
-        name: 'publicKey',
-        raw: publicKey,
-      },
-      {
-        name: 'privateKey',
-        raw: privateKey,
-      },
-    ],
-    pass: masterPassword,
-    name: yield call(generateSystemItemName, entity, entityId),
+    data: {
+      attachments,
+      raws,
+      pass: masterPassword,
+      name: yield call(generateSystemItemName, entity, entityId),
+    },
   };
 
   return systemItemData;
@@ -318,16 +324,16 @@ export function* createItemSaga({
   payload: { item },
   meta: { setSubmitting = Function.prototype },
 }) {
-  try {
+  try {console.log(item);
     const {
       id: itemId,
       teamId = null,
       listId,
       type,
       relatedItem,
-      data: { raws, ...data },
+      data: { raws = {}, ...data },
     } = item;
-
+console.log(item);
     const isSystemItem = type === ITEM_TYPE.SYSTEM;
     const keyPair = yield select(personalKeyPairSelector);
     const userPersonalDefaultListId = yield select(

@@ -51,22 +51,6 @@ export const itemChildItemsSelector = createSelector(
   (item, childItemsById) => item.invited.map(childItemId => childItemsById[childItemId]),
 );
 
-export const itemsChildItemsBatchSelector = createSelector(
-  itemsByIdSelector,
-  itemIdsPropSelector,
-  childItemsByIdSelector,
-  (itemsById, itemIds, childItemsById) => {
-    return itemIds.reduce((accumulator, itemId) => {
-      return [
-        ...accumulator,
-        ...itemsById[itemId].invited.map(
-          childItemId => childItemsById[childItemId],
-        ),
-      ];
-    }, []);
-  },
-);
-
 export const systemItemsSelector = createSelector(
   itemsByIdSelector,
   items =>
@@ -76,17 +60,11 @@ export const systemItemsSelector = createSelector(
 export const systemItemsBatchSelector = createSelector(
   systemItemsSelector,
   itemIdsPropSelector,
-  (systemItems, itemIds) =>
-    itemIds.map(itemId => {
-      //        console.log(systemItems);
-      //       console.log(itemId);
-      return (
-        systemItems.find(
-          ({ data }) =>
-            data.name === generateSystemItemName(ENTITY_TYPE.ITEM, itemId),
-        ) || {}
-      );
-    }),
+  (systemItems, itemIds) => itemIds.map(itemId => systemItems.find(
+    ({ data }) =>
+      data.name === generateSystemItemName(ENTITY_TYPE.ITEM, itemId),
+    ) || {}
+  ),
 );
 
 export const teamSystemItemSelector = createSelector(

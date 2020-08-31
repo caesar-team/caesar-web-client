@@ -409,7 +409,7 @@ export function* createItemSaga({
           userPersonalDefaultListId,
           itemData.id,
         );
-        systemItemData.relatedItem = itemData.id;
+        systemItemData.relatedItemId = itemData.id;
 
         yield put(createItemRequest(systemItemData));
       }

@@ -408,9 +408,9 @@ export function* createItemSaga({
           generateSystemItem,
           ENTITY_TYPE.ITEM,
           userPersonalDefaultListId,
-          itemId,
+          itemData.id,
         );
-        systemItemData.relatedItem = itemId;
+        systemItemData.relatedItem = itemData.id;
 
         yield put(createItemRequest(systemItemData));
       }

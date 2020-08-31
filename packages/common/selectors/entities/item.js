@@ -48,8 +48,7 @@ export const teamItemListSelector = createSelector(
 export const itemChildItemsSelector = createSelector(
   itemSelector,
   childItemsByIdSelector,
-  (item, childItemsById) =>
-    item.invited.map(childItemId => childItemsById[childItemId]),
+  (item, childItemsById) => item.invited.map(childItemId => childItemsById[childItemId]),
 );
 
 export const itemsChildItemsBatchSelector = createSelector(

@@ -36,7 +36,7 @@ import {
 
 const ITEM_CHILD_ITEM_CHUNK_SIZE = 50;
 
-export function* createChildItemBatchSaga({ payload: { itemUserPairs } }) {
+export function* createChildItemBatchSaga({ payload: { itemUserPairs } }) {console.log(itemUserPairs);
   try {
     yield put(encryption({ items: itemUserPairs }));
 

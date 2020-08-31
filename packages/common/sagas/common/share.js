@@ -73,7 +73,7 @@ function* getItemUserPairCombinations(item, members = [], privateKeyObj) {
   }));
 }
 
-export function* getItemUserPairs({ items, members }) {console.log(items);
+export function* getItemUserPairs({ items, members }) {
   const keyPair = yield select(actualKeyPairSelector);
   const masterPassword = yield select(masterPasswordSelector);
 

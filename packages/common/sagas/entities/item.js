@@ -328,7 +328,6 @@ export function* createItemSaga({
 }) {
   try {
     const {
-      id: itemId,
       teamId = null,
       listId,
       type,

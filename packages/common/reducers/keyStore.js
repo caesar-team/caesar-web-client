@@ -1,5 +1,4 @@
 import { createReducer } from '@caesar/common/utils/reducer';
-import { extractKeysFromSystemItem } from '@caesar/common/utils/item';
 import { KEY_TYPE } from '@caesar/common/constants';
 import {
   ADD_PERSONAL_KEY_PAIR,
@@ -24,8 +23,8 @@ export default createReducer(initialState, {
     };
   },
   [ADD_ENTITY_KEY_PAIR](state, { payload }) {
-    const { id, data } = payload.data;
-    const { publicKey, privateKey } = extractKeysFromSystemItem(data);
+    const { id, data: { name, pass, raws = {} } } = payload.data;
+    const { publicKey, privateKey } = raws || {};
 
     return {
       ...state,
@@ -33,8 +32,8 @@ export default createReducer(initialState, {
         ...state[KEY_TYPE.ENTITY],
         [id]: {
           id,
-          name: data.name,
-          pass: data.pass,
+          name,
+          pass,
           publicKey,
           privateKey,
           raw: payload.data,

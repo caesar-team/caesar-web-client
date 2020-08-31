@@ -99,7 +99,6 @@ import {
 } from '@caesar/common/utils/item';
 import { passwordGenerator } from '@caesar/common/utils/passwordGenerator';
 import { generateKeys } from '@caesar/common/utils/key';
-import { processUploadedFiles } from '@caesar/common/utils/attachment';
 
 const ITEMS_CHUNK_SIZE = 50;
 
@@ -327,7 +326,7 @@ export function* createItemSaga({
   payload: { item },
   meta: { setSubmitting = Function.prototype },
 }) {
-  try {console.log(item);
+  try {
     const {
       id: itemId,
       teamId = null,
@@ -336,7 +335,7 @@ export function* createItemSaga({
       relatedItem,
       data: { raws = {}, ...data },
     } = item;
-console.log(item);
+
     const isSystemItem = type === ITEM_TYPE.SYSTEM;
     const keyPair = yield select(personalKeyPairSelector);
     const userPersonalDefaultListId = yield select(

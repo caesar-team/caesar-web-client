@@ -1,5 +1,5 @@
 import * as yup from 'yup';
-import { checkFileSize } from '@caesar/common/validation/utils';
+import { checkFileSize } from '@caesar/common/utils/file';
 import { SCHEMA } from '@caesar/common/validation/schema';
 
 const MAX_SIZE = '8MB';

@@ -99,6 +99,7 @@ import {
 } from '@caesar/common/utils/item';
 import { passwordGenerator } from '@caesar/common/utils/passwordGenerator';
 import { generateKeys } from '@caesar/common/utils/key';
+import { addSystemItemsBatch } from '@caesar/common/actions/entities/system';
 
 const ITEMS_CHUNK_SIZE = 50;
 
@@ -118,12 +119,10 @@ export function* generateSystemItem(entity, listId, entityId) {
         {
           id: 'publicKey',
           name: 'publicKey',
-          raw: publicKey,
         },
         {
           id: 'privateKey',
           name: 'privateKey',
-          raw: privateKey,
         },
       ],
       raws: {
@@ -326,9 +325,8 @@ export function* createItemSaga({
   payload: { item },
   meta: { setSubmitting = Function.prototype },
 }) {
-  try {
+  try {console.log(item);
     const {
-      id: itemId,
       teamId = null,
       listId,
       type,
@@ -381,13 +379,17 @@ export function* createItemSaga({
       ...itemData,
     };
 
-    yield put(createItemSuccess(newItem));
+    if (!isSystemItem) {
+      yield put(createItemSuccess(newItem));
+    }
 
     const currentTeamId = yield select(currentTeamIdSelector);
 
     if (
-      currentTeamId === teamId ||
-      (!teamId && currentTeamId === TEAM_TYPE.PERSONAL)
+      (
+        currentTeamId === teamId ||
+        (!teamId && currentTeamId === TEAM_TYPE.PERSONAL)
+      ) && !isSystemItem
     ) {
       yield put(addItemToList(newItem));
     }
@@ -395,6 +397,7 @@ export function* createItemSaga({
     yield put(setCurrentTeamId(teamId || TEAM_TYPE.PERSONAL));
 
     if (isSystemItem) {
+      yield put(addSystemItemsBatch([newItem]));
       if (data.name.includes(ENTITY_TYPE.TEAM)) {
         yield put(addTeamKeyPair(newItem));
       } else {
@@ -412,9 +415,9 @@ export function* createItemSaga({
           generateSystemItem,
           ENTITY_TYPE.ITEM,
           userPersonalDefaultListId,
-          itemId,
+          itemData.id,
         );
-        systemItemData.relatedItem = itemId;
+        systemItemData.relatedItem = itemData.id;
 
         yield put(createItemRequest(systemItemData));
       }

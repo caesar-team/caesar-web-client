@@ -67,7 +67,7 @@ export function* decryption({ items, raws, key, masterPassword, coresCount }) {
             const systemItems = [];
             const nonSystemItems = [];
 
-            itemsById.foreach(item => {
+            Object.values(itemsById).forEach(item => {
               if (item.type === ITEM_TYPE.SYSTEM) {
                 systemItems.push(item);
               } else {

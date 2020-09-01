@@ -303,7 +303,7 @@ export default createReducer(initialState, {
             ...accumulator,
             [itemId]: {
               ...state.byId[itemId],
-              invited: [...state.byId[itemId].invited, ...childItemIds],
+              invited: [...(state.byId[itemId]?.invited || []), ...childItemIds],
             },
           }),
           {},

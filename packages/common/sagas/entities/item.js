@@ -413,7 +413,7 @@ export function* createItemSaga({
       if (!teamId && currentTeamId === TEAM_TYPE.PERSONAL) {
         const systemItemData = yield call(
           generateSystemItem,
-          ENTITY_TYPE.ITEM,
+          ENTITY_TYPE.SHARE,
           userPersonalDefaultListId,
           itemData.id,
         );

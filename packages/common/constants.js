@@ -166,7 +166,7 @@ export const ENTITY_TYPE = {
   LIST: 'list',
   TEAM: 'team',
   MEMBER: 'member',
-  SHARE: 'SHARE',
+  SHARE: 'share',
 };
 
 export const COMMON_PROGRESS_NOTIFICATION = 'In progress...';

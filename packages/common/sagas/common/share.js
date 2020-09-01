@@ -11,8 +11,10 @@ import { getOrCreateMemberBatchSaga } from '@caesar/common/sagas/entities/member
 import {
   itemChildItemsSelector,
   itemsBatchSelector,
-  systemItemsBatchSelector,
 } from '@caesar/common/selectors/entities/item';
+import {
+  systemItemsBatchSelector,
+} from '@caesar/common/selectors/entities/system';
 import {
   masterPasswordSelector,
   userDataSelector,

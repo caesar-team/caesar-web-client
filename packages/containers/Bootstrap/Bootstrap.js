@@ -62,7 +62,6 @@ class Bootstrap extends Component {
       logout,
       initCoresCount,
       shared = {},
-      masterPassword = null,
     } = this.props;
     initCoresCount();
 

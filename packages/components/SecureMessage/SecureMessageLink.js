@@ -71,9 +71,18 @@ const SecureMessageLinkComponent = ({
     if (canShare(shareData)) {
       navigator
         .share(shareData)
-        .then(() => console.log('Share was successful.'))
-        .catch(error => console.log('Sharing failed', error));
+        .then(() =>
+          notification.show({
+            text: 'The message has been shared!',
+            options: {
+              timeout: 1000,
+            },
+          }),
+        )
+        // eslint-disable-next-line no-console
+        .catch(error => console.error('Sharing failed', error));
     } else {
+      // eslint-disable-next-line no-console
       console.error(`Your system doesn't support sharing files.`);
     }
   };

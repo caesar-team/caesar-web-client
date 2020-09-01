@@ -325,7 +325,7 @@ export function* createItemSaga({
   payload: { item },
   meta: { setSubmitting = Function.prototype },
 }) {
-  try {console.log(item);
+  try {
     const {
       teamId = null,
       listId,
@@ -397,8 +397,6 @@ export function* createItemSaga({
     yield put(setCurrentTeamId(teamId || TEAM_TYPE.PERSONAL));
 
     if (isSystemItem) {
-      console.log('addSystemItemsBatch saga');
-      console.log(newItem);
       yield put(addSystemItemsBatch([newItem]));
       if (data.name.includes(ENTITY_TYPE.TEAM)) {
         yield put(addTeamKeyPair(newItem));

@@ -120,7 +120,11 @@ const SecureMessageLinkComponent = ({
           color="white"
           onClick={() =>
             handleClickCopy(
-              generateMessageLink(messageId, password, isPasswordLessPassword),
+              generateMessageLink({
+                messageId,
+                password,
+                isPasswordLessPassword,
+              }),
               'The link has been copied!',
             )
           }

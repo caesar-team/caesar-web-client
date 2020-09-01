@@ -68,11 +68,11 @@ export const getSecureMessageText = ({
   isPasswordLess = false,
 }) => `${message}
 - - - - - - - - - - - - - - - - - - - - - - - - - -
-URL: <strong>${generateMessageLink(
+URL: <strong>${generateMessageLink({
   messageId,
   password,
   isPasswordLess,
-)}</strong>${
+})}</strong>${
   !isPasswordLess ? `\nPassword: <strong>${escapeHTML(password)}</strong>` : ``
 }
 Expire within: <strong>${getExpireDate(seconds)}</strong>

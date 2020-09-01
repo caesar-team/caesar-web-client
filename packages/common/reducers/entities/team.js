@@ -26,7 +26,11 @@ import {
   REMOVE_TEAM_MEMBER_FAILURE,
   ADD_TEAMS_BATCH,
   ADD_TEAM_MEMBER,
+  CREATE_TEAM_KEYS_REQUEST,
+  CREATE_TEAM_KEYS_SUCCESS,
+  CREATE_TEAM_KEYS_FAILURE,
 } from '@caesar/common/actions/entities/team';
+import { KEY_TYPE } from '../../constants';
 
 const initialState = {
   isLoading: true,
@@ -72,6 +76,25 @@ export default createReducer(initialState, {
       isLoading: false,
       isError: true,
     };
+  },
+  [CREATE_TEAM_KEYS_REQUEST](state) {
+    return state;
+  },
+  [CREATE_TEAM_KEYS_SUCCESS](state, { payload }) {
+    const { item } = payload;
+
+    return {
+      ...state,
+      [KEY_TYPE.TEAMS]: {
+        ...state[KEY_TYPE.TEAMS],
+        [item.id]: {
+          ...item,
+        },
+      },
+    };
+  },
+  [CREATE_TEAM_KEYS_FAILURE](state) {
+    return state;
   },
   [CREATE_TEAM_REQUEST](state) {
     return state;

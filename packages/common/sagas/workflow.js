@@ -96,6 +96,7 @@ function* initKeyStore() {
       );
     }
   } catch (error) {
+    // eslint-disable-next-line no-console
     console.log(error);
     yield put(
       updateGlobalNotification(getServerErrorMessage(error), false, true),
@@ -383,6 +384,7 @@ export function* decryptionEndWatchSaga() {
       yield all(systemItems.map(item => put(addEntityKeyPair(item))));
     }
   } catch (error) {
+    // eslint-disable-next-line no-console
     console.log(error);
   }
 }
@@ -405,6 +407,7 @@ function* setWorkInProgressItemSaga({ payload: { item } }) {
       );
     }
   } catch (error) {
+    // eslint-disable-next-line no-console
     console.log('error: ', error);
   }
 }

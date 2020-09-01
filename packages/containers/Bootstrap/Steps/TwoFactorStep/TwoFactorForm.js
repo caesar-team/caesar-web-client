@@ -97,7 +97,6 @@ class TwoFactorForm extends Component {
     const { notification } = this.props;
 
     if (copy(value)) {
-      console.log(`The code has been copied.`);
       notification.show({
         text: `The code has been copied.`,
       });

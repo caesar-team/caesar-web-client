@@ -35,13 +35,13 @@ class MasterPasswordStep extends Component {
   state = this.prepareInitialState();
 
   async componentDidMount() {
-    const { initialStep, sharedMasterPassword } = this.props;
+    const { initialStep, masterPassword, sharedMasterPassword } = this.props;
 
     const state = {
       step: initialStep,
       publicKey: null,
       encryptedPrivateKey: null,
-      masterPassword: '',
+      masterPassword,
     };
 
     if (initialStep === MASTER_PASSWORD_CREATE) {
@@ -63,18 +63,20 @@ class MasterPasswordStep extends Component {
 
       state.publicKey = publicKey;
       state.encryptedPrivateKey = encryptedPrivateKey;
+      const currentMasterPassword =
+        sharedMasterPassword || masterPassword || null;
 
       // it's anonymous situation
-      if (sharedMasterPassword) {
+      if (currentMasterPassword) {
         try {
-          await validateKeys(sharedMasterPassword, state.encryptedPrivateKey);
+          await validateKeys(currentMasterPassword, state.encryptedPrivateKey);
 
           return this.onFinishMasterPassword({
             currentKeyPair: {
               publicKey: state.publicKey,
               encryptedPrivateKey: state.encryptedPrivateKey,
             },
-            masterPassword: sharedMasterPassword,
+            masterPassword: currentMasterPassword,
           });
         } catch (e) {
           state.step = MASTER_PASSWORD_CHECK;
@@ -190,7 +192,8 @@ class MasterPasswordStep extends Component {
         masterPassword,
       });
     } catch (error) {
-      console.log('error', error);
+      // eslint-disable-next-line no-console
+      console.error('error', error);
       setErrors({ confirmPassword: 'Something wrong' });
 
       return setSubmitting(false);
@@ -208,7 +211,7 @@ class MasterPasswordStep extends Component {
       step: null,
       publicKey: null,
       encryptedPrivateKey: null,
-      masterPassword: '',
+      masterPassword: this.props.masterPassword || '',
       sharedMasterPassword: this.props.sharedMasterPassword,
     };
   }

@@ -58,7 +58,12 @@ class Bootstrap extends Component {
   }
 
   async componentDidMount() {
-    const { logout, initCoresCount, shared = {} } = this.props;
+    const {
+      logout,
+      initCoresCount,
+      shared = {},
+      masterPassword = null,
+    } = this.props;
     initCoresCount();
 
     try {
@@ -252,6 +257,7 @@ class Bootstrap extends Component {
           navigationSteps={this.navigationPanelSteps}
           user={this.user}
           sharedMasterPassword={shared.mp}
+          masterPassword={this.props.masterPassword || null}
           onFinish={this.handleFinishMasterPassword}
         />
       );

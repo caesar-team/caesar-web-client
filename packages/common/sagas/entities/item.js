@@ -332,7 +332,7 @@ export function* createItemSaga({
       teamId = null,
       listId,
       type,
-      relatedItem,
+      relatedItem = null,
       data: { raws = {}, ...data },
     } = item;
 
@@ -354,6 +354,7 @@ export function* createItemSaga({
       });
       publicKey = teamSystemItem.publicKey;
     }
+
     const encryptedItemData = yield call(encryptItem, data, publicKey);
 
     const encryptedItem = {

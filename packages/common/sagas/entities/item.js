@@ -375,7 +375,6 @@ export function* createItemSaga({
     // TODO: Make the class of the item instead of the direct object
     const newItem = {
       ...item,
-      ...relatedItem,
       ...itemData,
     };
 
@@ -397,7 +396,9 @@ export function* createItemSaga({
     yield put(setCurrentTeamId(teamId || TEAM_TYPE.PERSONAL));
 
     if (isSystemItem) {
-      yield put(addSystemItemsBatch([newItem]));
+      yield put(addSystemItemsBatch({
+        [newItem.id]: newItem,
+      }));
       if (data.name.includes(ENTITY_TYPE.TEAM)) {
         yield put(addTeamKeyPair(newItem));
       } else {

@@ -74,12 +74,13 @@ export function* decryption({ items, raws, key, masterPassword, coresCount }) {
                 nonSystemItems.push(item);
               }
             });
-            
+
             yield put(
               addSystemItemsBatch(
                 match(arrayToObject(systemItems), checkItemsAfterDecryption(event.returnValue)),
               ),
             );
+
             yield put(
               addItemsBatch(
                 match(arrayToObject(nonSystemItems), checkItemsAfterDecryption(event.returnValue)),

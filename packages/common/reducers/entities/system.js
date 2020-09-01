@@ -4,8 +4,7 @@ import {
   REMOVE_SYSTEM_ITEM,
 } from '@caesar/common/actions/entities/system';
 
-const initialState = {
-};
+const initialState = {};
 
 export default createReducer(initialState, {
   [ADD_SYSTEM_ITEMS_BATCH](state, { payload }) {

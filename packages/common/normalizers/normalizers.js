@@ -1,16 +1,21 @@
 import { normalize } from 'normalizr';
+import { ITEM_TYPE, LIST_TYPE } from '@caesar/common/constants';
 import { listSchema, memberSchema, teamSchema } from './schemas';
-import { ITEM_TYPE } from '@caesar/common/constants';
 
 export const extractRelatedAndNonSystemItems = lists => {
-  const result = lists.map(({ children, ...rest }) => {
-    const relatedItems = children.filter(item => item && item.relatedItem);
+  const result = lists.map(({ children, type, ...rest }) => {
+    const relatedItems = type === LIST_TYPE.INBOX 
+      ? children
+        .filter(item => item && item.relatedItem)
+        .map(item => item.relatedItem) 
+      : [];
     const nonSystemChildren = children.filter(
       item => item?.type !== ITEM_TYPE.SYSTEM,
     );
-    
+
     return {
       ...rest,
+      type,
       children: [...nonSystemChildren, ...relatedItems],
     };
   });

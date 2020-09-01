@@ -1,12 +1,18 @@
 import React, { useState } from 'react';
 import { useEffectOnce } from 'react-use';
 import copy from 'copy-text-to-clipboard';
-import { Button, Checkbox, withNotification } from '@caesar/components';
-import { useMedia } from '@caesar/common/hooks';
-import { generateMessageLink, getSecureMessageText, stripHtml } from './common';
+import { Checkbox, withNotification } from '@caesar/components';
+import { useMedia, useShare as canShare } from '@caesar/common/hooks';
+import {
+  generateMessageLink,
+  getSecureMessageText,
+  stripHtml,
+  getShareData,
+  dummyShareData,
+} from './common';
 import {
   ButtonsWrapper,
-  CopyAllButton,
+  ActionButton,
   CreateNewButton,
   Link,
   Text,
@@ -44,15 +50,32 @@ const SecureMessageLinkComponent = ({
   const handleCopyText = () => {
     handleClickCopy(
       stripHtml(
-        getSecureMessageText(
+        getSecureMessageText({
           messageId,
           password,
           seconds,
           isPasswordLessPassword,
-        ),
+        }),
       ),
       'The text has been copied!',
     );
+  };
+
+  const handleShareClick = () => {
+    const shareData = getShareData({
+      messageId,
+      password,
+      seconds,
+      isPasswordLessPassword,
+    });
+    if (canShare(shareData)) {
+      navigator
+        .share(shareData)
+        .then(() => console.log('Share was successful.'))
+        .catch(error => console.log('Sharing failed', error));
+    } else {
+      console.error(`Your system doesn't support sharing files.`);
+    }
   };
 
   return (
@@ -61,12 +84,12 @@ const SecureMessageLinkComponent = ({
       <Link>
         <ContentEditableStyled
           disabled={isMobile}
-          content={getSecureMessageText(
+          content={getSecureMessageText({
             messageId,
             password,
             seconds,
             isPasswordLessPassword,
-          )}
+          })}
           handleClick={isMobile ? handleCopyText : Function.prototype}
         />
       </Link>
@@ -80,10 +103,10 @@ const SecureMessageLinkComponent = ({
         </Checkbox>
       </Row>
       <ButtonsWrapper>
-        <CopyAllButton icon="copy" onClick={handleCopyText}>
+        <ActionButton icon="copy" onClick={handleCopyText}>
           Copy the text
-        </CopyAllButton>
-        <Button
+        </ActionButton>
+        <ActionButton
           icon="link"
           color="white"
           onClick={() =>
@@ -94,7 +117,10 @@ const SecureMessageLinkComponent = ({
           }
         >
           Copy the {isPasswordLessPassword ? `passwordless` : ``} link
-        </Button>
+        </ActionButton>
+        {canShare(dummyShareData) && (
+          <ActionButton color="white" icon="share" onClick={handleShareClick} />
+        )}
         <CreateNewButton color="transparent" onClick={onClickReturn}>
           Create New Secure Message
         </CreateNewButton>

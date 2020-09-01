@@ -73,7 +73,7 @@ export function* sortListSaga({
 
 export function* createListSaga({
   payload: { list },
-  meta: { notification, setCreatingMode },
+  meta: { setCreatingMode },
 }) {
   try {
     const {
@@ -126,10 +126,7 @@ export function* createListSaga({
   }
 }
 
-export function* editListSaga({
-  payload: { list },
-  meta: { notification, setEditMode },
-}) {
+export function* editListSaga({ payload: { list }, meta: { setEditMode } }) {
   try {
     if (list.teamId) {
       yield call(patchTeamList, list.teamId, list.id, { label: list.label });

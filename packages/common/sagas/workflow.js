@@ -94,7 +94,8 @@ function* initKeyStore() {
       );
     }
   } catch (error) {
-    console.log(error);
+    // eslint-disable-next-line no-console
+    console.error(error);
     yield put(
       updateGlobalNotification(getServerErrorMessage(error), false, true),
     );
@@ -379,7 +380,8 @@ export function* decryptionEndWatchSaga() {
       yield all(systemItems.map(item => item.data?.name?.includes(ENTITY_TYPE.TEAM) ? put(addTeamKeyPair(item)) : put(addShareKeyPair(item))));
     }
   } catch (error) {
-    console.log(error);
+    // eslint-disable-next-line no-console
+    console.error(error);
   }
 }
 
@@ -401,7 +403,8 @@ function* setWorkInProgressItemSaga({ payload: { item } }) {
       );
     }
   } catch (error) {
-    console.log('error: ', error);
+    // eslint-disable-next-line no-console
+    console.error('error: ', error);
   }
 }
 

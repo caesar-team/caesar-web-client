@@ -84,7 +84,6 @@ function* initKeyStore() {
     );
 
     if (systemItems?.length > 0) {
-      //yield put(addSystemItemsBatch(arrayToObject(systemItems)));
       yield put(
         decryption({
           items: systemItems,
@@ -374,9 +373,14 @@ export function* setCurrentTeamIdWatchSaga({
 export function* decryptionEndWatchSaga() {
   try {
     const systemItems = yield select(systemItemsSelector);
+    const systemItemsArray = objectToArray(systemItems);
 
-    if (systemItems.length > 0) {
-      yield all(systemItems.map(item => item.data?.name?.includes(ENTITY_TYPE.TEAM) ? put(addTeamKeyPair(item)) : put(addShareKeyPair(item))));
+    if (systemItemsArray.length > 0) {
+      yield all(systemItemsArray.map(
+        item => item.data?.name?.includes(ENTITY_TYPE.TEAM)
+          ? put(addTeamKeyPair(item))
+          : put(addShareKeyPair(item))),
+      );
     }
   } catch (error) {
     console.log(error);

@@ -27,7 +27,7 @@ import {
   convertNodesToEntities,
   extractRelatedAndNonSystemItems,
 } from '@caesar/common/normalizers/normalizers';
-import { objectToArray, arrayToObject } from '@caesar/common/utils/utils';
+import { objectToArray } from '@caesar/common/utils/utils';
 import { sortItemsByFavorites } from '@caesar/common/utils/workflow';
 import {
   getLists,
@@ -371,7 +371,7 @@ export function* setCurrentTeamIdWatchSaga({
   }
 }
 
-export function* decryptionEndWatchSaga() {
+export function* decryptionEndWatchSaga() {console.log('Saga');
   try {
     const systemItems = yield select(systemItemsSelector);
     const systemItemsArray = objectToArray(systemItems);

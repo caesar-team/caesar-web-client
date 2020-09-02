@@ -1,8 +1,6 @@
 import { createSelector } from 'reselect';
 import { childItemsByIdSelector } from '@caesar/common/selectors/entities/childItem';
-import { currentTeamSelector } from '@caesar/common/selectors/user';
-import { generateSystemItemName } from '@caesar/common/utils/item';
-import { ENTITY_TYPE, ITEM_TYPE } from '@caesar/common/constants';
+import { ITEM_TYPE } from '@caesar/common/constants';
 
 export const entitiesSelector = state => state.entities;
 

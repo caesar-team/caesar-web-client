@@ -8,10 +8,7 @@ import {
   take,
 } from '@redux-saga/core/effects';
 import { getOrCreateMemberBatchSaga } from '@caesar/common/sagas/entities/member';
-import {
-  itemChildItemsSelector,
-  itemsBatchSelector,
-} from '@caesar/common/selectors/entities/item';
+import { itemsBatchSelector } from '@caesar/common/selectors/entities/item';
 import {
   systemItemsBatchSelector,
 } from '@caesar/common/selectors/entities/system';

@@ -1,4 +1,4 @@
-import { put, call, fork, takeLatest, select, all } from 'redux-saga/effects';
+import { put, call, fork, takeLatest, takeEvery, select, all } from 'redux-saga/effects';
 import {
   INIT_WORKFLOW,
   UPDATE_WORK_IN_PROGRESS_ITEM,
@@ -371,7 +371,7 @@ export function* setCurrentTeamIdWatchSaga({
   }
 }
 
-export function* decryptionEndWatchSaga() {console.log('Saga');
+export function* decryptionEndWatchSaga() {
   try {
     const systemItems = yield select(systemItemsSelector);
     const systemItemsArray = objectToArray(systemItems);
@@ -416,6 +416,6 @@ export default function* workflowSagas() {
   yield takeLatest(INIT_WORKFLOW, initWorkflow);
   yield takeLatest(UPDATE_WORK_IN_PROGRESS_ITEM, updateWorkInProgressItemSaga);
   yield takeLatest(SET_CURRENT_TEAM_ID, setCurrentTeamIdWatchSaga);
-  yield takeLatest(DECRYPTION_END, decryptionEndWatchSaga);
+  yield takeEvery(DECRYPTION_END, decryptionEndWatchSaga);
   yield takeLatest(SET_WORK_IN_PROGRESS_ITEM, setWorkInProgressItemSaga);
 }

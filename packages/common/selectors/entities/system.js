@@ -5,9 +5,14 @@ import { ENTITY_TYPE } from '@caesar/common/constants';
 
 export const entitiesSelector = state => state.entities;
 
-export const systemItemsSelector = createSelector(
+export const systemItemsEntitySelector = createSelector(
   entitiesSelector,
-  entities => entities.system || {},
+  entities => entities.system,
+);
+
+export const systemItemsSelector = createSelector(
+  systemItemsEntitySelector,
+  systemItemsEntity => systemItemsEntity.byId || {},
 );
 
 const itemIdsPropSelector = (_, props) => props.itemIds;

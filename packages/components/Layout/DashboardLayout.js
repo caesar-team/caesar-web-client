@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { memo } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import styled from 'styled-components';
 import ScrollLock from 'react-scrolllock';
@@ -17,7 +17,7 @@ const LayoutConstructorStyled = styled(LayoutConstructor)`
   overflow: hidden;
 `;
 
-export const DashboardLayout = ({
+const DashboardLayoutComponent = ({
   searchedText,
   setSearchedText,
   setMode,
@@ -67,4 +67,4 @@ export const DashboardLayout = ({
   );
 };
 
-export default DashboardLayout;
+export const DashboardLayout = memo(DashboardLayoutComponent);

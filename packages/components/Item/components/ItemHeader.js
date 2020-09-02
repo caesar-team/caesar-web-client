@@ -1,5 +1,5 @@
 /* eslint-disable camelcase */
-import React from 'react';
+import React, { memo } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import styled from 'styled-components';
 import {
@@ -65,7 +65,7 @@ const ActionButton = styled(Button)`
   margin-left: 16px;
 `;
 
-export const ItemHeader = ({
+const ItemHeaderComponent = ({
   item,
   onClickShare,
   onClickMove,
@@ -163,3 +163,5 @@ export const ItemHeader = ({
     </ColumnHeader>
   );
 };
+
+export const ItemHeader = memo(ItemHeaderComponent);

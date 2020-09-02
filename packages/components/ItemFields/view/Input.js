@@ -181,18 +181,23 @@ const InputComponent = ({
   );
 };
 
-const InputWithPermissions = ({ value, itemSubject, ...props }) =>
-  value ? (
+const InputWithPermissions = ({ value, itemSubject, ...props }) => {
+  return value ? (
     <InputComponent value={value} itemSubject={itemSubject} {...props} />
   ) : (
     <Can I={PERMISSION.EDIT} an={itemSubject}>
       <InputComponent value={value} itemSubject={itemSubject} {...props} />
     </Can>
   );
+};
 
-const InputField = memo(
-  withNotification(InputWithPermissions),
-  (prevProps, nextProps) => equal(prevProps, nextProps),
+const InputField = withNotification(
+  memo(InputWithPermissions, (prevProps, nextProps) =>
+    equal(
+      [prevProps.itemSubject, prevProps.label, prevProps.name, prevProps.value],
+      [nextProps.itemSubject, nextProps.label, nextProps.name, nextProps.value],
+    ),
+  ),
 );
 
 InputField.ValueWrapper = ValueWrapper;

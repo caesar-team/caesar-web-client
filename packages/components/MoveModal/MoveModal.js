@@ -1,5 +1,6 @@
-import React, { useState, memo } from 'react';
+import React, { useState, useMemo, memo } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
+import equal from 'fast-deep-equal';
 import styled from 'styled-components';
 import { userDataSelector } from '@caesar/common/selectors/user';
 import { teamsByIdSelector } from '@caesar/common/selectors/entities/team';
@@ -164,42 +165,51 @@ const MoveModalComponent = ({
 
   const teamAvatar = checkedTeamId && teamsById[checkedTeamId]?.icon;
 
-  const teamOptionsRenderer = teamOptions
-    .filter(team =>
-      team?.title?.toLowerCase().includes(searchTeamValue?.toLowerCase()),
-    )
-    .map(team => (
-      <StyledRadio
-        key={team.id || team.title}
-        value={team.id || getTeamTitle(team)}
-        label={
-          <>
-            <StyledTeamAvatar
-              avatar={team.icon}
-              email={team.email}
-              size={24}
-              fontSize="xs"
-            />
-            <Name>{getTeamTitle(team)}</Name>
-          </>
-        }
-        name="team"
-        onChange={() => setCheckedTeamId(team.id)}
-      />
-    ));
-  const listOptionsRenderer = listOptions
-    .filter(list =>
-      list?.label?.toLowerCase().includes(searchListValue?.toLowerCase()),
-    )
-    .map(list => (
-      <StyledRadio
-        key={list.id}
-        value={list.id}
-        label={<Name>{list.label}</Name>}
-        name="list"
-        onChange={() => setCheckedListId(list.id)}
-      />
-    ));
+  const teamOptionsRenderer = useMemo(
+    () =>
+      teamOptions
+        .filter(team =>
+          team?.title?.toLowerCase().includes(searchTeamValue?.toLowerCase()),
+        )
+        .map(team => (
+          <StyledRadio
+            key={team.id || team.title}
+            value={team.id || getTeamTitle(team)}
+            label={
+              <>
+                <StyledTeamAvatar
+                  avatar={team.icon}
+                  email={team.email}
+                  size={24}
+                  fontSize="xs"
+                />
+                <Name>{getTeamTitle(team)}</Name>
+              </>
+            }
+            name="team"
+            onChange={() => setCheckedTeamId(team.id)}
+          />
+        )),
+    [teamOptions],
+  );
+
+  const listOptionsRenderer = useMemo(
+    () =>
+      listOptions
+        .filter(list =>
+          list?.label?.toLowerCase().includes(searchListValue?.toLowerCase()),
+        )
+        .map(list => (
+          <StyledRadio
+            key={list.id}
+            value={list.id}
+            label={<Name>{list.label}</Name>}
+            name="list"
+            onChange={() => setCheckedListId(list.id)}
+          />
+        )),
+    [listOptions],
+  );
 
   return (
     <Modal
@@ -285,6 +295,9 @@ const MoveModalComponent = ({
   );
 };
 
-const MoveModal = memo(withNotification(MoveModalComponent));
+const MoveModal = memo(
+  withNotification(MoveModalComponent),
+  (prevProps, nextProps) => equal(prevProps, nextProps),
+);
 
 export default MoveModal;

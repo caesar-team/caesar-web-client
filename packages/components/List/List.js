@@ -5,7 +5,7 @@ import { transformListTitle } from '@caesar/common/utils/string';
 import { DASHBOARD_MODE } from '@caesar/common/constants';
 import { Scrollbar } from '../Scrollbar';
 import { EmptyList } from './EmptyList';
-import { Item } from './Item';
+import { FixedSizeItem } from './FixedSizeItem';
 
 const Wrapper = styled.div`
   position: relative;
@@ -66,7 +66,7 @@ const ListComponent = ({
     return (
       <Scrollbar>
         {items.map((item, index) => (
-          <Item
+          <FixedSizeItem
             key={item.id}
             index={index}
             isMultiItem={isMultiItem}

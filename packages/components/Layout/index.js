@@ -1,7 +1,7 @@
 export { default as AuthLayout } from './AuthLayout';
 export { default as BootstrapLayout } from './BootstrapLayout';
 export { CreateLayout } from './CreateLayout';
-export { default as DashboardLayout } from './DashboardLayout';
+export { DashboardLayout } from './DashboardLayout';
 export { default as ErrorLayout } from './ErrorLayout';
 export { PrimaryHeader } from './PrimaryHeader';
 export { default as SecondaryHeader } from './SecondaryHeader';

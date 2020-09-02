@@ -125,10 +125,10 @@ const ItemComponent = ({
           </Can>
         </Scrollbar>
       </InnerWrapper>
-      {!isTrashItem && (
+      {!isTrashItem && isMoveModalOpened && (
         <MoveModal
           item={item}
-          isOpened={isMoveModalOpened}
+          isOpened
           closeModal={() => setMoveModalOpened(false)}
         />
       )}

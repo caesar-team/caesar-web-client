@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, memo } from 'react';
 import { useEffectOnce } from 'react-use';
 import { useSelector, useDispatch } from 'react-redux';
 import styled from 'styled-components';
@@ -155,20 +155,18 @@ const DashboardComponent = ({ notification }) => {
           handleCtrlSelectionItemBehaviour={handleCtrlSelectionItemBehaviour}
         />
       )}
-      <ConfirmMoveToTrashModal
-        notification={notification}
-        isOpened={openedModal === MODAL.MOVE_TO_TRASH}
-        handleCloseModal={handleCloseModal}
-      />
-      <ConfirmRemoveItemModal
-        isOpened={openedModal === MODAL.REMOVE_ITEM}
-        handleCloseModal={handleCloseModal}
-      />
+      {openedModal === MODAL.MOVE_TO_TRASH && (
+        <ConfirmMoveToTrashModal
+          notification={notification}
+          isOpened
+          handleCloseModal={handleCloseModal}
+        />
+      )}
+      {openedModal === MODAL.REMOVE_ITEM && (
+        <ConfirmRemoveItemModal isOpened handleCloseModal={handleCloseModal} />
+      )}
     </>
   );
 };
 
-// TODO: Replace with smth else?
-// DashboardComponent.contextType = AbilityContext;
-
-export const Dashboard = withNotification(DashboardComponent);
+export const Dashboard = withNotification(memo(DashboardComponent));

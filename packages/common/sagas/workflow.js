@@ -1,4 +1,12 @@
-import { put, call, fork, takeLatest, select, all } from 'redux-saga/effects';
+import {
+  put,
+  call,
+  fork,
+  takeLatest,
+  takeEvery,
+  select,
+  all,
+} from 'redux-saga/effects';
 import {
   INIT_WORKFLOW,
   UPDATE_WORK_IN_PROGRESS_ITEM,
@@ -30,7 +38,7 @@ import {
   convertNodesToEntities,
   extractRelatedAndNonSystemItems,
 } from '@caesar/common/normalizers/normalizers';
-import { objectToArray, arrayToObject } from '@caesar/common/utils/utils';
+import { objectToArray } from '@caesar/common/utils/utils';
 import { sortItemsByFavorites } from '@caesar/common/utils/workflow';
 import {
   getLists,
@@ -87,8 +95,6 @@ function* initKeyStore() {
     );
 
     if (systemItems?.length > 0) {
-      // TODO: Do we need the botton line?
-      // yield put(addSystemItemsBatch(arrayToObject(systemItems)));
       yield put(
         decryption({
           items: systemItems,
@@ -375,10 +381,11 @@ export function* setCurrentTeamIdWatchSaga({
 export function* decryptionEndWatchSaga() {
   try {
     const systemItems = yield select(systemItemsSelector);
+    const systemItemsArray = objectToArray(systemItems);
 
-    if (systemItems.length > 0) {
+    if (systemItemsArray.length > 0) {
       yield all(
-        systemItems.map(item =>
+        systemItemsArray.map(item =>
           item.data?.name?.includes(ENTITY_TYPE.TEAM)
             ? put(addTeamKeyPair(item))
             : put(addShareKeyPair(item)),
@@ -418,6 +425,6 @@ export default function* workflowSagas() {
   yield takeLatest(INIT_WORKFLOW, initWorkflow);
   yield takeLatest(UPDATE_WORK_IN_PROGRESS_ITEM, updateWorkInProgressItemSaga);
   yield takeLatest(SET_CURRENT_TEAM_ID, setCurrentTeamIdWatchSaga);
-  yield takeLatest(DECRYPTION_END, decryptionEndWatchSaga);
+  yield takeEvery(DECRYPTION_END, decryptionEndWatchSaga);
   yield takeLatest(SET_WORK_IN_PROGRESS_ITEM, setWorkInProgressItemSaga);
 }

@@ -1,5 +1,6 @@
 import { createTransform } from 'redux-persist';
 import localForage from 'localforage';
+import { IS_PROD } from '../constants';
 
 const itemTransform = createTransform(
   inboundState => ({
@@ -22,9 +23,10 @@ const itemTransform = createTransform(
 
 const userTransform = createTransform(
   inboundState => {
-    const { masterPassword, keyPair, ...user } = inboundState;
+    const { masterPassword, keyPair, ...cleanUser } = inboundState;
+    const { ...user } = inboundState;
 
-    return user;
+    return IS_PROD ? cleanUser : user;
   },
   outboundState => outboundState,
   { whitelist: ['user'] },

@@ -93,7 +93,8 @@ function* initKeyStore() {
       );
     }
   } catch (error) {
-    console.log(error);
+    // eslint-disable-next-line no-console
+    console.error(error);
     yield put(
       updateGlobalNotification(getServerErrorMessage(error), false, true),
     );
@@ -383,7 +384,8 @@ export function* decryptionEndWatchSaga() {
       );
     }
   } catch (error) {
-    console.log(error);
+    // eslint-disable-next-line no-console
+    console.error(error);
   }
 }
 
@@ -405,7 +407,8 @@ function* setWorkInProgressItemSaga({ payload: { item } }) {
       );
     }
   } catch (error) {
-    console.log('error: ', error);
+    // eslint-disable-next-line no-console
+    console.error('error: ', error);
   }
 }
 

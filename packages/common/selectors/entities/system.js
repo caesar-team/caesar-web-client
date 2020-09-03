@@ -23,8 +23,8 @@ export const systemItemsBatchSelector = createSelector(
   (systemItems, itemIds) =>
     itemIds.map(itemId => {console.log(systemItems);
       return (
-        Object.values(systemItems).find(
-          ({ data }) => [
+        Object.values(systemItems).find(({ data }) =>
+          [
             generateSystemItemName(ENTITY_TYPE.SHARE, itemId),
             generateSystemItemName(ENTITY_TYPE.TEAM, itemId),
           ].includes(data?.name),

@@ -63,9 +63,8 @@ export { NavigationPanel } from './NavigationPanel';
 export { TeamModal } from './TeamModal';
 export {
   GlobalNotification,
-  NotificationConsumer,
+  NotificationContext,
   NotificationProvider,
-  withNotification,
 } from './Notification';
 export {
   OfflineDetectionProvider,

@@ -18,7 +18,6 @@ import {
 import {
   Item,
   MenuList,
-  withNotification,
   DashboardLayout,
   SecureMessage,
   FullScreenLoader,
@@ -65,7 +64,7 @@ const StyledSecureMessage = styled(SecureMessage)`
   margin: 0 auto;
 `;
 
-const DashboardComponent = ({ notification }) => {
+const DashboardComponent = () => {
   const dispatch = useDispatch();
   const [mode, setMode] = useState(DASHBOARD_MODE.DEFAULT);
   const [searchedText, setSearchedText] = useState('');
@@ -132,7 +131,6 @@ const DashboardComponent = ({ notification }) => {
               </MiddleColumnWrapper>
               <RightColumnWrapper>
                 <Item
-                  notification={notification}
                   onClickShare={handleOpenModal(MODAL.SHARE)}
                   onClickMoveToTrash={handleOpenModal(MODAL.MOVE_TO_TRASH)}
                   onClickRemoveItem={handleOpenModal(MODAL.REMOVE_ITEM)}
@@ -143,24 +141,16 @@ const DashboardComponent = ({ notification }) => {
         </CenterWrapper>
       </DashboardLayout>
       {openedModal === MODAL.SHARE && (
-        <ShareModal
-          notification={notification}
-          handleCloseModal={handleCloseModal}
-        />
+        <ShareModal handleCloseModal={handleCloseModal} />
       )}
       {openedModal === MODAL.MOVE_ITEM && (
         <MoveModal
-          notification={notification}
           handleCloseModal={handleCloseModal}
           handleCtrlSelectionItemBehaviour={handleCtrlSelectionItemBehaviour}
         />
       )}
       {openedModal === MODAL.MOVE_TO_TRASH && (
-        <ConfirmMoveToTrashModal
-          notification={notification}
-          isOpened
-          handleCloseModal={handleCloseModal}
-        />
+        <ConfirmMoveToTrashModal isOpened handleCloseModal={handleCloseModal} />
       )}
       {openedModal === MODAL.REMOVE_ITEM && (
         <ConfirmRemoveItemModal isOpened handleCloseModal={handleCloseModal} />
@@ -169,4 +159,4 @@ const DashboardComponent = ({ notification }) => {
   );
 };
 
-export const Dashboard = withNotification(memo(DashboardComponent));
+export const Dashboard = memo(DashboardComponent);

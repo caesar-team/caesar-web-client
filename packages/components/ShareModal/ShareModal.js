@@ -3,6 +3,7 @@ import { useEffectOnce, useUpdateEffect } from 'react-use';
 import { useSelector } from 'react-redux';
 import copy from 'copy-text-to-clipboard';
 import styled from 'styled-components';
+import { useNotification } from '@caesar/common/hooks';
 import { userDataSelector } from '@caesar/common/selectors/user';
 import { Modal, ModalTitle, ModalSubtitle } from '../Modal';
 import { UserSearchInput } from '../Input';
@@ -39,7 +40,6 @@ const ButtonStyled = styled(Button)`
 `;
 
 export const ShareModal = ({
-  notification,
   sharedMembers,
   teams,
   withAnonymousLink,
@@ -56,6 +56,7 @@ export const ShareModal = ({
   const [link, setLink] = useState(null);
   const [isGeneratingLink, setGeneratingLink] = useState(false);
   const user = useSelector(userDataSelector);
+  const notification = useNotification();
 
   const handleAddMember = member => {
     setMembers([...members, member]);

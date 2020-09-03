@@ -1,8 +1,8 @@
-import React, { Component } from 'react';
+import React, { memo } from 'react';
 import styled from 'styled-components';
 import copy from 'copy-text-to-clipboard';
+import { useNotification } from '@caesar/common/hooks';
 import {
-  withNotification,
   AuthTitle,
   AuthDescription,
   Button,
@@ -92,14 +92,13 @@ const CheckboxWrapper = styled.div`
   margin-bottom: 30px;
 `;
 
-class TwoFactorForm extends Component {
-  handleCopy = value => () => {
-    const { notification } = this.props;
+const TwoFactorForm = ({ qr, code, onSubmit }) => {
+  const notification = useNotification();
 
+  const handleCopy = value => () => {
     if (copy(value)) {
-      console.log(`The code has been copied.`);
       notification.show({
-        text: `The code has been copied.`,
+        text: `The code has been copied`,
       });
     } else {
       notification.show({
@@ -108,76 +107,72 @@ class TwoFactorForm extends Component {
     }
   };
 
-  render() {
-    const { qr, code, onSubmit } = this.props;
-
-    return (
-      <Wrapper>
-        <AuthTitle>Two Factor Authentication</AuthTitle>
-        <AuthDescription>Scan the QR code in 2FA app</AuthDescription>
-        <QrCodeWrapper>
-          <QrCodeImageWrapper>
-            <QrCodeImage src={qr} />
-          </QrCodeImageWrapper>
-          <QrCodeAndApplicationDescription>
-            <QrCodeDescription>
-              You can use{' '}
-              <ApplicationLink target="_blank" href={AUTHY_LINK}>
-                Authy
-              </ApplicationLink>
-              ,{' '}
-              <ApplicationLink target="_blank" href={GOOGLE_AUTHENTICATOR_LINK}>
-                Google Authenticator
-              </ApplicationLink>{' '}
-              or other similar app. If you haven’t QR-scan you can enter the key
-              in the application:
-            </QrCodeDescription>
-            <QrCodeKeyWrapper onClick={this.handleCopy(code)}>
-              <QrCodeKey>{code}</QrCodeKey>
-            </QrCodeKeyWrapper>
-          </QrCodeAndApplicationDescription>
-        </QrCodeWrapper>
-        <TextWithLines>Enter the 6-digit code from the app</TextWithLines>
-        <Formik
-          key="codeForm"
-          initialValues={initialValues}
-          validationSchema={codeSchema}
-          onSubmit={onSubmit}
-        >
-          {({ errors, handleSubmit, isSubmitting, setFieldValue, values }) => (
-            <Form onSubmit={handleSubmit}>
-              <FastField name="code">
-                {() => (
-                  <CodeInput
-                    onChange={value => setFieldValue('code', value, true)}
-                    length={CODE_LENGTH}
-                    focus
-                    disabled={isSubmitting}
-                    errors={errors}
-                  />
+  return (
+    <Wrapper>
+      <AuthTitle>Two Factor Authentication</AuthTitle>
+      <AuthDescription>Scan the QR code in 2FA app</AuthDescription>
+      <QrCodeWrapper>
+        <QrCodeImageWrapper>
+          <QrCodeImage src={qr} />
+        </QrCodeImageWrapper>
+        <QrCodeAndApplicationDescription>
+          <QrCodeDescription>
+            You can use{' '}
+            <ApplicationLink target="_blank" href={AUTHY_LINK}>
+              Authy
+            </ApplicationLink>
+            ,{' '}
+            <ApplicationLink target="_blank" href={GOOGLE_AUTHENTICATOR_LINK}>
+              Google Authenticator
+            </ApplicationLink>{' '}
+            or other similar app. If you haven’t QR-scan you can enter the key
+            in the application:
+          </QrCodeDescription>
+          <QrCodeKeyWrapper onClick={handleCopy(code)}>
+            <QrCodeKey>{code}</QrCodeKey>
+          </QrCodeKeyWrapper>
+        </QrCodeAndApplicationDescription>
+      </QrCodeWrapper>
+      <TextWithLines>Enter the 6-digit code from the app</TextWithLines>
+      <Formik
+        key="codeForm"
+        initialValues={initialValues}
+        validationSchema={codeSchema}
+        onSubmit={onSubmit}
+      >
+        {({ errors, handleSubmit, isSubmitting, setFieldValue, values }) => (
+          <Form onSubmit={handleSubmit}>
+            <FastField name="code">
+              {() => (
+                <CodeInput
+                  onChange={value => setFieldValue('code', value, true)}
+                  length={CODE_LENGTH}
+                  focus
+                  disabled={isSubmitting}
+                  errors={errors}
+                />
+              )}
+            </FastField>
+            <CheckboxWrapper>
+              <FastField name="fpCheck">
+                {({ field }) => (
+                  <Checkbox {...field} checked={field.value}>
+                    Remember current device
+                  </Checkbox>
                 )}
               </FastField>
-              <CheckboxWrapper>
-                <FastField name="fpCheck">
-                  {({ field }) => (
-                    <Checkbox {...field} checked={field.value}>
-                      Remember current device
-                    </Checkbox>
-                  )}
-                </FastField>
-              </CheckboxWrapper>
-              <NextButton
-                htmlType="submit"
-                disabled={isSubmitting || values.code.length !== CODE_LENGTH}
-              >
-                Continue
-              </NextButton>
-            </Form>
-          )}
-        </Formik>
-      </Wrapper>
-    );
-  }
-}
+            </CheckboxWrapper>
+            <NextButton
+              htmlType="submit"
+              disabled={isSubmitting || values.code.length !== CODE_LENGTH}
+            >
+              Continue
+            </NextButton>
+          </Form>
+        )}
+      </Formik>
+    </Wrapper>
+  );
+};
 
-export default withNotification(TwoFactorForm);
+export default memo(TwoFactorForm);

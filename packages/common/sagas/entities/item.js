@@ -232,7 +232,10 @@ export function* toggleItemToFavoriteSaga({ payload: { item } }) {
   }
 }
 
-export function* moveItemSaga({ payload: { itemId, teamId, listId } }) {
+export function* moveItemSaga({
+  payload: { itemId, teamId, listId },
+  meta: { notification, notificationText } = {},
+}) {
   try {
     yield put(updateGlobalNotification(MOVING_IN_PROGRESS_NOTIFICATION, true));
 
@@ -254,6 +257,12 @@ export function* moveItemSaga({ payload: { itemId, teamId, listId } }) {
     yield put(moveItemToList(item.id, item.listId, newListId));
 
     yield put(updateGlobalNotification(NOOP_NOTIFICATION, false));
+
+    if (notification) {
+      yield call(notification.show, {
+        text: notificationText || `The '${item.data.name}' has been moved`,
+      });
+    }
 
     if (item.teamId !== teamId) {
       yield put(updateItemField(item.id, 'teamId', teamId));
@@ -277,8 +286,6 @@ export function* moveItemSaga({ payload: { itemId, teamId, listId } }) {
     if (item.teamId && !teamId) {
       yield put(removeChildItemsBatchFromItem(item.id, childItemIds));
       yield put(removeChildItemsBatch(childItemIds));
-
-      yield put(updateGlobalNotification(NOOP_NOTIFICATION, false));
     }
 
     if (item.teamId && teamId && item.teamId !== teamId) {
@@ -305,13 +312,20 @@ export function* moveItemSaga({ payload: { itemId, teamId, listId } }) {
   }
 }
 
-export function* moveItemsBatchSaga({ payload: { itemIds, teamId, listId } }) {
+export function* moveItemsBatchSaga({
+  payload: { itemIds, teamId, listId },
+  meta: { notification, notificationText } = {},
+}) {
   try {
     yield all(
       itemIds.map(itemId =>
         call(moveItemSaga, { payload: { itemId, teamId, listId } }),
       ),
     );
+
+    yield call(notification.show, {
+      text: notificationText || 'The items have been moved',
+    });
   } catch (error) {
     // eslint-disable-next-line no-console
     console.log(error);

@@ -13,14 +13,16 @@ import {
   resetWorkInProgressItemIds,
 } from '@caesar/common/actions/workflow';
 import { getTeamTitle } from '@caesar/common/utils/team';
-import { useItemTeamAndListOptions } from '@caesar/common/hooks';
+import {
+  useItemTeamAndListOptions,
+  useNotification,
+} from '@caesar/common/hooks';
 import { Modal, ModalTitle } from '../Modal';
 import { Radio } from '../Radio';
 import { Button } from '../Button';
 import { Icon } from '../Icon';
 import { Avatar } from '../Avatar';
 import { SelectVisible } from '../SelectVisible';
-import { withNotification } from '../Notification';
 import { ListItem } from '../List';
 import { Scrollbar } from '../Scrollbar';
 import { TextWithLines } from '../TextWithLines';
@@ -99,7 +101,6 @@ const StyledModalTitle = styled(ModalTitle)`
 `;
 
 const MoveModalComponent = ({
-  notification,
   item,
   items,
   currentTeamId,
@@ -115,6 +116,7 @@ const MoveModalComponent = ({
   const user = useSelector(userDataSelector);
   const teamId = isMultiMode ? currentTeamId : item.teamId;
   const listId = isMultiMode ? currentListId : item.listId;
+  const notification = useNotification();
 
   const [searchTeamValue, setSearchTeamValue] = useState('');
   const [searchListValue, setSearchListValue] = useState('');
@@ -140,20 +142,15 @@ const MoveModalComponent = ({
           workInProgressItemIds,
           checkedTeamId,
           checkedListId,
+          notification,
         ),
       );
       dispatch(resetWorkInProgressItemIds());
-
-      notification.show({
-        text: 'The items have been moved.',
-      });
     } else {
-      dispatch(moveItemRequest(item.id, checkedTeamId, checkedListId));
+      dispatch(
+        moveItemRequest(item.id, checkedTeamId, checkedListId, notification),
+      );
       dispatch(setWorkInProgressItem(null));
-
-      notification.show({
-        text: `The '${item.data.name}' has been moved.`,
-      });
     }
 
     closeModal();
@@ -295,9 +292,8 @@ const MoveModalComponent = ({
   );
 };
 
-const MoveModal = memo(
-  withNotification(MoveModalComponent),
-  (prevProps, nextProps) => equal(prevProps, nextProps),
+const MoveModal = memo(MoveModalComponent, (prevProps, nextProps) =>
+  equal(prevProps, nextProps),
 );
 
 export default MoveModal;

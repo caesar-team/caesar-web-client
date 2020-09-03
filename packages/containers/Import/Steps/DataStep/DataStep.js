@@ -74,13 +74,14 @@ const StyledSelect = styled(Select)`
 `;
 
 const Cell = styled.div`
-  display: flex;
-  align-items: center;
-  height: 40px;
-  line-height: 40px;
-  cursor: text;
   width: 100%;
   min-width: 100px;
+  height: 40px;
+  overflow: hidden;
+  line-height: 40px;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  cursor: text;
 `;
 
 const SelectListWrapper = styled.div`
@@ -393,10 +394,10 @@ class DataStep extends Component {
           </SelectedItems>
           <ButtonsWrapper>
             <StyledButton onClick={onCancel} disabled={isSubmitting}>
-              CANCEL
+              Cancel
             </StyledButton>
             <Button onClick={this.handleSubmit} disabled={isButtonDisabled}>
-              IMPORT
+              Import
             </Button>
           </ButtonsWrapper>
         </BottomWrapper>

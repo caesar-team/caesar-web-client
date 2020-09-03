@@ -37,6 +37,7 @@ const MasterPasswordStep = ({
   initialStep,
   navigationSteps,
   user,
+  masterPassword: masterPasswordProp,
   sharedMasterPassword,
   onFinish,
 }) => {
@@ -45,7 +46,7 @@ const MasterPasswordStep = ({
     step: null,
     publicKey: null,
     encryptedPrivateKey: null,
-    masterPassword: '',
+    masterPassword: masterPasswordProp || '',
     sharedMasterPassword,
   });
 
@@ -74,7 +75,7 @@ const MasterPasswordStep = ({
         step: initialStep,
         publicKey: null,
         encryptedPrivateKey: null,
-        masterPassword: '',
+        masterPassword: masterPasswordProp,
       };
 
       if (initialStep === MASTER_PASSWORD_CREATE) {
@@ -97,11 +98,14 @@ const MasterPasswordStep = ({
         initState.publicKey = publicKey;
         initState.encryptedPrivateKey = encryptedPrivateKey;
 
+        const currentMasterPassword =
+          sharedMasterPassword || initState.masterPassword || null;
+
         // it's anonymous situation
-        if (sharedMasterPassword) {
+        if (currentMasterPassword) {
           try {
             await validateKeys(
-              sharedMasterPassword,
+              currentMasterPassword,
               initState.encryptedPrivateKey,
             );
 
@@ -110,7 +114,7 @@ const MasterPasswordStep = ({
                 publicKey: initState.publicKey,
                 encryptedPrivateKey: initState.encryptedPrivateKey,
               },
-              masterPassword: sharedMasterPassword,
+              masterPassword: currentMasterPassword,
             });
           } catch (e) {
             initState.step = MASTER_PASSWORD_CHECK;
@@ -191,7 +195,7 @@ const MasterPasswordStep = ({
       });
     } catch (error) {
       // eslint-disable-next-line no-console
-      console.log('error', error);
+      console.error('error', error);
       setErrors({ confirmPassword: 'Something wrong' });
 
       return setSubmitting(false);

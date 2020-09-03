@@ -1,4 +1,12 @@
-import { put, call, fork, takeLatest, select, all } from 'redux-saga/effects';
+import {
+  put,
+  call,
+  fork,
+  takeLatest,
+  takeEvery,
+  select,
+  all,
+} from 'redux-saga/effects';
 import {
   INIT_WORKFLOW,
   UPDATE_WORK_IN_PROGRESS_ITEM,
@@ -21,12 +29,14 @@ import {
   setCurrentTeamId,
   setPersonalDefaultListId,
 } from '@caesar/common/actions/user';
-import { addEntityKeyPair } from '@caesar/common/actions/keyStore';
-import { addChildItemsBatch } from '@caesar/common/actions/entities/childItem';
+import {
+  addTeamKeyPair,
+  addShareKeyPair,
+} from '@caesar/common/actions/keyStore';
 import { fetchMembersSaga } from '@caesar/common/sagas/entities/member';
 import {
   convertNodesToEntities,
-  extractRelatedItems,
+  extractRelatedAndNonSystemItems,
 } from '@caesar/common/normalizers/normalizers';
 import { objectToArray } from '@caesar/common/utils/utils';
 import { sortItemsByFavorites } from '@caesar/common/utils/workflow';
@@ -36,7 +46,7 @@ import {
   getTeams,
   getUserItems,
 } from '@caesar/common/api';
-import { ITEM_TYPE, TEAM_TYPE } from '@caesar/common/constants';
+import { ENTITY_TYPE, ITEM_TYPE, TEAM_TYPE } from '@caesar/common/constants';
 import {
   favoriteListSelector,
   trashListSelector,
@@ -49,10 +59,8 @@ import {
   userIdSelector,
   userPersonalDefaultListIdSelector,
 } from '@caesar/common/selectors/user';
-import {
-  itemSelector,
-  systemItemsSelector,
-} from '@caesar/common/selectors/entities/item';
+import { itemSelector } from '@caesar/common/selectors/entities/item';
+import { systemItemsSelector } from '@caesar/common/selectors/entities/system';
 import {
   workInProgressListIdSelector,
   workInProgressItemSelector,
@@ -60,7 +68,7 @@ import {
 import {
   personalKeyPairSelector,
   teamKeyPairSelector,
-  itemsKeyPairSelector,
+  sharesKeyPairSelector,
 } from '@caesar/common/selectors/keyStore';
 import { getFavoritesList } from '@caesar/common/normalizers/utils';
 import { fetchTeamSuccess } from '@caesar/common/actions/entities/team';
@@ -96,7 +104,8 @@ function* initKeyStore() {
       );
     }
   } catch (error) {
-    console.log(error);
+    // eslint-disable-next-line no-console
+    console.error(error);
     yield put(
       updateGlobalNotification(getServerErrorMessage(error), false, true),
     );
@@ -112,10 +121,8 @@ function* initPersonal(withDecryption) {
     }
 
     const { data: rawLists } = yield call(getLists);
-    const lists = extractRelatedItems(rawLists);
-    const { listsById, itemsById, childItemsById } = convertNodesToEntities(
-      lists,
-    );
+    const lists = extractRelatedAndNonSystemItems(rawLists);
+    const { listsById, itemsById } = convertNodesToEntities(lists);
 
     if (withDecryption) {
       const currentUserId = yield select(userIdSelector);
@@ -144,8 +151,8 @@ function* initPersonal(withDecryption) {
       }
 
       if (notOwnItems?.length > 0) {
-        const keyPairs = yield select(itemsKeyPairSelector, {
-          itemIds: notOwnItems.map(({ id }) => id),
+        const keyPairs = yield select(sharesKeyPairSelector, {
+          shareIds: notOwnItems.map(({ id }) => id),
         });
 
         yield all(
@@ -177,7 +184,6 @@ function* initPersonal(withDecryption) {
         [favoritesList.id]: favoritesList,
       }),
     );
-    yield put(addChildItemsBatch(childItemsById));
 
     const workInProgressListId = yield select(workInProgressListIdSelector);
 
@@ -225,9 +231,7 @@ function* initTeam(team, withDecryption) {
     const currentUserId = yield select(userIdSelector);
     const isCurrentUserTeamAdmin = teamAdmins.includes(currentUserId);
     const { data: lists } = yield call(getTeamLists, team.id);
-    const { listsById, itemsById, childItemsById } = convertNodesToEntities(
-      lists,
-    );
+    const { listsById, itemsById } = convertNodesToEntities(lists);
 
     const trashList = yield select(currentTeamTrashListSelector);
     const favoritesList = getFavoritesList(
@@ -242,7 +246,6 @@ function* initTeam(team, withDecryption) {
         [favoritesList.id]: favoritesList,
       }),
     );
-    yield put(addChildItemsBatch(childItemsById));
 
     const workInProgressListId = yield select(workInProgressListIdSelector);
 
@@ -269,7 +272,7 @@ function* initTeam(team, withDecryption) {
       );
       const teamSystemItem = yield call(
         generateSystemItem,
-        'team',
+        ENTITY_TYPE.TEAM,
         userPersonalDefaultListId,
         team.id,
       );
@@ -279,7 +282,7 @@ function* initTeam(team, withDecryption) {
         pass: teamSystemItem.pass,
       };
 
-      yield put(addEntityKeyPair(teamSystemItem));
+      yield put(addTeamKeyPair(teamSystemItem));
       yield put(createItemRequest(teamSystemItem));
     }
 
@@ -378,12 +381,20 @@ export function* setCurrentTeamIdWatchSaga({
 export function* decryptionEndWatchSaga() {
   try {
     const systemItems = yield select(systemItemsSelector);
+    const systemItemsArray = objectToArray(systemItems);
 
-    if (systemItems.length > 0) {
-      yield all(systemItems.map(item => put(addEntityKeyPair(item))));
+    if (systemItemsArray.length > 0) {
+      yield all(
+        systemItemsArray.map(item =>
+          item.data?.name?.includes(ENTITY_TYPE.TEAM)
+            ? put(addTeamKeyPair(item))
+            : put(addShareKeyPair(item)),
+        ),
+      );
     }
   } catch (error) {
-    console.log(error);
+    // eslint-disable-next-line no-console
+    console.error(error);
   }
 }
 
@@ -405,7 +416,8 @@ function* setWorkInProgressItemSaga({ payload: { item } }) {
       );
     }
   } catch (error) {
-    console.log('error: ', error);
+    // eslint-disable-next-line no-console
+    console.error('error: ', error);
   }
 }
 
@@ -413,6 +425,6 @@ export default function* workflowSagas() {
   yield takeLatest(INIT_WORKFLOW, initWorkflow);
   yield takeLatest(UPDATE_WORK_IN_PROGRESS_ITEM, updateWorkInProgressItemSaga);
   yield takeLatest(SET_CURRENT_TEAM_ID, setCurrentTeamIdWatchSaga);
-  yield takeLatest(DECRYPTION_END, decryptionEndWatchSaga);
+  yield takeEvery(DECRYPTION_END, decryptionEndWatchSaga);
   yield takeLatest(SET_WORK_IN_PROGRESS_ITEM, setWorkInProgressItemSaga);
 }

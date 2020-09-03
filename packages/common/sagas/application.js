@@ -6,6 +6,8 @@ import { itemListSelector } from '@caesar/common/selectors/entities/item';
 import { masterPasswordSelector } from '@caesar/common/selectors/user';
 import { actualKeyPairSelector } from '@caesar/common/selectors/keyStore';
 
+// TODO: Is conflicting with next-offline?
+// @Depricated
 export function* rehydrateStoreSaga() {
   try {
     const isOnline = yield select(isOnlineSelector);

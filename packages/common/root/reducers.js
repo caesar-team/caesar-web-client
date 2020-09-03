@@ -9,6 +9,7 @@ import {
   teamReducer,
   applicationReducer,
   keyStoreReducer,
+  systemReducer,
 } from '../reducers';
 
 const entitiesReducer = combineReducers({
@@ -17,6 +18,7 @@ const entitiesReducer = combineReducers({
   item: itemReducer,
   childItem: childItemReducer,
   team: teamReducer,
+  system: systemReducer,
 });
 
 export const rootReducer = combineReducers({

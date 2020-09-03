@@ -43,7 +43,7 @@ export const Item = ({
   workInProgressItem,
   ...props
 }) => {
-  const shouldShowMembers = !!invited.length;
+  const shouldShowMembers = !!invited?.length;
   const shouldShowAttachments =
     attachments && Array.isArray(attachments) && attachments.length > 0;
 

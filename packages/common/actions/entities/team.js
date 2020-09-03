@@ -10,6 +10,10 @@ export const CREATE_TEAM_REQUEST = '@team/CREATE_TEAM_REQUEST';
 export const CREATE_TEAM_SUCCESS = '@team/CREATE_TEAM_SUCCESS';
 export const CREATE_TEAM_FAILURE = '@team/CREATE_TEAM_FAILURE';
 
+export const CREATE_TEAM_KEYS_REQUEST = '@team/CREATE_TEAM_KEYS_REQUEST';
+export const CREATE_TEAM_KEYS_SUCCESS = '@team/CREATE_TEAM_KEYS_SUCCESS';
+export const CREATE_TEAM_KEYS_FAILURE = '@team/CREATE_TEAM_KEYS_FAILURE';
+
 export const EDIT_TEAM_REQUEST = '@team/EDIT_TEAM_REQUEST';
 export const EDIT_TEAM_SUCCESS = '@team/EDIT_TEAM_SUCCESS';
 export const EDIT_TEAM_FAILURE = '@team/EDIT_TEAM_FAILURE';
@@ -89,6 +93,26 @@ export const createTeamSuccess = team => ({
 
 export const createTeamFailure = () => ({
   type: CREATE_TEAM_FAILURE,
+});
+
+export const createTeamKeysRequest = team => {
+  return {
+    type: CREATE_TEAM_KEYS_REQUEST,
+    payload: {
+      team,
+    },
+  };
+};
+
+export const createTeamKeysSuccess = teamSystemItem => ({
+  type: CREATE_TEAM_KEYS_SUCCESS,
+  payload: {
+    item: teamSystemItem,
+  },
+});
+
+export const createTeamKeysFailure = () => ({
+  type: CREATE_TEAM_KEYS_FAILURE,
 });
 
 export const editTeamRequest = (teamId, title, icon) => ({

@@ -44,7 +44,11 @@ export const caslUserDataSelector = createSelector(
 export const userTeamListSelector = createSelector(
   teamsByIdSelector,
   userTeamIdsSelector,
-  (teamsById, userTeamIds) => userTeamIds.map(teamId => teamsById[teamId]),
+  (teamsById, userTeamIds) => {
+    if (!Object.keys(teamsById).length) return [];
+
+    return userTeamIds.map(teamId => teamsById[teamId]);
+  },
 );
 
 export const currentTeamIdSelector = createSelector(

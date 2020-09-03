@@ -3,6 +3,7 @@ import React, { memo, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import styled from 'styled-components';
 import { PERMISSION, PERMISSION_ENTITY } from '@caesar/common/constants';
+import { useNotification } from '@caesar/common/hooks';
 import { workInProgressItemSelector } from '@caesar/common/selectors/workflow';
 import {
   trashListSelector,
@@ -38,7 +39,6 @@ const Wrapper = styled.div`
 `;
 
 const ItemComponent = ({
-  notification,
   onClickShare = Function.prototype,
   onClickMoveToTrash = Function.prototype,
   onClickRemoveItem = Function.prototype,
@@ -50,6 +50,7 @@ const ItemComponent = ({
   const [isSubmitting, setSubmitting] = useState(false);
   const [isMoveModalOpened, setMoveModalOpened] = useState(false);
   // const [item, setItem] = useState(useSelector(workInProgressItemSelector));
+  const notification = useNotification();
 
   if (!item) {
     return <EmptyItem />;
@@ -125,10 +126,10 @@ const ItemComponent = ({
           </Can>
         </Scrollbar>
       </InnerWrapper>
-      {!isTrashItem && (
+      {!isTrashItem && isMoveModalOpened && (
         <MoveModal
           item={item}
-          isOpened={isMoveModalOpened}
+          isOpened
           closeModal={() => setMoveModalOpened(false)}
         />
       )}

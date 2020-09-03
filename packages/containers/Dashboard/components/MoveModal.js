@@ -9,7 +9,6 @@ import { currentTeamSelector } from '@caesar/common/selectors/user';
 import { MoveModal as MoveModalComponent } from '@caesar/components';
 
 export const MoveModal = ({
-  notification,
   handleCloseModal,
   handleCtrlSelectionItemBehaviour,
 }) => {
@@ -24,7 +23,6 @@ export const MoveModal = ({
       currentTeamId={currentTeam?.id}
       currentListId={workInProgressListId}
       workInProgressItemIds={workInProgressItemIds}
-      notification={notification}
       isMultiMode
       isOpened
       closeModal={handleCloseModal}

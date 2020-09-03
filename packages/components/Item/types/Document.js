@@ -1,10 +1,10 @@
-import React from 'react';
+import React, { memo } from 'react';
 import { SCHEMA } from '@caesar/common/validation';
 import { Title, Note, Attachments } from '../../ItemFields/view';
 import { Row } from '../../ItemFields/common';
 import { OwnerAndInvitation } from '../components';
 
-export const Document = ({
+const DocumentComponent = ({
   item,
   itemSubject,
   onClickAcceptEdit,
@@ -46,3 +46,5 @@ export const Document = ({
     </>
   );
 };
+
+export const Document = memo(DocumentComponent);

@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, memo } from 'react';
 import { useClickAway, useKeyPressEvent } from 'react-use';
 import styled from 'styled-components';
 import { Icon } from '../Icon';
@@ -102,7 +102,7 @@ const Error = styled.div`
   color: ${({ theme }) => theme.color.red};
 `;
 
-const Input = ({
+const InputComponent = ({
   type = 'text',
   label,
   name,
@@ -189,6 +189,8 @@ const Input = ({
     </Label>
   );
 };
+
+const Input = memo(InputComponent);
 
 Input.InputField = InputField;
 Input.Prefix = Prefix;

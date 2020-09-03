@@ -46,8 +46,7 @@ export function* decryption({ items, raws, key, masterPassword, coresCount }) {
   }
 
   if (items) {
-    //const chunks = chunk(items, DECRYPTION_CHUNK_SIZE);
-    const chunks = chunk(items, 1);
+    const chunks = chunk(items, DECRYPTION_CHUNK_SIZE);
 
     chunks.map(itemsChunk =>
       pool.queue(taskAction(itemsChunk, null, key, masterPassword)),
@@ -75,7 +74,7 @@ export function* decryption({ items, raws, key, masterPassword, coresCount }) {
                 nonSystemItems.push(item);
               }
             });
-
+            console.log(nonSystemItems);
             yield put(
               addSystemItemsBatch(
                 match(

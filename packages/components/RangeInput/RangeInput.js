@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import styled from 'styled-components';
-import debounce from 'lodash.debounce';
+import { debounce } from 'lodash';
 import { formatNumber } from '@caesar/common/utils/number';
 
 const Wrapper = styled.div`

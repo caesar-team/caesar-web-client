@@ -9,22 +9,39 @@ const state = {
   privateKeyObject: null,
 };
 const decryptItemData = async (item, privateKeyObject) => {
-  const { data: encryptedData, raws: encryptedRaws } = JSON.parse(item.secret);
-  const promises = [];
-  promises.push(decryptItem(encryptedData, privateKeyObject));
+  try {
+    const { data: encryptedData, raws: encryptedRaws } = JSON.parse(
+      item.secret,
+    );
+    const promises = [];
+    promises.push(decryptItem(encryptedData, privateKeyObject));
 
-  if (item.type === ITEM_TYPE.SYSTEM) {
-    promises.push(decryptItem(encryptedRaws, privateKeyObject));
+    if (item.type === ITEM_TYPE.SYSTEM) {
+      promises.push(decryptItem(encryptedRaws, privateKeyObject));
+    }
+
+    const [data, raws = {}] = await Promise.all(promises);
+
+    if (!data) {
+      return {
+        data: null,
+      };
+    }
+
+    return {
+      data: {
+        ...data,
+        raws,
+      },
+    };
+  } catch (error) {
+    // eslint-disable-next-line no-console
+    console.error(error);
+
+    return {
+      data: null,
+    };
   }
-
-  const [data, raws = {}] = await Promise.all(promises);
-
-  return {
-    data: {
-      ...data,
-      raws,
-    },
-  };
 };
 const decryption = {
   async init(key, masterPassword) {
@@ -40,12 +57,15 @@ const decryption = {
   },
   async decryptAll(items) {
     const { privateKeyObject } = state;
+
     // eslint-disable-next-line no-return-await
     const result = await Promise.all(
       items.map(async item => {
+        const data = await decryptItemData(item, privateKeyObject);
+
         return {
           ...item,
-          ...(await decryptItemData(item, privateKeyObject)),
+          ...data,
         };
       }),
     );

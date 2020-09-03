@@ -104,8 +104,8 @@ export const Row = styled.div`
       }
     `}
 
-  ${({ isMultiItem, isActive, isInModal, theme }) => {
-    if (isActive && isMultiItem) {
+  ${({ isMultiItem, isActive, isChecked, isInModal, theme }) => {
+    if ((isActive || isChecked) && isMultiItem) {
       return `background: ${theme.color.gallery};`;
     }
 
@@ -116,15 +116,16 @@ export const Row = styled.div`
     return '';
   }}
 
-  ${({ isActive, theme }) =>
-    isActive &&
+  ${({ isActive, isChecked, theme }) =>
+    (isActive || isChecked) &&
     `
       border-top-color: ${theme.color.gallery};
       border-bottom-color: ${theme.color.gallery};
     `}
 
   ${Title} {
-    font-weight: ${({ isActive }) => (isActive ? 600 : 400)};
+    font-weight: ${({ isActive, isChecked }) =>
+      isActive || isChecked ? 600 : 400};
   }
   
   ${CheckboxStyled}, ${NotEditIcon} {

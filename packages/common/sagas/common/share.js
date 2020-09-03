@@ -109,7 +109,7 @@ export function* shareItemBatchSaga({
     if (currentTeamId === TEAM_TYPE.PERSONAL) {
       items = yield select(systemItemsBatchSelector, { itemIds });
     }
-console.log(items);
+
     const preparedMembers = yield call(prepareUsersForSharing, members);
 
     const newMembers = preparedMembers.filter(({ isNew }) => isNew);
@@ -137,7 +137,7 @@ console.log(items);
         payload: { members: newMembers },
       });
     }
-console.log(itemUserPairs);
+
     if (itemUserPairs.length > 0) {
       yield fork(createChildItemBatchSaga, { payload: { itemUserPairs } });
 

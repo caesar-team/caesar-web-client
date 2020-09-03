@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { memo } from 'react';
 import styled from 'styled-components';
 import { Button } from '@caesar/components';
 import { Checkbox } from '../Checkbox';
@@ -45,7 +45,7 @@ const CheckboxStyled = styled(Checkbox)`
   }
 `;
 
-export const MultiItem = ({
+const MultiItemComponent = ({
   isInboxItems = false,
   isTrashItems = false,
   areAllItemsSelected = false,
@@ -86,3 +86,5 @@ export const MultiItem = ({
     </Wrapper>
   );
 };
+
+export const MultiItem = memo(MultiItemComponent);

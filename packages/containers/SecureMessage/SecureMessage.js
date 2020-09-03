@@ -1,16 +1,15 @@
-import React, { useState } from 'react';
+import React, { useState, memo } from 'react';
 import Link from 'next/link';
 import copy from 'copy-text-to-clipboard';
-import { withNotification } from '@caesar/components';
 import {
   downloadAsZip,
   downloadFile,
   makeFileFromAttachment,
 } from '@caesar/common/utils/file';
 import { DOMAIN_SECURE_ROUTE } from '@caesar/common/constants';
+import { useNotification } from '@caesar/common/hooks';
 import { decryptSecretRaws } from '@caesar/common/utils/secret';
 import { MessageStep, PasswordStep } from './steps';
-
 import {
   Wrapper,
   StyledLogo,
@@ -21,11 +20,8 @@ import {
   StyledLink,
 } from './styles';
 
-const SecureMessageContainerComponent = ({
-  notification,
-  message,
-  password,
-}) => {
+const SecureMessageContainerComponent = ({ message, password }) => {
+  const notification = useNotification();
   const [decryptedMessage, setDecryptedMessage] = useState(null);
   // const [encryptedRaws, setEncryptedRaws] = useState(null);
   const [decryptedRaws, setDecryptedRaws] = useState(null);
@@ -41,7 +37,7 @@ const SecureMessageContainerComponent = ({
     copy(decryptedMessage.text);
 
     notification.show({
-      text: `The text has been copied.`,
+      text: `The text has been copied`,
     });
   };
 
@@ -131,6 +127,4 @@ const SecureMessageContainerComponent = ({
   );
 };
 
-export const SecureMessageContainer = withNotification(
-  SecureMessageContainerComponent,
-);
+export const SecureMessageContainer = memo(SecureMessageContainerComponent);

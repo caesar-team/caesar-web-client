@@ -166,6 +166,7 @@ export const ENTITY_TYPE = {
   LIST: 'list',
   TEAM: 'team',
   MEMBER: 'member',
+  SYSTEM: 'system',
   SHARE: 'share',
 };
 

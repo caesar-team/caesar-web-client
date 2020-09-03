@@ -84,7 +84,6 @@ export const ListItem = ({
   onClickMenuItem = Function.prototype,
   isCreatingMode,
   isDraggable,
-  notification,
   setCreatingMode,
 }) => {
   const dispatch = useDispatch();
@@ -113,14 +112,14 @@ export const ListItem = ({
       dispatch(
         createListRequest(
           { label: value, teamId: currentTeam?.id || null },
-          { notification, setCreatingMode },
+          { setCreatingMode },
         ),
       );
     } else {
       dispatch(
         editListRequest(
           { ...list, label: value, teamId: currentTeam?.id || null },
-          { notification, setEditMode },
+          { setEditMode },
         ),
       );
     }

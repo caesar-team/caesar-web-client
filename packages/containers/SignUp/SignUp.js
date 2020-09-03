@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { memo } from 'react';
 import { withTheme } from 'styled-components';
 import Router, { withRouter } from 'next/router';
 import { ROUTES } from '@caesar/common/constants';
@@ -7,19 +7,24 @@ import {
   AuthDescription,
   AuthLayout,
   SecondaryHeader,
-  withNotification,
 } from '@caesar/components';
+import { useNotification } from '@caesar/common/hooks';
 import { registration } from '@caesar/common/utils/authUtils';
 import SignUpForm from './SignUpForm';
 
 const headerComponent = <SecondaryHeader buttonText="Sign In" url="/signin" />;
 
-class SignUpContainer extends Component {
-  handleSubmit = async ({ email, password }, { setSubmitting, setErrors }) => {
+const SignUpContainer = () => {
+  const notification = useNotification();
+
+  const handleSubmit = async (
+    { email, password },
+    { setSubmitting, setErrors },
+  ) => {
     try {
       await registration(email, password);
 
-      this.props.notification.show({
+      notification.show({
         text: 'You have successfully signed up',
       });
 
@@ -34,15 +39,13 @@ class SignUpContainer extends Component {
     }
   };
 
-  render() {
-    return (
-      <AuthLayout headerComponent={headerComponent}>
-        <AuthTitle>Nice to meet you!</AuthTitle>
-        <AuthDescription>Welcome to Caesar.Team!</AuthDescription>
-        <SignUpForm onSubmit={this.handleSubmit} />
-      </AuthLayout>
-    );
-  }
-}
+  return (
+    <AuthLayout headerComponent={headerComponent}>
+      <AuthTitle>Nice to meet you!</AuthTitle>
+      <AuthDescription>Welcome to Caesar.Team!</AuthDescription>
+      <SignUpForm onSubmit={handleSubmit} />
+    </AuthLayout>
+  );
+};
 
-export default withNotification(withTheme(withRouter(SignUpContainer)));
+export default withTheme(withRouter(memo(SignUpContainer)));

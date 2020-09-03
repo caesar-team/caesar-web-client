@@ -22,7 +22,6 @@ import {
   resetWorkInProgressItemIds,
 } from '@caesar/common/actions/workflow';
 import { sortListRequest } from '@caesar/common/actions/entities/list';
-import { withNotification } from '@caesar/components/Notification';
 import { Can } from '../../Ability';
 import { Icon } from '../../Icon';
 import { Scrollbar } from '../../Scrollbar';
@@ -85,7 +84,6 @@ const MenuListInnerComponent = ({
   setMode,
   isListsOpened,
   setListsOpened,
-  notification,
 }) => {
   const dispatch = useDispatch();
   const user = useSelector(userDataSelector);
@@ -246,7 +244,6 @@ const MenuListInnerComponent = ({
                     <ListItem
                       isCreatingMode={isCreatingMode}
                       setCreatingMode={setCreatingMode}
-                      notification={notification}
                     />
                   )}
                   {children &&
@@ -257,7 +254,6 @@ const MenuListInnerComponent = ({
                           list={list}
                           activeListId={activeListId}
                           index={index}
-                          notification={notification}
                           onClickMenuItem={handleClickMenuItem}
                         />
                       ))
@@ -280,7 +276,6 @@ const MenuListInnerComponent = ({
                                   activeListId={activeListId}
                                   index={index}
                                   isDraggable
-                                  notification={notification}
                                   onClickMenuItem={handleClickMenuItem}
                                 />
                               ))}
@@ -300,4 +295,4 @@ const MenuListInnerComponent = ({
   );
 };
 
-export const MenuListInner = memo(withNotification(MenuListInnerComponent));
+export const MenuListInner = memo(MenuListInnerComponent);

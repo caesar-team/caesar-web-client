@@ -1,6 +1,5 @@
-import React from 'react';
+import React, { memo } from 'react';
 import { SCHEMA } from '@caesar/common/validation';
-
 import {
   Title,
   Input,
@@ -12,7 +11,7 @@ import {
 import { Row } from '../../ItemFields/common';
 import { OwnerAndInvitation } from '../components';
 
-export const Credentials = ({
+const CredentialsComponent = ({
   item,
   itemSubject,
   onClickAcceptEdit,
@@ -80,3 +79,5 @@ export const Credentials = ({
     </>
   );
 };
+
+export const Credentials = memo(CredentialsComponent);

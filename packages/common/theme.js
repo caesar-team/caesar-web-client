@@ -11,6 +11,7 @@ const theme = {
     white: '#fff',
     red: '#ff3355',
     lightRed: 'rgba(255, 51, 85, 0.1)',
+    blackBoxShadow: 'rgba(0, 0, 0, 0.08)',
     // TODO: The below colors are redundant. Need to get rid of them
     darkGray: '#363636',
   },

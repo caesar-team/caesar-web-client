@@ -94,22 +94,10 @@ const ArrowIcon = styled(Icon)`
   transition: transform 0.2s;
 `;
 
-const PrimaryHeaderComponent = ({
-  user,
-  searchedText,
-  showAddItemButton,
-  onSearch,
-  onClickReset,
-}) => {
+const Options = () => {
   const dispatch = useDispatch();
-  const [isDropdownOpened, setDropdownOpened] = useState(false);
-  const userName = (user && (user.name || user.email)) || '';
 
-  const handleToggleDropdown = () => {
-    setDropdownOpened(!isDropdownOpened);
-  };
-
-  const Options = (
+  return (
     <>
       <Option key="settings">
         <Link href={ROUTES.SETTINGS + ROUTES.TEAM}>
@@ -121,6 +109,21 @@ const PrimaryHeaderComponent = ({
       </Option>
     </>
   );
+};
+
+const PrimaryHeaderComponent = ({
+  user,
+  searchedText,
+  showAddItemButton,
+  onSearch,
+  onClickReset,
+}) => {
+  const [isDropdownOpened, setDropdownOpened] = useState(false);
+  const userName = (user && (user.name || user.email)) || '';
+
+  const handleToggleDropdown = () => {
+    setDropdownOpened(!isDropdownOpened);
+  };
 
   return (
     <>
@@ -142,7 +145,7 @@ const PrimaryHeaderComponent = ({
             {showAddItemButton && <AddItemButton />}
             <UserSection>
               <StyledDropdown
-                renderOverlay={() => Options}
+                renderOverlay={Options}
                 onToggle={handleToggleDropdown}
                 withTriangleAtTop
               >
@@ -156,7 +159,7 @@ const PrimaryHeaderComponent = ({
                 />
               </StyledDropdown>
             </UserSection>
-            {/* TODO: Add notifications */}
+            {/* TODO: Add notifications feature */}
           </RightWrapper>
         )}
       </Wrapper>

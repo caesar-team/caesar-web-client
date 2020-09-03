@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { memo } from 'react';
 import styled from 'styled-components';
 import { CircleLoader } from '../Loader';
 import { Icon } from '../Icon';
@@ -50,7 +50,7 @@ const CloseIcon = styled(Icon)`
   height: 16px;
 `;
 
-const GlobalNotification = ({
+const GlobalNotificationComponent = ({
   text = 'Your request is in progress...',
   isError = false,
   onClose = Function.prototype,
@@ -69,4 +69,4 @@ const GlobalNotification = ({
   </Wrapper>
 );
 
-export default GlobalNotification;
+export const GlobalNotification = memo(GlobalNotificationComponent);

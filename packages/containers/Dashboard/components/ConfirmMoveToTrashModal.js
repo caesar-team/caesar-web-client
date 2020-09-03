@@ -1,5 +1,6 @@
 import React from 'react';
 import { useSelector, useDispatch } from 'react-redux';
+import { useNotification } from '@caesar/common/hooks';
 import { getPlural } from '@caesar/common/utils/string';
 import {
   workInProgressItemSelector,
@@ -20,17 +21,14 @@ import {
 } from '@caesar/common/actions/entities/item';
 import { ConfirmModal } from '@caesar/components';
 
-export const ConfirmMoveToTrashModal = ({
-  notification,
-  isOpened,
-  handleCloseModal,
-}) => {
+export const ConfirmMoveToTrashModal = ({ isOpened, handleCloseModal }) => {
   const dispatch = useDispatch();
   const workInProgressItemIds = useSelector(workInProgressItemIdsSelector);
   const workInProgressList = useSelector(workInProgressListSelector);
   const workInProgressItem = useSelector(workInProgressItemSelector);
   const teamsTrashLists = useSelector(teamsTrashListsSelector);
   const trashList = useSelector(trashListSelector);
+  const notification = useNotification();
 
   const handleMoveToTrash = () => {
     const isTeamList = !!workInProgressList?.teamId;
@@ -46,29 +44,25 @@ export const ConfirmMoveToTrashModal = ({
           workInProgressItemIds,
           workInProgressList?.teamId || null,
           trashListId,
+          notification,
+          `The ${getPlural(workInProgressItemIds?.length, [
+            'item has',
+            'items have',
+          ])} been removed`,
         ),
       );
       dispatch(resetWorkInProgressItemIds());
-
-      notification.show({
-        text: `The ${getPlural(workInProgressItemIds?.length, [
-          'item has',
-          'items have',
-        ])} been removed`,
-      });
     } else {
       dispatch(
         moveItemRequest(
           workInProgressItem.id,
           workInProgressItem.teamId || null,
           trashListId,
+          notification,
+          `The '${workInProgressItem.data.name}' has been removed`,
         ),
       );
       dispatch(setWorkInProgressItem(null));
-
-      notification.show({
-        text: `The '${workInProgressItem.data.name}' has been removed`,
-      });
     }
 
     handleCloseModal();

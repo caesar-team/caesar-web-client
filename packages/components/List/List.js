@@ -1,11 +1,14 @@
 import React, { memo } from 'react';
-import styled from 'styled-components';
 import equal from 'fast-deep-equal';
+import memoize from 'memoize-one';
+import { FixedSizeList } from 'react-window';
+import AutoSizer from 'react-virtualized-auto-sizer';
+import styled from 'styled-components';
 import { transformListTitle } from '@caesar/common/utils/string';
 import { DASHBOARD_MODE } from '@caesar/common/constants';
 import { Scrollbar } from '../Scrollbar';
 import { EmptyList } from './EmptyList';
-import { Item } from './Item';
+import { FixedSizeItem } from './FixedSizeItem';
 
 const Wrapper = styled.div`
   position: relative;
@@ -33,6 +36,60 @@ const ColumnTitle = styled.div`
   color: ${({ theme }) => theme.color.black};
 `;
 
+const createItemData = memoize(
+  (
+    items,
+    isMultiItem,
+    onClickItem,
+    onSelectItem,
+    workInProgressItemIds,
+    workInProgressItem,
+  ) => ({
+    items,
+    isMultiItem,
+    onClickItem,
+    onSelectItem,
+    workInProgressItemIds,
+    workInProgressItem,
+  }),
+);
+
+const RenderedList = ({
+  items,
+  isMultiItem,
+  onClickItem,
+  onSelectItem,
+  workInProgressItemIds,
+  workInProgressItem,
+}) => {
+  const itemData = createItemData(
+    items,
+    isMultiItem,
+    onClickItem,
+    onSelectItem,
+    workInProgressItemIds,
+    workInProgressItem,
+  );
+
+  return (
+    <Scrollbar>
+      <AutoSizer>
+        {({ height, width }) => (
+          <FixedSizeList
+            height={height}
+            itemCount={items.length}
+            itemData={itemData}
+            itemSize={58}
+            width={width}
+          >
+            {FixedSizeItem}
+          </FixedSizeList>
+        )}
+      </AutoSizer>
+    </Scrollbar>
+  );
+};
+
 const ListComponent = ({
   mode,
   isMultiItem = false,
@@ -44,10 +101,13 @@ const ListComponent = ({
   onSelectItem = Function.prototype,
 }) => {
   const isDashboardDefaultMode = mode === DASHBOARD_MODE.DEFAULT;
+  const isEmpty = items.length === 0;
+
   if (
-    isDashboardDefaultMode &&
-    !workInProgressList &&
-    !workInProgressItemIds.length
+    isEmpty ||
+    (isDashboardDefaultMode &&
+      !workInProgressList &&
+      !workInProgressItemIds.length)
   ) {
     return (
       <Wrapper isEmpty>
@@ -55,31 +115,6 @@ const ListComponent = ({
       </Wrapper>
     );
   }
-
-  const isEmpty = items.length === 0;
-  const renderedList = () => {
-    if (isEmpty) {
-      return <EmptyList />;
-    }
-
-    // TODO: Need to check a long list with items. Mayby beetter to return AutoSizer, but need to fix Scrolling
-    return (
-      <Scrollbar>
-        {items.map((item, index) => (
-          <Item
-            key={item.id}
-            index={index}
-            isMultiItem={isMultiItem}
-            onClickItem={onClickItem}
-            onSelectItem={onSelectItem}
-            workInProgressItemIds={workInProgressItemIds}
-            workInProgressItem={workInProgressItem}
-            {...item}
-          />
-        ))}
-      </Scrollbar>
-    );
-  };
 
   const listTitle = transformListTitle(workInProgressList?.label);
 
@@ -102,7 +137,14 @@ const ListComponent = ({
           /> */}
         </ColumnHeader>
       )}
-      {renderedList()}
+      <RenderedList
+        items={items}
+        isMultiItem={isMultiItem}
+        onClickItem={onClickItem}
+        onSelectItem={onSelectItem}
+        workInProgressItemIds={workInProgressItemIds}
+        workInProgressItem={workInProgressItem}
+      />
     </Wrapper>
   );
 };

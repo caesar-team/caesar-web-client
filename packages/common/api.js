@@ -8,6 +8,7 @@ import { isClient } from './utils/isEnvironment';
 const softExit = () => {
   if (isClient) {
     removeCookieValue('token');
+
     if (Router.router.pathname !== ROUTES.SIGN_IN) {
       Router.push(ROUTES.SIGN_IN);
     }

@@ -1,4 +1,12 @@
-import { put, call, fork, takeLatest, takeEvery, select, all } from 'redux-saga/effects';
+import {
+  put,
+  call,
+  fork,
+  takeLatest,
+  takeEvery,
+  select,
+  all,
+} from 'redux-saga/effects';
 import {
   INIT_WORKFLOW,
   UPDATE_WORK_IN_PROGRESS_ITEM,
@@ -21,7 +29,10 @@ import {
   setCurrentTeamId,
   setPersonalDefaultListId,
 } from '@caesar/common/actions/user';
-import { addTeamKeyPair, addShareKeyPair } from '@caesar/common/actions/keyStore';
+import {
+  addTeamKeyPair,
+  addShareKeyPair,
+} from '@caesar/common/actions/keyStore';
 import { fetchMembersSaga } from '@caesar/common/sagas/entities/member';
 import {
   convertNodesToEntities,
@@ -111,9 +122,7 @@ function* initPersonal(withDecryption) {
 
     const { data: rawLists } = yield call(getLists);
     const lists = extractRelatedAndNonSystemItems(rawLists);
-    const { listsById, itemsById } = convertNodesToEntities(
-      lists,
-    );
+    const { listsById, itemsById } = convertNodesToEntities(lists);
 
     if (withDecryption) {
       const currentUserId = yield select(userIdSelector);
@@ -222,9 +231,7 @@ function* initTeam(team, withDecryption) {
     const currentUserId = yield select(userIdSelector);
     const isCurrentUserTeamAdmin = teamAdmins.includes(currentUserId);
     const { data: lists } = yield call(getTeamLists, team.id);
-    const { listsById, itemsById } = convertNodesToEntities(
-      lists,
-    );
+    const { listsById, itemsById } = convertNodesToEntities(lists);
 
     const trashList = yield select(currentTeamTrashListSelector);
     const favoritesList = getFavoritesList(
@@ -377,10 +384,12 @@ export function* decryptionEndWatchSaga() {
     const systemItemsArray = objectToArray(systemItems);
 
     if (systemItemsArray.length > 0) {
-      yield all(systemItemsArray.map(
-        item => item.data?.name?.includes(ENTITY_TYPE.TEAM)
-          ? put(addTeamKeyPair(item))
-          : put(addShareKeyPair(item))),
+      yield all(
+        systemItemsArray.map(item =>
+          item.data?.name?.includes(ENTITY_TYPE.TEAM)
+            ? put(addTeamKeyPair(item))
+            : put(addShareKeyPair(item)),
+        ),
       );
     }
   } catch (error) {

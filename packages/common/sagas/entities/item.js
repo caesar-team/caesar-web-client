@@ -105,7 +105,8 @@ const ITEMS_CHUNK_SIZE = 50;
 
 export function* generateSystemItem(entity, listId, entityId) {
   const masterPassword = yield call(passwordGenerator);
-  const systemItemEmail = yield call(generateSystemItemEmail, entity, entityId);
+  const systemItemName = yield call(generateSystemItemName, entity, entityId);
+  const systemItemEmail = yield call(generateSystemItemEmail, systemItemName);
 
   const { publicKey, privateKey } = yield call(generateKeys, masterPassword, [
     systemItemEmail,
@@ -130,7 +131,7 @@ export function* generateSystemItem(entity, listId, entityId) {
         publicKey,
       },
       pass: masterPassword,
-      name: yield call(generateSystemItemName, entity, entityId),
+      name: systemItemName,
     },
   };
 

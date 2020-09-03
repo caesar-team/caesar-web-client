@@ -43,7 +43,7 @@ export function* createChildItemBatchSaga({ payload: { itemUserPairs } }) {
     const {
       payload: { sets: encryptedChildItems },
     } = yield take(ENCRYPTION_FINISHED_EVENT);
-
+console.log(encryptedChildItems);
     const preparedChildItemsGroupedByItemId = encryptedChildItems.reduce(
       (accumulator, { itemId, ...data }) => {
         if (!accumulator[itemId]) {

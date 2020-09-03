@@ -59,16 +59,17 @@ export function* prepareUsersForSharing(members) {
 }
 
 function* getItemUserPairCombinations(item, members = [], privateKeyObj) {
-  const { id, data } = item;
+  const { id, data: { raws = {}, ...data } } = item;
 
   let itemData = data;
+  let itemRaws = raws;
 
   if (!itemData) {
     itemData = yield call(decryptItem, item.secret, privateKeyObj);
   }
 
   return members.map(({ id: memberId, email, publicKey, teamId }) => ({
-    item: { id, data: itemData },
+    item: { id, data: itemData, raws: itemRaws },
     user: { id: memberId, email, publicKey, teamId },
   }));
 }
@@ -108,7 +109,7 @@ export function* shareItemBatchSaga({
     if (currentTeamId === TEAM_TYPE.PERSONAL) {
       items = yield select(systemItemsBatchSelector, { itemIds });
     }
-
+console.log(items);
     const preparedMembers = yield call(prepareUsersForSharing, members);
 
     const newMembers = preparedMembers.filter(({ isNew }) => isNew);
@@ -136,7 +137,7 @@ export function* shareItemBatchSaga({
         payload: { members: newMembers },
       });
     }
-
+console.log(itemUserPairs);
     if (itemUserPairs.length > 0) {
       yield fork(createChildItemBatchSaga, { payload: { itemUserPairs } });
 

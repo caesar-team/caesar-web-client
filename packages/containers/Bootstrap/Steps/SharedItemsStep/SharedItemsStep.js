@@ -160,7 +160,16 @@ class SharedItemsStep extends Component {
       const decryptedItems = await Promise.all(
         personalItems.map(
           // eslint-disable-next-line
-          async ({ secret }) => await decryptItem(secret, privateKeyObj),
+          async ({ secret }) => {
+            const { data: encryptedData, raws: encryptedRaws } = JSON.parse(secret);
+            const data = await decryptItem(encryptedData, privateKeyObj);
+            const raws = await decryptItem(encryptedRaws, privateKeyObj);
+            
+            return {
+              ...data,
+              raws,
+            };
+          },
         ),
       );
 

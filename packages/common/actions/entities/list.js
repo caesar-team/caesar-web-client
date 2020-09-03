@@ -1,3 +1,7 @@
+export const GET_LIST_REQUEST = '@list/GET_LIST_REQUEST';
+export const GET_LIST_SUCCESS = '@list/GET_LIST_SUCCESS';
+export const GET_LIST_FAILURE = '@list/GET_LIST_FAILURE';
+
 export const CREATE_LIST_REQUEST = '@list/CREATE_LIST_REQUEST';
 export const CREATE_LIST_SUCCESS = '@list/CREATE_LIST_SUCCESS';
 export const CREATE_LIST_FAILURE = '@list/CREATE_LIST_FAILURE';

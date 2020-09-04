@@ -48,9 +48,8 @@ export const Item = ({
     attachments && Array.isArray(attachments) && attachments.length > 0;
 
   const shouldShowFavoriteIcon = favorite && !isClosable;
-  const isActive =
-    workInProgressItem?.id === id ||
-    (isMultiItem && workInProgressItemIds.includes(id));
+  const isActive = workInProgressItem?.id === id;
+  const isChecked = isMultiItem && workInProgressItemIds.includes(id);
 
   const isTop = index === 0;
   const itemSubject = teamId
@@ -73,6 +72,7 @@ export const Item = ({
       style={style}
       onClick={onClickItem(id)}
       isActive={isActive}
+      isChecked={isChecked}
       isMultiItem={isMultiItem}
       hasHover={hasHover}
       isInModal={isInModal}
@@ -88,7 +88,7 @@ export const Item = ({
           >
             {allowed ? (
               <CheckboxStyled
-                checked={isActive}
+                checked={isChecked}
                 onChange={() => {
                   onSelectItem(id);
                 }}

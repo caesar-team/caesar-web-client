@@ -10,7 +10,8 @@ const Svg = styled.svg`
   fill: currentColor;
   transition: color 0.2s;
 
-  ${({ disabled }) => disabled && `opacity: 0.5`}
+  ${({ width }) => width && `flex: 0 0 ${width}px;`}
+  ${({ disabled }) => disabled && `opacity: 0.5;`}
 `;
 
 const getIconDisabledStatus = (withOfflineCheck, isOnline, disabled) =>

@@ -16,5 +16,5 @@ export const ERROR = {
   ) =>
     `All attachments must be less than ${maxAllFilesSize}. Please, delete some attachmnets`,
   WEBSITE: 'Must be an url',
-  IMAGE_UPLOAD: 'Please upload an image',
+  IMAGE_UPLOAD: 'Please, upload an image',
 };

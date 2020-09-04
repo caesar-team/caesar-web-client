@@ -61,7 +61,7 @@ import {
   currentTeamIdSelector,
   userPersonalDefaultListIdSelector,
 } from '@caesar/common/selectors/user';
-import { addEntityKeyPair } from '@caesar/common/actions/keyStore';
+import { addShareKeyPair, addTeamKeyPair } from '@caesar/common/actions/keyStore';
 import {
   postCreateItem,
   postCreateItemsBatch,
@@ -99,12 +99,14 @@ import {
 } from '@caesar/common/utils/item';
 import { passwordGenerator } from '@caesar/common/utils/passwordGenerator';
 import { generateKeys } from '@caesar/common/utils/key';
+import { addSystemItemsBatch } from '@caesar/common/actions/entities/system';
 
 const ITEMS_CHUNK_SIZE = 50;
 
 export function* generateSystemItem(entity, listId, entityId) {
   const masterPassword = yield call(passwordGenerator);
-  const systemItemEmail = yield call(generateSystemItemEmail, entity, entityId);
+  const systemItemName = yield call(generateSystemItemName, entity, entityId);
+  const systemItemEmail = yield call(generateSystemItemEmail, systemItemName);
 
   const { publicKey, privateKey } = yield call(generateKeys, masterPassword, [
     systemItemEmail,
@@ -118,12 +120,10 @@ export function* generateSystemItem(entity, listId, entityId) {
         {
           id: 'publicKey',
           name: 'publicKey',
-          raw: publicKey,
         },
         {
           id: 'privateKey',
           name: 'privateKey',
-          raw: privateKey,
         },
       ],
       raws: {
@@ -131,7 +131,7 @@ export function* generateSystemItem(entity, listId, entityId) {
         publicKey,
       },
       pass: masterPassword,
-      name: yield call(generateSystemItemName, entity, entityId),
+      name: systemItemName,
     },
   };
 
@@ -232,7 +232,10 @@ export function* toggleItemToFavoriteSaga({ payload: { item } }) {
   }
 }
 
-export function* moveItemSaga({ payload: { itemId, teamId, listId } }) {
+export function* moveItemSaga({
+  payload: { itemId, teamId, listId },
+  meta: { notification, notificationText } = {},
+}) {
   try {
     yield put(updateGlobalNotification(MOVING_IN_PROGRESS_NOTIFICATION, true));
 
@@ -254,6 +257,12 @@ export function* moveItemSaga({ payload: { itemId, teamId, listId } }) {
     yield put(moveItemToList(item.id, item.listId, newListId));
 
     yield put(updateGlobalNotification(NOOP_NOTIFICATION, false));
+
+    if (notification) {
+      yield call(notification.show, {
+        text: notificationText || `The '${item.data.name}' has been moved`,
+      });
+    }
 
     if (item.teamId !== teamId) {
       yield put(updateItemField(item.id, 'teamId', teamId));
@@ -277,8 +286,6 @@ export function* moveItemSaga({ payload: { itemId, teamId, listId } }) {
     if (item.teamId && !teamId) {
       yield put(removeChildItemsBatchFromItem(item.id, childItemIds));
       yield put(removeChildItemsBatch(childItemIds));
-
-      yield put(updateGlobalNotification(NOOP_NOTIFICATION, false));
     }
 
     if (item.teamId && teamId && item.teamId !== teamId) {
@@ -305,13 +312,20 @@ export function* moveItemSaga({ payload: { itemId, teamId, listId } }) {
   }
 }
 
-export function* moveItemsBatchSaga({ payload: { itemIds, teamId, listId } }) {
+export function* moveItemsBatchSaga({
+  payload: { itemIds, teamId, listId },
+  meta: { notification, notificationText } = {},
+}) {
   try {
     yield all(
       itemIds.map(itemId =>
         call(moveItemSaga, { payload: { itemId, teamId, listId } }),
       ),
     );
+
+    yield call(notification.show, {
+      text: notificationText || 'The items have been moved',
+    });
   } catch (error) {
     // eslint-disable-next-line no-console
     console.log(error);
@@ -328,7 +342,6 @@ export function* createItemSaga({
 }) {
   try {
     const {
-      id: itemId,
       teamId = null,
       listId,
       type,
@@ -378,17 +391,20 @@ export function* createItemSaga({
     // TODO: Make the class of the item instead of the direct object
     const newItem = {
       ...item,
-      ...relatedItem,
       ...itemData,
     };
 
-    yield put(createItemSuccess(newItem));
+    if (!isSystemItem) {
+      yield put(createItemSuccess(newItem));
+    }
 
     const currentTeamId = yield select(currentTeamIdSelector);
 
     if (
-      currentTeamId === teamId ||
-      (!teamId && currentTeamId === TEAM_TYPE.PERSONAL)
+      (
+        currentTeamId === teamId ||
+        (!teamId && currentTeamId === TEAM_TYPE.PERSONAL)
+      ) && !isSystemItem
     ) {
       yield put(addItemToList(newItem));
     }
@@ -396,7 +412,14 @@ export function* createItemSaga({
     yield put(setCurrentTeamId(teamId || TEAM_TYPE.PERSONAL));
 
     if (isSystemItem) {
-      yield put(addEntityKeyPair(newItem));
+      yield put(addSystemItemsBatch({
+        [newItem.id]: newItem,
+      }));
+      if (data.name.includes(ENTITY_TYPE.TEAM)) {
+        yield put(addTeamKeyPair(newItem));
+      } else {
+        yield put(addShareKeyPair(newItem));
+      }
     } else {
       yield put(setWorkInProgressListId(listId));
       yield put(setWorkInProgressItem(newItem));
@@ -407,11 +430,11 @@ export function* createItemSaga({
       if (!teamId && currentTeamId === TEAM_TYPE.PERSONAL) {
         const systemItemData = yield call(
           generateSystemItem,
-          ENTITY_TYPE.ITEM,
+          ENTITY_TYPE.SHARE,
           userPersonalDefaultListId,
-          itemId,
+          itemData.id,
         );
-        systemItemData.relatedItem = itemId;
+        systemItemData.relatedItem = itemData.id;
 
         yield put(createItemRequest(systemItemData));
       }

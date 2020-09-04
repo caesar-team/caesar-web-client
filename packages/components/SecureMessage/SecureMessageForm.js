@@ -1,17 +1,16 @@
-import React, { useState } from 'react';
+import React, { useState, memo } from 'react';
 import styled from 'styled-components';
 import { useFormik } from 'formik';
 import { media } from '@caesar/assets/styles/media';
 import { Select } from '@caesar/components/Select';
 import { checkError } from '@caesar/common/utils/formikUtils';
 import { downloadFile } from '@caesar/common/utils/file';
-import { useMedia } from '@caesar/common/hooks';
+import { useMedia, useNotification } from '@caesar/common/hooks';
 import { Checkbox } from '../Checkbox';
 import { TextArea, PasswordInput } from '../Input';
 import { File } from '../File';
 import { Uploader } from '../Uploader';
 import { Button } from '../Button';
-import { withNotification } from '../Notification';
 import { withOfflineDetection } from '../Offline';
 import { Hint } from '../Hint';
 import { TextError } from '../Error';
@@ -208,7 +207,8 @@ const renderAttachments = (
   ));
 };
 
-const SecureMessageFormComponent = ({ onSubmit, notification, isOnline }) => {
+const SecureMessageFormComponent = ({ onSubmit, isOnline }) => {
+  const notification = useNotification();
   const { isMobile } = useMedia();
   const [isCustomPassword, setCustomPassword] = useState(false);
 
@@ -366,5 +366,5 @@ const SecureMessageFormComponent = ({ onSubmit, notification, isOnline }) => {
 };
 
 export const SecureMessageForm = withOfflineDetection(
-  withNotification(SecureMessageFormComponent),
+  memo(SecureMessageFormComponent),
 );

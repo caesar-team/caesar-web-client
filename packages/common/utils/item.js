@@ -40,27 +40,17 @@ export function generateSystemItemName(entity, id) {
   return `${entity}-${id}`;
 }
 
-export function generateSystemItemEmail(entity, id) {
-  return `${generateSystemItemName(entity, id)}@${getHostName()}.com`;
+export function generateSystemItemEmail(entityName) {
+  return `teams+${entityName}@${getHostName()}.com`;
 }
 
 export function extractKeysFromSystemItem(item) {
-  const itemAttachments = item.data?.attachments;
-  const itemRaws = item.data?.raws;
-  if (!itemAttachments || !itemRaws) {
-    return {
-      publicKey: null,
-      privateKey: null,
-    };
-  }
-  const publicKeyIndex = itemAttachments?.findIndex(
-    ({ name }) => name === 'publicKey',
-  )?.raw;
-  const privateKeyIndex = itemAttachments?.findIndex(
-    ({ name }) => name === 'privateKey',
-  )?.raw;
-  const publicKey = itemRaws[publicKeyIndex];
-  const privateKey = itemRaws[privateKeyIndex];
+  const itemRaws = item.data?.raws || {
+    publicKey: null,
+    privateKey: null,
+  };
+
+  const { publicKey = null, privateKey = null } = itemRaws;
 
   return {
     publicKey,

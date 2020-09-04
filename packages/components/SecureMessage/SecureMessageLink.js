@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, memo } from 'react';
 import { useEffectOnce } from 'react-use';
 import copy from 'copy-text-to-clipboard';
 import { Checkbox, withNotification } from '@caesar/components';
@@ -21,15 +21,17 @@ import {
 } from './styles';
 
 const SecureMessageLinkComponent = ({
-  notification,
   messageId = '',
   password = '',
   seconds = 0,
   onClickReturn,
 }) => {
+  const notification = useNotification();
+
   useEffectOnce(() => {
     notification.hide();
   });
+
   const { isMobile } = useMedia();
   const [isPasswordLessPassword, setPasswordLess] = useState(false);
   const handleChangeCustomPassword = () => {
@@ -142,4 +144,4 @@ const SecureMessageLinkComponent = ({
   );
 };
 
-export const SecureMessageLink = withNotification(SecureMessageLinkComponent);
+export const SecureMessageLink = memo(SecureMessageLinkComponent);

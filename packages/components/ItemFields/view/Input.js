@@ -4,11 +4,11 @@ import copy from 'copy-text-to-clipboard';
 import equal from 'fast-deep-equal';
 import styled from 'styled-components';
 import { PERMISSION } from '@caesar/common/constants';
+import { useNotification } from '@caesar/common/hooks';
 import { makeObject } from '@caesar/common/utils/object';
 import { Can } from '../../Ability';
 import { Input } from '../../Input';
 import { Icon } from '../../Icon';
-import { withNotification } from '../../Notification';
 
 const Wrapper = styled.div`
   ${({ withLabel }) => withLabel && 'padding-top: 20px;'}
@@ -91,7 +91,6 @@ const InputComponent = ({
   autoComplete,
   withCopyButton = true,
   withEllipsis,
-  notification,
   addonIcons,
   addonPostfix,
   onClickAcceptEdit,
@@ -99,6 +98,7 @@ const InputComponent = ({
 }) => {
   const [isEdit, setEdit] = useState(false);
   const [value, setValue] = useState(originalValue || propValue);
+  const notification = useNotification();
 
   useUpdateEffect(() => {
     if (propValue !== value) {
@@ -109,7 +109,7 @@ const InputComponent = ({
   const handleClickCopy = () => {
     copy(originalValue || propValue);
     notification.show({
-      text: `The ${label.toLowerCase()} has been copied.`,
+      text: `The ${label.toLowerCase()} has been copied`,
     });
   };
 
@@ -181,18 +181,21 @@ const InputComponent = ({
   );
 };
 
-const InputWithPermissions = ({ value, itemSubject, ...props }) =>
-  value ? (
+const InputWithPermissions = ({ value, itemSubject, ...props }) => {
+  return value ? (
     <InputComponent value={value} itemSubject={itemSubject} {...props} />
   ) : (
     <Can I={PERMISSION.EDIT} an={itemSubject}>
       <InputComponent value={value} itemSubject={itemSubject} {...props} />
     </Can>
   );
+};
 
-const InputField = memo(
-  withNotification(InputWithPermissions),
-  (prevProps, nextProps) => equal(prevProps, nextProps),
+const InputField = memo(InputWithPermissions, (prevProps, nextProps) =>
+  equal(
+    [prevProps.itemSubject, prevProps.label, prevProps.name, prevProps.value],
+    [nextProps.itemSubject, nextProps.label, nextProps.name, nextProps.value],
+  ),
 );
 
 InputField.ValueWrapper = ValueWrapper;

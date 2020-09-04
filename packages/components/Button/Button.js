@@ -1,4 +1,4 @@
-import React, { forwardRef } from 'react';
+import React, { memo, forwardRef } from 'react';
 import styled from 'styled-components';
 import withOfflineDetection from '../Offline/withOfflineDetection';
 import Icon from '../Icon/Icon';
@@ -177,7 +177,7 @@ const ButtonComponent = forwardRef(
   },
 );
 
-const Button = withOfflineDetection(ButtonComponent);
+const Button = withOfflineDetection(memo(ButtonComponent));
 
 Button.Text = Text;
 

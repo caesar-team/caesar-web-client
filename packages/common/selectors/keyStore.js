@@ -7,39 +7,34 @@ import {
 import { generateSystemItemName } from '@caesar/common/utils/item';
 import { KEY_TYPE, TEAM_TYPE, ENTITY_TYPE } from '@caesar/common/constants';
 
-const findEntityItemsByType = (data, entityType) =>
-  Object.values(data[KEY_TYPE.ENTITY]).filter(({ name }) =>
-    name.includes(entityType),
-  ) || [];
-
-const findTeamItemByName = (items, teamId) =>
-  items.find(
+const findTeamByItemName = (data, teamId) =>
+  Object.values(data).find(
     ({ name }) => name === generateSystemItemName(ENTITY_TYPE.TEAM, teamId),
   ) || {};
 
-const findItemsByNames = (items, itemIds) =>
-  itemIds.map(
-    itemId =>
-      items.find(
-        ({ name }) => name === generateSystemItemName(ENTITY_TYPE.ITEM, itemId),
+const findSharesByItemNames = (data, shareIds) =>
+  shareIds.map(
+    shareId =>
+      Object.values(data).find(
+        ({ name }) => name === generateSystemItemName(ENTITY_TYPE.SHARE, shareId),
       ) || {},
   );
 
 export const keyStoreSelector = state => state.keyStore;
 
+const teamsSelector = createSelector(
+  keyStoreSelector,
+  keyStore => keyStore[KEY_TYPE.TEAMS],
+);
+
+const sharesSelector = createSelector(
+  keyStoreSelector,
+  keyStore => keyStore[KEY_TYPE.SHARES],
+);
+
 const teamIdPropSelector = (_, props) => props.teamId;
 
-const itemIdsPropSelector = (_, props) => props.itemIds;
-
-export const entityTeamSelector = createSelector(
-  keyStoreSelector,
-  data => findEntityItemsByType(data, ENTITY_TYPE.TEAM),
-);
-
-export const entityItemSelector = createSelector(
-  keyStoreSelector,
-  data => findEntityItemsByType(data, ENTITY_TYPE.ITEM),
-);
+const shareIdsPropSelector = (_, props) => props.shareIds;
 
 export const personalKeyPairSelector = createSelector(
   keyStoreSelector,
@@ -47,15 +42,15 @@ export const personalKeyPairSelector = createSelector(
 );
 
 export const teamKeyPairSelector = createSelector(
-  entityTeamSelector,
+  teamsSelector,
   teamIdPropSelector,
-  (data, teamId) => findTeamItemByName(data, teamId),
+  (data, teamId) => findTeamByItemName(data, teamId),
 );
 
-export const itemsKeyPairSelector = createSelector(
-  entityItemSelector,
-  itemIdsPropSelector,
-  (data, itemIds) => findItemsByNames(data, itemIds),
+export const sharesKeyPairSelector = createSelector(
+  sharesSelector,
+  shareIdsPropSelector,
+  (data, shareIds) => findSharesByItemNames(data, shareIds),
 );
 
 export const anonymousKeyPairSelector = createSelector(

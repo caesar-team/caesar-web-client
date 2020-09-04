@@ -16,7 +16,7 @@ import {
 } from '@caesar/common/actions/entities/item';
 import { ShareModal as ShareModalComponent } from '@caesar/components';
 
-export const ShareModal = ({ notification, handleCloseModal }) => {
+export const ShareModal = ({ handleCloseModal }) => {
   const dispatch = useDispatch();
   const workInProgressItem = useSelector(workInProgressItemSelector);
   const workInProgressItemIds = useSelector(workInProgressItemIdsSelector);
@@ -88,7 +88,6 @@ export const ShareModal = ({ notification, handleCloseModal }) => {
       onActivateLink={handleActivateLink}
       onDeactivateLink={handleDeactivateLink}
       onCancel={handleCloseModal}
-      notification={notification}
     />
   );
 };

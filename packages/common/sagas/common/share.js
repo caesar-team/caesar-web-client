@@ -8,11 +8,10 @@ import {
   take,
 } from '@redux-saga/core/effects';
 import { getOrCreateMemberBatchSaga } from '@caesar/common/sagas/entities/member';
+import { itemsBatchSelector } from '@caesar/common/selectors/entities/item';
 import {
-  itemChildItemsSelector,
-  itemsBatchSelector,
   systemItemsBatchSelector,
-} from '@caesar/common/selectors/entities/item';
+} from '@caesar/common/selectors/entities/system';
 import {
   masterPasswordSelector,
   userDataSelector,
@@ -59,20 +58,7 @@ export function* prepareUsersForSharing(members) {
   });
 }
 
-function* clarifyItemMembers(item, members = []) {
-  const childItems = yield select(itemChildItemsSelector, { itemId: item.id });
-
-  return members.filter(
-    ({ id, teamId }) =>
-      !childItems.some(
-        childItem => childItem.userId === id && childItem.teamId === teamId,
-      ),
-  );
-}
-
 function* getItemUserPairCombinations(item, members = [], privateKeyObj) {
-  const cleanedMembers = yield call(clarifyItemMembers, item, members);
-
   const { id, data } = item;
 
   let itemData = data;
@@ -81,7 +67,7 @@ function* getItemUserPairCombinations(item, members = [], privateKeyObj) {
     itemData = yield call(decryptItem, item.secret, privateKeyObj);
   }
 
-  return cleanedMembers.map(({ id: memberId, email, publicKey, teamId }) => ({
+  return members.map(({ id: memberId, email, publicKey, teamId }) => ({
     item: { id, data: itemData },
     user: { id: memberId, email, publicKey, teamId },
   }));

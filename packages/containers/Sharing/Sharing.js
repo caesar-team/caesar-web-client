@@ -1,6 +1,6 @@
-import React, { Component } from 'react';
+import React, { Component, memo } from 'react';
 import { getLists } from '@caesar/common/api';
-import { SharingLayout, withNotification } from '@caesar/components';
+import { SharingLayout } from '@caesar/components';
 import { ItemByType } from '@caesar/components/Item/ItemByType';
 import { LIST_TYPE, PERMISSION_ENTITY } from '@caesar/common/constants';
 import {
@@ -18,7 +18,7 @@ const getInboxItem = list => {
   return inbox.children[0];
 };
 
-class Sharing extends Component {
+class SharingComponent extends Component {
   state = this.prepareInitialState();
 
   async componentDidMount() {
@@ -43,7 +43,6 @@ class Sharing extends Component {
   }
 
   render() {
-    const { notification } = this.props;
     const { item } = this.state;
 
     if (!item) {
@@ -56,15 +55,12 @@ class Sharing extends Component {
 
     return (
       <SharingLayout>
-        <ItemByType
-          item={item}
-          itemSubject={itemSubject}
-          notification={notification}
-          isSharedItem
-        />
+        <ItemByType item={item} itemSubject={itemSubject} isSharedItem />
       </SharingLayout>
     );
   }
 }
 
-export default withNotification(Sharing);
+const Sharing = memo(SharingComponent);
+
+export default Sharing;

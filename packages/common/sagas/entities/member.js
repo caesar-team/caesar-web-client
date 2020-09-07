@@ -11,6 +11,7 @@ import {
   fetchMembersFailure,
   fetchMembersSuccess,
 } from '@caesar/common/actions/entities/member';
+import { updateTeamMembersWithRoles } from '@caesar/common/actions/entities/team';
 import {
   getMembers,
   getPublicKeyByEmailBatch,
@@ -228,11 +229,16 @@ export function* getOrCreateMemberBatchSaga({ payload: { emailRolePairs } }) {
   }
 }
 
-export function* fetchTeamMembersSaga({ payload: { teamId } }) {
+export function* fetchTeamMembersSaga({ payload: { teamId, needUpdateTeamMembers = false } }) {
   try {
     const { data } = yield call(getTeamMembers, teamId);
+    const members = convertMembersToEntity(data);
 
     yield put(fetchMembersSuccess(convertMembersToEntity(data)));
+
+    if (needUpdateTeamMembers) {
+      yield put(updateTeamMembersWithRoles(teamId, data));
+    }
   } catch (e) {
     yield put(fetchMembersFailure());
   }

@@ -29,6 +29,7 @@ import {
   CREATE_TEAM_KEYS_REQUEST,
   CREATE_TEAM_KEYS_SUCCESS,
   CREATE_TEAM_KEYS_FAILURE,
+  UPDATE_TEAM_MEMBERS_WITH_ROLES,
 } from '@caesar/common/actions/entities/team';
 import { KEY_TYPE } from '../../constants';
 
@@ -234,6 +235,22 @@ export default createReducer(initialState, {
             ...state.byId[payload.teamId].users,
             { id: payload.userId, role: payload.role },
           ],
+        },
+      },
+    };
+  },
+  [UPDATE_TEAM_MEMBERS_WITH_ROLES](state, { payload }) {
+    return {
+      ...state,
+      byId: {
+        ...state.byId,
+        [payload.teamId]: {
+          ...state.byId[payload.teamId],
+          users: payload.members.map(({ id, role, _links }) => ({
+            id,
+            role,
+            _links,
+          })),
         },
       },
     };

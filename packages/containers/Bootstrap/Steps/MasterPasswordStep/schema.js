@@ -1,7 +1,6 @@
 import * as yup from 'yup';
 import zxcvbn from 'zxcvbn';
-
-const GOOD_PASSWORD_SCORE = 3;
+import { GOOD_PASSWORD_SCORE } from '@caesar/common/constants';
 
 const checkIsPasswordValid = value =>
   value && zxcvbn(value).score >= GOOD_PASSWORD_SCORE;

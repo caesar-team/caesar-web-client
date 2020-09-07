@@ -232,7 +232,6 @@ export function* getOrCreateMemberBatchSaga({ payload: { emailRolePairs } }) {
 export function* fetchTeamMembersSaga({ payload: { teamId, needUpdateTeamMembers = false } }) {
   try {
     const { data } = yield call(getTeamMembers, teamId);
-    const members = convertMembersToEntity(data);
 
     yield put(fetchMembersSuccess(convertMembersToEntity(data)));
 

@@ -10,6 +10,7 @@ import {
 } from '@caesar/components';
 import { useNotification } from '@caesar/common/hooks';
 import { registration } from '@caesar/common/utils/authUtils';
+import { getServerErrorsByName } from '@caesar/common/utils/error';
 import SignUpForm from './SignUpForm';
 
 const headerComponent = <SecondaryHeader buttonText="Sign In" url="/signin" />;
@@ -30,11 +31,9 @@ const SignUpContainer = () => {
 
       Router.push(ROUTES.SIGN_IN);
     } catch (e) {
-      setErrors({
-        email: 'Wrong email',
-        password: 'Wrong password',
-        confirmPassword: 'Wrong password',
-      });
+      const serverErrorsByName = getServerErrorsByName(e);
+
+      setErrors(serverErrorsByName);
       setSubmitting(false);
     }
   };

@@ -61,7 +61,10 @@ import {
   currentTeamIdSelector,
   userPersonalDefaultListIdSelector,
 } from '@caesar/common/selectors/user';
-import { addShareKeyPair, addTeamKeyPair } from '@caesar/common/actions/keyStore';
+import {
+  addShareKeyPair,
+  addTeamKeyPair,
+} from '@caesar/common/actions/keyStore';
 import {
   postCreateItem,
   postCreateItemsBatch,
@@ -323,9 +326,11 @@ export function* moveItemsBatchSaga({
       ),
     );
 
-    yield call(notification.show, {
-      text: notificationText || 'The items have been moved',
-    });
+    if (notification) {
+      yield call(notification.show, {
+        text: notificationText || 'The items have been moved',
+      });
+    }
   } catch (error) {
     // eslint-disable-next-line no-console
     console.log(error);
@@ -401,10 +406,9 @@ export function* createItemSaga({
     const currentTeamId = yield select(currentTeamIdSelector);
 
     if (
-      (
-        currentTeamId === teamId ||
-        (!teamId && currentTeamId === TEAM_TYPE.PERSONAL)
-      ) && !isSystemItem
+      (currentTeamId === teamId ||
+        (!teamId && currentTeamId === TEAM_TYPE.PERSONAL)) &&
+      !isSystemItem
     ) {
       yield put(addItemToList(newItem));
     }
@@ -412,9 +416,11 @@ export function* createItemSaga({
     yield put(setCurrentTeamId(teamId || TEAM_TYPE.PERSONAL));
 
     if (isSystemItem) {
-      yield put(addSystemItemsBatch({
-        [newItem.id]: newItem,
-      }));
+      yield put(
+        addSystemItemsBatch({
+          [newItem.id]: newItem,
+        }),
+      );
       if (data.name.includes(ENTITY_TYPE.TEAM)) {
         yield put(addTeamKeyPair(newItem));
       } else {

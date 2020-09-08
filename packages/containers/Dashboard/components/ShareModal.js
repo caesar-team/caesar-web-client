@@ -31,7 +31,7 @@ export const ShareModal = ({
   );
   const childItemsById = useSelector(childItemsByIdSelector);
 
-  const isMultiItem = workInProgressItemIds?.length > 1;
+  const isMultiItem = workInProgressItemIds?.length > 0;
   const availableTeamsForSharing = userTeamList.filter(
     ({ id }) => id !== workInProgressItem?.teamId && id !== null,
   );

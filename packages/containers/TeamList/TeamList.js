@@ -64,14 +64,25 @@ class TeamListContainer extends Component {
     this.props.fetchMembersRequest();
   }
 
-  handleCreateSubmit = ({ title, icon }) => {
-    this.props.createTeamRequest(title, icon);
-    this.handleCloseModal(NEW_TEAM_MODAL)();
+  handleCreateSubmit = ({ title, icon, setSubmitting, setErrors }) => {
+    this.props.createTeamRequest(
+      title,
+      icon,
+      this.handleCloseModal(NEW_TEAM_MODAL),
+      setSubmitting,
+      setErrors,
+    );
   };
 
-  handleEditSubmit = ({ teamId, title, icon }) => {
-    this.props.editTeamRequest(teamId, title, icon);
-    this.handleCloseModal(NEW_TEAM_MODAL)();
+  handleEditSubmit = ({ teamId, title, icon, setSubmitting, setErrors }) => {
+    this.props.editTeamRequest(
+      teamId,
+      title,
+      icon,
+      this.handleCloseModal(NEW_TEAM_MODAL),
+      setSubmitting,
+      setErrors,
+    );
   };
 
   handleOpenModal = modal => () => {

@@ -31,14 +31,14 @@ const FieldWrapper = styled.div`
 `;
 
 const TipText = styled.div`
-  font-size: 14px;
+  font-size: ${({ theme }) => theme.font.size.small};
   line-height: 1.5;
   text-align: center;
-  margin-top: 20px;
+  margin-top: 30px;
 `;
 
 const PasswordIndicatorStyled = styled(PasswordIndicator)`
-  margin-top: 20px;
+  margin-top: 30px;
 `;
 
 const StrengthIndicatorStyled = styled(StrengthIndicator)`
@@ -143,7 +143,13 @@ class MasterPasswordCreateForm extends PureComponent {
                 <StrengthIndicatorStyled
                   text="Our recommendations for creating a good master password:"
                   value={values.password}
-                  rules={REGEXP_TEXT_MATCH}
+                  rules={[
+                    ...REGEXP_TEXT_MATCH,
+                    {
+                      text: 'Unique password (i.e. do not use qwerty)',
+                      regexp: 'zxcvbn',
+                    },
+                  ]}
                 />
               </Tooltip>
               <DiceIcon

@@ -1,6 +1,6 @@
-import React from 'react';
+import React, { useState } from 'react';
+import equal from 'fast-deep-equal';
 import styled from 'styled-components';
-import { Icon, Uploader } from '@caesar/components';
 import IconTeam1 from '@caesar/assets/icons/svg/icon-team-ava-1.svg';
 import IconTeam2 from '@caesar/assets/icons/svg/icon-team-ava-2.svg';
 import IconTeam3 from '@caesar/assets/icons/svg/icon-team-ava-3.svg';
@@ -8,6 +8,9 @@ import IconTeam4 from '@caesar/assets/icons/svg/icon-team-ava-4.svg';
 import IconTeam5 from '@caesar/assets/icons/svg/icon-team-ava-5.svg';
 import { TEAM_AVATAR_MAX_SIZE } from '@caesar/common/constants';
 import { ERROR } from '@caesar/common/validation';
+import { TextError as Error } from '../Error';
+import { Icon } from '../Icon';
+import { Uploader } from '../Uploader';
 
 const IMAGE_BASE64_LIST = [
   IconTeam1,
@@ -126,12 +129,6 @@ const UploadedImage = styled.img`
   border-radius: 50%;
 `;
 
-const Error = styled.div`
-  width: 100%;
-  margin-top: 8px;
-  color: ${({ theme }) => theme.color.red};
-`;
-
 const UploaderHoverableWrapper = styled.div`
   position: relative;
   width: 56px;
@@ -159,8 +156,28 @@ const UploaderHoverableWrapper = styled.div`
   }
 `;
 
-export const renderTeamAvatars = ({ icon }, setFieldValue) => {
-  const renderedAvatars = Object.keys(IMAGE_NAME_BASE64_MAP).map(name => {
+const checkErrors = rejectedFiles => {
+  if (rejectedFiles.length > 0) {
+    const errors = [];
+
+    if (!rejectedFiles[0].type.includes('image/')) {
+      errors.push(ERROR.IMAGE_UPLOAD);
+    }
+
+    if (rejectedFiles[0].size > TEAM_AVATAR_MAX_SIZE) {
+      errors.push(
+        ERROR.FILE_SIZE(`${Math.round(TEAM_AVATAR_MAX_SIZE / 1024 / 1024)}MB`),
+      );
+    }
+
+    return errors;
+  }
+
+  return null;
+};
+
+const RenderedAvatars = ({ icon, setFieldValue }) =>
+  Object.keys(IMAGE_NAME_BASE64_MAP).map(name => {
     const currentIcon = IMAGE_NAME_BASE64_MAP[name];
     const isActive = icon && currentIcon === icon.raw;
 
@@ -179,75 +196,72 @@ export const renderTeamAvatars = ({ icon }, setFieldValue) => {
     );
   });
 
-  const showErrors = rejectedFiles => {
-    if (rejectedFiles.length > 0) {
-      const errors = [];
-
-      if (!rejectedFiles[0].type.includes('image/')) {
-        errors.push(<Error>{ERROR.IMAGE_UPLOAD}</Error>);
-      }
-
-      if (rejectedFiles[0].size > TEAM_AVATAR_MAX_SIZE) {
-        errors.push(
-          <Error>
-            {ERROR.FILE_SIZE(
-              `${Math.round(TEAM_AVATAR_MAX_SIZE / 1024 / 1024)}MB`,
-            )}
-          </Error>,
-        );
-      }
-
-      return errors;
-    }
-
-    return null;
-  };
+export const renderTeamAvatars = ({ icon = {} }, setFieldValue) => {
+  const [errors, setErrors] = useState(null);
 
   const isDefaultIcon = icon.raw && IMAGE_BASE64_LIST.includes(icon.raw);
   const isCustomIcon = icon.raw && !isDefaultIcon;
   const shouldShowUploader = isDefaultIcon || !icon.raw;
 
   return (
-    <AvatarsWrapper>
-      {renderedAvatars}
-      <UploaderHoverableWrapper
-        shouldShowUploader={shouldShowUploader}
-        shouldShowEdit={isCustomIcon}
-      >
-        <Uploader
-          asPreview
-          name="icon"
-          accept="image/*"
-          maxSize={TEAM_AVATAR_MAX_SIZE}
-          files={icon?.raw ? [icon] : []}
-          onChange={(_, file) => setFieldValue('icon', file)}
+    <>
+      <AvatarsWrapper>
+        <RenderedAvatars icon={icon} setFieldValue={setFieldValue} />
+        <UploaderHoverableWrapper
+          shouldShowUploader={shouldShowUploader}
+          shouldShowEdit={isCustomIcon}
         >
-          {({ getRootProps, getInputProps, isDragActive, rejectedFiles }) => (
-            <>
-              <UploaderWrapper {...getRootProps()} isDragActive={isDragActive}>
-                <input {...getInputProps()} />
-                {isCustomIcon ? (
-                  <AddImgIcon
-                    name="pencil"
-                    color="gray"
-                    width={16}
-                    height={16}
-                  />
-                ) : (
-                  <AddImgIcon name="plus" color="gray" width={16} height={16} />
-                )}
-              </UploaderWrapper>
-              {showErrors(rejectedFiles)}
-            </>
-          )}
-        </Uploader>
-        <UploadedImageWrapper>
-          <UploadedImage src={icon.raw} />
-          <SelectedIconWrapper>
-            <TopIconStyled name="checkmark" />
-          </SelectedIconWrapper>
-        </UploadedImageWrapper>
-      </UploaderHoverableWrapper>
-    </AvatarsWrapper>
+          <Uploader
+            asPreview
+            name="icon"
+            accept="image/*"
+            maxSize={TEAM_AVATAR_MAX_SIZE}
+            files={icon?.raw ? [icon] : []}
+            onChange={(_, file) => setFieldValue('icon', file)}
+          >
+            {({ getRootProps, getInputProps, isDragActive, rejectedFiles }) => {
+              const errorsList = checkErrors(rejectedFiles);
+
+              if (!equal(errors, errorsList)) {
+                setErrors(errorsList);
+              }
+
+              return (
+                <>
+                  <UploaderWrapper
+                    {...getRootProps()}
+                    isDragActive={isDragActive}
+                  >
+                    <input {...getInputProps()} />
+                    {isCustomIcon ? (
+                      <AddImgIcon
+                        name="pencil"
+                        color="gray"
+                        width={16}
+                        height={16}
+                      />
+                    ) : (
+                      <AddImgIcon
+                        name="plus"
+                        color="gray"
+                        width={16}
+                        height={16}
+                      />
+                    )}
+                  </UploaderWrapper>
+                </>
+              );
+            }}
+          </Uploader>
+          <UploadedImageWrapper>
+            <UploadedImage src={icon.raw} />
+            <SelectedIconWrapper>
+              <TopIconStyled name="checkmark" />
+            </SelectedIconWrapper>
+          </UploadedImageWrapper>
+        </UploaderHoverableWrapper>
+      </AvatarsWrapper>
+      {errors && errors.map(error => <Error>{error}</Error>)}
+    </>
   );
 };

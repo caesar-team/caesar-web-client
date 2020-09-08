@@ -126,7 +126,7 @@ export const ShareModal = ({
     });
   };
 
-  const handleCloseItem = itemId => () => {
+  const handleDeleteItem = itemId => () => {
     onRemove(itemId);
   };  
 
@@ -228,7 +228,7 @@ export const ShareModal = ({
                 <ListItemStyled
                   isClosable
                   key={listItem.id}
-                  onClickClose={handleCloseItem(listItem.id)}
+                  onClickClose={handleDeleteItem(listItem.id)}
                   hasHover={false}
                   isInModal
                   {...listItem}

@@ -2,6 +2,7 @@ import React from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import {
   workInProgressItemSelector,
+  workInProgressItemsSelector,
   workInProgressItemIdsSelector,
   workInProgressItemSharedMembersSelector,
 } from '@caesar/common/selectors/workflow';
@@ -16,8 +17,12 @@ import {
 } from '@caesar/common/actions/entities/item';
 import { ShareModal as ShareModalComponent } from '@caesar/components';
 
-export const ShareModal = ({ handleCloseModal }) => {
+export const ShareModal = ({
+ handleCloseModal,
+ handleCtrlSelectionItemBehaviour,
+}) => {
   const dispatch = useDispatch();
+  const workInProgressItems = useSelector(workInProgressItemsSelector);
   const workInProgressItem = useSelector(workInProgressItemSelector);
   const workInProgressItemIds = useSelector(workInProgressItemIdsSelector);
   const userTeamList = useSelector(userTeamListSelector);
@@ -79,15 +84,17 @@ export const ShareModal = ({ handleCloseModal }) => {
 
   return (
     <ShareModalComponent
+      items={workInProgressItems}
       teams={availableTeamsForSharing}
       sharedMembers={workInProgressItemSharedMembers}
       anonymousLink={workInProgressItem?.shared}
-      withAnonymousLink={!isMultiItem}
+      isMultiMode={isMultiItem}
       onShare={handleShare}
       onRevokeAccess={handleRevokeAccess}
       onActivateLink={handleActivateLink}
       onDeactivateLink={handleDeactivateLink}
       onCancel={handleCloseModal}
+      onRemove={handleCtrlSelectionItemBehaviour}
     />
   );
 };

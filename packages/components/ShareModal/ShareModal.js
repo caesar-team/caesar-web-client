@@ -5,13 +5,16 @@ import copy from 'copy-text-to-clipboard';
 import styled from 'styled-components';
 import { useNotification } from '@caesar/common/hooks';
 import { userDataSelector } from '@caesar/common/selectors/user';
-import { Modal, ModalTitle, ModalSubtitle } from '../Modal';
+import { Modal, ModalTitle } from '../Modal';
 import { UserSearchInput } from '../Input';
 import { Section } from '../Section';
 import { MemberList } from '../MemberList';
 import { Button } from '../Button';
 import { AnonymousLink, TeamList } from './components';
 import { getAnonymousLink } from './utils';
+import { Scrollbar } from '../Scrollbar';
+import { ListItem } from '../List';
+import { TextWithLines } from '../TextWithLines';
 
 const Row = styled.div`
   margin-bottom: 20px;
@@ -28,6 +31,10 @@ const StyledMemberList = styled(MemberList)`
   }
 `;
 
+const StyledModalTitle = styled(ModalTitle)`
+  justify-content: flex-start;
+`;
+
 const ButtonsWrapper = styled.div`
   display: flex;
   align-items: center;
@@ -39,16 +46,43 @@ const ButtonStyled = styled(Button)`
   margin-right: 16px;
 `;
 
+const ListItemsWrapper = styled.div`
+  display: flex;
+  flex-direction: column;
+  margin: 10px 0 20px;
+`;
+
+const ListItemStyled = styled(ListItem)`
+  margin-bottom: 4px;
+  border-bottom: none;
+
+  &:last-of-type {
+    margin-bottom: 0;
+  }
+`;
+
+const TextWithLinesStyled = styled(TextWithLines)`
+  &::after {
+    margin-right: 0;
+  }
+`;
+
+const Items = styled.div`
+  margin-top: 16px;
+`;
+
 export const ShareModal = ({
   sharedMembers,
+  items,
   teams,
-  withAnonymousLink,
   anonymousLink = [],
-  onActivateLink,
-  onDeactivateLink,
-  onShare,
-  onCancel,
-  onRevokeAccess,
+  isMultiMode = false,
+  onActivateLink = Function.prototype,
+  onDeactivateLink = Function.prototype,
+  onShare = Function.prototype,
+  onCancel = Function.prototype,
+  onRevokeAccess = Function.prototype,
+  onRemove = Function.prototype,
 }) => {
   const [members, setMembers] = useState([]);
   const [teamIds, setTeamIds] = useState([]);
@@ -92,6 +126,10 @@ export const ShareModal = ({
     });
   };
 
+  const handleCloseItem = itemId => () => {
+    onRemove(itemId);
+  };  
+
   useEffectOnce(() => {
     if (anonymousLink) {
       setLink(getAnonymousLink(anonymousLink));
@@ -126,8 +164,11 @@ export const ShareModal = ({
       shouldCloseOnEsc
       shouldCloseOnOverlayClick
     >
-      <ModalTitle>Share</ModalTitle>
-      <ModalSubtitle>Share item with team</ModalSubtitle>
+      <StyledModalTitle>
+        {isMultiMode
+          ? 'Share selected items'
+          : 'Share the item'}
+      </StyledModalTitle>
       <Row>
         <UserSearchInput
           blackList={searchedBlackListMemberIds}
@@ -165,7 +206,7 @@ export const ShareModal = ({
           </Section>
         </Row>
       )}
-      {withAnonymousLink && (
+      {!isMultiMode && (
         <Row>
           <AnonymousLink
             link={link}
@@ -175,6 +216,27 @@ export const ShareModal = ({
             onUpdate={handleUpdateAnonymousLink}
           />
         </Row>
+      )}
+      {isMultiMode && (
+        <Items>
+          <TextWithLinesStyled position="left" width={1}>
+            Selected items ({items.length})
+          </TextWithLinesStyled>
+          <ListItemsWrapper>
+            <Scrollbar autoHeight autoHeightMax={400}>
+              {items.map(listItem => (
+                <ListItemStyled
+                  isClosable
+                  key={listItem.id}
+                  onClickClose={handleCloseItem(listItem.id)}
+                  hasHover={false}
+                  isInModal
+                  {...listItem}
+                />
+              ))}
+            </Scrollbar>
+          </ListItemsWrapper>
+        </Items>
       )}
       <ButtonsWrapper>
         <ButtonStyled color="white" onClick={onCancel}>

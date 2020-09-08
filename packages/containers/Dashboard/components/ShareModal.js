@@ -31,14 +31,14 @@ export const ShareModal = ({
   );
   const childItemsById = useSelector(childItemsByIdSelector);
 
-  const isMultiItem = workInProgressItemIds?.length > 0;
+  const isMultiItem = workInProgressItemIds?.length > 1;
   const availableTeamsForSharing = userTeamList.filter(
     ({ id }) => id !== workInProgressItem?.teamId && id !== null,
   );
 
   const handleShare = (members, teamIds) => {
     if (members.length > 0 || teamIds.length > 0) {
-      if (workInProgressItemIds?.length > 0) {
+      if (isMultiItem) {
         dispatch(
           shareItemBatchRequest({
             itemIds: workInProgressItemIds,

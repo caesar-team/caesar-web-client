@@ -6,6 +6,7 @@ import {
   LIST_TYPE,
   DECRYPTING_ITEM_NOTIFICATION,
   NOOP_NOTIFICATION,
+  TEAM_TYPE,
 } from '@caesar/common/constants';
 import {
   workInProgressItemSelector,
@@ -19,6 +20,8 @@ import {
   teamsTrashListsSelector,
   listsByIdSelector,
 } from '@caesar/common/selectors/entities/list';
+import { teamMembersSelector } from '@caesar/common/selectors/entities/team';
+import { currentTeamIdSelector } from '@caesar/common/selectors/user';
 import {
   setWorkInProgressItem,
   setWorkInProgressItemIds,
@@ -45,7 +48,10 @@ const MiddleColumnComponent = ({
   const teamsTrashLists = useSelector(teamsTrashListsSelector);
   const itemsById = useSelector(itemsByIdSelector);
   const listsById = useSelector(listsByIdSelector);
+  const currentTeamId = useSelector(currentTeamIdSelector);
+  const teamMembers = useSelector(state => teamMembersSelector(state, { teamId: currentTeamId }));
 
+  const isPersonalTeam = currentTeamId === TEAM_TYPE.PERSONAL;
   const isMultiItem = workInProgressItemIds?.length > 0;
   const isInboxList = workInProgressList?.type === LIST_TYPE.INBOX;
   const isTrashList =
@@ -137,6 +143,7 @@ const MiddleColumnComponent = ({
         items={
           mode === DASHBOARD_MODE.DEFAULT ? visibleListItems : searchedItems
         }
+        teamMembersCount={isPersonalTeam ? 1 : teamMembers.length}
         onClickItem={handleClickItem}
         onSelectItem={handleCtrlSelectionItemBehaviour}
       />

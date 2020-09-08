@@ -57,6 +57,7 @@ const createItemData = memoize(
 const RenderedList = ({
   items,
   isMultiItem,
+  teamMembersCount,
   onClickItem,
   onSelectItem,
   workInProgressItemIds,
@@ -65,6 +66,7 @@ const RenderedList = ({
   const itemData = createItemData(
     items,
     isMultiItem,
+    teamMembersCount,
     onClickItem,
     onSelectItem,
     workInProgressItemIds,
@@ -97,6 +99,7 @@ const ListComponent = ({
   workInProgressItemIds,
   workInProgressItem,
   items = [],
+  teamMembersCount = 1,
   onClickItem = Function.prototype,
   onSelectItem = Function.prototype,
 }) => {
@@ -140,6 +143,7 @@ const ListComponent = ({
       <RenderedList
         items={items}
         isMultiItem={isMultiItem}
+        teamMembersCount={teamMembersCount}
         onClickItem={onClickItem}
         onSelectItem={onSelectItem}
         workInProgressItemIds={workInProgressItemIds}

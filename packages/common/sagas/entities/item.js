@@ -416,6 +416,7 @@ export function* createItemSaga({
     yield put(setCurrentTeamId(teamId || TEAM_TYPE.PERSONAL));
 
     if (isSystemItem) {
+      console.log(isSystemItem);
       yield put(
         addSystemItemsBatch({
           [newItem.id]: newItem,
@@ -431,20 +432,20 @@ export function* createItemSaga({
       yield put(setWorkInProgressItem(newItem));
       yield call(Router.push, ROUTES.DASHBOARD);
     }
+    // TODO: Remove the commeted lines before merge.
+    // if (!isSystemItem) {
+    //   if (!teamId && currentTeamId === TEAM_TYPE.PERSONAL) {
+    //     const systemItemData = yield call(
+    //       generateSystemItem,
+    //       ENTITY_TYPE.SHARE,
+    //       userPersonalDefaultListId,
+    //       itemData.id,
+    //     );
+    //     systemItemData.relatedItem = itemData.id;
 
-    if (!isSystemItem) {
-      if (!teamId && currentTeamId === TEAM_TYPE.PERSONAL) {
-        const systemItemData = yield call(
-          generateSystemItem,
-          ENTITY_TYPE.SHARE,
-          userPersonalDefaultListId,
-          itemData.id,
-        );
-        systemItemData.relatedItem = itemData.id;
-
-        yield put(createItemRequest(systemItemData));
-      }
-    }
+    //     yield put(createItemRequest(systemItemData));
+    //   }
+    // }
   } catch (error) {
     // eslint-disable-next-line no-console
     console.log(error);

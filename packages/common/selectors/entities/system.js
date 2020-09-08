@@ -21,7 +21,7 @@ export const systemItemsBatchSelector = createSelector(
   systemItemsSelector,
   itemIdsPropSelector,
   (systemItems, itemIds) =>
-    itemIds.map(itemId => {console.log(systemItems);
+    itemIds.map(itemId => {
       return (
         Object.values(systemItems).find(({ data }) =>
           [

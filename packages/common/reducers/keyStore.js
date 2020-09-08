@@ -26,7 +26,10 @@ export default createReducer(initialState, {
     };
   },
   [ADD_TEAM_KEY_PAIR](state, { payload }) {
-    const { id, data: { name, pass, raws = {} } } = payload.data;
+    const {
+      id,
+      data: { name, pass, raws = {} },
+    } = payload.data;
     const { publicKey, privateKey } = raws || {};
 
     return {
@@ -45,8 +48,15 @@ export default createReducer(initialState, {
     };
   },
   [ADD_SHARE_KEY_PAIR](state, { payload }) {
-    const { id, data: { name, pass, raws = {} } } = payload.data;
+    const {
+      id,
+      data: { name, pass, raws = {} },
+    } = payload.data;
     const { publicKey, privateKey } = raws || {};
+
+    if (!id) {
+      return state;
+    }
 
     return {
       ...state,
@@ -62,7 +72,7 @@ export default createReducer(initialState, {
         },
       },
     };
-  },  
+  },
   [ADD_ANONYMOUS_KEY_PAIR](state, { payload }) {
     return {
       ...state,
@@ -92,7 +102,7 @@ export default createReducer(initialState, {
         [payload.itemId]: undefined,
       },
     };
-  },  
+  },
   [REMOVE_ANONYMOUS_KEY_PAIR](state) {
     return {
       ...state,

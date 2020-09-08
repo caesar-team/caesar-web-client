@@ -22,6 +22,9 @@ export const REMOVE_TEAM_REQUEST = '@team/REMOVE_TEAM_REQUEST';
 export const REMOVE_TEAM_SUCCESS = '@team/REMOVE_TEAM_SUCCESS';
 export const REMOVE_TEAM_FAILURE = '@team/REMOVE_TEAM_FAILURE';
 
+export const UPDATE_TEAM_MEMBERS_WITH_ROLES =
+  '@team/UPDATE_TEAM_MEMBERS_WITH_ROLES';
+
 export const UPDATE_TEAM_MEMBER_ROLE_REQUEST =
   '@team/UPDATE_TEAM_MEMBER_ROLE_REQUEST';
 export const UPDATE_TEAM_MEMBER_ROLE_SUCCESS =
@@ -251,5 +254,13 @@ export const addMemberToTeamList = (teamId, userId, role) => ({
     teamId,
     userId,
     role,
+  },
+});
+
+export const updateTeamMembersWithRoles = (teamId, members) => ({
+  type: UPDATE_TEAM_MEMBERS_WITH_ROLES,
+  payload: {
+    teamId,
+    members,
   },
 });

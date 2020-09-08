@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { Component, memo } from 'react';
 import styled from 'styled-components';
 import debounce from 'lodash.debounce';
 import { getSearchUser } from '@caesar/common/api';
@@ -93,7 +93,7 @@ const createNewMember = email => ({
   isNew: true,
 });
 
-class UserSearchInput extends Component {
+class UserSearchInputComponent extends Component {
   state = this.prepareInitialState();
 
   getPostfix() {
@@ -246,5 +246,7 @@ class UserSearchInput extends Component {
     );
   }
 }
+
+const UserSearchInput = memo(UserSearchInputComponent);
 
 export default UserSearchInput;

@@ -61,7 +61,10 @@ import {
   currentTeamIdSelector,
   userPersonalDefaultListIdSelector,
 } from '@caesar/common/selectors/user';
-import { addShareKeyPair, addTeamKeyPair } from '@caesar/common/actions/keyStore';
+import {
+  addShareKeyPair,
+  addTeamKeyPair,
+} from '@caesar/common/actions/keyStore';
 import {
   postCreateItem,
   postCreateItemsBatch,
@@ -232,7 +235,10 @@ export function* toggleItemToFavoriteSaga({ payload: { item } }) {
   }
 }
 
-export function* moveItemSaga({ payload: { itemId, teamId, listId } }) {
+export function* moveItemSaga({
+  payload: { itemId, teamId, listId },
+  meta: { notification, notificationText } = {},
+}) {
   try {
     yield put(updateGlobalNotification(MOVING_IN_PROGRESS_NOTIFICATION, true));
 
@@ -254,6 +260,12 @@ export function* moveItemSaga({ payload: { itemId, teamId, listId } }) {
     yield put(moveItemToList(item.id, item.listId, newListId));
 
     yield put(updateGlobalNotification(NOOP_NOTIFICATION, false));
+
+    if (notification) {
+      yield call(notification.show, {
+        text: notificationText || `The '${item.data.name}' has been moved`,
+      });
+    }
 
     if (item.teamId !== teamId) {
       yield put(updateItemField(item.id, 'teamId', teamId));
@@ -277,8 +289,6 @@ export function* moveItemSaga({ payload: { itemId, teamId, listId } }) {
     if (item.teamId && !teamId) {
       yield put(removeChildItemsBatchFromItem(item.id, childItemIds));
       yield put(removeChildItemsBatch(childItemIds));
-
-      yield put(updateGlobalNotification(NOOP_NOTIFICATION, false));
     }
 
     if (item.teamId && teamId && item.teamId !== teamId) {
@@ -305,13 +315,22 @@ export function* moveItemSaga({ payload: { itemId, teamId, listId } }) {
   }
 }
 
-export function* moveItemsBatchSaga({ payload: { itemIds, teamId, listId } }) {
+export function* moveItemsBatchSaga({
+  payload: { itemIds, teamId, listId },
+  meta: { notification, notificationText } = {},
+}) {
   try {
     yield all(
       itemIds.map(itemId =>
         call(moveItemSaga, { payload: { itemId, teamId, listId } }),
       ),
     );
+
+    if (notification) {
+      yield call(notification.show, {
+        text: notificationText || 'The items have been moved',
+      });
+    }
   } catch (error) {
     // eslint-disable-next-line no-console
     console.log(error);
@@ -387,10 +406,9 @@ export function* createItemSaga({
     const currentTeamId = yield select(currentTeamIdSelector);
 
     if (
-      (
-        currentTeamId === teamId ||
-        (!teamId && currentTeamId === TEAM_TYPE.PERSONAL)
-      ) && !isSystemItem
+      (currentTeamId === teamId ||
+        (!teamId && currentTeamId === TEAM_TYPE.PERSONAL)) &&
+      !isSystemItem
     ) {
       yield put(addItemToList(newItem));
     }
@@ -398,9 +416,11 @@ export function* createItemSaga({
     yield put(setCurrentTeamId(teamId || TEAM_TYPE.PERSONAL));
 
     if (isSystemItem) {
-      yield put(addSystemItemsBatch({
-        [newItem.id]: newItem,
-      }));
+      yield put(
+        addSystemItemsBatch({
+          [newItem.id]: newItem,
+        }),
+      );
       if (data.name.includes(ENTITY_TYPE.TEAM)) {
         yield put(addTeamKeyPair(newItem));
       } else {

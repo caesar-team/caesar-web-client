@@ -1,4 +1,4 @@
-import React, { useState, Fragment } from 'react';
+import React, { useState, memo, Fragment } from 'react';
 import styled from 'styled-components';
 import { media } from '@caesar/assets/styles/media';
 import { match } from '@caesar/common/utils/match';
@@ -9,8 +9,9 @@ import {
   ENCRYPTING_ITEM_NOTIFICATION,
   SAVE_NOTIFICATION,
 } from '@caesar/common/constants';
+import { useNotification } from '@caesar/common/hooks';
 import { passwordGenerator } from '@caesar/common/utils/passwordGenerator';
-import { Scrollbar, withNotification } from '@caesar/components';
+import { Scrollbar } from '@caesar/components';
 import { SecureMessageForm } from './SecureMessageForm';
 import { SecureMessageLink } from './SecureMessageLink';
 import {
@@ -42,14 +43,11 @@ const defaultState = {
   requests: null,
 };
 
-const SecureMessageComponent = ({
-  notification,
-  withScroll = false,
-  className,
-}) => {
+const SecureMessageComponent = ({ withScroll = false, className }) => {
   const [{ step, password, messageId, seconds, requests }, setState] = useState(
     defaultState,
   );
+  const notification = useNotification();
 
   const handleSubmitForm = (
     { secondsLimit, requestsLimit, password: passwordValue, ...secret },
@@ -159,4 +157,4 @@ const SecureMessageComponent = ({
   );
 };
 
-export const SecureMessage = withNotification(SecureMessageComponent);
+export const SecureMessage = memo(SecureMessageComponent);

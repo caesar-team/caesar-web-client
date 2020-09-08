@@ -8,7 +8,6 @@ import {
   RangeInput,
   Icon,
   Button,
-  withNotification,
 } from '@caesar-ui';
 
 const Wrapper = styled.div`
@@ -101,7 +100,7 @@ function copyTextToClipboard(text, notification) {
   document.execCommand('copy', false, null);
 
   notification.show({
-    text: `The password has been copied.`,
+    text: `The password has been copied`,
   });
 }
 
@@ -227,4 +226,4 @@ class PasswordpasswordGenerator extends Component {
   }
 }
 
-export default withNotification(PasswordpasswordGenerator);
+export default PasswordpasswordGenerator;

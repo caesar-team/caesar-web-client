@@ -13,7 +13,7 @@ const Wrapper = styled.div`
   width: 320px;
   overflow: hidden;
   border-radius: 3px;
-  box-shadow: 0 12px 24px 0 rgba(0, 0, 0, 0.08);
+  box-shadow: 0 12px 24px 0 ${({ theme }) => theme.color.blackBoxShadow};
 `;
 
 const Header = styled.div`

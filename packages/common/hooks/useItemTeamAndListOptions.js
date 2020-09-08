@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { useEffectOnce, useUpdateEffect } from 'react-use';
 import { useSelector } from 'react-redux';
 import { TEAM_TYPE, TEAM_TEXT_TYPE } from '@caesar/common/constants';
@@ -50,25 +50,33 @@ export const useItemTeamAndListOptions = ({ teamId = null, listId }) => {
     setCheckedListId(defaultTeamListId);
   }, [checkedTeamId]);
 
-  const teamOptions = teams
-    .sort((a, b) => {
-      if (a.title.toLowerCase() === TEAM_TYPE.PERSONAL) return -1;
-      if (b.title.toLowerCase() === TEAM_TYPE.PERSONAL) return 1;
+  const teamOptions = useMemo(
+    () =>
+      teams
+        .sort((a, b) => {
+          if (a.title.toLowerCase() === TEAM_TYPE.PERSONAL) return -1;
+          if (b.title.toLowerCase() === TEAM_TYPE.PERSONAL) return 1;
 
-      if (a.title.toLowerCase() === TEAM_TYPE.DEFAULT) return 1;
-      if (b.title.toLowerCase() === TEAM_TYPE.DEFAULT) return -1;
+          if (a.title.toLowerCase() === TEAM_TYPE.DEFAULT) return 1;
+          if (b.title.toLowerCase() === TEAM_TYPE.DEFAULT) return -1;
 
-      return sortByName(a.title, b.title);
-    })
-    .map(team =>
-      team.type === TEAM_TYPE.DEFAULT
-        ? { ...team, title: TEAM_TEXT_TYPE[team.type] }
-        : team,
-    );
+          return sortByName(a.title, b.title);
+        })
+        .map(team =>
+          team.type === TEAM_TYPE.DEFAULT
+            ? { ...team, title: TEAM_TEXT_TYPE[team.type] }
+            : team,
+        ),
+    [teams],
+  );
 
-  const listOptions = lists
-    .filter(list => list.teamId === checkedTeamId)
-    .map(list => ({ ...list, label: transformListTitle(list.label) }));
+  const listOptions = useMemo(
+    () =>
+      lists
+        .filter(list => list.teamId === checkedTeamId)
+        .map(list => ({ ...list, label: transformListTitle(list.label) })),
+    [lists],
+  );
 
   return {
     checkedTeamId,

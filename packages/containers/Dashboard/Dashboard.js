@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, memo } from 'react';
 import { useEffectOnce } from 'react-use';
 import { useSelector, useDispatch } from 'react-redux';
 import styled from 'styled-components';
@@ -18,7 +18,6 @@ import {
 import {
   Item,
   MenuList,
-  withNotification,
   DashboardLayout,
   SecureMessage,
   FullScreenLoader,
@@ -65,7 +64,7 @@ const StyledSecureMessage = styled(SecureMessage)`
   margin: 0 auto;
 `;
 
-const DashboardComponent = ({ notification }) => {
+const DashboardComponent = () => {
   const dispatch = useDispatch();
   const [mode, setMode] = useState(DASHBOARD_MODE.DEFAULT);
   const [searchedText, setSearchedText] = useState('');
@@ -132,7 +131,6 @@ const DashboardComponent = ({ notification }) => {
               </MiddleColumnWrapper>
               <RightColumnWrapper>
                 <Item
-                  notification={notification}
                   onClickShare={handleOpenModal(MODAL.SHARE)}
                   onClickMoveToTrash={handleOpenModal(MODAL.MOVE_TO_TRASH)}
                   onClickRemoveItem={handleOpenModal(MODAL.REMOVE_ITEM)}
@@ -143,32 +141,22 @@ const DashboardComponent = ({ notification }) => {
         </CenterWrapper>
       </DashboardLayout>
       {openedModal === MODAL.SHARE && (
-        <ShareModal
-          notification={notification}
-          handleCloseModal={handleCloseModal}
-        />
+        <ShareModal handleCloseModal={handleCloseModal} />
       )}
       {openedModal === MODAL.MOVE_ITEM && (
         <MoveModal
-          notification={notification}
           handleCloseModal={handleCloseModal}
           handleCtrlSelectionItemBehaviour={handleCtrlSelectionItemBehaviour}
         />
       )}
-      <ConfirmMoveToTrashModal
-        notification={notification}
-        isOpened={openedModal === MODAL.MOVE_TO_TRASH}
-        handleCloseModal={handleCloseModal}
-      />
-      <ConfirmRemoveItemModal
-        isOpened={openedModal === MODAL.REMOVE_ITEM}
-        handleCloseModal={handleCloseModal}
-      />
+      {openedModal === MODAL.MOVE_TO_TRASH && (
+        <ConfirmMoveToTrashModal isOpened handleCloseModal={handleCloseModal} />
+      )}
+      {openedModal === MODAL.REMOVE_ITEM && (
+        <ConfirmRemoveItemModal isOpened handleCloseModal={handleCloseModal} />
+      )}
     </>
   );
 };
 
-// TODO: Replace with smth else?
-// DashboardComponent.contextType = AbilityContext;
-
-export const Dashboard = withNotification(DashboardComponent);
+export const Dashboard = memo(DashboardComponent);

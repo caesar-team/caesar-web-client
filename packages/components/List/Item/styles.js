@@ -11,6 +11,7 @@ export const Title = styled.div`
   overflow: hidden;
   white-space: nowrap;
 `;
+
 export const CheckboxStyled = styled(Checkbox)`
   ${Checkbox.Box} {
     background-color: ${({ theme }) => theme.color.emperor};
@@ -36,12 +37,15 @@ export const CheckboxStyled = styled(Checkbox)`
     border-color: ${({ theme }) => theme.color.emperor};
   }
 `;
+
 export const ItemTypeIcon = ({ type }) => {
   const icon = ITEM_ICON_TYPE[type] || ITEM_ICON_TYPE[ITEM_TYPE.CREDENTIALS];
 
   return <Icon name={icon} width={20} height={20} color="white" />;
 };
+
 export const IconWrapper = styled.span``;
+
 export const Tooltip = styled.div`
   display: none;
   position: absolute;
@@ -56,6 +60,7 @@ export const Tooltip = styled.div`
   white-space: nowrap;
   z-index: ${({ theme }) => theme.zIndex.basic};
 `;
+
 export const NotEditIconWrapper = styled.div`
   position: relative;
 
@@ -65,7 +70,9 @@ export const NotEditIconWrapper = styled.div`
     }
   }
 `;
+
 export const NotEditIcon = styled(Icon)``;
+
 export const Row = styled.div`
   position: relative;
   display: flex;
@@ -97,8 +104,8 @@ export const Row = styled.div`
       }
     `}
 
-  ${({ isMultiItem, isActive, isInModal, theme }) => {
-    if (isActive && isMultiItem) {
+  ${({ isMultiItem, isActive, isChecked, isInModal, theme }) => {
+    if ((isActive || isChecked) && isMultiItem) {
       return `background: ${theme.color.gallery};`;
     }
 
@@ -109,15 +116,16 @@ export const Row = styled.div`
     return '';
   }}
 
-  ${({ isActive, theme }) =>
-    isActive &&
+  ${({ isActive, isChecked, theme }) =>
+    (isActive || isChecked) &&
     `
       border-top-color: ${theme.color.gallery};
       border-bottom-color: ${theme.color.gallery};
     `}
 
   ${Title} {
-    font-weight: ${({ isActive }) => (isActive ? 600 : 400)};
+    font-weight: ${({ isActive, isChecked }) =>
+      isActive || isChecked ? 600 : 400};
   }
   
   ${CheckboxStyled}, ${NotEditIcon} {
@@ -132,6 +140,7 @@ export const Row = styled.div`
     display: none;
   }
 `;
+
 export const TypeIconWrapper = styled.div`
   display: flex;
   justify-content: center;
@@ -142,6 +151,7 @@ export const TypeIconWrapper = styled.div`
     isForbiddenMultiItem ? theme.color.lightGray : theme.color.gray};
   border-radius: 4px;
 `;
+
 export const Addon = styled.div`
   display: flex;
   align-items: center;
@@ -156,10 +166,12 @@ export const Addon = styled.div`
     }
   `};
 `;
+
 export const AddonText = styled.div`
   margin-left: 4px;
   font-size: ${({ theme }) => theme.font.size.small};
 `;
+
 export const CloseIcon = styled(Icon)`
   position: absolute;
   top: 0;

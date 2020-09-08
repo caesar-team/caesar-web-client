@@ -115,7 +115,9 @@ const DropdownComponent = ({
 
   const dropdownRef = useRef(null);
   useClickAway(dropdownRef, () => {
-    setOpened(false);
+    if (isOpened) {
+      setOpened(false);
+    }
   });
 
   return (

@@ -1,13 +1,15 @@
 // TODO: Rewrite all this requests with fetch 'packages/common/fetch.js'
 import Router from 'next/router';
 import axios from 'axios';
-import { removeCookieValue, getCookieValue } from './utils/token';
+import { removeCookieValue, getCookieValue, clearStorage } from './utils/token';
 import { API_URI, API_BASE_PATH, ROUTES } from './constants';
 import { isClient } from './utils/isEnvironment';
 
 const softExit = () => {
   if (isClient) {
     removeCookieValue('token');
+    clearStorage();
+
     if (Router.router.pathname !== ROUTES.SIGN_IN) {
       Router.push(ROUTES.SIGN_IN);
     }

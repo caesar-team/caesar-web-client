@@ -1,5 +1,7 @@
 import React, { forwardRef } from 'react';
+import zxcvbn from 'zxcvbn';
 import styled from 'styled-components';
+import { GOOD_PASSWORD_SCORE } from '@caesar/common/constants';
 
 const Wrapper = styled.div`
   display: flex;
@@ -40,7 +42,10 @@ const validate = (rules, value) =>
   rules.map(({ text, regexp }) => ({
     text,
     regexp,
-    isValid: regexp.test(value),
+    isValid:
+      regexp === 'zxcvbn'
+        ? zxcvbn(value).score >= GOOD_PASSWORD_SCORE
+        : regexp.test(value),
   }));
 
 const StrengthIndicator = forwardRef(

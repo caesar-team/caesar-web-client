@@ -24,10 +24,9 @@ export const ConfirmRemoveListModal = ({
       title={`You are going to remove «${label}» list`}
       // TODO: Full text when share list will be implemented
       // 'You delete 20 items and 15 people lose access'
-      description={`You will delete ${children?.length} ${getPlural(
-        children?.length,
-        ['item', 'items'],
-      )} `}
+      description={`Are you sure you want to move ${
+        children?.length
+      } ${getPlural(children?.length, ['item', 'items'])} to the trash?`}
       icon="trash"
       confirmBtnText="Remove"
       onClickConfirm={handleClickConfirmRemove}

@@ -140,6 +140,8 @@ const MoveModalComponent = ({
       dispatch(
         moveItemsBatchRequest(
           workInProgressItemIds,
+          teamId,
+          listId,
           checkedTeamId,
           checkedListId,
           notification,

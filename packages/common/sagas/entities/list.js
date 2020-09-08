@@ -32,7 +32,7 @@ import {
   removeTeamList,
 } from '@caesar/common/api';
 import { ENTITY_TYPE, LIST_TYPE } from '@caesar/common/constants';
-import { getServerErrorByNames } from '@caesar/common/utils/error';
+import { getServerErrors } from '@caesar/common/utils/error';
 
 const reorder = (list, startIndex, endIndex) => {
   const result = Array.from(list);
@@ -120,9 +120,7 @@ export function* createListSaga({
     }
   } catch (error) {
     yield put(createListFailure());
-    yield put(
-      updateGlobalNotification(getServerErrorByNames(error), false, true),
-    );
+    yield put(updateGlobalNotification(getServerErrors(error), false, true));
   }
 }
 
@@ -140,9 +138,7 @@ export function* editListSaga({ payload: { list }, meta: { setEditMode } }) {
     // eslint-disable-next-line no-console
     console.log(error);
     yield put(editListFailure());
-    yield put(
-      updateGlobalNotification(getServerErrorByNames(error), false, true),
-    );
+    yield put(updateGlobalNotification(getServerErrors(error), false, true));
   }
 }
 
@@ -158,6 +154,8 @@ export function* removeListSaga({ payload: { teamId, listId } }) {
     yield call(moveItemsBatchSaga, {
       payload: {
         itemIds: listItemIds,
+        oldTeamId: teamId || null,
+        oldListId: list.id,
         teamId: teamId || null,
         listId: trashList?.id,
       },

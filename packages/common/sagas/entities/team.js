@@ -62,7 +62,10 @@ import {
   postAddTeamMember,
   deleteTeamMember,
 } from '@caesar/common/api';
-import { getServerErrorMessage } from '@caesar/common/utils/error';
+import {
+  getServerErrorMessage,
+  getServerErrors,
+} from '@caesar/common/utils/error';
 import { convertTeamsToEntity } from '@caesar/common/normalizers/normalizers';
 import {
   COMMANDS_ROLES,
@@ -191,6 +194,7 @@ export function* createTeamKeysSaga({ payload: { team } }) {
     yield put(
       createTeamKeysSuccess({ ...systemItemData, __type: ENTITY_TYPE.SYSTEM }),
     );
+    yield call(fetchTeamMembersSaga, { payload: { teamId: team.id, needUpdateTeamMembers: true } });
   } catch (error) {
     // eslint-disable-next-line no-console
     console.log(error);
@@ -203,31 +207,43 @@ export function* createTeamKeysSaga({ payload: { team } }) {
   }
 }
 
-export function* createTeamSaga({ payload: { title, icon } }) {
+export function* createTeamSaga({
+  payload: { title, icon },
+  meta: { handleCloseModal, setSubmitting, setErrors },
+}) {
   try {
     const { data: team } = yield call(postCreateTeam, { title, icon });
     yield call(createTeamKeysSaga, { payload: { team } });
+    yield call(setSubmitting, false);
+    yield call(handleCloseModal);
   } catch (error) {
     // eslint-disable-next-line no-console
     console.error(error);
-    yield put(
-      updateGlobalNotification(getServerErrorMessage(error), false, true),
-    );
+    const errors = getServerErrors(error);
+
+    yield call(setErrors, { form: errors });
+    yield call(setSubmitting, false);
     yield put(createTeamFailure());
   }
 }
 
-export function* editTeamSaga({ payload: { teamId, title, icon } }) {
+export function* editTeamSaga({
+  payload: { teamId, title, icon },
+  meta: { handleCloseModal, setSubmitting, setErrors },
+}) {
   try {
     const { data: team } = yield call(editTeam, teamId, { title, icon });
 
     yield put(editTeamSuccess({ ...team, __type: ENTITY_TYPE.TEAM }));
+    yield call(setSubmitting, false);
+    yield call(handleCloseModal);
   } catch (error) {
     // eslint-disable-next-line no-console
     console.log(error);
-    yield put(
-      updateGlobalNotification(getServerErrorMessage(error), false, true),
-    );
+    const errors = getServerErrors(error);
+
+    yield call(setErrors, { form: errors });
+    yield call(setSubmitting, false);
     yield put(editTeamFailure());
   }
 }

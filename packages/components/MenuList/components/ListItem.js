@@ -163,7 +163,7 @@ export const ListItem = ({
   const isListAlreadyExists = value !== label 
     && nestedListsLabels.includes(value?.toLowerCase());
 
-  const isSaveDisabled = !value || value === label || isListAlreadyExists;
+  const isAcceptDisabled = !value || value === label || isListAlreadyExists;
   
   const renderInner = dragHandleProps => (
     <>
@@ -174,7 +174,7 @@ export const ListItem = ({
             setEditMode={setEditMode}
             isCreatingMode={isCreatingMode}
             setCreatingMode={setCreatingMode}
-            isSaveDisabled={isSaveDisabled}
+            isAcceptDisabled={isAcceptDisabled}
             value={value}
             setValue={setValue}
             onClickAcceptEdit={handleClickAcceptEdit}

@@ -34,7 +34,7 @@ export const ListInput = ({
   setEditMode,
   isCreatingMode,
   setCreatingMode,
-  isSaveDisabled,
+  isAcceptDisabled,
   value,
   setValue,
   onClickAcceptEdit,
@@ -80,7 +80,7 @@ export const ListInput = ({
               width={16}
               height={16}
               color="gray"
-              isDisabled={isSaveDisabled}
+              isDisabled={isAcceptDisabled}
               onClick={onClickAcceptEdit}
             />
             <StyledIcon

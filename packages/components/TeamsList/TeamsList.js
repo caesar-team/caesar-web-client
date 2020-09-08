@@ -66,7 +66,7 @@ const TeamsListComponent = ({ activeTeamId, handleToggle, setListsOpened }) => {
         </Option>
       )}
       {teamList.map(team => {
-        return activeTeamId === team.id ? null : (
+        return activeTeamId === team.id || !team.id ? null : (
           <Option
             key={team.id}
             onClick={() => {

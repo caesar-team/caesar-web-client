@@ -346,10 +346,10 @@ class DataStep extends Component {
 
     const selectedRowsLength = denormalize(selectedRows).length;
 
-    const teamOptions = teamsLists.map(({ id, name }) => ({
-      value: id,
-      label: name.toLowerCase(),
-    }));
+    // const teamOptions = teamsLists.map(({ id, name }) => ({
+    //   value: id,
+    //   label: name.toLowerCase(),
+    // }));
 
     const currentTeam = teamsLists.find(({ id }) => id === teamId);
     const currentTeamListsOptions = currentTeam.lists.map(({ id, label }) => ({
@@ -374,13 +374,14 @@ class DataStep extends Component {
           columns={this.getColumns()}
         />
         <SelectListWrapper>
-          <MoveToText>Select team and list of importing:</MoveToText>
+          <MoveToText>Select list of importing:</MoveToText>
+          {/* TODO: Uncomment to enable import into chosen team + add generating system item + change text on upper string
           <StyledSelect
             boxDirection="up"
             options={teamOptions}
             value={teamId}
             onChange={this.handleChangeTeamId}
-          />
+          /> */}
           <StyledSelect
             boxDirection="up"
             options={currentTeamListsOptions}

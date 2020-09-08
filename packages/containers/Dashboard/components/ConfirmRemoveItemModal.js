@@ -51,7 +51,7 @@ export const ConfirmRemoveItemModal = ({ isOpened, handleCloseModal }) => {
       }`}
       description={`Are you sure you want to delete the ${
         workInProgressItem ? 'item' : pluralItemText
-      }?`}
+      } permanently?`}
       icon="trash"
       confirmBtnText="Delete"
       onClickConfirm={handleRemoveItem}

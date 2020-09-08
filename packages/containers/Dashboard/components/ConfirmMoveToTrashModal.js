@@ -43,6 +43,8 @@ export const ConfirmMoveToTrashModal = ({ isOpened, handleCloseModal }) => {
         moveItemsBatchRequest(
           workInProgressItemIds,
           workInProgressList?.teamId || null,
+          workInProgressList.id,
+          workInProgressList?.teamId || null,
           trashListId,
           notification,
           `The ${getPlural(workInProgressItemIds?.length, [
@@ -83,7 +85,7 @@ export const ConfirmMoveToTrashModal = ({ isOpened, handleCloseModal }) => {
       }`}
       description={`Are you sure you want to move the ${
         workInProgressItem ? 'item' : pluralItemText
-      } to trash?`}
+      } to the trash?`}
       icon="trash"
       confirmBtnText="Remove"
       onClickConfirm={handleMoveToTrash}

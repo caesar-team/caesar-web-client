@@ -9,12 +9,14 @@ import {
   PERMISSION_ENTITY,
   ITEM_TYPE,
 } from '@caesar/common/constants';
+import { ERROR } from '@caesar/common/validation/constants';
 import { currentTeamSelector } from '@caesar/common/selectors/user';
 import {
   createListRequest,
   editListRequest,
 } from '@caesar/common/actions/entities/list';
 import { visibleItemsSelector } from '@caesar/common/selectors/entities/item';
+import { Tooltip } from '@caesar/components/List/Item/styles';
 import { Can } from '../../Ability';
 import { Icon } from '../../Icon';
 import { ListInput } from './ListInput';
@@ -74,11 +76,19 @@ const Wrapper = styled(MenuItemInner)`
     }
   }
 `;
+
+const StyledTooltip = styled(Tooltip)`
+  display: flex;
+  top: -20px;
+  left: auto;
+`;
+
 const filterVisibleItems = items =>
   items.filter(item => item && item?.type !== ITEM_TYPE.SYSTEM);
 
 export const ListItem = ({
   list = {},
+  nestedListsLabels = [],
   activeListId,
   index,
   onClickMenuItem = Function.prototype,
@@ -150,20 +160,30 @@ export const ListItem = ({
         delete_list: !!list?._links?.delete_list,
       };
 
+  const isListAlreadyExists = value !== label 
+    && nestedListsLabels.includes(value?.toLowerCase());
+
+  const isSaveDisabled = !value || value === label || isListAlreadyExists;
+  
   const renderInner = dragHandleProps => (
     <>
       {isEditMode ? (
-        <ListInput
-          isEditMode={isEditMode}
-          setEditMode={setEditMode}
-          isCreatingMode={isCreatingMode}
-          setCreatingMode={setCreatingMode}
-          value={value}
-          setValue={setValue}
-          label={label}
-          onClickAcceptEdit={handleClickAcceptEdit}
-          onClickClose={handleClickClose}
-        />
+        <>
+          <ListInput
+            isEditMode={isEditMode}
+            setEditMode={setEditMode}
+            isCreatingMode={isCreatingMode}
+            setCreatingMode={setCreatingMode}
+            isSaveDisabled={isSaveDisabled}
+            value={value}
+            setValue={setValue}
+            onClickAcceptEdit={handleClickAcceptEdit}
+            onClickClose={handleClickClose}
+          />
+          {isListAlreadyExists && (
+            <StyledTooltip>{ERROR.LIST_ALREADY_EXISTS}</StyledTooltip>
+          )}
+        </>
       ) : (
         <>
           <div {...dragHandleProps}>

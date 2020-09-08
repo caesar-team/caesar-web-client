@@ -79,11 +79,22 @@ export const fetchTeamFailure = () => ({
   type: FETCH_TEAM_FAILURE,
 });
 
-export const createTeamRequest = (title, icon) => ({
+export const createTeamRequest = (
+  title,
+  icon,
+  handleCloseModal,
+  setSubmitting,
+  setErrors,
+) => ({
   type: CREATE_TEAM_REQUEST,
   payload: {
     title,
     icon,
+  },
+  meta: {
+    handleCloseModal,
+    setSubmitting,
+    setErrors,
   },
 });
 
@@ -118,12 +129,24 @@ export const createTeamKeysFailure = () => ({
   type: CREATE_TEAM_KEYS_FAILURE,
 });
 
-export const editTeamRequest = (teamId, title, icon) => ({
+export const editTeamRequest = (
+  teamId,
+  title,
+  icon,
+  handleCloseModal,
+  setSubmitting,
+  setErrors,
+) => ({
   type: EDIT_TEAM_REQUEST,
   payload: {
     teamId,
     title,
     icon,
+  },
+  meta: {
+    handleCloseModal,
+    setSubmitting,
+    setErrors,
   },
 });
 

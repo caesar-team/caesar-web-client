@@ -30,7 +30,6 @@ import {
   toggleItemToFavoriteFailure,
   removeChildItemsBatchFromItem,
   updateItemField,
-  createItemRequest,
 } from '@caesar/common/actions/entities/item';
 import { shareItemBatchSaga } from '@caesar/common/sagas/common/share';
 import {
@@ -61,7 +60,6 @@ import {
 import { itemSelector } from '@caesar/common/selectors/entities/item';
 import {
   currentTeamIdSelector,
-  userPersonalDefaultListIdSelector,
 } from '@caesar/common/selectors/user';
 import {
   addShareKeyPair,
@@ -388,12 +386,14 @@ export function* saveItemSaga({ item, publicKey }) {
       secret,
     };
   } else {
-    let { data: itemData } = yield call(postCreateItem, {
+    const { data } = yield call(postCreateItem, {
       listId,
       type,
       secret,
       relatedItem,
     });
+    
+    itemData = data;
   }
 
   return itemData;
@@ -408,15 +408,12 @@ export function* createItemSaga({
       teamId = null,
       listId,
       type,
-      relatedItem = null,
       data: { raws = {}, ...data },
     } = item;
 
     const isSystemItem = type === ITEM_TYPE.SYSTEM;
     const keyPair = yield select(personalKeyPairSelector);
-    const userPersonalDefaultListId = yield select(
-      userPersonalDefaultListIdSelector,
-    );
+
     const notificationText = isSystemItem
       ? COMMON_PROGRESS_NOTIFICATION
       : ENCRYPTING_ITEM_NOTIFICATION;
@@ -563,11 +560,6 @@ export function* createItemsBatchSaga({
 
 export function* updateItemSaga({ payload: { item } }) {
   try {
-    const {
-      id: itemId,
-      data: { raws, ...data },
-    } = item;
-
     yield put(updateGlobalNotification(ENCRYPTING_ITEM_NOTIFICATION, true));
 
     const { publicKey } = yield select(personalKeyPairSelector);

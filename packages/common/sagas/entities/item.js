@@ -355,6 +355,50 @@ export function* moveItemsBatchSaga({
   }
 }
 
+export function* saveItemSaga({ item, publicKey }) {
+  const {
+    id = null,
+    listId,
+    type,
+    relatedItem = null,
+    data: { raws = {}, ...data },
+  } = item;
+  let itemData;
+
+  const encryptedItemData = yield call(encryptItem, data, publicKey);
+
+  const encryptedItem = {
+    data: encryptedItemData,
+    raws: Object.keys(raws).length
+      ? yield call(encryptItem, raws, publicKey)
+      : null,
+  };
+  
+  const secret = JSON.stringify(encryptedItem);
+  
+  if (id) {
+    const {
+      data: { lastUpdated },
+    } = yield call(updateItem, itemId, {
+      item: { secret },
+    });
+    itemData = {
+      ...item,
+      lastUpdated,
+      secret: encryptedItemSecret,
+    };
+  } else {
+    let { data: itemData } = yield call(postCreateItem, {
+      listId,
+      type,
+      secret,
+      relatedItem,
+    });
+  }
+
+  return itemData;
+}
+
 export function* createItemSaga({
   payload: { item },
   meta: { setSubmitting = Function.prototype },
@@ -387,25 +431,11 @@ export function* createItemSaga({
       publicKey = teamSystemItem.publicKey;
     }
 
-    const encryptedItemData = yield call(encryptItem, data, publicKey);
-
-    const encryptedItem = {
-      data: encryptedItemData,
-      raws: Object.keys(raws).length
-        ? yield call(encryptItem, raws, publicKey)
-        : null,
-    };
-
     if (!isSystemItem) {
       yield put(updateGlobalNotification(CREATING_ITEM_NOTIFICATION, true));
     }
 
-    const { data: itemData } = yield call(postCreateItem, {
-      listId,
-      type,
-      secret: JSON.stringify(encryptedItem),
-      relatedItem,
-    });
+    const itemData = yield call(saveItemSaga, { item, publicKey });
 
     // TODO: Make the class of the item instead of the direct object
     const newItem = {
@@ -444,20 +474,6 @@ export function* createItemSaga({
       yield put(setWorkInProgressListId(listId));
       yield put(setWorkInProgressItem(newItem));
       yield call(Router.push, ROUTES.DASHBOARD);
-    }
-
-    if (!isSystemItem) {
-      if (!teamId && currentTeamId === TEAM_TYPE.PERSONAL) {
-        const systemItemData = yield call(
-          generateSystemItem,
-          ENTITY_TYPE.SHARE,
-          userPersonalDefaultListId,
-          itemData.id,
-        );
-        systemItemData.relatedItem = itemData.id;
-
-        yield put(createItemRequest(systemItemData));
-      }
     }
   } catch (error) {
     // eslint-disable-next-line no-console
@@ -554,28 +570,10 @@ export function* updateItemSaga({ payload: { item } }) {
 
     yield put(updateGlobalNotification(ENCRYPTING_ITEM_NOTIFICATION, true));
 
-    const keyPair = yield select(personalKeyPairSelector);
+    const { publicKey } = yield select(personalKeyPairSelector);
 
-    const encryptedItemData = yield call(encryptItem, data, keyPair.publicKey);
-    const encryptedItem = {
-      data: encryptedItemData,
-      raws: Object.keys(raws).length
-        ? yield call(encryptItem, raws, keyPair.publicKey)
-        : null,
-    };
+    const updatedItem = yield call(saveItemSaga, { item, publicKey });
 
-    const encryptedItemSecret = JSON.stringify(encryptedItem);
-
-    const {
-      data: { lastUpdated },
-    } = yield call(updateItem, itemId, {
-      item: { secret: encryptedItemSecret },
-    });
-    const updatedItem = {
-      ...item,
-      lastUpdated,
-      secret: encryptedItemSecret,
-    };
     yield put(updateItemSuccess(updatedItem));
 
     yield put(updateWorkInProgressItem());

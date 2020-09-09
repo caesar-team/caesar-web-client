@@ -158,7 +158,7 @@ const MoveModalComponent = ({
     closeModal();
   };
 
-  const handleCloseItem = itemId => () => {
+  const handleDeleteItem = itemId => () => {
     onRemove(itemId);
   };
 
@@ -266,7 +266,7 @@ const MoveModalComponent = ({
                 <ListItemStyled
                   isClosable
                   key={listItem.id}
-                  onClickClose={handleCloseItem(listItem.id)}
+                  onClickClose={handleDeleteItem(listItem.id)}
                   hasHover={false}
                   isInModal
                   {...listItem}

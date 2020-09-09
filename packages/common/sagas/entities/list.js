@@ -154,6 +154,8 @@ export function* removeListSaga({ payload: { teamId, listId } }) {
     yield call(moveItemsBatchSaga, {
       payload: {
         itemIds: listItemIds,
+        oldTeamId: teamId || null,
+        oldListId: list.id,
         teamId: teamId || null,
         listId: trashList?.id,
       },

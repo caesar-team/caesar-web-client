@@ -78,15 +78,37 @@ const StyledSelect = styled(Select)`
   }
 `;
 
+const CellWrapper = styled.div`
+  position: relative;
+  width: 100%;
+  padding: 0 8px;
+
+  ${({ isPassword }) =>
+    isPassword &&
+    `
+    padding-right: 24px;
+  `}
+`;
+
+const EyeIcon = styled(Icon)`
+  position: absolute;
+  top: 50%;
+  right: 4px;
+  transform: translateY(-50%);
+  cursor: pointer;
+
+  &:hover {
+    color: ${({ theme }) => theme.color.black};
+  }
+`;
+
 const Cell = styled.div`
   width: 100%;
-  min-width: 100px;
   height: 40px;
-  overflow: hidden;
   line-height: 40px;
-  white-space: nowrap;
-  text-overflow: ellipsis;
-  cursor: text;
+  overflow: hidden;
+  cursor: ${({ isEditableStyles }) =>
+    isEditableStyles ? 'text' : 'not-allowed'};
 `;
 
 const SelectListWrapper = styled.div`
@@ -132,7 +154,7 @@ class DataStep extends Component {
   );
 
   getColumns() {
-    const { data, selectedRows } = this.state;
+    const { data, selectedRows, indexShownPassword } = this.state;
     const { headings } = this.props;
 
     const columns = Object.keys(headings);
@@ -193,20 +215,58 @@ class DataStep extends Component {
       Header: 'Type',
     };
 
+    const handleClickEyeIcon = i => {
+      if (i === indexShownPassword) {
+        this.setState({
+          indexShownPassword: null,
+        });
+
+        return;
+      }
+
+      this.setState({
+        indexShownPassword: i,
+      });
+    };
+
     const restColumns = columns.map(id => ({
       id,
       accessor: id,
       Header: capitalize(id),
-      Cell: cellInfo => (
-        <Cell
-          contentEditable
-          onBlur={this.handleBlurField(cellInfo.index, cellInfo.column.id)}
-          onKeyDown={this.handleKeyDown(cellInfo.index, cellInfo.column.id)}
-          dangerouslySetInnerHTML={{
-            __html: data[cellInfo.index][cellInfo.column.id],
-          }}
-        />
-      ),
+      Cell: cellInfo => {
+        const cellData = data[cellInfo.index][cellInfo.column.id];
+        const isPassword = cellInfo.column.id === 'pass';
+        const isEmptyPassword = isPassword && !cellData;
+        const isCurrentPasswordShown = indexShownPassword === cellInfo.index;
+        const isDataShown = !isPassword || isCurrentPasswordShown;
+
+        return (
+          <CellWrapper isPassword={isPassword}>
+            <Cell
+              isEditableStyles={
+                !isPassword ||
+                isEmptyPassword ||
+                (!isEmptyPassword && isDataShown)
+              }
+              contentEditable={isDataShown || isEmptyPassword}
+              onBlur={this.handleBlurField(cellInfo.index, cellInfo.column.id)}
+              onKeyDown={this.handleKeyDown(cellInfo.index, cellInfo.column.id)}
+              dangerouslySetInnerHTML={{
+                __html: !isDataShown && cellData ? '********' : cellData,
+              }}
+            />
+            {isPassword && cellData && (
+              <EyeIcon
+                name={isCurrentPasswordShown ? 'eye-off' : 'eye-on'}
+                width={16}
+                height={16}
+                color="gray"
+                onClick={() => handleClickEyeIcon(cellInfo.index)}
+              />
+            )}
+          </CellWrapper>
+        );
+      },
     }));
 
     return [firstColumn, ...restColumns, lastColumn];
@@ -334,6 +394,7 @@ class DataStep extends Component {
       filterText: '',
       selectedRows: normalize(this.props.data),
       data: this.props.data,
+      indexShownPassword: null,
       isSubmitting: false,
     };
   }

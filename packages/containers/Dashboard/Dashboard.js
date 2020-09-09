@@ -141,7 +141,10 @@ const DashboardComponent = () => {
         </CenterWrapper>
       </DashboardLayout>
       {openedModal === MODAL.SHARE && (
-        <ShareModal handleCloseModal={handleCloseModal} />
+        <ShareModal
+          handleCloseModal={handleCloseModal}
+          handleCtrlSelectionItemBehaviour={handleCtrlSelectionItemBehaviour}
+        />
       )}
       {openedModal === MODAL.MOVE_ITEM && (
         <MoveModal

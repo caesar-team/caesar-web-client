@@ -9,9 +9,7 @@ import {
 } from '@redux-saga/core/effects';
 import { getOrCreateMemberBatchSaga } from '@caesar/common/sagas/entities/member';
 import { itemsBatchSelector } from '@caesar/common/selectors/entities/item';
-import {
-  systemItemsBatchSelector,
-} from '@caesar/common/selectors/entities/system';
+import { systemItemsBatchSelector } from '@caesar/common/selectors/entities/system';
 import {
   masterPasswordSelector,
   userDataSelector,
@@ -59,10 +57,13 @@ export function* prepareUsersForSharing(members) {
 }
 
 function* getItemUserPairCombinations(item, members = [], privateKeyObj) {
-  const { id, data: { raws = {}, ...data } } = item;
+  const {
+    id,
+    data: { raws = {}, ...data },
+  } = item;
 
   let itemData = data;
-  let itemRaws = raws;
+  const itemRaws = raws;
 
   if (!itemData) {
     itemData = yield call(decryptItem, item.secret, privateKeyObj);
@@ -163,7 +164,8 @@ export function* shareItemBatchSaga({
 
     yield put(updateGlobalNotification(NOOP_NOTIFICATION, false));
   } catch (error) {
-    console.log(error);
+    // eslint-disable-next-line no-console
+    console.error(error);
     yield put(
       updateGlobalNotification(getServerErrorMessage(error), false, true),
     );
@@ -183,7 +185,8 @@ export function* removeShareSaga({ payload: { shareId } }) {
 
     yield put(updateGlobalNotification(NOOP_NOTIFICATION, false));
   } catch (error) {
-    console.log(error);
+    // eslint-disable-next-line no-console
+    console.error(error);
     yield put(
       updateGlobalNotification(getServerErrorMessage(error), false, true),
     );

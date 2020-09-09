@@ -36,6 +36,7 @@ export const Item = ({
   teamId,
   _links,
   index,
+  teamMembersCount,
   onClickClose = Function.prototype,
   onClickItem = Function.prototype,
   onSelectItem = Function.prototype,
@@ -43,14 +44,14 @@ export const Item = ({
   workInProgressItem,
   ...props
 }) => {
-  const shouldShowMembers = !!invited?.length;
+  const sharedCount = invited.length + teamMembersCount - 1;
+  const shouldShowMembers = !!sharedCount;
   const shouldShowAttachments =
     attachments && Array.isArray(attachments) && attachments.length > 0;
 
   const shouldShowFavoriteIcon = favorite && !isClosable;
-  const isActive =
-    workInProgressItem?.id === id ||
-    (isMultiItem && workInProgressItemIds.includes(id));
+  const isActive = workInProgressItem?.id === id;
+  const isChecked = isMultiItem && workInProgressItemIds.includes(id);
 
   const isTop = index === 0;
   const itemSubject = teamId
@@ -73,6 +74,7 @@ export const Item = ({
       style={style}
       onClick={onClickItem(id)}
       isActive={isActive}
+      isChecked={isChecked}
       isMultiItem={isMultiItem}
       hasHover={hasHover}
       isInModal={isInModal}
@@ -88,7 +90,7 @@ export const Item = ({
           >
             {allowed ? (
               <CheckboxStyled
-                checked={isActive}
+                checked={isChecked}
                 onChange={() => {
                   onSelectItem(id);
                 }}
@@ -122,7 +124,7 @@ export const Item = ({
       {shouldShowMembers && (
         <Addon isInModal={isInModal}>
           <Icon name="members" width={16} height={16} />
-          <AddonText>{invited.length}</AddonText>
+          <AddonText>{sharedCount}</AddonText>
         </Addon>
       )}
       {shouldShowFavoriteIcon && (

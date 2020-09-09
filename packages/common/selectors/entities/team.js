@@ -56,7 +56,7 @@ export const teamsBatchSelector = createSelector(
 export const teamMembersSelector = createSelector(
   teamSelector,
   membersByIdSelector,
-  (team, membersById) => team.users.map(({ userId }) => membersById[userId]),
+  (team, membersById) => team?.users?.map(({ userId }) => membersById[userId]) ?? [],
 );
 
 export const teamsMembersSelector = createSelector(

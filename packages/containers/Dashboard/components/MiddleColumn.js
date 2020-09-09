@@ -1,7 +1,13 @@
-import React, { memo, useRef } from 'react';
+import React, { memo, useRef, useEffect } from 'react';
 import { useClickAway } from 'react-use';
 import { useSelector, useDispatch } from 'react-redux';
-import { DASHBOARD_MODE, LIST_TYPE } from '@caesar/common/constants';
+import {
+  DASHBOARD_MODE,
+  LIST_TYPE,
+  DECRYPTING_ITEM_NOTIFICATION,
+  NOOP_NOTIFICATION,
+  TEAM_TYPE,
+} from '@caesar/common/constants';
 import {
   workInProgressItemSelector,
   workInProgressItemIdsSelector,
@@ -12,12 +18,16 @@ import { itemsByIdSelector } from '@caesar/common/selectors/entities/item';
 import {
   trashListSelector,
   teamsTrashListsSelector,
+  listsByIdSelector,
 } from '@caesar/common/selectors/entities/list';
+import { teamMembersSelector } from '@caesar/common/selectors/entities/team';
+import { currentTeamIdSelector } from '@caesar/common/selectors/user';
 import {
   setWorkInProgressItem,
   setWorkInProgressItemIds,
   resetWorkInProgressItemIds,
 } from '@caesar/common/actions/workflow';
+import { updateGlobalNotification } from '@caesar/common/actions/application';
 import { MultiItem, List } from '@caesar/components';
 import { MODAL } from '../constants';
 import { filter } from '../utils';
@@ -37,7 +47,11 @@ const MiddleColumnComponent = ({
   const trashList = useSelector(trashListSelector);
   const teamsTrashLists = useSelector(teamsTrashListsSelector);
   const itemsById = useSelector(itemsByIdSelector);
+  const listsById = useSelector(listsByIdSelector);
+  const currentTeamId = useSelector(currentTeamIdSelector);
+  const teamMembers = useSelector(state => teamMembersSelector(state, { teamId: currentTeamId }));
 
+  const isPersonalTeam = currentTeamId === TEAM_TYPE.PERSONAL;
   const isMultiItem = workInProgressItemIds?.length > 0;
   const isInboxList = workInProgressList?.type === LIST_TYPE.INBOX;
   const isTrashList =
@@ -51,6 +65,24 @@ const MiddleColumnComponent = ({
       ? searchedItems.length === workInProgressItemIds.length
       : visibleListItems.length === workInProgressItemIds.length;
   const ref = useRef(null);
+
+  useEffect(() => {
+    const itemsLengthInList =
+      listsById[(workInProgressList?.id)]?.children.length;
+    const visibleListItemsLength = visibleListItems.length;
+
+    if (!itemsLengthInList) return;
+
+    if (itemsLengthInList && !visibleListItemsLength) {
+      dispatch(updateGlobalNotification(DECRYPTING_ITEM_NOTIFICATION, true));
+
+      return;
+    }
+
+    if (itemsLengthInList && visibleListItemsLength) {
+      dispatch(updateGlobalNotification(NOOP_NOTIFICATION, false));
+    }
+  }, [listsById, workInProgressList, visibleListItems]);
 
   useClickAway(ref, () => {
     if (isMultiItem && !hasOpenedModal) {
@@ -111,6 +143,7 @@ const MiddleColumnComponent = ({
         items={
           mode === DASHBOARD_MODE.DEFAULT ? visibleListItems : searchedItems
         }
+        teamMembersCount={isPersonalTeam ? 1 : teamMembers.length}
         onClickItem={handleClickItem}
         onSelectItem={handleCtrlSelectionItemBehaviour}
       />

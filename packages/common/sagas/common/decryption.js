@@ -74,24 +74,26 @@ export function* decryption({ items, raws, key, masterPassword, coresCount }) {
                 nonSystemItems.push(item);
               }
             });
-            console.log(nonSystemItems);
-            yield put(
-              addSystemItemsBatch(
-                match(
-                  arrayToObject(systemItems),
-                  checkItemsAfterDecryption(event.returnValue),
+            if (systemItems.length > 0) {
+              yield put(
+                addSystemItemsBatch(
+                  match(
+                    arrayToObject(systemItems),
+                    checkItemsAfterDecryption(event.returnValue),
+                  ),
                 ),
-              ),
-            );
-
-            yield put(
-              addItemsBatch(
-                match(
-                  arrayToObject(nonSystemItems),
-                  checkItemsAfterDecryption(event.returnValue),
+              );
+            }
+            if (nonSystemItems.length > 0) {
+              yield put(
+                addItemsBatch(
+                  match(
+                    arrayToObject(nonSystemItems),
+                    checkItemsAfterDecryption(event.returnValue),
+                  ),
                 ),
-              ),
-            );
+              );
+            }
           }
 
           if (raws) {

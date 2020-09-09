@@ -5,6 +5,7 @@ import { useFormik } from 'formik';
 import { teamSelector } from '@caesar/common/selectors/entities/team';
 import { Modal, FormInput, Button, Label } from '@caesar/components';
 import { checkError } from '@caesar/common/utils/formikUtils';
+import { TextError as Error } from '../Error';
 import { renderTeamAvatars } from './renderTeamAvatars';
 import { schema } from './schema';
 
@@ -64,10 +65,16 @@ const TeamModal = ({
     setFieldValue,
   } = useFormik({
     initialValues: getInitialValues(team),
-    onSubmit: ({ title, icon }) =>
+    onSubmit: ({ title, icon }, { setErrors, setSubmitting }) =>
       teamId
-        ? onEditSubmit({ teamId, title, icon: icon.raw })
-        : onCreateSubmit({ title, icon: icon.raw }),
+        ? onEditSubmit({
+            teamId,
+            title,
+            icon: icon.raw,
+            setSubmitting,
+            setErrors,
+          })
+        : onCreateSubmit({ title, icon: icon.raw, setSubmitting, setErrors }),
     validationSchema: schema,
   });
 
@@ -98,6 +105,7 @@ const TeamModal = ({
           </GroupAvatarsTip>
           {renderTeamAvatars(values, setFieldValue)}
         </GroupAvatarsWrapper>
+        {errors?.form?.map(error => <Error key={error}>{error}</Error>)}
         <ButtonWrapper>
           <Button
             disabled={!dirty || isSubmitting || !isValid}

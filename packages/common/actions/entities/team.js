@@ -22,6 +22,9 @@ export const REMOVE_TEAM_REQUEST = '@team/REMOVE_TEAM_REQUEST';
 export const REMOVE_TEAM_SUCCESS = '@team/REMOVE_TEAM_SUCCESS';
 export const REMOVE_TEAM_FAILURE = '@team/REMOVE_TEAM_FAILURE';
 
+export const UPDATE_TEAM_MEMBERS_WITH_ROLES =
+  '@team/UPDATE_TEAM_MEMBERS_WITH_ROLES';
+
 export const UPDATE_TEAM_MEMBER_ROLE_REQUEST =
   '@team/UPDATE_TEAM_MEMBER_ROLE_REQUEST';
 export const UPDATE_TEAM_MEMBER_ROLE_SUCCESS =
@@ -76,11 +79,22 @@ export const fetchTeamFailure = () => ({
   type: FETCH_TEAM_FAILURE,
 });
 
-export const createTeamRequest = (title, icon) => ({
+export const createTeamRequest = (
+  title,
+  icon,
+  handleCloseModal,
+  setSubmitting,
+  setErrors,
+) => ({
   type: CREATE_TEAM_REQUEST,
   payload: {
     title,
     icon,
+  },
+  meta: {
+    handleCloseModal,
+    setSubmitting,
+    setErrors,
   },
 });
 
@@ -115,12 +129,24 @@ export const createTeamKeysFailure = () => ({
   type: CREATE_TEAM_KEYS_FAILURE,
 });
 
-export const editTeamRequest = (teamId, title, icon) => ({
+export const editTeamRequest = (
+  teamId,
+  title,
+  icon,
+  handleCloseModal,
+  setSubmitting,
+  setErrors,
+) => ({
   type: EDIT_TEAM_REQUEST,
   payload: {
     teamId,
     title,
     icon,
+  },
+  meta: {
+    handleCloseModal,
+    setSubmitting,
+    setErrors,
   },
 });
 
@@ -228,5 +254,13 @@ export const addMemberToTeamList = (teamId, userId, role) => ({
     teamId,
     userId,
     role,
+  },
+});
+
+export const updateTeamMembersWithRoles = (teamId, members) => ({
+  type: UPDATE_TEAM_MEMBERS_WITH_ROLES,
+  payload: {
+    teamId,
+    members,
   },
 });

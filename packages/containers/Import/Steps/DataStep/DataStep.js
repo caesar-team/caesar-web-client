@@ -2,7 +2,12 @@ import React, { Component } from 'react';
 import styled from 'styled-components';
 import memoize from 'memoize-one';
 import { waitIdle } from '@caesar/common/utils/utils';
-import { LIST_TYPE, ITEM_TYPE, KEY_CODES } from '@caesar/common/constants';
+import {
+  TEAM_TYPE,
+  LIST_TYPE,
+  ITEM_TYPE,
+  KEY_CODES,
+} from '@caesar/common/constants';
 import {
   Input,
   Icon,
@@ -346,10 +351,12 @@ class DataStep extends Component {
 
     const selectedRowsLength = denormalize(selectedRows).length;
 
-    // const teamOptions = teamsLists.map(({ id, name }) => ({
-    //   value: id,
-    //   label: name.toLowerCase(),
-    // }));
+    const teamOptions = teamsLists
+      .filter(({ id }) => id === TEAM_TYPE.PERSONAL)
+      .map(({ id, name }) => ({
+        value: id,
+        label: name.toLowerCase(),
+      }));
 
     const currentTeam = teamsLists.find(({ id }) => id === teamId);
     const currentTeamListsOptions = currentTeam.lists
@@ -377,13 +384,12 @@ class DataStep extends Component {
         />
         <SelectListWrapper>
           <MoveToText>Select list of importing:</MoveToText>
-          {/* TODO: Uncomment to enable import into chosen team + add generating system item + change text on upper string
           <StyledSelect
             boxDirection="up"
             options={teamOptions}
             value={teamId}
             onChange={this.handleChangeTeamId}
-          /> */}
+          />
           <StyledSelect
             boxDirection="up"
             options={currentTeamListsOptions}

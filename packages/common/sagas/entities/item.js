@@ -385,7 +385,7 @@ export function* saveItemSaga({ item, publicKey }) {
     itemData = {
       ...item,
       lastUpdated,
-      secret: encryptedItemSecret,
+      secret,
     };
   } else {
     let { data: itemData } = yield call(postCreateItem, {

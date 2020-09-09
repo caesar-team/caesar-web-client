@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import styled from 'styled-components';
 import memoize from 'memoize-one';
 import { waitIdle } from '@caesar/common/utils/utils';
-import { ITEM_TYPE, KEY_CODES } from '@caesar/common/constants';
+import { LIST_TYPE, ITEM_TYPE, KEY_CODES } from '@caesar/common/constants';
 import {
   Input,
   Icon,
@@ -352,10 +352,12 @@ class DataStep extends Component {
     // }));
 
     const currentTeam = teamsLists.find(({ id }) => id === teamId);
-    const currentTeamListsOptions = currentTeam.lists.map(({ id, label }) => ({
-      value: id,
-      label: label.toLowerCase(),
-    }));
+    const currentTeamListsOptions = currentTeam.lists
+      .filter(({ type }) => type !== LIST_TYPE.INBOX)
+      .map(({ id, label }) => ({
+        value: id,
+        label: label.toLowerCase(),
+      }));
 
     const isButtonDisabled = isSubmitting || !selectedRowsLength;
 

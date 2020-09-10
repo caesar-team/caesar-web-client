@@ -1,9 +1,10 @@
 import React from 'react';
 import styled from 'styled-components';
 import { Formik, FastField } from 'formik';
-import { Input, PasswordInput, Button, Icon } from '@caesar/components';
+import { Input, PasswordInput, Button, Icon, Tooltip, StrengthIndicator } from '@caesar/components';
 import { checkError } from '@caesar/common/utils/formikUtils';
 import { schema } from './schema';
+import { REGEXP_TEXT_MATCH } from '../Bootstrap/constants';
 
 const Form = styled.form`
   width: 100%;
@@ -73,6 +74,26 @@ const ButtonWrapper = styled.div`
   margin-bottom: 60px;
 `;
 
+const StrengthIndicatorStyled = styled(StrengthIndicator)`
+  font-size: 14px;
+  color: ${({ theme }) => theme.color.gray};
+  padding: 15px;
+
+  ${StrengthIndicator.Text} {
+    margin-bottom: 15px;
+  }
+
+  ${StrengthIndicator.HelperText} {
+    font-size: 14px;
+    color: ${({ theme }) => theme.color.gray};
+    margin-bottom: 8px;
+
+    &:last-of-type {
+      margin-bottom: 0;
+    }
+  }
+`;
+
 const EmailInputPrefix = (
   <Prefix>
     <Icon name="email" width={18} height={18} />
@@ -92,7 +113,7 @@ const SignUpForm = ({ onSubmit }) => (
     initialValues={{ email: '', password: '', confirmPassword: '' }}
     validationSchema={schema}
   >
-    {({ errors, touched, handleSubmit, handleBlur, isSubmitting, isValid }) => (
+    {({ values, errors, touched, handleSubmit, handleBlur, isSubmitting, isValid }) => (
       <Form onSubmit={handleSubmit}>
         <Row>
           <FastField name="email">
@@ -120,6 +141,24 @@ const SignUpForm = ({ onSubmit }) => (
               />
             )}
           </FastField>
+          <Tooltip
+            show={values.password && !isValid}
+            textBoxWidth="280px"
+            arrowAlign="top"
+            position="right center"
+          >
+            <StrengthIndicatorStyled
+              text="Our recommendations for creating a good password:"
+              value={values.password}
+              rules={[
+                ...REGEXP_TEXT_MATCH,
+                {
+                  text: 'Unique password (i.e. do not use qwerty)',
+                  regexp: 'zxcvbn',
+                },
+              ]}
+            />
+          </Tooltip>          
           {checkError(touched, errors, 'password') && (
             <Error>{errors.password}</Error>
           )}

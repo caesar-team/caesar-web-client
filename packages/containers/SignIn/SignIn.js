@@ -8,6 +8,7 @@ import {
   REDIRECT_AUTH_ENDPOINT,
   ROUTES,
 } from '@caesar/common/constants';
+import { ERROR } from '@caesar/common/validation';
 import { isServer } from '@caesar/common/utils/isEnvironment';
 import {
   Icon,
@@ -19,7 +20,6 @@ import {
 } from '@caesar/components';
 import { login } from '@caesar/common/utils/authUtils';
 import { setCookieValue } from '@caesar/common/utils/token';
-import { getServerErrorMessage } from '@caesar/common/utils/error';
 import SignInForm from './SignInForm';
 
 const AuthWrapper = styled.a`
@@ -86,7 +86,7 @@ class SignInContainer extends Component {
 
       Router.push(ROUTES.DASHBOARD);
     } catch (e) {
-      setErrors({ password: getServerErrorMessage(e) });
+      setErrors({ password: ERROR.INCORRECT_CREDENTIALS });
       setSubmitting(false);
     }
   };

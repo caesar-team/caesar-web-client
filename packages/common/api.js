@@ -1,8 +1,13 @@
 // TODO: Rewrite all this requests with fetch 'packages/common/fetch.js'
 import Router from 'next/router';
 import axios from 'axios';
-import { removeCookieValue, getCookieValue, clearStorage } from './utils/token';
-import { API_URI, API_BASE_PATH, ROUTES, FINGERPRINT } from './constants';
+import {
+  removeCookieValue,
+  getCookieValue,
+  getTrustedDeviceToken,
+  clearStorage,
+} from './utils/token';
+import { API_URI, API_BASE_PATH, ROUTES } from './constants';
 import { isClient } from './utils/isEnvironment';
 
 const softExit = () => {
@@ -24,7 +29,7 @@ const callApi = axios.create({
 
 callApi.interceptors.request.use(config => {
   const token = getCookieValue('token');
-  const fingerprint = window.localStorage.getItem(FINGERPRINT);
+  const fingerprint = getTrustedDeviceToken(false);
 
   if (token) {
     // eslint-disable-next-line no-param-reassign

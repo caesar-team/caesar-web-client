@@ -18,6 +18,7 @@ import {
   SecondaryHeader,
 } from '@caesar/components';
 import { login } from '@caesar/common/utils/authUtils';
+import { getServerErrorMessage } from '@caesar/common/utils/error';
 import {
   getTrustedDeviceToken,
   setCookieValue,
@@ -90,7 +91,7 @@ class SignInContainer extends Component {
 
       Router.push(ROUTES.DASHBOARD);
     } catch (e) {
-      setErrors({ email: 'Wrong email', password: 'Wrong password' });
+      setErrors({ password: getServerErrorMessage(e) });
       setSubmitting(false);
     }
   };

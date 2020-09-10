@@ -132,6 +132,7 @@ const MenuListInnerComponent = ({
     dispatch(sortListRequest(draggableId, source.index, destination.index));
   };
 
+  const nestedLists = isPersonal ? personalLists.list : teamLists.list;
   const menuList = [
     {
       id: isPersonal ? personalLists.inbox?.id : null,
@@ -151,7 +152,7 @@ const MenuListInnerComponent = ({
       id: 'lists',
       title: 'Lists',
       icon: 'list',
-      children: isPersonal ? personalLists.list : teamLists.list,
+      children: nestedLists,
     },
     // TODO: Implement History feature
     // {
@@ -185,6 +186,8 @@ const MenuListInnerComponent = ({
         // eslint-disable-next-line camelcase
         create_list: !!user?._links?.create_list,
       };
+  
+  const nestedListsLabels = nestedLists.map(({ label }) => label.toLowerCase());
 
   return (
     <Scrollbar>
@@ -244,6 +247,7 @@ const MenuListInnerComponent = ({
                     <ListItem
                       isCreatingMode={isCreatingMode}
                       setCreatingMode={setCreatingMode}
+                      nestedListsLabels={nestedListsLabels}
                     />
                   )}
                   {children &&
@@ -254,6 +258,7 @@ const MenuListInnerComponent = ({
                           list={list}
                           activeListId={activeListId}
                           index={index}
+                          nestedListsLabels={nestedListsLabels}
                           onClickMenuItem={handleClickMenuItem}
                         />
                       ))
@@ -276,6 +281,7 @@ const MenuListInnerComponent = ({
                                   activeListId={activeListId}
                                   index={index}
                                   isDraggable
+                                  nestedListsLabels={nestedListsLabels}
                                   onClickMenuItem={handleClickMenuItem}
                                 />
                               ))}

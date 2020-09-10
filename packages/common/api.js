@@ -1,7 +1,12 @@
 // TODO: Rewrite all this requests with fetch 'packages/common/fetch.js'
 import Router from 'next/router';
 import axios from 'axios';
-import { removeCookieValue, getCookieValue, clearStorage } from './utils/token';
+import {
+  removeCookieValue,
+  getCookieValue,
+  getTrustedDeviceToken,
+  clearStorage,
+} from './utils/token';
 import { API_URI, API_BASE_PATH, ROUTES } from './constants';
 import { isClient } from './utils/isEnvironment';
 
@@ -23,10 +28,16 @@ const callApi = axios.create({
 });
 
 callApi.interceptors.request.use(config => {
-  if (getCookieValue('token')) {
-    const token = `Bearer ${getCookieValue('token')}`;
+  const token = getCookieValue('token');
+  const fingerprint = getTrustedDeviceToken(false);
+
+  if (token) {
     // eslint-disable-next-line no-param-reassign
-    config.headers.Authorization = token;
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  if (fingerprint) {
+    // eslint-disable-next-line no-param-reassign
+    config.headers['x-fingerprint'] = fingerprint;
   }
 
   return config;
@@ -143,6 +154,8 @@ export const postLoginPrepare = data =>
   callApi.post('/auth/srpp/login_prepare', data);
 
 export const postLogin = data => callApi.post('/auth/srpp/login', data);
+
+export const postLogout = () => callApi.post('/logout');
 
 export const postRegistration = data =>
   callApi.post('/auth/srpp/registration', data);

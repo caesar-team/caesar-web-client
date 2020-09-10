@@ -1,5 +1,6 @@
 import Cookies from 'js-cookie';
 import Fingerprint2 from 'fingerprintjs2';
+import { FINGERPRINT } from '@caesar/common/constants';
 import { isServer } from './isEnvironment';
 
 export function setCookieValue(name, value, path = '/') {
@@ -16,6 +17,7 @@ export function removeCookieValue(name, path = '/') {
 
 const generateFingerPrint = () => {
   let token = '';
+
   if (window.requestIdleCallback) {
     return new Promise(resolve =>
       requestIdleCallback(() => {
@@ -41,12 +43,13 @@ const generateFingerPrint = () => {
 
 export const getTrustedDeviceToken = generate => {
   if (isServer) return null;
-  const token = window.localStorage.getItem('trustedDevice');
+
+  const token = window.localStorage.getItem(FINGERPRINT);
 
   if (!token && generate) {
     return new Promise(resolve => {
       generateFingerPrint().then(data => {
-        window.localStorage.setItem('trustedDevice', data);
+        window.localStorage.setItem(FINGERPRINT, data);
         resolve(data);
       });
     });
@@ -58,7 +61,7 @@ export const getTrustedDeviceToken = generate => {
 export const removeTrustedDevice = () => {
   if (isServer) return null;
 
-  return window.localStorage.removeItem('trustedDevice');
+  return window.localStorage.removeItem(FINGERPRINT);
 };
 
 export const clearStorage = () => {

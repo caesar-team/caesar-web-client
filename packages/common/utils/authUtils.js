@@ -7,35 +7,25 @@ import {
 import { createSrp } from './srp';
 
 async function loginFirstPhase(email, A, prepareLoginEndpoint) {
-  try {
-    const {
-      data: { publicEphemeralValue, seed },
-    } = await prepareLoginEndpoint({
-      email,
-      publicEphemeralValue: A,
-    });
+  const {
+    data: { publicEphemeralValue, seed },
+  } = await prepareLoginEndpoint({
+    email,
+    publicEphemeralValue: A,
+  });
 
-    return { B: publicEphemeralValue, seed };
-  } catch (e) {
-    console.log(e.response);
-    throw new Error(e);
-  }
+  return { B: publicEphemeralValue, seed };
 }
 
 async function loginSecondPhase(email, matcher, loginEndpoint) {
-  try {
-    const {
-      data: { secondMatcher, jwt },
-    } = await loginEndpoint({
-      email,
-      matcher,
-    });
+  const {
+    data: { secondMatcher, jwt },
+  } = await loginEndpoint({
+    email,
+    matcher,
+  });
 
-    return { serverM2: secondMatcher, jwt };
-  } catch (e) {
-    console.log(e.response);
-    throw new Error(e);
-  }
+  return { serverM2: secondMatcher, jwt };
 }
 
 export async function login(

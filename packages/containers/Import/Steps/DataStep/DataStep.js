@@ -216,16 +216,8 @@ class DataStep extends Component {
     };
 
     const handleClickEyeIcon = i => {
-      if (i === indexShownPassword) {
-        this.setState({
-          indexShownPassword: null,
-        });
-
-        return;
-      }
-
       this.setState({
-        indexShownPassword: i,
+        indexShownPassword: i === indexShownPassword ? null : i,
       });
     };
 
@@ -412,20 +404,25 @@ class DataStep extends Component {
 
     const selectedRowsLength = denormalize(selectedRows).length;
 
-    const teamOptions = teamsLists
-      .filter(({ id }) => id === TEAM_TYPE.PERSONAL)
-      .map(({ id, name }) => ({
-        value: id,
-        label: name.toLowerCase(),
-      }));
+    const teamOptions = teamsLists.flatMap(({ id, name }) =>
+      id !== TEAM_TYPE.PERSONAL
+        ? []
+        : {
+            value: id,
+            label: name.toLowerCase(),
+          },
+    );
 
     const currentTeam = teamsLists.find(({ id }) => id === teamId);
-    const currentTeamListsOptions = currentTeam.lists
-      .filter(({ type }) => type !== LIST_TYPE.INBOX)
-      .map(({ id, label }) => ({
-        value: id,
-        label: label.toLowerCase(),
-      }));
+    const currentTeamListsOptions = currentTeam.lists.flatMap(
+      ({ type, id, label }) =>
+        type === LIST_TYPE.INBOX
+          ? []
+          : {
+              value: id,
+              label: label.toLowerCase(),
+            },
+    );
 
     const isButtonDisabled = isSubmitting || !selectedRowsLength;
 

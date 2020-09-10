@@ -2,7 +2,12 @@ import React, { Component } from 'react';
 import styled from 'styled-components';
 import memoize from 'memoize-one';
 import { waitIdle } from '@caesar/common/utils/utils';
-import { ITEM_TYPE, KEY_CODES } from '@caesar/common/constants';
+import {
+  TEAM_TYPE,
+  LIST_TYPE,
+  ITEM_TYPE,
+  KEY_CODES,
+} from '@caesar/common/constants';
 import {
   Input,
   Icon,
@@ -73,15 +78,37 @@ const StyledSelect = styled(Select)`
   }
 `;
 
+const CellWrapper = styled.div`
+  position: relative;
+  width: 100%;
+  padding: 0 8px;
+
+  ${({ isPassword }) =>
+    isPassword &&
+    `
+    padding-right: 24px;
+  `}
+`;
+
+const EyeIcon = styled(Icon)`
+  position: absolute;
+  top: 50%;
+  right: 4px;
+  transform: translateY(-50%);
+  cursor: pointer;
+
+  &:hover {
+    color: ${({ theme }) => theme.color.black};
+  }
+`;
+
 const Cell = styled.div`
   width: 100%;
-  min-width: 100px;
   height: 40px;
-  overflow: hidden;
   line-height: 40px;
-  white-space: nowrap;
-  text-overflow: ellipsis;
-  cursor: text;
+  overflow: hidden;
+  cursor: ${({ isEditableStyles }) =>
+    isEditableStyles ? 'text' : 'not-allowed'};
 `;
 
 const SelectListWrapper = styled.div`
@@ -127,7 +154,7 @@ class DataStep extends Component {
   );
 
   getColumns() {
-    const { data, selectedRows } = this.state;
+    const { data, selectedRows, indexShownPassword } = this.state;
     const { headings } = this.props;
 
     const columns = Object.keys(headings);
@@ -188,20 +215,50 @@ class DataStep extends Component {
       Header: 'Type',
     };
 
+    const handleClickEyeIcon = i => {
+      this.setState({
+        indexShownPassword: i === indexShownPassword ? null : i,
+      });
+    };
+
     const restColumns = columns.map(id => ({
       id,
       accessor: id,
       Header: capitalize(id),
-      Cell: cellInfo => (
-        <Cell
-          contentEditable
-          onBlur={this.handleBlurField(cellInfo.index, cellInfo.column.id)}
-          onKeyDown={this.handleKeyDown(cellInfo.index, cellInfo.column.id)}
-          dangerouslySetInnerHTML={{
-            __html: data[cellInfo.index][cellInfo.column.id],
-          }}
-        />
-      ),
+      Cell: cellInfo => {
+        const cellData = data[cellInfo.index][cellInfo.column.id];
+        const isPassword = cellInfo.column.id === 'pass';
+        const isEmptyPassword = isPassword && !cellData;
+        const isCurrentPasswordShown = indexShownPassword === cellInfo.index;
+        const isDataShown = !isPassword || isCurrentPasswordShown;
+
+        return (
+          <CellWrapper isPassword={isPassword}>
+            <Cell
+              isEditableStyles={
+                !isPassword ||
+                isEmptyPassword ||
+                (!isEmptyPassword && isDataShown)
+              }
+              contentEditable={isDataShown || isEmptyPassword}
+              onBlur={this.handleBlurField(cellInfo.index, cellInfo.column.id)}
+              onKeyDown={this.handleKeyDown(cellInfo.index, cellInfo.column.id)}
+              dangerouslySetInnerHTML={{
+                __html: !isDataShown && cellData ? '********' : cellData,
+              }}
+            />
+            {isPassword && cellData && (
+              <EyeIcon
+                name={isCurrentPasswordShown ? 'eye-off' : 'eye-on'}
+                width={16}
+                height={16}
+                color="gray"
+                onClick={() => handleClickEyeIcon(cellInfo.index)}
+              />
+            )}
+          </CellWrapper>
+        );
+      },
     }));
 
     return [firstColumn, ...restColumns, lastColumn];
@@ -329,6 +386,7 @@ class DataStep extends Component {
       filterText: '',
       selectedRows: normalize(this.props.data),
       data: this.props.data,
+      indexShownPassword: null,
       isSubmitting: false,
     };
   }
@@ -346,16 +404,25 @@ class DataStep extends Component {
 
     const selectedRowsLength = denormalize(selectedRows).length;
 
-    const teamOptions = teamsLists.map(({ id, name }) => ({
-      value: id,
-      label: name.toLowerCase(),
-    }));
+    const teamOptions = teamsLists.flatMap(({ id, name }) =>
+      id !== TEAM_TYPE.PERSONAL
+        ? []
+        : {
+            value: id,
+            label: name.toLowerCase(),
+          },
+    );
 
     const currentTeam = teamsLists.find(({ id }) => id === teamId);
-    const currentTeamListsOptions = currentTeam.lists.map(({ id, label }) => ({
-      value: id,
-      label: label.toLowerCase(),
-    }));
+    const currentTeamListsOptions = currentTeam.lists.flatMap(
+      ({ type, id, label }) =>
+        type === LIST_TYPE.INBOX
+          ? []
+          : {
+              value: id,
+              label: label.toLowerCase(),
+            },
+    );
 
     const isButtonDisabled = isSubmitting || !selectedRowsLength;
 
@@ -374,7 +441,7 @@ class DataStep extends Component {
           columns={this.getColumns()}
         />
         <SelectListWrapper>
-          <MoveToText>Select team and list of importing:</MoveToText>
+          <MoveToText>Select list of importing:</MoveToText>
           <StyledSelect
             boxDirection="up"
             options={teamOptions}

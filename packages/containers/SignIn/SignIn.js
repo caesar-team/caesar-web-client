@@ -19,6 +19,7 @@ import {
 } from '@caesar/components';
 import { login } from '@caesar/common/utils/authUtils';
 import { setCookieValue } from '@caesar/common/utils/token';
+import { getServerErrorMessage } from '@caesar/common/utils/error';
 import SignInForm from './SignInForm';
 
 const AuthWrapper = styled.a`
@@ -85,7 +86,7 @@ class SignInContainer extends Component {
 
       Router.push(ROUTES.DASHBOARD);
     } catch (e) {
-      setErrors({ email: 'Wrong email', password: 'Wrong password' });
+      setErrors({ password: getServerErrorMessage(e) });
       setSubmitting(false);
     }
   };

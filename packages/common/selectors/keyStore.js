@@ -16,7 +16,8 @@ const findSharesByItemNames = (data, shareIds) =>
   shareIds.map(
     shareId =>
       Object.values(data).find(
-        ({ name }) => name === generateSystemItemName(ENTITY_TYPE.SHARE, shareId),
+        ({ name }) =>
+          name === generateSystemItemName(ENTITY_TYPE.SHARE, shareId),
       ) || {},
   );
 
@@ -68,10 +69,12 @@ export const actualKeyPairSelector = createSelector(
     switch (true) {
       case isAnonymous:
         return (
-          Object.values(data[KEY_TYPE.ANONYMOUS]).find(({ id }) => userId) || {}
+          Object.values(data[KEY_TYPE.ANONYMOUS]).find(
+            ({ id }) => id === userId,
+          ) || {}
         );
       case currentTeamId !== TEAM_TYPE.PERSONAL:
-        return findTeamItemByName(data, currentTeamId);
+        return findTeamByItemName(data, currentTeamId);
       case currentTeamId === TEAM_TYPE.PERSONAL:
         return personalKeyPair;
       default:

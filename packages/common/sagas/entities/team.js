@@ -194,7 +194,9 @@ export function* createTeamKeysSaga({ payload: { team } }) {
     yield put(
       createTeamKeysSuccess({ ...systemItemData, __type: ENTITY_TYPE.SYSTEM }),
     );
-    yield call(fetchTeamMembersSaga, { payload: { teamId: team.id, needUpdateTeamMembers: true } });
+    yield call(fetchTeamMembersSaga, {
+      payload: { teamId: team.id, needUpdateTeamMembers: true },
+    });
   } catch (error) {
     // eslint-disable-next-line no-console
     console.log(error);

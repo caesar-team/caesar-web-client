@@ -105,6 +105,7 @@ import { addSystemItemsBatch } from '@caesar/common/actions/entities/system';
 
 const ITEMS_CHUNK_SIZE = 50;
 
+// TODO: move to the system item sage
 export function* generateSystemItem(entity, listId, entityId) {
   const masterPassword = yield call(passwordGenerator);
   const systemItemName = yield call(generateSystemItemName, entity, entityId);
@@ -358,7 +359,7 @@ export function* saveItemSaga({ item, publicKey }) {
     type,
     favorite = false,
     relatedItem = null,
-    data: { raws = {}, ...data },
+    data: { raws, ...data } = { raws: {} },
   } = item;
 
   const encryptedItemData = yield call(encryptItem, data, publicKey);
@@ -378,7 +379,7 @@ export function* saveItemSaga({ item, publicKey }) {
     const {
       data: { updatedItemData },
     } = yield call(updateItem, id, {
-      item: { listId, type, favorite, secret, relatedItem },
+      item: { secret },
     });
     serverItemData = updatedItemData || {};
   } else {
@@ -395,7 +396,7 @@ export function* saveItemSaga({ item, publicKey }) {
 
   const itemData = {
     ...item,
-    serverItemData,
+    ...serverItemData,
     secret,
   };
 
@@ -430,12 +431,12 @@ export function* createItemSaga({
       yield put(updateGlobalNotification(CREATING_ITEM_NOTIFICATION, true));
     }
 
-    const itemData = yield call(saveItemSaga, { item, publicKey });
+    const itemFromServer = yield call(saveItemSaga, { item, publicKey });
 
     // TODO: Make the class of the item instead of the direct object
     const newItem = {
       ...item,
-      ...itemData,
+      ...itemFromServer,
     };
 
     if (!isSystemItem) {

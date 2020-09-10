@@ -10,6 +10,19 @@ export const systemItemsEntitySelector = createSelector(
   entities => entities.system,
 );
 
+const itemIdPropSelector = (_, props) => props.id;
+export const systemItemSelector = createSelector(
+  systemItemsEntitySelector,
+  itemIdPropSelector,
+  (systemItems, itemId) =>
+    Object.values(systemItems).find(({ data }) =>
+      [
+        generateSystemItemName(ENTITY_TYPE.SHARE, itemId),
+        generateSystemItemName(ENTITY_TYPE.TEAM, itemId),
+      ].includes(data?.name),
+    ) || null,
+);
+
 export const systemItemsSelector = createSelector(
   systemItemsEntitySelector,
   systemItemsEntity => systemItemsEntity.byId || {},

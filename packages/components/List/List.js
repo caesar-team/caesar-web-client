@@ -37,14 +37,14 @@ const ColumnTitle = styled.div`
 `;
 
 const createItemData = memoize(
-  (
+  ({
     items,
     isMultiItem,
     onClickItem,
     onSelectItem,
     workInProgressItemIds,
     workInProgressItem,
-  ) => ({
+  }) => ({
     items,
     isMultiItem,
     onClickItem,
@@ -63,7 +63,7 @@ const RenderedList = ({
   workInProgressItemIds,
   workInProgressItem,
 }) => {
-  const itemData = createItemData(
+  const itemData = createItemData({
     items,
     isMultiItem,
     teamMembersCount,
@@ -71,7 +71,7 @@ const RenderedList = ({
     onSelectItem,
     workInProgressItemIds,
     workInProgressItem,
-  );
+  });
 
   return (
     <Scrollbar>

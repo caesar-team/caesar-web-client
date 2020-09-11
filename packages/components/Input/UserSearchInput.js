@@ -1,4 +1,4 @@
-import React, { Component, memo, useState, useRef } from 'react';
+import React, { memo, useState, useRef } from 'react';
 import { useClickAway } from 'react-use';
 import styled from 'styled-components';
 import debounce from 'lodash.debounce';

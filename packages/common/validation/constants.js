@@ -18,4 +18,5 @@ export const ERROR = {
   WEBSITE: 'Must be an url',
   IMAGE_UPLOAD: 'Please, upload an image',
   LIST_ALREADY_EXISTS: 'List with such label already exists',
+  INCORRECT_CREDENTIALS: 'Incorrect credentials',
 };

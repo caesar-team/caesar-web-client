@@ -32,6 +32,7 @@ import {
   INVITE_TYPE,
   PERMISSION_READ,
   NOOP_NOTIFICATION,
+  SHARE_TYPE,
 } from '@caesar/common/constants';
 
 const ITEM_CHILD_ITEM_CHUNK_SIZE = 50;
@@ -65,7 +66,7 @@ export function* createChildItemBatchSaga({ payload: { itemUserPairs } }) {
           teamId,
           secret,
           access: PERMISSION_READ,
-          cause: INVITE_TYPE,
+          cause: SHARE_TYPE,
         }),
       ),
     }));
@@ -109,7 +110,7 @@ export function* createChildItemBatchSaga({ payload: { itemUserPairs } }) {
       }),
       {},
     );
-
+    debugger;
     yield put(createChildItemBatchSuccess(childItemsById));
 
     yield put(updateGlobalNotification(NOOP_NOTIFICATION, false));

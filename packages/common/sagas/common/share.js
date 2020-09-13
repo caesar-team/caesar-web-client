@@ -21,6 +21,8 @@ import {
 import {
   actualKeyPairSelector,
   personalKeyPairSelector,
+  shareKeyPairSelector,
+  sharesSelector,
 } from '@caesar/common/selectors/keyStore';
 import {
   decryptItem,
@@ -97,13 +99,14 @@ export function* getItemUserPairs({ items, members }) {
       call(getItemUserPairCombinations, item, members, privateKeyObj),
     ),
   );
-
+  debugger;
   return itemUserPairs.flat();
 }
 
 // TODO: move to the system item sage
 export function* findOrCreateSystemItemKeyPair({ payload: { item } }) {
-  let systemKeyPairItem = yield select(systemItemSelector, { id: item.id });
+  let systemKeyPairItem = yield select(shareKeyPairSelector, { id: item.id });
+
   if (!systemKeyPairItem) {
     const userPersonalDefaultListId = yield select(
       userPersonalDefaultListIdSelector,
@@ -133,12 +136,14 @@ export function* findOrCreateSystemItemKeyPair({ payload: { item } }) {
         [systemKeyPairItem.id]: systemKeyPairItem,
       }),
     );
+
+    return yield select(shareKeyPairSelector, { id: item.id });
   }
 
   return systemKeyPairItem;
 }
 
-export function* reCryptSharedItem({ data, ...item }) {
+export function* reCryptSharedItem(item) {
   const systemKeyPairItem = yield call(findOrCreateSystemItemKeyPair, {
     payload: {
       item,
@@ -151,7 +156,13 @@ export function* reCryptSharedItem({ data, ...item }) {
     );
   }
 
-  const { publicKey } = extractKeysFromSystemItem(systemKeyPairItem);
+  const { publicKey } = systemKeyPairItem;
+
+  if (!publicKey) {
+    throw new Error(
+      `Can not find the publicKey for the shared item: ${item.id}`,
+    );
+  }
 
   const updatedTeamFromServer = yield call(saveItemSaga, {
     item,
@@ -161,7 +172,6 @@ export function* reCryptSharedItem({ data, ...item }) {
   return {
     ...item,
     ...updatedTeamFromServer,
-    __type: ENTITY_TYPE.SHARE,
   };
 }
 
@@ -227,7 +237,7 @@ export function* shareItemBatchSaga({
 
     if (itemUserPairs.length > 0) {
       yield fork(createChildItemBatchSaga, { payload: { itemUserPairs } });
-
+      return;
       const {
         payload: { childItems },
       } = yield take(CREATE_CHILD_ITEM_BATCH_FINISHED_EVENT);

@@ -253,3 +253,16 @@ export const KEY_TYPE = {
   SHARES: 'shares',
   ANONYMOUS: 'anonymous',
 };
+
+export const REGEXP_TESTER = {
+  SYSTEM: {
+    IS_SHARE: name =>
+      /\b(share)-[0-9a-f]{8}\b-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-\b[0-9a-f]{12}\b/.test(
+        name,
+      ),
+    IS_TEAM: name =>
+      /\b(team)-[0-9a-f]{8}\b-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-\b[0-9a-f]{12}\b/.test(
+        name,
+      ),
+  },
+};

@@ -31,6 +31,7 @@ export default createReducer(initialState, {
       data: { name, pass, raws = {} },
     } = payload.data;
     const { publicKey, privateKey } = raws || {};
+    // TODO: Get teamId and make it as a key
 
     return {
       ...state,
@@ -42,7 +43,6 @@ export default createReducer(initialState, {
           pass,
           publicKey,
           privateKey,
-          raw: payload.data,
         },
       },
     };
@@ -50,25 +50,24 @@ export default createReducer(initialState, {
   [ADD_SHARE_KEY_PAIR](state, { payload }) {
     const {
       id,
-      data: { name, pass, raws = {} },
+      data: { name, pass, raws = {} } = { raws: {} },
+      relatedItem,
     } = payload.data;
-    const { publicKey, privateKey } = raws || {};
+    const itemId = relatedItem?.id || null;
+    if (!itemId) return state;
 
-    if (!id) {
-      return state;
-    }
+    const { publicKey, privateKey } = raws || {};
 
     return {
       ...state,
       [KEY_TYPE.SHARES]: {
         ...state[KEY_TYPE.SHARES],
-        [id]: {
+        [itemId]: {
           id,
           name,
           pass,
           publicKey,
           privateKey,
-          raw: payload.data,
         },
       },
     };

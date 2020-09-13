@@ -1,12 +1,11 @@
 import { schema } from 'normalizr';
 import { ENTITY_TYPE } from '@caesar/common/constants';
-import itemSchema from './item';
 
 const listSchema = new schema.Entity(
   'listsById',
-  {
-    children: [itemSchema],
-  },
+  // {
+  //   children: [itemSchema],
+  // },
   {
     processStrategy: entity => ({
       ...entity,

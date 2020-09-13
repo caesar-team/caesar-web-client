@@ -12,15 +12,6 @@ const findTeamByItemName = (data, teamId) =>
     ({ name }) => name === generateSystemItemName(ENTITY_TYPE.TEAM, teamId),
   ) || {};
 
-const findSharesByItemNames = (data, shareIds) =>
-  shareIds.map(
-    shareId =>
-      Object.values(data).find(
-        ({ name }) =>
-          name === generateSystemItemName(ENTITY_TYPE.SHARE, shareId),
-      ) || {},
-  );
-
 export const keyStoreSelector = state => state.keyStore;
 
 const teamsSelector = createSelector(
@@ -28,14 +19,22 @@ const teamsSelector = createSelector(
   keyStore => keyStore[KEY_TYPE.TEAMS],
 );
 
-const sharesSelector = createSelector(
+export const sharesSelector = createSelector(
   keyStoreSelector,
-  keyStore => keyStore[KEY_TYPE.SHARES],
+  keyStore => {
+    return keyStore[KEY_TYPE.SHARES];
+  },
+);
+
+export const keyPairsStoreSelector = createSelector(
+  sharesSelector,
+  teamsSelector,
+  (sharesKeys, teamKeys) => [...sharesKeys, ...teamKeys],
 );
 
 const teamIdPropSelector = (_, props) => props.teamId;
 
-const shareIdsPropSelector = (_, props) => props.shareIds;
+const idsPropSelector = (_, props) => props.ids;
 
 export const personalKeyPairSelector = createSelector(
   keyStoreSelector,
@@ -48,10 +47,33 @@ export const teamKeyPairSelector = createSelector(
   (data, teamId) => findTeamByItemName(data, teamId),
 );
 
-export const sharesKeyPairSelector = createSelector(
+export const idsKeyPairsSelector = createSelector(
+  keyPairsStoreSelector,
+  idsPropSelector,
+  (keys, ids) => ids.map(itemId => keys[itemId]),
+);
+
+const shareIdPropSelector = (_, props) => props.id;
+export const shareKeyPairSelector = createSelector(
   sharesSelector,
-  shareIdsPropSelector,
-  (data, shareIds) => findSharesByItemNames(data, shareIds),
+  shareIdPropSelector,
+  (shares, id) => shares[id] || null,
+);
+
+export const shareKeysPairSelector = createSelector(
+  sharesSelector,
+  idsPropSelector,
+  (shares, ids) => {
+    const keys = {};
+
+    ids.forEach(id => {
+      if (shares[id]) {
+        keys[id] = shares[id];
+      }
+    });
+
+    return keys;
+  },
 );
 
 export const anonymousKeyPairSelector = createSelector(

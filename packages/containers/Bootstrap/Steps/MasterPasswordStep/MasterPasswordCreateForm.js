@@ -14,6 +14,7 @@ import {
   Tooltip,
   StrengthIndicator,
 } from '@caesar/components';
+import { INDICATOR_TYPE } from '@caesar/components/PasswordIndicator';
 import { passwordSchema } from './schema';
 import { REGEXP_TEXT_MATCH } from '../../constants';
 import { TooltipPasswordGenerator } from './components';
@@ -38,7 +39,14 @@ const TipText = styled.div`
 `;
 
 const PasswordIndicatorStyled = styled(PasswordIndicator)`
+  justify-content: space-between;
   margin-top: 30px;
+
+  ${PasswordIndicator.ScoreName} {
+    width: 80px;
+    margin-left: 16px;
+    text-align: right;
+  }
 `;
 
 const StrengthIndicatorStyled = styled(StrengthIndicator)`
@@ -168,7 +176,10 @@ class MasterPasswordCreateForm extends PureComponent {
               />
             </FieldWrapper>
             {values.password && (
-              <PasswordIndicatorStyled score={zxcvbn(values.password).score} />
+              <PasswordIndicatorStyled
+                type={INDICATOR_TYPE.LINE}
+                score={zxcvbn(values.password).score}
+              />
             )}
             <TipText>
               Please, copy & save the master password in a safe place. Relogin

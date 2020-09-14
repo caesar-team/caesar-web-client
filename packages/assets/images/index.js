@@ -1,1 +1,1 @@
-export { default as loader } from './loader.png';
+export { default as loader } from './loader.svg';

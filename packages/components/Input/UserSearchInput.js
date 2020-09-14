@@ -94,7 +94,7 @@ const createNewMember = email => ({
   isNew: true,
 });
 
-function UserSearchInputComponent({ blackList, onClickAdd, className }) {
+const UserSearchInputComponent = ({ blackList, onClickAdd, className }) => {
   const [isLoading, setLoading] = useState(false);
   const [members, setMembers] = useState([]);
   const [filterText, setFilterText] = useState('');

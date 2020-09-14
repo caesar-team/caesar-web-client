@@ -6,7 +6,7 @@ import { PasswordInput } from '../../Input';
 import { PasswordIndicator } from '../../PasswordIndicator';
 
 const StyledTooltipPasswordGenerator = styled(TooltipPasswordGenerator)`
-  margin-right: 8px;
+  margin-right: 16px;
 `;
 
 const StyledPasswordInput = styled(PasswordInput)`
@@ -16,7 +16,7 @@ const StyledPasswordInput = styled(PasswordInput)`
 `;
 
 const StyledPasswordIndicator = styled(PasswordIndicator)`
-  margin-right: 8px;
+  margin-right: 16px;
 `;
 
 const Password = ({ name, value, setFieldValue, ...props }) => {

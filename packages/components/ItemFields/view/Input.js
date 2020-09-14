@@ -94,28 +94,38 @@ const InputComponent = ({
   addonIcons,
   addonPostfix,
   onClickAcceptEdit,
+  onChange = Function.prototype,
   className,
 }) => {
   const [isEdit, setEdit] = useState(false);
-  const [value, setValue] = useState(originalValue || propValue);
+  const [value, setValue] = useState(propValue);
   const notification = useNotification();
 
   useUpdateEffect(() => {
     if (propValue !== value) {
       setValue(propValue);
+      onChange(propValue);
     }
   }, [propValue]);
 
   const handleClickCopy = () => {
-    copy(originalValue || propValue);
+    copy(propValue);
     notification.show({
       text: `The ${label.toLowerCase()} has been copied`,
     });
   };
 
   const handleClickClose = () => {
-    setValue(propValue);
+    setValue(originalValue);
+    onChange(originalValue);
     setEdit(false);
+  };
+
+  const handleChange = e => {
+    const val = e.target.value;
+
+    setValue(val);
+    onChange(val);
   };
 
   const validationState = useAsync(async () => {
@@ -138,7 +148,7 @@ const InputComponent = ({
           placeholder={placeholder}
           autoComplete={autoComplete}
           isAcceptIconDisabled={!value || validationState?.error?.message}
-          onChange={e => setValue(e.target.value)}
+          onChange={handleChange}
           onClickAcceptEdit={() => {
             onClickAcceptEdit(makeObject(name, value));
             setEdit(false);
@@ -152,7 +162,9 @@ const InputComponent = ({
         <ValueWrapper withMinHeight={!value}>
           {label && <Label>{label}</Label>}
           <ValueInner>
-            <Value withEllipsis={withEllipsis}>{propValue}</Value>
+            <Value withEllipsis={withEllipsis}>
+              {type === 'password' ? '********' : propValue}
+            </Value>
             <Can I={PERMISSION.EDIT} an={itemSubject}>
               {onClickAcceptEdit && (
                 <PencilIcon
@@ -193,8 +205,22 @@ const InputWithPermissions = ({ value, itemSubject, ...props }) => {
 
 const InputField = memo(InputWithPermissions, (prevProps, nextProps) =>
   equal(
-    [prevProps.itemSubject, prevProps.label, prevProps.name, prevProps.value],
-    [nextProps.itemSubject, nextProps.label, nextProps.name, nextProps.value],
+    [
+      prevProps.itemSubject,
+      prevProps.type,
+      prevProps.label,
+      prevProps.name,
+      prevProps.value,
+      prevProps.originalValue,
+    ],
+    [
+      nextProps.itemSubject,
+      nextProps.type,
+      nextProps.label,
+      nextProps.name,
+      nextProps.value,
+      nextProps.originalValue,
+    ],
   ),
 );
 

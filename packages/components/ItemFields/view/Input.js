@@ -116,8 +116,8 @@ const InputComponent = ({
   };
 
   const handleClickClose = () => {
-    setValue(originalValue);
-    onChange(originalValue);
+    setValue(originalValue || propValue);
+    onChange(originalValue || propValue);
     setEdit(false);
   };
 

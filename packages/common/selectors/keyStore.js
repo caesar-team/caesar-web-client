@@ -19,7 +19,7 @@ const teamsSelector = createSelector(
   keyStore => keyStore[KEY_TYPE.TEAMS],
 );
 
-export const sharesSelector = createSelector(
+export const shareKeyPairsSelector = createSelector(
   keyStoreSelector,
   keyStore => {
     return keyStore[KEY_TYPE.SHARES];
@@ -27,7 +27,7 @@ export const sharesSelector = createSelector(
 );
 
 export const keyPairsStoreSelector = createSelector(
-  sharesSelector,
+  shareKeyPairsSelector,
   teamsSelector,
   (sharesKeys, teamKeys) => [...sharesKeys, ...teamKeys],
 );
@@ -55,13 +55,13 @@ export const idsKeyPairsSelector = createSelector(
 
 const shareIdPropSelector = (_, props) => props.id;
 export const shareKeyPairSelector = createSelector(
-  sharesSelector,
+  shareKeyPairsSelector,
   shareIdPropSelector,
   (shares, id) => shares[id] || null,
 );
 
 export const shareKeysPairSelector = createSelector(
-  sharesSelector,
+  shareKeyPairsSelector,
   idsPropSelector,
   (shares, ids) => {
     const keys = {};

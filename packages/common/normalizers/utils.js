@@ -7,6 +7,8 @@ export const getFavoritesList = (itemsById, trashListId, teamId) => {
     .filter(({ favorite, listId }) => favorite && listId !== trashListId)
     .map(({ id }) => id);
 
+  
+
   return {
     id: favoriteListId,
     type: LIST_TYPE.FAVORITES,

@@ -1,6 +1,6 @@
 import React, { Component, memo } from 'react';
 import styled from 'styled-components';
-import debounce from 'lodash.debounce';
+import { debounce } from 'lodash';
 import { getSearchUser } from '@caesar/common/api';
 import { uuid4 } from '@caesar/common/utils/uuid4';
 import { Input } from './Input';

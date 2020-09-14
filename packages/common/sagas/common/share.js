@@ -99,7 +99,7 @@ export function* getItemUserPairs({ items, members }) {
       call(getItemUserPairCombinations, item, members, privateKeyObj),
     ),
   );
-  debugger;
+
   return itemUserPairs.flat();
 }
 

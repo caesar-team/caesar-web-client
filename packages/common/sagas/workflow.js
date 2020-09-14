@@ -29,8 +29,9 @@ import {
   setCurrentTeamId,
 } from '@caesar/common/actions/user';
 import {
-  addTeamKeyPair,
-  addShareKeyPair,, ADD_SHARE_KEY_PAIR
+  addTeamKeyPairBatch,
+  addShareKeyPairBatch,
+  ADD_SHARE_KEY_PAIR_BATCH,
 } from '@caesar/common/actions/keyStore';
 import { fetchMembersSaga } from '@caesar/common/sagas/entities/member';
 import {
@@ -63,7 +64,10 @@ import {
   userIdSelector,
   userPersonalDefaultListIdSelector,
 } from '@caesar/common/selectors/user';
-import { itemSelector } from '@caesar/common/selectors/entities/item';
+import {
+  itemSelector,
+  nonDecryptedItemsSelector,
+} from '@caesar/common/selectors/entities/item';
 import { systemItemsSelector } from '@caesar/common/selectors/entities/system';
 import {
   workInProgressListIdSelector,
@@ -141,6 +145,7 @@ function* decryptionSharedItems(itemsEcnryptedSharedKeys) {
 }
 function* initPersonalVault() {
   try {
+    // Init personal keys
     const keyPair = yield select(personalKeyPairSelector);
     const masterPassword = yield select(masterPasswordSelector);
 
@@ -151,22 +156,33 @@ function* initPersonalVault() {
         teams: teamsItems = [],
       },
     } = yield call(getUserItems);
+
+    // Merge all user items in the one array
     const allUserItems = [
       ...(personalItems || []),
       ...(sharedItems || []),
       ...(teamsItems?.items || []),
     ];
+
+    // Collect all related items from the shared keys
     const relatedItems = allUserItems.filter(item => item.relatedItem !== null);
+
+    // Remove duplicates
     const uniqueItems = {};
     [...allUserItems, ...relatedItems].forEach(item => {
       uniqueItems[item.id] = item;
     });
+    // Turn it into an array
     const allItems = Object.values(uniqueItems);
+
+    // Find all system items
     const systemItemsById = buildSystems(allItems);
+    // Find all non-system items
     const nonSystemItems = allItems.filter(
       item => item.type !== ITEM_TYPE.SYSTEM,
     );
 
+    // TODO: the server should put the invited into the intem (non-system)
     const personalItemsWithInvited = processingInvitedItem(
       nonSystemItems,
       systemItemsById,
@@ -178,10 +194,14 @@ function* initPersonalVault() {
       objectToArray(itemsById),
     );
     const systemItems = objectToArray(systemItemsById);
+
+    // Split the items into personal (can be decrypted by the user keys) and shared (can be decrypted by the shared keys)
     const {
       personalItems: items,
       sharedItems: itemsEcnryptedSharedKeys,
     } = splitSharesAndPersonal(sortedByFavoritesItems);
+
+    yield put(addItemsBatch(itemsEcnryptedSharedKeys));
 
     const itemsEncryptedUserKeys = [...items, ...systemItems];
     if (itemsEncryptedUserKeys?.length > 0) {
@@ -192,7 +212,7 @@ function* initPersonalVault() {
           masterPassword,
         }),
       );
-      yield call(decryptionSharedItems, itemsEcnryptedSharedKeys);
+      // yield call(decryptionSharedItems, itemsEcnryptedSharedKeys);
     }
   } catch (error) {
     // eslint-disable-next-line no-console
@@ -374,12 +394,12 @@ function* initTeams(withDecryption) {
 export function* initWorkflow({ payload: { withDecryption = true } }) {
   yield call(initPersonalVault);
   // yield call(initKeyStore);
-  // const currentTeamId = yield select(currentTeamIdSelector);
+  const currentTeamId = yield select(currentTeamIdSelector);
 
-  // yield put(
-  //   setCurrentTeamId(currentTeamId || TEAM_TYPE.PERSONAL, withDecryption),
-  // );
-  // yield fork(fetchMembersSaga);
+  yield put(
+    setCurrentTeamId(currentTeamId || TEAM_TYPE.PERSONAL, withDecryption),
+  );
+  yield fork(fetchMembersSaga);
 }
 
 export function* updateWorkInProgressItemSaga({ payload: { itemId } }) {
@@ -424,28 +444,6 @@ export function* setCurrentTeamIdWatchSaga({
   }
 }
 
-export function* decryptionEndWatchSaga({ payload: { items } }) {
-  try {
-    console.log('decryptionEndWatchSaga', items);
-
-    const systemItems = yield select(systemItemsSelector);
-    const systemItemsArray = objectToArray(systemItems);
-
-    // if (systemItemsArray.length > 0) {
-    //   yield all(
-    //     systemItemsArray.map(item =>
-    //       item.data?.name?.includes(ENTITY_TYPE.TEAM)
-    //         ? put(addTeamKeyPair(item))
-    //         : put(addShareKeyPair(item)),
-    //     ),
-    //   );
-    // }
-  } catch (error) {
-    // eslint-disable-next-line no-console
-    console.error(error);
-  }
-}
-
 function* setWorkInProgressItemSaga({ payload: { item } }) {
   try {
     if (!item) return;
@@ -469,22 +467,27 @@ function* setWorkInProgressItemSaga({ payload: { item } }) {
   }
 }
 
-export function* processSystemItemsSaga({ payload: { items } }) {
+export function* processSystemItemsSaga({ payload: { itemsById } }) {
   try {
-    console.log('decryptionEndWatchSaga', items);
-
-    const systemItems = items.filter(item => (item.type = ENTITY_TYPE.SYSTEM));
+    const items = objectToArray(itemsById);
+    if (!items) return;
+    const systemItems = items.filter(item => item.type === ENTITY_TYPE.SYSTEM);
 
     if (systemItems.length > 0) {
-      const putSagas = systemItems.map(item => {
+      const teamKeys = [];
+      const shareKeys = [];
+      systemItems.forEach(item => {
         if (!item.data?.name) return null;
 
         return REGEXP_TESTER.SYSTEM.IS_TEAM(item.data?.name)
-          ? put(addTeamKeyPair(item))
-          : put(addShareKeyPair(item));
+          ? teamKeys.push(item)
+          : shareKeys.push(item);
       });
 
-      yield all(putSagas);
+      yield all([
+        put(addTeamKeyPairBatch(teamKeys)),
+        put(addShareKeyPairBatch(shareKeys)),
+      ]);
     }
   } catch (error) {
     // eslint-disable-next-line no-console
@@ -492,11 +495,27 @@ export function* processSystemItemsSaga({ payload: { items } }) {
   }
 }
 
-export function* processSharedItemsSaga({ payload: { keyPair } }) {
+export function* processSharedItemsSaga({ payload: { data } }) {
   try {
-    console.log('processSharedItemsSaga', keyPair);
+    const keyPairs = {};
+    data.forEach(item => {
+      keyPairs[item.relatedItem.id] = item;
+    });
 
-    
+    const items = yield select(nonDecryptedItemsSelector);
+    const putSagas = items.map(item => {
+      const keyPair = extractKeysFromSystemItem(keyPairs[item.id]);
+      // TODO:  the decryption should be refactor to accept the multiple items and keys
+
+      return put(
+        decryption({
+          items: [item],
+          key: keyPair.privateKey,
+          masterPassword: keyPair.pass,
+        }),
+      );
+    });
+    yield all(putSagas);
   } catch (error) {
     // eslint-disable-next-line no-console
     console.error(error);
@@ -507,8 +526,8 @@ export default function* workflowSagas() {
   yield takeLatest(INIT_WORKFLOW, initWorkflow);
   yield takeLatest(UPDATE_WORK_IN_PROGRESS_ITEM, updateWorkInProgressItemSaga);
   yield takeLatest(SET_CURRENT_TEAM_ID, setCurrentTeamIdWatchSaga);
-  yield takeEvery(DECRYPTION_END, decryptionEndWatchSaga);
+  // yield takeEvery(DECRYPTION_END, decryptionEndWatchSaga);
   yield takeEvery(ADD_SYSTEM_ITEMS_BATCH, processSystemItemsSaga);
-  yield takeEvery(ADD_SHARE_KEY_PAIR, processSharedItemsSaga)
+  yield takeEvery(ADD_SHARE_KEY_PAIR_BATCH, processSharedItemsSaga);
   yield takeLatest(SET_WORK_IN_PROGRESS_ITEM, setWorkInProgressItemSaga);
 }

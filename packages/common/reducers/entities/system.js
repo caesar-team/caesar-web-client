@@ -14,16 +14,18 @@ export default createReducer(initialState, {
       ...state,
       byId: {
         ...state.byId,
-        ...payload.items,
+        ...payload.itemsById,
       },
     };
   },
   [REMOVE_SYSTEM_ITEM](state, { payload }) {
+    const itemsById = state.byId;
+    delete itemsById[payload.itemId];
+
     return {
       ...state,
       byId: {
-        ...state.byId,
-        [payload.itemId]: undefined,
+        ...itemsById,
       },
     };
   },

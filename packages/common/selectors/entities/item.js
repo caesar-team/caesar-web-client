@@ -35,6 +35,11 @@ export const itemsBatchSelector = createSelector(
   (itemsById, itemIds) => itemIds.map(itemId => itemsById[itemId] || {}),
 );
 
+export const nonDecryptedItemsSelector = createSelector(
+  itemsByIdSelector,
+  items => Object.values(items).filter(item => !item?.data),
+);
+
 const teamIdPropSelector = (_, prop) => prop.teamId;
 
 export const teamItemListSelector = createSelector(

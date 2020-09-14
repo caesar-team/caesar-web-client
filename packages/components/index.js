@@ -38,6 +38,7 @@ export {
 } from './Input';
 export { InviteModal } from './InviteModal';
 export { Item, MultiItem, Credentials, Document } from './Item';
+export { ItemIcon } from './ItemIcon';
 export { Label } from './Label';
 export {
   AuthLayout,

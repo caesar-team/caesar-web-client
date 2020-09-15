@@ -5,6 +5,10 @@ const Wrapper = styled.div`
   margin-bottom: ${({ marginBottom }) => marginBottom || 16}px;
 `;
 
-export const Row = ({ marginBottom, children }) => {
-  return <Wrapper marginBottom={marginBottom}>{children}</Wrapper>;
+export const Row = ({ marginBottom, children, className }) => {
+  return (
+    <Wrapper marginBottom={marginBottom} className={className}>
+      {children}
+    </Wrapper>
+  );
 };

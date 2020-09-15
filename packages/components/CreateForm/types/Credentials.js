@@ -1,4 +1,5 @@
 import React from 'react';
+import styled from 'styled-components';
 import { checkError } from '@caesar/common/utils/formikUtils';
 import {
   Title,
@@ -8,6 +9,11 @@ import {
   Attachments,
 } from '../../ItemFields/create';
 import { Row } from '../../ItemFields/common';
+
+const PasswordRow = styled(Row)`
+  position: relative;
+  z-index: ${({ theme }) => theme.zIndex.basic};
+`;
 
 export const Credentials = ({ formik }) => {
   const {
@@ -47,7 +53,7 @@ export const Credentials = ({ formik }) => {
           disabled={isSubmitting}
         />
       </Row>
-      <Row marginBottom={32}>
+      <PasswordRow marginBottom={32}>
         <Password
           name="pass"
           label="Password"
@@ -58,8 +64,9 @@ export const Credentials = ({ formik }) => {
           onBlur={handleBlur}
           withBorder
           disabled={isSubmitting}
+          setFieldValue={setFieldValue}
         />
-      </Row>
+      </PasswordRow>
       <Row marginBottom={32}>
         <Input
           name="website"

@@ -2,7 +2,11 @@
 import React, { memo, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import styled from 'styled-components';
-import { PERMISSION, PERMISSION_ENTITY } from '@caesar/common/constants';
+import {
+  PERMISSION,
+  PERMISSION_ENTITY,
+  TOTAL_MAX_UPLOADING_FILES_SIZES,
+} from '@caesar/common/constants';
 import { useNotification } from '@caesar/common/hooks';
 import { workInProgressItemSelector } from '@caesar/common/selectors/workflow';
 import {
@@ -15,18 +19,12 @@ import {
   editItemRequest,
 } from '@caesar/common/actions/entities/item';
 import { Can } from '../Ability';
-import { Scrollbar } from '../Scrollbar';
 import { MoveModal } from '../MoveModal';
-import { Row } from '../ItemFields/common';
+import { Uploader } from '../Uploader';
+import { Icon } from '../Icon';
 import { EmptyItem } from './EmptyItem';
-import { ItemByType } from './ItemByType';
-import {
-  ItemHeader,
-  InnerWrapper,
-  RemoveButton,
-  ReadOnlyBanner,
-  Meta,
-} from './components';
+import { InnerItem } from './InnerItem';
+import { ItemHeader, ReadOnlyBanner } from './components';
 
 const Wrapper = styled.div`
   height: 100%;
@@ -37,6 +35,34 @@ const Wrapper = styled.div`
     pointer-events: none;
   `}
 `;
+
+const UploaderWrapper = styled.div`
+  position: relative;
+  width: 100%;
+  height: 100%;
+  outline: none;
+`;
+
+const ActiveDragDescription = styled.div`
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  z-index: ${({ theme }) => theme.zIndex.basic};
+  text-align: center;
+  transform: translate(-50%, -50%);
+`;
+
+const ActiveDragText = styled.div`
+  margin-top: 24px;
+  margin-bottom: 8px;
+`;
+
+const ActiveDragTip = styled.div`
+  font-size: ${({ theme }) => theme.font.size.small};
+  color: ${({ theme }) => theme.color.gray};
+`;
+
+const DownloadIcon = styled(Icon)``;
 
 const ItemComponent = ({
   onClickShare = Function.prototype,
@@ -108,24 +134,54 @@ const ItemComponent = ({
       <Can not I={PERMISSION.EDIT} an={itemSubject}>
         <ReadOnlyBanner />
       </Can>
-      <InnerWrapper>
-        <Scrollbar>
-          <ItemByType
-            item={item}
-            itemSubject={itemSubject}
-            onClickAcceptEdit={!isTrashItem && handleClickAcceptEdit}
-            onClickShare={onClickShare}
-          />
-          <Meta item={item} />
-          <Can I={PERMISSION.TRASH} an={itemSubject}>
-            {!isTrashItem && (
-              <Row>
-                <RemoveButton onClick={onClickMoveToTrash} />
-              </Row>
-            )}
-          </Can>
-        </Scrollbar>
-      </InnerWrapper>
+      {isTrashItem ? (
+        <InnerItem
+          item={item}
+          itemSubject={itemSubject}
+          isTrashItem={isTrashItem}
+          handleClickAcceptEdit={handleClickAcceptEdit}
+          onClickShare={onClickShare}
+          onClickMoveToTrash={onClickMoveToTrash}
+        />
+      ) : (
+        <Uploader
+          multiple
+          name="attachments"
+          noClick
+          onChange={Function.prototype}
+        >
+          {({ getRootProps, getInputProps, isDragActive }) => (
+            <UploaderWrapper {...getRootProps()} isDragActive={isDragActive}>
+              <input {...getInputProps()} />
+              {isDragActive && (
+                <>
+                  <ActiveDragDescription>
+                    <DownloadIcon
+                      name="download"
+                      width={40}
+                      height={40}
+                      color="black"
+                    />
+                    <ActiveDragText>Drop your files to upload</ActiveDragText>
+                    <ActiveDragTip>
+                      Not more than {TOTAL_MAX_UPLOADING_FILES_SIZES}
+                    </ActiveDragTip>
+                  </ActiveDragDescription>
+                </>
+              )}
+              <InnerItem
+                item={item}
+                itemSubject={itemSubject}
+                isTrashItem={isTrashItem}
+                isDragActive={isDragActive}
+                handleClickAcceptEdit={handleClickAcceptEdit}
+                onClickShare={onClickShare}
+                onClickMoveToTrash={onClickMoveToTrash}
+              />
+            </UploaderWrapper>
+          )}
+        </Uploader>
+      )}
       {!isTrashItem && isMoveModalOpened && (
         <MoveModal
           item={item}

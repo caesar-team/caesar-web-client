@@ -269,7 +269,6 @@ const SecureMessageFormComponent = ({ onSubmit, isOnline }) => {
       <AttachmentsSection>
         <StyledUploader
           multiple
-          asPreview
           name="attachments"
           files={values.attachments}
           error={

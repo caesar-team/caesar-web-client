@@ -211,8 +211,8 @@ export const Attachments = ({
           {onClickAcceptEdit && (
             <Uploader
               multiple
-              asPreview
               name="attachments"
+              noDrag
               onChange={handleChange}
             >
               {({ getRootProps, getInputProps, isDragActive }) => (

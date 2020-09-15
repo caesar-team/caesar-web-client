@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from 'react';
+import { useUpdateEffect } from 'react-use';
+import equal from 'fast-deep-equal';
 import styled from 'styled-components';
 import {
   downloadFile,
@@ -13,6 +15,7 @@ import { Icon } from '../../Icon';
 import { File } from '../../File';
 import { Uploader } from '../../Uploader';
 import { NewFilesModal } from './NewFilesModal';
+import { ConfirmDeleteAttachmentModal } from './ConfirmDeleteAttachmentModal';
 
 const Wrapper = styled.div``;
 
@@ -69,6 +72,11 @@ const AddNewAttach = styled.div`
   }
 `;
 
+const MODAL = {
+  NEW_FILES: 'new_files',
+  DELETE_FILE: 'delete_file',
+};
+
 export const Attachments = ({
   attachments = [],
   raws = {},
@@ -78,10 +86,16 @@ export const Attachments = ({
   const [newFiles, setNewFiles] = useState([]);
   const [itemRaws, setItemRaws] = useState(raws);
   const [itemAttachments, setItemAttachments] = useState(attachments);
-  const [isModalOpened, setModalOpened] = useState(false);
+  const [openedModal, setOpenedModal] = useState(null);
   const syncStateWithServer = newItemData => {
     onClickAcceptEdit(newItemData);
   };
+
+  useUpdateEffect(() => {
+    if (!equal(attachments, itemAttachments)) {
+      setItemAttachments(attachments);
+    }
+  }, [attachments]);
 
   useEffect(() => {
     if (Object.keys(raws).length > 0) {
@@ -149,7 +163,7 @@ export const Attachments = ({
     setItemRaws(allRaws);
     setItemAttachments(allAttachments);
 
-    setModalOpened(true);
+    setOpenedModal(MODAL.NEW_FILES);
     syncStateWithServer({
       attachments: allAttachments,
       raws: allRaws,
@@ -173,15 +187,25 @@ export const Attachments = ({
       <Inner>
         {isIterable(itemAttachments) &&
           itemAttachments.map(attachment => (
-            <File
-              key={attachment.name}
-              itemSubject={itemSubject}
-              onClickDownload={() => handleClickDownloadFile(attachment)}
-              onClickRemove={
-                onClickAcceptEdit && (() => onClickRemove(attachment))
-              }
-              {...attachment}
-            />
+            <>
+              <File
+                key={attachment.name}
+                itemSubject={itemSubject}
+                onClickDownload={() => handleClickDownloadFile(attachment)}
+                onClickRemove={
+                  onClickAcceptEdit && (() => setOpenedModal(MODAL.DELETE_FILE))
+                }
+                {...attachment}
+              />
+              {openedModal === MODAL.DELETE_FILE && (
+                <ConfirmDeleteAttachmentModal
+                  isOpened
+                  fileName={attachment.name}
+                  onDeleteFile={() => onClickRemove(attachment)}
+                  handleCloseModal={() => setOpenedModal(null)}
+                />
+              )}
+            </>
           ))}
         <Can I={PERMISSION.EDIT} an={itemSubject}>
           {onClickAcceptEdit && (
@@ -201,10 +225,10 @@ export const Attachments = ({
           )}
         </Can>
       </Inner>
-      {isModalOpened && (
+      {openedModal === MODAL.NEW_FILES && (
         <NewFilesModal
           files={newFiles}
-          closeModal={() => setModalOpened(false)}
+          closeModal={() => setOpenedModal(null)}
         />
       )}
     </Wrapper>

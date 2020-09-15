@@ -1,14 +1,19 @@
 import React, { useState } from 'react';
 import zxcvbn from 'zxcvbn';
 import styled from 'styled-components';
+import { TooltipPasswordGenerator } from '../../TooltipPasswordGenerator';
 import { PasswordIndicator } from '../../PasswordIndicator';
 import { HoldClickBehaviour } from '../../HoldClickBehaviour';
 import { Icon } from '../../Icon';
 import { Input } from './Input';
 
+const StyledTooltipPasswordGenerator = styled(TooltipPasswordGenerator)`
+  margin-left: 16px;
+`;
+
 const StyledInput = styled(Input)`
   ${Input.InputField} {
-    padding-right: 104px;
+    padding-right: 236px;
   }
 `;
 
@@ -21,14 +26,28 @@ const EyeIcon = styled(Icon)`
   }
 `;
 
-export const Password = ({ value, itemSubject, schema, onClickAcceptEdit }) => {
+export const Password = ({
+  value: propValue,
+  itemSubject,
+  schema,
+  onClickAcceptEdit,
+}) => {
   const [isVisible, setVisible] = useState(false);
+  const [value, setValue] = useState(propValue);
+
+  const handleGeneratePassword = set => password => {
+    set(password);
+  };
 
   const handleHoldStart = () => {
     setVisible(true);
   };
   const handleHoldEnd = () => {
     setVisible(false);
+  };
+
+  const handleChange = val => {
+    setValue(val);
   };
 
   const eyeIcon = (
@@ -48,12 +67,22 @@ export const Password = ({ value, itemSubject, schema, onClickAcceptEdit }) => {
       label="Password"
       name="pass"
       autoComplete="new-password"
-      value={isVisible ? value : '********'}
+      value={value}
       itemSubject={itemSubject}
       schema={schema}
-      originalValue={value}
+      originalValue={propValue}
       onClickAcceptEdit={onClickAcceptEdit}
-      addonPostfix={eyeIcon}
+      onChange={handleChange}
+      addonPostfix={
+        <>
+          {value && <PasswordIndicator score={zxcvbn(value).score} />}
+          <StyledTooltipPasswordGenerator
+            tooltipProps={{ position: 'left center', textBoxWidth: '230px' }}
+            onGeneratePassword={handleGeneratePassword(setValue)}
+          />
+          {eyeIcon}
+        </>
+      }
       addonIcons={
         <>
           {value && <PasswordIndicator score={zxcvbn(value).score} />}

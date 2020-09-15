@@ -1,4 +1,5 @@
 import React, { memo } from 'react';
+import styled from 'styled-components';
 import { SCHEMA } from '@caesar/common/validation';
 import {
   Title,
@@ -10,6 +11,11 @@ import {
 } from '../../ItemFields/view';
 import { Row } from '../../ItemFields/common';
 import { OwnerAndInvitation } from '../components';
+
+const PasswordRow = styled(Row)`
+  position: relative;
+  z-index: ${({ theme }) => theme.zIndex.basic};
+`;
 
 const CredentialsComponent = ({
   item,
@@ -45,14 +51,14 @@ const CredentialsComponent = ({
           onClickAcceptEdit={onClickAcceptEdit}
         />
       </Row>
-      <Row>
+      <PasswordRow>
         <Password
           value={pass}
           itemSubject={itemSubject}
           schema={SCHEMA.REQUIRED_LIMITED_STRING()}
           onClickAcceptEdit={onClickAcceptEdit}
         />
-      </Row>
+      </PasswordRow>
       <Row>
         <Website
           value={website}

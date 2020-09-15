@@ -1,10 +1,20 @@
 import React from 'react';
 import styled from 'styled-components';
+import zxcvbn from 'zxcvbn';
 import { Formik, FastField } from 'formik';
-import { Input, PasswordInput, Button, Icon, Tooltip, StrengthIndicator } from '@caesar/components';
+import {
+  Input,
+  PasswordInput,
+  Button,
+  Icon,
+  Tooltip,
+  StrengthIndicator,
+  PasswordIndicator,
+} from '@caesar/components';
 import { checkError } from '@caesar/common/utils/formikUtils';
 import { schema } from './schema';
 import { REGEXP_TEXT_MATCH } from '../Bootstrap/constants';
+import { INDICATOR_TYPE } from '@caesar/components/PasswordIndicator';
 
 const Form = styled.form`
   width: 100%;
@@ -14,11 +24,16 @@ const Form = styled.form`
 const Row = styled.div`
   display: flex;
   flex-direction: column;
+  position: relative;
   margin-bottom: 10px;
 
   &:last-child {
     margin-bottom: 0;
   }
+`;
+
+const FieldWrapper = styled.div`
+  position: relative;
 `;
 
 const StyledEmailInput = styled(Input)`
@@ -74,7 +89,18 @@ const ButtonWrapper = styled.div`
   margin-bottom: 60px;
 `;
 
-const StrengthIndicatorStyled = styled(StrengthIndicator)`
+const StyledPasswordIndicator = styled(PasswordIndicator)`
+  justify-content: space-between;
+  margin-top: 30px;
+
+  ${PasswordIndicator.ScoreName} {
+    width: 80px;
+    margin-left: 16px;
+    text-align: right;
+  }
+`;
+
+const StyledStrengthIndicator = styled(StrengthIndicator)`
   font-size: 14px;
   color: ${({ theme }) => theme.color.gray};
   padding: 15px;
@@ -131,34 +157,42 @@ const SignUpForm = ({ onSubmit }) => (
           )}
         </Row>
         <Row>
-          <FastField name="password">
-            {({ field }) => (
-              <StyledPasswordInput
-                {...field}
-                onBlur={handleBlur}
-                placeholder="Password"
-                prefix={PasswordInputPrefix}
+          <FieldWrapper>
+            <FastField name="password">
+              {({ field }) => (
+                <StyledPasswordInput
+                  {...field}
+                  onBlur={handleBlur}
+                  placeholder="Password"
+                  prefix={PasswordInputPrefix}
+                />
+              )}
+            </FastField>
+            <Tooltip
+              show={values.password && checkError(touched, errors, 'password')}
+              textBoxWidth="280px"
+              arrowAlign="top"
+              position="right center"
+            >
+              <StyledStrengthIndicator
+                text="Our recommendations for creating a good password:"
+                value={values.password}
+                rules={[
+                  ...REGEXP_TEXT_MATCH,
+                  {
+                    text: 'Unique password (i.e. do not use qwerty)',
+                    regexp: 'zxcvbn',
+                  },
+                ]}
               />
-            )}
-          </FastField>
-          <Tooltip
-            show={values.password && !isValid}
-            textBoxWidth="280px"
-            arrowAlign="top"
-            position="right center"
-          >
-            <StrengthIndicatorStyled
-              text="Our recommendations for creating a good password:"
-              value={values.password}
-              rules={[
-                ...REGEXP_TEXT_MATCH,
-                {
-                  text: 'Unique password (i.e. do not use qwerty)',
-                  regexp: 'zxcvbn',
-                },
-              ]}
+            </Tooltip>
+          </FieldWrapper>  
+          {values.password && (
+            <StyledPasswordIndicator
+              type={INDICATOR_TYPE.LINE}
+              score={zxcvbn(values.password).score}
             />
-          </Tooltip>          
+          )}
           {checkError(touched, errors, 'password') && (
             <Error>{errors.password}</Error>
           )}

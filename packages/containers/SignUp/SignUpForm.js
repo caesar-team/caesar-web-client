@@ -13,7 +13,7 @@ import {
 } from '@caesar/components';
 import { checkError } from '@caesar/common/utils/formikUtils';
 import { schema } from './schema';
-import { REGEXP_TEXT_MATCH } from '../Bootstrap/constants';
+import { GOOD_PASSWORD_RULES } from '@caesar/common/validation/constants';
 import { INDICATOR_TYPE } from '@caesar/components/PasswordIndicator';
 
 const Form = styled.form`
@@ -101,16 +101,16 @@ const StyledPasswordIndicator = styled(PasswordIndicator)`
 `;
 
 const StyledStrengthIndicator = styled(StrengthIndicator)`
-  font-size: 14px;
+  font-size: ${({ theme }) => theme.font.size.small};
   color: ${({ theme }) => theme.color.gray};
-  padding: 15px;
+  padding: 16px;
 
   ${StrengthIndicator.Text} {
     margin-bottom: 15px;
   }
 
   ${StrengthIndicator.HelperText} {
-    font-size: 14px;
+    font-size: ${({ theme }) => theme.font.size.small};
     color: ${({ theme }) => theme.color.gray};
     margin-bottom: 8px;
 
@@ -177,13 +177,7 @@ const SignUpForm = ({ onSubmit }) => (
               <StyledStrengthIndicator
                 text="Our recommendations for creating a good password:"
                 value={values.password}
-                rules={[
-                  ...REGEXP_TEXT_MATCH,
-                  {
-                    text: 'Unique password (i.e. do not use qwerty)',
-                    regexp: 'zxcvbn',
-                  },
-                ]}
+                rules={GOOD_PASSWORD_RULES}
               />
             </Tooltip>
           </FieldWrapper>  

@@ -206,7 +206,9 @@ const File = ({
       onClick={onClickDownload}
       {...props}
     >
-      <FileExt>{ext}</FileExt>
+      <FileExt>
+        <img alt="kitten" src="https://placekitten.com/50/50" />
+      </FileExt>
       <Details>
         <FileName>{name}</FileName>
         <FileSize>{humanizeSize(size)}</FileSize>

@@ -62,7 +62,7 @@ import { currentTeamIdSelector } from '@caesar/common/selectors/user';
 import {
   addShareKeyPair,
   addTeamKeyPair,
-} from '@caesar/common/actions/keyStore';
+} from '@caesar/common/actions/keystore';
 import {
   postCreateItem,
   postCreateItemsBatch,
@@ -94,7 +94,7 @@ import {
 import {
   personalKeyPairSelector,
   teamKeyPairSelector,
-} from '@caesar/common/selectors/keyStore';
+} from '@caesar/common/selectors/keystore';
 import {
   generateSystemItemEmail,
   generateSystemItemName,
@@ -102,6 +102,7 @@ import {
 import { passwordGenerator } from '@caesar/common/utils/passwordGenerator';
 import { generateKeys } from '@caesar/common/utils/key';
 import { addSystemItemsBatch } from '@caesar/common/actions/entities/system';
+import { teamSelector } from '../../selectors/entities/team';
 
 const ITEMS_CHUNK_SIZE = 50;
 
@@ -167,7 +168,7 @@ export function* removeItemSaga({ payload: { itemId, listId } }) {
     yield put(updateGlobalNotification(NOOP_NOTIFICATION, false));
   } catch (error) {
     // eslint-disable-next-line no-console
-    console.log(error);
+    console.error(error);
     yield put(
       updateGlobalNotification(getServerErrorMessage(error), false, true),
     );
@@ -202,7 +203,7 @@ export function* removeItemsBatchSaga({ payload: { listId } }) {
     yield put(updateGlobalNotification(NOOP_NOTIFICATION, false));
   } catch (error) {
     // eslint-disable-next-line no-console
-    console.log(error);
+    console.error(error);
     yield put(
       updateGlobalNotification(getServerErrorMessage(error), false, true),
     );
@@ -227,7 +228,7 @@ export function* toggleItemToFavoriteSaga({ payload: { item } }) {
     yield put(updateWorkInProgressItem(item.id));
   } catch (error) {
     // eslint-disable-next-line no-console
-    console.log(error);
+    console.error(error);
     yield put(
       updateGlobalNotification(getServerErrorMessage(error), false, true),
     );
@@ -310,7 +311,7 @@ export function* moveItemSaga({
     }
   } catch (error) {
     // eslint-disable-next-line no-console
-    console.log(error);
+    console.error(error);
     yield put(moveItemFailure());
   }
 }
@@ -344,7 +345,7 @@ export function* moveItemsBatchSaga({
     yield put(updateGlobalNotification(NOOP_NOTIFICATION, false));
   } catch (error) {
     // eslint-disable-next-line no-console
-    console.log(error);
+    console.error(error);
     yield put(
       updateGlobalNotification(getServerErrorMessage(error), false, true),
     );
@@ -425,6 +426,13 @@ export function* createItemSaga({
         teamId,
       });
       publicKey = teamSystemItem.publicKey;
+    }
+
+    if (!publicKey) {
+      // Nothing to do here
+      throw new Error(
+        `Can't fine the publicKey in the key pair for the team ${teamId}`,
+      );
     }
 
     if (!isSystemItem) {
@@ -547,7 +555,7 @@ export function* createItemsBatchSaga({
     }
   } catch (error) {
     // eslint-disable-next-line no-console
-    console.log(error);
+    console.error(error);
     yield put(
       updateGlobalNotification(getServerErrorMessage(error), false, true),
     );
@@ -572,7 +580,7 @@ export function* updateItemSaga({ payload: { item } }) {
     yield put(updateGlobalNotification(NOOP_NOTIFICATION, false));
   } catch (error) {
     // eslint-disable-next-line no-console
-    console.log(error);
+    console.error(error);
     yield put(
       updateGlobalNotification(getServerErrorMessage(error), false, true),
     );
@@ -623,7 +631,7 @@ export function* editItemSaga({
     });
   } catch (error) {
     // eslint-disable-next-line no-console
-    console.log(error);
+    console.error(error);
     yield put(
       updateGlobalNotification(getServerErrorMessage(error), false, true),
     );

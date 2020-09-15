@@ -36,5 +36,5 @@ export const persistOptions = {
   key: 'root',
   localForage,
   blacklist: ['application', 'workflow', 'entities'],
-  // transforms: [itemTransform, userTransform],
+  transforms: [itemTransform, userTransform],
 };

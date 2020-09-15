@@ -266,3 +266,8 @@ export const REGEXP_TESTER = {
       ),
   },
 };
+
+export const REGEXP_EXCTRACTOR = {
+  ID: stringData =>
+    stringData ? stringData?.match(UUID_REGEXP)[0] || null : null,
+};

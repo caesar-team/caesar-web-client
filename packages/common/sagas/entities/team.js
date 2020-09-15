@@ -84,7 +84,7 @@ import {
   generateSystemItem,
   createItemSaga,
 } from '@caesar/common/sagas/entities/item';
-import { teamKeyPairSelector } from '@caesar/common/selectors/keyStore';
+import { teamKeyPairSelector } from '@caesar/common/selectors/keystore';
 
 export function* fetchTeamsSaga() {
   try {
@@ -105,7 +105,7 @@ export function* fetchTeamsSaga() {
     );
   } catch (error) {
     // eslint-disable-next-line no-console
-    console.log(error);
+    console.error(error);
     yield put(
       updateGlobalNotification(getServerErrorMessage(error), false, true),
     );
@@ -120,7 +120,7 @@ export function* fetchTeamSaga({ payload: { teamId } }) {
     yield put(fetchTeamSuccess(data));
   } catch (error) {
     // eslint-disable-next-line no-console
-    console.log(error);
+    console.error(error);
     yield put(
       updateGlobalNotification(getServerErrorMessage(error), false, true),
     );
@@ -151,7 +151,7 @@ export function* removeTeamSaga({ payload: { teamId } }) {
     }
   } catch (error) {
     // eslint-disable-next-line no-console
-    console.log(error);
+    console.error(error);
     yield put(
       updateGlobalNotification(getServerErrorMessage(error), false, true),
     );
@@ -161,6 +161,8 @@ export function* removeTeamSaga({ payload: { teamId } }) {
 
 export function* createTeamKeysSaga({ payload: { team } }) {
   try {
+    if (!team) return;
+
     let listId = null;
 
     const user = yield select(userDataSelector);
@@ -199,7 +201,7 @@ export function* createTeamKeysSaga({ payload: { team } }) {
     });
   } catch (error) {
     // eslint-disable-next-line no-console
-    console.log(error);
+    console.error(error);
     yield put(
       updateGlobalNotification(getServerErrorMessage(error), false, true),
     );
@@ -241,7 +243,7 @@ export function* editTeamSaga({
     yield call(handleCloseModal);
   } catch (error) {
     // eslint-disable-next-line no-console
-    console.log(error);
+    console.error(error);
     const errors = getServerErrors(error);
 
     yield call(setErrors, { form: errors });
@@ -259,7 +261,7 @@ export function* updateTeamMemberRoleSaga({
     yield put(updateTeamMemberRoleSuccess(teamId, userId, role));
   } catch (error) {
     // eslint-disable-next-line no-console
-    console.log(error);
+    console.error(error);
     yield put(
       updateGlobalNotification(getServerErrorMessage(error), false, true),
     );
@@ -331,7 +333,7 @@ export function* addMemberToTeamListsBatchSaga({
     yield put(updateGlobalNotification(NOOP_NOTIFICATION, false));
   } catch (error) {
     // eslint-disable-next-line no-console
-    console.log(error);
+    console.error(error);
     yield put(
       updateGlobalNotification(getServerErrorMessage(error), false, true),
     );
@@ -364,7 +366,7 @@ export function* removeTeamMemberSaga({ payload: { teamId, userId } }) {
     yield put(updateGlobalNotification(NOOP_NOTIFICATION, false));
   } catch (error) {
     // eslint-disable-next-line no-console
-    console.log(error);
+    console.error(error);
     yield put(
       updateGlobalNotification(getServerErrorMessage(error), false, true),
     );

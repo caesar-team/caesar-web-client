@@ -35,6 +35,16 @@ export const itemsBatchSelector = createSelector(
   (itemsById, itemIds) => itemIds.map(itemId => itemsById[itemId] || {}),
 );
 
+export const nonDecryptedSharedItemsSelector = createSelector(
+  itemsByIdSelector,
+  items => Object.values(items).filter(item => !item?.data && item.isShared),
+);
+
+export const nonDecryptedTeamItemsSelector = createSelector(
+  itemsByIdSelector,
+  items => Object.values(items).filter(item => !item?.data && !item.isShared),
+);
+
 export const nonDecryptedItemsSelector = createSelector(
   itemsByIdSelector,
   items => Object.values(items).filter(item => !item?.data),

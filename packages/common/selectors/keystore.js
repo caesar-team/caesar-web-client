@@ -7,28 +7,28 @@ import {
 import { generateSystemItemName } from '@caesar/common/utils/item';
 import { KEY_TYPE, TEAM_TYPE, ENTITY_TYPE } from '@caesar/common/constants';
 
-const findTeamByItemName = (data, teamId) =>
+const findSystemItemsTeamByItemName = (data, teamId) =>
   Object.values(data).find(
     ({ name }) => name === generateSystemItemName(ENTITY_TYPE.TEAM, teamId),
   ) || {};
 
-export const keyStoreSelector = state => state.keyStore;
+export const keyStoreSelector = state => state.keystore;
 
-const teamsSelector = createSelector(
+export const teamKeyPairsSelector = createSelector(
   keyStoreSelector,
-  keyStore => keyStore[KEY_TYPE.TEAMS],
+  keystore => keystore[KEY_TYPE.TEAMS],
 );
 
 export const shareKeyPairsSelector = createSelector(
   keyStoreSelector,
-  keyStore => {
-    return keyStore[KEY_TYPE.SHARES];
+  keystore => {
+    return keystore[KEY_TYPE.SHARES];
   },
 );
 
 export const keyPairsStoreSelector = createSelector(
   shareKeyPairsSelector,
-  teamsSelector,
+  teamKeyPairsSelector,
   (sharesKeys, teamKeys) => [...sharesKeys, ...teamKeys],
 );
 
@@ -38,13 +38,15 @@ const idsPropSelector = (_, props) => props.ids;
 
 export const personalKeyPairSelector = createSelector(
   keyStoreSelector,
-  keyStore => keyStore[KEY_TYPE.PERSONAL] || {},
+  keystore => keystore[KEY_TYPE.PERSONAL] || {},
 );
 
 export const teamKeyPairSelector = createSelector(
-  teamsSelector,
+  teamKeyPairsSelector,
   teamIdPropSelector,
-  (data, teamId) => findTeamByItemName(data, teamId),
+  (keyPairs, teamId) =>
+    keyPairs[teamId] ||
+    Object.keys(findSystemItemsTeamByItemName(keyPairs, teamId)),
 );
 
 export const idsKeyPairsSelector = createSelector(
@@ -96,7 +98,7 @@ export const actualKeyPairSelector = createSelector(
           ) || {}
         );
       case currentTeamId !== TEAM_TYPE.PERSONAL:
-        return findTeamByItemName(data, currentTeamId);
+        return findSystemItemsTeamByItemName(data, currentTeamId);
       case currentTeamId === TEAM_TYPE.PERSONAL:
         return personalKeyPair;
       default:

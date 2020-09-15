@@ -23,7 +23,7 @@ import {
   personalKeyPairSelector,
   shareKeyPairSelector,
   shareKeyPairsSelector,
-} from '@caesar/common/selectors/keyStore';
+} from '@caesar/common/selectors/keystore';
 import {
   decryptItem,
   getPrivateKeyObj,

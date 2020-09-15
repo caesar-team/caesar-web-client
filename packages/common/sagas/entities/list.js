@@ -66,7 +66,7 @@ export function* sortListSaga({
     yield call(patchListSort, listId, { sort: destinationIndex });
   } catch (error) {
     // eslint-disable-next-line no-console
-    console.log(error);
+    console.error(error);
     yield put(sortListFailure());
   }
 }
@@ -136,7 +136,7 @@ export function* editListSaga({ payload: { list }, meta: { setEditMode } }) {
     yield put(editListSuccess(list));
   } catch (error) {
     // eslint-disable-next-line no-console
-    console.log(error);
+    console.error(error);
     yield put(editListFailure());
     yield put(updateGlobalNotification(getServerErrors(error), false, true));
   }
@@ -170,7 +170,7 @@ export function* removeListSaga({ payload: { teamId, listId } }) {
     yield put(removeListSuccess(listId));
   } catch (error) {
     // eslint-disable-next-line no-console
-    console.log(error);
+    console.error(error);
     yield put(removeListFailure());
   }
 }

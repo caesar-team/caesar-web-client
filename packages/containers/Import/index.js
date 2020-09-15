@@ -7,7 +7,7 @@ import {
 } from '@caesar/common/actions/user';
 import { createStructuredSelector } from 'reselect';
 import { selectableTeamsListsSelector } from '@caesar/common/selectors/entities/list';
-import { personalKeyPairSelector } from '@caesar/common/selectors/keyStore';
+import { personalKeyPairSelector } from '@caesar/common/selectors/keystore';
 import { isLoadingSelector } from '@caesar/common/selectors/workflow';
 import Import from './Import';
 

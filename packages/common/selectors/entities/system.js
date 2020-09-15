@@ -1,7 +1,8 @@
 import { createSelector } from 'reselect';
 import { currentTeamSelector } from '@caesar/common/selectors/user';
 import { generateSystemItemName } from '@caesar/common/utils/item';
-import { ENTITY_TYPE } from '@caesar/common/constants';
+import { ENTITY_TYPE, REGEXP_TESTER } from '@caesar/common/constants';
+import { objectToArray } from '../../utils/utils';
 
 export const entitiesSelector = state => state.entities;
 
@@ -53,5 +54,13 @@ export const teamSystemItemSelector = createSelector(
     items.find(
       ({ data }) =>
         data.name === generateSystemItemName(ENTITY_TYPE.TEAM, currentTeam.id),
+    ) || {},
+);
+
+export const teamSystemItemsSelector = createSelector(
+  systemItemsSelector,
+  items =>
+    objectToArray(items).filter(({ data }) =>
+      REGEXP_TESTER.SYSTEM.IS_TEAM(data.name),
     ) || {},
 );

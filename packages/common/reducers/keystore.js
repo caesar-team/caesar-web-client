@@ -1,5 +1,5 @@
 import { createReducer } from '@caesar/common/utils/reducer';
-import { KEY_TYPE } from '@caesar/common/constants';
+import { KEY_TYPE, REGEXP_EXCTRACTOR } from '@caesar/common/constants';
 import {
   ADD_PERSONAL_KEY_PAIR,
   ADD_TEAM_KEY_PAIR,
@@ -9,7 +9,11 @@ import {
   REMOVE_TEAM_KEY_PAIR,
   REMOVE_SHARE_KEY_PAIR,
   REMOVE_ANONYMOUS_KEY_PAIR,
-} from '@caesar/common/actions/keyStore';
+  ADD_TEAM_KEY_PAIR_BATCH,
+  ADD_SHARE_KEY_PAIR_BATCH,
+} from '@caesar/common/actions/keystore';
+
+import { converSystemItemToKeyPair } from '../utils/item';
 
 const initialState = {
   [KEY_TYPE.PERSONAL]: {},
@@ -23,6 +27,37 @@ export default createReducer(initialState, {
     return {
       ...state,
       [KEY_TYPE.PERSONAL]: payload.data,
+    };
+  },
+  [ADD_TEAM_KEY_PAIR_BATCH](state, { payload }) {
+    if (!payload.data || payload.data?.length <= 0) return state;
+
+    const keyPairs = {};
+    payload.data.forEach(systemItem => {
+      const { data: { name } = { name: null } } = systemItem;
+      keyPairs[
+        REGEXP_EXCTRACTOR.ID(name) || systemItem.id
+      ] = converSystemItemToKeyPair(systemItem);
+    });
+
+    return {
+      ...state,
+      [KEY_TYPE.TEAMS]: keyPairs,
+    };
+  },
+  [ADD_SHARE_KEY_PAIR_BATCH](state, { payload }) {
+    if (!payload.data || payload.data?.length <= 0) return state;
+
+    const keyPairs = {};
+    payload.data.forEach(systemItem => {
+      keyPairs[
+        systemItem?.relatedItem?.id || systemItem.id
+      ] = converSystemItemToKeyPair(systemItem);
+    });
+
+    return {
+      ...state,
+      [KEY_TYPE.SHARES]: keyPairs,
     };
   },
   [ADD_TEAM_KEY_PAIR](state, { payload }) {

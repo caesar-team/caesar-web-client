@@ -44,7 +44,7 @@ export function* fetchMembersSaga() {
     yield put(fetchMembersSuccess(convertMembersToEntity(members)));
   } catch (error) {
     // eslint-disable-next-line no-console
-    console.log(error);
+    console.error(error);
     yield put(fetchMembersFailure());
   }
 }
@@ -229,7 +229,9 @@ export function* getOrCreateMemberBatchSaga({ payload: { emailRolePairs } }) {
   }
 }
 
-export function* fetchTeamMembersSaga({ payload: { teamId, needUpdateTeamMembers = false } }) {
+export function* fetchTeamMembersSaga({
+  payload: { teamId, needUpdateTeamMembers = false },
+}) {
   try {
     const { data } = yield call(getTeamMembers, teamId);
 

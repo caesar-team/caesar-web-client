@@ -59,6 +59,24 @@ export function extractKeysFromSystemItem(item) {
     privateKey,
   };
 }
+export function converSystemItemToKeyPair(item) {
+  if (!item.data) return null;
+  const { name, pass } = item.data;
+  const itemRaws = item.data?.raws || {
+    publicKey: null,
+    privateKey: null,
+  };
+
+  const { publicKey = null, privateKey = null } = itemRaws;
+
+  return {
+    id: item.id,
+    name,
+    pass,
+    publicKey,
+    privateKey,
+  };
+}
 
 export const decryptItemData = async (item, privateKeyObject) => {
   try {

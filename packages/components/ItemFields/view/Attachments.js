@@ -84,7 +84,7 @@ export const Attachments = ({
   };
 
   useEffect(() => {
-    if (Object.keys(raws).length > 0) {
+    if (Object.keys(raws)?.length > 0) {
       setItemRaws(raws);
     }
   }, [raws, setItemRaws]); // This will only run when one of those variables change

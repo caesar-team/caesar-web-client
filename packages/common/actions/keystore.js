@@ -1,13 +1,13 @@
-export const ADD_TEAM_KEY_PAIR = '@keyStore/ADD_TEAM_KEY_PAIR';
-export const ADD_TEAM_KEY_PAIR_BATCH = '@keyStore/ADD_TEAM_KEY_BATCH_PAIR';
-export const REMOVE_TEAM_KEY_PAIR = '@keyStore/REMOVE_TEAM_KEY_PAIR';
-export const ADD_SHARE_KEY_PAIR = '@keyStore/ADD_SHARE_KEY_PAIR';
-export const ADD_SHARE_KEY_PAIR_BATCH = '@keyStore/ADD_SHARE_KEY_BATCH_PAIR';
-export const REMOVE_SHARE_KEY_PAIR = '@keyStore/REMOVE_SHARE_KEY_PAIR';
-export const ADD_PERSONAL_KEY_PAIR = '@keyStore/ADD_PERSONAL_KEY_PAIR';
-export const REMOVE_PERSONAL_KEY_PAIR = '@keyStore/REMOVE_PERSONAL_KEY_PAIR';
-export const ADD_ANONYMOUS_KEY_PAIR = '@keyStore/ADD_ANONYMOUS_KEY_PAIR';
-export const REMOVE_ANONYMOUS_KEY_PAIR = '@keyStore/REMOVE_ANONYMOUS_KEY_PAIR';
+export const ADD_TEAM_KEY_PAIR = '@keystore/ADD_TEAM_KEY_PAIR';
+export const ADD_TEAM_KEY_PAIR_BATCH = '@keystore/ADD_TEAM_KEY_PAIR_BATCH';
+export const REMOVE_TEAM_KEY_PAIR = '@keystore/REMOVE_TEAM_KEY_PAIR';
+export const ADD_SHARE_KEY_PAIR = '@keystore/ADD_SHARE_KEY_PAIR';
+export const ADD_SHARE_KEY_PAIR_BATCH = '@keystore/ADD_SHARE_KEY_PAIR_BATCH';
+export const REMOVE_SHARE_KEY_PAIR = '@keystore/REMOVE_SHARE_KEY_PAIR';
+export const ADD_PERSONAL_KEY_PAIR = '@keystore/ADD_PERSONAL_KEY_PAIR';
+export const REMOVE_PERSONAL_KEY_PAIR = '@keystore/REMOVE_PERSONAL_KEY_PAIR';
+export const ADD_ANONYMOUS_KEY_PAIR = '@keystore/ADD_ANONYMOUS_KEY_PAIR';
+export const REMOVE_ANONYMOUS_KEY_PAIR = '@keystore/REMOVE_ANONYMOUS_KEY_PAIR';
 
 export const addPersonalKeyPair = data => ({
   type: ADD_PERSONAL_KEY_PAIR,

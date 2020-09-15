@@ -6,6 +6,7 @@ import {
   PERMISSION_MESSAGES,
 } from '@caesar/common/constants';
 import { Icon } from '../../Icon';
+import { ItemIcon } from '../../ItemIcon';
 import { Can } from '../../Ability';
 import {
   Row,
@@ -24,7 +25,7 @@ import {
 
 export const Item = ({
   id,
-  data: { name, attachments = [] },
+  data: { name, attachments = [], website },
   type,
   invited,
   isMultiItem = false,
@@ -107,7 +108,10 @@ export const Item = ({
               </NotEditIconWrapper>
             )}
             <IconWrapper>
-              <ItemTypeIcon type={type} />
+              {website
+                ? <ItemIcon url={website} />
+                : <ItemTypeIcon type={type} />
+              }
             </IconWrapper>
           </TypeIconWrapper>
         )}

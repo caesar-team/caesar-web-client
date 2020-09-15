@@ -10,14 +10,13 @@ import {
   MasterPasswordInput,
   Button,
   PasswordIndicator,
-  Icon,
+  TooltipPasswordGenerator,
   Tooltip,
   StrengthIndicator,
 } from '@caesar/components';
 import { INDICATOR_TYPE } from '@caesar/components/PasswordIndicator';
 import { passwordSchema } from './schema';
 import { REGEXP_TEXT_MATCH } from '../../constants';
-import { TooltipPasswordGenerator } from './components';
 
 const Form = styled.form`
   display: flex;
@@ -76,35 +75,19 @@ const StyledButton = styled(Button)`
   margin-top: 45px;
 `;
 
-const DiceIcon = styled(Icon)`
-  cursor: pointer;
+const StyledTooltipPasswordGenerator = styled(TooltipPasswordGenerator)`
   position: absolute;
+  top: 50%;
   right: 60px;
-  top: 18px;
-  height: 20px;
+  transform: translateY(-50%);
 `;
 
 class MasterPasswordCreateForm extends PureComponent {
-  state = this.prepareInitialState();
-
-  handleToggleVisibility = changedVisibility => () => {
-    this.setState({
-      isPasswordGeneratorTooltipVisible: changedVisibility,
-    });
-  };
-
   handleGeneratePassword = setFieldValue => password =>
     setFieldValue('password', password);
 
-  prepareInitialState() {
-    return {
-      isPasswordGeneratorTooltipVisible: false,
-    };
-  }
-
   render() {
     const { initialValues, onSubmit } = this.props;
-    const { isPasswordGeneratorTooltipVisible } = this.state;
 
     return (
       <Formik
@@ -160,18 +143,7 @@ class MasterPasswordCreateForm extends PureComponent {
                   ]}
                 />
               </Tooltip>
-              <DiceIcon
-                name="dice"
-                width={20}
-                height={20}
-                onClick={this.handleToggleVisibility(true)}
-              />
-              <TooltipPasswordGenerator
-                isVisible={isPasswordGeneratorTooltipVisible}
-                onToggleVisibility={this.handleToggleVisibility(
-                  false,
-                  setFieldValue,
-                )}
+              <StyledTooltipPasswordGenerator
                 onGeneratePassword={this.handleGeneratePassword(setFieldValue)}
               />
             </FieldWrapper>

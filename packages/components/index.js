@@ -89,5 +89,6 @@ export { TeamTag } from './TeamTag';
 export { TextWithLines } from './TextWithLines';
 export { Toggle } from './Toggle';
 export { Tooltip } from './Tooltip';
+export { TooltipPasswordGenerator } from './TooltipPasswordGenerator';
 export { Uploader } from './Uploader';
 export { WrapperAlignTop } from './WrapperAlignTop';

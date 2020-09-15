@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
+import zxcvbn from 'zxcvbn';
 import styled from 'styled-components';
+import { PasswordIndicator } from '../../PasswordIndicator';
 import { HoldClickBehaviour } from '../../HoldClickBehaviour';
 import { Icon } from '../../Icon';
 import { Input } from './Input';
@@ -52,7 +54,12 @@ export const Password = ({ value, itemSubject, schema, onClickAcceptEdit }) => {
       originalValue={value}
       onClickAcceptEdit={onClickAcceptEdit}
       addonPostfix={eyeIcon}
-      addonIcons={eyeIcon}
+      addonIcons={
+        <>
+          {value && <PasswordIndicator score={zxcvbn(value).score} />}
+          {eyeIcon}
+        </>
+      }
     />
   );
 };

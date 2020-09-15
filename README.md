@@ -74,22 +74,3 @@ Build for remote server
 2. Run production build on local server
    `secure:start:production`
 3. To open project just go to http://localhost:3000/
-
-## Author
-
-👤 **ave@caesar.team**
-
-- Twitter: [@CaesarTeamApp](https://twitter.com/CaesarTeamApp)
-- Github: [@caesar-team](https://github.com/caesar-team)
-
-## 🤝 Contributing
-
-Contributions, issues and feature requests are welcome!
-
-Feel free to check [issues page](https://github.com/caesar-team/caesar.team/issues).
-
-## 📝 License
-
-Copyright © 2020 [ave@caesar.team](https://github.com/caesar-team).
-
-This project is [PolyForm Internal Use](https://polyformproject.org/licenses/internal-use/1.0.0/) licensed.

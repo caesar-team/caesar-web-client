@@ -1,9 +1,20 @@
 import React from 'react';
 import styled from 'styled-components';
+import zxcvbn from 'zxcvbn';
 import { Formik, FastField } from 'formik';
-import { Input, PasswordInput, Button, Icon } from '@caesar/components';
+import {
+  Input,
+  PasswordInput,
+  Button,
+  Icon,
+  Tooltip,
+  StrengthIndicator,
+  PasswordIndicator,
+} from '@caesar/components';
 import { checkError } from '@caesar/common/utils/formikUtils';
 import { schema } from './schema';
+import { GOOD_PASSWORD_RULES } from '@caesar/common/validation/constants';
+import { INDICATOR_TYPE } from '@caesar/components/PasswordIndicator';
 
 const Form = styled.form`
   width: 100%;
@@ -13,11 +24,16 @@ const Form = styled.form`
 const Row = styled.div`
   display: flex;
   flex-direction: column;
+  position: relative;
   margin-bottom: 10px;
 
   &:last-child {
     margin-bottom: 0;
   }
+`;
+
+const FieldWrapper = styled.div`
+  position: relative;
 `;
 
 const StyledEmailInput = styled(Input)`
@@ -73,6 +89,37 @@ const ButtonWrapper = styled.div`
   margin-bottom: 60px;
 `;
 
+const StyledPasswordIndicator = styled(PasswordIndicator)`
+  justify-content: space-between;
+  margin-top: 30px;
+
+  ${PasswordIndicator.ScoreName} {
+    width: 80px;
+    margin-left: 16px;
+    text-align: right;
+  }
+`;
+
+const StyledStrengthIndicator = styled(StrengthIndicator)`
+  font-size: ${({ theme }) => theme.font.size.small};
+  color: ${({ theme }) => theme.color.gray};
+  padding: 16px;
+
+  ${StrengthIndicator.Text} {
+    margin-bottom: 15px;
+  }
+
+  ${StrengthIndicator.HelperText} {
+    font-size: ${({ theme }) => theme.font.size.small};
+    color: ${({ theme }) => theme.color.gray};
+    margin-bottom: 8px;
+
+    &:last-of-type {
+      margin-bottom: 0;
+    }
+  }
+`;
+
 const EmailInputPrefix = (
   <Prefix>
     <Icon name="email" width={18} height={18} />
@@ -92,7 +139,7 @@ const SignUpForm = ({ onSubmit }) => (
     initialValues={{ email: '', password: '', confirmPassword: '' }}
     validationSchema={schema}
   >
-    {({ errors, touched, handleSubmit, handleBlur, isSubmitting, isValid }) => (
+    {({ values, errors, touched, handleSubmit, handleBlur, isSubmitting, isValid }) => (
       <Form onSubmit={handleSubmit}>
         <Row>
           <FastField name="email">
@@ -110,16 +157,36 @@ const SignUpForm = ({ onSubmit }) => (
           )}
         </Row>
         <Row>
-          <FastField name="password">
-            {({ field }) => (
-              <StyledPasswordInput
-                {...field}
-                onBlur={handleBlur}
-                placeholder="Password"
-                prefix={PasswordInputPrefix}
+          <FieldWrapper>
+            <FastField name="password">
+              {({ field }) => (
+                <StyledPasswordInput
+                  {...field}
+                  onBlur={handleBlur}
+                  placeholder="Password"
+                  prefix={PasswordInputPrefix}
+                />
+              )}
+            </FastField>
+            <Tooltip
+              show={values.password && checkError(touched, errors, 'password')}
+              textBoxWidth="280px"
+              arrowAlign="top"
+              position="right center"
+            >
+              <StyledStrengthIndicator
+                text="Our recommendations for creating a good password:"
+                value={values.password}
+                rules={GOOD_PASSWORD_RULES}
               />
-            )}
-          </FastField>
+            </Tooltip>
+          </FieldWrapper>  
+          {values.password && (
+            <StyledPasswordIndicator
+              type={INDICATOR_TYPE.LINE}
+              score={zxcvbn(values.password).score}
+            />
+          )}
           {checkError(touched, errors, 'password') && (
             <Error>{errors.password}</Error>
           )}

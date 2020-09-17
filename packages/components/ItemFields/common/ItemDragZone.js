@@ -5,14 +5,14 @@ import { Icon } from '../../Icon';
 
 const DragZone = styled.div`
   position: absolute;
-  top: -30px;
-  left: -45px;
+  top: -24px;
+  left: -40px;
   z-index: ${({ theme }) => theme.zIndex.basic};
-  width: calc(100% + 45px * 2);
-  height: calc(100% + 30px * 2);
+  width: calc(100% + 40px * 2);
+  height: calc(100% + 24px * 2);
   background: white;
   border: 1px dashed blue;
-  opacity: 0.95;
+  opacity: 0.93;
 `;
 
 const ActiveDragDescription = styled.div`
@@ -34,13 +34,11 @@ const ActiveDragTip = styled.div`
   color: ${({ theme }) => theme.color.gray};
 `;
 
-const DownloadIcon = styled(Icon)``;
-
 export const ItemDragZone = forwardRef((props, ref) => (
   <div ref={ref} {...props}>
     <DragZone />
     <ActiveDragDescription>
-      <DownloadIcon name="download" width={40} height={40} color="black" />
+      <Icon name="download" width={40} height={40} color="black" />
       <ActiveDragText>Drop your files to upload</ActiveDragText>
       <ActiveDragTip>
         Not more than {TOTAL_MAX_UPLOADING_FILES_SIZES}

@@ -3,44 +3,12 @@ import styled from 'styled-components';
 import {
   Button,
   TeamCard,
-  LogoLoader,
+  SettingsWrapper,
   TeamModal,
   ConfirmModal,
   Can,
 } from '@caesar/components';
 import { PERMISSION, PERMISSION_ENTITY } from '@caesar/common/constants';
-
-const LogoWrapper = styled.div`
-  display: flex;
-  flex-direction: column;
-  background: ${({ theme }) => theme.color.alto};
-  width: 100%;
-  position: relative;
-  height: calc(100vh - 55px);
-  align-items: center;
-  justify-content: center;
-`;
-
-const Wrapper = styled.div`
-  display: flex;
-  flex-direction: column;
-  background: ${({ theme }) => theme.color.alto};
-  width: 100%;
-  padding: 40px;
-  position: relative;
-`;
-
-const TopWrapper = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 30px;
-`;
-
-const Title = styled.div`
-  font-size: 36px;
-  color: ${({ theme }) => theme.color.black};
-`;
 
 const TeamListWrapper = styled.div`
   display: flex;
@@ -176,16 +144,8 @@ class TeamListContainer extends Component {
   }
 
   render() {
-    const { isLoading } = this.props;
+    const { isLoading, teams } = this.props;
     const { modalVisibilities } = this.state;
-
-    if (isLoading) {
-      return (
-        <LogoWrapper>
-          <LogoLoader textColor="black" />
-        </LogoWrapper>
-      );
-    }
 
     const renderedTeamCards = this.renderTeamCards();
 
@@ -196,9 +156,10 @@ class TeamListContainer extends Component {
     };
 
     return (
-      <Wrapper>
-        <TopWrapper>
-          <Title>Teams</Title>
+      <SettingsWrapper
+        isLoading={isLoading}
+        title={`Teams (${teams.length})`}
+        addonTopComponent={
           <Can I={PERMISSION.CREATE} a={teamSubject}>
             <Button
               withOfflineCheck
@@ -209,7 +170,8 @@ class TeamListContainer extends Component {
               Add a team
             </Button>
           </Can>
-        </TopWrapper>
+        }
+      >
         <TeamListWrapper>{renderedTeamCards}</TeamListWrapper>
         {modalVisibilities[NEW_TEAM_MODAL] && (
           <TeamModal
@@ -225,7 +187,7 @@ class TeamListContainer extends Component {
           onClickConfirm={this.handleRemoveTeam}
           onClickCancel={this.handleCloseModal(REMOVE_TEAM_MODAL)}
         />
-      </Wrapper>
+      </SettingsWrapper>
     );
   }
 }

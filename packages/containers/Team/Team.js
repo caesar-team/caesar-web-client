@@ -5,7 +5,7 @@ import memoizeOne from 'memoize-one';
 import styled from 'styled-components';
 import {
   Button,
-  LogoLoader,
+  SettingsWrapper,
   DataTable,
   Avatar,
   Input,
@@ -24,39 +24,6 @@ import {
 } from '@caesar/common/constants';
 import { getTeamTitle } from '@caesar/common/utils/team';
 import { sortByName } from '@caesar/common/utils/utils';
-
-const LogoWrapper = styled.div`
-  display: flex;
-  flex-direction: column;
-  background: ${({ theme }) => theme.color.alto};
-  width: 100%;
-  position: relative;
-  height: calc(100vh - 55px);
-  align-items: center;
-  justify-content: center;
-`;
-
-const Wrapper = styled.div`
-  display: flex;
-  flex-direction: column;
-  background: ${({ theme }) => theme.color.alto};
-  width: 100%;
-  max-width: calc(100vw - 56px);
-  padding: 40px;
-  position: relative;
-`;
-
-const TopWrapper = styled.div`
-  display: flex;
-  align-items: center;
-  margin-bottom: 30px;
-`;
-
-const Title = styled.div`
-  margin-right: auto;
-  font-size: ${({ theme }) => theme.font.size.large};
-  color: ${({ theme }) => theme.color.black};
-`;
 
 const ButtonStyled = styled(Button)`
   margin-right: 24px;
@@ -482,14 +449,6 @@ class TeamContainer extends Component {
     const { isLoading, team, user, membersById } = this.props;
     const { filter, modalVisibilities } = this.state;
 
-    if (isLoading) {
-      return (
-        <LogoWrapper>
-          <LogoLoader textColor="black" />
-        </LogoWrapper>
-      );
-    }
-
     if (!team) {
       this.props.router.push(ROUTES.SETTINGS + ROUTES.TEAM);
 
@@ -514,32 +473,35 @@ class TeamContainer extends Component {
     };
 
     return (
-      <Wrapper ref={this.wrapperRef}>
-        <TopWrapper>
-          <Title>
-            {getTeamTitle(team)} ({filteredMembersList.length})
-          </Title>
-          <Can I={PERMISSION.DELETE} a={teamSubject}>
-            <ButtonStyled
-              withOfflineCheck
-              icon="trash"
-              color="white"
-              onClick={this.handleOpenModal(REMOVE_TEAM_MODAL)}
-            >
-              Remove
-            </ButtonStyled>
-          </Can>
-          <Can I={PERMISSION.ADD} a={teamMemberSubject}>
-            <ButtonStyled
-              withOfflineCheck
-              onClick={this.handleOpenModal(INVITE_MEMBER_MODAL)}
-              icon="plus"
-              color="black"
-            >
-              Add a member
-            </ButtonStyled>
-          </Can>
-        </TopWrapper>
+      <SettingsWrapper
+        isLoading={isLoading}
+        ref={this.wrapperRef}
+        title={`${getTeamTitle(team)} (${filteredMembersList.length})`}
+        addonTopComponent={
+          <>
+            <Can I={PERMISSION.DELETE} a={teamSubject}>
+              <ButtonStyled
+                withOfflineCheck
+                icon="trash"
+                color="white"
+                onClick={this.handleOpenModal(REMOVE_TEAM_MODAL)}
+              >
+                Remove
+              </ButtonStyled>
+            </Can>
+            <Can I={PERMISSION.ADD} a={teamMemberSubject}>
+              <ButtonStyled
+                withOfflineCheck
+                onClick={this.handleOpenModal(INVITE_MEMBER_MODAL)}
+                icon="plus"
+                color="black"
+              >
+                Add a member
+              </ButtonStyled>
+            </Can>
+          </>
+        }
+      >
         <DataTableStyled
           noDataText={null}
           showPagination={false}
@@ -567,7 +529,7 @@ class TeamContainer extends Component {
           onClickConfirm={this.handleRemoveTeam}
           onClickCancel={this.handleCloseModal(REMOVE_TEAM_MODAL)}
         />
-      </Wrapper>
+      </SettingsWrapper>
     );
   }
 }

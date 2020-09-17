@@ -1,23 +1,13 @@
 import React from 'react';
-import styled from 'styled-components';
+import { SettingsWrapper } from '@caesar/components';
 
-const Wrapper = styled.div`
-  display: flex;
-  flex-direction: column;
-  background: ${({ theme }) => theme.color.alto};
-  width: 100%;
-  padding: 40px;
-`;
+export const Users = () => {
+  const isLoading = false;
+  const users = [];
 
-const Title = styled.div`
-  font-size: 36px;
-  color: ${({ theme }) => theme.color.black};
-  margin-bottom: 30px;
-`;
-
-export const Users = () => (
-  <Wrapper>
-    <Title>Users</Title>
-    <div>Users list</div>
-  </Wrapper>
-);
+  return (
+    <SettingsWrapper isLoading={isLoading} title={`Users (${users.length})`}>
+      <div>Users list</div>
+    </SettingsWrapper>
+  );
+};

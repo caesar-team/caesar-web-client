@@ -25,6 +25,10 @@ const StyledLink = styled(Link)`
     ${({ isActive, theme }) => (isActive ? theme.color.gallery : 'transparent')};
   border-right: none;
   border-left: none;
+
+  &:hover {
+    color: ${({ theme }) => theme.color.black};
+  }
 `;
 
 const LINKS = [

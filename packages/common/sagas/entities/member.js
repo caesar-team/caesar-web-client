@@ -37,6 +37,8 @@ import {
   generateUsersBatch,
 } from '@caesar/common/utils/cipherUtils';
 import { ENTITY_TYPE, ROLE_ANONYMOUS_USER, ROUTES } from '@caesar/common/constants';
+import { updateGlobalNotification } from '@caesar/common/actions/application';
+import { getServerErrorMessage } from '@caesar/common/utils/error';
 
 const setNewFlag = (members, isNew) =>
   members.map(member => ({
@@ -264,6 +266,9 @@ export function* leaveTeamSaga({ payload: { teamId } }) {
     yield put(removeTeamFromMember(teamId, userId));
     yield call(Router.push, ROUTES.SETTINGS_TEAMS);
   } catch (e) {
+    yield put(
+      updateGlobalNotification(getServerErrorMessage(e), false, true),
+    );    
     yield put(leaveTeamFailure());
   }
 }

@@ -16,6 +16,7 @@ import { File } from '../../File';
 import { Uploader } from '../../Uploader';
 import { NewFilesModal } from './NewFilesModal';
 import { ConfirmDeleteAttachmentModal } from './ConfirmDeleteAttachmentModal';
+import { ItemDragZone } from '../common';
 
 const Wrapper = styled.div``;
 
@@ -82,11 +83,13 @@ export const Attachments = ({
   raws = {},
   itemSubject,
   onClickAcceptEdit,
+  isVisibleDragZone,
 }) => {
   const [newFiles, setNewFiles] = useState([]);
   const [itemRaws, setItemRaws] = useState(raws);
   const [itemAttachments, setItemAttachments] = useState(attachments);
   const [openedModal, setOpenedModal] = useState(null);
+
   const syncStateWithServer = newItemData => {
     onClickAcceptEdit(newItemData);
   };
@@ -187,7 +190,7 @@ export const Attachments = ({
       <Inner>
         {isIterable(itemAttachments) &&
           itemAttachments.map(attachment => (
-            <>
+            <div key={attachment.name}>
               <File
                 key={attachment.name}
                 itemSubject={itemSubject}
@@ -205,22 +208,42 @@ export const Attachments = ({
                   handleCloseModal={() => setOpenedModal(null)}
                 />
               )}
-            </>
+            </div>
           ))}
         <Can I={PERMISSION.EDIT} an={itemSubject}>
           {onClickAcceptEdit && (
-            <Uploader
-              multiple
-              name="attachments"
-              noDrag
-              onChange={handleChange}
-            >
-              {({ getRootProps, getInputProps, isDragActive }) => (
-                <AddNewAttach {...getRootProps()} isDragActive={isDragActive}>
-                  <input {...getInputProps()} />
-                  <PlusIcon name="plus" width={16} height={16} color="gray" />
-                </AddNewAttach>
-              )}
+            <Uploader multiple name="attachments" onChange={handleChange}>
+              {({ getRootProps, getInputProps }) => {
+                const {
+                  onClick,
+                  onKeyDown,
+                  onFocus,
+                  onBlur,
+                  ...dragAndDropRootProps
+                } = getRootProps();
+
+                return (
+                  <>
+                    {isVisibleDragZone && (
+                      <ItemDragZone {...dragAndDropRootProps} />
+                    )}
+                    <AddNewAttach
+                      onClick={onClick}
+                      onFocus={onFocus}
+                      onBlur={onBlur}
+                      onKeyDown={onKeyDown}
+                    >
+                      <input {...getInputProps()} />
+                      <PlusIcon
+                        name="plus"
+                        width={16}
+                        height={16}
+                        color="gray"
+                      />
+                    </AddNewAttach>
+                  </>
+                );
+              }}
             </Uploader>
           )}
         </Can>

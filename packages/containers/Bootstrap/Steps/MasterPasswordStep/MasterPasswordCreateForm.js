@@ -14,9 +14,9 @@ import {
   Tooltip,
   StrengthIndicator,
 } from '@caesar/components';
+import { GOOD_PASSWORD_RULES } from '@caesar/common/validation/constants';
 import { INDICATOR_TYPE } from '@caesar/components/PasswordIndicator';
 import { passwordSchema } from './schema';
-import { REGEXP_TEXT_MATCH } from '../../constants';
 
 const Form = styled.form`
   display: flex;
@@ -134,13 +134,7 @@ class MasterPasswordCreateForm extends PureComponent {
                 <StrengthIndicatorStyled
                   text="Our recommendations for creating a good master password:"
                   value={values.password}
-                  rules={[
-                    ...REGEXP_TEXT_MATCH,
-                    {
-                      text: 'Unique password (i.e. do not use qwerty)',
-                      regexp: 'zxcvbn',
-                    },
-                  ]}
+                  rules={GOOD_PASSWORD_RULES}
                 />
               </Tooltip>
               <StyledTooltipPasswordGenerator

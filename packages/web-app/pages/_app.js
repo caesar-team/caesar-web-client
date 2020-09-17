@@ -17,7 +17,6 @@ import {
 import { Bootstrap } from '@caesar/containers';
 import {
   NotificationProvider,
-  OfflineDetectionProvider,
   OfflineNotification,
   AbilityProvider,
 } from '@caesar/components';
@@ -51,17 +50,15 @@ class Application extends NextApp {
     if (SHARED_ROUTES.includes(route)) {
       return (
         <ThemeProvider theme={theme}>
-          <OfflineDetectionProvider>
-            <NotificationProvider>
-              <GlobalStyles />
-              <Provider store={store}>
-                <AbilityProvider>
-                  <Component {...pageProps} />
-                  <OfflineNotification />
-                </AbilityProvider>
-              </Provider>
-            </NotificationProvider>
-          </OfflineDetectionProvider>
+          <NotificationProvider>
+            <GlobalStyles />
+            <Provider store={store}>
+              <AbilityProvider>
+                <Component {...pageProps} />
+                <OfflineNotification />
+              </AbilityProvider>
+            </Provider>
+          </NotificationProvider>
         </ThemeProvider>
       );
     }
@@ -69,13 +66,11 @@ class Application extends NextApp {
     if (UNLOCKED_ROUTES.includes(route)) {
       return (
         <ThemeProvider theme={theme}>
-          <OfflineDetectionProvider>
-            <NotificationProvider>
-              <GlobalStyles />
-              <Component {...pageProps} />
-              <OfflineNotification />
-            </NotificationProvider>
-          </OfflineDetectionProvider>
+          <NotificationProvider>
+            <GlobalStyles />
+            <Component {...pageProps} />
+            <OfflineNotification />
+          </NotificationProvider>
         </ThemeProvider>
       );
     }
@@ -91,15 +86,13 @@ class Application extends NextApp {
     return (
       <ThemeProvider theme={theme}>
         <NotificationProvider>
-          <OfflineDetectionProvider>
-            <GlobalStyles />
-            <Provider store={store}>
-              <AbilityProvider>
-                <Bootstrap {...pageProps} component={Component} />
-                <OfflineNotification />
-              </AbilityProvider>
-            </Provider>
-          </OfflineDetectionProvider>
+          <GlobalStyles />
+          <Provider store={store}>
+            <AbilityProvider>
+              <Bootstrap {...pageProps} component={Component} />
+              <OfflineNotification />
+            </AbilityProvider>
+          </Provider>
         </NotificationProvider>
       </ThemeProvider>
     );

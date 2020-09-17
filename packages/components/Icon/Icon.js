@@ -1,6 +1,6 @@
-import React from 'react';
+import React, { memo } from 'react';
 import styled from 'styled-components';
-import { withOfflineDetection } from '../Offline';
+import { useNavigatorOnline } from '@caesar/common/hooks';
 import '@caesar/assets/icons/svg';
 
 const Svg = styled.svg`
@@ -17,11 +17,10 @@ const Svg = styled.svg`
 const getIconDisabledStatus = (withOfflineCheck, isOnline, disabled) =>
   (withOfflineCheck && !isOnline) || disabled;
 
-const Icon = ({
+const IconComponent = ({
   name,
   color,
   withOfflineCheck = false,
-  isOnline,
   disabled,
   onClick = Function.prototype,
   onMouseEnter = Function.prototype,
@@ -32,6 +31,7 @@ const Icon = ({
     return null;
   }
 
+  const isOnline = useNavigatorOnline();
   const isDisabled = getIconDisabledStatus(
     withOfflineCheck,
     isOnline,
@@ -53,4 +53,4 @@ const Icon = ({
   );
 };
 
-export default withOfflineDetection(Icon);
+export const Icon = memo(IconComponent);

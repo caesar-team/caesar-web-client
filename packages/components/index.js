@@ -67,11 +67,7 @@ export {
   NotificationContext,
   NotificationProvider,
 } from './Notification';
-export {
-  OfflineDetectionProvider,
-  OfflineNotification,
-  withOfflineDetection,
-} from './Offline';
+export { OfflineNotification } from './Offline';
 export { PasswordGenerator } from './PasswordGenerator';
 export { PasswordIndicator } from './PasswordIndicator';
 export { ProgressBar } from './ProgressBar';

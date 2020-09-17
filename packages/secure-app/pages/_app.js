@@ -7,10 +7,7 @@ import theme from '@caesar/common/theme';
 import withRedux from 'next-redux-wrapper';
 import withReduxSaga from 'next-redux-saga';
 import { configureWebStore } from '@caesar/common/root/store';
-import {
-  NotificationProvider,
-  OfflineDetectionProvider,
-} from '@caesar/components';
+import { NotificationProvider } from '@caesar/components';
 
 import {
   fixedSizeListener,
@@ -45,20 +42,14 @@ class Application extends NextApp {
   }
 
   render() {
-    const {
-      Component,
-      pageProps,
-      router: { route },
-    } = this.props;
+    const { Component, pageProps } = this.props;
 
     return (
       <ThemeProvider theme={theme}>
-        <OfflineDetectionProvider>
-          <NotificationProvider>
-            <GlobalStyles />
-            <Component {...pageProps} />
-          </NotificationProvider>
-        </OfflineDetectionProvider>
+        <NotificationProvider>
+          <GlobalStyles />
+          <Component {...pageProps} />
+        </NotificationProvider>
       </ThemeProvider>
     );
   }

@@ -1,7 +1,7 @@
-import React from 'react';
+import React, { memo } from 'react';
 import styled from 'styled-components';
+import { useNavigatorOnline } from '@caesar/common/hooks';
 import { Icon } from '../Icon';
-import withOfflineDetection from './withOfflineDetection';
 
 const Wrapper = styled.div`
   position: absolute;
@@ -23,17 +23,22 @@ const Text = styled.div`
   margin-right: 8px;
 `;
 
-const OfflineNotification = ({ isOnline, isOnLightBg = true }) =>
-  !isOnline && (
-    <Wrapper isOnLightBg={isOnLightBg}>
-      <Text>You are currently offline.</Text>
-      <Icon
-        name="warning"
-        width={20}
-        height={20}
-        color={isOnLightBg ? 'white' : 'black'}
-      />
-    </Wrapper>
-  );
+const OfflineNotificationComponent = ({ isOnLightBg = true }) => {
+  const isOnline = useNavigatorOnline();
 
-export default withOfflineDetection(OfflineNotification);
+  return (
+    !isOnline && (
+      <Wrapper isOnLightBg={isOnLightBg}>
+        <Text>You are currently offline.</Text>
+        <Icon
+          name="warning"
+          width={20}
+          height={20}
+          color={isOnLightBg ? 'white' : 'black'}
+        />
+      </Wrapper>
+    )
+  );
+};
+
+export const OfflineNotification = memo(OfflineNotificationComponent);

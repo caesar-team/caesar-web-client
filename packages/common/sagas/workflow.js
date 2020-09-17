@@ -345,7 +345,6 @@ export function* processTeamItemsSaga({ payload: { teamId } }) {
 
     const teamKeyPairs = yield select(teamKeyPairSelector, { teamId });
 
-    yield all(decryptItemsBySystemKeys(teamItems, teamKeyPairs));
     yield put(
       decryption({
         items: teamItems,

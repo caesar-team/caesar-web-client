@@ -15,6 +15,7 @@ import {
   InviteModal,
   Can,
   ConfirmModal,
+  ConfirmLeaveTeamModal,
 } from '@caesar/components';
 import {
   COMMANDS_ROLES,
@@ -584,11 +585,9 @@ class TeamContainer extends Component {
           onClickConfirm={this.handleRemoveTeam}
           onClickCancel={this.handleCloseModal(REMOVE_TEAM_MODAL)}
         />
-        <ConfirmModal
+        <ConfirmLeaveTeamModal
           isOpened={modalVisibilities[LEAVE_TEAM_MODAL]}
-          title={`You are going to leave "${team.title}" team`}
-          description="You will lose access to the team items. Are you sure?"
-          confirmBtnText="Yes, leave team"
+          teamTitle={team.title}
           onClickConfirm={this.handleLeaveTeam}
           onClickCancel={this.handleCloseModal(LEAVE_TEAM_MODAL)}
         />        

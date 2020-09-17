@@ -34,7 +34,7 @@ const StyledButton = styled(Button)`
   margin-right: 20px;
 `;
 
-const ConfirmModal = ({
+export const ConfirmModal = ({
   isOpened,
   title = 'Warning',
   description,
@@ -66,5 +66,3 @@ const ConfirmModal = ({
     </Wrapper>
   </Modal>
 );
-
-export default ConfirmModal;

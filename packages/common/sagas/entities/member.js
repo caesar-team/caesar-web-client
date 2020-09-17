@@ -264,7 +264,7 @@ export function* leaveTeamSaga({ payload: { teamId } }) {
     yield put(leaveTeamSuccess());
     yield put(removeTeamMemberSuccess(teamId, userId));
     yield put(removeTeamFromMember(teamId, userId));
-    yield call(Router.push, ROUTES.SETTINGS_TEAMS);
+    yield call(Router.push, ROUTES.SETTINGS + ROUTES.TEAM);
   } catch (e) {
     yield put(
       updateGlobalNotification(getServerErrorMessage(e), false, true),

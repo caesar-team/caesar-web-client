@@ -6,6 +6,7 @@ import {
   LogoLoader,
   TeamModal,
   ConfirmModal,
+  ConfirmLeaveTeamModal,
   Can,
 } from '@caesar/components';
 import { PERMISSION, PERMISSION_ENTITY } from '@caesar/common/constants';
@@ -255,11 +256,9 @@ class TeamListContainer extends Component {
           onClickConfirm={this.handleRemoveTeam}
           onClickCancel={this.handleCloseModal(REMOVE_TEAM_MODAL)}
         />
-        <ConfirmModal
+        <ConfirmLeaveTeamModal
           isOpened={modalVisibilities[LEAVE_TEAM_MODAL]}
-          title={`You are going to leave "${selectedTeamTitle}" team`}
-          description="You will lose access to the team items. Are you sure?"
-          confirmBtnText="Yes, leave team"
+          teamTitle={selectedTeamTitle}
           onClickConfirm={this.handleLeaveTeam}
           onClickCancel={this.handleCloseModal(LEAVE_TEAM_MODAL)}
         />        

@@ -377,7 +377,7 @@ export const updateItemField = (itemId, key, value) => ({
 });
 
 export const addItemsBatch = items => {
-  let itemsById = {};
+  let itemsById = items;
 
   if (Array.isArray(items)) {
     itemsById = arrayToObject(items);

@@ -24,6 +24,7 @@ const decryption = {
   },
   async decryptAll(items) {
     const { privateKeyObject } = state;
+
     // eslint-disable-next-line no-return-await
     const result = await Promise.all(
       items.map(async item => {

@@ -49,7 +49,9 @@ const MiddleColumnComponent = ({
   const itemsById = useSelector(itemsByIdSelector);
   const listsById = useSelector(listsByIdSelector);
   const currentTeamId = useSelector(currentTeamIdSelector);
-  const teamMembers = useSelector(state => teamMembersSelector(state, { teamId: currentTeamId }));
+  const teamMembers = useSelector(state =>
+    teamMembersSelector(state, { teamId: currentTeamId }),
+  );
 
   const isPersonalTeam = currentTeamId === TEAM_TYPE.PERSONAL;
   const isMultiItem = workInProgressItemIds?.length > 0;

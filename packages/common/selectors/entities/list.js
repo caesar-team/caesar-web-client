@@ -179,6 +179,14 @@ export const currentTeamListsSelector = createSelector(
   }),
 );
 
+const teamIdPropSelector = (_, props) => props.teamId;
+export const listsIdTeamSelector = createSelector(
+  listsSelector,
+  teamIdPropSelector,
+  (lists, teamId) =>
+    lists.filter(list => list.teamId === teamId).map(list => list.id),
+);
+
 export const selectableTeamsListsSelector = createSelector(
   teamListSelector,
   personalListsSelector,

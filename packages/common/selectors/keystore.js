@@ -26,6 +26,15 @@ export const shareKeyPairsSelector = createSelector(
   },
 );
 
+const itemIdPropSelector = (_, props) => props.itemId;
+export const shareItemKeyPairSelector = createSelector(
+  shareKeyPairsSelector,
+  itemIdPropSelector,
+  (keyPairs, itemId) => {
+    return keyPairs[itemId];
+  },
+);
+
 export const keyPairsStoreSelector = createSelector(
   shareKeyPairsSelector,
   teamKeyPairsSelector,

@@ -168,7 +168,6 @@ export const visibleListItemsSelector = createSelector(
       : teamFavoriteList;
 
     const isFavoriteList = workInProgressListId === favoriteList?.id;
-
     switch (true) {
       case isFavoriteList:
         return createListItemsList(favoriteList.children, itemsById);

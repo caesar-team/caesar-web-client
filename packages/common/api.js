@@ -190,6 +190,8 @@ export const getUsersByIds = userIds =>
 
 export const getTeamMembers = teamId => callApi.get(`/teams/${teamId}/members`);
 
+export const postLeaveTeam = teamId => callApi.post(`/teams/${teamId}/leave`);
+
 export const postCreateTeam = data => callApi.post('/teams', data);
 
 export const editTeam = (teamId, data) =>

@@ -107,6 +107,7 @@ const TeamCard = ({
   members,
   onClick = Function.prototype,
   onClickEditTeam = Function.prototype,
+  onClickLeaveTeam = Function.prototype,
   onClickRemoveTeam = Function.prototype,
 }) => {
   const { id, icon, users } = team;
@@ -137,6 +138,9 @@ const TeamCard = ({
                 Edit
               </MenuButton>
             </Can>
+            <MenuButton color="white" onClick={onClickLeaveTeam}>
+              Leave
+            </MenuButton>            
             <Can I={PERMISSION.DELETE} a={teamSubject}>
               <MenuButton color="white" onClick={onClickRemoveTeam}>
                 Remove

@@ -125,6 +125,7 @@ export const ROUTES = {
   INVITE: '/invite',
   DASHBOARD: '/',
   SETTINGS: '/settings',
+  SETTINGS_TEAMS: '/settings/team',
   IMPORT: '/import',
   TEAM: '/team',
   CREATE: '/create',

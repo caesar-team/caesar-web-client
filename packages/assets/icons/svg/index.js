@@ -20,6 +20,7 @@ import './icon-history.svg?sprite';
 import './icon-inbox.svg?sprite';
 import './icon-key-diagonal.svg?sprite';
 import './icon-key.svg?sprite';
+import './icon-leave.svg?sprite';
 import './icon-link.svg?sprite';
 import './icon-list.svg?sprite';
 import './icon-loader-error.svg?sprite';

@@ -144,7 +144,6 @@ const ItemComponent = ({
             onClickAcceptEdit={!isTrashItem && handleClickAcceptEdit}
             onClickShare={onClickShare}
             isVisibleDragZone={isVisibleDragZone}
-            dragZoneState={{ isVisibleDragZone, setVisibleDragZone }}
           />
           <Meta item={item} />
           <Can I={PERMISSION.TRASH} an={itemSubject}>

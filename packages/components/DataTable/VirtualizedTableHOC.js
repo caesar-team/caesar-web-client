@@ -1,7 +1,7 @@
 import React, { memo } from 'react';
 import { areEqual, FixedSizeList } from 'react-window';
 import AutoSizer from 'react-virtualized-auto-sizer';
-import { ReactTableDefaults } from 'react-table';
+import { ReactTableDefaults } from 'react-table-6';
 import { get } from '@caesar/common/utils/utils';
 
 const ITEM_HEIGHT = 40;
@@ -48,7 +48,7 @@ const TbodyComponent = props => {
   );
 };
 
-const VirtualizedTableHOC = Component => {
+export const VirtualizedTableHOC = Component => {
   return class RTVirtualizedTable extends React.Component {
     getTbodyProps = state => {
       const { expanded, pageRows } = state;
@@ -90,5 +90,3 @@ const VirtualizedTableHOC = Component => {
     }
   };
 };
-
-export default VirtualizedTableHOC;

@@ -1,2 +1,2 @@
-export { default as DataTable } from './DataTable';
-export { default as VirtualizedTableHOC } from './VirtualizedTableHOC';
+export { DataTable } from './DataTable';
+export { VirtualizedTableHOC } from './VirtualizedTableHOC';

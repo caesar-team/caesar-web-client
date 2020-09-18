@@ -191,7 +191,6 @@ class Bootstrap extends Component {
     } = this.props;
     const {
       currentStep,
-      oldKeyPair,
       currentKeyPair,
       masterPassword,
     } = this.state;

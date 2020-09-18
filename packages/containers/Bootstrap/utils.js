@@ -7,14 +7,12 @@ import {
   MASTER_PASSWORD_CREATE,
   MASTER_PASSWORD_CHECK,
   MASTER_PASSWORD_CONFIRM,
-  SHARED_ITEMS_CHECK,
 } from './constants';
 
 export const getBootstrapStates = memoize(bootstrap => ({
   twoFactorAuthState: `TWO_FACTOR_${bootstrap.twoFactorAuthState}`,
   passwordState: `PASSWORD_${bootstrap.passwordState}`,
   masterPasswordState: `MASTER_PASSWORD_${bootstrap.masterPasswordState}`,
-  sharedItemsState: `SHARED_ITEMS_${bootstrap.sharedItemsState}`,
 }));
 
 const createStep = (name, text) => ({ name, text });

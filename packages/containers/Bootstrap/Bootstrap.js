@@ -102,7 +102,6 @@ class Bootstrap extends Component {
   };
 
   handleFinishMasterPassword = ({
-    oldKeyPair,
     currentKeyPair,
     masterPassword,
   }) => {
@@ -113,7 +112,6 @@ class Bootstrap extends Component {
     });
 
     this.setState({
-      oldKeyPair,
       currentKeyPair,
       masterPassword,
       currentStep: BOOTSTRAP_FINISH,
@@ -167,10 +165,6 @@ class Bootstrap extends Component {
     return {
       currentStep: null,
       masterPassword: null,
-      oldKeyPair: {
-        publicKey: null,
-        encryptedPrivateKey: null,
-      },
       currentKeyPair: {
         publicKey: null,
         encryptedPrivateKey: null,

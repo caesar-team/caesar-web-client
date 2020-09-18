@@ -91,7 +91,10 @@ export default createReducer(initialState, {
   [ADD_LISTS_BATCH](state, { payload }) {
     return {
       ...state,
-      byId: payload.listsById,
+      byId: {
+        ...state.byId,
+        ...payload.listsById,
+      },
     };
   },
   [ADD_ITEM_TO_LIST](state, { payload }) {

@@ -106,7 +106,7 @@ export const decryptItemData = async (item, privateKeyObject) => {
     };
   } catch (error) {
     // eslint-disable-next-line no-console
-    console.error(error);
+    console.error(`Can't decrypt the item ${item.id}, the error is %s`, error);
 
     return {
       data: null,

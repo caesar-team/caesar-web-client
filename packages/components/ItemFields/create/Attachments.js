@@ -71,7 +71,6 @@ export const Attachments = ({
     <Title>Attachments</Title>
     <StyledUploader
       multiple
-      asPreview
       name={name}
       files={value}
       error={typeof error === 'string' ? error : ''}

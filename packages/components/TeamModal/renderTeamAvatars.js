@@ -212,7 +212,6 @@ export const renderTeamAvatars = ({ icon = {} }, setFieldValue) => {
           shouldShowEdit={isCustomIcon}
         >
           <Uploader
-            asPreview
             name="icon"
             accept="image/*"
             maxSize={TEAM_AVATAR_MAX_SIZE}

@@ -23,6 +23,7 @@ const CredentialsComponent = ({
   onClickAcceptEdit,
   onClickShare,
   isSharedItem,
+  isVisibleDragZone,
 }) => {
   const { name, login, pass, website, note, attachments, raws } = item.data;
 
@@ -80,6 +81,7 @@ const CredentialsComponent = ({
           raws={raws}
           itemSubject={itemSubject}
           onClickAcceptEdit={onClickAcceptEdit}
+          isVisibleDragZone={isVisibleDragZone}
         />
       </Row>
     </>

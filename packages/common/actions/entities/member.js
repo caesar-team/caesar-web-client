@@ -26,6 +26,10 @@ export const REMOVE_TEAM_FROM_MEMBER = '@member/REMOVE_TEAM_FROM_MEMBER';
 export const REMOVE_TEAM_FROM_MEMBERS_BATCH =
   '@member/REMOVE_TEAM_FROM_MEMBERS_BATCH';
 
+export const LEAVE_TEAM_REQUEST = '@team/LEAVE_TEAM_REQUEST';
+export const LEAVE_TEAM_SUCCESS = '@team/LEAVE_TEAM_SUCCESS';
+export const LEAVE_TEAM_FAILURE = '@team/LEAVE_TEAM_FAILURE';
+
 export const fetchMembersRequest = memberIds => ({
   type: FETCH_MEMBERS_REQUEST,
   payload: {
@@ -119,4 +123,23 @@ export const removeTeamFromMembersBatch = (teamId, memberIds) => ({
     teamId,
     memberIds,
   },
+});
+
+
+export const leaveTeamRequest = teamId => ({
+  type: LEAVE_TEAM_REQUEST,
+  payload: {
+    teamId,
+  },
+});
+
+export const leaveTeamSuccess = teamId => ({
+  type: LEAVE_TEAM_SUCCESS,
+  payload: {
+    teamId,
+  },
+});
+
+export const leaveTeamFailure = () => ({
+  type: LEAVE_TEAM_FAILURE,
 });

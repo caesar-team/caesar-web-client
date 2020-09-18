@@ -107,6 +107,7 @@ const TeamCard = ({
   members,
   onClick = Function.prototype,
   onClickEditTeam = Function.prototype,
+  onClickLeaveTeam = Function.prototype,
   onClickRemoveTeam = Function.prototype,
 }) => {
   const { id, icon, users } = team;
@@ -120,31 +121,32 @@ const TeamCard = ({
 
   return (
     <Wrapper className={className} onClick={onClick}>
-      <Can I={PERMISSION.CRUD} a={teamSubject}>
-        <StyledDottedMenu
-          tooltipProps={{
-            textBoxWidth: '100px',
-            arrowAlign: 'start',
-            position: 'left top',
-            padding: '0px 0px',
-            flat: true,
-            zIndex: '1',
-          }}
-        >
-          <MenuWrapper>
-            <Can I={PERMISSION.EDIT} a={teamSubject}>
-              <MenuButton color="white" onClick={onClickEditTeam}>
-                Edit
-              </MenuButton>
-            </Can>
-            <Can I={PERMISSION.DELETE} a={teamSubject}>
-              <MenuButton color="white" onClick={onClickRemoveTeam}>
-                Remove
-              </MenuButton>
-            </Can>
-          </MenuWrapper>
-        </StyledDottedMenu>
-      </Can>
+      <StyledDottedMenu
+        tooltipProps={{
+          textBoxWidth: '100px',
+          arrowAlign: 'start',
+          position: 'left top',
+          padding: '0px 0px',
+          flat: true,
+          zIndex: '1',
+        }}
+      >
+        <MenuWrapper>
+          <Can I={PERMISSION.EDIT} a={teamSubject}>
+            <MenuButton color="white" onClick={onClickEditTeam}>
+              Edit
+            </MenuButton>
+          </Can>
+          <MenuButton color="white" onClick={onClickLeaveTeam}>
+            Leave
+          </MenuButton>            
+          <Can I={PERMISSION.DELETE} a={teamSubject}>
+            <MenuButton color="white" onClick={onClickRemoveTeam}>
+              Remove
+            </MenuButton>
+          </Can>
+        </MenuWrapper>
+      </StyledDottedMenu>
       <Link
         key={id}
         href={`${ROUTES.SETTINGS}${ROUTES.TEAM}/[id]`}

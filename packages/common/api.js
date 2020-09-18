@@ -172,10 +172,6 @@ export const postInvitationBatch = data => callApi.post('/invitations', data);
 export const patchChildItemBatch = data =>
   callApi.patch('/child_item/batch', data);
 
-export const getOfferedItems = () => callApi.get('/offered_item');
-
-export const patchAcceptItem = data => callApi.patch('/accept_item', data);
-
 export const patchResetPassword = (token, data) =>
   callApi.patch(`/auth/srpp/reset/${token}`, data);
 
@@ -229,8 +225,6 @@ export const getMembers = () => callApi.get('/users');
 
 export const getDefaultTeamMembers = () =>
   callApi.get('/teams/default/members');
-
-export const patchAcceptTeamItems = () => callApi.patch('/accept_teams_items');
 
 export const getMovableLists = () => callApi.get(`/lists/movable`);
 

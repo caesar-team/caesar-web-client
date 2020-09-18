@@ -55,22 +55,14 @@ const getMasterPasswordSteps = masterPasswordState => {
   return [];
 };
 
-const getSharedItemsSteps = sharedItemsState => {
-  return sharedItemsState === SHARED_ITEMS_CHECK
-    ? [createStep(SHARED_ITEMS_CHECK, 'Shared Items')]
-    : [];
-};
-
 export const getNavigationPanelSteps = memoize(
   ({
     twoFactorAuthState,
     passwordState,
     masterPasswordState,
-    sharedItemsState,
   }) => [
     ...getTwoFactorSteps(twoFactorAuthState),
     ...getPasswordSteps(passwordState),
     ...getMasterPasswordSteps(masterPasswordState),
-    ...getSharedItemsSteps(sharedItemsState),
   ],
 );

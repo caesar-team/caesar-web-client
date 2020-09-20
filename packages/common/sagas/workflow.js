@@ -148,7 +148,7 @@ export function decryptItemsBySystemKeys(items, keyPairs) {
         decryption({
           items: [item],
           key: keyPair.privateKey,
-          masterPassword: keyPair.pass,
+          masterPassword: keyPair.password,
         }),
       );
     });
@@ -176,7 +176,7 @@ export function* processSharedItemsSaga() {
 
 export function* processTeamItemsSaga({ payload: { teamId } }) {
   try {
-    const teamItems = yield select(nonDecryptedTeamsItemsSelector);
+    const teamItems = yield select(nonDecryptedTeamItemsSelector, { teamId });
     if (teamItems.length <= 0) return;
 
     const teamKeyPairs = yield select(teamKeyPairSelector, { teamId });
@@ -185,7 +185,7 @@ export function* processTeamItemsSaga({ payload: { teamId } }) {
       decryption({
         items: teamItems,
         key: teamKeyPairs.privateKey,
-        masterPassword: teamKeyPairs.pass,
+        masterPassword: teamKeyPairs.password,
       }),
     );
   } catch (error) {
@@ -219,7 +219,7 @@ function* initPersonalVault() {
     const keyPair = yield select(teamKeyPairSelector, {
       teamId: TEAM_TYPE.PERSONAL,
     });
-    const masterPassword = yield select(masterPasswordSelector);
+    // const masterPassword = yield select(masterPasswordSelector);
 
     const {
       data: { personal: personalItems = [], shared: sharedItems = [] },
@@ -427,7 +427,7 @@ function* initTeam(teamId) {
   }
 }
 
-function* initTeams(withDecryption) {
+function* initTeams() {
   try {
     // Load avaible teams
     const { data: teams } = yield call(getTeams);
@@ -440,8 +440,7 @@ function* initTeams(withDecryption) {
     const teamById = arrayToObject(teams);
     yield put(addTeamsBatch(teamById));
 
-    if (withDecryption)
-      yield all(teams.map(({ id }) => call(initTeam, id, false)));
+    yield all(teams.map(({ id }) => call(initTeam, id, false)));
   } catch (error) {
     // eslint-disable-next-line no-console
     console.error(error);
@@ -538,7 +537,7 @@ function* decryptItemRaws({ payload: { item } }) {
     const masterPassword =
       !item.teamId && !item.isShared
         ? yield select(masterPasswordSelector)
-        : keyPair.pass;
+        : keyPair.password;
 
     yield put(
       decryption({

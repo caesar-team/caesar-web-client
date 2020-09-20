@@ -82,6 +82,12 @@ export const decryptItemData = async (item, privateKeyObject) => {
     const { data: encryptedData, raws: encryptedRaws } = JSON.parse(
       item.secret,
     );
+    if (item.type !== ITEM_TYPE.SYSTEM) {
+      console.log(`Decrypting ${item.id}`);
+      console.log(`encryptedData: ${encryptedData}`);
+      console.log(`encryptedRaws: ${encryptedRaws}`);
+    }
+
     const promises = [];
     promises.push(decryptItem(encryptedData, privateKeyObject));
 
@@ -90,7 +96,10 @@ export const decryptItemData = async (item, privateKeyObject) => {
     }
 
     const [data, raws = {}] = await Promise.all(promises);
-
+    if (item.type !== ITEM_TYPE.SYSTEM) {
+      console.log(`data: %o`, data);
+      console.log(`raws: %o`, raws);
+    }
     if (!data) {
       return {
         data: null,

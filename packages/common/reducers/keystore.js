@@ -1,5 +1,9 @@
 import { createReducer } from '@caesar/common/utils/reducer';
-import { KEY_TYPE, REGEXP_EXCTRACTOR } from '@caesar/common/constants';
+import {
+  KEY_TYPE,
+  REGEXP_EXCTRACTOR,
+  TEAM_TYPE,
+} from '@caesar/common/constants';
 import {
   ADD_PERSONAL_KEY_PAIR,
   ADD_TEAM_KEY_PAIR,
@@ -23,10 +27,19 @@ const initialState = {
 };
 
 export default createReducer(initialState, {
-  [ADD_PERSONAL_KEY_PAIR](state, { payload }) {
+  [ADD_PERSONAL_KEY_PAIR](
+    state,
+    {
+      payload: {
+        data: { privateKey, publicKey, password },
+      },
+    },
+  ) {
     return {
       ...state,
-      [KEY_TYPE.PERSONAL]: payload.data,
+      [KEY_TYPE.TEAMS]: {
+        [TEAM_TYPE.PERSONAL]: { privateKey, publicKey, password },
+      },
     };
   },
   [ADD_TEAM_KEY_PAIR_BATCH](state, { payload }) {
@@ -42,7 +55,10 @@ export default createReducer(initialState, {
 
     return {
       ...state,
-      [KEY_TYPE.TEAMS]: keyPairs,
+      [KEY_TYPE.TEAMS]: {
+        ...state[KEY_TYPE.TEAMS],
+        ...keyPairs,
+      },
     };
   },
   [ADD_SHARE_KEY_PAIR_BATCH](state, { payload }) {

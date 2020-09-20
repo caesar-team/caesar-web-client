@@ -16,7 +16,7 @@ import {
 import {
   masterPasswordSelector,
   userDataSelector,
-  userPersonalDefaultListIdSelector,
+  userDefaultListIdSelector,
 } from '@caesar/common/selectors/user';
 import {
   actualKeyPairSelector,
@@ -108,15 +108,13 @@ export function* findOrCreateSystemItemKeyPair({ payload: { item } }) {
   let systemKeyPairItem = yield select(shareKeyPairSelector, { id: item.id });
 
   if (!systemKeyPairItem) {
-    const userPersonalDefaultListId = yield select(
-      userPersonalDefaultListIdSelector,
-    );
+    const defaultListId = yield select(userDefaultListIdSelector);
     const { publicKey } = yield select(personalKeyPairSelector);
 
     systemKeyPairItem = yield call(
       generateSystemItem,
       ENTITY_TYPE.SHARE,
-      userPersonalDefaultListId,
+      defaultListId,
       item.id,
     );
 

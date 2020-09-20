@@ -1,5 +1,5 @@
 import { schema } from 'normalizr';
-import { ENTITY_TYPE } from '@caesar/common/constants';
+import { ENTITY_TYPE, TEAM_TYPE } from '@caesar/common/constants';
 import childItemSchema from './childItem';
 
 const itemSchema = new schema.Entity(
@@ -11,7 +11,7 @@ const itemSchema = new schema.Entity(
     processStrategy: (entity, parent) => ({
       ...entity,
       listId: parent.id,
-      teamId: parent.teamId,
+      teamId: parent.teamId || TEAM_TYPE.PERSONAL,
       __type: ENTITY_TYPE.ITEM,
     }),
   },

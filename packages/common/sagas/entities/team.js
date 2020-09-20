@@ -50,7 +50,7 @@ import {
   currentTeamIdSelector,
   userDataSelector,
   userTeamIdsSelector,
-  userPersonalDefaultListIdSelector,
+  userDefaultListIdSelector,
 } from '@caesar/common/selectors/user';
 import {
   getTeams,
@@ -167,7 +167,7 @@ export function* createTeamKeysSaga({ payload: { team } }) {
 
     const user = yield select(userDataSelector);
 
-    listId = yield select(userPersonalDefaultListIdSelector);
+    listId = yield select(userDefaultListIdSelector);
 
     if (!listId || typeof listId === 'undefined') {
       // TODO: Bug fix: we lost the user default list and we need to restore it from the list api

@@ -31,7 +31,7 @@ export const listSelector = createSelector(
 
 export const personalListsSelector = createSelector(
   listsSelector,
-  lists => lists.filter(list => !list.teamId),
+  lists => lists.filter(list => list.teamId === TEAM_TYPE.PERSONAL),
 );
 
 export const selectableListsSelector = createSelector(

@@ -37,11 +37,6 @@ export const itemsBatchSelector = createSelector(
 
 const teamIdPropSelector = (_, prop) => prop.teamId;
 
-export const nonDecryptedSharedItemsSelector = createSelector(
-  itemsByIdSelector,
-  items => Object.values(items).filter(item => !item?.data && item.isShared),
-);
-
 export const nonDecryptedTeamItemsSelector = createSelector(
   itemsByIdSelector,
   teamIdPropSelector,
@@ -53,7 +48,7 @@ export const nonDecryptedTeamItemsSelector = createSelector(
 
 export const nonDecryptedTeamsItemsSelector = createSelector(
   itemsByIdSelector,
-  items => Object.values(items).filter(item => !item?.data && !item.isShared),
+  items => Object.values(items).filter(item => !item?.data && item.teamId),
 );
 
 const listsIdPropSelector = (_, prop) => prop.listsId;
@@ -69,6 +64,11 @@ export const nonDecryptedListsItemsSelector = createSelector(
 export const nonDecryptedItemsSelector = createSelector(
   itemsByIdSelector,
   items => Object.values(items).filter(item => !item?.data),
+);
+
+export const nonDecryptedSharedItemsSelector = createSelector(
+  nonDecryptedItemsSelector,
+  items => items.filter(item => item.isShared),
 );
 
 export const teamItemListSelector = createSelector(

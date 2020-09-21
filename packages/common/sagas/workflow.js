@@ -122,7 +122,7 @@ const processingInvitedItem = (items, systemItemsById) => {
       : item,
   );
 };
-export function decryptItemsBySystemKeys(items, keyPairs) {
+export function decryptItemsByItemIdKeys(items, keyPairs) {
   try {
     const putSagas = items.map(item => {
       const keyPair = keyPairs[item.id];
@@ -144,11 +144,13 @@ export function decryptItemsBySystemKeys(items, keyPairs) {
       }
       // TODO:  the decryption should be refactor to accept the multiple items and keys
 
+      const { privateKey, password } = keyPair;
+
       return put(
         decryption({
           items: [item],
-          key: keyPair.privateKey,
-          masterPassword: keyPair.password,
+          key: privateKey,
+          masterPassword: password,
         }),
       );
     });
@@ -167,7 +169,7 @@ export function* processSharedItemsSaga() {
     const keyPairs = yield select(shareKeyPairsSelector);
     const sharedItems = yield select(nonDecryptedSharedItemsSelector);
 
-    yield all(decryptItemsBySystemKeys(sharedItems, keyPairs));
+    yield all(decryptItemsByItemIdKeys(sharedItems, keyPairs));
   } catch (error) {
     // eslint-disable-next-line no-console
     console.error(error);
@@ -206,7 +208,7 @@ export function* processTeamsItemsSaga() {
         return select(teamKeyPairSelector, { teamId: team.id });
       }),
     );
-    yield all(decryptItemsBySystemKeys(teamItems, teamKeyPairs));
+    yield all(decryptItemsByItemIdKeys(teamItems, teamKeyPairs));
   } catch (error) {
     // eslint-disable-next-line no-console
     console.error(error);
@@ -335,6 +337,8 @@ export function* openTeamVaultSaga({ payload: { teamId } }) {
     yield put(resetWorkInProgressItemIds(null));
 
     const keyPair = yield select(teamKeyPairSelector, { teamId });
+
+    // TODO: Shoub be moved to the create item saga?
     if (!keyPair && teamId !== TEAM_TYPE.PERSONAL) {
       const team = yield select(teamSelector, { teamId });
       // eslint-disable-next-line no-console
@@ -343,19 +347,20 @@ export function* openTeamVaultSaga({ payload: { teamId } }) {
       );
       yield call(createTeamKeysSaga, { payload: { team } });
     }
-    const decryptItemsSagas = [
-      call(processTeamItemsSaga, {
-        payload: {
-          teamId,
-        },
-      }),
-      call(processSharedItemsSaga, {
-        payload: {
-          teamId,
-        },
-      }),
-    ];
-    yield all(decryptItemsSagas);
+
+    // TODO: Here is opportunity to improve the calls
+    yield call(processTeamItemsSaga, {
+      payload: {
+        teamId,
+      },
+    });
+
+    yield fork(processSharedItemsSaga, {
+      payload: {
+        teamId,
+      },
+    });
+
     yield put(finishIsLoading());
   } catch (error) {
     // eslint-disable-next-line no-console

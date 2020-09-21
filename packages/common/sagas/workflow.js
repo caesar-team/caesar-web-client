@@ -35,6 +35,7 @@ import { fetchMembersSaga } from '@caesar/common/sagas/entities/member';
 import {
   convertNodesToEntities,
   convertItemsToEntities,
+  convertTeamsToEntity,
   extractRelatedAndNonSystemItems,
 } from '@caesar/common/normalizers/normalizers';
 import { objectToArray, arrayToObject } from '@caesar/common/utils/utils';
@@ -212,6 +213,13 @@ export function* processTeamsItemsSaga() {
   }
 }
 
+function* getFavoritesListFromStore(teamId) {
+  return (
+    (yield select(listsTeamSelector, {
+      teamId,
+    })).find(list => list.type === LIST_TYPE.FAVORITES) || null
+  );
+}
 function* initPersonalVault() {
   try {
     // Init personal keys
@@ -287,7 +295,17 @@ function* initPersonalVault() {
     const { listsById, itemsById: listItemsByID } = convertNodesToEntities(
       lists,
     );
-    const favoritesList = getFavoritesList(listItemsByID);
+    const trashList = lists.find(list => list.type === LIST_TYPE.TRASH);
+    const teamId = TEAM_TYPE.PERSONAL;
+
+    const favoriteListFromStore = yield call(getFavoritesListFromStore, teamId);
+
+    const favoritesList = getFavoritesList({
+      favoriteListId: favoriteListFromStore?.id,
+      itemsById: listItemsByID,
+      trashListId: trashList?.id,
+      teamId,
+    });
 
     yield put(
       addListsBatch({
@@ -342,13 +360,16 @@ function* initTeam(teamId) {
 
     const { data: lists } = yield call(getTeamLists, currentTeamId);
     const { listsById, itemsById } = convertNodesToEntities(lists);
-    // const defaultList = lists.find(list => list.type === LIST_TYPE.DEFAULT);
     const trashList = lists.find(list => list.type === LIST_TYPE.TRASH);
-    const favoritesList = getFavoritesList(
+
+    const favoriteListFromStore = yield call(getFavoritesListFromStore, teamId);
+
+    const favoritesList = getFavoritesList({
+      favoriteListId: favoriteListFromStore?.id,
       itemsById,
-      trashList?.id,
-      currentTeamId,
-    );
+      trashListId: trashList?.id,
+      teamId,
+    });
 
     yield put(
       addListsBatch({
@@ -387,9 +408,20 @@ function* initTeams() {
         team_create_item: true,
         // eslint-disable-next-line camelcase
         create_item: true,
+        // eslint-disable-next-line camelcase
+        team_create_list: true,
+        // eslint-disable-next-line camelcase
+        team_edit: true,
+        // eslint-disable-next-line camelcase
+        team_get_lists: true,
+        // eslint-disable-next-line camelcase
+        team_member_add: false,
+        // eslint-disable-next-line camelcase
+        team_members: false,
       },
     });
 
+    console.log(convertTeamsToEntity(teams));
     const teamById = arrayToObject(teams);
     yield put(addTeamsBatch(teamById));
   } catch (error) {

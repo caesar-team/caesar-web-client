@@ -79,6 +79,8 @@ export const AddItem = ({ className }) => {
         create_item: !!workInProgressList?._links?.create_item,
       };
 
+  console.log(itemSubject);
+  console.log(workInProgressList);
   return (
     <Can I={PERMISSION.CREATE} an={itemSubject}>
       <Dropdown

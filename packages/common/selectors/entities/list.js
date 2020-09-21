@@ -192,7 +192,7 @@ export const listsIdTeamSelector = createSelector(
 export const listsTeamSelector = createSelector(
   listsSelector,
   teamIdPropSelector,
-  (lists, teamId) => lists.filter(list => list.teamId === teamId),
+  (lists, teamId) => lists.filter(list => list.teamId === teamId) || [],
 );
 
 export const teamDefaultListSelector = createSelector(

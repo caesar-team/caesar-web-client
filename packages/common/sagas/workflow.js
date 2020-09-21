@@ -312,7 +312,7 @@ function* initPersonalVault() {
 
 export function* openTeamVaultSaga({ payload: { teamId } }) {
   try {
-    const listsById = yield select(listsByIdSelector);
+    const listsById = yield select(listsTeamSelector, { teamId });
     const lists = objectToArray(listsById);
     const defaultList = lists.find(list => list.type === LIST_TYPE.DEFAULT);
     // const trashList = lists.find(list => list.type === LIST_TYPE.TRASH);
@@ -330,6 +330,7 @@ export function* openTeamVaultSaga({ payload: { teamId } }) {
         yield put(setWorkInProgressListId(defaultList?.id));
       }
     }
+
     const workInProgressItem = yield select(workInProgressItemSelector);
     if (!workInProgressItem || workInProgressItem?.teamId !== teamId) {
       yield put(setWorkInProgressItem(null));

@@ -73,9 +73,10 @@ export const favoriteListSelector = createSelector(
 
     return {
       ...favoriteList,
-      children: favoriteList.children?.filter(
-        itemId => items[itemId]?.listId !== trash.id,
-      ),
+      children:
+        favoriteList?.children?.filter(
+          itemId => items[itemId]?.listId !== trash.id,
+        ) || [],
     };
   },
 );
@@ -154,9 +155,10 @@ export const currentTeamFavoriteListSelector = createSelector(
 
     return {
       ...favoriteList,
-      children: favoriteList.children?.filter(
-        itemId => items[itemId]?.listId !== trash.id,
-      ),
+      children:
+        favoriteList.children?.filter(
+          itemId => items[itemId]?.listId !== trash.id,
+        ) || [],
     };
   },
 );

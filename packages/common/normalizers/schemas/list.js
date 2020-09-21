@@ -1,5 +1,5 @@
 import { schema } from 'normalizr';
-import { ENTITY_TYPE, TEAM_TYPE } from '@caesar/common/constants';
+import { ENTITY_TYPE, TEAM_TYPE, LIST_TYPE } from '@caesar/common/constants';
 import itemSchema from './item';
 
 const listSchema = new schema.Entity(
@@ -12,6 +12,8 @@ const listSchema = new schema.Entity(
       ...entity,
       __type: ENTITY_TYPE.LIST,
       teamId: entity.teamId || TEAM_TYPE.PERSONAL,
+      type:
+        entity.label === LIST_TYPE.DEFAULT ? LIST_TYPE.DEFAULT : entity.type,
     }),
   },
 );

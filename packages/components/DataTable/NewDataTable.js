@@ -28,8 +28,6 @@ export const NewDataTable = ({
   const defaultColumn = useMemo(
     () => ({
       width: 180,
-      disableFilters: true,
-      disableSortBy: true,
     }),
     [],
   );

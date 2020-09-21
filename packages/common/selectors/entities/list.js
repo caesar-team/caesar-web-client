@@ -195,6 +195,15 @@ export const listsTeamSelector = createSelector(
   (lists, teamId) => lists.filter(list => list.teamId === teamId),
 );
 
+export const teamDefaultListSelector = createSelector(
+  listsSelector,
+  teamIdPropSelector,
+  (lists, teamId) =>
+    lists.find(
+      list => list.teamId === teamId && list.type === LIST_TYPE.DEFAULT,
+    ) || null,
+);
+
 export const selectableTeamsListsSelector = createSelector(
   teamListSelector,
   personalListsSelector,

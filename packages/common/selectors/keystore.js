@@ -53,9 +53,7 @@ export const personalKeyPairSelector = createSelector(
 export const teamKeyPairSelector = createSelector(
   teamKeyPairsSelector,
   teamIdPropSelector,
-  (keyPairs, teamId) =>
-    keyPairs[teamId] ||
-    Object.keys(findSystemItemsTeamByItemName(keyPairs, teamId)),
+  (keyPairs, teamId) => keyPairs[teamId] || null,
 );
 
 export const idsKeyPairsSelector = createSelector(

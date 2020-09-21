@@ -16,6 +16,8 @@ import {
   setWorkInProgressItem,
   resetWorkInProgressItemIds,
   decryption,
+  OPEN_VAULT,
+  openVault,
 } from '@caesar/common/actions/workflow';
 import {
   addListsBatch,
@@ -348,7 +350,6 @@ export function* openTeamVaultSaga({ payload: { teamId } }) {
       );
       yield call(createTeamKeysSaga, { payload: { team } });
     }
-
     // TODO: Here is opportunity to improve the calls
     yield call(processTeamItemsSaga, {
       payload: {
@@ -356,7 +357,7 @@ export function* openTeamVaultSaga({ payload: { teamId } }) {
       },
     });
 
-    yield fork(processSharedItemsSaga, {
+    yield call(processSharedItemsSaga, {
       payload: {
         teamId,
       },
@@ -466,9 +467,7 @@ export function* initWorkflow({ payload: { withDecryption = true } }) {
   } else {
     yield call(initPersonalVault);
   }
-  yield put(
-    setCurrentTeamId(currentTeamId || TEAM_TYPE.PERSONAL, withDecryption),
-  );
+  yield put(setCurrentTeamId(currentTeamId || TEAM_TYPE.PERSONAL));
   yield fork(fetchMembersSaga);
 }
 
@@ -492,26 +491,6 @@ export function* updateWorkInProgressItemSaga({ payload: { itemId } }) {
   }
 }
 
-export function* setCurrentTeamIdWatchSaga({
-  payload: { withDecryption = true },
-}) {
-  try {
-    const currentTeamId = yield select(currentTeamIdSelector);
-    if (!currentTeamId) return;
-
-    yield call(openTeamVaultSaga, {
-      payload: {
-        teamId: currentTeamId,
-      },
-    });
-  } catch (error) {
-    // eslint-disable-next-line no-console
-    console.error(error);
-    yield put(
-      updateGlobalNotification(getServerErrorMessage(error), false, true),
-    );
-  }
-}
 function* getItemKeyPair({
   payload: {
     item: { id: itemId, teamId, isShared },
@@ -609,5 +588,5 @@ export default function* workflowSagas() {
   yield takeLatest(SET_WORK_IN_PROGRESS_ITEM, setWorkInProgressItemSaga);
   yield takeLatest(ADD_LISTS_BATCH, initListsAndProgressEntities);
   yield takeLatest(UPDATE_WORK_IN_PROGRESS_ITEM, updateWorkInProgressItemSaga);
-  yield takeLatest(SET_CURRENT_TEAM_ID, setCurrentTeamIdWatchSaga);
+  yield takeLatest(SET_CURRENT_TEAM_ID, openTeamVaultSaga);
 }

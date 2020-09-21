@@ -85,6 +85,10 @@ import {
   createItemSaga,
 } from '@caesar/common/sagas/entities/item';
 import { teamKeyPairSelector } from '@caesar/common/selectors/keystore';
+import {
+  currentTeamDefaultListSelector,
+  teamDefaultListSelector,
+} from '../../selectors/entities/list';
 
 export function* fetchTeamsSaga() {
   try {
@@ -159,15 +163,18 @@ export function* removeTeamSaga({ payload: { teamId } }) {
   }
 }
 
-export function* createTeamKeysSaga({ payload: { team } }) {
+export function* createTeamKeysSaga({
+  payload: { team },
+  meta: { removeWhenFail } = { removeWhenFail: false },
+}) {
   try {
     if (!team) return;
 
-    let listId = null;
-
     const user = yield select(userDataSelector);
 
-    listId = yield select(userDefaultListIdSelector);
+    const { id: listId } = yield select(teamDefaultListSelector, {
+      teamId: team.id,
+    });
 
     if (!listId || typeof listId === 'undefined') {
       // TODO: Bug fix: we lost the user default list and we need to restore it from the list api
@@ -194,7 +201,10 @@ export function* createTeamKeysSaga({ payload: { team } }) {
     );
     yield put(addMemberToTeam(team.id));
     yield put(
-      createTeamKeysSuccess({ ...systemItemData, __type: ENTITY_TYPE.SYSTEM }),
+      createTeamKeysSuccess({
+        ...systemItemData,
+        __type: ENTITY_TYPE.SYSTEM,
+      }),
     );
     yield call(fetchTeamMembersSaga, {
       payload: { teamId: team.id, needUpdateTeamMembers: true },
@@ -205,7 +215,11 @@ export function* createTeamKeysSaga({ payload: { team } }) {
     yield put(
       updateGlobalNotification(getServerErrorMessage(error), false, true),
     );
-    yield put(removeTeamRequest(team.id));
+
+    if (removeWhenFail) {
+      yield put(removeTeamRequest(team.id));
+    }
+
     // Todo: need to remove all dependet entities when create team is failed
     yield put(createTeamFailure());
   }
@@ -217,7 +231,10 @@ export function* createTeamSaga({
 }) {
   try {
     const { data: team } = yield call(postCreateTeam, { title, icon });
-    yield call(createTeamKeysSaga, { payload: { team } });
+    yield call(createTeamKeysSaga, {
+      payload: { team },
+      meta: { removeWhenFail: true },
+    });
     yield call(setSubmitting, false);
     yield call(handleCloseModal);
   } catch (error) {

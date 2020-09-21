@@ -31,7 +31,7 @@ import {
   patchTeamList,
   removeTeamList,
 } from '@caesar/common/api';
-import { ENTITY_TYPE, LIST_TYPE } from '@caesar/common/constants';
+import { ENTITY_TYPE, LIST_TYPE, TEAM_TYPE } from '@caesar/common/constants';
 import { getServerErrors } from '@caesar/common/utils/error';
 
 const reorder = (list, startIndex, endIndex) => {
@@ -78,13 +78,14 @@ export function* createListSaga({
   try {
     const {
       data: { id: listId, _links },
-    } = list.teamId
-      ? yield call(postCreateTeamList, list.teamId, {
-          label: list.label,
-        })
-      : yield call(postCreateList, {
-          label: list.label,
-        });
+    } =
+      list.teamId && list.teamId !== TEAM_TYPE.PERSONAL
+        ? yield call(postCreateTeamList, list.teamId, {
+            label: list.label,
+          })
+        : yield call(postCreateList, {
+            label: list.label,
+          });
 
     yield call(setCreatingMode, false);
     yield put(

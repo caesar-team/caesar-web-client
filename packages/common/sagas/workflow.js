@@ -307,13 +307,14 @@ function* initPersonalVault() {
       teamId,
     });
 
+    const { listsById: favoritesListById } = convertNodesToEntities([
+      favoritesList,
+    ]);
+
     yield put(
       addListsBatch({
         ...listsById,
-        [favoritesList.id]: {
-          ...favoritesList,
-          teamId: TEAM_TYPE.PERSONAL,
-        },
+        ...favoritesListById,
       }),
     );
   } catch (error) {
@@ -371,14 +372,14 @@ function* initTeam(teamId) {
       teamId,
     });
 
+    const { listsById: favoritesListById } = convertNodesToEntities([
+      favoritesList,
+    ]);
+
     yield put(
       addListsBatch({
         ...listsById,
-        [favoritesList.id]: {
-          ...favoritesList,
-          type: LIST_TYPE.FAVORITES,
-          teamId,
-        },
+        ...favoritesListById,
       }),
     );
 
@@ -421,8 +422,7 @@ function* initTeams() {
       },
     });
 
-    console.log(convertTeamsToEntity(teams));
-    const teamById = arrayToObject(teams);
+    const teamById = convertTeamsToEntity(teams);
     yield put(addTeamsBatch(teamById));
   } catch (error) {
     // eslint-disable-next-line no-console

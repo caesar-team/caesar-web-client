@@ -58,7 +58,10 @@ import {
   currentTeamDefaultListSelector,
 } from '@caesar/common/selectors/entities/list';
 import { itemSelector } from '@caesar/common/selectors/entities/item';
-import { currentTeamIdSelector } from '@caesar/common/selectors/user';
+import {
+  currentTeamIdSelector,
+  keyPairSelector,
+} from '@caesar/common/selectors/user';
 import {
   addShareKeyPair,
   addTeamKeyPair,
@@ -94,6 +97,7 @@ import {
 import {
   personalKeyPairSelector,
   teamKeyPairSelector,
+  shareItemKeyPairSelector,
 } from '@caesar/common/selectors/keystore';
 import {
   generateSystemItemEmail,
@@ -103,6 +107,7 @@ import { passwordGenerator } from '@caesar/common/utils/passwordGenerator';
 import { generateKeys } from '@caesar/common/utils/key';
 import { addSystemItemsBatch } from '@caesar/common/actions/entities/system';
 import { teamSelector } from '../../selectors/entities/team';
+import { createSystemItemKeyPair } from './system';
 
 const ITEMS_CHUNK_SIZE = 50;
 
@@ -404,29 +409,47 @@ export function* saveItemSaga({ item, publicKey }) {
   return itemData;
 }
 
+export function* findOrCreateTeamSystemItemKeyPair({ payload: { item } }) {
+  const systemKeyPairItem = yield select(teamKeyPairSelector, {
+    teamId: item.teamId,
+  });
+
+  if (!systemKeyPairItem) {
+    yield call(createSystemItemKeyPair, { item, type: ENTITY_TYPE.SHARE });
+
+    return yield select(teamKeyPairSelector, {
+      teamId: item.teamId,
+    });
+  }
+
+  return systemKeyPairItem;
+}
+
 export function* createItemSaga({
   payload: { item },
   meta: { setSubmitting = Function.prototype },
 }) {
   try {
-    const { teamId = null, listId, type, data } = item;
+    const { teamId = TEAM_TYPE.PERSONAL, listId, type, data } = item;
 
     const isSystemItem = type === ITEM_TYPE.SYSTEM;
-    const keyPair = yield select(personalKeyPairSelector);
+    // const keyPair = yield select(personalKeyPairSelector);
+    const keyPair = yield call(findOrCreateTeamSystemItemKeyPair, {
+      payload: {
+        item,
+      },
+    });
+
+    if (!keyPair) {
+      throw new Error(`Can't find or create the key pair for the items.`);
+    }
 
     const notificationText = isSystemItem
       ? COMMON_PROGRESS_NOTIFICATION
       : ENCRYPTING_ITEM_NOTIFICATION;
-    let { publicKey } = keyPair;
+    const { publicKey } = keyPair;
 
     yield put(updateGlobalNotification(notificationText, true));
-
-    if (teamId) {
-      const teamSystemItem = yield select(teamKeyPairSelector, {
-        teamId,
-      });
-      publicKey = teamSystemItem.publicKey;
-    }
 
     if (!publicKey) {
       // Nothing to do here
@@ -491,16 +514,24 @@ export function* createItemSaga({
     setSubmitting(false);
   }
 }
+
 // TODO: Need to be updated to the sepated raws feature
 export function* createItemsBatchSaga({
   payload: { items, listId },
   meta: { setSubmitting },
 }) {
   try {
+    if (items.length <= 0) {
+      throw new Error('The items list is empty');
+    }
+
     yield put(updateGlobalNotification(ENCRYPTING_ITEM_NOTIFICATION, true));
 
-    const list = yield select(listSelector, { listId });
-    const keyPair = yield select(personalKeyPairSelector);
+    const keyPair = findOrCreateTeamSystemItemKeyPair(items[0]);
+
+    if (!keyPair) {
+      throw new Error(`Can't find or create the key pair for the items.`);
+    }
 
     const preparedForEncryptingItems = items.map(
       ({ attachments, type, ...data }) => ({
@@ -537,22 +568,7 @@ export function* createItemsBatchSaga({
     yield put(addItemsBatchToList(data.map(({ id }) => id), listId));
     yield put(updateGlobalNotification(NOOP_NOTIFICATION, false));
 
-    if (list.teamId) {
-      // TODO: [Import] create system items for team
-      // yield fork(shareItemBatchSaga, {
-      //   payload: {
-      //     data: {
-      //       itemIds: data.map(({ id }) => id),
-      //       teamIds: [list.teamId],
-      //     },
-      //     options: {
-      //       includeIniciator: false,
-      //     },
-      //   },
-      // });
-    } else {
-      yield put(updateGlobalNotification(NOOP_NOTIFICATION, false));
-    }
+    yield put(updateGlobalNotification(NOOP_NOTIFICATION, false));
   } catch (error) {
     // eslint-disable-next-line no-console
     console.error(error);

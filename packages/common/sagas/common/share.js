@@ -56,6 +56,7 @@ import { generateSystemItem, saveItemSaga } from '../entities/item';
 import { extractKeysFromSystemItem } from '../../utils/item';
 import { addSystemItemsBatch } from '../../actions/entities/system';
 import { CREATE_CHILD_ITEM_BATCH_FINISHED_EVENT } from '../../actions/entities/childItem';
+import { createSystemItemKeyPair } from '../entities/system';
 
 export function* prepareUsersForSharing(members) {
   const emailRolePairs = members.map(({ email }) => ({
@@ -105,35 +106,10 @@ export function* getItemUserPairs({ items, members }) {
 
 // TODO: move to the system item sage
 export function* findOrCreateSystemItemKeyPair({ payload: { item } }) {
-  let systemKeyPairItem = yield select(shareKeyPairSelector, { id: item.id });
+  const systemKeyPairItem = yield select(shareKeyPairSelector, { id: item.id });
 
   if (!systemKeyPairItem) {
-    const defaultListId = yield select(userDefaultListIdSelector);
-    const { publicKey } = yield select(personalKeyPairSelector);
-
-    systemKeyPairItem = yield call(
-      generateSystemItem,
-      ENTITY_TYPE.SHARE,
-      defaultListId,
-      item.id,
-    );
-
-    // Encrypt and save the system keypair item to the owner personal vault
-    const systemItemFromServer = yield call(saveItemSaga, {
-      item: { ...systemKeyPairItem, relatedItem: item.id },
-      publicKey,
-    });
-
-    systemKeyPairItem = {
-      ...systemKeyPairItem,
-      ...systemItemFromServer,
-    };
-
-    yield put(
-      addSystemItemsBatch({
-        [systemKeyPairItem.id]: systemKeyPairItem,
-      }),
-    );
+    yield call(createSystemItemKeyPair, { item, type: ENTITY_TYPE.SHARE });
 
     return yield select(shareKeyPairSelector, { id: item.id });
   }
@@ -235,6 +211,7 @@ export function* shareItemBatchSaga({
 
     if (itemUserPairs.length > 0) {
       yield fork(createChildItemBatchSaga, { payload: { itemUserPairs } });
+
       return;
       const {
         payload: { childItems },

@@ -10,7 +10,7 @@ import { itemsByIdSelector } from '@caesar/common/selectors/entities/item';
 import { childItemsByIdSelector } from '@caesar/common/selectors/entities/childItem';
 import { membersByIdSelector } from '@caesar/common/selectors/entities/member';
 import { teamsByIdSelector } from '@caesar/common/selectors/entities/team';
-import { ITEM_TYPE } from '../constants';
+import { ITEM_TYPE, ROLE_USER } from '../constants';
 
 export const workflowSelector = state => state.workflow;
 
@@ -115,8 +115,9 @@ export const workInProgressListSelector = createSelector(
   workInProgressListIdSelector,
   (listsById, teamsById, workInProgressListId) => {
     const list = listsById[workInProgressListId];
+
     const userRole =
-      list && list.teamId ? teamsById[list.teamId].userRole : null;
+      list && list.teamId ? teamsById[list.teamId]?.userRole : null;
 
     return list
       ? {

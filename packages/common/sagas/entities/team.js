@@ -61,12 +61,16 @@ import {
   updateTeamMember,
   postAddTeamMember,
   deleteTeamMember,
+  getTeamLists,
 } from '@caesar/common/api';
 import {
   getServerErrorMessage,
   getServerErrors,
 } from '@caesar/common/utils/error';
-import { convertTeamsToEntity } from '@caesar/common/normalizers/normalizers';
+import {
+  convertTeamsToEntity,
+  convertNodesToEntities,
+} from '@caesar/common/normalizers/normalizers';
 import {
   COMMANDS_ROLES,
   ENTITY_TYPE,
@@ -88,7 +92,9 @@ import { teamKeyPairSelector } from '@caesar/common/selectors/keystore';
 import {
   currentTeamDefaultListSelector,
   teamDefaultListSelector,
+  listsTeamSelector,
 } from '../../selectors/entities/list';
+import { addListsBatch } from '../../actions/entities/list';
 
 export function* fetchTeamsSaga() {
   try {
@@ -169,11 +175,13 @@ export function* createTeamKeysSaga({
 }) {
   try {
     if (!team) return;
-
+    yield call;
     const user = yield select(userDataSelector);
 
+    // TODO: The server should ignore the list id for system items
+    // Get the personal deault list to add the systen item to the personal vault
     const { id: listId } = yield select(teamDefaultListSelector, {
-      teamId: team.id,
+      teamId: TEAM_TYPE.PERSONAL,
     });
 
     if (!listId || typeof listId === 'undefined') {
@@ -231,6 +239,14 @@ export function* createTeamSaga({
 }) {
   try {
     const { data: team } = yield call(postCreateTeam, { title, icon });
+    if (!team?.id) {
+      throw new Error(`Can't create the team with the title ${title}`);
+    }
+    // TODO: Here is the duplicated code, shoul be moved into sagas.
+    const { data: lists } = yield call(getTeamLists, team.id);
+    const { listsById } = convertNodesToEntities(lists);
+    yield put(addListsBatch(listsById));
+
     yield call(createTeamKeysSaga, {
       payload: { team },
       meta: { removeWhenFail: true },

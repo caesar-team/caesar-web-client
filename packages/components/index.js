@@ -16,7 +16,12 @@ export { CodeInput } from './CodeInput';
 export { ContentEditable } from './Common';
 export { ConfirmModal } from './ConfirmModal';
 export { CreateForm } from './CreateForm';
-export { DataTable, VirtualizedTableHOC } from './DataTable';
+export {
+  NewDataTable,
+  TableStyles,
+  DataTable,
+  VirtualizedTableHOC,
+} from './DataTable';
 export { DottedMenu } from './DottedMenu';
 export { Dropdown } from './Dropdown';
 export { Error, TextError } from './Error';

@@ -1,0 +1,70 @@
+import styled from 'styled-components';
+import { Input } from '../Input';
+
+const Main = styled.div`
+  .table {
+    display: inline-block;
+
+    .th,
+    .td {
+      padding: 8px 24px;
+      text-align: left;
+    }
+
+    .thead .tr {
+      margin-bottom: 8px;
+      border-bottom: 1px solid ${({ theme }) => theme.color.emperor};
+    }
+
+    .thead .th {
+      display: inline-flex !important;
+      align-items: center;
+      padding-top: 0;
+      padding-bottom: 0;
+    }
+
+    .tbody .td {
+      display: inline-flex !important;
+      align-items: center;
+      margin-bottom: 4px;
+      background-color: ${({ theme }) => theme.color.white};
+    }
+  }
+`;
+
+const Header = styled.div``;
+
+const HeaderInput = styled(Input)`
+  display: flex;
+  align-items: center;
+  width: 100%;
+  height: 32px;
+
+  ${Input.Prefix} {
+    position: relative;
+    top: 0;
+    left: 0;
+    margin-right: 8px;
+    transform: none;
+  }
+
+  ${Input.InputField} {
+    padding: 0;
+    background-color: transparent;
+
+    &::placeholder {
+      text-transform: uppercase;
+    }
+  }
+`;
+
+const Cell = styled.div`
+  display: flex;
+  align-items: center;
+`;
+
+const EmailCell = styled.div`
+  color: ${({ theme }) => theme.color.gray};
+`;
+
+export const TableStyles = { Main, Header, HeaderInput, Cell, EmailCell };

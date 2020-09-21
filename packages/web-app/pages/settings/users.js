@@ -10,6 +10,7 @@ import {
 import { UsersContainer } from '@caesar/containers';
 import { userDataSelector } from '@caesar/common/selectors/user';
 import { fetchUserSelfRequest } from '@caesar/common/actions/user';
+import { fetchMembersRequest } from '@caesar/common/actions/entities/member';
 
 const SettingsUsersPage = () => {
   const dispatch = useDispatch();
@@ -17,6 +18,7 @@ const SettingsUsersPage = () => {
 
   useEffectOnce(() => {
     dispatch(fetchUserSelfRequest());
+    dispatch(fetchMembersRequest());
   });
 
   const shouldShowLoader = !userData;

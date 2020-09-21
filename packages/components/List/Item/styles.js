@@ -44,7 +44,10 @@ export const ItemTypeIcon = ({ type }) => {
   return <Icon name={icon} width={20} height={20} color="white" />;
 };
 
-export const IconWrapper = styled.span``;
+export const IconWrapper = styled.div`
+  display: flex;
+  align-items: center;
+`;
 
 export const Tooltip = styled.div`
   display: none;
@@ -133,7 +136,7 @@ export const Row = styled.div`
   }
   
   ${IconWrapper} {
-    display: ${({ isMultiItem }) => (isMultiItem ? 'none' : 'inline-block')};
+    display: ${({ isMultiItem }) => (isMultiItem ? 'none' : 'flex')};
   }
   
   ${Tooltip} {

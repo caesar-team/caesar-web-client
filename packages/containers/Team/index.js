@@ -7,6 +7,7 @@ import {
   updateTeamMemberRoleRequest,
   removeTeamRequest,
 } from '@caesar/common/actions/entities/team';
+import { leaveTeamRequest } from '@caesar/common/actions/entities/member';
 import { initWorkflow } from '@caesar/common/actions/workflow';
 import {
   isLoadingSelector,
@@ -29,6 +30,7 @@ const mapDispatchToProps = {
   removeTeamMemberRequest,
   updateTeamMemberRoleRequest,
   initWorkflow,
+  leaveTeamRequest,
   removeTeamRequest,
 };
 

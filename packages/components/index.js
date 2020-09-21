@@ -14,7 +14,7 @@ export { Carousel } from './Carousel';
 export { Checkbox } from './Checkbox';
 export { CodeInput } from './CodeInput';
 export { ContentEditable } from './Common';
-export { ConfirmModal } from './ConfirmModal';
+export { ConfirmModal, ConfirmLeaveTeamModal } from './ConfirmModal';
 export { CreateForm } from './CreateForm';
 export { DataTable, VirtualizedTableHOC } from './DataTable';
 export { DottedMenu } from './DottedMenu';
@@ -38,6 +38,7 @@ export {
 } from './Input';
 export { InviteModal } from './InviteModal';
 export { Item, MultiItem, Credentials, Document } from './Item';
+export { ItemIcon } from './ItemIcon';
 export { Label } from './Label';
 export {
   AuthLayout,
@@ -66,11 +67,7 @@ export {
   NotificationContext,
   NotificationProvider,
 } from './Notification';
-export {
-  OfflineDetectionProvider,
-  OfflineNotification,
-  withOfflineDetection,
-} from './Offline';
+export { OfflineNotification } from './Offline';
 export { PasswordGenerator } from './PasswordGenerator';
 export { PasswordIndicator } from './PasswordIndicator';
 export { ProgressBar } from './ProgressBar';
@@ -92,5 +89,6 @@ export { TeamTag } from './TeamTag';
 export { TextWithLines } from './TextWithLines';
 export { Toggle } from './Toggle';
 export { Tooltip } from './Tooltip';
+export { TooltipPasswordGenerator } from './TooltipPasswordGenerator';
 export { Uploader } from './Uploader';
 export { WrapperAlignTop } from './WrapperAlignTop';

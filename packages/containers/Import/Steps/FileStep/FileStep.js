@@ -37,7 +37,7 @@ const FileStep = ({ onSubmit }) => {
                 name="file"
                 files={values.file}
                 extText="*.csv file"
-                error={errors.file ? errors.file.name || errors.file.raw : null}
+                error={errors?.file?.ext || null}
                 onChange={(name, file) => {
                   setFieldValue('file', file);
                   submitForm().then();

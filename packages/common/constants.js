@@ -29,6 +29,8 @@ export const IS_SECURE_APP = APP_TYPE === 'secure';
 export const IS_EXTENSION_APP = APP_TYPE === 'extension';
 export const IS_GENERAL_APP = APP_TYPE === 'general';
 
+export const FINGERPRINT = 'trustedDevice';
+
 export const PORTAL_ID = 'portal';
 
 export const DEFAULT_IDLE_TIMEOUT = 5 * 60 * 1000;

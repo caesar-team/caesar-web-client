@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { forwardRef } from 'react';
 import styled from 'styled-components';
 
 const StyledWrapper = styled.div`
@@ -6,6 +6,8 @@ const StyledWrapper = styled.div`
   padding: 24px 40px;
 `;
 
-export const InnerWrapper = ({ children }) => {
-  return <StyledWrapper>{children}</StyledWrapper>;
-};
+export const InnerWrapper = forwardRef(({ children, className }, ref) => (
+  <StyledWrapper ref={ref} className={className}>
+    {children}
+  </StyledWrapper>
+));

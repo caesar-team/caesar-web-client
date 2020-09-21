@@ -1,5 +1,6 @@
 /* eslint-disable camelcase */
-import React, { memo, useState } from 'react';
+import React, { memo, useState, useRef, useCallback } from 'react';
+import { useEvent } from 'react-use';
 import { useSelector, useDispatch } from 'react-redux';
 import styled from 'styled-components';
 import {
@@ -53,8 +54,35 @@ const ItemComponent = ({
   const teamsTrashLists = useSelector(teamsTrashListsSelector);
   const [isSubmitting, setSubmitting] = useState(false);
   const [isMoveModalOpened, setMoveModalOpened] = useState(false);
+  const [isVisibleDragZone, setVisibleDragZone] = useState(false);
+  const itemRef = useRef(null);
   // const [item, setItem] = useState(useSelector(workInProgressItemSelector));
   const notification = useNotification();
+
+  const handleDragEnter = useCallback(
+    e => {
+      const isItemContainsEventTarget = itemRef?.current?.contains(e.target);
+
+      if (!isVisibleDragZone && isItemContainsEventTarget) {
+        setVisibleDragZone(true);
+      } else if (isVisibleDragZone && !isItemContainsEventTarget) {
+        setVisibleDragZone(false);
+      }
+    },
+    [isVisibleDragZone],
+  );
+
+  const handleDrop = useCallback(
+    e => {
+      if (isVisibleDragZone && itemRef?.current?.contains(e.target)) {
+        setVisibleDragZone(false);
+      }
+    },
+    [isVisibleDragZone],
+  );
+
+  useEvent('dragenter', handleDragEnter);
+  useEvent('drop', handleDrop);
 
   if (!item) {
     return <EmptyItem />;
@@ -114,13 +142,14 @@ const ItemComponent = ({
       <Can not I={PERMISSION.EDIT} an={itemSubject}>
         <ReadOnlyBanner />
       </Can>
-      <InnerWrapper>
+      <InnerWrapper ref={itemRef}>
         <Scrollbar>
           <ItemByType
             item={item}
             itemSubject={itemSubject}
             onClickAcceptEdit={!isTrashItem && handleClickAcceptEdit}
             onClickShare={onClickShare}
+            isVisibleDragZone={isVisibleDragZone}
           />
           <Meta item={item} />
           <Can I={PERMISSION.TRASH} an={itemSubject}>

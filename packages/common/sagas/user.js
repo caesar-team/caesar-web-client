@@ -19,7 +19,12 @@ import { addMembersBatch } from '@caesar/common/actions/entities/member';
 import { membersByIdSelector } from '@caesar/common/selectors/entities/member';
 import { currentTeamIdSelector } from '@caesar/common/selectors/user';
 import { convertTeamsToEntity } from '@caesar/common/normalizers/normalizers';
-import { getUserSelf, getKeys, getUserTeams } from '@caesar/common/api';
+import {
+  getUserSelf,
+  getKeys,
+  getUserTeams,
+  postLogout,
+} from '@caesar/common/api';
 import { removeCookieValue, clearStorage } from '@caesar/common/utils/token';
 import { ROUTES } from '@caesar/common/constants';
 
@@ -79,6 +84,7 @@ export function* fetchUserTeamsSaga() {
 
 export function* logoutSaga() {
   try {
+    yield call(postLogout);
     yield call(removeCookieValue, 'token');
     yield call(removeCookieValue, 'share');
     yield call(clearStorage);

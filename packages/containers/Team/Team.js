@@ -15,13 +15,15 @@ import {
   InviteModal,
   Can,
   ConfirmModal,
+  ConfirmLeaveTeamModal,
 } from '@caesar/components';
 import {
   COMMANDS_ROLES,
   PERMISSION,
   PERMISSION_ENTITY,
   ROUTES,
-} from '@caesar/common/constants';
+  TEAM_TYPE,
+} from "@caesar/common/constants";
 import { getTeamTitle } from '@caesar/common/utils/team';
 import { sortByName } from '@caesar/common/utils/utils';
 
@@ -214,6 +216,7 @@ const SearchIcon = styled(Icon)`
 `;
 
 const INVITE_MEMBER_MODAL = 'inviteMemberModal';
+const LEAVE_TEAM_MODAL = 'leaveTeamModal';
 const REMOVE_TEAM_MODAL = 'removeTeamModal';
 
 const ROW_HEIGHT = 56;
@@ -462,6 +465,10 @@ class TeamContainer extends Component {
     this.handleCloseModal(INVITE_MEMBER_MODAL)();
   };
 
+  handleLeaveTeam = () => {
+    this.props.leaveTeamRequest(this.props.team.id);
+  };
+
   handleRemoveTeam = () => {
     this.props.removeTeamRequest(this.props.team.id);
   };
@@ -512,6 +519,9 @@ class TeamContainer extends Component {
       __typename: PERMISSION_ENTITY.TEAM_MEMBER,
       team_member_add: !!team?._links?.team_member_add,
     };
+    
+    const isDomainTeam = team.type === TEAM_TYPE.DEFAULT ||
+      team.title.toLowerCase() === TEAM_TYPE.DEFAULT;
 
     return (
       <Wrapper ref={this.wrapperRef}>
@@ -526,9 +536,17 @@ class TeamContainer extends Component {
               color="white"
               onClick={this.handleOpenModal(REMOVE_TEAM_MODAL)}
             >
-              Remove
             </ButtonStyled>
           </Can>
+          {!isDomainTeam && (
+            <ButtonStyled
+              withOfflineCheck
+              icon="leave"
+              color="white"
+              onClick={this.handleOpenModal(LEAVE_TEAM_MODAL)}
+            >
+            </ButtonStyled>
+          )}
           <Can I={PERMISSION.ADD} a={teamMemberSubject}>
             <ButtonStyled
               withOfflineCheck
@@ -567,6 +585,12 @@ class TeamContainer extends Component {
           onClickConfirm={this.handleRemoveTeam}
           onClickCancel={this.handleCloseModal(REMOVE_TEAM_MODAL)}
         />
+        <ConfirmLeaveTeamModal
+          isOpened={modalVisibilities[LEAVE_TEAM_MODAL]}
+          teamTitle={team.title}
+          onClickConfirm={this.handleLeaveTeam}
+          onClickCancel={this.handleCloseModal(LEAVE_TEAM_MODAL)}
+        />        
       </Wrapper>
     );
   }

@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from 'react';
+import { useUpdateEffect } from 'react-use';
+import equal from 'fast-deep-equal';
 import styled from 'styled-components';
 import {
   downloadFile,
@@ -13,6 +15,8 @@ import { Icon } from '../../Icon';
 import { File } from '../../File';
 import { Uploader } from '../../Uploader';
 import { NewFilesModal } from './NewFilesModal';
+import { ConfirmDeleteAttachmentModal } from './ConfirmDeleteAttachmentModal';
+import { ItemDragZone } from '../common';
 
 const Wrapper = styled.div``;
 
@@ -69,19 +73,32 @@ const AddNewAttach = styled.div`
   }
 `;
 
+const MODAL = {
+  NEW_FILES: 'new_files',
+  DELETE_FILE: 'delete_file',
+};
+
 export const Attachments = ({
   attachments = [],
   raws = {},
   itemSubject,
   onClickAcceptEdit,
+  isVisibleDragZone,
 }) => {
   const [newFiles, setNewFiles] = useState([]);
   const [itemRaws, setItemRaws] = useState(raws);
   const [itemAttachments, setItemAttachments] = useState(attachments);
-  const [isModalOpened, setModalOpened] = useState(false);
+  const [openedModal, setOpenedModal] = useState(null);
+
   const syncStateWithServer = newItemData => {
     onClickAcceptEdit(newItemData);
   };
+
+  useUpdateEffect(() => {
+    if (!equal(attachments, itemAttachments)) {
+      setItemAttachments(attachments);
+    }
+  }, [attachments]);
 
   useEffect(() => {
     if (raws && Object.keys(raws)?.length > 0) {
@@ -149,7 +166,7 @@ export const Attachments = ({
     setItemRaws(allRaws);
     setItemAttachments(allAttachments);
 
-    setModalOpened(true);
+    setOpenedModal(MODAL.NEW_FILES);
     syncStateWithServer({
       attachments: allAttachments,
       raws: allRaws,
@@ -173,38 +190,68 @@ export const Attachments = ({
       <Inner>
         {isIterable(itemAttachments) &&
           itemAttachments.map(attachment => (
-            <File
-              key={attachment.name}
-              itemSubject={itemSubject}
-              onClickDownload={() => handleClickDownloadFile(attachment)}
-              onClickRemove={
-                onClickAcceptEdit && (() => onClickRemove(attachment))
-              }
-              {...attachment}
-            />
+            <div key={attachment.name}>
+              <File
+                key={attachment.name}
+                itemSubject={itemSubject}
+                onClickDownload={() => handleClickDownloadFile(attachment)}
+                onClickRemove={
+                  onClickAcceptEdit && (() => setOpenedModal(MODAL.DELETE_FILE))
+                }
+                {...attachment}
+              />
+              {openedModal === MODAL.DELETE_FILE && (
+                <ConfirmDeleteAttachmentModal
+                  isOpened
+                  fileName={attachment.name}
+                  onDeleteFile={() => onClickRemove(attachment)}
+                  handleCloseModal={() => setOpenedModal(null)}
+                />
+              )}
+            </div>
           ))}
         <Can I={PERMISSION.EDIT} an={itemSubject}>
           {onClickAcceptEdit && (
-            <Uploader
-              multiple
-              asPreview
-              name="attachments"
-              onChange={handleChange}
-            >
-              {({ getRootProps, getInputProps, isDragActive }) => (
-                <AddNewAttach {...getRootProps()} isDragActive={isDragActive}>
-                  <input {...getInputProps()} />
-                  <PlusIcon name="plus" width={16} height={16} color="gray" />
-                </AddNewAttach>
-              )}
+            <Uploader multiple name="attachments" onChange={handleChange}>
+              {({ getRootProps, getInputProps }) => {
+                const {
+                  onClick,
+                  onKeyDown,
+                  onFocus,
+                  onBlur,
+                  ...dragAndDropRootProps
+                } = getRootProps();
+
+                return (
+                  <>
+                    {isVisibleDragZone && (
+                      <ItemDragZone {...dragAndDropRootProps} />
+                    )}
+                    <AddNewAttach
+                      onClick={onClick}
+                      onFocus={onFocus}
+                      onBlur={onBlur}
+                      onKeyDown={onKeyDown}
+                    >
+                      <input {...getInputProps()} />
+                      <PlusIcon
+                        name="plus"
+                        width={16}
+                        height={16}
+                        color="gray"
+                      />
+                    </AddNewAttach>
+                  </>
+                );
+              }}
             </Uploader>
           )}
         </Can>
       </Inner>
-      {isModalOpened && (
+      {openedModal === MODAL.NEW_FILES && (
         <NewFilesModal
           files={newFiles}
-          closeModal={() => setModalOpened(false)}
+          closeModal={() => setOpenedModal(null)}
         />
       )}
     </Wrapper>

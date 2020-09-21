@@ -1,8 +1,8 @@
 import React, { Component } from 'react';
 import styled from 'styled-components';
 import { KEY_CODES } from '@caesar/common/constants';
+import { Icon } from '../Icon';
 import { Input } from './Input';
-import Icon from '../Icon/Icon';
 
 const StyledIcon = styled(Icon)`
   fill: ${({ theme }) => theme.color.gray};

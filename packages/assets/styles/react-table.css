@@ -11,7 +11,7 @@
 }
 
 .ReactTable .rt-td {
-  padding: 0 8px !important;
+  padding: 0 !important;
   border-right: 0 !important;
   display: flex;
   align-items: center;

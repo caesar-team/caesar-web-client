@@ -16,8 +16,6 @@ import {
   setWorkInProgressItem,
   resetWorkInProgressItemIds,
   decryption,
-  OPEN_VAULT,
-  openVault,
 } from '@caesar/common/actions/workflow';
 import {
   addListsBatch,
@@ -28,12 +26,10 @@ import { updateGlobalNotification } from '@caesar/common/actions/application';
 import {
   SET_CURRENT_TEAM_ID,
   setCurrentTeamId,
-  setDefaultListId,
 } from '@caesar/common/actions/user';
 import {
   addTeamKeyPairBatch,
   addShareKeyPairBatch,
-  ADD_SHARE_KEY_PAIR_BATCH,
 } from '@caesar/common/actions/keystore';
 import { fetchMembersSaga } from '@caesar/common/sagas/entities/member';
 import {
@@ -71,7 +67,6 @@ import {
   nonDecryptedSharedItemsSelector,
   nonDecryptedTeamItemsSelector,
   nonDecryptedTeamsItemsSelector,
-  sharedItemsEntitySelector,
 } from '@caesar/common/selectors/entities/item';
 import {
   workInProgressListIdSelector,
@@ -342,13 +337,13 @@ export function* openTeamVaultSaga({ payload: { teamId } }) {
     const keyPair = yield select(teamKeyPairSelector, { teamId });
 
     // TODO: Shoub be moved to the create item saga?
-    if (!keyPair && teamId !== TEAM_TYPE.PERSONAL) {
+    if (!keyPair && (teamId && teamId !== TEAM_TYPE.PERSONAL)) {
       const team = yield select(teamSelector, { teamId });
       // eslint-disable-next-line no-console
       console.warn(
-        `The key pair for the team ${team.name} not found. Creating a new one...`,
+        `The key pair for the team ${team.name}:${teamId} not found. Creating a new one...`,
       );
-      yield call(createTeamKeysSaga, { payload: { team } });
+      // yield call(createTeamKeysSaga, { payload: { team } });
     }
     // TODO: Here is opportunity to improve the calls
     yield call(processTeamItemsSaga, {
@@ -438,6 +433,8 @@ function* initTeams() {
   try {
     // Load avaible teams
     const { data: teams } = yield call(getTeams);
+    yield all(teams.map(({ id }) => call(initTeam, id, false)));
+    yield call(initPersonalVault);
     teams.push({
       id: TEAM_TYPE.PERSONAL,
       title: TEAM_TYPE.PERSONAL,
@@ -446,8 +443,6 @@ function* initTeams() {
 
     const teamById = arrayToObject(teams);
     yield put(addTeamsBatch(teamById));
-
-    yield all(teams.map(({ id }) => call(initTeam, id, false)));
   } catch (error) {
     // eslint-disable-next-line no-console
     console.error(error);
@@ -457,16 +452,12 @@ function* initTeams() {
   }
 }
 
-export function* initWorkflow({ payload: { withDecryption = true } }) {
+export function* initWorkflow() {
   yield call(initTeams);
 
   const currentTeamId = yield select(currentTeamIdSelector);
+  yield call(initTeam, currentTeamId);
 
-  if (currentTeamId && currentTeamId !== TEAM_TYPE.PERSONAL) {
-    yield call(initTeam, currentTeamId);
-  } else {
-    yield call(initPersonalVault);
-  }
   yield put(setCurrentTeamId(currentTeamId || TEAM_TYPE.PERSONAL));
   yield fork(fetchMembersSaga);
 }

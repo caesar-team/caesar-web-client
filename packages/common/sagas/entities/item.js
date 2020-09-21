@@ -60,7 +60,7 @@ import {
 import { itemSelector } from '@caesar/common/selectors/entities/item';
 import {
   currentTeamIdSelector,
-  keyPairSelector,
+  userDefaultListIdSelector,
 } from '@caesar/common/selectors/user';
 import {
   addShareKeyPair,
@@ -97,7 +97,6 @@ import {
 import {
   personalKeyPairSelector,
   teamKeyPairSelector,
-  shareItemKeyPairSelector,
 } from '@caesar/common/selectors/keystore';
 import {
   generateSystemItemEmail,
@@ -106,8 +105,6 @@ import {
 import { passwordGenerator } from '@caesar/common/utils/passwordGenerator';
 import { generateKeys } from '@caesar/common/utils/key';
 import { addSystemItemsBatch } from '@caesar/common/actions/entities/system';
-import { teamSelector } from '../../selectors/entities/team';
-import { createSystemItemKeyPair } from './system';
 
 const ITEMS_CHUNK_SIZE = 50;
 
@@ -408,7 +405,40 @@ export function* saveItemSaga({ item, publicKey }) {
 
   return itemData;
 }
+export function* createSystemItemKeyPair({ payload: { item, type } }) {
+  const defaultListId = yield select(userDefaultListIdSelector);
+  const { publicKey } = yield select(teamKeyPairSelector, {
+    teamId: TEAM_TYPE.PERSONAL,
+  });
 
+  if (!type) {
+    throw new Error(`The type of system item isn't defined`);
+  }
+
+  let systemKeyPairItem = yield call(
+    generateSystemItem,
+    type,
+    defaultListId,
+    item.id,
+  );
+
+  // Encrypt and save the system keypair item to the owner personal vault
+  const systemItemFromServer = yield call(saveItemSaga, {
+    item: { ...systemKeyPairItem, relatedItem: item.id },
+    publicKey,
+  });
+
+  systemKeyPairItem = {
+    ...systemKeyPairItem,
+    ...systemItemFromServer,
+  };
+
+  yield put(
+    addSystemItemsBatch({
+      [systemKeyPairItem.id]: systemKeyPairItem,
+    }),
+  );
+}
 export function* findOrCreateTeamSystemItemKeyPair({ payload: { item } }) {
   const systemKeyPairItem = yield select(teamKeyPairSelector, {
     teamId: item.teamId,

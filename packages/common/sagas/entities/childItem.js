@@ -29,7 +29,6 @@ import { getServerErrorMessage } from '@caesar/common/utils/error';
 import { chunk } from '@caesar/common/utils/utils';
 import {
   ENTITY_TYPE,
-  INVITE_TYPE,
   PERMISSION_READ,
   NOOP_NOTIFICATION,
   SHARE_TYPE,
@@ -110,7 +109,6 @@ export function* createChildItemBatchSaga({ payload: { itemUserPairs } }) {
       }),
       {},
     );
-    debugger;
     yield put(createChildItemBatchSuccess(childItemsById));
 
     yield put(updateGlobalNotification(NOOP_NOTIFICATION, false));

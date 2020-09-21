@@ -9,20 +9,14 @@ import {
 } from '@redux-saga/core/effects';
 import { getOrCreateMemberBatchSaga } from '@caesar/common/sagas/entities/member';
 import { itemsBatchSelector } from '@caesar/common/selectors/entities/item';
-import {
-  systemItemsBatchSelector,
-  systemItemSelector,
-} from '@caesar/common/selectors/entities/system';
+import { systemItemsBatchSelector } from '@caesar/common/selectors/entities/system';
 import {
   masterPasswordSelector,
   userDataSelector,
-  userDefaultListIdSelector,
 } from '@caesar/common/selectors/user';
 import {
   actualKeyPairSelector,
-  personalKeyPairSelector,
   shareKeyPairSelector,
-  shareKeyPairsSelector,
 } from '@caesar/common/selectors/keystore';
 import {
   decryptItem,
@@ -52,9 +46,7 @@ import { getServerErrorMessage } from '@caesar/common/utils/error';
 import { workInProgressItemSelector } from '@caesar/common/selectors/workflow';
 import { deleteChildItem } from '@caesar/common/api';
 import { inviteNewMemberBatchSaga } from './invite';
-import { generateSystemItem, saveItemSaga } from '../entities/item';
-import { extractKeysFromSystemItem } from '../../utils/item';
-import { addSystemItemsBatch } from '../../actions/entities/system';
+import { saveItemSaga } from '../entities/item';
 import { CREATE_CHILD_ITEM_BATCH_FINISHED_EVENT } from '../../actions/entities/childItem';
 import { createSystemItemKeyPair } from '../entities/system';
 
@@ -212,7 +204,6 @@ export function* shareItemBatchSaga({
     if (itemUserPairs.length > 0) {
       yield fork(createChildItemBatchSaga, { payload: { itemUserPairs } });
 
-      return;
       const {
         payload: { childItems },
       } = yield take(CREATE_CHILD_ITEM_BATCH_FINISHED_EVENT);

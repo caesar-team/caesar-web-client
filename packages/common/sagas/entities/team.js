@@ -50,7 +50,6 @@ import {
   currentTeamIdSelector,
   userDataSelector,
   userTeamIdsSelector,
-  userDefaultListIdSelector,
 } from '@caesar/common/selectors/user';
 import {
   getTeams,
@@ -89,11 +88,7 @@ import {
   createItemSaga,
 } from '@caesar/common/sagas/entities/item';
 import { teamKeyPairSelector } from '@caesar/common/selectors/keystore';
-import {
-  currentTeamDefaultListSelector,
-  teamDefaultListSelector,
-  listsTeamSelector,
-} from '../../selectors/entities/list';
+import { teamDefaultListSelector } from '../../selectors/entities/list';
 import { addListsBatch } from '../../actions/entities/list';
 
 export function* fetchTeamsSaga() {

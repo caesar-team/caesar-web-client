@@ -161,10 +161,12 @@ class SharedItemsStep extends Component {
         personalItems.map(
           // eslint-disable-next-line
           async ({ secret }) => {
-            const { data: encryptedData, raws: encryptedRaws } = JSON.parse(secret);
+            const { data: encryptedData, raws: encryptedRaws } = JSON.parse(
+              secret,
+            );
             const data = await decryptItem(encryptedData, privateKeyObj);
             const raws = await decryptItem(encryptedRaws, privateKeyObj);
-            
+
             return {
               data,
               raws,
@@ -243,7 +245,9 @@ class SharedItemsStep extends Component {
           teamsItems.map(
             // eslint-disable-next-line
             async ({ secret }) => {
-              const { data: encryptedData, raws: encryptedRaws } = JSON.parse(secret);
+              const { data: encryptedData, raws: encryptedRaws } = JSON.parse(
+                secret,
+              );
               const data = await decryptItem(encryptedData, privateKeyObj);
               const raws = await decryptItem(encryptedRaws, privateKeyObj);
 
@@ -277,7 +281,7 @@ class SharedItemsStep extends Component {
                 ? await encryptItem(raws, currentKeyPair.publicKey)
                 : null,
             };
-            
+
             return {
               originalItem: originalItemId,
               items: [

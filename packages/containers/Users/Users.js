@@ -14,7 +14,6 @@ const UserAvatar = styled(Avatar)`
   margin-right: 8px;
 `;
 
-const WRAPPER_PADDING = 40 * 2;
 const WIDTH_RATIO = {
   name: 0.35,
   email: 0.35,
@@ -78,22 +77,17 @@ export const Users = () => {
   const isLoading = false;
 
   const tableWrapperRef = useRef(null);
-  // Window height minus header height (55), top & bottom paddings (40+40), title size (54) and title margin bottom (30), thead height & margin-bottom (55)
-  const tableVisibleDataHeight = window?.innerHeight - 55 - 80 - 54 - 30 - 55;
-  const tableWidth =
-    tableWrapperRef?.current?.offsetWidth - WRAPPER_PADDING || 0;
+  // Window height minus stuff that takes vertical place (including table headers)
+  const tableVisibleDataHeight = window?.innerHeight - 275;
+  const tableWidth = tableWrapperRef?.current?.offsetWidth || 0;
 
   const users = useSelector(memberListSelector);
   const tableData = useMemo(() => createTableData(users), []);
   const columns = useMemo(() => createColumns(tableWidth), [tableWidth]);
 
   return (
-    <SettingsWrapper
-      isLoading={isLoading}
-      title={`Users (${users.length})`}
-      ref={tableWrapperRef}
-    >
-      <Table.Main>
+    <SettingsWrapper isLoading={isLoading} title={`Users (${users.length})`}>
+      <Table.Main ref={tableWrapperRef}>
         <NewDataTable
           columns={columns}
           data={tableData}

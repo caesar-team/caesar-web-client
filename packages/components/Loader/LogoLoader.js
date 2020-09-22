@@ -19,7 +19,7 @@ const Loader = styled.div`
   height: 100px;
   background-image: url(${loaderImage});
   animation: ${play} 2s steps(17) infinite;
-  border-radius: 3px;
+  border-radius: ${({ theme }) => theme.borderRadius};
 `;
 
 const LoadingText = styled.div`

@@ -12,7 +12,7 @@ const Wrapper = styled.div`
 const RangeBase = styled.div`
   position: relative;
   height: 8px;
-  border-radius: 3px;
+  border-radius: ${({ theme }) => theme.borderRadius};
   border: 1px solid ${({ theme }) => theme.color.gallery};
   background-color: ${({ theme }) => theme.color.white};
 
@@ -87,7 +87,7 @@ const RangeActiveLine = styled.div`
   z-index: ${({ theme }) => theme.zIndex.basic};
   top: 0;
   height: 8px;
-  border-radius: 3px;
+  border-radius: ${({ theme }) => theme.borderRadius};
   background-color: ${({ theme }) => theme.color.black};
   border: 1px solid ${({ theme }) => theme.color.black};
 `;

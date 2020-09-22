@@ -38,4 +38,4 @@ const BackLink = ({
   </Wrapper>
 );
 
-export default BackLink;
+export { BackLink };

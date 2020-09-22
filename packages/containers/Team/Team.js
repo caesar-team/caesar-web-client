@@ -145,7 +145,7 @@ const MenuButton = styled(Button)`
 `;
 
 const SelectStyled = styled(Select)`
-  border-radius: 3px;
+  border-radius: ${({ theme }) => theme.borderRadius};
   border: 1px solid ${({ theme }) => theme.color.gallery};
   width: 136px;
   height: 38px;

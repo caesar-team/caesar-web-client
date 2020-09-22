@@ -14,7 +14,7 @@ const InnerWrapper = styled.div`
   display: flex;
   align-items: center;
   height: 60px;
-  border-radius: 3px;
+  border-radius: ${({ theme }) => theme.borderRadius};
   background-color: ${({ theme }) => theme.color.darkGray};
   min-width: 400px;
 

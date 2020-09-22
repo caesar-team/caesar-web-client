@@ -26,7 +26,7 @@ const TextAreaField = styled.textarea`
   color: ${({ theme }) => theme.color.black};
   background-color: ${({ theme }) => theme.color.snow};
   border: 1px solid ${({ theme }) => theme.color.gallery};
-  border-radius: 3px;
+  border-radius: ${({ theme }) => theme.borderRadius};
   outline: none;
   resize: none;
   transition: border-color 0.2s, background-color 0.2s;

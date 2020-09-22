@@ -1,3 +1,4 @@
+import './icon-arrow-heavy.svg?sprite';
 import './icon-arrow-triangle.svg?sprite';
 import './icon-arrow.svg?sprite';
 import './icon-caesar.svg?sprite';

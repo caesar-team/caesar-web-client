@@ -122,7 +122,7 @@ const ItemTypeBox = styled.div`
   justify-content: center;
   width: 40px;
   height: 40px;
-  border-radius: 3px;
+  border-radius: ${({ theme }) => theme.borderRadius};
   background-color: ${({ theme }) => theme.color.gallery};
 `;
 

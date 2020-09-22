@@ -18,7 +18,7 @@ const StepWrapper = styled.div`
   display: flex;
   flex-direction: column;
   background: ${({ theme }) => theme.color.white};
-  padding: 30px;
+  padding: 24px;
 `;
 
 const StyledNavigationPanel = styled(NavigationPanel)`

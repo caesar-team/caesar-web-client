@@ -160,7 +160,18 @@ class SharedItemsStep extends Component {
       const decryptedItems = await Promise.all(
         personalItems.map(
           // eslint-disable-next-line
-          async ({ secret }) => await decryptItem(secret, privateKeyObj),
+          async ({ secret }) => {
+            const { data: encryptedData, raws: encryptedRaws } = JSON.parse(
+              secret,
+            );
+            const data = await decryptItem(encryptedData, privateKeyObj);
+            const raws = await decryptItem(encryptedRaws, privateKeyObj);
+
+            return {
+              data,
+              raws,
+            };
+          },
         ),
       );
 
@@ -233,7 +244,18 @@ class SharedItemsStep extends Component {
         const teamItemSecrets = await Promise.all(
           teamsItems.map(
             // eslint-disable-next-line
-            async ({ secret }) => await decryptItem(secret, privateKeyObj),
+            async ({ secret }) => {
+              const { data: encryptedData, raws: encryptedRaws } = JSON.parse(
+                secret,
+              );
+              const data = await decryptItem(encryptedData, privateKeyObj);
+              const raws = await decryptItem(encryptedRaws, privateKeyObj);
+
+              return {
+                data,
+                raws,
+              };
+            },
           ),
         );
 
@@ -246,15 +268,30 @@ class SharedItemsStep extends Component {
         ];
 
         const encryptedItems = await Promise.all(
-          allItems.map(async ({ secret, originalItemId }) => ({
-            originalItem: originalItemId,
-            items: [
-              {
-                userId: user.id,
-                secret: await encryptItem(secret, currentKeyPair.publicKey),
-              },
-            ],
-          })),
+          allItems.map(async ({ secret, originalItemId }) => {
+            const { data, raws } = secret;
+            const encryptedItemData = await encryptItem(
+              data,
+              currentKeyPair.publicKey,
+            );
+
+            const encryptedItem = {
+              data: encryptedItemData,
+              raws: Object.keys(raws).length
+                ? await encryptItem(raws, currentKeyPair.publicKey)
+                : null,
+            };
+
+            return {
+              originalItem: originalItemId,
+              items: [
+                {
+                  userId: user.id,
+                  secret: JSON.stringify(encryptedItem),
+                },
+              ],
+            };
+          }),
         );
 
         await patchChildItemBatch({ collectionItems: encryptedItems });
@@ -284,7 +321,7 @@ class SharedItemsStep extends Component {
     }
 
     const renderedItems = items.personal.map(
-      ({ id, type, secret: { name } }) => {
+      ({ id, type, secret: { data } }) => {
         const isActive = selectedIds.includes(id);
         const iconName = type === ITEM_TYPE.CREDENTIALS ? 'key' : 'securenote';
 
@@ -294,7 +331,7 @@ class SharedItemsStep extends Component {
               <ItemTypeBox>
                 <IconStyled name={iconName} />
               </ItemTypeBox>
-              <ItemName>{name}</ItemName>
+              <ItemName>{data.name}</ItemName>
             </ItemNameAndType>
             <Checkbox checked={isActive} onChange={this.handleSelectRow(id)} />
           </ItemRow>

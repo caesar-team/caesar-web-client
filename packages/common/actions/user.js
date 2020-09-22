@@ -14,8 +14,7 @@ export const SET_MASTER_PASSWORD = '@user/SET_MASTER_PASSWORD';
 export const SET_KEY_PAIR = '@user/SET_KEY_PAIR';
 export const SET_CURRENT_TEAM_ID = '@user/SET_CURRENT_TEAM_ID';
 
-export const SET_PERSONAL_DEFAULT_LIST_ID =
-  '@user/SET_PERSONAL_DEFAULT_LIST_ID';
+export const SET_DEFAULT_LIST_ID = '@user/SET_DEFAULT_LIST_ID';
 
 export const ADD_MEMBER_TO_TEAM = '@user/ADD_MEMBER_TO_TEAM';
 export const LEAVE_TEAM = '@user/LEAVE_TEAM';
@@ -103,8 +102,8 @@ export const leaveTeam = teamId => ({
   },
 });
 
-export const setPersonalDefaultListId = listId => ({
-  type: SET_PERSONAL_DEFAULT_LIST_ID,
+export const setDefaultListId = listId => ({
+  type: SET_DEFAULT_LIST_ID,
   payload: {
     listId,
   },

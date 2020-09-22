@@ -1,14 +1,15 @@
 import { normalize } from 'normalizr';
 import { ITEM_TYPE, LIST_TYPE } from '@caesar/common/constants';
-import { listSchema, memberSchema, teamSchema } from './schemas';
+import { listSchema, memberSchema, teamSchema, itemSchema } from './schemas';
 
 export const extractRelatedAndNonSystemItems = lists => {
   const result = lists.map(({ children, type, ...rest }) => {
-    const relatedItems = type === LIST_TYPE.INBOX 
-      ? children
-        .filter(item => item && item.relatedItem)
-        .map(item => item.relatedItem) 
-      : [];
+    const relatedItems =
+      type === LIST_TYPE.INBOX
+        ? children
+            .filter(item => item && item.relatedItem)
+            .map(item => item.relatedItem)
+        : [];
     const nonSystemChildren = children.filter(
       item => item?.type !== ITEM_TYPE.SYSTEM,
     );
@@ -21,6 +22,14 @@ export const extractRelatedAndNonSystemItems = lists => {
   });
 
   return result;
+};
+
+export const convertItemsToEntities = items => {
+  const normalized = normalize(items, [itemSchema]);
+
+  return {
+    itemsById: normalized.entities.itemsById || {},
+  };
 };
 
 export const convertNodesToEntities = nodes => {

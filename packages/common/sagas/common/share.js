@@ -4,20 +4,20 @@ import {
   all,
   takeLatest,
   put,
-  fork,
   take,
+  fork,
 } from '@redux-saga/core/effects';
 import { getOrCreateMemberBatchSaga } from '@caesar/common/sagas/entities/member';
 import { itemsBatchSelector } from '@caesar/common/selectors/entities/item';
-import {
-  systemItemsBatchSelector,
-} from '@caesar/common/selectors/entities/system';
+import { systemItemsBatchSelector } from '@caesar/common/selectors/entities/system';
 import {
   masterPasswordSelector,
   userDataSelector,
-  currentTeamIdSelector,
 } from '@caesar/common/selectors/user';
-import { actualKeyPairSelector } from '@caesar/common/selectors/keyStore';
+import {
+  actualKeyPairSelector,
+  shareKeyPairSelector,
+} from '@caesar/common/selectors/keystore';
 import {
   decryptItem,
   getPrivateKeyObj,
@@ -26,7 +26,7 @@ import {
   NOOP_NOTIFICATION,
   ROLE_USER,
   SHARING_IN_PROGRESS_NOTIFICATION,
-  TEAM_TYPE,
+  ENTITY_TYPE,
 } from '@caesar/common/constants';
 import {
   shareItemBatchSuccess,
@@ -36,16 +36,21 @@ import {
   removeShareSuccess,
   SHARE_ITEM_BATCH_REQUEST,
   REMOVE_SHARE_REQUEST,
+  createItemsBatchSuccess,
 } from '@caesar/common/actions/entities/item';
 import { updateGlobalNotification } from '@caesar/common/actions/application';
 import { teamsMembersSelector } from '@caesar/common/selectors/entities/team';
 import { createChildItemBatchSaga } from '@caesar/common/sagas/entities/childItem';
-import { CREATE_CHILD_ITEM_BATCH_FINISHED_EVENT } from '@caesar/common/actions/entities/childItem';
 import { updateWorkInProgressItem } from '@caesar/common/actions/workflow';
 import { getServerErrorMessage } from '@caesar/common/utils/error';
 import { workInProgressItemSelector } from '@caesar/common/selectors/workflow';
 import { deleteChildItem } from '@caesar/common/api';
-import { inviteNewMemberBatchSaga } from './invite';
+import {
+  createSystemItemKeyPair,
+  saveItemSaga,
+} from '@caesar/common/sagas/entities/item';
+import { CREATE_CHILD_ITEM_BATCH_FINISHED_EVENT } from '@caesar/common/actions/entities/childItem';
+import { inviteNewMemberBatchSaga } from '@caesar/common/sagas/common/invite';
 
 export function* prepareUsersForSharing(members) {
   const emailRolePairs = members.map(({ email }) => ({
@@ -59,16 +64,17 @@ export function* prepareUsersForSharing(members) {
 }
 
 function* getItemUserPairCombinations(item, members = [], privateKeyObj) {
-  const { id, data } = item;
+  const { id, data: { raws, ...data } = { raws: {} } } = item;
 
   let itemData = data;
+  const itemRaws = raws;
 
   if (!itemData) {
     itemData = yield call(decryptItem, item.secret, privateKeyObj);
   }
 
   return members.map(({ id: memberId, email, publicKey, teamId }) => ({
-    item: { id, data: itemData },
+    item: { id, data: itemData, raws: itemRaws },
     user: { id: memberId, email, publicKey, teamId },
   }));
 }
@@ -92,6 +98,54 @@ export function* getItemUserPairs({ items, members }) {
   return itemUserPairs.flat();
 }
 
+// TODO: move to the system item sage
+export function* findOrCreateSystemItemKeyPair({ payload: { item } }) {
+  const systemKeyPairItem = yield select(shareKeyPairSelector, { id: item.id });
+
+  if (!systemKeyPairItem) {
+    yield call(createSystemItemKeyPair, { item, type: ENTITY_TYPE.SHARE });
+
+    return yield select(shareKeyPairSelector, { id: item.id });
+  }
+
+  return systemKeyPairItem;
+}
+
+export function* reCryptSharedItem(item) {
+  const systemKeyPairItem = yield call(findOrCreateSystemItemKeyPair, {
+    payload: {
+      item,
+    },
+  });
+
+  if (!systemKeyPairItem || !('id' in systemKeyPairItem)) {
+    throw new Error(
+      `Can not create the system keypair item for the shared item: ${item.id}`,
+    );
+  }
+
+  const { publicKey } = systemKeyPairItem;
+
+  if (!publicKey) {
+    throw new Error(
+      `Can not find the publicKey for the shared item: ${item.id}`,
+    );
+  }
+
+  const updatedTeamFromServer = yield call(saveItemSaga, {
+    item,
+    publicKey,
+  });
+
+  return {
+    ...item,
+    ...updatedTeamFromServer,
+  };
+}
+
+// 1. Find or create the system keyPair item
+// 2. ReCrypt the item and update it with the system keyPair item
+// 3. Share the system keyPair item to the new members
 export function* shareItemBatchSaga({
   payload: {
     data: { itemIds = [], members = [], teamIds = [] },
@@ -102,11 +156,23 @@ export function* shareItemBatchSaga({
     yield put(updateGlobalNotification(SHARING_IN_PROGRESS_NOTIFICATION, true));
 
     const user = yield select(userDataSelector);
-    const currentTeamId = yield select(currentTeamIdSelector);
-    let items = yield select(itemsBatchSelector, { itemIds });
+    // const currentTeamId = yield select(currentTeamIdSelector);
+    const items = yield select(itemsBatchSelector, { itemIds });
 
-    if (currentTeamId === TEAM_TYPE.PERSONAL) {
-      items = yield select(systemItemsBatchSelector, { itemIds });
+    const reCryptedSharedItems = yield all(items.map(reCryptSharedItem));
+    yield put(createItemsBatchSuccess(reCryptedSharedItems));
+
+    const systemKeyPairItems = yield select(systemItemsBatchSelector, {
+      itemIds,
+    });
+
+    if (
+      Object.values(systemKeyPairItems).filter(el => el != null).length !==
+      items.length
+    ) {
+      throw new Error(
+        `The system keypair items length doesn't match with the input items length`,
+      );
     }
 
     const preparedMembers = yield call(prepareUsersForSharing, members);
@@ -126,16 +192,16 @@ export function* shareItemBatchSaga({
 
     const allMembers = [...directMembers, ...preparedTeamsMembers];
 
-    const itemUserPairs = yield call(getItemUserPairs, {
-      items,
-      members: allMembers,
-    });
-
     if (newMembers.length > 0) {
-      yield fork(inviteNewMemberBatchSaga, {
+      yield call(inviteNewMemberBatchSaga, {
         payload: { members: newMembers },
       });
     }
+    // Share the system keypair items with users
+    const itemUserPairs = yield call(getItemUserPairs, {
+      items: systemKeyPairItems,
+      members: allMembers,
+    });
 
     if (itemUserPairs.length > 0) {
       yield fork(createChildItemBatchSaga, { payload: { itemUserPairs } });
@@ -162,7 +228,8 @@ export function* shareItemBatchSaga({
 
     yield put(updateGlobalNotification(NOOP_NOTIFICATION, false));
   } catch (error) {
-    console.log(error);
+    // eslint-disable-next-line no-console
+    console.error(error);
     yield put(
       updateGlobalNotification(getServerErrorMessage(error), false, true),
     );
@@ -182,7 +249,8 @@ export function* removeShareSaga({ payload: { shareId } }) {
 
     yield put(updateGlobalNotification(NOOP_NOTIFICATION, false));
   } catch (error) {
-    console.log(error);
+    // eslint-disable-next-line no-console
+    console.error(error);
     yield put(
       updateGlobalNotification(getServerErrorMessage(error), false, true),
     );

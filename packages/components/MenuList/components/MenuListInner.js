@@ -186,7 +186,7 @@ const MenuListInnerComponent = ({
         // eslint-disable-next-line camelcase
         create_list: !!user?._links?.create_list,
       };
-  
+
   const nestedListsLabels = nestedLists.map(({ label }) => label.toLowerCase());
 
   return (

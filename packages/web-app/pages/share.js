@@ -39,6 +39,7 @@ SharePage.getInitialProps = async ({
       cause += '404 caused by the isFieldsValidated function. \n';
     }
 
+    // eslint-disable-next-line no-console
     console.error(cause);
 
     return { statusCode: 404 };

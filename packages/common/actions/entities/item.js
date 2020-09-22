@@ -1,3 +1,5 @@
+import { arrayToObject } from '../../utils/utils';
+
 export const REMOVE_ITEM_REQUEST = '@item/REMOVE_ITEM_REQUEST';
 export const REMOVE_ITEM_SUCCESS = '@item/REMOVE_ITEM_SUCCESS';
 export const REMOVE_ITEM_FAILURE = '@item/REMOVE_ITEM_FAILURE';
@@ -374,12 +376,20 @@ export const updateItemField = (itemId, key, value) => ({
   },
 });
 
-export const addItemsBatch = itemsById => ({
-  type: ADD_ITEMS_BATCH,
-  payload: {
-    itemsById,
-  },
-});
+export const addItemsBatch = items => {
+  let itemsById = items;
+
+  if (Array.isArray(items)) {
+    itemsById = arrayToObject(items);
+  }
+
+  return {
+    type: ADD_ITEMS_BATCH,
+    payload: {
+      itemsById,
+    },
+  };
+};
 
 export const removeItemsBatch = itemIds => ({
   type: REMOVE_ITEMS_BATCH,

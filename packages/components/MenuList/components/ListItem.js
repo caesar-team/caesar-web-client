@@ -160,11 +160,11 @@ export const ListItem = ({
         delete_list: !!list?._links?.delete_list,
       };
 
-  const isListAlreadyExists = value !== label 
-    && nestedListsLabels.includes(value?.toLowerCase());
+  const isListAlreadyExists =
+    value !== label && nestedListsLabels.includes(value?.toLowerCase());
 
   const isAcceptDisabled = !value || value === label || isListAlreadyExists;
-  
+
   const renderInner = dragHandleProps => (
     <>
       {isEditMode ? (

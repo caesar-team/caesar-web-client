@@ -21,10 +21,19 @@ export const DECRYPTION_END = '@workflow/DECRYPTION_END';
 export const ENCRYPTION = '@workflow/ENCRYPTION';
 export const ENCRYPTION_END = '@workflow/ENCRYPTION_END';
 
+export const OPEN_VAULT = '@workflow/OPEN_VAULT';
+
 export const initWorkflow = (withDecryption = true) => ({
   type: INIT_WORKFLOW,
   payload: {
     withDecryption,
+  },
+});
+
+export const openVault = teamId => ({
+  type: UPDATE_WORK_IN_PROGRESS_ITEM,
+  payload: {
+    teamId,
   },
 });
 

@@ -211,16 +211,7 @@ export default createReducer(initialState, {
       ...state,
       byId: {
         ...state.byId,
-        ...Object.keys(payload.teamsById).reduce(
-          (accumulator, teamId) => ({
-            ...accumulator,
-            [teamId]: {
-              ...(state.byId[teamId] || {}),
-              ...payload.teamsById[teamId],
-            },
-          }),
-          {},
-        ),
+        ...payload.teamsById,
       },
     };
   },

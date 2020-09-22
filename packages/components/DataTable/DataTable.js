@@ -1,5 +1,5 @@
 import React from 'react';
-// eslint-disable-next-line
+// @Deprecated. Use 'react-table' instead (v7)
 import ReactDataTable from 'react-table-6';
 import 'react-table-6/react-table.css';
 

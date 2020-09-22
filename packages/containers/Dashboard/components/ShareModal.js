@@ -18,8 +18,8 @@ import {
 import { ShareModal as ShareModalComponent } from '@caesar/components';
 
 export const ShareModal = ({
- handleCloseModal,
- handleCtrlSelectionItemBehaviour,
+  handleCloseModal,
+  handleCtrlSelectionItemBehaviour,
 }) => {
   const dispatch = useDispatch();
   const workInProgressItems = useSelector(workInProgressItemsSelector);

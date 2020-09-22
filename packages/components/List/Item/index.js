@@ -6,6 +6,7 @@ import {
   PERMISSION_MESSAGES,
 } from '@caesar/common/constants';
 import { Icon } from '../../Icon';
+import { ItemIcon } from '../../ItemIcon';
 import { Can } from '../../Ability';
 import {
   Row,
@@ -24,7 +25,7 @@ import {
 
 export const Item = ({
   id,
-  data: { name, attachments = [] },
+  data: { name, attachments = [], website },
   type,
   invited,
   isMultiItem = false,
@@ -36,6 +37,7 @@ export const Item = ({
   teamId,
   _links,
   index,
+  teamMembersCount,
   onClickClose = Function.prototype,
   onClickItem = Function.prototype,
   onSelectItem = Function.prototype,
@@ -43,7 +45,8 @@ export const Item = ({
   workInProgressItem,
   ...props
 }) => {
-  const shouldShowMembers = !!invited?.length;
+  const sharedCount = invited.length + teamMembersCount - 1;
+  const shouldShowMembers = !!sharedCount;
   const shouldShowAttachments =
     attachments && Array.isArray(attachments) && attachments.length > 0;
 
@@ -107,7 +110,10 @@ export const Item = ({
               </NotEditIconWrapper>
             )}
             <IconWrapper>
-              <ItemTypeIcon type={type} />
+              {website
+                ? <ItemIcon url={website} />
+                : <ItemTypeIcon type={type} />
+              }
             </IconWrapper>
           </TypeIconWrapper>
         )}
@@ -122,7 +128,7 @@ export const Item = ({
       {shouldShowMembers && (
         <Addon isInModal={isInModal}>
           <Icon name="members" width={16} height={16} />
-          <AddonText>{invited.length}</AddonText>
+          <AddonText>{sharedCount}</AddonText>
         </Addon>
       )}
       {shouldShowFavoriteIcon && (

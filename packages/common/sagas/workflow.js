@@ -11,31 +11,31 @@ import {
   INIT_WORKFLOW,
   UPDATE_WORK_IN_PROGRESS_ITEM,
   SET_WORK_IN_PROGRESS_ITEM,
-  DECRYPTION_END,
   finishIsLoading,
   setWorkInProgressListId,
   setWorkInProgressItem,
   resetWorkInProgressItemIds,
   decryption,
 } from '@caesar/common/actions/workflow';
-import { addListsBatch } from '@caesar/common/actions/entities/list';
 import {
-  addItemsBatch,
-  createItemRequest,
-} from '@caesar/common/actions/entities/item';
+  addListsBatch,
+  ADD_LISTS_BATCH,
+} from '@caesar/common/actions/entities/list';
+import { addItemsBatch } from '@caesar/common/actions/entities/item';
 import { updateGlobalNotification } from '@caesar/common/actions/application';
 import {
   SET_CURRENT_TEAM_ID,
   setCurrentTeamId,
-  setPersonalDefaultListId,
 } from '@caesar/common/actions/user';
 import {
-  addTeamKeyPair,
-  addShareKeyPair,
-} from '@caesar/common/actions/keyStore';
+  addTeamKeyPairBatch,
+  addShareKeyPairBatch,
+} from '@caesar/common/actions/keystore';
 import { fetchMembersSaga } from '@caesar/common/sagas/entities/member';
 import {
   convertNodesToEntities,
+  convertItemsToEntities,
+  convertTeamsToEntity,
   extractRelatedAndNonSystemItems,
 } from '@caesar/common/normalizers/normalizers';
 import { objectToArray } from '@caesar/common/utils/utils';
@@ -46,21 +46,30 @@ import {
   getTeams,
   getUserItems,
 } from '@caesar/common/api';
-import { ENTITY_TYPE, ITEM_TYPE, TEAM_TYPE } from '@caesar/common/constants';
+import {
+  ENTITY_TYPE,
+  ITEM_TYPE,
+  REGEXP_TESTER,
+  TEAM_TYPE,
+  LIST_TYPE,
+  ROLE_ADMIN,
+} from '@caesar/common/constants';
 import {
   favoriteListSelector,
-  trashListSelector,
-  currentTeamTrashListSelector,
+  listsByIdSelector,
   defaultListSelector,
+  listsTeamSelector,
 } from '@caesar/common/selectors/entities/list';
 import {
   masterPasswordSelector,
   currentTeamIdSelector,
-  userIdSelector,
-  userPersonalDefaultListIdSelector,
 } from '@caesar/common/selectors/user';
-import { itemSelector } from '@caesar/common/selectors/entities/item';
-import { systemItemsSelector } from '@caesar/common/selectors/entities/system';
+import {
+  itemSelector,
+  nonDecryptedSharedItemsSelector,
+  nonDecryptedTeamItemsSelector,
+  nonDecryptedTeamsItemsSelector,
+} from '@caesar/common/selectors/entities/item';
 import {
   workInProgressListIdSelector,
   workInProgressItemSelector,
@@ -68,41 +77,245 @@ import {
 import {
   personalKeyPairSelector,
   teamKeyPairSelector,
-  sharesKeyPairSelector,
-} from '@caesar/common/selectors/keyStore';
+  shareKeyPairsSelector,
+  shareItemKeyPairSelector,
+} from '@caesar/common/selectors/keystore';
 import { getFavoritesList } from '@caesar/common/normalizers/utils';
-import { fetchTeamSuccess } from '@caesar/common/actions/entities/team';
+import { addTeamsBatch } from '@caesar/common/actions/entities/team';
 import { getServerErrorMessage } from '@caesar/common/utils/error';
-import { generateSystemItem } from '@caesar/common/sagas/entities/item';
-import { extractKeysFromSystemItem } from '@caesar/common/utils/item';
-import { teamAdminUsersSelector } from '@caesar/common/selectors/entities/team';
+import {
+  teamListSelector,
+  teamSelector,
+} from '@caesar/common/selectors/entities/team';
+import { ADD_SYSTEM_ITEMS_BATCH } from '@caesar/common/actions/entities/system';
 
-function* initKeyStore() {
+const splitSharesAndPersonal = items => {
+  const personalItems = items.filter(item => !item.isShared);
+  const sharedItems = items.filter(item => item.isShared);
+
+  return {
+    personalItems,
+    sharedItems,
+  };
+};
+const buildSystems = items => {
+  const systemItems = {};
+
+  items.forEach(item => {
+    if (item.type === ITEM_TYPE.SYSTEM) {
+      systemItems[item?.relatedItem?.id || item.id] = item;
+    }
+  });
+
+  return systemItems;
+};
+const processingInvitedItem = (items, systemItemsById) => {
+  return items.map(item =>
+    systemItemsById[item.id]
+      ? {
+          ...item,
+          invited: systemItemsById[item.id].invited,
+          isShared: systemItemsById[item.id]?.invited?.length > 0,
+        } // Set invited from the system item
+      : item,
+  );
+};
+export function decryptItemsByItemIdKeys(items, keyPairs) {
   try {
-    const keyPair = yield select(personalKeyPairSelector);
-    const masterPassword = yield select(masterPasswordSelector);
+    const putSagas = items.map(item => {
+      const keyPair = keyPairs[item.id];
 
-    const { data: userItems } = yield call(getUserItems);
-    const systemItems = [
-      ...userItems.teams,
-      { items: userItems.personal },
-    ].reduce(
-      (acc, { items }) => [
-        ...acc,
-        ...items.filter(item => item.type === ITEM_TYPE.SYSTEM),
-      ],
-      [],
+      if (!keyPair) {
+        // eslint-disable-next-line no-console
+        console.error(`Can't find the shared key for the item = ${item.id}`);
+
+        return null;
+      }
+
+      if (!keyPair) {
+        // eslint-disable-next-line no-console
+        console.error(
+          `Can't extract the key pair from the keyPair for the item = ${item.id}`,
+        );
+
+        return null;
+      }
+      // TODO:  the decryption should be refactor to accept the multiple items and keys
+
+      const { privateKey, password } = keyPair;
+
+      return put(
+        decryption({
+          items: [item],
+          key: privateKey,
+          masterPassword: password,
+        }),
+      );
+    });
+
+    return putSagas;
+  } catch (error) {
+    // eslint-disable-next-line no-console
+    console.error(error);
+
+    return [];
+  }
+}
+
+export function* processSharedItemsSaga() {
+  try {
+    const keyPairs = yield select(shareKeyPairsSelector);
+    const sharedItems = yield select(nonDecryptedSharedItemsSelector);
+
+    yield all(decryptItemsByItemIdKeys(sharedItems, keyPairs));
+  } catch (error) {
+    // eslint-disable-next-line no-console
+    console.error(error);
+  }
+}
+
+export function* processTeamItemsSaga({ payload: { teamId } }) {
+  try {
+    const teamItems = yield select(nonDecryptedTeamItemsSelector, { teamId });
+    if (teamItems.length <= 0) return;
+
+    const teamKeyPairs = yield select(teamKeyPairSelector, { teamId });
+    yield put(
+      decryption({
+        items: teamItems,
+        key: teamKeyPairs.privateKey,
+        masterPassword: teamKeyPairs.password,
+      }),
+    );
+  } catch (error) {
+    // eslint-disable-next-line no-console
+    console.error(error);
+  }
+}
+
+export function* processTeamsItemsSaga() {
+  try {
+    const teams = yield select(teamListSelector);
+    const teamItems = yield select(nonDecryptedTeamsItemsSelector);
+
+    if (teamItems.length <= 0) return;
+
+    const teamKeyPairs = yield all(
+      teams.map(team => {
+        return select(teamKeyPairSelector, { teamId: team.id });
+      }),
+    );
+    yield all(decryptItemsByItemIdKeys(teamItems, teamKeyPairs));
+  } catch (error) {
+    // eslint-disable-next-line no-console
+    console.error(error);
+  }
+}
+
+function* getFavoritesListFromStore(teamId) {
+  return (
+    (yield select(listsTeamSelector, {
+      teamId,
+    })).find(list => list.type === LIST_TYPE.FAVORITES) || null
+  );
+}
+function* initPersonalVault() {
+  try {
+    // Init personal keys
+    const keyPair = yield select(teamKeyPairSelector, {
+      teamId: TEAM_TYPE.PERSONAL,
+    });
+    // const masterPassword = yield select(masterPasswordSelector);
+
+    const {
+      data: { personal: personalItems = [], shared: sharedItems = [] },
+    } = yield call(getUserItems);
+
+    // Merge all user items in the one array
+    const allUserItems = [
+      ...(personalItems || []),
+      ...(sharedItems || []),
+      // ...(teamsItems?.items || []),
+    ];
+
+    // Collect all related items from the shared keys
+    const relatedItems = allUserItems.filter(item => item.relatedItem !== null);
+
+    // Remove duplicates
+    const uniqueItems = {};
+    [...allUserItems, ...relatedItems].forEach(item => {
+      uniqueItems[item.id] = item;
+    });
+    // Turn it into an array
+    const allItems = Object.values(uniqueItems);
+
+    // Find all system items
+    const systemItemsById = buildSystems(allItems);
+    // Find all non-system items
+    const nonSystemItems = allItems.filter(
+      item => item.type !== ITEM_TYPE.SYSTEM,
     );
 
+    // TODO: the server should put the invited into the intem (non-system)
+    const personalItemsWithInvited = processingInvitedItem(
+      nonSystemItems,
+      systemItemsById,
+    );
+
+    const { itemsById } = convertItemsToEntities(personalItemsWithInvited);
+
+    const sortedByFavoritesItems = sortItemsByFavorites(
+      objectToArray(itemsById),
+    );
+    const systemItems = objectToArray(systemItemsById);
+
+    // Split the items into personal (can be decrypted by the user keys) and shared (can be decrypted by the shared keys)
+    const {
+      personalItems: items,
+      sharedItems: itemsEcnryptedSharedKeys,
+    } = splitSharesAndPersonal(sortedByFavoritesItems);
+
+    yield put(addItemsBatch([...itemsEcnryptedSharedKeys, ...items]));
+
+    // Decrypt only system items.
     if (systemItems?.length > 0) {
       yield put(
         decryption({
           items: systemItems,
           key: keyPair.privateKey,
-          masterPassword,
+          masterPassword: keyPair.password,
         }),
       );
     }
+
+    // Load lists
+    const { data: rawLists } = yield call(getLists);
+    const lists = extractRelatedAndNonSystemItems(rawLists);
+    const { listsById, itemsById: listItemsByID } = convertNodesToEntities(
+      lists,
+    );
+    const trashList = lists.find(list => list.type === LIST_TYPE.TRASH);
+    const teamId = TEAM_TYPE.PERSONAL;
+
+    const favoriteListFromStore = yield call(getFavoritesListFromStore, teamId);
+
+    const favoritesList = getFavoritesList({
+      favoriteListId: favoriteListFromStore?.id,
+      itemsById: listItemsByID,
+      trashListId: trashList?.id,
+      teamId,
+    });
+
+    const { listsById: favoritesListById } = convertNodesToEntities([
+      favoritesList,
+    ]);
+
+    yield put(
+      addListsBatch({
+        ...listsById,
+        ...favoritesListById,
+      }),
+    );
   } catch (error) {
     // eslint-disable-next-line no-console
     console.error(error);
@@ -112,228 +325,177 @@ function* initKeyStore() {
   }
 }
 
-function* initPersonal(withDecryption) {
-  try {
-    const currentTeamId = yield select(currentTeamIdSelector);
-
-    if (currentTeamId !== TEAM_TYPE.PERSONAL) {
-      return;
-    }
-
-    const { data: rawLists } = yield call(getLists);
-    const lists = extractRelatedAndNonSystemItems(rawLists);
-    const { listsById, itemsById } = convertNodesToEntities(lists);
-
-    if (withDecryption) {
-      const currentUserId = yield select(userIdSelector);
-      const keyPair = yield select(personalKeyPairSelector);
-      const masterPassword = yield select(masterPasswordSelector);
-      const items = sortItemsByFavorites(objectToArray(itemsById));
-      const ownItems = [];
-      const notOwnItems = [];
-
-      items.forEach(item => {
-        if (item.ownerId === currentUserId) {
-          ownItems.push(item);
-        } else {
-          notOwnItems.push(item);
-        }
-      });
-
-      if (ownItems?.length > 0) {
-        yield put(
-          decryption({
-            items: ownItems,
-            key: keyPair.privateKey,
-            masterPassword,
-          }),
-        );
-      }
-
-      if (notOwnItems?.length > 0) {
-        const keyPairs = yield select(sharesKeyPairSelector, {
-          shareIds: notOwnItems.map(({ id }) => id),
-        });
-
-        yield all(
-          keyPairs.map((pair, index) =>
-            put(
-              decryption({
-                items: [notOwnItems[index]],
-                key: pair.privateKey,
-                masterPassword: pair.pass,
-              }),
-            ),
-          ),
-        );
-      }
-    }
-
-    const defaultList = yield select(defaultListSelector);
-    const trashList = yield select(trashListSelector);
-    let favoritesList = yield select(favoriteListSelector);
-
-    if (!favoritesList?.id) {
-      favoritesList = getFavoritesList(itemsById, trashList?.id);
-    }
-
-    yield put(setPersonalDefaultListId(defaultList.id));
-    yield put(
-      addListsBatch({
-        ...listsById,
-        [favoritesList.id]: favoritesList,
-      }),
-    );
-
-    const workInProgressListId = yield select(workInProgressListIdSelector);
-
-    if (
-      !workInProgressListId ||
-      ![currentTeamId, null].includes(listsById[workInProgressListId]?.teamId)
-    ) {
-      yield put(setWorkInProgressListId(favoritesList.id));
-    }
-
-    const workInProgressItem = yield select(workInProgressItemSelector);
-
-    if (
-      !workInProgressItem ||
-      ![currentTeamId, null].includes(workInProgressItem?.teamId)
-    ) {
-      yield put(setWorkInProgressItem(null));
-    }
-
-    yield put(resetWorkInProgressItemIds(null));
-
-    yield put(finishIsLoading());
-  } catch (error) {
-    // eslint-disable-next-line no-console
-    console.log(error);
-    yield put(
-      updateGlobalNotification(getServerErrorMessage(error), false, true),
-    );
-  }
-}
-
-function* initTeam(team, withDecryption) {
-  try {
-    yield put(fetchTeamSuccess(team));
-
-    const currentTeamId = yield select(currentTeamIdSelector);
-
-    if (currentTeamId === TEAM_TYPE.PERSONAL || currentTeamId !== team.id) {
-      return;
-    }
-
-    const teamAdmins = yield select(teamAdminUsersSelector, {
-      teamId: team.id,
-    });
-    const currentUserId = yield select(userIdSelector);
-    const isCurrentUserTeamAdmin = teamAdmins.includes(currentUserId);
-    const { data: lists } = yield call(getTeamLists, team.id);
-    const { listsById, itemsById } = convertNodesToEntities(lists);
-
-    const trashList = yield select(currentTeamTrashListSelector);
-    const favoritesList = getFavoritesList(
-      itemsById,
-      trashList?.id,
-      currentTeamId,
-    );
-
-    yield put(
-      addListsBatch({
-        ...listsById,
-        [favoritesList.id]: favoritesList,
-      }),
-    );
-
-    const workInProgressListId = yield select(workInProgressListIdSelector);
-
-    if (
-      !workInProgressListId ||
-      listsById[workInProgressListId]?.teamId !== currentTeamId
-    ) {
-      yield put(setWorkInProgressListId(favoritesList.id));
-    }
-
-    const workInProgressItem = yield select(workInProgressItemSelector);
-
-    if (!workInProgressItem || workInProgressItem?.teamId !== currentTeamId) {
-      yield put(setWorkInProgressItem(null));
-    }
-
-    yield put(resetWorkInProgressItemIds(null));
-
-    let teamKeyPair = yield select(teamKeyPairSelector, { teamId: team.id });
-
-    if (!teamKeyPair.privateKey && isCurrentUserTeamAdmin) {
-      const userPersonalDefaultListId = yield select(
-        userPersonalDefaultListIdSelector,
-      );
-      const teamSystemItem = yield call(
-        generateSystemItem,
-        ENTITY_TYPE.TEAM,
-        userPersonalDefaultListId,
-        team.id,
-      );
-
-      teamKeyPair = {
-        ...extractKeysFromSystemItem(teamSystemItem),
-        pass: teamSystemItem.pass,
-      };
-
-      yield put(addTeamKeyPair(teamSystemItem));
-      yield put(createItemRequest(teamSystemItem));
-    }
-
-    if (currentTeamId === team.id && withDecryption) {
-      const items = objectToArray(itemsById);
-
-      if (items?.length > 0 && teamKeyPair.privateKey) {
-        yield put(
-          decryption({
-            items,
-            key: teamKeyPair.privateKey,
-            masterPassword: teamKeyPair.pass,
-          }),
-        );
-      }
-    } else {
-      yield put(addItemsBatch(itemsById));
-    }
-
-    yield put(finishIsLoading());
-  } catch (error) {
-    // eslint-disable-next-line no-console
-    console.log(error);
-    yield put(
-      updateGlobalNotification(getServerErrorMessage(error), false, true),
-    );
-  }
-}
-
-function* initTeams(withDecryption) {
-  try {
-    const { data: teams } = yield call(getTeams);
-
-    yield all(teams.map(team => call(initTeam, team, withDecryption)));
-  } catch (error) {
-    // eslint-disable-next-line no-console
-    console.log(error);
-    yield put(
-      updateGlobalNotification(getServerErrorMessage(error), false, true),
-    );
-  }
-}
-
-export function* initWorkflow({ payload: { withDecryption = true } }) {
-  yield call(initKeyStore);
+function* initListsAndProgressEntities() {
   const currentTeamId = yield select(currentTeamIdSelector);
 
-  yield put(
-    setCurrentTeamId(currentTeamId || TEAM_TYPE.PERSONAL, withDecryption),
-  );
+  const workInProgressListId = yield select(workInProgressListIdSelector);
+  const listsById = yield select(listsByIdSelector);
+  const favoritesList = yield select(favoriteListSelector);
+  const defaultList = yield select(defaultListSelector);
+
+  if (
+    !workInProgressListId ||
+    ![currentTeamId, null].includes(listsById[workInProgressListId]?.teamId)
+  ) {
+    if (favoritesList?.children?.length > 0) {
+      yield put(setWorkInProgressListId(favoritesList.id));
+    } else {
+      yield put(setWorkInProgressListId(defaultList.id));
+    }
+  }
+
+  const workInProgressItem = yield select(workInProgressItemSelector);
+
+  if (
+    !workInProgressItem ||
+    ![currentTeamId, null].includes(workInProgressItem?.teamId)
+  ) {
+    yield put(setWorkInProgressItem(null));
+  }
+}
+function* initTeam(teamId) {
+  try {
+    const currentTeamId = teamId;
+    if (!currentTeamId || currentTeamId === TEAM_TYPE.PERSONAL) return;
+
+    const { data: lists } = yield call(getTeamLists, currentTeamId);
+    const { listsById, itemsById } = convertNodesToEntities(lists);
+    const trashList = lists.find(list => list.type === LIST_TYPE.TRASH);
+
+    const favoriteListFromStore = yield call(getFavoritesListFromStore, teamId);
+
+    const favoritesList = getFavoritesList({
+      favoriteListId: favoriteListFromStore?.id,
+      itemsById,
+      trashListId: trashList?.id,
+      teamId,
+    });
+
+    const { listsById: favoritesListById } = convertNodesToEntities([
+      favoritesList,
+    ]);
+
+    yield put(
+      addListsBatch({
+        ...listsById,
+        ...favoritesListById,
+      }),
+    );
+
+    yield put(addItemsBatch(itemsById));
+  } catch (error) {
+    // eslint-disable-next-line no-console
+    console.error(error);
+    yield put(
+      updateGlobalNotification(getServerErrorMessage(error), false, true),
+    );
+  }
+}
+
+function* initTeams() {
+  try {
+    // Load avaible teams
+    const { data: teams } = yield call(getTeams);
+    yield all(teams.map(({ id }) => call(initTeam, id, false)));
+    yield call(initPersonalVault);
+    teams.push({
+      id: TEAM_TYPE.PERSONAL,
+      title: TEAM_TYPE.PERSONAL,
+      type: TEAM_TYPE.PERSONAL,
+      userRole: ROLE_ADMIN,
+      _links: {
+        // eslint-disable-next-line camelcase
+        team_create_item: true,
+        // eslint-disable-next-line camelcase
+        create_item: true,
+        // eslint-disable-next-line camelcase
+        team_create_list: true,
+        // eslint-disable-next-line camelcase
+        team_edit: true,
+        // eslint-disable-next-line camelcase
+        team_get_lists: true,
+        // eslint-disable-next-line camelcase
+        team_member_add: false,
+        // eslint-disable-next-line camelcase
+        team_members: false,
+      },
+    });
+
+    const teamById = convertTeamsToEntity(teams);
+    yield put(addTeamsBatch(teamById));
+  } catch (error) {
+    // eslint-disable-next-line no-console
+    console.error(error);
+    yield put(
+      updateGlobalNotification(getServerErrorMessage(error), false, true),
+    );
+  }
+}
+
+export function* initWorkflow() {
+  yield call(initTeams);
+
+  const currentTeamId = yield select(currentTeamIdSelector);
+
+  yield put(setCurrentTeamId(currentTeamId || TEAM_TYPE.PERSONAL));
   yield fork(fetchMembersSaga);
+}
+export function* openTeamVaultSaga({ payload: { teamId } }) {
+  try {
+    yield call(initTeam, teamId);
+    const listsById = yield select(listsTeamSelector, { teamId });
+    const lists = objectToArray(listsById);
+    const defaultList = lists.find(list => list.type === LIST_TYPE.DEFAULT);
+    const favoritesList = lists.find(list => list.type === LIST_TYPE.FAVORITES);
+
+    const workInProgressListId = yield select(workInProgressListIdSelector);
+
+    if (
+      !workInProgressListId ||
+      listsById[workInProgressListId]?.teamId !== teamId
+    ) {
+      if (favoritesList?.children?.length > 0) {
+        yield put(setWorkInProgressListId(favoritesList.id));
+      } else {
+        yield put(setWorkInProgressListId(defaultList?.id));
+      }
+    }
+
+    const workInProgressItem = yield select(workInProgressItemSelector);
+    if (!workInProgressItem || workInProgressItem?.teamId !== teamId) {
+      yield put(setWorkInProgressItem(null));
+    }
+    yield put(resetWorkInProgressItemIds(null));
+
+    const keyPair = yield select(teamKeyPairSelector, { teamId });
+
+    // TODO: Shoub be moved to the create item saga?
+    if (!keyPair && (teamId && teamId !== TEAM_TYPE.PERSONAL)) {
+      const team = yield select(teamSelector, { teamId });
+      // eslint-disable-next-line no-console
+      console.warn(
+        `The key pair for the team ${team.title}:${teamId} not found. Creating a new one...`,
+      );
+      // yield call(createTeamKeysSaga, { payload: { team } });
+    }
+    // TODO: Here is opportunity to improve the calls
+    yield call(processTeamItemsSaga, {
+      payload: {
+        teamId,
+      },
+    });
+
+    yield call(processSharedItemsSaga, {
+      payload: {
+        teamId,
+      },
+    });
+
+    yield put(finishIsLoading());
+  } catch (error) {
+    // eslint-disable-next-line no-console
+    console.error(error);
+  }
 }
 
 export function* updateWorkInProgressItemSaga({ payload: { itemId } }) {
@@ -356,41 +518,87 @@ export function* updateWorkInProgressItemSaga({ payload: { itemId } }) {
   }
 }
 
-export function* setCurrentTeamIdWatchSaga({
-  payload: { withDecryption = true },
+function* getItemKeyPair({
+  payload: {
+    item: { id: itemId, teamId, isShared },
+  },
 }) {
+  switch (true) {
+    case teamId:
+      return yield select(teamKeyPairSelector, { teamId });
+    case isShared:
+      return yield select(shareItemKeyPairSelector, { itemId });
+
+    default:
+      return yield select(personalKeyPairSelector);
+  }
+}
+function* decryptItemRaws({ payload: { item } }) {
   try {
-    const currentTeamId = yield select(currentTeamIdSelector);
+    // If item is null or aready had decypted attachments then do not dectrypt again!
+    if (!item || (item.data.raws && Object.values(item.data.raws) > 0)) return;
 
-    if (!currentTeamId) return;
+    const { raws } = JSON.parse(item.secret);
 
-    if (currentTeamId === TEAM_TYPE.PERSONAL) {
-      yield call(initPersonal, withDecryption);
-    } else {
-      yield call(initTeams, withDecryption);
-    }
+    const keyPair = yield call(getItemKeyPair, {
+      payload: {
+        item,
+      },
+    });
+
+    const masterPassword =
+      !item.teamId && !item.isShared
+        ? yield select(masterPasswordSelector)
+        : keyPair.password;
+
+    yield put(
+      decryption({
+        raws,
+        key: keyPair.privateKey,
+        masterPassword,
+      }),
+    );
   } catch (error) {
     // eslint-disable-next-line no-console
-    console.log(error);
-    yield put(
-      updateGlobalNotification(getServerErrorMessage(error), false, true),
-    );
+    console.error('error: ', error);
+  }
+}
+function setWorkInProgressItemSaga({ payload: { item } }) {
+  try {
+    if (!item) return;
+
+    decryptItemRaws({
+      payload: {
+        item,
+      },
+    });
+  } catch (error) {
+    // eslint-disable-next-line no-console
+    console.error('error: ', error);
   }
 }
 
-export function* decryptionEndWatchSaga() {
+export function* processSystemItemsSaga({ payload: { itemsById } }) {
   try {
-    const systemItems = yield select(systemItemsSelector);
-    const systemItemsArray = objectToArray(systemItems);
+    const items = objectToArray(itemsById);
+    if (!items) return;
+    const systemItems = items.filter(item => item.type === ENTITY_TYPE.SYSTEM);
 
-    if (systemItemsArray.length > 0) {
-      yield all(
-        systemItemsArray.map(item =>
-          item.data?.name?.includes(ENTITY_TYPE.TEAM)
-            ? put(addTeamKeyPair(item))
-            : put(addShareKeyPair(item)),
-        ),
-      );
+    if (systemItems.length > 0) {
+      const teamKeys = [];
+      const shareKeys = [];
+      systemItems.forEach(item => {
+        if (!item.data?.name) return null;
+
+        return REGEXP_TESTER.SYSTEM.IS_TEAM(item.data?.name)
+          ? teamKeys.push(item)
+          : shareKeys.push(item);
+      });
+
+      yield all([
+        put(addTeamKeyPairBatch(teamKeys)),
+        put(addShareKeyPairBatch(shareKeys)),
+      ]);
     }
   } catch (error) {
     // eslint-disable-next-line no-console
@@ -398,33 +606,12 @@ export function* decryptionEndWatchSaga() {
   }
 }
 
-function* setWorkInProgressItemSaga({ payload: { item } }) {
-  try {
-    if (!item) return;
-    const { raws } = JSON.parse(item.secret);
-
-    if (raws) {
-      const keyPair = yield select(personalKeyPairSelector);
-      const masterPassword = yield select(masterPasswordSelector);
-
-      yield put(
-        decryption({
-          raws,
-          key: keyPair.privateKey,
-          masterPassword,
-        }),
-      );
-    }
-  } catch (error) {
-    // eslint-disable-next-line no-console
-    console.error('error: ', error);
-  }
-}
-
 export default function* workflowSagas() {
+  // Init (get all items, keys, etc)
   yield takeLatest(INIT_WORKFLOW, initWorkflow);
-  yield takeLatest(UPDATE_WORK_IN_PROGRESS_ITEM, updateWorkInProgressItemSaga);
-  yield takeLatest(SET_CURRENT_TEAM_ID, setCurrentTeamIdWatchSaga);
-  yield takeEvery(DECRYPTION_END, decryptionEndWatchSaga);
+  yield takeEvery(ADD_SYSTEM_ITEMS_BATCH, processSystemItemsSaga);
   yield takeLatest(SET_WORK_IN_PROGRESS_ITEM, setWorkInProgressItemSaga);
+  yield takeLatest(ADD_LISTS_BATCH, initListsAndProgressEntities);
+  yield takeLatest(UPDATE_WORK_IN_PROGRESS_ITEM, updateWorkInProgressItemSaga);
+  yield takeLatest(SET_CURRENT_TEAM_ID, openTeamVaultSaga);
 }

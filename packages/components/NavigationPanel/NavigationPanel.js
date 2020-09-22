@@ -6,12 +6,9 @@ import { Icon } from '@caesar/components';
 const Wrapper = styled.div``;
 
 const StepsRow = styled.div`
+  position: relative;
   display: flex;
   align-items: center;
-  justify-content: center;
-  width: 100%;
-  margin: 0 auto;
-  position: relative;
 `;
 
 const StepBox = styled.div`
@@ -23,20 +20,15 @@ const StepBox = styled.div`
 `;
 
 const SeparatorIconWrapper = styled.div`
-  margin: 0 20px;
-  line-height: 10px;
+  margin: 0 16px;
+  line-height: 0;
 `;
 
 const StepDescription = styled.span`
-  font-size: 14px;
+  font-size: ${({ theme }) => theme.font.size.small};
   font-weight: 600;
   color: ${({ isActive, theme }) =>
-    isActive ? theme.color.black : theme.color.gray};
-`;
-
-const StyledIcon = styled(Icon)`
-  fill: ${({ isActive, theme }) =>
-    isActive ? theme.color.black : theme.color.gray};
+    isActive ? theme.color.black : theme.color.lightGray};
 `;
 
 const getStepIndex = (steps, stepName) => {
@@ -90,7 +82,12 @@ const NavigationPanel = ({
 
     return (
       <SeparatorIconWrapper key={index}>
-        <StyledIcon name="arrow" isActive={isActive} width={18} height={10} />
+        <Icon
+          name="arrow-heavy"
+          width={16}
+          height={16}
+          color={isActive ? 'black' : 'lightGray'}
+        />
       </SeparatorIconWrapper>
     );
   };
@@ -104,4 +101,4 @@ const NavigationPanel = ({
   );
 };
 
-export default NavigationPanel;
+export { NavigationPanel };

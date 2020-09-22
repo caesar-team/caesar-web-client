@@ -84,21 +84,6 @@ export const workInProgressItemSharedMembersSelector = createSelector(
       : [],
 );
 
-const constructedWorkInProgressItem = createSelector(
-  workInProgressItemSelector,
-  workInProgressItemOwnerSelector,
-  workInProgressItemChildItemsSelector,
-  (
-    workInProgressItem,
-    workInProgressItemOwner,
-    workInProgressItemChildItems,
-  ) => ({
-    ...workInProgressItem,
-    owner: workInProgressItemOwner,
-    invited: workInProgressItemChildItems,
-  }),
-);
-
 export const workInProgressListIdSelector = createSelector(
   workflowSelector,
   workflow => workflow.workInProgressListId,
@@ -115,8 +100,9 @@ export const workInProgressListSelector = createSelector(
   workInProgressListIdSelector,
   (listsById, teamsById, workInProgressListId) => {
     const list = listsById[workInProgressListId];
+
     const userRole =
-      list && list.teamId ? teamsById[list.teamId].userRole : null;
+      list && list.teamId ? teamsById[list.teamId]?.userRole : null;
 
     return list
       ? {

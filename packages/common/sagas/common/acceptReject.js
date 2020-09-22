@@ -60,7 +60,7 @@ export function* rejectItemSaga({ payload: { id } }) {
     yield put(rejectItemUpdateSuccess(id));
     yield put(updateWorkInProgressItem());
   } catch (error) {
-    console.log(error);
+    console.error(error);
     yield put(
       updateGlobalNotification(getServerErrorMessage(error), false, true),
     );

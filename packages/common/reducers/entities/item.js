@@ -339,6 +339,8 @@ export default createReducer(initialState, {
     return state;
   },
   [ADD_ITEMS_BATCH](state, { payload }) {
+    if (Object.values(payload.itemsById) <= 0) return state;
+
     return {
       ...state,
       byId: {

@@ -27,7 +27,6 @@ const SelectedOption = styled.div`
 const ValueText = styled.div`
   display: flex;
   align-items: center;
-  font-size: 18px;
   color: ${({ theme }) => theme.color.black};
   position: relative;
   width: 100%;
@@ -50,7 +49,7 @@ const OptionsList = styled.div`
   flex-direction: column;
   position: relative;
   border: 1px solid ${({ theme }) => theme.color.gallery};
-  border-radius: 3px;
+  border-radius: ${({ theme }) => theme.borderRadius};
   width: 100%;
 `;
 

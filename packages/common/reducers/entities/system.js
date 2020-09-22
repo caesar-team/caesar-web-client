@@ -4,19 +4,29 @@ import {
   REMOVE_SYSTEM_ITEM,
 } from '@caesar/common/actions/entities/system';
 
-const initialState = {};
+const initialState = {
+  byId: {},
+};
 
 export default createReducer(initialState, {
   [ADD_SYSTEM_ITEMS_BATCH](state, { payload }) {
     return {
       ...state,
-      ...payload.items,
+      byId: {
+        ...state.byId,
+        ...payload.itemsById,
+      },
     };
   },
   [REMOVE_SYSTEM_ITEM](state, { payload }) {
+    const itemsById = state.byId;
+    delete itemsById[payload.itemId];
+
     return {
       ...state,
-      [payload.itemId]: undefined,
+      byId: {
+        ...itemsById,
+      },
     };
   },
 });

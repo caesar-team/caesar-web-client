@@ -2,6 +2,7 @@ import {
   MAX_UPLOADING_FILE_SIZE,
   TOTAL_MAX_UPLOADING_FILES_SIZES,
 } from '@caesar/common/constants';
+import { REGEXP_TEXT_MATCH } from '@caesar/containers/Bootstrap/constants';
 
 export const ERROR = {
   REQUIRED: 'This field is required',
@@ -17,4 +18,15 @@ export const ERROR = {
     `All attachments must be less than ${maxAllFilesSize}. Please, delete some attachmnets`,
   WEBSITE: 'Must be an url',
   IMAGE_UPLOAD: 'Please, upload an image',
+  LIST_ALREADY_EXISTS: 'List with such label already exists',
+  INCORRECT_CREDENTIALS: 'Incorrect credentials',
 };
+
+
+export const GOOD_PASSWORD_RULES = [
+  ...REGEXP_TEXT_MATCH,
+  {
+    text: 'Unique password (i.e. do not use qwerty)',
+    regexp: 'zxcvbn',
+  },
+];

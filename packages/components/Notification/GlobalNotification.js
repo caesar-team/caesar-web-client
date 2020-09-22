@@ -15,7 +15,7 @@ const Wrapper = styled.div`
     `
     border: 1px solid ${theme.color.gallery}
   `};
-  border-radius: 3px;
+  border-radius: ${({ theme }) => theme.borderRadius};
 `;
 
 const InnerWrapper = styled.div`

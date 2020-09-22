@@ -24,7 +24,7 @@ const StyledDropdown = styled(Dropdown)`
     height: 100%;
     padding: 8px 16px;
     border: 1px solid ${({ theme }) => theme.color.gallery};
-    border-radius: 3px;
+    border-radius: ${({ theme }) => theme.borderRadius};
   }
 
   ${Dropdown.Box} {

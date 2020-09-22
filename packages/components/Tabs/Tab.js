@@ -20,7 +20,7 @@ const StyledTab = styled.li`
   margin-bottom: -1px;
   margin-right: 10px;
   cursor: pointer;
-  border-radius: 3px;
+  border-radius: ${({ theme }) => theme.borderRadius};
   background: ${({ isActive, theme }) =>
     isActive ? theme.color.white : 'transparent'};
 

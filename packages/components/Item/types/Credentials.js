@@ -1,4 +1,5 @@
 import React, { memo } from 'react';
+import styled from 'styled-components';
 import { SCHEMA } from '@caesar/common/validation';
 import {
   Title,
@@ -11,12 +12,18 @@ import {
 import { Row } from '../../ItemFields/common';
 import { OwnerAndInvitation } from '../components';
 
+const PasswordRow = styled(Row)`
+  position: relative;
+  z-index: ${({ theme }) => theme.zIndex.basic};
+`;
+
 const CredentialsComponent = ({
   item,
   itemSubject,
   onClickAcceptEdit,
   onClickShare,
   isSharedItem,
+  isVisibleDragZone,
 }) => {
   const { name, login, pass, website, note, attachments, raws } = item.data;
 
@@ -45,14 +52,14 @@ const CredentialsComponent = ({
           onClickAcceptEdit={onClickAcceptEdit}
         />
       </Row>
-      <Row>
+      <PasswordRow>
         <Password
           value={pass}
           itemSubject={itemSubject}
           schema={SCHEMA.REQUIRED_LIMITED_STRING()}
           onClickAcceptEdit={onClickAcceptEdit}
         />
-      </Row>
+      </PasswordRow>
       <Row>
         <Website
           value={website}
@@ -74,6 +81,7 @@ const CredentialsComponent = ({
           raws={raws}
           itemSubject={itemSubject}
           onClickAcceptEdit={onClickAcceptEdit}
+          isVisibleDragZone={isVisibleDragZone}
         />
       </Row>
     </>

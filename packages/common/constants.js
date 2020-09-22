@@ -29,6 +29,8 @@ export const IS_SECURE_APP = APP_TYPE === 'secure';
 export const IS_EXTENSION_APP = APP_TYPE === 'extension';
 export const IS_GENERAL_APP = APP_TYPE === 'general';
 
+export const FINGERPRINT = 'trustedDevice';
+
 export const PORTAL_ID = 'portal';
 
 export const DEFAULT_IDLE_TIMEOUT = 5 * 60 * 1000;
@@ -125,6 +127,7 @@ export const ROUTES = {
   SETTINGS: '/settings',
   IMPORT: '/import',
   TEAM: '/team',
+  USERS: '/users',
   CREATE: '/create',
   BOOTSTRAP: '/user/security/bootstrap',
   TWOFA: '/auth/2fa',
@@ -141,6 +144,7 @@ export const LOCKED_ROUTES = [
   ROUTES.DASHBOARD,
   ROUTES.IMPORT,
   ROUTES.TEAM,
+  ROUTES.USERS,
   ROUTES.CREATE,
   ROUTES.BOOTSTRAP,
   ROUTES.TWOFA,
@@ -252,4 +256,22 @@ export const KEY_TYPE = {
   TEAMS: 'teams',
   SHARES: 'shares',
   ANONYMOUS: 'anonymous',
+};
+
+export const REGEXP_TESTER = {
+  SYSTEM: {
+    IS_SHARE: name =>
+      /\b(share)-[0-9a-f]{8}\b-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-\b[0-9a-f]{12}\b/.test(
+        name,
+      ),
+    IS_TEAM: name =>
+      /\b(team)-[0-9a-f]{8}\b-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-\b[0-9a-f]{12}\b/.test(
+        name,
+      ),
+  },
+};
+
+export const REGEXP_EXCTRACTOR = {
+  ID: stringData =>
+    stringData ? stringData?.match(UUID_REGEXP)[0] || null : null,
 };

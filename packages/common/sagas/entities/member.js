@@ -1,4 +1,5 @@
-import { call, put, takeLatest, all } from 'redux-saga/effects';
+import Router from 'next/router';
+import { call, put, takeLatest, all, select } from 'redux-saga/effects';
 import {
   CREATE_MEMBER_BATCH_REQUEST,
   CREATE_MEMBER_REQUEST,
@@ -10,12 +11,21 @@ import {
   FETCH_TEAM_MEMBERS_REQUEST,
   fetchMembersFailure,
   fetchMembersSuccess,
+  leaveTeamFailure,
+  leaveTeamSuccess,
+  removeTeamFromMember,
+  LEAVE_TEAM_REQUEST,
 } from '@caesar/common/actions/entities/member';
-import { updateTeamMembersWithRoles } from '@caesar/common/actions/entities/team';
+import {
+  updateTeamMembersWithRoles,
+  removeTeamMemberSuccess,
+} from '@caesar/common/actions/entities/team';
+import { userIdSelector } from '@caesar/common/selectors/user';
 import {
   getMembers,
   getPublicKeyByEmailBatch,
   getTeamMembers,
+  postLeaveTeam,
   postNewUser,
   postNewUserBatch,
   updateKey,
@@ -26,7 +36,13 @@ import {
   generateUser,
   generateUsersBatch,
 } from '@caesar/common/utils/cipherUtils';
-import { ENTITY_TYPE, ROLE_ANONYMOUS_USER } from '@caesar/common/constants';
+import {
+  ENTITY_TYPE,
+  ROLE_ANONYMOUS_USER,
+  ROUTES,
+} from '@caesar/common/constants';
+import { updateGlobalNotification } from '@caesar/common/actions/application';
+import { getServerErrorMessage } from '@caesar/common/utils/error';
 
 const setNewFlag = (members, isNew) =>
   members.map(member => ({
@@ -44,7 +60,7 @@ export function* fetchMembersSaga() {
     yield put(fetchMembersSuccess(convertMembersToEntity(members)));
   } catch (error) {
     // eslint-disable-next-line no-console
-    console.log(error);
+    console.error(error);
     yield put(fetchMembersFailure());
   }
 }
@@ -229,7 +245,9 @@ export function* getOrCreateMemberBatchSaga({ payload: { emailRolePairs } }) {
   }
 }
 
-export function* fetchTeamMembersSaga({ payload: { teamId, needUpdateTeamMembers = false } }) {
+export function* fetchTeamMembersSaga({
+  payload: { teamId, needUpdateTeamMembers = false },
+}) {
   try {
     const { data } = yield call(getTeamMembers, teamId);
 
@@ -243,9 +261,25 @@ export function* fetchTeamMembersSaga({ payload: { teamId, needUpdateTeamMembers
   }
 }
 
+export function* leaveTeamSaga({ payload: { teamId } }) {
+  try {
+    yield call(postLeaveTeam, teamId);
+    const userId = yield select(userIdSelector);
+
+    yield put(leaveTeamSuccess());
+    yield put(removeTeamMemberSuccess(teamId, userId));
+    yield put(removeTeamFromMember(teamId, userId));
+    yield call(Router.push, ROUTES.SETTINGS + ROUTES.TEAM);
+  } catch (e) {
+    yield put(updateGlobalNotification(getServerErrorMessage(e), false, true));
+    yield put(leaveTeamFailure());
+  }
+}
+
 export default function* memberSagas() {
   yield takeLatest(FETCH_MEMBERS_REQUEST, fetchMembersSaga);
   yield takeLatest(CREATE_MEMBER_REQUEST, createMemberSaga);
   yield takeLatest(CREATE_MEMBER_BATCH_REQUEST, createMemberBatchSaga);
   yield takeLatest(FETCH_TEAM_MEMBERS_REQUEST, fetchTeamMembersSaga);
+  yield takeLatest(LEAVE_TEAM_REQUEST, leaveTeamSaga);
 }

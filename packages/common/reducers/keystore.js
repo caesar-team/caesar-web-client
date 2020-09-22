@@ -17,7 +17,7 @@ import {
   ADD_SHARE_KEY_PAIR_BATCH,
 } from '@caesar/common/actions/keystore';
 
-import { converSystemItemToKeyPair } from '../utils/item';
+import { convertSystemItemToKeyPair } from '@caesar/common/utils/item';
 
 const initialState = {
   [KEY_TYPE.PERSONAL]: {},
@@ -50,7 +50,7 @@ export default createReducer(initialState, {
       const { data: { name } = { name: null } } = systemItem;
       keyPairs[
         REGEXP_EXCTRACTOR.ID(name) || systemItem.id
-      ] = converSystemItemToKeyPair(systemItem);
+      ] = convertSystemItemToKeyPair(systemItem);
     });
 
     return {
@@ -68,7 +68,7 @@ export default createReducer(initialState, {
     payload.data.forEach(systemItem => {
       keyPairs[
         systemItem?.relatedItem?.id || systemItem.id
-      ] = converSystemItemToKeyPair(systemItem);
+      ] = convertSystemItemToKeyPair(systemItem);
     });
 
     return {

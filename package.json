@@ -10,7 +10,7 @@
     "secure:dev": "yarn --cwd packages/secure-app dev",
     "secure:build:production": "yarn --cwd packages/secure-app build:production",
     "secure:start:production": "yarn --cwd packages/secure-app start:production",
-    "eslit": "yarn bin eslint"
+    "eslint": "yarn bin eslint"
   },
   "npmClient": "yarn",
   "useWorkspaces": true

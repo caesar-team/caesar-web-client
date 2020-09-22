@@ -436,7 +436,6 @@ export function* initWorkflow() {
   yield call(initTeams);
 
   const currentTeamId = yield select(currentTeamIdSelector);
-  // yield call(initTeam, currentTeamId);
 
   yield put(setCurrentTeamId(currentTeamId || TEAM_TYPE.PERSONAL));
   yield fork(fetchMembersSaga);
@@ -447,7 +446,6 @@ export function* openTeamVaultSaga({ payload: { teamId } }) {
     const listsById = yield select(listsTeamSelector, { teamId });
     const lists = objectToArray(listsById);
     const defaultList = lists.find(list => list.type === LIST_TYPE.DEFAULT);
-    // const trashList = lists.find(list => list.type === LIST_TYPE.TRASH);
     const favoritesList = lists.find(list => list.type === LIST_TYPE.FAVORITES);
 
     const workInProgressListId = yield select(workInProgressListIdSelector);
@@ -612,8 +610,6 @@ export default function* workflowSagas() {
   // Init (get all items, keys, etc)
   yield takeLatest(INIT_WORKFLOW, initWorkflow);
   yield takeEvery(ADD_SYSTEM_ITEMS_BATCH, processSystemItemsSaga);
-  // yield takeEvery(ADD_SHARE_KEY_PAIR_BATCH, processSharedItemsSaga);
-  // yield takeEvery(ADD_TEAM_KEY_PAIR_BATCH, processTeamItemsSaga);
   yield takeLatest(SET_WORK_IN_PROGRESS_ITEM, setWorkInProgressItemSaga);
   yield takeLatest(ADD_LISTS_BATCH, initListsAndProgressEntities);
   yield takeLatest(UPDATE_WORK_IN_PROGRESS_ITEM, updateWorkInProgressItemSaga);

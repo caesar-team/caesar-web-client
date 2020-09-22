@@ -59,7 +59,7 @@ export function extractKeysFromSystemItem(item) {
     privateKey,
   };
 }
-export function converSystemItemToKeyPair(item) {
+export function convertSystemItemToKeyPair(item) {
   if (!item.data) return null;
   const { pass } = item.data;
   const itemRaws = item.data?.raws || {

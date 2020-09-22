@@ -2,16 +2,13 @@
   "name": "Node.js",
   "build": {
     "dockerfile": "Dockerfile",
-    // Update 'VARIANT' to pick a Node version: 10, 12, 14
     "args": {
       "VARIANT": "14"
     }
   },
-  // Set *default* container specific settings.json values on container create.
   "settings": {
     "terminal.integrated.shell.linux": "/bin/bash"
   },
-  // Add the IDs of extensions you want installed when the container is created.
   "extensions": [
     "dbaeumer.vscode-eslint",
     "esbenp.prettier-vscode",
@@ -19,12 +16,13 @@
     "vector-of-bool.gitflow",
     "mikestead.dotenv"
   ],
-  // Use 'forwardPorts' to make a list of ports inside the container available locally.
-  "forwardPorts": [
-    3000
+  "forwardPorts": [3000],
+  "mounts": [
+    "source=caesar-web-app-bashhistory,target=/commandhistory,type=volume",
+    "source=caesar-web-app-node_modules,target=${containerWorkspaceFolder}/packages/web-app/node_modules,type=volume",
+    "source=caesar-secure-app-node_modules,target=${containerWorkspaceFolder}/packages/secure-app/node_modules,type=volume",
+    "source=gpg-keys,target=/,type=volume"
   ],
-  // Specifies a command that should be run after the container has been created.
-  "postCreateCommand": "yarn install",
-  // Comment out the next line to run as root instead.
+  "postCreateCommand": "sudo chown node packages/web-app/node_modules packages/secure-app/node_modules && yarn install",
   "remoteUser": "node"
 }

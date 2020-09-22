@@ -19,7 +19,7 @@ const Wrapper = styled.div`
   display: flex;
   flex-direction: column;
   padding: 20px;
-  border-radius: 3px;
+  border-radius: ${({ theme }) => theme.borderRadius};
   background-color: ${({ theme }) => theme.color.white};
 `;
 
@@ -43,7 +43,7 @@ const MenuWrapper = styled.div`
   width: 100%;
   height: 82px;
   border: 1px solid ${({ theme }) => theme.color.gallery};
-  border-radius: 3px;
+  border-radius: ${({ theme }) => theme.borderRadius};
 `;
 
 const MenuButton = styled(Button)`
@@ -139,7 +139,7 @@ const TeamCard = ({
           </Can>
           <MenuButton color="white" onClick={onClickLeaveTeam}>
             Leave
-          </MenuButton>            
+          </MenuButton>
           <Can I={PERMISSION.DELETE} a={teamSubject}>
             <MenuButton color="white" onClick={onClickRemoveTeam}>
               Remove

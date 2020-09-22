@@ -1,4 +1,4 @@
-import React, { Component, Fragment } from 'react';
+import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { createStructuredSelector } from 'reselect';
 import {
@@ -8,10 +8,7 @@ import {
   SettingsSidebar,
 } from '@caesar/components';
 import { ImportContainer } from '@caesar/containers';
-import {
-  currentTeamSelector,
-  userDataSelector,
-} from '@caesar/common/selectors/user';
+import { userDataSelector } from '@caesar/common/selectors/user';
 import {
   fetchUserSelfRequest,
   fetchUserTeamsRequest,
@@ -24,8 +21,7 @@ class SettingsImportPage extends Component {
   }
 
   render() {
-    const { userData, currentTeam } = this.props;
-
+    const { userData } = this.props;
     const shouldShowLoader = !userData;
 
     if (shouldShowLoader) {
@@ -33,22 +29,21 @@ class SettingsImportPage extends Component {
     }
 
     return (
-      <Fragment>
+      <>
         <Head title="Import" />
-        <SettingsLayout user={userData} team={currentTeam}>
-          <Fragment>
+        <SettingsLayout user={userData}>
+          <>
             <SettingsSidebar />
             <ImportContainer />
-          </Fragment>
+          </>
         </SettingsLayout>
-      </Fragment>
+      </>
     );
   }
 }
 
 const mapStateToProps = createStructuredSelector({
   userData: userDataSelector,
-  currentTeam: currentTeamSelector,
 });
 
 const mapDispatchToProps = {

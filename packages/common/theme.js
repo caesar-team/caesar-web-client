@@ -40,6 +40,7 @@ const theme = {
     modal: 5,
     notification: 6,
   },
+  borderRadius: '3px',
 };
 
 export default theme;

@@ -43,7 +43,7 @@ const Box = styled.div`
   display: flex;
   font-size: 18px;
   line-height: 18px;
-  border-radius: 3px;
+  border-radius: ${({ theme }) => theme.borderRadius};
   border: 1px solid ${({ theme }) => theme.color.gallery};
   background-color: ${({ theme }) => theme.color.snow};
   position: relative;

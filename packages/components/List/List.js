@@ -37,14 +37,14 @@ const ColumnTitle = styled.div`
 `;
 
 const createItemData = memoize(
-  (
+  ({
     items,
     isMultiItem,
     onClickItem,
     onSelectItem,
     workInProgressItemIds,
     workInProgressItem,
-  ) => ({
+  }) => ({
     items,
     isMultiItem,
     onClickItem,
@@ -57,19 +57,21 @@ const createItemData = memoize(
 const RenderedList = ({
   items,
   isMultiItem,
+  teamMembersCount,
   onClickItem,
   onSelectItem,
   workInProgressItemIds,
   workInProgressItem,
 }) => {
-  const itemData = createItemData(
+  const itemData = createItemData({
     items,
     isMultiItem,
+    teamMembersCount,
     onClickItem,
     onSelectItem,
     workInProgressItemIds,
     workInProgressItem,
-  );
+  });
 
   return (
     <Scrollbar>
@@ -97,6 +99,7 @@ const ListComponent = ({
   workInProgressItemIds,
   workInProgressItem,
   items = [],
+  teamMembersCount = 1,
   onClickItem = Function.prototype,
   onSelectItem = Function.prototype,
 }) => {
@@ -140,6 +143,7 @@ const ListComponent = ({
       <RenderedList
         items={items}
         isMultiItem={isMultiItem}
+        teamMembersCount={teamMembersCount}
         onClickItem={onClickItem}
         onSelectItem={onSelectItem}
         workInProgressItemIds={workInProgressItemIds}

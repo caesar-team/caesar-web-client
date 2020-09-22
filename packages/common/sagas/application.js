@@ -4,7 +4,7 @@ import { REHYDRATE_STORE } from '@caesar/common/actions/application';
 import { isOnlineSelector } from '@caesar/common/selectors/application';
 import { itemListSelector } from '@caesar/common/selectors/entities/item';
 import { masterPasswordSelector } from '@caesar/common/selectors/user';
-import { actualKeyPairSelector } from '@caesar/common/selectors/keyStore';
+import { actualKeyPairSelector } from '@caesar/common/selectors/keystore';
 
 // TODO: Is conflicting with next-offline?
 // @Depricated
@@ -25,7 +25,7 @@ export function* rehydrateStoreSaga() {
     }
   } catch (error) {
     // eslint-disable-next-line no-console
-    console.log(error);
+    console.error(error);
   }
 }
 

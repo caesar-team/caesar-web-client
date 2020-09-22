@@ -1,0 +1,28 @@
+{
+  "name": "Node.js",
+  "build": {
+    "dockerfile": "Dockerfile",
+    "args": {
+      "VARIANT": "14"
+    }
+  },
+  "settings": {
+    "terminal.integrated.shell.linux": "/bin/bash"
+  },
+  "extensions": [
+    "dbaeumer.vscode-eslint",
+    "esbenp.prettier-vscode",
+    "rvest.vs-code-prettier-eslint",
+    "vector-of-bool.gitflow",
+    "mikestead.dotenv"
+  ],
+  "forwardPorts": [3000],
+  "mounts": [
+    "source=caesar-web-app-bashhistory,target=/commandhistory,type=volume",
+    "source=caesar-web-app-node_modules,target=${containerWorkspaceFolder}/packages/web-app/node_modules,type=volume",
+    "source=caesar-secure-app-node_modules,target=${containerWorkspaceFolder}/packages/secure-app/node_modules,type=volume",
+    "source=gpg-keys,target=/,type=volume"
+  ],
+  "postCreateCommand": "sudo chown node packages/web-app/node_modules packages/secure-app/node_modules && yarn install",
+  "remoteUser": "node"
+}

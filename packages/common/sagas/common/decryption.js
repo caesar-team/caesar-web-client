@@ -14,6 +14,21 @@ import {
   POOL_QUEUE_INITIALIZED_EVENT_TYPE,
 } from './constants';
 
+const matchInboundAndOutbound = ({ inbound, outbound }) => {
+  return match(
+    Array.isArray(inbound) ? arrayToObject(inbound) : inbound,
+    checkItemsAfterDecryption(outbound),
+  );
+};
+
+const matchAndAddItems = ({ inbound, outbound }) => {
+  return addItemsBatch(matchInboundAndOutbound({ inbound, outbound }));
+};
+
+const matchAndAddSystemItems = ({ inbound, outbound }) => {
+  return addSystemItemsBatch(matchInboundAndOutbound({ inbound, outbound }));
+};
+
 const taskAction = (items, raws, key, masterPassword) => async task => {
   await task.init(key, masterPassword);
   let result = [];
@@ -28,15 +43,13 @@ const taskAction = (items, raws, key, masterPassword) => async task => {
 };
 
 export function* decryption({ items, raws, key, masterPassword, coresCount }) {
-  const itemsById = items ? arrayToObject(items) : {};
-
   const normalizerEvent = normalizeEvent(coresCount);
+
   const pool = Pool(() => spawn(new Worker('../../workers/decryption')), {
     name: 'decryption',
     size: coresCount,
   });
   const poolChannel = yield call(createPoolChannel, pool);
-
   while (poolChannel) {
     const event = yield take(poolChannel);
 
@@ -47,7 +60,6 @@ export function* decryption({ items, raws, key, masterPassword, coresCount }) {
 
   if (items) {
     const chunks = chunk(items, DECRYPTION_CHUNK_SIZE);
-
     chunks.map(itemsChunk =>
       pool.queue(taskAction(itemsChunk, null, key, masterPassword)),
     );
@@ -64,28 +76,30 @@ export function* decryption({ items, raws, key, masterPassword, coresCount }) {
       switch (event.type) {
         case TASK_QUEUE_COMPLETED_EVENT_TYPE:
           if (items) {
-            const systemItems = [];
-            const nonSystemItems = [];
-
-            Object.values(itemsById).forEach(item => {
-              if (item.type === ITEM_TYPE.SYSTEM) {
-                systemItems.push(item);
-              } else {
-                nonSystemItems.push(item);
-              }
-            });
-
-            yield put(
-              addSystemItemsBatch(
-                match(arrayToObject(systemItems), checkItemsAfterDecryption(event.returnValue)),
-              ),
+            const systemItems = items.filter(
+              item => item.type === ITEM_TYPE.SYSTEM,
+            );
+            const generalItems = items.filter(
+              item => item.type !== ITEM_TYPE.SYSTEM,
             );
 
-            yield put(
-              addItemsBatch(
-                match(arrayToObject(nonSystemItems), checkItemsAfterDecryption(event.returnValue)),
-              ),
-            );
+            if (systemItems.length > 0) {
+              yield put(
+                matchAndAddSystemItems({
+                  inbound: systemItems,
+                  outbound: event.returnValue,
+                }),
+              );
+            }
+
+            if (generalItems.length > 0) {
+              yield put(
+                matchAndAddItems({
+                  inbound: generalItems,
+                  outbound: event.returnValue,
+                }),
+              );
+            }
           }
 
           if (raws) {
@@ -100,7 +114,7 @@ export function* decryption({ items, raws, key, masterPassword, coresCount }) {
       }
     } catch (error) {
       // eslint-disable-next-line no-console
-      console.log(error);
+      console.error(error);
     }
   }
 }

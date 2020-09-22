@@ -54,7 +54,7 @@ export function* encryption({ items, coresCount }) {
           break;
       }
     } catch (error) {
-      console.log(error);
+      console.error(error);
     }
   }
 }

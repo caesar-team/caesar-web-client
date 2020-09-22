@@ -58,11 +58,7 @@ class Bootstrap extends Component {
   }
 
   async componentDidMount() {
-    const {
-      logout,
-      initCoresCount,
-      shared = {},
-    } = this.props;
+    const { logout, initCoresCount, shared = {} } = this.props;
     initCoresCount();
 
     try {
@@ -116,6 +112,7 @@ class Bootstrap extends Component {
     this.props.setKeyPair({
       publicKey: currentKeyPair.publicKey,
       privateKey: currentKeyPair.encryptedPrivateKey,
+      password: masterPassword,
     });
 
     this.setState({

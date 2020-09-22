@@ -1,7 +1,7 @@
 import { connect } from 'react-redux';
 import { createStructuredSelector } from 'reselect';
 import { setMasterPassword, logout } from '@caesar/common/actions/user';
-import { addPersonalKeyPair as setKeyPair } from '@caesar/common/actions/keyStore';
+import { addPersonalKeyPair as setKeyPair } from '@caesar/common/actions/keystore';
 import { resetWorkflowStore } from '@caesar/common/actions/workflow';
 import {
   initCoresCount,

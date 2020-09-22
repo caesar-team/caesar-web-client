@@ -98,9 +98,14 @@ module.exports = withPlugins(
       },
     },
     webpack: (config, { isServer }) => {
-      if (isServer) {
-        config.output.globalObject = `typeof self !== 'undefined' ? self : this`;
-      }
+      config.output.globalObject = 'typeof self !== "object" ? self : this';
+
+      // Temporary fix for https://github.com/zeit/next.js/issues/8071
+      config.plugins.forEach(plugin => {
+        if (plugin.definitions && plugin.definitions['typeof window']) {
+          delete plugin.definitions['typeof window'];
+        }
+      });
 
       config.plugins.push(new ThreadsPlugin());
       config.externals['tiny-worker'] = 'tiny-worker';

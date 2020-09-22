@@ -67,16 +67,19 @@ export const AddItem = ({ className }) => {
 
   const isOnline = useNavigatorOnline();
 
+  // Todo: The Can should get an entity itself
   const itemSubject = currentTeam
     ? {
         __typename: PERMISSION_ENTITY.TEAM_ITEM,
         // eslint-disable-next-line camelcase
-        team_create_item: !!workInProgressList?._links?.team_create_item,
+        team_create_item:
+          // eslint-disable-next-line camelcase
+          workInProgressList?._permissions?.team_create_item || false,
       }
     : {
         __typename: PERMISSION_ENTITY.ITEM,
         // eslint-disable-next-line camelcase
-        create_item: !!workInProgressList?._links?.create_item,
+        create_item: workInProgressList?._permissions?.create_item || false,
       };
 
   return (

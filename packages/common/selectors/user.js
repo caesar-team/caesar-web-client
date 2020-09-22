@@ -72,7 +72,7 @@ export const userIdSelector = createSelector(
   data => data.id,
 );
 
-export const userPersonalDefaultListIdSelector = createSelector(
+export const userDefaultListIdSelector = createSelector(
   userSelector,
-  user => user.personalDefaultListId,
+  user => user.defaultListId,
 );

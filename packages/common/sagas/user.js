@@ -13,7 +13,7 @@ import {
   fetchUserTeamsFailure,
   setCurrentTeamId,
 } from '@caesar/common/actions/user';
-import { addPersonalKeyPair } from '@caesar/common/actions/keyStore';
+import { addPersonalKeyPair } from '@caesar/common/actions/keystore';
 import { addTeamsBatch } from '@caesar/common/actions/entities/team';
 import { addMembersBatch } from '@caesar/common/actions/entities/member';
 import { membersByIdSelector } from '@caesar/common/selectors/entities/member';

@@ -31,7 +31,7 @@ import {
   patchTeamList,
   removeTeamList,
 } from '@caesar/common/api';
-import { ENTITY_TYPE, LIST_TYPE } from '@caesar/common/constants';
+import { ENTITY_TYPE, LIST_TYPE, TEAM_TYPE } from '@caesar/common/constants';
 import { getServerErrors } from '@caesar/common/utils/error';
 
 const reorder = (list, startIndex, endIndex) => {
@@ -66,7 +66,7 @@ export function* sortListSaga({
     yield call(patchListSort, listId, { sort: destinationIndex });
   } catch (error) {
     // eslint-disable-next-line no-console
-    console.log(error);
+    console.error(error);
     yield put(sortListFailure());
   }
 }
@@ -78,13 +78,14 @@ export function* createListSaga({
   try {
     const {
       data: { id: listId, _links },
-    } = list.teamId
-      ? yield call(postCreateTeamList, list.teamId, {
-          label: list.label,
-        })
-      : yield call(postCreateList, {
-          label: list.label,
-        });
+    } =
+      list.teamId && list.teamId !== TEAM_TYPE.PERSONAL
+        ? yield call(postCreateTeamList, list.teamId, {
+            label: list.label,
+          })
+        : yield call(postCreateList, {
+            label: list.label,
+          });
 
     yield call(setCreatingMode, false);
     yield put(
@@ -136,7 +137,7 @@ export function* editListSaga({ payload: { list }, meta: { setEditMode } }) {
     yield put(editListSuccess(list));
   } catch (error) {
     // eslint-disable-next-line no-console
-    console.log(error);
+    console.error(error);
     yield put(editListFailure());
     yield put(updateGlobalNotification(getServerErrors(error), false, true));
   }
@@ -170,7 +171,7 @@ export function* removeListSaga({ payload: { teamId, listId } }) {
     yield put(removeListSuccess(listId));
   } catch (error) {
     // eslint-disable-next-line no-console
-    console.log(error);
+    console.error(error);
     yield put(removeListFailure());
   }
 }

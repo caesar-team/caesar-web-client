@@ -29,9 +29,9 @@ import { getServerErrorMessage } from '@caesar/common/utils/error';
 import { chunk } from '@caesar/common/utils/utils';
 import {
   ENTITY_TYPE,
-  INVITE_TYPE,
   PERMISSION_READ,
   NOOP_NOTIFICATION,
+  SHARE_TYPE,
 } from '@caesar/common/constants';
 
 const ITEM_CHILD_ITEM_CHUNK_SIZE = 50;
@@ -65,7 +65,7 @@ export function* createChildItemBatchSaga({ payload: { itemUserPairs } }) {
           teamId,
           secret,
           access: PERMISSION_READ,
-          cause: INVITE_TYPE,
+          cause: SHARE_TYPE,
         }),
       ),
     }));
@@ -109,7 +109,6 @@ export function* createChildItemBatchSaga({ payload: { itemUserPairs } }) {
       }),
       {},
     );
-
     yield put(createChildItemBatchSuccess(childItemsById));
 
     yield put(updateGlobalNotification(NOOP_NOTIFICATION, false));
@@ -117,7 +116,7 @@ export function* createChildItemBatchSaga({ payload: { itemUserPairs } }) {
     yield put(createChildItemBatchFinishedEvent(shares));
   } catch (error) {
     // eslint-disable-next-line no-console
-    console.log(error);
+    console.error(error);
     yield put(
       updateGlobalNotification(getServerErrorMessage(error), false, true),
     );
@@ -167,7 +166,7 @@ export function* updateChildItemsBatchSaga({
     yield put(updateGlobalNotification(NOOP_NOTIFICATION, false));
   } catch (error) {
     // eslint-disable-next-line no-console
-    console.log(error);
+    console.error(error);
     yield put(
       updateGlobalNotification(getServerErrorMessage(error), false, true),
     );
@@ -185,7 +184,7 @@ export function* changeChildItemPermissionSaga({
     yield put(updateWorkInProgressItem());
   } catch (error) {
     // eslint-disable-next-line no-console
-    console.log(error);
+    console.error(error);
     yield put(
       updateGlobalNotification(getServerErrorMessage(error), false, true),
     );

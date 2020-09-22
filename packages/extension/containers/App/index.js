@@ -4,7 +4,7 @@ import {
   fetchKeyPairRequest,
   setMasterPassword,
 } from '@caesar/common/actions/user';
-import { personalKeyPairSelector } from '@caesar/common/selectors/keyStore';
+import { personalKeyPairSelector } from '@caesar/common/selectors/keystore';
 import App from './App';
 
 const mapStateToProps = createStructuredSelector({

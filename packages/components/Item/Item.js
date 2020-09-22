@@ -3,7 +3,11 @@ import React, { memo, useState, useRef, useCallback } from 'react';
 import { useEvent } from 'react-use';
 import { useSelector, useDispatch } from 'react-redux';
 import styled from 'styled-components';
-import { PERMISSION, PERMISSION_ENTITY } from '@caesar/common/constants';
+import {
+  PERMISSION,
+  PERMISSION_ENTITY,
+  TEAM_TYPE,
+} from '@caesar/common/constants';
 import { useNotification } from '@caesar/common/hooks';
 import { workInProgressItemSelector } from '@caesar/common/selectors/workflow';
 import {
@@ -108,21 +112,23 @@ const ItemComponent = ({
     dispatch(setWorkInProgressItem(null));
   };
 
-  const itemSubject = item.teamId
-    ? {
-        __typename: PERMISSION_ENTITY.TEAM_ITEM,
-        team_edit_item: !!item._links?.team_edit_item,
-        team_move_item: !!item._links?.team_move_item,
-        team_batch_share_item: !!item._links?.team_batch_share_item,
-        team_delete_item: !!item._links?.team_delete_item,
-      }
-    : {
-        __typename: PERMISSION_ENTITY.ITEM,
-        edit_item: !!item._links?.edit_item,
-        move_item: !!item._links?.move_item,
-        batch_share_item: !!item._links?.batch_share_item,
-        delete_item: !!item._links?.delete_item,
-      };
+  const itemSubject =
+    item.teamId && item.teamId !== TEAM_TYPE.PERSONAL
+      ? {
+          __typename: PERMISSION_ENTITY.TEAM_ITEM,
+          team_edit_item: item?._permissions?.team_edit_item || false,
+          team_move_item: item?._permissions?.team_move_item || false,
+          team_batch_share_item:
+            item?._permissions?.team_batch_share_item || false,
+          team_delete_item: item?._permissions?.team_delete_item || false,
+        }
+      : {
+          __typename: PERMISSION_ENTITY.ITEM,
+          edit_item: item?._permissions?.edit_item || false,
+          move_item: item?._permissions?.move_item || false,
+          batch_share_item: item?._permissions?.batch_share_item || false,
+          delete_item: item?._permissions?.delete_item || false,
+        };
 
   return (
     <Wrapper isDisabled={isSubmitting}>

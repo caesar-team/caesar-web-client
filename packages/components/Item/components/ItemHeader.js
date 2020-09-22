@@ -97,21 +97,26 @@ const ItemHeaderComponent = ({
     dispatch(setWorkInProgressItem(null));
   };
 
-  const itemSubject = item.teamId
-    ? {
-        __typename: PERMISSION_ENTITY.TEAM_ITEM,
-        team_move_item: !!item._links?.team_move_item,
-        team_batch_share_item: !!item._links?.team_batch_share_item,
-        team_favorite_item_toggle: !!item._links?.team_favorite_item_toggle,
-        team_delete_item: !!item._links?.team_delete_item,
-      }
-    : {
-        __typename: PERMISSION_ENTITY.ITEM,
-        move_item: !!item._links?.move_item,
-        batch_share_item: !!item._links?.batch_share_item,
-        favorite_item_toggle: !!item._links?.favorite_item_toggle,
-        delete_item: !!item._links?.delete_item,
-      };
+  // TODO: Refactor the duplicated code
+  const itemSubject =
+    item.teamId && item.teamId !== TEAM_TYPE.PERSONAL
+      ? {
+          __typename: PERMISSION_ENTITY.TEAM_ITEM,
+          team_move_item: item?._permissions?.team_move_item || false,
+          team_batch_share_item:
+            item?._permissions?.team_batch_share_item || false,
+          team_favorite_item_toggle:
+            item?._permissions?.team_favorite_item_toggle || false,
+          team_delete_item: item?._permissions?.team_delete_item || false,
+        }
+      : {
+          __typename: PERMISSION_ENTITY.ITEM,
+          move_item: item?._permissions?.move_item || false,
+          batch_share_item: item?._permissions?.batch_share_item || false,
+          favorite_item_toggle:
+            item?._permissions?.favorite_item_toggle || false,
+          delete_item: item?._permissions?.delete_item || false,
+        };
 
   return (
     <ColumnHeader>

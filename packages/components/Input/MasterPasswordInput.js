@@ -15,7 +15,7 @@ const InnerWrapper = styled.div`
   height: 60px;
   border: 1px solid
     ${({ theme, isError }) => (isError ? theme.color.red : theme.color.gallery)};
-  border-radius: 3px;
+  border-radius: ${({ theme }) => theme.borderRadius};
 `;
 
 const IconWrapper = styled.div`

@@ -11,7 +11,7 @@ const Wrapper = styled.div`
   justify-content: space-between;
   padding: 8px 16px;
   background: ${({ theme }) => theme.color.black};
-  border-radius: 3px;
+  border-radius: ${({ theme }) => theme.borderRadius};
   box-shadow: 0 11px 23px 0 ${({ theme }) => theme.color.blackBoxShadow};
 
   ${({ position }) =>

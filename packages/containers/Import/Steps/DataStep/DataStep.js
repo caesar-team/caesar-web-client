@@ -1,476 +1,158 @@
-import React, { Component } from 'react';
-import styled from 'styled-components';
-import memoize from 'memoize-one';
+import React, { useState, useMemo, useRef } from 'react';
 import { waitIdle } from '@caesar/common/utils/utils';
+import { TEAM_TYPE, LIST_TYPE } from '@caesar/common/constants';
+import { Icon, NewDataTable } from '@caesar/components';
 import {
-  TEAM_TYPE,
-  LIST_TYPE,
-  ITEM_TYPE,
-  KEY_CODES,
-} from '@caesar/common/constants';
-import {
-  Input,
-  Icon,
-  Button,
-  Select,
-  Checkbox,
-  DataTable,
-  VirtualizedTableHOC,
-} from '@caesar/components';
+  Title,
+  SearchInput,
+  BottomWrapper,
+  SelectedItems,
+  StyledButton,
+  SelectListWrapper,
+  MoveToText,
+  StyledSelect,
+  StyledTable,
+} from './styles';
+import { normalize, denormalize, filter } from './utils';
+import { createColumns } from './createColumns';
 
-const Wrapper = styled.div`
-  width: calc(100vw - 495px);
-`;
+const DataStep = ({
+  data: propData,
+  headings,
+  teamsLists,
+  onSubmit,
+  onCancel,
+}) => {
+  const [state, setState] = useState({
+    teamId: teamsLists[0].id,
+    listId: teamsLists[0].lists[0].id,
+    filterText: '',
+    selectedRows: normalize(propData),
+    data: propData,
+    indexShownPassword: null,
+    isSubmitting: false,
+  });
+  const {
+    data,
+    selectedRows,
+    filterText,
+    teamId,
+    listId,
+    isSubmitting,
+  } = state;
 
-const Title = styled.div`
-  font-size: 18px;
-  font-weight: 600;
-  margin-bottom: 20px;
-`;
+  const tableWrapperRef = useRef(null);
+  // Window height minus stuff that takes vertical place (including table headers)
+  const tableVisibleDataHeight = window?.innerHeight - 575;
+  const tableWidth = tableWrapperRef?.current?.offsetWidth || 0;
 
-const SearchInput = styled(Input)`
-  border: 1px solid ${({ theme }) => theme.color.gallery};
-  margin-bottom: 10px;
-
-  ${Input.InputField} {
-    padding: 10px 0 10px 50px;
-    background: ${({ theme }) => theme.color.white};
-
-    &:hover {
-      background: ${({ theme }) => theme.color.white};
-    }
-  }
-`;
-
-const StyledIcon = styled(Icon)`
-  fill: ${({ theme }) => theme.color.gallery};
-`;
-
-const BottomWrapper = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin: 30px 0 0;
-`;
-
-const SelectedItems = styled.div`
-  font-size: 14px;
-  font-weight: 600;
-`;
-
-const ButtonsWrapper = styled.div`
-  display: flex;
-`;
-
-const StyledButton = styled(Button)`
-  margin-right: 20px;
-`;
-
-const StyledSelect = styled(Select)`
-  padding: 0;
-  border-bottom: 0;
-  margin: 0 20px;
-
-  ${Select.ValueText} {
-    font-size: 16px;
-    margin-right: 20px;
-    color: rgba(0, 0, 0, 0.87);
-  }
-`;
-
-const CellWrapper = styled.div`
-  position: relative;
-  width: 100%;
-  padding: 0 8px;
-
-  ${({ isPassword }) =>
-    isPassword &&
-    `
-    padding-right: 24px;
-  `}
-`;
-
-const EyeIcon = styled(Icon)`
-  position: absolute;
-  top: 50%;
-  right: 4px;
-  transform: translateY(-50%);
-  cursor: pointer;
-
-  &:hover {
-    color: ${({ theme }) => theme.color.black};
-  }
-`;
-
-const Cell = styled.div`
-  width: 100%;
-  height: 40px;
-  line-height: 40px;
-  overflow: hidden;
-  cursor: ${({ isEditableStyles }) =>
-    isEditableStyles ? 'text' : 'not-allowed'};
-`;
-
-const SelectListWrapper = styled.div`
-  display: flex;
-  align-items: center;
-  margin: 30px 0;
-`;
-
-const MoveToText = styled.div`
-  font-size: 14px;
-  margin-right: 20px;
-`;
-
-const DataTableStyled = styled(DataTable)`
-  height: 400px;
-`;
-
-const capitalize = string => {
-  if (typeof string !== 'string') return '';
-
-  return string.charAt(0).toUpperCase() + string.slice(1);
-};
-
-const normalize = array =>
-  array.reduce(
-    (accumulator, curr, index) => ({ ...accumulator, [index]: curr }),
-    {},
+  const tableData = useMemo(() => filter(data, filterText), [filterText]);
+  const columns = useMemo(
+    () => createColumns({ state, setState, headings, tableWidth }),
+    [state, headings, tableWidth],
   );
 
-const denormalize = object => Object.values(object);
+  const selectedRowsLength = denormalize(selectedRows).length;
+  const isButtonDisabled = isSubmitting || !selectedRowsLength;
 
-const SEARCH_FIELDS = ['name'];
-
-const VirtualizedTable = VirtualizedTableHOC(DataTableStyled);
-
-class DataStep extends Component {
-  state = this.prepareInitialState();
-
-  filter = memoize((data, pattern) =>
-    data.filter(row =>
-      SEARCH_FIELDS.some(field => row[field].toLowerCase().includes(pattern)),
-    ),
+  const teamOptions = teamsLists.flatMap(({ id, name }) =>
+    id === TEAM_TYPE.PERSONAL
+      ? {
+          value: id,
+          label: name.toLowerCase(),
+        }
+      : [],
   );
 
-  getColumns() {
-    const { data, selectedRows, indexShownPassword } = this.state;
-    const { headings } = this.props;
-
-    const columns = Object.keys(headings);
-
-    const firstColumn = {
-      id: 'checkbox',
-      accessor: '',
-      width: 60,
-      sortable: false,
-      Cell: ({ original }) => (
-        <Checkbox
-          checked={!!selectedRows[original.index]}
-          onChange={this.handleSelectRow(original.index)}
-        />
-      ),
-      Header: props => (
-        <Checkbox
-          checked={props.data.length === denormalize(selectedRows).length}
-          onChange={this.handleSelectAll}
-        />
-      ),
-    };
-
-    const lastColumn = {
-      id: 'type',
-      accessor: 'type',
-      sortable: false,
-      width: 180,
-      Cell: cellInfo => {
-        const {
-          original: { login, pass },
-        } = cellInfo;
-        const isCredentialsDisabled = !login || !pass;
-        const isDocumentDisabled = false;
-
-        const options = [
-          {
-            value: ITEM_TYPE.CREDENTIALS,
-            label: 'Password',
-            isDisabled: isCredentialsDisabled,
+  const currentTeam = teamsLists.find(({ id }) => id === teamId);
+  const currentTeamListsOptions = currentTeam.lists.flatMap(
+    ({ type, id, label }) =>
+      type === LIST_TYPE.INBOX
+        ? []
+        : {
+            value: id,
+            label: label.toLowerCase(),
           },
-          {
-            value: ITEM_TYPE.DOCUMENT,
-            label: 'Secure Note',
-            isDisabled: isDocumentDisabled,
-          },
-        ];
+  );
 
-        return (
-          <StyledSelect
-            name="type"
-            options={options}
-            value={data[cellInfo.index][cellInfo.column.id]}
-            onChange={this.handleChangeType(cellInfo.index)}
-          />
-        );
-      },
-      Header: 'Type',
-    };
-
-    const handleClickEyeIcon = i => {
-      this.setState({
-        indexShownPassword: i === indexShownPassword ? null : i,
-      });
-    };
-
-    const restColumns = columns.map(id => ({
-      id,
-      accessor: id,
-      Header: capitalize(id),
-      Cell: cellInfo => {
-        const cellData = data[cellInfo.index][cellInfo.column.id];
-        const isPassword = cellInfo.column.id === 'pass';
-        const isEmptyPassword = isPassword && !cellData;
-        const isCurrentPasswordShown = indexShownPassword === cellInfo.index;
-        const isDataShown = !isPassword || isCurrentPasswordShown;
-
-        return (
-          <CellWrapper isPassword={isPassword}>
-            <Cell
-              isEditableStyles={
-                !isPassword ||
-                isEmptyPassword ||
-                (!isEmptyPassword && isDataShown)
-              }
-              contentEditable={isDataShown || isEmptyPassword}
-              onBlur={this.handleBlurField(cellInfo.index, cellInfo.column.id)}
-              onKeyDown={this.handleKeyDown(cellInfo.index, cellInfo.column.id)}
-              dangerouslySetInnerHTML={{
-                __html: !isDataShown && cellData ? '********' : cellData,
-              }}
-            />
-            {isPassword && cellData && (
-              <EyeIcon
-                name={isCurrentPasswordShown ? 'eye-off' : 'eye-on'}
-                width={16}
-                height={16}
-                color="gray"
-                onClick={() => handleClickEyeIcon(cellInfo.index)}
-              />
-            )}
-          </CellWrapper>
-        );
-      },
-    }));
-
-    return [firstColumn, ...restColumns, lastColumn];
-  }
-
-  handleSearch = event => {
+  const handleSearch = event => {
     event.preventDefault();
-
-    const {
-      target: { value },
-    } = event;
-
-    this.setState({
-      filterText: value,
+    setState({
+      ...state,
+      filterText: event.target.value,
     });
   };
 
-  handleSubmit = async () => {
-    const { onSubmit } = this.props;
-    const { selectedRows, listId } = this.state;
-
-    this.setSubmitting(true);
-
-    await waitIdle();
-
-    onSubmit(listId, denormalize(selectedRows), this.setSubmitting);
-  };
-
-  handleSelectAll = event => {
-    const { checked } = event.currentTarget;
-    const { data } = this.state;
-
-    this.setState({
-      selectedRows: checked ? normalize(data) : [],
-    });
-  };
-
-  handleSelectRow = rowIndex => event => {
-    const { checked } = event.currentTarget;
-    const { data, selectedRows } = this.state;
-
-    let updatedData = null;
-
-    if (checked) {
-      const row = data.find((_, index) => index === rowIndex);
-
-      updatedData = { ...selectedRows, [rowIndex]: row };
-    } else {
-      const { [rowIndex]: row, ...rest } = selectedRows;
-
-      updatedData = rest;
-    }
-
-    this.setState({
-      selectedRows: updatedData,
-    });
-  };
-
-  handleChangeField = (index, columnId, value) => {
-    this.setState(prevState => ({
-      data: prevState.data.map((row, rowIndex) =>
-        rowIndex === index ? { ...row, [columnId]: value } : row,
-      ),
-      selectedRows: prevState.selectedRows[index]
-        ? {
-            ...prevState.selectedRows,
-            [index]: {
-              ...prevState.selectedRows[index],
-              [columnId]: value,
-            },
-          }
-        : prevState.selectedRows,
-    }));
-  };
-
-  handleBlurField = (index, columnId) => event => {
-    event.preventDefault();
-    event.stopPropagation();
-
-    const {
-      target: { innerText, textContent },
-    } = event;
-
-    const value = innerText || textContent;
-
-    this.handleChangeField(index, columnId, value);
-  };
-
-  handleKeyDown = (index, columnId) => event => {
-    if (event.keyCode === KEY_CODES.ENTER) {
-      this.handleBlurField(index, columnId)(event);
-    }
-  };
-
-  handleChangeType = index => (_, value) => {
-    this.handleChangeField(index, 'type', value);
-  };
-
-  handleChangeTeamId = (_, value) => {
-    this.setState(prevState => ({
+  const handleChangeTeamId = (_, value) => {
+    setState({
       teamId: value,
-      listId:
-        prevState.teamId !== value
-          ? this.props.teamsLists.find(({ id }) => id === value).lists[0].id
-          : prevState.listId,
-    }));
+      listId: teamsLists.find(({ id }) => id === value).lists[0].id,
+    });
   };
 
-  handleChangeListId = (_, value) => {
-    this.setState({
+  const handleChangeListId = (_, value) => {
+    setState({
+      ...state,
       listId: value,
     });
   };
 
-  setSubmitting = isSubmitting => {
-    this.setState({
-      isSubmitting,
+  const setSubmitting = isSubmit => {
+    setState({
+      ...state,
+      isSubmit,
     });
   };
 
-  prepareInitialState() {
-    return {
-      teamId: this.props.teamsLists[0].id,
-      listId: this.props.teamsLists[0].lists[0].id,
-      filterText: '',
-      selectedRows: normalize(this.props.data),
-      data: this.props.data,
-      indexShownPassword: null,
-      isSubmitting: false,
-    };
-  }
+  const handleSubmit = async () => {
+    setSubmitting(true);
+    await waitIdle();
+    onSubmit(listId, denormalize(selectedRows), setSubmitting);
+  };
 
-  render() {
-    const { teamsLists, onCancel } = this.props;
-    const {
-      data,
-      selectedRows,
-      filterText,
-      teamId,
-      listId,
-      isSubmitting,
-    } = this.state;
-
-    const selectedRowsLength = denormalize(selectedRows).length;
-
-    const teamOptions = teamsLists.flatMap(({ id, name }) =>
-      id !== TEAM_TYPE.PERSONAL
-        ? []
-        : {
-            value: id,
-            label: name.toLowerCase(),
-          },
-    );
-
-    const currentTeam = teamsLists.find(({ id }) => id === teamId);
-    const currentTeamListsOptions = currentTeam.lists.flatMap(
-      ({ type, id, label }) =>
-        type === LIST_TYPE.INBOX
-          ? []
-          : {
-              value: id,
-              label: label.toLowerCase(),
-            },
-    );
-
-    const isButtonDisabled = isSubmitting || !selectedRowsLength;
-
-    return (
-      <Wrapper>
-        <Title>Select items to import data into Caesar</Title>
-        <SearchInput
-          prefix={<StyledIcon name="search" width={18} height={18} />}
-          placeholder="Search"
-          onChange={this.handleSearch}
+  return (
+    <>
+      <Title>Select items to import data into Caesar</Title>
+      <SearchInput
+        prefix={<Icon name="search" width={16} height={16} color="gallery" />}
+        placeholder="Search"
+        onChange={handleSearch}
+      />
+      <StyledTable ref={tableWrapperRef}>
+        <NewDataTable
+          columns={columns}
+          data={tableData}
+          tableVisibleDataHeight={tableVisibleDataHeight}
         />
-        <VirtualizedTable
-          data={this.filter(data, filterText)}
-          showPagination={false}
-          defaultPageSize={data.length}
-          columns={this.getColumns()}
+      </StyledTable>
+      <SelectListWrapper>
+        <MoveToText>Select list of importing:</MoveToText>
+        <StyledSelect
+          boxDirection="up"
+          options={teamOptions}
+          value={teamId}
+          onChange={handleChangeTeamId}
         />
-        <SelectListWrapper>
-          <MoveToText>Select list of importing:</MoveToText>
-          <StyledSelect
-            boxDirection="up"
-            options={teamOptions}
-            value={teamId}
-            onChange={this.handleChangeTeamId}
-          />
-          <StyledSelect
-            boxDirection="up"
-            options={currentTeamListsOptions}
-            value={listId}
-            onChange={this.handleChangeListId}
-          />
-        </SelectListWrapper>
-        <BottomWrapper>
-          <SelectedItems>
-            Selected items: {selectedRowsLength} / {data.length}
-          </SelectedItems>
-          <ButtonsWrapper>
-            <StyledButton onClick={onCancel} disabled={isSubmitting}>
-              Cancel
-            </StyledButton>
-            <Button onClick={this.handleSubmit} disabled={isButtonDisabled}>
-              Import
-            </Button>
-          </ButtonsWrapper>
-        </BottomWrapper>
-      </Wrapper>
-    );
-  }
-}
+        <StyledSelect
+          boxDirection="up"
+          options={currentTeamListsOptions}
+          value={listId}
+          onChange={handleChangeListId}
+        />
+      </SelectListWrapper>
+      <BottomWrapper>
+        <SelectedItems>
+          Selected items: {selectedRowsLength} / {data.length}
+        </SelectedItems>
+        <StyledButton color="white" onClick={onCancel} disabled={isSubmitting}>
+          Cancel
+        </StyledButton>
+        <StyledButton onClick={handleSubmit} disabled={isButtonDisabled}>
+          Import
+        </StyledButton>
+      </BottomWrapper>
+    </>
+  );
+};
 
-export default DataStep;
+export { DataStep };

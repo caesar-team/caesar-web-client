@@ -61,6 +61,8 @@ const HeaderInput = styled(Input)`
 const Cell = styled.div`
   display: flex;
   align-items: center;
+  overflow: hidden;
+  white-space: nowrap;
 `;
 
 const EmailCell = styled.div`

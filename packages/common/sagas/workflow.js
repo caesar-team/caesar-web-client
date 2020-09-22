@@ -38,7 +38,7 @@ import {
   convertTeamsToEntity,
   extractRelatedAndNonSystemItems,
 } from '@caesar/common/normalizers/normalizers';
-import { objectToArray, arrayToObject } from '@caesar/common/utils/utils';
+import { objectToArray } from '@caesar/common/utils/utils';
 import { sortItemsByFavorites } from '@caesar/common/utils/workflow';
 import {
   getLists,
@@ -87,8 +87,7 @@ import {
   teamListSelector,
   teamSelector,
 } from '@caesar/common/selectors/entities/team';
-import { ADD_SYSTEM_ITEMS_BATCH } from '../actions/entities/system';
-import { createTeamKeysSaga } from './entities/team';
+import { ADD_SYSTEM_ITEMS_BATCH } from '@caesar/common/actions/entities/system';
 
 const splitSharesAndPersonal = items => {
   const personalItems = items.filter(item => !item.isShared);

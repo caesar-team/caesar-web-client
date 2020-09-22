@@ -3,9 +3,9 @@ import styled from 'styled-components';
 import NextLink from 'next/link';
 
 const StyledAnchor = styled.a`
-  cursor: pointer;
-  font-size: 18px;
   color: ${({ theme }) => theme.color.black};
+  cursor: pointer;
+  transition: color 0.2s;
 
   &:hover {
     color: ${({ theme }) => theme.color.gray};

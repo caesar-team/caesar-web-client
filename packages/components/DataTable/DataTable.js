@@ -1,8 +1,6 @@
 import React from 'react';
-// eslint-disable-next-line
-import ReactDataTable from 'react-table';
-import 'react-table/react-table.css';
+// @Deprecated. Use 'react-table' instead (v7)
+import ReactDataTable from 'react-table-6';
+import 'react-table-6/react-table.css';
 
-const DataTable = props => <ReactDataTable {...props} />;
-
-export default DataTable;
+export const DataTable = props => <ReactDataTable {...props} />;

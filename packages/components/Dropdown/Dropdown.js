@@ -16,7 +16,7 @@ const Box = styled.div`
     withTriangleAtTop ? 'calc(100% + 19px)' : 'calc(100% - 1px)'};
   right: 0;
   z-index: ${({ theme }) => theme.zIndex.dropdown};
-  border-radius: 3px;
+  border-radius: ${({ theme }) => theme.borderRadius};
   background-color: ${({ theme }) => theme.color.white};
   border: 1px solid ${({ theme }) => theme.color.gallery};
 
@@ -38,7 +38,7 @@ const Box = styled.div`
 const OptionsList = styled.div`
   position: relative;
   background-color: ${({ theme }) => theme.color.white};
-  border-radius: 3px;
+  border-radius: ${({ theme }) => theme.borderRadius};
   overflow: hidden;
 `;
 

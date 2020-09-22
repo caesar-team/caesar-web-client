@@ -13,7 +13,7 @@ const StyledLabel = styled(Label)`
 
 const Inner = styled.div`
   border: 1px solid ${({ theme }) => theme.color.gallery};
-  border-radius: 3px;
+  border-radius: ${({ theme }) => theme.borderRadius};
 `;
 
 const Active = styled.div`
@@ -23,7 +23,7 @@ const Active = styled.div`
   padding: 8px 16px;
   color: ${({ theme }) => theme.color.white};
   background-color: ${({ theme }) => theme.color.black};
-  border-radius: 3px;
+  border-radius: ${({ theme }) => theme.borderRadius};
 `;
 
 const SearchInput = styled(Input)`

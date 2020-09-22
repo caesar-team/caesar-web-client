@@ -69,7 +69,7 @@ const Label = styled.div`
 `;
 
 const InputStyled = styled(PasswordInput)`
-  border-radius: 3px;
+  border-radius: ${({ theme }) => theme.borderRadius};
   border: solid 1px ${({ theme }) => theme.color.gallery};
 `;
 
@@ -148,7 +148,7 @@ const StyledSelect = styled(Select)`
   height: 40px;
   padding: 8px 16px;
   border: 1px solid ${({ theme }) => theme.color.gallery};
-  border-radius: 3px;
+  border-radius: ${({ theme }) => theme.borderRadius};
 
   ${Select.ValueText} {
     padding: 0;

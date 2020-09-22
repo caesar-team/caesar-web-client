@@ -51,7 +51,7 @@ const AddNewAttach = styled.div`
   align-self: center;
   height: 40px;
   border: 1px dashed ${({ theme }) => theme.color.gallery};
-  border-radius: 3px;
+  border-radius: ${({ theme }) => theme.borderRadius};
   cursor: pointer;
   transition: border-color 0.2s;
 

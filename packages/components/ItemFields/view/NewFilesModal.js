@@ -12,7 +12,7 @@ const Wrapper = styled.div`
   z-index: ${({ theme }) => theme.zIndex.basic};
   width: 320px;
   overflow: hidden;
-  border-radius: 3px;
+  border-radius: ${({ theme }) => theme.borderRadius};
   box-shadow: 0 12px 24px 0 ${({ theme }) => theme.color.blackBoxShadow};
 `;
 

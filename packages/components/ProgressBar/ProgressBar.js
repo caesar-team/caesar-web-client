@@ -6,7 +6,7 @@ const Progress = styled.div`
   height: 10px;
   overflow: hidden;
   background-color: ${({ theme }) => theme.color.gallery};
-  border-radius: 3px;
+  border-radius: ${({ theme }) => theme.borderRadius};
 `;
 
 const Line = styled.div`

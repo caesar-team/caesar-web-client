@@ -1,1 +1,1 @@
-export { default as DataStep } from './DataStep';
+export { DataStep } from './DataStep';

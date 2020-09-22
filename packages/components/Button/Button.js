@@ -94,7 +94,7 @@ const StyledButton = styled.button`
   font-size: ${({ isHigh }) => (isHigh ? '18px' : '14px')};
   letter-spacing: ${({ isHigh }) => (isHigh ? '0.6px' : '0.4px')};
   white-space: nowrap;
-  border-radius: 3px;
+  border-radius: ${({ theme }) => theme.borderRadius};
   border: 0;
   outline: none;
   cursor: pointer;

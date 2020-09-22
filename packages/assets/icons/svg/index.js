@@ -43,6 +43,7 @@ import './icon-search.svg?sprite';
 import './icon-securenote.svg?sprite';
 import './icon-share-network.svg?sprite';
 import './icon-share.svg?sprite';
+import './icon-sort.svg?sprite';
 import './icon-team-ava-1.svg?sprite';
 import './icon-team-ava-2.svg?sprite';
 import './icon-team-ava-3.svg?sprite';

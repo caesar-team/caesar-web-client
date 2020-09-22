@@ -16,7 +16,12 @@ export { CodeInput } from './CodeInput';
 export { ContentEditable } from './Common';
 export { ConfirmModal, ConfirmLeaveTeamModal } from './ConfirmModal';
 export { CreateForm } from './CreateForm';
-export { DataTable, VirtualizedTableHOC } from './DataTable';
+export {
+  NewDataTable,
+  TableStyles,
+  DataTable,
+  VirtualizedTableHOC,
+} from './DataTable';
 export { DottedMenu } from './DottedMenu';
 export { Dropdown } from './Dropdown';
 export { Error, TextError } from './Error';
@@ -79,6 +84,7 @@ export { SecureMessage } from './SecureMessage';
 export { Select } from './Select';
 export { SelectVisible } from './SelectVisible';
 export { SessionChecker } from './SessionChecker';
+export { SettingsWrapper } from './SettingsWrapper';
 export { SettingsSidebar } from './SettingsSidebar';
 export { ShareModal } from './ShareModal';
 export { Tab, Tabs } from './Tabs';

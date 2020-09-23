@@ -26,7 +26,7 @@
     "source=caesar-secure-app-next_dir,target=${containerWorkspaceFolder}/packages/secure-app/.next,type=volume",
     "source=gpg-volume,target=/home/node/.gnupg,type=volume"
   ],
-  "postCreateCommand": "sudo chown node packages/web-app/node_modules packages/secure-app/node_modules /home/node/.gnupg && yarn install",
+  "postCreateCommand": "sudo chown node packages/web-app/node_modules packages/secure-app/node_modules packages/web-app/.next packages/secure-app/.next /home/node/.gnupg && yarn install",
   // "postAttachCommand": "${containerWorkspaceFolder}/.devcontainer/bin/setup_git_signing.sh",
   "remoteUser": "node"
 }

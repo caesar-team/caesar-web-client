@@ -70,6 +70,7 @@ import {
   convertTeamsToEntity,
   convertNodesToEntities,
 } from '@caesar/common/normalizers/normalizers';
+import { createPermissionsFromLinks } from '@caesar/common/utils/createPermissionsFromLinks';
 import {
   COMMANDS_ROLES,
   ENTITY_TYPE,
@@ -315,7 +316,7 @@ export function* addMemberToTeamListsBatchSaga({
     const teamItemList = yield select(teamItemListSelector, { teamId });
     const teamSystemItem = yield select(teamKeyPairSelector, { teamId });
 
-    teamItemList.push(teamSystemItem.raw);
+    teamItemList.push(teamSystemItem?.raw);
     const itemUserPairs = yield call(getItemUserPairs, {
       items: teamItemList,
       members: teamMembers,
@@ -343,6 +344,7 @@ export function* addMemberToTeamListsBatchSaga({
           role: data.role,
           teamId,
           _links: data._links,
+          _permissions: createPermissionsFromLinks(data._links),
         });
       });
     });

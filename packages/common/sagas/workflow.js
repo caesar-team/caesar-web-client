@@ -98,6 +98,7 @@ const splitSharesAndPersonal = items => {
     sharedItems,
   };
 };
+
 const buildSystems = items => {
   const systemItems = {};
 
@@ -109,6 +110,7 @@ const buildSystems = items => {
 
   return systemItems;
 };
+
 const processingInvitedItem = (items, systemItemsById) => {
   return items.map(item =>
     systemItemsById[item.id]
@@ -120,6 +122,7 @@ const processingInvitedItem = (items, systemItemsById) => {
       : item,
   );
 };
+
 export function decryptItemsByItemIdKeys(items, keyPairs) {
   try {
     const putSagas = items.map(item => {
@@ -353,9 +356,11 @@ function* initListsAndProgressEntities() {
     yield put(setWorkInProgressItem(null));
   }
 }
+
 function* initTeam(teamId) {
   try {
     const currentTeamId = teamId;
+
     if (!currentTeamId || currentTeamId === TEAM_TYPE.PERSONAL) return;
 
     const { data: lists } = yield call(getTeamLists, currentTeamId);
@@ -409,6 +414,8 @@ function* initTeams() {
         // eslint-disable-next-line camelcase
         create_item: true,
         // eslint-disable-next-line camelcase
+        create_list: true,
+        // eslint-disable-next-line camelcase
         team_create_list: true,
         // eslint-disable-next-line camelcase
         team_edit: true,
@@ -440,6 +447,7 @@ export function* initWorkflow() {
   yield put(setCurrentTeamId(currentTeamId || TEAM_TYPE.PERSONAL));
   yield fork(fetchMembersSaga);
 }
+
 export function* openTeamVaultSaga({ payload: { teamId } }) {
   try {
     yield call(initTeam, teamId);

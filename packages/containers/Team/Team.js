@@ -234,7 +234,11 @@ class TeamContainer extends Component {
     users.reduce(
       (accumulator, user) => [
         ...accumulator,
-        { ...membersById[user.id], role: user.role, _links: user._links },
+        {
+          ...membersById[user.id],
+          role: user.role,
+          _permissions: user._permissions,
+        },
       ],
       [],
     ),
@@ -296,8 +300,8 @@ class TeamContainer extends Component {
 
     const getTeamMemberSubject = member => ({
       __typename: PERMISSION_ENTITY.TEAM_MEMBER,
-      team_member_edit: !!member?._links?.team_member_edit,
-      team_member_remove: !!member?._links?.team_member_remove,
+      team_member_edit: member?._permissions?.team_member_edit || false,
+      team_member_remove: member?._permissions?.team_member_remove || false,
     });
 
     const roleColumn = {
@@ -471,12 +475,12 @@ class TeamContainer extends Component {
 
     const teamSubject = {
       __typename: PERMISSION_ENTITY.TEAM,
-      team_delete: !!team?._links?.team_delete,
+      team_delete: team?._permissions?.team_delete || false,
     };
 
     const teamMemberSubject = {
       __typename: PERMISSION_ENTITY.TEAM_MEMBER,
-      team_member_add: !!team?._links?.team_member_add,
+      team_member_add: team?._permissions?.team_member_add || false,
     };
 
     const isDomainTeam =

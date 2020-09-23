@@ -1,6 +1,7 @@
 /* eslint-disable camelcase */
 import { schema } from 'normalizr';
 import { ENTITY_TYPE, TEAM_TYPE, LIST_TYPE } from '@caesar/common/constants';
+import { createPermissionsFromLinks } from '@caesar/common/utils/createPermissionsFromLinks';
 import itemSchema from './item';
 
 const personalPermissions = teamId => ({
@@ -21,13 +22,7 @@ const listSchema = new schema.Entity(
       _permissions: entity._links
         ? {
             ...personalPermissions(entity.teamId || TEAM_TYPE.PERSONAL),
-            ...Object.keys(entity._links).reduce(
-              (accumulator, key) => ({
-                ...accumulator,
-                [key]: !!entity._links[key],
-              }),
-              {},
-            ),
+            ...createPermissionsFromLinks(entity._links),
           }
         : personalPermissions(entity.teamId || TEAM_TYPE.PERSONAL),
       type:

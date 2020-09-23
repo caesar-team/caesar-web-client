@@ -1,5 +1,6 @@
 import { schema } from 'normalizr';
 import { ENTITY_TYPE, TEAM_TYPE } from '@caesar/common/constants';
+import { createPermissionsFromLinks } from '@caesar/common/utils/createPermissionsFromLinks';
 import childItemSchema from './childItem';
 
 const itemSchema = new schema.Entity(
@@ -11,15 +12,7 @@ const itemSchema = new schema.Entity(
     processStrategy: (entity, parent) => ({
       ...entity,
       listId: parent.id,
-      _permissions: entity._links
-        ? Object.keys(entity._links).reduce(
-            (accumulator, key) => ({
-              ...accumulator,
-              [key]: !!entity._links[key],
-            }),
-            {},
-          )
-        : {},
+      _permissions: createPermissionsFromLinks(entity._links),
       teamId: parent.teamId || TEAM_TYPE.PERSONAL,
       __type: ENTITY_TYPE.ITEM,
     }),

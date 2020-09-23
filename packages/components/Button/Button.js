@@ -106,6 +106,7 @@ const StyledButton = styled.button`
     onlyIcon &&
     `
     width: 40px;
+    flex: 0 0 40px;
     padding: 0;
   `};
 

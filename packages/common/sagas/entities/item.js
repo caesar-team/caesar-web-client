@@ -82,6 +82,7 @@ import {
 } from '@caesar/common/utils/cipherUtils';
 import { getServerErrorMessage } from '@caesar/common/utils/error';
 import { chunk } from '@caesar/common/utils/utils';
+import { createPermissionsFromLinks } from '@caesar/common/utils/createPermissionsFromLinks';
 import {
   ENTITY_TYPE,
   COMMON_PROGRESS_NOTIFICATION,
@@ -498,6 +499,7 @@ export function* createItemSaga({
     const newItem = {
       ...item,
       ...itemFromServer,
+      _permissions: createPermissionsFromLinks(itemFromServer._links),
     };
 
     if (!isSystemItem) {

@@ -33,6 +33,7 @@ import {
 } from '@caesar/common/api';
 import { ENTITY_TYPE, LIST_TYPE, TEAM_TYPE } from '@caesar/common/constants';
 import { getServerErrors } from '@caesar/common/utils/error';
+import { createPermissionsFromLinks } from '@caesar/common/utils/createPermissionsFromLinks';
 
 const reorder = (list, startIndex, endIndex) => {
   const result = Array.from(list);
@@ -96,6 +97,7 @@ export function* createListSaga({
         sort: 0,
         __type: ENTITY_TYPE.LIST,
         _links,
+        _permissions: createPermissionsFromLinks(_links),
         ...list,
       }),
     );

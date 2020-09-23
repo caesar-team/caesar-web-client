@@ -119,7 +119,7 @@ export function* reCryptSharedItem(item) {
       item,
     },
   });
-
+  debugger;
   if (!systemKeyPairItem || !('id' in systemKeyPairItem)) {
     throw new Error(
       `Can not create the system keypair item for the shared item: ${item.id}`,

@@ -4,7 +4,7 @@ export const ADD_SYSTEM_ITEMS_BATCH = '@system/ADD_SYSTEM_ITEMS_BATCH';
 export const REMOVE_SYSTEM_ITEM = '@system/REMOVE_SYSTEM_ITEM';
 
 export const addSystemItemsBatch = items => {
-  let itemsById = {};
+  let itemsById = items;
 
   if (Array.isArray(items)) {
     itemsById = arrayToObject(items);

@@ -10,7 +10,7 @@ const itemSchema = new schema.Entity(
   {
     processStrategy: (entity, parent) => ({
       ...entity,
-      listId: parent.id,
+      listId: entity.listId || parent.id || null,
       _permissions: entity._links
         ? Object.keys(entity._links).reduce(
             (accumulator, key) => ({
@@ -20,7 +20,8 @@ const itemSchema = new schema.Entity(
             {},
           )
         : {},
-      teamId: parent.teamId || TEAM_TYPE.PERSONAL,
+      isShared: entity.isShared,
+      teamId: parent.teamId || entity.teamId || TEAM_TYPE.PERSONAL,
       __type: ENTITY_TYPE.ITEM,
     }),
   },

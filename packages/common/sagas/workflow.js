@@ -115,7 +115,6 @@ const processingInvitedItem = (items, systemItemsById) => {
       ? {
           ...item,
           invited: systemItemsById[item.id].invited,
-          isShared: systemItemsById[item.id]?.invited?.length > 0,
         } // Set invited from the system item
       : item,
   );
@@ -166,7 +165,6 @@ export function* processSharedItemsSaga() {
   try {
     const keyPairs = yield select(shareKeyPairsSelector);
     const sharedItems = yield select(nonDecryptedSharedItemsSelector);
-
     yield all(decryptItemsByItemIdKeys(sharedItems, keyPairs));
   } catch (error) {
     // eslint-disable-next-line no-console
@@ -275,7 +273,11 @@ function* initPersonalVault() {
       sharedItems: itemsEcnryptedSharedKeys,
     } = splitSharesAndPersonal(sortedByFavoritesItems);
 
-    yield put(addItemsBatch([...itemsEcnryptedSharedKeys, ...items]));
+    const { itemsById: normalizedSharedItemsById } = convertItemsToEntities([
+      ...itemsEcnryptedSharedKeys,
+      ...items,
+    ]);
+    yield put(addItemsBatch(normalizedSharedItemsById));
 
     // Decrypt only system items.
     if (systemItems?.length > 0) {

@@ -72,6 +72,7 @@ export const userIdSelector = createSelector(
   data => data.id,
 );
 
+// @Deprecated
 export const userDefaultListIdSelector = createSelector(
   userSelector,
   user => user.defaultListId,

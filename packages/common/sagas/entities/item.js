@@ -56,12 +56,10 @@ import {
   currentTeamFavoriteListSelector,
   defaultListSelector,
   currentTeamDefaultListSelector,
+  teamDefaultListSelector,
 } from '@caesar/common/selectors/entities/list';
 import { itemSelector } from '@caesar/common/selectors/entities/item';
-import {
-  currentTeamIdSelector,
-  userDefaultListIdSelector,
-} from '@caesar/common/selectors/user';
+import { currentTeamIdSelector } from '@caesar/common/selectors/user';
 import {
   addShareKeyPair,
   addTeamKeyPair,
@@ -406,9 +404,12 @@ export function* saveItemSaga({ item, publicKey }) {
   return itemData;
 }
 export function* createSystemItemKeyPair({ payload: { item, type } }) {
-  const defaultListId = yield select(userDefaultListIdSelector);
+  const teamId = item.teamId || TEAM_TYPE.PERSONAL;
+  const { id: defaultListId } = yield select(teamDefaultListSelector, {
+    teamId,
+  });
   const { publicKey } = yield select(teamKeyPairSelector, {
-    teamId: TEAM_TYPE.PERSONAL,
+    teamId,
   });
 
   if (!type) {
@@ -445,7 +446,9 @@ export function* findOrCreateTeamSystemItemKeyPair({ payload: { item } }) {
   });
 
   if (!systemKeyPairItem) {
-    yield call(createSystemItemKeyPair, { item, type: ENTITY_TYPE.SHARE });
+    yield call(createSystemItemKeyPair, {
+      payload: { item, type: ENTITY_TYPE.SHARE },
+    });
 
     return yield select(teamKeyPairSelector, {
       teamId: item.teamId,

@@ -103,7 +103,9 @@ export function* findOrCreateSystemItemKeyPair({ payload: { item } }) {
   const systemKeyPairItem = yield select(shareKeyPairSelector, { id: item.id });
 
   if (!systemKeyPairItem) {
-    yield call(createSystemItemKeyPair, { item, type: ENTITY_TYPE.SHARE });
+    yield call(createSystemItemKeyPair, {
+      payload: { item, type: ENTITY_TYPE.SHARE },
+    });
 
     return yield select(shareKeyPairSelector, { id: item.id });
   }

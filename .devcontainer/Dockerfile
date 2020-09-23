@@ -21,7 +21,7 @@ RUN SNIPPET="export PROMPT_COMMAND='history -a' && export HISTFILE=/commandhisto
     && echo $SNIPPET >> "/home/${USERNAME}/.bashrc"
 COPY conf/gpg-agent.conf "/home/${USERNAME}/.gnupg"
 COPY conf/gpg.conf "/home/${USERNAME}/.gnupg"    
-RUN chmod 600 ~/.gnupg/* && chmod 700 ~/.gnupg
+RUN chmod 600 /home/${USERNAME}/.gnupg/* && chmod 700 /home/${USERNAME}/.gnupg
 # [Optional] Uncomment this section to install additional OS packages.
 # RUN apt-get update && export DEBIAN_FRONTEND=noninteractive \
 #     && apt-get -y install --no-install-recommends <your-package-list-here>

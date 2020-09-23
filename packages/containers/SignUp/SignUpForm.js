@@ -12,9 +12,9 @@ import {
   PasswordIndicator,
 } from '@caesar/components';
 import { checkError } from '@caesar/common/utils/formikUtils';
-import { schema } from './schema';
 import { GOOD_PASSWORD_RULES } from '@caesar/common/validation/constants';
 import { INDICATOR_TYPE } from '@caesar/components/PasswordIndicator';
+import { schema } from './schema';
 
 const Form = styled.form`
   width: 100%;
@@ -139,7 +139,15 @@ const SignUpForm = ({ onSubmit }) => (
     initialValues={{ email: '', password: '', confirmPassword: '' }}
     validationSchema={schema}
   >
-    {({ values, errors, touched, handleSubmit, handleBlur, isSubmitting, isValid }) => (
+    {({
+      values,
+      errors,
+      touched,
+      handleSubmit,
+      handleBlur,
+      isSubmitting,
+      isValid,
+    }) => (
       <Form onSubmit={handleSubmit}>
         <Row>
           <FastField name="email">
@@ -180,7 +188,7 @@ const SignUpForm = ({ onSubmit }) => (
                 rules={GOOD_PASSWORD_RULES}
               />
             </Tooltip>
-          </FieldWrapper>  
+          </FieldWrapper>
           {values.password && (
             <StyledPasswordIndicator
               type={INDICATOR_TYPE.LINE}

@@ -24,7 +24,7 @@
     "source=caesar-secure-app-node_modules,target=${containerWorkspaceFolder}/packages/secure-app/node_modules,type=volume",
     "source=caesar-web-app-next_dir,target=${containerWorkspaceFolder}/packages/web-app/.next,type=volume",
     "source=caesar-secure-app-next_dir,target=${containerWorkspaceFolder}/packages/secure-app/.next,type=volume",
-    "source=caesar-secure-app-next_dir,target=${containerWorkspaceFolder}/packages/secure-app/.next,type=volume",
+    "source=gpg-volume,target=/home/node/.gnupg,type=volume",
     "source=yarn-cache,target=/home/node/.cache/yarn,type=volume"
   ],
   "postCreateCommand": "sudo chown node packages/web-app/node_modules packages/secure-app/node_modules packages/web-app/.next packages/secure-app/.next /home/node/.gnupg /home/node/.cache/yarn && yarn install",

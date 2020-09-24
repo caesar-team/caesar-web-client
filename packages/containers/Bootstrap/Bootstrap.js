@@ -24,21 +24,17 @@ import {
   PASSWORD_CHANGE,
   MASTER_PASSWORD_CHECK,
   MASTER_PASSWORD_CREATE,
-  SHARED_ITEMS_CHECK,
-  SHARED_ITEMS_SKIP,
   BOOTSTRAP_FINISH,
 } from './constants';
 import {
   TwoFactorStep,
   PasswordStep,
   MasterPasswordStep,
-  SharedItemsStep,
 } from './Steps';
 
 const TWO_FACTOR_STEPS = [TWO_FACTOR_CREATE, TWO_FACTOR_CHECK];
 const PASSWORD_STEPS = [PASSWORD_CHANGE];
 const MASTER_PASSWORD_STEPS = [MASTER_PASSWORD_CREATE, MASTER_PASSWORD_CHECK];
-const SHARED_ITEMS_STEPS = [SHARED_ITEMS_CHECK];
 
 class Bootstrap extends Component {
   state = this.prepareInitialState();
@@ -102,12 +98,9 @@ class Bootstrap extends Component {
   };
 
   handleFinishMasterPassword = ({
-    oldKeyPair,
     currentKeyPair,
     masterPassword,
   }) => {
-    const { sharedItemsState } = this.bootstrap;
-
     this.props.setMasterPassword(masterPassword);
     this.props.setKeyPair({
       publicKey: currentKeyPair.publicKey,
@@ -116,20 +109,8 @@ class Bootstrap extends Component {
     });
 
     this.setState({
-      oldKeyPair,
       currentKeyPair,
       masterPassword,
-      currentStep:
-        sharedItemsState === SHARED_ITEMS_CHECK
-          ? SHARED_ITEMS_CHECK
-          : BOOTSTRAP_FINISH,
-    });
-  };
-
-  handleFinishSharedItems = () => {
-    this.bootstrap.sharedItemsState = SHARED_ITEMS_SKIP;
-
-    this.setState({
       currentStep: BOOTSTRAP_FINISH,
     });
   };
@@ -160,7 +141,6 @@ class Bootstrap extends Component {
       twoFactorAuthState,
       passwordState,
       masterPasswordState,
-      sharedItemsState,
     } = getBootstrapStates(bootstrap);
 
     if (TWO_FACTOR_STEPS.includes(twoFactorAuthState)) {
@@ -175,10 +155,6 @@ class Bootstrap extends Component {
       return masterPasswordState;
     }
 
-    if (SHARED_ITEMS_STEPS.includes(sharedItemsState)) {
-      return sharedItemsState;
-    }
-
     return MASTER_PASSWORD_CHECK;
   }
 
@@ -186,10 +162,6 @@ class Bootstrap extends Component {
     return {
       currentStep: null,
       masterPassword: null,
-      oldKeyPair: {
-        publicKey: null,
-        encryptedPrivateKey: null,
-      },
       currentKeyPair: {
         publicKey: null,
         encryptedPrivateKey: null,
@@ -210,7 +182,6 @@ class Bootstrap extends Component {
     } = this.props;
     const {
       currentStep,
-      oldKeyPair,
       currentKeyPair,
       masterPassword,
     } = this.state;
@@ -256,31 +227,6 @@ class Bootstrap extends Component {
           masterPassword={this.props.masterPassword || null}
           onFinish={this.handleFinishMasterPassword}
         />
-      );
-    }
-
-    if (SHARED_ITEMS_STEPS.includes(currentStep)) {
-      return (
-        <>
-          <BootstrapLayout user={this.user}>
-            <SharedItemsStep
-              navigationSteps={this.navigationPanelSteps}
-              oldKeyPair={oldKeyPair}
-              currentKeyPair={currentKeyPair}
-              oldMasterPassword={shared.mp}
-              currentMasterPassword={masterPassword}
-              onFinish={this.handleFinishSharedItems}
-              updateGlobalNotification={updateGlobalNotification}
-            />
-          </BootstrapLayout>
-          {shouldShowGlobalNotification && (
-            <GlobalNotification
-              text={globalNotificationText}
-              isError={isErrorGlobalNotification}
-              onClose={this.handleCloseNotification}
-            />
-          )}
-        </>
       );
     }
 

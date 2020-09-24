@@ -35,6 +35,6 @@ const userTransform = createTransform(
 export const persistOptions = {
   key: 'root',
   localForage,
-  blacklist: ['application', 'workflow', 'entities'],
+  blacklist: ['application', 'workflow'],
   transforms: [itemTransform, userTransform],
 };

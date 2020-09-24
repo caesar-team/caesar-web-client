@@ -43,8 +43,8 @@ import { sortItemsByFavorites } from '@caesar/common/utils/workflow';
 import {
   getLists,
   getTeamLists,
-  getTeams,
   getUserItems,
+  getUserTeams,
 } from '@caesar/common/api';
 import {
   ENTITY_TYPE,
@@ -165,6 +165,7 @@ export function* processSharedItemsSaga() {
   try {
     const keyPairs = yield select(shareKeyPairsSelector);
     const sharedItems = yield select(nonDecryptedSharedItemsSelector);
+
     yield all(decryptItemsByItemIdKeys(sharedItems, keyPairs));
   } catch (error) {
     // eslint-disable-next-line no-console
@@ -397,7 +398,7 @@ function* initTeam(teamId) {
 function* initTeams() {
   try {
     // Load avaible teams
-    const { data: teams } = yield call(getTeams);
+    const { data: teams } = yield call(getUserTeams);
     yield all(teams.map(({ id }) => call(initTeam, id, false)));
     yield call(initPersonalVault);
     teams.push({
@@ -598,8 +599,8 @@ export function* processSystemItemsSaga({ payload: { itemsById } }) {
       });
 
       yield all([
-        put(addTeamKeyPairBatch(teamKeys)),
-        put(addShareKeyPairBatch(shareKeys)),
+        teamKeys.length > 0 ? put(addTeamKeyPairBatch(teamKeys)) : null,
+        shareKeys.length > 0 ? put(addShareKeyPairBatch(shareKeys)) : null,
       ]);
     }
   } catch (error) {

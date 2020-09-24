@@ -439,19 +439,17 @@ export function* createSystemItemKeyPair({ payload: { item, type } }) {
       [systemKeyPairItem.id]: systemKeyPairItem,
     }),
   );
+
+  return systemKeyPairItem;
 }
 export function* findOrCreateTeamSystemItemKeyPair({ payload: { item } }) {
-  const systemKeyPairItem = yield select(teamKeyPairSelector, {
+  let systemKeyPairItem = yield select(teamKeyPairSelector, {
     teamId: item.teamId,
   });
 
   if (!systemKeyPairItem) {
-    yield call(createSystemItemKeyPair, {
+    systemKeyPairItem = yield call(createSystemItemKeyPair, {
       payload: { item, type: ENTITY_TYPE.SHARE },
-    });
-
-    return yield select(teamKeyPairSelector, {
-      teamId: item.teamId,
     });
   }
 

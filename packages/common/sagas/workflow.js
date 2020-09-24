@@ -61,6 +61,7 @@ import {
   listsTeamSelector,
 } from '@caesar/common/selectors/entities/list';
 import {
+  userDataSelector,
   masterPasswordSelector,
   currentTeamIdSelector,
 } from '@caesar/common/selectors/user';
@@ -403,29 +404,15 @@ function* initTeams() {
     const { data: teams } = yield call(getTeams);
     yield all(teams.map(({ id }) => call(initTeam, id, false)));
     yield call(initPersonalVault);
+
+    const userData = yield select(userDataSelector);
+
     teams.push({
       id: TEAM_TYPE.PERSONAL,
       title: TEAM_TYPE.PERSONAL,
       type: TEAM_TYPE.PERSONAL,
       userRole: ROLE_ADMIN,
-      _links: {
-        // eslint-disable-next-line camelcase
-        team_create_item: true,
-        // eslint-disable-next-line camelcase
-        create_item: true,
-        // eslint-disable-next-line camelcase
-        create_list: true,
-        // eslint-disable-next-line camelcase
-        team_create_list: true,
-        // eslint-disable-next-line camelcase
-        team_edit: true,
-        // eslint-disable-next-line camelcase
-        team_get_lists: true,
-        // eslint-disable-next-line camelcase
-        team_member_add: false,
-        // eslint-disable-next-line camelcase
-        team_members: false,
-      },
+      _links: userData._links,
     });
 
     const teamById = convertTeamsToEntity(teams);

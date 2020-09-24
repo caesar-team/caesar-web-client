@@ -1,6 +1,11 @@
 import { normalize } from 'normalizr';
 import { ITEM_TYPE, LIST_TYPE } from '@caesar/common/constants';
-import { listSchema, memberSchema, teamSchema, itemSchema } from './schemas';
+import {
+  listSchema,
+  memberSchema,
+  teamSchema,
+  itemSchema,
+} from '@caesar/common/normalizers/schemas';
 
 export const extractRelatedAndNonSystemItems = lists => {
   const result = lists.map(({ children, type, ...rest }) => {

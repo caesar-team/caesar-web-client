@@ -21,7 +21,10 @@ import {
   addListsBatch,
   ADD_LISTS_BATCH,
 } from '@caesar/common/actions/entities/list';
-import { addItemsBatch } from '@caesar/common/actions/entities/item';
+import {
+  addItemsBatch,
+  removeItemsBatch,
+} from '@caesar/common/actions/entities/item';
 import { updateGlobalNotification } from '@caesar/common/actions/application';
 import {
   SET_CURRENT_TEAM_ID,
@@ -166,7 +169,20 @@ export function* processSharedItemsSaga() {
     const keyPairs = yield select(shareKeyPairsSelector);
     const sharedItems = yield select(nonDecryptedSharedItemsSelector);
 
-    yield all(decryptItemsByItemIdKeys(sharedItems, keyPairs));
+    yield all(
+      decryptItemsByItemIdKeys(
+        sharedItems.filter(sharedItem => keyPairs[sharedItem.id]),
+        keyPairs,
+      ),
+    );
+
+    // Remove undecrypttable items from the store
+    yield call(
+      removeItemsBatch,
+      sharedItems
+        .filter(sharedItem => !keyPairs[sharedItem.id])
+        .map(sharedItem => sharedItem.id),
+    );
   } catch (error) {
     // eslint-disable-next-line no-console
     console.error(error);

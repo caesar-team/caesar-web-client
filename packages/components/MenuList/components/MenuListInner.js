@@ -85,7 +85,7 @@ const MenuListInnerComponent = ({
 }) => {
   const dispatch = useDispatch();
   const currentTeam = useSelector(currentTeamSelector);
-  const isPersonal = !currentTeam;
+  const isPersonal = currentTeam?.id === TEAM_TYPE.PERSONAL;
   const personalLists = useSelector(personalListsByTypeSelector);
   const teamLists = useSelector(currentTeamListsSelector);
   const workInProgressList = useSelector(workInProgressListSelector);

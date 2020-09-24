@@ -26,6 +26,7 @@ import {
   postLogout,
 } from '@caesar/common/api';
 import { removeCookieValue, clearStorage } from '@caesar/common/utils/token';
+import { createPermissionsFromLinks } from '@caesar/common/utils/createPermissionsFromLinks';
 import { ROUTES } from '@caesar/common/constants';
 
 export function* fetchUserSelfSaga() {
@@ -37,6 +38,7 @@ export function* fetchUserSelfSaga() {
     const fixedUser = {
       ...membersById[user.id],
       ...user,
+      _permissions: createPermissionsFromLinks(user._links),
       teamIds: user.teamIds || [],
     };
 

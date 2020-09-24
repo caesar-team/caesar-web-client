@@ -22,6 +22,7 @@ const ROW_HEIGHT = 56;
 export const NewDataTable = ({
   columns,
   data,
+  initialState = {},
   tableVisibleDataHeight,
   itemSize = ROW_HEIGHT,
 }) => {
@@ -44,6 +45,7 @@ export const NewDataTable = ({
       columns,
       data,
       defaultColumn,
+      initialState,
     },
     useBlockLayout,
     useFilters,

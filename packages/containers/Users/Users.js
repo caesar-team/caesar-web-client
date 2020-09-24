@@ -86,11 +86,22 @@ export const Users = () => {
   const columns = useMemo(() => createColumns(tableWidth), [tableWidth]);
 
   return (
-    <SettingsWrapper isLoading={isLoading} title={`Users (${users.length})`}>
+    <SettingsWrapper
+      isLoading={isLoading}
+      title={`All users (${users.length})`}
+    >
       <Table.Main ref={tableWrapperRef}>
         <NewDataTable
           columns={columns}
           data={tableData}
+          initialState={{
+            sortBy: [
+              {
+                id: 'name',
+                desc: false,
+              },
+            ],
+          }}
           tableVisibleDataHeight={tableVisibleDataHeight}
         />
       </Table.Main>

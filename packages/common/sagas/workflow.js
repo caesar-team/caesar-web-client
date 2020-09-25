@@ -31,6 +31,7 @@ import {
   addTeamKeyPairBatch,
   addShareKeyPairBatch,
 } from '@caesar/common/actions/keystore';
+import { fetchUserSelfSaga } from '@caesar/common/sagas/user';
 import { fetchMembersSaga } from '@caesar/common/sagas/entities/member';
 import {
   convertNodesToEntities,
@@ -39,6 +40,7 @@ import {
   extractRelatedAndNonSystemItems,
 } from '@caesar/common/normalizers/normalizers';
 import { objectToArray } from '@caesar/common/utils/utils';
+import { upperFirst } from '@caesar/common/utils/string';
 import { sortItemsByFavorites } from '@caesar/common/utils/workflow';
 import {
   getLists,
@@ -409,10 +411,12 @@ function* initTeams() {
 
     teams.push({
       id: TEAM_TYPE.PERSONAL,
-      title: TEAM_TYPE.PERSONAL,
+      title: upperFirst(TEAM_TYPE.PERSONAL),
       type: TEAM_TYPE.PERSONAL,
+      icon: userData?.avatar,
+      email: userData?.email,
       userRole: ROLE_ADMIN,
-      _links: userData._links,
+      _links: userData?._links,
     });
 
     const teamById = convertTeamsToEntity(teams);
@@ -427,6 +431,7 @@ function* initTeams() {
 }
 
 export function* initWorkflow() {
+  yield call(fetchUserSelfSaga);
   yield call(initTeams);
 
   const currentTeamId = yield select(currentTeamIdSelector);

@@ -1,27 +1,18 @@
 import { useState, useMemo } from 'react';
 import { useEffectOnce, useUpdateEffect } from 'react-use';
 import { useSelector } from 'react-redux';
-import { TEAM_TYPE, TEAM_TEXT_TYPE } from '@caesar/common/constants';
+import { TEAM_TYPE } from '@caesar/common/constants';
 import { sortByName } from '@caesar/common/utils/utils';
 import { transformListTitle } from '@caesar/common/utils/string';
-import {
-  userDataSelector,
-  userTeamListSelector,
-} from '@caesar/common/selectors/user';
+import { userTeamListSelector } from '@caesar/common/selectors/user';
 import { teamsByIdSelector } from '@caesar/common/selectors/entities/team';
 import { getTeamTitle } from '@caesar/common/utils/team';
 import { getMovableLists } from '../api';
-
-const getCheckedTeamTitle = (checkedTeamId, teams) =>
-  !checkedTeamId
-    ? TEAM_TEXT_TYPE[TEAM_TYPE.PERSONAL]
-    : getTeamTitle(teams[checkedTeamId] || {});
 
 const getListTitle = (listId, lists) =>
   transformListTitle(lists.find(list => list.id === listId)?.label);
 
 export const useItemTeamAndListOptions = ({ teamId = null, listId }) => {
-  const user = useSelector(userDataSelector);
   const teams = useSelector(userTeamListSelector) || [];
   const teamsById = useSelector(teamsByIdSelector);
   const [lists, setLists] = useState([]);
@@ -30,16 +21,13 @@ export const useItemTeamAndListOptions = ({ teamId = null, listId }) => {
 
   useEffectOnce(() => {
     getMovableLists().then(({ data }) => {
-      setLists(data);
+      setLists(
+        data.map(list => ({
+          ...list,
+          teamId: list.teamId || TEAM_TYPE.PERSONAL,
+        })),
+      );
     });
-
-    if (teams[0]?.id !== null) {
-      teams.splice(0, 0, {
-        id: null,
-        title: TEAM_TEXT_TYPE[TEAM_TYPE.PERSONAL],
-        email: user.email,
-      });
-    }
   });
 
   useUpdateEffect(() => {
@@ -64,7 +52,7 @@ export const useItemTeamAndListOptions = ({ teamId = null, listId }) => {
         })
         .map(team =>
           team.type === TEAM_TYPE.DEFAULT
-            ? { ...team, title: TEAM_TEXT_TYPE[team.type] }
+            ? { ...team, title: getTeamTitle(team) }
             : team,
         ),
     [teams],
@@ -80,7 +68,7 @@ export const useItemTeamAndListOptions = ({ teamId = null, listId }) => {
 
   return {
     checkedTeamId,
-    checkedTeamTitle: getCheckedTeamTitle(checkedTeamId, teamsById),
+    checkedTeamTitle: getTeamTitle(teamsById[checkedTeamId]),
     checkedListId,
     checkedListLabel: getListTitle(checkedListId, lists),
     setCheckedTeamId,

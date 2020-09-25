@@ -11,7 +11,6 @@ const itemSchema = new schema.Entity(
   {
     processStrategy: (entity, parent) => ({
       ...entity,
-      listId: parent.id,
       _permissions: createPermissionsFromLinks(entity._links),
       teamId: parent.teamId || TEAM_TYPE.PERSONAL,
       __type: ENTITY_TYPE.ITEM,

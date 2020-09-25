@@ -406,6 +406,7 @@ export function* saveItemSaga({ item, publicKey }) {
 
   return itemData;
 }
+
 export function* createSystemItemKeyPair({ payload: { item, type } }) {
   const defaultListId = yield select(userDefaultListIdSelector);
   const { publicKey } = yield select(teamKeyPairSelector, {
@@ -440,6 +441,7 @@ export function* createSystemItemKeyPair({ payload: { item, type } }) {
     }),
   );
 }
+
 export function* findOrCreateTeamSystemItemKeyPair({ payload: { item } }) {
   const systemKeyPairItem = yield select(teamKeyPairSelector, {
     teamId: item.teamId,

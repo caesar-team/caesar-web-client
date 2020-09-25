@@ -30,7 +30,10 @@ export const teamSortedListSelector = createSelector(
   teams => {
     const defaultTeam = teams.find(team => team.type === TEAM_TYPE.DEFAULT);
     const otherTeams = teams
-      .filter(team => team.type !== TEAM_TYPE.DEFAULT)
+      .filter(
+        team =>
+          team.type !== TEAM_TYPE.DEFAULT && team.type !== TEAM_TYPE.PERSONAL,
+      )
       .sort((a, b) => sortByName(a.title, b.title));
 
     return defaultTeam ? [defaultTeam, ...otherTeams] : otherTeams;

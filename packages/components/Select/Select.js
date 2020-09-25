@@ -16,7 +16,7 @@ const SelectedOption = styled.div`
   justify-content: space-between;
   align-items: center;
   border-bottom: 1px solid ${({ theme }) => theme.color.gallery};
-  padding: 5px 15px;
+  padding: 8px 16px;
   cursor: pointer;
 
   &[disabled] {
@@ -72,14 +72,15 @@ const Option = styled.div`
 `;
 
 const ArrowIcon = styled(Icon)`
+  margin-left: 8px;
   transform: ${({ isOpened }) => (isOpened ? 'scaleY(-1)' : 'scaleY(1)')};
   transition: transform 0.2s;
 `;
 
 const BOX_DIRECTION_DOWN = 'down';
 
-const DEFAULT_TOP_OFFSET = 36;
-const DEFAULT_OPTION_SIZE = 36;
+const DEFAULT_TOP_OFFSET = 40;
+const DEFAULT_OPTION_SIZE = 40;
 
 class SelectInner extends Component {
   state = {

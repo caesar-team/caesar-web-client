@@ -1,5 +1,7 @@
+import React from 'react';
 import styled from 'styled-components';
 import { Input } from '../Input';
+import { Icon } from '../Icon';
 
 const Main = styled.div`
   .table {
@@ -59,6 +61,7 @@ const HeaderInput = styled(Input)`
 `;
 
 const Cell = styled.div`
+  position: relative;
   display: flex;
   align-items: center;
   overflow: hidden;
@@ -69,4 +72,24 @@ const EmailCell = styled.div`
   color: ${({ theme }) => theme.color.gray};
 `;
 
-export const TableStyles = { Main, Header, HeaderInput, Cell, EmailCell };
+const DropdownCell = styled(Cell)`
+  width: 100%;
+  overflow: initial;
+`;
+
+const MenuCell = styled(Cell)`
+  overflow: initial;
+`;
+
+const SearchIcon = <Icon name="search" width={16} height={16} color="gray" />;
+
+export const TableStyles = {
+  Main,
+  Header,
+  HeaderInput,
+  Cell,
+  EmailCell,
+  DropdownCell,
+  MenuCell,
+  SearchIcon,
+};

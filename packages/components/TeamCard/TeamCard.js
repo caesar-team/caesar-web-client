@@ -41,7 +41,7 @@ const StyledDottedMenu = styled(DottedMenu)`
 const MenuWrapper = styled.div`
   position: absolute;
   width: 100%;
-  height: 82px;
+  min-height: 42px;
   border: 1px solid ${({ theme }) => theme.color.gallery};
   border-radius: ${({ theme }) => theme.borderRadius};
 `;

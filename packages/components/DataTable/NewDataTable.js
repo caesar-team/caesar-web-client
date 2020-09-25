@@ -64,13 +64,11 @@ export const NewDataTable = ({
           })}
           className="tr"
         >
-          {row.cells.map(cell => {
-            return (
-              <div {...cell.getCellProps()} className="td">
-                {cell.render('Cell')}
-              </div>
-            );
-          })}
+          {row.cells.map(cell => (
+            <div {...cell.getCellProps()} className="td">
+              {cell.render('Cell')}
+            </div>
+          ))}
         </div>
       );
     },

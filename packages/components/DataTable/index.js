@@ -1,2 +1,2 @@
-export { NewDataTable } from './NewDataTable';
+export { DataTable } from './DataTable';
 export { TableStyles } from './styles';

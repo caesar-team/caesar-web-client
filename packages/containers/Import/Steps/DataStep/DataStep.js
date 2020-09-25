@@ -1,7 +1,7 @@
 import React, { useState, useMemo, useRef } from 'react';
 import { waitIdle } from '@caesar/common/utils/utils';
 import { TEAM_TYPE, LIST_TYPE } from '@caesar/common/constants';
-import { Icon, NewDataTable } from '@caesar/components';
+import { Icon, DataTable } from '@caesar/components';
 import {
   Title,
   SearchInput,
@@ -119,7 +119,7 @@ const DataStep = ({
         onChange={handleSearch}
       />
       <StyledTable ref={tableWrapperRef}>
-        <NewDataTable
+        <DataTable
           columns={columns}
           data={tableData}
           tableVisibleDataHeight={tableVisibleDataHeight}

@@ -19,7 +19,7 @@ const SortIcon = styled(Icon)`
 
 const ROW_HEIGHT = 56;
 
-export const NewDataTable = ({
+export const DataTable = ({
   columns,
   data,
   initialState = {},

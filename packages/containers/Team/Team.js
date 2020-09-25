@@ -23,7 +23,7 @@ import {
   Button,
   SettingsWrapper,
   Can,
-  NewDataTable,
+  DataTable,
   TableStyles as Table,
   InviteModal,
   ConfirmModal,
@@ -184,7 +184,7 @@ export const TeamContainer = () => {
       }
     >
       <Table.Main ref={tableWrapperRef}>
-        <NewDataTable
+        <DataTable
           columns={columns}
           data={tableData}
           initialState={{

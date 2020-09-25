@@ -5,7 +5,7 @@ import { isLoadingSelector } from '@caesar/common/selectors/workflow';
 import { memberListSelector } from '@caesar/common/selectors/entities/member';
 import {
   SettingsWrapper,
-  NewDataTable,
+  DataTable,
   TableStyles as Table,
   Avatar,
 } from '@caesar/components';
@@ -89,7 +89,7 @@ export const Users = () => {
       title={`All users (${users.length})`}
     >
       <Table.Main ref={tableWrapperRef}>
-        <NewDataTable
+        <DataTable
           columns={columns}
           data={tableData}
           initialState={{

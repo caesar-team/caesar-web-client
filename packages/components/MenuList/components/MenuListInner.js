@@ -6,11 +6,9 @@ import {
   DASHBOARD_MODE,
   PERMISSION,
   PERMISSION_ENTITY,
+  TEAM_TYPE,
 } from '@caesar/common/constants';
-import {
-  userDataSelector,
-  currentTeamSelector,
-} from '@caesar/common/selectors/user';
+import { currentTeamSelector } from '@caesar/common/selectors/user';
 import {
   personalListsByTypeSelector,
   currentTeamListsSelector,
@@ -86,9 +84,8 @@ const MenuListInnerComponent = ({
   setListsOpened,
 }) => {
   const dispatch = useDispatch();
-  const user = useSelector(userDataSelector);
   const currentTeam = useSelector(currentTeamSelector);
-  const isPersonal = !currentTeam;
+  const isPersonal = currentTeam?.id === TEAM_TYPE.PERSONAL;
   const personalLists = useSelector(personalListsByTypeSelector);
   const teamLists = useSelector(currentTeamListsSelector);
   const workInProgressList = useSelector(workInProgressListSelector);
@@ -175,17 +172,18 @@ const MenuListInnerComponent = ({
     },
   ];
 
-  const listSubject = currentTeam
-    ? {
-        __typename: PERMISSION_ENTITY.TEAM_LIST,
-        // eslint-disable-next-line camelcase
-        team_create_list: !!currentTeam._links?.team_create_list,
-      }
-    : {
-        __typename: PERMISSION_ENTITY.LIST,
-        // eslint-disable-next-line camelcase
-        create_list: !!user?._links?.create_list,
-      };
+  const listSubject =
+    currentTeam?.id === TEAM_TYPE.PERSONAL
+      ? {
+          __typename: PERMISSION_ENTITY.LIST,
+          // eslint-disable-next-line camelcase
+          create_list: currentTeam?._permissions?.create_list || false,
+        }
+      : {
+          __typename: PERMISSION_ENTITY.TEAM_LIST,
+          // eslint-disable-next-line camelcase
+          team_create_list: currentTeam._permissions?.team_create_list || false,
+        };
 
   const nestedListsLabels = nestedLists.map(({ label }) => label.toLowerCase());
 

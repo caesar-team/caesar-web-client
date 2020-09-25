@@ -99,8 +99,16 @@ const ItemHeaderComponent = ({
 
   // TODO: Refactor the duplicated code
   const itemSubject =
-    item.teamId && item.teamId !== TEAM_TYPE.PERSONAL
+    item?.teamId === TEAM_TYPE.PERSONAL
       ? {
+          __typename: PERMISSION_ENTITY.ITEM,
+          move_item: item?._permissions?.move_item || false,
+          batch_share_item: item?._permissions?.batch_share_item || false,
+          favorite_item_toggle:
+            item?._permissions?.favorite_item_toggle || false,
+          delete_item: item?._permissions?.delete_item || false,
+        }
+      : {
           __typename: PERMISSION_ENTITY.TEAM_ITEM,
           team_move_item: item?._permissions?.team_move_item || false,
           team_batch_share_item:
@@ -108,14 +116,6 @@ const ItemHeaderComponent = ({
           team_favorite_item_toggle:
             item?._permissions?.team_favorite_item_toggle || false,
           team_delete_item: item?._permissions?.team_delete_item || false,
-        }
-      : {
-          __typename: PERMISSION_ENTITY.ITEM,
-          move_item: item?._permissions?.move_item || false,
-          batch_share_item: item?._permissions?.batch_share_item || false,
-          favorite_item_toggle:
-            item?._permissions?.favorite_item_toggle || false,
-          delete_item: item?._permissions?.delete_item || false,
         };
 
   return (

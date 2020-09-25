@@ -25,20 +25,8 @@ export const userDataSelector = createSelector(
 );
 
 export const userTeamIdsSelector = createSelector(
-  userSelector,
-  user => user.teamIds,
-);
-
-export const caslUserDataSelector = createSelector(
   userDataSelector,
-  userTeamIdsSelector,
-  (userData, userTeamIds) =>
-    userData
-      ? {
-          ...userData,
-          teamIds: userTeamIds,
-        }
-      : null,
+  user => (!user ? ['personal'] : ['personal', ...user?.teamIds]),
 );
 
 export const userTeamListSelector = createSelector(

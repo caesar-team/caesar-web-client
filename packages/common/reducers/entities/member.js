@@ -19,7 +19,7 @@ import {
   ADD_TEAM_TO_MEMBERS_TEAMS_LIST_BATCH,
   LEAVE_TEAM_SUCCESS,
   LEAVE_TEAM_FAILURE,
-} from "@caesar/common/actions/entities/member";
+} from '@caesar/common/actions/entities/member';
 
 const initialState = {
   isLoading: false,

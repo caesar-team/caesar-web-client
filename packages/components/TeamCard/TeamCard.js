@@ -115,8 +115,8 @@ const TeamCard = ({
 
   const teamSubject = {
     __typename: PERMISSION_ENTITY.TEAM,
-    team_edit: !!team?._links?.team_edit,
-    team_delete: !!team?._links?.team_delete,
+    team_edit: team?._permissions?.team_edit || false,
+    team_delete: team?._permissions?.team_delete || false,
   };
 
   return (

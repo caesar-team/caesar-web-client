@@ -34,6 +34,7 @@ import {
   addTeamKeyPairBatch,
   addShareKeyPairBatch,
 } from '@caesar/common/actions/keystore';
+import { fetchUserSelfSaga } from '@caesar/common/sagas/user';
 import { fetchMembersSaga } from '@caesar/common/sagas/entities/member';
 import {
   convertNodesToEntities,
@@ -42,6 +43,7 @@ import {
   extractRelatedAndNonSystemItems,
 } from '@caesar/common/normalizers/normalizers';
 import { objectToArray } from '@caesar/common/utils/utils';
+import { upperFirst } from '@caesar/common/utils/string';
 import { sortItemsByFavorites } from '@caesar/common/utils/workflow';
 import {
   getLists,
@@ -64,6 +66,7 @@ import {
   listsTeamSelector,
 } from '@caesar/common/selectors/entities/list';
 import {
+  userDataSelector,
   masterPasswordSelector,
   currentTeamIdSelector,
 } from '@caesar/common/selectors/user';
@@ -101,6 +104,7 @@ const splitSharesAndPersonal = items => {
     sharedItems,
   };
 };
+
 const buildSystems = items => {
   const systemItems = {};
 
@@ -112,6 +116,7 @@ const buildSystems = items => {
 
   return systemItems;
 };
+
 const processingInvitedItem = (items, systemItemsById) => {
   return items.map(item =>
     systemItemsById[item.id]
@@ -122,6 +127,7 @@ const processingInvitedItem = (items, systemItemsById) => {
       : item,
   );
 };
+
 export function decryptItemsByItemIdKeys(items, keyPairs) {
   try {
     const putSagas = items.map(item => {
@@ -372,9 +378,11 @@ function* initListsAndProgressEntities() {
     yield put(setWorkInProgressItem(null));
   }
 }
+
 function* initTeam(teamId) {
   try {
     const currentTeamId = teamId;
+
     if (!currentTeamId || currentTeamId === TEAM_TYPE.PERSONAL) return;
 
     const { data: lists } = yield call(getTeamLists, currentTeamId);
@@ -417,27 +425,17 @@ function* initTeams() {
     const { data: teams } = yield call(getUserTeams);
     yield all(teams.map(({ id }) => call(initTeam, id, false)));
     yield call(initPersonalVault);
+
+    const userData = yield select(userDataSelector);
+
     teams.push({
       id: TEAM_TYPE.PERSONAL,
-      title: TEAM_TYPE.PERSONAL,
+      title: upperFirst(TEAM_TYPE.PERSONAL),
       type: TEAM_TYPE.PERSONAL,
+      icon: userData?.avatar,
+      email: userData?.email,
       userRole: ROLE_ADMIN,
-      _links: {
-        // eslint-disable-next-line camelcase
-        team_create_item: true,
-        // eslint-disable-next-line camelcase
-        create_item: true,
-        // eslint-disable-next-line camelcase
-        team_create_list: true,
-        // eslint-disable-next-line camelcase
-        team_edit: true,
-        // eslint-disable-next-line camelcase
-        team_get_lists: true,
-        // eslint-disable-next-line camelcase
-        team_member_add: false,
-        // eslint-disable-next-line camelcase
-        team_members: false,
-      },
+      _links: userData?._links,
     });
 
     const teamById = convertTeamsToEntity(teams);
@@ -452,6 +450,7 @@ function* initTeams() {
 }
 
 export function* initWorkflow() {
+  yield call(fetchUserSelfSaga);
   yield call(initTeams);
 
   const currentTeamId = yield select(currentTeamIdSelector);
@@ -459,6 +458,7 @@ export function* initWorkflow() {
   yield put(setCurrentTeamId(currentTeamId || TEAM_TYPE.PERSONAL));
   yield fork(fetchMembersSaga);
 }
+
 export function* openTeamVaultSaga({ payload: { teamId } }) {
   try {
     yield call(initTeam, teamId);

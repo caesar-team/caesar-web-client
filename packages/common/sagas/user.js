@@ -34,7 +34,7 @@ export function* fetchUserSelfSaga() {
     const { data: user } = yield call(getUserSelf);
     const membersById = yield select(membersByIdSelector);
 
-    // TODO: added teamIds on BE side
+    // TODO: Move to normalizr
     const fixedUser = {
       ...membersById[user.id],
       ...user,

@@ -16,6 +16,8 @@ import {
   setWorkInProgressItem,
   resetWorkInProgressItemIds,
   decryption,
+  VAULTS_ARE_READY,
+  vaultsReady,
 } from '@caesar/common/actions/workflow';
 import {
   addListsBatch,
@@ -33,6 +35,7 @@ import {
 import {
   addTeamKeyPairBatch,
   addShareKeyPairBatch,
+  ADD_TEAM_KEY_PAIR_BATCH,
 } from '@caesar/common/actions/keystore';
 import { fetchUserSelfSaga } from '@caesar/common/sagas/user';
 import { fetchMembersSaga } from '@caesar/common/sagas/entities/member';
@@ -94,6 +97,7 @@ import {
   teamSelector,
 } from '@caesar/common/selectors/entities/team';
 import { ADD_SYSTEM_ITEMS_BATCH } from '@caesar/common/actions/entities/system';
+import { createTeamKeysSaga } from './entities/team';
 
 const splitSharesAndPersonal = items => {
   const personalItems = items.filter(item => !item.isShared);
@@ -197,10 +201,22 @@ export function* processSharedItemsSaga() {
 
 export function* processTeamItemsSaga({ payload: { teamId } }) {
   try {
+    const teamKeyPairs = yield select(teamKeyPairSelector, { teamId });
+
+    if (!teamKeyPairs) {
+      const team = yield select(teamSelector, { teamId });
+      // eslint-disable-next-line no-console
+      console.warn(
+        `The key pair for the team ${team.title}:${teamId} not found. Need to create a new one...`,
+      );
+
+      yield call(createTeamKeysSaga, {
+        payload: { team },
+      });
+    }
+
     const teamItems = yield select(nonDecryptedTeamItemsSelector, { teamId });
     if (teamItems.length <= 0) return;
-
-    const teamKeyPairs = yield select(teamKeyPairSelector, { teamId });
     yield put(
       decryption({
         items: teamItems,
@@ -419,12 +435,16 @@ function* initTeam(teamId) {
   }
 }
 
+export function* openCurrentVaultSaga() {
+  const currentTeamId = yield select(currentTeamIdSelector);
+  yield put(setCurrentTeamId(currentTeamId || TEAM_TYPE.PERSONAL));
+}
+
 function* initTeams() {
   try {
     // Load avaible teams
     const { data: teams } = yield call(getUserTeams);
-    yield all(teams.map(({ id }) => call(initTeam, id, false)));
-    yield call(initPersonalVault);
+    yield all(teams.map(({ id }) => fork(initTeam, id, false)));
 
     const userData = yield select(userDataSelector);
 
@@ -440,6 +460,7 @@ function* initTeams() {
 
     const teamById = convertTeamsToEntity(teams);
     yield put(addTeamsBatch(teamById));
+    yield call(openCurrentVaultSaga);
   } catch (error) {
     // eslint-disable-next-line no-console
     console.error(error);
@@ -451,11 +472,8 @@ function* initTeams() {
 
 export function* initWorkflow() {
   yield call(fetchUserSelfSaga);
-  yield call(initTeams);
-
-  const currentTeamId = yield select(currentTeamIdSelector);
-
-  yield put(setCurrentTeamId(currentTeamId || TEAM_TYPE.PERSONAL));
+  yield call(initPersonalVault);
+  // We need to wait for the decryption of team keypair to initiate the Teams
   yield fork(fetchMembersSaga);
 }
 
@@ -486,25 +504,14 @@ export function* openTeamVaultSaga({ payload: { teamId } }) {
     }
     yield put(resetWorkInProgressItemIds(null));
 
-    const keyPair = yield select(teamKeyPairSelector, { teamId });
-
-    // TODO: Shoub be moved to the create item saga?
-    if (!keyPair && (teamId && teamId !== TEAM_TYPE.PERSONAL)) {
-      const team = yield select(teamSelector, { teamId });
-      // eslint-disable-next-line no-console
-      console.warn(
-        `The key pair for the team ${team.title}:${teamId} not found. Creating a new one...`,
-      );
-      // yield call(createTeamKeysSaga, { payload: { team } });
-    }
     // TODO: Here is opportunity to improve the calls
-    yield call(processTeamItemsSaga, {
+    yield fork(processTeamItemsSaga, {
       payload: {
         teamId,
       },
     });
 
-    yield call(processSharedItemsSaga, {
+    yield fork(processSharedItemsSaga, {
       payload: {
         teamId,
       },
@@ -633,4 +640,5 @@ export default function* workflowSagas() {
   yield takeLatest(ADD_LISTS_BATCH, initListsAndProgressEntities);
   yield takeLatest(UPDATE_WORK_IN_PROGRESS_ITEM, updateWorkInProgressItemSaga);
   yield takeLatest(SET_CURRENT_TEAM_ID, openTeamVaultSaga);
+  yield takeLatest(ADD_TEAM_KEY_PAIR_BATCH, initTeams);
 }

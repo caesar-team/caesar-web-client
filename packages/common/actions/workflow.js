@@ -1,6 +1,7 @@
 export const INIT_WORKFLOW = '@workflow/INIT_WORKFLOW';
 
 export const FINISH_IS_LOADING = '@workflow/FINISH_IS_LOADING';
+export const VAULTS_ARE_READY = '@workflow/VAULTS_ARE_READY';
 
 export const SET_WORK_IN_PROGRESS_ITEM = '@workflow/SET_WORK_IN_PROGRESS_ITEM';
 export const UPDATE_WORK_IN_PROGRESS_ITEM =
@@ -39,6 +40,10 @@ export const openVault = teamId => ({
 
 export const finishIsLoading = () => ({
   type: FINISH_IS_LOADING,
+});
+
+export const vaultsReady = () => ({
+  type: VAULTS_ARE_READY,
 });
 
 export const setWorkInProgressItem = item => ({

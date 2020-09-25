@@ -488,7 +488,7 @@ export function* createItemSaga({
     if (!publicKey) {
       // Nothing to do here
       throw new Error(
-        `Can't fine the publicKey in the key pair for the team ${teamId}`,
+        `Can't find the publicKey in the key pair for the team ${teamId}`,
       );
     }
 

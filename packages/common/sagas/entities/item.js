@@ -360,7 +360,7 @@ export function* saveItemSaga({ item, publicKey }) {
     listId,
     type,
     favorite = false,
-    relatedItem = null,
+    relatedItemId = null,
     data: { raws, ...data } = { raws: {} },
   } = item;
 
@@ -390,7 +390,7 @@ export function* saveItemSaga({ item, publicKey }) {
       type,
       favorite,
       secret,
-      relatedItem,
+      relatedItemId,
     });
 
     serverItemData = updatedItemData || {};
@@ -427,7 +427,7 @@ export function* createSystemItemKeyPair({ payload: { item, type } }) {
 
   // Encrypt and save the system keypair item to the owner personal vault
   const systemItemFromServer = yield call(saveItemSaga, {
-    item: { ...systemKeyPairItem, relatedItem: item.id },
+    item: { ...systemKeyPairItem, relatedItemId: item.id },
     publicKey,
   });
 

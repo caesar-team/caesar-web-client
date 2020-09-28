@@ -244,4 +244,4 @@ export const getDefaultTeamMembers = () =>
 
 export const getMovableLists = () => callApi.get(`/lists/movable`);
 
-export const getUserItems = () => callApi.get('/items/batch');
+export const getUserItems = () => callApi.get('/items/all');

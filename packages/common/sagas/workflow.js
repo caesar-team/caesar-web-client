@@ -72,7 +72,6 @@ import {
   currentTeamIdSelector,
 } from '@caesar/common/selectors/user';
 import {
-  itemListSelector,
   itemSelector,
   nonDecryptedSharedItemsSelector,
   nonDecryptedTeamItemsSelector,
@@ -340,14 +339,18 @@ function* initPersonalVault() {
     // const masterPassword = yield select(masterPasswordSelector);
 
     const {
-      data: { personal: personalItems = [], shared: sharedItems = [] },
+      data: {
+        personal: personalItems = [],
+        shared: sharedItems = [],
+        teams: teamsItems = [],
+      },
     } = yield call(getUserItems);
 
     // Merge all user items in the one array
     const allUserItems = [
       ...(personalItems || []),
       ...(sharedItems || []),
-      // ...(teamsItems?.items || []),
+      ...(teamsItems?.items || []),
     ];
 
     // Collect all related items from the shared keys
@@ -474,8 +477,8 @@ function* initListsAndProgressEntities() {
 }
 
 export function* initWorkflow() {
-  yield call(fetchUserSelfSaga);
-  yield call(initPersonalVault);
+  yield fork(fetchUserSelfSaga);
+  yield fork(initPersonalVault);
 
   // We need to wait for the decryption of team keypair to initiate the Teams
   yield fork(fetchMembersSaga);

@@ -93,10 +93,7 @@ import {
   TEAM_TYPE,
   ITEM_TYPE,
 } from '@caesar/common/constants';
-import {
-  personalKeyPairSelector,
-  teamKeyPairSelector,
-} from '@caesar/common/selectors/keystore';
+import { teamKeyPairSelector } from '@caesar/common/selectors/keystore';
 import {
   generateSystemItemEmail,
   generateSystemItemName,
@@ -380,9 +377,7 @@ export function* saveItemSaga({ item, publicKey }) {
   if (id) {
     const {
       data: { updatedItemData },
-    } = yield call(updateItem, id, {
-      item: { secret },
-    });
+    } = yield call(updateItem, id, { secret });
     serverItemData = updatedItemData || {};
   } else {
     const { data: updatedItemData } = yield call(postCreateItem, {
@@ -620,7 +615,17 @@ export function* updateItemSaga({ payload: { item } }) {
   try {
     yield put(updateGlobalNotification(ENCRYPTING_ITEM_NOTIFICATION, true));
 
-    const { publicKey } = yield select(personalKeyPairSelector);
+    const list = yield select(listSelector, { listId: item.listId });
+
+    const { publicKey } = yield select(teamKeyPairSelector, {
+      teamId: list.teamId || TEAM_TYPE.PERSONAL,
+    });
+
+    if (!publicKey) {
+      throw new Error(
+        `Can't get the publicKey for the item ${item.id} and the list ${list.id}`,
+      );
+    }
 
     const updatedItem = yield call(saveItemSaga, { item, publicKey });
 

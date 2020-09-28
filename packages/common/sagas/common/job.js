@@ -1,4 +1,4 @@
-import { call, put, take, takeEvery, select, spawn } from 'redux-saga/effects';
+import { call, put, takeEvery, select, spawn } from 'redux-saga/effects';
 import { availableCoresCountSelector } from '@caesar/common/selectors/application';
 import {
   increaseCoresCount,

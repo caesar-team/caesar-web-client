@@ -16,8 +16,6 @@ import {
   setWorkInProgressItem,
   resetWorkInProgressItemIds,
   decryption,
-  VAULTS_ARE_READY,
-  vaultsReady,
 } from '@caesar/common/actions/workflow';
 import {
   addListsBatch,

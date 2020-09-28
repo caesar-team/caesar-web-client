@@ -424,10 +424,8 @@ function* initPersonalVault() {
           masterPassword: keyPair.password,
         }),
       );
-    }
-
-    if (allItems.length <= 0) {
-      // Empty the personal vault, passtrought call of  initTeams();
+    } else {
+      // Empty the personal vault or without system items, passtrought call of initTeams();
       yield call(initTeams);
     }
 

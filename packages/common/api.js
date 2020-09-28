@@ -10,6 +10,8 @@ import {
 import { API_URI, API_BASE_PATH, ROUTES } from './constants';
 import { isClient } from './utils/isEnvironment';
 
+const { CancelToken } = axios;
+
 const softExit = () => {
   if (isClient) {
     removeCookieValue('token');
@@ -221,7 +223,19 @@ export const patchTeamList = (teamId, listId, data) =>
 export const removeTeamList = (teamId, listId) =>
   callApi.delete(`/teams/${teamId}/lists/${listId}`);
 
-export const getSearchUser = email => callApi.get(`/users/search/`, { email });
+let getSearchUserSource;
+
+export const getSearchUser = email => {
+  if (getSearchUserSource) getSearchUserSource();
+
+  return callApi.get(`/users/search/`, {
+    params: { email },
+    cancelToken: new CancelToken(function executor(c) {
+      // An executor function receives a cancel function as a parameter
+      getSearchUserSource = c;
+    }),
+  });
+};
 
 export const getMembers = () => callApi.get('/users');
 

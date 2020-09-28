@@ -221,7 +221,7 @@ export const patchTeamList = (teamId, listId, data) =>
 export const removeTeamList = (teamId, listId) =>
   callApi.delete(`/teams/${teamId}/lists/${listId}`);
 
-export const getSearchUser = text => callApi.get(`/users/search/${text}`);
+export const getSearchUser = email => callApi.get(`/users/search/`, { email });
 
 export const getMembers = () => callApi.get('/users');
 

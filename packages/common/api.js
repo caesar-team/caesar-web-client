@@ -10,6 +10,8 @@ import {
 import { API_URI, API_BASE_PATH, ROUTES } from './constants';
 import { isClient } from './utils/isEnvironment';
 
+const { CancelToken } = axios;
+
 const softExit = () => {
   if (isClient) {
     removeCookieValue('token');
@@ -172,10 +174,6 @@ export const postInvitationBatch = data => callApi.post('/invitations', data);
 export const patchChildItemBatch = data =>
   callApi.patch('/child_item/batch', data);
 
-export const getOfferedItems = () => callApi.get('/offered_item');
-
-export const patchAcceptItem = data => callApi.patch('/accept_item', data);
-
 export const patchResetPassword = (token, data) =>
   callApi.patch(`/auth/srpp/reset/${token}`, data);
 
@@ -225,15 +223,25 @@ export const patchTeamList = (teamId, listId, data) =>
 export const removeTeamList = (teamId, listId) =>
   callApi.delete(`/teams/${teamId}/lists/${listId}`);
 
-export const getSearchUser = text => callApi.get(`/users/search/${text}`);
+let getSearchUserSource;
+
+export const getSearchUser = email => {
+  if (getSearchUserSource) getSearchUserSource();
+
+  return callApi.get(`/users/search/`, {
+    params: { email },
+    cancelToken: new CancelToken(function executor(c) {
+      // An executor function receives a cancel function as a parameter
+      getSearchUserSource = c;
+    }),
+  });
+};
 
 export const getMembers = () => callApi.get('/users');
 
 export const getDefaultTeamMembers = () =>
   callApi.get('/teams/default/members');
 
-export const patchAcceptTeamItems = () => callApi.patch('/accept_teams_items');
-
 export const getMovableLists = () => callApi.get(`/lists/movable`);
 
-export const getUserItems = () => callApi.get('/items/batch');
+export const getUserItems = () => callApi.get('/items/all');

@@ -3,7 +3,6 @@ import { useUpdateEffect } from 'react-use';
 import { useSelector } from 'react-redux';
 import styled from 'styled-components';
 import { useItemTeamAndListOptions } from '@caesar/common/hooks';
-import { userDataSelector } from '@caesar/common/selectors/user';
 import { teamsByIdSelector } from '@caesar/common/selectors/entities/team';
 import { getTeamTitle } from '@caesar/common/utils/team';
 import { Dropdown } from '../../Dropdown';
@@ -73,7 +72,6 @@ const ArrowIcon = styled(Icon)`
 export const FormHeader = ({ teamId, listId, onChangePath, className }) => {
   const [isTeamDropdownOpened, setTeamDropdownOpened] = useState(false);
   const [isListDropdownOpened, setListDropdownOpened] = useState(false);
-  const user = useSelector(userDataSelector);
   const teamsById = useSelector(teamsByIdSelector);
   const {
     checkedTeamId,
@@ -115,6 +113,7 @@ export const FormHeader = ({ teamId, listId, onChangePath, className }) => {
     }));
 
   const teamAvatar = teamsById[checkedTeamId]?.icon;
+  const teamEmail = teamsById[checkedTeamId]?.email;
 
   return (
     <Wrapper className={className}>
@@ -124,11 +123,12 @@ export const FormHeader = ({ teamId, listId, onChangePath, className }) => {
         onToggle={() => setTeamDropdownOpened(!isTeamDropdownOpened)}
         onClick={(name, value) => setCheckedTeamId(value)}
       >
-        {checkedTeamId ? (
-          <StyledTeamAvatar size={24} fontSize="xs" avatar={teamAvatar} />
-        ) : (
-          <StyledTeamAvatar size={24} fontSize="xs" {...user} />
-        )}
+        <StyledTeamAvatar
+          size={24}
+          fontSize="xs"
+          avatar={teamAvatar}
+          email={teamEmail}
+        />
         <Name>{checkedTeamTitle}</Name>
         <ArrowIcon
           name="arrow-triangle"

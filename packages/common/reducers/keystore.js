@@ -23,7 +23,7 @@ const initialState = {
   [KEY_TYPE.PERSONAL]: {},
   [KEY_TYPE.TEAMS]: {},
   [KEY_TYPE.SHARES]: {},
-  [KEY_TYPE.ANONYMOUS]: [],
+  [KEY_TYPE.ANONYMOUS]: {},
 };
 
 export default createReducer(initialState, {
@@ -44,10 +44,14 @@ export default createReducer(initialState, {
   },
   [ADD_TEAM_KEY_PAIR_BATCH](state, { payload }) {
     if (!payload.data || payload.data?.length <= 0) return state;
-
+    // TODO: Use the normalizr library
     const keyPairs = {};
     payload.data.forEach(systemItem => {
-      const { data: { name } = { name: null } } = systemItem;
+      const {
+        data: { name } = {
+          name: null,
+        },
+      } = systemItem;
       keyPairs[
         REGEXP_EXCTRACTOR.ID(name) || systemItem.id
       ] = convertSystemItemToKeyPair(systemItem);
@@ -64,6 +68,7 @@ export default createReducer(initialState, {
   [ADD_SHARE_KEY_PAIR_BATCH](state, { payload }) {
     if (!payload.data || payload.data?.length <= 0) return state;
 
+    // TODO: Use the normalizr library
     const keyPairs = {};
     payload.data.forEach(systemItem => {
       keyPairs[
@@ -124,9 +129,28 @@ export default createReducer(initialState, {
     };
   },
   [ADD_ANONYMOUS_KEY_PAIR](state, { payload }) {
+    const {
+      id,
+      data: { name, pass, raws = {} } = { raws: {} },
+      relatedItem,
+    } = payload.data;
+    const itemId = relatedItem?.id || null;
+    if (!itemId) return state;
+
+    const { publicKey, privateKey } = raws || {};
+
     return {
       ...state,
-      [KEY_TYPE.ANONYMOUS]: [...state[KEY_TYPE.ANONYMOUS], payload.data],
+      [KEY_TYPE.ANONYMOUS]: {
+        ...state[KEY_TYPE.ANONYMOUS],
+        [itemId]: {
+          id,
+          name,
+          pass,
+          publicKey,
+          privateKey,
+        },
+      },
     };
   },
   [REMOVE_PERSONAL_KEY_PAIR](state) {
@@ -136,27 +160,30 @@ export default createReducer(initialState, {
     };
   },
   [REMOVE_TEAM_KEY_PAIR](state, { payload }) {
+    const newState = state[KEY_TYPE.TEAMS];
+    delete newState[payload.itemId];
+
     return {
       ...state,
-      [KEY_TYPE.TEAMS]: {
-        ...state[KEY_TYPE.TEAMS],
-        [payload.teamId]: undefined,
-      },
+      [KEY_TYPE.TEAMS]: newState,
     };
   },
   [REMOVE_SHARE_KEY_PAIR](state, { payload }) {
+    const newState = state[KEY_TYPE.SHARES];
+    delete newState[payload.itemId];
+
     return {
       ...state,
-      [KEY_TYPE.SHARES]: {
-        ...state[KEY_TYPE.SHARES],
-        [payload.itemId]: undefined,
-      },
+      [KEY_TYPE.SHARES]: newState,
     };
   },
-  [REMOVE_ANONYMOUS_KEY_PAIR](state) {
+  [REMOVE_ANONYMOUS_KEY_PAIR](state, { payload }) {
+    const newState = state[KEY_TYPE.ANONYMOUS];
+    delete newState[payload.itemId];
+
     return {
       ...state,
-      [KEY_TYPE.ANONYMOUS]: [],
+      [KEY_TYPE.ANONYMOUS]: newState,
     };
   },
 });

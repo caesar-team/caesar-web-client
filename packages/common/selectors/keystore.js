@@ -14,6 +14,11 @@ const findSystemItemsTeamByItemName = (data, teamId) =>
 
 export const keyStoreSelector = state => state.keystore;
 
+export const anonymousKeyPairsSelector = createSelector(
+  keyStoreSelector,
+  keystore => keystore[KEY_TYPE.ANONYMOUS],
+);
+
 export const teamKeyPairsSelector = createSelector(
   keyStoreSelector,
   keystore => keystore[KEY_TYPE.TEAMS],
@@ -35,11 +40,12 @@ export const shareItemKeyPairSelector = createSelector(
   },
 );
 
-export const keyPairsStoreSelector = createSelector(
-  shareKeyPairsSelector,
-  teamKeyPairsSelector,
-  (sharesKeys, teamKeys) => [...sharesKeys, ...teamKeys],
-);
+// export const keyPairsStoreSelector = createSelector(
+//   shareKeyPairsSelector,
+//   teamKeyPairsSelector,
+//   anonymousKeyPairsSelector,
+//   (sharesKeys, teamKeys, anonymousKeys) => [...sharesKeys, ...teamKeys],
+// );
 
 const teamIdPropSelector = (_, props) => props.teamId;
 
@@ -54,12 +60,6 @@ export const teamKeyPairSelector = createSelector(
   teamKeyPairsSelector,
   teamIdPropSelector,
   (keyPairs, teamId) => keyPairs[teamId] || null,
-);
-
-export const idsKeyPairsSelector = createSelector(
-  keyPairsStoreSelector,
-  idsPropSelector,
-  (keys, ids) => ids.map(itemId => keys[itemId]),
 );
 
 const shareIdPropSelector = (_, props) => props.id;
@@ -88,6 +88,21 @@ export const shareKeysPairSelector = createSelector(
 export const anonymousKeyPairSelector = createSelector(
   keyStoreSelector,
   data => Object.values(data[KEY_TYPE.ANONYMOUS]) || {},
+);
+
+export const idsKeyPairsSelector = createSelector(
+  shareKeyPairsSelector,
+  teamKeyPairsSelector,
+  anonymousKeyPairsSelector,
+  idsPropSelector,
+  (shares, teams, anons, ids) =>
+    ids.map(itemId => {
+      return {
+        share: shares[itemId] || null,
+        team: teams[itemId] || null,
+        anon: anons[itemId] || null,
+      };
+    }),
 );
 
 export const actualKeyPairSelector = createSelector(

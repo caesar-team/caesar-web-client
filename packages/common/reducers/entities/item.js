@@ -350,6 +350,8 @@ export default createReducer(initialState, {
     };
   },
   [REMOVE_ITEMS_BATCH](state, { payload }) {
+    if (!state.byId || Object.keys(state.byId).length <= 0) return state;
+
     return {
       ...state,
       byId: Object.keys(state.byId).reduce(

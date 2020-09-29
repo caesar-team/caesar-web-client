@@ -1,7 +1,6 @@
 import React, { memo, useState, useRef } from 'react';
-import { useClickAway } from 'react-use';
+import { useClickAway, useDebounce } from 'react-use';
 import styled from 'styled-components';
-import { debounce } from 'lodash';
 import { getSearchUser } from '@caesar/common/api';
 import { uuid4 } from '@caesar/common/utils/uuid4';
 import { Input } from './Input';
@@ -94,16 +93,87 @@ const createNewMember = email => ({
   isNew: true,
 });
 
+const Prefix = <Icon name="search" width={16} height={16} color="gray" />;
+
+const Postfix = ({
+  isLoading,
+  members,
+  filterText,
+  handleClickReset,
+  handleAddNewMember,
+}) => {
+  if (isLoading) {
+    return <CircleLoader size={18} />;
+  }
+
+  if (members.length && filterText) {
+    return (
+      <IconWrapper>
+        <SearchedUsersCount>
+          {members.length} member{members.length === 1 ? '' : 's'}
+        </SearchedUsersCount>
+        <CloseIcon
+          name="close"
+          width={16}
+          height={16}
+          color="gray"
+          onClick={handleClickReset}
+        />
+      </IconWrapper>
+    );
+  }
+
+  if (!isLoading && !members.length && filterText?.includes('@')) {
+    const isDisabled = !EMAIL_REGEX.test(filterText);
+
+    return (
+      <AddButton disabled={isDisabled} onClick={handleAddNewMember}>
+        <Icon name="plus" width={16} height={16} color="white" />
+      </AddButton>
+    );
+  }
+
+  return null;
+};
+
 const UserSearchInputComponent = ({ blackList, onClickAdd, className }) => {
   const [isLoading, setLoading] = useState(false);
   const [members, setMembers] = useState([]);
   const [filterText, setFilterText] = useState('');
-  
   const ref = useRef(null);
-  
+
   useClickAway(ref, () => {
     setFilterText('');
   });
+
+  useDebounce(
+    async () => {
+      if (!filterText) return;
+      setLoading(true);
+
+      try {
+        const { data } = await getSearchUser(filterText);
+        if (!data) {
+          setLoading(false);
+
+          return;
+        }
+
+        setMembers(data.filter(member => !blackList?.includes(member.id)));
+        setLoading(false);
+        // eslint-disable-next-line no-empty
+      } catch (error) {}
+    },
+    500,
+    [filterText],
+  );
+
+  const handleChange = event => {
+    const { value } = event.target;
+
+    setFilterText(value);
+    setMembers(!value ? [] : members);
+  };
 
   const handleAddNewMember = () => {
     setFilterText('');
@@ -111,57 +181,10 @@ const UserSearchInputComponent = ({ blackList, onClickAdd, className }) => {
 
     onClickAdd(createNewMember(filterText));
   };
-  
-  const getPostfix = () => {
-    if (isLoading) {
-      return <CircleLoader size={18} />;
-    }
 
-    if (members.length && filterText) {
-      return (
-        <IconWrapper>
-          <SearchedUsersCount>
-            {members.length} member{members.length === 1 ? '' : 's'}
-          </SearchedUsersCount>
-          <CloseIcon
-            name="close"
-            width={16}
-            height={16}
-            color="gray"
-            onClick={handleClickReset}
-          />
-        </IconWrapper>
-      );
-    }
-
-    if (
-      !isLoading &&
-      !members.length &&
-      filterText &&
-      filterText.includes('@')
-    ) {
-      const isDisabled = !EMAIL_REGEX.test(filterText);
-
-      return (
-        <AddButton disabled={isDisabled} onClick={handleAddNewMember}>
-          <Icon name="plus" width={16} height={16} color="white" />
-        </AddButton>
-      );
-    }
-
-    return null;
-  }
-
-  // eslint-disable-next-line
-  const handleChange = event => {
-    const {
-      target: { value },
-    } = event;
-
-    setFilterText(value);
-    setMembers(!value ? [] : members);
-
-    debouncedSearch(value);
+  const handleClickReset = () => {
+    setMembers([]);
+    setFilterText('');
   };
 
   const handleClick = member => () => {
@@ -171,32 +194,11 @@ const UserSearchInputComponent = ({ blackList, onClickAdd, className }) => {
     onClickAdd(member);
   };
 
-  const handleClickReset = () => {
-    setMembers([]);
-    setFilterText('');
-  };
-
-  const search = async text => {
-    if (!text) return;
-
-    setLoading(true);
-
-    const { data } = await getSearchUser(text);
-
-    setMembers(data.filter(member => !blackList.includes(member.id)));
-    setLoading(false);
-  };
-
-  // eslint-disable-next-line
-  const debouncedSearch = debounce(search, 500);
-
   const mappedMembers = members.map(({ name, ...member }) => member);
 
-  const Prefix = <Icon name="search" width={16} height={16} color="gray" />;
-  const Postfix = getPostfix();
+  const shouldShowResultBox =
+    !isLoading && mappedMembers.length > 0 && filterText;
 
-  const shouldShowResultBox = !isLoading && mappedMembers.length > 0 && filterText;
-  
   return (
     <Wrapper className={className} ref={ref}>
       <InputStyled
@@ -205,7 +207,15 @@ const UserSearchInputComponent = ({ blackList, onClickAdd, className }) => {
         value={filterText}
         onChange={handleChange}
         prefix={Prefix}
-        postfix={Postfix}
+        postfix={
+          <Postfix
+            isLoading={isLoading}
+            members={members}
+            filterText={filterText}
+            handleClickReset={handleClickReset}
+            handleAddNewMember={handleAddNewMember}
+          />
+        }
       />
       {shouldShowResultBox && (
         <SearchedResultBox>
@@ -219,7 +229,7 @@ const UserSearchInputComponent = ({ blackList, onClickAdd, className }) => {
       )}
     </Wrapper>
   );
-}
+};
 
 const UserSearchInput = memo(UserSearchInputComponent);
 

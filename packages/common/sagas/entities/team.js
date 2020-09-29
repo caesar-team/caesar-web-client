@@ -177,7 +177,7 @@ export function* createTeamKeysSaga({
     // TODO: The server should ignore the list id for system items
     // Get the personal deault list to add the systen item to the personal vault
     const { id: listId } = yield select(teamDefaultListSelector, {
-      teamId: TEAM_TYPE.PERSONAL,
+      teamId,
     });
 
     if (!listId || typeof listId === 'undefined') {

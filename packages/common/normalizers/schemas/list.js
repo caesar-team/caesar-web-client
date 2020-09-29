@@ -15,6 +15,7 @@ const listSchema = new schema.Entity(
       __type: ENTITY_TYPE.LIST,
       teamId: entity.teamId || TEAM_TYPE.PERSONAL,
       _permissions: createPermissionsFromLinks(entity._links),
+      items: entity.children.map(item => item.id),
       type:
         entity.label === LIST_TYPE.DEFAULT ? LIST_TYPE.DEFAULT : entity.type,
     }),

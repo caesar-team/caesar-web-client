@@ -37,13 +37,20 @@ export const convertItemsToEntities = items => {
   };
 };
 
+export const convertListsToEntities = nodes => {
+  const normalized = normalize(nodes, [listSchema]);
+
+  return {
+    listsById: normalized.entities.listsById || {},
+  };
+};
+
 export const convertNodesToEntities = nodes => {
   const normalized = normalize(nodes, [listSchema]);
 
   return {
     listsById: normalized.entities.listsById || {},
     itemsById: normalized.entities.itemsById || {},
-    childItemsById: normalized.entities.childItemsById || {},
   };
 };
 

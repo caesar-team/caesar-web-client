@@ -213,7 +213,7 @@ export function* shareItemBatchSaga({
       yield take(CREATE_CHILD_ITEM_BATCH_FINISHED_EVENT);
 
       const sharedItemIds = systemKeyPairItems.map(
-        systemItem => systemItem?.relatedItem?.id,
+        systemItem => systemItem?.relatedItemId,
       );
 
       const sharedItems = yield select(itemsBatchSelector, {

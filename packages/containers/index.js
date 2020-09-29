@@ -8,6 +8,6 @@ export { SecureMessageContainer } from './SecureMessage';
 export { Sharing } from './Sharing';
 export { SignInContainer } from './SignIn';
 export { SignUpContainer } from './SignUp';
-export { default as TeamContainer } from './Team';
+export { TeamContainer } from './Team';
 export { default as TeamListContainer } from './TeamList';
 export { Users as UsersContainer } from './Users';

@@ -1,13 +1,13 @@
 import React, { useMemo, useRef } from 'react';
 import { useSelector } from 'react-redux';
 import styled from 'styled-components';
+import { isLoadingSelector } from '@caesar/common/selectors/workflow';
 import { memberListSelector } from '@caesar/common/selectors/entities/member';
 import {
   SettingsWrapper,
-  NewDataTable,
+  DataTable,
   TableStyles as Table,
   Avatar,
-  Icon,
 } from '@caesar/components';
 
 const UserAvatar = styled(Avatar)`
@@ -20,13 +20,11 @@ const WIDTH_RATIO = {
   team: 0.3,
 };
 
-const Prefix = <Icon name="search" width={16} height={16} color="gray" />;
-
 const getColumnFilter = (placeholder = '') => ({
   column: { filterValue, setFilter },
 }) => (
   <Table.HeaderInput
-    prefix={Prefix}
+    prefix={Table.SearchIcon}
     value={filterValue || ''}
     onChange={e => {
       setFilter(e.target.value || undefined); // Set undefined to remove the filter entirely
@@ -74,7 +72,7 @@ const createColumns = tableWidth => [
 ];
 
 export const Users = () => {
-  const isLoading = false;
+  const isLoading = useSelector(isLoadingSelector);
 
   const tableWrapperRef = useRef(null);
   // Window height minus stuff that takes vertical place (including table headers)
@@ -91,7 +89,7 @@ export const Users = () => {
       title={`All users (${users.length})`}
     >
       <Table.Main ref={tableWrapperRef}>
-        <NewDataTable
+        <DataTable
           columns={columns}
           data={tableData}
           initialState={{

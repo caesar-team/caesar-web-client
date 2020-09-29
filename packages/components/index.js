@@ -32,7 +32,6 @@ export {
   PasswordInput,
   MasterPasswordInput,
   TextArea,
-  ShareInput,
   StrengthIndicator,
   UserSearchInput,
 } from './Input';

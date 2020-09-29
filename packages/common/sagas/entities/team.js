@@ -171,7 +171,7 @@ export function* createTeamKeysSaga({
 }) {
   try {
     if (!team) return;
-    yield call;
+    const teamId = team.id;
     const user = yield select(userDataSelector);
 
     // TODO: The server should ignore the list id for system items
@@ -184,12 +184,21 @@ export function* createTeamKeysSaga({
       // TODO: Bug fix: we lost the user default list and we need to restore it from the list api
       throw new Error('Fatal error: The list id not found.');
     }
+
+    if (!teamId || typeof teamId === 'undefined') {
+      // TODO: Bug fix: we lost the user default list and we need to restore it from the list api
+      throw new Error('Fatal error: The team id is undefined.', team);
+    }
+
     const systemItemData = yield call(
       generateSystemItem,
       ENTITY_TYPE.TEAM,
       listId,
       team.id,
     );
+
+    // System item have to store it in the personal vault first.
+    systemItemData.teamId = TEAM_TYPE.PERSONAL;
 
     // Todo: return the data from the server and check it.
     yield call(createItemSaga, {

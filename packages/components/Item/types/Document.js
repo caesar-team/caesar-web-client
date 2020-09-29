@@ -25,6 +25,7 @@ const DocumentComponent = ({
       />
       {!isSharedItem && (
         <OwnerAndInvitation
+          invited={item.invited}
           itemSubject={itemSubject}
           onClickShare={onClickShare}
         />

@@ -56,12 +56,10 @@ import {
   currentTeamFavoriteListSelector,
   defaultListSelector,
   currentTeamDefaultListSelector,
+  teamDefaultListSelector,
 } from '@caesar/common/selectors/entities/list';
 import { itemSelector } from '@caesar/common/selectors/entities/item';
-import {
-  currentTeamIdSelector,
-  userDefaultListIdSelector,
-} from '@caesar/common/selectors/user';
+import { currentTeamIdSelector } from '@caesar/common/selectors/user';
 import {
   addShareKeyPair,
   addTeamKeyPair,
@@ -95,10 +93,7 @@ import {
   TEAM_TYPE,
   ITEM_TYPE,
 } from '@caesar/common/constants';
-import {
-  personalKeyPairSelector,
-  teamKeyPairSelector,
-} from '@caesar/common/selectors/keystore';
+import { teamKeyPairSelector } from '@caesar/common/selectors/keystore';
 import {
   generateSystemItemEmail,
   generateSystemItemName,
@@ -362,7 +357,7 @@ export function* saveItemSaga({ item, publicKey }) {
     listId,
     type,
     favorite = false,
-    relatedItem = null,
+    relatedItemId = null,
     data: { raws, ...data } = { raws: {} },
   } = item;
 
@@ -382,9 +377,7 @@ export function* saveItemSaga({ item, publicKey }) {
   if (id) {
     const {
       data: { updatedItemData },
-    } = yield call(updateItem, id, {
-      item: { secret },
-    });
+    } = yield call(updateItem, id, { secret });
     serverItemData = updatedItemData || {};
   } else {
     const { data: updatedItemData } = yield call(postCreateItem, {
@@ -392,7 +385,7 @@ export function* saveItemSaga({ item, publicKey }) {
       type,
       favorite,
       secret,
-      relatedItem,
+      relatedItemId,
     });
 
     serverItemData = updatedItemData || {};
@@ -408,9 +401,12 @@ export function* saveItemSaga({ item, publicKey }) {
 }
 
 export function* createSystemItemKeyPair({ payload: { item, type } }) {
-  const defaultListId = yield select(userDefaultListIdSelector);
+  const teamId = item.teamId || TEAM_TYPE.PERSONAL;
+  const { id: defaultListId } = yield select(teamDefaultListSelector, {
+    teamId,
+  });
   const { publicKey } = yield select(teamKeyPairSelector, {
-    teamId: TEAM_TYPE.PERSONAL,
+    teamId,
   });
 
   if (!type) {
@@ -426,7 +422,7 @@ export function* createSystemItemKeyPair({ payload: { item, type } }) {
 
   // Encrypt and save the system keypair item to the owner personal vault
   const systemItemFromServer = yield call(saveItemSaga, {
-    item: { ...systemKeyPairItem, relatedItem: item.id },
+    item: { ...systemKeyPairItem, relatedItemId: item.id },
     publicKey,
   });
 
@@ -440,18 +436,18 @@ export function* createSystemItemKeyPair({ payload: { item, type } }) {
       [systemKeyPairItem.id]: systemKeyPairItem,
     }),
   );
+
+  return systemKeyPairItem;
 }
 
 export function* findOrCreateTeamSystemItemKeyPair({ payload: { item } }) {
-  const systemKeyPairItem = yield select(teamKeyPairSelector, {
+  let systemKeyPairItem = yield select(teamKeyPairSelector, {
     teamId: item.teamId,
   });
 
   if (!systemKeyPairItem) {
-    yield call(createSystemItemKeyPair, { item, type: ENTITY_TYPE.SHARE });
-
-    return yield select(teamKeyPairSelector, {
-      teamId: item.teamId,
+    systemKeyPairItem = yield call(createSystemItemKeyPair, {
+      payload: { item, type: ENTITY_TYPE.SHARE },
     });
   }
 
@@ -487,7 +483,7 @@ export function* createItemSaga({
     if (!publicKey) {
       // Nothing to do here
       throw new Error(
-        `Can't fine the publicKey in the key pair for the team ${teamId}`,
+        `Can't find the publicKey in the key pair for the team ${teamId}`,
       );
     }
 
@@ -619,7 +615,17 @@ export function* updateItemSaga({ payload: { item } }) {
   try {
     yield put(updateGlobalNotification(ENCRYPTING_ITEM_NOTIFICATION, true));
 
-    const { publicKey } = yield select(personalKeyPairSelector);
+    const list = yield select(listSelector, { listId: item.listId });
+
+    const { publicKey } = yield select(teamKeyPairSelector, {
+      teamId: list.teamId || TEAM_TYPE.PERSONAL,
+    });
+
+    if (!publicKey) {
+      throw new Error(
+        `Can't get the publicKey for the item ${item.id} and the list ${list.id}`,
+      );
+    }
 
     const updatedItem = yield call(saveItemSaga, { item, publicKey });
 

@@ -149,13 +149,20 @@ const UserSearchInputComponent = ({ blackList, onClickAdd, className }) => {
   useDebounce(
     async () => {
       if (!filterText) return;
-
       setLoading(true);
 
-      const { data } = await getSearchUser(filterText);
+      try {
+        const { data } = await getSearchUser(filterText);
+        if (!data) {
+          setLoading(false);
 
-      setMembers(data.filter(member => !blackList?.includes(member.id)));
-      setLoading(false);
+          return;
+        }
+
+        setMembers(data.filter(member => !blackList?.includes(member.id)));
+        setLoading(false);
+        // eslint-disable-next-line no-empty
+      } catch (error) {}
     },
     500,
     [filterText],

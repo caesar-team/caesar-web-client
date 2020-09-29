@@ -271,6 +271,17 @@ export const REGEXP_TESTER = {
   },
 };
 
+export const REGEXP_MATCHER = {
+  SYSTEM: {
+    ITEM_ID: stringData =>
+      stringData
+        ? stringData?.match(
+            /\b(share|team)-([0-9a-f]{8}\b-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-\b[0-9a-f]{12})\b/,
+          )[1] || null
+        : null,
+  },
+};
+
 export const REGEXP_EXCTRACTOR = {
   ID: stringData =>
     stringData ? stringData?.match(UUID_REGEXP)[0] || null : null,

@@ -1,5 +1,5 @@
 /* eslint-disable camelcase */
-import React from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import styled from 'styled-components';
 import {
   DottedMenu,
@@ -22,11 +22,11 @@ const UserAvatar = styled(Avatar)`
 `;
 
 const StyledSelect = styled(Select)`
-  border-radius: ${({ theme }) => theme.borderRadius};
-  border: 1px solid ${({ theme }) => theme.color.gallery};
+  width: 100%;
 
   ${Select.SelectedOption} {
-    width: 100%;
+    border-radius: ${({ theme }) => theme.borderRadius};
+    border: 1px solid ${({ theme }) => theme.color.gallery};
   }
 `;
 
@@ -71,6 +71,8 @@ const getTeamMemberSubject = member => ({
 
 export const createColumns = ({
   tableWidth,
+  tableHeight,
+  tableScrollTop,
   handleChangeRole,
   handleRemoveMember,
 }) => {
@@ -104,14 +106,31 @@ export const createColumns = ({
     Filter: getColumnFilter('Role'),
     Header: () => null,
     Cell: ({ value, row: { original } }) => {
+      const [isDropdownUp, setDropdownUp] = useState(false);
+      const cellRef = useRef(null);
+
+      useEffect(() => {
+        if (cellRef?.current) {
+          const rowScrolledTopPosition = cellRef.current.closest('[role="row"]')
+            ?.offsetTop;
+          const rowTopPositionRelativeToTable =
+            rowScrolledTopPosition - tableScrollTop;
+          const dropdownBottomPosition =
+            rowTopPositionRelativeToTable + (OPTIONS.length + 1) * 44 + 4;
+
+          setDropdownUp(dropdownBottomPosition >= tableHeight);
+        }
+      }, [cellRef, tableScrollTop]);
+
       return (
-        <Table.DropdownCell>
+        <Table.DropdownCell ref={cellRef}>
           <Can I={PERMISSION.EDIT} of={getTeamMemberSubject(original)}>
             <StyledSelect
               name="role"
               value={value}
               options={OPTIONS}
               onChange={handleChangeRole(original.id)}
+              boxDirection={isDropdownUp ? 'up' : 'down'}
             />
           </Can>
           <Can not I={PERMISSION.EDIT} of={getTeamMemberSubject(original)}>

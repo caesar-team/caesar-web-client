@@ -1,6 +1,6 @@
 /* eslint-disable camelcase */
 import React, { useState, useMemo, useRef } from 'react';
-import { useEffectOnce } from 'react-use';
+import { useEffectOnce, useUpdateEffect } from 'react-use';
 import { useSelector, useDispatch } from 'react-redux';
 import { useRouter } from 'next/router';
 import memoizeOne from 'memoize-one';
@@ -75,6 +75,21 @@ export const TeamContainer = () => {
   // Window height minus stuff that takes vertical place (including table headers)
   const tableVisibleDataHeight = window?.innerHeight - 275;
   const tableWidth = tableWrapperRef?.current?.offsetWidth || 0;
+  // To calculate where roleDropdown must be opened
+  const tableRowGroup =
+    tableWrapperRef?.current?.children[0]?.children[1].children[0];
+  const tableHeight = tableRowGroup?.offsetHeight;
+  const [tableScrollTop, setTableScrollTop] = useState(0);
+
+  useUpdateEffect(() => {
+    const handler = () => {
+      setTableScrollTop(tableRowGroup?.scrollTop);
+    };
+
+    tableRowGroup.addEventListener('scroll', handler);
+
+    return () => tableRowGroup.removeEventListener('scroll', handler);
+  }, [tableRowGroup]);
 
   const user = useSelector(userDataSelector);
   const team = useSelector(state =>
@@ -82,7 +97,7 @@ export const TeamContainer = () => {
   );
   const membersById = useSelector(membersByIdSelector);
   const members = getMemberList(team.users, membersById);
-  const tableData = useMemo(() => members, []);
+  const tableData = useMemo(() => members, [members]);
 
   const handleChangeRole = userId => (_, value) => {
     dispatch(updateTeamMemberRoleRequest(team.id, userId, value));
@@ -93,8 +108,15 @@ export const TeamContainer = () => {
   };
 
   const columns = useMemo(
-    () => createColumns({ tableWidth, handleChangeRole, handleRemoveMember }),
-    [tableWidth],
+    () =>
+      createColumns({
+        tableWidth,
+        tableHeight,
+        tableScrollTop,
+        handleChangeRole,
+        handleRemoveMember,
+      }),
+    [tableWidth, tableHeight, tableScrollTop],
   );
 
   useEffectOnce(() => {

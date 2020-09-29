@@ -31,8 +31,7 @@ export const teamSortedListSelector = createSelector(
     const defaultTeam = teams.find(team => team.type === TEAM_TYPE.DEFAULT);
     const otherTeams = teams
       .filter(
-        team =>
-          team.type !== TEAM_TYPE.DEFAULT && team.type !== TEAM_TYPE.PERSONAL,
+        team => ![TEAM_TYPE.DEFAULT, TEAM_TYPE.PERSONAL].includes(team.type),
       )
       .sort((a, b) => sortByName(a.title, b.title));
 

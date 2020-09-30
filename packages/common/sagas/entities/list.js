@@ -129,10 +129,10 @@ export function* createListSaga({
 
 export function* editListSaga({ payload: { list }, meta: { setEditMode } }) {
   try {
-    if (list.teamId) {
-      yield call(patchTeamList, list.teamId, list.id, { label: list.label });
-    } else {
+    if (list.teamId === TEAM_TYPE.PERSONAL) {
       yield call(patchList, list.id, { label: list.label });
+    } else {
+      yield call(patchTeamList, list.teamId, list.id, { label: list.label });
     }
 
     yield call(setEditMode, false);

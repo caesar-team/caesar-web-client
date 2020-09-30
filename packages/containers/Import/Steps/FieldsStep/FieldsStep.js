@@ -12,9 +12,8 @@ const Wrapper = styled.div`
 const Form = styled.form``;
 
 const Title = styled.div`
-  font-size: 18px;
+  margin-bottom: 24px;
   font-weight: 600;
-  margin-bottom: 25px;
 `;
 
 const TwoColumnsWrapper = styled.div`
@@ -35,20 +34,18 @@ const Column = styled.div`
 `;
 
 const Label = styled.div`
-  font-size: 14px;
-  margin-bottom: 10px;
+  margin-bottom: 8px;
 `;
 
 const Box = styled.div`
-  display: flex;
-  font-size: 18px;
-  line-height: 18px;
-  border-radius: ${({ theme }) => theme.borderRadius};
-  border: 1px solid ${({ theme }) => theme.color.gallery};
-  background-color: ${({ theme }) => theme.color.snow};
   position: relative;
-  padding: 10px 15px;
-  margin-bottom: 10px;
+  display: flex;
+  height: 40px;
+  padding: 8px 16px;
+  margin-bottom: 8px;
+  background-color: ${({ theme }) => theme.color.snow};
+  border: 1px solid ${({ theme }) => theme.color.gallery};
+  border-radius: ${({ theme }) => theme.borderRadius};
 
   &:last-child {
     margin-bottom: 0;
@@ -74,10 +71,10 @@ const BottomWrapper = styled.div`
 `;
 
 const RequiredText = styled.div`
-  font-size: 14px;
-  color: ${({ theme }) => theme.color.gray};
   position: relative;
   padding-left: 20px;
+  font-size: ${({ theme }) => theme.font.size.small};
+  color: ${({ theme }) => theme.color.gray};
 
   &::before {
     content: '●';
@@ -90,26 +87,26 @@ const RequiredText = styled.div`
 `;
 
 const StyledSelect = styled(Select)`
+  margin-bottom: 8px;
   border: 1px solid ${({ theme }) => theme.color.gallery};
-  margin-bottom: 10px;
-  font-size: 18px;
-  line-height: 18px;
-  padding: 10px 15px;
-  height: 40px;
+
+  ${Select.SelectedOption} {
+    height: 40px;
+  }
 
   &:last-child {
-    margin-bottom: 10px;
+    margin-bottom: 0;
   }
 `;
 
 const ButtonsWrapper = styled.div`
   display: flex;
-  align-items: center;
   justify-content: space-between;
+  align-items: center;
 `;
 
 const StyledButton = styled(Button)`
-  margin-right: 20px;
+  margin-left: 16px;
 `;
 
 const getOptions = headings =>
@@ -182,11 +179,14 @@ const FieldsStep = ({ headings, initialValues, onSubmit, onCancel }) => (
             <RequiredText>Required fields</RequiredText>
             <ButtonsWrapper>
               <StyledButton color="white" onClick={onCancel}>
-                CANCEL
+                Cancel
               </StyledButton>
-              <Button htmlType="submit" disabled={isSubmitting || !isValid}>
-                SUBMIT
-              </Button>
+              <StyledButton
+                htmlType="submit"
+                disabled={isSubmitting || !isValid}
+              >
+                Submit
+              </StyledButton>
             </ButtonsWrapper>
           </BottomWrapper>
         </Form>

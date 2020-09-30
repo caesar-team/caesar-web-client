@@ -2,9 +2,9 @@ import styled from 'styled-components';
 import { Icon } from '../Icon';
 
 export const Wrapper = styled.div`
+  position: relative;
   display: flex;
   flex-direction: column;
-  position: relative;
   background-color: ${({ theme }) => theme.color.white};
 `;
 
@@ -12,7 +12,7 @@ export const SelectedOption = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
-  border-bottom: 1px solid ${({ theme }) => theme.color.gallery};
+  height: 100%;
   padding: 8px 16px;
   cursor: pointer;
 
@@ -22,11 +22,11 @@ export const SelectedOption = styled.div`
 `;
 
 export const ValueText = styled.div`
+  position: relative;
   display: flex;
   align-items: center;
-  color: ${({ theme }) => theme.color.black};
-  position: relative;
   width: 100%;
+  color: ${({ theme }) => theme.color.black};
 `;
 
 export const IconCloseStyled = styled(Icon)`
@@ -36,24 +36,24 @@ export const IconCloseStyled = styled(Icon)`
 
 export const Box = styled.div`
   position: absolute;
-  top: ${({ top }) => `${top}px`};
+  top: ${({ top }) => `${top - 2}px`};
+  left: -1px;
   z-index: ${({ theme }) => theme.zIndex.basic};
-  width: 100%;
+  width: calc(100% + 2px);
 `;
 
 export const OptionsList = styled.div`
+  position: relative;
   display: flex;
   flex-direction: column;
-  position: relative;
+  width: 100%;
   border: 1px solid ${({ theme }) => theme.color.gallery};
   border-radius: ${({ theme }) => theme.borderRadius};
-  width: 100%;
 `;
 
 export const Option = styled.div`
   display: flex;
-  padding: 10px 15px;
-  font-size: 16px;
+  padding: 8px 16px;
   font-weight: ${({ isActive }) => (isActive ? 'bold' : 'normal')};
   color: ${({ theme, isDisabled }) =>
     isDisabled ? theme.color.lightGray : theme.color.black};

@@ -54,6 +54,7 @@ export const StyledSelect = styled(Select)`
   border-bottom: 0;
 
   ${Select.ValueText} {
+    padding: 0;
     margin-right: 16px;
   }
 `;
@@ -62,7 +63,7 @@ export const TypeSelect = styled(StyledSelect)`
   margin: 0;
 
   ${Select.ValueText} {
-    margin-right: 8px;
+    margin-right: 0;
   }
 `;
 

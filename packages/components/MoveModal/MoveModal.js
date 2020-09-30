@@ -2,7 +2,6 @@ import React, { useState, useMemo, memo } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import equal from 'fast-deep-equal';
 import styled from 'styled-components';
-import { userDataSelector } from '@caesar/common/selectors/user';
 import { teamsByIdSelector } from '@caesar/common/selectors/entities/team';
 import {
   moveItemRequest,
@@ -113,7 +112,6 @@ const MoveModalComponent = ({
 }) => {
   const dispatch = useDispatch();
   const teamsById = useSelector(teamsByIdSelector);
-  const user = useSelector(userDataSelector);
   const teamId = isMultiMode ? currentTeamId : item.teamId;
   const listId = isMultiMode ? currentListId : item.listId;
   const notification = useNotification();

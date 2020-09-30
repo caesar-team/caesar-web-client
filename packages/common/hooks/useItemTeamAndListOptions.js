@@ -63,7 +63,7 @@ export const useItemTeamAndListOptions = ({ teamId = null, listId }) => {
       lists
         .filter(list => list.teamId === checkedTeamId)
         .map(list => ({ ...list, label: transformListTitle(list.label) })),
-    [lists],
+    [lists, checkedTeamId],
   );
 
   return {

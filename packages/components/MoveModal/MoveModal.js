@@ -162,7 +162,8 @@ const MoveModalComponent = ({
     onRemove(itemId);
   };
 
-  const teamAvatar = checkedTeamId && teamsById[checkedTeamId]?.icon;
+  const teamAvatar = teamsById[checkedTeamId]?.icon;
+  const teamEmail = teamsById[checkedTeamId]?.email;
 
   const teamOptionsRenderer = useMemo(
     () =>
@@ -186,10 +187,11 @@ const MoveModalComponent = ({
               </>
             }
             name="team"
+            checked={team.id === checkedTeamId}
             onChange={() => setCheckedTeamId(team.id)}
           />
         )),
-    [teamOptions],
+    [teamOptions, checkedTeamId],
   );
 
   const listOptionsRenderer = useMemo(
@@ -204,10 +206,11 @@ const MoveModalComponent = ({
             value={list.id}
             label={<Name>{list.label}</Name>}
             name="list"
+            checked={list.id === checkedListId}
             onChange={() => setCheckedListId(list.id)}
           />
         )),
-    [listOptions],
+    [listOptions, checkedListId],
   );
 
   return (
@@ -228,11 +231,12 @@ const MoveModalComponent = ({
           label="Vault"
           active={
             <>
-              {checkedTeamId ? (
-                <StyledTeamAvatar size={24} fontSize="xs" avatar={teamAvatar} />
-              ) : (
-                <StyledTeamAvatar size={24} fontSize="xs" {...user} />
-              )}
+              <StyledTeamAvatar
+                size={24}
+                fontSize="xs"
+                avatar={teamAvatar}
+                email={teamEmail}
+              />
               <Name>{checkedTeamTitle}</Name>
             </>
           }

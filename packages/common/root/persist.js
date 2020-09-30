@@ -29,7 +29,7 @@ const userTransform = createTransform(
     return IS_PROD ? cleanUser : user;
   },
   outboundState => outboundState,
-  { whitelist: [] },
+  { whitelist: ['user'] },
 );
 
 export const persistOptions = {

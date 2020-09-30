@@ -1,4 +1,5 @@
 import React, { useState, useMemo, useRef } from 'react';
+import { useEffectOnce } from 'react-use';
 import { waitIdle } from '@caesar/common/utils/utils';
 import { TEAM_TYPE, LIST_TYPE } from '@caesar/common/constants';
 import { Icon, DataTable } from '@caesar/components';
@@ -44,7 +45,11 @@ const DataStep = ({
   const tableWrapperRef = useRef(null);
   // Window height minus stuff that takes vertical place (including table headers)
   const tableVisibleDataHeight = window?.innerHeight - 575;
-  const tableWidth = tableWrapperRef?.current?.offsetWidth || 0;
+  const [tableWidth, setTableWidth] = useState(0);
+
+  useEffectOnce(() => {
+    setTableWidth(tableWrapperRef?.current?.offsetWidth);
+  });
 
   const tableData = useMemo(() => filter(data, filterText), [filterText]);
   const columns = useMemo(

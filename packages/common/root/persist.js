@@ -29,12 +29,12 @@ const userTransform = createTransform(
     return IS_PROD ? cleanUser : user;
   },
   outboundState => outboundState,
-  { whitelist: ['user'] },
+  { whitelist: [] },
 );
 
 export const persistOptions = {
   key: 'root',
   localForage,
-  blacklist: ['application', 'workflow'],
+  blacklist: ['application', 'workflow', 'user'],
   transforms: [itemTransform, userTransform],
 };

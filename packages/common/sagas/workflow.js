@@ -2,6 +2,7 @@ import {
   put,
   call,
   fork,
+  take,
   takeLatest,
   takeEvery,
   select,
@@ -29,6 +30,7 @@ import { updateGlobalNotification } from '@caesar/common/actions/application';
 import {
   SET_CURRENT_TEAM_ID,
   setCurrentTeamId,
+  FETCH_USER_SELF_SUCCESS,
 } from '@caesar/common/actions/user';
 import {
   addTeamKeyPairBatch,
@@ -41,11 +43,11 @@ import {
   convertNodesToEntities,
   convertItemsToEntities,
   convertTeamsToEntity,
-  extractRelatedAndNonSystemItems,
+  convertListsToEntities,
 } from '@caesar/common/normalizers/normalizers';
 import { objectToArray } from '@caesar/common/utils/utils';
 import { upperFirst } from '@caesar/common/utils/string';
-import { sortItemsByFavorites } from '@caesar/common/utils/workflow';
+import { itemsByFavoritesSort } from '@caesar/common/utils/workflow';
 import {
   getLists,
   getTeamLists,
@@ -95,40 +97,6 @@ import {
   teamSelector,
 } from '@caesar/common/selectors/entities/team';
 import { ADD_SYSTEM_ITEMS_BATCH } from '@caesar/common/actions/entities/system';
-import { createTeamKeysSaga } from './entities/team';
-
-const splitSharesAndPersonal = items => {
-  const personalItems = items.filter(item => !item.isShared);
-  const sharedItems = items.filter(item => item.isShared);
-
-  return {
-    personalItems,
-    sharedItems,
-  };
-};
-
-const buildSystems = items => {
-  const systemItems = {};
-
-  items.forEach(item => {
-    if (item.type === ITEM_TYPE.SYSTEM) {
-      systemItems[item?.relatedItem?.id || item.id] = item;
-    }
-  });
-
-  return systemItems;
-};
-
-const processingInvitedItem = (items, systemItemsById) => {
-  return items.map(item =>
-    systemItemsById[item.id]
-      ? {
-          ...item,
-          invited: systemItemsById[item.id].invited,
-        } // Set invited from the system item
-      : item,
-  );
-};
 
 export function decryptItemsByItemIdKeys(items, keyPairs) {
   try {
@@ -208,9 +176,9 @@ export function* processTeamItemsSaga({ payload: { teamId } }) {
         `The key pair for the team ${team.title}:${teamId} not found. Need to create a new one...`,
       );
 
-      yield call(createTeamKeysSaga, {
-        payload: { team },
-      });
+      // yield call(createTeamKeysSaga, {
+      //   payload: { team },
+      // });
     }
 
     const teamItems = yield select(nonDecryptedTeamItemsSelector, { teamId });
@@ -329,14 +297,15 @@ function* initTeams() {
     );
   }
 }
-
+const nonSystemItemsFilter = item => item.type !== ITEM_TYPE.SYSTEM;
+const systemItemsFilter = item => item.type === ITEM_TYPE.SYSTEM;
 function* initPersonalVault() {
   try {
+    yield take(FETCH_USER_SELF_SUCCESS);
     // Init personal keys
     const keyPair = yield select(teamKeyPairSelector, {
       teamId: TEAM_TYPE.PERSONAL,
     });
-    // const masterPassword = yield select(masterPasswordSelector);
 
     const {
       data: {
@@ -347,78 +316,26 @@ function* initPersonalVault() {
     } = yield call(getUserItems);
 
     // Merge all user items in the one array
-    const allUserItems = [
-      ...(personalItems || []),
-      ...(sharedItems || []),
-      ...(teamsItems?.items || []),
-    ];
-
-    // Collect all related items from the shared keys
-    const relatedItems = allUserItems.filter(item => item.relatedItem !== null);
-
-    // Remove duplicates
-    const uniqueItems = {};
-    [...allUserItems, ...relatedItems].forEach(item => {
-      uniqueItems[item.id] = item;
-    });
-    // Turn it into an array
-    const allItems = Object.values(uniqueItems);
-
-    // Find all system items
-    const systemItemsById = buildSystems(allItems);
-    // Find all non-system items
-    const nonSystemItems = allItems.filter(
-      item => item.type !== ITEM_TYPE.SYSTEM,
+    const { itemsById: systemItemsById } = convertItemsToEntities(
+      [
+        ...(personalItems || []),
+        ...(sharedItems || []),
+        ...(teamsItems || []),
+      ].filter(systemItemsFilter),
+    );
+    const { itemsById } = convertItemsToEntities(personalItems);
+    const { itemsById: sharedItemsById } = convertItemsToEntities(
+      sharedItems.filter(nonSystemItemsFilter),
+    );
+    const { itemsById: teamsItemsById } = convertItemsToEntities(
+      teamsItems.filter(nonSystemItemsFilter),
     );
 
-    // TODO: the server should put the invited into the intem (non-system)
-    const personalItemsWithInvited = processingInvitedItem(
-      nonSystemItems,
-      systemItemsById,
-    );
+    // Put to the store the shared and the team items
+    yield put(addItemsBatch({ ...sharedItemsById, ...teamsItemsById }));
 
-    const { itemsById } = convertItemsToEntities(personalItemsWithInvited);
-
-    const sortedByFavoritesItems = sortItemsByFavorites(
-      objectToArray(itemsById),
-    );
+    // Put the system items to decryptions
     const systemItems = objectToArray(systemItemsById);
-
-    // Split the items into personal (can be decrypted by the user keys) and shared (can be decrypted by the shared keys)
-    const {
-      personalItems: items,
-      sharedItems: itemsEcnryptedSharedKeys,
-    } = splitSharesAndPersonal(sortedByFavoritesItems);
-
-    const { itemsById: normalizedSharedItemsById } = convertItemsToEntities([
-      ...itemsEcnryptedSharedKeys,
-      ...items,
-    ]);
-    yield put(addItemsBatch(normalizedSharedItemsById));
-
-    // Load lists
-    const { data: rawLists } = yield call(getLists);
-    const lists = extractRelatedAndNonSystemItems(rawLists);
-    const { listsById, itemsById: listItemsByID } = convertNodesToEntities(
-      lists,
-    );
-    const trashList = lists.find(list => list.type === LIST_TYPE.TRASH);
-    const teamId = TEAM_TYPE.PERSONAL;
-
-    const favoriteListFromStore = yield call(getFavoritesListFromStore, teamId);
-
-    const favoritesList = getFavoritesList({
-      favoriteListId: favoriteListFromStore?.id,
-      itemsById: listItemsByID,
-      trashListId: trashList?.id,
-      teamId,
-    });
-
-    const { listsById: favoritesListById } = convertNodesToEntities([
-      favoritesList,
-    ]);
-
-    // Decrypt only system items.
     if (systemItems?.length > 0) {
       yield put(
         decryption({
@@ -427,17 +344,51 @@ function* initPersonalVault() {
           masterPassword: keyPair.password,
         }),
       );
-    } else {
-      // Empty the personal vault or without system items, passtrought call of initTeams();
-      yield call(initTeams);
     }
 
+    // Put the user items to decryptions
+    const userItems = objectToArray(itemsById).sort(itemsByFavoritesSort);
+
+    if (userItems?.length > 0) {
+      yield put(
+        decryption({
+          items: userItems,
+          key: keyPair.privateKey,
+          masterPassword: keyPair.password,
+        }),
+      );
+    }
+
+    const teamId = TEAM_TYPE.PERSONAL;
+
+    // Load lists
+    const { data: lists } = yield call(getLists);
+    const { listsById } = convertListsToEntities(lists);
+    const trashList = lists.find(list => list.type === LIST_TYPE.TRASH);
+
+    const favoriteListFromStore = yield call(getFavoritesListFromStore, teamId);
+
+    const favoritesList = getFavoritesList({
+      favoriteListId: favoriteListFromStore?.id,
+      itemsById: listsById,
+      trashListId: trashList?.id,
+      teamId,
+    });
+
+    const { listsById: favoritesListById } = convertListsToEntities([
+      favoritesList,
+    ]);
     yield put(
       addListsBatch({
         ...listsById,
         ...favoritesListById,
       }),
     );
+
+    if (!systemItems?.length) {
+      // Empty the personal vault or without system items, passtrought call of initTeams();
+      yield call(initTeams);
+    }
   } catch (error) {
     // eslint-disable-next-line no-console
     console.error(error);
@@ -632,6 +583,11 @@ export function* processSystemItemsSaga({ payload: { itemsById } }) {
         teamKeys.length > 0 ? put(addTeamKeyPairBatch(teamKeys)) : null,
         shareKeys.length > 0 ? put(addShareKeyPairBatch(shareKeys)) : null,
       ]);
+
+      if (!teamKeys?.length) {
+        // Empty the personal vault or without system items, passtrought call of initTeams();
+        yield call(initTeams);
+      }
     }
   } catch (error) {
     // eslint-disable-next-line no-console

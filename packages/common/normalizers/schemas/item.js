@@ -1,5 +1,5 @@
 import { schema } from 'normalizr';
-import { ENTITY_TYPE, TEAM_TYPE } from '@caesar/common/constants';
+import { ENTITY_TYPE } from '@caesar/common/constants';
 import { createPermissionsFromLinks } from '@caesar/common/utils/createPermissionsFromLinks';
 
 const itemSchema = new schema.Entity(
@@ -9,7 +9,7 @@ const itemSchema = new schema.Entity(
     processStrategy: (entity, parent) => ({
       ...entity,
       _permissions: createPermissionsFromLinks(entity._links),
-      teamId: parent.teamId || TEAM_TYPE.PERSONAL,
+      teamId: entity.teamId || parent.teamId || null,
       __type: ENTITY_TYPE.ITEM,
     }),
   },

@@ -405,6 +405,7 @@ export function* createSystemItemKeyPair({ payload: { item, type } }) {
   const { id: defaultListId } = yield select(teamDefaultListSelector, {
     teamId,
   });
+
   const { publicKey } = yield select(teamKeyPairSelector, {
     teamId,
   });

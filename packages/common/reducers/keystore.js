@@ -72,7 +72,7 @@ export default createReducer(initialState, {
     const keyPairs = {};
     payload.data.forEach(systemItem => {
       keyPairs[
-        systemItem?.relatedItem?.id || systemItem.id
+        systemItem?.relatedItemId || systemItem.id
       ] = convertSystemItemToKeyPair(systemItem);
     });
 
@@ -107,9 +107,9 @@ export default createReducer(initialState, {
     const {
       id,
       data: { name, pass, raws = {} } = { raws: {} },
-      relatedItem,
+      relatedItemId,
     } = payload.data;
-    const itemId = relatedItem?.id || null;
+    const itemId = relatedItemId || null;
     if (!itemId) return state;
 
     const { publicKey, privateKey } = raws || {};
@@ -132,9 +132,9 @@ export default createReducer(initialState, {
     const {
       id,
       data: { name, pass, raws = {} } = { raws: {} },
-      relatedItem,
+      relatedItemId,
     } = payload.data;
-    const itemId = relatedItem?.id || null;
+    const itemId = relatedItemId || null;
     if (!itemId) return state;
 
     const { publicKey, privateKey } = raws || {};

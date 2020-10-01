@@ -197,7 +197,7 @@ export const TEAM_AVATAR_MAX_SIZE = 8 * 1024 * 1024;
 
 export const GOOD_PASSWORD_SCORE = 3;
 
-export const DEFAULT_ERROR_MESSAGE = 'Something wrong. Please try again';
+export const DEFAULT_ERROR_MESSAGE = 'Something wrong. Please, try again';
 
 export const PERMISSION = {
   CREATE: 'create',

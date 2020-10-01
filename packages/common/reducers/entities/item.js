@@ -128,7 +128,7 @@ export default createReducer(initialState, {
             ...accumulator,
             [itemId]: {
               ...state.byId[itemId],
-              teamId: payload.teamId,
+              teamId: payload.newTeamId,
               listId: payload.newListId,
               previousListId: payload.oldListId,
             },

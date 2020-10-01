@@ -1,11 +1,15 @@
 import React from 'react';
-// eslint-disable-next-line
-import { default as NextDocument, Head, Main, NextScript } from 'next/document';
-import styled, { ServerStyleSheet } from 'styled-components';
+import {
+  // eslint-disable-next-line import/no-named-default
+  default as NextDocument,
+  Html,
+  Head,
+  Main,
+  NextScript,
+} from 'next/document';
+import { ServerStyleSheet } from 'styled-components';
 import { PORTAL_ID } from '@caesar/common/constants';
 import sprite from 'svg-sprite-loader/runtime/sprite.build';
-
-const Body = styled.body``;
 
 export default class Document extends NextDocument {
   static getInitialProps({ renderPage }) {
@@ -21,7 +25,7 @@ export default class Document extends NextDocument {
 
   render() {
     return (
-      <html lang="en">
+      <Html lang="en">
         <Head>
           <meta name="viewport" content="width=device-width, initial-scale=1" />
           {this.props.styleTags}
@@ -39,13 +43,13 @@ export default class Document extends NextDocument {
           <meta name="msapplication-TileColor" content="#da532c" />
           <meta name="theme-color" content="#ffffff" />
         </Head>
-        <Body>
+        <body>
           <div dangerouslySetInnerHTML={{ __html: this.props.spriteContent }} />
           <div id={PORTAL_ID} />
           <Main />
           <NextScript />
-        </Body>
-      </html>
+        </body>
+      </Html>
     );
   }
 }

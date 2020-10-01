@@ -46,7 +46,7 @@ const MasterPasswordStep = ({
     step: null,
     publicKey: null,
     encryptedPrivateKey: null,
-    masterPassword: masterPasswordProp || '',
+    masterPassword: masterPasswordProp || null,
     sharedMasterPassword,
   });
 

@@ -164,10 +164,10 @@ export function* removeListSaga({ payload: { teamId, listId } }) {
       },
     });
 
-    if (teamId) {
-      yield call(removeTeamList, teamId, listId);
-    } else {
+    if (teamId === TEAM_TYPE.PERSONAL) {
       yield call(removeList, listId);
+    } else {
+      yield call(removeTeamList, teamId, listId);
     }
 
     yield put(removeListSuccess(listId));

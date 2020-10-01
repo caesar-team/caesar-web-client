@@ -50,9 +50,9 @@ const UserSection = styled.div`
 `;
 
 const UserName = styled.div`
-  font-size: 16px;
-  margin-left: 15px;
-  margin-right: 15px;
+  margin-left: 8px;
+  margin-right: 8px;
+  white-space: nowrap;
 `;
 
 const StyledDropdown = styled(Dropdown)`

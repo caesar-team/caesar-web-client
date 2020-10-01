@@ -4,7 +4,7 @@ export { Input } from './Input';
 export { default as LockInput } from './LockInput';
 export { default as MasterPasswordInput } from './MasterPasswordInput';
 export { default as PasswordInput } from './PasswordInput';
-export { default as SearchInput } from './SearchInput';
+export { SearchInput } from './SearchInput';
 export { default as StrengthIndicator } from './StrengthIndicator';
 export { TextArea } from './TextArea';
 export { default as UserSearchInput } from './UserSearchInput';

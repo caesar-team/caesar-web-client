@@ -5,6 +5,7 @@ import { getUserBootstrap, getUserSelf } from '@caesar/common/api';
 import {
   DEFAULT_IDLE_TIMEOUT,
   NOOP_NOTIFICATION,
+  IS_PROD,
 } from '@caesar/common/constants';
 import {
   SessionChecker,
@@ -26,11 +27,7 @@ import {
   MASTER_PASSWORD_CREATE,
   BOOTSTRAP_FINISH,
 } from './constants';
-import {
-  TwoFactorStep,
-  PasswordStep,
-  MasterPasswordStep,
-} from './Steps';
+import { TwoFactorStep, PasswordStep, MasterPasswordStep } from './Steps';
 
 const TWO_FACTOR_STEPS = [TWO_FACTOR_CREATE, TWO_FACTOR_CHECK];
 const PASSWORD_STEPS = [PASSWORD_CHANGE];
@@ -97,10 +94,7 @@ class Bootstrap extends Component {
     });
   };
 
-  handleFinishMasterPassword = ({
-    currentKeyPair,
-    masterPassword,
-  }) => {
+  handleFinishMasterPassword = ({ currentKeyPair, masterPassword }) => {
     this.props.setMasterPassword(masterPassword);
     this.props.setKeyPair({
       publicKey: currentKeyPair.publicKey,
@@ -180,11 +174,7 @@ class Bootstrap extends Component {
       updateGlobalNotification,
       ...props
     } = this.props;
-    const {
-      currentStep,
-      currentKeyPair,
-      masterPassword,
-    } = this.state;
+    const { currentStep, currentKeyPair, masterPassword } = this.state;
 
     if (!currentStep) {
       return <FullScreenLoader />;
@@ -224,7 +214,7 @@ class Bootstrap extends Component {
           navigationSteps={this.navigationPanelSteps}
           user={this.user}
           sharedMasterPassword={shared.mp}
-          masterPassword={this.props.masterPassword || null}
+          masterPassword={IS_PROD ? null : this.props.masterPassword}
           onFinish={this.handleFinishMasterPassword}
         />
       );

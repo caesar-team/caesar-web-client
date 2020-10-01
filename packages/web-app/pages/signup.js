@@ -1,10 +1,12 @@
-import React, { Fragment } from 'react';
+import React from 'react';
 import { SignUpContainer } from '@caesar/containers';
 import { Head } from '@caesar/components';
 
-export default () => (
-  <Fragment>
+const SignUpPage = () => (
+  <>
     <Head title="Sign Up" />
     <SignUpContainer />
-  </Fragment>
+  </>
 );
+
+export default SignUpPage;

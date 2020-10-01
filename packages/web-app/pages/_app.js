@@ -1,5 +1,5 @@
 import React from 'react';
-// eslint-disable-next-line
+// eslint-disable-next-line import/no-named-default
 import { default as NextApp } from 'next/app';
 import { ThemeProvider, createGlobalStyle } from 'styled-components';
 import '@caesar/assets/styles/additionalStyles';

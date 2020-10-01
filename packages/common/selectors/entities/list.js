@@ -237,9 +237,7 @@ export const customizableListsSelector = createSelector(
   (personalLists, teamLists) => {
     const lists = personalLists.length ? personalLists : teamLists.list;
 
-    return lists.filter(
-      list => list.type === LIST_TYPE.LIST && list.label !== 'default',
-    );
+    return lists.filter(list => list.type === LIST_TYPE.LIST);
   },
 );
 

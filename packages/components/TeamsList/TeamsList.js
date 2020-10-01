@@ -4,7 +4,6 @@ import styled from 'styled-components';
 import { sortByName } from '@caesar/common/utils/utils';
 import { TEAM_TYPE } from '@caesar/common/constants';
 import {
-  userDataSelector,
   userTeamListSelector,
   currentTeamSelector,
 } from '@caesar/common/selectors/user';
@@ -35,7 +34,6 @@ const StyledAvatar = styled(Avatar)`
 
 const TeamsListComponent = ({ activeTeamId, handleToggle, setListsOpened }) => {
   const dispatch = useDispatch();
-  const user = useSelector(userDataSelector);
   const currentTeam = useSelector(currentTeamSelector);
   const teamList = useSelector(userTeamListSelector).sort((a, b) => {
     if (a.title.toLowerCase() === TEAM_TYPE.DEFAULT) return 1;
@@ -53,32 +51,23 @@ const TeamsListComponent = ({ activeTeamId, handleToggle, setListsOpened }) => {
     }
   };
 
-  return (
-    <>
-      {activeTeamId !== TEAM_TYPE.PERSONAL && (
-        <Option
-          onClick={() => {
-            handleChangeTeam(TEAM_TYPE.PERSONAL);
-          }}
-        >
-          <StyledAvatar {...user} size={32} fontSize="small" />
-          Personal
-        </Option>
-      )}
-      {teamList.map(team => {
-        return activeTeamId === team?.id || !team?.id ? null : (
-          <Option
-            key={team.id}
-            onClick={() => {
-              handleChangeTeam(team.id);
-            }}
-          >
-            <StyledAvatar avatar={team.icon} size={32} fontSize="small" />
-            {getTeamTitle(team)}
-          </Option>
-        );
-      })}
-    </>
+  return teamList.map(team =>
+    activeTeamId === team?.id || !team?.id ? null : (
+      <Option
+        key={team.id}
+        onClick={() => {
+          handleChangeTeam(team.id);
+        }}
+      >
+        <StyledAvatar
+          avatar={team.icon}
+          email={team.email}
+          size={32}
+          fontSize="small"
+        />
+        {getTeamTitle(team)}
+      </Option>
+    ),
   );
 };
 

@@ -2,10 +2,7 @@ import React, { memo, useState } from 'react';
 import { useSelector } from 'react-redux';
 import styled from 'styled-components';
 import { TEAM_TYPE, TEAM_TEXT_TYPE } from '@caesar/common/constants';
-import {
-  userDataSelector,
-  currentTeamSelector,
-} from '@caesar/common/selectors/user';
+import { currentTeamSelector } from '@caesar/common/selectors/user';
 import { teamsByIdSelector } from '@caesar/common/selectors/entities/team';
 import { getTeamTitle } from '@caesar/common/utils/team';
 import { Scrollbar } from '../Scrollbar';
@@ -64,7 +61,6 @@ const StyledAppVersion = styled(AppVersion)`
 
 const MenuListComponent = ({ mode, setSearchedText, setMode }) => {
   const currentTeam = useSelector(currentTeamSelector);
-  const user = useSelector(userDataSelector);
   const teamList = useSelector(teamsByIdSelector);
   const [isDropdownOpened, setDropdownOpened] = useState(false);
   const [isListsOpened, setListsOpened] = useState(true);
@@ -95,15 +91,12 @@ const MenuListComponent = ({ mode, setSearchedText, setMode }) => {
           bgColor={isDropdownOpened ? 'white' : 'alto'}
           isDropdownOpened={isDropdownOpened}
         >
-          {activeTeamId === TEAM_TYPE.PERSONAL ? (
-            <Avatar {...user} size={32} fontSize="small" />
-          ) : (
-            <Avatar
-              avatar={teamList[activeTeamId]?.icon}
-              size={32}
-              fontSize="small"
-            />
-          )}
+          <Avatar
+            avatar={teamList[activeTeamId]?.icon}
+            email={teamList[activeTeamId]?.email}
+            size={32}
+            fontSize="small"
+          />
           <ColumnTitle>{getColumnTitle()}</ColumnTitle>
           <DropdownIcon
             name="arrow-triangle"

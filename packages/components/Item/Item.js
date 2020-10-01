@@ -56,7 +56,6 @@ const ItemComponent = ({
   const [isMoveModalOpened, setMoveModalOpened] = useState(false);
   const [isVisibleDragZone, setVisibleDragZone] = useState(false);
   const itemRef = useRef(null);
-  // const [item, setItem] = useState(useSelector(workInProgressItemSelector));
   const notification = useNotification();
 
   const handleDragEnter = useCallback(

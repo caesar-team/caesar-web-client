@@ -2,7 +2,6 @@ import React, { useState, useMemo, memo } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import equal from 'fast-deep-equal';
 import styled from 'styled-components';
-import { userDataSelector } from '@caesar/common/selectors/user';
 import { teamsByIdSelector } from '@caesar/common/selectors/entities/team';
 import {
   moveItemRequest,
@@ -113,7 +112,6 @@ const MoveModalComponent = ({
 }) => {
   const dispatch = useDispatch();
   const teamsById = useSelector(teamsByIdSelector);
-  const user = useSelector(userDataSelector);
   const teamId = isMultiMode ? currentTeamId : item.teamId;
   const listId = isMultiMode ? currentListId : item.listId;
   const notification = useNotification();
@@ -162,7 +160,8 @@ const MoveModalComponent = ({
     onRemove(itemId);
   };
 
-  const teamAvatar = checkedTeamId && teamsById[checkedTeamId]?.icon;
+  const teamAvatar = teamsById[checkedTeamId]?.icon;
+  const teamEmail = teamsById[checkedTeamId]?.email;
 
   const teamOptionsRenderer = useMemo(
     () =>
@@ -186,10 +185,11 @@ const MoveModalComponent = ({
               </>
             }
             name="team"
+            checked={team.id === checkedTeamId}
             onChange={() => setCheckedTeamId(team.id)}
           />
         )),
-    [teamOptions],
+    [teamOptions, checkedTeamId],
   );
 
   const listOptionsRenderer = useMemo(
@@ -204,10 +204,11 @@ const MoveModalComponent = ({
             value={list.id}
             label={<Name>{list.label}</Name>}
             name="list"
+            checked={list.id === checkedListId}
             onChange={() => setCheckedListId(list.id)}
           />
         )),
-    [listOptions],
+    [listOptions, checkedListId],
   );
 
   return (
@@ -228,11 +229,12 @@ const MoveModalComponent = ({
           label="Vault"
           active={
             <>
-              {checkedTeamId ? (
-                <StyledTeamAvatar size={24} fontSize="xs" avatar={teamAvatar} />
-              ) : (
-                <StyledTeamAvatar size={24} fontSize="xs" {...user} />
-              )}
+              <StyledTeamAvatar
+                size={24}
+                fontSize="xs"
+                avatar={teamAvatar}
+                email={teamEmail}
+              />
               <Name>{checkedTeamTitle}</Name>
             </>
           }

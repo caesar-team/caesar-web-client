@@ -1,4 +1,4 @@
-import React, { Fragment } from 'react';
+import React from 'react';
 import styled from 'styled-components';
 import { Head, SecureMessage, SecureLayout } from '@caesar/components';
 
@@ -6,11 +6,13 @@ const SecureMessageStyled = styled(SecureMessage)`
   height: auto;
 `;
 
-export default () => (
-  <Fragment>
+const SecurePage = () => (
+  <>
     <Head title="Secure Message" />
     <SecureLayout>
       <SecureMessageStyled />
     </SecureLayout>
-  </Fragment>
+  </>
 );
+
+export default SecurePage;

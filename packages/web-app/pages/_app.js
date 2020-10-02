@@ -1,6 +1,7 @@
 import React from 'react';
-// eslint-disable-next-line
+// eslint-disable-next-line import/no-named-default
 import { default as NextApp } from 'next/app';
+import Head from 'next/head';
 import { ThemeProvider, createGlobalStyle } from 'styled-components';
 import '@caesar/assets/styles/additionalStyles';
 import globalStyles from '@caesar/assets/styles/globalStyles';
@@ -39,7 +40,7 @@ class Application extends NextApp {
     super.componentDidCatch(error, errorInfo);
   }
 
-  render() {
+  renderRouterLayout() {
     const {
       Component,
       pageProps,
@@ -47,54 +48,65 @@ class Application extends NextApp {
       store,
     } = this.props;
 
-    if (SHARED_ROUTES.includes(route)) {
-      return (
-        <ThemeProvider theme={theme}>
-          <NotificationProvider>
-            <GlobalStyles />
-            <Provider store={store}>
-              <AbilityProvider>
-                <Component {...pageProps} />
-                <OfflineNotification />
-              </AbilityProvider>
-            </Provider>
-          </NotificationProvider>
-        </ThemeProvider>
-      );
-    }
+    switch (true) {
+      case SHARED_ROUTES.includes(route):
+        return (
+          <ThemeProvider theme={theme}>
+            <NotificationProvider>
+              <GlobalStyles />
+              <Provider store={store}>
+                <AbilityProvider>
+                  <Component {...pageProps} />
+                  <OfflineNotification />
+                </AbilityProvider>
+              </Provider>
+            </NotificationProvider>
+          </ThemeProvider>
+        );
 
-    if (UNLOCKED_ROUTES.includes(route)) {
-      return (
-        <ThemeProvider theme={theme}>
-          <NotificationProvider>
-            <GlobalStyles />
-            <Component {...pageProps} />
-            <OfflineNotification />
-          </NotificationProvider>
-        </ThemeProvider>
-      );
-    }
-
-    if (TECH_ROUTES.includes(route)) {
-      return (
-        <Provider store={store}>
-          <Component {...pageProps} />
-        </Provider>
-      );
-    }
-
-    return (
-      <ThemeProvider theme={theme}>
-        <NotificationProvider>
-          <GlobalStyles />
-          <Provider store={store}>
-            <AbilityProvider>
-              <Bootstrap {...pageProps} component={Component} />
+      case UNLOCKED_ROUTES.includes(route):
+        return (
+          <ThemeProvider theme={theme}>
+            <NotificationProvider>
+              <GlobalStyles />
+              <Component {...pageProps} />
               <OfflineNotification />
-            </AbilityProvider>
+            </NotificationProvider>
+          </ThemeProvider>
+        );
+
+      case TECH_ROUTES.includes(route):
+        return (
+          <Provider store={store}>
+            <Component {...pageProps} />
           </Provider>
-        </NotificationProvider>
-      </ThemeProvider>
+        );
+
+      default:
+        return (
+          <ThemeProvider theme={theme}>
+            <NotificationProvider>
+              <GlobalStyles />
+              <Provider store={store}>
+                <AbilityProvider>
+                  <Bootstrap {...pageProps} component={Component} />
+                  <OfflineNotification />
+                </AbilityProvider>
+              </Provider>
+            </NotificationProvider>
+          </ThemeProvider>
+        );
+    }
+  }
+
+  render() {
+    return (
+      <>
+        <Head>
+          <meta name="viewport" content="width=device-width, initial-scale=1" />
+        </Head>
+        {this.renderRouterLayout()}
+      </>
     );
   }
 }

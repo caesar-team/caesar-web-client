@@ -1,6 +1,7 @@
 import React from 'react';
 // eslint-disable-next-line
 import { default as NextApp } from 'next/app';
+import Head from 'next/head';
 import { ThemeProvider, createGlobalStyle } from 'styled-components';
 import globalStyles from '@caesar/assets/styles/globalStyles';
 import theme from '@caesar/common/theme';
@@ -18,7 +19,7 @@ import { PWA_WINDOW_SIZE } from '@caesar/common/constants';
 const GlobalStyles = createGlobalStyle`${globalStyles}`;
 
 class Application extends NextApp {
-  static async getInitialProps({ Component, router: { route }, ctx }) {
+  static async getInitialProps({ Component, ctx }) {
     // entryResolver({ route, ctx });
 
     const pageProps = Component.getInitialProps
@@ -45,12 +46,17 @@ class Application extends NextApp {
     const { Component, pageProps } = this.props;
 
     return (
-      <ThemeProvider theme={theme}>
-        <NotificationProvider>
-          <GlobalStyles />
-          <Component {...pageProps} />
-        </NotificationProvider>
-      </ThemeProvider>
+      <>
+        <Head>
+          <meta name="viewport" content="width=device-width, initial-scale=1" />
+        </Head>
+        <ThemeProvider theme={theme}>
+          <NotificationProvider>
+            <GlobalStyles />
+            <Component {...pageProps} />
+          </NotificationProvider>
+        </ThemeProvider>
+      </>
     );
   }
 }

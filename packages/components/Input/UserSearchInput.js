@@ -3,6 +3,7 @@ import { useClickAway, useDebounce } from 'react-use';
 import styled from 'styled-components';
 import { getSearchUser } from '@caesar/common/api';
 import { uuid4 } from '@caesar/common/utils/uuid4';
+import { DEFAULT_ERROR_MESSAGE } from '@caesar/common/constants';
 import { Input } from './Input';
 import { Icon } from '../Icon';
 import { CircleLoader } from '../Loader';
@@ -140,6 +141,7 @@ const UserSearchInputComponent = ({ blackList, onClickAdd, className }) => {
   const [isLoading, setLoading] = useState(false);
   const [members, setMembers] = useState([]);
   const [filterText, setFilterText] = useState('');
+  const [serverError, setServerError] = useState(null);
   const ref = useRef(null);
 
   useClickAway(ref, () => {
@@ -148,11 +150,14 @@ const UserSearchInputComponent = ({ blackList, onClickAdd, className }) => {
 
   useDebounce(
     async () => {
+      setServerError(null);
+
       if (!filterText) return;
       setLoading(true);
 
       try {
         const { data } = await getSearchUser(filterText);
+
         if (!data) {
           setLoading(false);
 
@@ -162,7 +167,14 @@ const UserSearchInputComponent = ({ blackList, onClickAdd, className }) => {
         setMembers(data.filter(member => !blackList?.includes(member.id)));
         setLoading(false);
         // eslint-disable-next-line no-empty
-      } catch (error) {}
+      } catch (error) {
+        const errorText = error?.data?.error?.message;
+
+        setServerError(
+          typeof errorText === 'string' ? errorText : DEFAULT_ERROR_MESSAGE,
+        );
+        setLoading(false);
+      }
     },
     500,
     [filterText],
@@ -216,6 +228,7 @@ const UserSearchInputComponent = ({ blackList, onClickAdd, className }) => {
             handleAddNewMember={handleAddNewMember}
           />
         }
+        error={serverError}
       />
       {shouldShowResultBox && (
         <SearchedResultBox>

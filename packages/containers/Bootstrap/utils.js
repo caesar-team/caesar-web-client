@@ -54,11 +54,7 @@ const getMasterPasswordSteps = masterPasswordState => {
 };
 
 export const getNavigationPanelSteps = memoize(
-  ({
-    twoFactorAuthState,
-    passwordState,
-    masterPasswordState,
-  }) => [
+  ({ twoFactorAuthState, passwordState, masterPasswordState }) => [
     ...getTwoFactorSteps(twoFactorAuthState),
     ...getPasswordSteps(passwordState),
     ...getMasterPasswordSteps(masterPasswordState),

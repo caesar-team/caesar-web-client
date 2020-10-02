@@ -1,7 +1,8 @@
-import React, { PureComponent } from 'react';
-import styled from 'styled-components';
-import { Formik, FastField } from 'formik';
+import React, { memo } from 'react';
+import { useEffectOnce } from 'react-use';
+import { useFormik } from 'formik';
 import zxcvbn from 'zxcvbn';
+import styled from 'styled-components';
 import { checkError } from '@caesar/common/utils/formikUtils';
 import {
   Head,
@@ -76,83 +77,79 @@ const StyledTooltipPasswordGenerator = styled(TooltipPasswordGenerator)`
   transform: translateY(-50%);
 `;
 
-class MasterPasswordCreateForm extends PureComponent {
-  handleGeneratePassword = setFieldValue => password =>
-    setFieldValue('password', password);
+const MasterPasswordCreateFormComponent = ({ initialValues, onSubmit }) => {
+  const {
+    errors,
+    touched,
+    isSubmitting,
+    isValid,
+    dirty,
+    values,
+    handleSubmit,
+    handleChange,
+    handleBlur,
+    setFieldValue,
+    validateForm,
+  } = useFormik({
+    initialValues,
+    validationSchema: passwordSchema,
+    onSubmit,
+  });
 
-  render() {
-    const { initialValues, onSubmit } = this.props;
+  useEffectOnce(() => {
+    validateForm();
+  });
 
-    return (
-      <Formik
-        key="password"
-        initialValues={initialValues}
-        isInitialValid={passwordSchema.isValidSync(initialValues)}
-        validationSchema={passwordSchema}
-        onSubmit={onSubmit}
-      >
-        {({
-          errors,
-          touched,
-          handleSubmit,
-          isSubmitting,
-          isValid,
-          dirty,
-          values,
-          setFieldValue,
-        }) => (
-          <Form onSubmit={handleSubmit}>
-            <Head title="Create master password for Caesar" />
-            <AuthTitle>Master Password</AuthTitle>
-            <AuthDescription>Create master password for Caesar</AuthDescription>
-            <FieldWrapper>
-              <FastField name="password">
-                {({ field }) => (
-                  <MasterPasswordInput
-                    {...field}
-                    isAlwaysVisibleIcon
-                    placeholder="Type password…"
-                    autoFocus
-                    error={
-                      dirty ? checkError(touched, errors, 'password') : null
-                    }
-                  />
-                )}
-              </FastField>
-              <Tooltip
-                show={values.password && !isValid}
-                textBoxWidth="280px"
-                arrowAlign="top"
-                position="right center"
-              >
-                <StrengthIndicatorStyled
-                  text="Our recommendations for creating a good master password:"
-                  value={values.password}
-                  rules={GOOD_PASSWORD_RULES}
-                />
-              </Tooltip>
-              <StyledTooltipPasswordGenerator
-                onGeneratePassword={this.handleGeneratePassword(setFieldValue)}
-              />
-            </FieldWrapper>
-            {values.password && (
-              <PasswordIndicatorStyled
-                type={INDICATOR_TYPE.LINE}
-                score={zxcvbn(values.password).score}
-              />
-            )}
-            <TipText>
-              Please, copy & save the master password in a safe place. Relogin
-              will not be possible without this password.
-            </TipText>
-            <StyledButton htmlType="submit" disabled={isSubmitting || !isValid}>
-              Copy Password & Continue
-            </StyledButton>
-          </Form>
-        )}
-      </Formik>
-    );
-  }
-}
+  const handleGeneratePassword = setValue => password =>
+    setValue('password', password);
 
-export default MasterPasswordCreateForm;
+  return (
+    <Form onSubmit={handleSubmit}>
+      <Head title="Create master password for Caesar" />
+      <AuthTitle>Master Password</AuthTitle>
+      <AuthDescription>Create master password for Caesar</AuthDescription>
+      <FieldWrapper>
+        <MasterPasswordInput
+          name="password"
+          value={values.password}
+          placeholder="Type password…"
+          isAlwaysVisibleIcon
+          autoFocus
+          error={dirty ? checkError(touched, errors, 'password') : null}
+          onChange={handleChange}
+          onBlur={handleBlur}
+        />
+        <Tooltip
+          show={values.password && !isValid}
+          textBoxWidth="280px"
+          arrowAlign="top"
+          position="right center"
+        >
+          <StrengthIndicatorStyled
+            text="Our recommendations for creating a good master password:"
+            value={values.password}
+            rules={GOOD_PASSWORD_RULES}
+          />
+        </Tooltip>
+        <StyledTooltipPasswordGenerator
+          onGeneratePassword={handleGeneratePassword(setFieldValue)}
+        />
+      </FieldWrapper>
+      {values.password && (
+        <PasswordIndicatorStyled
+          type={INDICATOR_TYPE.LINE}
+          score={zxcvbn(values.password).score}
+        />
+      )}
+      <TipText>
+        Please, copy & save the master password in a safe place. Relogin will
+        not be possible without this password.
+      </TipText>
+      <StyledButton htmlType="submit" disabled={isSubmitting || !isValid}>
+        Copy Password & Continue
+      </StyledButton>
+    </Form>
+  );
+};
+
+export const MasterPasswordCreateForm = memo(MasterPasswordCreateFormComponent);

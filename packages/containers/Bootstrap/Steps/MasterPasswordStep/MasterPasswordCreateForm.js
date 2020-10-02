@@ -40,12 +40,6 @@ const TipText = styled.div`
 const PasswordIndicatorStyled = styled(PasswordIndicator)`
   justify-content: space-between;
   margin-top: 30px;
-
-  ${PasswordIndicator.ScoreName} {
-    width: 80px;
-    margin-left: 16px;
-    text-align: right;
-  }
 `;
 
 const StrengthIndicatorStyled = styled(StrengthIndicator)`

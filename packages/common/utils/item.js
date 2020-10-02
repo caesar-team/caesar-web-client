@@ -86,7 +86,7 @@ export const decryptItemData = async (item, privateKeyObject) => {
     const promises = [];
     promises.push(decryptItem(encryptedData, privateKeyObject));
 
-    if (item.type === ITEM_TYPE.SYSTEM) {
+    if (item.type === ITEM_TYPE.SYSTEM || item.type === ITEM_TYPE.KEYPAIR) {
       promises.push(decryptItem(encryptedRaws, privateKeyObject));
     }
 

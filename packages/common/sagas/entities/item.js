@@ -59,7 +59,11 @@ import {
   teamDefaultListSelector,
 } from '@caesar/common/selectors/entities/list';
 import { itemSelector } from '@caesar/common/selectors/entities/item';
-import { currentTeamIdSelector } from '@caesar/common/selectors/user';
+import {
+  currentTeamIdSelector,
+  userDataSelector,
+  userIdSelector,
+} from '@caesar/common/selectors/user';
 import {
   addShareKeyPair,
   addTeamKeyPair,
@@ -101,13 +105,18 @@ import {
 import { passwordGenerator } from '@caesar/common/utils/passwordGenerator';
 import { generateKeys } from '@caesar/common/utils/key';
 import { addSystemItemsBatch } from '@caesar/common/actions/entities/system';
+import { memberSelector } from '../../selectors/entities/member';
 
 const ITEMS_CHUNK_SIZE = 50;
 
 // TODO: move to the system item sage
-export function* generateSystemItem(entity, listId, entityId) {
+export function* generateSystemItem(entityType, listId, entityId) {
   const masterPassword = yield call(passwordGenerator);
-  const systemItemName = yield call(generateSystemItemName, entity, entityId);
+  const systemItemName = yield call(
+    generateSystemItemName,
+    entityType,
+    entityId,
+  );
   const systemItemEmail = yield call(generateSystemItemEmail, systemItemName);
 
   const { publicKey, privateKey } = yield call(generateKeys, masterPassword, [
@@ -115,7 +124,7 @@ export function* generateSystemItem(entity, listId, entityId) {
   ]);
 
   const systemItemData = {
-    type: ITEM_TYPE.SYSTEM,
+    type: entityType === ITEM_TYPE.SYSTEM,
     listId,
     data: {
       attachments: [
@@ -400,30 +409,63 @@ export function* saveItemSaga({ item, publicKey }) {
   return itemData;
 }
 
-export function* createSystemItemKeyPair({ payload: { item, type } }) {
-  const teamId = item.teamId || TEAM_TYPE.PERSONAL;
+export function* getKeyPairForTeam(teamId) {
+  const teamKeyPair = yield select(teamKeyPairSelector, {
+    teamId,
+  });
+
+  if (teamKeyPair) {
+    return teamKeyPair;
+  }
+
+  return yield select(teamKeyPairSelector, {
+    teamId: TEAM_TYPE.PERSONAL,
+  });
+}
+
+export function* createSystemItemKeyPair({
+  payload: {
+    entityId,
+    entityTeamId,
+    entityType,
+    publicKey,
+    entityOwnerId = null,
+  },
+}) {
+  // The deafult values
+  const teamId = entityTeamId || TEAM_TYPE.PERSONAL;
+  const currentUserId = yield select(userIdSelector);
+  const ownerId = entityOwnerId || currentUserId;
+
   const { id: defaultListId } = yield select(teamDefaultListSelector, {
     teamId,
   });
 
-  const { publicKey } = yield select(teamKeyPairSelector, {
-    teamId,
-  });
-
-  if (!type) {
+  if (!entityType) {
     throw new Error(`The type of system item isn't defined`);
   }
 
+  // Create an empty item
   let systemKeyPairItem = yield call(
     generateSystemItem,
-    type,
+    entityType,
     defaultListId,
-    item.id,
+    entityId,
   );
+
+  // If the keypair for the shared item
+  if (ENTITY_TYPE.SHARE === entityType) {
+    systemKeyPairItem.relatedItemId = entityId;
+  } else if (ENTITY_TYPE.TEAM === entityType) {
+    systemKeyPairItem.ownerId = ownerId;
+  }
 
   // Encrypt and save the system keypair item to the owner personal vault
   const systemItemFromServer = yield call(saveItemSaga, {
-    item: { ...systemKeyPairItem, relatedItemId: item.id },
+    item: {
+      ...systemKeyPairItem,
+      type: ITEM_TYPE.KEYPAIR,
+    },
     publicKey,
   });
 
@@ -441,14 +483,29 @@ export function* createSystemItemKeyPair({ payload: { item, type } }) {
   return systemKeyPairItem;
 }
 
-export function* findOrCreateTeamSystemItemKeyPair({ payload: { item } }) {
+export function* findOrCreateTeamSystemItemKeyPair({
+  payload: { teamId, ownerId },
+}) {
+  if (!teamId) return;
+  const currentUser = yield select(userDataSelector);
+  const userId = ownerId || currentUser.id;
+
+  const owner = yield select(memberSelector, { memberId: userId });
+  const { publicKey } = owner;
+
   let systemKeyPairItem = yield select(teamKeyPairSelector, {
     teamId: item.teamId,
   });
 
   if (!systemKeyPairItem) {
     systemKeyPairItem = yield call(createSystemItemKeyPair, {
-      payload: { item, type: ENTITY_TYPE.SHARE },
+      payload: {
+        entityId: teamId,
+        entityTeamId: teamId,
+        entityType: ENTITY_TYPE.TEAM,
+        entityOwnerId: userId,
+        publicKey,
+      },
     });
   }
 

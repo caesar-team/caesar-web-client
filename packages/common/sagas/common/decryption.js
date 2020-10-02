@@ -2,6 +2,7 @@ import { Pool, spawn, Worker } from 'threads';
 import { call, put, take } from 'redux-saga/effects';
 import { addItemsBatch } from '@caesar/common/actions/entities/item';
 import { addSystemItemsBatch } from '@caesar/common/actions/entities/system';
+import { addKeyPairsBatch } from '@caesar/common/actions/entities/keypair';
 import { updateWorkInProgressItemRaws } from '@caesar/common/actions/workflow';
 import { arrayToObject, chunk, match } from '@caesar/common/utils/utils';
 import { checkItemsAfterDecryption } from '@caesar/common/utils/item';
@@ -27,6 +28,10 @@ const matchAndAddItems = ({ inbound, outbound }) => {
 
 const matchAndAddSystemItems = ({ inbound, outbound }) => {
   return addSystemItemsBatch(matchInboundAndOutbound({ inbound, outbound }));
+};
+
+const matchAndAddKeyPairs = ({ inbound, outbound }) => {
+  return addKeyPairsBatch(matchInboundAndOutbound({ inbound, outbound }));
 };
 
 const taskAction = (items, raws, key, masterPassword) => async task => {
@@ -79,6 +84,9 @@ export function* decryption({ items, raws, key, masterPassword, coresCount }) {
             const systemItems = items.filter(
               item => item.type === ITEM_TYPE.SYSTEM,
             );
+            const keyPairsItems = items.filter(
+              item => item.type === ITEM_TYPE.KEYPAIR,
+            );
             const generalItems = items.filter(
               item => item.type !== ITEM_TYPE.SYSTEM,
             );
@@ -87,6 +95,15 @@ export function* decryption({ items, raws, key, masterPassword, coresCount }) {
               yield put(
                 matchAndAddSystemItems({
                   inbound: systemItems,
+                  outbound: event.returnValue,
+                }),
+              );
+            }
+
+            if (keyPairsItems.length > 0) {
+              yield put(
+                matchAndAddKeyPairs({
+                  inbound: keyPairsItems,
                   outbound: event.returnValue,
                 }),
               );

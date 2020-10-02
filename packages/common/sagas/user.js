@@ -14,7 +14,10 @@ import {
   setCurrentTeamId,
 } from '@caesar/common/actions/user';
 import { addPersonalKeyPair } from '@caesar/common/actions/keystore';
-import { addTeamsBatch } from '@caesar/common/actions/entities/team';
+import {
+  addTeamsBatch,
+  fetchTeamSuccess,
+} from '@caesar/common/actions/entities/team';
 import { addMembersBatch } from '@caesar/common/actions/entities/member';
 import { membersByIdSelector } from '@caesar/common/selectors/entities/member';
 import { currentTeamIdSelector } from '@caesar/common/selectors/user';
@@ -74,7 +77,7 @@ export function* fetchUserTeamsSaga() {
       yield put(fetchUserTeamsSuccess(data.map(({ id }) => id)));
       // TODO: need fixes from BE
       yield put(addTeamsBatch(convertTeamsToEntity(data)));
-
+      yield put(fetchTeamSuccess(convertTeamsToEntity(data)));
       const currentTeamId = yield select(currentTeamIdSelector);
       put(setCurrentTeamId(currentTeamId || data[0].id));
     }

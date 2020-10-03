@@ -1,1 +1,1 @@
-export { default as MasterPasswordStep } from './MasterPasswordStep';
+export { MasterPasswordStep } from './MasterPasswordStep';

@@ -91,13 +91,7 @@ const ButtonWrapper = styled.div`
 
 const StyledPasswordIndicator = styled(PasswordIndicator)`
   justify-content: space-between;
-  margin-top: 30px;
-
-  ${PasswordIndicator.ScoreName} {
-    width: 80px;
-    margin-left: 16px;
-    text-align: right;
-  }
+  margin-top: 10px;
 `;
 
 const StyledStrengthIndicator = styled(StrengthIndicator)`
@@ -147,80 +141,85 @@ const SignUpForm = ({ onSubmit }) => (
       handleBlur,
       isSubmitting,
       isValid,
-    }) => (
-      <Form onSubmit={handleSubmit}>
-        <Row>
-          <FastField name="email">
-            {({ field }) => (
-              <StyledEmailInput
-                {...field}
-                onBlur={handleBlur}
-                placeholder="Email"
-                prefix={EmailInputPrefix}
+    }) => {
+      const showTooltip =
+        (values.password && checkError(touched, errors, 'password')) || false;
+
+      return (
+        <Form onSubmit={handleSubmit}>
+          <Row>
+            <FastField name="email">
+              {({ field }) => (
+                <StyledEmailInput
+                  {...field}
+                  onBlur={handleBlur}
+                  placeholder="Email"
+                  prefix={EmailInputPrefix}
+                />
+              )}
+            </FastField>
+            {checkError(touched, errors, 'email') && (
+              <Error>{errors.email}</Error>
+            )}
+          </Row>
+          <Row>
+            <FieldWrapper>
+              <FastField name="password">
+                {({ field }) => (
+                  <StyledPasswordInput
+                    {...field}
+                    onBlur={handleBlur}
+                    placeholder="Password"
+                    prefix={PasswordInputPrefix}
+                  />
+                )}
+              </FastField>
+              <Tooltip
+                show={showTooltip}
+                textBoxWidth="280px"
+                arrowAlign="top"
+                position="right center"
+              >
+                <StyledStrengthIndicator
+                  text="Our recommendations for creating a good password:"
+                  value={values.password}
+                  rules={GOOD_PASSWORD_RULES}
+                />
+              </Tooltip>
+            </FieldWrapper>
+            {values.password && (
+              <StyledPasswordIndicator
+                type={INDICATOR_TYPE.LINE}
+                score={zxcvbn(values.password).score}
               />
             )}
-          </FastField>
-          {checkError(touched, errors, 'email') && (
-            <Error>{errors.email}</Error>
-          )}
-        </Row>
-        <Row>
-          <FieldWrapper>
-            <FastField name="password">
+            {checkError(touched, errors, 'password') && (
+              <Error>{errors.password}</Error>
+            )}
+          </Row>
+          <Row>
+            <FastField name="confirmPassword">
               {({ field }) => (
                 <StyledPasswordInput
                   {...field}
                   onBlur={handleBlur}
-                  placeholder="Password"
+                  placeholder="Confirm Password"
                   prefix={PasswordInputPrefix}
                 />
               )}
             </FastField>
-            <Tooltip
-              show={values.password && checkError(touched, errors, 'password')}
-              textBoxWidth="280px"
-              arrowAlign="top"
-              position="right center"
-            >
-              <StyledStrengthIndicator
-                text="Our recommendations for creating a good password:"
-                value={values.password}
-                rules={GOOD_PASSWORD_RULES}
-              />
-            </Tooltip>
-          </FieldWrapper>
-          {values.password && (
-            <StyledPasswordIndicator
-              type={INDICATOR_TYPE.LINE}
-              score={zxcvbn(values.password).score}
-            />
-          )}
-          {checkError(touched, errors, 'password') && (
-            <Error>{errors.password}</Error>
-          )}
-        </Row>
-        <Row>
-          <FastField name="confirmPassword">
-            {({ field }) => (
-              <StyledPasswordInput
-                {...field}
-                onBlur={handleBlur}
-                placeholder="Confirm Password"
-                prefix={PasswordInputPrefix}
-              />
+            {checkError(touched, errors, 'confirmPassword') && (
+              <Error>{errors.confirmPassword}</Error>
             )}
-          </FastField>
-          {checkError(touched, errors, 'confirmPassword') && (
-            <Error>{errors.confirmPassword}</Error>
-          )}
-        </Row>
-        <ButtonWrapper>
-          <StyledButton htmlType="submit" disabled={isSubmitting || !isValid}>
-            Sign Up
-          </StyledButton>
-        </ButtonWrapper>
-      </Form>
-    )}
+          </Row>
+          <ButtonWrapper>
+            <StyledButton htmlType="submit" disabled={isSubmitting || !isValid}>
+              Sign Up
+            </StyledButton>
+          </ButtonWrapper>
+        </Form>
+      );
+    }}
   </Formik>
 );
 

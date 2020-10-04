@@ -90,6 +90,7 @@ import {
   teamListSelector,
   teamSelector,
 } from '@caesar/common/selectors/entities/team';
+import { ADD_KEYPAIRS_BATCH } from '../actions/entities/keypair';
 
 const keyPairFilter = item => item.type === ITEM_TYPE.KEYPAIR;
 export function decryptItemsByItemIdKeys(items, keyPairs) {
@@ -307,11 +308,10 @@ function* initTeams() {
   }
 }
 
-export function* processKeyPairsSaga({ payload: { keypairsById } }) {
+export function* processKeyPairsSaga({ payload: { itemsById } }) {
   try {
-    if (!keypairsById) return;
-    const keyPairs = objectToArray(keypairsById);
-    debugger;
+    if (!itemsById) return;
+    const keyPairs = objectToArray(itemsById);
     if (keyPairs.length > 0) {
       const teamKeys = [];
       const shareKeys = [];
@@ -331,17 +331,6 @@ export function* processKeyPairsSaga({ payload: { keypairsById } }) {
   } catch (error) {
     // eslint-disable-next-line no-console
     console.error(error);
-  }
-}
-
-export function* processItemsSaga({ payload: { itemsById } }) {
-  // Find keypairs, system and shared
-  const items = objectToArray(itemsById);
-  const keyPairs = items.filter(keyPairFilter);
-
-  if (keyPairs.length) {
-    const keypairsById = arrayToObject(keyPairs);
-    yield call(processKeyPairsSaga, { payload: { keypairsById } });
   }
 }
 
@@ -417,6 +406,10 @@ function* initPersonalVault() {
         ...favoritesListById,
       }),
     );
+
+    if (!keypairsArray?.length) {
+      yield fork(initTeams);
+    }
   } catch (error) {
     // eslint-disable-next-line no-console
     console.error(error);
@@ -598,5 +591,5 @@ export default function* workflowSagas() {
   yield takeLatest(SET_CURRENT_TEAM_ID, openTeamVaultSaga);
   yield takeLatest(ADD_TEAM_KEY_PAIR_BATCH, initTeams);
   // Wait for keypairs
-  yield takeLatest(ADD_ITEMS_BATCH, processItemsSaga);
+  yield takeLatest(ADD_KEYPAIRS_BATCH, processKeyPairsSaga);
 }

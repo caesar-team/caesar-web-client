@@ -67,6 +67,7 @@ import {
 import {
   addShareKeyPair,
   addTeamKeyPair,
+  addTeamKeyPairBatch,
 } from '@caesar/common/actions/keystore';
 import {
   postCreateItem,
@@ -475,7 +476,7 @@ export function* createSystemItemKeyPair({
   };
 
   yield put(
-    addSystemItemsBatch({
+    addTeamKeyPairBatch({
       [systemKeyPairItem.id]: systemKeyPairItem,
     }),
   );

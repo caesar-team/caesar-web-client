@@ -13,7 +13,11 @@ const getListTitle = (listId, lists) =>
   transformListTitle(lists.find(list => list.id === listId)?.label);
 
 export const useItemTeamAndListOptions = ({ teamId = null, listId }) => {
-  const teams = useSelector(userTeamListSelector) || [];
+  // TODO: Hot fix for [CAES-1329]
+  const teams =
+    useSelector(userTeamListSelector).filter(
+      team => typeof team !== 'undefined',
+    ) || [];
   const teamsById = useSelector(teamsByIdSelector);
   const [lists, setLists] = useState([]);
   const [checkedTeamId, setCheckedTeamId] = useState(teamId);
@@ -52,7 +56,10 @@ export const useItemTeamAndListOptions = ({ teamId = null, listId }) => {
         })
         .map(team =>
           team.type === TEAM_TYPE.DEFAULT
-            ? { ...team, title: getTeamTitle(team) }
+            ? {
+                ...team,
+                title: getTeamTitle(team),
+              }
             : team,
         ),
     [teams],
@@ -62,7 +69,10 @@ export const useItemTeamAndListOptions = ({ teamId = null, listId }) => {
     () =>
       lists
         .filter(list => list.teamId === checkedTeamId)
-        .map(list => ({ ...list, label: transformListTitle(list.label) })),
+        .map(list => ({
+          ...list,
+          label: transformListTitle(list.label),
+        })),
     [lists, checkedTeamId],
   );
 

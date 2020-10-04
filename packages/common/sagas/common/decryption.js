@@ -5,8 +5,13 @@ import { addSystemItemsBatch } from '@caesar/common/actions/entities/system';
 import { addKeyPairsBatch } from '@caesar/common/actions/entities/keypair';
 import { updateWorkInProgressItemRaws } from '@caesar/common/actions/workflow';
 import { arrayToObject, chunk, match } from '@caesar/common/utils/utils';
-import { checkItemsAfterDecryption } from '@caesar/common/utils/item';
-import { DECRYPTION_CHUNK_SIZE, ITEM_TYPE } from '@caesar/common/constants';
+import {
+  checkItemsAfterDecryption,
+  isGeneralItem,
+  isKeyPairItem,
+  isSystemItem,
+} from '@caesar/common/utils/item';
+import { DECRYPTION_CHUNK_SIZE } from '@caesar/common/constants';
 import { createPoolChannel } from './channels';
 import { normalizeEvent } from './utils';
 import {
@@ -49,7 +54,6 @@ const taskAction = (items, raws, key, masterPassword) => async task => {
 
 export function* decryption({ items, raws, key, masterPassword, coresCount }) {
   const normalizerEvent = normalizeEvent(coresCount);
-
   const pool = Pool(() => spawn(new Worker('../../workers/decryption')), {
     name: 'decryption',
     size: coresCount,
@@ -81,15 +85,9 @@ export function* decryption({ items, raws, key, masterPassword, coresCount }) {
       switch (event.type) {
         case TASK_QUEUE_COMPLETED_EVENT_TYPE:
           if (items) {
-            const systemItems = items.filter(
-              item => item.type === ITEM_TYPE.SYSTEM,
-            );
-            const keyPairsItems = items.filter(
-              item => item.type === ITEM_TYPE.KEYPAIR,
-            );
-            const generalItems = items.filter(
-              item => item.type !== ITEM_TYPE.SYSTEM,
-            );
+            const systemItems = items.filter(isSystemItem);
+            const keyPairsItems = items.filter(isKeyPairItem);
+            const generalItems = items.filter(isGeneralItem);
 
             if (systemItems.length > 0) {
               yield put(

@@ -81,7 +81,6 @@ import { teamKeyPairSelector } from '@caesar/common/selectors/keystore';
 import { teamDefaultListSelector } from '../../selectors/entities/list';
 import { addListsBatch } from '../../actions/entities/list';
 import { memberSelector } from '../../selectors/entities/member';
-import { processKeyPairsSaga } from '../workflow';
 
 export function* fetchTeamsSaga() {
   try {
@@ -188,7 +187,7 @@ export function* createTeamKeysSaga({
       throw new Error('Fatal error: The publicKey not found.');
     }
 
-    const systemKeyPairItem = yield call(createSystemItemKeyPair, {
+    yield call(createSystemItemKeyPair, {
       payload: {
         entityId: teamId,
         entityTeamId: teamId,
@@ -196,11 +195,6 @@ export function* createTeamKeysSaga({
         entityOwnerId: userId,
         publicKey,
       },
-    });
-
-    // TODO: Move to the producer
-    yield fork(processKeyPairsSaga, {
-      payload: { [systemKeyPairItem.id]: systemKeyPairItem },
     });
   } catch (error) {
     // eslint-disable-next-line no-console

@@ -297,7 +297,6 @@ function* initTeams() {
 
     const teamById = convertTeamsToEntity(teams);
     yield put(addTeamsBatch(teamById));
-    yield call(openCurrentVaultSaga);
   } catch (error) {
     // eslint-disable-next-line no-console
     console.error(error);
@@ -311,7 +310,7 @@ export function* processKeyPairsSaga({ payload: { keypairsById } }) {
   try {
     if (!keypairsById) return;
     const keyPairs = objectToArray(keypairsById);
-    debugger;
+
     if (keyPairs.length > 0) {
       const teamKeys = [];
       const shareKeys = [];
@@ -459,6 +458,8 @@ export function* initWorkflow() {
   // Wait for the user data
   yield take(FETCH_USER_SELF_SUCCESS);
   yield call(initPersonalVault);
+  yield call(initTeams);
+  yield call(openCurrentVaultSaga);
   // We need to wait for the decryption of team keypair to initiate the Teams
   yield fork(fetchMembersSaga);
 }
@@ -596,7 +597,5 @@ export default function* workflowSagas() {
   yield takeLatest(ADD_LISTS_BATCH, initListsAndProgressEntities);
   yield takeLatest(UPDATE_WORK_IN_PROGRESS_ITEM, updateWorkInProgressItemSaga);
   yield takeLatest(SET_CURRENT_TEAM_ID, openTeamVaultSaga);
-  yield takeLatest(ADD_TEAM_KEY_PAIR_BATCH, initTeams);
-  // Wait for keypairs
-  yield takeLatest(ADD_ITEMS_BATCH, processItemsSaga);
+  yield takeLatest(ADD_TEAM_KEY_PAIR_BATCH, processKeyPairsSaga);
 }

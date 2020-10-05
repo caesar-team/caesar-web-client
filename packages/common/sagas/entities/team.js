@@ -25,7 +25,6 @@ import {
   addTeamMembersBatchFailure,
   removeTeamMemberSuccess,
   removeTeamMemberFailure,
-  removeTeamRequest,
   addTeamsBatch,
 } from '@caesar/common/actions/entities/team';
 import { createChildItemBatchSaga } from '@caesar/common/sagas/entities/childItem';
@@ -47,14 +46,12 @@ import {
 } from '@caesar/common/selectors/user';
 import {
   getTeams,
-  postCreateTeam,
   editTeam,
   deleteTeam,
   getTeam,
   updateTeamMember,
   postAddTeamMember,
   deleteTeamMember,
-  getTeamLists,
   postCreateVault,
 } from '@caesar/common/api';
 import {
@@ -63,7 +60,6 @@ import {
 } from '@caesar/common/utils/error';
 import {
   convertTeamsToEntity,
-  convertNodesToEntities,
   convertKeyPairToEntity,
 } from '@caesar/common/normalizers/normalizers';
 import { createPermissionsFromLinks } from '@caesar/common/utils/createPermissionsFromLinks';
@@ -81,18 +77,13 @@ import { inviteNewMemberBatchSaga } from '@caesar/common/sagas/common/invite';
 import { createChildItemsFilterSelector } from '@caesar/common/selectors/entities/childItem';
 import { updateGlobalNotification } from '@caesar/common/actions/application';
 import {
-  createSystemItemKeyPair,
   encryptSecret,
   generateTeamKeyPair,
 } from '@caesar/common/sagas/entities/item';
 import { teamKeyPairSelector } from '@caesar/common/selectors/keystore';
-import { teamDefaultListSelector } from '../../selectors/entities/list';
-import { addListsBatch } from '../../actions/entities/list';
 import { memberSelector } from '../../selectors/entities/member';
-import { encryptItem } from '../../utils/cipherUtils';
 import { addTeamKeyPairBatch } from '../../actions/keystore';
 import { createVaultSuccess } from '../../actions/entities/vault';
-import { convertSystemItemToKeyPair } from '../../utils/item';
 
 export function* fetchTeamsSaga() {
   try {

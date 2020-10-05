@@ -18,12 +18,16 @@ import {
 } from '@caesar/common/actions/keystore';
 
 import { convertSystemItemToKeyPair } from '@caesar/common/utils/item';
+import { CREATE_VAULT_SUCCESS } from '../actions/entities/vault';
+import { arrayToObject } from '../utils/utils';
 
 const initialState = {
   [KEY_TYPE.PERSONAL]: {},
   [KEY_TYPE.TEAMS]: {},
   [KEY_TYPE.SHARES]: {},
   [KEY_TYPE.ANONYMOUS]: {},
+  isLoading: false,
+  isError: false,
 };
 
 export default createReducer(initialState, {
@@ -42,26 +46,38 @@ export default createReducer(initialState, {
       },
     };
   },
-  [ADD_TEAM_KEY_PAIR_BATCH](state, { payload }) {
-    if (!payload.data || payload.data?.length <= 0) return state;
-    // TODO: Use the normalizr library
-    const keyPairs = {};
-    payload.data.forEach(systemItem => {
-      const {
-        data: { name } = {
-          name: null,
-        },
-      } = systemItem;
-      keyPairs[
-        REGEXP_EXCTRACTOR.ID(name) || systemItem.id
-      ] = convertSystemItemToKeyPair(systemItem);
-    });
+  // [CREATE_VAULT_SUCCESS](state, { payload }) {
+  //   const { keypair } = payload;
+  //   if (!keypair || !keypair?.id) return state;
+
+  //   return {
+  //     ...state,
+  //     isLoading: false,
+  //     isError: false,
+  //     [KEY_TYPE.TEAMS]: {
+  //       ...state[KEY_TYPE.TEAMS],
+  //       ...{
+  //         [keypair.id]: {
+  //           ...(state[KEY_TYPE.TEAMS][keypair.id] || {}),
+  //           ...keypair,
+  //         },
+  //       },
+  //     },
+  //   };
+  // },
+  [ADD_TEAM_KEY_PAIR_BATCH](state, { data }) {
+    let pairsById = data;
+    if (Array.isArray(data)) pairsById = arrayToObject(data);
+
+    if (!pairsById) return state;
+
+    if (Object.values(pairsById)?.length <= 0) return state;
 
     return {
       ...state,
       [KEY_TYPE.TEAMS]: {
         ...state[KEY_TYPE.TEAMS],
-        ...keyPairs,
+        ...pairsById,
       },
     };
   },

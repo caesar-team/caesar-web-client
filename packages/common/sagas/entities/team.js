@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import { put, call, takeLatest, select, all, fork } from 'redux-saga/effects';
 import {
   FETCH_TEAMS_REQUEST,
@@ -25,6 +26,7 @@ import {
   removeTeamMemberSuccess,
   removeTeamMemberFailure,
   removeTeamRequest,
+  addTeamsBatch,
 } from '@caesar/common/actions/entities/team';
 import { createChildItemBatchSaga } from '@caesar/common/sagas/entities/childItem';
 import { fetchTeamMembersSaga } from '@caesar/common/sagas/entities/member';
@@ -53,6 +55,7 @@ import {
   postAddTeamMember,
   deleteTeamMember,
   getTeamLists,
+  postCreateVault,
 } from '@caesar/common/api';
 import {
   getServerErrorMessage,
@@ -76,11 +79,18 @@ import {
 import { inviteNewMemberBatchSaga } from '@caesar/common/sagas/common/invite';
 import { createChildItemsFilterSelector } from '@caesar/common/selectors/entities/childItem';
 import { updateGlobalNotification } from '@caesar/common/actions/application';
-import { createSystemItemKeyPair } from '@caesar/common/sagas/entities/item';
+import {
+  createSystemItemKeyPair,
+  encryptSecret,
+  generateTeamKeyPair,
+} from '@caesar/common/sagas/entities/item';
 import { teamKeyPairSelector } from '@caesar/common/selectors/keystore';
 import { teamDefaultListSelector } from '../../selectors/entities/list';
 import { addListsBatch } from '../../actions/entities/list';
 import { memberSelector } from '../../selectors/entities/member';
+import { encryptItem } from '../../utils/cipherUtils';
+import { addTeamKeyPairBatch } from '../../actions/keystore';
+import { createVaultSuccess } from '../../actions/entities/vault';
 
 export function* fetchTeamsSaga() {
   try {
@@ -155,87 +165,103 @@ export function* removeTeamSaga({ payload: { teamId } }) {
   }
 }
 
-export function* createTeamKeysSaga({
-  payload: { teamId, ownerId = null },
-  meta: { removeWhenFail } = { removeWhenFail: false },
-}) {
+export function* createTeamKeyPairSaga({ payload: { teamName, publicKey } }) {
   try {
-    if (!teamId) return;
-    const currentUser = yield select(userDataSelector);
-    const userId = ownerId || currentUser.id;
-
-    const owner = yield select(memberSelector, { memberId: userId });
-    const { publicKey } = owner;
-    // TODO: The server should ignore the list id for system items
-    // Get the personal deault list to add the systen item to the personal vault
-    const { id: listId } = yield select(teamDefaultListSelector, {
-      teamId,
-    });
-
-    if (!listId || typeof listId === 'undefined') {
-      // TODO: Bug fix: we lost the user default list and we need to restore it from the list api
-      throw new Error('Fatal error: The list id not found.');
-    }
-
-    if (!teamId || typeof teamId === 'undefined') {
-      // TODO: Bug fix: we lost the user default list and we need to restore it from the list api
-      throw new Error('Fatal error: The team id is undefined.');
-    }
-
     if (!publicKey || typeof publicKey === 'undefined') {
       // TODO: Bug fix: we lost the user default list and we need to restore it from the list api
       throw new Error('Fatal error: The publicKey not found.');
     }
 
-    yield call(createSystemItemKeyPair, {
+    const teamKeyPair = yield call(generateTeamKeyPair, {
       payload: {
-        entityId: teamId,
-        entityTeamId: teamId,
-        entityType: ENTITY_TYPE.TEAM,
-        entityOwnerId: userId,
+        name: teamName,
         publicKey,
       },
     });
+
+    return teamKeyPair;
   } catch (error) {
     // eslint-disable-next-line no-console
     console.error(error);
     yield put(
       updateGlobalNotification(getServerErrorMessage(error), false, true),
     );
-
-    if (removeWhenFail) {
-      yield put(removeTeamRequest(teamId));
-    }
-
     // Todo: need to remove all dependet entities when create team is failed
     yield put(createTeamFailure());
+
+    return null;
   }
 }
 
 export function* createTeamSaga({
-  payload: { title, icon },
+  payload: { title, icon, ownerId = null },
   meta: { handleCloseModal, setSubmitting, setErrors },
 }) {
   try {
-    const { data: team } = yield call(postCreateTeam, { title, icon });
-    if (!team?.id) {
-      throw new Error(`Can't create the team with the title ${title}`);
-    }
-    // TODO: Here is the duplicated code, shoul be moved into sagas.
-    const { data: lists } = yield call(getTeamLists, team.id);
-    const { listsById } = convertNodesToEntities(lists);
-    yield put(addListsBatch(listsById));
+    const currentUser = yield select(userDataSelector);
+    const userId = ownerId || currentUser.id;
 
-    yield call(createTeamKeysSaga, {
-      payload: { team },
-      meta: { removeWhenFail: true },
+    const owner = yield select(memberSelector, { memberId: userId });
+    const { publicKey } = owner;
+
+    const team = {
+      title,
+      icon,
+    };
+
+    const teamKeyPair = yield call(createTeamKeyPairSaga, {
+      payload: { teamName: encodeURIComponent(title), publicKey },
     });
+
+    if (!teamKeyPair) {
+      throw new Error(`Can't create the team with the title: ${title}`);
+    }
+    const encryptedKeypair = yield call(encryptSecret, {
+      item: teamKeyPair,
+      publicKey,
+    });
+
+    const serverPayload = {
+      team,
+      keypair: {
+        secret: encryptedKeypair,
+      },
+    };
+
+    const {
+      data: { team: serverTeam, keypair: serverKeypair },
+    } = yield call(postCreateVault, serverPayload);
+
+    // TODO: [Refactoring] The calls for the sagas below should be refactor to the vault reduser of the createVaultSuccess event
+    if (serverTeam?.id) {
+      yield put(
+        addTeamsBatch({
+          [serverTeam.id]: serverTeam,
+        }),
+      );
+    }
+
+    if (serverKeypair?.id) {
+      yield put(
+        addTeamKeyPairBatch({
+          [serverKeypair.id]: serverKeypair,
+        }),
+      );
+    }
+
+    yield put(
+      createVaultSuccess({
+        team: serverTeam,
+        keypair: serverKeypair,
+      }),
+    );
+
     yield call(setSubmitting, false);
     yield call(handleCloseModal);
   } catch (error) {
     // eslint-disable-next-line no-console
     console.error(error);
-    const errors = getServerErrors(error);
+    const errors = getServerErrors(error) || error;
 
     yield call(setErrors, { form: errors });
     yield call(setSubmitting, false);
@@ -391,7 +417,7 @@ export default function* teamSagas() {
   yield takeLatest(FETCH_TEAMS_REQUEST, fetchTeamsSaga);
   yield takeLatest(FETCH_TEAM_REQUEST, fetchTeamSaga);
   yield takeLatest(CREATE_TEAM_REQUEST, createTeamSaga);
-  yield takeLatest(CREATE_TEAM_KEYS_REQUEST, createTeamKeysSaga);
+  yield takeLatest(CREATE_TEAM_KEYS_REQUEST, createTeamKeyPairSaga);
   yield takeLatest(EDIT_TEAM_REQUEST, editTeamSaga);
   yield takeLatest(REMOVE_TEAM_REQUEST, removeTeamSaga);
   yield takeLatest(UPDATE_TEAM_MEMBER_ROLE_REQUEST, updateTeamMemberRoleSaga);

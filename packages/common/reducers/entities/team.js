@@ -32,6 +32,7 @@ import {
   UPDATE_TEAM_MEMBERS_WITH_ROLES,
 } from '@caesar/common/actions/entities/team';
 import { KEY_TYPE } from '../../constants';
+import { CREATE_VAULT_SUCCESS } from '../../actions/entities/vault';
 
 const initialState = {
   isLoading: true,
@@ -40,6 +41,23 @@ const initialState = {
 };
 
 export default createReducer(initialState, {
+  // [CREATE_VAULT_SUCCESS](state, { payload }) {
+  //   const { team } = payload;
+  //   if (!team || !team?.id) return state;
+
+  //   return {
+  //     ...state,
+  //     isLoading: false,
+  //     isError: false,
+  //     byId: {
+  //       ...state.byId,
+  //       [team.id]: {
+  //         ...(state.byId[team.id] || {}),
+  //         ...team,
+  //       },
+  //     },
+  //   };
+  // },
   [FETCH_TEAMS_REQUEST](state) {
     return { ...state, isLoading: true };
   },

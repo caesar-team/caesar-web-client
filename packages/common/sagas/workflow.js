@@ -38,14 +38,14 @@ import {
   ADD_TEAM_KEY_PAIR_BATCH,
 } from '@caesar/common/actions/keystore';
 import { fetchMembersSaga } from '@caesar/common/sagas/entities/member';
-import { createTeamKeysSaga } from '@caesar/common/sagas/entities/team';
+import { createTeamKeyPairSaga } from '@caesar/common/sagas/entities/team';
 import {
   convertNodesToEntities,
   convertItemsToEntities,
   convertTeamsToEntity,
   convertListsToEntities,
 } from '@caesar/common/normalizers/normalizers';
-import { objectToArray } from '@caesar/common/utils/utils';
+import { arrayToObject, objectToArray } from '@caesar/common/utils/utils';
 import { upperFirst } from '@caesar/common/utils/string';
 import { itemsByFavoritesSort } from '@caesar/common/utils/workflow';
 import { getLists, getTeamLists, getUserItems } from '@caesar/common/api';
@@ -89,6 +89,7 @@ import {
   teamSelector,
 } from '@caesar/common/selectors/entities/team';
 import { ADD_KEYPAIRS_BATCH } from '../actions/entities/keypair';
+import { memberSelector } from '../selectors/entities/member';
 
 export function decryptItemsByItemIdKeys(items, keyPairs) {
   try {
@@ -164,14 +165,21 @@ export function* processTeamItemsSaga({ payload: { teamId } }) {
     if (!teamKeyPairs) {
       const team = yield select(teamSelector, { teamId });
       const { id: ownerId } = yield select(userDataSelector);
+      const { publicKey } = yield select(memberSelector, { memberId: ownerId });
 
       // eslint-disable-next-line no-console
       console.warn(
         `The key pair for the team ${team.title}: ${teamId} not found. Need to create a new one...`,
       );
 
-      yield call(createTeamKeysSaga, {
-        payload: { teamId, ownerId },
+      if (!publicKey) {
+        throw new Error(
+          `Can't creat the team:  ${team.title} cause the publickey is null`,
+        );
+      }
+
+      yield call(createTeamKeyPairSaga, {
+        payload: { teamName: team.title, publicKey },
       });
 
       return;
@@ -310,13 +318,15 @@ export function* processKeyPairsSaga({ payload: { itemsById } }) {
       keyPairs.forEach(keyPair => {
         if (!keyPair.data?.name) return null;
 
-        return REGEXP_TESTER.SYSTEM.IS_TEAM(keyPair.data?.name)
+        return keyPair.teamId !== null
           ? teamKeys.push(keyPair)
           : shareKeys.push(keyPair);
       });
 
       yield all([
-        teamKeys.length > 0 ? put(addTeamKeyPairBatch(teamKeys)) : null,
+        teamKeys.length > 0
+          ? put(addTeamKeyPairBatch(arrayToObject(teamKeys)))
+          : null,
         shareKeys.length > 0 ? put(addShareKeyPairBatch(shareKeys)) : null,
       ]);
     }

@@ -59,10 +59,15 @@ import {
   teamDefaultListSelector,
 } from '@caesar/common/selectors/entities/list';
 import { itemSelector } from '@caesar/common/selectors/entities/item';
-import { currentTeamIdSelector } from '@caesar/common/selectors/user';
+import {
+  currentTeamIdSelector,
+  userDataSelector,
+  userIdSelector,
+} from '@caesar/common/selectors/user';
 import {
   addShareKeyPair,
   addTeamKeyPair,
+  addTeamKeyPairBatch,
 } from '@caesar/common/actions/keystore';
 import {
   postCreateItem,
@@ -97,17 +102,23 @@ import { teamKeyPairSelector } from '@caesar/common/selectors/keystore';
 import {
   generateSystemItemEmail,
   generateSystemItemName,
+  isGeneralItem,
 } from '@caesar/common/utils/item';
 import { passwordGenerator } from '@caesar/common/utils/passwordGenerator';
 import { generateKeys } from '@caesar/common/utils/key';
 import { addSystemItemsBatch } from '@caesar/common/actions/entities/system';
+import { memberSelector } from '../../selectors/entities/member';
 
 const ITEMS_CHUNK_SIZE = 50;
 
 // TODO: move to the system item sage
-export function* generateSystemItem(entity, listId, entityId) {
+export function* generateSystemItem(entityType, listId, entityId) {
   const masterPassword = yield call(passwordGenerator);
-  const systemItemName = yield call(generateSystemItemName, entity, entityId);
+  const systemItemName = yield call(
+    generateSystemItemName,
+    entityType,
+    entityId,
+  );
   const systemItemEmail = yield call(generateSystemItemEmail, systemItemName);
 
   const { publicKey, privateKey } = yield call(generateKeys, masterPassword, [
@@ -115,7 +126,7 @@ export function* generateSystemItem(entity, listId, entityId) {
   ]);
 
   const systemItemData = {
-    type: ITEM_TYPE.SYSTEM,
+    type: entityType,
     listId,
     data: {
       attachments: [
@@ -371,7 +382,6 @@ export function* saveItemSaga({ item, publicKey }) {
   };
 
   const secret = JSON.stringify(encryptedItem);
-
   let serverItemData = {};
 
   if (id) {
@@ -400,30 +410,67 @@ export function* saveItemSaga({ item, publicKey }) {
   return itemData;
 }
 
-export function* createSystemItemKeyPair({ payload: { item, type } }) {
-  const teamId = item.teamId || TEAM_TYPE.PERSONAL;
+export function* getKeyPairForTeam(teamId) {
+  const teamKeyPair = yield select(teamKeyPairSelector, {
+    teamId,
+  });
+
+  if (teamKeyPair) {
+    return teamKeyPair;
+  }
+
+  return yield select(teamKeyPairSelector, {
+    teamId: TEAM_TYPE.PERSONAL,
+  });
+}
+
+export function* createSystemItemKeyPair({
+  payload: {
+    entityId,
+    entityTeamId,
+    entityType,
+    publicKey,
+    entityOwnerId = null,
+  },
+}) {
+  // The deafult values
+  const teamId = entityTeamId || TEAM_TYPE.PERSONAL;
+  const currentUserId = yield select(userIdSelector);
+  const ownerId = entityOwnerId || currentUserId;
+
   const { id: defaultListId } = yield select(teamDefaultListSelector, {
     teamId,
   });
 
-  const { publicKey } = yield select(teamKeyPairSelector, {
-    teamId,
-  });
-
-  if (!type) {
+  if (!entityType) {
     throw new Error(`The type of system item isn't defined`);
   }
 
+  // Create an empty item
   let systemKeyPairItem = yield call(
     generateSystemItem,
-    type,
+    entityType,
     defaultListId,
-    item.id,
+    entityId,
   );
+
+  // If the keypair for the shared item
+  if (ENTITY_TYPE.SHARE === entityType) {
+    systemKeyPairItem.relatedItemId = entityId;
+  } else if (ENTITY_TYPE.TEAM === entityType) {
+    systemKeyPairItem.ownerId = ownerId;
+  }
+
+  if (teamId !== TEAM_TYPE.PERSONAL) {
+    systemKeyPairItem.teamId = teamId;
+  }
 
   // Encrypt and save the system keypair item to the owner personal vault
   const systemItemFromServer = yield call(saveItemSaga, {
-    item: { ...systemKeyPairItem, relatedItemId: item.id },
+    item: {
+      ...systemKeyPairItem,
+      type: ITEM_TYPE.KEYPAIR,
+    },
     publicKey,
   });
 
@@ -433,26 +480,39 @@ export function* createSystemItemKeyPair({ payload: { item, type } }) {
   };
 
   yield put(
-    addSystemItemsBatch({
-      [systemKeyPairItem.id]: systemKeyPairItem,
-    }),
+    addTeamKeyPairBatch([
+      {
+        [systemKeyPairItem.id]: systemKeyPairItem,
+      },
+    ]),
   );
 
   return systemKeyPairItem;
 }
 
-export function* findOrCreateTeamSystemItemKeyPair({ payload: { item } }) {
-  let systemKeyPairItem = yield select(teamKeyPairSelector, {
-    teamId: item.teamId,
+export function* createIfNotExistKeyPair({ payload: { teamId, ownerId } }) {
+  if (!teamId) return;
+  const currentUser = yield select(userDataSelector);
+  const userId = ownerId || currentUser.id;
+
+  const owner = yield select(memberSelector, { memberId: userId });
+  const { publicKey } = owner;
+
+  const systemKeyPairItem = yield select(teamKeyPairSelector, {
+    teamId,
   });
 
   if (!systemKeyPairItem) {
-    systemKeyPairItem = yield call(createSystemItemKeyPair, {
-      payload: { item, type: ENTITY_TYPE.SHARE },
+    yield call(createSystemItemKeyPair, {
+      payload: {
+        entityId: teamId,
+        entityTeamId: teamId,
+        entityType: ENTITY_TYPE.TEAM,
+        entityOwnerId: userId,
+        publicKey,
+      },
     });
   }
-
-  return systemKeyPairItem;
 }
 
 export function* createItemSaga({
@@ -460,23 +520,33 @@ export function* createItemSaga({
   meta: { setSubmitting = Function.prototype },
 }) {
   try {
-    const { teamId = TEAM_TYPE.PERSONAL, listId, type, data } = item;
+    const currentUserId = yield select(userIdSelector);
+    const {
+      teamId = TEAM_TYPE.PERSONAL,
+      ownerId = currentUserId,
+      listId,
+      data,
+    } = item;
 
-    const isSystemItem = type === ITEM_TYPE.SYSTEM;
-    // const keyPair = yield select(personalKeyPairSelector);
-    const keyPair = yield call(findOrCreateTeamSystemItemKeyPair, {
+    yield call(createIfNotExistKeyPair, {
       payload: {
-        item,
+        teamId,
+        ownerId,
       },
+    });
+
+    const keyPair = yield select(teamKeyPairSelector, {
+      teamId,
     });
 
     if (!keyPair) {
       throw new Error(`Can't find or create the key pair for the items.`);
     }
 
-    const notificationText = isSystemItem
+    const notificationText = !isGeneralItem(item)
       ? COMMON_PROGRESS_NOTIFICATION
       : ENCRYPTING_ITEM_NOTIFICATION;
+
     const { publicKey } = keyPair;
 
     yield put(updateGlobalNotification(notificationText, true));
@@ -487,7 +557,7 @@ export function* createItemSaga({
         `Can't find the publicKey in the key pair for the team ${teamId}`,
       );
     }
-
+    const isSystemItem = !isGeneralItem(item);
     if (!isSystemItem) {
       yield put(updateGlobalNotification(CREATING_ITEM_NOTIFICATION, true));
     }
@@ -548,7 +618,7 @@ export function* createItemSaga({
 
 // TODO: Need to be updated to the sepated raws feature
 export function* createItemsBatchSaga({
-  payload: { items, listId },
+  payload: { items, listId, ownerId = null },
   meta: { setSubmitting },
 }) {
   try {
@@ -558,7 +628,19 @@ export function* createItemsBatchSaga({
 
     yield put(updateGlobalNotification(ENCRYPTING_ITEM_NOTIFICATION, true));
 
-    const keyPair = findOrCreateTeamSystemItemKeyPair(items[0]);
+    const userId = yield select(userIdSelector);
+    const { teamId } = items[0];
+
+    yield call(createIfNotExistKeyPair, {
+      payload: {
+        teamId,
+        ownerId: ownerId || userId,
+      },
+    });
+
+    const keyPair = yield select(teamKeyPairSelector, {
+      teamId,
+    });
 
     if (!keyPair) {
       throw new Error(`Can't find or create the key pair for the items.`);

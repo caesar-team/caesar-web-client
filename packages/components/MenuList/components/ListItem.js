@@ -8,7 +8,6 @@ import {
   PERMISSION,
   PERMISSION_ENTITY,
   TEAM_TYPE,
-  ITEM_TYPE,
 } from '@caesar/common/constants';
 import { ERROR } from '@caesar/common/validation/constants';
 import { currentTeamSelector } from '@caesar/common/selectors/user';
@@ -18,6 +17,7 @@ import {
 } from '@caesar/common/actions/entities/list';
 import { visibleItemsSelector } from '@caesar/common/selectors/entities/item';
 import { Tooltip } from '@caesar/components/List/Item/styles';
+import { isGeneralItem } from '@caesar/common/utils/item';
 import { Can } from '../../Ability';
 import { Icon } from '../../Icon';
 import { ListInput } from './ListInput';
@@ -84,8 +84,7 @@ const StyledTooltip = styled(Tooltip)`
   left: auto;
 `;
 
-const filterVisibleItems = items =>
-  items.filter(item => item && item?.type !== ITEM_TYPE.SYSTEM);
+const filterVisibleItems = items => items.filter(isGeneralItem);
 
 export const ListItem = ({
   list = {},

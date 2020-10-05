@@ -80,6 +80,7 @@ export const ITEM_TYPE = {
   CREDIT_CARD: 'card',
   DOCUMENT: 'document',
   SYSTEM: 'system',
+  KEYPAIR: 'keypair',
 };
 
 export const ITEM_TYPES_ARRAY = [
@@ -88,7 +89,7 @@ export const ITEM_TYPES_ARRAY = [
   ITEM_TYPE.DOCUMENT,
 ];
 
-export const ITEM_TEXT_TYPE = {
+export const ITEM_CONTENT_TYPE = {
   [ITEM_TYPE.CREDENTIALS]: 'credential',
   [ITEM_TYPE.DOCUMENT]: 'note',
 };
@@ -172,6 +173,7 @@ export const ENTITY_TYPE = {
   MEMBER: 'member',
   SYSTEM: 'system',
   SHARE: 'share',
+  KEYPAIR: 'keypair',
 };
 
 export const COMMON_PROGRESS_NOTIFICATION = 'In progress...';

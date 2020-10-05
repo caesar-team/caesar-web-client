@@ -51,23 +51,22 @@ const TeamsListComponent = ({ activeTeamId, handleToggle, setListsOpened }) => {
     }
   };
 
-  return teamList.map(team =>
-    activeTeamId === team?.id || !team?.id ? null : (
-      <Option
-        key={team.id}
-        onClick={() => {
-          handleChangeTeam(team.id);
-        }}
-      >
-        <StyledAvatar
-          avatar={team.icon}
-          email={team.email}
-          size={32}
-          fontSize="small"
-        />
-        {getTeamTitle(team)}
-      </Option>
-    ),
+  return (
+    <>
+      {teamList.map(team => {
+        return activeTeamId === team?.id || !team?.id ? null : (
+          <Option
+            key={team.id}
+            onClick={() => {
+              handleChangeTeam(team.id);
+            }}
+          >
+            <StyledAvatar avatar={team.icon} size={32} fontSize="small" />
+            {getTeamTitle(team)}
+          </Option>
+        );
+      })}
+    </>
   );
 };
 

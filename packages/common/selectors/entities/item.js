@@ -1,6 +1,6 @@
 import { createSelector } from 'reselect';
 import { childItemsByIdSelector } from '@caesar/common/selectors/entities/childItem';
-import { ITEM_TYPE } from '@caesar/common/constants';
+import { isGeneralItem } from '../../utils/item';
 
 export const entitiesSelector = state => state.entities;
 
@@ -102,5 +102,5 @@ export const itemsChildItemsBatchSelector = createSelector(
 
 export const visibleItemsSelector = createSelector(
   itemsBatchSelector,
-  items => items.filter(({ type }) => type !== ITEM_TYPE.SYSTEM) || [],
+  items => items.filter(isGeneralItem) || [],
 );

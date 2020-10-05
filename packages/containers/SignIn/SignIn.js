@@ -31,7 +31,7 @@ const AuthWrapper = styled.a`
   width: 100%;
   text-decoration: none;
   cursor: pointer;
-  border-radius: 3px;
+  border-radius: ${({ theme }) => theme.borderRadius};
   box-shadow: 0 11px 23px 0 rgba(0, 0, 0, 0.1);
   background-color: ${({ theme }) => theme.color.black};
   transition: all 0.2s;

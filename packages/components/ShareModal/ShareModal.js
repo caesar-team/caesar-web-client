@@ -128,7 +128,7 @@ export const ShareModal = ({
 
   const handleDeleteItem = itemId => () => {
     onRemove(itemId);
-  };  
+  };
 
   useEffectOnce(() => {
     if (anonymousLink) {
@@ -165,9 +165,7 @@ export const ShareModal = ({
       shouldCloseOnOverlayClick
     >
       <StyledModalTitle>
-        {isMultiMode
-          ? 'Share selected items'
-          : 'Share the item'}
+        {isMultiMode ? 'Share selected items' : 'Share the item'}
       </StyledModalTitle>
       <Row>
         <UserSearchInput

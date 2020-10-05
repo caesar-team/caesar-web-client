@@ -67,7 +67,9 @@ export const CircleIndicatorOverlay = styled.div`
 `;
 
 export const ScoreName = styled.div`
-  margin-left: 8px;
+  width: 80px;
+  margin-left: 16px;
   font-size: ${({ theme }) => theme.font.size.xs};
   font-weight: 600;
+  text-align: right;
 `;

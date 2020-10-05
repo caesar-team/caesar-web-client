@@ -30,7 +30,9 @@ export const teamSortedListSelector = createSelector(
   teams => {
     const defaultTeam = teams.find(team => team.type === TEAM_TYPE.DEFAULT);
     const otherTeams = teams
-      .filter(team => team.type !== TEAM_TYPE.DEFAULT)
+      .filter(
+        team => ![TEAM_TYPE.DEFAULT, TEAM_TYPE.PERSONAL].includes(team.type),
+      )
       .sort((a, b) => sortByName(a.title, b.title));
 
     return defaultTeam ? [defaultTeam, ...otherTeams] : otherTeams;
@@ -56,7 +58,8 @@ export const teamsBatchSelector = createSelector(
 export const teamMembersSelector = createSelector(
   teamSelector,
   membersByIdSelector,
-  (team, membersById) => team.users.map(({ userId }) => membersById[userId]),
+  (team, membersById) =>
+    team?.users?.map(({ userId }) => membersById[userId]) ?? [],
 );
 
 export const teamsMembersSelector = createSelector(

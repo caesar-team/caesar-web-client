@@ -1,12 +1,14 @@
-import React from 'react';
+import React, { useState, memo } from 'react';
+import { useEffectOnce } from 'react-use';
 import styled from 'styled-components';
 import { FastField, Formik } from 'formik';
 import copy from 'copy-text-to-clipboard';
+import { getBackupCodes } from '@caesar/common/api';
 import { useNotification } from '@caesar/common/hooks';
 import { formatNumbersByColumns } from '@caesar/common/utils/format';
-import { Button, Checkbox, AuthTitle } from '@caesar/components';
 import { downloadTextData } from '@caesar/common/utils/download';
 import { printData } from '@caesar/common/utils/print';
+import { Button, Checkbox, AuthTitle, LogoLoader } from '@caesar/components';
 import { backupInitialValues } from './constants';
 import { agreeSchema } from './schema';
 
@@ -71,9 +73,20 @@ const NextButton = styled(Button)`
   margin-top: 30px;
 `;
 
-const TwoFactorBackupForm = ({ codes, onSubmit }) => {
+const TwoFactorBackupFormComponent = ({ onSubmit }) => {
+  const [codes, setCodes] = useState([]);
   const notification = useNotification();
   const numbersByColumns = formatNumbersByColumns(codes, 4);
+
+  useEffectOnce(() => {
+    const setBackupCodes = async () => {
+      const { data } = await getBackupCodes();
+
+      setCodes(data);
+    };
+
+    setBackupCodes();
+  });
 
   const handleClickCopyCodes = () => {
     copy(numbersByColumns);
@@ -85,65 +98,69 @@ const TwoFactorBackupForm = ({ codes, onSubmit }) => {
 
   return (
     <Wrapper>
-      <Formik
-        key="backupCodes"
-        initialValues={backupInitialValues}
-        validationSchema={agreeSchema}
-        onSubmit={onSubmit}
-      >
-        {({ dirty, handleSubmit, isSubmitting, isValid }) => (
-          <Form onSubmit={handleSubmit}>
-            <AuthTitle>Save your backup codes</AuthTitle>
-            <Description>
-              Backup codes let you access your account if you lose your phone.
-              Keep these codes somewhere safe but accessible.
-            </Description>
-            <Codes id="codes">
-              {codes.map((code, index) => (
-                <Code key={index}>{code}</Code>
-              ))}
-            </Codes>
-            <ButtonsWrapper>
-              <StyledButton
-                color="white"
-                icon="copy"
-                onClick={handleClickCopyCodes}
+      {codes.length === 0 ? (
+        <LogoLoader />
+      ) : (
+        <Formik
+          key="backupCodes"
+          initialValues={backupInitialValues}
+          validationSchema={agreeSchema}
+          onSubmit={onSubmit}
+        >
+          {({ dirty, handleSubmit, isSubmitting, isValid }) => (
+            <Form onSubmit={handleSubmit}>
+              <AuthTitle>Save your backup codes</AuthTitle>
+              <Description>
+                Backup codes let you access your account if you lose your phone.
+                Keep these codes somewhere safe but accessible.
+              </Description>
+              <Codes id="codes">
+                {codes.map((code, index) => (
+                  <Code key={index}>{code}</Code>
+                ))}
+              </Codes>
+              <ButtonsWrapper>
+                <StyledButton
+                  color="white"
+                  icon="copy"
+                  onClick={handleClickCopyCodes}
+                >
+                  Copy
+                </StyledButton>
+                <StyledButton
+                  color="white"
+                  icon="download"
+                  onClick={() => downloadTextData(numbersByColumns)}
+                >
+                  Download
+                </StyledButton>
+                <StyledButton
+                  color="white"
+                  icon="print"
+                  onClick={() => printData(numbersByColumns)}
+                >
+                  Print
+                </StyledButton>
+              </ButtonsWrapper>
+              <FastField name="agreeCheck">
+                {({ field }) => (
+                  <StyledCheckbox {...field} checked={field.value}>
+                    I have printed or saved these codes
+                  </StyledCheckbox>
+                )}
+              </FastField>
+              <NextButton
+                htmlType="submit"
+                disabled={isSubmitting || !isValid || !dirty}
               >
-                Copy
-              </StyledButton>
-              <StyledButton
-                color="white"
-                icon="download"
-                onClick={() => downloadTextData(numbersByColumns)}
-              >
-                Download
-              </StyledButton>
-              <StyledButton
-                color="white"
-                icon="print"
-                onClick={() => printData(numbersByColumns)}
-              >
-                Print
-              </StyledButton>
-            </ButtonsWrapper>
-            <FastField name="agreeCheck">
-              {({ field }) => (
-                <StyledCheckbox {...field} checked={field.value}>
-                  I have printed or saved these codes
-                </StyledCheckbox>
-              )}
-            </FastField>
-            <NextButton
-              htmlType="submit"
-              disabled={isSubmitting || !isValid || !dirty}
-            >
-              Continue
-            </NextButton>
-          </Form>
-        )}
-      </Formik>
+                Continue
+              </NextButton>
+            </Form>
+          )}
+        </Formik>
+      )}
     </Wrapper>
   );
 };
 
-export default TwoFactorBackupForm;
+export const TwoFactorBackupForm = memo(TwoFactorBackupFormComponent);

@@ -1,6 +1,7 @@
 export const INIT_WORKFLOW = '@workflow/INIT_WORKFLOW';
 
 export const FINISH_IS_LOADING = '@workflow/FINISH_IS_LOADING';
+export const VAULTS_ARE_READY = '@workflow/VAULTS_ARE_READY';
 
 export const SET_WORK_IN_PROGRESS_ITEM = '@workflow/SET_WORK_IN_PROGRESS_ITEM';
 export const UPDATE_WORK_IN_PROGRESS_ITEM =
@@ -21,6 +22,8 @@ export const DECRYPTION_END = '@workflow/DECRYPTION_END';
 export const ENCRYPTION = '@workflow/ENCRYPTION';
 export const ENCRYPTION_END = '@workflow/ENCRYPTION_END';
 
+export const OPEN_VAULT = '@workflow/OPEN_VAULT';
+
 export const initWorkflow = (withDecryption = true) => ({
   type: INIT_WORKFLOW,
   payload: {
@@ -28,8 +31,19 @@ export const initWorkflow = (withDecryption = true) => ({
   },
 });
 
+export const openVault = teamId => ({
+  type: UPDATE_WORK_IN_PROGRESS_ITEM,
+  payload: {
+    teamId,
+  },
+});
+
 export const finishIsLoading = () => ({
   type: FINISH_IS_LOADING,
+});
+
+export const vaultsReady = () => ({
+  type: VAULTS_ARE_READY,
 });
 
 export const setWorkInProgressItem = item => ({

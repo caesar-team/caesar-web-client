@@ -31,7 +31,7 @@ const WarningIcon = styled(Icon)`
 const TooltipText = styled.div`
   display: flex;
   align-items: center;
-  border-radius: 3px;
+  border-radius: ${({ theme }) => theme.borderRadius};
   background-color: ${({ theme }) => theme.color.black};
   padding: 4px 10px;
   font-size: 12px;

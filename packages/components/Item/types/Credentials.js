@@ -38,6 +38,7 @@ const CredentialsComponent = ({
       />
       {!isSharedItem && (
         <OwnerAndInvitation
+          invited={item.invited}
           itemSubject={itemSubject}
           onClickShare={onClickShare}
         />

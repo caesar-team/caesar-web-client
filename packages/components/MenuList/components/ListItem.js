@@ -7,7 +7,7 @@ import { transformListTitle } from '@caesar/common/utils/string';
 import {
   PERMISSION,
   PERMISSION_ENTITY,
-  ITEM_TYPE,
+  TEAM_TYPE,
 } from '@caesar/common/constants';
 import { ERROR } from '@caesar/common/validation/constants';
 import { currentTeamSelector } from '@caesar/common/selectors/user';
@@ -17,6 +17,7 @@ import {
 } from '@caesar/common/actions/entities/list';
 import { visibleItemsSelector } from '@caesar/common/selectors/entities/item';
 import { Tooltip } from '@caesar/components/List/Item/styles';
+import { isGeneralItem } from '@caesar/common/utils/item';
 import { Can } from '../../Ability';
 import { Icon } from '../../Icon';
 import { ListInput } from './ListInput';
@@ -83,8 +84,7 @@ const StyledTooltip = styled(Tooltip)`
   left: auto;
 `;
 
-const filterVisibleItems = items =>
-  items.filter(item => item && item?.type !== ITEM_TYPE.SYSTEM);
+const filterVisibleItems = items => items.filter(isGeneralItem);
 
 export const ListItem = ({
   list = {},
@@ -146,25 +146,26 @@ export const ListItem = ({
 
   const listTitle = transformListTitle(label);
 
-  const listSubject = teamId
-    ? {
-        __typename: PERMISSION_ENTITY.TEAM_LIST,
-        team_edit_list: !!list?._links?.team_edit_list,
-        team_sort_list: !!list?._links?.team_sort_list,
-        team_delete_list: !!list?._links?.team_delete_list,
-      }
-    : {
-        __typename: PERMISSION_ENTITY.LIST,
-        edit_list: !!list?._links?.edit_list,
-        sort_list: !!list?._links?.sort_list,
-        delete_list: !!list?._links?.delete_list,
-      };
+  const listSubject =
+    teamId === TEAM_TYPE.PERSONAL
+      ? {
+          __typename: PERMISSION_ENTITY.LIST,
+          edit_list: list?._permissions?.edit_list || false,
+          sort_list: list?._permissions?.sort_list || false,
+          delete_list: list?._permissions?.delete_list || false,
+        }
+      : {
+          __typename: PERMISSION_ENTITY.TEAM_LIST,
+          team_edit_list: list?._permissions?.team_edit_list || false,
+          team_sort_list: list?._permissions?.team_sort_list || false,
+          team_delete_list: list?._permissions?.team_delete_list || false,
+        };
 
-  const isListAlreadyExists = value !== label 
-    && nestedListsLabels.includes(value?.toLowerCase());
+  const isListAlreadyExists =
+    value !== label && nestedListsLabels.includes(value?.toLowerCase());
 
   const isAcceptDisabled = !value || value === label || isListAlreadyExists;
-  
+
   const renderInner = dragHandleProps => (
     <>
       {isEditMode ? (

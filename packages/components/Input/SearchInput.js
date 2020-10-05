@@ -20,24 +20,26 @@ const CloseIcon = styled(Icon)`
   cursor: pointer;
 `;
 
+const SearchIconComponent = (
+  <Icon name="search" width={20} height={20} color="gray" />
+);
+
+const CloseIconComponent = ({ onClickReset }) => (
+  <CloseIcon name="close" width={16} height={16} onClick={onClickReset} />
+);
+
 const SearchInputComponent = ({
   searchedText,
   onClickReset = Function.prototype,
   ...props
 }) => {
-  const SearchIconComponent = (
-    <Icon name="search" width={20} height={20} color="gray" />
+  const iconComponent = searchedText ? (
+    <CloseIconComponent onClickReset={onClickReset} />
+  ) : (
+    SearchIconComponent
   );
-
-  const CloseIconComponent = (
-    <CloseIcon name="close" width={18} height={18} onClick={onClickReset} />
-  );
-
-  const iconComponent = searchedText ? CloseIconComponent : SearchIconComponent;
 
   return <InputStyled prefix={iconComponent} value={searchedText} {...props} />;
 };
 
-const SearchInput = memo(SearchInputComponent);
-
-export default SearchInput;
+export const SearchInput = memo(SearchInputComponent);

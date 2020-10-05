@@ -1,9 +1,4 @@
-import * as yup from 'yup';
+export const FIRST_COLUMN_WIDTH = 40;
+export const LAST_COLUMN_WIDTH = 170;
 
-export const schema = yup.object().shape({
-  name: yup.number().required(),
-  login: yup.number().required(),
-  pass: yup.number().required(),
-  website: yup.number().nullable(),
-  note: yup.number().nullable(),
-});
+export const SEARCH_FIELDS = ['name'];

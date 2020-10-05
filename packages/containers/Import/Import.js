@@ -4,7 +4,7 @@ import { withRouter } from 'next/router';
 import { matchStrict } from '@caesar/common/utils/match';
 import { parseFile } from '@caesar/common/utils/importUtils';
 import { ITEM_TYPE, ROUTES } from '@caesar/common/constants';
-import { NavigationPanel, LogoLoader } from '@caesar/components';
+import { NavigationPanel, SettingsWrapper } from '@caesar/components';
 import { DataStep, FieldsStep, FileStep, ImportingStep } from './Steps';
 import {
   DATA_STEP,
@@ -14,36 +14,11 @@ import {
   STEPS,
 } from './constants';
 
-const Wrapper = styled.div`
-  display: flex;
-  flex-direction: column;
-  background: ${({ theme }) => theme.color.alto};
-  width: 100%;
-  padding: 40px;
-`;
-
-const LogoWrapper = styled.div`
-  display: flex;
-  flex-direction: column;
-  background: ${({ theme }) => theme.color.alto};
-  width: 100%;
-  position: relative;
-  height: calc(100vh - 55px);
-  align-items: center;
-  justify-content: center;
-`;
-
-const Title = styled.div`
-  font-size: 36px;
-  color: ${({ theme }) => theme.color.black};
-  margin-bottom: 30px;
-`;
-
 const StepWrapper = styled.div`
   display: flex;
   flex-direction: column;
   background: ${({ theme }) => theme.color.white};
-  padding: 30px;
+  padding: 24px;
 `;
 
 const StyledNavigationPanel = styled(NavigationPanel)`
@@ -209,24 +184,15 @@ class Import extends Component {
     const { isLoading } = this.props;
     const { currentStep } = this.state;
 
-    if (isLoading) {
-      return (
-        <LogoWrapper>
-          <LogoLoader textColor="black" />
-        </LogoWrapper>
-      );
-    }
-
     return (
-      <Wrapper>
-        <Title>Import</Title>
+      <SettingsWrapper isLoading={isLoading} title="Import">
         <StepWrapper>{this.renderStep()}</StepWrapper>
         <StyledNavigationPanel
           steps={STEPS}
           currentStep={currentStep}
           onClickStep={this.handleClickStep}
         />
-      </Wrapper>
+      </SettingsWrapper>
     );
   }
 }

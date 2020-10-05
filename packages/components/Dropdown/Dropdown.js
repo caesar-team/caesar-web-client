@@ -16,7 +16,7 @@ const Box = styled.div`
     withTriangleAtTop ? 'calc(100% + 19px)' : 'calc(100% - 1px)'};
   right: 0;
   z-index: ${({ theme }) => theme.zIndex.dropdown};
-  border-radius: 3px;
+  border-radius: ${({ theme }) => theme.borderRadius};
   background-color: ${({ theme }) => theme.color.white};
   border: 1px solid ${({ theme }) => theme.color.gallery};
 
@@ -35,10 +35,14 @@ const Box = styled.div`
   }
 `;
 
+const EmptyList = styled.div`
+  padding: 8px 16px;
+`;
+
 const OptionsList = styled.div`
   position: relative;
   background-color: ${({ theme }) => theme.color.white};
-  border-radius: 3px;
+  border-radius: ${({ theme }) => theme.borderRadius};
   overflow: hidden;
 `;
 
@@ -88,20 +92,23 @@ const DropdownComponent = ({
     if (onClick) onClick(name, value);
   };
 
-  const renderOptions = () => {
-    return options.map(({ label, value }, index) =>
-      optionRender ? (
-        cloneElement(optionRender(value, label), {
-          key: index,
-          onClick: handleClick(value),
-        })
-      ) : (
-        <Option key={index} onClick={handleClick(value)}>
-          {label}
-        </Option>
-      ),
+  const renderOptions = () =>
+    options.length ? (
+      options.map(({ label, value }, index) =>
+        optionRender ? (
+          cloneElement(optionRender(value, label), {
+            key: index,
+            onClick: handleClick(value),
+          })
+        ) : (
+          <Option key={index} onClick={handleClick(value)}>
+            {label}
+          </Option>
+        ),
+      )
+    ) : (
+      <EmptyList>No options</EmptyList>
     );
-  };
 
   useUpdateEffect(() => {
     if (onToggle) {

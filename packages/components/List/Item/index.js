@@ -4,6 +4,7 @@ import {
   PERMISSION_ENTITY,
   PERMISSION,
   PERMISSION_MESSAGES,
+  TEAM_TYPE,
 } from '@caesar/common/constants';
 import { Icon } from '../../Icon';
 import { ItemIcon } from '../../ItemIcon';
@@ -35,8 +36,9 @@ export const Item = ({
   favorite,
   style,
   teamId,
-  _links,
+  _permissions,
   index,
+  teamMembersCount,
   onClickClose = Function.prototype,
   onClickItem = Function.prototype,
   onSelectItem = Function.prototype,
@@ -44,7 +46,8 @@ export const Item = ({
   workInProgressItem,
   ...props
 }) => {
-  const shouldShowMembers = !!invited?.length;
+  const sharedCount = invited.length + teamMembersCount - 1;
+  const shouldShowMembers = !!sharedCount;
   const shouldShowAttachments =
     attachments && Array.isArray(attachments) && attachments.length > 0;
 
@@ -53,19 +56,20 @@ export const Item = ({
   const isChecked = isMultiItem && workInProgressItemIds.includes(id);
 
   const isTop = index === 0;
-  const itemSubject = teamId
-    ? {
-        __typename: PERMISSION_ENTITY.TEAM_ITEM,
-        team_move_item: !!_links?.team_move_item,
-        team_batch_share_item: !!_links?.team_batch_share_item,
-        team_delete_item: !!_links?.team_delete_item,
-      }
-    : {
-        __typename: PERMISSION_ENTITY.ITEM,
-        move_item: !!_links?.move_item,
-        batch_share_item: !!_links?.batch_share_item,
-        delete_item: !!_links?.delete_item,
-      };
+  const itemSubject =
+    teamId === TEAM_TYPE.PERSONAL
+      ? {
+          __typename: PERMISSION_ENTITY.ITEM,
+          move_item: _permissions?.move_item || false,
+          batch_share_item: _permissions?.batch_share_item || false,
+          delete_item: _permissions?.delete_item || false,
+        }
+      : {
+          __typename: PERMISSION_ENTITY.TEAM_ITEM,
+          team_move_item: _permissions?.team_move_item || false,
+          team_batch_share_item: _permissions?.team_batch_share_item || false,
+          team_delete_item: _permissions?.team_delete_item || false,
+        };
 
   return (
     <Row
@@ -108,10 +112,11 @@ export const Item = ({
               </NotEditIconWrapper>
             )}
             <IconWrapper>
-              {website
-                ? <ItemIcon url={website} />
-                : <ItemTypeIcon type={type} />
-              }
+              {website ? (
+                <ItemIcon url={website} />
+              ) : (
+                <ItemTypeIcon type={type} />
+              )}
             </IconWrapper>
           </TypeIconWrapper>
         )}
@@ -126,7 +131,7 @@ export const Item = ({
       {shouldShowMembers && (
         <Addon isInModal={isInModal}>
           <Icon name="members" width={16} height={16} />
-          <AddonText>{invited.length}</AddonText>
+          <AddonText>{sharedCount}</AddonText>
         </Addon>
       )}
       {shouldShowFavoriteIcon && (

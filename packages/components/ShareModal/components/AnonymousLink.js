@@ -15,7 +15,7 @@ const AnonymousLinkWrapper = styled.div`
   flex-direction: column;
   padding: 8px 16px;
   background-color: ${({ theme }) => theme.color.alto};
-  border-radius: 3px;
+  border-radius: ${({ theme }) => theme.borderRadius};
 `;
 
 const ToggleWrapper = styled.div`
@@ -46,7 +46,7 @@ const LinkWrapper = styled.div`
   padding: 8px 16px;
   margin-right: 16px;
   background-color: ${({ theme }) => theme.color.white};
-  border-radius: 3px;
+  border-radius: ${({ theme }) => theme.borderRadius};
   border: solid 1px ${({ theme }) => theme.color.gallery};
 `;
 

@@ -51,7 +51,7 @@ const AddNewAttach = styled.div`
   align-self: center;
   height: 40px;
   border: 1px dashed ${({ theme }) => theme.color.gallery};
-  border-radius: 3px;
+  border-radius: ${({ theme }) => theme.borderRadius};
   cursor: pointer;
   transition: border-color 0.2s;
 
@@ -101,7 +101,7 @@ export const Attachments = ({
   }, [attachments]);
 
   useEffect(() => {
-    if (Object.keys(raws).length > 0) {
+    if (raws && Object.keys(raws)?.length > 0) {
       setItemRaws(raws);
     }
   }, [raws, setItemRaws]); // This will only run when one of those variables change
@@ -204,7 +204,10 @@ export const Attachments = ({
                 <ConfirmDeleteAttachmentModal
                   isOpened
                   fileName={attachment.name}
-                  onDeleteFile={() => onClickRemove(attachment)}
+                  onDeleteFile={() => {
+                    onClickRemove(attachment);
+                    setOpenedModal(null);
+                  }}
                   handleCloseModal={() => setOpenedModal(null)}
                 />
               )}

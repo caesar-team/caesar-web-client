@@ -1,27 +1,38 @@
 import { getHostName } from '@caesar/common/utils/getDomainName';
 import { processUploadedFiles } from './attachment';
+import { decryptItem } from './cipherUtils';
+import { ITEM_TYPE } from '../constants';
 
-function isValidItem(item) {
+export const extractItemType = item => item?.type || ITEM_TYPE.SYSTEM;
+
+export const isSystemItem = item => extractItemType(item) === ITEM_TYPE.SYSTEM;
+export const isKeyPairItem = item =>
+  extractItemType(item) === ITEM_TYPE.KEYPAIR;
+export const isGeneralItem = item =>
+  extractItemType(item) !== ITEM_TYPE.SYSTEM &&
+  extractItemType(item) !== ITEM_TYPE.KEYPAIR;
+
+export const isValidItem = item => {
   // TODO: strengthen checks
   if (!('data' in item)) {
     // eslint-disable-next-line no-console
     console.error(
-      `The item with ID: ${item.id} is broken. It doesn't contain item credentials after decryption.`,
+      `The item with ID: ${item.id} is broken. It doesn't contain the data after decryption.`,
     );
 
     return false;
   }
 
   return true;
-}
+};
 
-export function checkItemsAfterDecryption(items) {
+export const checkItemsAfterDecryption = items => {
   return items.reduce(
     (accumulator, item) =>
       isValidItem(item) ? [...accumulator, item] : accumulator,
     [],
   );
-}
+};
 
 export const splitItemAttachments = item => {
   const itemAttachments = item.data?.attachments;
@@ -36,15 +47,15 @@ export const splitItemAttachments = item => {
   };
 };
 
-export function generateSystemItemName(entity, id) {
+export const generateSystemItemName = (entity, id) => {
   return `${entity}-${id}`;
-}
+};
 
-export function generateSystemItemEmail(entityName) {
+export const generateSystemItemEmail = entityName => {
   return `teams+${entityName}@${getHostName()}.com`;
-}
+};
 
-export function extractKeysFromSystemItem(item) {
+export const extractKeysFromSystemItem = item => {
   const itemRaws = item.data?.raws || {
     publicKey: null,
     privateKey: null,
@@ -56,4 +67,59 @@ export function extractKeysFromSystemItem(item) {
     publicKey,
     privateKey,
   };
-}
+};
+
+export const convertSystemItemToKeyPair = item => {
+  if (!item.data) return null;
+  const { pass } = item.data;
+  const itemRaws = item.data?.raws || {
+    publicKey: null,
+    privateKey: null,
+  };
+
+  const { publicKey = null, privateKey = null } = itemRaws;
+
+  return {
+    id: item.id,
+    password: pass,
+    publicKey,
+    privateKey,
+  };
+};
+
+export const decryptItemData = async (item, privateKeyObject) => {
+  try {
+    const { data: encryptedData, raws: encryptedRaws } = JSON.parse(
+      item.secret,
+    );
+
+    const promises = [];
+    promises.push(decryptItem(encryptedData, privateKeyObject));
+
+    if (!isGeneralItem(item)) {
+      promises.push(decryptItem(encryptedRaws, privateKeyObject));
+    }
+
+    const [data, raws = {}] = await Promise.all(promises);
+
+    if (!data) {
+      return {
+        data: null,
+      };
+    }
+
+    return {
+      data: {
+        ...data,
+        raws,
+      },
+    };
+  } catch (error) {
+    // eslint-disable-next-line no-console
+    console.error(`Can't decrypt the item ${item.id}, the error is %s`, error);
+
+    return {
+      data: null,
+    };
+  }
+};

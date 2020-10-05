@@ -96,7 +96,7 @@ export function* createAnonymousLinkSaga() {
     yield put(createAnonymousLinkSuccess(workInProgressItem.id, share));
     yield put(updateWorkInProgressItem());
   } catch (error) {
-    console.log(error);
+    console.error(error);
     yield put(
       updateGlobalNotification(getServerErrorMessage(error), false, true),
     );
@@ -113,7 +113,7 @@ export function* removeAnonymousLinkSaga() {
     yield put(removeAnonymousLinkSuccess(workInProgressItem.id));
     yield put(updateWorkInProgressItem());
   } catch (error) {
-    console.log(error);
+    console.error(error);
     yield put(
       updateGlobalNotification(getServerErrorMessage(error), false, true),
     );

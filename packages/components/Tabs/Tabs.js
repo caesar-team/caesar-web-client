@@ -13,7 +13,7 @@ const PanelWrapper = styled.div`
   display: flex;
   width: 100%;
   padding: 30px;
-  border-radius: 3px;
+  border-radius: ${({ theme }) => theme.borderRadius};
   background: ${({ theme }) => theme.color.white};
 `;
 

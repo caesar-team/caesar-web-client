@@ -5,6 +5,7 @@ import { getUserBootstrap, getUserSelf } from '@caesar/common/api';
 import {
   DEFAULT_IDLE_TIMEOUT,
   NOOP_NOTIFICATION,
+  IS_PROD,
 } from '@caesar/common/constants';
 import {
   SessionChecker,
@@ -24,21 +25,13 @@ import {
   PASSWORD_CHANGE,
   MASTER_PASSWORD_CHECK,
   MASTER_PASSWORD_CREATE,
-  SHARED_ITEMS_CHECK,
-  SHARED_ITEMS_SKIP,
   BOOTSTRAP_FINISH,
 } from './constants';
-import {
-  TwoFactorStep,
-  PasswordStep,
-  MasterPasswordStep,
-  SharedItemsStep,
-} from './Steps';
+import { TwoFactorStep, PasswordStep, MasterPasswordStep } from './Steps';
 
 const TWO_FACTOR_STEPS = [TWO_FACTOR_CREATE, TWO_FACTOR_CHECK];
 const PASSWORD_STEPS = [PASSWORD_CHANGE];
 const MASTER_PASSWORD_STEPS = [MASTER_PASSWORD_CREATE, MASTER_PASSWORD_CHECK];
-const SHARED_ITEMS_STEPS = [SHARED_ITEMS_CHECK];
 
 class Bootstrap extends Component {
   state = this.prepareInitialState();
@@ -58,11 +51,7 @@ class Bootstrap extends Component {
   }
 
   async componentDidMount() {
-    const {
-      logout,
-      initCoresCount,
-      shared = {},
-    } = this.props;
+    const { logout, initCoresCount, shared = {} } = this.props;
     initCoresCount();
 
     try {
@@ -105,34 +94,17 @@ class Bootstrap extends Component {
     });
   };
 
-  handleFinishMasterPassword = ({
-    oldKeyPair,
-    currentKeyPair,
-    masterPassword,
-  }) => {
-    const { sharedItemsState } = this.bootstrap;
-
+  handleFinishMasterPassword = ({ currentKeyPair, masterPassword }) => {
     this.props.setMasterPassword(masterPassword);
     this.props.setKeyPair({
       publicKey: currentKeyPair.publicKey,
       privateKey: currentKeyPair.encryptedPrivateKey,
+      password: masterPassword,
     });
 
     this.setState({
-      oldKeyPair,
       currentKeyPair,
       masterPassword,
-      currentStep:
-        sharedItemsState === SHARED_ITEMS_CHECK
-          ? SHARED_ITEMS_CHECK
-          : BOOTSTRAP_FINISH,
-    });
-  };
-
-  handleFinishSharedItems = () => {
-    this.bootstrap.sharedItemsState = SHARED_ITEMS_SKIP;
-
-    this.setState({
       currentStep: BOOTSTRAP_FINISH,
     });
   };
@@ -163,7 +135,6 @@ class Bootstrap extends Component {
       twoFactorAuthState,
       passwordState,
       masterPasswordState,
-      sharedItemsState,
     } = getBootstrapStates(bootstrap);
 
     if (TWO_FACTOR_STEPS.includes(twoFactorAuthState)) {
@@ -178,10 +149,6 @@ class Bootstrap extends Component {
       return masterPasswordState;
     }
 
-    if (SHARED_ITEMS_STEPS.includes(sharedItemsState)) {
-      return sharedItemsState;
-    }
-
     return MASTER_PASSWORD_CHECK;
   }
 
@@ -189,10 +156,6 @@ class Bootstrap extends Component {
     return {
       currentStep: null,
       masterPassword: null,
-      oldKeyPair: {
-        publicKey: null,
-        encryptedPrivateKey: null,
-      },
       currentKeyPair: {
         publicKey: null,
         encryptedPrivateKey: null,
@@ -211,12 +174,7 @@ class Bootstrap extends Component {
       updateGlobalNotification,
       ...props
     } = this.props;
-    const {
-      currentStep,
-      oldKeyPair,
-      currentKeyPair,
-      masterPassword,
-    } = this.state;
+    const { currentStep, currentKeyPair, masterPassword } = this.state;
 
     if (!currentStep) {
       return <FullScreenLoader />;
@@ -256,34 +214,9 @@ class Bootstrap extends Component {
           navigationSteps={this.navigationPanelSteps}
           user={this.user}
           sharedMasterPassword={shared.mp}
-          masterPassword={this.props.masterPassword || null}
+          masterPassword={IS_PROD ? null : this.props.masterPassword}
           onFinish={this.handleFinishMasterPassword}
         />
-      );
-    }
-
-    if (SHARED_ITEMS_STEPS.includes(currentStep)) {
-      return (
-        <>
-          <BootstrapLayout user={this.user}>
-            <SharedItemsStep
-              navigationSteps={this.navigationPanelSteps}
-              oldKeyPair={oldKeyPair}
-              currentKeyPair={currentKeyPair}
-              oldMasterPassword={shared.mp}
-              currentMasterPassword={masterPassword}
-              onFinish={this.handleFinishSharedItems}
-              updateGlobalNotification={updateGlobalNotification}
-            />
-          </BootstrapLayout>
-          {shouldShowGlobalNotification && (
-            <GlobalNotification
-              text={globalNotificationText}
-              isError={isErrorGlobalNotification}
-              onClose={this.handleCloseNotification}
-            />
-          )}
-        </>
       );
     }
 

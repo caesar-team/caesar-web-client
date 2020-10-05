@@ -15,6 +15,25 @@ export const getPrivateKeyObj = async (privateKey, password) => {
   return privateKeyObj;
 };
 
+export const testDecryptSecretArmored = async (
+  secretArmored,
+  privateKeyObj,
+) => {
+  try {
+    await openpgp.decrypt({
+      message: await openpgp.message.readArmored(secretArmored),
+      privateKeys: [privateKeyObj],
+    });
+
+    return true;
+  } catch (error) {
+    // eslint-disable-next-line no-console
+    console.error('decryption error %s', error);
+
+    return false;
+  }
+};
+
 export const decryptItem = async (secretArmored, privateKeyObj) => {
   try {
     const secret = await openpgp.message.readArmored(secretArmored);

@@ -1,5 +1,5 @@
 import Router from 'next/router';
-import { call, put, takeLatest, all } from 'redux-saga/effects';
+import { call, put, takeLatest, all, select } from 'redux-saga/effects';
 import {
   CREATE_MEMBER_BATCH_REQUEST,
   CREATE_MEMBER_REQUEST,
@@ -15,7 +15,7 @@ import {
   leaveTeamSuccess,
   removeTeamFromMember,
   LEAVE_TEAM_REQUEST,
-} from "@caesar/common/actions/entities/member";
+} from '@caesar/common/actions/entities/member';
 import {
   updateTeamMembersWithRoles,
   removeTeamMemberSuccess,
@@ -28,15 +28,19 @@ import {
   postLeaveTeam,
   postNewUser,
   postNewUserBatch,
-  updateKey
-} from "@caesar/common/api";
+  updateKey,
+} from '@caesar/common/api';
 import { convertMembersToEntity } from '@caesar/common/normalizers/normalizers';
 import {
   generateSeedAndVerifier,
   generateUser,
   generateUsersBatch,
 } from '@caesar/common/utils/cipherUtils';
-import { ENTITY_TYPE, ROLE_ANONYMOUS_USER, ROUTES } from '@caesar/common/constants';
+import {
+  ENTITY_TYPE,
+  ROLE_ANONYMOUS_USER,
+  ROUTES,
+} from '@caesar/common/constants';
 import { updateGlobalNotification } from '@caesar/common/actions/application';
 import { getServerErrorMessage } from '@caesar/common/utils/error';
 
@@ -56,7 +60,7 @@ export function* fetchMembersSaga() {
     yield put(fetchMembersSuccess(convertMembersToEntity(members)));
   } catch (error) {
     // eslint-disable-next-line no-console
-    console.log(error);
+    console.error(error);
     yield put(fetchMembersFailure());
   }
 }
@@ -241,7 +245,9 @@ export function* getOrCreateMemberBatchSaga({ payload: { emailRolePairs } }) {
   }
 }
 
-export function* fetchTeamMembersSaga({ payload: { teamId, needUpdateTeamMembers = false } }) {
+export function* fetchTeamMembersSaga({
+  payload: { teamId, needUpdateTeamMembers = false },
+}) {
   try {
     const { data } = yield call(getTeamMembers, teamId);
 
@@ -255,7 +261,6 @@ export function* fetchTeamMembersSaga({ payload: { teamId, needUpdateTeamMembers
   }
 }
 
-
 export function* leaveTeamSaga({ payload: { teamId } }) {
   try {
     yield call(postLeaveTeam, teamId);
@@ -266,9 +271,7 @@ export function* leaveTeamSaga({ payload: { teamId } }) {
     yield put(removeTeamFromMember(teamId, userId));
     yield call(Router.push, ROUTES.SETTINGS + ROUTES.TEAM);
   } catch (e) {
-    yield put(
-      updateGlobalNotification(getServerErrorMessage(e), false, true),
-    );    
+    yield put(updateGlobalNotification(getServerErrorMessage(e), false, true));
     yield put(leaveTeamFailure());
   }
 }

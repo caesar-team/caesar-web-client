@@ -1,9 +1,5 @@
 import { createReducer } from '@caesar/common/utils/reducer';
-import {
-  KEY_TYPE,
-  REGEXP_EXCTRACTOR,
-  TEAM_TYPE,
-} from '@caesar/common/constants';
+import { KEY_TYPE, TEAM_TYPE } from '@caesar/common/constants';
 import {
   ADD_PERSONAL_KEY_PAIR,
   ADD_TEAM_KEY_PAIR,
@@ -18,7 +14,6 @@ import {
 } from '@caesar/common/actions/keystore';
 
 import { convertSystemItemToKeyPair } from '@caesar/common/utils/item';
-import { CREATE_VAULT_SUCCESS } from '../actions/entities/vault';
 import { arrayToObject } from '../utils/utils';
 
 const initialState = {
@@ -65,10 +60,14 @@ export default createReducer(initialState, {
   //     },
   //   };
   // },
-  [ADD_TEAM_KEY_PAIR_BATCH](state, { data }) {
+  [ADD_TEAM_KEY_PAIR_BATCH](
+    state,
+    {
+      payload: { data },
+    },
+  ) {
     let pairsById = data;
     if (Array.isArray(data)) pairsById = arrayToObject(data);
-
     if (!pairsById) return state;
 
     if (Object.values(pairsById)?.length <= 0) return state;
@@ -81,20 +80,24 @@ export default createReducer(initialState, {
       },
     };
   },
-  [ADD_SHARE_KEY_PAIR_BATCH](state, { payload }) {
-    if (!payload.data || payload.data?.length <= 0) return state;
+  [ADD_SHARE_KEY_PAIR_BATCH](
+    state,
+    {
+      payload: { data },
+    },
+  ) {
+    let pairsById = data;
+    if (Array.isArray(data)) pairsById = arrayToObject(data);
+    if (!pairsById) return state;
 
-    // TODO: Use the normalizr library
-    const keyPairs = {};
-    payload.data.forEach(systemItem => {
-      keyPairs[
-        systemItem?.relatedItemId || systemItem.id
-      ] = convertSystemItemToKeyPair(systemItem);
-    });
+    if (Object.values(pairsById)?.length <= 0) return state;
 
     return {
       ...state,
-      [KEY_TYPE.SHARES]: keyPairs,
+      [KEY_TYPE.SHARES]: {
+        ...state[KEY_TYPE.SHARES],
+        ...pairsById,
+      },
     };
   },
   [ADD_TEAM_KEY_PAIR](state, { payload }) {

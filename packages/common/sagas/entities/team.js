@@ -64,6 +64,7 @@ import {
 import {
   convertTeamsToEntity,
   convertNodesToEntities,
+  convertKeyPairToEntity,
 } from '@caesar/common/normalizers/normalizers';
 import { createPermissionsFromLinks } from '@caesar/common/utils/createPermissionsFromLinks';
 import {
@@ -91,6 +92,7 @@ import { memberSelector } from '../../selectors/entities/member';
 import { encryptItem } from '../../utils/cipherUtils';
 import { addTeamKeyPairBatch } from '../../actions/keystore';
 import { createVaultSuccess } from '../../actions/entities/vault';
+import { convertSystemItemToKeyPair } from '../../utils/item';
 
 export function* fetchTeamsSaga() {
   try {
@@ -234,19 +236,13 @@ export function* createTeamSaga({
 
     // TODO: [Refactoring] The calls for the sagas below should be refactor to the vault reduser of the createVaultSuccess event
     if (serverTeam?.id) {
-      yield put(
-        addTeamsBatch({
-          [serverTeam.id]: serverTeam,
-        }),
-      );
+      const teamsById = convertTeamsToEntity([serverTeam]);
+      yield put(addTeamsBatch(teamsById));
     }
 
     if (serverKeypair?.id) {
-      yield put(
-        addTeamKeyPairBatch({
-          [serverKeypair.id]: serverKeypair,
-        }),
-      );
+      const keyPairsById = convertKeyPairToEntity([serverKeypair]);
+      yield put(addTeamKeyPairBatch(keyPairsById));
     }
 
     yield put(

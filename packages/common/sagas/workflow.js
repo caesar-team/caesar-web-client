@@ -33,8 +33,8 @@ import {
   FETCH_USER_TEAMS_SUCCESS,
 } from '@caesar/common/actions/user';
 import {
-  addTeamKeyPairBatch,
   addShareKeyPairBatch,
+  addTeamKeyPairBatch,
   ADD_TEAM_KEY_PAIR_BATCH,
 } from '@caesar/common/actions/keystore';
 import { fetchMembersSaga } from '@caesar/common/sagas/entities/member';
@@ -44,17 +44,13 @@ import {
   convertItemsToEntities,
   convertTeamsToEntity,
   convertListsToEntities,
+  convertKeyPairToEntity,
 } from '@caesar/common/normalizers/normalizers';
-import { arrayToObject, objectToArray } from '@caesar/common/utils/utils';
+import { objectToArray } from '@caesar/common/utils/utils';
 import { upperFirst } from '@caesar/common/utils/string';
 import { itemsByFavoritesSort } from '@caesar/common/utils/workflow';
 import { getLists, getTeamLists, getUserItems } from '@caesar/common/api';
-import {
-  REGEXP_TESTER,
-  TEAM_TYPE,
-  LIST_TYPE,
-  ROLE_ADMIN,
-} from '@caesar/common/constants';
+import { TEAM_TYPE, LIST_TYPE, ROLE_ADMIN } from '@caesar/common/constants';
 import {
   favoriteListSelector,
   listsByIdSelector,
@@ -161,7 +157,6 @@ export function* processSharedItemsSaga() {
 export function* processTeamItemsSaga({ payload: { teamId } }) {
   try {
     const teamKeyPairs = yield select(teamKeyPairSelector, { teamId });
-
     if (!teamKeyPairs) {
       const team = yield select(teamSelector, { teamId });
       const { id: ownerId } = yield select(userDataSelector);
@@ -298,6 +293,7 @@ function* initTeams() {
     });
 
     const teamById = convertTeamsToEntity(teams);
+
     yield put(addTeamsBatch(teamById));
   } catch (error) {
     // eslint-disable-next-line no-console
@@ -323,12 +319,18 @@ export function* processKeyPairsSaga({ payload: { itemsById } }) {
           : shareKeys.push(keyPair);
       });
 
-      yield all([
-        teamKeys.length > 0
-          ? put(addTeamKeyPairBatch(arrayToObject(teamKeys)))
-          : null,
-        shareKeys.length > 0 ? put(addShareKeyPairBatch(shareKeys)) : null,
-      ]);
+      const putSagas = [];
+      if (teamKeys.length > 0) {
+        const teamKeyPairsById = convertKeyPairToEntity(teamKeys);
+        putSagas.push(put(addTeamKeyPairBatch(teamKeyPairsById)));
+      }
+
+      if (shareKeys.length > 0) {
+        const shareKeysById = convertKeyPairToEntity(shareKeys);
+        putSagas.push(put(addShareKeyPairBatch(shareKeysById)));
+      }
+
+      yield all(putSagas);
     }
   } catch (error) {
     // eslint-disable-next-line no-console
@@ -408,10 +410,6 @@ function* initPersonalVault() {
         ...favoritesListById,
       }),
     );
-
-    if (!keypairsArray?.length) {
-      yield fork(initTeams);
-    }
   } catch (error) {
     // eslint-disable-next-line no-console
     console.error(error);
@@ -454,6 +452,7 @@ export function* initWorkflow() {
   // Wait for the user data
   yield take(FETCH_USER_SELF_SUCCESS);
   yield call(initPersonalVault);
+  yield call(initTeams);
   // We need to wait for the decryption of team keypair to initiate the Teams
   yield fork(fetchMembersSaga);
 }

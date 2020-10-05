@@ -32,7 +32,6 @@ import {
   UPDATE_TEAM_MEMBERS_WITH_ROLES,
 } from '@caesar/common/actions/entities/team';
 import { KEY_TYPE } from '../../constants';
-import { CREATE_VAULT_SUCCESS } from '../../actions/entities/vault';
 
 const initialState = {
   isLoading: true,

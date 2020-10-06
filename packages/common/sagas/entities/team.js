@@ -79,11 +79,17 @@ import { updateGlobalNotification } from '@caesar/common/actions/application';
 import {
   encryptSecret,
   generateTeamKeyPair,
+  saveItemSaga,
 } from '@caesar/common/sagas/entities/item';
 import { teamKeyPairSelector } from '@caesar/common/selectors/keystore';
 import { memberSelector } from '../../selectors/entities/member';
 import { addTeamKeyPairBatch } from '../../actions/keystore';
 import { createVaultSuccess } from '../../actions/entities/vault';
+import {
+  currentTeamDefaultListSelector,
+  defaultListSelector,
+  teamDefaultListSelector,
+} from '../../selectors/entities/list';
 
 export function* fetchTeamsSaga() {
   try {
@@ -158,7 +164,7 @@ export function* removeTeamSaga({ payload: { teamId } }) {
   }
 }
 
-export function* createTeamKeyPairSaga({ payload: { teamName, publicKey } }) {
+export function* createTeamKeyPairSaga({ payload: { team, publicKey } }) {
   try {
     if (!publicKey || typeof publicKey === 'undefined') {
       // TODO: Bug fix: we lost the user default list and we need to restore it from the list api
@@ -167,12 +173,26 @@ export function* createTeamKeyPairSaga({ payload: { teamName, publicKey } }) {
 
     const teamKeyPair = yield call(generateTeamKeyPair, {
       payload: {
-        name: teamName,
+        name: team.name,
         publicKey,
       },
     });
 
-    return teamKeyPair;
+    const { id: listId } = yield select(teamDefaultListSelector, {
+      teamId: team.id,
+    });
+
+    const { data: serverKeypairItem } = yield call(saveItemSaga, {
+      item: {
+        teamId: team.id,
+        listId,
+        ...teamKeyPair,
+      },
+      publicKey,
+    });
+
+    const keyPairsById = convertKeyPairToEntity(serverKeypairItem);
+    yield put(addTeamKeyPairBatch(keyPairsById));
   } catch (error) {
     // eslint-disable-next-line no-console
     console.error(error);
@@ -181,8 +201,6 @@ export function* createTeamKeyPairSaga({ payload: { teamName, publicKey } }) {
     );
     // Todo: need to remove all dependet entities when create team is failed
     yield put(createTeamFailure());
-
-    return null;
   }
 }
 

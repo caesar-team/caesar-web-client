@@ -151,6 +151,45 @@ export function* generateSystemItem(entityType, listId, entityId) {
   return systemItemData;
 }
 
+export function* generateTeamKeyPair({ name }) {
+  const masterPassword = yield call(passwordGenerator);
+  const systemItemName = yield call(
+    generateSystemItemName,
+    ITEM_TYPE.KEYPAIR,
+    name,
+  );
+
+  const systemItemEmail = yield call(generateSystemItemEmail, systemItemName);
+
+  const { publicKey, privateKey } = yield call(generateKeys, masterPassword, [
+    systemItemEmail,
+  ]);
+
+  const systemItemData = {
+    type: ITEM_TYPE.KEYPAIR,
+    data: {
+      attachments: [
+        {
+          id: 'publicKey',
+          name: 'publicKey',
+        },
+        {
+          id: 'privateKey',
+          name: 'privateKey',
+        },
+      ],
+      raws: {
+        privateKey,
+        publicKey,
+      },
+      pass: masterPassword,
+      name: systemItemName,
+    },
+  };
+
+  return systemItemData;
+}
+
 export function* removeItemSaga({ payload: { itemId, listId } }) {
   try {
     yield put(
@@ -362,16 +401,8 @@ export function* moveItemsBatchSaga({
   }
 }
 
-export function* saveItemSaga({ item, publicKey }) {
-  const {
-    id = null,
-    listId,
-    type,
-    favorite = false,
-    relatedItemId = null,
-    data: { raws, ...data } = { raws: {} },
-  } = item;
-
+export function* encryptSecret({ item, publicKey }) {
+  const { data: { raws, ...data } = { raws: {} } } = item;
   const encryptedItemData = yield call(encryptItem, data, publicKey);
 
   const encryptedItem = {
@@ -381,7 +412,20 @@ export function* saveItemSaga({ item, publicKey }) {
       : null,
   };
 
-  const secret = JSON.stringify(encryptedItem);
+  return JSON.stringify(encryptedItem);
+}
+
+export function* saveItemSaga({ item, publicKey }) {
+  const {
+    id = null,
+    listId,
+    type,
+    favorite = false,
+    relatedItemId = null,
+  } = item;
+
+  const secret = yield call(encryptSecret, { item, publicKey });
+
   let serverItemData = {};
 
   if (id) {
@@ -482,11 +526,9 @@ export function* createSystemItemKeyPair({
   };
 
   yield put(
-    addTeamKeyPairBatch([
-      {
-        [systemKeyPairItem.id]: systemKeyPairItem,
-      },
-    ]),
+    addTeamKeyPairBatch({
+      [systemKeyPairItem.id]: systemKeyPairItem,
+    }),
   );
 
   return systemKeyPairItem;

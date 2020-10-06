@@ -13,7 +13,6 @@ import {
   ADD_SHARE_KEY_PAIR_BATCH,
 } from '@caesar/common/actions/keystore';
 
-import { convertSystemItemToKeyPair } from '@caesar/common/utils/item';
 import { arrayToObject } from '../utils/utils';
 
 const initialState = {

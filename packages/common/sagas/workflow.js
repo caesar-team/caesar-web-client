@@ -418,8 +418,6 @@ function* initPersonalVault() {
     if (!keypairsArray?.length) {
       yield call(openCurrentVaultSaga);
     }
-
-    yield put(finishIsLoading());
   } catch (error) {
     // eslint-disable-next-line no-console
     console.error(error);
@@ -506,8 +504,6 @@ export function* openTeamVaultSaga({ payload: { teamId } }) {
         teamId,
       },
     });
-
-    yield put(finishIsLoading());
   } catch (error) {
     // eslint-disable-next-line no-console
     console.error(error);

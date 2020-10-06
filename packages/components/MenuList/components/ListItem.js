@@ -17,7 +17,6 @@ import {
 } from '@caesar/common/actions/entities/list';
 import { visibleItemsSelector } from '@caesar/common/selectors/entities/item';
 import { Tooltip } from '@caesar/components/List/Item/styles';
-import { isGeneralItem } from '@caesar/common/utils/item';
 import { Can } from '../../Ability';
 import { Icon } from '../../Icon';
 import { ListInput } from './ListInput';

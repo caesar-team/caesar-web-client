@@ -34,20 +34,6 @@ export const personalListsSelector = createSelector(
   lists => lists.filter(list => list.teamId === TEAM_TYPE.PERSONAL),
 );
 
-export const selectableListsSelector = createSelector(
-  personalListsSelector,
-  lists => [
-    ...lists.filter(list => list.type === LIST_TYPE.INBOX),
-    ...lists.filter(list => list.type === LIST_TYPE.TRASH),
-    ...lists.filter(list => list.type === LIST_TYPE.LIST),
-  ],
-);
-
-export const selectableListsWithoutChildrenSelector = createSelector(
-  selectableListsSelector,
-  lists => lists.map(({ children, ...rest }) => rest),
-);
-
 export const inboxListSelector = createSelector(
   personalListsSelector,
   lists => lists.find(({ type }) => type === LIST_TYPE.INBOX) || {},

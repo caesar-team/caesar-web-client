@@ -117,7 +117,6 @@ const InputComponent = ({
   onClickAcceptEdit,
   onClickClose,
   onClickAway = Function.prototype,
-  children,
   className,
   ...props
 }) => {

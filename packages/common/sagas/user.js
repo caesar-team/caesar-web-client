@@ -1,6 +1,6 @@
 /* eslint-disable no-console */
 import Router from 'next/router';
-import { put, call, takeLatest, select } from 'redux-saga/effects';
+import { put, call, all, takeLatest, select } from 'redux-saga/effects';
 import {
   FETCH_USER_SELF_REQUEST,
   FETCH_KEY_PAIR_REQUEST,
@@ -14,10 +14,7 @@ import {
   setCurrentTeamId,
 } from '@caesar/common/actions/user';
 import { addPersonalKeyPair } from '@caesar/common/actions/keystore';
-import {
-  addTeamsBatch,
-  fetchTeamSuccess,
-} from '@caesar/common/actions/entities/team';
+import { addTeamsBatch } from '@caesar/common/actions/entities/team';
 import { addMembersBatch } from '@caesar/common/actions/entities/member';
 import { membersByIdSelector } from '@caesar/common/selectors/entities/member';
 import { currentTeamIdSelector } from '@caesar/common/selectors/user';
@@ -31,6 +28,7 @@ import {
 import { removeCookieValue, clearStorage } from '@caesar/common/utils/token';
 import { createPermissionsFromLinks } from '@caesar/common/utils/createPermissionsFromLinks';
 import { ROUTES } from '@caesar/common/constants';
+import { objectToArray } from '../utils/utils';
 
 export function* fetchUserSelfSaga() {
   try {
@@ -77,7 +75,9 @@ export function* fetchUserTeamsSaga() {
       yield put(fetchUserTeamsSuccess(data.map(({ id }) => id)));
       // TODO: need fixes from BE
       yield put(addTeamsBatch(convertTeamsToEntity(data)));
-      yield put(fetchTeamSuccess(convertTeamsToEntity(data)));
+      const teamList = objectToArray(convertTeamsToEntity(data));
+      yield all(teamList.map(team => call(addTeamsBatch, team)));
+
       const currentTeamId = yield select(currentTeamIdSelector);
       put(setCurrentTeamId(currentTeamId || data[0].id));
     }

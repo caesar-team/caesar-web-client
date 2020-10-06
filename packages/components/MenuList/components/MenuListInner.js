@@ -172,18 +172,17 @@ const MenuListInnerComponent = ({
     },
   ];
 
-  const listSubject =
-    currentTeam?.id === TEAM_TYPE.PERSONAL
-      ? {
-          __typename: PERMISSION_ENTITY.LIST,
-          // eslint-disable-next-line camelcase
-          create_list: currentTeam?._permissions?.create_list || false,
-        }
-      : {
-          __typename: PERMISSION_ENTITY.TEAM_LIST,
-          // eslint-disable-next-line camelcase
-          team_create_list: currentTeam._permissions?.team_create_list || false,
-        };
+  const listSubject = isPersonal
+    ? {
+        __typename: PERMISSION_ENTITY.LIST,
+        // eslint-disable-next-line camelcase
+        create_list: currentTeam?._permissions?.create_list || false,
+      }
+    : {
+        __typename: PERMISSION_ENTITY.TEAM_LIST,
+        // eslint-disable-next-line camelcase
+        team_create_list: currentTeam?._permissions?.team_create_list || false,
+      };
 
   const nestedListsLabels = nestedLists.map(({ label }) => label.toLowerCase());
 

@@ -404,6 +404,7 @@ export function* saveItemSaga({ item, publicKey }) {
   const itemData = {
     ...item,
     ...serverItemData,
+    _permissions: createPermissionsFromLinks(serverItemData._links) || {},
     secret,
   };
 

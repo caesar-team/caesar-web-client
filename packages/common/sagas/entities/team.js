@@ -182,7 +182,7 @@ export function* createTeamKeyPairSaga({ payload: { team, publicKey } }) {
       teamId: team.id,
     });
 
-    const { data: serverKeypairItem } = yield call(saveItemSaga, {
+    const serverKeypairItem = yield call(saveItemSaga, {
       item: {
         teamId: team.id,
         listId,
@@ -191,7 +191,7 @@ export function* createTeamKeyPairSaga({ payload: { team, publicKey } }) {
       publicKey,
     });
 
-    const keyPairsById = convertKeyPairToEntity(serverKeypairItem);
+    const keyPairsById = convertKeyPairToEntity([serverKeypairItem]);
     yield put(addTeamKeyPairBatch(keyPairsById));
   } catch (error) {
     // eslint-disable-next-line no-console

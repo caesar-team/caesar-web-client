@@ -9,13 +9,21 @@ const encryption = {
     // eslint-disable-next-line
     return await Promise.all(
       pairs.map(async ({ item, user }) => {
-        const data = await encryptItem(item.data, user.publicKey);
+        const { id, data, raws = {} } = item;
+        const encryptedItemData = await encryptItem(data, user.publicKey);
+
+        const encryptedItem = {
+          data: encryptedItemData,
+          raws: Object.keys(raws).length
+            ? await encryptItem(raws, user.publicKey)
+            : null,
+        };
 
         return {
-          itemId: item.id,
+          itemId: id,
           userId: user.id,
           teamId: user.teamId,
-          secret: data,
+          secret: JSON.stringify(encryptedItem),
         };
       }),
     );

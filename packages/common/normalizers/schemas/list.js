@@ -1,5 +1,7 @@
+/* eslint-disable camelcase */
 import { schema } from 'normalizr';
-import { ENTITY_TYPE } from '@caesar/common/constants';
+import { ENTITY_TYPE, TEAM_TYPE, LIST_TYPE } from '@caesar/common/constants';
+import { createPermissionsFromLinks } from '@caesar/common/utils/createPermissionsFromLinks';
 import itemSchema from './item';
 
 const listSchema = new schema.Entity(
@@ -11,6 +13,11 @@ const listSchema = new schema.Entity(
     processStrategy: entity => ({
       ...entity,
       __type: ENTITY_TYPE.LIST,
+      teamId: entity.teamId || TEAM_TYPE.PERSONAL,
+      _permissions: createPermissionsFromLinks(entity._links),
+      items: entity.children.map(item => item.id),
+      type:
+        entity.label === LIST_TYPE.DEFAULT ? LIST_TYPE.DEFAULT : entity.type,
     }),
   },
 );

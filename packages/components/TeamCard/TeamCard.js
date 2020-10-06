@@ -19,7 +19,7 @@ const Wrapper = styled.div`
   display: flex;
   flex-direction: column;
   padding: 20px;
-  border-radius: 3px;
+  border-radius: ${({ theme }) => theme.borderRadius};
   background-color: ${({ theme }) => theme.color.white};
 `;
 
@@ -41,9 +41,9 @@ const StyledDottedMenu = styled(DottedMenu)`
 const MenuWrapper = styled.div`
   position: absolute;
   width: 100%;
-  height: 82px;
+  min-height: 42px;
   border: 1px solid ${({ theme }) => theme.color.gallery};
-  border-radius: 3px;
+  border-radius: ${({ theme }) => theme.borderRadius};
 `;
 
 const MenuButton = styled(Button)`
@@ -107,6 +107,7 @@ const TeamCard = ({
   members,
   onClick = Function.prototype,
   onClickEditTeam = Function.prototype,
+  onClickLeaveTeam = Function.prototype,
   onClickRemoveTeam = Function.prototype,
 }) => {
   const { id, icon, users } = team;
@@ -114,37 +115,38 @@ const TeamCard = ({
 
   const teamSubject = {
     __typename: PERMISSION_ENTITY.TEAM,
-    team_edit: !!team?._links?.team_edit,
-    team_delete: !!team?._links?.team_delete,
+    team_edit: team?._permissions?.team_edit || false,
+    team_delete: team?._permissions?.team_delete || false,
   };
 
   return (
     <Wrapper className={className} onClick={onClick}>
-      <Can I={PERMISSION.CRUD} a={teamSubject}>
-        <StyledDottedMenu
-          tooltipProps={{
-            textBoxWidth: '100px',
-            arrowAlign: 'start',
-            position: 'left top',
-            padding: '0px 0px',
-            flat: true,
-            zIndex: '1',
-          }}
-        >
-          <MenuWrapper>
-            <Can I={PERMISSION.EDIT} a={teamSubject}>
-              <MenuButton color="white" onClick={onClickEditTeam}>
-                Edit
-              </MenuButton>
-            </Can>
-            <Can I={PERMISSION.DELETE} a={teamSubject}>
-              <MenuButton color="white" onClick={onClickRemoveTeam}>
-                Remove
-              </MenuButton>
-            </Can>
-          </MenuWrapper>
-        </StyledDottedMenu>
-      </Can>
+      <StyledDottedMenu
+        tooltipProps={{
+          textBoxWidth: '100px',
+          arrowAlign: 'start',
+          position: 'left top',
+          padding: '0px 0px',
+          flat: true,
+          zIndex: '1',
+        }}
+      >
+        <MenuWrapper>
+          <Can I={PERMISSION.EDIT} a={teamSubject}>
+            <MenuButton color="white" onClick={onClickEditTeam}>
+              Edit
+            </MenuButton>
+          </Can>
+          <MenuButton color="white" onClick={onClickLeaveTeam}>
+            Leave
+          </MenuButton>
+          <Can I={PERMISSION.DELETE} a={teamSubject}>
+            <MenuButton color="white" onClick={onClickRemoveTeam}>
+              Remove
+            </MenuButton>
+          </Can>
+        </MenuWrapper>
+      </StyledDottedMenu>
       <Link
         key={id}
         href={`${ROUTES.SETTINGS}${ROUTES.TEAM}/[id]`}

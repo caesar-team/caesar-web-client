@@ -10,7 +10,7 @@ import { itemsByIdSelector } from '@caesar/common/selectors/entities/item';
 import { childItemsByIdSelector } from '@caesar/common/selectors/entities/childItem';
 import { membersByIdSelector } from '@caesar/common/selectors/entities/member';
 import { teamsByIdSelector } from '@caesar/common/selectors/entities/team';
-import { ITEM_TYPE } from '../constants';
+import { isGeneralItem } from '../utils/item';
 
 export const workflowSelector = state => state.workflow;
 
@@ -84,21 +84,6 @@ export const workInProgressItemSharedMembersSelector = createSelector(
       : [],
 );
 
-const constructedWorkInProgressItem = createSelector(
-  workInProgressItemSelector,
-  workInProgressItemOwnerSelector,
-  workInProgressItemChildItemsSelector,
-  (
-    workInProgressItem,
-    workInProgressItemOwner,
-    workInProgressItemChildItems,
-  ) => ({
-    ...workInProgressItem,
-    owner: workInProgressItemOwner,
-    invited: workInProgressItemChildItems,
-  }),
-);
-
 export const workInProgressListIdSelector = createSelector(
   workflowSelector,
   workflow => workflow.workInProgressListId,
@@ -115,8 +100,9 @@ export const workInProgressListSelector = createSelector(
   workInProgressListIdSelector,
   (listsById, teamsById, workInProgressListId) => {
     const list = listsById[workInProgressListId];
+
     const userRole =
-      list && list.teamId ? teamsById[list.teamId].userRole : null;
+      list && list.teamId ? teamsById[list.teamId]?.userRole : null;
 
     return list
       ? {
@@ -143,7 +129,7 @@ const createListItemsList = (children, itemsById) =>
   children
     .reduce(
       (accumulator, itemId) =>
-        itemsById[itemId]?.data && itemsById[itemId].type !== ITEM_TYPE.SYSTEM
+        itemsById[itemId]?.data && isGeneralItem(itemsById[itemId].type)
           ? [...accumulator, itemsById[itemId]]
           : accumulator,
       [],

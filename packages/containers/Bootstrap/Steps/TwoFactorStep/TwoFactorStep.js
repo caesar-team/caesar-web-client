@@ -1,7 +1,6 @@
 import React, { Component, Fragment } from 'react';
 import {
   getQrCode,
-  getBackupCodes,
   postActivateTwoFactor,
   postCheckTwoFactor,
 } from '@caesar/common/api';
@@ -19,7 +18,7 @@ import {
 } from '../../constants';
 import TwoFactorForm from './TwoFactorForm';
 import { TwoFactorCheckForm } from './TwoFactorCheckForm';
-import TwoFactorBackupForm from './TwoFactorBackupForm';
+import { TwoFactorBackupForm } from './TwoFactorBackupForm';
 
 class TwoFactorStep extends Component {
   state = this.prepareInitialState();
@@ -32,12 +31,9 @@ class TwoFactorStep extends Component {
         data: { qr, code },
       } = await getQrCode();
 
-      const { data: codes } = await getBackupCodes();
-
       this.setState({
         qr,
         code,
-        codes,
       });
     }
   }
@@ -96,13 +92,12 @@ class TwoFactorStep extends Component {
       step: initialStep,
       qr: '',
       code: '',
-      codes: [],
     };
   }
 
   render() {
     const { navigationSteps } = this.props;
-    const { qr, code, codes, step } = this.state;
+    const { qr, code, step } = this.state;
 
     const renderedStep = matchStrict(
       step,
@@ -112,10 +107,7 @@ class TwoFactorStep extends Component {
         ),
         [TWO_FACTOR_CHECK]: <TwoFactorCheckForm onSubmit={this.handleSubmit} />,
         [TWO_FACTOR_BACKUPS]: (
-          <TwoFactorBackupForm
-            codes={codes}
-            onSubmit={this.handleClickSaveBackups}
-          />
+          <TwoFactorBackupForm onSubmit={this.handleClickSaveBackups} />
         ),
       },
       null,

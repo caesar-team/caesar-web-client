@@ -9,7 +9,7 @@ const StyledInput = styled.input`
   margin-right: 5px;
   font-size: 35px;
   text-align: center;
-  border-radius: 3px;
+  border-radius: ${({ theme }) => theme.borderRadius};
   border: none;
   outline: none;
   background: ${({ errors, theme }) =>

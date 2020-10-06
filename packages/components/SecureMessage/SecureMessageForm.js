@@ -5,13 +5,16 @@ import { media } from '@caesar/assets/styles/media';
 import { Select } from '@caesar/components/Select';
 import { checkError } from '@caesar/common/utils/formikUtils';
 import { downloadFile } from '@caesar/common/utils/file';
-import { useMedia, useNotification } from '@caesar/common/hooks';
+import {
+  useMedia,
+  useNotification,
+  useNavigatorOnline,
+} from '@caesar/common/hooks';
 import { Checkbox } from '../Checkbox';
 import { TextArea, PasswordInput } from '../Input';
 import { File } from '../File';
 import { Uploader } from '../Uploader';
 import { Button } from '../Button';
-import { withOfflineDetection } from '../Offline';
 import { Hint } from '../Hint';
 import { TextError } from '../Error';
 import {
@@ -66,7 +69,7 @@ const Label = styled.div`
 `;
 
 const InputStyled = styled(PasswordInput)`
-  border-radius: 3px;
+  border-radius: ${({ theme }) => theme.borderRadius};
   border: solid 1px ${({ theme }) => theme.color.gallery};
 `;
 
@@ -145,7 +148,7 @@ const StyledSelect = styled(Select)`
   height: 40px;
   padding: 8px 16px;
   border: 1px solid ${({ theme }) => theme.color.gallery};
-  border-radius: 3px;
+  border-radius: ${({ theme }) => theme.borderRadius};
 
   ${Select.ValueText} {
     padding: 0;
@@ -207,10 +210,11 @@ const renderAttachments = (
   ));
 };
 
-const SecureMessageFormComponent = ({ onSubmit, isOnline }) => {
+const SecureMessageFormComponent = ({ onSubmit }) => {
   const notification = useNotification();
   const { isMobile } = useMedia();
   const [isCustomPassword, setCustomPassword] = useState(false);
+  const isOnline = useNavigatorOnline();
 
   const {
     values,
@@ -269,7 +273,6 @@ const SecureMessageFormComponent = ({ onSubmit, isOnline }) => {
       <AttachmentsSection>
         <StyledUploader
           multiple
-          asPreview
           name="attachments"
           files={values.attachments}
           error={
@@ -365,6 +368,4 @@ const SecureMessageFormComponent = ({ onSubmit, isOnline }) => {
   );
 };
 
-export const SecureMessageForm = withOfflineDetection(
-  memo(SecureMessageFormComponent),
-);
+export const SecureMessageForm = memo(SecureMessageFormComponent);

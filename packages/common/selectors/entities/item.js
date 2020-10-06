@@ -1,6 +1,6 @@
 import { createSelector } from 'reselect';
 import { childItemsByIdSelector } from '@caesar/common/selectors/entities/childItem';
-import { ITEM_TYPE } from '@caesar/common/constants';
+import { isGeneralItem } from '../../utils/item';
 
 export const entitiesSelector = state => state.entities;
 
@@ -37,6 +37,40 @@ export const itemsBatchSelector = createSelector(
 
 const teamIdPropSelector = (_, prop) => prop.teamId;
 
+export const nonDecryptedTeamItemsSelector = createSelector(
+  itemsByIdSelector,
+  teamIdPropSelector,
+  (items, teamId) =>
+    Object.values(items).filter(
+      item => !item?.data && !item.isShared && item.teamId === teamId,
+    ),
+);
+
+export const nonDecryptedTeamsItemsSelector = createSelector(
+  itemsByIdSelector,
+  items => Object.values(items).filter(item => !item?.data && item.teamId),
+);
+
+const listsIdPropSelector = (_, prop) => prop.listsId;
+export const nonDecryptedListsItemsSelector = createSelector(
+  itemsByIdSelector,
+  listsIdPropSelector,
+  (items, listsId) =>
+    Object.values(items).filter(
+      item => !item?.data && !item.isShared && listsId.includes(item.listId),
+    ),
+);
+
+export const nonDecryptedItemsSelector = createSelector(
+  itemsByIdSelector,
+  items => Object.values(items).filter(item => !item?.data),
+);
+
+export const nonDecryptedSharedItemsSelector = createSelector(
+  nonDecryptedItemsSelector,
+  items => items.filter(item => item.isShared),
+);
+
 export const teamItemListSelector = createSelector(
   itemListSelector,
   teamIdPropSelector,
@@ -68,5 +102,5 @@ export const itemsChildItemsBatchSelector = createSelector(
 
 export const visibleItemsSelector = createSelector(
   itemsBatchSelector,
-  items => items.filter(({ type }) => type !== ITEM_TYPE.SYSTEM) || [],
+  items => items.filter(isGeneralItem) || [],
 );

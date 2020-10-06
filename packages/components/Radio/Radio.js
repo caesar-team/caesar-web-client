@@ -61,12 +61,21 @@ const Wrapper = styled.label`
   }
 `;
 
-const Radio = ({ label, disabled, className, value, name, onChange }) => (
+const Radio = ({
+  label,
+  checked = false,
+  disabled,
+  className,
+  value,
+  name,
+  onChange,
+}) => (
   <Wrapper disabled={disabled} className={className}>
     <DefaultRadio
       type="radio"
       name={name}
       value={value}
+      checked={checked}
       disabled={disabled}
       onChange={onChange}
     />

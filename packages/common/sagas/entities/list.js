@@ -31,8 +31,9 @@ import {
   patchTeamList,
   removeTeamList,
 } from '@caesar/common/api';
-import { ENTITY_TYPE, LIST_TYPE } from '@caesar/common/constants';
+import { ENTITY_TYPE, LIST_TYPE, TEAM_TYPE } from '@caesar/common/constants';
 import { getServerErrors } from '@caesar/common/utils/error';
+import { createPermissionsFromLinks } from '@caesar/common/utils/createPermissionsFromLinks';
 
 const reorder = (list, startIndex, endIndex) => {
   const result = Array.from(list);
@@ -66,7 +67,7 @@ export function* sortListSaga({
     yield call(patchListSort, listId, { sort: destinationIndex });
   } catch (error) {
     // eslint-disable-next-line no-console
-    console.log(error);
+    console.error(error);
     yield put(sortListFailure());
   }
 }
@@ -78,13 +79,14 @@ export function* createListSaga({
   try {
     const {
       data: { id: listId, _links },
-    } = list.teamId
-      ? yield call(postCreateTeamList, list.teamId, {
-          label: list.label,
-        })
-      : yield call(postCreateList, {
-          label: list.label,
-        });
+    } =
+      list.teamId && list.teamId !== TEAM_TYPE.PERSONAL
+        ? yield call(postCreateTeamList, list.teamId, {
+            label: list.label,
+          })
+        : yield call(postCreateList, {
+            label: list.label,
+          });
 
     yield call(setCreatingMode, false);
     yield put(
@@ -95,6 +97,7 @@ export function* createListSaga({
         sort: 0,
         __type: ENTITY_TYPE.LIST,
         _links,
+        _permissions: createPermissionsFromLinks(_links),
         ...list,
       }),
     );
@@ -126,17 +129,17 @@ export function* createListSaga({
 
 export function* editListSaga({ payload: { list }, meta: { setEditMode } }) {
   try {
-    if (list.teamId) {
-      yield call(patchTeamList, list.teamId, list.id, { label: list.label });
-    } else {
+    if (list.teamId === TEAM_TYPE.PERSONAL) {
       yield call(patchList, list.id, { label: list.label });
+    } else {
+      yield call(patchTeamList, list.teamId, list.id, { label: list.label });
     }
 
     yield call(setEditMode, false);
     yield put(editListSuccess(list));
   } catch (error) {
     // eslint-disable-next-line no-console
-    console.log(error);
+    console.error(error);
     yield put(editListFailure());
     yield put(updateGlobalNotification(getServerErrors(error), false, true));
   }
@@ -161,16 +164,16 @@ export function* removeListSaga({ payload: { teamId, listId } }) {
       },
     });
 
-    if (teamId) {
-      yield call(removeTeamList, teamId, listId);
-    } else {
+    if (teamId === TEAM_TYPE.PERSONAL) {
       yield call(removeList, listId);
+    } else {
+      yield call(removeTeamList, teamId, listId);
     }
 
     yield put(removeListSuccess(listId));
   } catch (error) {
     // eslint-disable-next-line no-console
-    console.log(error);
+    console.error(error);
     yield put(removeListFailure());
   }
 }

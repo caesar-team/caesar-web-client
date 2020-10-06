@@ -7,7 +7,10 @@ import {
   editTeamRequest,
   removeTeamRequest,
 } from '@caesar/common/actions/entities/team';
-import { fetchMembersRequest } from '@caesar/common/actions/entities/member';
+import {
+  fetchMembersRequest,
+  leaveTeamRequest,
+} from '@caesar/common/actions/entities/member';
 import {
   teamsByIdSelector,
   teamSortedListSelector,
@@ -39,6 +42,7 @@ const mapDispatchToProps = {
   fetchTeamsRequest,
   createTeamRequest,
   editTeamRequest,
+  leaveTeamRequest,
   removeTeamRequest,
 };
 

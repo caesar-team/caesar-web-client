@@ -24,6 +24,8 @@ class SessionChecker extends Component {
         passive: true,
       });
     });
+
+    this.resetTimeout();
   }
 
   componentWillUnmount() {

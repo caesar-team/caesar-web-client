@@ -128,7 +128,7 @@ export default createReducer(initialState, {
             ...accumulator,
             [itemId]: {
               ...state.byId[itemId],
-              teamId: payload.teamId,
+              teamId: payload.newTeamId,
               listId: payload.newListId,
               previousListId: payload.oldListId,
             },
@@ -339,6 +339,8 @@ export default createReducer(initialState, {
     return state;
   },
   [ADD_ITEMS_BATCH](state, { payload }) {
+    if (Object.values(payload.itemsById) <= 0) return state;
+
     return {
       ...state,
       byId: {
@@ -348,6 +350,8 @@ export default createReducer(initialState, {
     };
   },
   [REMOVE_ITEMS_BATCH](state, { payload }) {
+    if (!state.byId || Object.keys(state.byId).length <= 0) return state;
+
     return {
       ...state,
       byId: Object.keys(state.byId).reduce(

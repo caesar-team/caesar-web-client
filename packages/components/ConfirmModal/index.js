@@ -1,1 +1,2 @@
-export { default as ConfirmModal } from './ConfirmModal';
+export { ConfirmModal } from './ConfirmModal';
+export { ConfirmLeaveTeamModal } from './ConfirmLeaveTeamModal';

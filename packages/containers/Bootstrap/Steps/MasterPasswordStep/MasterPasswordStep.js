@@ -20,7 +20,7 @@ import {
   MASTER_PASSWORD_CONFIRM,
 } from '../../constants';
 import MasterPasswordCheckForm from './MasterPasswordCheckForm';
-import MasterPasswordCreateForm from './MasterPasswordCreateForm';
+import { MasterPasswordCreateForm } from './MasterPasswordCreateForm';
 import MasterPasswordConfirmForm from './MasterPasswordConfirmForm';
 
 const Wrapper = styled.div`
@@ -33,7 +33,7 @@ const isSameKeyPair = (oldKeyPair, currentKeyPair) =>
   oldKeyPair.publicKey === currentKeyPair.publicKey &&
   oldKeyPair.encryptedPrivateKey === currentKeyPair.encryptedPrivateKey;
 
-const MasterPasswordStep = ({
+const MasterPasswordStepComponent = ({
   initialStep,
   navigationSteps,
   user,
@@ -46,7 +46,7 @@ const MasterPasswordStep = ({
     step: null,
     publicKey: null,
     encryptedPrivateKey: null,
-    masterPassword: masterPasswordProp || '',
+    masterPassword: masterPasswordProp || null,
     sharedMasterPassword,
   });
 
@@ -238,7 +238,7 @@ const MasterPasswordStep = ({
       [MASTER_PASSWORD_CREATE]: (
         <MasterPasswordCreateForm
           initialValues={{
-            password: state.masterPassword,
+            password: state.masterPassword || '',
           }}
           onSubmit={handleSubmitCreatePassword}
         />
@@ -275,4 +275,4 @@ const MasterPasswordStep = ({
   );
 };
 
-export default memo(MasterPasswordStep);
+export const MasterPasswordStep = memo(MasterPasswordStepComponent);

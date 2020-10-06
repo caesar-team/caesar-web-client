@@ -10,6 +10,7 @@ const DocumentComponent = ({
   onClickAcceptEdit,
   onClickShare,
   isSharedItem,
+  isVisibleDragZone,
 }) => {
   const { name, note, attachments, raws } = item.data;
 
@@ -24,6 +25,7 @@ const DocumentComponent = ({
       />
       {!isSharedItem && (
         <OwnerAndInvitation
+          invited={item.invited}
           itemSubject={itemSubject}
           onClickShare={onClickShare}
         />
@@ -41,6 +43,7 @@ const DocumentComponent = ({
           raws={raws}
           itemSubject={itemSubject}
           onClickAcceptEdit={onClickAcceptEdit}
+          isVisibleDragZone={isVisibleDragZone}
         />
       </Row>
     </>

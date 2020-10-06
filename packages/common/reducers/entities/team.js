@@ -40,6 +40,23 @@ const initialState = {
 };
 
 export default createReducer(initialState, {
+  // [CREATE_VAULT_SUCCESS](state, { payload }) {
+  //   const { team } = payload;
+  //   if (!team || !team?.id) return state;
+
+  //   return {
+  //     ...state,
+  //     isLoading: false,
+  //     isError: false,
+  //     byId: {
+  //       ...state.byId,
+  //       [team.id]: {
+  //         ...(state.byId[team.id] || {}),
+  //         ...team,
+  //       },
+  //     },
+  //   };
+  // },
   [FETCH_TEAMS_REQUEST](state) {
     return { ...state, isLoading: true };
   },
@@ -173,10 +190,10 @@ export default createReducer(initialState, {
           ...state.byId[payload.teamId],
           users: [
             ...state.byId[payload.teamId].users,
-            ...payload.members.map(({ id, role, _links }) => ({
+            ...payload.members.map(({ id, role, _permissions }) => ({
               id,
               role,
-              _links,
+              _permissions,
             })),
           ],
         },
@@ -211,16 +228,7 @@ export default createReducer(initialState, {
       ...state,
       byId: {
         ...state.byId,
-        ...Object.keys(payload.teamsById).reduce(
-          (accumulator, teamId) => ({
-            ...accumulator,
-            [teamId]: {
-              ...(state.byId[teamId] || {}),
-              ...payload.teamsById[teamId],
-            },
-          }),
-          {},
-        ),
+        ...payload.teamsById,
       },
     };
   },
@@ -246,10 +254,10 @@ export default createReducer(initialState, {
         ...state.byId,
         [payload.teamId]: {
           ...state.byId[payload.teamId],
-          users: payload.members.map(({ id, role, _links }) => ({
+          users: payload.members.map(({ id, role, _permissions }) => ({
             id,
             role,
-            _links,
+            _permissions,
           })),
         },
       },

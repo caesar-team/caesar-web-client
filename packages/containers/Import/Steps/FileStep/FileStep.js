@@ -11,9 +11,8 @@ const Wrapper = styled.div`
 const Form = styled.form``;
 
 const Title = styled.div`
-  font-size: 18px;
+  margin-bottom: 24px;
   font-weight: 600;
-  margin-bottom: 25px;
 `;
 
 const initialValues = {

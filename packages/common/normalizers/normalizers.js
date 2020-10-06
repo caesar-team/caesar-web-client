@@ -1,26 +1,26 @@
 import { normalize } from 'normalizr';
-import { ITEM_TYPE, LIST_TYPE } from '@caesar/common/constants';
-import { listSchema, memberSchema, teamSchema } from './schemas';
+import {
+  listSchema,
+  memberSchema,
+  teamSchema,
+  keypairSchema,
+  itemSchema,
+} from '@caesar/common/normalizers/schemas';
 
-export const extractRelatedAndNonSystemItems = lists => {
-  const result = lists.map(({ children, type, ...rest }) => {
-    const relatedItems = type === LIST_TYPE.INBOX 
-      ? children
-        .filter(item => item && item.relatedItem)
-        .map(item => item.relatedItem) 
-      : [];
-    const nonSystemChildren = children.filter(
-      item => item?.type !== ITEM_TYPE.SYSTEM,
-    );
+export const convertItemsToEntities = items => {
+  const normalized = normalize(items, [itemSchema]);
 
-    return {
-      ...rest,
-      type,
-      children: [...nonSystemChildren, ...relatedItems],
-    };
-  });
+  return {
+    itemsById: normalized.entities.itemsById || {},
+  };
+};
 
-  return result;
+export const convertListsToEntities = nodes => {
+  const normalized = normalize(nodes, [listSchema]);
+
+  return {
+    listsById: normalized.entities.listsById || {},
+  };
 };
 
 export const convertNodesToEntities = nodes => {
@@ -29,7 +29,6 @@ export const convertNodesToEntities = nodes => {
   return {
     listsById: normalized.entities.listsById || {},
     itemsById: normalized.entities.itemsById || {},
-    childItemsById: normalized.entities.childItemsById || {},
   };
 };
 
@@ -41,6 +40,12 @@ export const convertMembersToEntity = members => {
 
 export const convertTeamsToEntity = teams => {
   const normalized = normalize(teams, [teamSchema]);
+
+  return normalized.entities.byId || {};
+};
+
+export const convertKeyPairToEntity = keypairs => {
+  const normalized = normalize(keypairs, [keypairSchema]);
 
   return normalized.entities.byId || {};
 };

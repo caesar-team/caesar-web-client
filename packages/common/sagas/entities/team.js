@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import { put, call, takeLatest, select, all, fork } from 'redux-saga/effects';
 import {
   FETCH_TEAMS_REQUEST,
@@ -13,7 +14,6 @@ import {
   fetchTeamsFailure,
   fetchTeamSuccess,
   fetchTeamFailure,
-  createTeamSuccess,
   createTeamFailure,
   editTeamSuccess,
   editTeamFailure,
@@ -25,48 +25,44 @@ import {
   addTeamMembersBatchFailure,
   removeTeamMemberSuccess,
   removeTeamMemberFailure,
-  addMemberToTeamList,
-  removeTeamRequest,
-  createTeamKeysSuccess,
+  addTeamsBatch,
 } from '@caesar/common/actions/entities/team';
 import { createChildItemBatchSaga } from '@caesar/common/sagas/entities/childItem';
 import { fetchTeamMembersSaga } from '@caesar/common/sagas/entities/member';
 import {
-  addTeamToMemberTeamsList,
   addTeamToMembersTeamsListBatch,
   removeTeamFromMember,
   removeTeamFromMembersBatch,
 } from '@caesar/common/actions/entities/member';
 import { removeChildItemsBatchFromItems } from '@caesar/common/actions/entities/item';
 import { removeChildItemsBatch } from '@caesar/common/actions/entities/childItem';
-import {
-  setCurrentTeamId,
-  leaveTeam,
-  addMemberToTeam,
-} from '@caesar/common/actions/user';
+import { setCurrentTeamId, leaveTeam } from '@caesar/common/actions/user';
 import { teamSelector } from '@caesar/common/selectors/entities/team';
 import { teamItemListSelector } from '@caesar/common/selectors/entities/item';
 import {
   currentTeamIdSelector,
   userDataSelector,
   userTeamIdsSelector,
-  userPersonalDefaultListIdSelector,
 } from '@caesar/common/selectors/user';
 import {
   getTeams,
-  postCreateTeam,
   editTeam,
   deleteTeam,
   getTeam,
   updateTeamMember,
   postAddTeamMember,
   deleteTeamMember,
+  postCreateVault,
 } from '@caesar/common/api';
 import {
   getServerErrorMessage,
   getServerErrors,
 } from '@caesar/common/utils/error';
-import { convertTeamsToEntity } from '@caesar/common/normalizers/normalizers';
+import {
+  convertTeamsToEntity,
+  convertKeyPairToEntity,
+} from '@caesar/common/normalizers/normalizers';
+import { createPermissionsFromLinks } from '@caesar/common/utils/createPermissionsFromLinks';
 import {
   COMMANDS_ROLES,
   ENTITY_TYPE,
@@ -81,10 +77,13 @@ import { inviteNewMemberBatchSaga } from '@caesar/common/sagas/common/invite';
 import { createChildItemsFilterSelector } from '@caesar/common/selectors/entities/childItem';
 import { updateGlobalNotification } from '@caesar/common/actions/application';
 import {
-  generateSystemItem,
-  createItemSaga,
+  encryptSecret,
+  generateTeamKeyPair,
 } from '@caesar/common/sagas/entities/item';
-import { teamKeyPairSelector } from '@caesar/common/selectors/keyStore';
+import { teamKeyPairSelector } from '@caesar/common/selectors/keystore';
+import { memberSelector } from '../../selectors/entities/member';
+import { addTeamKeyPairBatch } from '../../actions/keystore';
+import { createVaultSuccess } from '../../actions/entities/vault';
 
 export function* fetchTeamsSaga() {
   try {
@@ -105,7 +104,7 @@ export function* fetchTeamsSaga() {
     );
   } catch (error) {
     // eslint-disable-next-line no-console
-    console.log(error);
+    console.error(error);
     yield put(
       updateGlobalNotification(getServerErrorMessage(error), false, true),
     );
@@ -120,7 +119,7 @@ export function* fetchTeamSaga({ payload: { teamId } }) {
     yield put(fetchTeamSuccess(data));
   } catch (error) {
     // eslint-disable-next-line no-console
-    console.log(error);
+    console.error(error);
     yield put(
       updateGlobalNotification(getServerErrorMessage(error), false, true),
     );
@@ -151,7 +150,7 @@ export function* removeTeamSaga({ payload: { teamId } }) {
     }
   } catch (error) {
     // eslint-disable-next-line no-console
-    console.log(error);
+    console.error(error);
     yield put(
       updateGlobalNotification(getServerErrorMessage(error), false, true),
     );
@@ -159,67 +158,97 @@ export function* removeTeamSaga({ payload: { teamId } }) {
   }
 }
 
-export function* createTeamKeysSaga({ payload: { team } }) {
+export function* createTeamKeyPairSaga({ payload: { teamName, publicKey } }) {
   try {
-    let listId = null;
-
-    const user = yield select(userDataSelector);
-
-    listId = yield select(userPersonalDefaultListIdSelector);
-
-    if (!listId || typeof listId === 'undefined') {
+    if (!publicKey || typeof publicKey === 'undefined') {
       // TODO: Bug fix: we lost the user default list and we need to restore it from the list api
-      throw new Error('Fatal error: The list id not found.');
+      throw new Error('Fatal error: The publicKey not found.');
     }
-    const systemItemData = yield call(
-      generateSystemItem,
-      ENTITY_TYPE.TEAM,
-      listId,
-      team.id,
-    );
 
-    // Todo: return the data from the server and check it.
-    yield call(createItemSaga, {
+    const teamKeyPair = yield call(generateTeamKeyPair, {
       payload: {
-        item: systemItemData,
+        name: teamName,
+        publicKey,
       },
-      meta: {},
     });
-    yield put(createTeamSuccess({ ...team, __type: ENTITY_TYPE.TEAM }));
-    yield put(addTeamToMemberTeamsList(team.id, user.id));
-    yield put(
-      addMemberToTeamList(team.id, user.id, COMMANDS_ROLES.USER_ROLE_ADMIN),
-    );
-    yield put(addMemberToTeam(team.id));
-    yield put(
-      createTeamKeysSuccess({ ...systemItemData, __type: ENTITY_TYPE.SYSTEM }),
-    );
-    yield call(fetchTeamMembersSaga, { payload: { teamId: team.id, needUpdateTeamMembers: true } });
+
+    return teamKeyPair;
   } catch (error) {
     // eslint-disable-next-line no-console
-    console.log(error);
+    console.error(error);
     yield put(
       updateGlobalNotification(getServerErrorMessage(error), false, true),
     );
-    yield put(removeTeamRequest(team.id));
     // Todo: need to remove all dependet entities when create team is failed
     yield put(createTeamFailure());
+
+    return null;
   }
 }
 
 export function* createTeamSaga({
-  payload: { title, icon },
+  payload: { title, icon, ownerId = null },
   meta: { handleCloseModal, setSubmitting, setErrors },
 }) {
   try {
-    const { data: team } = yield call(postCreateTeam, { title, icon });
-    yield call(createTeamKeysSaga, { payload: { team } });
+    const currentUser = yield select(userDataSelector);
+    const userId = ownerId || currentUser.id;
+
+    const owner = yield select(memberSelector, { memberId: userId });
+    const { publicKey } = owner;
+
+    const team = {
+      title,
+      icon,
+    };
+
+    const teamKeyPair = yield call(createTeamKeyPairSaga, {
+      payload: { teamName: encodeURIComponent(title), publicKey },
+    });
+
+    if (!teamKeyPair) {
+      throw new Error(`Can't create the team with the title: ${title}`);
+    }
+    const encryptedKeypair = yield call(encryptSecret, {
+      item: teamKeyPair,
+      publicKey,
+    });
+
+    const serverPayload = {
+      team,
+      keypair: {
+        secret: encryptedKeypair,
+      },
+    };
+
+    const {
+      data: { team: serverTeam, keypair: serverKeypair },
+    } = yield call(postCreateVault, serverPayload);
+
+    // TODO: [Refactoring] The calls for the sagas below should be refactor to the vault reduser of the createVaultSuccess event
+    if (serverTeam?.id) {
+      const teamsById = convertTeamsToEntity([serverTeam]);
+      yield put(addTeamsBatch(teamsById));
+    }
+
+    if (serverKeypair?.id) {
+      const keyPairsById = convertKeyPairToEntity([serverKeypair]);
+      yield put(addTeamKeyPairBatch(keyPairsById));
+    }
+
+    yield put(
+      createVaultSuccess({
+        team: serverTeam,
+        keypair: serverKeypair,
+      }),
+    );
+
     yield call(setSubmitting, false);
     yield call(handleCloseModal);
   } catch (error) {
     // eslint-disable-next-line no-console
     console.error(error);
-    const errors = getServerErrors(error);
+    const errors = getServerErrors(error) || error;
 
     yield call(setErrors, { form: errors });
     yield call(setSubmitting, false);
@@ -239,7 +268,7 @@ export function* editTeamSaga({
     yield call(handleCloseModal);
   } catch (error) {
     // eslint-disable-next-line no-console
-    console.log(error);
+    console.error(error);
     const errors = getServerErrors(error);
 
     yield call(setErrors, { form: errors });
@@ -257,7 +286,7 @@ export function* updateTeamMemberRoleSaga({
     yield put(updateTeamMemberRoleSuccess(teamId, userId, role));
   } catch (error) {
     // eslint-disable-next-line no-console
-    console.log(error);
+    console.error(error);
     yield put(
       updateGlobalNotification(getServerErrorMessage(error), false, true),
     );
@@ -283,7 +312,7 @@ export function* addMemberToTeamListsBatchSaga({
     const teamItemList = yield select(teamItemListSelector, { teamId });
     const teamSystemItem = yield select(teamKeyPairSelector, { teamId });
 
-    teamItemList.push(teamSystemItem.raw);
+    teamItemList.push(teamSystemItem?.raw);
     const itemUserPairs = yield call(getItemUserPairs, {
       items: teamItemList,
       members: teamMembers,
@@ -311,6 +340,7 @@ export function* addMemberToTeamListsBatchSaga({
           role: data.role,
           teamId,
           _links: data._links,
+          _permissions: createPermissionsFromLinks(data._links),
         });
       });
     });
@@ -329,7 +359,7 @@ export function* addMemberToTeamListsBatchSaga({
     yield put(updateGlobalNotification(NOOP_NOTIFICATION, false));
   } catch (error) {
     // eslint-disable-next-line no-console
-    console.log(error);
+    console.error(error);
     yield put(
       updateGlobalNotification(getServerErrorMessage(error), false, true),
     );
@@ -362,7 +392,7 @@ export function* removeTeamMemberSaga({ payload: { teamId, userId } }) {
     yield put(updateGlobalNotification(NOOP_NOTIFICATION, false));
   } catch (error) {
     // eslint-disable-next-line no-console
-    console.log(error);
+    console.error(error);
     yield put(
       updateGlobalNotification(getServerErrorMessage(error), false, true),
     );
@@ -374,7 +404,7 @@ export default function* teamSagas() {
   yield takeLatest(FETCH_TEAMS_REQUEST, fetchTeamsSaga);
   yield takeLatest(FETCH_TEAM_REQUEST, fetchTeamSaga);
   yield takeLatest(CREATE_TEAM_REQUEST, createTeamSaga);
-  yield takeLatest(CREATE_TEAM_KEYS_REQUEST, createTeamKeysSaga);
+  yield takeLatest(CREATE_TEAM_KEYS_REQUEST, createTeamKeyPairSaga);
   yield takeLatest(EDIT_TEAM_REQUEST, editTeamSaga);
   yield takeLatest(REMOVE_TEAM_REQUEST, removeTeamSaga);
   yield takeLatest(UPDATE_TEAM_MEMBER_ROLE_REQUEST, updateTeamMemberRoleSaga);

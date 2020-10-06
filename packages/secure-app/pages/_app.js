@@ -1,16 +1,14 @@
 import React from 'react';
 // eslint-disable-next-line
 import { default as NextApp } from 'next/app';
+import Head from 'next/head';
 import { ThemeProvider, createGlobalStyle } from 'styled-components';
 import globalStyles from '@caesar/assets/styles/globalStyles';
 import theme from '@caesar/common/theme';
 import withRedux from 'next-redux-wrapper';
 import withReduxSaga from 'next-redux-saga';
 import { configureWebStore } from '@caesar/common/root/store';
-import {
-  NotificationProvider,
-  OfflineDetectionProvider,
-} from '@caesar/components';
+import { NotificationProvider } from '@caesar/components';
 
 import {
   fixedSizeListener,
@@ -21,7 +19,7 @@ import { PWA_WINDOW_SIZE } from '@caesar/common/constants';
 const GlobalStyles = createGlobalStyle`${globalStyles}`;
 
 class Application extends NextApp {
-  static async getInitialProps({ Component, router: { route }, ctx }) {
+  static async getInitialProps({ Component, ctx }) {
     // entryResolver({ route, ctx });
 
     const pageProps = Component.getInitialProps
@@ -45,21 +43,20 @@ class Application extends NextApp {
   }
 
   render() {
-    const {
-      Component,
-      pageProps,
-      router: { route },
-    } = this.props;
+    const { Component, pageProps } = this.props;
 
     return (
-      <ThemeProvider theme={theme}>
-        <OfflineDetectionProvider>
+      <>
+        <Head>
+          <meta name="viewport" content="width=device-width, initial-scale=1" />
+        </Head>
+        <ThemeProvider theme={theme}>
           <NotificationProvider>
             <GlobalStyles />
             <Component {...pageProps} />
           </NotificationProvider>
-        </OfflineDetectionProvider>
-      </ThemeProvider>
+        </ThemeProvider>
+      </>
     );
   }
 }

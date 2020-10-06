@@ -1,7 +1,7 @@
 import React, { memo, forwardRef } from 'react';
 import styled from 'styled-components';
-import withOfflineDetection from '../Offline/withOfflineDetection';
-import Icon from '../Icon/Icon';
+import { useNavigatorOnline } from '@caesar/common/hooks';
+import { Icon } from '../Icon';
 
 const getButtonStyles = ({ color, theme }) => {
   const colorsMap = {
@@ -94,7 +94,7 @@ const StyledButton = styled.button`
   font-size: ${({ isHigh }) => (isHigh ? '18px' : '14px')};
   letter-spacing: ${({ isHigh }) => (isHigh ? '0.6px' : '0.4px')};
   white-space: nowrap;
-  border-radius: 3px;
+  border-radius: ${({ theme }) => theme.borderRadius};
   border: 0;
   outline: none;
   cursor: pointer;
@@ -106,6 +106,7 @@ const StyledButton = styled.button`
     onlyIcon &&
     `
     width: 40px;
+    flex: 0 0 40px;
     padding: 0;
   `};
 
@@ -146,12 +147,12 @@ const ButtonComponent = forwardRef(
       children,
       disabled,
       withOfflineCheck = false,
-      isOnline,
       isHigh,
       ...props
     },
     ref,
   ) => {
+    const isOnline = useNavigatorOnline();
     const onlyIcon = !children;
     const withIcon = !!icon;
     const isDisabled = getButtonDisabledStatus(
@@ -177,7 +178,7 @@ const ButtonComponent = forwardRef(
   },
 );
 
-const Button = withOfflineDetection(memo(ButtonComponent));
+const Button = memo(ButtonComponent);
 
 Button.Text = Text;
 

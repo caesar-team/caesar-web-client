@@ -2,10 +2,16 @@ import { Pool, spawn, Worker } from 'threads';
 import { call, put, take } from 'redux-saga/effects';
 import { addItemsBatch } from '@caesar/common/actions/entities/item';
 import { addSystemItemsBatch } from '@caesar/common/actions/entities/system';
+import { addKeyPairsBatch } from '@caesar/common/actions/entities/keypair';
 import { updateWorkInProgressItemRaws } from '@caesar/common/actions/workflow';
 import { arrayToObject, chunk, match } from '@caesar/common/utils/utils';
-import { checkItemsAfterDecryption } from '@caesar/common/utils/item';
-import { DECRYPTION_CHUNK_SIZE, ITEM_TYPE } from '@caesar/common/constants';
+import {
+  checkItemsAfterDecryption,
+  isGeneralItem,
+  isKeyPairItem,
+  isSystemItem,
+} from '@caesar/common/utils/item';
+import { DECRYPTION_CHUNK_SIZE } from '@caesar/common/constants';
 import { createPoolChannel } from './channels';
 import { normalizeEvent } from './utils';
 import {
@@ -13,6 +19,25 @@ import {
   POOL_QUEUE_FINISHED_EVENT_TYPE,
   POOL_QUEUE_INITIALIZED_EVENT_TYPE,
 } from './constants';
+
+const matchInboundAndOutbound = ({ inbound, outbound }) => {
+  return match(
+    Array.isArray(inbound) ? arrayToObject(inbound) : inbound,
+    checkItemsAfterDecryption(outbound),
+  );
+};
+
+const matchAndAddItems = ({ inbound, outbound }) => {
+  return addItemsBatch(matchInboundAndOutbound({ inbound, outbound }));
+};
+
+const matchAndAddSystemItems = ({ inbound, outbound }) => {
+  return addSystemItemsBatch(matchInboundAndOutbound({ inbound, outbound }));
+};
+
+const matchAndAddKeyPairs = ({ inbound, outbound }) => {
+  return addKeyPairsBatch(matchInboundAndOutbound({ inbound, outbound }));
+};
 
 const taskAction = (items, raws, key, masterPassword) => async task => {
   await task.init(key, masterPassword);
@@ -28,15 +53,12 @@ const taskAction = (items, raws, key, masterPassword) => async task => {
 };
 
 export function* decryption({ items, raws, key, masterPassword, coresCount }) {
-  const itemsById = items ? arrayToObject(items) : {};
-
   const normalizerEvent = normalizeEvent(coresCount);
   const pool = Pool(() => spawn(new Worker('../../workers/decryption')), {
     name: 'decryption',
     size: coresCount,
   });
   const poolChannel = yield call(createPoolChannel, pool);
-
   while (poolChannel) {
     const event = yield take(poolChannel);
 
@@ -47,7 +69,6 @@ export function* decryption({ items, raws, key, masterPassword, coresCount }) {
 
   if (items) {
     const chunks = chunk(items, DECRYPTION_CHUNK_SIZE);
-
     chunks.map(itemsChunk =>
       pool.queue(taskAction(itemsChunk, null, key, masterPassword)),
     );
@@ -64,28 +85,36 @@ export function* decryption({ items, raws, key, masterPassword, coresCount }) {
       switch (event.type) {
         case TASK_QUEUE_COMPLETED_EVENT_TYPE:
           if (items) {
-            const systemItems = [];
-            const nonSystemItems = [];
+            const systemItems = items.filter(isSystemItem);
+            const keyPairsItems = items.filter(isKeyPairItem);
+            const generalItems = items.filter(isGeneralItem);
 
-            Object.values(itemsById).forEach(item => {
-              if (item.type === ITEM_TYPE.SYSTEM) {
-                systemItems.push(item);
-              } else {
-                nonSystemItems.push(item);
-              }
-            });
+            if (systemItems.length > 0) {
+              yield put(
+                matchAndAddSystemItems({
+                  inbound: systemItems,
+                  outbound: event.returnValue,
+                }),
+              );
+            }
 
-            yield put(
-              addSystemItemsBatch(
-                match(arrayToObject(systemItems), checkItemsAfterDecryption(event.returnValue)),
-              ),
-            );
+            if (keyPairsItems.length > 0) {
+              yield put(
+                matchAndAddKeyPairs({
+                  inbound: keyPairsItems,
+                  outbound: event.returnValue,
+                }),
+              );
+            }
 
-            yield put(
-              addItemsBatch(
-                match(arrayToObject(nonSystemItems), checkItemsAfterDecryption(event.returnValue)),
-              ),
-            );
+            if (generalItems.length > 0) {
+              yield put(
+                matchAndAddItems({
+                  inbound: generalItems,
+                  outbound: event.returnValue,
+                }),
+              );
+            }
           }
 
           if (raws) {
@@ -100,7 +129,7 @@ export function* decryption({ items, raws, key, masterPassword, coresCount }) {
       }
     } catch (error) {
       // eslint-disable-next-line no-console
-      console.log(error);
+      console.error(error);
     }
   }
 }

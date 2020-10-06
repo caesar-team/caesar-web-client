@@ -3,44 +3,13 @@ import styled from 'styled-components';
 import {
   Button,
   TeamCard,
-  LogoLoader,
+  SettingsWrapper,
   TeamModal,
   ConfirmModal,
+  ConfirmLeaveTeamModal,
   Can,
 } from '@caesar/components';
 import { PERMISSION, PERMISSION_ENTITY } from '@caesar/common/constants';
-
-const LogoWrapper = styled.div`
-  display: flex;
-  flex-direction: column;
-  background: ${({ theme }) => theme.color.alto};
-  width: 100%;
-  position: relative;
-  height: calc(100vh - 55px);
-  align-items: center;
-  justify-content: center;
-`;
-
-const Wrapper = styled.div`
-  display: flex;
-  flex-direction: column;
-  background: ${({ theme }) => theme.color.alto};
-  width: 100%;
-  padding: 40px;
-  position: relative;
-`;
-
-const TopWrapper = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 30px;
-`;
-
-const Title = styled.div`
-  font-size: 36px;
-  color: ${({ theme }) => theme.color.black};
-`;
 
 const TeamListWrapper = styled.div`
   display: flex;
@@ -54,6 +23,7 @@ const StyledTeamCard = styled(TeamCard)`
 `;
 
 const NEW_TEAM_MODAL = 'newTeamModal';
+const LEAVE_TEAM_MODAL = 'leaveTeamModal';
 const REMOVE_TEAM_MODAL = 'removeTeamModal';
 
 class TeamListContainer extends Component {
@@ -130,6 +100,32 @@ class TeamListContainer extends Component {
     );
   };
 
+  handleClickLeaveTeam = team => event => {
+    event.preventDefault();
+    event.stopPropagation();
+    const { id, title } = team;
+
+    this.setState(
+      {
+        selectedTeamId: id,
+        selectedTeamTitle: title,
+      },
+      this.handleOpenModal(LEAVE_TEAM_MODAL),
+    );
+  };
+
+  handleLeaveTeam = () => {
+    this.props.leaveTeamRequest(this.state.selectedTeamId);
+
+    this.setState(
+      {
+        selectedTeamId: null,
+        selectedTeamTitle: null,
+      },
+      this.handleCloseModal(LEAVE_TEAM_MODAL),
+    );
+  };
+
   handleRemoveTeam = () => {
     this.props.removeTeamRequest(this.state.selectedTeamId);
 
@@ -150,8 +146,10 @@ class TeamListContainer extends Component {
   prepareInitialState() {
     return {
       selectedTeamId: null,
+      selectedTeamTitle: null,
       modalVisibilities: {
         [NEW_TEAM_MODAL]: false,
+        [LEAVE_TEAM_MODAL]: false,
         [REMOVE_TEAM_MODAL]: false,
       },
     };
@@ -170,35 +168,29 @@ class TeamListContainer extends Component {
         team={team}
         members={members}
         onClickEditTeam={this.handleClickEditTeam(team.id)}
+        onClickLeaveTeam={this.handleClickLeaveTeam(team)}
         onClickRemoveTeam={this.handleClickRemoveTeam(team.id)}
       />
     ));
   }
 
   render() {
-    const { isLoading } = this.props;
-    const { modalVisibilities } = this.state;
-
-    if (isLoading) {
-      return (
-        <LogoWrapper>
-          <LogoLoader textColor="black" />
-        </LogoWrapper>
-      );
-    }
+    const { isLoading, teams } = this.props;
+    const { modalVisibilities, selectedTeamTitle } = this.state;
 
     const renderedTeamCards = this.renderTeamCards();
 
     const teamSubject = {
       __typename: PERMISSION_ENTITY.TEAM,
       // eslint-disable-next-line camelcase
-      team_create: !!this.props.user?._links?.team_create,
+      team_create: this.props.user?._permissions?.team_create || false,
     };
 
     return (
-      <Wrapper>
-        <TopWrapper>
-          <Title>Teams</Title>
+      <SettingsWrapper
+        isLoading={isLoading}
+        title={`Teams (${teams.length})`}
+        addonTopComponent={
           <Can I={PERMISSION.CREATE} a={teamSubject}>
             <Button
               withOfflineCheck
@@ -209,7 +201,8 @@ class TeamListContainer extends Component {
               Add a team
             </Button>
           </Can>
-        </TopWrapper>
+        }
+      >
         <TeamListWrapper>{renderedTeamCards}</TeamListWrapper>
         {modalVisibilities[NEW_TEAM_MODAL] && (
           <TeamModal
@@ -225,7 +218,13 @@ class TeamListContainer extends Component {
           onClickConfirm={this.handleRemoveTeam}
           onClickCancel={this.handleCloseModal(REMOVE_TEAM_MODAL)}
         />
-      </Wrapper>
+        <ConfirmLeaveTeamModal
+          isOpened={modalVisibilities[LEAVE_TEAM_MODAL]}
+          teamTitle={selectedTeamTitle}
+          onClickConfirm={this.handleLeaveTeam}
+          onClickCancel={this.handleCloseModal(LEAVE_TEAM_MODAL)}
+        />
+      </SettingsWrapper>
     );
   }
 }

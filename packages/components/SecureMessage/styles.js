@@ -37,7 +37,7 @@ export const ButtonsWrapper = styled.div`
   `}
 `;
 
-export const CopyAllButton = styled(Button)`
+export const ActionButton = styled(Button)`
   margin-right: 24px;
 
   ${media.wideMobile`

@@ -84,8 +84,6 @@ const StyledTooltip = styled(Tooltip)`
   left: auto;
 `;
 
-const filterVisibleItems = items => items.filter(isGeneralItem);
-
 export const ListItem = ({
   list = {},
   nestedListsLabels = [],
@@ -101,7 +99,7 @@ export const ListItem = ({
   const { id, label, children = [], teamId } = list;
 
   const visibleItems = useSelector(state =>
-    visibleItemsSelector(state, { itemIds: filterVisibleItems(children) }),
+    visibleItemsSelector(state, { itemIds: children }),
   );
 
   const isDefault = label === 'default';

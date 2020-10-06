@@ -16,7 +16,7 @@ export { CodeInput } from './CodeInput';
 export { ContentEditable } from './Common';
 export { ConfirmModal, ConfirmLeaveTeamModal } from './ConfirmModal';
 export { CreateForm } from './CreateForm';
-export { NewDataTable, TableStyles, DataTable } from './DataTable';
+export { DataTable, TableStyles } from './DataTable';
 export { DottedMenu } from './DottedMenu';
 export { Dropdown } from './Dropdown';
 export { Error, TextError } from './Error';
@@ -32,7 +32,6 @@ export {
   PasswordInput,
   MasterPasswordInput,
   TextArea,
-  ShareInput,
   StrengthIndicator,
   UserSearchInput,
 } from './Input';

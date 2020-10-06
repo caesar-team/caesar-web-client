@@ -10,13 +10,10 @@ import {
 import { getOrCreateMemberBatchSaga } from '@caesar/common/sagas/entities/member';
 import { itemsBatchSelector } from '@caesar/common/selectors/entities/item';
 import { systemItemsBatchSelector } from '@caesar/common/selectors/entities/system';
+import { userDataSelector } from '@caesar/common/selectors/user';
 import {
-  masterPasswordSelector,
-  userDataSelector,
-} from '@caesar/common/selectors/user';
-import {
-  actualKeyPairSelector,
   shareKeyPairSelector,
+  teamKeyPairSelector,
 } from '@caesar/common/selectors/keystore';
 import {
   decryptItem,
@@ -27,9 +24,9 @@ import {
   ROLE_USER,
   SHARING_IN_PROGRESS_NOTIFICATION,
   ENTITY_TYPE,
+  TEAM_TYPE,
 } from '@caesar/common/constants';
 import {
-  shareItemBatchSuccess,
   shareItemBatchFailure,
   removeChildItemFromItem,
   removeShareFailure,
@@ -37,6 +34,7 @@ import {
   SHARE_ITEM_BATCH_REQUEST,
   REMOVE_SHARE_REQUEST,
   createItemsBatchSuccess,
+  addItemsBatch,
 } from '@caesar/common/actions/entities/item';
 import { updateGlobalNotification } from '@caesar/common/actions/application';
 import { teamsMembersSelector } from '@caesar/common/selectors/entities/team';
@@ -51,6 +49,7 @@ import {
 } from '@caesar/common/sagas/entities/item';
 import { CREATE_CHILD_ITEM_BATCH_FINISHED_EVENT } from '@caesar/common/actions/entities/childItem';
 import { inviteNewMemberBatchSaga } from '@caesar/common/sagas/common/invite';
+import { convertSystemItemToKeyPair } from '../../utils/item';
 
 export function* prepareUsersForSharing(members) {
   const emailRolePairs = members.map(({ email }) => ({
@@ -63,14 +62,14 @@ export function* prepareUsersForSharing(members) {
   });
 }
 
-function* getItemUserPairCombinations(item, members = [], privateKeyObj) {
-  const { id, data: { raws, ...data } = { raws: {} } } = item;
+function* getItemUserPairCombinations(systemItem, members = [], privateKeyObj) {
+  const { id, data: { raws, ...data } = { raws: {} } } = systemItem;
 
   let itemData = data;
   const itemRaws = raws;
 
   if (!itemData) {
-    itemData = yield call(decryptItem, item.secret, privateKeyObj);
+    itemData = yield call(decryptItem, systemItem.secret, privateKeyObj);
   }
 
   return members.map(({ id: memberId, email, publicKey, teamId }) => ({
@@ -79,19 +78,15 @@ function* getItemUserPairCombinations(item, members = [], privateKeyObj) {
   }));
 }
 
-export function* getItemUserPairs({ items, members }) {
-  const keyPair = yield select(actualKeyPairSelector);
-  const masterPassword = yield select(masterPasswordSelector);
-
-  const privateKeyObj = yield call(
-    getPrivateKeyObj,
-    keyPair.privateKey,
-    masterPassword,
-  );
+export function* getItemUserPairs({ systemItems, members }) {
+  const { privateKey, password } = yield select(teamKeyPairSelector, {
+    teamId: TEAM_TYPE.PERSONAL,
+  });
+  const privateKeyObj = yield call(getPrivateKeyObj, privateKey, password);
 
   const itemUserPairs = yield all(
-    items.map(item =>
-      call(getItemUserPairCombinations, item, members, privateKeyObj),
+    systemItems.map(systemItem =>
+      call(getItemUserPairCombinations, systemItem, members, privateKeyObj),
     ),
   );
 
@@ -100,12 +95,13 @@ export function* getItemUserPairs({ items, members }) {
 
 // TODO: move to the system item sage
 export function* findOrCreateSystemItemKeyPair({ payload: { item } }) {
-  const systemKeyPairItem = yield select(shareKeyPairSelector, { id: item.id });
+  let systemKeyPairItem = yield select(shareKeyPairSelector, { id: item.id });
 
   if (!systemKeyPairItem) {
-    yield call(createSystemItemKeyPair, { item, type: ENTITY_TYPE.SHARE });
-
-    return yield select(shareKeyPairSelector, { id: item.id });
+    const systemItem = yield call(createSystemItemKeyPair, {
+      payload: { item, type: ENTITY_TYPE.SHARE },
+    });
+    systemKeyPairItem = convertSystemItemToKeyPair(systemItem);
   }
 
   return systemKeyPairItem;
@@ -132,15 +128,23 @@ export function* reCryptSharedItem(item) {
     );
   }
 
-  const updatedTeamFromServer = yield call(saveItemSaga, {
-    item,
-    publicKey,
-  });
+  // Check if the item already has shared
+  if (!item.isShared) {
+    const updatedItemFromServer = yield call(saveItemSaga, {
+      item,
+      publicKey,
+    });
 
-  return {
-    ...item,
-    ...updatedTeamFromServer,
-  };
+    return {
+      ...item,
+      ...updatedItemFromServer,
+      ...{
+        isShared: true,
+      },
+    };
+  }
+
+  return item;
 }
 
 // 1. Find or create the system keyPair item
@@ -199,29 +203,32 @@ export function* shareItemBatchSaga({
     }
     // Share the system keypair items with users
     const itemUserPairs = yield call(getItemUserPairs, {
-      items: systemKeyPairItems,
+      systemItems: systemKeyPairItems,
       members: allMembers,
     });
 
     if (itemUserPairs.length > 0) {
       yield fork(createChildItemBatchSaga, { payload: { itemUserPairs } });
 
-      const {
-        payload: { childItems },
-      } = yield take(CREATE_CHILD_ITEM_BATCH_FINISHED_EVENT);
+      yield take(CREATE_CHILD_ITEM_BATCH_FINISHED_EVENT);
 
-      const shares = childItems.reduce(
-        (accumulator, item) => [
-          ...accumulator,
-          {
-            itemId: item.originalItemId,
-            childItemIds: item.items.map(({ id }) => id),
-          },
-        ],
-        [],
+      const sharedItemIds = systemKeyPairItems.map(
+        systemItem => systemItem?.relatedItemId,
       );
 
-      yield put(shareItemBatchSuccess(shares));
+      const sharedItems = yield select(itemsBatchSelector, {
+        itemIds: sharedItemIds,
+      });
+
+      const updatedSharedItems = sharedItems.map(item => ({
+        ...item,
+        ...{
+          invited: allMembers.map(member => member.id),
+        },
+      }));
+
+      yield put(addItemsBatch(updatedSharedItems));
+      // yield put(shareItemBatchSuccess(shares));
 
       yield put(updateWorkInProgressItem());
     }

@@ -2,7 +2,7 @@ import { useDispatch } from 'react-redux';
 import { useIsomorphicLayoutEffect } from 'react-use';
 import { logout } from '@caesar/common/actions/user';
 
-export default () => {
+const LogoutPage = () => {
   const dispatch = useDispatch();
 
   useIsomorphicLayoutEffect(() => {
@@ -11,3 +11,5 @@ export default () => {
 
   return null;
 };
+
+export default LogoutPage;

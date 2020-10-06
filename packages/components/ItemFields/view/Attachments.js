@@ -204,7 +204,10 @@ export const Attachments = ({
                 <ConfirmDeleteAttachmentModal
                   isOpened
                   fileName={attachment.name}
-                  onDeleteFile={() => onClickRemove(attachment)}
+                  onDeleteFile={() => {
+                    onClickRemove(attachment);
+                    setOpenedModal(null);
+                  }}
                   handleCloseModal={() => setOpenedModal(null)}
                 />
               )}

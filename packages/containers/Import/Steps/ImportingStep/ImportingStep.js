@@ -5,7 +5,6 @@ import { ProgressBar, Icon, Button } from '@caesar/components';
 const Wrapper = styled.div``;
 
 const Text = styled.div`
-  font-size: 18px;
   font-weight: 600;
   color: ${({ theme }) => theme.color.black};
 `;

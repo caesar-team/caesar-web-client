@@ -56,7 +56,6 @@ const ItemComponent = ({
   const [isMoveModalOpened, setMoveModalOpened] = useState(false);
   const [isVisibleDragZone, setVisibleDragZone] = useState(false);
   const itemRef = useRef(null);
-  // const [item, setItem] = useState(useSelector(workInProgressItemSelector));
   const notification = useNotification();
 
   const handleDragEnter = useCallback(
@@ -113,21 +112,21 @@ const ItemComponent = ({
   };
 
   const itemSubject =
-    item.teamId && item.teamId !== TEAM_TYPE.PERSONAL
+    item?.teamId === TEAM_TYPE.PERSONAL
       ? {
+          __typename: PERMISSION_ENTITY.ITEM,
+          edit_item: item?._permissions?.edit_item || false,
+          move_item: item?._permissions?.move_item || false,
+          batch_share_item: item?._permissions?.batch_share_item || false,
+          delete_item: item?._permissions?.delete_item || false,
+        }
+      : {
           __typename: PERMISSION_ENTITY.TEAM_ITEM,
           team_edit_item: item?._permissions?.team_edit_item || false,
           team_move_item: item?._permissions?.team_move_item || false,
           team_batch_share_item:
             item?._permissions?.team_batch_share_item || false,
           team_delete_item: item?._permissions?.team_delete_item || false,
-        }
-      : {
-          __typename: PERMISSION_ENTITY.ITEM,
-          edit_item: item?._permissions?.edit_item || false,
-          move_item: item?._permissions?.move_item || false,
-          batch_share_item: item?._permissions?.batch_share_item || false,
-          delete_item: item?._permissions?.delete_item || false,
         };
 
   return (

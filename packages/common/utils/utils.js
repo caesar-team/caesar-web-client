@@ -34,8 +34,8 @@ export const arrayToObject = (arr, id = 'id') =>
 
 export const match = (inboundItems, outboundItems, idField = 'id') => {
   if (Object.keys(inboundItems).length === 0) return [];
-  const results = outboundItems.filter(
-    outboundItem => inboundItems[outboundItem[idField]],
+  const results = outboundItems.filter(outboundItem =>
+    inboundItems[outboundItem[idField]] ? outboundItem[idField] : null,
   );
 
   return results;

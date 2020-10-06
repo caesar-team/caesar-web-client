@@ -31,7 +31,7 @@ import {
   ENTITY_TYPE,
   PERMISSION_READ,
   NOOP_NOTIFICATION,
-  SHARE_TYPE,
+  INVITE_TYPE,
 } from '@caesar/common/constants';
 
 const ITEM_CHILD_ITEM_CHUNK_SIZE = 50;
@@ -65,7 +65,7 @@ export function* createChildItemBatchSaga({ payload: { itemUserPairs } }) {
           teamId,
           secret,
           access: PERMISSION_READ,
-          cause: SHARE_TYPE,
+          cause: INVITE_TYPE,
         }),
       ),
     }));

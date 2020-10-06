@@ -1,6 +1,6 @@
 /* eslint-disable no-console */
 import Router from 'next/router';
-import { put, call, takeLatest, select } from 'redux-saga/effects';
+import { put, call, all, takeLatest, select } from 'redux-saga/effects';
 import {
   FETCH_USER_SELF_REQUEST,
   FETCH_KEY_PAIR_REQUEST,
@@ -26,17 +26,20 @@ import {
   postLogout,
 } from '@caesar/common/api';
 import { removeCookieValue, clearStorage } from '@caesar/common/utils/token';
+import { createPermissionsFromLinks } from '@caesar/common/utils/createPermissionsFromLinks';
 import { ROUTES } from '@caesar/common/constants';
+import { objectToArray } from '../utils/utils';
 
 export function* fetchUserSelfSaga() {
   try {
     const { data: user } = yield call(getUserSelf);
     const membersById = yield select(membersByIdSelector);
 
-    // TODO: added teamIds on BE side
+    // TODO: Move to normalizr
     const fixedUser = {
       ...membersById[user.id],
       ...user,
+      _permissions: createPermissionsFromLinks(user._links),
       teamIds: user.teamIds || [],
     };
 
@@ -72,6 +75,8 @@ export function* fetchUserTeamsSaga() {
       yield put(fetchUserTeamsSuccess(data.map(({ id }) => id)));
       // TODO: need fixes from BE
       yield put(addTeamsBatch(convertTeamsToEntity(data)));
+      const teamList = objectToArray(convertTeamsToEntity(data));
+      yield all(teamList.map(team => call(addTeamsBatch, team)));
 
       const currentTeamId = yield select(currentTeamIdSelector);
       put(setCurrentTeamId(currentTeamId || data[0].id));

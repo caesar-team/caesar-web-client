@@ -1,4 +1,4 @@
-import { call, put, take, select, spawn } from 'redux-saga/effects';
+import { call, put, takeEvery, select, spawn } from 'redux-saga/effects';
 import { availableCoresCountSelector } from '@caesar/common/selectors/application';
 import {
   increaseCoresCount,
@@ -69,46 +69,44 @@ function* jobSaga({ id, coresCount, action }) {
   yield put({ type: endEventType, payload: { id, coresCount } });
 }
 
-export function* jobLoadBalancerSaga() {
+function* jobAction(action) {
   const queue = createQueue();
+  if (isEndJob(action.type)) {
+    yield put(increaseCoresCount(action.payload.coresCount));
 
-  while (true) {
-    const action = yield take(JOB_EVENTS);
+    const availableCoresCount = yield select(availableCoresCountSelector);
 
-    if (isEndJob(action.type)) {
-      yield put(increaseCoresCount(action.payload.coresCount));
-
-      const availableCoresCount = yield select(availableCoresCountSelector);
-
-      if (!queue.isEmpty()) {
-        if (canRunJobImmediately(availableCoresCount)) {
-          const nextJob = queue.dequeue();
-
-          const coresCount = getCoresCountFor(
-            nextJob.action,
-            availableCoresCount,
-          );
-          const job = prepareJob(nextJob.action, coresCount);
-
-          yield put(decreaseCoresCount(coresCount));
-          yield spawn(jobSaga, job);
-        }
-      }
-    } else {
-      const availableCoresCount = yield select(availableCoresCountSelector);
-
+    if (!queue.isEmpty()) {
       if (canRunJobImmediately(availableCoresCount)) {
-        const coresCount = getCoresCountFor(action, availableCoresCount);
-        const job = prepareJob(action, coresCount);
+        const nextJob = queue.dequeue();
+
+        const coresCount = getCoresCountFor(
+          nextJob.action,
+          availableCoresCount,
+        );
+        const job = prepareJob(nextJob.action, coresCount);
 
         yield put(decreaseCoresCount(coresCount));
         yield spawn(jobSaga, job);
-      } else {
-        // cores count will be estimated when job will be pulled out from queue
-        const job = prepareJob(action, null);
-
-        queue.enqueue(job);
       }
     }
+  } else {
+    const availableCoresCount = yield select(availableCoresCountSelector);
+
+    if (canRunJobImmediately(availableCoresCount)) {
+      const coresCount = getCoresCountFor(action, availableCoresCount);
+      const job = prepareJob(action, coresCount);
+
+      yield put(decreaseCoresCount(coresCount));
+      yield spawn(jobSaga, job);
+    } else {
+      // cores count will be estimated when job will be pulled out from queue
+      const job = prepareJob(action, null);
+
+      queue.enqueue(job);
+    }
   }
+}
+export function* jobLoadBalancerSaga() {
+  yield takeEvery(JOB_EVENTS, jobAction);
 }

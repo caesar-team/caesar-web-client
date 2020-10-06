@@ -2,11 +2,7 @@ import React from 'react';
 import { useSelector } from 'react-redux';
 import styled from 'styled-components';
 import { PERMISSION } from '@caesar/common/constants';
-import { userDataSelector } from '@caesar/common/selectors/user';
-import {
-  workInProgressItemOwnerSelector,
-  workInProgressItemChildItemsSelector,
-} from '@caesar/common/selectors/workflow';
+import { workInProgressItemOwnerSelector } from '@caesar/common/selectors/workflow';
 import { membersByIdSelector } from '@caesar/common/selectors/entities/member';
 import { Can } from '../../Ability';
 import { Avatar, AvatarsList } from '../../Avatar';
@@ -80,27 +76,16 @@ const ShareButton = styled.button`
   `}
 `;
 
-export const OwnerAndInvitation = ({ itemSubject, onClickShare }) => {
-  const user = useSelector(userDataSelector);
+export const OwnerAndInvitation = ({ invited, itemSubject, onClickShare }) => {
   const owner = useSelector(workInProgressItemOwnerSelector);
-  const childItems = useSelector(workInProgressItemChildItemsSelector);
   const membersById = useSelector(membersByIdSelector);
 
-  const hasInvited = childItems.length > 0;
+  const hasInvited = invited?.length > 0;
 
-  const avatars = childItems.reduce((accumulator, childItem) => {
-    if (!membersById[childItem.userId]) {
-      return accumulator;
-    }
-
-    if (user.id === childItem.userId && user.id !== owner.id) {
-      accumulator.unshift(user);
-    } else if (owner.id !== childItem.userId) {
-      accumulator.push(membersById[childItem.userId]);
-    }
-
-    return accumulator;
-  }, []);
+  // TODO: Do not work with data in the component
+  const avatars = hasInvited
+    ? invited.map(invite => membersById[invite.userId])
+    : [];
 
   return (
     <Wrapper>

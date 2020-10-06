@@ -1,9 +1,5 @@
 import { createReducer } from '@caesar/common/utils/reducer';
-import {
-  KEY_TYPE,
-  REGEXP_EXCTRACTOR,
-  TEAM_TYPE,
-} from '@caesar/common/constants';
+import { KEY_TYPE, TEAM_TYPE } from '@caesar/common/constants';
 import {
   ADD_PERSONAL_KEY_PAIR,
   ADD_TEAM_KEY_PAIR,
@@ -17,13 +13,15 @@ import {
   ADD_SHARE_KEY_PAIR_BATCH,
 } from '@caesar/common/actions/keystore';
 
-import { convertSystemItemToKeyPair } from '@caesar/common/utils/item';
+import { arrayToObject } from '../utils/utils';
 
 const initialState = {
   [KEY_TYPE.PERSONAL]: {},
   [KEY_TYPE.TEAMS]: {},
   [KEY_TYPE.SHARES]: {},
-  [KEY_TYPE.ANONYMOUS]: [],
+  [KEY_TYPE.ANONYMOUS]: {},
+  isLoading: false,
+  isError: false,
 };
 
 export default createReducer(initialState, {
@@ -42,38 +40,63 @@ export default createReducer(initialState, {
       },
     };
   },
-  [ADD_TEAM_KEY_PAIR_BATCH](state, { payload }) {
-    if (!payload.data || payload.data?.length <= 0) return state;
+  // [CREATE_VAULT_SUCCESS](state, { payload }) {
+  //   const { keypair } = payload;
+  //   if (!keypair || !keypair?.id) return state;
 
-    const keyPairs = {};
-    payload.data.forEach(systemItem => {
-      const { data: { name } = { name: null } } = systemItem;
-      keyPairs[
-        REGEXP_EXCTRACTOR.ID(name) || systemItem.id
-      ] = convertSystemItemToKeyPair(systemItem);
-    });
+  //   return {
+  //     ...state,
+  //     isLoading: false,
+  //     isError: false,
+  //     [KEY_TYPE.TEAMS]: {
+  //       ...state[KEY_TYPE.TEAMS],
+  //       ...{
+  //         [keypair.id]: {
+  //           ...(state[KEY_TYPE.TEAMS][keypair.id] || {}),
+  //           ...keypair,
+  //         },
+  //       },
+  //     },
+  //   };
+  // },
+  [ADD_TEAM_KEY_PAIR_BATCH](
+    state,
+    {
+      payload: { data },
+    },
+  ) {
+    let pairsById = data;
+    if (Array.isArray(data)) pairsById = arrayToObject(data);
+    if (!pairsById) return state;
+
+    if (Object.values(pairsById)?.length <= 0) return state;
 
     return {
       ...state,
       [KEY_TYPE.TEAMS]: {
         ...state[KEY_TYPE.TEAMS],
-        ...keyPairs,
+        ...pairsById,
       },
     };
   },
-  [ADD_SHARE_KEY_PAIR_BATCH](state, { payload }) {
-    if (!payload.data || payload.data?.length <= 0) return state;
+  [ADD_SHARE_KEY_PAIR_BATCH](
+    state,
+    {
+      payload: { data },
+    },
+  ) {
+    let pairsById = data;
+    if (Array.isArray(data)) pairsById = arrayToObject(data);
+    if (!pairsById) return state;
 
-    const keyPairs = {};
-    payload.data.forEach(systemItem => {
-      keyPairs[
-        systemItem?.relatedItem?.id || systemItem.id
-      ] = convertSystemItemToKeyPair(systemItem);
-    });
+    if (Object.values(pairsById)?.length <= 0) return state;
 
     return {
       ...state,
-      [KEY_TYPE.SHARES]: keyPairs,
+      [KEY_TYPE.SHARES]: {
+        ...state[KEY_TYPE.SHARES],
+        ...pairsById,
+      },
     };
   },
   [ADD_TEAM_KEY_PAIR](state, { payload }) {
@@ -102,9 +125,9 @@ export default createReducer(initialState, {
     const {
       id,
       data: { name, pass, raws = {} } = { raws: {} },
-      relatedItem,
+      relatedItemId,
     } = payload.data;
-    const itemId = relatedItem?.id || null;
+    const itemId = relatedItemId || null;
     if (!itemId) return state;
 
     const { publicKey, privateKey } = raws || {};
@@ -124,9 +147,28 @@ export default createReducer(initialState, {
     };
   },
   [ADD_ANONYMOUS_KEY_PAIR](state, { payload }) {
+    const {
+      id,
+      data: { name, pass, raws = {} } = { raws: {} },
+      relatedItemId,
+    } = payload.data;
+    const itemId = relatedItemId || null;
+    if (!itemId) return state;
+
+    const { publicKey, privateKey } = raws || {};
+
     return {
       ...state,
-      [KEY_TYPE.ANONYMOUS]: [...state[KEY_TYPE.ANONYMOUS], payload.data],
+      [KEY_TYPE.ANONYMOUS]: {
+        ...state[KEY_TYPE.ANONYMOUS],
+        [itemId]: {
+          id,
+          name,
+          pass,
+          publicKey,
+          privateKey,
+        },
+      },
     };
   },
   [REMOVE_PERSONAL_KEY_PAIR](state) {
@@ -136,27 +178,30 @@ export default createReducer(initialState, {
     };
   },
   [REMOVE_TEAM_KEY_PAIR](state, { payload }) {
+    const newState = state[KEY_TYPE.TEAMS];
+    delete newState[payload.itemId];
+
     return {
       ...state,
-      [KEY_TYPE.TEAMS]: {
-        ...state[KEY_TYPE.TEAMS],
-        [payload.teamId]: undefined,
-      },
+      [KEY_TYPE.TEAMS]: newState,
     };
   },
   [REMOVE_SHARE_KEY_PAIR](state, { payload }) {
+    const newState = state[KEY_TYPE.SHARES];
+    delete newState[payload.itemId];
+
     return {
       ...state,
-      [KEY_TYPE.SHARES]: {
-        ...state[KEY_TYPE.SHARES],
-        [payload.itemId]: undefined,
-      },
+      [KEY_TYPE.SHARES]: newState,
     };
   },
-  [REMOVE_ANONYMOUS_KEY_PAIR](state) {
+  [REMOVE_ANONYMOUS_KEY_PAIR](state, { payload }) {
+    const newState = state[KEY_TYPE.ANONYMOUS];
+    delete newState[payload.itemId];
+
     return {
       ...state,
-      [KEY_TYPE.ANONYMOUS]: [],
+      [KEY_TYPE.ANONYMOUS]: newState,
     };
   },
 });

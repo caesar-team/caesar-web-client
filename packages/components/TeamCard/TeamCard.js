@@ -41,7 +41,7 @@ const StyledDottedMenu = styled(DottedMenu)`
 const MenuWrapper = styled.div`
   position: absolute;
   width: 100%;
-  height: 82px;
+  min-height: 42px;
   border: 1px solid ${({ theme }) => theme.color.gallery};
   border-radius: ${({ theme }) => theme.borderRadius};
 `;
@@ -115,8 +115,8 @@ const TeamCard = ({
 
   const teamSubject = {
     __typename: PERMISSION_ENTITY.TEAM,
-    team_edit: !!team?._links?.team_edit,
-    team_delete: !!team?._links?.team_delete,
+    team_edit: team?._permissions?.team_edit || false,
+    team_delete: team?._permissions?.team_delete || false,
   };
 
   return (

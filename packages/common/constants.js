@@ -80,6 +80,7 @@ export const ITEM_TYPE = {
   CREDIT_CARD: 'card',
   DOCUMENT: 'document',
   SYSTEM: 'system',
+  KEYPAIR: 'keypair',
 };
 
 export const ITEM_TYPES_ARRAY = [
@@ -88,7 +89,7 @@ export const ITEM_TYPES_ARRAY = [
   ITEM_TYPE.DOCUMENT,
 ];
 
-export const ITEM_TEXT_TYPE = {
+export const ITEM_CONTENT_TYPE = {
   [ITEM_TYPE.CREDENTIALS]: 'credential',
   [ITEM_TYPE.DOCUMENT]: 'note',
 };
@@ -172,6 +173,7 @@ export const ENTITY_TYPE = {
   MEMBER: 'member',
   SYSTEM: 'system',
   SHARE: 'share',
+  KEYPAIR: 'keypair',
 };
 
 export const COMMON_PROGRESS_NOTIFICATION = 'In progress...';
@@ -197,7 +199,7 @@ export const TEAM_AVATAR_MAX_SIZE = 8 * 1024 * 1024;
 
 export const GOOD_PASSWORD_SCORE = 3;
 
-export const DEFAULT_ERROR_MESSAGE = 'Something wrong. Please try again';
+export const DEFAULT_ERROR_MESSAGE = 'Something wrong. Please, try again';
 
 export const PERMISSION = {
   CREATE: 'create',
@@ -268,6 +270,17 @@ export const REGEXP_TESTER = {
       /\b(team)-[0-9a-f]{8}\b-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-\b[0-9a-f]{12}\b/.test(
         name,
       ),
+  },
+};
+
+export const REGEXP_MATCHER = {
+  SYSTEM: {
+    ITEM_ID: stringData =>
+      stringData
+        ? stringData?.match(
+            /\b(share|team)-([0-9a-f]{8}\b-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-\b[0-9a-f]{12})\b/,
+          )[1] || null
+        : null,
   },
 };
 

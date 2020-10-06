@@ -85,11 +85,7 @@ import { teamKeyPairSelector } from '@caesar/common/selectors/keystore';
 import { memberSelector } from '../../selectors/entities/member';
 import { addTeamKeyPairBatch } from '../../actions/keystore';
 import { createVaultSuccess } from '../../actions/entities/vault';
-import {
-  currentTeamDefaultListSelector,
-  defaultListSelector,
-  teamDefaultListSelector,
-} from '../../selectors/entities/list';
+import { teamDefaultListSelector } from '../../selectors/entities/list';
 
 export function* fetchTeamsSaga() {
   try {

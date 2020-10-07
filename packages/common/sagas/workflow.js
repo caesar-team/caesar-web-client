@@ -14,13 +14,9 @@ import {
   finishIsLoading,
   setWorkInProgressListId,
   setWorkInProgressItem,
-  resetWorkInProgressItemIds,
   decryption,
 } from '@caesar/common/actions/workflow';
-import {
-  addListsBatch,
-  ADD_LISTS_BATCH,
-} from '@caesar/common/actions/entities/list';
+import { addListsBatch } from '@caesar/common/actions/entities/list';
 import {
   addItemsBatch,
   removeItemsBatch,
@@ -30,7 +26,6 @@ import {
   SET_CURRENT_TEAM_ID,
   setCurrentTeamId,
   FETCH_USER_SELF_SUCCESS,
-  FETCH_USER_TEAMS_SUCCESS,
 } from '@caesar/common/actions/user';
 import {
   addShareKeyPairBatch,
@@ -51,12 +46,7 @@ import { upperFirst } from '@caesar/common/utils/string';
 import { itemsByFavoritesSort } from '@caesar/common/utils/workflow';
 import { getLists, getTeamLists, getUserItems } from '@caesar/common/api';
 import { TEAM_TYPE, LIST_TYPE, ROLE_ADMIN } from '@caesar/common/constants';
-import {
-  favoriteListSelector,
-  listsByIdSelector,
-  defaultListSelector,
-  listsTeamSelector,
-} from '@caesar/common/selectors/entities/list';
+import { teamListsSelector } from '@caesar/common/selectors/entities/list';
 import {
   userDataSelector,
   masterPasswordSelector,
@@ -221,7 +211,7 @@ export function* processTeamsItemsSaga() {
 
 function* getFavoritesListFromStore(teamId) {
   return (
-    (yield select(listsTeamSelector, {
+    (yield select(teamListsSelector, {
       teamId,
     })).find(list => list.type === LIST_TYPE.FAVORITES) || null
   );
@@ -275,12 +265,6 @@ function* initTeams() {
     // Load avaible teams
     // const { data: teams } = yield call(getUserTeams);
     const teams = yield select(teamListSelector);
-
-    // TODO: What if user was added to a new team? Need to do a request?
-    if (teams?.length) {
-      yield take(FETCH_USER_TEAMS_SUCCESS);
-    }
-
     // yield all(teams.map(({ id }) => fork(initTeam, id, false)));
 
     const userData = yield select(userDataSelector);
@@ -341,7 +325,7 @@ export function* processKeyPairsSaga({ payload: { itemsById } }) {
   }
 }
 
-function* initPersonalVault() {
+function* loadKeyPairsAndPersonalItems() {
   try {
     // Init personal keys
     const keyPair = yield select(teamKeyPairSelector, {
@@ -430,14 +414,16 @@ function* initListsAndProgressEntities() {
   const currentTeamId = yield select(currentTeamIdSelector);
 
   const workInProgressListId = yield select(workInProgressListIdSelector);
-  const listsById = yield select(listsByIdSelector);
-  const favoritesList = yield select(favoriteListSelector);
-  const defaultList = yield select(defaultListSelector);
+  const lists = yield select(teamListsSelector, {
+    teamId: currentTeamId,
+  });
+  const workInProgressList = !workInProgressListId
+    ? lists.find(list => list.id === workInProgressListId)
+    : null;
+  const favoritesList = lists.find(list => list.type === LIST_TYPE.FAVORITES);
+  const defaultList = lists.find(list => list.type === LIST_TYPE.DEFAULT);
 
-  if (
-    !workInProgressListId ||
-    ![currentTeamId, null].includes(listsById[workInProgressListId]?.teamId)
-  ) {
+  if (!workInProgressList) {
     if (favoritesList?.children?.length > 0) {
       yield put(setWorkInProgressListId(favoritesList.id));
     } else {
@@ -458,10 +444,9 @@ function* initListsAndProgressEntities() {
 export function* initWorkflow() {
   // Wait for the user data
   yield take(FETCH_USER_SELF_SUCCESS);
-  yield call(initPersonalVault);
   yield fork(initTeams);
-  // We need to wait for the decryption of team keypair to initiate the Teams
   yield fork(fetchMembersSaga);
+  yield call(loadKeyPairsAndPersonalItems);
 }
 
 export function* openTeamVaultSaga({ payload: { teamId } }) {
@@ -479,30 +464,7 @@ export function* openTeamVaultSaga({ payload: { teamId } }) {
     }
 
     yield call(initTeam, teamId);
-    const listsById = yield select(listsTeamSelector, { teamId });
-    const lists = objectToArray(listsById);
-    const defaultList = lists.find(list => list.type === LIST_TYPE.DEFAULT);
-    const favoritesList = lists.find(list => list.type === LIST_TYPE.FAVORITES);
-
-    const workInProgressListId = yield select(workInProgressListIdSelector);
-
-    if (
-      !workInProgressListId ||
-      listsById[workInProgressListId]?.teamId !== teamId
-    ) {
-      if (favoritesList?.children?.length > 0) {
-        yield put(setWorkInProgressListId(favoritesList.id));
-      } else {
-        yield put(setWorkInProgressListId(defaultList?.id));
-      }
-    }
-
-    const workInProgressItem = yield select(workInProgressItemSelector);
-    if (!workInProgressItem || workInProgressItem?.teamId !== teamId) {
-      yield put(setWorkInProgressItem(null));
-    }
-    yield put(resetWorkInProgressItemIds(null));
-
+    yield call(initListsAndProgressEntities);
     // TODO: Here is opportunity to improve the calls
     yield fork(processTeamItemsSaga, {
       payload: {
@@ -606,7 +568,6 @@ export default function* workflowSagas() {
   // Init (get all items, keys, etc)
   yield takeLatest(INIT_WORKFLOW, initWorkflow);
   yield takeLatest(SET_WORK_IN_PROGRESS_ITEM, setWorkInProgressItemSaga);
-  yield takeLatest(ADD_LISTS_BATCH, initListsAndProgressEntities);
   yield takeLatest(UPDATE_WORK_IN_PROGRESS_ITEM, updateWorkInProgressItemSaga);
   yield takeLatest(SET_CURRENT_TEAM_ID, openTeamVaultSaga);
   yield takeLatest(ADD_TEAM_KEY_PAIR_BATCH, openCurrentVaultSaga);

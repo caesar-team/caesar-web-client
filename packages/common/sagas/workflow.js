@@ -156,7 +156,8 @@ export function* processSharedItemsSaga() {
 
 export function* processTeamItemsSaga({ payload: { teamId } }) {
   try {
-    const teamKeyPairs = yield select(teamKeyPairSelector, { teamId });
+    let teamKeyPairs = yield select(teamKeyPairSelector, { teamId });
+
     if (!teamKeyPairs) {
       const team = yield select(teamSelector, { teamId });
       const { id: ownerId } = yield select(userDataSelector);
@@ -164,20 +165,21 @@ export function* processTeamItemsSaga({ payload: { teamId } }) {
 
       // eslint-disable-next-line no-console
       console.warn(
-        `The key pair for the team ${team.title}: ${teamId} not found. Need to create a new one...`,
+        `The key pair for the team ${team?.title}: ${teamId} not found. Need to create a new one...`,
       );
 
       if (!publicKey) {
         throw new Error(
-          `Can't creat the team:  ${team.title} cause the publickey is null`,
+          `Can't creat the team:  ${team?.title ||
+            teamId} cause the publickey is null`,
         );
       }
 
       yield call(createTeamKeyPairSaga, {
-        payload: { teamName: team.title, publicKey },
+        payload: { team, publicKey },
       });
-
-      return;
+      teamKeyPairs = yield select(teamKeyPairSelector, { teamId });
+      if (!teamKeyPairs) return;
     }
 
     const { privateKey = null, password = null } = teamKeyPairs;
@@ -274,7 +276,8 @@ function* initTeams() {
     // const { data: teams } = yield call(getUserTeams);
     const teams = yield select(teamListSelector);
 
-    if (!teams?.length) {
+    // TODO: What if user was added to a new team? Need to do a request?
+    if (teams?.length) {
       yield take(FETCH_USER_TEAMS_SUCCESS);
     }
 
@@ -410,6 +413,10 @@ function* initPersonalVault() {
         ...favoritesListById,
       }),
     );
+
+    if (!keypairsArray?.length) {
+      yield call(openCurrentVaultSaga);
+    }
   } catch (error) {
     // eslint-disable-next-line no-console
     console.error(error);
@@ -452,13 +459,25 @@ export function* initWorkflow() {
   // Wait for the user data
   yield take(FETCH_USER_SELF_SUCCESS);
   yield call(initPersonalVault);
-  yield call(initTeams);
+  yield fork(initTeams);
   // We need to wait for the decryption of team keypair to initiate the Teams
   yield fork(fetchMembersSaga);
 }
 
 export function* openTeamVaultSaga({ payload: { teamId } }) {
   try {
+    const team = yield select(teamSelector, { teamId });
+
+    if (!team && teamId !== TEAM_TYPE.PERSONAL) {
+      yield put(setCurrentTeamId(TEAM_TYPE.PERSONAL));
+
+      return;
+    }
+
+    if (!team) {
+      throw new Error('Houston, we have a problem!');
+    }
+
     yield call(initTeam, teamId);
     const listsById = yield select(listsTeamSelector, { teamId });
     const lists = objectToArray(listsById);

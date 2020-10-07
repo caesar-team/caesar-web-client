@@ -17,7 +17,6 @@ import {
 } from '@caesar/common/actions/entities/list';
 import { visibleItemsSelector } from '@caesar/common/selectors/entities/item';
 import { Tooltip } from '@caesar/components/List/Item/styles';
-import { isGeneralItem } from '@caesar/common/utils/item';
 import { Can } from '../../Ability';
 import { Icon } from '../../Icon';
 import { ListInput } from './ListInput';
@@ -84,8 +83,6 @@ const StyledTooltip = styled(Tooltip)`
   left: auto;
 `;
 
-const filterVisibleItems = items => items.filter(isGeneralItem);
-
 export const ListItem = ({
   list = {},
   nestedListsLabels = [],
@@ -101,7 +98,7 @@ export const ListItem = ({
   const { id, label, children = [], teamId } = list;
 
   const visibleItems = useSelector(state =>
-    visibleItemsSelector(state, { itemIds: filterVisibleItems(children) }),
+    visibleItemsSelector(state, { itemIds: children }),
   );
 
   const isDefault = label === 'default';

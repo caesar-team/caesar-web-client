@@ -298,9 +298,6 @@ function* initTeams() {
     const teamById = convertTeamsToEntity(teams);
 
     yield put(addTeamsBatch(teamById));
-    yield call(openCurrentVaultSaga);
-
-    yield put(finishIsLoading());
   } catch (error) {
     // eslint-disable-next-line no-console
     console.error(error);

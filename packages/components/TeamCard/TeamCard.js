@@ -8,10 +8,10 @@ import {
   PERMISSION,
   PERMISSION_ENTITY,
 } from '@caesar/common/constants';
+import { ability } from '@caesar/common/ability';
 import { getTeamTitle } from '@caesar/common/utils/team';
 import { Button } from '../Button';
 import { AvatarsList } from '../Avatar';
-import { Can } from '../Ability';
 import { DottedMenu } from '../DottedMenu';
 
 const Wrapper = styled.div`
@@ -103,6 +103,7 @@ const getMembers = memoizeOne((users, members) =>
 
 const TeamCard = ({
   className,
+  userId,
   team,
   members,
   onClick = Function.prototype,
@@ -118,35 +119,43 @@ const TeamCard = ({
     team_edit: team?._permissions?.team_edit || false,
     team_delete: team?._permissions?.team_delete || false,
   };
-
+  const isCurrentUserTeamMember = !!users.find(({ id }) => id === userId); 
+  const canEditTeam = ability.can(PERMISSION.EDIT, teamSubject);
+  const canRemoveTeam = ability.can(PERMISSION.DELETE, teamSubject);
+  const shouldShowMenu = isCurrentUserTeamMember || canEditTeam || canRemoveTeam;
+  
   return (
     <Wrapper className={className} onClick={onClick}>
-      <StyledDottedMenu
-        tooltipProps={{
-          textBoxWidth: '100px',
-          arrowAlign: 'start',
-          position: 'left top',
-          padding: '0px 0px',
-          flat: true,
-          zIndex: '1',
-        }}
-      >
-        <MenuWrapper>
-          <Can I={PERMISSION.EDIT} a={teamSubject}>
-            <MenuButton color="white" onClick={onClickEditTeam}>
-              Edit
-            </MenuButton>
-          </Can>
-          <MenuButton color="white" onClick={onClickLeaveTeam}>
-            Leave
-          </MenuButton>
-          <Can I={PERMISSION.DELETE} a={teamSubject}>
-            <MenuButton color="white" onClick={onClickRemoveTeam}>
-              Remove
-            </MenuButton>
-          </Can>
-        </MenuWrapper>
-      </StyledDottedMenu>
+      {shouldShowMenu && (
+        <StyledDottedMenu
+          tooltipProps={{
+            textBoxWidth: '100px',
+            arrowAlign: 'start',
+            position: 'left top',
+            padding: '0px 0px',
+            flat: true,
+            zIndex: '1',
+          }}
+        >
+          <MenuWrapper>
+            {canEditTeam && (
+              <MenuButton color="white" onClick={onClickEditTeam}>
+                Edit
+              </MenuButton>
+            )}
+            {isCurrentUserTeamMember && (
+              <MenuButton color="white" onClick={onClickLeaveTeam}>
+                Leave
+              </MenuButton>
+            )}
+            {canRemoveTeam && (
+              <MenuButton color="white" onClick={onClickRemoveTeam}>
+                Remove
+              </MenuButton>
+            )}
+          </MenuWrapper>
+        </StyledDottedMenu>
+      )}
       <Link
         key={id}
         href={`${ROUTES.SETTINGS}${ROUTES.TEAM}/[id]`}

@@ -156,7 +156,7 @@ class TeamListContainer extends Component {
   }
 
   renderTeamCards() {
-    const { teams, members } = this.props;
+    const { teams, members, user } = this.props;
 
     if (!teams.length) {
       return <div>No teams</div>;
@@ -165,6 +165,7 @@ class TeamListContainer extends Component {
     return teams.map(team => (
       <StyledTeamCard
         key={team.id}
+        userId={user.id}
         team={team}
         members={members}
         onClickEditTeam={this.handleClickEditTeam(team.id)}

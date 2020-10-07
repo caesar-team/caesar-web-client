@@ -93,13 +93,13 @@ export const personalListsByTypeSelector = createSelector(
   }),
 );
 
-export const teamIdsSelector = createSelector(
+export const teamIdsListSelector = createSelector(
   listsSelector,
   lists => lists.filter(list => list.teamId),
 );
 
 export const teamsTrashListsSelector = createSelector(
-  teamIdsSelector,
+  teamIdsListSelector,
   lists => lists.filter(({ type }) => type === LIST_TYPE.TRASH) || [],
 );
 
@@ -113,7 +113,7 @@ export const allTrashListIdsSelector = createSelector(
 );
 
 export const currentTeamDefaultListSelector = createSelector(
-  teamIdsSelector,
+  teamIdsListSelector,
   currentTeamIdSelector,
   (lists, currentTeamId) =>
     lists.find(
@@ -123,7 +123,7 @@ export const currentTeamDefaultListSelector = createSelector(
 );
 
 export const currentTeamTrashListSelector = createSelector(
-  teamIdsSelector,
+  teamIdsListSelector,
   currentTeamIdSelector,
   (lists, currentTeamId) =>
     lists.find(
@@ -133,7 +133,7 @@ export const currentTeamTrashListSelector = createSelector(
 );
 
 export const currentTeamFavoriteListSelector = createSelector(
-  teamIdsSelector,
+  teamIdsListSelector,
   currentTeamIdSelector,
   currentTeamTrashListSelector,
   itemsByIdSelector,
@@ -155,7 +155,7 @@ export const currentTeamFavoriteListSelector = createSelector(
 );
 
 export const currentTeamListsSelector = createSelector(
-  teamIdsSelector,
+  teamIdsListSelector,
   currentTeamIdSelector,
   currentTeamFavoriteListSelector,
   currentTeamTrashListSelector,
@@ -212,7 +212,7 @@ export const teamFavoriteListSelector = createSelector(
 export const selectableTeamsListsSelector = createSelector(
   teamListSelector,
   personalListsSelector,
-  teamIdsSelector,
+  teamIdsListSelector,
   (teamList, personalLists, teamLists) => {
     const filterLists = lists =>
       lists.filter(

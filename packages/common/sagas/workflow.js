@@ -458,8 +458,8 @@ function* initListsAndProgressEntities() {
 export function* initWorkflow() {
   // Wait for the user data
   yield take(FETCH_USER_SELF_SUCCESS);
+  yield call(initTeams);
   yield call(initPersonalVault);
-  yield fork(initTeams);
   // We need to wait for the decryption of team keypair to initiate the Teams
   yield fork(fetchMembersSaga);
 }
@@ -467,6 +467,7 @@ export function* initWorkflow() {
 export function* openTeamVaultSaga({ payload: { teamId } }) {
   try {
     const team = yield select(teamSelector, { teamId });
+
     if (!team && teamId !== TEAM_TYPE.PERSONAL) {
       yield put(setCurrentTeamId(TEAM_TYPE.PERSONAL));
 

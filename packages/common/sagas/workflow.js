@@ -467,6 +467,7 @@ export function* initWorkflow() {
 export function* openTeamVaultSaga({ payload: { teamId } }) {
   try {
     const team = yield select(teamSelector, { teamId });
+
     if (!team && teamId !== TEAM_TYPE.PERSONAL) {
       yield put(setCurrentTeamId(TEAM_TYPE.PERSONAL));
 

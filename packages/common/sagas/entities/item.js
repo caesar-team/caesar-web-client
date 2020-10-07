@@ -448,6 +448,7 @@ export function* saveItemSaga({ item, publicKey }) {
   const itemData = {
     ...item,
     ...serverItemData,
+    teamId: item.teamId || TEAM_TYPE.PERSONAL,
     _permissions: createPermissionsFromLinks(serverItemData._links) || {},
     secret,
   };

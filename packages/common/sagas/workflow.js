@@ -156,7 +156,8 @@ export function* processSharedItemsSaga() {
 
 export function* processTeamItemsSaga({ payload: { teamId } }) {
   try {
-    const teamKeyPairs = yield select(teamKeyPairSelector, { teamId });
+    let teamKeyPairs = yield select(teamKeyPairSelector, { teamId });
+
     if (!teamKeyPairs) {
       const team = yield select(teamSelector, { teamId });
       const { id: ownerId } = yield select(userDataSelector);
@@ -164,20 +165,21 @@ export function* processTeamItemsSaga({ payload: { teamId } }) {
 
       // eslint-disable-next-line no-console
       console.warn(
-        `The key pair for the team ${team.title}: ${teamId} not found. Need to create a new one...`,
+        `The key pair for the team ${team?.title}: ${teamId} not found. Need to create a new one...`,
       );
 
       if (!publicKey) {
         throw new Error(
-          `Can't creat the team:  ${team.title} cause the publickey is null`,
+          `Can't creat the team:  ${team?.title ||
+            teamId} cause the publickey is null`,
         );
       }
 
       yield call(createTeamKeyPairSaga, {
-        payload: { teamName: team.title, publicKey },
+        payload: { team, publicKey },
       });
-
-      return;
+      teamKeyPairs = yield select(teamKeyPairSelector, { teamId });
+      if (!teamKeyPairs) return;
     }
 
     const { privateKey = null, password = null } = teamKeyPairs;
@@ -296,9 +298,6 @@ function* initTeams() {
     const teamById = convertTeamsToEntity(teams);
 
     yield put(addTeamsBatch(teamById));
-    yield call(openCurrentVaultSaga);
-
-    yield put(finishIsLoading());
   } catch (error) {
     // eslint-disable-next-line no-console
     console.error(error);
@@ -467,6 +466,17 @@ export function* initWorkflow() {
 
 export function* openTeamVaultSaga({ payload: { teamId } }) {
   try {
+    const team = yield select(teamSelector, { teamId });
+    if (!team && teamId !== TEAM_TYPE.PERSONAL) {
+      yield put(setCurrentTeamId(TEAM_TYPE.PERSONAL));
+
+      return;
+    }
+
+    if (!team) {
+      throw new Error('Houston, we have a problem!');
+    }
+
     yield call(initTeam, teamId);
     const listsById = yield select(listsTeamSelector, { teamId });
     const lists = objectToArray(listsById);
@@ -504,6 +514,8 @@ export function* openTeamVaultSaga({ payload: { teamId } }) {
         teamId,
       },
     });
+
+    yield put(finishIsLoading());
   } catch (error) {
     // eslint-disable-next-line no-console
     console.error(error);

@@ -274,7 +274,8 @@ function* initTeams() {
     // const { data: teams } = yield call(getUserTeams);
     const teams = yield select(teamListSelector);
 
-    if (!teams?.length) {
+    // TODO: What if user was added to a new team? Need to do a request?
+    if (teams?.length) {
       yield take(FETCH_USER_TEAMS_SUCCESS);
     }
 
@@ -410,6 +411,10 @@ function* initPersonalVault() {
         ...favoritesListById,
       }),
     );
+
+    if (!keypairsArray?.length) {
+      yield call(openCurrentVaultSaga);
+    }
   } catch (error) {
     // eslint-disable-next-line no-console
     console.error(error);
@@ -452,7 +457,7 @@ export function* initWorkflow() {
   // Wait for the user data
   yield take(FETCH_USER_SELF_SUCCESS);
   yield call(initPersonalVault);
-  yield call(initTeams);
+  yield fork(initTeams);
   // We need to wait for the decryption of team keypair to initiate the Teams
   yield fork(fetchMembersSaga);
 }

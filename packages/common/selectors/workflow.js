@@ -129,7 +129,7 @@ const createListItemsList = (children, itemsById) =>
   children
     .reduce(
       (accumulator, itemId) =>
-        itemsById[itemId]?.data && isGeneralItem(itemsById[itemId].type)
+        itemsById[itemId]?.data && isGeneralItem(itemsById[itemId])
           ? [...accumulator, itemsById[itemId]]
           : accumulator,
       [],

@@ -178,7 +178,11 @@ export const patchResetPassword = (token, data) =>
   callApi.patch(`/auth/srpp/reset/${token}`, data);
 
 export const getSecureMessage = id => callApi.get(`/message/${id}`);
+/* VAULT */
 
+export const postCreateVault = payload => callApi.post('/vault', payload);
+
+/* TEAM */
 export const getUserTeams = () => callApi.get('/user/teams');
 
 export const getTeams = () => callApi.get('/teams');
@@ -190,6 +194,7 @@ export const getTeamMembers = teamId => callApi.get(`/teams/${teamId}/members`);
 
 export const postLeaveTeam = teamId => callApi.post(`/teams/${teamId}/leave`);
 
+// @Deprecated
 export const postCreateTeam = data => callApi.post('/teams', data);
 
 export const editTeam = (teamId, data) =>
@@ -225,6 +230,7 @@ export const patchTeamList = (teamId, listId, data) =>
 export const removeTeamList = (teamId, listId) =>
   callApi.delete(`/teams/${teamId}/lists/${listId}`);
 
+/* COMMON */
 let getSearchUserSource;
 
 export const getSearchUser = email => {

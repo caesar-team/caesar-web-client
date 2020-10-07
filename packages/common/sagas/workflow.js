@@ -33,28 +33,24 @@ import {
   FETCH_USER_TEAMS_SUCCESS,
 } from '@caesar/common/actions/user';
 import {
-  addTeamKeyPairBatch,
   addShareKeyPairBatch,
+  addTeamKeyPairBatch,
   ADD_TEAM_KEY_PAIR_BATCH,
 } from '@caesar/common/actions/keystore';
 import { fetchMembersSaga } from '@caesar/common/sagas/entities/member';
-import { createTeamKeysSaga } from '@caesar/common/sagas/entities/team';
+import { createTeamKeyPairSaga } from '@caesar/common/sagas/entities/team';
 import {
   convertNodesToEntities,
   convertItemsToEntities,
   convertTeamsToEntity,
   convertListsToEntities,
+  convertKeyPairToEntity,
 } from '@caesar/common/normalizers/normalizers';
 import { objectToArray } from '@caesar/common/utils/utils';
 import { upperFirst } from '@caesar/common/utils/string';
 import { itemsByFavoritesSort } from '@caesar/common/utils/workflow';
 import { getLists, getTeamLists, getUserItems } from '@caesar/common/api';
-import {
-  REGEXP_TESTER,
-  TEAM_TYPE,
-  LIST_TYPE,
-  ROLE_ADMIN,
-} from '@caesar/common/constants';
+import { TEAM_TYPE, LIST_TYPE, ROLE_ADMIN } from '@caesar/common/constants';
 import {
   favoriteListSelector,
   listsByIdSelector,
@@ -89,6 +85,7 @@ import {
   teamSelector,
 } from '@caesar/common/selectors/entities/team';
 import { ADD_KEYPAIRS_BATCH } from '../actions/entities/keypair';
+import { memberSelector } from '../selectors/entities/member';
 
 export function decryptItemsByItemIdKeys(items, keyPairs) {
   try {
@@ -160,18 +157,24 @@ export function* processSharedItemsSaga() {
 export function* processTeamItemsSaga({ payload: { teamId } }) {
   try {
     const teamKeyPairs = yield select(teamKeyPairSelector, { teamId });
-
     if (!teamKeyPairs) {
       const team = yield select(teamSelector, { teamId });
       const { id: ownerId } = yield select(userDataSelector);
+      const { publicKey } = yield select(memberSelector, { memberId: ownerId });
 
       // eslint-disable-next-line no-console
       console.warn(
         `The key pair for the team ${team.title}: ${teamId} not found. Need to create a new one...`,
       );
 
-      yield call(createTeamKeysSaga, {
-        payload: { teamId, ownerId },
+      if (!publicKey) {
+        throw new Error(
+          `Can't creat the team:  ${team.title} cause the publickey is null`,
+        );
+      }
+
+      yield call(createTeamKeyPairSaga, {
+        payload: { teamName: team.title, publicKey },
       });
 
       return;
@@ -290,6 +293,7 @@ function* initTeams() {
     });
 
     const teamById = convertTeamsToEntity(teams);
+
     yield put(addTeamsBatch(teamById));
   } catch (error) {
     // eslint-disable-next-line no-console
@@ -310,15 +314,23 @@ export function* processKeyPairsSaga({ payload: { itemsById } }) {
       keyPairs.forEach(keyPair => {
         if (!keyPair.data?.name) return null;
 
-        return REGEXP_TESTER.SYSTEM.IS_TEAM(keyPair.data?.name)
+        return keyPair.teamId !== null
           ? teamKeys.push(keyPair)
           : shareKeys.push(keyPair);
       });
 
-      yield all([
-        teamKeys.length > 0 ? put(addTeamKeyPairBatch(teamKeys)) : null,
-        shareKeys.length > 0 ? put(addShareKeyPairBatch(shareKeys)) : null,
-      ]);
+      const putSagas = [];
+      if (teamKeys.length > 0) {
+        const teamKeyPairsById = convertKeyPairToEntity(teamKeys);
+        putSagas.push(put(addTeamKeyPairBatch(teamKeyPairsById)));
+      }
+
+      if (shareKeys.length > 0) {
+        const shareKeysById = convertKeyPairToEntity(shareKeys);
+        putSagas.push(put(addShareKeyPairBatch(shareKeysById)));
+      }
+
+      yield all(putSagas);
     }
   } catch (error) {
     // eslint-disable-next-line no-console
@@ -398,10 +410,6 @@ function* initPersonalVault() {
         ...favoritesListById,
       }),
     );
-
-    if (!keypairsArray?.length) {
-      yield fork(initTeams);
-    }
   } catch (error) {
     // eslint-disable-next-line no-console
     console.error(error);
@@ -444,6 +452,7 @@ export function* initWorkflow() {
   // Wait for the user data
   yield take(FETCH_USER_SELF_SUCCESS);
   yield call(initPersonalVault);
+  yield call(initTeams);
   // We need to wait for the decryption of team keypair to initiate the Teams
   yield fork(fetchMembersSaga);
 }

@@ -9,6 +9,7 @@ import {
   ADD_TEAM_MEMBERS_BATCH_REQUEST,
   REMOVE_TEAM_MEMBER_REQUEST,
   CREATE_TEAM_KEYS_REQUEST,
+  PIN_TEAM_REQUEST,
   fetchTeamsSuccess,
   fetchTeamsFailure,
   fetchTeamSuccess,
@@ -25,7 +26,9 @@ import {
   removeTeamMemberSuccess,
   removeTeamMemberFailure,
   removeTeamRequest,
-} from '@caesar/common/actions/entities/team';
+  pinTeamSuccess,
+  pinTeamFailure,
+} from "@caesar/common/actions/entities/team";
 import { createChildItemBatchSaga } from '@caesar/common/sagas/entities/childItem';
 import { fetchTeamMembersSaga } from '@caesar/common/sagas/entities/member';
 import {
@@ -53,6 +56,7 @@ import {
   postAddTeamMember,
   deleteTeamMember,
   getTeamLists,
+  pinTeam,
 } from '@caesar/common/api';
 import {
   getServerErrorMessage,
@@ -387,6 +391,21 @@ export function* removeTeamMemberSaga({ payload: { teamId, userId } }) {
   }
 }
 
+export function* pinTeamSaga({ payload: { teamId } }) {
+  try {
+    const { data: { pinned } } = yield call(pinTeam, { teamId });
+
+    yield put(pinTeamSuccess(teamId, pinned));
+  } catch (error) {
+    // eslint-disable-next-line no-console
+    console.error(error);
+    yield put(
+      updateGlobalNotification(getServerErrorMessage(error), false, true),
+    );
+    yield put(pinTeamFailure());
+  }
+}
+
 export default function* teamSagas() {
   yield takeLatest(FETCH_TEAMS_REQUEST, fetchTeamsSaga);
   yield takeLatest(FETCH_TEAM_REQUEST, fetchTeamSaga);
@@ -400,4 +419,5 @@ export default function* teamSagas() {
     addMemberToTeamListsBatchSaga,
   );
   yield takeLatest(REMOVE_TEAM_MEMBER_REQUEST, removeTeamMemberSaga);
+  yield takeLatest(PIN_TEAM_REQUEST, pinTeamSaga);
 }

@@ -199,6 +199,8 @@ export const deleteTeam = teamId => callApi.delete(`/teams/${teamId}`);
 
 export const getTeam = teamId => callApi.get(`/teams/${teamId}`);
 
+export const pinTeam = teamId => callApi.post(`/teams/${teamId}/pinned`);
+
 export const updateTeamMember = ({ teamId, userId, role }) =>
   callApi.patch(`/teams/${teamId}/members/${userId}`, {
     userRole: role,

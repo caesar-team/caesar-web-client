@@ -29,8 +29,8 @@ import {
   CREATE_TEAM_KEYS_REQUEST,
   CREATE_TEAM_KEYS_SUCCESS,
   CREATE_TEAM_KEYS_FAILURE,
-  UPDATE_TEAM_MEMBERS_WITH_ROLES,
-} from '@caesar/common/actions/entities/team';
+  UPDATE_TEAM_MEMBERS_WITH_ROLES, PIN_TEAM_SUCCESS
+} from "@caesar/common/actions/entities/team";
 import { KEY_TYPE } from '../../constants';
 
 const initialState = {
@@ -242,6 +242,18 @@ export default createReducer(initialState, {
             role,
             _permissions,
           })),
+        },
+      },
+    };
+  },
+  [PIN_TEAM_SUCCESS](state, { payload }) {
+    return {
+      ...state,
+      byId: {
+        ...state.byId,
+        [payload.teamId]: {
+          ...state.byId[payload.teamId],
+          pinned: payload.pinned,
         },
       },
     };

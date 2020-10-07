@@ -13,6 +13,7 @@ import { Button } from '../Button';
 import { AvatarsList } from '../Avatar';
 import { Can } from '../Ability';
 import { DottedMenu } from '../DottedMenu';
+import { Toggle } from '../Toggle';
 
 const Wrapper = styled.div`
   position: relative;
@@ -93,6 +94,12 @@ const AvatarsWrapper = styled.div`
   justify-content: space-between;
 `;
 
+const TeamFooter = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+`;
+
 const getMembers = memoizeOne((users, members) =>
   users.reduce((accumulator, { id }) => {
     const member = members.find(user => user.id === id);
@@ -109,9 +116,11 @@ const TeamCard = ({
   onClickEditTeam = Function.prototype,
   onClickLeaveTeam = Function.prototype,
   onClickRemoveTeam = Function.prototype,
+  onPinTeam = Function.prototype,
 }) => {
   const { id, icon, users } = team;
   const areMembersAvailable = users && users.length > 0;
+  const isPinned = true;
 
   const teamSubject = {
     __typename: PERMISSION_ENTITY.TEAM,
@@ -157,9 +166,17 @@ const TeamCard = ({
             <TeamIcon src={icon} />
             <TeamInfo>
               <TeamName>{getTeamTitle(team)}</TeamName>
-              {areMembersAvailable && (
-                <TeamMembers>{users.length} members</TeamMembers>
-              )}
+              <TeamFooter>
+                {areMembersAvailable && (
+                  <TeamMembers>{users.length} members</TeamMembers>
+                )}
+                <Can I={PERMISSION.EDIT} a={teamSubject}>
+                  <Toggle
+                    onChange={onPinTeam}
+                    checked={isPinned}
+                  />
+                </Can>
+              </TeamFooter>  
             </TeamInfo>
           </TeamDetails>
         </TeamWrapper>

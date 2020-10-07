@@ -8,6 +8,8 @@ import {
   ConfirmModal,
   ConfirmLeaveTeamModal,
   Can,
+  Tabs,
+  Tab,
 } from '@caesar/components';
 import { PERMISSION, PERMISSION_ENTITY } from '@caesar/common/constants';
 
@@ -143,6 +145,13 @@ class TeamListContainer extends Component {
     this.props.updateTeamMemberRoleRequest(selectedTeamId, member.id, role);
   };
 
+  handlePinTeam = teamId => event => {
+    event.preventDefault();
+    event.stopPropagation();
+
+    this.props.pinTeamRequest(teamId);
+  };  
+
   prepareInitialState() {
     return {
       selectedTeamId: null,
@@ -170,6 +179,7 @@ class TeamListContainer extends Component {
         onClickEditTeam={this.handleClickEditTeam(team.id)}
         onClickLeaveTeam={this.handleClickLeaveTeam(team)}
         onClickRemoveTeam={this.handleClickRemoveTeam(team.id)}
+        onPinTeam={this.handlePinTeam(team.id)}
       />
     ));
   }
@@ -203,7 +213,10 @@ class TeamListContainer extends Component {
           </Can>
         }
       >
-        <TeamListWrapper>{renderedTeamCards}</TeamListWrapper>
+        <TeamListWrapper>
+          <Tabs>
+          {renderedTeamCards}
+        </TeamListWrapper>
         {modalVisibilities[NEW_TEAM_MODAL] && (
           <TeamModal
             teamId={this.state.selectedTeamId}

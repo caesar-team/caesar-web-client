@@ -9,6 +9,7 @@ import {
 } from 'redux-saga/effects';
 import {
   INIT_WORKFLOW,
+  INIT_SETTINGS,
   UPDATE_WORK_IN_PROGRESS_ITEM,
   SET_WORK_IN_PROGRESS_ITEM,
   finishIsLoading,
@@ -38,7 +39,10 @@ import {
   ADD_TEAM_KEY_PAIR_BATCH,
 } from '@caesar/common/actions/keystore';
 import { fetchMembersSaga } from '@caesar/common/sagas/entities/member';
-import { createTeamKeyPairSaga } from '@caesar/common/sagas/entities/team';
+import {
+  createTeamKeyPairSaga,
+  fetchTeamsSaga,
+} from '@caesar/common/sagas/entities/team';
 import {
   convertNodesToEntities,
   convertItemsToEntities,
@@ -557,6 +561,7 @@ function* getItemKeyPair({
       return yield select(teamKeyPairSelector, { teamId: TEAM_TYPE.PERSONAL });
   }
 }
+
 function* decryptItemRaws({ payload: { item } }) {
   try {
     // If item is null or aready had decypted attachments then do not dectrypt again!
@@ -587,6 +592,7 @@ function* decryptItemRaws({ payload: { item } }) {
     console.error('error: ', error);
   }
 }
+
 function setWorkInProgressItemSaga({ payload: { item } }) {
   try {
     if (!item) return;
@@ -602,9 +608,22 @@ function setWorkInProgressItemSaga({ payload: { item } }) {
   }
 }
 
+function* initSettings() {
+  try {
+    yield call(fetchTeamsSaga);
+    yield call(fetchMembersSaga);
+
+    yield put(finishIsLoading());
+  } catch (error) {
+    // eslint-disable-next-line no-console
+    console.error('error: ', error);
+  }
+}
+
 export default function* workflowSagas() {
   // Init (get all items, keys, etc)
   yield takeLatest(INIT_WORKFLOW, initWorkflow);
+  yield takeLatest(INIT_SETTINGS, initSettings);
   yield takeLatest(SET_WORK_IN_PROGRESS_ITEM, setWorkInProgressItemSaga);
   yield takeLatest(ADD_LISTS_BATCH, initListsAndProgressEntities);
   yield takeLatest(UPDATE_WORK_IN_PROGRESS_ITEM, updateWorkInProgressItemSaga);

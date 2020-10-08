@@ -11,3 +11,5 @@ build
 .env
 .history
 .vscode
+/cypress/*
+cypress.json

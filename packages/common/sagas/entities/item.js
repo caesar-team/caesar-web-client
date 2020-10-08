@@ -151,7 +151,7 @@ export function* generateTeamKeyPair({ name }) {
   const systemItemName = yield call(
     generateSystemItemName,
     ITEM_TYPE.KEYPAIR,
-    name,
+    encodeURIComponent(name),
   );
 
   const systemItemEmail = yield call(generateSystemItemEmail, systemItemName);

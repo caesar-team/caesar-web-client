@@ -42,10 +42,6 @@ export const REJECT_ITEM_UPDATE_FAILURE = '@item/REJECT_ITEM_UPDATE_FAILURE';
 
 export const TOGGLE_ITEM_TO_FAVORITE_REQUEST =
   '@item/TOGGLE_ITEM_TO_FAVORITE_REQUEST';
-export const TOGGLE_ITEM_TO_FAVORITE_SUCCESS =
-  '@item/TOGGLE_ITEM_TO_FAVORITE_SUCCESS';
-export const TOGGLE_ITEM_TO_FAVORITE_FAILURE =
-  '@item/TOGGLE_ITEM_TO_FAVORITE_FAILURE';
 
 export const CREATE_ANONYMOUS_LINK_REQUEST =
   '@item/CREATE_ANONYMOUS_LINK_REQUEST';
@@ -317,23 +313,6 @@ export const toggleItemToFavoriteRequest = item => ({
   payload: {
     item,
   },
-});
-
-export const toggleItemToFavoriteSuccess = (
-  itemId,
-  favoritesListId,
-  isFavorite,
-) => ({
-  type: TOGGLE_ITEM_TO_FAVORITE_SUCCESS,
-  payload: {
-    itemId,
-    favoritesListId,
-    isFavorite,
-  },
-});
-
-export const toggleItemToFavoriteFailure = () => ({
-  type: TOGGLE_ITEM_TO_FAVORITE_FAILURE,
 });
 
 export const createAnonymousLinkRequest = () => ({

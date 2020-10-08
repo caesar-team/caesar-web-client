@@ -31,8 +31,6 @@ import {
   REJECT_ITEM_UPDATE_SUCCESS,
   REJECT_ITEM_UPDATE_FAILURE,
   TOGGLE_ITEM_TO_FAVORITE_REQUEST,
-  TOGGLE_ITEM_TO_FAVORITE_SUCCESS,
-  TOGGLE_ITEM_TO_FAVORITE_FAILURE,
   CREATE_ANONYMOUS_LINK_FAILURE,
   CREATE_ANONYMOUS_LINK_REQUEST,
   CREATE_ANONYMOUS_LINK_SUCCESS,
@@ -238,21 +236,6 @@ export default createReducer(initialState, {
     return state;
   },
   [TOGGLE_ITEM_TO_FAVORITE_REQUEST](state) {
-    return state;
-  },
-  [TOGGLE_ITEM_TO_FAVORITE_SUCCESS](state, { payload }) {
-    return {
-      ...state,
-      byId: {
-        ...state.byId,
-        [payload.itemId]: {
-          ...state.byId[payload.itemId],
-          favorite: payload.isFavorite,
-        },
-      },
-    };
-  },
-  [TOGGLE_ITEM_TO_FAVORITE_FAILURE](state) {
     return state;
   },
   [CREATE_ANONYMOUS_LINK_REQUEST](state) {

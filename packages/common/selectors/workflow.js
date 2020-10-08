@@ -1,10 +1,10 @@
 import { createSelector } from 'reselect';
+import { LIST_TYPE } from '@caesar/common/constants';
 import { sortByDate } from '@caesar/common/utils/dateUtils';
 import {
   listsByIdSelector,
   extendedSortedCustomizableListsSelector,
-  favoriteListSelector,
-  currentTeamFavoriteListSelector,
+  favoritesListSelector,
 } from '@caesar/common/selectors/entities/list';
 import { itemsByIdSelector } from '@caesar/common/selectors/entities/item';
 import { childItemsByIdSelector } from '@caesar/common/selectors/entities/childItem';
@@ -98,18 +98,14 @@ export const workInProgressListSelector = createSelector(
   listsByIdSelector,
   teamsByIdSelector,
   workInProgressListIdSelector,
-  (listsById, teamsById, workInProgressListId) => {
-    const list = listsById[workInProgressListId];
+  favoritesListSelector,
+  (listsById, teamsById, workInProgressListId, favoritesList) => {
+    const list =
+      workInProgressListId === LIST_TYPE.FAVORITES
+        ? favoritesList
+        : listsById[workInProgressListId];
 
-    const userRole =
-      list && list.teamId ? teamsById[list.teamId]?.userRole : null;
-
-    return list
-      ? {
-          ...list,
-          userRole,
-        }
-      : null;
+    return list || null;
   },
 );
 
@@ -140,19 +136,8 @@ export const visibleListItemsSelector = createSelector(
   listsByIdSelector,
   itemsByIdSelector,
   workInProgressListIdSelector,
-  favoriteListSelector,
-  currentTeamFavoriteListSelector,
-  (
-    listsById,
-    itemsById,
-    workInProgressListId,
-    personalFavoriteList,
-    teamFavoriteList,
-  ) => {
-    const favoriteList = personalFavoriteList.id
-      ? personalFavoriteList
-      : teamFavoriteList;
-
+  favoritesListSelector,
+  (listsById, itemsById, workInProgressListId, favoriteList) => {
     const isFavoriteList = workInProgressListId === favoriteList?.id;
 
     switch (true) {

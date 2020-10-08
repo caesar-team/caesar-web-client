@@ -84,14 +84,12 @@ export function* createMemberSaga({ payload: { email, role } }) {
       roles: [role],
     };
 
-    const {
-      data: { user: userId },
-    } = yield call(postNewUser, data);
+    const { data: user } = yield call(postNewUser, data);
 
     if (role !== ROLE_ANONYMOUS_USER) {
       yield put(
         createMemberSuccess({
-          id: userId,
+          id: user.id,
           email,
           name: email,
           avatar: null,
@@ -101,7 +99,7 @@ export function* createMemberSaga({ payload: { email, role } }) {
       );
     }
 
-    return { ...data, name: email, masterPassword, id: userId, password };
+    return { ...data, name: email, masterPassword, id: user.id, password };
   } catch (error) {
     yield put(createMemberFailure());
 
@@ -137,9 +135,9 @@ export function* createMemberBatchSaga({ payload: { emailRolePairs } }) {
       }),
     );
 
-    const {
-      data: { users: userIds },
-    } = yield call(postNewUserBatch, { users: members });
+    const { data: users } = yield call(postNewUserBatch, { users: members });
+
+    const userIds = users.map(({ id }) => id);
 
     const preparedMembersForStore = userIds.reduce(
       (accumulator, userId, index) => {

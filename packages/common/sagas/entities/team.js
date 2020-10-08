@@ -407,7 +407,7 @@ export function* removeTeamMemberSaga({ payload: { teamId, userId } }) {
 
 export function* pinTeamSaga({ payload: { teamId } }) {
   try {
-    const { data: { pinned } } = yield call(pinTeam, { teamId });
+    const { data: { pinned } } = yield call(pinTeam, teamId);
 
     yield put(pinTeamSuccess(teamId, pinned));
   } catch (error) {

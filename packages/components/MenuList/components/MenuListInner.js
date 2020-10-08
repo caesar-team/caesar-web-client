@@ -182,7 +182,7 @@ const MenuListInnerComponent = ({
       : {
           __typename: PERMISSION_ENTITY.TEAM_LIST,
           // eslint-disable-next-line camelcase
-          team_create_list: currentTeam._permissions?.team_create_list || false,
+          team_create_list: currentTeam?._permissions?.team_create_list || false,
         };
 
   const nestedListsLabels = nestedLists.map(({ label }) => label.toLowerCase());

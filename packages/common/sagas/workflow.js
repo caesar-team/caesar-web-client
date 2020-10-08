@@ -455,6 +455,7 @@ export function* initWorkflow() {
   yield call(initTeams);
   // We need to wait for the decryption of team keypair to initiate the Teams
   yield fork(fetchMembersSaga);
+  
 }
 
 export function* openTeamVaultSaga({ payload: { teamId } }) {

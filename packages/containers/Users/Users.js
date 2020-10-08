@@ -3,12 +3,14 @@ import { useSelector } from 'react-redux';
 import styled from 'styled-components';
 import { isLoadingSelector } from '@caesar/common/selectors/workflow';
 import { memberListSelector } from '@caesar/common/selectors/entities/member';
+import { teamsByIdSelector } from '@caesar/common/selectors/entities/team';
 import {
   SettingsWrapper,
   DataTable,
   TableStyles as Table,
   Avatar,
 } from '@caesar/components';
+import { getTeamTitle } from '@caesar/common/utils/team';
 
 const UserAvatar = styled(Avatar)`
   margin-right: 8px;
@@ -33,13 +35,18 @@ const getColumnFilter = (placeholder = '') => ({
   />
 );
 
-const createTableData = data =>
-  data.map(({ email, name, avatar, teamIds }) => ({
-    email,
-    name,
-    avatar,
-    team: teamIds.join(', '),
-  }));
+const createTableData = (users, teamsById) =>
+  users.map(({ email, name, avatar, teamIds }) => {
+    const userTeamsByName =
+      teamIds?.map(id => getTeamTitle(teamsById[id])) || [];
+
+    return {
+      email,
+      name,
+      avatar,
+      team: userTeamsByName.join(', '),
+    };
+  });
 
 const createColumns = tableWidth => [
   {
@@ -80,7 +87,8 @@ export const Users = () => {
   const tableWidth = tableWrapperRef?.current?.offsetWidth || 0;
 
   const users = useSelector(memberListSelector);
-  const tableData = useMemo(() => createTableData(users), []);
+  const teamsById = useSelector(teamsByIdSelector);
+  const tableData = useMemo(() => createTableData(users, teamsById), []);
   const columns = useMemo(() => createColumns(tableWidth), [tableWidth]);
 
   return (

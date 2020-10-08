@@ -99,11 +99,13 @@ export function* fetchTeamsSaga() {
       yield put(setCurrentTeamId(teamList[0].id));
     }
 
-    yield all(
-      teamList.map(team =>
-        call(fetchTeamMembersSaga, { payload: { teamId: team.id } }),
-      ),
-    );
+    // @Deprecated
+    // TODO: Need to check if it doesn't break smth
+    // yield all(
+    //   teamList.map(team =>
+    //     call(fetchTeamMembersSaga, { payload: { teamId: team.id } }),
+    //   ),
+    // );
   } catch (error) {
     // eslint-disable-next-line no-console
     console.error(error);

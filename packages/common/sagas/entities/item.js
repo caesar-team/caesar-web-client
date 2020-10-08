@@ -429,9 +429,8 @@ export function* saveItemSaga({ item, publicKey }) {
   let serverItemData = {};
 
   if (id) {
-    const {
-      data: { updatedItemData },
-    } = yield call(updateItem, id, { secret });
+    const { data: updatedItemData } = yield call(updateItem, id, { secret });
+
     serverItemData = updatedItemData || {};
   } else {
     const { data: updatedItemData } = yield call(postCreateItem, {

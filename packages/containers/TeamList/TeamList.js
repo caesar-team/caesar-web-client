@@ -150,7 +150,13 @@ class TeamListContainer extends Component {
     event.stopPropagation();
 
     this.props.pinTeamRequest(teamId);
-  };  
+  };
+
+  handleChangeTab = (name, tabName) => {
+    this.setState({
+      activeTabName: tabName,
+    });
+  };
 
   prepareInitialState() {
     return {
@@ -161,11 +167,12 @@ class TeamListContainer extends Component {
         [LEAVE_TEAM_MODAL]: false,
         [REMOVE_TEAM_MODAL]: false,
       },
+      activeTabName: "all",
     };
   }
 
-  renderTeamCards() {
-    const { teams, members, user } = this.props;
+  renderTeamCards(teams) {
+    const { members, user } = this.props;
 
     if (!teams.length) {
       return <div>No teams</div>;
@@ -187,10 +194,11 @@ class TeamListContainer extends Component {
 
   render() {
     const { isLoading, teams } = this.props;
-    const { modalVisibilities, selectedTeamTitle } = this.state;
-
-    const renderedTeamCards = this.renderTeamCards();
-
+    const { modalVisibilities, selectedTeamTitle, activeTabName } = this.state;
+    const favoriteTeams = teams.filter(team => team.pinned);
+    const allTeamCards = this.renderTeamCards(teams);
+    const favoriteTeamCards = this.renderTeamCards(favoriteTeams);
+    
     const teamSubject = {
       __typename: PERMISSION_ENTITY.TEAM,
       // eslint-disable-next-line camelcase
@@ -214,10 +222,19 @@ class TeamListContainer extends Component {
           </Can>
         }
       >
-        <TeamListWrapper>
-          <Tabs>
-          {renderedTeamCards}
-        </TeamListWrapper>
+        <Can I={PERMISSION.CREATE} a={teamSubject}>
+          <Tabs activeTabName={activeTabName} onChange={this.handleChangeTab}>
+            <Tab title="All" name="all">
+              <TeamListWrapper>{allTeamCards}</TeamListWrapper>
+            </Tab>
+            <Tab title="Favorites" name="favorites">
+              <TeamListWrapper>{favoriteTeamCards}</TeamListWrapper>
+            </Tab>
+          </Tabs>
+        </Can>
+        <Can not I={PERMISSION.CREATE} a={teamSubject}>
+          <TeamListWrapper>{allTeamCards}</TeamListWrapper>
+        </Can>  
         {modalVisibilities[NEW_TEAM_MODAL] && (
           <TeamModal
             teamId={this.state.selectedTeamId}

@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import { CircleLoader } from '../Loader';
 
 const Wrapper = styled.label`
-  display: flex;
+   display: flex;
   justify-content: center;
   align-items: center;
 `;

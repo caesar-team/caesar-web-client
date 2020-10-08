@@ -94,10 +94,10 @@ const AvatarsWrapper = styled.div`
   justify-content: space-between;
 `;
 
-const TeamFooter = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
+const ToggleWrapper = styled.div`
+  position: absolute;
+  bottom: 110px;
+  right: 20px;
 `;
 
 const getMembers = memoizeOne((users, members) =>
@@ -119,9 +119,8 @@ const TeamCard = ({
   onClickRemoveTeam = Function.prototype,
   onPinTeam = Function.prototype,
 }) => {
-  const { id, icon, users } = team;
+  const { id, icon, users, pinned } = team;
   const areMembersAvailable = users && users.length > 0;
-  const isPinned = true;
 
   const teamSubject = {
     __typename: PERMISSION_ENTITY.TEAM,
@@ -170,25 +169,27 @@ const TeamCard = ({
         href={`${ROUTES.SETTINGS}${ROUTES.TEAM}/[id]`}
         as={`${ROUTES.SETTINGS}${ROUTES.TEAM}/${id}`}
       >
+        <>
         <TeamWrapper>
           <TeamDetails>
             <TeamIcon src={icon} />
             <TeamInfo>
               <TeamName>{getTeamTitle(team)}</TeamName>
-              <TeamFooter>
-                {areMembersAvailable && (
-                  <TeamMembers>{users.length} members</TeamMembers>
-                )}
-                <Can I={PERMISSION.EDIT} a={teamSubject}>
-                  <Toggle
-                    onChange={onPinTeam}
-                    checked={isPinned}
-                  />
-                </Can>
-              </TeamFooter>  
+              {areMembersAvailable && (
+                <TeamMembers>{users.length} members</TeamMembers>
+              )}
             </TeamInfo>
           </TeamDetails>
         </TeamWrapper>
+        {canEditTeam && (
+          <ToggleWrapper>
+            <Toggle
+              onChange={onPinTeam}
+              checked={pinned}
+            />
+          </ToggleWrapper>
+        )}
+        </>
       </Link>
       <AvatarsWrapper>
         {areMembersAvailable && (

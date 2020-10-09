@@ -126,10 +126,12 @@ const TeamCard = ({
     __typename: PERMISSION_ENTITY.TEAM,
     team_edit: team?._permissions?.team_edit || false,
     team_delete: team?._permissions?.team_delete || false,
+    team_pinned: team?._permissions?.team_pinned || false,
   };
   const isCurrentUserTeamMember = !!users.find(({ id }) => id === userId); 
   const canEditTeam = ability.can(PERMISSION.EDIT, teamSubject);
   const canRemoveTeam = ability.can(PERMISSION.DELETE, teamSubject);
+  const canPinTeam = ability.can(PERMISSION.PIN, teamSubject);
   const shouldShowMenu = isCurrentUserTeamMember || canEditTeam || canRemoveTeam;
   
   return (
@@ -181,7 +183,7 @@ const TeamCard = ({
             </TeamInfo>
           </TeamDetails>
         </TeamWrapper>
-        {canEditTeam && (
+        {canPinTeam && (
           <ToggleWrapper>
             <Toggle
               onChange={onPinTeam}

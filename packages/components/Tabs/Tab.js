@@ -17,8 +17,8 @@ const StyledTab = styled.li`
   display: inline-block;
   outline: 0;
   margin-bottom: -1px;
-  margin-right: 30px;
-  padding: 0 10px 4px;
+  margin-right: 32px;
+  padding: 0 12px 4px;
   cursor: pointer;
   border-bottom: 1px solid ${({ isActive, theme }) =>
     isActive ? theme.color.black : 'transparent'};

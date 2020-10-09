@@ -25,6 +25,7 @@ import {
   SHARING_IN_PROGRESS_NOTIFICATION,
   ENTITY_TYPE,
   TEAM_TYPE,
+  ROLE_ADMIN,
 } from '@caesar/common/constants';
 import {
   shareItemBatchFailure,
@@ -52,9 +53,9 @@ import { inviteNewMemberBatchSaga } from '@caesar/common/sagas/common/invite';
 import { convertSystemItemToKeyPair } from '../../utils/item';
 
 export function* prepareUsersForSharing(members) {
-  const emailRolePairs = members.map(({ email }) => ({
+  const emailRolePairs = members.map(({ email, roles }) => ({
     email,
-    role: ROLE_USER,
+    role: roles.include(ROLE_ADMIN) ? ROLE_ADMIN : ROLE_USER,
   }));
 
   return yield call(getOrCreateMemberBatchSaga, {

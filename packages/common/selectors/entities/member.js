@@ -1,4 +1,5 @@
 import { createSelector } from 'reselect';
+import { ROLE_ADMIN } from '../../constants';
 
 export const entitiesSelector = state => state.entities;
 
@@ -31,4 +32,9 @@ export const membersBatchSelector = createSelector(
   membersByIdSelector,
   memberIdsPropSelector,
   (membersById, memberIds) => memberIds.map(memberId => membersById[memberId]),
+);
+
+export const memberAdminsSelector = createSelector(
+  memberListSelector,
+  membersList => membersList.map(({ roles }) => roles.include(ROLE_ADMIN)),
 );

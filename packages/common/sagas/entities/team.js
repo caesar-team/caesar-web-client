@@ -294,6 +294,7 @@ export function* createTeamSaga({
     const adminMembers = yield select(memberAdminsSelector);
     // Get all admins except current
     const adminsToInvite = adminMembers.filter(({ id }) => id !== userId);
+
     const team = {
       title,
       icon,

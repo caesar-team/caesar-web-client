@@ -36,5 +36,5 @@ export const membersBatchSelector = createSelector(
 
 export const memberAdminsSelector = createSelector(
   memberListSelector,
-  membersList => membersList.map(({ roles }) => roles.include(ROLE_ADMIN)),
+  membersList => membersList.filter(({ roles }) => roles.includes(ROLE_ADMIN)),
 );

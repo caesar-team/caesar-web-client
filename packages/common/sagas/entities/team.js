@@ -84,11 +84,13 @@ import { updateGlobalNotification } from '@caesar/common/actions/application';
 import {
   encryptSecret,
   generateTeamKeyPair,
+  saveItemSaga,
 } from '@caesar/common/sagas/entities/item';
 import { teamKeyPairSelector } from '@caesar/common/selectors/keystore';
 import { memberSelector } from '../../selectors/entities/member';
 import { addTeamKeyPairBatch } from '../../actions/keystore';
 import { createVaultSuccess } from '../../actions/entities/vault';
+import { teamDefaultListSelector } from '../../selectors/entities/list';
 
 export function* fetchTeamsSaga() {
   try {
@@ -102,11 +104,13 @@ export function* fetchTeamsSaga() {
       yield put(setCurrentTeamId(teamList[0].id));
     }
 
-    yield all(
-      teamList.map(team =>
-        call(fetchTeamMembersSaga, { payload: { teamId: team.id } }),
-      ),
-    );
+    // @Deprecated
+    // TODO: Need to check if it doesn't break smth
+    // yield all(
+    //   teamList.map(team =>
+    //     call(fetchTeamMembersSaga, { payload: { teamId: team.id } }),
+    //   ),
+    // );
   } catch (error) {
     // eslint-disable-next-line no-console
     console.error(error);
@@ -163,7 +167,7 @@ export function* removeTeamSaga({ payload: { teamId } }) {
   }
 }
 
-export function* createTeamKeyPairSaga({ payload: { teamName, publicKey } }) {
+export function* createTeamKeyPairSaga({ payload: { team, publicKey } }) {
   try {
     if (!publicKey || typeof publicKey === 'undefined') {
       // TODO: Bug fix: we lost the user default list and we need to restore it from the list api
@@ -172,12 +176,27 @@ export function* createTeamKeyPairSaga({ payload: { teamName, publicKey } }) {
 
     const teamKeyPair = yield call(generateTeamKeyPair, {
       payload: {
-        name: teamName,
-        publicKey,
+        name: team.title,
       },
     });
 
-    return teamKeyPair;
+    const { id: listId } = yield select(teamDefaultListSelector, {
+      teamId: team.id,
+    });
+
+    const serverKeypairItem = yield call(saveItemSaga, {
+      item: {
+        teamId: team.id,
+        listId,
+        ...teamKeyPair,
+      },
+      publicKey,
+    });
+
+    const keyPairsById = convertKeyPairToEntity([serverKeypairItem]);
+    yield put(addTeamKeyPairBatch(keyPairsById));
+
+    return keyPairsById;
   } catch (error) {
     // eslint-disable-next-line no-console
     console.error(error);
@@ -207,8 +226,10 @@ export function* createTeamSaga({
       icon,
     };
 
-    const teamKeyPair = yield call(createTeamKeyPairSaga, {
-      payload: { teamName: encodeURIComponent(title), publicKey },
+    const teamKeyPair = yield call(generateTeamKeyPair, {
+      payload: {
+        name: title,
+      },
     });
 
     if (!teamKeyPair) {

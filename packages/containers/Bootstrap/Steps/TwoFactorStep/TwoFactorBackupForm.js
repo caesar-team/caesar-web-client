@@ -20,6 +20,10 @@ const Wrapper = styled.div`
   text-align: center;
 `;
 
+const StyledLogoLoader = styled(LogoLoader)`
+  margin: 40px auto;
+`;
+
 const Form = styled.form`
   display: flex;
   flex-direction: column;
@@ -99,7 +103,7 @@ const TwoFactorBackupFormComponent = ({ onSubmit }) => {
   return (
     <Wrapper>
       {codes.length === 0 ? (
-        <LogoLoader />
+        <StyledLogoLoader textColor="black" />
       ) : (
         <Formik
           key="backupCodes"

@@ -19,7 +19,6 @@ import {
   MOVE_ITEMS_BATCH_TO_LIST,
   REMOVE_ITEM_FROM_LIST,
   REMOVE_ITEMS_BATCH_FROM_LIST,
-  TOGGLE_ITEM_TO_FAVORITE_LIST,
 } from '@caesar/common/actions/entities/list';
 
 const initialState = {
@@ -190,22 +189,6 @@ export default createReducer(initialState, {
           children: state.byId[payload.listId].children.filter(
             id => !payload.itemIds.includes(id),
           ),
-        },
-      },
-    };
-  },
-  [TOGGLE_ITEM_TO_FAVORITE_LIST](state, { payload }) {
-    return {
-      ...state,
-      byId: {
-        ...state.byId,
-        [payload.favoritesListId]: {
-          ...state.byId[payload.favoritesListId],
-          children: payload.isFavorite
-            ? [...state.byId[payload.favoritesListId].children, payload.itemId]
-            : state.byId[payload.favoritesListId].children.filter(
-                id => id !== payload.itemId,
-              ),
         },
       },
     };

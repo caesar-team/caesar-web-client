@@ -9,18 +9,15 @@ import {
 } from 'redux-saga/effects';
 import {
   INIT_WORKFLOW,
+  INIT_SETTINGS,
   UPDATE_WORK_IN_PROGRESS_ITEM,
   SET_WORK_IN_PROGRESS_ITEM,
   finishIsLoading,
   setWorkInProgressListId,
   setWorkInProgressItem,
-  resetWorkInProgressItemIds,
   decryption,
 } from '@caesar/common/actions/workflow';
-import {
-  addListsBatch,
-  ADD_LISTS_BATCH,
-} from '@caesar/common/actions/entities/list';
+import { addListsBatch } from '@caesar/common/actions/entities/list';
 import {
   addItemsBatch,
   removeItemsBatch,
@@ -30,7 +27,6 @@ import {
   SET_CURRENT_TEAM_ID,
   setCurrentTeamId,
   FETCH_USER_SELF_SUCCESS,
-  FETCH_USER_TEAMS_SUCCESS,
 } from '@caesar/common/actions/user';
 import {
   addShareKeyPairBatch,
@@ -38,7 +34,10 @@ import {
   ADD_TEAM_KEY_PAIR_BATCH,
 } from '@caesar/common/actions/keystore';
 import { fetchMembersSaga } from '@caesar/common/sagas/entities/member';
-import { createTeamKeyPairSaga } from '@caesar/common/sagas/entities/team';
+import {
+  createTeamKeyPairSaga,
+  fetchTeamsSaga,
+} from '@caesar/common/sagas/entities/team';
 import {
   convertNodesToEntities,
   convertItemsToEntities,
@@ -51,12 +50,7 @@ import { upperFirst } from '@caesar/common/utils/string';
 import { itemsByFavoritesSort } from '@caesar/common/utils/workflow';
 import { getLists, getTeamLists, getUserItems } from '@caesar/common/api';
 import { TEAM_TYPE, LIST_TYPE, ROLE_ADMIN } from '@caesar/common/constants';
-import {
-  favoriteListSelector,
-  listsByIdSelector,
-  defaultListSelector,
-  listsTeamSelector,
-} from '@caesar/common/selectors/entities/list';
+import { teamListsSelector } from '@caesar/common/selectors/entities/list';
 import {
   userDataSelector,
   masterPasswordSelector,
@@ -77,7 +71,6 @@ import {
   shareKeyPairsSelector,
   shareItemKeyPairSelector,
 } from '@caesar/common/selectors/keystore';
-import { getFavoritesList } from '@caesar/common/normalizers/utils';
 import { addTeamsBatch } from '@caesar/common/actions/entities/team';
 import { getServerErrorMessage } from '@caesar/common/utils/error';
 import {
@@ -156,7 +149,8 @@ export function* processSharedItemsSaga() {
 
 export function* processTeamItemsSaga({ payload: { teamId } }) {
   try {
-    const teamKeyPairs = yield select(teamKeyPairSelector, { teamId });
+    let teamKeyPairs = yield select(teamKeyPairSelector, { teamId });
+
     if (!teamKeyPairs) {
       const team = yield select(teamSelector, { teamId });
       const { id: ownerId } = yield select(userDataSelector);
@@ -164,20 +158,21 @@ export function* processTeamItemsSaga({ payload: { teamId } }) {
 
       // eslint-disable-next-line no-console
       console.warn(
-        `The key pair for the team ${team.title}: ${teamId} not found. Need to create a new one...`,
+        `The key pair for the team ${team?.title}: ${teamId} not found. Need to create a new one...`,
       );
 
       if (!publicKey) {
         throw new Error(
-          `Can't creat the team:  ${team.title} cause the publickey is null`,
+          `Can't creat the team:  ${team?.title ||
+            teamId} cause the publickey is null`,
         );
       }
 
       yield call(createTeamKeyPairSaga, {
-        payload: { teamName: team.title, publicKey },
+        payload: { team, publicKey },
       });
-
-      return;
+      teamKeyPairs = yield select(teamKeyPairSelector, { teamId });
+      if (!teamKeyPairs) return;
     }
 
     const { privateKey = null, password = null } = teamKeyPairs;
@@ -217,14 +212,6 @@ export function* processTeamsItemsSaga() {
   }
 }
 
-function* getFavoritesListFromStore(teamId) {
-  return (
-    (yield select(listsTeamSelector, {
-      teamId,
-    })).find(list => list.type === LIST_TYPE.FAVORITES) || null
-  );
-}
-
 function* initTeam(teamId) {
   try {
     const currentTeamId = teamId;
@@ -232,28 +219,9 @@ function* initTeam(teamId) {
     if (!currentTeamId || currentTeamId === TEAM_TYPE.PERSONAL) return;
 
     const { data: lists } = yield call(getTeamLists, currentTeamId);
-    const { listsById, itemsById } = convertNodesToEntities(lists);
-    const trashList = lists.find(list => list.type === LIST_TYPE.TRASH);
+    const { listsById } = convertNodesToEntities(lists);
 
-    const favoriteListFromStore = yield call(getFavoritesListFromStore, teamId);
-
-    const favoritesList = getFavoritesList({
-      favoriteListId: favoriteListFromStore?.id,
-      itemsById,
-      trashListId: trashList?.id,
-      teamId,
-    });
-
-    const { listsById: favoritesListById } = convertNodesToEntities([
-      favoritesList,
-    ]);
-
-    yield put(
-      addListsBatch({
-        ...listsById,
-        ...favoritesListById,
-      }),
-    );
+    yield put(addListsBatch(listsById));
   } catch (error) {
     // eslint-disable-next-line no-console
     console.error(error);
@@ -273,11 +241,6 @@ function* initTeams() {
     // Load avaible teams
     // const { data: teams } = yield call(getUserTeams);
     const teams = yield select(teamListSelector);
-
-    if (!teams?.length) {
-      yield take(FETCH_USER_TEAMS_SUCCESS);
-    }
-
     // yield all(teams.map(({ id }) => fork(initTeam, id, false)));
 
     const userData = yield select(userDataSelector);
@@ -338,7 +301,7 @@ export function* processKeyPairsSaga({ payload: { itemsById } }) {
   }
 }
 
-function* initPersonalVault() {
+function* loadKeyPairsAndPersonalItems() {
   try {
     // Init personal keys
     const keyPair = yield select(teamKeyPairSelector, {
@@ -385,31 +348,15 @@ function* initPersonalVault() {
     // Put to the store the shared and the team items, wait for processing of keypairs
     yield put(addItemsBatch({ ...sharedItemsById, ...teamsItemsById }));
 
-    const teamId = TEAM_TYPE.PERSONAL;
-
     // Load lists
     const { data: lists } = yield call(getLists);
     const { listsById } = convertListsToEntities(lists);
-    const trashList = lists.find(list => list.type === LIST_TYPE.TRASH);
 
-    const favoriteListFromStore = yield call(getFavoritesListFromStore, teamId);
+    yield put(addListsBatch(listsById));
 
-    const favoritesList = getFavoritesList({
-      favoriteListId: favoriteListFromStore?.id,
-      itemsById: listsById,
-      trashListId: trashList?.id,
-      teamId,
-    });
-
-    const { listsById: favoritesListById } = convertListsToEntities([
-      favoritesList,
-    ]);
-    yield put(
-      addListsBatch({
-        ...listsById,
-        ...favoritesListById,
-      }),
-    );
+    if (!keypairsArray?.length) {
+      yield call(openCurrentVaultSaga);
+    }
   } catch (error) {
     // eslint-disable-next-line no-console
     console.error(error);
@@ -423,14 +370,16 @@ function* initListsAndProgressEntities() {
   const currentTeamId = yield select(currentTeamIdSelector);
 
   const workInProgressListId = yield select(workInProgressListIdSelector);
-  const listsById = yield select(listsByIdSelector);
-  const favoritesList = yield select(favoriteListSelector);
-  const defaultList = yield select(defaultListSelector);
+  const lists = yield select(teamListsSelector, {
+    teamId: currentTeamId,
+  });
+  const workInProgressList = !workInProgressListId
+    ? lists.find(list => list.id === workInProgressListId)
+    : null;
+  const favoritesList = lists.find(list => list.type === LIST_TYPE.FAVORITES);
+  const defaultList = lists.find(list => list.type === LIST_TYPE.DEFAULT);
 
-  if (
-    !workInProgressListId ||
-    ![currentTeamId, null].includes(listsById[workInProgressListId]?.teamId)
-  ) {
+  if (!workInProgressList) {
     if (favoritesList?.children?.length > 0) {
       yield put(setWorkInProgressListId(favoritesList.id));
     } else {
@@ -451,40 +400,27 @@ function* initListsAndProgressEntities() {
 export function* initWorkflow() {
   // Wait for the user data
   yield take(FETCH_USER_SELF_SUCCESS);
-  yield call(initPersonalVault);
-  yield call(initTeams);
-  // We need to wait for the decryption of team keypair to initiate the Teams
+  yield fork(initTeams);
   yield fork(fetchMembersSaga);
-  
+  yield call(loadKeyPairsAndPersonalItems);
 }
 
 export function* openTeamVaultSaga({ payload: { teamId } }) {
   try {
+    const team = yield select(teamSelector, { teamId });
+
+    if (!team && teamId !== TEAM_TYPE.PERSONAL) {
+      yield put(setCurrentTeamId(TEAM_TYPE.PERSONAL));
+
+      return;
+    }
+
+    if (!team) {
+      throw new Error('Houston, we have a problem!');
+    }
+
     yield call(initTeam, teamId);
-    const listsById = yield select(listsTeamSelector, { teamId });
-    const lists = objectToArray(listsById);
-    const defaultList = lists.find(list => list.type === LIST_TYPE.DEFAULT);
-    const favoritesList = lists.find(list => list.type === LIST_TYPE.FAVORITES);
-
-    const workInProgressListId = yield select(workInProgressListIdSelector);
-
-    if (
-      !workInProgressListId ||
-      listsById[workInProgressListId]?.teamId !== teamId
-    ) {
-      if (favoritesList?.children?.length > 0) {
-        yield put(setWorkInProgressListId(favoritesList.id));
-      } else {
-        yield put(setWorkInProgressListId(defaultList?.id));
-      }
-    }
-
-    const workInProgressItem = yield select(workInProgressItemSelector);
-    if (!workInProgressItem || workInProgressItem?.teamId !== teamId) {
-      yield put(setWorkInProgressItem(null));
-    }
-    yield put(resetWorkInProgressItemIds(null));
-
+    yield call(initListsAndProgressEntities);
     // TODO: Here is opportunity to improve the calls
     yield fork(processTeamItemsSaga, {
       payload: {
@@ -539,6 +475,7 @@ function* getItemKeyPair({
       return yield select(teamKeyPairSelector, { teamId: TEAM_TYPE.PERSONAL });
   }
 }
+
 function* decryptItemRaws({ payload: { item } }) {
   try {
     // If item is null or aready had decypted attachments then do not dectrypt again!
@@ -569,6 +506,7 @@ function* decryptItemRaws({ payload: { item } }) {
     console.error('error: ', error);
   }
 }
+
 function setWorkInProgressItemSaga({ payload: { item } }) {
   try {
     if (!item) return;
@@ -584,11 +522,23 @@ function setWorkInProgressItemSaga({ payload: { item } }) {
   }
 }
 
+function* initSettings() {
+  try {
+    yield call(fetchTeamsSaga);
+    yield call(fetchMembersSaga);
+
+    yield put(finishIsLoading());
+  } catch (error) {
+    // eslint-disable-next-line no-console
+    console.error('error: ', error);
+  }
+}
+
 export default function* workflowSagas() {
   // Init (get all items, keys, etc)
   yield takeLatest(INIT_WORKFLOW, initWorkflow);
+  yield takeLatest(INIT_SETTINGS, initSettings);
   yield takeLatest(SET_WORK_IN_PROGRESS_ITEM, setWorkInProgressItemSaga);
-  yield takeLatest(ADD_LISTS_BATCH, initListsAndProgressEntities);
   yield takeLatest(UPDATE_WORK_IN_PROGRESS_ITEM, updateWorkInProgressItemSaga);
   yield takeLatest(SET_CURRENT_TEAM_ID, openTeamVaultSaga);
   yield takeLatest(ADD_TEAM_KEY_PAIR_BATCH, openCurrentVaultSaga);

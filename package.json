@@ -13,5 +13,11 @@
     "eslint": "yarn bin eslint"
   },
   "npmClient": "yarn",
-  "useWorkspaces": true
+  "useWorkspaces": true,
+  "dependencies": {
+    "wait-on": "^5.2.0"
+  },
+  "engines": {
+    "node": ">=12.13"
+  }
 }

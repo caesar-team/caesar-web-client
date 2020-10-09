@@ -126,12 +126,6 @@ export const patchChildAccess = (childItemId, data) =>
 export const patchChildItem = (childItemId, data) =>
   callApi.patch(`/child_item/${childItemId}`, data);
 
-export const acceptUpdateItem = itemId =>
-  callApi.post(`/items/${itemId}/accept_update`);
-
-export const rejectUpdateItem = itemId =>
-  callApi.post(`/items/${itemId}/decline_update`);
-
 export const deleteChildItem = childItemId =>
   callApi.delete(`/child_item/${childItemId}`);
 

@@ -1,4 +1,5 @@
 export const INIT_WORKFLOW = '@workflow/INIT_WORKFLOW';
+export const INIT_SETTINGS = '@workflow/INIT_SETTINGS';
 
 export const FINISH_IS_LOADING = '@workflow/FINISH_IS_LOADING';
 export const VAULTS_ARE_READY = '@workflow/VAULTS_ARE_READY';
@@ -29,6 +30,10 @@ export const initWorkflow = (withDecryption = true) => ({
   payload: {
     withDecryption,
   },
+});
+
+export const initSettings = () => ({
+  type: INIT_SETTINGS,
 });
 
 export const openVault = teamId => ({

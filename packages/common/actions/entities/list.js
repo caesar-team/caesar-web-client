@@ -26,8 +26,6 @@ export const MOVE_ITEMS_BATCH_TO_LIST = '@list/MOVE_ITEMS_BATCH_TO_LIST';
 export const REMOVE_ITEM_FROM_LIST = '@list/REMOVE_ITEM_FROM_LIST';
 export const REMOVE_ITEMS_BATCH_FROM_LIST =
   '@list/REMOVE_ITEMS_BATCH_FROM_LIST';
-export const TOGGLE_ITEM_TO_FAVORITE_LIST =
-  '@list/TOGGLE_ITEM_TO_FAVORITE_LIST';
 
 export const CLEAR_SERVER_ERRORS = '@list/CLEAR_SERVER_ERRORS';
 
@@ -162,19 +160,6 @@ export const removeItemsBatchFromList = (itemIds, listId) => ({
   payload: {
     itemIds,
     listId,
-  },
-});
-
-export const toggleItemToFavoriteList = (
-  itemId,
-  favoritesListId,
-  isFavorite,
-) => ({
-  type: TOGGLE_ITEM_TO_FAVORITE_LIST,
-  payload: {
-    itemId,
-    favoritesListId,
-    isFavorite,
   },
 });
 

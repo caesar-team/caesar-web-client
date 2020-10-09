@@ -9,16 +9,14 @@ import {
 } from '@caesar/components';
 import { UsersContainer } from '@caesar/containers';
 import { userDataSelector } from '@caesar/common/selectors/user';
-import { fetchUserSelfRequest } from '@caesar/common/actions/user';
-import { fetchMembersRequest } from '@caesar/common/actions/entities/member';
+import { initSettings } from '@caesar/common/actions/workflow';
 
 const SettingsUsersPage = () => {
   const dispatch = useDispatch();
   const userData = useSelector(userDataSelector);
 
   useEffectOnce(() => {
-    dispatch(fetchUserSelfRequest());
-    dispatch(fetchMembersRequest());
+    dispatch(initSettings());
   });
 
   const shouldShowLoader = !userData;

@@ -1,9 +1,9 @@
 import { createSelector } from 'reselect';
 import { LIST_TYPE, TEAM_TYPE } from '@caesar/common/constants';
-import { itemsByIdSelector } from '@caesar/common/selectors/entities/item';
-import { childItemsByIdSelector } from '@caesar/common/selectors/entities/childItem';
-import { teamListSelector } from '@caesar/common/selectors/entities/team';
-import { currentTeamIdSelector } from '@caesar/common/selectors/user';
+import { currentTeamIdSelector } from '../user';
+import { teamListSelector } from './team';
+import { itemsByIdSelector, itemListSelector } from './item';
+import { childItemsByIdSelector } from './childItem';
 
 export const entitiesSelector = state => state.entities;
 
@@ -49,22 +49,22 @@ export const trashListSelector = createSelector(
   lists => lists.find(({ type }) => type === LIST_TYPE.TRASH) || {},
 );
 
-export const favoriteListSelector = createSelector(
-  personalListsSelector,
+export const favoritesListSelector = createSelector(
+  itemListSelector,
+  currentTeamIdSelector,
   trashListSelector,
-  itemsByIdSelector,
-  (lists, trash, items) => {
-    const favoriteList =
-      lists.find(({ type }) => type === LIST_TYPE.FAVORITES) || {};
-
-    return {
-      ...favoriteList,
-      children:
-        favoriteList?.children?.filter(
-          itemId => items[itemId]?.listId !== trash.id,
-        ) || [],
-    };
-  },
+  (itemList, currentTeamId, trashList) => ({
+    id: LIST_TYPE.FAVORITES,
+    label: LIST_TYPE.FAVORITES,
+    type: LIST_TYPE.FAVORITES,
+    children: itemList.flatMap(item =>
+      item.favorite &&
+      item.teamId === currentTeamId &&
+      item.listId !== trashList.id
+        ? item.id
+        : [],
+    ),
+  }),
 );
 
 const nestedListsSelector = createSelector(
@@ -83,7 +83,7 @@ const nestedListsSelector = createSelector(
 export const personalListsByTypeSelector = createSelector(
   inboxListSelector,
   nestedListsSelector,
-  favoriteListSelector,
+  favoritesListSelector,
   trashListSelector,
   (inbox, lists, favorites, trash) => ({
     inbox,
@@ -93,13 +93,13 @@ export const personalListsByTypeSelector = createSelector(
   }),
 );
 
-export const teamListsSelector = createSelector(
+export const teamIdsListSelector = createSelector(
   listsSelector,
   lists => lists.filter(list => list.teamId),
 );
 
 export const teamsTrashListsSelector = createSelector(
-  teamListsSelector,
+  teamIdsListSelector,
   lists => lists.filter(({ type }) => type === LIST_TYPE.TRASH) || [],
 );
 
@@ -113,7 +113,7 @@ export const allTrashListIdsSelector = createSelector(
 );
 
 export const currentTeamDefaultListSelector = createSelector(
-  teamListsSelector,
+  teamIdsListSelector,
   currentTeamIdSelector,
   (lists, currentTeamId) =>
     lists.find(
@@ -123,7 +123,7 @@ export const currentTeamDefaultListSelector = createSelector(
 );
 
 export const currentTeamTrashListSelector = createSelector(
-  teamListsSelector,
+  teamIdsListSelector,
   currentTeamIdSelector,
   (lists, currentTeamId) =>
     lists.find(
@@ -132,32 +132,10 @@ export const currentTeamTrashListSelector = createSelector(
     ) || {},
 );
 
-export const currentTeamFavoriteListSelector = createSelector(
-  teamListsSelector,
-  currentTeamIdSelector,
-  currentTeamTrashListSelector,
-  itemsByIdSelector,
-  (lists, currentTeamId, trash, items) => {
-    const favoriteList =
-      lists.find(
-        ({ type, teamId }) =>
-          teamId === currentTeamId && type === LIST_TYPE.FAVORITES,
-      ) || {};
-
-    return {
-      ...favoriteList,
-      children:
-        favoriteList.children?.filter(
-          itemId => items[itemId]?.listId !== trash.id,
-        ) || [],
-    };
-  },
-);
-
 export const currentTeamListsSelector = createSelector(
-  teamListsSelector,
+  teamIdsListSelector,
   currentTeamIdSelector,
-  currentTeamFavoriteListSelector,
+  favoritesListSelector,
   currentTeamTrashListSelector,
   (teamLists, currentTeamId, favorites, trash) => ({
     list: teamLists
@@ -180,25 +158,30 @@ export const listsIdTeamSelector = createSelector(
     lists.filter(list => list.teamId === teamId).map(list => list.id),
 );
 
-export const listsTeamSelector = createSelector(
+export const teamListsSelector = createSelector(
   listsSelector,
   teamIdPropSelector,
-  (lists, teamId) => lists.filter(list => list.teamId === teamId) || [],
+  (lists, teamId) => {
+    return lists.filter(list => list.teamId === teamId) || [];
+  },
 );
 
+// export const teamListsSelector = createSelector(
+//   listsIdTeamSelector,
+//   listsByIdSelector,
+//   (listsIds, listsById) => listsIds.filter(id => listsById[id]) || null,
+// );
+
 export const teamDefaultListSelector = createSelector(
-  listsSelector,
-  teamIdPropSelector,
-  (lists, teamId) =>
-    lists.find(
-      list => list.teamId === teamId && list.type === LIST_TYPE.DEFAULT,
-    ) || null,
+  listsIdTeamSelector,
+  listsByIdSelector,
+  (listsIds, listsById) => listsIds.filter(id => listsById[id]) || null,
 );
 
 export const selectableTeamsListsSelector = createSelector(
   teamListSelector,
   personalListsSelector,
-  teamListsSelector,
+  teamIdsListSelector,
   (teamList, personalLists, teamLists) => {
     const filterLists = lists =>
       lists.filter(

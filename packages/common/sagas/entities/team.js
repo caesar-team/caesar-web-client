@@ -99,11 +99,13 @@ export function* fetchTeamsSaga() {
       yield put(setCurrentTeamId(teamList[0].id));
     }
 
-    yield all(
-      teamList.map(team =>
-        call(fetchTeamMembersSaga, { payload: { teamId: team.id } }),
-      ),
-    );
+    // @Deprecated
+    // TODO: Need to check if it doesn't break smth
+    // yield all(
+    //   teamList.map(team =>
+    //     call(fetchTeamMembersSaga, { payload: { teamId: team.id } }),
+    //   ),
+    // );
   } catch (error) {
     // eslint-disable-next-line no-console
     console.error(error);
@@ -169,8 +171,7 @@ export function* createTeamKeyPairSaga({ payload: { team, publicKey } }) {
 
     const teamKeyPair = yield call(generateTeamKeyPair, {
       payload: {
-        name: team.name,
-        publicKey,
+        name: team.title,
       },
     });
 
@@ -189,6 +190,8 @@ export function* createTeamKeyPairSaga({ payload: { team, publicKey } }) {
 
     const keyPairsById = convertKeyPairToEntity([serverKeypairItem]);
     yield put(addTeamKeyPairBatch(keyPairsById));
+
+    return keyPairsById;
   } catch (error) {
     // eslint-disable-next-line no-console
     console.error(error);
@@ -197,6 +200,8 @@ export function* createTeamKeyPairSaga({ payload: { team, publicKey } }) {
     );
     // Todo: need to remove all dependet entities when create team is failed
     yield put(createTeamFailure());
+
+    return null;
   }
 }
 
@@ -216,8 +221,10 @@ export function* createTeamSaga({
       icon,
     };
 
-    const teamKeyPair = yield call(createTeamKeyPairSaga, {
-      payload: { teamName: encodeURIComponent(title), publicKey },
+    const teamKeyPair = yield call(generateTeamKeyPair, {
+      payload: {
+        name: title,
+      },
     });
 
     if (!teamKeyPair) {

@@ -26,8 +26,6 @@ import {
   removeItemFailure,
   removeItemsBatchSuccess,
   removeItemsBatchFailure,
-  toggleItemToFavoriteSuccess,
-  toggleItemToFavoriteFailure,
   removeChildItemsBatchFromItem,
   updateItemField,
 } from '@caesar/common/actions/entities/item';
@@ -39,7 +37,6 @@ import {
   moveItemsBatchToList,
   removeItemFromList,
   removeItemsBatchFromList,
-  toggleItemToFavoriteList,
 } from '@caesar/common/actions/entities/list';
 import { removeChildItemsBatch } from '@caesar/common/actions/entities/childItem';
 import { setCurrentTeamId } from '@caesar/common/actions/user';
@@ -52,8 +49,6 @@ import {
 import { workInProgressItemIdsSelector } from '@caesar/common/selectors/workflow';
 import {
   listSelector,
-  favoriteListSelector,
-  currentTeamFavoriteListSelector,
   defaultListSelector,
   currentTeamDefaultListSelector,
   teamDefaultListSelector,
@@ -156,7 +151,7 @@ export function* generateTeamKeyPair({ name }) {
   const systemItemName = yield call(
     generateSystemItemName,
     ITEM_TYPE.KEYPAIR,
-    name,
+    encodeURIComponent(name),
   );
 
   const systemItemEmail = yield call(generateSystemItemEmail, systemItemName);
@@ -205,11 +200,6 @@ export function* removeItemSaga({ payload: { itemId, listId } }) {
 
     if (item.invited && item.invited.length > 0) {
       yield put(removeChildItemsBatch(item.invited));
-    }
-
-    if (item.favorite) {
-      const favoriteList = yield select(favoriteListSelector);
-      yield put(removeItemFromList(itemId, favoriteList.id));
     }
 
     yield put(setWorkInProgressItem(null));
@@ -261,18 +251,7 @@ export function* removeItemsBatchSaga({ payload: { listId } }) {
 
 export function* toggleItemToFavoriteSaga({ payload: { item } }) {
   try {
-    const favoritesList = item.teamId
-      ? yield select(currentTeamFavoriteListSelector)
-      : yield select(favoriteListSelector);
-
-    const {
-      data: { favorite: isFavorite },
-    } = yield call(toggleFavorite, item.id);
-
-    yield put(
-      toggleItemToFavoriteSuccess(item.id, favoritesList.id, isFavorite),
-    );
-    yield put(toggleItemToFavoriteList(item.id, favoritesList.id, isFavorite));
+    yield call(toggleFavorite, item.id);
     yield put(updateWorkInProgressItem(item.id));
   } catch (error) {
     // eslint-disable-next-line no-console
@@ -280,7 +259,6 @@ export function* toggleItemToFavoriteSaga({ payload: { item } }) {
     yield put(
       updateGlobalNotification(getServerErrorMessage(error), false, true),
     );
-    yield put(toggleItemToFavoriteFailure());
   }
 }
 
@@ -429,9 +407,8 @@ export function* saveItemSaga({ item, publicKey }) {
   let serverItemData = {};
 
   if (id) {
-    const {
-      data: { updatedItemData },
-    } = yield call(updateItem, id, { secret });
+    const { data: updatedItemData } = yield call(updateItem, id, { secret });
+
     serverItemData = updatedItemData || {};
   } else {
     const { data: updatedItemData } = yield call(postCreateItem, {

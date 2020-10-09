@@ -26,7 +26,6 @@ import {
   addTeamMembersBatchFailure,
   removeTeamMemberSuccess,
   removeTeamMemberFailure,
-  removeTeamRequest,
   pinTeamSuccess,
   pinTeamFailure,
   addTeamsBatch,

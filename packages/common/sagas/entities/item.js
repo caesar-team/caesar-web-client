@@ -108,6 +108,7 @@ import { passwordGenerator } from '@caesar/common/utils/passwordGenerator';
 import { generateKeys } from '@caesar/common/utils/key';
 import { addSystemItemsBatch } from '@caesar/common/actions/entities/system';
 import { memberSelector } from '../../selectors/entities/member';
+import { convertKeyPairToItemEntity } from '../../normalizers/normalizers';
 
 const ITEMS_CHUNK_SIZE = 50;
 
@@ -143,7 +144,7 @@ export function* generateSystemItem(entityType, listId, entityId) {
         privateKey,
         publicKey,
       },
-      pass: masterPassword,
+      password: masterPassword,
       name: systemItemName,
     },
   };
@@ -182,7 +183,7 @@ export function* generateTeamKeyPair({ name }) {
         privateKey,
         publicKey,
       },
-      pass: masterPassword,
+      password: masterPassword,
       name: systemItemName,
     },
   };

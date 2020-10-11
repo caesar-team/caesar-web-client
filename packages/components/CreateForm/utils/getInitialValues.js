@@ -9,7 +9,7 @@ export const getInitialValues = (type, teamId, listId) => {
         listId,
         name: '',
         login: '',
-        pass: '',
+        password: '',
         website: '',
         note: '',
         attachments: [],

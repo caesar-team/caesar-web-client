@@ -5,6 +5,7 @@ import {
   teamSchema,
   keypairSchema,
   itemSchema,
+  keypairItemSchema,
 } from '@caesar/common/normalizers/schemas';
 
 export const convertItemsToEntities = items => {
@@ -46,6 +47,12 @@ export const convertTeamsToEntity = teams => {
 
 export const convertKeyPairToEntity = keypairs => {
   const normalized = normalize(keypairs, [keypairSchema]);
+
+  return normalized.entities.byId || {};
+};
+
+export const convertKeyPairToItemEntity = keypairs => {
+  const normalized = normalize(keypairs, [keypairItemSchema]);
 
   return normalized.entities.byId || {};
 };

@@ -61,6 +61,7 @@ import {
 import {
   convertTeamsToEntity,
   convertKeyPairToEntity,
+  convertKeyPairToItemEntity,
 } from '@caesar/common/normalizers/normalizers';
 import { createPermissionsFromLinks } from '@caesar/common/utils/createPermissionsFromLinks';
 import {
@@ -77,6 +78,7 @@ import { inviteNewMemberBatchSaga } from '@caesar/common/sagas/common/invite';
 import { createChildItemsFilterSelector } from '@caesar/common/selectors/entities/childItem';
 import { updateGlobalNotification } from '@caesar/common/actions/application';
 import {
+  cloneKeyPair,
   encryptSecret,
   generateTeamKeyPair,
   saveItemSaga,
@@ -207,12 +209,22 @@ export function* createTeamKeyPairSaga({ payload: { team, publicKey } }) {
     return null;
   }
 }
+/* 
+1. Get all public keys for the members
+1a. If user doesn't exist then create a keypair & masterpassword for that user
+2. Create a keypair clone from the team keypair per member
+3. Create secrets (encrypted keypairs) from the members keypairs
+4. Save all secrets to the server
+5. Add the members to the team
+
+*/
+
 export function* addMemberToTeamListsBatchSaga({
   payload: { teamId, members },
 }) {
   try {
+    // point 1 and 1a
     const preparedMembers = yield call(prepareUsersForSharing, members);
-
     const teamMembers = preparedMembers.map(member => ({ ...member, teamId }));
     const newMembers = preparedMembers.filter(({ isNew }) => isNew);
 
@@ -221,53 +233,59 @@ export function* addMemberToTeamListsBatchSaga({
         payload: { members: newMembers },
       });
     }
-
-    const teamItemList = yield select(teamItemListSelector, { teamId });
-    const teamSystemItem = yield select(teamKeyPairSelector, { teamId });
-
-    teamItemList.push(teamSystemItem?.raw);
-    const itemUserPairs = yield call(getItemUserPairs, {
-      items: teamItemList,
-      members: teamMembers,
-    });
-
-    const invitedMemberIds = teamMembers.map(({ id }) => id);
-    const invitedMembersWithCommandRole = teamMembers.map(member => ({
-      ...member,
-      role: COMMANDS_ROLES.USER_ROLE_MEMBER,
-    }));
-
-    const promises = invitedMembersWithCommandRole.map(({ id: userId, role }) =>
-      postAddTeamMember({ teamId, userId, role }),
+    const teamKeyPair = select(teamKeyPairSelector, { teamId });
+    const clonedKeyPairs = preparedMembers.map(() =>
+      convertKeyPairToItemEntity([teamKeyPair]),
     );
 
-    const invitedMembersWithLinks = [];
+    debugger;
+    // const secret = yield call(encryptSecret, { item, publicKey });
+    // const teamItemList = yield select(teamItemListSelector, { teamId });
+    // const teamSystemItem = yield select(teamKeyPairSelector, { teamId });
 
-    yield Promise.all(promises).then(result => {
-      result.forEach(({ data }) => {
-        invitedMembersWithLinks.push({
-          email: data.email,
-          id: data.id,
-          isNew: false,
-          publicKey: data.publicKey,
-          role: data.role,
-          teamId,
-          _links: data._links,
-          _permissions: createPermissionsFromLinks(data._links),
-        });
-      });
-    });
+    // teamItemList.push(teamSystemItem?.raw);
+    // const itemUserPairs = yield call(getItemUserPairs, {
+    //   items: teamItemList,
+    //   members: teamMembers,
+    // });
 
-    // TODO: add invite for members new or not new i dunno
+    // const invitedMemberIds = teamMembers.map(({ id }) => id);
+    // const invitedMembersWithCommandRole = teamMembers.map(member => ({
+    //   ...member,
+    //   role: COMMANDS_ROLES.USER_ROLE_MEMBER,
+    // }));
 
-    yield put(addTeamMembersBatchSuccess(teamId, invitedMembersWithLinks));
-    yield put(addTeamToMembersTeamsListBatch(teamId, invitedMemberIds));
+    // const promises = invitedMembersWithCommandRole.map(({ id: userId, role }) =>
+    //   postAddTeamMember({ teamId, userId, role }),
+    // );
 
-    if (itemUserPairs.length > 0) {
-      yield fork(createChildItemBatchSaga, {
-        payload: { itemUserPairs },
-      });
-    }
+    // const invitedMembersWithLinks = [];
+
+    // yield Promise.all(promises).then(result => {
+    //   result.forEach(({ data }) => {
+    //     invitedMembersWithLinks.push({
+    //       email: data.email,
+    //       id: data.id,
+    //       isNew: false,
+    //       publicKey: data.publicKey,
+    //       role: data.role,
+    //       teamId,
+    //       _links: data._links,
+    //       _permissions: createPermissionsFromLinks(data._links),
+    //     });
+    //   });
+    // });
+
+    // // TODO: add invite for members new or not new i dunno
+
+    // yield put(addTeamMembersBatchSuccess(teamId, invitedMembersWithLinks));
+    // yield put(addTeamToMembersTeamsListBatch(teamId, invitedMemberIds));
+
+    // if (itemUserPairs.length > 0) {
+    //   yield fork(createChildItemBatchSaga, {
+    //     payload: { itemUserPairs },
+    //   });
+    // }
 
     yield put(updateGlobalNotification(NOOP_NOTIFICATION, false));
   } catch (error) {
@@ -292,7 +310,7 @@ export function* createTeamSaga({
     const { publicKey } = owner;
 
     const adminMembers = yield select(memberAdminsSelector);
-    // Get all admins except current
+    // Gathering admins except current
     const adminsToInvite = adminMembers.filter(({ id }) => id !== userId);
     const team = {
       title,

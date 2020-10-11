@@ -55,7 +55,7 @@ import { convertSystemItemToKeyPair } from '../../utils/item';
 export function* prepareUsersForSharing(members) {
   const emailRolePairs = members.map(({ email, roles }) => ({
     email,
-    role: roles.include(ROLE_ADMIN) ? ROLE_ADMIN : ROLE_USER,
+    role: roles.includes(ROLE_ADMIN) ? ROLE_ADMIN : ROLE_USER,
   }));
 
   return yield call(getOrCreateMemberBatchSaga, {

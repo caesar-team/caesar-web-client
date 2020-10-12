@@ -30,6 +30,7 @@ import {
   CREATE_TEAM_KEYS_SUCCESS,
   CREATE_TEAM_KEYS_FAILURE,
   UPDATE_TEAM_MEMBERS_WITH_ROLES,
+  RESET_TEAM_STATE,
 } from '@caesar/common/actions/entities/team';
 import { KEY_TYPE } from '../../constants';
 
@@ -262,5 +263,8 @@ export default createReducer(initialState, {
         },
       },
     };
+  },
+  [RESET_TEAM_STATE]() {
+    return initialState;
   },
 });

@@ -6,7 +6,7 @@ import {
   UPDATE_WORK_IN_PROGRESS_ITEM_RAWS,
   SET_WORK_IN_PROGRESS_ITEM_IDS,
   SET_WORK_IN_PROGRESS_LIST_ID,
-  RESET_WORKFLOW_STORE,
+  RESET_WORKFLOW_STATE,
 } from '@caesar/common/actions/workflow';
 
 const initialState = {
@@ -65,7 +65,7 @@ export default createReducer(initialState, {
       workInProgressItemIds: [],
     };
   },
-  [RESET_WORKFLOW_STORE]() {
+  [RESET_WORKFLOW_STATE]() {
     return initialState;
   },
 });

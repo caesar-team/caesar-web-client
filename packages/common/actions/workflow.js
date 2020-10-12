@@ -16,7 +16,7 @@ export const SET_WORK_IN_PROGRESS_LIST_ID =
 
 export const RESET_WORK_IN_PROGRESS_ITEM_IDS =
   '@workflow/RESET_WORK_IN_PROGRESS_ITEM_IDS';
-export const RESET_WORKFLOW_STORE = '@workflow/RESET_WORKFLOW_STORE';
+export const RESET_WORKFLOW_STATE = '@workflow/RESET_WORKFLOW_STATE';
 
 export const DECRYPTION = '@workflow/DECRYPTION';
 export const DECRYPTION_END = '@workflow/DECRYPTION_END';
@@ -90,8 +90,8 @@ export const resetWorkInProgressItemIds = () => ({
   type: RESET_WORK_IN_PROGRESS_ITEM_IDS,
 });
 
-export const resetWorkflowStore = () => ({
-  type: RESET_WORKFLOW_STORE,
+export const resetWorkflowState = () => ({
+  type: RESET_WORKFLOW_STATE,
 });
 
 export const decryption = ({ items, raws, key, masterPassword }) => ({

@@ -16,6 +16,7 @@ import {
 import { addPersonalKeyPair } from '@caesar/common/actions/keystore';
 import { addTeamsBatch } from '@caesar/common/actions/entities/team';
 import { addMembersBatch } from '@caesar/common/actions/entities/member';
+import { resetStore } from '@caesar/common/actions/application';
 import { membersByIdSelector } from '@caesar/common/selectors/entities/member';
 import { currentTeamIdSelector } from '@caesar/common/selectors/user';
 import { convertTeamsToEntity } from '@caesar/common/normalizers/normalizers';
@@ -93,6 +94,7 @@ export function* logoutSaga() {
     yield call(removeCookieValue, 'token');
     yield call(removeCookieValue, 'share');
     yield call(clearStorage);
+    yield put(resetStore());
     yield call(Router.push, ROUTES.SIGN_IN);
   } catch (error) {
     console.error('error', error);

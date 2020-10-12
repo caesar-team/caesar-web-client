@@ -47,7 +47,6 @@ import {
 } from '@caesar/common/normalizers/normalizers';
 import { objectToArray } from '@caesar/common/utils/utils';
 import { upperFirst } from '@caesar/common/utils/string';
-import { itemsByFavoritesSort } from '@caesar/common/utils/workflow';
 import { getLists, getTeamLists, getUserItems } from '@caesar/common/api';
 import { TEAM_TYPE, LIST_TYPE, ROLE_ADMIN } from '@caesar/common/constants';
 import { teamListsSelector } from '@caesar/common/selectors/entities/list';
@@ -327,7 +326,7 @@ function* loadKeyPairsAndPersonalItems() {
 
     const keypairsArray = objectToArray(keypairsById);
     const systemItems = objectToArray(systemItemsById);
-    const userItems = objectToArray(itemsById).sort(itemsByFavoritesSort);
+    const userItems = objectToArray(itemsById);
     const itemsEncryptedByUserKeys = [
       ...keypairsArray,
       ...systemItems,

@@ -320,7 +320,7 @@ export function* processKeyPairsSaga({ payload: { itemsById } }) {
         const shareKeysById = convertKeyPairToEntity(shareKeys);
         putSagas.push(put(addShareKeyPairBatch(shareKeysById)));
       }
-
+      debugger;
       yield all(putSagas);
     }
   } catch (error) {

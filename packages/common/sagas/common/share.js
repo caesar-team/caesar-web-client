@@ -17,7 +17,7 @@ import {
 } from '@caesar/common/selectors/keystore';
 import {
   decryptItem,
-  getPrivateKeyObj,
+  unsealPrivateKeyObj,
 } from '@caesar/common/utils/cipherUtils';
 import {
   NOOP_NOTIFICATION,
@@ -83,7 +83,7 @@ export function* getItemUserPairs({ systemItems, members }) {
   const { privateKey, password } = yield select(teamKeyPairSelector, {
     teamId: TEAM_TYPE.PERSONAL,
   });
-  const privateKeyObj = yield call(getPrivateKeyObj, privateKey, password);
+  const privateKeyObj = yield call(unsealPrivateKeyObj, privateKey, password);
 
   const itemUserPairs = yield all(
     systemItems.map(systemItem =>

@@ -8,7 +8,7 @@ import { passwordGenerator } from './passwordGenerator';
 
 const srp = createSrp();
 
-export const getPrivateKeyObj = async (privateKey, password) => {
+export const unsealPrivateKeyObj = async (privateKey, password) => {
   const privateKeyObj = (await openpgp.key.readArmored(privateKey)).keys[0];
   await privateKeyObj.decrypt(password);
 

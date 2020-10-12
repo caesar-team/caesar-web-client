@@ -30,6 +30,7 @@ import {
 import { fetchTeamMembersSaga } from '@caesar/common/sagas/entities/member';
 import {
   addTeamToMembersTeamsListBatch,
+  fetchMembersSuccess,
   removeTeamFromMember,
   removeTeamFromMembersBatch,
 } from '@caesar/common/actions/entities/member';
@@ -47,9 +48,9 @@ import {
   deleteTeam,
   getTeam,
   updateTeamMember,
-  postAddTeamMember,
   deleteTeamMember,
   postCreateVault,
+  postAddTeamMemberBatch,
 } from '@caesar/common/api';
 import {
   getServerErrorMessage,
@@ -59,13 +60,16 @@ import {
   convertTeamsToEntity,
   convertKeyPairToEntity,
   convertKeyPairToItemEntity,
+  convertMembersToEntity,
 } from '@caesar/common/normalizers/normalizers';
 import { createPermissionsFromLinks } from '@caesar/common/utils/createPermissionsFromLinks';
 import {
-  COMMANDS_ROLES,
+  TEAM_ROLES,
   ENTITY_TYPE,
   NOOP_NOTIFICATION,
+  ROLE_ADMIN,
   TEAM_TYPE,
+  USER_ROLE_ADMIN,
 } from '@caesar/common/constants';
 import {
   prepareUsersForSharing,
@@ -205,6 +209,7 @@ export function* createTeamKeyPairSaga({ payload: { team, publicKey } }) {
     return null;
   }
 }
+
 /* 
 1. Get all public keys for the members
 1a. If user doesn't exist then create a keypair & masterpassword for that user
@@ -214,27 +219,49 @@ export function* createTeamKeyPairSaga({ payload: { team, publicKey } }) {
 5. Add the members to the team
 
 */
+function* encryptMemberTeamKey({ member, keypair }) {
+  const { id: userId, roles, publicKey } = member;
+  const secret = yield call(encryptSecret, {
+    item: convertKeyPairToItemEntity([keypair]),
+    publicKey,
+  });
 
+  return {
+    userId,
+    secret,
+    userRole: roles.includes(ROLE_ADMIN)
+      ? TEAM_ROLES.USER_ROLE_ADMIN
+      : TEAM_ROLES.USER_ROLE_MEMBER,
+  };
+}
 export function* addMemberToTeamListsBatchSaga({
   payload: { teamId, members },
 }) {
   try {
-    // point 1 and 1a
-    const preparedMembers = yield call(prepareUsersForSharing, members);
-    const teamMembers = preparedMembers.map(member => ({ ...member, teamId }));
-    const newMembers = preparedMembers.filter(({ isNew }) => isNew);
+    // const preparedMembers = yield call(prepareUsersForSharing, members);
+    // const teamMembers = preparedMembers.map(member => ({ ...member, teamId }));
+    // const newMembers = preparedMembers.filter(({ isNew }) => isNew);
 
-    if (newMembers.length > 0) {
-      yield fork(inviteNewMemberBatchSaga, {
-        payload: { members: newMembers },
-      });
-    }
-    const teamKeyPair = select(teamKeyPairSelector, { teamId });
-    const clonedKeyPairs = preparedMembers.map(() =>
-      convertKeyPairToItemEntity([teamKeyPair]),
+    // if (newMembers.length > 0) {
+    //   yield fork(inviteNewMemberBatchSaga, {
+    //     payload: { members: newMembers },
+    //   });
+    // }
+    const keypair = yield select(teamKeyPairSelector, { teamId });
+    const postDataSagas = members.map(member =>
+      call(encryptMemberTeamKey, { member, keypair }),
     );
+    const postData = yield all(postDataSagas);
+    const { data: serverMembers } = yield call(postAddTeamMemberBatch, {
+      members: postData,
+      teamId,
+    });
 
-    debugger;
+    yield put(
+      addTeamMembersBatchSuccess(teamId, convertMembersToEntity(serverMembers)),
+    );
+    // yield put(fetchMembersSuccess(convertMembersToEntity(serverMembers)));
+
     // const secret = yield call(encryptSecret, { item, publicKey });
     // const teamItemList = yield select(teamItemListSelector, { teamId });
     // const teamSystemItem = yield select(teamKeyPairSelector, { teamId });
@@ -248,7 +275,7 @@ export function* addMemberToTeamListsBatchSaga({
     // const invitedMemberIds = teamMembers.map(({ id }) => id);
     // const invitedMembersWithCommandRole = teamMembers.map(member => ({
     //   ...member,
-    //   role: COMMANDS_ROLES.USER_ROLE_MEMBER,
+    //   role: TEAM_ROLES.USER_ROLE_MEMBER,
     // }));
 
     // const promises = invitedMembersWithCommandRole.map(({ id: userId, role }) =>
@@ -274,7 +301,6 @@ export function* addMemberToTeamListsBatchSaga({
 
     // // TODO: add invite for members new or not new i dunno
 
-    // yield put(addTeamMembersBatchSuccess(teamId, invitedMembersWithLinks));
     // yield put(addTeamToMembersTeamsListBatch(teamId, invitedMemberIds));
 
     // if (itemUserPairs.length > 0) {
@@ -346,7 +372,13 @@ export function* createTeamSaga({
     }
 
     if (serverKeypair?.id) {
-      const keyPairsById = convertKeyPairToEntity([serverKeypair]);
+      const keyPairsById = convertKeyPairToEntity([
+        {
+          ...serverKeypair,
+          ...teamKeyPair,
+        },
+      ]);
+
       yield put(addTeamKeyPairBatch(keyPairsById));
     }
 

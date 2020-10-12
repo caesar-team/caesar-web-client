@@ -16,6 +16,7 @@ import {
   setWorkInProgressListId,
   setWorkInProgressItem,
   decryption,
+  INIT_TEAMS,
 } from '@caesar/common/actions/workflow';
 import { addListsBatch } from '@caesar/common/actions/entities/list';
 import {
@@ -159,7 +160,7 @@ export function* processTeamItemsSaga({ payload: { teamId } }) {
       console.warn(
         `The key pair for the team ${team?.title}: ${teamId} not found. Need to create a new one...`,
       );
-
+      debugger;
       if (!publicKey) {
         throw new Error(
           `Can't creat the team:  ${team?.title ||
@@ -167,10 +168,10 @@ export function* processTeamItemsSaga({ payload: { teamId } }) {
         );
       }
 
-      yield call(createTeamKeyPairSaga, {
-        payload: { team, publicKey },
-      });
-      teamKeyPairs = yield select(teamKeyPairSelector, { teamId });
+      // yield call(createTeamKeyPairSaga, {
+      //   payload: { team, publicKey },
+      // });
+      // teamKeyPairs = yield select(teamKeyPairSelector, { teamId });
       if (!teamKeyPairs) return;
     }
 
@@ -291,7 +292,7 @@ export function* processKeyPairsSaga({ payload: { itemsById } }) {
         const shareKeysById = convertKeyPairToEntity(shareKeys);
         putSagas.push(put(addShareKeyPairBatch(shareKeysById)));
       }
-      debugger;
+
       yield all(putSagas);
     }
   } catch (error) {
@@ -536,11 +537,12 @@ function* initSettings() {
 export default function* workflowSagas() {
   // Init (get all items, keys, etc)
   yield takeLatest(INIT_WORKFLOW, initWorkflow);
+  yield takeLatest(INIT_TEAMS, initTeams);
   yield takeLatest(INIT_SETTINGS, initSettings);
   yield takeLatest(SET_WORK_IN_PROGRESS_ITEM, setWorkInProgressItemSaga);
   yield takeLatest(UPDATE_WORK_IN_PROGRESS_ITEM, updateWorkInProgressItemSaga);
   yield takeLatest(SET_CURRENT_TEAM_ID, openTeamVaultSaga);
-  yield takeLatest(ADD_TEAM_KEY_PAIR_BATCH, openCurrentVaultSaga);
+  // yield takeLatest(ADD_TEAM_KEY_PAIR_BATCH, openCurrentVaultSaga);
   // Wait for keypairs
   yield takeLatest(ADD_KEYPAIRS_BATCH, processKeyPairsSaga);
 }

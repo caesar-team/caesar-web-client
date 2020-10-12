@@ -1,4 +1,5 @@
 export const INIT_WORKFLOW = '@workflow/INIT_WORKFLOW';
+export const INIT_TEAMS = '@workflow/INIT_TEAMS';
 export const INIT_SETTINGS = '@workflow/INIT_SETTINGS';
 
 export const FINISH_IS_LOADING = '@workflow/FINISH_IS_LOADING';
@@ -30,6 +31,10 @@ export const initWorkflow = (withDecryption = true) => ({
   payload: {
     withDecryption,
   },
+});
+
+export const initTeams = () => ({
+  type: INIT_TEAMS,
 });
 
 export const initSettings = () => ({

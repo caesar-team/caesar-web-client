@@ -1,6 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
-import { COMMANDS_ROLES } from '@caesar/common/constants';
+import { TEAM_ROLES } from '@caesar/common/constants';
 import { Icon } from '../../Icon';
 import { Select } from '../../Select';
 
@@ -30,7 +30,7 @@ const SelectStyled = styled(Select)`
   margin-right: 20px;
 `;
 
-const OPTIONS = Object.values(COMMANDS_ROLES).map(role => ({
+const OPTIONS = Object.values(TEAM_ROLES).map(role => ({
   value: role,
   label: role,
 }));

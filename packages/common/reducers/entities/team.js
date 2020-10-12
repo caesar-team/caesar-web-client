@@ -182,6 +182,15 @@ export default createReducer(initialState, {
     return state;
   },
   [ADD_TEAM_MEMBERS_BATCH_SUCCESS](state, { payload }) {
+    const {
+      members: membersById = {
+        membersById: {},
+      },
+    } = payload;
+    const members = Object.values(membersById);
+
+    if (members.length <= 0) return state;
+
     return {
       ...state,
       byId: {
@@ -190,7 +199,7 @@ export default createReducer(initialState, {
           ...state.byId[payload.teamId],
           users: [
             ...state.byId[payload.teamId].users,
-            ...payload.members.map(({ id, role, _permissions }) => ({
+            ...members.map(({ id, role, _permissions }) => ({
               id,
               role,
               _permissions,

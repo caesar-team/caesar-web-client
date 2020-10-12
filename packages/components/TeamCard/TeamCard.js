@@ -131,7 +131,8 @@ const TeamCard = ({
   const isCurrentUserTeamMember = !!users.find(({ id }) => id === userId); 
   const canEditTeam = ability.can(PERMISSION.EDIT, teamSubject);
   const canRemoveTeam = ability.can(PERMISSION.DELETE, teamSubject);
-  const canPinTeam = ability.can(PERMISSION.PIN, teamSubject);
+  //const canPinTeam = ability.can(PERMISSION.PIN, teamSubject);
+  const canPinTeam = true;
   const shouldShowMenu = isCurrentUserTeamMember || canEditTeam || canRemoveTeam;
   
   return (

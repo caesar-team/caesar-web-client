@@ -145,11 +145,11 @@ class TeamListContainer extends Component {
     this.props.updateTeamMemberRoleRequest(selectedTeamId, member.id, role);
   };
 
-  handlePinTeam = teamId => event => {
+  handlePinTeam = (teamId, isPinned) => event => {
     event.preventDefault();
     event.stopPropagation();
 
-    this.props.pinTeamRequest(teamId);
+    this.props.togglePinTeamRequest(teamId, !isPinned);
   };
 
   handleChangeTab = (name, tabName) => {
@@ -187,7 +187,7 @@ class TeamListContainer extends Component {
         onClickEditTeam={this.handleClickEditTeam(team.id)}
         onClickLeaveTeam={this.handleClickLeaveTeam(team)}
         onClickRemoveTeam={this.handleClickRemoveTeam(team.id)}
-        onPinTeam={this.handlePinTeam(team.id)}
+        onPinTeam={this.handlePinTeam(team.id, team.pinned)}
       />
     ));
   }

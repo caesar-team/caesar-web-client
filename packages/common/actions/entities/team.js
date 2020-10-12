@@ -22,9 +22,9 @@ export const REMOVE_TEAM_REQUEST = '@team/REMOVE_TEAM_REQUEST';
 export const REMOVE_TEAM_SUCCESS = '@team/REMOVE_TEAM_SUCCESS';
 export const REMOVE_TEAM_FAILURE = '@team/REMOVE_TEAM_FAILURE';
 
-export const PIN_TEAM_REQUEST = '@team/PIN_TEAM_REQUEST';
-export const PIN_TEAM_SUCCESS = '@team/PIN_TEAM_SUCCESS';
-export const PIN_TEAM_FAILURE = '@team/PIN_TEAM_FAILURE';
+export const TOGGLE_PIN_TEAM_REQUEST = '@team/TOGGLE_PIN_TEAM_REQUEST';
+export const TOGGLE_PIN_TEAM_SUCCESS = '@team/TOGGLE_PIN_TEAM_SUCCESS';
+export const TOGGLE_PIN_TEAM_FAILURE = '@team/TOGGLE_PIN_TEAM_FAILURE';
 
 export const UPDATE_TEAM_MEMBERS_WITH_ROLES =
   '@team/UPDATE_TEAM_MEMBERS_WITH_ROLES';
@@ -269,21 +269,22 @@ export const updateTeamMembersWithRoles = (teamId, members) => ({
   },
 });
 
-export const pinTeamRequest = teamId => ({
-  type: PIN_TEAM_REQUEST,
+export const togglePinTeamRequest = (teamId, shouldPinned) => ({
+  type: TOGGLE_PIN_TEAM_REQUEST,
   payload: {
     teamId,
+    shouldPinned,
   },
 });
 
-export const pinTeamSuccess = (teamId, pinned) => ({
-  type: PIN_TEAM_SUCCESS,
+export const togglePinTeamSuccess = (teamId, pinned) => ({
+  type: TOGGLE_PIN_TEAM_SUCCESS,
   payload: {
     teamId,
     pinned,
   },
 });
 
-export const pinTeamFailure = () => ({
-  type: PIN_TEAM_FAILURE,
+export const togglePinTeamFailure = () => ({
+  type: TOGGLE_PIN_TEAM_FAILURE,
 });

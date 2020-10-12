@@ -10,7 +10,7 @@ import {
   ADD_TEAM_MEMBERS_BATCH_REQUEST,
   REMOVE_TEAM_MEMBER_REQUEST,
   CREATE_TEAM_KEYS_REQUEST,
-  PIN_TEAM_REQUEST,
+  TOGGLE_PIN_TEAM_REQUEST,
   fetchTeamsSuccess,
   fetchTeamsFailure,
   fetchTeamSuccess,
@@ -28,8 +28,8 @@ import {
   removeTeamMemberFailure,
   pinTeamSuccess,
   pinTeamFailure,
-  addTeamsBatch,
-} from '@caesar/common/actions/entities/team';
+  addTeamsBatch, togglePinTeamSuccess, togglePinTeamFailure
+} from "@caesar/common/actions/entities/team";
 import { createChildItemBatchSaga } from '@caesar/common/sagas/entities/childItem';
 import { fetchTeamMembersSaga } from '@caesar/common/sagas/entities/member';
 import {
@@ -425,18 +425,18 @@ export function* removeTeamMemberSaga({ payload: { teamId, userId } }) {
   }
 }
 
-export function* pinTeamSaga({ payload: { teamId } }) {
+export function* togglePinTeamSaga({ payload: { teamId, shouldPinned } }) {
   try {
-    const { data: { pinned } } = yield call(pinTeam, teamId);
+    const { data: { pinned } } = yield call(pinTeam, teamId, shouldPinned);
 
-    yield put(pinTeamSuccess(teamId, pinned));
+    yield put(togglePinTeamSuccess(teamId, pinned));
   } catch (error) {
     // eslint-disable-next-line no-console
     console.error(error);
     yield put(
       updateGlobalNotification(getServerErrorMessage(error), false, true),
     );
-    yield put(pinTeamFailure());
+    yield put(togglePinTeamFailure());
   }
 }
 
@@ -453,5 +453,5 @@ export default function* teamSagas() {
     addMemberToTeamListsBatchSaga,
   );
   yield takeLatest(REMOVE_TEAM_MEMBER_REQUEST, removeTeamMemberSaga);
-  yield takeLatest(PIN_TEAM_REQUEST, pinTeamSaga);
+  yield takeLatest(TOGGLE_PIN_TEAM_REQUEST, togglePinTeamSaga);
 }

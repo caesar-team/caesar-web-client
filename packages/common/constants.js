@@ -166,7 +166,6 @@ export const UNLOCKED_ROUTES = [
 export const TECH_ROUTES = [ROUTES.LOGOUT];
 
 export const ENTITY_TYPE = {
-  CHILD_ITEM: 'childItem',
   ITEM: 'item',
   LIST: 'list',
   TEAM: 'team',

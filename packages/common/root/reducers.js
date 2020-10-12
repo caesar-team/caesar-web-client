@@ -5,7 +5,6 @@ import {
   workflowReducer,
   listReducer,
   itemReducer,
-  childItemReducer,
   teamReducer,
   applicationReducer,
   keystoreReducer,
@@ -16,7 +15,6 @@ const entitiesReducer = combineReducers({
   member: memberReducer,
   list: listReducer,
   item: itemReducer,
-  childItem: childItemReducer,
   team: teamReducer,
   system: systemReducer,
 });

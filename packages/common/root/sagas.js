@@ -6,7 +6,6 @@ import {
   memberSagas,
   listSagas,
   itemSagas,
-  childItemSagas,
   teamSagas,
 } from '@caesar/common/sagas';
 import { jobLoadBalancerSaga } from '@caesar/common/sagas/common/job';
@@ -21,7 +20,6 @@ const sagas = [
   memberSagas,
   listSagas,
   itemSagas,
-  childItemSagas,
   teamSagas,
   shareItemSagas,
   anonymousSagas,

@@ -47,7 +47,6 @@ import {
 } from '@caesar/common/normalizers/normalizers';
 import { objectToArray } from '@caesar/common/utils/utils';
 import { upperFirst } from '@caesar/common/utils/string';
-import { itemsByFavoritesSort } from '@caesar/common/utils/workflow';
 import { getLists, getTeamLists, getUserItems } from '@caesar/common/api';
 import { TEAM_TYPE, LIST_TYPE, ROLE_ADMIN } from '@caesar/common/constants';
 import { teamListsSelector } from '@caesar/common/selectors/entities/list';
@@ -71,7 +70,6 @@ import {
   shareKeyPairsSelector,
   shareItemKeyPairSelector,
 } from '@caesar/common/selectors/keystore';
-import { getFavoritesList } from '@caesar/common/normalizers/utils';
 import { addTeamsBatch } from '@caesar/common/actions/entities/team';
 import { getServerErrorMessage } from '@caesar/common/utils/error';
 import {
@@ -213,14 +211,6 @@ export function* processTeamsItemsSaga() {
   }
 }
 
-function* getFavoritesListFromStore(teamId) {
-  return (
-    (yield select(teamListsSelector, {
-      teamId,
-    })).find(list => list.type === LIST_TYPE.FAVORITES) || null
-  );
-}
-
 function* initTeam(teamId) {
   try {
     const currentTeamId = teamId;
@@ -228,28 +218,9 @@ function* initTeam(teamId) {
     if (!currentTeamId || currentTeamId === TEAM_TYPE.PERSONAL) return;
 
     const { data: lists } = yield call(getTeamLists, currentTeamId);
-    const { listsById, itemsById } = convertNodesToEntities(lists);
-    const trashList = lists.find(list => list.type === LIST_TYPE.TRASH);
+    const { listsById } = convertNodesToEntities(lists);
 
-    const favoriteListFromStore = yield call(getFavoritesListFromStore, teamId);
-
-    const favoritesList = getFavoritesList({
-      favoriteListId: favoriteListFromStore?.id,
-      itemsById,
-      trashListId: trashList?.id,
-      teamId,
-    });
-
-    const { listsById: favoritesListById } = convertNodesToEntities([
-      favoritesList,
-    ]);
-
-    yield put(
-      addListsBatch({
-        ...listsById,
-        ...favoritesListById,
-      }),
-    );
+    yield put(addListsBatch(listsById));
   } catch (error) {
     // eslint-disable-next-line no-console
     console.error(error);
@@ -355,7 +326,7 @@ function* loadKeyPairsAndPersonalItems() {
 
     const keypairsArray = objectToArray(keypairsById);
     const systemItems = objectToArray(systemItemsById);
-    const userItems = objectToArray(itemsById).sort(itemsByFavoritesSort);
+    const userItems = objectToArray(itemsById);
     const itemsEncryptedByUserKeys = [
       ...keypairsArray,
       ...systemItems,
@@ -376,31 +347,11 @@ function* loadKeyPairsAndPersonalItems() {
     // Put to the store the shared and the team items, wait for processing of keypairs
     yield put(addItemsBatch({ ...sharedItemsById, ...teamsItemsById }));
 
-    const teamId = TEAM_TYPE.PERSONAL;
-
     // Load lists
     const { data: lists } = yield call(getLists);
     const { listsById } = convertListsToEntities(lists);
-    const trashList = lists.find(list => list.type === LIST_TYPE.TRASH);
 
-    const favoriteListFromStore = yield call(getFavoritesListFromStore, teamId);
-
-    const favoritesList = getFavoritesList({
-      favoriteListId: favoriteListFromStore?.id,
-      itemsById: listsById,
-      trashListId: trashList?.id,
-      teamId,
-    });
-
-    const { listsById: favoritesListById } = convertListsToEntities([
-      favoritesList,
-    ]);
-    yield put(
-      addListsBatch({
-        ...listsById,
-        ...favoritesListById,
-      }),
-    );
+    yield put(addListsBatch(listsById));
 
     if (!keypairsArray?.length) {
       yield call(openCurrentVaultSaga);

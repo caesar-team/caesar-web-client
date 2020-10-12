@@ -1,5 +1,4 @@
 import { createSelector } from 'reselect';
-import { childItemsByIdSelector } from '@caesar/common/selectors/entities/childItem';
 import { isGeneralItem } from '../../utils/item';
 
 export const entitiesSelector = state => state.entities;
@@ -75,29 +74,6 @@ export const teamItemListSelector = createSelector(
   itemListSelector,
   teamIdPropSelector,
   (itemList, teamId) => itemList.filter(item => item.teamId === teamId),
-);
-
-export const itemChildItemsSelector = createSelector(
-  itemSelector,
-  childItemsByIdSelector,
-  (item, childItemsById) =>
-    item.invited.map(childItemId => childItemsById[childItemId]),
-);
-
-export const itemsChildItemsBatchSelector = createSelector(
-  itemsByIdSelector,
-  itemIdsPropSelector,
-  childItemsByIdSelector,
-  (itemsById, itemIds, childItemsById) => {
-    return itemIds.reduce((accumulator, itemId) => {
-      return [
-        ...accumulator,
-        ...itemsById[itemId].invited.map(
-          childItemId => childItemsById[childItemId],
-        ),
-      ];
-    }, []);
-  },
 );
 
 export const visibleItemsSelector = createSelector(

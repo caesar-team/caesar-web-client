@@ -27,15 +27,12 @@ import {
   removeTeamMemberFailure,
   addTeamsBatch,
 } from '@caesar/common/actions/entities/team';
-import { createChildItemBatchSaga } from '@caesar/common/sagas/entities/childItem';
 import { fetchTeamMembersSaga } from '@caesar/common/sagas/entities/member';
 import {
   addTeamToMembersTeamsListBatch,
   removeTeamFromMember,
   removeTeamFromMembersBatch,
 } from '@caesar/common/actions/entities/member';
-import { removeChildItemsBatchFromItems } from '@caesar/common/actions/entities/item';
-import { removeChildItemsBatch } from '@caesar/common/actions/entities/childItem';
 import { setCurrentTeamId, leaveTeam } from '@caesar/common/actions/user';
 import { teamSelector } from '@caesar/common/selectors/entities/team';
 import { teamItemListSelector } from '@caesar/common/selectors/entities/item';
@@ -75,7 +72,6 @@ import {
   getItemUserPairs,
 } from '@caesar/common/sagas/common/share';
 import { inviteNewMemberBatchSaga } from '@caesar/common/sagas/common/invite';
-import { createChildItemsFilterSelector } from '@caesar/common/selectors/entities/childItem';
 import { updateGlobalNotification } from '@caesar/common/actions/application';
 import {
   cloneKeyPair,
@@ -423,25 +419,11 @@ export function* updateTeamMemberRoleSaga({
 
 export function* removeTeamMemberSaga({ payload: { teamId, userId } }) {
   try {
+    // TODO: Implement remove Team Member
+    console.log('Remove Team Member will be implemented.');
     yield call(deleteTeamMember, { teamId, userId });
     yield put(removeTeamMemberSuccess(teamId, userId));
     yield put(removeTeamFromMember(teamId, userId));
-
-    const childItemsFilterSelector = createChildItemsFilterSelector({
-      teamId,
-      userId,
-    });
-
-    const childItems = yield select(childItemsFilterSelector);
-
-    const childItemIds = childItems.map(({ id }) => id);
-
-    const originalItemIds = childItems.map(
-      ({ originalItemId }) => originalItemId,
-    );
-
-    yield put(removeChildItemsBatch(childItemIds));
-    yield put(removeChildItemsBatchFromItems(originalItemIds, childItemIds));
 
     yield put(updateGlobalNotification(NOOP_NOTIFICATION, false));
   } catch (error) {

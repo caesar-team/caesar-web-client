@@ -31,8 +31,6 @@ import {
   REJECT_ITEM_UPDATE_SUCCESS,
   REJECT_ITEM_UPDATE_FAILURE,
   TOGGLE_ITEM_TO_FAVORITE_REQUEST,
-  TOGGLE_ITEM_TO_FAVORITE_SUCCESS,
-  TOGGLE_ITEM_TO_FAVORITE_FAILURE,
   CREATE_ANONYMOUS_LINK_FAILURE,
   CREATE_ANONYMOUS_LINK_REQUEST,
   CREATE_ANONYMOUS_LINK_SUCCESS,
@@ -47,13 +45,7 @@ import {
   REMOVE_SHARE_SUCCESS,
   ADD_ITEMS_BATCH,
   REMOVE_ITEMS_BATCH,
-  ADD_CHILD_ITEM_TO_ITEM,
-  ADD_CHILD_ITEMS_BATCH_TO_ITEM,
-  REMOVE_CHILD_ITEM_FROM_ITEM,
-  REMOVE_CHILD_ITEMS_BATCH_FROM_ITEM,
-  REMOVE_CHILD_ITEMS_BATCH_FROM_ITEMS,
   REMOVE_ITEMS_DATA,
-  ADD_CHILD_ITEMS_BATCH_TO_ITEMS,
   UPDATE_ITEM_FIELD,
 } from '@caesar/common/actions/entities/item';
 
@@ -240,21 +232,6 @@ export default createReducer(initialState, {
   [TOGGLE_ITEM_TO_FAVORITE_REQUEST](state) {
     return state;
   },
-  [TOGGLE_ITEM_TO_FAVORITE_SUCCESS](state, { payload }) {
-    return {
-      ...state,
-      byId: {
-        ...state.byId,
-        [payload.itemId]: {
-          ...state.byId[payload.itemId],
-          favorite: payload.isFavorite,
-        },
-      },
-    };
-  },
-  [TOGGLE_ITEM_TO_FAVORITE_FAILURE](state) {
-    return state;
-  },
   [CREATE_ANONYMOUS_LINK_REQUEST](state) {
     return state;
   },
@@ -300,14 +277,11 @@ export default createReducer(initialState, {
       byId: {
         ...state.byId,
         ...payload.invited.reduce(
-          (accumulator, { itemId, childItemIds }) => ({
+          (accumulator, { itemId }) => ({
             ...accumulator,
             [itemId]: {
               ...state.byId[itemId],
-              invited: [
-                ...(state.byId[itemId]?.invited || []),
-                ...childItemIds,
-              ],
+              invited: [...(state.byId[itemId]?.invited || [])],
             },
           }),
           {},
@@ -361,102 +335,6 @@ export default createReducer(initialState, {
             : { ...accumulator, [itemId]: state.byId[itemId] },
         {},
       ),
-    };
-  },
-  [ADD_CHILD_ITEM_TO_ITEM](state, { payload }) {
-    return {
-      ...state,
-      byId: {
-        ...state.byId,
-        [payload.itemId]: {
-          ...state.byId[payload.itemId],
-          invited: [...state.byId[payload.itemId].invited, payload.childItemId],
-        },
-      },
-    };
-  },
-  [ADD_CHILD_ITEMS_BATCH_TO_ITEM](state, { payload }) {
-    return {
-      ...state,
-      byId: {
-        ...state.byId,
-        ...payload.itemIdsWithChildItemIdsSet.reduce(
-          (accumulator, { itemId, childItemIds }) => ({
-            ...accumulator,
-            [itemId]: {
-              ...state.byId[itemId],
-              invited: [...state.byId[itemId].invited, ...childItemIds],
-            },
-          }),
-          {},
-        ),
-      },
-    };
-  },
-  [ADD_CHILD_ITEMS_BATCH_TO_ITEMS](state, { payload }) {
-    return {
-      ...state,
-      byId: {
-        ...state.byId,
-        ...payload.itemIdsWithChildItemIdsSet.reduce(
-          (accumulator, { itemId, childItemIds }) => ({
-            ...accumulator,
-            [itemId]: {
-              ...state.byId[itemId],
-              invited: [...state.byId[itemId].invited, ...childItemIds],
-            },
-          }),
-          {},
-        ),
-      },
-    };
-  },
-  [REMOVE_CHILD_ITEM_FROM_ITEM](state, { payload }) {
-    return {
-      ...state,
-      byId: {
-        ...state.byId,
-        [payload.itemId]: {
-          ...state.byId[payload.itemId],
-          invited: state.byId[payload.itemId].invited.filter(
-            id => payload.childItemId !== id,
-          ),
-        },
-      },
-    };
-  },
-  [REMOVE_CHILD_ITEMS_BATCH_FROM_ITEM](state, { payload }) {
-    return {
-      ...state,
-      byId: {
-        ...state.byId,
-        [payload.itemId]: {
-          ...state.byId[payload.itemId],
-          invited: state.byId[payload.itemId].invited.filter(
-            id => !payload.childItemIds.includes(id),
-          ),
-        },
-      },
-    };
-  },
-  [REMOVE_CHILD_ITEMS_BATCH_FROM_ITEMS](state, { payload }) {
-    return {
-      ...state,
-      byId: {
-        ...state.byId,
-        ...payload.itemIds.reduce(
-          (accumulator, itemId) => ({
-            ...accumulator,
-            [itemId]: {
-              ...state.byId[itemId],
-              invited: state.byId[itemId].invited.filter(
-                id => !payload.childItemIds.includes(id),
-              ),
-            },
-          }),
-          {},
-        ),
-      },
     };
   },
   [REMOVE_ITEMS_DATA](state) {

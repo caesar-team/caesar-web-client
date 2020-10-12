@@ -42,10 +42,6 @@ export const REJECT_ITEM_UPDATE_FAILURE = '@item/REJECT_ITEM_UPDATE_FAILURE';
 
 export const TOGGLE_ITEM_TO_FAVORITE_REQUEST =
   '@item/TOGGLE_ITEM_TO_FAVORITE_REQUEST';
-export const TOGGLE_ITEM_TO_FAVORITE_SUCCESS =
-  '@item/TOGGLE_ITEM_TO_FAVORITE_SUCCESS';
-export const TOGGLE_ITEM_TO_FAVORITE_FAILURE =
-  '@item/TOGGLE_ITEM_TO_FAVORITE_FAILURE';
 
 export const CREATE_ANONYMOUS_LINK_REQUEST =
   '@item/CREATE_ANONYMOUS_LINK_REQUEST';
@@ -61,27 +57,17 @@ export const REMOVE_ANONYMOUS_LINK_SUCCESS =
 export const REMOVE_ANONYMOUS_LINK_FAILURE =
   '@item/REMOVE_ANONYMOUS_LINK_FAILURE';
 
-export const SHARE_ITEM_BATCH_REQUEST = '@childItem/SHARE_ITEM_BATCH_REQUEST';
-export const SHARE_ITEM_BATCH_SUCCESS = '@childItem/SHARE_ITEM_BATCH_SUCCESS';
-export const SHARE_ITEM_BATCH_FAILURE = '@childItem/SHARE_ITEM_BATCH_FAILURE';
+export const SHARE_ITEM_BATCH_REQUEST = '@item/SHARE_ITEM_BATCH_REQUEST';
+export const SHARE_ITEM_BATCH_SUCCESS = '@item/SHARE_ITEM_BATCH_SUCCESS';
+export const SHARE_ITEM_BATCH_FAILURE = '@item/SHARE_ITEM_BATCH_FAILURE';
 
-export const REMOVE_SHARE_REQUEST = '@childItem/REMOVE_SHARE_REQUEST';
-export const REMOVE_SHARE_SUCCESS = '@childItem/REMOVE_SHARE_SUCCESS';
-export const REMOVE_SHARE_FAILURE = '@childItem/REMOVE_SHARE_FAILURE';
+export const REMOVE_SHARE_REQUEST = '@item/REMOVE_SHARE_REQUEST';
+export const REMOVE_SHARE_SUCCESS = '@item/REMOVE_SHARE_SUCCESS';
+export const REMOVE_SHARE_FAILURE = '@item/REMOVE_SHARE_FAILURE';
 
 export const UPDATE_ITEM_FIELD = '@item/UPDATE_ITEM_FIELD';
 export const ADD_ITEMS_BATCH = '@item/ADD_ITEMS_BATCH';
 export const REMOVE_ITEMS_BATCH = '@item/REMOVE_ITEMS_BATCH';
-export const ADD_CHILD_ITEM_TO_ITEM = '@item/ADD_CHILD_ITEM_TO_ITEM';
-export const ADD_CHILD_ITEMS_BATCH_TO_ITEM =
-  '@item/ADD_CHILD_ITEMS_BATCH_TO_ITEM';
-export const ADD_CHILD_ITEMS_BATCH_TO_ITEMS =
-  '@item/ADD_CHILD_ITEMS_BATCH_TO_ITEMS';
-export const REMOVE_CHILD_ITEM_FROM_ITEM = '@item/REMOVE_CHILD_ITEM_FROM_ITEM';
-export const REMOVE_CHILD_ITEMS_BATCH_FROM_ITEM =
-  '@item/REMOVE_CHILD_ITEMS_BATCH_FROM_ITEM';
-export const REMOVE_CHILD_ITEMS_BATCH_FROM_ITEMS =
-  '@item/REMOVE_CHILD_ITEMS_BATCH_FROM_ITEMS';
 
 export const REMOVE_ITEMS_DATA = '@item/REMOVE_ITEMS_DATA';
 
@@ -319,23 +305,6 @@ export const toggleItemToFavoriteRequest = item => ({
   },
 });
 
-export const toggleItemToFavoriteSuccess = (
-  itemId,
-  favoritesListId,
-  isFavorite,
-) => ({
-  type: TOGGLE_ITEM_TO_FAVORITE_SUCCESS,
-  payload: {
-    itemId,
-    favoritesListId,
-    isFavorite,
-  },
-});
-
-export const toggleItemToFavoriteFailure = () => ({
-  type: TOGGLE_ITEM_TO_FAVORITE_FAILURE,
-});
-
 export const createAnonymousLinkRequest = () => ({
   type: CREATE_ANONYMOUS_LINK_REQUEST,
 });
@@ -395,52 +364,6 @@ export const removeItemsBatch = itemIds => ({
   type: REMOVE_ITEMS_BATCH,
   payload: {
     itemIds,
-  },
-});
-
-export const addChildItemToItem = (itemId, childItemId) => ({
-  type: ADD_CHILD_ITEM_TO_ITEM,
-  payload: {
-    itemId,
-    childItemId,
-  },
-});
-
-export const addChildItemsBatchToItem = itemIdWithChildItemIdsSet => ({
-  type: ADD_CHILD_ITEMS_BATCH_TO_ITEM,
-  payload: {
-    itemIdWithChildItemIdsSet,
-  },
-});
-
-export const addChildItemsBatchToItems = itemIdsWithChildItemIdsSet => ({
-  type: ADD_CHILD_ITEMS_BATCH_TO_ITEMS,
-  payload: {
-    itemIdsWithChildItemIdsSet,
-  },
-});
-
-export const removeChildItemFromItem = (itemId, childItemId) => ({
-  type: REMOVE_CHILD_ITEM_FROM_ITEM,
-  payload: {
-    itemId,
-    childItemId,
-  },
-});
-
-export const removeChildItemsBatchFromItem = (itemId, childItemIds) => ({
-  type: REMOVE_CHILD_ITEMS_BATCH_FROM_ITEM,
-  payload: {
-    itemId,
-    childItemIds,
-  },
-});
-
-export const removeChildItemsBatchFromItems = (itemIds, childItemIds) => ({
-  type: REMOVE_CHILD_ITEMS_BATCH_FROM_ITEMS,
-  payload: {
-    itemIds,
-    childItemIds,
   },
 });
 

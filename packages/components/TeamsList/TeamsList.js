@@ -61,7 +61,12 @@ const TeamsListComponent = ({ activeTeamId, handleToggle, setListsOpened }) => {
               handleChangeTeam(team.id);
             }}
           >
-            <StyledAvatar avatar={team.icon} size={32} fontSize="small" />
+            <StyledAvatar
+              avatar={team.icon}
+              email={team.email}
+              size={32}
+              fontSize="small"
+            />
             {getTeamTitle(team)}
           </Option>
         );

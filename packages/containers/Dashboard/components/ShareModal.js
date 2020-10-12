@@ -4,16 +4,14 @@ import {
   workInProgressItemSelector,
   workInProgressItemsSelector,
   workInProgressItemIdsSelector,
-  workInProgressItemSharedMembersSelector,
 } from '@caesar/common/selectors/workflow';
 import { userTeamListSelector } from '@caesar/common/selectors/user';
-import { childItemsByIdSelector } from '@caesar/common/selectors/entities/childItem';
 import { resetWorkInProgressItemIds } from '@caesar/common/actions/workflow';
 import {
   createAnonymousLinkRequest,
   removeAnonymousLinkRequest,
   shareItemBatchRequest,
-  removeShareRequest,
+  // removeShareRequest,
 } from '@caesar/common/actions/entities/item';
 import { ShareModal as ShareModalComponent } from '@caesar/components';
 
@@ -26,10 +24,8 @@ export const ShareModal = ({
   const workInProgressItem = useSelector(workInProgressItemSelector);
   const workInProgressItemIds = useSelector(workInProgressItemIdsSelector);
   const userTeamList = useSelector(userTeamListSelector);
-  const workInProgressItemSharedMembers = useSelector(
-    workInProgressItemSharedMembersSelector,
-  );
-  const childItemsById = useSelector(childItemsByIdSelector);
+  // TODO: Add correct selector
+  const workInProgressItemSharedMembers = [];
 
   const isMultiItem = workInProgressItemIds?.length > 0;
   const availableTeamsForSharing = userTeamList.filter(
@@ -62,16 +58,10 @@ export const ShareModal = ({
   };
 
   const handleRevokeAccess = member => {
-    const childItem = Object.values(childItemsById).filter(
-      item =>
-        item.originalItemId === workInProgressItem?.id &&
-        item.userId === member.id,
-    );
-    const childItemId = childItem[0]?.id;
-
-    if (childItemId) {
-      dispatch(removeShareRequest(childItemId));
-    }
+    // TODO: Implement revoke share access
+    // dispatch(removeShareRequest());
+    console.log('Revoke share access will be implemented soon.');
+    console.log('member: ', member);
   };
 
   const handleActivateLink = () => {

@@ -3,11 +3,9 @@ import { LIST_TYPE } from '@caesar/common/constants';
 import { sortByDate } from '@caesar/common/utils/dateUtils';
 import {
   listsByIdSelector,
-  extendedSortedCustomizableListsSelector,
   favoritesListSelector,
 } from '@caesar/common/selectors/entities/list';
 import { itemsByIdSelector } from '@caesar/common/selectors/entities/item';
-import { childItemsByIdSelector } from '@caesar/common/selectors/entities/childItem';
 import { membersByIdSelector } from '@caesar/common/selectors/entities/member';
 import { teamsByIdSelector } from '@caesar/common/selectors/entities/team';
 import { isGeneralItem } from '../utils/item';
@@ -60,30 +58,6 @@ export const workInProgressItemOwnerSelector = createSelector(
       : null,
 );
 
-export const workInProgressItemChildItemsSelector = createSelector(
-  workInProgressItemSelector,
-  childItemsByIdSelector,
-  (workInProgressItem, childItemsById) =>
-    workInProgressItem && Object.values(childItemsById).length
-      ? workInProgressItem.invited.map(id => childItemsById[id])
-      : [],
-);
-
-export const workInProgressItemSharedMembersSelector = createSelector(
-  workInProgressItemChildItemsSelector,
-  membersByIdSelector,
-  (workInProgressItemChildItems, membersById) =>
-    workInProgressItemChildItems.length && Object.values(membersById).length
-      ? workInProgressItemChildItems.reduce(
-          (accumulator, { userId }) =>
-            membersById[userId]
-              ? [...accumulator, membersById[userId]]
-              : accumulator,
-          [],
-        )
-      : [],
-);
-
 export const workInProgressListIdSelector = createSelector(
   workflowSelector,
   workflow => workflow.workInProgressListId,
@@ -114,11 +88,6 @@ export const workInProgressItemsSelector = createSelector(
   workInProgressItemIdsSelector,
   (itemsById, workInProgressItemIds) =>
     workInProgressItemIds.map(itemId => itemsById[itemId]),
-);
-
-export const shouldLoadNodesSelector = createSelector(
-  extendedSortedCustomizableListsSelector,
-  lists => !lists.length,
 );
 
 const createListItemsList = (children, itemsById) =>

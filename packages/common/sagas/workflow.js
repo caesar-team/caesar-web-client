@@ -17,6 +17,9 @@ import {
   setWorkInProgressItem,
   decryption,
   INIT_TEAMS,
+  vaultsReady,
+  OPEN_CURRENT_VAULT,
+  VAULTS_ARE_READY,
 } from '@caesar/common/actions/workflow';
 import { addListsBatch } from '@caesar/common/actions/entities/list';
 import {
@@ -35,10 +38,7 @@ import {
   ADD_TEAM_KEY_PAIR_BATCH,
 } from '@caesar/common/actions/keystore';
 import { fetchMembersSaga } from '@caesar/common/sagas/entities/member';
-import {
-  createTeamKeyPairSaga,
-  fetchTeamsSaga,
-} from '@caesar/common/sagas/entities/team';
+import { fetchTeamsSaga } from '@caesar/common/sagas/entities/team';
 import {
   convertNodesToEntities,
   convertItemsToEntities,
@@ -232,6 +232,7 @@ function* initTeam(teamId) {
 }
 
 export function* openCurrentVaultSaga() {
+  yield take(VAULTS_ARE_READY); // Shoud work but doesn't
   const currentTeamId = yield select(currentTeamIdSelector);
   yield put(setCurrentTeamId(currentTeamId || TEAM_TYPE.PERSONAL));
 }
@@ -303,6 +304,7 @@ export function* processKeyPairsSaga({ payload: { itemsById } }) {
 
 function* loadKeyPairsAndPersonalItems() {
   try {
+    const { id: currentUserId } = yield select(userDataSelector);
     // Init personal keys
     const keyPair = yield select(teamKeyPairSelector, {
       teamId: TEAM_TYPE.PERSONAL,
@@ -329,7 +331,7 @@ function* loadKeyPairsAndPersonalItems() {
     const systemItems = objectToArray(systemItemsById);
     const userItems = objectToArray(itemsById);
     const itemsEncryptedByUserKeys = [
-      ...keypairsArray,
+      ...keypairsArray.filter(({ ownerId }) => ownerId === currentUserId),
       ...systemItems,
       ...userItems,
     ];
@@ -408,7 +410,6 @@ export function* initWorkflow() {
 export function* openTeamVaultSaga({ payload: { teamId } }) {
   try {
     const team = yield select(teamSelector, { teamId });
-
     if (!team && teamId !== TEAM_TYPE.PERSONAL) {
       yield put(setCurrentTeamId(TEAM_TYPE.PERSONAL));
 
@@ -534,6 +535,10 @@ function* initSettings() {
   }
 }
 
+function* vaultsReadySaga() {
+  yield put(vaultsReady());
+}
+
 export default function* workflowSagas() {
   // Init (get all items, keys, etc)
   yield takeLatest(INIT_WORKFLOW, initWorkflow);
@@ -542,7 +547,8 @@ export default function* workflowSagas() {
   yield takeLatest(SET_WORK_IN_PROGRESS_ITEM, setWorkInProgressItemSaga);
   yield takeLatest(UPDATE_WORK_IN_PROGRESS_ITEM, updateWorkInProgressItemSaga);
   yield takeLatest(SET_CURRENT_TEAM_ID, openTeamVaultSaga);
-  // yield takeLatest(ADD_TEAM_KEY_PAIR_BATCH, openCurrentVaultSaga);
+  yield takeLatest(ADD_TEAM_KEY_PAIR_BATCH, vaultsReadySaga);
   // Wait for keypairs
   yield takeLatest(ADD_KEYPAIRS_BATCH, processKeyPairsSaga);
+  yield takeLatest(OPEN_CURRENT_VAULT, openCurrentVaultSaga);
 }

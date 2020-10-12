@@ -1,6 +1,6 @@
 import React, { useState, memo } from 'react';
 import { useEffectOnce } from 'react-use';
-import { useSelector, useDispatch } from 'react-redux';
+import { useSelector, useDispatch, batch } from 'react-redux';
 import styled from 'styled-components';
 import {
   isLoadingSelector,
@@ -12,6 +12,7 @@ import {
 } from '@caesar/common/actions/user';
 import {
   initWorkflow,
+  openCurrentVault,
   setWorkInProgressItem,
   setWorkInProgressItemIds,
 } from '@caesar/common/actions/workflow';
@@ -90,9 +91,12 @@ const DashboardComponent = () => {
   };
 
   useEffectOnce(() => {
-    dispatch(fetchUserSelfRequest());
-    dispatch(fetchUserTeamsRequest());
-    dispatch(initWorkflow());
+    batch(() => {
+      dispatch(fetchUserSelfRequest());
+      dispatch(fetchUserTeamsRequest());
+      dispatch(initWorkflow());
+      dispatch(openCurrentVault());
+    });
   });
 
   if (isLoading) {

@@ -1,4 +1,4 @@
-import { all, fork } from 'redux-saga/effects';
+import { all, fork, takeLatest } from 'redux-saga/effects';
 import {
   userSagas,
   workflowSagas,

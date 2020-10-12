@@ -25,6 +25,7 @@ export const ENCRYPTION = '@workflow/ENCRYPTION';
 export const ENCRYPTION_END = '@workflow/ENCRYPTION_END';
 
 export const OPEN_VAULT = '@workflow/OPEN_VAULT';
+export const OPEN_CURRENT_VAULT = '@workflow/OPEN_CURRENT_VAULT';
 
 export const initWorkflow = (withDecryption = true) => ({
   type: INIT_WORKFLOW,
@@ -46,6 +47,10 @@ export const openVault = teamId => ({
   payload: {
     teamId,
   },
+});
+
+export const openCurrentVault = () => ({
+  type: OPEN_CURRENT_VAULT,
 });
 
 export const finishIsLoading = () => ({

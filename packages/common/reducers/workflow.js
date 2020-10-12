@@ -7,11 +7,14 @@ import {
   SET_WORK_IN_PROGRESS_ITEM_IDS,
   SET_WORK_IN_PROGRESS_LIST_ID,
   RESET_WORKFLOW_STORE,
+  VAULTS_ARE_READY,
+  OPEN_CURRENT_VAULT,
 } from '@caesar/common/actions/workflow';
 
 const initialState = {
   isLoading: true,
   isError: false,
+  isReady: false,
   workInProgressItem: null,
   workInProgressItemIds: [],
   workInProgressListId: null,
@@ -23,6 +26,15 @@ export default createReducer(initialState, {
       ...state,
       isLoading: false,
     };
+  },
+  [VAULTS_ARE_READY](state) {
+    return {
+      ...state,
+      isReady: true,
+    };
+  },
+  [OPEN_CURRENT_VAULT](state) {
+    return state;
   },
   [SET_WORK_IN_PROGRESS_ITEM](state, { payload }) {
     return {

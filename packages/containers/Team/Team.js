@@ -94,7 +94,7 @@ export const TeamContainer = () => {
   const user = useSelector(userDataSelector);
   const team = useSelector(state =>
     teamSelector(state, { teamId: router.query.id }),
-  );
+  );console.log(team);
   const membersById = useSelector(membersByIdSelector);
   const members = getMemberList(team.users, membersById);
   const tableData = useMemo(() => members, [members]);
@@ -137,7 +137,7 @@ export const TeamContainer = () => {
     });
   };
 
-  const handleInvite = invitedMembers => {
+  const handleInvite = invitedMembers => {console.log(invitedMembers);console.log(team.id);
     addTeamMembersBatchRequest(team.id, invitedMembers);
     handleCloseModal(INVITE_MEMBER_MODAL)();
   };

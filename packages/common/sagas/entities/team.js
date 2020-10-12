@@ -317,19 +317,20 @@ export function* updateTeamMemberRoleSaga({
 
 export function* addMemberToTeamListsBatchSaga({
   payload: { teamId, members },
-}) {
+}) {console.log('Saga');
   try {
     const preparedMembers = yield call(prepareUsersForSharing, members);
 
     const teamMembers = preparedMembers.map(member => ({ ...member, teamId }));
     const newMembers = preparedMembers.filter(({ isNew }) => isNew);
-
+    console.log(teamMembers);
+    console.log(newMembers);
     if (newMembers.length > 0) {
       yield fork(inviteNewMemberBatchSaga, {
         payload: { members: newMembers },
       });
     }
-
+    
     const teamItemList = yield select(teamItemListSelector, { teamId });
     const teamSystemItem = yield select(teamKeyPairSelector, { teamId });
 
@@ -338,13 +339,13 @@ export function* addMemberToTeamListsBatchSaga({
       items: teamItemList,
       members: teamMembers,
     });
-
+    console.log(itemUserPairs);
     const invitedMemberIds = teamMembers.map(({ id }) => id);
     const invitedMembersWithCommandRole = teamMembers.map(member => ({
       ...member,
       role: COMMANDS_ROLES.USER_ROLE_MEMBER,
     }));
-
+    console.log(invitedMembersWithCommandRole);
     const promises = invitedMembersWithCommandRole.map(({ id: userId, role }) =>
       postAddTeamMember({ teamId, userId, role }),
     );
@@ -367,7 +368,7 @@ export function* addMemberToTeamListsBatchSaga({
     });
 
     // TODO: add invite for members new or not new i dunno
-
+    console.log(invitedMembersWithLinks);
     yield put(addTeamMembersBatchSuccess(teamId, invitedMembersWithLinks));
     yield put(addTeamToMembersTeamsListBatch(teamId, invitedMemberIds));
 

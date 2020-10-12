@@ -362,7 +362,9 @@ export function* addMemberToTeamListsBatchSaga({
       });
     });
 
-    // TODO: add invite for members new or not new i dunno
+    if (itemUserPairs.length > 0) {
+      // TODO: Need to do smth instead of createChildItemBatchSaga
+    }
 
     yield put(addTeamMembersBatchSuccess(teamId, invitedMembersWithLinks));
     yield put(addTeamToMembersTeamsListBatch(teamId, invitedMemberIds));

@@ -13,7 +13,7 @@ const teamSchema = new schema.Entity('byId', undefined, {
         ...user,
         _permissions: createPermissionsFromLinks(user._links),
       })) || [],
-  })
+  }),
 });
 
 export default teamSchema;

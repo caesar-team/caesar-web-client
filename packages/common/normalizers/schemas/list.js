@@ -20,9 +20,10 @@ const listSchema = new schema.Entity(
       teamId: entity.teamId || TEAM_TYPE.PERSONAL,
       _permissions: {
         ...createPermissionsFromLinks(entity._links),
-        __typename: entity.teamId
-          ? PERMISSION_ENTITY.TEAM_LIST
-          : PERMISSION_ENTITY.LIST,
+        __typename:
+          entity.teamId !== TEAM_TYPE.PERSONAL
+            ? PERMISSION_ENTITY.TEAM_LIST
+            : PERMISSION_ENTITY.LIST,
       },
     }),
   },

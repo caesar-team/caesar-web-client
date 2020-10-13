@@ -15,7 +15,7 @@ const itemSchema = new schema.Entity(
       _permissions: {
         ...createPermissionsFromLinks(entity._links),
         __typename:
-          entity.teamId && entity.teamId !== TEAM_TYPE.PERSONAL
+          entity.teamId !== TEAM_TYPE.PERSONAL
             ? PERMISSION_ENTITY.TEAM_ITEM
             : PERMISSION_ENTITY.ITEM,
       },

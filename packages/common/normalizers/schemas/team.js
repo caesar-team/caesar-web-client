@@ -8,11 +8,11 @@ const teamSchema = new schema.Entity('byId', undefined, {
     ...entity,
     __type: ENTITY_TYPE.TEAM,
     _permissions: createPermissionsFromLinks(entity._links),
-    users: 
+    users:
       entity.users?.map(user => ({
-      ...user,
-      _permissions: createPermissionsFromLinks(user._links),
-    })) || [],
+        ...user,
+        _permissions: createPermissionsFromLinks(user._links),
+      })) || [],
   })
 });
 

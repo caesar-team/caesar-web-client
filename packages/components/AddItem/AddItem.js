@@ -8,6 +8,8 @@ import {
   ITEM_TYPE,
   ITEM_ICON_TYPE,
   PERMISSION,
+  PERMISSION_ENTITY,
+  TEAM_TYPE,
 } from '@caesar/common/constants';
 import { workInProgressListSelector } from '@caesar/common/selectors/workflow';
 import { currentTeamSelector } from '@caesar/common/selectors/user';
@@ -69,8 +71,16 @@ export const AddItem = ({ className }) => {
   // Todo: The Can should get an entity itself
   const { _permissions } = workInProgressList;
 
+  const itemPermission = {
+    ..._permissions,
+    __typename:
+      currentTeam.id !== TEAM_TYPE.PERSONAL
+        ? PERMISSION_ENTITY.TEAM_ITEM
+        : PERMISSION_ENTITY.ITEM,
+  };
+
   return (
-    <Can I={PERMISSION.CREATE} an={_permissions}>
+    <Can I={PERMISSION.CREATE} an={itemPermission}>
       <Dropdown
         options={itemTypesOptions}
         onClick={handleClickAddItem}

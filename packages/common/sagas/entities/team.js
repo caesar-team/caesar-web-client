@@ -173,7 +173,7 @@ export function* createTeamKeyPairSaga({ payload: { team, publicKey } }) {
       publicKey,
     });
 
-    const keyPairsById = convertKeyPairToEntity([serverKeypairItem]);
+    const keyPairsById = convertKeyPairToEntity([serverKeypairItem], 'teamId');
     yield put(addTeamKeyPairBatch(keyPairsById));
 
     return keyPairsById;
@@ -352,12 +352,15 @@ export function* createTeamSaga({
     }
 
     if (serverKeypair?.id) {
-      const keyPairsById = convertKeyPairToEntity([
-        {
-          ...serverKeypair,
-          ...teamKeyPair,
-        },
-      ]);
+      const keyPairsById = convertKeyPairToEntity(
+        [
+          {
+            ...serverKeypair,
+            ...teamKeyPair,
+          },
+        ],
+        'teamId',
+      );
 
       yield put(addTeamKeyPairBatch(keyPairsById));
     }

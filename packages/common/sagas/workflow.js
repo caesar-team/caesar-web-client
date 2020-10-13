@@ -277,21 +277,24 @@ export function* processKeyPairsSaga({ payload: { itemsById } }) {
       const teamKeys = [];
       const shareKeys = [];
       keyPairs.forEach(keyPair => {
-        if (!keyPair.data?.name) return null;
+        if (!keyPair?.data) return null;
 
-        return keyPair.teamId !== null
+        return !keyPair.relatedItemId
           ? teamKeys.push(keyPair)
           : shareKeys.push(keyPair);
       });
 
       const putSagas = [];
       if (teamKeys.length > 0) {
-        const teamKeyPairsById = convertKeyPairToEntity(teamKeys);
+        const teamKeyPairsById = convertKeyPairToEntity(teamKeys, 'teamId');
         putSagas.push(put(addTeamKeyPairBatch(teamKeyPairsById)));
       }
 
       if (shareKeys.length > 0) {
-        const shareKeysById = convertKeyPairToEntity(shareKeys);
+        const shareKeysById = convertKeyPairToEntity(
+          shareKeys,
+          'relatedItemId',
+        );
         putSagas.push(put(addShareKeyPairBatch(shareKeysById)));
       }
 
@@ -303,7 +306,11 @@ export function* processKeyPairsSaga({ payload: { itemsById } }) {
     console.error(error);
   }
 }
-
+// If the teamId and  the relatedItemId are presented then the key belong the share item in the team
+const keyPairsEncryptedByUserKeysFilter = keypair =>
+  keypair.teamId === TEAM_TYPE.PERSONAL || !keypair.relatedItemId;
+const keyPairsEncryptedByTeamKeysFilter = keypair =>
+  keypair.teamId !== TEAM_TYPE.PERSONAL && keypair.relatedItemId;
 function* loadKeyPairsAndPersonalItems() {
   try {
     // Init personal keys
@@ -332,10 +339,13 @@ function* loadKeyPairsAndPersonalItems() {
     const systemItems = objectToArray(systemItemsById);
     const userItems = objectToArray(itemsById);
     const itemsEncryptedByUserKeys = [
-      ...keypairsArray,
+      ...keypairsArray.filter(keyPairsEncryptedByUserKeysFilter),
       ...systemItems,
       ...userItems,
     ];
+    const itemsEncryptedByTeamKeys = keypairsArray.filter(
+      keyPairsEncryptedByTeamKeysFilter,
+    );
 
     // decrypt the items
     if (itemsEncryptedByUserKeys?.length > 0) {
@@ -349,7 +359,13 @@ function* loadKeyPairsAndPersonalItems() {
     }
 
     // Put to the store the shared and the team items, wait for processing of keypairs
-    yield put(addItemsBatch({ ...sharedItemsById, ...teamsItemsById }));
+    yield put(
+      addItemsBatch({
+        ...sharedItemsById,
+        ...teamsItemsById,
+        ...itemsEncryptedByTeamKeys,
+      }),
+    );
 
     // Load lists
     const { data: lists } = yield call(getLists);
@@ -468,6 +484,7 @@ function* getItemKeyPair({
     item: { id: itemId, teamId, isShared },
   },
 }) {
+  debugger;
   switch (true) {
     case teamId:
       return yield select(teamKeyPairSelector, { teamId });

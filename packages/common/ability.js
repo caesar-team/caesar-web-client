@@ -94,6 +94,7 @@ export const ability = defineAbility({ subjectName }, can => {
   });
   can(PERMISSION.SHARE, PERMISSION_ENTITY.TEAM_ITEM, {
     team_share_item: true,
+    block_this_feature: true,
   });
   can(PERMISSION.FAVORITE, PERMISSION_ENTITY.TEAM_ITEM, {
     team_favorite_item_toggle: true,

@@ -45,8 +45,8 @@ export const convertTeamsToEntity = teams => {
   return normalized.entities.byId || {};
 };
 
-export const convertKeyPairToEntity = keypairs => {
-  const normalized = normalize(keypairs, [keypairSchema]);
+export const convertKeyPairToEntity = (keypairs, idAttribute = 'teamId') => {
+  const normalized = normalize(keypairs, [keypairSchema(idAttribute)]);
 
   return normalized.entities.byId || {};
 };

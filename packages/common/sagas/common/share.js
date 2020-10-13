@@ -2,7 +2,10 @@ import { call, select, all, takeLatest, put } from '@redux-saga/core/effects';
 import { getOrCreateMemberBatchSaga } from '@caesar/common/sagas/entities/member';
 import { itemsBatchSelector } from '@caesar/common/selectors/entities/item';
 import { userDataSelector } from '@caesar/common/selectors/user';
-import { shareKeyPairSelector } from '@caesar/common/selectors/keystore';
+import {
+  shareKeyPairSelector,
+  teamKeyPairSelector,
+} from '@caesar/common/selectors/keystore';
 import {
   NOOP_NOTIFICATION,
   ROLE_USER,
@@ -114,6 +117,10 @@ function* processMembersItemShare({ item, members }) {
     id: uuid4(),
     ...generatedKeyPair,
   };
+  const { publicKey: ownerPublicKey } = yield select(teamKeyPairSelector, {
+    teamId: item.teamId,
+  });
+
   const defaultList = yield select(teamDefaultListSelector, {
     teamId: item.teamId,
   });
@@ -126,8 +133,9 @@ function* processMembersItemShare({ item, members }) {
 
   yield call(saveItemSaga, {
     item: currentUserKeyPairForSharedItem,
-    publicKey,
+    publicKey: ownerPublicKey,
   });
+
   yield call(saveItemSaga, { item, publicKey });
   const { data: userPublicKeys } = yield call(getPublicKeyByEmailBatch, {
     emails: members.map(member => member.email),

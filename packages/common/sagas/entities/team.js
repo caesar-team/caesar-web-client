@@ -329,7 +329,7 @@ export function* addMemberToTeamListsBatchSaga({
         payload: { members: newMembers },
       });
     }
-    
+
     const teamItemList = yield select(teamItemListSelector, { teamId });
     const teamSystemItem = yield select(teamKeyPairSelector, { teamId });
 
@@ -367,6 +367,7 @@ export function* addMemberToTeamListsBatchSaga({
     });
 
     // TODO: add invite for members new or not new i dunno
+
     yield put(addTeamMembersBatchSuccess(teamId, invitedMembersWithLinks));
     yield put(addTeamToMembersTeamsListBatch(teamId, invitedMemberIds));
 

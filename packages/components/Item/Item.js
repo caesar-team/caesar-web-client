@@ -111,23 +111,7 @@ const ItemComponent = ({
     dispatch(setWorkInProgressItem(null));
   };
 
-  const itemSubject =
-    item?.teamId === TEAM_TYPE.PERSONAL
-      ? {
-          __typename: PERMISSION_ENTITY.ITEM,
-          edit_item: item?._permissions?.edit_item || false,
-          move_item: item?._permissions?.move_item || false,
-          batch_share_item: item?._permissions?.batch_share_item || false,
-          delete_item: item?._permissions?.delete_item || false,
-        }
-      : {
-          __typename: PERMISSION_ENTITY.TEAM_ITEM,
-          team_edit_item: item?._permissions?.team_edit_item || false,
-          team_move_item: item?._permissions?.team_move_item || false,
-          team_batch_share_item:
-            item?._permissions?.team_batch_share_item || false,
-          team_delete_item: item?._permissions?.team_delete_item || false,
-        };
+  const { _permissions } = item;
 
   return (
     <Wrapper isDisabled={isSubmitting}>
@@ -138,20 +122,20 @@ const ItemComponent = ({
         onClickRestoreItem={handleClickRestoreItem}
         onClickRemoveItem={onClickRemoveItem}
       />
-      <Can not I={PERMISSION.EDIT} an={itemSubject}>
+      <Can not I={PERMISSION.EDIT} an={_permissions}>
         <ReadOnlyBanner />
       </Can>
       <InnerWrapper ref={itemRef}>
         <Scrollbar>
           <ItemByType
             item={item}
-            itemSubject={itemSubject}
+            itemSubject={_permissions}
             onClickAcceptEdit={!isTrashItem && handleClickAcceptEdit}
             onClickShare={onClickShare}
             isVisibleDragZone={isVisibleDragZone}
           />
           <Meta item={item} />
-          <Can I={PERMISSION.TRASH} an={itemSubject}>
+          <Can I={PERMISSION.TRASH} an={_permissions}>
             {!isTrashItem && (
               <Row>
                 <RemoveButton onClick={onClickMoveToTrash} />

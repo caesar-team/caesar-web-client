@@ -184,6 +184,7 @@ const MenuListInnerComponent = ({
         team_create_list: currentTeam?._permissions?.team_create_list || false,
       };
 
+  debugger;
   const nestedListsLabels = nestedLists.map(({ label }) => label.toLowerCase());
 
   return (

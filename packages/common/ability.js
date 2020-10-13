@@ -63,7 +63,8 @@ export const ability = defineAbility({ subjectName }, can => {
     move_item: true,
   });
   can(PERMISSION.SHARE, PERMISSION_ENTITY.ITEM, {
-    batch_share_item: true,
+    edit_item: true,
+    create_item: true,
   });
   can(PERMISSION.FAVORITE, PERMISSION_ENTITY.ITEM, {
     favorite_item_toggle: true,
@@ -76,7 +77,7 @@ export const ability = defineAbility({ subjectName }, can => {
     delete_item: true,
   });
   can(PERMISSION.MULTISELECT, PERMISSION_ENTITY.ITEM, {
-    batch_share_item: true,
+    edit_item: true,
     move_item: true,
     delete_item: true,
   });
@@ -90,7 +91,8 @@ export const ability = defineAbility({ subjectName }, can => {
     team_move_item: true,
   });
   can(PERMISSION.SHARE, PERMISSION_ENTITY.TEAM_ITEM, {
-    team_batch_share_item: true,
+    team_edit_item: true,
+    team_create_item: true,
   });
   can(PERMISSION.FAVORITE, PERMISSION_ENTITY.TEAM_ITEM, {
     team_favorite_item_toggle: true,
@@ -103,7 +105,7 @@ export const ability = defineAbility({ subjectName }, can => {
     team_delete_item: true,
   });
   can(PERMISSION.MULTISELECT, PERMISSION_ENTITY.TEAM_ITEM, {
-    team_batch_share_item: true,
+    team_edit_item: true,
     team_move_item: true,
     team_delete_item: true,
   });

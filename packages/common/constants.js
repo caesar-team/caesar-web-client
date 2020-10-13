@@ -213,6 +213,7 @@ export const PERMISSION = {
   RESTORE: 'restore',
   MULTISELECT: 'multiselect',
   CRUD: 'crud',
+  LEAVE: 'leave',
 };
 
 export const PERMISSION_ENTITY = {

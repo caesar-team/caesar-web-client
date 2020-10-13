@@ -1,11 +1,6 @@
 /* eslint-disable camelcase */
 import React from 'react';
-import {
-  PERMISSION_ENTITY,
-  PERMISSION,
-  PERMISSION_MESSAGES,
-  TEAM_TYPE,
-} from '@caesar/common/constants';
+import { PERMISSION, PERMISSION_MESSAGES } from '@caesar/common/constants';
 import { Icon } from '../../Icon';
 import { ItemIcon } from '../../ItemIcon';
 import { Can } from '../../Ability';

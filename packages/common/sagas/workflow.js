@@ -20,6 +20,9 @@ import {
   vaultsReady,
   OPEN_CURRENT_VAULT,
   VAULTS_ARE_READY,
+  INIT_DASHBOARD,
+  finishProcessingKeyPairs,
+  FINISH_PROCESSING_KEYPAIRS,
 } from '@caesar/common/actions/workflow';
 import { addListsBatch } from '@caesar/common/actions/entities/list';
 import {
@@ -35,10 +38,9 @@ import {
 import {
   addShareKeyPairBatch,
   addTeamKeyPairBatch,
-  ADD_TEAM_KEY_PAIR_BATCH,
 } from '@caesar/common/actions/keystore';
 import { fetchMembersSaga } from '@caesar/common/sagas/entities/member';
-import { fetchTeamsSaga } from '@caesar/common/sagas/entities/team';
+import { createTeamKeyPairSaga } from '@caesar/common/sagas/entities/team';
 import {
   convertNodesToEntities,
   convertItemsToEntities,
@@ -160,7 +162,7 @@ export function* processTeamItemsSaga({ payload: { teamId } }) {
       console.warn(
         `The key pair for the team ${team?.title}: ${teamId} not found. Need to create a new one...`,
       );
-      debugger;
+
       if (!publicKey) {
         throw new Error(
           `Can't creat the team:  ${team?.title ||
@@ -168,10 +170,10 @@ export function* processTeamItemsSaga({ payload: { teamId } }) {
         );
       }
 
-      // yield call(createTeamKeyPairSaga, {
-      //   payload: { team, publicKey },
-      // });
-      // teamKeyPairs = yield select(teamKeyPairSelector, { teamId });
+      yield call(createTeamKeyPairSaga, {
+        payload: { team, publicKey },
+      });
+      teamKeyPairs = yield select(teamKeyPairSelector, { teamId });
       if (!teamKeyPairs) return;
     }
 
@@ -232,7 +234,7 @@ function* initTeam(teamId) {
 }
 
 export function* openCurrentVaultSaga() {
-  yield take(VAULTS_ARE_READY); // Shoud work but doesn't
+  yield take(VAULTS_ARE_READY);
   const currentTeamId = yield select(currentTeamIdSelector);
   yield put(setCurrentTeamId(currentTeamId || TEAM_TYPE.PERSONAL));
 }
@@ -295,6 +297,7 @@ export function* processKeyPairsSaga({ payload: { itemsById } }) {
       }
 
       yield all(putSagas);
+      yield put(finishProcessingKeyPairs());
     }
   } catch (error) {
     // eslint-disable-next-line no-console
@@ -304,7 +307,6 @@ export function* processKeyPairsSaga({ payload: { itemsById } }) {
 
 function* loadKeyPairsAndPersonalItems() {
   try {
-    const { id: currentUserId } = yield select(userDataSelector);
     // Init personal keys
     const keyPair = yield select(teamKeyPairSelector, {
       teamId: TEAM_TYPE.PERSONAL,
@@ -331,7 +333,7 @@ function* loadKeyPairsAndPersonalItems() {
     const systemItems = objectToArray(systemItemsById);
     const userItems = objectToArray(itemsById);
     const itemsEncryptedByUserKeys = [
-      ...keypairsArray.filter(({ ownerId }) => ownerId === currentUserId),
+      ...keypairsArray,
       ...systemItems,
       ...userItems,
     ];
@@ -357,7 +359,7 @@ function* loadKeyPairsAndPersonalItems() {
     yield put(addListsBatch(listsById));
 
     if (!keypairsArray?.length) {
-      yield call(openCurrentVaultSaga);
+      yield put(finishProcessingKeyPairs());
     }
   } catch (error) {
     // eslint-disable-next-line no-console
@@ -525,10 +527,17 @@ function setWorkInProgressItemSaga({ payload: { item } }) {
 
 function* initSettings() {
   try {
-    yield call(fetchTeamsSaga);
-    yield call(fetchMembersSaga);
+    yield call(initWorkflow);
+  } catch (error) {
+    // eslint-disable-next-line no-console
+    console.error('error: ', error);
+  }
+}
 
-    yield put(finishIsLoading());
+function* initDashboardSaga() {
+  try {
+    yield call(initWorkflow);
+    yield call(openCurrentVaultSaga);
   } catch (error) {
     // eslint-disable-next-line no-console
     console.error('error: ', error);
@@ -547,8 +556,9 @@ export default function* workflowSagas() {
   yield takeLatest(SET_WORK_IN_PROGRESS_ITEM, setWorkInProgressItemSaga);
   yield takeLatest(UPDATE_WORK_IN_PROGRESS_ITEM, updateWorkInProgressItemSaga);
   yield takeLatest(SET_CURRENT_TEAM_ID, openTeamVaultSaga);
-  yield takeLatest(ADD_TEAM_KEY_PAIR_BATCH, vaultsReadySaga);
+  yield takeLatest(FINISH_PROCESSING_KEYPAIRS, vaultsReadySaga);
   // Wait for keypairs
   yield takeLatest(ADD_KEYPAIRS_BATCH, processKeyPairsSaga);
   yield takeLatest(OPEN_CURRENT_VAULT, openCurrentVaultSaga);
+  yield takeLatest(INIT_DASHBOARD, initDashboardSaga);
 }

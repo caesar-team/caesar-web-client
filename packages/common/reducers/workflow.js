@@ -9,6 +9,8 @@ import {
   RESET_WORKFLOW_STORE,
   VAULTS_ARE_READY,
   OPEN_CURRENT_VAULT,
+  INIT_DASHBOARD,
+  FINISH_PROCESSING_KEYPAIRS,
 } from '@caesar/common/actions/workflow';
 
 const initialState = {
@@ -34,6 +36,12 @@ export default createReducer(initialState, {
     };
   },
   [OPEN_CURRENT_VAULT](state) {
+    return state;
+  },
+  [INIT_DASHBOARD](state) {
+    return state;
+  },
+  [FINISH_PROCESSING_KEYPAIRS](state) {
     return state;
   },
   [SET_WORK_IN_PROGRESS_ITEM](state, { payload }) {

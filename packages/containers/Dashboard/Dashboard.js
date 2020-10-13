@@ -11,8 +11,7 @@ import {
   fetchUserTeamsRequest,
 } from '@caesar/common/actions/user';
 import {
-  initWorkflow,
-  openCurrentVault,
+  initDashboard,
   setWorkInProgressItem,
   setWorkInProgressItemIds,
 } from '@caesar/common/actions/workflow';
@@ -94,8 +93,7 @@ const DashboardComponent = () => {
     batch(() => {
       dispatch(fetchUserSelfRequest());
       dispatch(fetchUserTeamsRequest());
-      dispatch(initWorkflow());
-      dispatch(openCurrentVault());
+      dispatch(initDashboard());
     });
   });
 

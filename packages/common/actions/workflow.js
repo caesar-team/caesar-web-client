@@ -1,6 +1,9 @@
 export const INIT_WORKFLOW = '@workflow/INIT_WORKFLOW';
 export const INIT_TEAMS = '@workflow/INIT_TEAMS';
 export const INIT_SETTINGS = '@workflow/INIT_SETTINGS';
+export const INIT_DASHBOARD = '@workflow/INIT_DASHBOARD';
+export const FINISH_PROCESSING_KEYPAIRS =
+  '@workflow/FINISH_PROCESSING_KEYPAIRS';
 
 export const FINISH_IS_LOADING = '@workflow/FINISH_IS_LOADING';
 export const VAULTS_ARE_READY = '@workflow/VAULTS_ARE_READY';
@@ -40,6 +43,14 @@ export const initTeams = () => ({
 
 export const initSettings = () => ({
   type: INIT_SETTINGS,
+});
+
+export const initDashboard = () => ({
+  type: INIT_DASHBOARD,
+});
+
+export const finishProcessingKeyPairs = () => ({
+  type: FINISH_PROCESSING_KEYPAIRS,
 });
 
 export const openVault = teamId => ({

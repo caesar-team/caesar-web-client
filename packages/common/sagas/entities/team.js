@@ -452,7 +452,8 @@ export function* updateTeamMemberRoleSaga({
 export function* removeTeamMemberSaga({ payload: { teamId, userId } }) {
   try {
     // TODO: Implement remove Team Member
-    console.log('Remove Team Member will be implemented.');
+    // eslint-disable-next-line no-console
+    console.warn('Remove Team Member will be implemented.');
     yield call(deleteTeamMember, { teamId, userId });
     yield put(removeTeamMemberSuccess(teamId, userId));
     yield put(removeTeamFromMember(teamId, userId));

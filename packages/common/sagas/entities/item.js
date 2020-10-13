@@ -101,7 +101,6 @@ import { passwordGenerator } from '@caesar/common/utils/passwordGenerator';
 import { generateKeys } from '@caesar/common/utils/key';
 import { addSystemItemsBatch } from '@caesar/common/actions/entities/system';
 import { memberSelector } from '../../selectors/entities/member';
-import { convertKeyPairToItemEntity } from '../../normalizers/normalizers';
 
 const ITEMS_CHUNK_SIZE = 50;
 
@@ -394,7 +393,7 @@ export function* encryptSecret({ item, publicKey }) {
 export function* saveItemSaga({ item, publicKey }) {
   const {
     id = null,
-    listId,
+    listId = null,
     type,
     favorite = false,
     relatedItemId = null,
@@ -403,6 +402,10 @@ export function* saveItemSaga({ item, publicKey }) {
   const secret = yield call(encryptSecret, { item, publicKey });
 
   let serverItemData = {};
+
+  if (!listId) {
+    throw new Error('The listId can not be undefined.');
+  }
 
   if (id) {
     const { data: updatedItemData } = yield call(updateItem, id, { secret });

@@ -202,7 +202,7 @@ export const updateTeamMemberRoleFailure = () => ({
 });
 
 export const addTeamMembersBatchRequest = (teamId, members) => ({
- type: ADD_TEAM_MEMBERS_BATCH_REQUEST,
+  type: ADD_TEAM_MEMBERS_BATCH_REQUEST,
   payload: {
     teamId,
     members,

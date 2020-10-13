@@ -259,7 +259,6 @@ function* initTeams() {
     });
 
     const teamById = convertTeamsToEntity(teams);
-
     yield put(addTeamsBatch(teamById));
   } catch (error) {
     // eslint-disable-next-line no-console

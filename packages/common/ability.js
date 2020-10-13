@@ -22,7 +22,7 @@ export const ability = defineAbility({ subjectName }, can => {
   });
   can(PERMISSION.LEAVE, PERMISSION_ENTITY.TEAM, {
     team_leave: true,
-  });  
+  });
   can(PERMISSION.ADD, PERMISSION_ENTITY.TEAM_MEMBER, {
     team_member_add: true,
   });

@@ -26,7 +26,6 @@ import {
   removeItemFailure,
   removeItemsBatchSuccess,
   removeItemsBatchFailure,
-  removeChildItemsBatchFromItem,
   updateItemField,
 } from '@caesar/common/actions/entities/item';
 import { shareItemBatchSaga } from '@caesar/common/sagas/common/share';
@@ -38,7 +37,6 @@ import {
   removeItemFromList,
   removeItemsBatchFromList,
 } from '@caesar/common/actions/entities/list';
-import { removeChildItemsBatch } from '@caesar/common/actions/entities/childItem';
 import { setCurrentTeamId } from '@caesar/common/actions/user';
 import { updateGlobalNotification } from '@caesar/common/actions/application';
 import {
@@ -199,7 +197,8 @@ export function* removeItemSaga({ payload: { itemId, listId } }) {
     yield put(removeItemSuccess(itemId, listId));
 
     if (item.invited && item.invited.length > 0) {
-      yield put(removeChildItemsBatch(item.invited));
+      // TODO: Implement remove share access
+      // If user delete item all shares must be deleted
     }
 
     yield put(setWorkInProgressItem(null));
@@ -251,7 +250,10 @@ export function* removeItemsBatchSaga({ payload: { listId } }) {
 
 export function* toggleItemToFavoriteSaga({ payload: { item } }) {
   try {
-    yield call(toggleFavorite, item.id);
+    const {
+      data: { favorite },
+    } = yield call(toggleFavorite, item.id);
+    yield put(updateItemField(item.id, 'favorite', favorite));
     yield put(updateWorkInProgressItem(item.id));
   } catch (error) {
     // eslint-disable-next-line no-console
@@ -278,7 +280,6 @@ export function* moveItemSaga({
     const newListId = list ? listId : defaultList?.id;
 
     const item = yield select(itemSelector, { itemId });
-    const childItemIds = item.invited;
 
     yield call(updateMoveItem, item.id, {
       listId: newListId,
@@ -314,14 +315,10 @@ export function* moveItemSaga({
     }
 
     if (item.teamId && !teamId) {
-      yield put(removeChildItemsBatchFromItem(item.id, childItemIds));
-      yield put(removeChildItemsBatch(childItemIds));
+      // TODO: Implement share access rights when moving item
     }
 
     if (item.teamId && teamId && item.teamId !== teamId) {
-      yield put(removeChildItemsBatchFromItem(item.id, childItemIds));
-      yield put(removeChildItemsBatch(childItemIds));
-
       yield fork(shareItemBatchSaga, {
         payload: {
           data: {

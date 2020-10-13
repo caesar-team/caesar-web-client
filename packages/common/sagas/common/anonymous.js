@@ -5,16 +5,7 @@ import {
   generateAnonymousEmail,
 } from '@caesar/common/utils/cipherUtils';
 import { createMemberSaga } from '@caesar/common/sagas/entities/member';
-import {
-  PERMISSION_READ,
-  ROLE_ANONYMOUS_USER,
-  SHARE_TYPE,
-} from '@caesar/common/constants';
-import {
-  deleteChildItem,
-  patchChildItem,
-  postCreateChildItem,
-} from '@caesar/common/api';
+import { ROLE_ANONYMOUS_USER } from '@caesar/common/constants';
 import { generateSharingUrl } from '@caesar/common/utils/sharing';
 import { objectToBase64 } from '@caesar/common/utils/base64';
 import {
@@ -48,29 +39,22 @@ export function* createAnonymousLinkSaga() {
       },
     });
 
+    // TODO: Add new flow of sharing with keipair.share
+    console.log('Anonym flow will be implemented soon');
     const encryptedSecret = yield call(
       encryptItem,
       workInProgressItem.data,
       publicKey,
     );
 
-    // @Deprecated
-    const {
-      data: { items },
-    } = yield call(postCreateChildItem, workInProgressItem.id, {
-      items: [
-        {
-          userId,
-          secret: encryptedSecret,
-          cause: SHARE_TYPE,
-          access: PERMISSION_READ,
-        },
-      ],
-    });
+    const item = {
+      id: 'itemId',
+      secret: encryptedSecret,
+    };
 
     // TODO: Make shorted link
     const link = generateSharingUrl(
-      items[0].id,
+      item.id,
       objectToBase64({
         e: email,
         p: password,
@@ -78,12 +62,8 @@ export function* createAnonymousLinkSaga() {
       }),
     );
 
-    yield call(patchChildItem, workInProgressItem.id, {
-      items: [{ userId, link, secret: encryptedSecret }],
-    });
-
     const share = {
-      id: items[0].id,
+      id: item.id,
       userId,
       email,
       name,
@@ -106,9 +86,8 @@ export function* createAnonymousLinkSaga() {
 
 export function* removeAnonymousLinkSaga() {
   try {
+    // TODO: Fix remove anonym flow
     const workInProgressItem = yield select(workInProgressItemSelector);
-
-    yield call(deleteChildItem, workInProgressItem.shared.id);
 
     yield put(removeAnonymousLinkSuccess(workInProgressItem.id));
     yield put(updateWorkInProgressItem());

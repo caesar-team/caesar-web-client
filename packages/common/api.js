@@ -114,21 +114,6 @@ export const updateMoveItemsBatch = (data, listId) =>
 export const updateItem = (itemId, data) =>
   callApi.patch(`/items/${itemId}`, data);
 
-export const postCreateChildItem = (itemId, data) =>
-  callApi.post(`/items/${itemId}/child_item`, data);
-
-export const postCreateChildItemBatch = data =>
-  callApi.post('/items/batch/share', data);
-
-export const patchChildAccess = (childItemId, data) =>
-  callApi.patch(`/child_item/${childItemId}/access`, data);
-
-export const patchChildItem = (childItemId, data) =>
-  callApi.patch(`/child_item/${childItemId}`, data);
-
-export const deleteChildItem = childItemId =>
-  callApi.delete(`/child_item/${childItemId}`);
-
 // list
 export const postCreateList = data => callApi.post('/list', data);
 
@@ -164,9 +149,6 @@ export const getCheckShare = id => callApi.get(`/anonymous/share/${id}/check`);
 export const postInvitation = data => callApi.post('/invitation', data);
 
 export const postInvitationBatch = data => callApi.post('/invitations', data);
-
-export const patchChildItemBatch = data =>
-  callApi.patch('/child_item/batch', data);
 
 export const patchResetPassword = (token, data) =>
   callApi.patch(`/auth/srpp/reset/${token}`, data);

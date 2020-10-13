@@ -2,8 +2,7 @@ import { createSelector } from 'reselect';
 import { LIST_TYPE, TEAM_TYPE } from '@caesar/common/constants';
 import { currentTeamIdSelector } from '../user';
 import { teamListSelector } from './team';
-import { itemsByIdSelector, itemListSelector } from './item';
-import { childItemsByIdSelector } from './childItem';
+import { itemListSelector } from './item';
 
 export const entitiesSelector = state => state.entities;
 
@@ -166,12 +165,6 @@ export const teamListsSelector = createSelector(
   },
 );
 
-// export const teamListsSelector = createSelector(
-//   listsIdTeamSelector,
-//   listsByIdSelector,
-//   (listsIds, listsById) => listsIds.filter(id => listsById[id]) || null,
-// );
-
 export const teamDefaultListSelector = createSelector(
   listsIdTeamSelector,
   listsByIdSelector,
@@ -203,50 +196,4 @@ export const selectableTeamsListsSelector = createSelector(
       })),
     ];
   },
-);
-
-export const customizableListsSelector = createSelector(
-  personalListsSelector,
-  currentTeamListsSelector,
-  (personalLists, teamLists) => {
-    const lists = personalLists.length ? personalLists : teamLists.list;
-
-    return lists.filter(list => list.type === LIST_TYPE.LIST);
-  },
-);
-
-export const sortedCustomizableListsSelector = createSelector(
-  customizableListsSelector,
-  lists => lists.sort((a, b) => a.sort - b.sort),
-);
-
-export const extendedSortedCustomizableListsSelector = createSelector(
-  sortedCustomizableListsSelector,
-  itemsByIdSelector,
-  childItemsByIdSelector,
-  (lists, itemsById, childItemsById) =>
-    lists.map(({ children, ...data }) => ({
-      ...data,
-      count: children.length,
-      invited: [
-        ...new Set(
-          children.reduce(
-            (accumulator, itemId) =>
-              itemsById[itemId]
-                ? [
-                    ...accumulator,
-                    ...itemsById[itemId].invited.reduce(
-                      (acc, childItemId) =>
-                        childItemsById[childItemId]
-                          ? [...acc, childItemsById[childItemId]]
-                          : acc,
-                      [],
-                    ),
-                  ]
-                : accumulator,
-            [],
-          ),
-        ),
-      ],
-    })),
 );

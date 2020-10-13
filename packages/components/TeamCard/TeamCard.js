@@ -110,7 +110,7 @@ const TeamCard = ({
   onClickEditTeam = Function.prototype,
   onClickLeaveTeam = Function.prototype,
   onClickRemoveTeam = Function.prototype,
-}) => {console.log(team);
+}) => {
   const { id, icon, users } = team;
   const areMembersAvailable = users && users.length > 0;
 

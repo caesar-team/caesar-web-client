@@ -178,9 +178,9 @@ export default createReducer(initialState, {
   [UPDATE_TEAM_MEMBER_ROLE_FAILURE](state) {
     return state;
   },
-  // [ADD_TEAM_MEMBERS_BATCH_REQUEST](state) {
-  //   return state;
-  // },
+  [ADD_TEAM_MEMBERS_BATCH_REQUEST](state) {
+    return state;
+  },
   [ADD_TEAM_MEMBERS_BATCH_SUCCESS](state, { payload }) {
     return {
       ...state,

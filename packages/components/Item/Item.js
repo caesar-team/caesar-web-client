@@ -3,11 +3,7 @@ import React, { memo, useState, useRef, useCallback } from 'react';
 import { useEvent } from 'react-use';
 import { useSelector, useDispatch } from 'react-redux';
 import styled from 'styled-components';
-import {
-  PERMISSION,
-  PERMISSION_ENTITY,
-  TEAM_TYPE,
-} from '@caesar/common/constants';
+import { PERMISSION } from '@caesar/common/constants';
 import { useNotification } from '@caesar/common/hooks';
 import { workInProgressItemSelector } from '@caesar/common/selectors/workflow';
 import {

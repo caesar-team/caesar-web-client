@@ -8,8 +8,6 @@ import {
   ITEM_TYPE,
   ITEM_ICON_TYPE,
   PERMISSION,
-  PERMISSION_ENTITY,
-  TEAM_TYPE,
 } from '@caesar/common/constants';
 import { workInProgressListSelector } from '@caesar/common/selectors/workflow';
 import { currentTeamSelector } from '@caesar/common/selectors/user';

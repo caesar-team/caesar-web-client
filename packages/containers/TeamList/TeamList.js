@@ -32,6 +32,7 @@ class TeamListContainer extends Component {
   componentDidMount() {
     this.props.fetchTeamsRequest();
     this.props.fetchMembersRequest();
+    this.props.initWorkflow();
   }
 
   handleCreateSubmit = ({ title, icon, setSubmitting, setErrors }) => {

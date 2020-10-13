@@ -136,7 +136,7 @@ export function* generateSystemItem(entityType, listId, entityId) {
         privateKey,
         publicKey,
       },
-      pass: masterPassword,
+      password: masterPassword,
       name: systemItemName,
     },
   };
@@ -175,7 +175,7 @@ export function* generateTeamKeyPair({ name }) {
         privateKey,
         publicKey,
       },
-      pass: masterPassword,
+      password: masterPassword,
       name: systemItemName,
     },
   };
@@ -393,7 +393,7 @@ export function* encryptSecret({ item, publicKey }) {
 export function* saveItemSaga({ item, publicKey }) {
   const {
     id = null,
-    listId,
+    listId = null,
     type,
     favorite = false,
     relatedItemId = null,
@@ -402,6 +402,10 @@ export function* saveItemSaga({ item, publicKey }) {
   const secret = yield call(encryptSecret, { item, publicKey });
 
   let serverItemData = {};
+
+  if (!listId) {
+    throw new Error('The listId can not be undefined.');
+  }
 
   if (id) {
     const { data: updatedItemData } = yield call(updateItem, id, { secret });

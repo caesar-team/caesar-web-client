@@ -48,8 +48,8 @@ export const createColumns = ({ state, setState, headings, tableWidth }) => {
     width: LAST_COLUMN_WIDTH,
     Header: 'Type',
     Cell: ({ column, row: { original } }) => {
-      const { login, pass, index } = original;
-      const isCredentialsDisabled = !login || !pass;
+      const { login, password, index } = original;
+      const isCredentialsDisabled = !login || !password;
       const isDocumentDisabled = false;
 
       const options = [
@@ -79,14 +79,14 @@ export const createColumns = ({ state, setState, headings, tableWidth }) => {
   const restColumns = columns.map(id => ({
     id,
     accessor: id,
-    disableSortBy: id === 'pass',
+    disableSortBy: id === 'password',
     width: dataColumnWidth > 0 ? dataColumnWidth : 100,
     Header: capitalize(id),
     Cell: ({ column, row: { original } }) => {
       const { index } = original;
 
       const cellData = state.data[index][column.id];
-      const isPassword = column.id === 'pass';
+      const isPassword = column.id === 'password';
       const isEmptyPassword = isPassword && !cellData;
       const isCurrentPasswordShown = state.indexShownPassword === index;
       const isDataShown = !isPassword || isCurrentPasswordShown;

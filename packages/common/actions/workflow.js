@@ -1,5 +1,9 @@
 export const INIT_WORKFLOW = '@workflow/INIT_WORKFLOW';
+export const INIT_TEAMS = '@workflow/INIT_TEAMS';
 export const INIT_SETTINGS = '@workflow/INIT_SETTINGS';
+export const INIT_DASHBOARD = '@workflow/INIT_DASHBOARD';
+export const FINISH_PROCESSING_KEYPAIRS =
+  '@workflow/FINISH_PROCESSING_KEYPAIRS';
 
 export const FINISH_IS_LOADING = '@workflow/FINISH_IS_LOADING';
 export const VAULTS_ARE_READY = '@workflow/VAULTS_ARE_READY';
@@ -24,6 +28,7 @@ export const ENCRYPTION = '@workflow/ENCRYPTION';
 export const ENCRYPTION_END = '@workflow/ENCRYPTION_END';
 
 export const OPEN_VAULT = '@workflow/OPEN_VAULT';
+export const OPEN_CURRENT_VAULT = '@workflow/OPEN_CURRENT_VAULT';
 
 export const initWorkflow = (withDecryption = true) => ({
   type: INIT_WORKFLOW,
@@ -32,8 +37,20 @@ export const initWorkflow = (withDecryption = true) => ({
   },
 });
 
+export const initTeams = () => ({
+  type: INIT_TEAMS,
+});
+
 export const initSettings = () => ({
   type: INIT_SETTINGS,
+});
+
+export const initDashboard = () => ({
+  type: INIT_DASHBOARD,
+});
+
+export const finishProcessingKeyPairs = () => ({
+  type: FINISH_PROCESSING_KEYPAIRS,
 });
 
 export const openVault = teamId => ({
@@ -41,6 +58,10 @@ export const openVault = teamId => ({
   payload: {
     teamId,
   },
+});
+
+export const openCurrentVault = () => ({
+  type: OPEN_CURRENT_VAULT,
 });
 
 export const finishIsLoading = () => ({

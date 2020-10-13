@@ -9,7 +9,7 @@ import {
 } from '@caesar/common/selectors/keystore';
 import {
   decryptItem,
-  getPrivateKeyObj,
+  unsealPrivateKeyObj,
 } from '@caesar/common/utils/cipherUtils';
 import {
   NOOP_NOTIFICATION,
@@ -17,6 +17,7 @@ import {
   SHARING_IN_PROGRESS_NOTIFICATION,
   ENTITY_TYPE,
   TEAM_TYPE,
+  ROLE_ADMIN,
 } from '@caesar/common/constants';
 import {
   shareItemBatchFailure,
@@ -40,9 +41,9 @@ import { inviteNewMemberBatchSaga } from '@caesar/common/sagas/common/invite';
 import { convertSystemItemToKeyPair } from '../../utils/item';
 
 export function* prepareUsersForSharing(members) {
-  const emailRolePairs = members.map(({ email }) => ({
+  const emailRolePairs = members.map(({ email, roles }) => ({
     email,
-    role: ROLE_USER,
+    role: roles.includes(ROLE_ADMIN) ? ROLE_ADMIN : ROLE_USER,
   }));
 
   return yield call(getOrCreateMemberBatchSaga, {
@@ -70,7 +71,7 @@ export function* getItemUserPairs({ systemItems, members }) {
   const { privateKey, password } = yield select(teamKeyPairSelector, {
     teamId: TEAM_TYPE.PERSONAL,
   });
-  const privateKeyObj = yield call(getPrivateKeyObj, privateKey, password);
+  const privateKeyObj = yield call(unsealPrivateKeyObj, privateKey, password);
 
   const itemUserPairs = yield all(
     systemItems.map(systemItem =>
@@ -231,7 +232,8 @@ export function* shareItemBatchSaga({
 export function* removeShareSaga({ payload: { shareId } }) {
   try {
     // TODO: Implement remove sharing
-    console.log('Remove sharing will be implemented.');
+    // eslint-disable-next-line no-console
+    console.warn('Remove sharing will be implemented.');
     const workInProgressItem = yield select(workInProgressItemSelector);
 
     yield put(removeShareSuccess(workInProgressItem.id, shareId));

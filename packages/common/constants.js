@@ -231,7 +231,7 @@ export const PERMISSION_WRITE = 'write';
 export const USER_ROLE_ADMIN = 'admin';
 export const USER_ROLE_MEMBER = 'member';
 
-export const COMMANDS_ROLES = {
+export const TEAM_ROLES = {
   USER_ROLE_ADMIN,
   USER_ROLE_MEMBER,
 };

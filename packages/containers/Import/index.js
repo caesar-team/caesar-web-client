@@ -1,6 +1,6 @@
 import { connect } from 'react-redux';
 import { createItemsBatchRequest } from '@caesar/common/actions/entities/item';
-import { initWorkflow } from '@caesar/common/actions/workflow';
+import { initDashboard } from '@caesar/common/actions/workflow';
 import {
   fetchKeyPairRequest,
   fetchUserSelfRequest,
@@ -18,7 +18,7 @@ const mapStateToProps = createStructuredSelector({
 });
 
 const mapDispatchToProps = {
-  initWorkflow,
+  initDashboard,
   fetchKeyPairRequest,
   fetchUserSelfRequest,
   createItemsBatchRequest,

@@ -206,8 +206,8 @@ export const addTeamMembersBatchRequest = (teamId, members) => ({
   payload: {
     teamId,
     members,
-  }, 
-};
+  },
+});
 
 export const addTeamMembersBatchSuccess = (teamId, members) => ({
   type: ADD_TEAM_MEMBERS_BATCH_SUCCESS,

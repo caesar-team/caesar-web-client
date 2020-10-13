@@ -49,7 +49,10 @@ import { objectToArray } from '@caesar/common/utils/utils';
 import { upperFirst } from '@caesar/common/utils/string';
 import { getLists, getTeamLists, getUserItems } from '@caesar/common/api';
 import { TEAM_TYPE, LIST_TYPE, ROLE_ADMIN } from '@caesar/common/constants';
-import { teamListsSelector } from '@caesar/common/selectors/entities/list';
+import {
+  teamListsSelector,
+  favoritesListSelector,
+} from '@caesar/common/selectors/entities/list';
 import {
   userDataSelector,
   masterPasswordSelector,
@@ -375,7 +378,7 @@ function* initListsAndProgressEntities() {
   const workInProgressList = !workInProgressListId
     ? lists.find(list => list.id === workInProgressListId)
     : null;
-  const favoritesList = lists.find(list => list.type === LIST_TYPE.FAVORITES);
+  const favoritesList = yield select(favoritesListSelector);
   const defaultList = lists.find(list => list.type === LIST_TYPE.DEFAULT);
 
   if (!workInProgressList) {

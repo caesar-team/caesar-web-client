@@ -117,6 +117,7 @@ const TeamCard = ({
     __typename: PERMISSION_ENTITY.TEAM,
     team_edit: team?._permissions?.team_edit || false,
     team_delete: team?._permissions?.team_delete || false,
+    team_leave: team?._permissions?.team_leave || false,
   };
   const canEditTeam = ability.can(PERMISSION.EDIT, teamSubject);
   const canRemoveTeam = ability.can(PERMISSION.DELETE, teamSubject);

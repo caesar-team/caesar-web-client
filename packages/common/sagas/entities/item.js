@@ -144,7 +144,7 @@ export function* generateSystemItem(entityType, listId, entityId) {
   return systemItemData;
 }
 
-export function* generateTeamKeyPair({ name }) {
+export function* generateKeyPair({ name }) {
   const masterPassword = yield call(passwordGenerator);
   const systemItemName = yield call(
     generateSystemItemName,
@@ -378,6 +378,7 @@ export function* moveItemsBatchSaga({
 
 export function* encryptSecret({ item, publicKey }) {
   const { data: { raws, ...data } = { raws: {} } } = item;
+
   const encryptedItemData = yield call(encryptItem, data, publicKey);
 
   const encryptedItem = {
@@ -547,7 +548,6 @@ export function* createItemSaga({
       teamId = TEAM_TYPE.PERSONAL,
       ownerId = currentUserId,
       listId,
-      data,
     } = item;
 
     yield call(createIfNotExistKeyPair, {
@@ -615,7 +615,7 @@ export function* createItemSaga({
           [newItem.id]: newItem,
         }),
       );
-      if (data.name.includes(ENTITY_TYPE.TEAM)) {
+      if (!newItem.relatedItemId) {
         yield put(addTeamKeyPair(newItem));
       } else {
         yield put(addShareKeyPair(newItem));

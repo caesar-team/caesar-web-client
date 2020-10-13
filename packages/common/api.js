@@ -144,6 +144,8 @@ export const postRegistration = data =>
 export const postChangePassword = data =>
   callApi.patch('/auth/srpp/password', data);
 
+export const postItemShare = ({ itemId, users }) =>
+  callApi.post(`/api/items/${itemId}/share`, { users });
 export const getCheckShare = id => callApi.get(`/anonymous/share/${id}/check`);
 
 export const postInvitation = data => callApi.post('/invitation', data);

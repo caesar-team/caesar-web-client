@@ -68,7 +68,7 @@ import {
 import { updateGlobalNotification } from '@caesar/common/actions/application';
 import {
   encryptSecret,
-  generateTeamKeyPair,
+  generateKeyPair,
   saveItemSaga,
 } from '@caesar/common/sagas/entities/item';
 import { teamKeyPairSelector } from '@caesar/common/selectors/keystore';
@@ -154,7 +154,7 @@ export function* createTeamKeyPairSaga({ payload: { team, publicKey } }) {
       throw new Error('Fatal error: The publicKey not found.');
     }
 
-    const teamKeyPair = yield call(generateTeamKeyPair, {
+    const teamKeyPair = yield call(generateKeyPair, {
       payload: {
         name: team.title,
       },
@@ -320,7 +320,7 @@ export function* createTeamSaga({
       icon,
     };
 
-    const teamKeyPair = yield call(generateTeamKeyPair, {
+    const teamKeyPair = yield call(generateKeyPair, {
       payload: {
         name: title,
       },

@@ -74,7 +74,6 @@ export function* fetchUserTeamsSaga() {
     if (data.length) {
       yield put(fetchUserTeamsSuccess(data.map(({ id }) => id)));
       // TODO: need fixes from BE
-      yield put(addTeamsBatch(convertTeamsToEntity(data)));
       const teamList = objectToArray(convertTeamsToEntity(data));
       yield all(teamList.map(team => call(addTeamsBatch, team)));
 

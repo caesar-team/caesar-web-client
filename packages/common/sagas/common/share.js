@@ -1,12 +1,4 @@
-import {
-  call,
-  select,
-  all,
-  takeLatest,
-  put,
-  take,
-  fork,
-} from '@redux-saga/core/effects';
+import { call, select, all, takeLatest, put } from '@redux-saga/core/effects';
 import { getOrCreateMemberBatchSaga } from '@caesar/common/sagas/entities/member';
 import { itemsBatchSelector } from '@caesar/common/selectors/entities/item';
 import { systemItemsBatchSelector } from '@caesar/common/selectors/entities/system';
@@ -28,7 +20,6 @@ import {
 } from '@caesar/common/constants';
 import {
   shareItemBatchFailure,
-  removeChildItemFromItem,
   removeShareFailure,
   removeShareSuccess,
   SHARE_ITEM_BATCH_REQUEST,
@@ -38,16 +29,13 @@ import {
 } from '@caesar/common/actions/entities/item';
 import { updateGlobalNotification } from '@caesar/common/actions/application';
 import { teamsMembersSelector } from '@caesar/common/selectors/entities/team';
-import { createChildItemBatchSaga } from '@caesar/common/sagas/entities/childItem';
 import { updateWorkInProgressItem } from '@caesar/common/actions/workflow';
 import { getServerErrorMessage } from '@caesar/common/utils/error';
 import { workInProgressItemSelector } from '@caesar/common/selectors/workflow';
-import { deleteChildItem } from '@caesar/common/api';
 import {
   createSystemItemKeyPair,
   saveItemSaga,
 } from '@caesar/common/sagas/entities/item';
-import { CREATE_CHILD_ITEM_BATCH_FINISHED_EVENT } from '@caesar/common/actions/entities/childItem';
 import { inviteNewMemberBatchSaga } from '@caesar/common/sagas/common/invite';
 import { convertSystemItemToKeyPair } from '../../utils/item';
 
@@ -208,10 +196,6 @@ export function* shareItemBatchSaga({
     });
 
     if (itemUserPairs.length > 0) {
-      yield fork(createChildItemBatchSaga, { payload: { itemUserPairs } });
-
-      yield take(CREATE_CHILD_ITEM_BATCH_FINISHED_EVENT);
-
       const sharedItemIds = systemKeyPairItems.map(
         systemItem => systemItem?.relatedItemId,
       );
@@ -246,11 +230,10 @@ export function* shareItemBatchSaga({
 
 export function* removeShareSaga({ payload: { shareId } }) {
   try {
+    // TODO: Implement remove sharing
+    console.log('Remove sharing will be implemented.');
     const workInProgressItem = yield select(workInProgressItemSelector);
 
-    yield call(deleteChildItem, shareId);
-
-    yield put(removeChildItemFromItem(workInProgressItem.id, shareId));
     yield put(removeShareSuccess(workInProgressItem.id, shareId));
     yield put(updateWorkInProgressItem());
 

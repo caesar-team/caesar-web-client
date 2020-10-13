@@ -74,9 +74,9 @@ export const AddItem = ({ className }) => {
   const itemPermission = {
     ..._permissions,
     __typename:
-      currentTeam.id !== TEAM_TYPE.PERSONAL
-        ? PERMISSION_ENTITY.TEAM_ITEM
-        : PERMISSION_ENTITY.ITEM,
+      currentTeam.id === TEAM_TYPE.PERSONAL
+        ? PERMISSION_ENTITY.ITEM
+        : PERMISSION_ENTITY.TEAM_ITEM,
   };
 
   return (

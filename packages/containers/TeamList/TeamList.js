@@ -183,8 +183,7 @@ class TeamListContainer extends Component {
 
     const teamSubject = {
       __typename: PERMISSION_ENTITY.TEAM,
-      // eslint-disable-next-line camelcase
-      team_create: this.props.user?._permissions?.team_create || false,
+      ...this.props.user?._permissions,
     };
 
     return (

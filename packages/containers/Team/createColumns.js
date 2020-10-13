@@ -65,8 +65,7 @@ const getColumnFilter = (placeholder = '') => ({
 
 const getTeamMemberSubject = member => ({
   __typename: PERMISSION_ENTITY.TEAM_MEMBER,
-  team_member_edit: member?._permissions?.team_member_edit || false,
-  team_member_remove: member?._permissions?.team_member_remove || false,
+  ...member._permissions,
 });
 
 export const createColumns = ({

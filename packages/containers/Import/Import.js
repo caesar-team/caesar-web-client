@@ -25,15 +25,16 @@ const StyledNavigationPanel = styled(NavigationPanel)`
   margin-top: 25px;
 `;
 
-const normalizeData = (rows, { name, login, pass, website, note }) =>
+const normalizeData = (rows, { name, login, password, website, note }) =>
   rows.map((row, index) => ({
     index,
     name: row[name],
     login: row[login],
-    pass: row[pass],
+    password: row[password],
     website: row[website],
     note: row[note],
-    type: row[pass] && row[login] ? ITEM_TYPE.CREDENTIALS : ITEM_TYPE.DOCUMENT,
+    type:
+      row[password] && row[login] ? ITEM_TYPE.CREDENTIALS : ITEM_TYPE.DOCUMENT,
   }));
 
 const pick = (object, keys) =>
@@ -46,7 +47,13 @@ const pick = (object, keys) =>
   }, {});
 
 const DOCUMENT_TYPE_FIELDS = ['name', 'note'];
-const CREDENTIALS_TYPE_FIELDS = ['name', 'login', 'pass', 'website', 'note'];
+const CREDENTIALS_TYPE_FIELDS = [
+  'name',
+  'login',
+  'password',
+  'website',
+  'note',
+];
 
 class Import extends Component {
   state = this.prepareInitialState();

@@ -8,13 +8,13 @@ const keypairSchema = new schema.Entity('byId', undefined, {
     id,
     teamId,
     data: {
-      pass = null,
+      password = null,
       raws: { publicKey, privateKey } = {
         publicKey: null,
         privateKey: null,
       },
     } = {
-      pass: null,
+      password: null,
       raws: {
         publicKey: null,
         privateKey: null,
@@ -23,7 +23,7 @@ const keypairSchema = new schema.Entity('byId', undefined, {
   }) => ({
     id,
     teamId,
-    password: pass,
+    password,
     publicKey,
     privateKey,
     __type: ENTITY_TYPE.KEYPAIR,

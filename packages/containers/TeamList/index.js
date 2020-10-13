@@ -24,6 +24,7 @@ import {
   memberListSelector,
   membersByIdSelector,
 } from '@caesar/common/selectors/entities/member';
+import { initWorkflow } from '@caesar/common/actions/workflow';
 import TeamList from './TeamList';
 
 const mapStateToProps = createStructuredSelector({
@@ -44,6 +45,7 @@ const mapDispatchToProps = {
   editTeamRequest,
   leaveTeamRequest,
   removeTeamRequest,
+  initWorkflow,
 };
 
 export default connect(

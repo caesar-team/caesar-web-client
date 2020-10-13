@@ -1,5 +1,5 @@
 import { expose } from 'threads/worker';
-import { decryptItem, getPrivateKeyObj } from '../utils/cipherUtils';
+import { decryptItem, unsealPrivateKeyObj } from '../utils/cipherUtils';
 
 import { decryptItemData } from '../utils/item';
 
@@ -12,7 +12,7 @@ const state = {
 
 const decryption = {
   async init(key, masterPassword) {
-    state.privateKeyObject = await getPrivateKeyObj(key, masterPassword);
+    state.privateKeyObject = await unsealPrivateKeyObj(key, masterPassword);
   },
   async decrypt(item) {
     const decryptedData = await decryptItemData(item, state.privateKeyObject);

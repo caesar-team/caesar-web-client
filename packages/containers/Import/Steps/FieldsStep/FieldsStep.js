@@ -153,9 +153,9 @@ const FieldsStep = ({ headings, initialValues, onSubmit, onCancel }) => (
                 onChange={setFieldValue}
               />
               <StyledSelect
-                name="pass"
+                name="password"
                 isCancellable
-                value={values.pass}
+                value={values.password}
                 options={getOptions(headings)}
                 onChange={setFieldValue}
               />

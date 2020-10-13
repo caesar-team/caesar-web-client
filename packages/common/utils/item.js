@@ -71,7 +71,7 @@ export const extractKeysFromSystemItem = item => {
 
 export const convertSystemItemToKeyPair = item => {
   if (!item.data) return null;
-  const { pass } = item.data;
+  const { password } = item.data;
   const itemRaws = item.data?.raws || {
     publicKey: null,
     privateKey: null,
@@ -81,7 +81,7 @@ export const convertSystemItemToKeyPair = item => {
 
   return {
     id: item.id,
-    password: pass,
+    password: password,
     publicKey,
     privateKey,
   };

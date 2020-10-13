@@ -65,7 +65,7 @@ export const Password = ({
     <StyledInput
       type={isVisible ? 'text' : 'password'}
       label="Password"
-      name="pass"
+      name="password"
       autoComplete="new-password"
       value={value}
       itemSubject={itemSubject}

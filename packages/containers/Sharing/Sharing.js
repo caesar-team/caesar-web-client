@@ -4,7 +4,7 @@ import { SharingLayout } from '@caesar/components';
 import { ItemByType } from '@caesar/components/Item/ItemByType';
 import { LIST_TYPE, PERMISSION_ENTITY } from '@caesar/common/constants';
 import {
-  getPrivateKeyObj,
+  unsealPrivateKeyObj,
   decryptItem,
 } from '@caesar/common/utils/cipherUtils';
 
@@ -28,7 +28,7 @@ class SharingComponent extends Component {
 
     const item = getInboxItem(list);
 
-    const privateKeyObj = await getPrivateKeyObj(privateKey, password);
+    const privateKeyObj = await unsealPrivateKeyObj(privateKey, password);
     const decryptedSecret = await decryptItem(item.secret, privateKeyObj);
 
     this.setState({

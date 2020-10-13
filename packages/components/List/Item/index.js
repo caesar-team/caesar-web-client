@@ -1,11 +1,6 @@
 /* eslint-disable camelcase */
 import React from 'react';
-import {
-  PERMISSION_ENTITY,
-  PERMISSION,
-  PERMISSION_MESSAGES,
-  TEAM_TYPE,
-} from '@caesar/common/constants';
+import { PERMISSION, PERMISSION_MESSAGES } from '@caesar/common/constants';
 import { Icon } from '../../Icon';
 import { ItemIcon } from '../../ItemIcon';
 import { Can } from '../../Ability';
@@ -56,20 +51,6 @@ export const Item = ({
   const isChecked = isMultiItem && workInProgressItemIds.includes(id);
 
   const isTop = index === 0;
-  const itemSubject =
-    teamId === TEAM_TYPE.PERSONAL
-      ? {
-          __typename: PERMISSION_ENTITY.ITEM,
-          move_item: _permissions?.move_item || false,
-          batch_share_item: _permissions?.batch_share_item || false,
-          delete_item: _permissions?.delete_item || false,
-        }
-      : {
-          __typename: PERMISSION_ENTITY.TEAM_ITEM,
-          team_move_item: _permissions?.team_move_item || false,
-          team_batch_share_item: _permissions?.team_batch_share_item || false,
-          team_delete_item: _permissions?.team_delete_item || false,
-        };
 
   return (
     <Row
@@ -83,7 +64,7 @@ export const Item = ({
       isInModal={isInModal}
       {...props}
     >
-      <Can I={PERMISSION.MULTISELECT} an={itemSubject} passThrough>
+      <Can I={PERMISSION.MULTISELECT} an={_permissions} passThrough>
         {allowed => (
           <TypeIconWrapper
             onClick={e => {

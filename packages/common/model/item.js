@@ -2,7 +2,7 @@ export const getDataFiledsFromItem = item => {
   const {
     name = '',
     note = '',
-    pass = '',
+    password = '',
     website = '',
     login = '',
     attachments = [],
@@ -12,7 +12,7 @@ export const getDataFiledsFromItem = item => {
   return {
     name,
     note,
-    pass,
+    password,
     website,
     login,
     attachments,

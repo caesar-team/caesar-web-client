@@ -1,5 +1,5 @@
 /* eslint-disable no-unused-vars */
-import { put, call, takeLatest, select, all, fork } from 'redux-saga/effects';
+import { put, call, takeLatest, select, all } from 'redux-saga/effects';
 import {
   FETCH_TEAMS_REQUEST,
   FETCH_TEAM_REQUEST,
@@ -27,16 +27,12 @@ import {
   removeTeamMemberFailure,
   addTeamsBatch,
 } from '@caesar/common/actions/entities/team';
-import { fetchTeamMembersSaga } from '@caesar/common/sagas/entities/member';
 import {
-  addTeamToMembersTeamsListBatch,
-  fetchMembersSuccess,
   removeTeamFromMember,
   removeTeamFromMembersBatch,
 } from '@caesar/common/actions/entities/member';
 import { setCurrentTeamId, leaveTeam } from '@caesar/common/actions/user';
 import { teamSelector } from '@caesar/common/selectors/entities/team';
-import { teamItemListSelector } from '@caesar/common/selectors/entities/item';
 import {
   currentTeamIdSelector,
   userDataSelector,
@@ -62,23 +58,15 @@ import {
   convertKeyPairToItemEntity,
   convertMembersToEntity,
 } from '@caesar/common/normalizers/normalizers';
-import { createPermissionsFromLinks } from '@caesar/common/utils/createPermissionsFromLinks';
 import {
   TEAM_ROLES,
   ENTITY_TYPE,
   NOOP_NOTIFICATION,
   ROLE_ADMIN,
   TEAM_TYPE,
-  USER_ROLE_ADMIN,
 } from '@caesar/common/constants';
-import {
-  prepareUsersForSharing,
-  getItemUserPairs,
-} from '@caesar/common/sagas/common/share';
-import { inviteNewMemberBatchSaga } from '@caesar/common/sagas/common/invite';
 import { updateGlobalNotification } from '@caesar/common/actions/application';
 import {
-  cloneKeyPair,
   encryptSecret,
   generateTeamKeyPair,
   saveItemSaga,
@@ -103,14 +91,6 @@ export function* fetchTeamsSaga() {
     if (teamList.length && !currentTeamId) {
       yield put(setCurrentTeamId(teamList[0].id));
     }
-
-    // @Deprecated
-    // TODO: Need to check if it doesn't break smth
-    // yield all(
-    //   teamList.map(team =>
-    //     call(fetchTeamMembersSaga, { payload: { teamId: team.id } }),
-    //   ),
-    // );
   } catch (error) {
     // eslint-disable-next-line no-console
     console.error(error);

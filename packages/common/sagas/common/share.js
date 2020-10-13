@@ -232,7 +232,8 @@ export function* shareItemBatchSaga({
 export function* removeShareSaga({ payload: { shareId } }) {
   try {
     // TODO: Implement remove sharing
-    console.log('Remove sharing will be implemented.');
+    // eslint-disable-next-line no-console
+    console.warn('Remove sharing will be implemented.');
     const workInProgressItem = yield select(workInProgressItemSelector);
 
     yield put(removeShareSuccess(workInProgressItem.id, shareId));

@@ -76,6 +76,7 @@ export function* fetchUserTeamsSaga() {
       // TODO: need fixes from BE
       const teamList = objectToArray(convertTeamsToEntity(data));
       yield all(teamList.map(team => call(addTeamsBatch, team)));
+
       const currentTeamId = yield select(currentTeamIdSelector);
       put(setCurrentTeamId(currentTeamId || data[0].id));
     }

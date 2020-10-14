@@ -177,7 +177,7 @@ const MenuListInnerComponent = ({
   const listPermission = {
     ..._permissions,
     __typename:
-      currentTeam.id === TEAM_TYPE.PERSONAL
+      (currentTeam?.id || TEAM_TYPE.PERSONAL) === TEAM_TYPE.PERSONAL
         ? PERMISSION_ENTITY.LIST
         : PERMISSION_ENTITY.TEAM_LIST,
   };

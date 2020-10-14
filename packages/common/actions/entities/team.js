@@ -277,11 +277,11 @@ export const togglePinTeamRequest = (teamId, shouldPinned) => ({
   },
 });
 
-export const togglePinTeamSuccess = (teamId, pinned) => ({
+export const togglePinTeamSuccess = (teamId, isPinned) => ({
   type: TOGGLE_PIN_TEAM_SUCCESS,
   payload: {
     teamId,
-    pinned,
+    isPinned,
   },
 });
 

@@ -69,7 +69,7 @@ export const AddItem = ({ className }) => {
   const isOnline = useNavigatorOnline();
 
   // Todo: The Can should get an entity itself
-  const { _permissions } = workInProgressList;
+  const { _permissions } = workInProgressList || {};
 
   const itemPermission = {
     ..._permissions,

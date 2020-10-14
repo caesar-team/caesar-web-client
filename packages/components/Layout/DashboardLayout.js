@@ -3,7 +3,11 @@ import { useSelector, useDispatch } from 'react-redux';
 import styled from 'styled-components';
 import ScrollLock from 'react-scrolllock';
 import { DASHBOARD_MODE } from '@caesar/common/constants';
-import { userDataSelector } from '@caesar/common/selectors/user';
+import {
+  userDataSelector,
+  currentTeamIdSelector,
+} from '@caesar/common/selectors/user';
+import { teamKeyPairSelector } from '@caesar/common/selectors/keystore';
 import {
   setWorkInProgressItem,
   setWorkInProgressListId,
@@ -26,6 +30,8 @@ const DashboardLayoutComponent = ({
 }) => {
   const dispatch = useDispatch();
   const user = useSelector(userDataSelector);
+  const teamId = useSelector(currentTeamIdSelector);
+  const keyPair = useSelector(state => teamKeyPairSelector(state, { teamId }));
 
   const handleSearch = event => {
     event.preventDefault();
@@ -55,7 +61,7 @@ const DashboardLayoutComponent = ({
         <PrimaryHeader
           user={user}
           searchedText={searchedText}
-          showAddItemButton
+          showAddItemButton={!!keyPair}
           onSearch={handleSearch}
           onClickReset={handleClickResetSearch}
         />

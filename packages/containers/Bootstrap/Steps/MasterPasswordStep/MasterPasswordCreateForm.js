@@ -2,7 +2,9 @@ import React, { memo } from 'react';
 import { useEffectOnce } from 'react-use';
 import { useFormik } from 'formik';
 import zxcvbn from 'zxcvbn';
+import copy from 'copy-text-to-clipboard';
 import styled from 'styled-components';
+import { useNotification } from '@caesar/common/hooks';
 import { checkError } from '@caesar/common/utils/formikUtils';
 import {
   Head,
@@ -78,6 +80,7 @@ const StyledTooltipPasswordGenerator = styled(TooltipPasswordGenerator)`
 `;
 
 const MasterPasswordCreateFormComponent = ({ initialValues, onSubmit }) => {
+  const notification = useNotification();
   const {
     errors,
     touched,
@@ -100,8 +103,13 @@ const MasterPasswordCreateFormComponent = ({ initialValues, onSubmit }) => {
     validateForm();
   });
 
-  const handleGeneratePassword = setValue => password =>
+  const handleGeneratePassword = setValue => password => {
     setValue('password', password);
+    copy(password);
+    notification.show({
+      text: 'Master Password has been copied to clipboard!',
+    });
+  };
 
   return (
     <Form onSubmit={handleSubmit}>

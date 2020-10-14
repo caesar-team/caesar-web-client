@@ -121,7 +121,7 @@ const TeamCard = ({
   const { id, icon, users, pinned } = team;
   const areMembersAvailable = users && users.length > 0;
 
-  const { _permissions } = team;
+  const { _permissions } = team || {};
 
   const canEditTeam = ability.can(PERMISSION.EDIT, _permissions);
   const canRemoveTeam = ability.can(PERMISSION.DELETE, _permissions);

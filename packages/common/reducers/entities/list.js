@@ -19,6 +19,7 @@ import {
   MOVE_ITEMS_BATCH_TO_LIST,
   REMOVE_ITEM_FROM_LIST,
   REMOVE_ITEMS_BATCH_FROM_LIST,
+  RESET_LIST_STATE,
 } from '@caesar/common/actions/entities/list';
 
 const initialState = {
@@ -192,5 +193,8 @@ export default createReducer(initialState, {
         },
       },
     };
+  },
+  [RESET_LIST_STATE]() {
+    return initialState;
   },
 });

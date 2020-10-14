@@ -32,6 +32,8 @@ import {
   UPDATE_TEAM_MEMBERS_WITH_ROLES,
   TOGGLE_PIN_TEAM_SUCCESS,
 } from "@caesar/common/actions/entities/team";
+  RESET_TEAM_STATE,
+} from '@caesar/common/actions/entities/team';
 import { KEY_TYPE } from '../../constants';
 
 const initialState = {
@@ -272,6 +274,9 @@ export default createReducer(initialState, {
         },
       },
     };
+  },
+  [RESET_TEAM_STATE]() {
+    return initialState;
   },
   [TOGGLE_PIN_TEAM_SUCCESS](state, { payload }) {
     return {

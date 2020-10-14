@@ -8,6 +8,7 @@ export const ADD_PERSONAL_KEY_PAIR = '@keystore/ADD_PERSONAL_KEY_PAIR';
 export const REMOVE_PERSONAL_KEY_PAIR = '@keystore/REMOVE_PERSONAL_KEY_PAIR';
 export const ADD_ANONYMOUS_KEY_PAIR = '@keystore/ADD_ANONYMOUS_KEY_PAIR';
 export const REMOVE_ANONYMOUS_KEY_PAIR = '@keystore/REMOVE_ANONYMOUS_KEY_PAIR';
+export const RESET_KEYSTORE_STATE = '@keystore/RESET_KEYSTORE_STATE';
 
 export const addPersonalKeyPair = data => ({
   type: ADD_PERSONAL_KEY_PAIR,
@@ -74,4 +75,8 @@ export const removeAnonymousKeyPair = keyId => ({
   payload: {
     keyId,
   },
+});
+
+export const resetKeystoreState = () => ({
+  type: RESET_KEYSTORE_STATE,
 });

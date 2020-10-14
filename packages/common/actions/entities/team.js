@@ -50,6 +50,8 @@ export const REMOVE_TEAM_MEMBER_FAILURE = '@team/REMOVE_TEAM_MEMBER_FAILURE';
 export const ADD_TEAMS_BATCH = '@team/ADD_TEAMS_BATCH';
 export const ADD_TEAM_MEMBER = '@team/ADD_TEAM_MEMBER';
 
+export const RESET_TEAM_STATE = '@team/RESET_TEAM_STATE';
+
 export const fetchTeamsRequest = () => ({
   type: FETCH_TEAMS_REQUEST,
 });
@@ -267,6 +269,10 @@ export const updateTeamMembersWithRoles = (teamId, members) => ({
     teamId,
     members,
   },
+});
+
+export const resetTeamState = () => ({
+  type: RESET_TEAM_STATE,
 });
 
 export const togglePinTeamRequest = (teamId, shouldPinned) => ({

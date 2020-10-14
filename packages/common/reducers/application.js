@@ -5,6 +5,7 @@ import {
   INIT_CORES_COUNT,
   INCREASE_CORES_COUNT,
   DECREASE_CORES_COUNT,
+  RESET_APPLICATION_STATE,
 } from '@caesar/common/actions/application';
 import { DEFAULT_CORES_COUNT } from '@caesar/common/constants';
 
@@ -58,5 +59,8 @@ export default createReducer(initialState, {
       ...state,
       availableCoresCount: state.availableCoresCount - payload.delta,
     };
+  },
+  [RESET_APPLICATION_STATE]() {
+    return initialState;
   },
 });

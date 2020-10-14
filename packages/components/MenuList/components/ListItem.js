@@ -142,26 +142,12 @@ export const ListItem = ({
   };
 
   const listTitle = transformListTitle(label);
-
-  const listSubject =
-    teamId === TEAM_TYPE.PERSONAL
-      ? {
-          __typename: PERMISSION_ENTITY.LIST,
-          edit_list: list?._permissions?.edit_list || false,
-          sort_list: list?._permissions?.sort_list || false,
-          delete_list: list?._permissions?.delete_list || false,
-        }
-      : {
-          __typename: PERMISSION_ENTITY.TEAM_LIST,
-          team_edit_list: list?._permissions?.team_edit_list || false,
-          team_sort_list: list?._permissions?.team_sort_list || false,
-          team_delete_list: list?._permissions?.team_delete_list || false,
-        };
-
   const isListAlreadyExists =
     value !== label && nestedListsLabels.includes(value?.toLowerCase());
 
   const isAcceptDisabled = !value || value === label || isListAlreadyExists;
+
+  const { _permissions } = list;
 
   const renderInner = dragHandleProps => (
     <>
@@ -185,18 +171,18 @@ export const ListItem = ({
       ) : (
         <>
           <div {...dragHandleProps}>
-            <Can I={PERMISSION.SORT} a={listSubject}>
+            <Can I={PERMISSION.SORT} a={_permissions}>
               <DnDIcon name="drag-n-drop" width={16} height={16} color="gray" />
             </Can>
           </div>
           <Title>{listTitle}</Title>
-          <Can I={PERMISSION.EDIT} a={listSubject}>
+          <Can I={PERMISSION.EDIT} a={_permissions}>
             <Counter>{visibleItems.length}</Counter>
           </Can>
-          <Can not I={PERMISSION.EDIT} a={listSubject}>
+          <Can not I={PERMISSION.EDIT} a={_permissions}>
             <div>{visibleItems.length}</div>
           </Can>
-          <Can I={PERMISSION.EDIT} a={listSubject}>
+          <Can I={PERMISSION.EDIT} a={_permissions}>
             <ActionIcon
               name="pencil"
               width={16}
@@ -205,7 +191,7 @@ export const ListItem = ({
               onClick={handleClickEdit}
             />
           </Can>
-          <Can I={PERMISSION.DELETE} a={listSubject}>
+          <Can I={PERMISSION.DELETE} a={_permissions}>
             <ActionIcon
               name="trash"
               width={16}

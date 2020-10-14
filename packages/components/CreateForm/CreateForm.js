@@ -1,11 +1,10 @@
 import React from 'react';
 import { useRouter } from 'next/router';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import { useFormik } from 'formik';
 import styled from 'styled-components';
 import { createItemRequest } from '@caesar/common/actions/entities/item';
 import { processUploadedFiles } from '@caesar/common/utils/attachment';
-import { userIdSelector } from '@caesar/common/selectors/user';
 import { FormByType, FormHeader, FormFooter } from './components';
 import { getInitialValues, getValidationSchema } from './utils';
 

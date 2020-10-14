@@ -155,9 +155,7 @@ export function* createTeamKeyPairSaga({ payload: { team, publicKey } }) {
     }
 
     const teamKeyPair = yield call(generateTeamKeyPair, {
-      payload: {
-        name: team.title,
-      },
+      name: team.title,
     });
 
     const { id: listId } = yield select(teamDefaultListSelector, {
@@ -321,9 +319,7 @@ export function* createTeamSaga({
     };
 
     const teamKeyPair = yield call(generateTeamKeyPair, {
-      payload: {
-        name: title,
-      },
+      name: title,
     });
 
     if (!teamKeyPair) {

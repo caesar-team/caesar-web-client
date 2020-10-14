@@ -69,12 +69,12 @@ export const AddItem = ({ className }) => {
   const isOnline = useNavigatorOnline();
 
   // Todo: The Can should get an entity itself
-  const { _permissions } = workInProgressList;
+  const { _permissions } = workInProgressList || {};
 
   const itemPermission = {
     ..._permissions,
     __typename:
-      currentTeam.id === TEAM_TYPE.PERSONAL
+      (currentTeam?.id || TEAM_TYPE.PERSONAL) === TEAM_TYPE.PERSONAL
         ? PERMISSION_ENTITY.ITEM
         : PERMISSION_ENTITY.TEAM_ITEM,
   };

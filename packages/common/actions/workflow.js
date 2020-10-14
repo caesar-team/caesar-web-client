@@ -1,6 +1,7 @@
 export const INIT_WORKFLOW = '@workflow/INIT_WORKFLOW';
 export const INIT_TEAMS = '@workflow/INIT_TEAMS';
 export const INIT_SETTINGS = '@workflow/INIT_SETTINGS';
+export const INIT_CREATE_PAGE = '@workflow/INIT_CREATE_PAGE';
 export const INIT_DASHBOARD = '@workflow/INIT_DASHBOARD';
 export const FINISH_PROCESSING_KEYPAIRS =
   '@workflow/FINISH_PROCESSING_KEYPAIRS';
@@ -35,6 +36,10 @@ export const initWorkflow = (withDecryption = true) => ({
   payload: {
     withDecryption,
   },
+});
+
+export const initCreatePage = () => ({
+  type: INIT_CREATE_PAGE,
 });
 
 export const initTeams = () => ({

@@ -6,6 +6,7 @@ import {
   createTeamRequest,
   editTeamRequest,
   removeTeamRequest,
+  togglePinTeamRequest,
 } from '@caesar/common/actions/entities/team';
 import {
   fetchMembersRequest,
@@ -46,6 +47,7 @@ const mapDispatchToProps = {
   leaveTeamRequest,
   removeTeamRequest,
   initWorkflow,
+  togglePinTeamRequest,
 };
 
 export default connect(

@@ -8,6 +8,8 @@ import {
   ConfirmModal,
   ConfirmLeaveTeamModal,
   Can,
+  Tabs,
+  Tab,
 } from '@caesar/components';
 import { PERMISSION, PERMISSION_ENTITY } from '@caesar/common/constants';
 
@@ -144,6 +146,19 @@ class TeamListContainer extends Component {
     this.props.updateTeamMemberRoleRequest(selectedTeamId, member.id, role);
   };
 
+  handlePinTeam = (teamId, isPinned) => event => {
+    event.preventDefault();
+    event.stopPropagation();
+
+    this.props.togglePinTeamRequest(teamId, !isPinned);
+  };
+
+  handleChangeTab = (name, tabName) => {
+    this.setState({
+      activeTabName: tabName,
+    });
+  };
+
   prepareInitialState() {
     return {
       selectedTeamId: null,
@@ -153,11 +168,12 @@ class TeamListContainer extends Component {
         [LEAVE_TEAM_MODAL]: false,
         [REMOVE_TEAM_MODAL]: false,
       },
+      activeTabName: "all",
     };
   }
 
-  renderTeamCards() {
-    const { teams, members } = this.props;
+  renderTeamCards(teams) {
+    const { members } = this.props;
 
     if (!teams.length) {
       return <div>No teams</div>;
@@ -171,16 +187,18 @@ class TeamListContainer extends Component {
         onClickEditTeam={this.handleClickEditTeam(team.id)}
         onClickLeaveTeam={this.handleClickLeaveTeam(team)}
         onClickRemoveTeam={this.handleClickRemoveTeam(team.id)}
+        onPinTeam={this.handlePinTeam(team.id, team.pinned)}
       />
     ));
   }
 
   render() {
     const { isLoading, teams } = this.props;
-    const { modalVisibilities, selectedTeamTitle } = this.state;
-
-    const renderedTeamCards = this.renderTeamCards();
-
+    const { modalVisibilities, selectedTeamTitle, activeTabName } = this.state;
+    const favoriteTeams = teams.filter(team => team.pinned);
+    const allTeamCards = this.renderTeamCards(teams);
+    const favoriteTeamCards = this.renderTeamCards(favoriteTeams);
+    
     const teamSubject = {
       __typename: PERMISSION_ENTITY.TEAM,
       ...this.props.user?._permissions,
@@ -203,7 +221,19 @@ class TeamListContainer extends Component {
           </Can>
         }
       >
-        <TeamListWrapper>{renderedTeamCards}</TeamListWrapper>
+        <Can I={PERMISSION.PIN} a={teamSubject}>
+          <Tabs activeTabName={activeTabName} onChange={this.handleChangeTab}>
+            <Tab title="All" name="all">
+              <TeamListWrapper>{allTeamCards}</TeamListWrapper>
+            </Tab>
+            <Tab title="Favorites" name="favorites">
+              <TeamListWrapper>{favoriteTeamCards}</TeamListWrapper>
+            </Tab>
+          </Tabs>
+        </Can>
+        <Can not I={PERMISSION.PIN} a={teamSubject}>
+          <TeamListWrapper>{allTeamCards}</TeamListWrapper>
+        </Can>  
         {modalVisibilities[NEW_TEAM_MODAL] && (
           <TeamModal
             teamId={this.state.selectedTeamId}

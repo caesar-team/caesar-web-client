@@ -92,11 +92,10 @@ export const decryptItemData = async (item, privateKeyObject) => {
     const { data: encryptedData, raws: encryptedRaws } = JSON.parse(
       item.secret,
     );
-
     const promises = [];
     promises.push(decryptItem(encryptedData, privateKeyObject));
 
-    if (!isGeneralItem(item)) {
+    if (!isGeneralItem(item) && encryptedRaws) {
       promises.push(decryptItem(encryptedRaws, privateKeyObject));
     }
 

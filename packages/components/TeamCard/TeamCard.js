@@ -13,6 +13,7 @@ import { getTeamTitle } from '@caesar/common/utils/team';
 import { Button } from '../Button';
 import { AvatarsList } from '../Avatar';
 import { DottedMenu } from '../DottedMenu';
+import { Toggle } from '../Toggle';
 
 const Wrapper = styled.div`
   position: relative;
@@ -93,6 +94,12 @@ const AvatarsWrapper = styled.div`
   justify-content: space-between;
 `;
 
+const ToggleWrapper = styled.div`
+  position: absolute;
+  bottom: 110px;
+  right: 20px;
+`;
+
 const getMembers = memoizeOne((users, members) =>
   users.reduce((accumulator, { id }) => {
     const member = members.find(user => user.id === id);
@@ -109,15 +116,17 @@ const TeamCard = ({
   onClickEditTeam = Function.prototype,
   onClickLeaveTeam = Function.prototype,
   onClickRemoveTeam = Function.prototype,
+  onPinTeam = Function.prototype,
 }) => {
-  const { id, icon, users } = team;
+  const { id, icon, users, pinned } = team;
   const areMembersAvailable = users && users.length > 0;
 
-  const { _permissions } = team;
+  const { _permissions } = team || {};
 
   const canEditTeam = ability.can(PERMISSION.EDIT, _permissions);
   const canRemoveTeam = ability.can(PERMISSION.DELETE, _permissions);
   const canLeaveTeam = ability.can(PERMISSION.LEAVE, _permissions);
+  const canPinTeam = ability.can(PERMISSION.PIN, _permissions);
   const shouldShowMenu = canLeaveTeam || canEditTeam || canRemoveTeam;
 
   return (
@@ -157,17 +166,27 @@ const TeamCard = ({
         href={`${ROUTES.SETTINGS}${ROUTES.TEAM}/[id]`}
         as={`${ROUTES.SETTINGS}${ROUTES.TEAM}/${id}`}
       >
-        <TeamWrapper>
-          <TeamDetails>
-            <TeamIcon src={icon} />
-            <TeamInfo>
-              <TeamName>{getTeamTitle(team)}</TeamName>
-              {areMembersAvailable && (
-                <TeamMembers>{users.length} members</TeamMembers>
-              )}
-            </TeamInfo>
-          </TeamDetails>
-        </TeamWrapper>
+        <>
+          <TeamWrapper>
+            <TeamDetails>
+              <TeamIcon src={icon} />
+              <TeamInfo>
+                <TeamName>{getTeamTitle(team)}</TeamName>
+                {areMembersAvailable && (
+                  <TeamMembers>{users.length} members</TeamMembers>
+                )}
+              </TeamInfo>
+            </TeamDetails>
+          </TeamWrapper>
+          {canPinTeam && (
+            <ToggleWrapper>
+              <Toggle
+                onChange={onPinTeam}
+                checked={pinned}
+              />
+            </ToggleWrapper>
+          )}
+        </>
       </Link>
       <AvatarsWrapper>
         {areMembersAvailable && (

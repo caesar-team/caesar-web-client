@@ -78,7 +78,6 @@ import {
 } from '@caesar/common/utils/cipherUtils';
 import { getServerErrorMessage } from '@caesar/common/utils/error';
 import { chunk } from '@caesar/common/utils/utils';
-import { createPermissionsFromLinks } from '@caesar/common/utils/createPermissionsFromLinks';
 import {
   ENTITY_TYPE,
   COMMON_PROGRESS_NOTIFICATION,
@@ -101,6 +100,7 @@ import { passwordGenerator } from '@caesar/common/utils/passwordGenerator';
 import { generateKeys } from '@caesar/common/utils/key';
 import { addSystemItemsBatch } from '@caesar/common/actions/entities/system';
 import { memberSelector } from '../../selectors/entities/member';
+import { convertItemsToEntities } from '../../normalizers/normalizers';
 
 const ITEMS_CHUNK_SIZE = 50;
 
@@ -427,12 +427,12 @@ export function* saveItemSaga({ item, publicKey }) {
   const itemData = {
     ...item,
     ...serverItemData,
-    teamId: item.teamId || TEAM_TYPE.PERSONAL,
-    _permissions: createPermissionsFromLinks(serverItemData._links) || {},
     secret,
   };
+  const { itemsById } = convertItemsToEntities([itemData]);
+  const normalizedItem = Object.values(itemsById).shift();
 
-  return itemData;
+  return normalizedItem;
 }
 
 export function* getKeyPairForTeam(teamId) {
@@ -584,17 +584,9 @@ export function* createItemSaga({
       yield put(updateGlobalNotification(CREATING_ITEM_NOTIFICATION, true));
     }
 
-    const itemFromServer = yield call(saveItemSaga, { item, publicKey });
-
-    // TODO: Make the class of the item instead of the direct object
-    const newItem = {
-      ...item,
-      ...itemFromServer,
-      _permissions: createPermissionsFromLinks(itemFromServer._links),
-    };
-
+    const savedItem = yield call(saveItemSaga, { item, publicKey });
     if (!isSystemItem) {
-      yield put(createItemSuccess(newItem));
+      yield put(createItemSuccess(savedItem));
     }
 
     const currentTeamId = yield select(currentTeamIdSelector);
@@ -604,7 +596,7 @@ export function* createItemSaga({
         (!teamId && currentTeamId === TEAM_TYPE.PERSONAL)) &&
       !isSystemItem
     ) {
-      yield put(addItemToList(newItem));
+      yield put(addItemToList(savedItem));
     }
 
     yield put(setCurrentTeamId(teamId || TEAM_TYPE.PERSONAL));
@@ -612,17 +604,17 @@ export function* createItemSaga({
     if (isSystemItem) {
       yield put(
         addSystemItemsBatch({
-          [newItem.id]: newItem,
+          [savedItem.id]: savedItem,
         }),
       );
-      if (!newItem.relatedItemId) {
-        yield put(addTeamKeyPair(newItem));
+      if (!savedItem.relatedItemId) {
+        yield put(addTeamKeyPair(savedItem));
       } else {
-        yield put(addShareKeyPair(newItem));
+        yield put(addShareKeyPair(savedItem));
       }
     } else {
       yield put(setWorkInProgressListId(listId));
-      yield put(setWorkInProgressItem(newItem));
+      yield put(setWorkInProgressItem(savedItem));
       yield call(Router.push, ROUTES.DASHBOARD);
     }
   } catch (error) {

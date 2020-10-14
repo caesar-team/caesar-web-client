@@ -173,11 +173,11 @@ const MenuListInnerComponent = ({
   ];
 
   const nestedListsLabels = nestedLists.map(({ label }) => label.toLowerCase());
-  const { _permissions } = currentTeam;
+  const { _permissions } = currentTeam || {};
   const listPermission = {
     ..._permissions,
     __typename:
-      currentTeam.id === TEAM_TYPE.PERSONAL
+      (currentTeam?.id || TEAM_TYPE.PERSONAL) === TEAM_TYPE.PERSONAL
         ? PERMISSION_ENTITY.LIST
         : PERMISSION_ENTITY.TEAM_LIST,
   };

@@ -20,6 +20,9 @@ export const ability = defineAbility({ subjectName }, can => {
   can([PERMISSION.DELETE, PERMISSION.CRUD], PERMISSION_ENTITY.TEAM, {
     team_delete: true,
   });
+  can(PERMISSION.PIN, PERMISSION_ENTITY.TEAM, {
+    team_pinned: true,
+  });
   can(PERMISSION.LEAVE, PERMISSION_ENTITY.TEAM, {
     team_leave: true,
   });

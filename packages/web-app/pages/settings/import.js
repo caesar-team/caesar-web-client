@@ -9,15 +9,11 @@ import {
 } from '@caesar/components';
 import { ImportContainer } from '@caesar/containers';
 import { userDataSelector } from '@caesar/common/selectors/user';
-import {
-  fetchUserSelfRequest,
-  fetchUserTeamsRequest,
-} from '@caesar/common/actions/user';
+import { initImportSettings } from '@caesar/common/actions/workflow';
 
 class SettingsImportPage extends Component {
   componentDidMount() {
-    this.props.fetchUserSelfRequest();
-    this.props.fetchUserTeamsRequest();
+    this.props.initImportSettings();
   }
 
   render() {
@@ -47,8 +43,7 @@ const mapStateToProps = createStructuredSelector({
 });
 
 const mapDispatchToProps = {
-  fetchUserSelfRequest,
-  fetchUserTeamsRequest,
+  initImportSettings,
 };
 
 export default connect(

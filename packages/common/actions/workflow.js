@@ -1,6 +1,9 @@
 export const INIT_WORKFLOW = '@workflow/INIT_WORKFLOW';
 export const INIT_TEAMS = '@workflow/INIT_TEAMS';
-export const INIT_SETTINGS = '@workflow/INIT_SETTINGS';
+export const INIT_USERS_SETTINGS = '@workflow/INIT_USERS_SETTINGS';
+export const INIT_TEAMS_SETTINGS = '@workflow/INIT_TEAMS_SETTINGS';
+export const INIT_TEAM_SETTINGS = '@workflow/INIT_TEAM_SETTINGS';
+export const INIT_IMPORT_SETTINGS = '@workflow/INIT_IMPORT_SETTINGS';
 export const INIT_CREATE_PAGE = '@workflow/INIT_CREATE_PAGE';
 export const INIT_DASHBOARD = '@workflow/INIT_DASHBOARD';
 export const FINISH_PROCESSING_KEYPAIRS =
@@ -46,8 +49,20 @@ export const initTeams = () => ({
   type: INIT_TEAMS,
 });
 
-export const initSettings = () => ({
-  type: INIT_SETTINGS,
+export const initUsersSettings = () => ({
+  type: INIT_USERS_SETTINGS,
+});
+
+export const initTeamsSettings = () => ({
+  type: INIT_TEAMS_SETTINGS,
+});
+
+export const initTeamSettings = () => ({
+  type: INIT_TEAM_SETTINGS,
+});
+
+export const initImportSettings = () => ({
+  type: INIT_IMPORT_SETTINGS,
 });
 
 export const initDashboard = () => ({

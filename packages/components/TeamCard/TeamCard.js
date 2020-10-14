@@ -121,19 +121,14 @@ const TeamCard = ({
   const { id, icon, users, pinned } = team;
   const areMembersAvailable = users && users.length > 0;
 
-  const teamSubject = {
-    __typename: PERMISSION_ENTITY.TEAM,
-    team_edit: team?._permissions?.team_edit || false,
-    team_delete: team?._permissions?.team_delete || false,
-    team_leave: team?._permissions?.team_leave || false,
-    team_pinned: team?._permissions?.team_pinned || false,
-  };
-  const canEditTeam = ability.can(PERMISSION.EDIT, teamSubject);
-  const canRemoveTeam = ability.can(PERMISSION.DELETE, teamSubject);
-  const canPinTeam = ability.can(PERMISSION.PIN, teamSubject);
-  const canLeaveTeam = ability.can(PERMISSION.LEAVE, teamSubject);
+  const { _permissions } = team;
+
+  const canEditTeam = ability.can(PERMISSION.EDIT, _permissions);
+  const canRemoveTeam = ability.can(PERMISSION.DELETE, _permissions);
+  const canLeaveTeam = ability.can(PERMISSION.LEAVE, _permissions);
+  const canPinTeam = ability.can(PERMISSION.PIN, _permissions);
   const shouldShowMenu = canLeaveTeam || canEditTeam || canRemoveTeam;
-  
+
   return (
     <Wrapper className={className} onClick={onClick}>
       {shouldShowMenu && (

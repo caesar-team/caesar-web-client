@@ -213,6 +213,7 @@ export const PERMISSION = {
   RESTORE: 'restore',
   MULTISELECT: 'multiselect',
   CRUD: 'crud',
+  LEAVE: 'leave',
 };
 
 export const PERMISSION_ENTITY = {
@@ -230,7 +231,7 @@ export const PERMISSION_WRITE = 'write';
 export const USER_ROLE_ADMIN = 'admin';
 export const USER_ROLE_MEMBER = 'member';
 
-export const COMMANDS_ROLES = {
+export const TEAM_ROLES = {
   USER_ROLE_ADMIN,
   USER_ROLE_MEMBER,
 };

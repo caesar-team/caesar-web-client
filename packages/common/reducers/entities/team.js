@@ -30,6 +30,7 @@ import {
   CREATE_TEAM_KEYS_SUCCESS,
   CREATE_TEAM_KEYS_FAILURE,
   UPDATE_TEAM_MEMBERS_WITH_ROLES,
+  RESET_TEAM_STATE,
 } from '@caesar/common/actions/entities/team';
 import { KEY_TYPE } from '../../constants';
 
@@ -182,6 +183,15 @@ export default createReducer(initialState, {
     return state;
   },
   [ADD_TEAM_MEMBERS_BATCH_SUCCESS](state, { payload }) {
+    const {
+      members: membersById = {
+        membersById: {},
+      },
+    } = payload;
+    const members = Object.values(membersById);
+
+    if (members.length <= 0) return state;
+
     return {
       ...state,
       byId: {
@@ -190,7 +200,7 @@ export default createReducer(initialState, {
           ...state.byId[payload.teamId],
           users: [
             ...state.byId[payload.teamId].users,
-            ...payload.members.map(({ id, role, _permissions }) => ({
+            ...members.map(({ id, role, _permissions }) => ({
               id,
               role,
               _permissions,
@@ -262,5 +272,8 @@ export default createReducer(initialState, {
         },
       },
     };
+  },
+  [RESET_TEAM_STATE]() {
+    return initialState;
   },
 });

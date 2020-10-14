@@ -55,11 +55,11 @@ export const Credentials = ({ formik }) => {
       </Row>
       <PasswordRow marginBottom={32}>
         <Password
-          name="pass"
+          name="password"
           label="Password"
           autoComplete="new-password"
-          value={values.pass}
-          error={checkError(touched, errors, 'pass')}
+          value={values.password}
+          error={checkError(touched, errors, 'password')}
           onChange={handleChange}
           onBlur={handleBlur}
           withBorder

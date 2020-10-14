@@ -32,6 +32,7 @@ class TeamListContainer extends Component {
   componentDidMount() {
     this.props.fetchTeamsRequest();
     this.props.fetchMembersRequest();
+    this.props.initWorkflow();
   }
 
   handleCreateSubmit = ({ title, icon, setSubmitting, setErrors }) => {
@@ -156,7 +157,7 @@ class TeamListContainer extends Component {
   }
 
   renderTeamCards() {
-    const { teams, members, user } = this.props;
+    const { teams, members } = this.props;
 
     if (!teams.length) {
       return <div>No teams</div>;
@@ -165,7 +166,6 @@ class TeamListContainer extends Component {
     return teams.map(team => (
       <StyledTeamCard
         key={team.id}
-        userId={user.id}
         team={team}
         members={members}
         onClickEditTeam={this.handleClickEditTeam(team.id)}
@@ -183,8 +183,7 @@ class TeamListContainer extends Component {
 
     const teamSubject = {
       __typename: PERMISSION_ENTITY.TEAM,
-      // eslint-disable-next-line camelcase
-      team_create: this.props.user?._permissions?.team_create || false,
+      ...this.props.user?._permissions,
     };
 
     return (

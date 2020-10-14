@@ -25,7 +25,7 @@ export const CreateForm = () => {
     {
       name = null,
       note = null,
-      pass = null,
+      password = null,
       website = null,
       login = null,
       attachments: uploadedFiles = null,
@@ -37,7 +37,7 @@ export const CreateForm = () => {
     const data = {
       name,
       note,
-      pass,
+      password,
       website,
       login,
       attachments,

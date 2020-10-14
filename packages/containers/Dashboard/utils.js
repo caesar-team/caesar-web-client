@@ -10,7 +10,7 @@ export const initialCredentials = listId => ({
   data: {
     name: '',
     login: '',
-    pass: '',
+    password: '',
     website: '',
     note: '',
     attachments: [],

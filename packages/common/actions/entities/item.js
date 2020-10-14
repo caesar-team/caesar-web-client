@@ -71,6 +71,8 @@ export const REMOVE_ITEMS_BATCH = '@item/REMOVE_ITEMS_BATCH';
 
 export const REMOVE_ITEMS_DATA = '@item/REMOVE_ITEMS_DATA';
 
+export const RESET_ITEM_STATE = '@item/RESET_ITEM_STATE';
+
 export const removeItemRequest = (itemId, listId) => ({
   type: REMOVE_ITEM_REQUEST,
   payload: {
@@ -414,4 +416,8 @@ export const removeShareSuccess = (itemId, shareId) => ({
 
 export const removeShareFailure = () => ({
   type: REMOVE_SHARE_FAILURE,
+});
+
+export const resetItemState = () => ({
+  type: RESET_ITEM_STATE,
 });

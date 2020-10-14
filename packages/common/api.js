@@ -102,6 +102,7 @@ export const postCreateItemsBatch = data => callApi.post('/items/batch', data);
 
 export const removeItem = itemId => callApi.delete(`/items/${itemId}`);
 
+// TODO: Refactor: use body instead of query (change together with backend)
 export const removeItemsBatch = query =>
   callApi.delete(`/items/batch?${query}`);
 
@@ -188,9 +189,24 @@ export const updateTeamMember = ({ teamId, userId, role }) =>
 export const deleteTeamMember = ({ teamId, userId }) =>
   callApi.delete(`/teams/${teamId}/members/${userId}`);
 
-export const postAddTeamMember = ({ teamId, userId, role }) =>
+export const postAddTeamMember = ({ teamId, userId, role, secret }) =>
   callApi.post(`/teams/${teamId}/members/${userId}`, {
     userRole: role,
+    secret,
+  });
+
+/*
+"members": [
+    {
+      "userRole": "member",
+      "secret": "string",
+      "userId": "string"
+    }
+  ]
+*/
+export const postAddTeamMemberBatch = ({ teamId, members }) =>
+  callApi.post(`/teams/${teamId}/members/batch`, {
+    members,
   });
 
 export const getTeamLists = teamId => callApi.get(`/teams/${teamId}/lists`);
@@ -210,7 +226,7 @@ let getSearchUserSource;
 export const getSearchUser = email => {
   if (getSearchUserSource) getSearchUserSource();
 
-  return callApi.get(`/users/search/`, {
+  return callApi.get(`/users/search`, {
     params: { email },
     cancelToken: new CancelToken(function executor(c) {
       // An executor function receives a cancel function as a parameter

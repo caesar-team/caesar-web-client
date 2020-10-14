@@ -25,7 +25,7 @@ const CredentialsComponent = ({
   isSharedItem,
   isVisibleDragZone,
 }) => {
-  const { name, login, pass, website, note, attachments, raws } = item.data;
+  const { name, login, password, website, note, attachments, raws } = item.data;
 
   return (
     <>
@@ -55,7 +55,7 @@ const CredentialsComponent = ({
       </Row>
       <PasswordRow>
         <Password
-          value={pass}
+          value={password}
           itemSubject={itemSubject}
           schema={SCHEMA.REQUIRED_LIMITED_STRING()}
           onClickAcceptEdit={onClickAcceptEdit}

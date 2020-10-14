@@ -103,7 +103,6 @@ const getMembers = memoizeOne((users, members) =>
 
 const TeamCard = ({
   className,
-  userId,
   team,
   members,
   onClick = Function.prototype,
@@ -114,16 +113,13 @@ const TeamCard = ({
   const { id, icon, users } = team;
   const areMembersAvailable = users && users.length > 0;
 
-  const teamSubject = {
-    __typename: PERMISSION_ENTITY.TEAM,
-    team_edit: team?._permissions?.team_edit || false,
-    team_delete: team?._permissions?.team_delete || false,
-  };
-  const isCurrentUserTeamMember = !!users.find(({ id }) => id === userId); 
-  const canEditTeam = ability.can(PERMISSION.EDIT, teamSubject);
-  const canRemoveTeam = ability.can(PERMISSION.DELETE, teamSubject);
-  const shouldShowMenu = isCurrentUserTeamMember || canEditTeam || canRemoveTeam;
-  
+  const { _permissions } = team;
+
+  const canEditTeam = ability.can(PERMISSION.EDIT, _permissions);
+  const canRemoveTeam = ability.can(PERMISSION.DELETE, _permissions);
+  const canLeaveTeam = ability.can(PERMISSION.LEAVE, _permissions);
+  const shouldShowMenu = canLeaveTeam || canEditTeam || canRemoveTeam;
+
   return (
     <Wrapper className={className} onClick={onClick}>
       {shouldShowMenu && (
@@ -143,7 +139,7 @@ const TeamCard = ({
                 Edit
               </MenuButton>
             )}
-            {isCurrentUserTeamMember && (
+            {canLeaveTeam && (
               <MenuButton color="white" onClick={onClickLeaveTeam}>
                 Leave
               </MenuButton>

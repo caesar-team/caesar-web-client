@@ -1,5 +1,9 @@
 export const INIT_WORKFLOW = '@workflow/INIT_WORKFLOW';
+export const INIT_TEAMS = '@workflow/INIT_TEAMS';
 export const INIT_SETTINGS = '@workflow/INIT_SETTINGS';
+export const INIT_DASHBOARD = '@workflow/INIT_DASHBOARD';
+export const FINISH_PROCESSING_KEYPAIRS =
+  '@workflow/FINISH_PROCESSING_KEYPAIRS';
 
 export const FINISH_IS_LOADING = '@workflow/FINISH_IS_LOADING';
 export const VAULTS_ARE_READY = '@workflow/VAULTS_ARE_READY';
@@ -16,7 +20,7 @@ export const SET_WORK_IN_PROGRESS_LIST_ID =
 
 export const RESET_WORK_IN_PROGRESS_ITEM_IDS =
   '@workflow/RESET_WORK_IN_PROGRESS_ITEM_IDS';
-export const RESET_WORKFLOW_STORE = '@workflow/RESET_WORKFLOW_STORE';
+export const RESET_WORKFLOW_STATE = '@workflow/RESET_WORKFLOW_STATE';
 
 export const DECRYPTION = '@workflow/DECRYPTION';
 export const DECRYPTION_END = '@workflow/DECRYPTION_END';
@@ -24,6 +28,7 @@ export const ENCRYPTION = '@workflow/ENCRYPTION';
 export const ENCRYPTION_END = '@workflow/ENCRYPTION_END';
 
 export const OPEN_VAULT = '@workflow/OPEN_VAULT';
+export const OPEN_CURRENT_VAULT = '@workflow/OPEN_CURRENT_VAULT';
 
 export const initWorkflow = (withDecryption = true) => ({
   type: INIT_WORKFLOW,
@@ -32,8 +37,20 @@ export const initWorkflow = (withDecryption = true) => ({
   },
 });
 
+export const initTeams = () => ({
+  type: INIT_TEAMS,
+});
+
 export const initSettings = () => ({
   type: INIT_SETTINGS,
+});
+
+export const initDashboard = () => ({
+  type: INIT_DASHBOARD,
+});
+
+export const finishProcessingKeyPairs = () => ({
+  type: FINISH_PROCESSING_KEYPAIRS,
 });
 
 export const openVault = teamId => ({
@@ -41,6 +58,10 @@ export const openVault = teamId => ({
   payload: {
     teamId,
   },
+});
+
+export const openCurrentVault = () => ({
+  type: OPEN_CURRENT_VAULT,
 });
 
 export const finishIsLoading = () => ({
@@ -90,8 +111,8 @@ export const resetWorkInProgressItemIds = () => ({
   type: RESET_WORK_IN_PROGRESS_ITEM_IDS,
 });
 
-export const resetWorkflowStore = () => ({
-  type: RESET_WORKFLOW_STORE,
+export const resetWorkflowState = () => ({
+  type: RESET_WORKFLOW_STATE,
 });
 
 export const decryption = ({ items, raws, key, masterPassword }) => ({

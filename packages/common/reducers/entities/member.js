@@ -19,6 +19,7 @@ import {
   ADD_TEAM_TO_MEMBERS_TEAMS_LIST_BATCH,
   LEAVE_TEAM_SUCCESS,
   LEAVE_TEAM_FAILURE,
+  RESET_MEMBER_STATE,
 } from '@caesar/common/actions/entities/member';
 
 const initialState = {
@@ -176,5 +177,8 @@ export default createReducer(initialState, {
   },
   [LEAVE_TEAM_FAILURE](state) {
     return { ...state, isError: true };
+  },
+  [RESET_MEMBER_STATE]() {
+    return initialState;
   },
 });

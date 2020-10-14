@@ -11,6 +11,7 @@ import {
   REMOVE_ANONYMOUS_KEY_PAIR,
   ADD_TEAM_KEY_PAIR_BATCH,
   ADD_SHARE_KEY_PAIR_BATCH,
+  RESET_KEYSTORE_STATE,
 } from '@caesar/common/actions/keystore';
 
 import { arrayToObject } from '../utils/utils';
@@ -102,7 +103,7 @@ export default createReducer(initialState, {
   [ADD_TEAM_KEY_PAIR](state, { payload }) {
     const {
       id,
-      data: { name, pass, raws = {} },
+      data: { name, password, raws = {} },
     } = payload.data;
     const { publicKey, privateKey } = raws || {};
     // TODO: Get teamId and make it as a key
@@ -114,7 +115,7 @@ export default createReducer(initialState, {
         [id]: {
           id,
           name,
-          pass,
+          password,
           publicKey,
           privateKey,
         },
@@ -124,7 +125,7 @@ export default createReducer(initialState, {
   [ADD_SHARE_KEY_PAIR](state, { payload }) {
     const {
       id,
-      data: { name, pass, raws = {} } = { raws: {} },
+      data: { name, password, raws = {} } = { raws: {} },
       relatedItemId,
     } = payload.data;
     const itemId = relatedItemId || null;
@@ -139,7 +140,7 @@ export default createReducer(initialState, {
         [itemId]: {
           id,
           name,
-          pass,
+          password,
           publicKey,
           privateKey,
         },
@@ -149,7 +150,7 @@ export default createReducer(initialState, {
   [ADD_ANONYMOUS_KEY_PAIR](state, { payload }) {
     const {
       id,
-      data: { name, pass, raws = {} } = { raws: {} },
+      data: { name, password, raws = {} } = { raws: {} },
       relatedItemId,
     } = payload.data;
     const itemId = relatedItemId || null;
@@ -164,7 +165,7 @@ export default createReducer(initialState, {
         [itemId]: {
           id,
           name,
-          pass,
+          password,
           publicKey,
           privateKey,
         },
@@ -203,5 +204,8 @@ export default createReducer(initialState, {
       ...state,
       [KEY_TYPE.ANONYMOUS]: newState,
     };
+  },
+  [RESET_KEYSTORE_STATE]() {
+    return initialState;
   },
 });

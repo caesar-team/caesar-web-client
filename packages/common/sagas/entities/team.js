@@ -52,6 +52,7 @@ import {
   postAddTeamMemberBatch,
   pinTeam,
 } from '@caesar/common/api';
+import { fetchMembersSaga } from '@caesar/common/sagas/entities/member';
 import {
   getServerErrorMessage,
   getServerErrors,
@@ -312,6 +313,9 @@ export function* createTeamSaga({
 
     const owner = yield select(memberSelector, { memberId: userId });
     const { publicKey } = owner;
+
+    // Get updates
+    yield call(fetchMembersSaga);
 
     const adminMembers = yield select(memberAdminsSelector);
     // Gathering admins except current

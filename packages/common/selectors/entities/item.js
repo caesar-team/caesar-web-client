@@ -31,7 +31,7 @@ const itemIdsPropSelector = (_, props) => props.itemIds;
 export const itemsBatchSelector = createSelector(
   itemsByIdSelector,
   itemIdsPropSelector,
-  (itemsById, itemIds) => itemIds.map(itemId => itemsById[itemId] || {}),
+  (itemsById, itemIds = []) => itemIds.map(itemId => itemsById[itemId] || {}),
 );
 
 const teamIdPropSelector = (_, prop) => prop.teamId;
@@ -76,7 +76,7 @@ export const teamItemListSelector = createSelector(
   (itemList, teamId) => itemList.filter(item => item.teamId === teamId),
 );
 
-export const visibleItemsSelector = createSelector(
+export const generalItemsSelector = createSelector(
   itemsBatchSelector,
   items => items.filter(isGeneralItem) || [],
 );

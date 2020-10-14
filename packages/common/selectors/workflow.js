@@ -92,13 +92,13 @@ export const workInProgressItemsSelector = createSelector(
 
 const createListItemsList = (children, itemsById) =>
   children
-    .reduce(
-      (accumulator, itemId) =>
-        itemsById[itemId]?.data && isGeneralItem(itemsById[itemId])
-          ? [...accumulator, itemsById[itemId]]
-          : accumulator,
-      [],
-    )
+    .reduce((accumulator, itemId) => {
+      const item = itemsById[itemId];
+
+      return item?.data && isGeneralItem(item)
+        ? [...accumulator, item]
+        : accumulator;
+    }, [])
     .sort((a, b) => sortByDate(a.lastUpdated, b.lastUpdated, 'DESC')) || [];
 
 export const visibleListItemsSelector = createSelector(

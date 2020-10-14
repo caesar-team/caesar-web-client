@@ -107,7 +107,7 @@ const ItemComponent = ({
     dispatch(setWorkInProgressItem(null));
   };
 
-  const { _permissions } = item;
+  const { _permissions } = item || {};
 
   return (
     <Wrapper isDisabled={isSubmitting}>

@@ -173,7 +173,7 @@ const MenuListInnerComponent = ({
   ];
 
   const nestedListsLabels = nestedLists.map(({ label }) => label.toLowerCase());
-  const { _permissions } = currentTeam;
+  const { _permissions } = currentTeam || {};
   const listPermission = {
     ..._permissions,
     __typename:

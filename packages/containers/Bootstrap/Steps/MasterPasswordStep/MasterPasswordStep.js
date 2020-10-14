@@ -1,9 +1,7 @@
 import React, { useState, memo } from 'react';
 import { useEffectOnce, useUpdateEffect } from 'react-use';
 import styled from 'styled-components';
-import copy from 'copy-text-to-clipboard';
 import { getKeys, postKeys } from '@caesar/common/api';
-import { useNotification } from '@caesar/common/hooks';
 import { matchStrict } from '@caesar/common/utils/match';
 import {
   validateKeys,
@@ -41,7 +39,6 @@ const MasterPasswordStepComponent = ({
   sharedMasterPassword,
   onFinish,
 }) => {
-  const notification = useNotification();
   const [state, setState] = useState({
     step: null,
     publicKey: null,
@@ -139,11 +136,6 @@ const MasterPasswordStepComponent = ({
   }, [state.step]);
 
   const handleSubmitCreatePassword = ({ password }) => {
-    copy(password);
-    notification.show({
-      text: 'Master Password has been copied to clipboard!',
-    });
-
     setState({
       ...state,
       masterPassword: password,

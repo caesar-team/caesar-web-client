@@ -28,7 +28,7 @@ import {
   removeTeamMemberFailure,
   addTeamsBatch,
   togglePinTeamSuccess,
-  togglePinTeamFailure,  
+  togglePinTeamFailure,
 } from '@caesar/common/actions/entities/team';
 import {
   removeTeamFromMember,
@@ -451,7 +451,9 @@ export function* removeTeamMemberSaga({ payload: { teamId, userId } }) {
 
 export function* togglePinTeamSaga({ payload: { teamId, shouldPinned } }) {
   try {
-    const { data: { pinned } } = yield call(pinTeam, teamId, shouldPinned);
+    const {
+      data: { pinned },
+    } = yield call(pinTeam, teamId, shouldPinned);
 
     yield put(togglePinTeamSuccess(teamId, pinned));
   } catch (error) {

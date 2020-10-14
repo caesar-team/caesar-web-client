@@ -147,7 +147,7 @@ export const ListItem = ({
 
   const isAcceptDisabled = !value || value === label || isListAlreadyExists;
 
-  const { _permissions } = list;
+  const { _permissions } = list || {};
 
   const renderInner = dragHandleProps => (
     <>

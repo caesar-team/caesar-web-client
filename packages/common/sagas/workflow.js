@@ -23,6 +23,7 @@ import {
   INIT_DASHBOARD,
   finishProcessingKeyPairs,
   FINISH_PROCESSING_KEYPAIRS,
+  INIT_CREATE_PAGE,
 } from '@caesar/common/actions/workflow';
 import { addListsBatch } from '@caesar/common/actions/entities/list';
 import {
@@ -242,7 +243,7 @@ export function* openCurrentVaultSaga() {
   yield put(setCurrentTeamId(currentTeamId || TEAM_TYPE.PERSONAL));
 }
 
-function* initTeams() {
+function* initTeamsSaga() {
   try {
     // Load avaible teams
     // const { data: teams } = yield call(getUserTeams);
@@ -282,7 +283,7 @@ export function* processKeyPairsSaga({ payload: { itemsById } }) {
       keyPairs.forEach(keyPair => {
         if (!keyPair.data?.name) return null;
 
-        return keyPair.teamId !== null
+        return keyPair.relatedItemId === null && keyPair.teamId !== null
           ? teamKeys.push(keyPair)
           : shareKeys.push(keyPair);
       });
@@ -406,7 +407,7 @@ function* initListsAndProgressEntities() {
 export function* initWorkflow() {
   // Wait for the user data
   yield take(FETCH_USER_SELF_SUCCESS);
-  yield fork(initTeams);
+  yield fork(initTeamsSaga);
   yield fork(fetchMembersSaga);
   yield call(loadKeyPairsAndPersonalItems);
 }
@@ -527,7 +528,16 @@ function setWorkInProgressItemSaga({ payload: { item } }) {
   }
 }
 
-function* initSettings() {
+function* initSettingsSaga() {
+  try {
+    yield call(initWorkflow);
+  } catch (error) {
+    // eslint-disable-next-line no-console
+    console.error('error: ', error);
+  }
+}
+
+function* initCreatePageSaga() {
   try {
     yield call(initWorkflow);
   } catch (error) {
@@ -553,8 +563,10 @@ function* vaultsReadySaga() {
 export default function* workflowSagas() {
   // Init (get all items, keys, etc)
   yield takeLatest(INIT_WORKFLOW, initWorkflow);
-  yield takeLatest(INIT_TEAMS, initTeams);
-  yield takeLatest(INIT_SETTINGS, initSettings);
+  yield takeLatest(INIT_TEAMS, initTeamsSaga);
+  yield takeLatest(INIT_SETTINGS, initSettingsSaga);
+  yield takeLatest(INIT_CREATE_PAGE, initCreatePageSaga);
+
   yield takeLatest(SET_WORK_IN_PROGRESS_ITEM, setWorkInProgressItemSaga);
   yield takeLatest(UPDATE_WORK_IN_PROGRESS_ITEM, updateWorkInProgressItemSaga);
   yield takeLatest(SET_CURRENT_TEAM_ID, openTeamVaultSaga);

@@ -98,7 +98,7 @@ const ItemHeaderComponent = ({
   };
 
   // TODO: Refactor the duplicated code
-  const { _permissions } = item;
+  const { _permissions } = item || {};
 
   return (
     <ColumnHeader>

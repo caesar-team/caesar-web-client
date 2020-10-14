@@ -102,6 +102,7 @@ export const postCreateItemsBatch = data => callApi.post('/items/batch', data);
 
 export const removeItem = itemId => callApi.delete(`/items/${itemId}`);
 
+// TODO: Refactor: use body instead of query (change together with backend)
 export const removeItemsBatch = query =>
   callApi.delete(`/items/batch?${query}`);
 

@@ -47,6 +47,7 @@ import {
   REMOVE_ITEMS_BATCH,
   REMOVE_ITEMS_DATA,
   UPDATE_ITEM_FIELD,
+  RESET_ITEM_STATE,
 } from '@caesar/common/actions/entities/item';
 
 const initialState = {
@@ -363,5 +364,8 @@ export default createReducer(initialState, {
         },
       },
     };
+  },
+  [RESET_ITEM_STATE]() {
+    return initialState;
   },
 });

@@ -110,7 +110,7 @@ class Bootstrap extends Component {
   };
 
   handleInactiveTimeout = () => {
-    this.props.resetWorkflowStore();
+    this.props.resetWorkflowState();
     this.props.removeItemsData();
 
     this.setState({

@@ -11,6 +11,7 @@ import {
   REMOVE_ANONYMOUS_KEY_PAIR,
   ADD_TEAM_KEY_PAIR_BATCH,
   ADD_SHARE_KEY_PAIR_BATCH,
+  RESET_KEYSTORE_STATE,
 } from '@caesar/common/actions/keystore';
 
 import { arrayToObject } from '../utils/utils';
@@ -203,5 +204,8 @@ export default createReducer(initialState, {
       ...state,
       [KEY_TYPE.ANONYMOUS]: newState,
     };
+  },
+  [RESET_KEYSTORE_STATE]() {
+    return initialState;
   },
 });

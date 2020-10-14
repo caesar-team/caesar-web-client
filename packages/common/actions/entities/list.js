@@ -29,6 +29,8 @@ export const REMOVE_ITEMS_BATCH_FROM_LIST =
 
 export const CLEAR_SERVER_ERRORS = '@list/CLEAR_SERVER_ERRORS';
 
+export const RESET_LIST_STATE = '@list/RESET_LIST_STATE';
+
 export const createListRequest = (list, meta) => ({
   type: CREATE_LIST_REQUEST,
   payload: {
@@ -165,4 +167,8 @@ export const removeItemsBatchFromList = (itemIds, listId) => ({
 
 export const clearServerErrors = () => ({
   type: CLEAR_SERVER_ERRORS,
+});
+
+export const resetListState = () => ({
+  type: RESET_LIST_STATE,
 });

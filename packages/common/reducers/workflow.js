@@ -11,6 +11,7 @@ import {
   OPEN_CURRENT_VAULT,
   INIT_DASHBOARD,
   FINISH_PROCESSING_KEYPAIRS,
+  INIT_CREATE_PAGE,
 } from '@caesar/common/actions/workflow';
 
 const initialState = {
@@ -39,6 +40,9 @@ export default createReducer(initialState, {
     return state;
   },
   [INIT_DASHBOARD](state) {
+    return state;
+  },
+  [INIT_CREATE_PAGE](state) {
     return state;
   },
   [FINISH_PROCESSING_KEYPAIRS](state) {

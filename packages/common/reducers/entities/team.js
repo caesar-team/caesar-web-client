@@ -30,6 +30,7 @@ import {
   CREATE_TEAM_KEYS_SUCCESS,
   CREATE_TEAM_KEYS_FAILURE,
   UPDATE_TEAM_MEMBERS_WITH_ROLES,
+  TOGGLE_PIN_TEAM_SUCCESS,
   RESET_TEAM_STATE,
 } from '@caesar/common/actions/entities/team';
 import { KEY_TYPE } from '../../constants';
@@ -275,5 +276,17 @@ export default createReducer(initialState, {
   },
   [RESET_TEAM_STATE]() {
     return initialState;
+  },
+  [TOGGLE_PIN_TEAM_SUCCESS](state, { payload }) {
+    return {
+      ...state,
+      byId: {
+        ...state.byId,
+        [payload.teamId]: {
+          ...state.byId[payload.teamId],
+          pinned: payload.pinned,
+        },
+      },
+    };
   },
 });

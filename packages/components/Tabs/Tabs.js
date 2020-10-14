@@ -12,9 +12,7 @@ const TabsWrapper = styled.ul`
 const PanelWrapper = styled.div`
   display: flex;
   width: 100%;
-  padding: 30px;
-  border-radius: ${({ theme }) => theme.borderRadius};
-  background: ${({ theme }) => theme.color.white};
+  padding: 30px 0;
 `;
 
 export class Tabs extends Component {

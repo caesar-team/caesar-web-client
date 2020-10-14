@@ -213,6 +213,7 @@ export const PERMISSION = {
   RESTORE: 'restore',
   MULTISELECT: 'multiselect',
   CRUD: 'crud',
+  PIN: 'pin',
   LEAVE: 'leave',
 };
 

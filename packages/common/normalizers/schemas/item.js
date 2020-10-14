@@ -15,9 +15,9 @@ const itemSchema = new schema.Entity(
       _permissions: {
         ...createPermissionsFromLinks(entity._links),
         __typename:
-          entity.teamId !== TEAM_TYPE.PERSONAL
-            ? PERMISSION_ENTITY.TEAM_ITEM
-            : PERMISSION_ENTITY.ITEM,
+          (entity.teamId || TEAM_TYPE.PERSONAL) === TEAM_TYPE.PERSONAL
+            ? PERMISSION_ENTITY.ITEM
+            : PERMISSION_ENTITY.TEAM_ITEM,
       },
       teamId: entity.teamId || parent.teamId || TEAM_TYPE.PERSONAL, // If item is personal, it does not have enough time to normalize list data. Need to set 'personal' teamId explicitly
       __type: ENTITY_TYPE.ITEM,

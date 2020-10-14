@@ -98,37 +98,19 @@ const ItemHeaderComponent = ({
   };
 
   // TODO: Refactor the duplicated code
-  const itemSubject =
-    item?.teamId === TEAM_TYPE.PERSONAL
-      ? {
-          __typename: PERMISSION_ENTITY.ITEM,
-          move_item: item?._permissions?.move_item || false,
-          batch_share_item: item?._permissions?.batch_share_item || false,
-          favorite_item_toggle:
-            item?._permissions?.favorite_item_toggle || false,
-          delete_item: item?._permissions?.delete_item || false,
-        }
-      : {
-          __typename: PERMISSION_ENTITY.TEAM_ITEM,
-          team_move_item: item?._permissions?.team_move_item || false,
-          team_batch_share_item:
-            item?._permissions?.team_batch_share_item || false,
-          team_favorite_item_toggle:
-            item?._permissions?.team_favorite_item_toggle || false,
-          team_delete_item: item?._permissions?.team_delete_item || false,
-        };
+  const { _permissions } = item;
 
   return (
     <ColumnHeader>
       {isTrashItem ? (
         <>
           <Empty />
-          <Can I={PERMISSION.RESTORE} an={itemSubject}>
+          <Can I={PERMISSION.RESTORE} an={_permissions}>
             <ActionButton color="white" onClick={onClickRestoreItem}>
               Restore
             </ActionButton>
           </Can>
-          <Can I={PERMISSION.DELETE} an={itemSubject}>
+          <Can I={PERMISSION.DELETE} an={_permissions}>
             <ActionButton
               icon="trash"
               color="white"
@@ -138,24 +120,24 @@ const ItemHeaderComponent = ({
         </>
       ) : (
         <>
-          <Can I={PERMISSION.MOVE} an={itemSubject}>
+          <Can I={PERMISSION.MOVE} an={_permissions}>
             <PathButton color="white" onClick={onClickMove}>
               <PathText>{teamTitle}</PathText>
               <Delimeter>|</Delimeter>
               <PathText>{listTitle}</PathText>
             </PathButton>
           </Can>
-          <Can not I={PERMISSION.MOVE} an={itemSubject}>
+          <Can not I={PERMISSION.MOVE} an={_permissions}>
             <PathWrapper>
               <PathText>{teamTitle}</PathText>
               <Delimeter>|</Delimeter>
               <PathText>{listTitle}</PathText>
             </PathWrapper>
           </Can>
-          <Can I={PERMISSION.SHARE} an={itemSubject}>
+          <Can I={PERMISSION.SHARE} an={_permissions}>
             <ActionButton icon="share" color="white" onClick={onClickShare} />
           </Can>
-          <Can I={PERMISSION.FAVORITE} an={itemSubject}>
+          <Can I={PERMISSION.FAVORITE} an={_permissions}>
             <ActionButton
               icon={item.favorite ? 'favorite-active' : 'favorite'}
               color="white"

@@ -172,19 +172,15 @@ const MenuListInnerComponent = ({
     },
   ];
 
-  const listSubject = isPersonal
-    ? {
-        __typename: PERMISSION_ENTITY.LIST,
-        // eslint-disable-next-line camelcase
-        create_list: currentTeam?._permissions?.create_list || false,
-      }
-    : {
-        __typename: PERMISSION_ENTITY.TEAM_LIST,
-        // eslint-disable-next-line camelcase
-        team_create_list: currentTeam?._permissions?.team_create_list || false,
-      };
-
   const nestedListsLabels = nestedLists.map(({ label }) => label.toLowerCase());
+  const { _permissions } = currentTeam;
+  const listPermission = {
+    ..._permissions,
+    __typename:
+      currentTeam.id === TEAM_TYPE.PERSONAL
+        ? PERMISSION_ENTITY.LIST
+        : PERMISSION_ENTITY.TEAM_LIST,
+  };
 
   return (
     <Scrollbar>
@@ -221,7 +217,7 @@ const MenuListInnerComponent = ({
                 </MenuItemTitle>
                 {withChildren && (
                   <>
-                    <Can I={PERMISSION.CREATE} a={listSubject}>
+                    <Can I={PERMISSION.CREATE} a={listPermission}>
                       <ListAddIcon
                         name="plus"
                         width={16}

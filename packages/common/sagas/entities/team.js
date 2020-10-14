@@ -28,7 +28,7 @@ import {
   removeTeamMemberFailure,
   addTeamsBatch,
   togglePinTeamSuccess,
-  togglePinTeamFailure,  
+  togglePinTeamFailure,
 } from '@caesar/common/actions/entities/team';
 import {
   removeTeamFromMember,
@@ -159,9 +159,7 @@ export function* createTeamKeyPairSaga({ payload: { team, publicKey } }) {
     }
 
     const teamKeyPair = yield call(generateTeamKeyPair, {
-      payload: {
-        name: team.title,
-      },
+      name: team.title,
     });
 
     const { id: listId } = yield select(teamDefaultListSelector, {
@@ -325,9 +323,7 @@ export function* createTeamSaga({
     };
 
     const teamKeyPair = yield call(generateTeamKeyPair, {
-      payload: {
-        name: title,
-      },
+      name: title,
     });
 
     if (!teamKeyPair) {
@@ -455,7 +451,9 @@ export function* removeTeamMemberSaga({ payload: { teamId, userId } }) {
 
 export function* togglePinTeamSaga({ payload: { teamId, shouldPinned } }) {
   try {
-    const { data: { pinned } } = yield call(pinTeam, teamId, shouldPinned);
+    const {
+      data: { pinned },
+    } = yield call(pinTeam, teamId, shouldPinned);
 
     yield put(togglePinTeamSuccess(teamId, pinned));
   } catch (error) {

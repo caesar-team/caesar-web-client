@@ -14,9 +14,13 @@ import {
   workInProgressListSelector,
   visibleListItemsSelector,
 } from '@caesar/common/selectors/workflow';
-import { itemsByIdSelector } from '@caesar/common/selectors/entities/item';
+import {
+  itemsByIdSelector,
+  generalItemsSelector,
+} from '@caesar/common/selectors/entities/item';
 import {
   trashListSelector,
+  favoritesListSelector,
   teamsTrashListsSelector,
   listsByIdSelector,
 } from '@caesar/common/selectors/entities/list';
@@ -45,6 +49,7 @@ const MiddleColumnComponent = ({
   const workInProgressItem = useSelector(workInProgressItemSelector);
   const visibleListItems = useSelector(visibleListItemsSelector);
   const trashList = useSelector(trashListSelector);
+  const favoritesList = useSelector(favoritesListSelector);
   const teamsTrashLists = useSelector(teamsTrashListsSelector);
   const itemsById = useSelector(itemsByIdSelector);
   const listsById = useSelector(listsByIdSelector);
@@ -52,6 +57,16 @@ const MiddleColumnComponent = ({
   const teamMembers = useSelector(state =>
     teamMembersSelector(state, { teamId: currentTeamId }),
   );
+  const isFavoriteList = workInProgressList?.id === LIST_TYPE.FAVORITES;
+  const generalItems = useSelector(state =>
+    generalItemsSelector(state, {
+      itemIds: isFavoriteList
+        ? favoritesList.children
+        : listsById[(workInProgressList?.id)]?.children,
+    }),
+  );
+  const itemsLengthInList = generalItems.length;
+  const visibleListItemsLength = visibleListItems.length;
 
   const isPersonalTeam = currentTeamId === TEAM_TYPE.PERSONAL;
   const isMultiItem = workInProgressItemIds?.length > 0;
@@ -65,26 +80,18 @@ const MiddleColumnComponent = ({
   const areAllItemsSelected =
     mode === DASHBOARD_MODE.SEARCH
       ? searchedItems.length === workInProgressItemIds.length
-      : visibleListItems.length === workInProgressItemIds.length;
+      : visibleListItemsLength === workInProgressItemIds.length;
   const ref = useRef(null);
 
   useEffect(() => {
-    const itemsLengthInList =
-      listsById[(workInProgressList?.id)]?.children.length;
-    const visibleListItemsLength = visibleListItems.length;
-
-    if (!itemsLengthInList) return;
-
-    if (itemsLengthInList && !visibleListItemsLength) {
+    if (itemsLengthInList !== visibleListItemsLength) {
       dispatch(updateGlobalNotification(DECRYPTING_ITEM_NOTIFICATION, true));
 
       return;
     }
 
-    if (itemsLengthInList && visibleListItemsLength) {
-      dispatch(updateGlobalNotification(NOOP_NOTIFICATION, false));
-    }
-  }, [listsById, workInProgressList, visibleListItems]);
+    dispatch(updateGlobalNotification(NOOP_NOTIFICATION, false));
+  }, [itemsLengthInList, visibleListItemsLength]);
 
   useClickAway(ref, () => {
     if (isMultiItem && !hasOpenedModal) {

@@ -6,6 +6,8 @@ export const INIT_CORES_COUNT = '@app/INIT_CORES_COUNT';
 export const INCREASE_CORES_COUNT = '@app/INCREASE_CORES_COUNT';
 export const DECREASE_CORES_COUNT = '@app/DECREASE_CORES_COUNT';
 export const REHYDRATE_STORE = '@workflow/REHYDRATE_STORE';
+export const RESET_STORE = '@workflow/RESET_STORE';
+export const RESET_APPLICATION_STATE = '@app/RESET_APPLICATION_STATE';
 
 export const ENCRYPTION_FINISHED_EVENT = '@app/ENCRYPTION_FINISHED_EVENT';
 export const DECRYPTION_FINISHED = '@app/DECRYPTION_FINISHED';
@@ -51,9 +53,17 @@ export const rehydrateStore = () => ({
   type: REHYDRATE_STORE,
 });
 
+export const resetStore = () => ({
+  type: RESET_STORE,
+});
+
 export const encryptionFinishedEvent = sets => ({
   type: ENCRYPTION_FINISHED_EVENT,
   payload: {
     sets,
   },
+});
+
+export const resetApplicationState = () => ({
+  type: RESET_APPLICATION_STATE,
 });

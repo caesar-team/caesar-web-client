@@ -15,7 +15,7 @@ import {
   createListRequest,
   editListRequest,
 } from '@caesar/common/actions/entities/list';
-import { visibleItemsSelector } from '@caesar/common/selectors/entities/item';
+import { generalItemsSelector } from '@caesar/common/selectors/entities/item';
 import { Tooltip } from '@caesar/components/List/Item/styles';
 import { Can } from '../../Ability';
 import { Icon } from '../../Icon';
@@ -97,8 +97,8 @@ export const ListItem = ({
   const currentTeam = useSelector(currentTeamSelector);
   const { id, label, children = [], teamId } = list;
 
-  const visibleItems = useSelector(state =>
-    visibleItemsSelector(state, { itemIds: children }),
+  const generalItems = useSelector(state =>
+    generalItemsSelector(state, { itemIds: children }),
   );
 
   const isDefault = label === 'default';
@@ -177,10 +177,10 @@ export const ListItem = ({
           </div>
           <Title>{listTitle}</Title>
           <Can I={PERMISSION.EDIT} a={_permissions}>
-            <Counter>{visibleItems.length}</Counter>
+            <Counter>{generalItems.length}</Counter>
           </Can>
           <Can not I={PERMISSION.EDIT} a={_permissions}>
-            <div>{visibleItems.length}</div>
+            <div>{generalItems.length}</div>
           </Can>
           <Can I={PERMISSION.EDIT} a={_permissions}>
             <ActionIcon

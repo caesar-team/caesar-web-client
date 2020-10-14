@@ -6,7 +6,7 @@ import {
   UPDATE_WORK_IN_PROGRESS_ITEM_RAWS,
   SET_WORK_IN_PROGRESS_ITEM_IDS,
   SET_WORK_IN_PROGRESS_LIST_ID,
-  RESET_WORKFLOW_STORE,
+  RESET_WORKFLOW_STATE,
   VAULTS_ARE_READY,
   OPEN_CURRENT_VAULT,
   INIT_DASHBOARD,
@@ -85,7 +85,7 @@ export default createReducer(initialState, {
       workInProgressItemIds: [],
     };
   },
-  [RESET_WORKFLOW_STORE]() {
+  [RESET_WORKFLOW_STATE]() {
     return initialState;
   },
 });

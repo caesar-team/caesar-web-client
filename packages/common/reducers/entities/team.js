@@ -33,7 +33,7 @@ import {
   TOGGLE_PIN_TEAM_SUCCESS,
   RESET_TEAM_STATE,
 } from '@caesar/common/actions/entities/team';
-import { KEY_TYPE } from '../../constants';
+import { KEY_TYPE } from '../../constants';ADD_TEAMS_BATCH
 
 const initialState = {
   isLoading: true,
@@ -239,7 +239,7 @@ export default createReducer(initialState, {
       ...state,
       byId: {
         ...state.byId,
-        ...payload.teamsById,
+        ...payload.byId,
       },
     };
   },
@@ -284,7 +284,7 @@ export default createReducer(initialState, {
         ...state.byId,
         [payload.teamId]: {
           ...state.byId[payload.teamId],
-          pinned: payload.pinned,
+          pinned: payload.isPinned,
         },
       },
     };

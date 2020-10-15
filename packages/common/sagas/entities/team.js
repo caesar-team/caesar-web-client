@@ -88,7 +88,7 @@ import { teamDefaultListSelector } from '../../selectors/entities/list';
 export function* fetchTeamsSaga() {
   try {
     const { data: teamList } = yield call(getTeams);
-
+    console.log(convertTeamsToEntity(teamList));
     yield put(fetchTeamsSuccess(convertTeamsToEntity(teamList)));
 
     const currentTeamId = yield select(currentTeamIdSelector);
@@ -458,7 +458,7 @@ export function* togglePinTeamSaga({ payload: { teamId, shouldPinned } }) {
     const {
       data: { pinned },
     } = yield call(pinTeam, teamId, shouldPinned);
-
+console.log(pinned);
     yield put(togglePinTeamSuccess(teamId, pinned));
   } catch (error) {
     // eslint-disable-next-line no-console

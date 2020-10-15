@@ -221,7 +221,7 @@ class TeamListContainer extends Component {
           </Can>
         }
       >
-        <Can I={PERMISSION.PIN} a={teamSubject}>
+        <Can I={PERMISSION.CREATE} a={teamSubject}>
           <Tabs activeTabName={activeTabName} onChange={this.handleChangeTab}>
             <Tab title="All" name="all">
               <TeamListWrapper>{allTeamCards}</TeamListWrapper>
@@ -231,7 +231,7 @@ class TeamListContainer extends Component {
             </Tab>
           </Tabs>
         </Can>
-        <Can not I={PERMISSION.PIN} a={teamSubject}>
+        <Can not I={PERMISSION.CREATE} a={teamSubject}>
           <TeamListWrapper>{allTeamCards}</TeamListWrapper>
         </Can>  
         {modalVisibilities[NEW_TEAM_MODAL] && (

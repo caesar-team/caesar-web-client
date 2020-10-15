@@ -39,9 +39,9 @@ export const CheckboxStyled = styled(Checkbox)`
 `;
 
 export const WebsiteFavIcon = styled.img`
-  width: 20px;
-  height 20px;
-  background-size: 20px;
+  width: 16px;
+  height 16px;
+  background-size: 16px;
   background: url("https://www.google.com/s2/favicons?domain=${({ website }) =>
     website}") center no-repeat;
 `;

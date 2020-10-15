@@ -94,7 +94,11 @@ export const Item = ({
             )}
             <IconWrapper>
               {website ? (
-                <WebsiteFavIcon website={website} />
+                <WebsiteFavIcon
+                  website={website}
+                  src={`https://www.google.com/s2/favicons?domain=${website}`}
+                  alt={`The website favicon for address: ${website}`}
+                />
               ) : (
                 <ItemTypeIcon type={type} />
               )}

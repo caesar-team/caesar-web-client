@@ -8,16 +8,12 @@ import {
   SettingsSidebar,
   FullScreenLoader,
 } from '@caesar/components';
-import {
-  fetchUserSelfRequest,
-  fetchUserTeamsRequest,
-} from '@caesar/common/actions/user';
 import { userDataSelector } from '@caesar/common/selectors/user';
+import { initTeamSettings } from '@caesar/common/actions/workflow';
 
 class SettingsTeamPage extends Component {
   componentDidMount() {
-    this.props.fetchUserSelfRequest();
-    this.props.fetchUserTeamsRequest();
+    this.props.initTeamSettings();
   }
 
   render() {
@@ -48,8 +44,7 @@ const mapStateToProps = createStructuredSelector({
 });
 
 const mapDispatchToProps = {
-  fetchUserSelfRequest,
-  fetchUserTeamsRequest,
+  initTeamSettings,
 };
 
 export default connect(

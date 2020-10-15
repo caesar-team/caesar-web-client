@@ -58,10 +58,6 @@ const CREDENTIALS_TYPE_FIELDS = [
 class Import extends Component {
   state = this.prepareInitialState();
 
-  componentDidMount() {
-    this.props.initWorkflow(false);
-  }
-
   handleOnload = ({ file }) => {
     const data = parseFile(file.raw);
 

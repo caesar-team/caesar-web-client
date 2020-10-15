@@ -1,6 +1,6 @@
 /* eslint-disable camelcase */
 import React, { useState, useMemo, useRef } from 'react';
-import { useEffectOnce, useUpdateEffect } from 'react-use';
+import { useUpdateEffect } from 'react-use';
 import { useSelector, useDispatch } from 'react-redux';
 import { useRouter } from 'next/router';
 import memoizeOne from 'memoize-one';
@@ -11,7 +11,6 @@ import {
   teamSelector,
 } from '@caesar/common/selectors/entities/team';
 import { membersByIdSelector } from '@caesar/common/selectors/entities/member';
-import { initWorkflow } from '@caesar/common/actions/workflow';
 import {
   addTeamMembersBatchRequest,
   removeTeamMemberRequest,
@@ -119,10 +118,6 @@ export const TeamContainer = () => {
       }),
     [tableWidth, tableHeight, tableScrollTop],
   );
-
-  useEffectOnce(() => {
-    dispatch(initWorkflow());
-  });
 
   const handleOpenModal = modal => () => {
     setModalVisibilities({

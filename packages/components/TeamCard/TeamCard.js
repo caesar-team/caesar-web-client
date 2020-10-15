@@ -158,32 +158,30 @@ const TeamCard = ({
           </MenuWrapper>
         </StyledDottedMenu>
       )}
+      {canPinTeam && (
+        <ToggleWrapper>
+          <Toggle onChange={onPinTeam} checked={pinned} />
+        </ToggleWrapper>
+      )}
       <Link
         key={id}
         href={`${ROUTES.SETTINGS}${ROUTES.TEAM}/[id]`}
         as={`${ROUTES.SETTINGS}${ROUTES.TEAM}/${id}`}
       >
-        <>
-          <TeamWrapper>
-            <TeamDetails>
-              <TeamIcon src={icon} />
-              <TeamInfo>
-                <TeamName>{getTeamTitle(team)}</TeamName>
-                {areMembersAvailable && (
-                  <TeamMembers>
-                    {users.length}{' '}
-                    {getPlural(users.length, ['member', 'members'])}
-                  </TeamMembers>
-                )}
-              </TeamInfo>
-            </TeamDetails>
-          </TeamWrapper>
-          {canPinTeam && (
-            <ToggleWrapper>
-              <Toggle onChange={onPinTeam} checked={pinned} />
-            </ToggleWrapper>
-          )}
-        </>
+        <TeamWrapper>
+          <TeamDetails>
+            <TeamIcon src={icon} />
+            <TeamInfo>
+              <TeamName>{getTeamTitle(team)}</TeamName>
+              {areMembersAvailable && (
+                <TeamMembers>
+                  {users.length}{' '}
+                  {getPlural(users.length, ['member', 'members'])}
+                </TeamMembers>
+              )}
+            </TeamInfo>
+          </TeamDetails>
+        </TeamWrapper>
       </Link>
       <AvatarsWrapper>
         {areMembersAvailable && (

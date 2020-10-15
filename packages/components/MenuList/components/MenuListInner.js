@@ -136,8 +136,8 @@ const MenuListInnerComponent = ({
       id: isPersonal ? personalLists.inbox?.id : null,
       title: 'Shared with me',
       length: isPersonal
-        ? listItemCount(personalLists.inbox?.children)
-        : 0 || 0,
+        ? listItemCount(personalLists.inbox?.children) || 0
+        : 0,
       icon: 'share',
     },
     {

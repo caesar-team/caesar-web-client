@@ -62,27 +62,17 @@ export const teamKeyPairSelector = createSelector(
   (keyPairs, teamId) => keyPairs[teamId] || null,
 );
 
-const shareIdPropSelector = (_, props) => props.id;
+const shareItemIdPropSelector = (_, props) => props.itemId;
 export const shareKeyPairSelector = createSelector(
   shareKeyPairsSelector,
-  shareIdPropSelector,
-  (shares, id) => shares[id] || null,
+  shareItemIdPropSelector,
+  (shares, itemId) => shares[itemId] || null,
 );
 
 export const shareKeysPairSelector = createSelector(
   shareKeyPairsSelector,
   idsPropSelector,
-  (shares, ids) => {
-    const keys = {};
-
-    ids.forEach(id => {
-      if (shares[id]) {
-        keys[id] = shares[id];
-      }
-    });
-
-    return keys;
-  },
+  (shares, ids) => Object.values(shares).filter(key => ids.includes(key.id)),
 );
 
 export const anonymousKeyPairSelector = createSelector(

@@ -6,13 +6,30 @@ import {
   keypairSchema,
   itemSchema,
   keypairItemSchema,
+  shareItemSchema,
 } from '@caesar/common/normalizers/schemas';
 
 export const convertItemsToEntities = items => {
-  const normalized = normalize(items, [itemSchema]);
+  const normalized = normalize(items, [itemSchema()]);
 
   return {
     itemsById: normalized.entities.itemsById || {},
+  };
+};
+
+export const convertShareItemsToEntities = ({
+  items,
+  currentUserId,
+  defaultListId,
+}) => {
+  const { itemsById } = convertItemsToEntities(items);
+
+  const normalized = normalize(Object.values(itemsById), [
+    shareItemSchema({ currentUserId, defaultListId }),
+  ]);
+
+  return {
+    itemsById: normalized.entities.byId || {},
   };
 };
 

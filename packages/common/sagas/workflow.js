@@ -26,8 +26,10 @@ import {
   INIT_CREATE_PAGE,
 } from '@caesar/common/actions/workflow';
 import { addListsBatch } from '@caesar/common/actions/entities/list';
+import deepequal from 'fast-deep-equal';
 import {
   addItemsBatch,
+  ADD_ITEMS_BATCH,
   removeItemsBatch,
 } from '@caesar/common/actions/entities/item';
 import { updateGlobalNotification } from '@caesar/common/actions/application';
@@ -48,6 +50,7 @@ import {
   convertTeamsToEntity,
   convertListsToEntities,
   convertKeyPairToEntity,
+  convertShareItemsToEntities,
 } from '@caesar/common/normalizers/normalizers';
 import { objectToArray } from '@caesar/common/utils/utils';
 import { upperFirst } from '@caesar/common/utils/string';
@@ -177,7 +180,9 @@ export function* processTeamItemsSaga({ payload: { teamId } }) {
       yield call(createTeamKeyPairSaga, {
         payload: { team, publicKey },
       });
+
       teamKeyPairs = yield select(teamKeyPairSelector, { teamId });
+
       if (!teamKeyPairs) return;
     }
 
@@ -322,6 +327,14 @@ function* loadKeyPairsAndPersonalItems() {
       teamId: TEAM_TYPE.PERSONAL,
     });
 
+    // Load lists
+    const { data: lists } = yield call(getLists);
+    const { listsById } = convertListsToEntities(lists);
+    const defaultList = Object.values(listsById).find(
+      list => list.type === LIST_TYPE.DEFAULT,
+    );
+    const { id: currentUserId } = yield select(userDataSelector);
+
     const {
       data: {
         keypairs = [],
@@ -335,7 +348,11 @@ function* loadKeyPairsAndPersonalItems() {
     // Merge all user items in the one array
     const { itemsById: systemItemsById = {} } = convertItemsToEntities(systems);
     const { itemsById } = convertItemsToEntities(personals);
-    const { itemsById: sharedItemsById = {} } = convertItemsToEntities(shares);
+    const { itemsById: sharedItemsById = {} } = convertShareItemsToEntities({
+      items: shares,
+      currentUserId,
+      listId: defaultList?.id,
+    });
     const { itemsById: teamsItemsById = {} } = convertItemsToEntities(teams);
     const { itemsById: keypairsById = {} } = convertItemsToEntities(keypairs);
 
@@ -362,6 +379,19 @@ function* loadKeyPairsAndPersonalItems() {
       );
     }
 
+    // Inject shares into the defualt list
+    // TODO: Remove that code in the future!
+    if (defaultList?.id) {
+      const notMineSharedItemsIds = Object.values(sharedItemsById)
+        .filter(i => i.ownerId !== currentUserId)
+        .map(i => i.id);
+      listsById[defaultList.id].children = [
+        ...listsById[defaultList.id].children,
+        ...notMineSharedItemsIds,
+      ];
+    }
+
+    yield put(addListsBatch(listsById));
     // Put to the store the shared and the team items, wait for processing of keypairs
     yield put(
       addItemsBatch({
@@ -370,12 +400,6 @@ function* loadKeyPairsAndPersonalItems() {
         ...itemsEncryptedByTeamKeys,
       }),
     );
-
-    // Load lists
-    const { data: lists } = yield call(getLists);
-    const { listsById } = convertListsToEntities(lists);
-
-    yield put(addListsBatch(listsById));
 
     if (!keypairsArray?.length) {
       yield put(finishProcessingKeyPairs());
@@ -411,9 +435,13 @@ function* initListsAndProgressEntities() {
   }
 
   const workInProgressItem = yield select(workInProgressItemSelector);
+  const itemFromStore = yield select(itemSelector, {
+    itemId: workInProgressItem?.id,
+  });
+  const isItemExists = !!itemFromStore;
 
   if (
-    !workInProgressItem ||
+    !isItemExists ||
     ![currentTeamId, null].includes(workInProgressItem?.teamId)
   ) {
     yield put(setWorkInProgressItem(null));
@@ -488,7 +516,6 @@ function* getItemKeyPair({
     item: { id: itemId, teamId, isShared },
   },
 }) {
-  debugger;
   switch (true) {
     case teamId:
       return yield select(teamKeyPairSelector, { teamId });
@@ -577,6 +604,18 @@ function* vaultsReadySaga() {
   yield put(vaultsReady());
 }
 
+function* checkUpdatesForWIP({ payload: { itemsById } }) {
+  const oldItem = yield select(workInProgressItemSelector);
+  if (oldItem?.id) {
+    const newItem = itemsById[(oldItem?.id)];
+    const isData = !!newItem?.data && !!oldItem?.data;
+    const isChanged = !deepequal(newItem, oldItem);
+    if (isData && isChanged) {
+      yield put(setWorkInProgressItem(newItem));
+    }
+  }
+}
+
 export default function* workflowSagas() {
   // Init (get all items, keys, etc)
   yield takeLatest(INIT_WORKFLOW, initWorkflow);
@@ -592,4 +631,5 @@ export default function* workflowSagas() {
   yield takeLatest(ADD_KEYPAIRS_BATCH, processKeyPairsSaga);
   yield takeLatest(OPEN_CURRENT_VAULT, openCurrentVaultSaga);
   yield takeLatest(INIT_DASHBOARD, initDashboardSaga);
+  yield takeLatest(ADD_ITEMS_BATCH, checkUpdatesForWIP);
 }

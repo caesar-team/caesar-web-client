@@ -90,7 +90,10 @@ import {
   TEAM_TYPE,
   ITEM_TYPE,
 } from '@caesar/common/constants';
-import { teamKeyPairSelector } from '@caesar/common/selectors/keystore';
+import {
+  shareKeyPairSelector,
+  teamKeyPairSelector,
+} from '@caesar/common/selectors/keystore';
 import {
   generateSystemItemEmail,
   generateSystemItemName,
@@ -398,15 +401,12 @@ export function* saveItemSaga({ item, publicKey }) {
     type,
     favorite = false,
     relatedItemId = null,
+    ownerId,
   } = item;
 
   const secret = yield call(encryptSecret, { item, publicKey });
 
   let serverItemData = {};
-
-  if (!listId) {
-    throw new Error('The listId can not be undefined.');
-  }
 
   if (id) {
     const { data: updatedItemData } = yield call(updateItem, id, { secret });
@@ -415,6 +415,7 @@ export function* saveItemSaga({ item, publicKey }) {
   } else {
     const { data: updatedItemData } = yield call(postCreateItem, {
       listId,
+      ownerId,
       type,
       favorite,
       secret,
@@ -708,27 +709,34 @@ export function* createItemsBatchSaga({
   }
 }
 
+export function* getKeyPairForItem({ item }) {
+  let keypair;
+
+  if (item.isShared) {
+    keypair = yield select(shareKeyPairSelector, { itemId: item.id });
+  } else {
+    const list = yield select(listSelector, { listId: item.listId });
+
+    keypair = yield select(teamKeyPairSelector, {
+      teamId: list.teamId || TEAM_TYPE.PERSONAL,
+    });
+  }
+
+  return keypair;
+}
 export function* updateItemSaga({ payload: { item } }) {
   try {
     yield put(updateGlobalNotification(ENCRYPTING_ITEM_NOTIFICATION, true));
 
-    const list = yield select(listSelector, { listId: item.listId });
-
-    const { publicKey } = yield select(teamKeyPairSelector, {
-      teamId: list.teamId || TEAM_TYPE.PERSONAL,
-    });
-
-    if (!publicKey) {
-      throw new Error(
-        `Can't get the publicKey for the item ${item.id} and the list ${list.id}`,
-      );
+    const itemKeyPair = yield call(getKeyPairForItem, { item });
+    if (!itemKeyPair?.publicKey) {
+      throw new Error(`Can't get the publicKey for the item111 ${item.id}`);
     }
 
+    const { publicKey } = itemKeyPair;
     const updatedItem = yield call(saveItemSaga, { item, publicKey });
 
     yield put(updateItemSuccess(updatedItem));
-
-    yield put(updateWorkInProgressItem());
     yield put(setWorkInProgressItem(updatedItem));
     yield put(updateGlobalNotification(NOOP_NOTIFICATION, false));
   } catch (error) {

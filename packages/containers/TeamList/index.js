@@ -2,7 +2,6 @@ import { connect } from 'react-redux';
 import { createStructuredSelector } from 'reselect';
 import { fetchKeyPairRequest } from '@caesar/common/actions/user';
 import {
-  fetchTeamsRequest,
   createTeamRequest,
   editTeamRequest,
   removeTeamRequest,
@@ -13,9 +12,9 @@ import {
   leaveTeamRequest,
 } from '@caesar/common/actions/entities/member';
 import {
+  isLoadingTeamsSelector,
   teamsByIdSelector,
   teamSortedListSelector,
-  isLoadingSelector,
 } from '@caesar/common/selectors/entities/team';
 import {
   userDataSelector,
@@ -25,10 +24,12 @@ import {
   memberListSelector,
   membersByIdSelector,
 } from '@caesar/common/selectors/entities/member';
-import TeamList from './TeamList';
+import { isLoadingSelector } from '@caesar/common/selectors/workflow';
+import { TeamList } from './TeamList';
 
 const mapStateToProps = createStructuredSelector({
   isLoading: isLoadingSelector,
+  isLoadingTeams: isLoadingTeamsSelector,
   teamsById: teamsByIdSelector,
   teams: teamSortedListSelector,
   user: userDataSelector,
@@ -40,7 +41,6 @@ const mapStateToProps = createStructuredSelector({
 const mapDispatchToProps = {
   fetchKeyPairRequest,
   fetchMembersRequest,
-  fetchTeamsRequest,
   createTeamRequest,
   editTeamRequest,
   leaveTeamRequest,
@@ -48,7 +48,7 @@ const mapDispatchToProps = {
   togglePinTeamRequest,
 };
 
-export default connect(
+export const TeamListContainer = connect(
   mapStateToProps,
   mapDispatchToProps,
 )(TeamList);

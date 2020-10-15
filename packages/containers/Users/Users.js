@@ -1,4 +1,4 @@
-import React, { useMemo, useRef } from 'react';
+import React, { useState, useMemo, useCallback } from 'react';
 import { useSelector } from 'react-redux';
 import styled from 'styled-components';
 import { isLoadingSelector } from '@caesar/common/selectors/workflow';
@@ -81,14 +81,22 @@ const createColumns = tableWidth => [
 export const Users = () => {
   const isLoading = useSelector(isLoadingSelector);
 
-  const tableWrapperRef = useRef(null);
   // Window height minus stuff that takes vertical place (including table headers)
   const tableVisibleDataHeight = window?.innerHeight - 275;
-  const tableWidth = tableWrapperRef?.current?.offsetWidth || 0;
+  const [tableWidth, setTableWidth] = useState(0);
+
+  const measuredRef = useCallback(node => {
+    if (node !== null) {
+      setTableWidth(node.getBoundingClientRect().width);
+    }
+  }, []);
 
   const users = useSelector(memberListSelector);
   const teamsById = useSelector(teamsByIdSelector);
-  const tableData = useMemo(() => createTableData(users, teamsById), []);
+  const tableData = useMemo(() => createTableData(users, teamsById), [
+    users,
+    teamsById,
+  ]);
   const columns = useMemo(() => createColumns(tableWidth), [tableWidth]);
 
   return (
@@ -96,7 +104,7 @@ export const Users = () => {
       isLoading={isLoading}
       title={`All users (${users.length})`}
     >
-      <Table.Main ref={tableWrapperRef}>
+      <Table.Main ref={measuredRef}>
         <DataTable
           columns={columns}
           data={tableData}

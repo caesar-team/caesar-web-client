@@ -9,7 +9,10 @@ import {
 } from 'redux-saga/effects';
 import {
   INIT_WORKFLOW,
-  INIT_SETTINGS,
+  INIT_USERS_SETTINGS,
+  INIT_TEAMS_SETTINGS,
+  INIT_TEAM_SETTINGS,
+  INIT_IMPORT_SETTINGS,
   UPDATE_WORK_IN_PROGRESS_ITEM,
   SET_WORK_IN_PROGRESS_ITEM,
   finishIsLoading,
@@ -36,12 +39,15 @@ import { updateGlobalNotification } from '@caesar/common/actions/application';
 import {
   SET_CURRENT_TEAM_ID,
   setCurrentTeamId,
-  FETCH_USER_SELF_SUCCESS,
 } from '@caesar/common/actions/user';
 import {
   addShareKeyPairBatch,
   addTeamKeyPairBatch,
 } from '@caesar/common/actions/keystore';
+import {
+  fetchUserSelfSaga,
+  fetchUserTeamsSaga,
+} from '@caesar/common/sagas/user';
 import { fetchMembersSaga } from '@caesar/common/sagas/entities/member';
 import { createTeamKeyPairSaga } from '@caesar/common/sagas/entities/team';
 import {
@@ -448,9 +454,8 @@ function* initListsAndProgressEntities() {
   }
 }
 
-export function* initWorkflow() {
-  // Wait for the user data
-  yield take(FETCH_USER_SELF_SUCCESS);
+export function* initWorkflowSaga() {
+  yield call(fetchUserSelfSaga);
   yield fork(initTeamsSaga);
   yield fork(fetchMembersSaga);
   yield call(loadKeyPairsAndPersonalItems);
@@ -572,9 +577,11 @@ function setWorkInProgressItemSaga({ payload: { item } }) {
   }
 }
 
-function* initSettingsSaga() {
+function* initDashboardSaga() {
   try {
-    yield call(initWorkflow);
+    yield call(fetchUserTeamsSaga);
+    yield call(initWorkflowSaga);
+    yield call(openCurrentVaultSaga);
   } catch (error) {
     // eslint-disable-next-line no-console
     console.error('error: ', error);
@@ -583,17 +590,47 @@ function* initSettingsSaga() {
 
 function* initCreatePageSaga() {
   try {
-    yield call(initWorkflow);
+    yield call(initWorkflowSaga);
   } catch (error) {
     // eslint-disable-next-line no-console
     console.error('error: ', error);
   }
 }
 
-function* initDashboardSaga() {
+function* initUsersSettingsSaga() {
   try {
-    yield call(initWorkflow);
-    yield call(openCurrentVaultSaga);
+    yield call(initWorkflowSaga);
+    yield put(finishIsLoading());
+  } catch (error) {
+    // eslint-disable-next-line no-console
+    console.error('error: ', error);
+  }
+}
+
+function* initTeamsSettingsSaga() {
+  try {
+    yield call(initWorkflowSaga);
+    yield put(finishIsLoading());
+  } catch (error) {
+    // eslint-disable-next-line no-console
+    console.error('error: ', error);
+  }
+}
+
+function* initTeamSettingsSaga() {
+  try {
+    yield call(initWorkflowSaga);
+    yield put(finishIsLoading());
+  } catch (error) {
+    // eslint-disable-next-line no-console
+    console.error('error: ', error);
+  }
+}
+
+function* initImportSettingsSaga() {
+  try {
+    yield call(initWorkflowSaga);
+    yield put(finishIsLoading());
   } catch (error) {
     // eslint-disable-next-line no-console
     console.error('error: ', error);
@@ -618,10 +655,14 @@ function* checkUpdatesForWIP({ payload: { itemsById } }) {
 
 export default function* workflowSagas() {
   // Init (get all items, keys, etc)
-  yield takeLatest(INIT_WORKFLOW, initWorkflow);
-  yield takeLatest(INIT_TEAMS, initTeamsSaga);
-  yield takeLatest(INIT_SETTINGS, initSettingsSaga);
+  yield takeLatest(INIT_WORKFLOW, initWorkflowSaga);
+  yield takeLatest(INIT_DASHBOARD, initDashboardSaga);
   yield takeLatest(INIT_CREATE_PAGE, initCreatePageSaga);
+  yield takeLatest(INIT_TEAMS, initTeamsSaga);
+  yield takeLatest(INIT_USERS_SETTINGS, initUsersSettingsSaga);
+  yield takeLatest(INIT_TEAMS_SETTINGS, initTeamsSettingsSaga);
+  yield takeLatest(INIT_TEAM_SETTINGS, initTeamSettingsSaga);
+  yield takeLatest(INIT_IMPORT_SETTINGS, initImportSettingsSaga);
 
   yield takeLatest(SET_WORK_IN_PROGRESS_ITEM, setWorkInProgressItemSaga);
   yield takeLatest(UPDATE_WORK_IN_PROGRESS_ITEM, updateWorkInProgressItemSaga);

@@ -31,12 +31,6 @@ const REMOVE_TEAM_MODAL = 'removeTeamModal';
 class TeamListContainer extends Component {
   state = this.prepareInitialState();
 
-  componentDidMount() {
-    this.props.fetchTeamsRequest();
-    this.props.fetchMembersRequest();
-    this.props.initWorkflow();
-  }
-
   handleCreateSubmit = ({ title, icon, setSubmitting, setErrors }) => {
     this.props.createTeamRequest(
       title,
@@ -168,7 +162,7 @@ class TeamListContainer extends Component {
         [LEAVE_TEAM_MODAL]: false,
         [REMOVE_TEAM_MODAL]: false,
       },
-      activeTabName: "all",
+      activeTabName: 'all',
     };
   }
 
@@ -198,7 +192,7 @@ class TeamListContainer extends Component {
     const favoriteTeams = teams.filter(team => team.pinned);
     const allTeamCards = this.renderTeamCards(teams);
     const favoriteTeamCards = this.renderTeamCards(favoriteTeams);
-    
+
     const teamSubject = {
       __typename: PERMISSION_ENTITY.TEAM,
       ...this.props.user?._permissions,
@@ -233,7 +227,7 @@ class TeamListContainer extends Component {
         </Can>
         <Can not I={PERMISSION.CREATE} a={teamSubject}>
           <TeamListWrapper>{allTeamCards}</TeamListWrapper>
-        </Can>  
+        </Can>
         {modalVisibilities[NEW_TEAM_MODAL] && (
           <TeamModal
             teamId={this.state.selectedTeamId}

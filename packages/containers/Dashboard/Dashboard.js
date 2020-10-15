@@ -1,15 +1,11 @@
 import React, { useState, memo } from 'react';
 import { useEffectOnce } from 'react-use';
-import { useSelector, useDispatch, batch } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import styled from 'styled-components';
 import {
   isLoadingSelector,
   workInProgressItemIdsSelector,
 } from '@caesar/common/selectors/workflow';
-import {
-  fetchUserSelfRequest,
-  fetchUserTeamsRequest,
-} from '@caesar/common/actions/user';
 import {
   initDashboard,
   setWorkInProgressItem,
@@ -90,11 +86,7 @@ const DashboardComponent = () => {
   };
 
   useEffectOnce(() => {
-    batch(() => {
-      dispatch(fetchUserSelfRequest());
-      dispatch(fetchUserTeamsRequest());
-      dispatch(initDashboard());
-    });
+    dispatch(initDashboard());
   });
 
   if (isLoading) {

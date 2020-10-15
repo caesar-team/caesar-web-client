@@ -12,6 +12,11 @@ import {
   INIT_DASHBOARD,
   FINISH_PROCESSING_KEYPAIRS,
   INIT_CREATE_PAGE,
+  INIT_TEAMS,
+  INIT_USERS_SETTINGS,
+  INIT_TEAMS_SETTINGS,
+  INIT_TEAM_SETTINGS,
+  INIT_IMPORT_SETTINGS,
 } from '@caesar/common/actions/workflow';
 
 const initialState = {
@@ -43,6 +48,21 @@ export default createReducer(initialState, {
     return state;
   },
   [INIT_CREATE_PAGE](state) {
+    return state;
+  },
+  [INIT_TEAMS](state) {
+    return state;
+  },
+  [INIT_USERS_SETTINGS](state) {
+    return state;
+  },
+  [INIT_TEAMS_SETTINGS](state) {
+    return state;
+  },
+  [INIT_TEAM_SETTINGS](state) {
+    return state;
+  },
+  [INIT_IMPORT_SETTINGS](state) {
     return state;
   },
   [FINISH_PROCESSING_KEYPAIRS](state) {

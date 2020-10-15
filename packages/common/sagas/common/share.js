@@ -1,23 +1,18 @@
 import { call, select, all, takeLatest, put } from '@redux-saga/core/effects';
 import { getOrCreateMemberBatchSaga } from '@caesar/common/sagas/entities/member';
 import { itemsBatchSelector } from '@caesar/common/selectors/entities/item';
-import { systemItemsBatchSelector } from '@caesar/common/selectors/entities/system';
 import { userDataSelector } from '@caesar/common/selectors/user';
 import {
   shareKeyPairSelector,
   teamKeyPairSelector,
 } from '@caesar/common/selectors/keystore';
 import {
-  decryptItem,
-  unsealPrivateKeyObj,
-} from '@caesar/common/utils/cipherUtils';
-import {
   NOOP_NOTIFICATION,
   ROLE_USER,
   SHARING_IN_PROGRESS_NOTIFICATION,
   ENTITY_TYPE,
-  TEAM_TYPE,
   ROLE_ADMIN,
+  TEAM_TYPE,
 } from '@caesar/common/constants';
 import {
   shareItemBatchFailure,
@@ -25,20 +20,23 @@ import {
   removeShareSuccess,
   SHARE_ITEM_BATCH_REQUEST,
   REMOVE_SHARE_REQUEST,
-  createItemsBatchSuccess,
   addItemsBatch,
 } from '@caesar/common/actions/entities/item';
 import { updateGlobalNotification } from '@caesar/common/actions/application';
-import { teamsMembersSelector } from '@caesar/common/selectors/entities/team';
 import { updateWorkInProgressItem } from '@caesar/common/actions/workflow';
 import { getServerErrorMessage } from '@caesar/common/utils/error';
 import { workInProgressItemSelector } from '@caesar/common/selectors/workflow';
 import {
   createSystemItemKeyPair,
+  encryptSecret,
+  generateKeyPair,
   saveItemSaga,
 } from '@caesar/common/sagas/entities/item';
-import { inviteNewMemberBatchSaga } from '@caesar/common/sagas/common/invite';
 import { convertSystemItemToKeyPair } from '../../utils/item';
+import { getItem, getPublicKeyByEmailBatch, postItemShare } from '../../api';
+import { uuid4 } from '../../utils/uuid4';
+import { teamDefaultListSelector } from '../../selectors/entities/list';
+import { convertKeyPairToItemEntity } from '../../normalizers/normalizers';
 
 export function* prepareUsersForSharing(members) {
   const emailRolePairs = members.map(({ email, roles }) => ({
@@ -51,44 +49,22 @@ export function* prepareUsersForSharing(members) {
   });
 }
 
-function* getItemUserPairCombinations(systemItem, members = [], privateKeyObj) {
-  const { id, data: { raws, ...data } = { raws: {} } } = systemItem;
-
-  let itemData = data;
-  const itemRaws = raws;
-
-  if (!itemData) {
-    itemData = yield call(decryptItem, systemItem.secret, privateKeyObj);
-  }
-
-  return members.map(({ id: memberId, email, publicKey, teamId }) => ({
-    item: { id, data: itemData, raws: itemRaws },
-    user: { id: memberId, email, publicKey, teamId },
-  }));
-}
-
-export function* getItemUserPairs({ systemItems, members }) {
-  const { privateKey, password } = yield select(teamKeyPairSelector, {
-    teamId: TEAM_TYPE.PERSONAL,
+// @Deprecated
+export function* findOrCreateKeyPair({ payload: { item } }) {
+  let systemKeyPairItem = yield select(shareKeyPairSelector, {
+    itemId: item.id,
   });
-  const privateKeyObj = yield call(unsealPrivateKeyObj, privateKey, password);
-
-  const itemUserPairs = yield all(
-    systemItems.map(systemItem =>
-      call(getItemUserPairCombinations, systemItem, members, privateKeyObj),
-    ),
-  );
-
-  return itemUserPairs.flat();
-}
-
-// TODO: move to the system item sage
-export function* findOrCreateSystemItemKeyPair({ payload: { item } }) {
-  let systemKeyPairItem = yield select(shareKeyPairSelector, { id: item.id });
+  const { userId: ownerId, publicKey } = yield select(userDataSelector);
 
   if (!systemKeyPairItem) {
     const systemItem = yield call(createSystemItemKeyPair, {
-      payload: { item, type: ENTITY_TYPE.SHARE },
+      payload: {
+        entityId: item.id,
+        entityOwnerId: ownerId,
+        entityTeamId: item.teamId,
+        entityType: ENTITY_TYPE.SHARE,
+        publicKey,
+      },
     });
     systemKeyPairItem = convertSystemItemToKeyPair(systemItem);
   }
@@ -96,21 +72,7 @@ export function* findOrCreateSystemItemKeyPair({ payload: { item } }) {
   return systemKeyPairItem;
 }
 
-export function* reCryptSharedItem(item) {
-  const systemKeyPairItem = yield call(findOrCreateSystemItemKeyPair, {
-    payload: {
-      item,
-    },
-  });
-
-  if (!systemKeyPairItem || !('id' in systemKeyPairItem)) {
-    throw new Error(
-      `Can not create the system keypair item for the shared item: ${item.id}`,
-    );
-  }
-
-  const { publicKey } = systemKeyPairItem;
-
+export function* encryptItemBySharedKey({ item, publicKey }) {
   if (!publicKey) {
     throw new Error(
       `Can not find the publicKey for the shared item: ${item.id}`,
@@ -125,8 +87,8 @@ export function* reCryptSharedItem(item) {
     });
 
     return {
-      ...item,
       ...updatedItemFromServer,
+      ...item,
       ...{
         isShared: true,
       },
@@ -136,88 +98,148 @@ export function* reCryptSharedItem(item) {
   return item;
 }
 
+function* generateItemShareKey(item) {
+  return yield call(generateKeyPair, {
+    name: `shared-${item.id}`,
+  });
+}
+
+function* generateUserPostData({ keypair, userId, publicKey }) {
+  const item = Object.values(convertKeyPairToItemEntity([keypair])).shift();
+  const secret = yield call(encryptSecret, {
+    item,
+    publicKey,
+  });
+
+  return {
+    userId,
+    secret,
+  };
+}
+function* getSharedItemKeyPairKey(item) {
+  const generatedKeyPair = yield call(generateItemShareKey, item);
+  const keypair = {
+    id: uuid4(),
+    ...generatedKeyPair,
+  };
+
+  return convertSystemItemToKeyPair(keypair);
+}
+// Todo: Some code for refacting
+function* processMembersItemShare({ item, members }) {
+  // Checking if the item already has shared
+  let sharedItemKeyPairKey = yield select(shareKeyPairSelector, {
+    itemId: item.id,
+  });
+
+  if (!sharedItemKeyPairKey) {
+    const { publicKey: ownerPublicKey } = yield select(teamKeyPairSelector, {
+      teamId: item.teamId,
+    });
+    const { id: ownerId } = yield select(userDataSelector);
+    const defaultList = yield select(teamDefaultListSelector, {
+      teamId: item.teamId,
+    });
+
+    // eslint-disable-next-line require-atomic-updates
+    sharedItemKeyPairKey = yield call(getSharedItemKeyPairKey, item);
+
+    const itemKeyPair = Object.values(
+      convertKeyPairToItemEntity([sharedItemKeyPairKey]),
+    ).shift();
+    const ownerKey = {
+      ...itemKeyPair,
+      ...{
+        ownerId,
+        listId: defaultList.id,
+        relatedItemId: item.id,
+        teamId: item.teamId !== TEAM_TYPE.PERSONAL ? item.teamId : null,
+      },
+    };
+
+    // Need to save the new key to the owner's store
+    yield call(saveItemSaga, {
+      item: ownerKey,
+      publicKey: ownerPublicKey,
+    });
+
+    // Re-encrypt the item with new keys
+    yield call(saveItemSaga, {
+      item,
+      publicKey: sharedItemKeyPairKey.publicKey,
+    });
+  }
+
+  if (!sharedItemKeyPairKey) {
+    throw new Error(`Can not find the keypair for the item ${item.id}`);
+  }
+
+  // Check duplicates members
+  const invitedUserIds = item?.invited.map(invited => invited.userId);
+  const usersToInvite = members.filter(
+    member => !invitedUserIds.includes(member.id),
+  );
+
+  const { data: userPublicKeys } = yield call(getPublicKeyByEmailBatch, {
+    emails: usersToInvite.map(m => m.email),
+  });
+
+  const membersSecretsCalls = userPublicKeys.map(
+    ({ userId, publicKey: userPublicKey }) =>
+      call(generateUserPostData, {
+        keypair: sharedItemKeyPairKey,
+        userId,
+        publicKey: userPublicKey,
+      }),
+  );
+
+  const memberSecrets = yield all(membersSecretsCalls);
+
+  return call(postItemShare, {
+    itemId: item.id,
+    users: memberSecrets,
+  });
+}
+
 // 1. Find or create the system keyPair item
 // 2. ReCrypt the item and update it with the system keyPair item
 // 3. Share the system keyPair item to the new members
 export function* shareItemBatchSaga({
   payload: {
-    data: { itemIds = [], members = [], teamIds = [] },
-    options: { includeIniciator = true },
+    data: { itemIds = [], members = [] },
   },
 }) {
   try {
     yield put(updateGlobalNotification(SHARING_IN_PROGRESS_NOTIFICATION, true));
-
-    const user = yield select(userDataSelector);
     // const currentTeamId = yield select(currentTeamIdSelector);
     const items = yield select(itemsBatchSelector, { itemIds });
 
-    const reCryptedSharedItems = yield all(items.map(reCryptSharedItem));
-    yield put(createItemsBatchSuccess(reCryptedSharedItems));
+    // Need To Go Deeper (c)
+    yield all(
+      yield all(
+        items.map(item => call(processMembersItemShare, { item, members })),
+      ),
+    );
 
-    const systemKeyPairItems = yield select(systemItemsBatchSelector, {
-      itemIds,
-    });
-
-    if (
-      Object.values(systemKeyPairItems).filter(el => el != null).length !==
-      items.length
-    ) {
-      throw new Error(
-        `The system keypair items length doesn't match with the input items length`,
-      );
-    }
-
-    const preparedMembers = yield call(prepareUsersForSharing, members);
-
-    const newMembers = preparedMembers.filter(({ isNew }) => isNew);
-
-    const directMembers = preparedMembers.map(member => ({
-      ...member,
-      teamId: null,
-    }));
-
-    const teamsMembers = yield select(teamsMembersSelector, { teamIds });
-
-    const preparedTeamsMembers = includeIniciator
-      ? teamsMembers
-      : teamsMembers.filter(member => member.id !== user.id);
-
-    const allMembers = [...directMembers, ...preparedTeamsMembers];
-
-    if (newMembers.length > 0) {
-      yield call(inviteNewMemberBatchSaga, {
-        payload: { members: newMembers },
-      });
-    }
-    // Share the system keypair items with users
-    const itemUserPairs = yield call(getItemUserPairs, {
-      systemItems: systemKeyPairItems,
-      members: allMembers,
-    });
-
-    if (itemUserPairs.length > 0) {
-      const sharedItemIds = systemKeyPairItems.map(
-        systemItem => systemItem?.relatedItemId,
+    const workInProgressItem = yield select(workInProgressItemSelector);
+    if (workInProgressItem?.id) {
+      const { data: workInProgressItemFromServer } = yield call(
+        getItem,
+        workInProgressItem?.id,
       );
 
-      const sharedItems = yield select(itemsBatchSelector, {
-        itemIds: sharedItemIds,
-      });
-
-      const updatedSharedItems = sharedItems.map(item => ({
-        ...item,
-        ...{
-          invited: allMembers.map(member => member.id),
-        },
-      }));
-
-      yield put(addItemsBatch(updatedSharedItems));
-      // yield put(shareItemBatchSuccess(shares));
-
-      yield put(updateWorkInProgressItem());
+      const updatedItem = {
+        ...workInProgressItem,
+        invited: workInProgressItemFromServer?.invited,
+      };
+      if (updatedItem.id) {
+        yield put(
+          addItemsBatch({
+            [updatedItem.id]: updatedItem,
+          }),
+        );
+      }
     }
-
     yield put(updateGlobalNotification(NOOP_NOTIFICATION, false));
   } catch (error) {
     // eslint-disable-next-line no-console

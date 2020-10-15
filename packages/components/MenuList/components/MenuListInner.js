@@ -133,9 +133,9 @@ const MenuListInnerComponent = ({
   const menuList = [
     {
       id: isPersonal ? personalLists.inbox?.id : null,
-      title: 'Inbox',
+      title: 'Shared with me',
       length: isPersonal ? personalLists.inbox?.children?.length : null,
-      icon: 'inbox',
+      icon: 'share',
     },
     {
       id: isPersonal ? personalLists.favorites?.id : teamLists.favorites?.id,

@@ -6,7 +6,14 @@ const itemSchema = new schema.Entity(
   'byId',
   {},
   {
-    processStrategy: ({ privateKey, publicKey, teamId, password }) => ({
+    processStrategy: ({
+      privateKey,
+      publicKey,
+      teamId,
+      name,
+      id,
+      password,
+    }) => ({
       type: ITEM_TYPE.KEYPAIR,
       data: {
         attachments: [
@@ -24,7 +31,7 @@ const itemSchema = new schema.Entity(
           publicKey,
         },
         password,
-        name: generateSystemItemName(ITEM_TYPE.KEYPAIR, teamId),
+        name: name || generateSystemItemName(ITEM_TYPE.KEYPAIR, teamId || id),
       },
     }),
   },

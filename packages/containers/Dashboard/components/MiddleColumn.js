@@ -65,6 +65,7 @@ const MiddleColumnComponent = ({
         : listsById[(workInProgressList?.id)]?.children,
     }),
   );
+
   const itemsLengthInList = generalItems.length;
   const visibleListItemsLength = visibleListItems.length;
 

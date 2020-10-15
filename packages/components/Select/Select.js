@@ -13,8 +13,8 @@ import {
 
 const BOX_DIRECTION_DOWN = 'down';
 
-const DEFAULT_TOP_OFFSET = 38;
-const DEFAULT_OPTION_SIZE = 44;
+const DEFAULT_TOP_OFFSET = 40;
+const DEFAULT_OPTION_SIZE = 40;
 
 const renderOptions = ({ value, options, handleClickOption }) =>
   options.map(({ value: optionValue, label, isDisabled = false }) => {

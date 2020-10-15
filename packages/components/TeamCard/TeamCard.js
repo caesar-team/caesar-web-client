@@ -3,12 +3,9 @@ import React from 'react';
 import styled from 'styled-components';
 import Link from 'next/link';
 import memoizeOne from 'memoize-one';
-import {
-  ROUTES,
-  PERMISSION,
-  PERMISSION_ENTITY,
-} from '@caesar/common/constants';
+import { ROUTES, PERMISSION } from '@caesar/common/constants';
 import { ability } from '@caesar/common/ability';
+import { getPlural } from '@caesar/common/utils/string';
 import { getTeamTitle } from '@caesar/common/utils/team';
 import { Button } from '../Button';
 import { AvatarsList } from '../Avatar';
@@ -161,32 +158,30 @@ const TeamCard = ({
           </MenuWrapper>
         </StyledDottedMenu>
       )}
+      {canPinTeam && (
+        <ToggleWrapper>
+          <Toggle onChange={onPinTeam} checked={pinned} />
+        </ToggleWrapper>
+      )}
       <Link
         key={id}
         href={`${ROUTES.SETTINGS}${ROUTES.TEAM}/[id]`}
         as={`${ROUTES.SETTINGS}${ROUTES.TEAM}/${id}`}
       >
-        <>
-          <TeamWrapper>
-            <TeamDetails>
-              <TeamIcon src={icon} />
-              <TeamInfo>
-                <TeamName>{getTeamTitle(team)}</TeamName>
-                {areMembersAvailable && (
-                  <TeamMembers>{users.length} members</TeamMembers>
-                )}
-              </TeamInfo>
-            </TeamDetails>
-          </TeamWrapper>
-          {canPinTeam && (
-            <ToggleWrapper>
-              <Toggle
-                onChange={onPinTeam}
-                checked={pinned}
-              />
-            </ToggleWrapper>
-          )}
-        </>
+        <TeamWrapper>
+          <TeamDetails>
+            <TeamIcon src={icon} />
+            <TeamInfo>
+              <TeamName>{getTeamTitle(team)}</TeamName>
+              {areMembersAvailable && (
+                <TeamMembers>
+                  {users.length}{' '}
+                  {getPlural(users.length, ['member', 'members'])}
+                </TeamMembers>
+              )}
+            </TeamInfo>
+          </TeamDetails>
+        </TeamWrapper>
       </Link>
       <AvatarsWrapper>
         {areMembersAvailable && (

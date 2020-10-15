@@ -49,7 +49,10 @@ import {
   fetchUserTeamsSaga,
 } from '@caesar/common/sagas/user';
 import { fetchMembersSaga } from '@caesar/common/sagas/entities/member';
-import { createTeamKeyPairSaga } from '@caesar/common/sagas/entities/team';
+import {
+  createTeamKeyPairSaga,
+  fetchTeamsSaga,
+} from '@caesar/common/sagas/entities/team';
 import {
   convertNodesToEntities,
   convertItemsToEntities,
@@ -612,7 +615,7 @@ function* initUsersSettingsSaga() {
 function* initTeamsSettingsSaga() {
   try {
     yield call(initWorkflowSaga);
-    yield put(finishIsLoading());
+    yield call(fetchTeamsSaga);
   } catch (error) {
     // eslint-disable-next-line no-console
     console.error('error: ', error);
@@ -622,7 +625,7 @@ function* initTeamsSettingsSaga() {
 function* initTeamSettingsSaga() {
   try {
     yield call(initWorkflowSaga);
-    yield put(finishIsLoading());
+    yield call(fetchTeamsSaga);
   } catch (error) {
     // eslint-disable-next-line no-console
     console.error('error: ', error);

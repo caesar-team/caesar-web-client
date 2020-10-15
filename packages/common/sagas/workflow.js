@@ -336,8 +336,8 @@ function* loadKeyPairsAndPersonalItems() {
     // Load lists
     const { data: lists } = yield call(getLists);
     const { listsById } = convertListsToEntities(lists);
-    const defaultList = Object.values(listsById).find(
-      list => list.type === LIST_TYPE.DEFAULT,
+    const defaultShareList = Object.values(listsById).find(
+      list => list.type === LIST_TYPE.INBOX,
     );
     const { id: currentUserId } = yield select(userDataSelector);
 
@@ -357,7 +357,7 @@ function* loadKeyPairsAndPersonalItems() {
     const { itemsById: sharedItemsById = {} } = convertShareItemsToEntities({
       items: shares,
       currentUserId,
-      listId: defaultList?.id,
+      listId: defaultShareList?.id,
     });
     const { itemsById: teamsItemsById = {} } = convertItemsToEntities(teams);
     const { itemsById: keypairsById = {} } = convertItemsToEntities(keypairs);
@@ -387,12 +387,13 @@ function* loadKeyPairsAndPersonalItems() {
 
     // Inject shares into the defualt list
     // TODO: Remove that code in the future!
-    if (defaultList?.id) {
+    if (defaultShareList?.id) {
       const notMineSharedItemsIds = Object.values(sharedItemsById)
         .filter(i => i.ownerId !== currentUserId)
         .map(i => i.id);
-      listsById[defaultList.id].children = [
-        ...listsById[defaultList.id].children,
+
+      listsById[defaultShareList.id].children = [
+        ...listsById[defaultShareList.id].children,
         ...notMineSharedItemsIds,
       ];
     }
@@ -426,20 +427,21 @@ function* initListsAndProgressEntities() {
   const lists = yield select(teamListsSelector, {
     teamId: currentTeamId,
   });
-  const workInProgressList = !workInProgressListId
+  const workInProgressList = workInProgressListId
     ? lists.find(list => list.id === workInProgressListId)
     : null;
   const favoritesList = yield select(favoritesListSelector);
   const defaultList = lists.find(list => list.type === LIST_TYPE.DEFAULT);
-
+  const inboxList = lists.find(list => list.type === LIST_TYPE.INBOX);
   if (!workInProgressList) {
     if (favoritesList?.children?.length > 0) {
       yield put(setWorkInProgressListId(favoritesList.id));
+    } else if (inboxList?.children?.length > 0) {
+      yield put(setWorkInProgressListId(inboxList.id));
     } else {
       yield put(setWorkInProgressListId(defaultList.id));
     }
   }
-
   const workInProgressItem = yield select(workInProgressItemSelector);
   const itemFromStore = yield select(itemSelector, {
     itemId: workInProgressItem?.id,
@@ -671,6 +673,5 @@ export default function* workflowSagas() {
   // Wait for keypairs
   yield takeLatest(ADD_KEYPAIRS_BATCH, processKeyPairsSaga);
   yield takeLatest(OPEN_CURRENT_VAULT, openCurrentVaultSaga);
-  yield takeLatest(INIT_DASHBOARD, initDashboardSaga);
   yield takeLatest(ADD_ITEMS_BATCH, checkUpdatesForWIP);
 }

@@ -4,11 +4,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import { Draggable } from 'react-beautiful-dnd';
 import styled from 'styled-components';
 import { transformListTitle } from '@caesar/common/utils/string';
-import {
-  PERMISSION,
-  PERMISSION_ENTITY,
-  TEAM_TYPE,
-} from '@caesar/common/constants';
+import { LIST_TYPE, PERMISSION } from '@caesar/common/constants';
 import { ERROR } from '@caesar/common/validation/constants';
 import { currentTeamSelector } from '@caesar/common/selectors/user';
 import {
@@ -95,13 +91,13 @@ export const ListItem = ({
 }) => {
   const dispatch = useDispatch();
   const currentTeam = useSelector(currentTeamSelector);
-  const { id, label, children = [], teamId } = list;
+  const { id, label, type, children = [] } = list;
 
   const generalItems = useSelector(state =>
     generalItemsSelector(state, { itemIds: children }),
   );
 
-  const isDefault = label === 'default';
+  const isDefault = type === LIST_TYPE.DEFAULT;
   const [isEditMode, setEditMode] = useState(isCreatingMode);
   const [isOpenedPopup, setOpenedPopup] = useState(false);
   const [value, setValue] = useState(label);

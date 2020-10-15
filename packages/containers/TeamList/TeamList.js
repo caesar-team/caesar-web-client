@@ -187,7 +187,7 @@ class TeamListContainer extends Component {
   }
 
   render() {
-    const { isLoading, teams } = this.props;
+    const { isLoading, isLoadingTeams, teams } = this.props;
     const { modalVisibilities, selectedTeamTitle, activeTabName } = this.state;
     const favoriteTeams = teams.filter(team => team.pinned);
     const allTeamCards = this.renderTeamCards(teams);
@@ -200,7 +200,7 @@ class TeamListContainer extends Component {
 
     return (
       <SettingsWrapper
-        isLoading={isLoading}
+        isLoading={isLoading || isLoadingTeams}
         title={`Teams (${teams.length})`}
         addonTopComponent={
           <Can I={PERMISSION.CREATE} a={teamSubject}>
@@ -253,4 +253,4 @@ class TeamListContainer extends Component {
   }
 }
 
-export default TeamListContainer;
+export { TeamListContainer as TeamList };

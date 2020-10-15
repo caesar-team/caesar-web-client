@@ -71,6 +71,7 @@ import {
   TEAM_TYPE,
 } from '@caesar/common/constants';
 import { updateGlobalNotification } from '@caesar/common/actions/application';
+import { finishIsLoading } from '@caesar/common/actions/workflow';
 import {
   encryptSecret,
   generateTeamKeyPair,
@@ -90,12 +91,7 @@ export function* fetchTeamsSaga() {
     const { data: teamList } = yield call(getTeams);
 
     yield put(fetchTeamsSuccess(convertTeamsToEntity(teamList)));
-
-    const currentTeamId = yield select(currentTeamIdSelector);
-
-    if (teamList.length && !currentTeamId) {
-      yield put(setCurrentTeamId(teamList[0].id));
-    }
+    yield put(finishIsLoading());
   } catch (error) {
     // eslint-disable-next-line no-console
     console.error(error);

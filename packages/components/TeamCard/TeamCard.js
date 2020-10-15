@@ -3,12 +3,9 @@ import React from 'react';
 import styled from 'styled-components';
 import Link from 'next/link';
 import memoizeOne from 'memoize-one';
-import {
-  ROUTES,
-  PERMISSION,
-  PERMISSION_ENTITY,
-} from '@caesar/common/constants';
+import { ROUTES, PERMISSION } from '@caesar/common/constants';
 import { ability } from '@caesar/common/ability';
+import { getPlural } from '@caesar/common/utils/string';
 import { getTeamTitle } from '@caesar/common/utils/team';
 import { Button } from '../Button';
 import { AvatarsList } from '../Avatar';
@@ -173,17 +170,17 @@ const TeamCard = ({
               <TeamInfo>
                 <TeamName>{getTeamTitle(team)}</TeamName>
                 {areMembersAvailable && (
-                  <TeamMembers>{users.length} members</TeamMembers>
+                  <TeamMembers>
+                    {users.length}{' '}
+                    {getPlural(users.length, ['member', 'members'])}
+                  </TeamMembers>
                 )}
               </TeamInfo>
             </TeamDetails>
           </TeamWrapper>
           {canPinTeam && (
             <ToggleWrapper>
-              <Toggle
-                onChange={onPinTeam}
-                checked={pinned}
-              />
+              <Toggle onChange={onPinTeam} checked={pinned} />
             </ToggleWrapper>
           )}
         </>

@@ -1,13 +1,14 @@
 /* eslint-disable camelcase */
-import React, { useState, useMemo, useRef } from 'react';
+import React, { useState, useCallback, useMemo } from 'react';
 import { useUpdateEffect } from 'react-use';
 import { useSelector, useDispatch } from 'react-redux';
 import { useRouter } from 'next/router';
 import memoizeOne from 'memoize-one';
 import styled from 'styled-components';
+import { isLoadingSelector } from '@caesar/common/selectors/workflow';
 import { userDataSelector } from '@caesar/common/selectors/user';
 import {
-  isLoadingSelector,
+  isLoadingTeamsSelector,
   teamSelector,
 } from '@caesar/common/selectors/entities/team';
 import { membersByIdSelector } from '@caesar/common/selectors/entities/member';
@@ -47,7 +48,11 @@ const ButtonStyled = styled(Button)`
   margin-right: 24px;
 `;
 
-const getMemberList = memoizeOne((users, membersById) =>
+const AddMemberButton = styled(ButtonStyled)`
+  margin-right: 0;
+`;
+
+const getMemberList = memoizeOne((users = [], membersById) =>
   users.reduce(
     (accumulator, user) => [
       ...accumulator,
@@ -70,31 +75,42 @@ export const TeamContainer = () => {
     [REMOVE_TEAM_MODAL]: false,
   });
   const isLoading = useSelector(isLoadingSelector);
+  const isLoadingTeams = useSelector(isLoadingTeamsSelector);
 
-  const tableWrapperRef = useRef(null);
   // Window height minus stuff that takes vertical place (including table headers)
   const tableVisibleDataHeight = window?.innerHeight - 275;
-  const tableWidth = tableWrapperRef?.current?.offsetWidth || 0;
-  // To calculate where roleDropdown must be opened
-  const tableRowGroup =
-    tableWrapperRef?.current?.children[0]?.children[1].children[0];
-  const tableHeight = tableRowGroup?.offsetHeight;
+  const [tableRowGroupNode, setTableRowGroupNode] = useState(null);
+  const [tableWidth, setTableWidth] = useState(0);
+
+  const measuredRef = useCallback(node => {
+    if (node !== null) {
+      setTableWidth(node.getBoundingClientRect().width);
+      // To calculate where roleDropdown must be opened
+      setTableRowGroupNode(node.children[0]?.children[1].children[0]);
+    }
+  }, []);
+
+  const tableHeight = tableRowGroupNode?.offsetHeight;
   const [tableScrollTop, setTableScrollTop] = useState(0);
 
   useUpdateEffect(() => {
+    if (!tableRowGroupNode) {
+      return false;
+    }
+
     const handler = () => {
-      setTableScrollTop(tableRowGroup?.scrollTop);
+      setTableScrollTop(tableRowGroupNode.scrollTop);
     };
 
-    tableRowGroup.addEventListener('scroll', handler);
+    tableRowGroupNode.addEventListener('scroll', handler);
 
-    return () => tableRowGroup.removeEventListener('scroll', handler);
-  }, [tableRowGroup]);
+    return () => tableRowGroupNode.removeEventListener('scroll', handler);
+  }, [tableRowGroupNode]);
 
   const user = useSelector(userDataSelector);
-  const team = useSelector(state =>
-    teamSelector(state, { teamId: router.query.id }),
-  );
+  const team =
+    useSelector(state => teamSelector(state, { teamId: router.query.id })) ||
+    {};
   const membersById = useSelector(membersByIdSelector);
   const members = getMemberList(team.users, membersById);
   const tableData = useMemo(() => members, [members]);
@@ -146,7 +162,7 @@ export const TeamContainer = () => {
     removeTeamRequest(team.id);
   };
 
-  if (!team) {
+  if (!team.id && !isLoadingTeams) {
     router.push(ROUTES.SETTINGS + ROUTES.TEAM);
 
     return null;
@@ -154,24 +170,24 @@ export const TeamContainer = () => {
 
   const teamSubject = {
     __typename: PERMISSION_ENTITY.TEAM,
-    team_delete: team?._permissions?.team_delete || false,
+    team_delete: team._permissions?.team_delete || false,
   };
 
   const teamMemberSubject = {
     __typename: PERMISSION_ENTITY.TEAM_MEMBER,
     team_member_add:
-      team?._permissions?.team_member_add ||
-      team?.userRole === USER_ROLE_ADMIN ||
+      team._permissions?.team_member_add ||
+      team.userRole === USER_ROLE_ADMIN ||
       false,
   };
 
   const isDomainTeam =
     team.type === TEAM_TYPE.DEFAULT ||
-    team.title.toLowerCase() === TEAM_TYPE.DEFAULT;
+    team.title?.toLowerCase() === TEAM_TYPE.DEFAULT;
 
   return (
     <SettingsWrapper
-      isLoading={isLoading}
+      isLoading={isLoading || isLoadingTeams}
       title={`${getTeamTitle(team)} (${members.length})`}
       addonTopComponent={
         <>
@@ -192,19 +208,19 @@ export const TeamContainer = () => {
             />
           )}
           <Can I={PERMISSION.ADD} a={teamMemberSubject}>
-            <ButtonStyled
+            <AddMemberButton
               withOfflineCheck
               onClick={handleOpenModal(INVITE_MEMBER_MODAL)}
               icon="plus"
               color="black"
             >
               Add a member
-            </ButtonStyled>
+            </AddMemberButton>
           </Can>
         </>
       }
     >
-      <Table.Main ref={tableWrapperRef}>
+      <Table.Main ref={measuredRef}>
         <DataTable
           columns={columns}
           data={tableData}

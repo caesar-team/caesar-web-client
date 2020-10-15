@@ -42,16 +42,16 @@ const DataStep = ({
     isSubmitting,
   } = state;
 
-  const tableWrapperRef = useRef(null);
   // Window height minus stuff that takes vertical place (including table headers)
   const tableVisibleDataHeight = window?.innerHeight - 575;
+  const tableWrapperRef = useRef(null);
   const [tableWidth, setTableWidth] = useState(0);
 
   useEffectOnce(() => {
     setTableWidth(tableWrapperRef?.current?.offsetWidth);
   });
 
-  const tableData = useMemo(() => filter(data, filterText), [filterText]);
+  const tableData = useMemo(() => filter(data, filterText), [data, filterText]);
   const columns = useMemo(
     () => createColumns({ state, setState, headings, tableWidth }),
     [state, headings, tableWidth],

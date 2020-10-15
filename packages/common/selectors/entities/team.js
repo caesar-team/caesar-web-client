@@ -10,7 +10,7 @@ export const teamEntitySelector = createSelector(
   entities => entities.team,
 );
 
-export const isLoadingSelector = createSelector(
+export const isLoadingTeamsSelector = createSelector(
   teamEntitySelector,
   teamEntity => teamEntity.isLoading,
 );

@@ -9,5 +9,5 @@ export { Sharing } from './Sharing';
 export { SignInContainer } from './SignIn';
 export { SignUpContainer } from './SignUp';
 export { TeamContainer } from './Team';
-export { default as TeamListContainer } from './TeamList';
+export { TeamListContainer } from './TeamList';
 export { Users as UsersContainer } from './Users';

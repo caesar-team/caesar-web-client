@@ -88,16 +88,6 @@ module.exports = withPlugins(
     publicRuntimeConfig,
     serverRuntimeConfig,
     workboxOpts: workboxOptions,
-    experimental: {
-      async rewrites() {
-        return [
-          {
-            source: '/service-worker.js',
-            destination: '/_next/static/service-worker.js',
-          },
-        ];
-      },
-    },
     webpack: (config, { isServer }) => {
       config.output.globalObject = 'typeof self !== "object" ? self : this';
 

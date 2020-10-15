@@ -5,7 +5,7 @@ import { ROUTES } from '@caesar/common/constants';
 import { Link } from '@caesar/components';
 
 const Wrapper = styled.div`
-  min-width: 287px;
+  width: 287px;
   height: calc(100vh - 55px);
   padding: 40px 0;
   border-right: 1px solid ${({ theme }) => theme.color.gallery};

@@ -48,7 +48,9 @@ app.prepare().then(() => {
   server.use('/_next', express.static('.next'));
   server.use(
     '/service-worker.js',
-    express.static(path.join(__dirname, '.next', 'service-worker.js')),
+    express.static(
+      path.join(__dirname, '.next', 'static', 'service-worker.js'),
+    ),
   );
 
   // BE endpoint

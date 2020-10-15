@@ -150,16 +150,16 @@ export const TeamContainer = () => {
   };
 
   const handleInvite = invitedMembers => {
-    addTeamMembersBatchRequest(team.id, invitedMembers);
+    dispatch(addTeamMembersBatchRequest(team.id, invitedMembers));
     handleCloseModal(INVITE_MEMBER_MODAL)();
   };
 
   const handleLeaveTeam = () => {
-    leaveTeamRequest(team.id);
+    dispatch(leaveTeamRequest(team.id));
   };
 
   const handleRemoveTeam = () => {
-    removeTeamRequest(team.id);
+    dispatch(removeTeamRequest(team.id));
   };
 
   if (!team.id && !isLoadingTeams) {

@@ -31,7 +31,24 @@ export function configureWebStore(preloadedState) {
     ),
   );
 
-  const sagaTask = sagaMiddleware.run(rootSaga);
+  let sagaTask = sagaMiddleware.run(rootSaga);
+
+  if (process.env.NODE_ENV === 'development' && module.hot) {
+    // Enable Webpack hot module replacement for reducers
+    module.hot.accept('../reducers', () => {
+      const nextRootReducer = require('../reducers/index');
+      store.replaceReducer(nextRootReducer);
+    });
+    module.hot.accept('./sagas', () => {
+      const getNewSagas = require('./sagas');
+      sagaTask.cancel();
+      sagaTask.done.then(() => {
+        sagaTask = sagaMiddleware.run(function* replacedSaga() {
+          yield getNewSagas();
+        });
+      });
+    });
+  }
 
   return {
     ...store,

@@ -1,7 +1,7 @@
 import { getHostName } from '@caesar/common/utils/getDomainName';
 import { processUploadedFiles } from './attachment';
 import { decryptItem } from './cipherUtils';
-import { ITEM_TYPE } from '../constants';
+import { ITEM_TYPE, DOMAIN_HOSTNAME } from '../constants';
 
 export const extractItemType = item => item?.type || ITEM_TYPE.SYSTEM;
 
@@ -52,7 +52,7 @@ export const generateSystemItemName = (entity, id) => {
 };
 
 export const generateSystemItemEmail = entityName => {
-  return `teams+${entityName}@${getHostName()}.com`;
+  return `systems+${entityName}@${DOMAIN_HOSTNAME || getHostName()}`;
 };
 
 export const extractKeysFromSystemItem = item => {

@@ -48,6 +48,10 @@ const ButtonStyled = styled(Button)`
   margin-right: 24px;
 `;
 
+const AddMemberButton = styled(ButtonStyled)`
+  margin-right: 0;
+`;
+
 const getMemberList = memoizeOne((users = [], membersById) =>
   users.reduce(
     (accumulator, user) => [
@@ -75,29 +79,33 @@ export const TeamContainer = () => {
 
   // Window height minus stuff that takes vertical place (including table headers)
   const tableVisibleDataHeight = window?.innerHeight - 275;
+  const [tableRowGroupNode, setTableRowGroupNode] = useState(null);
   const [tableWidth, setTableWidth] = useState(0);
 
   const measuredRef = useCallback(node => {
     if (node !== null) {
       setTableWidth(node.getBoundingClientRect().width);
+      // To calculate where roleDropdown must be opened
+      setTableRowGroupNode(node.children[0]?.children[1].children[0]);
     }
   }, []);
 
-  // To calculate where roleDropdown must be opened
-  const tableRowGroup =
-    measuredRef?.current?.children[0]?.children[1].children[0];
-  const tableHeight = tableRowGroup?.offsetHeight;
+  const tableHeight = tableRowGroupNode?.offsetHeight;
   const [tableScrollTop, setTableScrollTop] = useState(0);
 
   useUpdateEffect(() => {
+    if (!tableRowGroupNode) {
+      return false;
+    }
+
     const handler = () => {
-      setTableScrollTop(tableRowGroup?.scrollTop);
+      setTableScrollTop(tableRowGroupNode.scrollTop);
     };
 
-    tableRowGroup.addEventListener('scroll', handler);
+    tableRowGroupNode.addEventListener('scroll', handler);
 
-    return () => tableRowGroup.removeEventListener('scroll', handler);
-  }, [tableRowGroup]);
+    return () => tableRowGroupNode.removeEventListener('scroll', handler);
+  }, [tableRowGroupNode]);
 
   const user = useSelector(userDataSelector);
   const team =
@@ -200,14 +208,14 @@ export const TeamContainer = () => {
             />
           )}
           <Can I={PERMISSION.ADD} a={teamMemberSubject}>
-            <ButtonStyled
+            <AddMemberButton
               withOfflineCheck
               onClick={handleOpenModal(INVITE_MEMBER_MODAL)}
               icon="plus"
               color="black"
             >
               Add a member
-            </ButtonStyled>
+            </AddMemberButton>
           </Can>
         </>
       }

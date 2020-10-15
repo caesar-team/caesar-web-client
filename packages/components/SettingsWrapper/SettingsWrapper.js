@@ -17,22 +17,26 @@ const Wrapper = styled.div`
   position: relative;
   display: flex;
   flex-direction: column;
-  background: ${({ theme }) => theme.color.alto};
-  width: 100%;
+  width: calc(100% - 287px);
   padding: 40px;
+  background: ${({ theme }) => theme.color.alto};
 `;
 
 const TopWrapper = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
+  width: 100%;
   margin-bottom: 30px;
 `;
 
 const Title = styled.div`
   margin-right: auto;
+  overflow: hidden;
   font-size: ${({ theme }) => theme.font.size.large};
   color: ${({ theme }) => theme.color.black};
+  text-overflow: ellipsis;
+  white-space: nowrap;
 `;
 
 export const SettingsWrapper = forwardRef(

@@ -730,7 +730,7 @@ export function* updateItemSaga({ payload: { item } }) {
 
     const itemKeyPair = yield call(getKeyPairForItem, { item });
     if (!itemKeyPair?.publicKey) {
-      throw new Error(`Can't get the publicKey for the item111 ${item.id}`);
+      throw new Error(`Can't get the publicKey for the item ${item.id}`);
     }
 
     const { publicKey } = itemKeyPair;

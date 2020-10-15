@@ -134,7 +134,6 @@ export const TeamContainer = () => {
   };
 
   const handleInvite = invitedMembers => {
-    debugger;
     addTeamMembersBatchRequest(team.id, invitedMembers);
     handleCloseModal(INVITE_MEMBER_MODAL)();
   };

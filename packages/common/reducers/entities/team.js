@@ -284,7 +284,7 @@ export default createReducer(initialState, {
         ...state.byId,
         [payload.teamId]: {
           ...state.byId[payload.teamId],
-          pinned: payload.pinned,
+          pinned: payload.isPinned,
         },
       },
     };

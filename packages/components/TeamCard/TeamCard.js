@@ -3,7 +3,7 @@ import React from 'react';
 import styled from 'styled-components';
 import Link from 'next/link';
 import memoizeOne from 'memoize-one';
-import { ROUTES, PERMISSION } from '@caesar/common/constants';
+import { ROUTES, PERMISSION, TEAM_MESSAGES } from '@caesar/common/constants';
 import { ability } from '@caesar/common/ability';
 import { getPlural } from '@caesar/common/utils/string';
 import { getTeamTitle } from '@caesar/common/utils/team';
@@ -72,6 +72,7 @@ const TeamInfo = styled.div`
   display: flex;
   flex-direction: column;
   margin-left: 20px;
+  margin-right: 44px;
 `;
 
 const TeamName = styled.div`
@@ -91,10 +92,30 @@ const AvatarsWrapper = styled.div`
   justify-content: space-between;
 `;
 
+const Tooltip = styled.div`
+  display: none;
+  position: absolute;
+  bottom: 20px;
+  left: 0;
+  padding: 4px 8px;
+  background-color: ${({ theme }) => theme.color.black};
+  color: ${({ theme }) => theme.color.white};
+  border-radius: 4px;
+  font-size: ${({ theme }) => theme.font.size.xs};
+  white-space: nowrap;
+  z-index: ${({ theme }) => theme.zIndex.basic};
+  transform: translate(-50%, 0);
+`;
+
 const ToggleWrapper = styled.div`
   position: absolute;
-  bottom: 110px;
+  top: 44px;
   right: 20px;
+
+  &:hover {
+    ${Tooltip} {
+      display: flex;
+    }  
 `;
 
 const getMembers = memoizeOne((users, members) =>
@@ -161,6 +182,7 @@ const TeamCard = ({
       {canPinTeam && (
         <ToggleWrapper>
           <Toggle onChange={onPinTeam} checked={pinned} />
+          <Tooltip>{TEAM_MESSAGES.PIN}</Tooltip>
         </ToggleWrapper>
       )}
       <Link

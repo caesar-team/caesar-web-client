@@ -262,6 +262,10 @@ export const KEY_TYPE = {
   ANONYMOUS: 'anonymous',
 };
 
+export const TEAM_MESSAGES = {
+  PIN: 'Enable/disable display the team in the list',
+};
+
 export const REGEXP_TESTER = {
   SYSTEM: {
     IS_SHARE: name =>

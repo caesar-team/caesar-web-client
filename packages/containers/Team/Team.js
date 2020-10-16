@@ -155,11 +155,11 @@ export const TeamContainer = () => {
   };
 
   const handleLeaveTeam = () => {
-    leaveTeamRequest(team.id);
+    dispatch(leaveTeamRequest(team.id));
   };
 
   const handleRemoveTeam = () => {
-    removeTeamRequest(team.id);
+    dispatch(removeTeamRequest(team.id));
   };
 
   if (!team.id && !isLoadingTeams) {

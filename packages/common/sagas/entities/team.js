@@ -457,7 +457,7 @@ export function* togglePinTeamSaga({ payload: { teamId, shouldPinned } }) {
     const {
       data: { pinned },
     } = yield call(pinTeam, teamId, shouldPinned);
-console.log(pinned);
+
     yield put(togglePinTeamSuccess(teamId, pinned));
   } catch (error) {
     // eslint-disable-next-line no-console

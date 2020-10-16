@@ -89,7 +89,7 @@ import { teamDefaultListSelector } from '../../selectors/entities/list';
 export function* fetchTeamsSaga() {
   try {
     const { data: teamList } = yield call(getTeams);
-    console.log(convertTeamsToEntity(teamList));
+
     yield put(fetchTeamsSuccess(convertTeamsToEntity(teamList)));
     yield put(finishIsLoading());
   } catch (error) {

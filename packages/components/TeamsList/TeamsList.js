@@ -54,7 +54,11 @@ const TeamsListComponent = ({ activeTeamId, handleToggle, setListsOpened }) => {
   return (
     <>
       {teamList.map(team => {
-        return activeTeamId === team?.id || !team?.id ? null : (
+        const isTeamHidden = activeTeamId === team?.id ||
+          !team?.id ||
+          !team.pinned;
+
+        return isTeamHidden ? null : (
           <Option
             key={team.id}
             onClick={() => {

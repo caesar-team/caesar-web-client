@@ -11,8 +11,8 @@ const Wrapper = styled.label`
 const InputContainer = styled.label`
   position: relative;
   display: inline-block;
-  width: 40px;
-  height: 20px;
+  width: 36px;
+  height: 16px;
   > input {
     display: none;
   }
@@ -63,8 +63,8 @@ const Slider = styled.span`
       position: relative;
       border-radius: 50%;
       content: '';
-      height: 20px;
-      width: 20px;
+      height: 16px;
+      width: 16px;
       background-color: ${theme.color.white};
       -webkit-transition: 0.4s;
       transition: 0.4s;

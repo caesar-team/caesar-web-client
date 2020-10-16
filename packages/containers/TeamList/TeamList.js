@@ -187,7 +187,7 @@ class TeamListContainer extends Component {
   }
 
   render() {
-    const { isLoading, isLoadingTeams, teams } = this.props;
+    const { isLoading, isLoadingTeams, teams, isDomainAdmin } = this.props;
     const { modalVisibilities, selectedTeamTitle, activeTabName } = this.state;
     const favoriteTeams = teams.filter(team => team.pinned);
     const allTeamCards = this.renderTeamCards(teams);
@@ -215,7 +215,7 @@ class TeamListContainer extends Component {
           </Can>
         }
       >
-        <Can I={PERMISSION.CREATE} a={teamSubject}>
+        {isDomainAdmin ? (
           <Tabs activeTabName={activeTabName} onChange={this.handleChangeTab}>
             <Tab title="All" name="all">
               <TeamListWrapper>{allTeamCards}</TeamListWrapper>
@@ -224,10 +224,7 @@ class TeamListContainer extends Component {
               <TeamListWrapper>{favoriteTeamCards}</TeamListWrapper>
             </Tab>
           </Tabs>
-        </Can>
-        <Can not I={PERMISSION.CREATE} a={teamSubject}>
-          <TeamListWrapper>{allTeamCards}</TeamListWrapper>
-        </Can>
+        ) : <TeamListWrapper>{allTeamCards}</TeamListWrapper>}
         {modalVisibilities[NEW_TEAM_MODAL] && (
           <TeamModal
             teamId={this.state.selectedTeamId}

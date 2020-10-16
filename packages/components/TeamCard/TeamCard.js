@@ -72,6 +72,7 @@ const TeamInfo = styled.div`
   display: flex;
   flex-direction: column;
   margin-left: 20px;
+  margin-right: 44px;
 `;
 
 const TeamName = styled.div`
@@ -93,7 +94,7 @@ const AvatarsWrapper = styled.div`
 
 const ToggleWrapper = styled.div`
   position: absolute;
-  bottom: 110px;
+  top: 44px;
   right: 20px;
 `;
 

@@ -71,9 +71,10 @@ import {
   TEAM_TYPE,
 } from '@caesar/common/constants';
 import { updateGlobalNotification } from '@caesar/common/actions/application';
+import { finishIsLoading } from '@caesar/common/actions/workflow';
 import {
   encryptSecret,
-  generateTeamKeyPair,
+  generateKeyPair,
   saveItemSaga,
 } from '@caesar/common/sagas/entities/item';
 import { teamKeyPairSelector } from '@caesar/common/selectors/keystore';
@@ -90,12 +91,7 @@ export function* fetchTeamsSaga() {
     const { data: teamList } = yield call(getTeams);
     console.log(convertTeamsToEntity(teamList));
     yield put(fetchTeamsSuccess(convertTeamsToEntity(teamList)));
-
-    const currentTeamId = yield select(currentTeamIdSelector);
-
-    if (teamList.length && !currentTeamId) {
-      yield put(setCurrentTeamId(teamList[0].id));
-    }
+    yield put(finishIsLoading());
   } catch (error) {
     // eslint-disable-next-line no-console
     console.error(error);
@@ -159,7 +155,7 @@ export function* createTeamKeyPairSaga({ payload: { team, publicKey } }) {
       throw new Error('Fatal error: The publicKey not found.');
     }
 
-    const teamKeyPair = yield call(generateTeamKeyPair, {
+    const teamKeyPair = yield call(generateKeyPair, {
       name: team.title,
     });
 
@@ -176,7 +172,7 @@ export function* createTeamKeyPairSaga({ payload: { team, publicKey } }) {
       publicKey,
     });
 
-    const keyPairsById = convertKeyPairToEntity([serverKeypairItem]);
+    const keyPairsById = convertKeyPairToEntity([serverKeypairItem], 'teamId');
     yield put(addTeamKeyPairBatch(keyPairsById));
 
     return keyPairsById;
@@ -326,7 +322,7 @@ export function* createTeamSaga({
       icon,
     };
 
-    const teamKeyPair = yield call(generateTeamKeyPair, {
+    const teamKeyPair = yield call(generateKeyPair, {
       name: title,
     });
 
@@ -356,12 +352,15 @@ export function* createTeamSaga({
     }
 
     if (serverKeypair?.id) {
-      const keyPairsById = convertKeyPairToEntity([
-        {
-          ...serverKeypair,
-          ...teamKeyPair,
-        },
-      ]);
+      const keyPairsById = convertKeyPairToEntity(
+        [
+          {
+            ...serverKeypair,
+            ...teamKeyPair,
+          },
+        ],
+        'teamId',
+      );
 
       yield put(addTeamKeyPairBatch(keyPairsById));
     }

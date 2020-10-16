@@ -101,7 +101,7 @@ export const postCreateItem = data => callApi.post('/items', data);
 export const postCreateItemsBatch = data => callApi.post('/items/batch', data);
 
 export const removeItem = itemId => callApi.delete(`/items/${itemId}`);
-
+export const getItem = itemId => callApi.get(`/items/${itemId}`);
 // TODO: Refactor: use body instead of query (change together with backend)
 export const removeItemsBatch = query =>
   callApi.delete(`/items/batch?${query}`);
@@ -145,6 +145,8 @@ export const postRegistration = data =>
 export const postChangePassword = data =>
   callApi.patch('/auth/srpp/password', data);
 
+export const postItemShare = ({ itemId, users }) =>
+  callApi.post(`/items/${itemId}/share`, { users });
 export const getCheckShare = id => callApi.get(`/anonymous/share/${id}/check`);
 
 export const postInvitation = data => callApi.post('/invitation', data);

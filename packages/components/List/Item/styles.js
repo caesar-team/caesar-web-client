@@ -3,6 +3,7 @@ import styled from 'styled-components';
 import { ITEM_TYPE, ITEM_ICON_TYPE } from '@caesar/common/constants';
 import { Icon } from '../../Icon';
 import { Checkbox } from '../../Checkbox';
+import { HintStyles } from '../../Hint';
 
 export const Title = styled.div`
   margin-right: auto;
@@ -58,18 +59,11 @@ export const IconWrapper = styled.div`
 `;
 
 export const Tooltip = styled.div`
-  display: none;
+  ${HintStyles};
   position: absolute;
-  top: ${({ isTop }) => (isTop ? 'auto' : '-40px')};
-  bottom: ${({ isTop }) => (isTop ? '-40px' : 'auto')};
+  top: ${({ showUnder }) => (showUnder ? '-40px' : 'auto')};
+  bottom: ${({ showUnder }) => (showUnder ? 'auto' : '-40px')};
   left: -10px;
-  padding: 4px 8px;
-  background-color: ${({ theme }) => theme.color.black};
-  color: ${({ theme }) => theme.color.white};
-  border-radius: 4px;
-  font-size: ${({ theme }) => theme.font.size.xs};
-  white-space: nowrap;
-  z-index: ${({ theme }) => theme.zIndex.basic};
 `;
 
 export const NotEditIconWrapper = styled.div`
@@ -77,7 +71,8 @@ export const NotEditIconWrapper = styled.div`
 
   &:hover {
     ${Tooltip} {
-      display: flex;
+      z-index: ${({ theme }) => theme.zIndex.basic};
+      opacity: 1;
     }
   }
 `;
@@ -148,7 +143,8 @@ export const Row = styled.div`
   }
   
   ${Tooltip} {
-    display: none;
+    z-index: ${({ theme }) => theme.zIndex.hidden};
+    opacity: 0;
   }
 `;
 

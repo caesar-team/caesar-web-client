@@ -1,6 +1,6 @@
 import { createSelector } from 'reselect';
 import { teamsByIdSelector } from '@caesar/common/selectors/entities/team';
-import { ROLE_ANONYMOUS_USER } from '@caesar/common/constants';
+import { ROLE_ANONYMOUS_USER, ROLE_ADMIN } from '@caesar/common/constants';
 
 export const userSelector = state => state.user;
 
@@ -58,6 +58,11 @@ export const isUserAnonymousSelector = createSelector(
 export const userIdSelector = createSelector(
   userDataSelector,
   data => data.id,
+);
+
+export const isUserDomainAdminSelector = createSelector(
+  userDataSelector,
+  data => data.roles.includes(ROLE_ADMIN),
 );
 
 // @Deprecated

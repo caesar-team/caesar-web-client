@@ -468,6 +468,11 @@ export function* initWorkflowSaga() {
 
 export function* openTeamVaultSaga({ payload: { teamId } }) {
   try {
+    const user = yield select(userDataSelector);
+
+    // If there is no user we can't init even personal team
+    if (!user) return;
+
     const team = yield select(teamSelector, { teamId });
     if (!team && teamId !== TEAM_TYPE.PERSONAL) {
       yield put(setCurrentTeamId(TEAM_TYPE.PERSONAL));

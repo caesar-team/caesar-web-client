@@ -1,6 +1,10 @@
 import { createSelector } from 'reselect';
 import { teamsByIdSelector } from '@caesar/common/selectors/entities/team';
-import { ROLE_ANONYMOUS_USER } from '@caesar/common/constants';
+import {
+  ROLE_ANONYMOUS_USER,
+  ROLE_ADMIN,
+  TEAM_TYPE,
+} from '@caesar/common/constants';
 
 export const userSelector = state => state.user;
 
@@ -26,7 +30,8 @@ export const userDataSelector = createSelector(
 
 export const userTeamIdsSelector = createSelector(
   userDataSelector,
-  user => (!user ? ['personal'] : ['personal', ...user?.teamIds]),
+  user =>
+    !user ? [TEAM_TYPE.PERSONAL] : [TEAM_TYPE.PERSONAL, ...user?.teamIds],
 );
 
 export const userTeamListSelector = createSelector(
@@ -58,6 +63,11 @@ export const isUserAnonymousSelector = createSelector(
 export const userIdSelector = createSelector(
   userDataSelector,
   data => data.id,
+);
+
+export const isUserDomainAdminSelector = createSelector(
+  userDataSelector,
+  data => data.roles.includes(ROLE_ADMIN),
 );
 
 // @Deprecated

@@ -50,7 +50,7 @@ export const Item = ({
   const isActive = workInProgressItem?.id === id;
   const isChecked = isMultiItem && workInProgressItemIds.includes(id);
 
-  const isTop = index === 0;
+  const showTooltipUnder = index > 0;
 
   return (
     <Row
@@ -87,7 +87,7 @@ export const Item = ({
                   height={20}
                   color="white"
                 />
-                <Tooltip isTop={isTop}>
+                <Tooltip showUnder={showTooltipUnder}>
                   {PERMISSION_MESSAGES.FORBIDDEN_SELECT}
                 </Tooltip>
               </NotEditIconWrapper>

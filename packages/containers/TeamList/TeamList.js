@@ -17,6 +17,7 @@ const TeamListWrapper = styled.div`
   display: flex;
   justify-content: space-between;
   flex-wrap: wrap;
+  width: 100%;
 `;
 
 const StyledTeamCard = styled(TeamCard)`
@@ -27,6 +28,9 @@ const StyledTeamCard = styled(TeamCard)`
 const NEW_TEAM_MODAL = 'newTeamModal';
 const LEAVE_TEAM_MODAL = 'leaveTeamModal';
 const REMOVE_TEAM_MODAL = 'removeTeamModal';
+
+const ALL_TAB_NAME = 'all';
+const FAVORITES_TAB_NAME = 'favorites';
 
 class TeamListContainer extends Component {
   state = this.prepareInitialState();
@@ -162,7 +166,7 @@ class TeamListContainer extends Component {
         [LEAVE_TEAM_MODAL]: false,
         [REMOVE_TEAM_MODAL]: false,
       },
-      activeTabName: 'all',
+      activeTabName: ALL_TAB_NAME,
     };
   }
 
@@ -198,10 +202,14 @@ class TeamListContainer extends Component {
       ...this.props.user?._permissions,
     };
 
+    const teamsLength = activeTabName === FAVORITES_TAB_NAME
+      ? favoriteTeams.length
+      : teams.length;
+
     return (
       <SettingsWrapper
         isLoading={isLoading || isLoadingTeams}
-        title={`Teams (${teams.length})`}
+        title={`Teams (${teamsLength})`}
         addonTopComponent={
           <Can I={PERMISSION.CREATE} a={teamSubject}>
             <Button
@@ -217,10 +225,10 @@ class TeamListContainer extends Component {
       >
         {isDomainAdmin ? (
           <Tabs activeTabName={activeTabName} onChange={this.handleChangeTab}>
-            <Tab title="All" name="all">
+            <Tab title="All" name={ALL_TAB_NAME}>
               <TeamListWrapper>{allTeamCards}</TeamListWrapper>
             </Tab>
-            <Tab title="Favorites" name="favorites">
+            <Tab title="Favorites" name={FAVORITES_TAB_NAME}>
               <TeamListWrapper>{favoriteTeamCards}</TeamListWrapper>
             </Tab>
           </Tabs>

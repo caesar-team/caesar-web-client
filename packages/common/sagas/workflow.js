@@ -48,7 +48,10 @@ import {
   fetchUserSelfSaga,
   fetchUserTeamsSaga,
 } from '@caesar/common/sagas/user';
-import { fetchMembersSaga } from '@caesar/common/sagas/entities/member';
+import {
+  fetchMembersSaga,
+  fetchTeamMembersSaga,
+} from '@caesar/common/sagas/entities/member';
 import {
   createTeamKeyPairSaga,
   fetchTeamsSaga,
@@ -93,10 +96,15 @@ import { addTeamsBatch } from '@caesar/common/actions/entities/team';
 import { getServerErrorMessage } from '@caesar/common/utils/error';
 import {
   teamListSelector,
+  teamMembersSelector,
   teamSelector,
 } from '@caesar/common/selectors/entities/team';
 import { ADD_KEYPAIRS_BATCH } from '../actions/entities/keypair';
 import { memberSelector } from '../selectors/entities/member';
+import {
+  fetchTeamMembersRequest,
+  FETCH_MEMBERS_SUCCESS,
+} from '../actions/entities/member';
 
 export function decryptItemsByItemIdKeys(items, keyPairs) {
   try {
@@ -164,37 +172,48 @@ export function* processSharedItemsSaga() {
     console.error(error);
   }
 }
+function* checkTeamPermissionsAndKeys(teamId) {
+  const teamKeyPairs = yield select(teamKeyPairSelector, { teamId });
+  if (!teamKeyPairs) {
+    // Update the members list
+    yield call(fetchTeamMembersRequest, teamId);
+    yield take(FETCH_MEMBERS_SUCCESS);
+    const team = yield select(teamSelector, { teamId });
+    const teamMembers = yield select(teamMembersSelector, { teamId });
 
-export function* processTeamItemsSaga({ payload: { teamId } }) {
-  try {
-    let teamKeyPairs = yield select(teamKeyPairSelector, { teamId });
-
-    if (!teamKeyPairs) {
-      const team = yield select(teamSelector, { teamId });
-      const { id: ownerId } = yield select(userDataSelector);
-      const { publicKey } = yield select(memberSelector, { memberId: ownerId });
-
+    if (teamMembers.length > 0) {
       // eslint-disable-next-line no-console
       console.warn(
-        `The key pair for the team ${team?.title}: ${teamId} not found. Need to create a new one...`,
+        `The key pair for the team ${team?.title}: ${teamId} not found. 
+        But the team has at least one member, the count of members is ${teamMembers?.length}.`,
       );
 
-      if (!publicKey) {
-        throw new Error(
-          `Can't creat the team:  ${team?.title ||
-            teamId} cause the publickey is null`,
-        );
-      }
-
-      yield call(createTeamKeyPairSaga, {
-        payload: { team, publicKey },
-      });
-
-      teamKeyPairs = yield select(teamKeyPairSelector, { teamId });
-
-      if (!teamKeyPairs) return;
+      return;
     }
 
+    const { id: ownerId } = yield select(userDataSelector);
+    const { publicKey } = yield select(memberSelector, { memberId: ownerId });
+
+    // eslint-disable-next-line no-console
+    console.warn(
+      `The key pair for the team ${team?.title}: ${teamId} not found. Need to create a new one...`,
+    );
+
+    if (!publicKey) {
+      throw new Error(
+        `Can't creat the team:  ${team?.title ||
+          teamId} cause the publickey is null`,
+      );
+    }
+
+    // yield call(createTeamKeyPairSaga, {
+    //   payload: { team, publicKey },
+    // });
+  }
+}
+export function* processTeamItemsSaga({ payload: { teamId } }) {
+  try {
+    const teamKeyPairs = yield select(teamKeyPairSelector, { teamId });
     const { privateKey = null, password = null } = teamKeyPairs;
 
     const teamItems = yield select(nonDecryptedTeamItemsSelector, { teamId });
@@ -486,6 +505,7 @@ export function* openTeamVaultSaga({ payload: { teamId } }) {
 
     yield call(initTeam, teamId);
     yield call(initListsAndProgressEntities);
+    yield call(checkTeamPermissionsAndKeys, teamId);
     // TODO: Here is opportunity to improve the calls
     yield fork(processTeamItemsSaga, {
       payload: {

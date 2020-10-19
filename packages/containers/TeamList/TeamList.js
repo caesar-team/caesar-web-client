@@ -224,7 +224,9 @@ class TeamListContainer extends Component {
               <TeamListWrapper>{favoriteTeamCards}</TeamListWrapper>
             </Tab>
           </Tabs>
-        ) : <TeamListWrapper>{allTeamCards}</TeamListWrapper>}
+        ) : (
+          <TeamListWrapper>{allTeamCards}</TeamListWrapper>
+        )}
         {modalVisibilities[NEW_TEAM_MODAL] && (
           <TeamModal
             teamId={this.state.selectedTeamId}

@@ -51,7 +51,7 @@ export const fetchTeamMembersSuccess = membersById => ({
 });
 
 export const fetchMembersRequest = memberIds => ({
-  type: FETCH_TEAM_MEMBERS_REQUEST,
+  type: FETCH_MEMBERS_REQUEST,
   payload: {
     memberIds,
   },

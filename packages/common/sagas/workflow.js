@@ -100,7 +100,10 @@ import {
   teamSelector,
 } from '@caesar/common/selectors/entities/team';
 import { ADD_KEYPAIRS_BATCH } from '../actions/entities/keypair';
-import { memberSelector } from '../selectors/entities/member';
+import {
+  memberSelector,
+  memberTeamSelector,
+} from '../selectors/entities/member';
 import {
   fetchTeamMembersRequest,
   FETCH_MEMBERS_SUCCESS,
@@ -174,21 +177,23 @@ export function* processSharedItemsSaga() {
 }
 function* checkTeamPermissionsAndKeys(teamId) {
   const teamKeyPairs = yield select(teamKeyPairSelector, { teamId });
+
   if (!teamKeyPairs) {
     // Update the members list
-    yield call(fetchTeamMembersRequest, teamId);
+    yield put(fetchTeamMembersRequest({ teamId }));
     yield take(FETCH_MEMBERS_SUCCESS);
+
     const team = yield select(teamSelector, { teamId });
-    const teamMembers = yield select(teamMembersSelector, { teamId });
+    const teamMembers = yield select(memberTeamSelector, { teamId });
 
     if (teamMembers.length > 0) {
       // eslint-disable-next-line no-console
       console.warn(
         `The key pair for the team ${team?.title}: ${teamId} not found. 
-        But the team has at least one member, the count of members is ${teamMembers?.length}.`,
+        But the team has at least one member, the count of members is ${teamMembers?.length}. `,
       );
 
-      return;
+      return false;
     }
 
     const { id: ownerId } = yield select(userDataSelector);
@@ -209,7 +214,11 @@ function* checkTeamPermissionsAndKeys(teamId) {
     // yield call(createTeamKeyPairSaga, {
     //   payload: { team, publicKey },
     // });
+
+    return !!(yield select(teamKeyPairSelector, { teamId }));
   }
+
+  return !!(yield select(teamKeyPairSelector, { teamId }));
 }
 export function* processTeamItemsSaga({ payload: { teamId } }) {
   try {
@@ -505,19 +514,32 @@ export function* openTeamVaultSaga({ payload: { teamId } }) {
 
     yield call(initTeam, teamId);
     yield call(initListsAndProgressEntities);
-    yield call(checkTeamPermissionsAndKeys, teamId);
-    // TODO: Here is opportunity to improve the calls
-    yield fork(processTeamItemsSaga, {
-      payload: {
-        teamId,
-      },
-    });
+    const checksResult = yield call(checkTeamPermissionsAndKeys, teamId);
 
-    yield fork(processSharedItemsSaga, {
-      payload: {
-        teamId,
-      },
-    });
+    if (checksResult) {
+      // TODO: Here is opportunity to improve the calls
+      yield fork(processTeamItemsSaga, {
+        payload: {
+          teamId,
+        },
+      });
+
+      yield fork(processSharedItemsSaga, {
+        payload: {
+          teamId,
+        },
+      });
+    } else {
+      yield put(
+        updateGlobalNotification(
+          `You do not have the keypair for the ${team?.title} team, please contact with your domain admin to provide access to the team.`,
+          false,
+          true,
+        ),
+      );
+      // eslint-disable-next-line no-console
+      console.error(`The team checks weren't pass`);
+    }
 
     yield put(finishIsLoading());
   } catch (error) {

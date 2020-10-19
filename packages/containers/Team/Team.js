@@ -150,7 +150,7 @@ export const TeamContainer = () => {
   };
 
   const handleInvite = invitedMembers => {
-    addTeamMembersBatchRequest(team.id, invitedMembers);
+    dispatch(addTeamMembersBatchRequest(team.id, invitedMembers));
     handleCloseModal(INVITE_MEMBER_MODAL)();
   };
 

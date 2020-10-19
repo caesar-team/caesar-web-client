@@ -139,7 +139,10 @@ export default createReducer(initialState, {
       ...state,
       byId: {
         ...state.byId,
-        [payload.team.id]: payload.team,
+        [payload.team.id]: {
+          ...state.byId[payload.team.id],
+          ...payload.team,
+        },
       },
     };
   },

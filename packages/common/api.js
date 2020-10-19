@@ -86,6 +86,9 @@ export const getBackupCodes = () => callApi.get('/auth/2fa/backups');
 export const postActivateTwoFactor = data =>
   callApi.post('/auth/2fa/activate', data);
 
+export const postAcceptTwoFactor = () =>
+  callApi.post('/auth/2fa/backups/accept');
+
 export const postCheckTwoFactor = data => callApi.post('/auth/2fa', data);
 
 // post

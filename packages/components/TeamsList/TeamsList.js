@@ -54,9 +54,8 @@ const TeamsListComponent = ({ activeTeamId, handleToggle, setListsOpened }) => {
   return (
     <>
       {teamList.map(team => {
-        const isTeamHidden = activeTeamId === team?.id ||
-          !team?.id ||
-          !team?.pinned;
+        const isTeamHidden =
+          activeTeamId === team?.id || !team?.id || !team?.pinned;
 
         return isTeamHidden ? null : (
           <Option

@@ -88,7 +88,6 @@ import {
   teamKeyPairSelector,
   shareKeyPairsSelector,
   shareItemKeyPairSelector,
-  teamKeyPairsSelector,
 } from '@caesar/common/selectors/keystore';
 import { addTeamsBatch, lockTeam } from '@caesar/common/actions/entities/team';
 import { getServerErrorMessage } from '@caesar/common/utils/error';

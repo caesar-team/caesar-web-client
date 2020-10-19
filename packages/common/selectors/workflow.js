@@ -95,9 +95,7 @@ const createListItemsList = (children, itemsById) =>
     .reduce((accumulator, itemId) => {
       const item = itemsById[itemId];
 
-      return item?.data && isGeneralItem(item)
-        ? [...accumulator, item]
-        : accumulator;
+      return isGeneralItem(item) ? [...accumulator, item] : accumulator;
     }, [])
     .sort((a, b) => sortByDate(a.lastUpdated, b.lastUpdated, 'DESC')) || [];
 

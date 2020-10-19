@@ -21,7 +21,11 @@ import {
 
 export const Item = ({
   id,
-  data: { name, attachments = [], website },
+  title,
+  data: { attachments = [], website } = {
+    attachments: [],
+    website: null,
+  },
   type,
   invited,
   isMultiItem = false,
@@ -102,7 +106,7 @@ export const Item = ({
           </TypeIconWrapper>
         )}
       </Can>
-      <Title>{name}</Title>
+      <Title>{title}</Title>
       {shouldShowAttachments && (
         <Addon isInModal={isInModal}>
           <Icon name="clip" width={16} height={16} />

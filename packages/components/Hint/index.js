@@ -1,1 +1,1 @@
-export { Hint } from './Hint';
+export { HintStyles, Hint } from './Hint';

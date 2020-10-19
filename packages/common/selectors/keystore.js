@@ -40,13 +40,6 @@ export const shareItemKeyPairSelector = createSelector(
   },
 );
 
-// export const keyPairsStoreSelector = createSelector(
-//   shareKeyPairsSelector,
-//   teamKeyPairsSelector,
-//   anonymousKeyPairsSelector,
-//   (sharesKeys, teamKeys, anonymousKeys) => [...sharesKeys, ...teamKeys],
-// );
-
 const teamIdPropSelector = (_, props) => props.teamId;
 
 const idsPropSelector = (_, props) => props.ids;

@@ -202,9 +202,10 @@ class TeamListContainer extends Component {
       ...this.props.user?._permissions,
     };
 
-    const teamsLength = activeTabName === FAVORITES_TAB_NAME
-      ? favoriteTeams.length
-      : teams.length;
+    const teamsLength =
+      activeTabName === FAVORITES_TAB_NAME
+        ? favoriteTeams.length
+        : teams.length;
 
     return (
       <SettingsWrapper

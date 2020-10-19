@@ -10,6 +10,7 @@ import {
 import { setCurrentTeamId } from '@caesar/common/actions/user';
 import { getTeamTitle } from '@caesar/common/utils/team';
 import { Avatar } from '../Avatar';
+import { Icon } from '../Icon';
 
 const Option = styled.div`
   display: flex;
@@ -31,6 +32,9 @@ const Option = styled.div`
 const StyledAvatar = styled(Avatar)`
   margin-right: 16px;
 `;
+const StyledWarningIcon = styled(Icon)`
+  margin-right: 16px;
+`;
 const sortTeams = (a, b) => {
   if (a.title.toLowerCase() === TEAM_TYPE.DEFAULT) return 1;
   if (b.title.toLowerCase() === TEAM_TYPE.DEFAULT) return -1;
@@ -48,6 +52,18 @@ const isTeamEnable = activeTeamId => team => {
 
   return (isPinnedTeams || isMustTeams) && isNonActiveTeam;
 };
+
+const TeamAvatar = ({ team }) =>
+  team?.locked ? (
+    <StyledWarningIcon name="warning" width={32} height={32} />
+  ) : (
+    <StyledAvatar
+      avatar={team.icon}
+      email={team.email}
+      size={32}
+      fontSize="small"
+    />
+  );
 const TeamsListComponent = ({ activeTeamId, handleToggle, setListsOpened }) => {
   const dispatch = useDispatch();
   const currentTeam = useSelector(currentTeamSelector);
@@ -75,12 +91,7 @@ const TeamsListComponent = ({ activeTeamId, handleToggle, setListsOpened }) => {
               handleChangeTeam(team.id);
             }}
           >
-            <StyledAvatar
-              avatar={team.icon}
-              email={team.email}
-              size={32}
-              fontSize="small"
-            />
+            <TeamAvatar team={team} />
             {getTeamTitle(team)}
           </Option>
         );

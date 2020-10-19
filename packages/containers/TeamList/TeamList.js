@@ -17,6 +17,7 @@ const TeamListWrapper = styled.div`
   display: flex;
   justify-content: space-between;
   flex-wrap: wrap;
+  width: 100%;
 `;
 
 const StyledTeamCard = styled(TeamCard)`
@@ -198,10 +199,12 @@ class TeamListContainer extends Component {
       ...this.props.user?._permissions,
     };
 
+    const teamsLength = activeTabName === 'favorites' ? favoriteTeams.length : teams.length;
+
     return (
       <SettingsWrapper
         isLoading={isLoading || isLoadingTeams}
-        title={`Teams (${teams.length})`}
+        title={`Teams (${teamsLength})`}
         addonTopComponent={
           <Can I={PERMISSION.CREATE} a={teamSubject}>
             <Button

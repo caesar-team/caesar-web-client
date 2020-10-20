@@ -51,6 +51,7 @@ export const ADD_TEAMS_BATCH = '@team/ADD_TEAMS_BATCH';
 export const ADD_TEAM_MEMBER = '@team/ADD_TEAM_MEMBER';
 
 export const RESET_TEAM_STATE = '@team/RESET_TEAM_STATE';
+export const LOCK_TEAM = '@team/LOCK_TEAM';
 
 export const fetchTeamsRequest = () => ({
   type: FETCH_TEAMS_REQUEST,
@@ -251,6 +252,14 @@ export const addTeamsBatch = teamsById => ({
   type: ADD_TEAMS_BATCH,
   payload: {
     teamsById,
+  },
+});
+
+export const lockTeam = (teamId, lock) => ({
+  type: LOCK_TEAM,
+  payload: {
+    teamId,
+    lock,
   },
 });
 

@@ -187,19 +187,11 @@ export const selectableTeamsListsSelector = createSelector(
         ({ type }) => ![LIST_TYPE.FAVORITES, LIST_TYPE.TRASH].includes(type),
       );
 
-    return [
-      {
-        id: TEAM_TYPE.PERSONAL,
-        name: TEAM_TYPE.PERSONAL,
-        icon: null,
-        lists: filterLists(personalLists),
-      },
-      ...teamList.map(team => ({
-        id: team.id,
-        name: team.title,
-        icon: team.icon,
-        lists: filterLists(teamLists.filter(list => list.teamId === team.id)),
-      })),
-    ];
+    return teamList.map(team => ({
+      id: team.id,
+      name: team.title,
+      icon: team.icon,
+      lists: filterLists(teamLists.filter(list => list.teamId === team.id)),
+    }));
   },
 );

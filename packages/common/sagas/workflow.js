@@ -648,8 +648,8 @@ function setWorkInProgressItemSaga({ payload: { item } }) {
 
 function* initDashboardSaga() {
   try {
-    yield all([call(fetchUserTeamsSaga), call(initWorkflowSaga)]);
     yield takeLatest(VAULTS_ARE_READY, openCurrentVaultSaga);
+    yield all([call(fetchUserTeamsSaga), call(initWorkflowSaga)]);
   } catch (error) {
     // eslint-disable-next-line no-console
     console.error('error: ', error);

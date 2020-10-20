@@ -52,7 +52,7 @@ export const generateSystemItemName = (entity, id) => {
 };
 
 export const generateSystemItemEmail = entityName => {
-  return `systems+${entityName}@${DOMAIN_HOSTNAME || getHostName()}.com`;
+  return `systems+${entityName}@${DOMAIN_HOSTNAME || getHostName()}`;
 };
 
 export const extractKeysFromSystemItem = item => {

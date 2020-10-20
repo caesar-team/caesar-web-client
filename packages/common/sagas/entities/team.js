@@ -199,16 +199,21 @@ export function* createTeamKeyPairSaga({ payload: { team, publicKey } }) {
 
 */
 function* encryptMemberTeamKey({ member, keypair }) {
-  const { id: userId, roles, publicKey } = member;
+  const { id: userId, publicKey } = member;
+
+  const itemKeyPair = Object.values(
+    convertKeyPairToItemEntity([keypair]),
+  ).shift();
+
   const secret = yield call(encryptSecret, {
-    item: convertKeyPairToItemEntity([keypair]),
+    item: itemKeyPair,
     publicKey,
   });
 
   return {
     userId,
     secret,
-    userRole: roles.includes(ROLE_ADMIN)
+    userRole: member?.roles?.includes(ROLE_ADMIN)
       ? TEAM_ROLES.USER_ROLE_ADMIN
       : TEAM_ROLES.USER_ROLE_MEMBER,
   };
@@ -217,20 +222,13 @@ export function* addMemberToTeamListsBatchSaga({
   payload: { teamId, members },
 }) {
   try {
-    // const preparedMembers = yield call(prepareUsersForSharing, members);
-    // const teamMembers = preparedMembers.map(member => ({ ...member, teamId }));
-    // const newMembers = preparedMembers.filter(({ isNew }) => isNew);
-
-    // if (newMembers.length > 0) {
-    //   yield fork(inviteNewMemberBatchSaga, {
-    //     payload: { members: newMembers },
-    //   });
-    // }
     const keypair = yield select(teamKeyPairSelector, { teamId });
+
     const postDataSagas = members.map(member =>
       call(encryptMemberTeamKey, { member, keypair }),
     );
     const postData = yield all(postDataSagas);
+
     const { data: serverMembers } = yield call(postAddTeamMemberBatch, {
       members: postData,
       teamId,
@@ -239,54 +237,6 @@ export function* addMemberToTeamListsBatchSaga({
     yield put(
       addTeamMembersBatchSuccess(teamId, convertMembersToEntity(serverMembers)),
     );
-    // yield put(fetchMembersSuccess(convertMembersToEntity(serverMembers)));
-
-    // const secret = yield call(encryptSecret, { item, publicKey });
-    // const teamItemList = yield select(teamItemListSelector, { teamId });
-    // const teamSystemItem = yield select(teamKeyPairSelector, { teamId });
-
-    // teamItemList.push(teamSystemItem?.raw);
-    // const itemUserPairs = yield call(getItemUserPairs, {
-    //   items: teamItemList,
-    //   members: teamMembers,
-    // });
-
-    // const invitedMemberIds = teamMembers.map(({ id }) => id);
-    // const invitedMembersWithCommandRole = teamMembers.map(member => ({
-    //   ...member,
-    //   role: TEAM_ROLES.USER_ROLE_MEMBER,
-    // }));
-
-    // const promises = invitedMembersWithCommandRole.map(({ id: userId, role }) =>
-    //   postAddTeamMember({ teamId, userId, role }),
-    // );
-
-    // const invitedMembersWithLinks = [];
-
-    // yield Promise.all(promises).then(result => {
-    //   result.forEach(({ data }) => {
-    //     invitedMembersWithLinks.push({
-    //       email: data.email,
-    //       id: data.id,
-    //       isNew: false,
-    //       publicKey: data.publicKey,
-    //       role: data.role,
-    //       teamId,
-    //       _links: data._links,
-    //       _permissions: createPermissionsFromLinks(data._links),
-    //     });
-    //   });
-    // });
-
-    // // TODO: add invite for members new or not new i dunno
-
-    // yield put(addTeamToMembersTeamsListBatch(teamId, invitedMemberIds));
-
-    // if (itemUserPairs.length > 0) {
-    //   yield fork(createChildItemBatchSaga, {
-    //     payload: { itemUserPairs },
-    //   });
-    // }
 
     yield put(updateGlobalNotification(NOOP_NOTIFICATION, false));
   } catch (error) {
@@ -434,9 +384,6 @@ export function* updateTeamMemberRoleSaga({
 
 export function* removeTeamMemberSaga({ payload: { teamId, userId } }) {
   try {
-    // TODO: Implement remove Team Member
-    // eslint-disable-next-line no-console
-    console.warn('Remove Team Member will be implemented.');
     yield call(deleteTeamMember, { teamId, userId });
     yield put(removeTeamMemberSuccess(teamId, userId));
     yield put(removeTeamFromMember(teamId, userId));

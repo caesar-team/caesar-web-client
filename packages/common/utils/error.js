@@ -8,7 +8,7 @@ export function getServerErrorMessage(error) {
   return DEFAULT_ERROR_MESSAGE;
 }
 
-function getArrayOfChildrenErrors(children) {console.log(children);
+function getArrayOfChildrenErrors(children) {
   return Object.keys(children).reduce((acc, key) => {
     if (Object.keys(children[key]?.children || {}).length > 0) {
       acc.push(getArrayOfChildrenErrors(children[key].children));

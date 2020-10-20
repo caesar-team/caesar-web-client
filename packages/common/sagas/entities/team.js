@@ -200,8 +200,13 @@ export function* createTeamKeyPairSaga({ payload: { team, publicKey } }) {
 */
 function* encryptMemberTeamKey({ member, keypair }) {
   const { id: userId, publicKey } = member;
+
+  const itemKeyPair = Object.values(
+    convertKeyPairToItemEntity([keypair]),
+  ).shift();
+
   const secret = yield call(encryptSecret, {
-    item: convertKeyPairToItemEntity([keypair]),
+    item: itemKeyPair,
     publicKey,
   });
 
@@ -218,10 +223,12 @@ export function* addMemberToTeamListsBatchSaga({
 }) {
   try {
     const keypair = yield select(teamKeyPairSelector, { teamId });
+
     const postDataSagas = members.map(member =>
       call(encryptMemberTeamKey, { member, keypair }),
     );
     const postData = yield all(postDataSagas);
+
     const { data: serverMembers } = yield call(postAddTeamMemberBatch, {
       members: postData,
       teamId,
@@ -377,9 +384,6 @@ export function* updateTeamMemberRoleSaga({
 
 export function* removeTeamMemberSaga({ payload: { teamId, userId } }) {
   try {
-    // TODO: Implement remove Team Member
-    // eslint-disable-next-line no-console
-    console.warn('Remove Team Member will be implemented.');
     yield call(deleteTeamMember, { teamId, userId });
     yield put(removeTeamMemberSuccess(teamId, userId));
     yield put(removeTeamFromMember(teamId, userId));

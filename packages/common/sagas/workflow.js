@@ -484,6 +484,7 @@ function* initListsAndProgressEntities() {
   const favoritesList = yield select(favoritesListSelector);
   const defaultList = lists.find(list => list.type === LIST_TYPE.DEFAULT);
   const inboxList = lists.find(list => list.type === LIST_TYPE.INBOX);
+
   if (!workInProgressList) {
     if (favoritesList?.children?.length > 0) {
       yield put(setWorkInProgressListId(favoritesList.id));
@@ -529,8 +530,8 @@ export function* openTeamVaultSaga({ payload: { teamId } }) {
     if (!team) {
       throw new Error('Houston, we have a problem!');
     }
-
-    yield all([call(initTeam, teamId), call(initListsAndProgressEntities)]);
+    yield call(initTeam, teamId);
+    yield call(initListsAndProgressEntities);
     const checksResult = yield call(checkTeamPermissionsAndKeys, teamId);
     if (checksResult) {
       yield put(lockTeam(teamId, false));
@@ -648,8 +649,8 @@ function setWorkInProgressItemSaga({ payload: { item } }) {
 
 function* initDashboardSaga() {
   try {
-    yield all([call(fetchUserTeamsSaga), call(initWorkflowSaga)]);
     yield takeLatest(VAULTS_ARE_READY, openCurrentVaultSaga);
+    yield all([call(fetchUserTeamsSaga), call(initWorkflowSaga)]);
   } catch (error) {
     // eslint-disable-next-line no-console
     console.error('error: ', error);

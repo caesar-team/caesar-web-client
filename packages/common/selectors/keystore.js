@@ -44,11 +44,6 @@ const teamIdPropSelector = (_, props) => props.teamId;
 
 const idsPropSelector = (_, props) => props.ids;
 
-export const personalKeyPairSelector = createSelector(
-  keyStoreSelector,
-  keystore => keystore[KEY_TYPE.PERSONAL] || {},
-);
-
 export const teamKeyPairSelector = createSelector(
   teamKeyPairsSelector,
   teamIdPropSelector,
@@ -91,10 +86,9 @@ export const idsKeyPairsSelector = createSelector(
 export const actualKeyPairSelector = createSelector(
   keyStoreSelector,
   currentTeamIdSelector,
-  personalKeyPairSelector,
   isUserAnonymousSelector,
   userIdSelector,
-  (data, currentTeamId, personalKeyPair, isAnonymous, userId) => {
+  (data, currentTeamId, isAnonymous, userId) => {
     switch (true) {
       case isAnonymous:
         return (
@@ -102,10 +96,8 @@ export const actualKeyPairSelector = createSelector(
             ({ id }) => id === userId,
           ) || {}
         );
-      case currentTeamId !== TEAM_TYPE.PERSONAL:
+      case !!currentTeamId:
         return findSystemItemsTeamByItemName(data, currentTeamId);
-      case currentTeamId === TEAM_TYPE.PERSONAL:
-        return personalKeyPair;
       default:
         return null;
     }

@@ -8,7 +8,6 @@ import globalStyles from '@caesar/assets/styles/globalStyles';
 import theme from '@caesar/common/theme';
 import { Provider } from 'react-redux';
 import withRedux from 'next-redux-wrapper';
-import withReduxSaga from 'next-redux-saga';
 import { configureWebStore } from '@caesar/common/root/store';
 import {
   UNLOCKED_ROUTES,
@@ -111,4 +110,4 @@ class Application extends NextApp {
   }
 }
 
-export default withRedux(configureWebStore)(withReduxSaga(Application));
+export default withRedux(configureWebStore)(Application);

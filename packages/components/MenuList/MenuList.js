@@ -80,8 +80,8 @@ const MenuListComponent = ({ mode, setSearchedText, setMode }) => {
       <Icon name="warning" width={32} height={32} />
     ) : (
       <Avatar
-        avatar={team.icon}
-        email={team.email}
+        avatar={team?.icon}
+        email={team?.email}
         size={32}
         fontSize="small"
       />

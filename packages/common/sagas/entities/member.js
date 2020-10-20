@@ -237,7 +237,8 @@ export function* getOrCreateMemberBatchSaga({ payload: { emailRolePairs } }) {
       ...setNewFlag(renameUserId(newMembers), true),
     ];
   } catch (e) {
-    console.log(e);
+    // eslint-disable-next-line no-console
+    console.error(e);
 
     return [];
   }

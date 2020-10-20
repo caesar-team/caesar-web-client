@@ -8,9 +8,9 @@ export function getServerErrorMessage(error) {
   return DEFAULT_ERROR_MESSAGE;
 }
 
-function getArrayOfChildrenErrors(children) {
+function getArrayOfChildrenErrors(children) {console.log(children);
   return Object.keys(children).reduce((acc, key) => {
-    if (children[key].children) {
+    if (Object.keys(children[key]?.children || {}).length > 0) {
       acc.push(getArrayOfChildrenErrors(children[key].children));
     } else if (children[key]?.errors) {
       acc.push(children[key]?.errors[0]);
@@ -33,7 +33,7 @@ export function getServerErrors(error) {
 
 export function getChildrenErrors(children) {
   return Object.keys(children).reduce((acc, key) => {
-    if (children[key].children) {
+    if (Object.keys(children[key]?.children || {}).length > 0) {
       getChildrenErrors(children[key].children);
     } else if (children[key]?.errors) {
       return { ...acc, [key]: children[key]?.errors[0] };

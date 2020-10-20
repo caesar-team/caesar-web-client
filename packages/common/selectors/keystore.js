@@ -5,7 +5,7 @@ import {
   userIdSelector,
 } from '@caesar/common/selectors/user';
 import { generateSystemItemName } from '@caesar/common/utils/item';
-import { KEY_TYPE, TEAM_TYPE, ENTITY_TYPE } from '@caesar/common/constants';
+import { KEY_TYPE, ENTITY_TYPE } from '@caesar/common/constants';
 
 const findSystemItemsTeamByItemName = (data, teamId) =>
   Object.values(data).find(

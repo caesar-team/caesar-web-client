@@ -25,6 +25,7 @@ const MemberWrapper = styled.div`
   justify-content: space-between;
   padding: 8px 20px;
   cursor: pointer;
+  transition: background-color 0.2s;
 
   &:hover {
     background-color: ${({ theme }) => theme.color.snow};

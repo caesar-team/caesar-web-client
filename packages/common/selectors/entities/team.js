@@ -55,6 +55,7 @@ export const teamsBatchSelector = createSelector(
   (teamsById, teamIds) => teamIds.map(teamId => teamsById[teamId]),
 );
 
+// @Deprecated
 export const teamMembersSelector = createSelector(
   teamSelector,
   membersByIdSelector,

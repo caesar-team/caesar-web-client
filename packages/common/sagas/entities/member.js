@@ -30,7 +30,10 @@ import {
   postNewUserBatch,
   updateKey,
 } from '@caesar/common/api';
-import { convertMembersToEntity } from '@caesar/common/normalizers/normalizers';
+import {
+  convertMembersToEntity,
+  convertUsersToEntity,
+} from '@caesar/common/normalizers/normalizers';
 import {
   generateSeedAndVerifier,
   generateUser,
@@ -57,7 +60,7 @@ export function* fetchMembersSaga() {
   try {
     const { data: members } = yield call(getMembers);
 
-    yield put(fetchMembersSuccess(convertMembersToEntity(members)));
+    yield put(fetchMembersSuccess(convertUsersToEntity(members)));
   } catch (error) {
     // eslint-disable-next-line no-console
     console.error(error);
@@ -244,17 +247,14 @@ export function* getOrCreateMemberBatchSaga({ payload: { emailRolePairs } }) {
   }
 }
 
-export function* fetchTeamMembersSaga({
-  payload: { teamId, needUpdateTeamMembers = false },
-}) {
+export function* fetchTeamMembersSaga({ payload: { teamId } }) {
   try {
     const { data } = yield call(getTeamMembers, teamId);
 
-    yield put(fetchMembersSuccess(convertMembersToEntity(data)));
+    const membersById = convertMembersToEntity(data);
+    yield put(fetchMembersSuccess(membersById));
 
-    if (needUpdateTeamMembers) {
-      yield put(updateTeamMembersWithRoles(teamId, data));
-    }
+    yield put(updateTeamMembersWithRoles(teamId, data));
   } catch (e) {
     yield put(fetchMembersFailure());
   }

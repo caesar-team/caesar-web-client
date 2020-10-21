@@ -5,7 +5,7 @@ export const entitiesSelector = state => state.entities;
 
 export const memberEntitySelector = createSelector(
   entitiesSelector,
-  entities => entities.member,
+  entities => entities?.member || {},
 );
 
 export const membersByIdSelector = createSelector(
@@ -45,5 +45,5 @@ export const memberTeamSelector = createSelector(
   memberListSelector,
   teamIdPropSelector,
   (membersList, teamId) =>
-    membersList.filter(({ teamIds }) => teamIds.includes(teamId)),
+    membersList.filter(({ teamIds }) => teamIds?.includes(teamId)),
 );

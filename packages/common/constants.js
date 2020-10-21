@@ -171,6 +171,7 @@ export const ENTITY_TYPE = {
   LIST: 'list',
   TEAM: 'team',
   MEMBER: 'member',
+  USER: 'user',
   SYSTEM: 'system',
   SHARE: 'share',
   KEYPAIR: 'keypair',
@@ -225,6 +226,7 @@ export const PERMISSION_ENTITY = {
   TEAM_LIST: 'team_list',
   ITEM: 'item',
   TEAM_ITEM: 'team_item',
+  DOMAIN: 'domain',
 };
 
 export const PERMISSION_READ = 'read';
@@ -234,6 +236,11 @@ export const TEAM_ROLES = {
   ROLE_ADMIN: 'ROLE_ADMIN',
   ROLE_MEMBER: 'ROLE_MEMBER',
   ROLE_GUEST: 'ROLE_GUEST',
+};
+export const TEAM_ROLES_LABELS = {
+  ROLE_ADMIN: 'Admin',
+  ROLE_MEMBER: 'Member',
+  ROLE_GUEST: 'Guest',
 };
 
 export const ROLE_USER = 'ROLE_USER';

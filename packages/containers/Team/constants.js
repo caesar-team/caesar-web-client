@@ -1,4 +1,4 @@
-import { TEAM_ROLES } from '@caesar/common/constants';
+import { TEAM_ROLES, TEAM_ROLES_LABELS } from '@caesar/common/constants';
 
 export const INVITE_MEMBER_MODAL = 'inviteMemberModal';
 export const LEAVE_TEAM_MODAL = 'leaveTeamModal';
@@ -14,10 +14,10 @@ export const WIDTH_RATIO = {
 export const OPTIONS = [
   {
     value: TEAM_ROLES.ROLE_ADMIN,
-    label: TEAM_ROLES.ROLE_ADMIN,
+    label: TEAM_ROLES_LABELS.ROLE_ADMIN,
   },
   {
     value: TEAM_ROLES.ROLE_MEMBER,
-    label: TEAM_ROLES.ROLE_MEMBER,
+    label: TEAM_ROLES_LABELS.ROLE_MEMBER,
   },
 ];

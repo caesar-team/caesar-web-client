@@ -3,15 +3,12 @@ import React, { useState, useCallback, useMemo } from 'react';
 import { useUpdateEffect } from 'react-use';
 import { useSelector, useDispatch } from 'react-redux';
 import { useRouter } from 'next/router';
-import memoizeOne from 'memoize-one';
 import styled from 'styled-components';
 import { isLoadingSelector } from '@caesar/common/selectors/workflow';
-import { userDataSelector } from '@caesar/common/selectors/user';
 import {
   isLoadingTeamsSelector,
   teamSelector,
 } from '@caesar/common/selectors/entities/team';
-import { membersByIdSelector } from '@caesar/common/selectors/entities/member';
 import {
   addTeamMembersBatchRequest,
   removeTeamMemberRequest,
@@ -37,6 +34,7 @@ import {
   TEAM_TYPE,
 } from '@caesar/common/constants';
 import { getTeamTitle } from '@caesar/common/utils/team';
+
 import {
   INVITE_MEMBER_MODAL,
   LEAVE_TEAM_MODAL,
@@ -52,21 +50,7 @@ const AddMemberButton = styled(ButtonStyled)`
   margin-right: 0;
 `;
 
-const getMemberList = memoizeOne((users = [], membersById) =>
-  users.reduce(
-    (accumulator, user) => [
-      ...accumulator,
-      {
-        ...membersById[user.id],
-        role: user.role,
-        _permissions: user._permissions,
-      },
-    ],
-    [],
-  ),
-);
-
-export const TeamContainer = () => {
+export const TeamContainer = ({ user, members }) => {
   const router = useRouter();
   const dispatch = useDispatch();
   const [modalVisibilities, setModalVisibilities] = useState({
@@ -74,6 +58,7 @@ export const TeamContainer = () => {
     [LEAVE_TEAM_MODAL]: false,
     [REMOVE_TEAM_MODAL]: false,
   });
+
   const isLoading = useSelector(isLoadingSelector);
   const isLoadingTeams = useSelector(isLoadingTeamsSelector);
 
@@ -107,12 +92,9 @@ export const TeamContainer = () => {
     return () => tableRowGroupNode.removeEventListener('scroll', handler);
   }, [tableRowGroupNode]);
 
-  const user = useSelector(userDataSelector);
   const team =
     useSelector(state => teamSelector(state, { teamId: router.query.id })) ||
     {};
-  const membersById = useSelector(membersByIdSelector);
-  const members = getMemberList(team.users, membersById);
   const tableData = useMemo(() => members, [members]);
 
   const handleChangeRole = userId => (_, value) => {

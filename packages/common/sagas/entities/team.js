@@ -31,6 +31,7 @@ import {
   togglePinTeamFailure,
 } from '@caesar/common/actions/entities/team';
 import {
+  addMembersBatch,
   removeTeamFromMember,
   removeTeamFromMembersBatch,
 } from '@caesar/common/actions/entities/member';
@@ -61,13 +62,13 @@ import {
   convertTeamsToEntity,
   convertKeyPairToEntity,
   convertKeyPairToItemEntity,
+  convertUsersToEntity,
   convertMembersToEntity,
 } from '@caesar/common/normalizers/normalizers';
 import {
   TEAM_ROLES,
   ENTITY_TYPE,
   NOOP_NOTIFICATION,
-  ROLE_ADMIN,
   TEAM_TYPE,
 } from '@caesar/common/constants';
 import { updateGlobalNotification } from '@caesar/common/actions/application';
@@ -80,6 +81,8 @@ import {
 import { teamKeyPairSelector } from '@caesar/common/selectors/keystore';
 import {
   memberAdminsSelector,
+  memberListSelector,
+  membersBatchSelector,
   memberSelector,
 } from '../../selectors/entities/member';
 import { addTeamKeyPairBatch } from '../../actions/keystore';
@@ -209,13 +212,14 @@ function* encryptMemberTeamKey({ member, keypair }) {
     item: itemKeyPair,
     publicKey,
   });
+  const teamRole = member?.domainRoles?.includes(TEAM_ROLES.ROLE_ADMIN)
+    ? TEAM_ROLES.ROLE_ADMIN
+    : TEAM_ROLES.ROLE_MEMBER;
 
   return {
     userId,
     secret,
-    userRole: member?.roles?.includes(ROLE_ADMIN)
-      ? TEAM_ROLES.USER_ROLE_ADMIN
-      : TEAM_ROLES.USER_ROLE_MEMBER,
+    teamRole,
   };
 }
 export function* addMemberToTeamListsBatchSaga({
@@ -223,8 +227,12 @@ export function* addMemberToTeamListsBatchSaga({
 }) {
   try {
     const keypair = yield select(teamKeyPairSelector, { teamId });
+    const memberIds = members.map(member => member.id);
+    // Domain users
+    // TODO: Invite unregistered users
+    const users = yield select(membersBatchSelector, { memberIds });
 
-    const postDataSagas = members.map(member =>
+    const postDataSagas = users.map(member =>
       call(encryptMemberTeamKey, { member, keypair }),
     );
     const postData = yield all(postDataSagas);
@@ -234,9 +242,9 @@ export function* addMemberToTeamListsBatchSaga({
       teamId,
     });
 
-    yield put(
-      addTeamMembersBatchSuccess(teamId, convertMembersToEntity(serverMembers)),
-    );
+    const membersById = convertMembersToEntity(serverMembers);
+    yield put(addTeamMembersBatchSuccess(teamId, membersById));
+    yield put(addMembersBatch(membersById));
 
     yield put(updateGlobalNotification(NOOP_NOTIFICATION, false));
   } catch (error) {
@@ -262,7 +270,6 @@ export function* createTeamSaga({
 
     // Get updates
     yield call(fetchMembersSaga);
-
     const adminMembers = yield select(memberAdminsSelector);
     // Gathering admins except current
     const adminsToInvite = adminMembers.filter(({ id }) => id !== userId);
@@ -279,6 +286,7 @@ export function* createTeamSaga({
     if (!teamKeyPair) {
       throw new Error(`Can't create the team with the title: ${title}`);
     }
+
     const encryptedKeypair = yield call(encryptSecret, {
       item: teamKeyPair,
       publicKey,

@@ -1,12 +1,13 @@
 import { normalize } from 'normalizr';
 import {
   listSchema,
-  memberSchema,
+  userSchema,
   teamSchema,
   keypairSchema,
   itemSchema,
   keypairItemSchema,
   shareItemSchema,
+  memberSchema,
 } from '@caesar/common/normalizers/schemas';
 
 export const convertItemsToEntities = items => {
@@ -48,6 +49,12 @@ export const convertNodesToEntities = nodes => {
     listsById: normalized.entities.listsById || {},
     itemsById: normalized.entities.itemsById || {},
   };
+};
+
+export const convertUsersToEntity = users => {
+  const normalized = normalize(users, [userSchema]);
+
+  return normalized.entities.byId || {};
 };
 
 export const convertMembersToEntity = members => {

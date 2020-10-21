@@ -204,9 +204,9 @@ export default createReducer(initialState, {
           ...state.byId[payload.teamId],
           users: [
             ...state.byId[payload.teamId].users,
-            ...members.map(({ id, role, _permissions }) => ({
+            ...members.map(({ id, teamRole, _permissions }) => ({
               id,
-              role,
+              teamRole,
               _permissions,
             })),
           ],

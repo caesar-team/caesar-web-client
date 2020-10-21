@@ -320,7 +320,7 @@ function* initTeamsSaga() {
       type: TEAM_TYPE.PERSONAL,
       icon: userData?.avatar,
       email: userData?.email,
-      userRole: ROLE_ADMIN,
+      teamRole: ROLE_ADMIN,
       _links: userData?._links,
     });
 

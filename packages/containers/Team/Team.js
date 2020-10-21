@@ -171,6 +171,7 @@ export const TeamContainer = () => {
   const teamSubject = {
     __typename: PERMISSION_ENTITY.TEAM,
     team_delete: team._permissions?.team_delete || false,
+    team_leave: team._permissions?.team_leave || false,
   };
 
   const teamMemberSubject = {
@@ -199,14 +200,16 @@ export const TeamContainer = () => {
               onClick={handleOpenModal(REMOVE_TEAM_MODAL)}
             />
           </Can>
-          {!isDomainTeam && (
-            <ButtonStyled
-              withOfflineCheck
-              icon="leave"
-              color="white"
-              onClick={handleOpenModal(LEAVE_TEAM_MODAL)}
-            />
-          )}
+          <Can I={PERMISSION.LEAVE} a={teamSubject}>
+            {!isDomainTeam && (
+              <ButtonStyled
+                withOfflineCheck
+                icon="leave"
+                color="white"
+                onClick={handleOpenModal(LEAVE_TEAM_MODAL)}
+              />
+            )}
+          </Can>
           <Can I={PERMISSION.ADD} a={teamMemberSubject}>
             <AddMemberButton
               withOfflineCheck

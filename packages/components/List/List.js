@@ -130,14 +130,6 @@ const ListComponent = ({
               ? listTitle
               : `Search results (${items.length} elements):`}
           </ColumnTitle>
-          {/* TODO: Add sharing list functional; Set condition when to show this button */}
-          {/* <Button
-            icon="share-network"
-            color="white"
-            onClick={() => {
-              console.log('Sharing modal');
-            }}
-          /> */}
         </ColumnHeader>
       )}
       <RenderedList

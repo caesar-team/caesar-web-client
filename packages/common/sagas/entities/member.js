@@ -81,7 +81,7 @@ export function* createMemberSaga({ payload: { email, role } }) {
       encryptedPrivateKey: privateKey,
       seed,
       verifier,
-      roles: [role],
+      domainRoles: [role],
     };
 
     const { data: user } = yield call(postNewUser, data);
@@ -94,7 +94,7 @@ export function* createMemberSaga({ payload: { email, role } }) {
           name: email,
           avatar: null,
           publicKey,
-          roles: [role],
+          domainRoles: [role],
         }),
       );
     }
@@ -130,7 +130,7 @@ export function* createMemberBatchSaga({ payload: { emailRolePairs } }) {
         publicKey,
         encryptedPrivateKey: privateKey,
         plainPassword: password,
-        roles: [emailRoleObject[email]],
+        domainRoles: [emailRoleObject[email]],
         ...generateSeedAndVerifier(email, password),
       }),
     );
@@ -143,7 +143,7 @@ export function* createMemberBatchSaga({ payload: { emailRolePairs } }) {
       (accumulator, userId, index) => {
         const member = members[index];
 
-        return member.roles.includes(ROLE_ANONYMOUS_USER)
+        return member.domainRoles.includes(ROLE_ANONYMOUS_USER)
           ? accumulator
           : [
               ...accumulator,
@@ -153,7 +153,7 @@ export function* createMemberBatchSaga({ payload: { emailRolePairs } }) {
                 name: member.email,
                 avatar: null,
                 publicKey: member.publicKey,
-                roles: [emailRoleObject[member.email]],
+                domainRoles: [emailRoleObject[member.email]],
                 teamIds: [],
                 __type: ENTITY_TYPE.MEMBER,
               },

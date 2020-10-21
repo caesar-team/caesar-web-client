@@ -33,8 +33,8 @@ import {
   PERMISSION,
   PERMISSION_ENTITY,
   ROUTES,
+  TEAM_ROLES,
   TEAM_TYPE,
-  USER_ROLE_ADMIN,
 } from '@caesar/common/constants';
 import { getTeamTitle } from '@caesar/common/utils/team';
 import {
@@ -177,7 +177,7 @@ export const TeamContainer = () => {
     __typename: PERMISSION_ENTITY.TEAM_MEMBER,
     team_member_add:
       team._permissions?.team_member_add ||
-      team.userRole === USER_ROLE_ADMIN ||
+      team.teamRole === TEAM_ROLES.ROLE_ADMIN ||
       false,
   };
 

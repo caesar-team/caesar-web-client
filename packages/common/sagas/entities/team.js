@@ -213,9 +213,9 @@ function* encryptMemberTeamKey({ member, keypair }) {
   return {
     userId,
     secret,
-    userRole: member?.roles?.includes(ROLE_ADMIN)
-      ? TEAM_ROLES.USER_ROLE_ADMIN
-      : TEAM_ROLES.USER_ROLE_MEMBER,
+    teamRole: member?.domainRoles?.includes(ROLE_ADMIN)
+      ? TEAM_ROLES.ROLE_ADMIN
+      : TEAM_ROLES.ROLE_MEMBER,
   };
 }
 export function* addMemberToTeamListsBatchSaga({

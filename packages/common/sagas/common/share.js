@@ -39,9 +39,9 @@ import { teamDefaultListSelector } from '../../selectors/entities/list';
 import { convertKeyPairToItemEntity } from '../../normalizers/normalizers';
 
 export function* prepareUsersForSharing(members) {
-  const emailRolePairs = members.map(({ email, roles }) => ({
+  const emailRolePairs = members.map(({ email, domainRoles }) => ({
     email,
-    role: roles.includes(ROLE_ADMIN) ? ROLE_ADMIN : ROLE_USER,
+    role: domainRoles.includes(ROLE_ADMIN) ? ROLE_ADMIN : ROLE_USER,
   }));
 
   return yield call(getOrCreateMemberBatchSaga, {

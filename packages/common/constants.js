@@ -230,12 +230,10 @@ export const PERMISSION_ENTITY = {
 export const PERMISSION_READ = 'read';
 export const PERMISSION_WRITE = 'write';
 
-export const USER_ROLE_ADMIN = 'admin';
-export const USER_ROLE_MEMBER = 'member';
-
 export const TEAM_ROLES = {
-  USER_ROLE_ADMIN,
-  USER_ROLE_MEMBER,
+  ROLE_ADMIN: 'ROLE_ADMIN',
+  ROLE_MEMBER: 'ROLE_MEMBER',
+  ROLE_GUEST: 'ROLE_GUEST',
 };
 
 export const ROLE_USER = 'ROLE_USER';

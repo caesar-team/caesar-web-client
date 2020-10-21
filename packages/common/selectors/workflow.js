@@ -42,7 +42,7 @@ export const workInProgressItemSelector = createSelector(
     return workInProgressItem
       ? {
           ...workInProgressItem,
-          userRole: team ? team.userRole : null,
+          teamRole: team ? team.teamRole : null,
           listType: list ? list.type : null,
         }
       : null;

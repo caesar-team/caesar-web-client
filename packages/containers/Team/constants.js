@@ -13,11 +13,11 @@ export const WIDTH_RATIO = {
 
 export const OPTIONS = [
   {
-    value: TEAM_ROLES.USER_ROLE_ADMIN,
-    label: TEAM_ROLES.USER_ROLE_ADMIN,
+    value: TEAM_ROLES.ROLE_ADMIN,
+    label: TEAM_ROLES.ROLE_ADMIN,
   },
   {
-    value: TEAM_ROLES.USER_ROLE_MEMBER,
-    label: TEAM_ROLES.USER_ROLE_MEMBER,
+    value: TEAM_ROLES.ROLE_MEMBER,
+    label: TEAM_ROLES.ROLE_MEMBER,
   },
 ];

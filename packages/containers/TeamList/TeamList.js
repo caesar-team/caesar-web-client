@@ -203,9 +203,10 @@ class TeamListContainer extends Component {
       ...this.props.user?._permissions,
     };
 
-    const teamsLength = activeTabName === FAVORITES_TAB_NAME
-      ? favoriteTeams.length
-      : teams.length;
+    const teamsLength =
+      activeTabName === FAVORITES_TAB_NAME
+        ? favoriteTeams.length
+        : teams.length;
 
     return (
       <SettingsWrapper
@@ -233,7 +234,9 @@ class TeamListContainer extends Component {
               <TeamListWrapper>{favoriteTeamCards}</TeamListWrapper>
             </Tab>
           </Tabs>
-        ) : <TeamListWrapper>{allTeamCards}</TeamListWrapper>}
+        ) : (
+          <TeamListWrapper>{allTeamCards}</TeamListWrapper>
+        )}
         {modalVisibilities[NEW_TEAM_MODAL] && (
           <TeamModal
             teamId={this.state.selectedTeamId}

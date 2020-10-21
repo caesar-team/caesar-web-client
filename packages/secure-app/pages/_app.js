@@ -6,7 +6,6 @@ import { ThemeProvider, createGlobalStyle } from 'styled-components';
 import globalStyles from '@caesar/assets/styles/globalStyles';
 import theme from '@caesar/common/theme';
 import withRedux from 'next-redux-wrapper';
-import withReduxSaga from 'next-redux-saga';
 import { configureWebStore } from '@caesar/common/root/store';
 import { NotificationProvider } from '@caesar/components';
 
@@ -61,4 +60,4 @@ class Application extends NextApp {
   }
 }
 
-export default withRedux(configureWebStore)(withReduxSaga(Application));
+export default withRedux(configureWebStore)(Application);

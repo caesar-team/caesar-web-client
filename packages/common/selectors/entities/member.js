@@ -38,3 +38,11 @@ export const memberAdminsSelector = createSelector(
   memberListSelector,
   membersList => membersList.filter(({ roles }) => roles.includes(ROLE_ADMIN)),
 );
+
+export const teamIdPropSelector = (_, props) => props.teamId;
+export const memberTeamSelector = createSelector(
+  memberListSelector,
+  teamIdPropSelector,
+  (membersList, teamId) =>
+    membersList.filter(({ teamIds }) => teamIds.includes(teamId)),
+);

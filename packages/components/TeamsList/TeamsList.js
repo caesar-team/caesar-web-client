@@ -10,6 +10,7 @@ import {
 import { setCurrentTeamId } from '@caesar/common/actions/user';
 import { getTeamTitle } from '@caesar/common/utils/team';
 import { Avatar } from '../Avatar';
+import { Icon } from '../Icon';
 
 const Option = styled.div`
   display: flex;
@@ -31,16 +32,45 @@ const Option = styled.div`
 const StyledAvatar = styled(Avatar)`
   margin-right: 16px;
 `;
+const StyledWarningIcon = styled(Icon)`
+  margin-right: 16px;
+`;
+const sortTeams = (a, b) => {
+  if (a.title.toLowerCase() === TEAM_TYPE.DEFAULT) return 1;
+  if (b.title.toLowerCase() === TEAM_TYPE.DEFAULT) return -1;
 
+  return sortByName(a.title, b.title);
+};
+const isTeamEnable = activeTeamId => team => {
+  if (!team?.id) return false;
+  // Don't show the active team
+  const isNonActiveTeam = team?.id !== activeTeamId;
+  // Always show the must and pinned teams
+  const isMustTeams =
+    team?.id === TEAM_TYPE.PERSONAL || team?.type === TEAM_TYPE.DEFAULT;
+  const isPinnedTeams = !!team?.pinned;
+
+  return (isPinnedTeams || isMustTeams) && isNonActiveTeam;
+};
+
+const TeamAvatar = ({ team }) =>
+  team?.locked ? (
+    <StyledWarningIcon name="warning" width={32} height={32} />
+  ) : (
+    <StyledAvatar
+      avatar={team.icon}
+      email={team.email}
+      size={32}
+      fontSize="small"
+    />
+  );
 const TeamsListComponent = ({ activeTeamId, handleToggle, setListsOpened }) => {
   const dispatch = useDispatch();
   const currentTeam = useSelector(currentTeamSelector);
-  const teamList = useSelector(userTeamListSelector).sort((a, b) => {
-    if (a.title.toLowerCase() === TEAM_TYPE.DEFAULT) return 1;
-    if (b.title.toLowerCase() === TEAM_TYPE.DEFAULT) return -1;
 
-    return sortByName(a.title, b.title);
-  });
+  const teamList = useSelector(userTeamListSelector)
+    .filter(isTeamEnable(activeTeamId))
+    .sort(sortTeams);
 
   const handleChangeTeam = teamId => {
     handleToggle();
@@ -54,23 +84,14 @@ const TeamsListComponent = ({ activeTeamId, handleToggle, setListsOpened }) => {
   return (
     <>
       {teamList.map(team => {
-        const isTeamHidden = activeTeamId === team?.id ||
-          !team?.id ||
-          !team?.pinned;
-
-        return isTeamHidden ? null : (
+        return (
           <Option
             key={team.id}
             onClick={() => {
               handleChangeTeam(team.id);
             }}
           >
-            <StyledAvatar
-              avatar={team.icon}
-              email={team.email}
-              size={32}
-              fontSize="small"
-            />
+            <TeamAvatar team={team} />
             {getTeamTitle(team)}
           </Option>
         );

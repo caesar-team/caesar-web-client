@@ -32,11 +32,33 @@ export const LEAVE_TEAM_REQUEST = '@team/LEAVE_TEAM_REQUEST';
 export const LEAVE_TEAM_SUCCESS = '@team/LEAVE_TEAM_SUCCESS';
 export const LEAVE_TEAM_FAILURE = '@team/LEAVE_TEAM_FAILURE';
 
+export const fetchTeamMembersRequest = ({
+  teamId,
+  needUpdateTeamMembers = false,
+}) => ({
+  type: FETCH_TEAM_MEMBERS_REQUEST,
+  payload: {
+    needUpdateTeamMembers,
+    teamId,
+  },
+});
+
+export const fetchTeamMembersSuccess = membersById => ({
+  type: FETCH_TEAM_MEMBERS_SUCCESS,
+  payload: {
+    membersById,
+  },
+});
+
 export const fetchMembersRequest = memberIds => ({
   type: FETCH_MEMBERS_REQUEST,
   payload: {
     memberIds,
   },
+});
+
+export const fetchTeamMembersFailure = () => ({
+  type: FETCH_TEAM_MEMBERS_FAILURE,
 });
 
 export const fetchMembersSuccess = membersById => ({

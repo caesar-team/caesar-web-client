@@ -17,7 +17,7 @@ const memberSchema = new schema.Entity(
       _permissions: entity?._links
         ? {
             ...createPermissionsFromLinks(entity._links),
-            __typename: PERMISSION_ENTITY.TEAM,
+            __typename: PERMISSION_ENTITY.TEAM_MEMBER,
           }
         : {},
     }),

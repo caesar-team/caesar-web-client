@@ -520,6 +520,7 @@ export function* createSystemItemKeyPair({
 
 export function* createIfNotExistKeyPair({ payload: { teamId, ownerId } }) {
   if (!teamId) return;
+
   const currentUser = yield select(userDataSelector);
   const userId = ownerId || currentUser.id;
 
@@ -647,13 +648,13 @@ export function* createItemsBatchSaga({
 
     yield put(updateGlobalNotification(ENCRYPTING_ITEM_NOTIFICATION, true));
 
-    const userId = yield select(userIdSelector);
-    const { teamId } = items[0];
+    const currentUserId = yield select(userIdSelector);
+    const { teamId = TEAM_TYPE.PERSONAL } = items[0];
 
     yield call(createIfNotExistKeyPair, {
       payload: {
         teamId,
-        ownerId: ownerId || userId,
+        ownerId: ownerId || currentUserId,
       },
     });
 

@@ -63,6 +63,7 @@ import {
   addTeamKeyPairBatch,
 } from '@caesar/common/actions/keystore';
 import {
+  postAddKeyPairBatch,
   postCreateItem,
   postCreateItemsBatch,
   removeItem,
@@ -95,6 +96,7 @@ import {
   teamKeyPairSelector,
 } from '@caesar/common/selectors/keystore';
 import {
+  convertSystemItemToKeyPair,
   generateSystemItemEmail,
   generateSystemItemName,
   isGeneralItem,
@@ -103,7 +105,11 @@ import { passwordGenerator } from '@caesar/common/utils/passwordGenerator';
 import { generateKeys } from '@caesar/common/utils/key';
 import { addSystemItemsBatch } from '@caesar/common/actions/entities/system';
 import { memberSelector } from '../../selectors/entities/member';
-import { convertItemsToEntities } from '../../normalizers/normalizers';
+import {
+  convertItemsToEntities,
+  convertKeyPairToEntity,
+} from '../../normalizers/normalizers';
+import { uuid4 } from '../../utils/uuid4';
 
 const ITEMS_CHUNK_SIZE = 50;
 
@@ -454,68 +460,128 @@ export function* getKeyPairForTeam(teamId) {
   });
 }
 
-export function* createSystemItemKeyPair({
+export function* saveKeyPair(
+  { ownerId, teamId, secret, relatedItemId } = {
+    teamId: null,
+    relatedItemId: null,
+  },
+) {
+  const keypairs = [{ ownerId, teamId, secret, relatedItemId }];
+
+  return yield call(postAddKeyPairBatch, {
+    items: keypairs,
+  });
+}
+
+export function* saveItemKeyPair({
+  item: { ownerId, teamId, data, relatedItemId },
+  publicKey,
+}) {
+  const secret = yield call(encryptItem, data, publicKey);
+
+  return yield call(saveKeyPair, {
+    ownerId,
+    teamId,
+    secret,
+    relatedItemId,
+  });
+}
+
+export function* generateItemKeyPairKeyByName(name) {
+  const generatedKeyPair = yield call(generateKeyPair, {
+    name,
+  });
+  const keypair = {
+    id: uuid4(),
+    ...generatedKeyPair,
+  };
+
+  return convertSystemItemToKeyPair(keypair);
+}
+
+export function* createKeyPair({
   payload: {
-    entityId,
-    entityTeamId,
-    entityType,
+    entityId = null,
+    entityTeamId = null,
     publicKey,
     entityOwnerId = null,
+  } = {
+    entityId: null,
+    entityTeamId: null,
+    entityOwnerId: null,
   },
 }) {
   // The deafult values
-  const teamId = entityTeamId || TEAM_TYPE.PERSONAL;
   const currentUserId = yield select(userIdSelector);
   const ownerId = entityOwnerId || currentUserId;
+  const teamId =
+    entityTeamId !== TEAM_TYPE.PERSONAL || entityTeamId ? entityTeamId : null;
 
-  const { id: defaultListId } = yield select(teamDefaultListSelector, {
-    teamId,
-  });
-
-  if (!entityType) {
-    throw new Error(`The type of system item isn't defined`);
+  if (!teamId && !entityId) {
+    throw new Error(`The team or the related item can not be null`);
   }
 
   // Create an empty item
-  let systemKeyPairItem = yield call(
-    generateSystemItem,
-    entityType,
-    defaultListId,
-    entityId,
-  );
-
-  // If the keypair for the shared item
-  if (ENTITY_TYPE.SHARE === entityType) {
-    systemKeyPairItem.relatedItemId = entityId;
-  } else if (ENTITY_TYPE.TEAM === entityType) {
-    systemKeyPairItem.ownerId = ownerId;
-  }
-
-  if (teamId !== TEAM_TYPE.PERSONAL) {
-    systemKeyPairItem.teamId = teamId;
-  }
-
-  // Encrypt and save the system keypair item to the owner personal vault
-  const systemItemFromServer = yield call(saveItemSaga, {
-    item: {
-      ...systemKeyPairItem,
-      type: ITEM_TYPE.KEYPAIR,
-    },
-    publicKey,
+  const keypair = yield call(generateKeyPair, {
+    name: entityTeamId || entityId,
   });
+  const secret = yield call(encryptSecret, { item: keypair, publicKey });
 
-  systemKeyPairItem = {
-    ...systemKeyPairItem,
-    ...systemItemFromServer,
-  };
+  const { data } = yield call(saveKeyPair, {
+    ownerId,
+    teamId,
+    secret,
+    relatedItemId: entityId,
+  });
+  debugger;
+  // const { id: defaultListId } = yield select(teamDefaultListSelector, {
+  //   teamId,
+  // });
 
-  yield put(
-    addTeamKeyPairBatch({
-      [systemKeyPairItem.id]: systemKeyPairItem,
-    }),
-  );
+  // if (!entityType) {
+  //   throw new Error(`The type of system item isn't defined`);
+  // }
 
-  return systemKeyPairItem;
+  // // Create an empty item
+  // let systemKeyPairItem = yield call(
+  //   generateSystemItem,
+  //   entityType,
+  //   defaultListId,
+  //   entityId,
+  // );
+
+  // // If the keypair for the shared item
+  // if (ENTITY_TYPE.SHARE === entityType) {
+  //   systemKeyPairItem.relatedItemId = entityId;
+  // } else if (ENTITY_TYPE.TEAM === entityType) {
+  //   systemKeyPairItem.ownerId = ownerId;
+  // }
+
+  // if (teamId !== TEAM_TYPE.PERSONAL) {
+  //   systemKeyPairItem.teamId = teamId;
+  // }
+
+  // // Encrypt and save the system keypair item to the owner personal vault
+  // const systemItemFromServer = yield call(saveItemSaga, {
+  //   item: {
+  //     ...systemKeyPairItem,
+  //     type: ITEM_TYPE.KEYPAIR,
+  //   },
+  //   publicKey,
+  // });
+
+  // systemKeyPairItem = {
+  //   ...systemKeyPairItem,
+  //   ...systemItemFromServer,
+  // };
+
+  // yield put(
+  //   addTeamKeyPairBatch({
+  //     [systemKeyPairItem.id]: systemKeyPairItem,
+  //   }),
+  // );
+
+  // return systemKeyPairItem;
 }
 
 export function* createIfNotExistKeyPair({ payload: { teamId, ownerId } }) {

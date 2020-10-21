@@ -31,7 +31,6 @@ import {
   togglePinTeamFailure,
 } from '@caesar/common/actions/entities/team';
 import {
-  addMembersBatch,
   removeTeamFromMember,
   removeTeamFromMembersBatch,
 } from '@caesar/common/actions/entities/member';
@@ -62,18 +61,19 @@ import {
   convertTeamsToEntity,
   convertKeyPairToEntity,
   convertKeyPairToItemEntity,
-  convertUsersToEntity,
   convertMembersToEntity,
 } from '@caesar/common/normalizers/normalizers';
 import {
   TEAM_ROLES,
   ENTITY_TYPE,
   NOOP_NOTIFICATION,
+  ROLE_ADMIN,
   TEAM_TYPE,
 } from '@caesar/common/constants';
 import { updateGlobalNotification } from '@caesar/common/actions/application';
 import { finishIsLoading } from '@caesar/common/actions/workflow';
 import {
+  createKeyPair,
   encryptSecret,
   generateKeyPair,
   saveItemSaga,
@@ -81,8 +81,6 @@ import {
 import { teamKeyPairSelector } from '@caesar/common/selectors/keystore';
 import {
   memberAdminsSelector,
-  memberListSelector,
-  membersBatchSelector,
   memberSelector,
 } from '../../selectors/entities/member';
 import { addTeamKeyPairBatch } from '../../actions/keystore';
@@ -151,7 +149,9 @@ export function* removeTeamSaga({ payload: { teamId } }) {
   }
 }
 
-export function* createTeamKeyPairSaga({ payload: { team, publicKey } }) {
+export function* createTeamKeyPairSaga({
+  payload: { team, ownerId, publicKey },
+}) {
   try {
     if (!publicKey || typeof publicKey === 'undefined') {
       // TODO: Bug fix: we lost the user default list and we need to restore it from the list api
@@ -161,20 +161,15 @@ export function* createTeamKeyPairSaga({ payload: { team, publicKey } }) {
     const teamKeyPair = yield call(generateKeyPair, {
       name: team.title,
     });
+    const secret = yield call(encryptSecret, { item: teamKeyPair, publicKey });
 
-    const { id: listId } = yield select(teamDefaultListSelector, {
+    const keypair = {
+      ownerId,
       teamId: team.id,
-    });
+      secret,
+    };
 
-    const serverKeypairItem = yield call(saveItemSaga, {
-      item: {
-        teamId: team.id,
-        listId,
-        ...teamKeyPair,
-      },
-      publicKey,
-    });
-
+    const serverKeypairItem = yield call(createKeyPair, keypair);
     const keyPairsById = convertKeyPairToEntity([serverKeypairItem], 'teamId');
     yield put(addTeamKeyPairBatch(keyPairsById));
 
@@ -212,14 +207,13 @@ function* encryptMemberTeamKey({ member, keypair }) {
     item: itemKeyPair,
     publicKey,
   });
-  const teamRole = member?.domainRoles?.includes(TEAM_ROLES.ROLE_ADMIN)
-    ? TEAM_ROLES.ROLE_ADMIN
-    : TEAM_ROLES.ROLE_MEMBER;
 
   return {
     userId,
     secret,
-    teamRole,
+    userRole: member?.roles?.includes(ROLE_ADMIN)
+      ? TEAM_ROLES.USER_ROLE_ADMIN
+      : TEAM_ROLES.USER_ROLE_MEMBER,
   };
 }
 export function* addMemberToTeamListsBatchSaga({
@@ -227,12 +221,8 @@ export function* addMemberToTeamListsBatchSaga({
 }) {
   try {
     const keypair = yield select(teamKeyPairSelector, { teamId });
-    const memberIds = members.map(member => member.id);
-    // Domain users
-    // TODO: Invite unregistered users
-    const users = yield select(membersBatchSelector, { memberIds });
 
-    const postDataSagas = users.map(member =>
+    const postDataSagas = members.map(member =>
       call(encryptMemberTeamKey, { member, keypair }),
     );
     const postData = yield all(postDataSagas);
@@ -242,9 +232,9 @@ export function* addMemberToTeamListsBatchSaga({
       teamId,
     });
 
-    const membersById = convertMembersToEntity(serverMembers);
-    yield put(addTeamMembersBatchSuccess(teamId, membersById));
-    yield put(addMembersBatch(membersById));
+    yield put(
+      addTeamMembersBatchSuccess(teamId, convertMembersToEntity(serverMembers)),
+    );
 
     yield put(updateGlobalNotification(NOOP_NOTIFICATION, false));
   } catch (error) {
@@ -270,6 +260,7 @@ export function* createTeamSaga({
 
     // Get updates
     yield call(fetchMembersSaga);
+
     const adminMembers = yield select(memberAdminsSelector);
     // Gathering admins except current
     const adminsToInvite = adminMembers.filter(({ id }) => id !== userId);
@@ -286,7 +277,6 @@ export function* createTeamSaga({
     if (!teamKeyPair) {
       throw new Error(`Can't create the team with the title: ${title}`);
     }
-
     const encryptedKeypair = yield call(encryptSecret, {
       item: teamKeyPair,
       publicKey,

@@ -213,7 +213,7 @@ function* checkTeamPermissionsAndKeys(teamId) {
     }
 
     yield call(createTeamKeyPairSaga, {
-      payload: { team, publicKey },
+      payload: { team, ownerId, publicKey },
     });
 
     return !!(yield select(teamKeyPairSelector, { teamId }));

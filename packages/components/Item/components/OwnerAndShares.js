@@ -76,7 +76,12 @@ const ShareButton = styled.button`
   `}
 `;
 
-export const OwnerAndInvitation = ({ invited, itemSubject, onClickShare }) => {
+export const OwnerAndShares = ({
+  showShares,
+  invited,
+  itemSubject,
+  onClickShare,
+}) => {
   const owner = useSelector(workInProgressItemOwnerSelector);
   const membersById = useSelector(membersByIdSelector);
 
@@ -100,27 +105,36 @@ export const OwnerAndInvitation = ({ invited, itemSubject, onClickShare }) => {
           <OwnerStatus>owner</OwnerStatus>
         </Owner>
       </OwnerWrapper>
-      <Can I={PERMISSION.SHARE} an={itemSubject} passThrough>
-        {allowed => (
-          <InvitedMembersWrapper resetMargin={!allowed}>
-            {hasInvited ? (
-              <AvatarsList avatars={avatars} />
-            ) : (
-              <NoMembers>
-                <Icon name="members" width={16} height={16} color="lightGray" />
-              </NoMembers>
+      {showShares && (
+        <>
+          <Can I={PERMISSION.SHARE} an={itemSubject} passThrough>
+            {allowed => (
+              <InvitedMembersWrapper resetMargin={!allowed}>
+                {hasInvited ? (
+                  <AvatarsList avatars={avatars} />
+                ) : (
+                  <NoMembers>
+                    <Icon
+                      name="members"
+                      width={16}
+                      height={16}
+                      color="lightGray"
+                    />
+                  </NoMembers>
+                )}
+              </InvitedMembersWrapper>
             )}
-          </InvitedMembersWrapper>
-        )}
-      </Can>
-      <Can I={PERMISSION.SHARE} an={itemSubject}>
-        <ShareButton
-          // disabled={!isOnline}
-          onClick={onClickShare}
-        >
-          <Icon withOfflineCheck name="plus" width={16} height={16} />
-        </ShareButton>
-      </Can>
+          </Can>
+          <Can I={PERMISSION.SHARE} an={itemSubject}>
+            <ShareButton
+              // disabled={!isOnline}
+              onClick={onClickShare}
+            >
+              <Icon withOfflineCheck name="plus" width={16} height={16} />
+            </ShareButton>
+          </Can>
+        </>
+      )}
     </Wrapper>
   );
 };

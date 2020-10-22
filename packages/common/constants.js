@@ -41,7 +41,6 @@ export const DECRYPTION_CHUNK_SIZE = 25;
 export const ENCRYPTION_CHUNK_SIZE = 25;
 
 export const LIST_TYPE = {
-  ROOT: 'root',
   INBOX: 'inbox',
   LIST: 'list',
   TRASH: 'trash',
@@ -49,15 +48,17 @@ export const LIST_TYPE = {
   FAVORITES: 'favorites',
 };
 
-export const DEFAULT_LIST_TYPES_ARRAY = [
-  LIST_TYPE.ROOT,
+export const NOT_SELECTABLE_LIST_TYPES = [
   LIST_TYPE.INBOX,
   LIST_TYPE.TRASH,
-  LIST_TYPE.DEFAULT,
   LIST_TYPE.FAVORITES,
 ];
 
-export const LIST_TYPES_ARRAY = [...DEFAULT_LIST_TYPES_ARRAY, LIST_TYPE.LIST];
+export const LIST_TYPES_ARRAY = [
+  ...NOT_SELECTABLE_LIST_TYPES,
+  LIST_TYPE.DEFAULT,
+  LIST_TYPE.LIST,
+];
 
 export const TEAM_TYPE = {
   DEFAULT: 'default',

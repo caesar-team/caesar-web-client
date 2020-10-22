@@ -58,10 +58,10 @@ class Bootstrap extends Component {
     try {
       const { data: bootstrap } = await getUserBootstrap();
       const { data: user } = await getUserSelf();
-      const isAnonymousOrReadOnlyUser = 
-        user?.roles.includes(DOMAIN_ROLES.ROLE_ANONYMOUS_USER) ||
-        user?.roles.includes(DOMAIN_ROLES.ROLE_READ_ONLY_USER)
-      
+      const isAnonymousOrReadOnlyUser =
+        user?.domainRoles?.includes(DOMAIN_ROLES.ROLE_ANONYMOUS_USER) ||
+        user?.domainRoles?.includes(DOMAIN_ROLES.ROLE_READ_ONLY_USER);
+
       if (!user || (isAnonymousOrReadOnlyUser && !shared?.mp)) {
         logout();
       }

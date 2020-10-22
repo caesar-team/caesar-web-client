@@ -6,6 +6,7 @@ import {
   DEFAULT_IDLE_TIMEOUT,
   NOOP_NOTIFICATION,
   IS_PROD,
+  DOMAIN_ROLES,
 } from '@caesar/common/constants';
 import {
   SessionChecker,
@@ -57,9 +58,11 @@ class Bootstrap extends Component {
     try {
       const { data: bootstrap } = await getUserBootstrap();
       const { data: user } = await getUserSelf();
-
-      if (!user || (user?.email.includes('anonymous') && !shared?.mp)) {
-        // TODO: Add namespaces into JWT token to avoid this dirty hack
+      const isAnonymousOrReadOnlyUser = 
+        user?.roles.includes(DOMAIN_ROLES.ROLE_ANONYMOUS_USER) ||
+        user?.roles.includes(DOMAIN_ROLES.ROLE_READ_ONLY_USER)
+      
+      if (!user || (isAnonymousOrReadOnlyUser && !shared?.mp)) {
         logout();
       }
 

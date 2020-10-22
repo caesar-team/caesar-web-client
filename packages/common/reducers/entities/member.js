@@ -1,4 +1,5 @@
 import { createReducer } from '@caesar/common/utils/reducer';
+import { arrayToObject } from '@caesar/common/utils/utils';
 import {
   FETCH_MEMBERS_REQUEST,
   FETCH_MEMBERS_SUCCESS,
@@ -33,13 +34,26 @@ export default createReducer(initialState, {
     return { ...state, isLoading: true };
   },
   [FETCH_MEMBERS_SUCCESS](state, { payload }) {
+    // TODO: (!!!) Need to seperate state to the users and to the members! I HAVE NO SHAME ON THIS!
+    const mergeMemberAndUserId = Object.keys(payload.membersById).map(
+      userId => {
+        const userInState = state.byId[userId] || {};
+        const userInInbound = payload.membersById[userId] || {};
+
+        return {
+          ...userInState,
+          ...userInInbound,
+        };
+      },
+    );
+
     return {
       ...state,
       isLoading: false,
       isError: false,
       byId: {
         ...state.byId,
-        ...payload.membersById,
+        ...arrayToObject(mergeMemberAndUserId),
       },
     };
   },

@@ -64,8 +64,8 @@ const getColumnFilter = (placeholder = '') => ({
 );
 
 const getTeamMemberSubject = member => ({
-  __typename: PERMISSION_ENTITY.TEAM_MEMBER,
   ...member._permissions,
+  __typename: PERMISSION_ENTITY.TEAM_MEMBER,
 });
 
 export const createColumns = ({
@@ -100,7 +100,7 @@ export const createColumns = ({
   };
 
   const roleColumn = {
-    accessor: 'role',
+    accessor: 'teamRole',
     width: ROLE_COLUMN_WIDTH,
     Filter: getColumnFilter('Role'),
     Header: () => null,
@@ -146,31 +146,33 @@ export const createColumns = ({
     disableFilters: true,
     disableSortBy: true,
     Header: () => null,
-    Cell: ({ row: { original } }) => (
-      <Table.MenuCell>
-        <Can I={PERMISSION.DELETE} a={getTeamMemberSubject(original)}>
-          <DottedMenu
-            tooltipProps={{
-              textBoxWidth: '100px',
-              arrowAlign: 'start',
-              position: 'left center',
-              padding: '0px 0px',
-              flat: true,
-              zIndex: '1',
-            }}
-          >
-            <MenuWrapper>
-              <MenuButton
-                color="white"
-                onClick={handleRemoveMember(original.id)}
-              >
-                Remove
-              </MenuButton>
-            </MenuWrapper>
-          </DottedMenu>
-        </Can>
-      </Table.MenuCell>
-    ),
+    Cell: ({ row: { original } }) => {
+      return (
+        <Table.MenuCell>
+          <Can I={PERMISSION.DELETE} a={getTeamMemberSubject(original)}>
+            <DottedMenu
+              tooltipProps={{
+                textBoxWidth: '100px',
+                arrowAlign: 'start',
+                position: 'left center',
+                padding: '0px 0px',
+                flat: true,
+                zIndex: '1',
+              }}
+            >
+              <MenuWrapper>
+                <MenuButton
+                  color="white"
+                  onClick={handleRemoveMember(original.id)}
+                >
+                  Remove
+                </MenuButton>
+              </MenuWrapper>
+            </DottedMenu>
+          </Can>
+        </Table.MenuCell>
+      );
+    },
   };
 
   return [nameColumn, emailColumn, roleColumn, menuColumn];

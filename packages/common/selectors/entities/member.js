@@ -5,7 +5,7 @@ export const entitiesSelector = state => state.entities;
 
 export const memberEntitySelector = createSelector(
   entitiesSelector,
-  entities => entities.member,
+  entities => entities?.member || {},
 );
 
 export const membersByIdSelector = createSelector(
@@ -36,7 +36,8 @@ export const membersBatchSelector = createSelector(
 
 export const memberAdminsSelector = createSelector(
   memberListSelector,
-  membersList => membersList.filter(({ roles }) => roles.includes(ROLE_ADMIN)),
+  membersList =>
+    membersList.filter(({ domainRoles }) => domainRoles.includes(ROLE_ADMIN)),
 );
 
 export const teamIdPropSelector = (_, props) => props.teamId;
@@ -44,5 +45,5 @@ export const memberTeamSelector = createSelector(
   memberListSelector,
   teamIdPropSelector,
   (membersList, teamId) =>
-    membersList.filter(({ teamIds }) => teamIds.includes(teamId)),
+    membersList.filter(({ teamIds }) => teamIds?.includes(teamId)),
 );

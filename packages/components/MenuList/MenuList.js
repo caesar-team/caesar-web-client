@@ -17,6 +17,11 @@ import { MenuListInner } from './components/MenuListInner';
 const StyledDropdown = styled(Dropdown)`
   ${Dropdown.Box} {
     width: 100%;
+    max-height: calc(100vh - 150px);
+  }
+
+  ${Dropdown.OptionsList} {
+    overflow: auto;
   }
 `;
 

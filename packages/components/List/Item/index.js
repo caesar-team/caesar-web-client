@@ -2,7 +2,6 @@
 import React from 'react';
 import { PERMISSION, PERMISSION_MESSAGES } from '@caesar/common/constants';
 import { Icon } from '../../Icon';
-import { ItemIcon } from '../../ItemIcon';
 import { Can } from '../../Ability';
 import {
   Row,
@@ -17,6 +16,7 @@ import {
   Addon,
   AddonText,
   CloseIcon,
+  WebsiteFavIcon,
 } from './styles';
 
 export const Item = ({
@@ -94,7 +94,11 @@ export const Item = ({
             )}
             <IconWrapper>
               {website ? (
-                <ItemIcon url={website} />
+                <WebsiteFavIcon
+                  website={website}
+                  src={`https://www.google.com/s2/favicons?domain=${website}`}
+                  alt={`The website favicon for address: ${website}`}
+                />
               ) : (
                 <ItemTypeIcon type={type} />
               )}

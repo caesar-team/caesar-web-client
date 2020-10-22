@@ -45,6 +45,7 @@ export const useItemTeamAndListOptions = ({ teamId = null, listId }) => {
   const teamOptions = useMemo(
     () =>
       teams
+        .filter(({ locked }) => !locked)
         .sort((a, b) => {
           if (a.title.toLowerCase() === TEAM_TYPE.PERSONAL) return -1;
           if (b.title.toLowerCase() === TEAM_TYPE.PERSONAL) return 1;

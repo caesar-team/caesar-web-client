@@ -31,7 +31,7 @@ export const userDataSelector = createSelector(
 export const userTeamIdsSelector = createSelector(
   userDataSelector,
   user =>
-    !user ? [TEAM_TYPE.PERSONAL] : [TEAM_TYPE.PERSONAL, ...user?.teamIds],
+    user ? [TEAM_TYPE.PERSONAL, ...user?.teamIds] : [TEAM_TYPE.PERSONAL],
 );
 
 export const userTeamListSelector = createSelector(
@@ -67,7 +67,7 @@ export const userIdSelector = createSelector(
 
 export const isUserDomainAdminSelector = createSelector(
   userDataSelector,
-  data => data.domainRoles.includes(ROLE_ADMIN),
+  data => data.domainRoles?.includes(ROLE_ADMIN),
 );
 
 // @Deprecated

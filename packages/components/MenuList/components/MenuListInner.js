@@ -9,7 +9,7 @@ import {
   TEAM_TYPE,
 } from '@caesar/common/constants';
 import { currentTeamSelector } from '@caesar/common/selectors/user';
-import { listItemCount } from '@caesar/common/utils/list';
+import { useListItemCounter } from '@caesar/common/hooks';
 import {
   personalListsByTypeSelector,
   currentTeamListsSelector,
@@ -92,6 +92,7 @@ const MenuListInnerComponent = ({
   const workInProgressList = useSelector(workInProgressListSelector);
   const activeListId = workInProgressList && workInProgressList.id;
   const [isCreatingMode, setCreatingMode] = useState(false);
+  const inboxItemsCounter = useListItemCounter(personalLists.inbox?.children);
 
   const handleClickMenuItem = id => {
     dispatch(setWorkInProgressListId(id));
@@ -135,9 +136,7 @@ const MenuListInnerComponent = ({
     {
       id: isPersonal ? personalLists.inbox?.id : null,
       title: 'Shared with me',
-      length: isPersonal
-        ? listItemCount(personalLists.inbox?.children) || 0
-        : 0,
+      length: isPersonal ? inboxItemsCounter : 0,
       icon: 'share',
     },
     {

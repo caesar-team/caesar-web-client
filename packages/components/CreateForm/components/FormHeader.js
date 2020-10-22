@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useUpdateEffect } from 'react-use';
 import { useSelector } from 'react-redux';
 import styled from 'styled-components';
-import { useItemTeamAndListOptions } from '@caesar/common/hooks';
+import { useItemVaultAndListOptions } from '@caesar/common/hooks';
 import { teamsByIdSelector } from '@caesar/common/selectors/entities/team';
 import { getTeamTitle } from '@caesar/common/utils/team';
 import { Dropdown } from '../../Dropdown';
@@ -82,7 +82,7 @@ export const FormHeader = ({ teamId, listId, onChangePath, className }) => {
     setCheckedListId,
     teamOptions,
     listOptions,
-  } = useItemTeamAndListOptions({ teamId, listId });
+  } = useItemVaultAndListOptions({ teamId, listId });
 
   useUpdateEffect(() => {
     onChangePath(checkedTeamId, checkedListId);

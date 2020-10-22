@@ -191,21 +191,34 @@ class TeamListContainer extends Component {
   }
 
   render() {
-    const { isLoading, isLoadingTeams, teams, isDomainAdmin } = this.props;
+    const {
+      isLoading,
+      isLoadingTeams,
+      teams,
+      userTeamList,
+      isDomainAdmin,
+      user,
+    } = this.props;
+
     const { modalVisibilities, selectedTeamTitle, activeTabName } = this.state;
     const favoriteTeams = teams.filter(team => team.pinned);
-    const allTeamCards = this.renderTeamCards(teams);
+    const allTeamCards = this.renderTeamCards(
+      isDomainAdmin ? teams : userTeamList,
+    );
     const favoriteTeamCards = this.renderTeamCards(favoriteTeams);
 
     const teamSubject = {
       __typename: PERMISSION_ENTITY.TEAM,
-      ...this.props.user?._permissions,
+      ...user?._permissions,
     };
 
     const teamsLength =
+      // eslint-disable-next-line no-nested-ternary
       activeTabName === FAVORITES_TAB_NAME
         ? favoriteTeams.length
-        : teams.length;
+        : isDomainAdmin
+        ? teams.length
+        : userTeamList.length;
 
     return (
       <SettingsWrapper

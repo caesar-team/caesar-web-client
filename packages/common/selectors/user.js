@@ -30,6 +30,11 @@ export const userDataSelector = createSelector(
 
 export const userTeamIdsSelector = createSelector(
   userDataSelector,
+  user => user?.teamIds,
+);
+
+export const userVaultIdsSelector = createSelector(
+  userDataSelector,
   user =>
     user ? [TEAM_TYPE.PERSONAL, ...user?.teamIds] : [TEAM_TYPE.PERSONAL],
 );
@@ -41,6 +46,16 @@ export const userTeamListSelector = createSelector(
     if (!Object.keys(teamsById).length) return [];
 
     return userTeamIds.map(teamId => teamsById[teamId]);
+  },
+);
+
+export const userVaultListSelector = createSelector(
+  teamsByIdSelector,
+  userVaultIdsSelector,
+  (teamsById, userVaultIds) => {
+    if (!Object.keys(teamsById).length) return [];
+
+    return userVaultIds.map(vaultId => teamsById[vaultId]);
   },
 );
 

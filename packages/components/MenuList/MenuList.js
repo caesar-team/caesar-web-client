@@ -75,6 +75,18 @@ const MenuListComponent = ({ mode, setSearchedText, setMode }) => {
       ? TEAM_TEXT_TYPE[TEAM_TYPE.PERSONAL]
       : getTeamTitle(teamList[activeTeamId]);
 
+  const TeamAvatar = ({ team }) =>
+    team?.locked ? (
+      <Icon name="warning" width={32} height={32} />
+    ) : (
+      <Avatar
+        avatar={team?.icon}
+        email={team?.email}
+        size={32}
+        fontSize="small"
+      />
+    );
+
   return (
     <>
       <StyledDropdown
@@ -91,12 +103,7 @@ const MenuListComponent = ({ mode, setSearchedText, setMode }) => {
           bgColor={isDropdownOpened ? 'white' : 'alto'}
           isDropdownOpened={isDropdownOpened}
         >
-          <Avatar
-            avatar={teamList[activeTeamId]?.icon}
-            email={teamList[activeTeamId]?.email}
-            size={32}
-            fontSize="small"
-          />
+          <TeamAvatar team={teamList[activeTeamId]} />
           <ColumnTitle>{getColumnTitle()}</ColumnTitle>
           <DropdownIcon
             name="arrow-triangle"

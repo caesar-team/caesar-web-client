@@ -32,6 +32,7 @@ import {
   UPDATE_TEAM_MEMBERS_WITH_ROLES,
   TOGGLE_PIN_TEAM_SUCCESS,
   RESET_TEAM_STATE,
+  LOCK_TEAM,
 } from '@caesar/common/actions/entities/team';
 import { KEY_TYPE } from '../../constants';
 
@@ -42,23 +43,22 @@ const initialState = {
 };
 
 export default createReducer(initialState, {
-  // [CREATE_VAULT_SUCCESS](state, { payload }) {
-  //   const { team } = payload;
-  //   if (!team || !team?.id) return state;
+  [LOCK_TEAM](state, { payload }) {
+    if (!payload?.teamId || !payload?.lock) return state;
 
-  //   return {
-  //     ...state,
-  //     isLoading: false,
-  //     isError: false,
-  //     byId: {
-  //       ...state.byId,
-  //       [team.id]: {
-  //         ...(state.byId[team.id] || {}),
-  //         ...team,
-  //       },
-  //     },
-  //   };
-  // },
+    return {
+      ...state,
+      byId: {
+        ...state.byId,
+        [payload.teamId]: {
+          ...(state.byId[payload.teamId] || {}),
+          ...{
+            locked: payload?.lock || false,
+          },
+        },
+      },
+    };
+  },
   [FETCH_TEAMS_REQUEST](state) {
     return { ...state, isLoading: true };
   },
@@ -204,9 +204,9 @@ export default createReducer(initialState, {
           ...state.byId[payload.teamId],
           users: [
             ...state.byId[payload.teamId].users,
-            ...members.map(({ id, role, _permissions }) => ({
+            ...members.map(({ id, teamRole, _permissions }) => ({
               id,
-              role,
+              teamRole,
               _permissions,
             })),
           ],

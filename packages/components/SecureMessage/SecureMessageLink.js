@@ -1,8 +1,12 @@
 import React, { useState, memo } from 'react';
 import { useEffectOnce } from 'react-use';
 import copy from 'copy-text-to-clipboard';
-import { Checkbox, withNotification } from '@caesar/components';
-import { useMedia, useShare as canShare } from '@caesar/common/hooks';
+import { Checkbox } from '@caesar/components';
+import {
+  useMedia,
+  useShare as canShare,
+  useNotification,
+} from '@caesar/common/hooks';
 import {
   generateMessageLink,
   getSecureMessageText,
@@ -33,9 +37,9 @@ const SecureMessageLinkComponent = ({
   });
 
   const { isMobile } = useMedia();
-  const [isPasswordLessPassword, setPasswordLess] = useState(false);
-  const handleChangeCustomPassword = () => {
-    setPasswordLess(!isPasswordLessPassword);
+  const [isPasswordLess, setPasswordLess] = useState(false);
+  const handleChangePasswordless = () => {
+    setPasswordLess(!isPasswordLess);
   };
   const handleClickCopy = (data, notify) => {
     copy(data);
@@ -56,7 +60,7 @@ const SecureMessageLinkComponent = ({
           messageId,
           password,
           seconds,
-          isPasswordLessPassword,
+          isPasswordLess,
         }),
       ),
       'The text has been copied!',
@@ -68,7 +72,7 @@ const SecureMessageLinkComponent = ({
       messageId,
       password,
       seconds,
-      isPasswordLessPassword,
+      isPasswordLess,
     });
     if (canShare(shareData)) {
       navigator
@@ -99,16 +103,16 @@ const SecureMessageLinkComponent = ({
             messageId,
             password,
             seconds,
-            isPasswordLessPassword,
+            isPasswordLess,
           })}
           handleClick={isMobile ? handleCopyText : Function.prototype}
         />
       </Link>
       <Row>
         <Checkbox
-          checked={isPasswordLessPassword}
-          value={isPasswordLessPassword}
-          onChange={handleChangeCustomPassword}
+          checked={isPasswordLess}
+          value={isPasswordLess}
+          onChange={handleChangePasswordless}
         >
           Make a passwordless link
         </Checkbox>
@@ -125,13 +129,13 @@ const SecureMessageLinkComponent = ({
               generateMessageLink({
                 messageId,
                 password,
-                isPasswordLessPassword,
+                isPasswordLess,
               }),
               'The link has been copied!',
             )
           }
         >
-          Copy the {isPasswordLessPassword ? `passwordless` : ``} link
+          Copy the {isPasswordLess ? `passwordless` : ``} link
         </ActionButton>
         {canShare(dummyShareData) && (
           <ActionButton color="white" icon="share" onClick={handleShareClick} />

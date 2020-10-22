@@ -15,8 +15,11 @@ const MemberInfo = styled.div`
 `;
 
 const MemberEmail = styled.div`
+  overflow: hidden;
   font-size: ${({ theme }) => theme.font.size.main};
   color: ${({ theme }) => theme.color.black};
+  text-overflow: ellipsis;
+  white-space: nowrap;
 `;
 
 const Member = ({ name, email, avatar, className }) => (

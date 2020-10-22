@@ -1,6 +1,6 @@
 import { createSelector } from 'reselect';
 import { membersByIdSelector } from '@caesar/common/selectors/entities/member';
-import { TEAM_TYPE, USER_ROLE_ADMIN } from '@caesar/common/constants';
+import { TEAM_ROLES, TEAM_TYPE } from '@caesar/common/constants';
 import { sortByName } from '@caesar/common/utils/utils';
 
 export const entitiesSelector = state => state.entities;
@@ -55,6 +55,7 @@ export const teamsBatchSelector = createSelector(
   (teamsById, teamIds) => teamIds.map(teamId => teamsById[teamId]),
 );
 
+// @Deprecated
 export const teamMembersSelector = createSelector(
   teamSelector,
   membersByIdSelector,
@@ -86,6 +87,6 @@ export const teamAdminUsersSelector = createSelector(
   teamSelector,
   team =>
     team.users
-      ?.filter(user => user.role === USER_ROLE_ADMIN)
+      ?.filter(user => user.role === TEAM_ROLES.ROLE_ADMIN)
       .map(user => user.id) || [],
 );

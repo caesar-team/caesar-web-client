@@ -11,6 +11,7 @@ const teamSchema = new schema.Entity('byId', undefined, {
       ...createPermissionsFromLinks(entity._links),
       __typename: PERMISSION_ENTITY.TEAM,
     },
+    locked: false,
     users:
       entity.users?.map(user => ({
         ...user,

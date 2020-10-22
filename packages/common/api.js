@@ -191,7 +191,7 @@ export const pinTeam = (teamId, shouldPinned) =>
 
 export const updateTeamMember = ({ teamId, userId, role }) =>
   callApi.patch(`/teams/${teamId}/members/${userId}`, {
-    userRole: role,
+    teamRole: role,
   });
 
 export const deleteTeamMember = ({ teamId, userId }) =>
@@ -199,14 +199,14 @@ export const deleteTeamMember = ({ teamId, userId }) =>
 
 export const postAddTeamMember = ({ teamId, userId, role, secret }) =>
   callApi.post(`/teams/${teamId}/members/${userId}`, {
-    userRole: role,
+    teamRole: role,
     secret,
   });
 
 /*
 "members": [
     {
-      "userRole": "member",
+      "teamRole": "member",
       "secret": "string",
       "userId": "string"
     }

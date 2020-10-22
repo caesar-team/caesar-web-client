@@ -9,6 +9,7 @@ import {
   TEAM_TYPE,
 } from '@caesar/common/constants';
 import { currentTeamSelector } from '@caesar/common/selectors/user';
+import { listItemCount } from '@caesar/common/utils/list';
 import {
   personalListsByTypeSelector,
   currentTeamListsSelector,
@@ -134,7 +135,9 @@ const MenuListInnerComponent = ({
     {
       id: isPersonal ? personalLists.inbox?.id : null,
       title: 'Shared with me',
-      length: isPersonal ? personalLists.inbox?.children?.length : null,
+      length: isPersonal
+        ? listItemCount(personalLists.inbox?.children) || 0
+        : 0,
       icon: 'share',
     },
     {
@@ -151,12 +154,6 @@ const MenuListInnerComponent = ({
       icon: 'list',
       children: nestedLists,
     },
-    // TODO: Implement History feature
-    // {
-    //   id: 'history',
-    //   title: 'History',
-    //   icon: 'history',
-    // },
     {
       id: isPersonal ? personalLists.trash?.id : teamLists.trash?.id,
       title: 'Trash',

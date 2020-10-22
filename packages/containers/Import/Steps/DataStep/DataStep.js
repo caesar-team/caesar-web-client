@@ -24,9 +24,12 @@ const DataStep = ({
   onSubmit,
   onCancel,
 }) => {
+  const personalTeamIndex =
+    teamsLists.findIndex(({ id }) => id === TEAM_TYPE.PERSONAL) || 0;
+
   const [state, setState] = useState({
-    teamId: teamsLists[0].id,
-    listId: teamsLists[0].lists[0].id,
+    teamId: teamsLists[personalTeamIndex]?.id || null,
+    listId: teamsLists[personalTeamIndex]?.lists[0]?.id || null,
     filterText: '',
     selectedRows: normalize(propData),
     data: propData,

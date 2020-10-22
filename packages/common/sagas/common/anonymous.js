@@ -70,12 +70,13 @@ export function* createAnonymousLinkSaga() {
       link,
       publicKey,
       isAccepted: false,
-      roles: [ROLE_ANONYMOUS_USER],
+      domainRoles: [ROLE_ANONYMOUS_USER],
     };
 
     yield put(createAnonymousLinkSuccess(workInProgressItem.id, share));
     yield put(updateWorkInProgressItem());
   } catch (error) {
+    // eslint-disable-next-line no-console
     console.error(error);
     yield put(
       updateGlobalNotification(getServerErrorMessage(error), false, true),
@@ -92,6 +93,7 @@ export function* removeAnonymousLinkSaga() {
     yield put(removeAnonymousLinkSuccess(workInProgressItem.id));
     yield put(updateWorkInProgressItem());
   } catch (error) {
+    // eslint-disable-next-line no-console
     console.error(error);
     yield put(
       updateGlobalNotification(getServerErrorMessage(error), false, true),

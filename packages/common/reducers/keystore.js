@@ -5,7 +5,6 @@ import {
   ADD_TEAM_KEY_PAIR,
   ADD_SHARE_KEY_PAIR,
   ADD_ANONYMOUS_KEY_PAIR,
-  REMOVE_PERSONAL_KEY_PAIR,
   REMOVE_TEAM_KEY_PAIR,
   REMOVE_SHARE_KEY_PAIR,
   REMOVE_ANONYMOUS_KEY_PAIR,
@@ -17,7 +16,6 @@ import {
 import { arrayToObject } from '../utils/utils';
 
 const initialState = {
-  [KEY_TYPE.PERSONAL]: {},
   [KEY_TYPE.TEAMS]: {},
   [KEY_TYPE.SHARES]: {},
   [KEY_TYPE.ANONYMOUS]: {},
@@ -170,12 +168,6 @@ export default createReducer(initialState, {
           privateKey,
         },
       },
-    };
-  },
-  [REMOVE_PERSONAL_KEY_PAIR](state) {
-    return {
-      ...state,
-      [KEY_TYPE.PERSONAL]: {},
     };
   },
   [REMOVE_TEAM_KEY_PAIR](state, { payload }) {

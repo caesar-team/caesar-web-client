@@ -64,6 +64,7 @@ const TeamAvatar = ({ team }) =>
       fontSize="small"
     />
   );
+
 const TeamsListComponent = ({ activeTeamId, handleToggle, setListsOpened }) => {
   const dispatch = useDispatch();
   const currentTeam = useSelector(currentTeamSelector);

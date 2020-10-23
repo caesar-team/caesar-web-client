@@ -13,7 +13,7 @@ import {
 } from '@caesar/common/actions/workflow';
 import { getTeamTitle } from '@caesar/common/utils/team';
 import {
-  useItemTeamAndListOptions,
+  useItemVaultAndListOptions,
   useNotification,
 } from '@caesar/common/hooks';
 import { Modal, ModalTitle } from '../Modal';
@@ -128,7 +128,7 @@ const MoveModalComponent = ({
     setCheckedListId,
     teamOptions,
     listOptions,
-  } = useItemTeamAndListOptions({
+  } = useItemVaultAndListOptions({
     teamId,
     listId,
   });

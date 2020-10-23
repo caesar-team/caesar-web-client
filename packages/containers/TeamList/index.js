@@ -13,7 +13,6 @@ import {
 } from '@caesar/common/actions/entities/member';
 import {
   isLoadingTeamsSelector,
-  teamsByIdSelector,
   teamSortedListSelector,
 } from '@caesar/common/selectors/entities/team';
 import {
@@ -21,23 +20,18 @@ import {
   userTeamListSelector,
   isUserDomainAdminSelector,
 } from '@caesar/common/selectors/user';
-import {
-  memberListSelector,
-  membersByIdSelector,
-} from '@caesar/common/selectors/entities/member';
+import { memberListSelector } from '@caesar/common/selectors/entities/member';
 import { isLoadingSelector } from '@caesar/common/selectors/workflow';
 import { TeamList } from './TeamList';
 
 const mapStateToProps = createStructuredSelector({
   isLoading: isLoadingSelector,
   isLoadingTeams: isLoadingTeamsSelector,
-  teamsById: teamsByIdSelector,
   teams: teamSortedListSelector,
   user: userDataSelector,
   userTeamList: userTeamListSelector,
   isDomainAdmin: isUserDomainAdminSelector,
   members: memberListSelector,
-  membersById: membersByIdSelector,
 });
 
 const mapDispatchToProps = {

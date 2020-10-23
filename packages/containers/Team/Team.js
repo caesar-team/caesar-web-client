@@ -152,8 +152,7 @@ export const TeamContainer = ({ user, members }) => {
 
   const teamSubject = {
     __typename: PERMISSION_ENTITY.TEAM,
-    team_delete: team._permissions?.team_delete || false,
-    team_leave: team._permissions?.team_leave || false,
+    ...team._permissions,
   };
 
   const teamMemberSubject = {

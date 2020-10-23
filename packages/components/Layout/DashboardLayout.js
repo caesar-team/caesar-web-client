@@ -10,7 +10,6 @@ import {
 import { teamKeyPairSelector } from '@caesar/common/selectors/keystore';
 import {
   setWorkInProgressItem,
-  setWorkInProgressListId,
   resetWorkInProgressItemIds,
 } from '@caesar/common/actions/workflow';
 import LayoutConstructor from './LayoutConstructor';
@@ -37,10 +36,10 @@ const DashboardLayoutComponent = ({
     event.preventDefault();
 
     dispatch(resetWorkInProgressItemIds());
-    dispatch(setWorkInProgressListId(null));
     dispatch(setWorkInProgressItem(null));
 
     setSearchedText(event.target.value);
+
     setMode(
       event.target.value ? DASHBOARD_MODE.SEARCH : DASHBOARD_MODE.DEFAULT,
     );
@@ -48,7 +47,6 @@ const DashboardLayoutComponent = ({
 
   const handleClickResetSearch = () => {
     dispatch(resetWorkInProgressItemIds());
-    dispatch(setWorkInProgressListId(null));
     dispatch(setWorkInProgressItem(null));
 
     setSearchedText('');

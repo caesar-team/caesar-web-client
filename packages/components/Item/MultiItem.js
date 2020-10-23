@@ -48,6 +48,7 @@ const CheckboxStyled = styled(Checkbox)`
 const MultiItemComponent = ({
   isInboxItems = false,
   isTrashItems = false,
+  isPersonalTeam,
   areAllItemsSelected = false,
   workInProgressItemIds,
   onClickMove = Function.prototype,
@@ -69,7 +70,7 @@ const MultiItemComponent = ({
           Move
         </ButtonStyled>
       )}
-      {!isInboxItems && !isTrashItems && (
+      {isPersonalTeam && !isInboxItems && !isTrashItems && (
         <ButtonStyled
           withOfflineCheck
           color="white"

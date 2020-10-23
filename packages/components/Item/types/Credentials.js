@@ -1,6 +1,7 @@
 import React, { memo } from 'react';
 import styled from 'styled-components';
 import { SCHEMA } from '@caesar/common/validation';
+import { TEAM_TYPE } from '@caesar/common/constants';
 import {
   Title,
   Input,
@@ -10,7 +11,7 @@ import {
   Attachments,
 } from '../../ItemFields/view';
 import { Row } from '../../ItemFields/common';
-import { OwnerAndInvitation } from '../components';
+import { OwnerAndShares } from '../components';
 
 const PasswordRow = styled(Row)`
   position: relative;
@@ -37,7 +38,8 @@ const CredentialsComponent = ({
         marginBottom={isSharedItem ? 24 : 0}
       />
       {!isSharedItem && (
-        <OwnerAndInvitation
+        <OwnerAndShares
+          showShares={item.teamId === TEAM_TYPE.PERSONAL}
           invited={item.invited}
           itemSubject={itemSubject}
           onClickShare={onClickShare}

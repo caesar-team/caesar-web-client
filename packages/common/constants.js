@@ -233,27 +233,40 @@ export const PERMISSION_ENTITY = {
 export const PERMISSION_READ = 'read';
 export const PERMISSION_WRITE = 'write';
 
+export const ROLE_ADMIN = 'ROLE_ADMIN';
+export const ROLE_MANAGER = 'ROLE_MANAGER';
+export const ROLE_USER = 'ROLE_USER';
+export const ROLE_MEMBER = 'ROLE_MEMBER';
+export const ROLE_GUEST = 'ROLE_GUEST';
+export const ROLE_READ_ONLY_USER = 'ROLE_READ_ONLY_USER';
+export const ROLE_ANONYMOUS_USER = 'ROLE_ANONYMOUS_USER';
+
 export const TEAM_ROLES = {
-  ROLE_ADMIN: 'ROLE_ADMIN',
-  ROLE_MEMBER: 'ROLE_MEMBER',
-  ROLE_GUEST: 'ROLE_GUEST',
+  ROLE_ADMIN,
+  ROLE_MEMBER,
+  ROLE_GUEST,
 };
+
 export const TEAM_ROLES_LABELS = {
   ROLE_ADMIN: 'Admin',
   ROLE_MEMBER: 'Member',
   ROLE_GUEST: 'Guest',
 };
 
-export const ROLE_USER = 'ROLE_USER';
-export const ROLE_ADMIN = 'ROLE_ADMIN';
-export const ROLE_READ_ONLY_USER = 'ROLE_READ_ONLY_USER';
-export const ROLE_ANONYMOUS_USER = 'ROLE_ANONYMOUS_USER';
-
 export const DOMAIN_ROLES = {
-  ROLE_USER,
   ROLE_ADMIN,
+  ROLE_MANAGER,
+  ROLE_USER,
   ROLE_READ_ONLY_USER,
   ROLE_ANONYMOUS_USER,
+};
+
+export const DOMAIN_ROLES_LABELS = {
+  ROLE_ADMIN: 'Admin',
+  ROLE_MANAGER: 'Manager',
+  ROLE_USER: 'Member',
+  ROLE_READ_ONLY_USER: 'Guest',
+  ROLE_ANONYMOUS_USER: 'Anonym',
 };
 
 export const PERMISSION_MESSAGES = {

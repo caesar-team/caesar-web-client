@@ -1,5 +1,9 @@
 import { createSelector } from 'reselect';
-import { LIST_TYPE, TEAM_TYPE } from '@caesar/common/constants';
+import {
+  TEAM_TYPE,
+  LIST_TYPE,
+  NOT_SELECTABLE_LIST_TYPES,
+} from '@caesar/common/constants';
 import { currentTeamIdSelector } from '../user';
 import { teamListSelector } from './team';
 import { itemListSelector } from './item';
@@ -141,7 +145,7 @@ export const currentTeamListsSelector = createSelector(
       .filter(
         list =>
           list.teamId === currentTeamId &&
-          ![LIST_TYPE.FAVORITES, LIST_TYPE.TRASH].includes(list.type),
+          !NOT_SELECTABLE_LIST_TYPES.includes(list.type),
       )
       .sort((a, b) => a.sort - b.sort),
     favorites,
@@ -179,15 +183,12 @@ export const teamDefaultListSelector = createSelector(
 
 export const selectableTeamsListsSelector = createSelector(
   teamListSelector,
-  personalListsSelector,
   teamIdsListSelector,
-  (teamList, personalLists, teamLists) => {
+  (teams, teamLists) => {
     const filterLists = lists =>
-      lists.filter(
-        ({ type }) => ![LIST_TYPE.FAVORITES, LIST_TYPE.TRASH].includes(type),
-      );
+      lists.filter(({ type }) => !NOT_SELECTABLE_LIST_TYPES.includes(type));
 
-    return teamList.map(team => ({
+    return teams.map(team => ({
       id: team.id,
       name: team.title,
       icon: team.icon,

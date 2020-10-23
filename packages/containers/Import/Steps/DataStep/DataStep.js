@@ -73,7 +73,7 @@ const DataStep = ({
   );
 
   const currentTeam = teamsLists.find(({ id }) => id === teamId);
-  const currentTeamListsOptions = currentTeam.lists.flatMap(
+  const currentTeamListsOptions = currentTeam?.lists.flatMap(
     ({ type, id, label }) =>
       type === LIST_TYPE.INBOX
         ? []
@@ -94,7 +94,7 @@ const DataStep = ({
   const handleChangeTeamId = (_, value) => {
     setState({
       teamId: value,
-      listId: teamsLists.find(({ id }) => id === value).lists[0].id,
+      listId: teamsLists.find(({ id }) => id === value)?.lists[0].id,
     });
   };
 

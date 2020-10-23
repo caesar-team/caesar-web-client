@@ -33,7 +33,7 @@ import {
 } from '@caesar/common/api';
 import { ENTITY_TYPE, LIST_TYPE, TEAM_TYPE } from '@caesar/common/constants';
 import { getServerErrors } from '@caesar/common/utils/error';
-import { createPermissionsFromLinks } from '@caesar/common/utils/createPermissionsFromLinks';
+import { convertListsToEntities } from '@caesar/common/normalizers/normalizers';
 
 const reorder = (list, startIndex, endIndex) => {
   const result = Array.from(list);
@@ -89,18 +89,21 @@ export function* createListSaga({
           });
 
     yield call(setCreatingMode, false);
-    yield put(
-      createListSuccess(listId, {
-        id: listId,
-        type: LIST_TYPE.LIST,
-        children: [],
-        sort: 0,
-        __type: ENTITY_TYPE.LIST,
-        _links,
-        _permissions: createPermissionsFromLinks(_links),
-        ...list,
-      }),
-    );
+
+    const listData = {
+      id: listId,
+      type: LIST_TYPE.LIST,
+      children: [],
+      sort: 0,
+      __type: ENTITY_TYPE.LIST,
+      _links,
+      ...list,
+    };
+
+    const { listsById } = convertListsToEntities([listData]);
+    const normalizedList = Object.values(listsById).shift();
+
+    yield put(createListSuccess(listId, normalizedList));
 
     const personalListsByType = yield select(personalListsByTypeSelector);
     const currentTeamLists = yield select(currentTeamListsSelector);

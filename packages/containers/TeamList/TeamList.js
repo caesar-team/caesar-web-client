@@ -171,7 +171,7 @@ class TeamListContainer extends Component {
   }
 
   renderTeamCards(teams) {
-    const { members } = this.props;
+    const { members, user } = this.props;
 
     if (!teams.length) {
       return <div>No teams</div>;
@@ -182,6 +182,7 @@ class TeamListContainer extends Component {
         key={team.id}
         team={team}
         members={members}
+        userId={user.id}
         onClickEditTeam={this.handleClickEditTeam(team.id)}
         onClickLeaveTeam={this.handleClickLeaveTeam(team)}
         onClickRemoveTeam={this.handleClickRemoveTeam(team.id)}

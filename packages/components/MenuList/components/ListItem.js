@@ -12,7 +12,7 @@ import {
   editListRequest,
 } from '@caesar/common/actions/entities/list';
 import { Tooltip } from '@caesar/components/List/Item/styles';
-import { listItemCount } from '@caesar/common/utils/list';
+import { useListItemCounter } from '@caesar/common/hooks';
 import { Can } from '../../Ability';
 import { Icon } from '../../Icon';
 import { ListInput } from './ListInput';
@@ -77,6 +77,9 @@ const StyledTooltip = styled(Tooltip)`
   display: flex;
   top: -20px;
   left: auto;
+  bottom: auto;
+  z-index: ${({ theme }) => theme.zIndex.basic};
+  opacity: 1;                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 
 `;
 
 export const ListItem = ({
@@ -93,12 +96,20 @@ export const ListItem = ({
   const currentTeam = useSelector(currentTeamSelector);
   const { id, label, type, children = [] } = list;
 
-  const itemCount = listItemCount(children);
+  const itemCount = useListItemCounter(children);
 
   const isDefault = type === LIST_TYPE.DEFAULT;
   const [isEditMode, setEditMode] = useState(isCreatingMode);
   const [isOpenedPopup, setOpenedPopup] = useState(false);
   const [value, setValue] = useState(label);
+
+  const listTitle = transformListTitle(label);
+  const isListAlreadyExists =
+    value !== label && nestedListsLabels.includes(value?.toLowerCase());
+
+  const isAcceptDisabled = !value || value === label || isListAlreadyExists;
+
+  const { _permissions } = list || {};
 
   const handleClickEdit = () => {
     setEditMode(true);
@@ -109,6 +120,10 @@ export const ListItem = ({
   };
 
   const handleClickAcceptEdit = () => {
+    if (isAcceptDisabled) {
+      return false;
+    }
+
     if (isCreatingMode) {
       dispatch(
         createListRequest(
@@ -134,14 +149,6 @@ export const ListItem = ({
     setEditMode(false);
     setValue(label);
   };
-
-  const listTitle = transformListTitle(label);
-  const isListAlreadyExists =
-    value !== label && nestedListsLabels.includes(value?.toLowerCase());
-
-  const isAcceptDisabled = !value || value === label || isListAlreadyExists;
-
-  const { _permissions } = list || {};
 
   const renderInner = dragHandleProps => (
     <>

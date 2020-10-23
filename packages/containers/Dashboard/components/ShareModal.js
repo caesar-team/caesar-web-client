@@ -25,8 +25,6 @@ export const ShareModal = ({
   const workInProgressItem = useSelector(workInProgressItemSelector);
   const workInProgressItemIds = useSelector(workInProgressItemIdsSelector);
   const userTeamList = useSelector(userTeamListSelector);
-  const isFromView = !!workInProgressItem;
-
   const workInProgressItemSharedMembers =
     useSelector(workInProgressItemSharedMembersSelector);
 

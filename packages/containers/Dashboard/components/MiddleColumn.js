@@ -135,6 +135,7 @@ const MiddleColumnComponent = ({
         <MultiItem
           isInboxItems={isInboxList}
           isTrashItems={isTrashList}
+          isPersonalTeam={isPersonalTeam}
           workInProgressItemIds={workInProgressItemIds}
           areAllItemsSelected={areAllItemsSelected}
           onClickMove={handleOpenModal(MODAL.MOVE_ITEM)}

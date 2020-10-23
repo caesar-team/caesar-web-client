@@ -4,7 +4,7 @@ import styled from 'styled-components';
 import { sortByName } from '@caesar/common/utils/utils';
 import { TEAM_TYPE } from '@caesar/common/constants';
 import {
-  userTeamListSelector,
+  userVaultListSelector,
   currentTeamSelector,
 } from '@caesar/common/selectors/user';
 import { setCurrentTeamId } from '@caesar/common/actions/user';
@@ -27,6 +27,10 @@ const Option = styled.div`
     border-top-color: ${({ theme }) => theme.color.gallery};
     border-bottom-color: ${({ theme }) => theme.color.gallery};
   }
+`;
+
+const DisabledOption = styled(Option)`
+  pointer-events: none;
 `;
 
 const StyledAvatar = styled(Avatar)`
@@ -53,22 +57,23 @@ const isTeamEnable = activeTeamId => team => {
   return (isPinnedTeams || isMustTeams) && isNonActiveTeam;
 };
 
-const TeamAvatar = ({ team }) =>
-  team?.locked ? (
+const VaultAvatar = ({ vault }) =>
+  vault?.locked ? (
     <StyledWarningIcon name="warning" width={32} height={32} />
   ) : (
     <StyledAvatar
-      avatar={team.icon}
-      email={team.email}
+      avatar={vault.icon}
+      email={vault.email}
       size={32}
       fontSize="small"
     />
   );
-const TeamsListComponent = ({ activeTeamId, handleToggle, setListsOpened }) => {
+
+const VaultListComponent = ({ activeTeamId, handleToggle, setListsOpened }) => {
   const dispatch = useDispatch();
   const currentTeam = useSelector(currentTeamSelector);
 
-  const teamList = useSelector(userTeamListSelector)
+  const vaultList = useSelector(userVaultListSelector)
     .filter(isTeamEnable(activeTeamId))
     .sort(sortTeams);
 
@@ -81,23 +86,23 @@ const TeamsListComponent = ({ activeTeamId, handleToggle, setListsOpened }) => {
     }
   };
 
-  return (
-    <>
-      {teamList.map(team => {
-        return (
-          <Option
-            key={team.id}
-            onClick={() => {
-              handleChangeTeam(team.id);
-            }}
-          >
-            <TeamAvatar team={team} />
-            {getTeamTitle(team)}
-          </Option>
-        );
-      })}
-    </>
+  return vaultList.length ? (
+    vaultList.map(vault => {
+      return (
+        <Option
+          key={vault.id}
+          onClick={() => {
+            handleChangeTeam(vault.id);
+          }}
+        >
+          <VaultAvatar vault={vault} />
+          {getTeamTitle(vault)}
+        </Option>
+      );
+    })
+  ) : (
+    <DisabledOption>No team vaults available</DisabledOption>
   );
 };
 
-export const TeamsList = memo(TeamsListComponent);
+export const VaultList = memo(VaultListComponent);

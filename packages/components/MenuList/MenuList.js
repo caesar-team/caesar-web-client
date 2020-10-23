@@ -9,7 +9,7 @@ import { Scrollbar } from '../Scrollbar';
 import { Dropdown } from '../Dropdown';
 import { Avatar } from '../Avatar';
 import { Icon } from '../Icon';
-import { TeamsList } from '../TeamsList';
+import { VaultList } from '../VaultList';
 import { AppVersion } from '../AppVersion';
 import { Overlay } from '../Modal';
 import { MenuListInner } from './components/MenuListInner';
@@ -17,6 +17,11 @@ import { MenuListInner } from './components/MenuListInner';
 const StyledDropdown = styled(Dropdown)`
   ${Dropdown.Box} {
     width: 100%;
+    max-height: calc(100vh - 150px);
+  }
+
+  ${Dropdown.OptionsList} {
+    overflow: auto;
   }
 `;
 
@@ -91,7 +96,7 @@ const MenuListComponent = ({ mode, setSearchedText, setMode }) => {
     <>
       <StyledDropdown
         renderOverlay={handleToggle => (
-          <TeamsList
+          <VaultList
             activeTeamId={activeTeamId}
             handleToggle={handleToggle}
             setListsOpened={setListsOpened}

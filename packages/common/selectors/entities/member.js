@@ -37,7 +37,7 @@ export const membersBatchSelector = createSelector(
 export const memberAdminsSelector = createSelector(
   memberListSelector,
   membersList =>
-    membersList.filter(({ domainRoles }) => domainRoles.includes(ROLE_ADMIN)),
+    membersList.filter(({ domainRoles }) => domainRoles?.includes(ROLE_ADMIN)),
 );
 
 export const teamIdPropSelector = (_, props) => props.teamId;

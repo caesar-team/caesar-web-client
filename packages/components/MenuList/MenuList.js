@@ -9,7 +9,7 @@ import { Scrollbar } from '../Scrollbar';
 import { Dropdown } from '../Dropdown';
 import { Avatar } from '../Avatar';
 import { Icon } from '../Icon';
-import { TeamsList } from '../TeamsList';
+import { VaultList } from '../VaultList';
 import { AppVersion } from '../AppVersion';
 import { Overlay } from '../Modal';
 import { MenuListInner } from './components/MenuListInner';
@@ -96,7 +96,7 @@ const MenuListComponent = ({ mode, setSearchedText, setMode }) => {
     <>
       <StyledDropdown
         renderOverlay={handleToggle => (
-          <TeamsList
+          <VaultList
             activeTeamId={activeTeamId}
             handleToggle={handleToggle}
             setListsOpened={setListsOpened}

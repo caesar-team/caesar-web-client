@@ -12,7 +12,7 @@ import {
   editListRequest,
 } from '@caesar/common/actions/entities/list';
 import { Tooltip } from '@caesar/components/List/Item/styles';
-import { listItemCount } from '@caesar/common/utils/list';
+import { useListItemCounter } from '@caesar/common/hooks';
 import { Can } from '../../Ability';
 import { Icon } from '../../Icon';
 import { ListInput } from './ListInput';
@@ -96,7 +96,7 @@ export const ListItem = ({
   const currentTeam = useSelector(currentTeamSelector);
   const { id, label, type, children = [] } = list;
 
-  const itemCount = listItemCount(children);
+  const itemCount = useListItemCounter(children);
 
   const isDefault = type === LIST_TYPE.DEFAULT;
   const [isEditMode, setEditMode] = useState(isCreatingMode);

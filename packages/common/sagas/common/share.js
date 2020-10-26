@@ -8,10 +8,9 @@ import {
 } from '@caesar/common/selectors/keystore';
 import {
   NOOP_NOTIFICATION,
-  ROLE_USER,
   SHARING_IN_PROGRESS_NOTIFICATION,
   ENTITY_TYPE,
-  ROLE_ADMIN,
+  DOMAIN_ROLES,
   TEAM_TYPE,
 } from '@caesar/common/constants';
 import {
@@ -42,7 +41,9 @@ export function* prepareUsersForSharing(members) {
   const emailRolePairs = members.map(({ email, domainRoles }) => ({
     email,
     role:
-      (domainRoles?.includes(ROLE_ADMIN) ? ROLE_ADMIN : ROLE_USER) || ROLE_USER,
+      (domainRoles?.includes(DOMAIN_ROLES.ROLE_ADMIN)
+        ? DOMAIN_ROLES.ROLE_ADMIN
+        : DOMAIN_ROLES.ROLE_USER) || DOMAIN_ROLES.ROLE_USER,
   }));
 
   return yield call(getOrCreateMemberBatchSaga, {

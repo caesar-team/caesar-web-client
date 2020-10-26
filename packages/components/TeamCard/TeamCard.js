@@ -130,6 +130,7 @@ const TeamCard = ({
   className,
   team,
   members,
+  userId,
   onClick = Function.prototype,
   onClickEditTeam = Function.prototype,
   onClickLeaveTeam = Function.prototype,
@@ -141,9 +142,11 @@ const TeamCard = ({
 
   const { _permissions } = team || {};
 
+  const isCurrentUserTeamMember = !!users.find(({ id }) => id === userId);
   const canEditTeam = ability.can(PERMISSION.EDIT, _permissions);
   const canRemoveTeam = ability.can(PERMISSION.DELETE, _permissions);
-  const canLeaveTeam = ability.can(PERMISSION.LEAVE, _permissions);
+  const canLeaveTeam = ability.can(PERMISSION.LEAVE, _permissions) &&
+    isCurrentUserTeamMember;
   const canPinTeam = ability.can(PERMISSION.PIN, _permissions);
   const shouldShowMenu = canLeaveTeam || canEditTeam || canRemoveTeam;
 

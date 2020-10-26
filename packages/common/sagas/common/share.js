@@ -10,7 +10,6 @@ import {
   NOOP_NOTIFICATION,
   ROLE_USER,
   SHARING_IN_PROGRESS_NOTIFICATION,
-  ENTITY_TYPE,
   ROLE_ADMIN,
   TEAM_TYPE,
 } from '@caesar/common/constants';
@@ -27,10 +26,10 @@ import { updateWorkInProgressItem } from '@caesar/common/actions/workflow';
 import { getServerErrorMessage } from '@caesar/common/utils/error';
 import { workInProgressItemSelector } from '@caesar/common/selectors/workflow';
 import {
-  createSystemItemKeyPair,
   encryptSecret,
   generateKeyPair,
   saveItemSaga,
+  saveShareKeyPairSaga,
 } from '@caesar/common/sagas/entities/item';
 import { convertSystemItemToKeyPair } from '../../utils/item';
 import { getItem, getPublicKeyByEmailBatch, postItemShare } from '../../api';
@@ -48,29 +47,6 @@ export function* prepareUsersForSharing(members) {
   return yield call(getOrCreateMemberBatchSaga, {
     payload: { emailRolePairs },
   });
-}
-
-// @Deprecated
-export function* findOrCreateKeyPair({ payload: { item } }) {
-  let systemKeyPairItem = yield select(shareKeyPairSelector, {
-    itemId: item.id,
-  });
-  const { userId: ownerId, publicKey } = yield select(userDataSelector);
-
-  if (!systemKeyPairItem) {
-    const systemItem = yield call(createSystemItemKeyPair, {
-      payload: {
-        entityId: item.id,
-        entityOwnerId: ownerId,
-        entityTeamId: item.teamId,
-        entityType: ENTITY_TYPE.SHARE,
-        publicKey,
-      },
-    });
-    systemKeyPairItem = convertSystemItemToKeyPair(systemItem);
-  }
-
-  return systemKeyPairItem;
 }
 
 export function* encryptItemBySharedKey({ item, publicKey }) {
@@ -148,6 +124,7 @@ function* processMembersItemShare({ item, members }) {
     const itemKeyPair = Object.values(
       convertKeyPairToItemEntity([sharedItemKeyPairKey]),
     ).shift();
+
     const ownerKey = {
       ...itemKeyPair,
       ...{
@@ -159,7 +136,7 @@ function* processMembersItemShare({ item, members }) {
     };
 
     // Need to save the new key to the owner's store
-    yield call(saveItemSaga, {
+    yield call(saveShareKeyPairSaga, {
       item: ownerKey,
       publicKey: ownerPublicKey,
     });
@@ -232,7 +209,9 @@ export function* shareItemBatchSaga({
       const updatedItem = {
         ...workInProgressItem,
         invited: workInProgressItemFromServer?.invited,
+        isShared: true,
       };
+
       if (updatedItem.id) {
         yield put(
           addItemsBatch({

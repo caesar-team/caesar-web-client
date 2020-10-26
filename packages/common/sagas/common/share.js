@@ -10,7 +10,6 @@ import {
   NOOP_NOTIFICATION,
   ROLE_USER,
   SHARING_IN_PROGRESS_NOTIFICATION,
-  ENTITY_TYPE,
   ROLE_ADMIN,
   TEAM_TYPE,
 } from '@caesar/common/constants';
@@ -27,13 +26,10 @@ import { updateWorkInProgressItem } from '@caesar/common/actions/workflow';
 import { getServerErrorMessage } from '@caesar/common/utils/error';
 import { workInProgressItemSelector } from '@caesar/common/selectors/workflow';
 import {
-  createKeyPair,
   encryptSecret,
-  generateItemKeyPairKeyByName,
   generateKeyPair,
-  saveItemKeyPair,
   saveItemSaga,
-  saveKeyPair,
+  saveShareKeyPairSaga,
 } from '@caesar/common/sagas/entities/item';
 import { convertSystemItemToKeyPair } from '../../utils/item';
 import { getItem, getPublicKeyByEmailBatch, postItemShare } from '../../api';
@@ -52,29 +48,6 @@ export function* prepareUsersForSharing(members) {
     payload: { emailRolePairs },
   });
 }
-
-// @Deprecated
-// export function* findOrCreateKeyPair({ payload: { item } }) {
-//   let systemKeyPairItem = yield select(shareKeyPairSelector, {
-//     itemId: item.id,
-//   });
-//   const { userId: ownerId, publicKey } = yield select(userDataSelector);
-
-//   if (!systemKeyPairItem) {
-//     const systemItem = yield call(createKeyPair, {
-//       payload: {
-//         entityId: item.id,
-//         entityOwnerId: ownerId,
-//         entityTeamId: item.teamId,
-//         entityType: ENTITY_TYPE.SHARE,
-//         publicKey,
-//       },
-//     });
-//     systemKeyPairItem = convertSystemItemToKeyPair(systemItem);
-//   }
-
-//   return systemKeyPairItem;
-// }
 
 export function* encryptItemBySharedKey({ item, publicKey }) {
   if (!publicKey) {
@@ -102,6 +75,12 @@ export function* encryptItemBySharedKey({ item, publicKey }) {
   return item;
 }
 
+function* generateItemShareKey(item) {
+  return yield call(generateKeyPair, {
+    name: `shared-${item.id}`,
+  });
+}
+
 function* generateUserPostData({ keypair, userId, publicKey }) {
   const item = Object.values(convertKeyPairToItemEntity([keypair])).shift();
   const secret = yield call(encryptSecret, {
@@ -114,7 +93,15 @@ function* generateUserPostData({ keypair, userId, publicKey }) {
     secret,
   };
 }
+function* getSharedItemKeyPairKey(item) {
+  const generatedKeyPair = yield call(generateItemShareKey, item);
+  const keypair = {
+    id: uuid4(),
+    ...generatedKeyPair,
+  };
 
+  return convertSystemItemToKeyPair(keypair);
+}
 // Todo: Some code for refacting
 function* processMembersItemShare({ item, members }) {
   // Checking if the item already has shared
@@ -127,26 +114,29 @@ function* processMembersItemShare({ item, members }) {
       teamId: item.teamId,
     });
     const { id: ownerId } = yield select(userDataSelector);
+    const defaultList = yield select(teamDefaultListSelector, {
+      teamId: item.teamId,
+    });
 
     // eslint-disable-next-line require-atomic-updates
-    sharedItemKeyPairKey = yield call(generateItemKeyPairKeyByName, {
-      name: `shared-${item.id}`,
-    });
+    sharedItemKeyPairKey = yield call(getSharedItemKeyPairKey, item);
 
     const itemKeyPair = Object.values(
       convertKeyPairToItemEntity([sharedItemKeyPairKey]),
     ).shift();
+
     const ownerKey = {
       ...itemKeyPair,
       ...{
         ownerId,
+        listId: defaultList.id,
         relatedItemId: item.id,
         teamId: item.teamId !== TEAM_TYPE.PERSONAL ? item.teamId : null,
       },
     };
 
     // Need to save the new key to the owner's store
-    yield call(saveItemKeyPair, {
+    yield call(saveShareKeyPairSaga, {
       item: ownerKey,
       publicKey: ownerPublicKey,
     });
@@ -219,7 +209,9 @@ export function* shareItemBatchSaga({
       const updatedItem = {
         ...workInProgressItem,
         invited: workInProgressItemFromServer?.invited,
+        isShared: true,
       };
+
       if (updatedItem.id) {
         yield put(
           addItemsBatch({

@@ -161,22 +161,19 @@ export function* createTeamKeyPairSaga({
       throw new Error('Fatal error: The publicKey not found.');
     }
 
-    const teamKeyPair = yield call(generateKeyPair, {
-      name: team.title,
+    const keyPairsById = yield call(createKeyPair, {
+      payload: {
+        entityTeamId: team.id,
+        publicKey,
+        entityOwnerId: ownerId,
+      },
     });
-    const secret = yield call(encryptSecret, { item: teamKeyPair, publicKey });
 
-    const keypair = {
-      ownerId,
-      teamId: team.id,
-      secret,
-    };
-
-    const serverKeypairItem = yield call(createKeyPair, keypair);
-    const keyPairsById = convertKeyPairToEntity([serverKeypairItem], 'teamId');
     yield put(addTeamKeyPairBatch(keyPairsById));
 
-    return keyPairsById;
+    const keyPair = Object.values(keyPairsById).shift();
+
+    return keyPair;
   } catch (error) {
     // eslint-disable-next-line no-console
     console.error(error);

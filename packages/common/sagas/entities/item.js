@@ -49,7 +49,6 @@ import {
   listSelector,
   defaultListSelector,
   currentTeamDefaultListSelector,
-  teamDefaultListSelector,
 } from '@caesar/common/selectors/entities/list';
 import { itemSelector } from '@caesar/common/selectors/entities/item';
 import {
@@ -58,14 +57,10 @@ import {
   userIdSelector,
 } from '@caesar/common/selectors/user';
 import {
-  addShareKeyPair,
-  addTeamKeyPair,
-  addTeamKeyPairBatch,
-} from '@caesar/common/actions/keystore';
-import {
   postAddKeyPairBatch,
   postCreateItem,
   postCreateItemsBatch,
+  postItemShare,
   removeItem,
   removeItemsBatch,
   toggleFavorite,
@@ -80,7 +75,6 @@ import {
 import { getServerErrorMessage } from '@caesar/common/utils/error';
 import { chunk } from '@caesar/common/utils/utils';
 import {
-  ENTITY_TYPE,
   COMMON_PROGRESS_NOTIFICATION,
   CREATING_ITEM_NOTIFICATION,
   ENCRYPTING_ITEM_NOTIFICATION,
@@ -400,15 +394,23 @@ export function* encryptSecret({ item, publicKey }) {
   return JSON.stringify(encryptedItem);
 }
 
+export function* saveShareKeyPairSaga({ item, publicKey }) {
+  const { relatedItemId, ownerId } = item;
+  const secret = yield call(encryptSecret, { item, publicKey });
+
+  return yield call(postItemShare, {
+    itemId: relatedItemId,
+    users: [
+      {
+        userId: ownerId,
+        secret,
+      },
+    ],
+  });
+}
+
 export function* saveItemSaga({ item, publicKey }) {
-  const {
-    id = null,
-    listId = null,
-    type,
-    favorite = false,
-    relatedItemId = null,
-    ownerId,
-  } = item;
+  const { id = null, listId = null, type, favorite = false, ownerId } = item;
 
   const secret = yield call(encryptSecret, { item, publicKey });
   const title = item?.data?.name;
@@ -429,7 +431,6 @@ export function* saveItemSaga({ item, publicKey }) {
       type,
       favorite,
       secret,
-      relatedItemId,
     });
 
     serverItemData = updatedItemData || {};
@@ -468,9 +469,7 @@ export function* saveKeyPair(
 ) {
   const keypairs = [{ ownerId, teamId, secret, relatedItemId }];
 
-  return yield call(postAddKeyPairBatch, {
-    items: keypairs,
-  });
+  return yield call(postAddKeyPairBatch, keypairs);
 }
 
 export function* saveItemKeyPair({
@@ -527,61 +526,21 @@ export function* createKeyPair({
   });
   const secret = yield call(encryptSecret, { item: keypair, publicKey });
 
-  const { data } = yield call(saveKeyPair, {
+  const { data: serverKeyPairItems } = yield call(saveKeyPair, {
     ownerId,
     teamId,
     secret,
     relatedItemId: entityId,
   });
-  debugger;
-  // const { id: defaultListId } = yield select(teamDefaultListSelector, {
-  //   teamId,
-  // });
+  const serverKeyPairItem = Object.values(serverKeyPairItems).shift();
+  const keyPairsById = convertKeyPairToEntity([
+    {
+      ...serverKeyPairItem,
+      ...keypair,
+    },
+  ]);
 
-  // if (!entityType) {
-  //   throw new Error(`The type of system item isn't defined`);
-  // }
-
-  // // Create an empty item
-  // let systemKeyPairItem = yield call(
-  //   generateSystemItem,
-  //   entityType,
-  //   defaultListId,
-  //   entityId,
-  // );
-
-  // // If the keypair for the shared item
-  // if (ENTITY_TYPE.SHARE === entityType) {
-  //   systemKeyPairItem.relatedItemId = entityId;
-  // } else if (ENTITY_TYPE.TEAM === entityType) {
-  //   systemKeyPairItem.ownerId = ownerId;
-  // }
-
-  // if (teamId !== TEAM_TYPE.PERSONAL) {
-  //   systemKeyPairItem.teamId = teamId;
-  // }
-
-  // // Encrypt and save the system keypair item to the owner personal vault
-  // const systemItemFromServer = yield call(saveItemSaga, {
-  //   item: {
-  //     ...systemKeyPairItem,
-  //     type: ITEM_TYPE.KEYPAIR,
-  //   },
-  //   publicKey,
-  // });
-
-  // systemKeyPairItem = {
-  //   ...systemKeyPairItem,
-  //   ...systemItemFromServer,
-  // };
-
-  // yield put(
-  //   addTeamKeyPairBatch({
-  //     [systemKeyPairItem.id]: systemKeyPairItem,
-  //   }),
-  // );
-
-  // return systemKeyPairItem;
+  return keyPairsById;
 }
 
 export function* createIfNotExistKeyPair({ payload: { teamId, ownerId } }) {
@@ -598,11 +557,10 @@ export function* createIfNotExistKeyPair({ payload: { teamId, ownerId } }) {
   });
 
   if (!systemKeyPairItem) {
-    yield call(createSystemItemKeyPair, {
+    yield call(createKeyPair, {
       payload: {
         entityId: teamId,
         entityTeamId: teamId,
-        entityType: ENTITY_TYPE.TEAM,
         entityOwnerId: userId,
         publicKey,
       },
@@ -615,19 +573,7 @@ export function* createItemSaga({
   meta: { setSubmitting = Function.prototype },
 }) {
   try {
-    const currentUserId = yield select(userIdSelector);
-    const {
-      teamId = TEAM_TYPE.PERSONAL,
-      ownerId = currentUserId,
-      listId,
-    } = item;
-
-    yield call(createIfNotExistKeyPair, {
-      payload: {
-        teamId,
-        ownerId,
-      },
-    });
+    const { teamId = TEAM_TYPE.PERSONAL, listId } = item;
 
     const keyPair = yield select(teamKeyPairSelector, {
       teamId,
@@ -679,11 +625,6 @@ export function* createItemSaga({
           [savedItem.id]: savedItem,
         }),
       );
-      if (!savedItem.relatedItemId) {
-        yield put(addTeamKeyPair(savedItem));
-      } else {
-        yield put(addShareKeyPair(savedItem));
-      }
     } else {
       yield put(setWorkInProgressListId(listId));
       yield put(setWorkInProgressItem(savedItem));
@@ -786,10 +727,15 @@ export function* getKeyPairForItem({ item }) {
   if (item.isShared) {
     keypair = yield select(shareKeyPairSelector, { itemId: item.id });
   } else {
-    const list = yield select(listSelector, { listId: item.listId });
+    let { teamId } = item;
+
+    if (!teamId) {
+      const list = yield select(listSelector, { listId: item.listId });
+      teamId = list.teamId;
+    }
 
     keypair = yield select(teamKeyPairSelector, {
-      teamId: list.teamId || TEAM_TYPE.PERSONAL,
+      teamId: teamId || TEAM_TYPE.PERSONAL,
     });
   }
 

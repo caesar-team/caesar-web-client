@@ -1,6 +1,6 @@
 import { connect } from 'react-redux';
 import { createStructuredSelector } from 'reselect';
-import { fetchKeyPairRequest } from '@caesar/common/actions/user';
+import { fetchKeyPairRequest } from '@caesar/common/actions/currentUser';
 import {
   createTeamRequest,
   editTeamRequest,
@@ -16,11 +16,11 @@ import {
   teamSortedListSelector,
 } from '@caesar/common/selectors/entities/team';
 import {
-  userDataSelector,
-  userTeamListSelector,
+  currentUserDataSelector,
+  currentUserTeamListSelector,
   isUserDomainAdminSelector,
   isUserDomainAdminOrManagerSelector,
-} from '@caesar/common/selectors/user';
+} from '@caesar/common/selectors/currentUser';
 import { memberListSelector } from '@caesar/common/selectors/entities/member';
 import { isLoadingSelector } from '@caesar/common/selectors/workflow';
 import { TeamList } from './TeamList';
@@ -29,8 +29,8 @@ const mapStateToProps = createStructuredSelector({
   isLoading: isLoadingSelector,
   isLoadingTeams: isLoadingTeamsSelector,
   teams: teamSortedListSelector,
-  user: userDataSelector,
-  userTeamList: userTeamListSelector,
+  currentUser: currentUserDataSelector,
+  userTeamList: currentUserTeamListSelector,
   isDomainAdmin: isUserDomainAdminSelector,
   isDomainAdminOrManager: isUserDomainAdminOrManagerSelector,
   members: memberListSelector,

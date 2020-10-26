@@ -37,7 +37,7 @@ import {
   removeItemFromList,
   removeItemsBatchFromList,
 } from '@caesar/common/actions/entities/list';
-import { setCurrentTeamId } from '@caesar/common/actions/user';
+import { setCurrentTeamId } from '@caesar/common/actions/currentUser';
 import { updateGlobalNotification } from '@caesar/common/actions/application';
 import {
   setWorkInProgressItem,
@@ -54,9 +54,9 @@ import {
 import { itemSelector } from '@caesar/common/selectors/entities/item';
 import {
   currentTeamIdSelector,
-  userDataSelector,
-  userIdSelector,
-} from '@caesar/common/selectors/user';
+  currentUserDataSelector,
+  currentUserIdSelector,
+} from '@caesar/common/selectors/currentUser';
 import {
   addShareKeyPair,
   addTeamKeyPair,
@@ -465,7 +465,7 @@ export function* createSystemItemKeyPair({
 }) {
   // The deafult values
   const teamId = entityTeamId || TEAM_TYPE.PERSONAL;
-  const currentUserId = yield select(userIdSelector);
+  const currentUserId = yield select(currentUserIdSelector);
   const ownerId = entityOwnerId || currentUserId;
 
   const { id: defaultListId } = yield select(teamDefaultListSelector, {
@@ -521,7 +521,7 @@ export function* createSystemItemKeyPair({
 export function* createIfNotExistKeyPair({ payload: { teamId, ownerId } }) {
   if (!teamId) return;
 
-  const currentUser = yield select(userDataSelector);
+  const currentUser = yield select(currentUserDataSelector);
   const userId = ownerId || currentUser.id;
 
   const owner = yield select(memberSelector, { memberId: userId });
@@ -549,7 +549,7 @@ export function* createItemSaga({
   meta: { setSubmitting = Function.prototype },
 }) {
   try {
-    const currentUserId = yield select(userIdSelector);
+    const currentUserId = yield select(currentUserIdSelector);
     const {
       teamId = TEAM_TYPE.PERSONAL,
       ownerId = currentUserId,
@@ -648,7 +648,7 @@ export function* createItemsBatchSaga({
 
     yield put(updateGlobalNotification(ENCRYPTING_ITEM_NOTIFICATION, true));
 
-    const currentUserId = yield select(userIdSelector);
+    const currentUserId = yield select(currentUserIdSelector);
     const { teamId = TEAM_TYPE.PERSONAL } = items[0];
 
     yield call(createIfNotExistKeyPair, {

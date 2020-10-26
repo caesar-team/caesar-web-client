@@ -171,7 +171,7 @@ class TeamListContainer extends Component {
   }
 
   renderTeamCards(teams) {
-    const { members, user } = this.props;
+    const { members, currentUser } = this.props;
 
     if (!teams.length) {
       return <div>No teams</div>;
@@ -182,7 +182,7 @@ class TeamListContainer extends Component {
         key={team.id}
         team={team}
         members={members}
-        userId={user.id}
+        userId={currentUser.id}
         onClickEditTeam={this.handleClickEditTeam(team.id)}
         onClickLeaveTeam={this.handleClickLeaveTeam(team)}
         onClickRemoveTeam={this.handleClickRemoveTeam(team.id)}
@@ -199,7 +199,7 @@ class TeamListContainer extends Component {
       userTeamList,
       isDomainAdmin,
       isDomainAdminOrManager,
-      user,
+      currentUser,
     } = this.props;
 
     const { modalVisibilities, selectedTeamTitle, activeTabName } = this.state;
@@ -211,7 +211,7 @@ class TeamListContainer extends Component {
 
     const teamSubject = {
       __typename: PERMISSION_ENTITY.TEAM,
-      ...user?._permissions,
+      ...currentUser?._permissions,
     };
 
     const teamsLength =

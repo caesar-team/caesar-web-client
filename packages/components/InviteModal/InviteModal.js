@@ -73,13 +73,13 @@ class InviteModal extends Component {
   }
 
   render() {
-    const { invitedMembers, user, onCancel } = this.props;
+    const { invitedMembers, currentUser, onCancel } = this.props;
     const { members } = this.state;
 
     const shouldShowAddedMembers = members.length > 0;
 
     const searchedBlackListMemberIds = [
-      user.id,
+      currentUser.id,
       ...members.map(({ id }) => id),
       ...invitedMembers.map(({ id }) => id),
     ];

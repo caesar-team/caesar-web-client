@@ -35,13 +35,16 @@ import {
   removeTeamFromMember,
   removeTeamFromMembersBatch,
 } from '@caesar/common/actions/entities/member';
-import { setCurrentTeamId, leaveTeam } from '@caesar/common/actions/user';
+import {
+  setCurrentTeamId,
+  leaveTeam,
+} from '@caesar/common/actions/currentUser';
 import { teamSelector } from '@caesar/common/selectors/entities/team';
 import {
   currentTeamIdSelector,
-  userDataSelector,
-  userTeamIdsSelector,
-} from '@caesar/common/selectors/user';
+  currentUserDataSelector,
+  currentUserTeamIdsSelector,
+} from '@caesar/common/selectors/currentUser';
 import {
   getTeams,
   editTeam,
@@ -122,7 +125,7 @@ export function* fetchTeamSaga({ payload: { teamId } }) {
 export function* removeTeamSaga({ payload: { teamId } }) {
   try {
     const team = yield select(teamSelector, { teamId });
-    const userTeamIds = yield select(userTeamIdsSelector);
+    const userTeamIds = yield select(currentUserTeamIdsSelector);
     const currentTeamId = yield select(currentTeamIdSelector);
 
     yield call(deleteTeam, teamId);
@@ -262,7 +265,7 @@ export function* createTeamSaga({
   meta: { handleCloseModal, setSubmitting, setErrors },
 }) {
   try {
-    const currentUser = yield select(userDataSelector);
+    const currentUser = yield select(currentUserDataSelector);
     const userId = ownerId || currentUser.id;
 
     const owner = yield select(memberSelector, { memberId: userId });

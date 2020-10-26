@@ -1,27 +1,27 @@
-export const FETCH_USER_SELF_REQUEST = '@user/FETCH_USER_SELF_REQUEST';
-export const FETCH_USER_SELF_SUCCESS = '@user/FETCH_USER_SELF_SUCCESS';
-export const FETCH_USER_SELF_FAILURE = '@user/FETCH_USER_SELF_FAILURE';
+export const FETCH_USER_SELF_REQUEST = '@currentUser/FETCH_USER_SELF_REQUEST';
+export const FETCH_USER_SELF_SUCCESS = '@currentUser/FETCH_USER_SELF_SUCCESS';
+export const FETCH_USER_SELF_FAILURE = '@currentUser/FETCH_USER_SELF_FAILURE';
 
-export const FETCH_KEY_PAIR_REQUEST = '@user/FETCH_KEY_PAIR_REQUEST';
-export const FETCH_KEY_PAIR_SUCCESS = '@user/FETCH_KEY_PAIR_SUCCESS';
-export const FETCH_KEY_PAIR_FAILURE = '@user/FETCH_KEY_PAIR_FAILURE';
+export const FETCH_KEY_PAIR_REQUEST = '@currentUser/FETCH_KEY_PAIR_REQUEST';
+export const FETCH_KEY_PAIR_SUCCESS = '@currentUser/FETCH_KEY_PAIR_SUCCESS';
+export const FETCH_KEY_PAIR_FAILURE = '@currentUser/FETCH_KEY_PAIR_FAILURE';
 
-export const FETCH_USER_TEAMS_REQUEST = '@user/FETCH_USER_TEAMS_REQUEST';
-export const FETCH_USER_TEAMS_SUCCESS = '@user/FETCH_USER_TEAMS_SUCCESS';
-export const FETCH_USER_TEAMS_FAILURE = '@user/FETCH_USER_TEAMS_FAILURE';
+export const FETCH_USER_TEAMS_REQUEST = '@currentUser/FETCH_USER_TEAMS_REQUEST';
+export const FETCH_USER_TEAMS_SUCCESS = '@currentUser/FETCH_USER_TEAMS_SUCCESS';
+export const FETCH_USER_TEAMS_FAILURE = '@currentUser/FETCH_USER_TEAMS_FAILURE';
 
-export const SET_MASTER_PASSWORD = '@user/SET_MASTER_PASSWORD';
-export const SET_KEY_PAIR = '@user/SET_KEY_PAIR';
-export const SET_CURRENT_TEAM_ID = '@user/SET_CURRENT_TEAM_ID';
+export const SET_MASTER_PASSWORD = '@currentUser/SET_MASTER_PASSWORD';
+export const SET_KEY_PAIR = '@currentUser/SET_KEY_PAIR';
+export const SET_CURRENT_TEAM_ID = '@currentUser/SET_CURRENT_TEAM_ID';
 
-export const SET_DEFAULT_LIST_ID = '@user/SET_DEFAULT_LIST_ID';
+export const SET_DEFAULT_LIST_ID = '@currentUser/SET_DEFAULT_LIST_ID';
 
-export const ADD_MEMBER_TO_TEAM = '@user/ADD_MEMBER_TO_TEAM';
-export const LEAVE_TEAM = '@user/LEAVE_TEAM';
+export const ADD_MEMBER_TO_TEAM = '@currentUser/ADD_MEMBER_TO_TEAM';
+export const LEAVE_TEAM = '@currentUser/LEAVE_TEAM';
 
-export const LOGOUT = '@user/LOGOUT';
+export const LOGOUT = '@currentUser/LOGOUT';
 
-export const RESET_USER_STATE = '@user/RESET_USER_STATE';
+export const RESET_USER_STATE = '@currentUser/RESET_USER_STATE';
 
 export const fetchUserSelfRequest = () => ({
   type: FETCH_USER_SELF_REQUEST,

@@ -8,18 +8,18 @@ import {
   SettingsSidebar,
 } from '@caesar/components';
 import { UsersContainer } from '@caesar/containers';
-import { userDataSelector } from '@caesar/common/selectors/user';
+import { currentUserDataSelector } from '@caesar/common/selectors/currentUser';
 import { initUsersSettings } from '@caesar/common/actions/workflow';
 
 const SettingsUsersPage = () => {
   const dispatch = useDispatch();
-  const userData = useSelector(userDataSelector);
+  const currentUserData = useSelector(currentUserDataSelector);
 
   useEffectOnce(() => {
     dispatch(initUsersSettings());
   });
 
-  const shouldShowLoader = !userData;
+  const shouldShowLoader = !currentUserData;
 
   if (shouldShowLoader) {
     return <FullScreenLoader />;
@@ -28,7 +28,7 @@ const SettingsUsersPage = () => {
   return (
     <>
       <Head title="All users" />
-      <SettingsLayout user={userData}>
+      <SettingsLayout currentUser={currentUserData}>
         <>
           <SettingsSidebar />
           <UsersContainer />

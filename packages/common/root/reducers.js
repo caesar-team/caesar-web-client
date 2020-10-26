@@ -1,7 +1,7 @@
 import { combineReducers } from 'redux';
 import {
   memberReducer,
-  userReducer,
+  currentUserReducer,
   workflowReducer,
   listReducer,
   itemReducer,
@@ -21,7 +21,7 @@ const entitiesReducer = combineReducers({
 
 export const rootReducer = combineReducers({
   application: applicationReducer,
-  user: userReducer,
+  currentUser: currentUserReducer,
   entities: entitiesReducer,
   workflow: workflowReducer,
   keystore: keystoreReducer,

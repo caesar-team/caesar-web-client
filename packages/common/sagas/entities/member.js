@@ -20,9 +20,9 @@ import {
   updateTeamMembersWithRoles,
   removeTeamMemberSuccess,
 } from '@caesar/common/actions/entities/team';
-import { userIdSelector } from '@caesar/common/selectors/user';
+import { currentUserIdSelector } from '@caesar/common/selectors/currentUser';
 import {
-  getMembers,
+  getUsers,
   getPublicKeyByEmailBatch,
   getTeamMembers,
   postLeaveTeam,
@@ -39,11 +39,7 @@ import {
   generateUser,
   generateUsersBatch,
 } from '@caesar/common/utils/cipherUtils';
-import {
-  ENTITY_TYPE,
-  DOMAIN_ROLES,
-  ROUTES,
-} from '@caesar/common/constants';
+import { ENTITY_TYPE, DOMAIN_ROLES, ROUTES } from '@caesar/common/constants';
 import { updateGlobalNotification } from '@caesar/common/actions/application';
 import { getServerErrorMessage } from '@caesar/common/utils/error';
 
@@ -58,7 +54,7 @@ const renameUserId = members =>
 
 export function* fetchMembersSaga() {
   try {
-    const { data: members } = yield call(getMembers);
+    const { data: members } = yield call(getUsers);
 
     yield put(fetchMembersSuccess(convertUsersToEntity(members)));
   } catch (error) {
@@ -263,7 +259,7 @@ export function* fetchTeamMembersSaga({ payload: { teamId } }) {
 export function* leaveTeamSaga({ payload: { teamId } }) {
   try {
     yield call(postLeaveTeam, teamId);
-    const userId = yield select(userIdSelector);
+    const userId = yield select(currentUserIdSelector);
 
     yield put(leaveTeamSuccess());
     yield put(removeTeamMemberSuccess(teamId, userId));

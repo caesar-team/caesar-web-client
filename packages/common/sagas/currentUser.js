@@ -12,13 +12,13 @@ import {
   fetchUserTeamsSuccess,
   fetchUserTeamsFailure,
   setCurrentTeamId,
-} from '@caesar/common/actions/user';
+} from '@caesar/common/actions/currentUser';
 import { addPersonalKeyPair } from '@caesar/common/actions/keystore';
 import { addTeamsBatch } from '@caesar/common/actions/entities/team';
 import { addMembersBatch } from '@caesar/common/actions/entities/member';
 import { resetStore } from '@caesar/common/actions/application';
 import { membersByIdSelector } from '@caesar/common/selectors/entities/member';
-import { currentTeamIdSelector } from '@caesar/common/selectors/user';
+import { currentTeamIdSelector } from '@caesar/common/selectors/currentUser';
 import { convertTeamsToEntity } from '@caesar/common/normalizers/normalizers';
 import {
   getUserSelf,
@@ -32,15 +32,15 @@ import { ROUTES } from '@caesar/common/constants';
 
 export function* fetchUserSelfSaga() {
   try {
-    const { data: user } = yield call(getUserSelf);
+    const { data: currentUser } = yield call(getUserSelf);
     const membersById = yield select(membersByIdSelector);
 
     // TODO: Move to normalizr
     const fixedUser = {
-      ...membersById[user.id],
-      ...user,
-      _permissions: createPermissionsFromLinks(user._links),
-      teamIds: user.teamIds || [],
+      ...membersById[currentUser.id],
+      ...currentUser,
+      _permissions: createPermissionsFromLinks(currentUser._links),
+      teamIds: currentUser.teamIds || [],
     };
 
     yield put(fetchUserSelfSuccess(fixedUser));
@@ -100,7 +100,7 @@ export function* logoutSaga() {
   }
 }
 
-export default function* userSagas() {
+export default function* currentUserSagas() {
   yield takeLatest(FETCH_USER_SELF_REQUEST, fetchUserSelfSaga);
   yield takeLatest(FETCH_KEY_PAIR_REQUEST, fetchKeyPairSaga);
   yield takeLatest(FETCH_USER_TEAMS_REQUEST, fetchUserTeamsSaga);

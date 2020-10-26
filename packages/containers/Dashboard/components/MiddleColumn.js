@@ -25,7 +25,7 @@ import {
   listsByIdSelector,
 } from '@caesar/common/selectors/entities/list';
 import { teamMembersSelector } from '@caesar/common/selectors/entities/team';
-import { currentTeamIdSelector } from '@caesar/common/selectors/user';
+import { currentTeamIdSelector } from '@caesar/common/selectors/currentUser';
 import {
   setWorkInProgressItem,
   setWorkInProgressItemIds,

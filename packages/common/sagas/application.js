@@ -10,12 +10,12 @@ import { resetListState } from '@caesar/common/actions/entities/list';
 import { resetMemberState } from '@caesar/common/actions/entities/member';
 import { resetTeamState } from '@caesar/common/actions/entities/team';
 import { resetSystemState } from '@caesar/common/actions/entities/system';
-import { resetUserState } from '@caesar/common/actions/user';
+import { resetUserState } from '@caesar/common/actions/currentUser';
 import { resetWorkflowState } from '@caesar/common/actions/workflow';
 import { resetKeystoreState } from '@caesar/common/actions/keystore';
 import { isOnlineSelector } from '@caesar/common/selectors/application';
 import { itemListSelector } from '@caesar/common/selectors/entities/item';
-import { masterPasswordSelector } from '@caesar/common/selectors/user';
+import { masterPasswordSelector } from '@caesar/common/selectors/currentUser';
 import { actualKeyPairSelector } from '@caesar/common/selectors/keystore';
 
 // TODO: Is conflicting with next-offline?

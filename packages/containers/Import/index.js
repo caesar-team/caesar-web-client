@@ -4,7 +4,7 @@ import { initDashboard } from '@caesar/common/actions/workflow';
 import {
   fetchKeyPairRequest,
   fetchUserSelfRequest,
-} from '@caesar/common/actions/user';
+} from '@caesar/common/actions/currentUser';
 import { createStructuredSelector } from 'reselect';
 import { selectableTeamsListsSelector } from '@caesar/common/selectors/entities/list';
 import { actualKeyPairSelector } from '@caesar/common/selectors/keystore';

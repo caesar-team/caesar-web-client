@@ -115,7 +115,8 @@ const ToggleWrapper = styled.div`
   &:hover {
     ${Tooltip} {
       display: flex;
-    }  
+    }
+  }
 `;
 
 const getMembers = memoizeOne((users, members) =>
@@ -142,11 +143,11 @@ const TeamCard = ({
 
   const { _permissions } = team || {};
 
-  const isCurrentUserTeamMember = !!users.find(({ id }) => id === userId);
+  const isCurrentUserTeamMember = !!users.find(user => user.id === userId);
   const canEditTeam = ability.can(PERMISSION.EDIT, _permissions);
   const canRemoveTeam = ability.can(PERMISSION.DELETE, _permissions);
-  const canLeaveTeam = ability.can(PERMISSION.LEAVE, _permissions) &&
-    isCurrentUserTeamMember;
+  const canLeaveTeam =
+    ability.can(PERMISSION.LEAVE, _permissions) && isCurrentUserTeamMember;
   const canPinTeam = ability.can(PERMISSION.PIN, _permissions);
   const shouldShowMenu = canLeaveTeam || canEditTeam || canRemoveTeam;
 

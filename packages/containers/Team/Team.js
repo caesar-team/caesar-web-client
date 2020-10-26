@@ -50,7 +50,7 @@ const AddMemberButton = styled(ButtonStyled)`
   margin-right: 0;
 `;
 
-export const TeamContainer = ({ user, members }) => {
+export const TeamContainer = ({ currentUser, members }) => {
   const router = useRouter();
   const dispatch = useDispatch();
   const [modalVisibilities, setModalVisibilities] = useState({
@@ -221,7 +221,7 @@ export const TeamContainer = ({ user, members }) => {
       </Table.Main>
       {modalVisibilities[INVITE_MEMBER_MODAL] && (
         <InviteModal
-          user={user}
+          currentUser={currentUser}
           teamId={team.id}
           invitedMembers={members}
           onRemoveMember={handleRemoveMember}

@@ -8,8 +8,7 @@ import {
   SettingsSidebar,
   FullScreenLoader,
 } from '@caesar/components';
-
-import { userDataSelector } from '@caesar/common/selectors/user';
+import { currentUserDataSelector } from '@caesar/common/selectors/currentUser';
 import { initTeamSettings } from '@caesar/common/actions/workflow';
 import { fetchTeamMembersRequest } from '@caesar/common/actions/entities/member';
 import { memberTeamSelector } from '@caesar/common/selectors/entities/member';
@@ -30,9 +29,9 @@ const SettingsTeamPage = () => {
   const members = useSelector(state =>
     memberTeamSelector(state, { teamId: id }),
   );
-  const userData = useSelector(userDataSelector);
+  const currentUserData = useSelector(currentUserDataSelector);
 
-  const shouldShowLoader = !userData || !members;
+  const shouldShowLoader = !currentUserData || !members;
 
   if (shouldShowLoader) {
     return <FullScreenLoader />;
@@ -41,10 +40,10 @@ const SettingsTeamPage = () => {
   return (
     <>
       <Head title="Team" />
-      <SettingsLayout user={userData}>
+      <SettingsLayout currentUser={currentUserData}>
         <>
           <SettingsSidebar />
-          <TeamContainer user={userData} members={members} />
+          <TeamContainer currentUser={currentUserData} members={members} />
         </>
       </SettingsLayout>
     </>

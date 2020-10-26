@@ -1,6 +1,6 @@
 import { all, fork } from 'redux-saga/effects';
 import {
-  userSagas,
+  currentUserSagas,
   workflowSagas,
   applicationSagas,
   memberSagas,
@@ -14,7 +14,7 @@ import { anonymousSagas } from '@caesar/common/sagas/common/anonymous';
 import { isClient } from '@caesar/common/utils/isEnvironment';
 
 const sagas = [
-  userSagas,
+  currentUserSagas,
   workflowSagas,
   applicationSagas,
   memberSagas,

@@ -39,7 +39,7 @@ import { updateGlobalNotification } from '@caesar/common/actions/application';
 import {
   SET_CURRENT_TEAM_ID,
   setCurrentTeamId,
-} from '@caesar/common/actions/user';
+} from '@caesar/common/actions/currentUser';
 import {
   addShareKeyPairBatch,
   addTeamKeyPairBatch,
@@ -47,7 +47,7 @@ import {
 import {
   fetchUserSelfSaga,
   fetchUserTeamsSaga,
-} from '@caesar/common/sagas/user';
+} from '@caesar/common/sagas/currentUser';
 import { fetchMembersSaga } from '@caesar/common/sagas/entities/member';
 import {
   createTeamKeyPairSaga,
@@ -70,12 +70,12 @@ import {
   favoritesListSelector,
 } from '@caesar/common/selectors/entities/list';
 import {
-  userDataSelector,
+  currentUserDataSelector,
   masterPasswordSelector,
   currentTeamIdSelector,
   isUserDomainAdminOrManagerSelector,
-  userTeamListSelector,
-} from '@caesar/common/selectors/user';
+  currentUserTeamListSelector,
+} from '@caesar/common/selectors/currentUser';
 import {
   itemSelector,
   nonDecryptedSharedItemsSelector,
@@ -200,7 +200,7 @@ function* checkTeamPermissionsAndKeys(teamId) {
       return false;
     }
 
-    const { id: ownerId } = yield select(userDataSelector);
+    const { id: ownerId } = yield select(currentUserDataSelector);
     const { publicKey } = yield select(memberSelector, { memberId: ownerId });
 
     // eslint-disable-next-line no-console
@@ -318,18 +318,18 @@ function* initTeamsSaga() {
 
     const teams = isUserDomainAdminOrManager
       ? yield select(teamListSelector)
-      : yield select(userTeamListSelector);
+      : yield select(currentUserTeamListSelector);
 
-    const userData = yield select(userDataSelector);
+    const currentUserData = yield select(currentUserDataSelector);
 
     teams.push({
       id: TEAM_TYPE.PERSONAL,
       title: upperFirst(TEAM_TYPE.PERSONAL),
       type: TEAM_TYPE.PERSONAL,
-      icon: userData?.avatar,
-      email: userData?.email,
+      icon: currentUserData?.avatar,
+      email: currentUserData?.email,
       teamRole: TEAM_ROLES.ROLE_ADMIN,
-      _links: userData?._links,
+      _links: currentUserData?._links,
     });
 
     const teamById = convertTeamsToEntity(teams);
@@ -398,7 +398,7 @@ function* loadKeyPairsAndPersonalItems() {
     const defaultShareList = Object.values(listsById).find(
       list => list.type === LIST_TYPE.INBOX,
     );
-    const { id: currentUserId } = yield select(userDataSelector);
+    const { id: currentUserId } = yield select(currentUserDataSelector);
 
     const {
       data: {
@@ -524,10 +524,10 @@ export function* initWorkflowSaga() {
 
 export function* openTeamVaultSaga({ payload: { teamId } }) {
   try {
-    const user = yield select(userDataSelector);
+    const currentUser = yield select(currentUserDataSelector);
 
-    // If there is no user we can't init even personal team
-    if (!user) return;
+    // If there is no currentUser we can't init even personal team
+    if (!currentUser) return;
 
     const team = yield select(teamSelector, { teamId });
     if (!team && teamId !== TEAM_TYPE.PERSONAL) {

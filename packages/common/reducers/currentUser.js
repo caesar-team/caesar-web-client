@@ -16,7 +16,7 @@ import {
   ADD_MEMBER_TO_TEAM,
   SET_DEFAULT_LIST_ID,
   RESET_USER_STATE,
-} from '@caesar/common/actions/user';
+} from '@caesar/common/actions/currentUser';
 
 const initialState = {
   isLoading: false,

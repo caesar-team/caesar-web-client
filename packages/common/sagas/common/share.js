@@ -1,7 +1,7 @@
 import { call, select, all, takeLatest, put } from '@redux-saga/core/effects';
 import { getOrCreateMemberBatchSaga } from '@caesar/common/sagas/entities/member';
 import { itemsBatchSelector } from '@caesar/common/selectors/entities/item';
-import { userDataSelector } from '@caesar/common/selectors/user';
+import { currentUserDataSelector } from '@caesar/common/selectors/currentUser';
 import {
   shareKeyPairSelector,
   teamKeyPairSelector,
@@ -56,7 +56,7 @@ export function* findOrCreateKeyPair({ payload: { item } }) {
   let systemKeyPairItem = yield select(shareKeyPairSelector, {
     itemId: item.id,
   });
-  const { userId: ownerId, publicKey } = yield select(userDataSelector);
+  const { userId: ownerId, publicKey } = yield select(currentUserDataSelector);
 
   if (!systemKeyPairItem) {
     const systemItem = yield call(createSystemItemKeyPair, {
@@ -138,7 +138,7 @@ function* processMembersItemShare({ item, members }) {
     const { publicKey: ownerPublicKey } = yield select(teamKeyPairSelector, {
       teamId: item.teamId,
     });
-    const { id: ownerId } = yield select(userDataSelector);
+    const { id: ownerId } = yield select(currentUserDataSelector);
     const defaultList = yield select(teamDefaultListSelector, {
       teamId: item.teamId,
     });

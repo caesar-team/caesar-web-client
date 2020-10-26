@@ -3,7 +3,7 @@ import { useDispatch } from 'react-redux';
 import equal from 'fast-deep-equal';
 import styled from 'styled-components';
 import Link from 'next/link';
-import { logout } from '@caesar/common/actions/user';
+import { logout } from '@caesar/common/actions/currentUser';
 import { ROUTES } from '@caesar/common/constants';
 import { Icon } from '../Icon';
 import { Dropdown } from '../Dropdown';
@@ -112,14 +112,15 @@ const Options = () => {
 };
 
 const PrimaryHeaderComponent = ({
-  user,
+  currentUser,
   searchedText,
   showAddItemButton,
   onSearch,
   onClickReset,
 }) => {
   const [isDropdownOpened, setDropdownOpened] = useState(false);
-  const userName = (user && (user.name || user.email)) || '';
+  const userName =
+    (currentUser && (currentUser.name || currentUser.email)) || '';
 
   const handleToggleDropdown = () => {
     setDropdownOpened(!isDropdownOpened);
@@ -131,7 +132,7 @@ const PrimaryHeaderComponent = ({
         <LeftWrapper>
           <Logo href="/" />
         </LeftWrapper>
-        {!!user && (
+        {!!currentUser && (
           <RightWrapper>
             {onSearch && (
               <StyledSearchInput

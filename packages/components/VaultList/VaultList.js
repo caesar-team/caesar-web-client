@@ -4,10 +4,10 @@ import styled from 'styled-components';
 import { sortByName } from '@caesar/common/utils/utils';
 import { TEAM_TYPE } from '@caesar/common/constants';
 import {
-  userVaultListSelector,
+  currentUserVaultListSelector,
   currentTeamSelector,
-} from '@caesar/common/selectors/user';
-import { setCurrentTeamId } from '@caesar/common/actions/user';
+} from '@caesar/common/selectors/currentUser';
+import { setCurrentTeamId } from '@caesar/common/actions/currentUser';
 import { getTeamTitle } from '@caesar/common/utils/team';
 import { Avatar } from '../Avatar';
 import { Icon } from '../Icon';
@@ -73,7 +73,7 @@ const VaultListComponent = ({ activeTeamId, handleToggle, setListsOpened }) => {
   const dispatch = useDispatch();
   const currentTeam = useSelector(currentTeamSelector);
 
-  const vaultList = useSelector(userVaultListSelector)
+  const vaultList = useSelector(currentUserVaultListSelector)
     .filter(isTeamEnable(activeTeamId))
     .sort(sortTeams);
 

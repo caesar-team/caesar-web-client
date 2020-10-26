@@ -14,10 +14,10 @@ const LayoutConstructorStyled = styled(LayoutConstructor)`
   }
 `;
 
-const BootstrapLayout = ({ user, ...props }) => (
+const BootstrapLayout = ({ currentUser, ...props }) => (
   <LayoutConstructorStyled
     withImages
-    headerComponent={<BootstrapHeader user={user} />}
+    headerComponent={<BootstrapHeader currentUser={currentUser} />}
     footerComponent={Footer}
     {...props}
   />

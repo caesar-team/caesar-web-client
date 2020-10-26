@@ -8,7 +8,7 @@ import {
 } from '@caesar/components';
 
 export const Title = styled.div`
-  margin-bottom: 24px;
+  margin-bottom: 12px;
   font-weight: 600;
 `;
 
@@ -41,7 +41,7 @@ export const StyledButton = styled(Button)`
 export const SelectListWrapper = styled.div`
   display: flex;
   align-items: center;
-  margin: 24px 0;
+  margin: 8px 0 0;
 `;
 
 export const MoveToText = styled.div`

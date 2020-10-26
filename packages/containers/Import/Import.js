@@ -18,7 +18,7 @@ const StepWrapper = styled.div`
   display: flex;
   flex-direction: column;
   background: ${({ theme }) => theme.color.white};
-  padding: 24px;
+  padding: 12px 24px;
 `;
 
 const StyledNavigationPanel = styled(NavigationPanel)`
@@ -188,7 +188,7 @@ class Import extends Component {
     const { currentStep } = this.state;
 
     return (
-      <SettingsWrapper isLoading={isLoading} title="Import">
+      <SettingsWrapper isLoading={isLoading} isCompact title="Import">
         <StepWrapper>{this.renderStep()}</StepWrapper>
         <StyledNavigationPanel
           steps={STEPS}

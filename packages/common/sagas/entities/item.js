@@ -679,9 +679,10 @@ export function* createItemsBatchSaga({
       keyPair.publicKey,
     );
 
-    const preparedForRequestItems = items.map(({ type }, index) => ({
+    const preparedForRequestItems = items.map(({ type, name: title }, index) => ({
       type,
       listId,
+      title,
       secret: JSON.stringify({
         data: encryptedItems[index],
         raws: null,

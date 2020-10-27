@@ -1,6 +1,5 @@
 import React, { useEffect } from 'react';
 import { useRouter } from 'next/router';
-
 import { useDispatch, batch, useSelector } from 'react-redux';
 import { TeamContainer } from '@caesar/containers';
 import {
@@ -42,7 +41,7 @@ const SettingsTeamPage = () => {
   return (
     <>
       <Head title="Team" />
-      <SettingsLayout>
+      <SettingsLayout user={userData}>
         <>
           <SettingsSidebar />
           <TeamContainer user={userData} members={members} />

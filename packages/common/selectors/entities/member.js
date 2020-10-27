@@ -1,5 +1,5 @@
 import { createSelector } from 'reselect';
-import { ROLE_ADMIN } from '../../constants';
+import { DOMAIN_ROLES } from '../../constants';
 
 export const entitiesSelector = state => state.entities;
 
@@ -37,7 +37,9 @@ export const membersBatchSelector = createSelector(
 export const memberAdminsSelector = createSelector(
   memberListSelector,
   membersList =>
-    membersList.filter(({ domainRoles }) => domainRoles?.includes(ROLE_ADMIN)),
+    membersList.filter(({ domainRoles }) =>
+      domainRoles?.includes(DOMAIN_ROLES.ROLE_ADMIN),
+    ),
 );
 
 export const teamIdPropSelector = (_, props) => props.teamId;

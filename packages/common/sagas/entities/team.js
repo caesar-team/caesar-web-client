@@ -66,7 +66,6 @@ import {
   convertTeamNodesToEntities,
   convertKeyPairToEntity,
   convertKeyPairToItemEntity,
-  convertUsersToEntity,
   convertMembersToEntity,
 } from '@caesar/common/normalizers/normalizers';
 import {
@@ -81,18 +80,15 @@ import {
   createKeyPair,
   encryptSecret,
   generateKeyPair,
-  saveItemSaga,
 } from '@caesar/common/sagas/entities/item';
 import { teamKeyPairSelector } from '@caesar/common/selectors/keystore';
 import {
   memberAdminsSelector,
-  memberListSelector,
   membersBatchSelector,
   memberSelector,
 } from '../../selectors/entities/member';
 import { addTeamKeyPairBatch } from '../../actions/keystore';
 import { createVaultSuccess } from '../../actions/entities/vault';
-import { teamDefaultListSelector } from '../../selectors/entities/list';
 
 export function* fetchTeamsSaga() {
   try {
@@ -118,7 +114,7 @@ export function* fetchTeamSaga({ payload: { teamId } }) {
 
     const teamsById = convertTeamsToEntity([team]);
 
-    yield put(fetchTeamSuccess(teamsById));
+    yield put(fetchTeamSuccess(teamsById[teamId]));
     yield put(finishIsLoading());
   } catch (error) {
     // eslint-disable-next-line no-console

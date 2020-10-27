@@ -1,7 +1,6 @@
 import { call, select, all, takeLatest, put } from '@redux-saga/core/effects';
 import { getOrCreateMemberBatchSaga } from '@caesar/common/sagas/entities/member';
 import {
-  itemEntitySelector,
   itemsBatchSelector,
   itemSelector,
 } from '@caesar/common/selectors/entities/item';

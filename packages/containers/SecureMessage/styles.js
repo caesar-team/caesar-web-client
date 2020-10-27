@@ -5,24 +5,33 @@ import { media } from '@caesar/assets/styles/media';
 export const Wrapper = styled.div`
   display: flex;
   flex-direction: column;
-  justify-content: center;
-  align-items: center;
   width: 100vw;
   height: 100%;
   min-height: 100vh;
-  padding: 24px 16px;
   background-color: ${({ theme }) => theme.color.emperor};
+`;
+
+export const Header = styled.div`
+  padding: 12px 16px;
+  border-bottom: 1px solid ${({ theme }) => theme.color.lighterGray};
+`;
+
+export const Content = styled.div`
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  flex-grow: 1;
+  padding: 24px 16px;
 `;
 
 export const Title = styled.div`
   font-size: 18px;
   color: ${({ theme }) => theme.color.lightGray};
   margin-bottom: 23px;
-  margin-top: 50px;
 `;
 
 export const StyledLogo = styled(Icon)`
-  margin-top: auto;
   fill: ${({ theme }) => theme.color.white};
 `;
 
@@ -54,9 +63,7 @@ export const ButtonStyled = styled(Button)`
   }
 `;
 
-export const Footer = styled.div`
-  margin-top: auto;
-`;
+export const Footer = styled.div``;
 
 export const StyledLink = styled.a`
   font-size: ${({ theme }) => theme.font.size.small};

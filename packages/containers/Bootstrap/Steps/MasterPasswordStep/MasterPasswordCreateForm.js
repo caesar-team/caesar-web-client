@@ -1,4 +1,4 @@
-import React, { memo } from 'react';
+import React, { memo, useState } from 'react';
 import { useEffectOnce } from 'react-use';
 import { useFormik } from 'formik';
 import zxcvbn from 'zxcvbn';
@@ -98,6 +98,7 @@ const MasterPasswordCreateFormComponent = ({ initialValues, onSubmit }) => {
     validationSchema: passwordSchema,
     onSubmit,
   });
+  const [isPasswordGenerated, setPasswordGenerated] = useState(false);  
 
   useEffectOnce(() => {
     validateForm();
@@ -105,6 +106,7 @@ const MasterPasswordCreateFormComponent = ({ initialValues, onSubmit }) => {
 
   const handleGeneratePassword = setValue => password => {
     setValue('password', password);
+    setPasswordGenerated(true);
     copy(password);
     notification.show({
       text: 'Master Password has been copied to clipboard!',
@@ -124,7 +126,10 @@ const MasterPasswordCreateFormComponent = ({ initialValues, onSubmit }) => {
           isAlwaysVisibleIcon
           autoFocus
           error={dirty ? checkError(touched, errors, 'password') : null}
-          onChange={handleChange}
+          onChange={e => {
+            handleChange(e);
+            setPasswordGenerated(false);
+          }}
           onBlur={handleBlur}
         />
         <Tooltip
@@ -154,7 +159,7 @@ const MasterPasswordCreateFormComponent = ({ initialValues, onSubmit }) => {
         not be possible without this password.
       </TipText>
       <StyledButton htmlType="submit" disabled={isSubmitting || !isValid}>
-        Copy Password & Continue
+        {isPasswordGenerated && 'Copy Password & '}Continue
       </StyledButton>
     </Form>
   );

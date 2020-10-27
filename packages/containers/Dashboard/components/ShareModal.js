@@ -4,6 +4,7 @@ import {
   workInProgressItemSelector,
   workInProgressItemsSelector,
   workInProgressItemIdsSelector,
+  workInProgressItemSharedMembersSelector,
 } from '@caesar/common/selectors/workflow';
 import { currentUserTeamListSelector } from '@caesar/common/selectors/currentUser';
 import { resetWorkInProgressItemIds } from '@caesar/common/actions/workflow';
@@ -24,8 +25,9 @@ export const ShareModal = ({
   const workInProgressItem = useSelector(workInProgressItemSelector);
   const workInProgressItemIds = useSelector(workInProgressItemIdsSelector);
   const userTeamList = useSelector(currentUserTeamListSelector);
-  // TODO: Add correct selector
-  const workInProgressItemSharedMembers = [];
+  const workInProgressItemSharedMembers = useSelector(
+    workInProgressItemSharedMembersSelector,
+  );
 
   const isMultiItem = workInProgressItemIds?.length > 0;
   const availableTeamsForSharing = userTeamList.filter(

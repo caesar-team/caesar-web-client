@@ -18,7 +18,7 @@ const failIsNotAnArray = arrayObject => {
 };
 export const convertItemsToEntities = items => {
   failIsNotAnArray(items);
-  const normalized = normalize(items, [itemSchema()]);
+  const normalized = normalize(items, [itemSchema]);
 
   return {
     itemsById: normalized.entities.itemsById || {},

@@ -201,6 +201,10 @@ export const getCheckShare = id => callApi.get(`/anonymous/share/${id}/check`);
 
 // item batch
 export const postCreateItemsBatch = data => callApi.post('/items/batch', data);
+export const postAddKeyPairBatch = items =>
+  callApi.post(`/items/batch/keypairs`, {
+    items,
+  });
 // TODO: Refactor: use body instead of query (change together with backend)
 export const removeItemsBatch = query =>
   callApi.delete(`/items/batch?${query}`);

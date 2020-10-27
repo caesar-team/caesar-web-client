@@ -78,6 +78,7 @@ import {
 import { updateGlobalNotification } from '@caesar/common/actions/application';
 import { finishIsLoading } from '@caesar/common/actions/workflow';
 import {
+  createKeyPair,
   encryptSecret,
   generateKeyPair,
   saveItemSaga,
@@ -158,34 +159,28 @@ export function* removeTeamSaga({ payload: { teamId } }) {
   }
 }
 
-export function* createTeamKeyPairSaga({ payload: { team, publicKey } }) {
+export function* createTeamKeyPairSaga({
+  payload: { team, ownerId, publicKey },
+}) {
   try {
     if (!publicKey || typeof publicKey === 'undefined') {
       // TODO: Bug fix: we lost the user default list and we need to restore it from the list api
       throw new Error('Fatal error: The publicKey not found.');
     }
 
-    const teamKeyPair = yield call(generateKeyPair, {
-      name: team.title,
-    });
-
-    const { id: listId } = yield select(teamDefaultListSelector, {
-      teamId: team.id,
-    });
-
-    const serverKeypairItem = yield call(saveItemSaga, {
-      item: {
-        teamId: team.id,
-        listId,
-        ...teamKeyPair,
+    const keyPairsById = yield call(createKeyPair, {
+      payload: {
+        entityTeamId: team.id,
+        publicKey,
+        entityOwnerId: ownerId,
       },
-      publicKey,
     });
 
-    const keyPairsById = convertKeyPairToEntity([serverKeypairItem], 'teamId');
     yield put(addTeamKeyPairBatch(keyPairsById));
 
-    return keyPairsById;
+    const keyPair = Object.values(keyPairsById).shift();
+
+    return keyPair;
   } catch (error) {
     // eslint-disable-next-line no-console
     console.error(error);

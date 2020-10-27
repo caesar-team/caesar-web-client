@@ -39,25 +39,7 @@ export default createReducer(initialState, {
       },
     };
   },
-  // [CREATE_VAULT_SUCCESS](state, { payload }) {
-  //   const { keypair } = payload;
-  //   if (!keypair || !keypair?.id) return state;
 
-  //   return {
-  //     ...state,
-  //     isLoading: false,
-  //     isError: false,
-  //     [KEY_TYPE.TEAMS]: {
-  //       ...state[KEY_TYPE.TEAMS],
-  //       ...{
-  //         [keypair.id]: {
-  //           ...(state[KEY_TYPE.TEAMS][keypair.id] || {}),
-  //           ...keypair,
-  //         },
-  //       },
-  //     },
-  //   };
-  // },
   [ADD_TEAM_KEY_PAIR_BATCH](
     state,
     {

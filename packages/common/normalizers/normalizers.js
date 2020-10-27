@@ -10,7 +10,14 @@ import {
   memberSchema,
 } from '@caesar/common/normalizers/schemas';
 
+const failIsNotAnArray = arrayObject => {
+  if (!Array.isArray(arrayObject))
+    throw new Error('The object should be an Array type.');
+
+  return true;
+};
 export const convertItemsToEntities = items => {
+  failIsNotAnArray(items);
   const normalized = normalize(items, [itemSchema()]);
 
   return {
@@ -23,6 +30,7 @@ export const convertShareItemsToEntities = ({
   currentUserId,
   defaultListId,
 }) => {
+  failIsNotAnArray(items);
   const { itemsById } = convertItemsToEntities(items);
 
   const normalized = normalize(Object.values(itemsById), [
@@ -41,18 +49,21 @@ export const convertListsToEntities = lists => {
 };
 
 export const convertUsersToEntity = users => {
+  failIsNotAnArray(users);
   const normalized = normalize(users, [userSchema]);
 
   return normalized.entities.byId || {};
 };
 
 export const convertMembersToEntity = members => {
+  failIsNotAnArray(members);
   const normalized = normalize(members, [memberSchema]);
 
   return normalized.entities.byId || {};
 };
 
 export const convertTeamsToEntity = teams => {
+  failIsNotAnArray(teams);
   const normalized = normalize(teams, [teamSchema]);
 
   return normalized.entities.byId || {};
@@ -68,12 +79,14 @@ export const convertTeamNodesToEntities = teams => {
 };
 
 export const convertKeyPairToEntity = (keypairs, idAttribute = 'teamId') => {
+  failIsNotAnArray(keypairs);
   const normalized = normalize(keypairs, [keypairSchema(idAttribute)]);
 
   return normalized.entities.byId || {};
 };
 
 export const convertKeyPairToItemEntity = keypairs => {
+  failIsNotAnArray(keypairs);
   const normalized = normalize(keypairs, [keypairItemSchema]);
 
   return normalized.entities.byId || {};

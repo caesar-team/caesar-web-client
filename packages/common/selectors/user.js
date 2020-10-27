@@ -9,6 +9,11 @@ export const isLoadingSelector = createSelector(
   user => user.isLoading,
 );
 
+export const getLastUpdatedSelector = createSelector(
+  userSelector,
+  user => user.lastUpdated,
+);
+
 export const keyPairSelector = createSelector(
   userSelector,
   user => user.keyPair,

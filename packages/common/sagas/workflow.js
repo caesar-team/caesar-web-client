@@ -39,11 +39,11 @@ import { updateGlobalNotification } from '@caesar/common/actions/application';
 import {
   SET_CURRENT_TEAM_ID,
   setCurrentTeamId,
+  setLastUpdatedUnixtime,
 } from '@caesar/common/actions/user';
 import {
   addShareKeyPairBatch,
   addTeamKeyPairBatch,
-  ADD_TEAM_KEY_PAIR_BATCH,
 } from '@caesar/common/actions/keystore';
 import {
   fetchUserSelfSaga,
@@ -64,7 +64,11 @@ import {
 } from '@caesar/common/normalizers/normalizers';
 import { arrayToObject, objectToArray } from '@caesar/common/utils/utils';
 import { upperFirst } from '@caesar/common/utils/string';
-import { getLists, getTeamLists, getUserItems } from '@caesar/common/api';
+import {
+  getLastUpdatedUserItems,
+  getLists,
+  getTeamLists,
+} from '@caesar/common/api';
 import { TEAM_TYPE, LIST_TYPE, TEAM_ROLES } from '@caesar/common/constants';
 import {
   teamListsSelector,
@@ -76,6 +80,7 @@ import {
   currentTeamIdSelector,
   isUserDomainAdminOrManagerSelector,
   userTeamListSelector,
+  getLastUpdatedSelector,
 } from '@caesar/common/selectors/user';
 import {
   itemSelector,
@@ -107,6 +112,7 @@ import {
   fetchTeamMembersRequest,
   FETCH_MEMBERS_SUCCESS,
 } from '../actions/entities/member';
+import { getCurrentUnixtime } from '../utils/dateUtils';
 
 export function decryptItemsByItemIdKeys(items, keyPairs) {
   try {
@@ -306,11 +312,6 @@ function* checkTeamsKeyPairs() {
   yield put(addTeamsBatch(arrayToObject(checkedTeams)));
 }
 
-export function* openCurrentVaultSaga() {
-  const currentTeamId = yield select(currentTeamIdSelector);
-  yield put(setCurrentTeamId(currentTeamId || TEAM_TYPE.PERSONAL));
-}
-
 function* initTeamsSaga() {
   try {
     // Load avaible teams
@@ -402,6 +403,7 @@ function* loadKeyPairsAndPersonalItems() {
       list => list.type === LIST_TYPE.INBOX,
     );
     const { id: currentUserId } = yield select(userDataSelector);
+    const lastUpdated = yield select(getLastUpdatedSelector);
 
     const {
       data: {
@@ -411,7 +413,9 @@ function* loadKeyPairsAndPersonalItems() {
         shares = [],
         teams = [],
       },
-    } = yield call(getUserItems);
+    } = yield call(getLastUpdatedUserItems, lastUpdated);
+
+    yield put(setLastUpdatedUnixtime(getCurrentUnixtime()));
 
     // Merge all user items in the one array
     const { itemsById: systemItemsById = {} } = convertItemsToEntities(systems);
@@ -576,6 +580,11 @@ export function* openTeamVaultSaga({ payload: { teamId } }) {
     // eslint-disable-next-line no-console
     console.error(error);
   }
+}
+
+export function* openCurrentVaultSaga() {
+  const teamId = yield select(currentTeamIdSelector) || TEAM_TYPE.PERSONAL;
+  yield call(openTeamVaultSaga, { payload: { teamId } });
 }
 
 export function* updateWorkInProgressItemSaga({ payload: { itemId } }) {
@@ -748,7 +757,7 @@ export default function* workflowSagas() {
 
   yield takeLatest(SET_WORK_IN_PROGRESS_ITEM, setWorkInProgressItemSaga);
   yield takeLatest(UPDATE_WORK_IN_PROGRESS_ITEM, updateWorkInProgressItemSaga);
-  yield takeLatest(SET_CURRENT_TEAM_ID, openTeamVaultSaga);
+  yield takeLatest(SET_CURRENT_TEAM_ID, initDashboardSaga);
   yield takeLatest(ADD_KEYPAIRS_BATCH, processKeyPairsSaga);
   yield takeLatest(FINISH_PROCESSING_KEYPAIRS, vaultsReadySaga);
   // Wait for keypairs

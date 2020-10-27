@@ -23,8 +23,17 @@ export const LOGOUT = '@user/LOGOUT';
 
 export const RESET_USER_STATE = '@user/RESET_USER_STATE';
 
+export const LAST_UPDATED_ITEMS_UNIXTIME = '@user/LAST_UPDATED_ITEMS_UNIXTIME';
+
 export const fetchUserSelfRequest = () => ({
   type: FETCH_USER_SELF_REQUEST,
+});
+
+export const setLastUpdatedUnixtime = time => ({
+  type: LAST_UPDATED_ITEMS_UNIXTIME,
+  payload: {
+    lastUpdated: time,
+  },
 });
 
 export const fetchUserSelfSuccess = data => ({

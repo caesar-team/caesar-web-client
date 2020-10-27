@@ -1,5 +1,7 @@
 import { DateTime } from 'luxon';
 
+export const getCurrentUnixtime = () => Math.round(+new Date() / 1000);
+
 export function formatDate(date, dateFormatTo = 'LLL dd, yyyy hh:mm a') {
   return DateTime.fromISO(date).toFormat(dateFormatTo);
 }

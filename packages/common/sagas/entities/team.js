@@ -84,9 +84,9 @@ import {
 import { teamKeyPairSelector } from '@caesar/common/selectors/keystore';
 import {
   memberAdminsSelector,
-  membersBatchSelector,
   memberSelector,
 } from '../../selectors/entities/member';
+import { usersBatchSelector } from '../../selectors/entities/user';
 import { addTeamKeyPairBatch } from '../../actions/keystore';
 import { createVaultSuccess } from '../../actions/entities/vault';
 
@@ -222,17 +222,15 @@ function* encryptMemberTeamKey({ member, keypair }) {
     teamRole,
   };
 }
-export function* addMemberToTeamListsBatchSaga({
-  payload: { teamId, members },
-}) {
+export function* addMemberToTeamListsBatchSaga({ payload: { teamId, users } }) {
   try {
     const keypair = yield select(teamKeyPairSelector, { teamId });
-    const memberIds = members.map(member => member.id);
+    const userIds = users.map(user => user.id);
     // Domain users
     // TODO: Invite unregistered users
-    const users = yield select(membersBatchSelector, { memberIds });
+    const newUsers = yield select(usersBatchSelector, { userIds });
 
-    const postDataSagas = users.map(member =>
+    const postDataSagas = newUsers.map(member =>
       call(encryptMemberTeamKey, { member, keypair }),
     );
     const postData = yield all(postDataSagas);

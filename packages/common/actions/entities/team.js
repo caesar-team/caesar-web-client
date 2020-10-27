@@ -205,11 +205,11 @@ export const updateTeamMemberRoleFailure = () => ({
   type: UPDATE_TEAM_MEMBER_ROLE_FAILURE,
 });
 
-export const addTeamMembersBatchRequest = (teamId, members) => ({
+export const addTeamMembersBatchRequest = (teamId, users) => ({
   type: ADD_TEAM_MEMBERS_BATCH_REQUEST,
   payload: {
     teamId,
-    members,
+    users,
   },
 });
 

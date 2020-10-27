@@ -191,9 +191,9 @@ export default createReducer(initialState, {
         membersById: {},
       },
     } = payload;
-    const members = Object.values(membersById);
+    const memberIds = Object.keys(membersById);
 
-    if (members.length <= 0) return state;
+    if (memberIds.length <= 0) return state;
 
     return {
       ...state,
@@ -201,14 +201,7 @@ export default createReducer(initialState, {
         ...state.byId,
         [payload.teamId]: {
           ...state.byId[payload.teamId],
-          members: [
-            ...state.byId[payload.teamId].members,
-            ...members.map(({ id, teamRole, _permissions }) => ({
-              id,
-              teamRole,
-              _permissions,
-            })),
-          ],
+          members: [...state.byId[payload.teamId].members, ...memberIds],
         },
       },
     };

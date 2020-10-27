@@ -131,8 +131,8 @@ export const TeamContainer = ({ currentUser, members }) => {
     });
   };
 
-  const handleInvite = invitedMembers => {
-    dispatch(addTeamMembersBatchRequest(team.id, invitedMembers));
+  const handleInvite = invitedUsers => {
+    dispatch(addTeamMembersBatchRequest(team.id, invitedUsers));
     handleCloseModal(INVITE_MEMBER_MODAL)();
   };
 
@@ -223,7 +223,7 @@ export const TeamContainer = ({ currentUser, members }) => {
         <InviteModal
           currentUser={currentUser}
           teamId={team.id}
-          invitedMembers={members}
+          members={members}
           onRemoveMember={handleRemoveMember}
           onCancel={handleCloseModal(INVITE_MEMBER_MODAL)}
           onSubmit={handleInvite}

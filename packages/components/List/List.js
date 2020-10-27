@@ -36,23 +36,7 @@ const ColumnTitle = styled.div`
   color: ${({ theme }) => theme.color.black};
 `;
 
-const createItemData = memoize(
-  ({
-    items,
-    isMultiItem,
-    onClickItem,
-    onSelectItem,
-    workInProgressItemIds,
-    workInProgressItem,
-  }) => ({
-    items,
-    isMultiItem,
-    onClickItem,
-    onSelectItem,
-    workInProgressItemIds,
-    workInProgressItem,
-  }),
-);
+const createItemData = memoize(itemData => itemData);
 
 const RenderedList = ({
   items,

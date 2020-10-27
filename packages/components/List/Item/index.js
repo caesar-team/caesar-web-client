@@ -21,7 +21,8 @@ import {
 
 export const Item = ({
   id,
-  data: { name, attachments = [], website },
+  title,
+  data,
   type,
   invited,
   isMultiItem = false,
@@ -41,6 +42,7 @@ export const Item = ({
   workInProgressItem,
   ...props
 }) => {
+  const { attachments = [], website } = data || {};
   const sharedCount = invited.length + teamMembersCount - 1;
   const shouldShowMembers = !!sharedCount;
   const shouldShowAttachments =
@@ -106,7 +108,7 @@ export const Item = ({
           </TypeIconWrapper>
         )}
       </Can>
-      <Title>{name}</Title>
+      <Title>{title}</Title>
       {shouldShowAttachments && (
         <Addon isInModal={isInModal}>
           <Icon name="clip" width={16} height={16} />

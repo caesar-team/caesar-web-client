@@ -23,7 +23,6 @@ const initialState = {
   isError: false,
   keyPair: null,
   masterPassword: null,
-  teamIds: [],
   currentTeamId: null,
   defaultListId: null,
   data: null,

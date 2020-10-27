@@ -7,8 +7,7 @@ const memberSchema = new schema.Entity(
   {},
   {
     processStrategy: entity => ({
-      teamId: entity.teamId,
-      teamRole: entity.teamRole,
+      ...entity,
       __type: ENTITY_TYPE.MEMBER,
       _permissions: entity?._links
         ? {

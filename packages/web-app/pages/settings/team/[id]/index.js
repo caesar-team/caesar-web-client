@@ -11,7 +11,7 @@ import {
 } from '@caesar/components';
 import { currentUserDataSelector } from '@caesar/common/selectors/currentUser';
 import { initTeamSettings } from '@caesar/common/actions/workflow';
-import { teamMembersSelector } from '@caesar/common/selectors/entities/member';
+import { teamMembersFullViewSelector } from '@caesar/common/selectors/entities/member';
 
 const SettingsTeamPage = () => {
   const router = useRouter();
@@ -24,7 +24,7 @@ const SettingsTeamPage = () => {
   });
 
   const members = useSelector(state =>
-    teamMembersSelector(state, { teamId: id }),
+    teamMembersFullViewSelector(state, { teamId: id }),
   );
   const currentUserData = useSelector(currentUserDataSelector);
 

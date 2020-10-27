@@ -45,28 +45,28 @@ export const convertShareItemsToEntities = ({
 export const convertListsToEntities = lists => {
   const normalized = normalize(lists, [listSchema]);
 
-  return normalized.entities.byId || {};
+  return normalized.entities.listsById || {};
 };
 
 export const convertUsersToEntity = users => {
   failIsNotAnArray(users);
   const normalized = normalize(users, [userSchema]);
 
-  return normalized.entities.byId || {};
+  return normalized.entities.usersById || {};
 };
 
 export const convertMembersToEntity = members => {
   failIsNotAnArray(members);
   const normalized = normalize(members, [memberSchema]);
 
-  return normalized.entities.byId || {};
+  return normalized.entities.membersById || {};
 };
 
 export const convertTeamsToEntity = teams => {
   failIsNotAnArray(teams);
   const normalized = normalize(teams, [teamSchema]);
 
-  return normalized.entities.byId || {};
+  return normalized.entities.teamsById || {};
 };
 
 export const convertTeamNodesToEntities = teams => {

@@ -57,7 +57,7 @@ export const teamsBatchSelector = createSelector(
 export const teamAdminUsersSelector = createSelector(
   teamSelector,
   team =>
-    team.users
-      ?.filter(user => user.role === TEAM_ROLES.ROLE_ADMIN)
-      .map(user => user.id) || [],
+    team.members
+      ?.filter(member => member.role === TEAM_ROLES.ROLE_ADMIN)
+      .map(member => member.id) || [],
 );

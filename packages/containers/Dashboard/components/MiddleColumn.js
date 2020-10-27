@@ -24,7 +24,7 @@ import {
   teamsTrashListsSelector,
   listsByIdSelector,
 } from '@caesar/common/selectors/entities/list';
-import { teamMembersSelector } from '@caesar/common/selectors/entities/member';
+import { teamMembersShortViewSelector } from '@caesar/common/selectors/entities/member';
 import { currentTeamIdSelector } from '@caesar/common/selectors/currentUser';
 import {
   setWorkInProgressItem,
@@ -55,7 +55,7 @@ const MiddleColumnComponent = ({
   const listsById = useSelector(listsByIdSelector);
   const currentTeamId = useSelector(currentTeamIdSelector);
   const teamMembers = useSelector(state =>
-    teamMembersSelector(state, { teamId: currentTeamId }),
+    teamMembersShortViewSelector(state, { teamId: currentTeamId }),
   );
   const isFavoriteList = workInProgressList?.id === LIST_TYPE.FAVORITES;
   const generalItems = useSelector(state =>

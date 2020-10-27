@@ -1,10 +1,10 @@
 /* eslint-disable camelcase */
-import React from 'react';
+import React, { useMemo, memo } from 'react';
 import { useSelector } from 'react-redux';
 import styled from 'styled-components';
 import Link from 'next/link';
 import { ROUTES, PERMISSION, TEAM_MESSAGES } from '@caesar/common/constants';
-import { teamMembersSelector } from '@caesar/common/selectors/entities/member';
+import { teamMembersFullViewSelector } from '@caesar/common/selectors/entities/member';
 import { ability } from '@caesar/common/ability';
 import { getPlural } from '@caesar/common/utils/string';
 import { getTeamTitle } from '@caesar/common/utils/team';
@@ -120,7 +120,7 @@ const ToggleWrapper = styled.div`
   }
 `;
 
-const TeamCard = ({
+const TeamCardComponent = ({
   className,
   team,
   userId,
@@ -130,15 +130,16 @@ const TeamCard = ({
   onClickRemoveTeam = Function.prototype,
   onPinTeam = Function.prototype,
 }) => {
-  const { id, icon, users, pinned } = team;
-  const areMembersAvailable = users && users.length > 0;
+  const { id, icon, members, pinned, _permissions } = team || {};
+  const areMembersAvailable = members && members.length > 0;
   const teamMembers = useSelector(state =>
-    teamMembersSelector(state, { teamId: id }),
+    teamMembersFullViewSelector(state, { teamId: id }),
   );
 
-  const { _permissions } = team || {};
-
-  const isCurrentUserTeamMember = !!users.find(user => user.id === userId);
+  const isCurrentUserTeamMember = useMemo(
+    () => !!members.find(member => member.userId === userId),
+    [members],
+  );
   const canEditTeam = ability.can(PERMISSION.EDIT, _permissions);
   const canRemoveTeam = ability.can(PERMISSION.DELETE, _permissions);
   const canLeaveTeam =
@@ -196,8 +197,8 @@ const TeamCard = ({
               <TeamName>{getTeamTitle(team)}</TeamName>
               {areMembersAvailable && (
                 <TeamMembers>
-                  {users.length}{' '}
-                  {getPlural(users.length, ['member', 'members'])}
+                  {members.length}{' '}
+                  {getPlural(members.length, ['member', 'members'])}
                 </TeamMembers>
               )}
             </TeamInfo>
@@ -218,4 +219,4 @@ const TeamCard = ({
   );
 };
 
-export default TeamCard;
+export const TeamCard = memo(TeamCardComponent);

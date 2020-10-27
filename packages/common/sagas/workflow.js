@@ -95,7 +95,7 @@ import {
 import { ADD_KEYPAIRS_BATCH } from '../actions/entities/keypair';
 import {
   memberSelector,
-  teamMembersSelector,
+  teamMembersFullViewSelector,
 } from '../selectors/entities/member';
 import { fetchTeamMembersRequest } from '../actions/entities/member';
 
@@ -180,9 +180,9 @@ function* checkTeamPermissionsAndKeys(teamId, createKeyPair = false) {
     yield put(fetchTeamMembersRequest({ teamId }));
     const { id: ownerId } = yield select(currentUserDataSelector);
     const team = yield select(teamSelector, { teamId });
-    const teamMembers = (yield select(teamMembersSelector, { teamId })).filter(
-      m => m.id !== ownerId,
-    );
+    const teamMembers = (yield select(teamMembersFullViewSelector, {
+      teamId,
+    })).filter(m => m.id !== ownerId);
 
     if (teamMembers.length > 0) {
       // eslint-disable-next-line no-console
@@ -306,7 +306,8 @@ export function* openCurrentVaultSaga() {
 function* initTeamsSaga() {
   try {
     // Load avaible teams
-    // const { data: teams } = yield call(getUserTeams);
+    yield call(fetchTeamsSaga);
+
     const isUserDomainAdminOrManager = yield select(
       isUserDomainAdminOrManagerSelector,
     );
@@ -654,7 +655,7 @@ function setWorkInProgressItemSaga({ payload: { item } }) {
 function* initDashboardSaga() {
   try {
     yield takeLatest(VAULTS_ARE_READY, openCurrentVaultSaga);
-    yield all([call(fetchUserTeamsSaga), call(initWorkflowSaga)]);
+    yield call(initWorkflowSaga);
   } catch (error) {
     // eslint-disable-next-line no-console
     console.error('error: ', error);
@@ -673,7 +674,6 @@ function* initCreatePageSaga() {
 function* initUsersSettingsSaga() {
   try {
     yield call(initWorkflowSaga);
-    yield call(fetchTeamsSaga);
   } catch (error) {
     // eslint-disable-next-line no-console
     console.error('error: ', error);
@@ -683,7 +683,6 @@ function* initUsersSettingsSaga() {
 function* initTeamsSettingsSaga() {
   try {
     yield call(initWorkflowSaga);
-    yield call(fetchTeamsSaga);
   } catch (error) {
     // eslint-disable-next-line no-console
     console.error('error: ', error);

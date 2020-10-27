@@ -173,7 +173,7 @@ export default createReducer(initialState, {
         ...state.byId,
         [payload.teamId]: {
           ...state.byId[payload.teamId],
-          users: state.byId[payload.teamId].users.map(user =>
+          members: state.byId[payload.teamId].members.map(user =>
             user.id === payload.userId ? { ...user, role: payload.role } : user,
           ),
         },
@@ -202,8 +202,8 @@ export default createReducer(initialState, {
         ...state.byId,
         [payload.teamId]: {
           ...state.byId[payload.teamId],
-          users: [
-            ...state.byId[payload.teamId].users,
+          members: [
+            ...state.byId[payload.teamId].members,
             ...members.map(({ id, teamRole, _permissions }) => ({
               id,
               teamRole,
@@ -227,7 +227,7 @@ export default createReducer(initialState, {
         ...state.byId,
         [payload.teamId]: {
           ...state.byId[payload.teamId],
-          users: state.byId[payload.teamId].users.filter(
+          members: state.byId[payload.teamId].members.filter(
             ({ id }) => id !== payload.userId,
           ),
         },
@@ -253,8 +253,8 @@ export default createReducer(initialState, {
         ...state.byId,
         [payload.teamId]: {
           ...state.byId[payload.teamId],
-          users: [
-            ...state.byId[payload.teamId].users,
+          members: [
+            ...state.byId[payload.teamId].members,
             { id: payload.userId, role: payload.role },
           ],
         },
@@ -268,7 +268,7 @@ export default createReducer(initialState, {
         ...state.byId,
         [payload.teamId]: {
           ...state.byId[payload.teamId],
-          users: payload.members.map(({ id, role, _permissions }) => ({
+          members: payload.members.map(({ id, role, _permissions }) => ({
             id,
             role,
             _permissions,

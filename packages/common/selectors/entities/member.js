@@ -44,13 +44,28 @@ export const memberAdminsSelector = createSelector(
     ),
 );
 
-export const teamMembersSelector = createSelector(
-  usersByIdSelector,
+export const teamMembersShortViewSelector = createSelector(
+  membersByIdSelector,
   teamsByIdSelector,
   teamIdPropSelector,
-  (users, team, teamId) =>
-    team[teamId]?.members.reduce((acc, member) => {
-      const user = users[member.userId];
+  (members, team, teamId) =>
+    team[teamId]?.members?.reduce((acc, memberId) => {
+      const member = members[memberId];
+
+      return [...acc, member];
+    }, []),
+);
+
+export const teamMembersFullViewSelector = createSelector(
+  usersByIdSelector,
+  membersByIdSelector,
+  teamsByIdSelector,
+  teamIdPropSelector,
+  (users, members, team, teamId) =>
+    team[teamId]?.members?.reduce((acc, memberId) => {
+      const member = members[memberId];
+      const { avatar, email, id, name, publicKey } = users[member.userId];
+      const user = { ...member, avatar, email, id, name, publicKey };
 
       return [...acc, user];
     }, []),

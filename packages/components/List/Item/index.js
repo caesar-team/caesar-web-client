@@ -41,7 +41,10 @@ export const Item = ({
   workInProgressItem,
   ...props
 }) => {
-  const sharedCount = invited?.length + teamMembersCount - 1;
+  const sharedCount =
+    invited?.length +
+    (teamMembersCount > 0 ? teamMembersCount - 1 : teamMembersCount);
+
   const shouldShowMembers = sharedCount > 0;
   const shouldShowAttachments =
     attachments && Array.isArray(attachments) && attachments.length > 0;

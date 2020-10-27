@@ -3,10 +3,7 @@ import { useSelector } from 'react-redux';
 import styled from 'styled-components';
 import { PERMISSION } from '@caesar/common/constants';
 import { workInProgressItemOwnerSelector } from '@caesar/common/selectors/workflow';
-import {
-  membersBatchSelector,
-  membersByIdSelector,
-} from '@caesar/common/selectors/entities/member';
+import { membersBatchSelector } from '@caesar/common/selectors/entities/member';
 import { Can } from '../../Ability';
 import { Avatar, AvatarsList } from '../../Avatar';
 import { Icon } from '../../Icon';

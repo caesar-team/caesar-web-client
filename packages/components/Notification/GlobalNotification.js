@@ -32,8 +32,6 @@ const Text = styled.div`
   color: ${({ isError, theme }) =>
     isError ? theme.color.red : theme.color.white};
   margin-left: 20px;
-  text-overflow: ellipsis;
-  white-space: nowrap;
   overflow: hidden;
   max-width: 400px;
 `;

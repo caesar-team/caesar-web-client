@@ -182,7 +182,7 @@ function* checkTeamPermissionsAndKeys(teamId, createKeyPair = false) {
     const team = yield select(teamSelector, { teamId });
     const teamMembers = (yield select(teamMembersFullViewSelector, {
       teamId,
-    })).filter(m => m.id !== ownerId);
+    })).filter(m => m.userId !== ownerId);
 
     if (teamMembers.length > 0) {
       // eslint-disable-next-line no-console

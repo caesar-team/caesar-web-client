@@ -73,11 +73,31 @@ export default createReducer(initialState, {
     return state;
   },
   [ADD_MEMBERS_BATCH](state, { payload }) {
+    const updatedMembers = Object.keys(payload.membersById).reduce(
+      (acc, memberId) => {
+        const updated = {
+          ...state.byId[memberId],
+          ...payload.membersById[memberId],
+          _links: {
+            ...state.byId[memberId]?._links,
+            ...payload.membersById[memberId]._links,
+          },
+          _permissions: {
+            ...state.byId[memberId]?._permissions,
+            ...payload.membersById[memberId]._permissions,
+          },
+        };
+
+        return { ...acc, [memberId]: { ...updated } };
+      },
+      {},
+    );
+
     return {
       ...state,
       byId: {
         ...state.byId,
-        ...payload.membersById,
+        ...updatedMembers,
       },
     };
   },

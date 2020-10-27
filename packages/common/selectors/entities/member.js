@@ -65,7 +65,7 @@ export const teamMembersFullViewSelector = createSelector(
     team[teamId]?.members?.reduce((acc, memberId) => {
       const member = members[memberId];
       const { avatar, email, id, name, publicKey } = users[member.userId];
-      const user = { ...member, avatar, email, id, name, publicKey };
+      const user = { ...member, avatar, email, userId: id, name, publicKey };
 
       return [...acc, user];
     }, []),

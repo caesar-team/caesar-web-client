@@ -114,9 +114,11 @@ export function* fetchTeamsSaga() {
 
 export function* fetchTeamSaga({ payload: { teamId } }) {
   try {
-    const { data } = yield call(getTeam, teamId);
+    const { data: team } = yield call(getTeam, teamId);
 
-    yield put(fetchTeamSuccess(data));
+    const teamsById = convertTeamsToEntity([team]);
+
+    yield put(fetchTeamSuccess(teamsById));
     yield put(finishIsLoading());
   } catch (error) {
     // eslint-disable-next-line no-console

@@ -198,13 +198,14 @@ class TeamListContainer extends Component {
       teams,
       userTeamList,
       isDomainAdmin,
+      isDomainAdminOrManager,
       user,
     } = this.props;
 
     const { modalVisibilities, selectedTeamTitle, activeTabName } = this.state;
     const favoriteTeams = teams.filter(team => team.pinned);
     const allTeamCards = this.renderTeamCards(
-      isDomainAdmin ? teams : userTeamList,
+      isDomainAdminOrManager ? teams : userTeamList,
     );
     const favoriteTeamCards = this.renderTeamCards(favoriteTeams);
 
@@ -217,7 +218,7 @@ class TeamListContainer extends Component {
       // eslint-disable-next-line no-nested-ternary
       activeTabName === FAVORITES_TAB_NAME
         ? favoriteTeams.length
-        : isDomainAdmin
+        : isDomainAdminOrManager
         ? teams.length
         : userTeamList.length;
 

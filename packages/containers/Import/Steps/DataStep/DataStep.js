@@ -46,7 +46,7 @@ const DataStep = ({
   } = state;
 
   // Window height minus stuff that takes vertical place (including table headers)
-  const tableVisibleDataHeight = window?.innerHeight - 575;
+  const tableVisibleDataHeight = window?.innerHeight - 450;
   const tableWrapperRef = useRef(null);
   const [tableWidth, setTableWidth] = useState(0);
 

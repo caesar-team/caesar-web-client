@@ -18,7 +18,7 @@ const Wrapper = styled.div`
   display: flex;
   flex-direction: column;
   width: calc(100% - 287px);
-  padding: 40px;
+  padding: ${({ isCompact }) => isCompact ? '12px 40px' : '40px'};
   background: ${({ theme }) => theme.color.alto};
 `;
 
@@ -27,7 +27,7 @@ const TopWrapper = styled.div`
   justify-content: space-between;
   align-items: center;
   width: 100%;
-  margin-bottom: 30px;
+  margin-bottom: ${({ isCompact }) => isCompact ? '16px' : '30px'};
 `;
 
 const Title = styled.div`
@@ -40,7 +40,7 @@ const Title = styled.div`
 `;
 
 export const SettingsWrapper = forwardRef(
-  ({ isLoading, title, addonTopComponent, children }, ref) => {
+  ({ isLoading, isCompact, title, addonTopComponent, children }, ref) => {
     if (isLoading) {
       return (
         <LogoWrapper>
@@ -50,8 +50,8 @@ export const SettingsWrapper = forwardRef(
     }
 
     return (
-      <Wrapper ref={ref}>
-        <TopWrapper>
+      <Wrapper isCompact={isCompact} ref={ref}>
+        <TopWrapper isCompact={isCompact}>
           <Title>{title}</Title>
           {addonTopComponent}
         </TopWrapper>

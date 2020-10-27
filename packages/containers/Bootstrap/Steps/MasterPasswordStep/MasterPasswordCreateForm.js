@@ -98,7 +98,6 @@ const MasterPasswordCreateFormComponent = ({ initialValues, onSubmit }) => {
     validationSchema: passwordSchema,
     onSubmit,
   });
-
   useEffectOnce(() => {
     validateForm();
   });
@@ -154,7 +153,7 @@ const MasterPasswordCreateFormComponent = ({ initialValues, onSubmit }) => {
         not be possible without this password.
       </TipText>
       <StyledButton htmlType="submit" disabled={isSubmitting || !isValid}>
-        Copy Password & Continue
+        Continue
       </StyledButton>
     </Form>
   );

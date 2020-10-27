@@ -65,7 +65,7 @@ import {
 import { arrayToObject, objectToArray } from '@caesar/common/utils/utils';
 import { upperFirst } from '@caesar/common/utils/string';
 import { getLists, getTeamLists, getUserItems } from '@caesar/common/api';
-import { TEAM_TYPE, LIST_TYPE, ROLE_ADMIN } from '@caesar/common/constants';
+import { TEAM_TYPE, LIST_TYPE, TEAM_ROLES } from '@caesar/common/constants';
 import {
   teamListsSelector,
   favoritesListSelector,
@@ -74,6 +74,8 @@ import {
   userDataSelector,
   masterPasswordSelector,
   currentTeamIdSelector,
+  isUserDomainAdminOrManagerSelector,
+  userTeamListSelector,
 } from '@caesar/common/selectors/user';
 import {
   itemSelector,
@@ -313,8 +315,13 @@ function* initTeamsSaga() {
   try {
     // Load avaible teams
     // const { data: teams } = yield call(getUserTeams);
-    const teams = yield select(teamListSelector);
-    // yield all(teams.map(({ id }) => fork(initTeam, id, false)));
+    const isUserDomainAdminOrManager = yield select(
+      isUserDomainAdminOrManagerSelector,
+    );
+
+    const teams = isUserDomainAdminOrManager
+      ? yield select(teamListSelector)
+      : yield select(userTeamListSelector);
 
     const userData = yield select(userDataSelector);
 
@@ -324,7 +331,7 @@ function* initTeamsSaga() {
       type: TEAM_TYPE.PERSONAL,
       icon: userData?.avatar,
       email: userData?.email,
-      teamRole: ROLE_ADMIN,
+      teamRole: TEAM_ROLES.ROLE_ADMIN,
       _links: userData?._links,
     });
 

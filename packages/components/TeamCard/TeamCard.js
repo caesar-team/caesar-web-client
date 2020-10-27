@@ -1,9 +1,10 @@
 /* eslint-disable camelcase */
 import React from 'react';
+import { useSelector } from 'react-redux';
 import styled from 'styled-components';
 import Link from 'next/link';
-import memoizeOne from 'memoize-one';
 import { ROUTES, PERMISSION, TEAM_MESSAGES } from '@caesar/common/constants';
+import { teamMembersSelector } from '@caesar/common/selectors/entities/member';
 import { ability } from '@caesar/common/ability';
 import { getPlural } from '@caesar/common/utils/string';
 import { getTeamTitle } from '@caesar/common/utils/team';
@@ -119,18 +120,9 @@ const ToggleWrapper = styled.div`
   }
 `;
 
-const getMembers = memoizeOne((users, members) =>
-  users.reduce((accumulator, { id }) => {
-    const member = members.find(user => user.id === id);
-
-    return member ? [...accumulator, member] : accumulator;
-  }, []),
-);
-
 const TeamCard = ({
   className,
   team,
-  members,
   userId,
   onClick = Function.prototype,
   onClickEditTeam = Function.prototype,
@@ -140,6 +132,9 @@ const TeamCard = ({
 }) => {
   const { id, icon, users, pinned } = team;
   const areMembersAvailable = users && users.length > 0;
+  const teamMembers = useSelector(state =>
+    teamMembersSelector(state, { teamId: id }),
+  );
 
   const { _permissions } = team || {};
 
@@ -214,7 +209,7 @@ const TeamCard = ({
           <AvatarsList
             size={32}
             fontSize="small"
-            avatars={getMembers(users, members)}
+            avatars={teamMembers}
             visibleCount={10}
           />
         )}

@@ -34,21 +34,10 @@ export const convertShareItemsToEntities = ({
   };
 };
 
-export const convertListsToEntities = nodes => {
-  const normalized = normalize(nodes, [listSchema]);
+export const convertListsToEntities = lists => {
+  const normalized = normalize(lists, [listSchema]);
 
-  return {
-    listsById: normalized.entities.listsById || {},
-  };
-};
-
-export const convertNodesToEntities = nodes => {
-  const normalized = normalize(nodes, [listSchema]);
-
-  return {
-    listsById: normalized.entities.listsById || {},
-    itemsById: normalized.entities.itemsById || {},
-  };
+  return normalized.entities.byId || {};
 };
 
 export const convertUsersToEntity = users => {
@@ -67,6 +56,15 @@ export const convertTeamsToEntity = teams => {
   const normalized = normalize(teams, [teamSchema]);
 
   return normalized.entities.byId || {};
+};
+
+export const convertTeamNodesToEntities = teams => {
+  const normalized = normalize(teams, [teamSchema]);
+
+  return {
+    teams: normalized.entities.teamsById || {},
+    members: normalized.entities.membersById || {},
+  };
 };
 
 export const convertKeyPairToEntity = (keypairs, idAttribute = 'teamId') => {

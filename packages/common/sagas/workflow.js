@@ -1,12 +1,5 @@
-import {
-  put,
-  call,
-  fork,
-  take,
-  takeLatest,
-  select,
-  all,
-} from 'redux-saga/effects';
+import { put, call, fork, takeLatest, select, all } from 'redux-saga/effects';
+import Router from 'next/router';
 import {
   INIT_WORKFLOW,
   INIT_USERS_SETTINGS,
@@ -48,13 +41,14 @@ import {
   fetchUserSelfSaga,
   fetchUserTeamsSaga,
 } from '@caesar/common/sagas/currentUser';
-import { fetchMembersSaga } from '@caesar/common/sagas/entities/member';
+import { fetchUsersSaga } from '@caesar/common/sagas/entities/user';
 import {
   createTeamKeyPairSaga,
   fetchTeamsSaga,
+  fetchTeamSaga,
 } from '@caesar/common/sagas/entities/team';
+import { fetchTeamMembersSaga } from '@caesar/common/sagas/entities/member';
 import {
-  convertNodesToEntities,
   convertItemsToEntities,
   convertTeamsToEntity,
   convertListsToEntities,
@@ -100,12 +94,9 @@ import {
 import { ADD_KEYPAIRS_BATCH } from '../actions/entities/keypair';
 import {
   memberSelector,
-  memberTeamSelector,
+  teamMembersSelector,
 } from '../selectors/entities/member';
-import {
-  fetchTeamMembersRequest,
-  FETCH_MEMBERS_SUCCESS,
-} from '../actions/entities/member';
+import { fetchTeamMembersRequest } from '../actions/entities/member';
 
 export function decryptItemsByItemIdKeys(items, keyPairs) {
   try {
@@ -185,10 +176,9 @@ function* checkTeamPermissionsAndKeys(teamId) {
     }
     // Update the members list
     yield put(fetchTeamMembersRequest({ teamId }));
-    yield take(FETCH_MEMBERS_SUCCESS);
 
     const team = yield select(teamSelector, { teamId });
-    const teamMembers = yield select(memberTeamSelector, { teamId });
+    const teamMembers = yield select(teamMembersSelector, { teamId });
 
     if (teamMembers.length > 0) {
       // eslint-disable-next-line no-console
@@ -272,7 +262,7 @@ function* initTeam(teamId) {
     if (!currentTeamId || currentTeamId === TEAM_TYPE.PERSONAL) return;
 
     const { data: lists } = yield call(getTeamLists, currentTeamId);
-    const { listsById } = convertNodesToEntities(lists);
+    const listsById = convertListsToEntities(lists);
 
     yield put(addListsBatch(listsById));
   } catch (error) {
@@ -394,7 +384,7 @@ function* loadKeyPairsAndPersonalItems() {
 
     // Load lists
     const { data: lists } = yield call(getLists);
-    const { listsById } = convertListsToEntities(lists);
+    const listsById = convertListsToEntities(lists);
     const defaultShareList = Object.values(listsById).find(
       list => list.type === LIST_TYPE.INBOX,
     );
@@ -519,7 +509,7 @@ function* initListsAndProgressEntities() {
 export function* initWorkflowSaga() {
   yield call(fetchUserSelfSaga);
   yield call(loadKeyPairsAndPersonalItems);
-  yield fork(fetchMembersSaga);
+  yield fork(fetchUsersSaga);
 }
 
 export function* openTeamVaultSaga({ payload: { teamId } }) {
@@ -677,7 +667,7 @@ function* initCreatePageSaga() {
 function* initUsersSettingsSaga() {
   try {
     yield call(initWorkflowSaga);
-    yield put(finishIsLoading());
+    yield call(fetchTeamsSaga);
   } catch (error) {
     // eslint-disable-next-line no-console
     console.error('error: ', error);
@@ -696,8 +686,15 @@ function* initTeamsSettingsSaga() {
 
 function* initTeamSettingsSaga() {
   try {
+    const {
+      router: {
+        query: { id: teamId },
+      },
+    } = Router;
+
     yield call(initWorkflowSaga);
-    yield call(fetchTeamsSaga);
+    yield call(fetchTeamSaga, { payload: { teamId } });
+    yield call(fetchTeamMembersSaga, { payload: { teamId } });
   } catch (error) {
     // eslint-disable-next-line no-console
     console.error('error: ', error);

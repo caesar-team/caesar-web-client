@@ -15,7 +15,7 @@ import {
   LEAVE_TEAM,
   ADD_MEMBER_TO_TEAM,
   SET_DEFAULT_LIST_ID,
-  RESET_USER_STATE,
+  RESET_CURRENT_USER_STATE,
 } from '@caesar/common/actions/currentUser';
 
 const initialState = {
@@ -89,7 +89,7 @@ export default createReducer(initialState, {
       defaultListId: payload.listId,
     };
   },
-  [RESET_USER_STATE]() {
+  [RESET_CURRENT_USER_STATE]() {
     return initialState;
   },
 });

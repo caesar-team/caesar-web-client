@@ -7,10 +7,9 @@ import {
   createMemberBatchSuccess,
   createMemberFailure,
   createMemberSuccess,
-  FETCH_MEMBERS_REQUEST,
   FETCH_TEAM_MEMBERS_REQUEST,
-  fetchMembersFailure,
-  fetchMembersSuccess,
+  fetchTeamMembersFailure,
+  fetchTeamMembersSuccess,
   leaveTeamFailure,
   leaveTeamSuccess,
   removeTeamFromMember,
@@ -22,7 +21,6 @@ import {
 } from '@caesar/common/actions/entities/team';
 import { currentUserIdSelector } from '@caesar/common/selectors/currentUser';
 import {
-  getUsers,
   getPublicKeyByEmailBatch,
   getTeamMembers,
   postLeaveTeam,
@@ -30,10 +28,7 @@ import {
   postNewUserBatch,
   updateKey,
 } from '@caesar/common/api';
-import {
-  convertMembersToEntity,
-  convertUsersToEntity,
-} from '@caesar/common/normalizers/normalizers';
+import { convertMembersToEntity } from '@caesar/common/normalizers/normalizers';
 import {
   generateSeedAndVerifier,
   generateUser,
@@ -51,18 +46,6 @@ const setNewFlag = (members, isNew) =>
 
 const renameUserId = members =>
   members.map(({ userId, ...member }) => ({ id: userId, ...member }));
-
-export function* fetchMembersSaga() {
-  try {
-    const { data: members } = yield call(getUsers);
-
-    yield put(fetchMembersSuccess(convertUsersToEntity(members)));
-  } catch (error) {
-    // eslint-disable-next-line no-console
-    console.error(error);
-    yield put(fetchMembersFailure());
-  }
-}
 
 export function* createMemberSaga({ payload: { email, role } }) {
   try {
@@ -248,11 +231,11 @@ export function* fetchTeamMembersSaga({ payload: { teamId } }) {
     const { data } = yield call(getTeamMembers, teamId);
 
     const membersById = convertMembersToEntity(data);
-    yield put(fetchMembersSuccess(membersById));
+    yield put(fetchTeamMembersSuccess(membersById));
 
     yield put(updateTeamMembersWithRoles(teamId, data));
   } catch (e) {
-    yield put(fetchMembersFailure());
+    yield put(fetchTeamMembersFailure());
   }
 }
 
@@ -272,7 +255,6 @@ export function* leaveTeamSaga({ payload: { teamId } }) {
 }
 
 export default function* memberSagas() {
-  yield takeLatest(FETCH_MEMBERS_REQUEST, fetchMembersSaga);
   yield takeLatest(CREATE_MEMBER_REQUEST, createMemberSaga);
   yield takeLatest(CREATE_MEMBER_BATCH_REQUEST, createMemberBatchSaga);
   yield takeLatest(FETCH_TEAM_MEMBERS_REQUEST, fetchTeamMembersSaga);

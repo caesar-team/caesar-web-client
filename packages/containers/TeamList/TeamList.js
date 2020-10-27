@@ -171,7 +171,7 @@ class TeamListContainer extends Component {
   }
 
   renderTeamCards(teams) {
-    const { members, currentUser } = this.props;
+    const { currentUser } = this.props;
 
     if (!teams.length) {
       return <div>No teams</div>;
@@ -181,7 +181,6 @@ class TeamListContainer extends Component {
       <StyledTeamCard
         key={team.id}
         team={team}
-        members={members}
         userId={currentUser.id}
         onClickEditTeam={this.handleClickEditTeam(team.id)}
         onClickLeaveTeam={this.handleClickLeaveTeam(team)}

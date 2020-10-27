@@ -1,7 +1,3 @@
-export const FETCH_MEMBERS_REQUEST = '@member/FETCH_MEMBERS_REQUEST';
-export const FETCH_MEMBERS_SUCCESS = '@member/FETCH_MEMBERS_SUCCESS';
-export const FETCH_MEMBERS_FAILURE = '@member/FETCH_MEMBERS_FAILURE';
-
 export const CREATE_MEMBER_REQUEST = '@member/CREATE_MEMBER_REQUEST';
 export const CREATE_MEMBER_SUCCESS = '@member/CREATE_MEMBER_SUCCESS';
 export const CREATE_MEMBER_FAILURE = '@member/CREATE_MEMBER_FAILURE';
@@ -18,10 +14,6 @@ export const FETCH_TEAM_MEMBERS_SUCCESS = '@member/FETCH_TEAM_MEMBERS_SUCCESS';
 export const FETCH_TEAM_MEMBERS_FAILURE = '@member/FETCH_TEAM_MEMBERS_FAILURE';
 
 export const ADD_MEMBERS_BATCH = '@member/ADD_MEMBERS';
-export const ADD_TEAM_TO_MEMBER_TEAMS_LIST =
-  '@member/ADD_TEAM_TO_MEMBER_TEAMS_LIST';
-export const ADD_TEAM_TO_MEMBERS_TEAMS_LIST_BATCH =
-  '@member/ADD_TEAM_TO_MEMBERS_TEAMS_LIST_BATCH';
 export const REMOVE_TEAM_FROM_MEMBER = '@member/REMOVE_TEAM_FROM_MEMBER';
 export const REMOVE_TEAM_FROM_MEMBERS_BATCH =
   '@member/REMOVE_TEAM_FROM_MEMBERS_BATCH';
@@ -50,26 +42,8 @@ export const fetchTeamMembersSuccess = membersById => ({
   },
 });
 
-export const fetchMembersRequest = memberIds => ({
-  type: FETCH_MEMBERS_REQUEST,
-  payload: {
-    memberIds,
-  },
-});
-
 export const fetchTeamMembersFailure = () => ({
   type: FETCH_TEAM_MEMBERS_FAILURE,
-});
-
-export const fetchMembersSuccess = membersById => ({
-  type: FETCH_MEMBERS_SUCCESS,
-  payload: {
-    membersById,
-  },
-});
-
-export const fetchMembersFailure = () => ({
-  type: FETCH_MEMBERS_FAILURE,
 });
 
 export const createMemberRequest = (email, role) => ({
@@ -117,22 +91,7 @@ export const addMembersBatch = membersById => ({
   },
 });
 
-export const addTeamToMemberTeamsList = (teamId, memberId) => ({
-  type: ADD_TEAM_TO_MEMBER_TEAMS_LIST,
-  payload: {
-    teamId,
-    memberId,
-  },
-});
-
-export const addTeamToMembersTeamsListBatch = (teamId, memberIds) => ({
-  type: ADD_TEAM_TO_MEMBERS_TEAMS_LIST_BATCH,
-  payload: {
-    teamId,
-    memberIds,
-  },
-});
-
+// @Deprecated
 export const removeTeamFromMember = (teamId, memberId) => ({
   type: REMOVE_TEAM_FROM_MEMBER,
   payload: {
@@ -141,6 +100,7 @@ export const removeTeamFromMember = (teamId, memberId) => ({
   },
 });
 
+// @Deprecated
 export const removeTeamFromMembersBatch = (teamId, memberIds) => ({
   type: REMOVE_TEAM_FROM_MEMBERS_BATCH,
   payload: {

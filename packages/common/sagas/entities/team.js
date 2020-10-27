@@ -56,13 +56,14 @@ import {
   postAddTeamMemberBatch,
   pinTeam,
 } from '@caesar/common/api';
-import { fetchMembersSaga } from '@caesar/common/sagas/entities/member';
+import { fetchUsersSaga } from '@caesar/common/sagas/entities/user';
 import {
   getServerErrorMessage,
   getServerErrors,
 } from '@caesar/common/utils/error';
 import {
   convertTeamsToEntity,
+  convertTeamNodesToEntities,
   convertKeyPairToEntity,
   convertKeyPairToItemEntity,
   convertUsersToEntity,
@@ -95,8 +96,10 @@ import { teamDefaultListSelector } from '../../selectors/entities/list';
 export function* fetchTeamsSaga() {
   try {
     const { data: teamList } = yield call(getTeams);
+    const { teams, members } = convertTeamNodesToEntities(teamList);
 
-    yield put(fetchTeamsSuccess(convertTeamsToEntity(teamList)));
+    yield put(fetchTeamsSuccess(teams));
+    yield put(addMembersBatch(members));
     yield put(finishIsLoading());
   } catch (error) {
     // eslint-disable-next-line no-console
@@ -113,6 +116,7 @@ export function* fetchTeamSaga({ payload: { teamId } }) {
     const { data } = yield call(getTeam, teamId);
 
     yield put(fetchTeamSuccess(data));
+    yield put(finishIsLoading());
   } catch (error) {
     // eslint-disable-next-line no-console
     console.error(error);
@@ -272,7 +276,7 @@ export function* createTeamSaga({
     const { publicKey } = owner;
 
     // Get updates
-    yield call(fetchMembersSaga);
+    yield call(fetchUsersSaga);
     const adminMembers = yield select(memberAdminsSelector);
     // Gathering admins except current
     const adminsToInvite = adminMembers.filter(({ id }) => id !== userId);

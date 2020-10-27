@@ -133,8 +133,6 @@ export const postInvitationBatch = data => callApi.post('/invitations', data);
 // team
 export const getTeams = () => callApi.get('/teams');
 export const getTeam = teamId => callApi.get(`/teams/${teamId}`);
-// @Deprecated
-export const postCreateTeam = data => callApi.post('/teams', data);
 export const editTeam = (teamId, data) =>
   callApi.patch(`/teams/${teamId}`, data);
 export const pinTeam = (teamId, shouldPinned) =>
@@ -174,7 +172,6 @@ export const patchList = (listId, data) =>
   callApi.patch(`/list/${listId}`, data);
 export const patchListSort = (listId, data) =>
   callApi.patch(`/list/${listId}/sort`, data);
-export const toggleFavorite = id => callApi.post(`/items/${id}/favorite`);
 export const removeList = listId => callApi.delete(`/list/${listId}`);
 export const getMovableLists = () => callApi.get(`/lists/movable`);
 
@@ -195,6 +192,7 @@ export const updateItem = (itemId, data) =>
   callApi.patch(`/items/${itemId}`, data);
 export const updateMoveItem = (itemId, data) =>
   callApi.patch(`/items/${itemId}/move`, data);
+export const toggleFavorite = id => callApi.post(`/items/${id}/favorite`);
 export const removeItem = itemId => callApi.delete(`/items/${itemId}`);
 
 export const postItemShare = ({ itemId, users }) =>

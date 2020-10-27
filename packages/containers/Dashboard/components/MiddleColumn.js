@@ -24,7 +24,7 @@ import {
   teamsTrashListsSelector,
   listsByIdSelector,
 } from '@caesar/common/selectors/entities/list';
-import { teamMembersSelector } from '@caesar/common/selectors/entities/team';
+import { teamMembersSelector } from '@caesar/common/selectors/entities/member';
 import { currentTeamIdSelector } from '@caesar/common/selectors/currentUser';
 import {
   setWorkInProgressItem,

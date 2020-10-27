@@ -21,7 +21,7 @@ export const LEAVE_TEAM = '@currentUser/LEAVE_TEAM';
 
 export const LOGOUT = '@currentUser/LOGOUT';
 
-export const RESET_USER_STATE = '@currentUser/RESET_USER_STATE';
+export const RESET_CURRENT_USER_STATE = '@currentUser/RESET_CURRENT_USER_STATE';
 
 export const fetchUserSelfRequest = () => ({
   type: FETCH_USER_SELF_REQUEST,
@@ -115,6 +115,6 @@ export const logout = () => ({
   type: LOGOUT,
 });
 
-export const resetUserState = () => ({
-  type: RESET_USER_STATE,
+export const resetCurrentUserState = () => ({
+  type: RESET_CURRENT_USER_STATE,
 });

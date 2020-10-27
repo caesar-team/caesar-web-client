@@ -1,6 +1,7 @@
-import React, { useEffect } from 'react';
+import React from 'react';
+import { useEffectOnce } from 'react-use';
 import { useRouter } from 'next/router';
-import { useDispatch, batch, useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { TeamContainer } from '@caesar/containers';
 import {
   Head,
@@ -10,8 +11,7 @@ import {
 } from '@caesar/components';
 import { currentUserDataSelector } from '@caesar/common/selectors/currentUser';
 import { initTeamSettings } from '@caesar/common/actions/workflow';
-import { fetchTeamMembersRequest } from '@caesar/common/actions/entities/member';
-import { memberTeamSelector } from '@caesar/common/selectors/entities/member';
+import { teamMembersSelector } from '@caesar/common/selectors/entities/member';
 
 const SettingsTeamPage = () => {
   const router = useRouter();
@@ -19,15 +19,12 @@ const SettingsTeamPage = () => {
 
   const { id } = router.query;
 
-  useEffect(() => {
-    batch(() => {
-      dispatch(initTeamSettings());
-      dispatch(fetchTeamMembersRequest({ teamId: id }));
-    });
-  }, [dispatch]);
+  useEffectOnce(() => {
+    dispatch(initTeamSettings());
+  });
 
   const members = useSelector(state =>
-    memberTeamSelector(state, { teamId: id }),
+    teamMembersSelector(state, { teamId: id }),
   );
   const currentUserData = useSelector(currentUserDataSelector);
 

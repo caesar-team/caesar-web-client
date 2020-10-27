@@ -1,5 +1,7 @@
 import { createSelector } from 'reselect';
 import { DOMAIN_ROLES } from '../../constants';
+import { usersByIdSelector } from './user';
+import { teamsByIdSelector, teamIdPropSelector } from './team';
 
 export const entitiesSelector = state => state.entities;
 
@@ -42,10 +44,14 @@ export const memberAdminsSelector = createSelector(
     ),
 );
 
-export const teamIdPropSelector = (_, props) => props.teamId;
-export const memberTeamSelector = createSelector(
-  memberListSelector,
+export const teamMembersSelector = createSelector(
+  usersByIdSelector,
+  teamsByIdSelector,
   teamIdPropSelector,
-  (membersList, teamId) =>
-    membersList.filter(({ teamIds }) => teamIds?.includes(teamId)),
+  (users, team, teamId) =>
+    team[teamId]?.members.reduce((acc, member) => {
+      const user = users[member.userId];
+
+      return [...acc, user];
+    }, []),
 );

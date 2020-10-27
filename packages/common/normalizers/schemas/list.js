@@ -8,7 +8,7 @@ import {
 import { createPermissionsFromLinks } from '@caesar/common/utils/createPermissionsFromLinks';
 
 const listSchema = new schema.Entity(
-  'listsById',
+  'byId',
   {},
   {
     processStrategy: entity => ({

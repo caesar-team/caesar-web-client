@@ -1,9 +1,5 @@
 import { createReducer } from '@caesar/common/utils/reducer';
-import { arrayToObject } from '@caesar/common/utils/utils';
 import {
-  FETCH_MEMBERS_REQUEST,
-  FETCH_MEMBERS_SUCCESS,
-  FETCH_MEMBERS_FAILURE,
   CREATE_MEMBER_REQUEST,
   CREATE_MEMBER_SUCCESS,
   CREATE_MEMBER_FAILURE,
@@ -14,10 +10,8 @@ import {
   FETCH_TEAM_MEMBERS_SUCCESS,
   FETCH_TEAM_MEMBERS_FAILURE,
   ADD_MEMBERS_BATCH,
-  ADD_TEAM_TO_MEMBER_TEAMS_LIST,
   REMOVE_TEAM_FROM_MEMBER,
   REMOVE_TEAM_FROM_MEMBERS_BATCH,
-  ADD_TEAM_TO_MEMBERS_TEAMS_LIST_BATCH,
   LEAVE_TEAM_SUCCESS,
   LEAVE_TEAM_FAILURE,
   RESET_MEMBER_STATE,
@@ -30,36 +24,6 @@ const initialState = {
 };
 
 export default createReducer(initialState, {
-  [FETCH_MEMBERS_REQUEST](state) {
-    return { ...state, isLoading: true };
-  },
-  [FETCH_MEMBERS_SUCCESS](state, { payload }) {
-    // TODO: (!!!) Need to seperate state to the users and to the members! I HAVE NO SHAME ON THIS!
-    const mergeMemberAndUserId = Object.keys(payload.membersById).map(
-      userId => {
-        const userInState = state.byId[userId] || {};
-        const userInInbound = payload.membersById[userId] || {};
-
-        return {
-          ...userInState,
-          ...userInInbound,
-        };
-      },
-    );
-
-    return {
-      ...state,
-      isLoading: false,
-      isError: false,
-      byId: {
-        ...state.byId,
-        ...arrayToObject(mergeMemberAndUserId),
-      },
-    };
-  },
-  [FETCH_MEMBERS_FAILURE](state) {
-    return { ...state, isLoading: false, isError: true };
-  },
   [CREATE_MEMBER_REQUEST](state) {
     return state;
   },
@@ -114,41 +78,6 @@ export default createReducer(initialState, {
       byId: {
         ...state.byId,
         ...payload.membersById,
-      },
-    };
-  },
-  [ADD_TEAM_TO_MEMBER_TEAMS_LIST](state, { payload }) {
-    return {
-      ...state,
-      byId: {
-        ...state.byId,
-        [payload.memberId]: {
-          ...state.byId[payload.memberId],
-          teamIds: [...state.byId[payload.memberId].teamIds, payload.teamId],
-        },
-      },
-    };
-  },
-  [ADD_TEAM_TO_MEMBERS_TEAMS_LIST_BATCH](state, { payload }) {
-    return {
-      ...state,
-      byId: {
-        ...state.byId,
-        ...payload.memberIds.reduce(
-          (accumulator, memberId) => ({
-            ...accumulator,
-            [memberId]: {
-              ...state.byId[memberId],
-              // TODO: this error because BE side doesn't return teamIds for searched user
-              teamIds: [
-                ...((state.byId[memberId] && state.byId[memberId].teamIds) ||
-                  []),
-                payload.teamId,
-              ],
-            },
-          }),
-          {},
-        ),
       },
     };
   },

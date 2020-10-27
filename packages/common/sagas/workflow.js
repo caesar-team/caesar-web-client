@@ -43,6 +43,7 @@ import {
 import {
   addShareKeyPairBatch,
   addTeamKeyPairBatch,
+  ADD_TEAM_KEY_PAIR_BATCH,
 } from '@caesar/common/actions/keystore';
 import {
   fetchUserSelfSaga,
@@ -173,8 +174,7 @@ export function* processSharedItemsSaga() {
     console.error(error);
   }
 }
-
-function* checkTeamPermissionsAndKeys(teamId) {
+function* checkTeamPermissionsAndKeys(teamId, createKeyPair = false) {
   const teamKeyPairs = yield select(teamKeyPairSelector, { teamId });
   if (!teamKeyPairs) {
     if (teamId === TEAM_TYPE.PERSONAL) {
@@ -186,9 +186,12 @@ function* checkTeamPermissionsAndKeys(teamId) {
     // Update the members list
     yield put(fetchTeamMembersRequest({ teamId }));
     yield take(FETCH_MEMBERS_SUCCESS);
+    const { id: ownerId } = yield select(userDataSelector);
 
     const team = yield select(teamSelector, { teamId });
-    const teamMembers = yield select(memberTeamSelector, { teamId });
+    const teamMembers = (yield select(memberTeamSelector, { teamId })).filter(
+      m => m.id !== ownerId,
+    );
 
     if (teamMembers.length > 0) {
       // eslint-disable-next-line no-console
@@ -200,7 +203,6 @@ function* checkTeamPermissionsAndKeys(teamId) {
       return false;
     }
 
-    const { id: ownerId } = yield select(userDataSelector);
     const { publicKey } = yield select(memberSelector, { memberId: ownerId });
 
     // eslint-disable-next-line no-console
@@ -214,10 +216,11 @@ function* checkTeamPermissionsAndKeys(teamId) {
           teamId} cause the publickey is null`,
       );
     }
-
-    yield call(createTeamKeyPairSaga, {
-      payload: { team, publicKey },
-    });
+    if (createKeyPair) {
+      yield call(createTeamKeyPairSaga, {
+        payload: { team, ownerId, publicKey },
+      });
+    }
 
     return !!(yield select(teamKeyPairSelector, { teamId }));
   }
@@ -285,7 +288,7 @@ function* initTeam(teamId) {
 }
 
 function* checkTeamKeyPair(team) {
-  const check = yield call(checkTeamPermissionsAndKeys, team.id);
+  const check = yield call(checkTeamPermissionsAndKeys, team.id, true);
 
   return {
     ...team,
@@ -541,6 +544,7 @@ export function* openTeamVaultSaga({ payload: { teamId } }) {
     yield call(initTeam, teamId);
     yield call(initListsAndProgressEntities);
     const checksResult = yield call(checkTeamPermissionsAndKeys, teamId);
+
     if (checksResult) {
       yield put(lockTeam(teamId, false));
       // TODO: Here is opportunity to improve the calls

@@ -41,7 +41,7 @@ import {
 } from '@caesar/common/utils/cipherUtils';
 import {
   ENTITY_TYPE,
-  ROLE_ANONYMOUS_USER,
+  DOMAIN_ROLES,
   ROUTES,
 } from '@caesar/common/constants';
 import { updateGlobalNotification } from '@caesar/common/actions/application';
@@ -89,7 +89,7 @@ export function* createMemberSaga({ payload: { email, role } }) {
 
     const { data: user } = yield call(postNewUser, data);
 
-    if (role !== ROLE_ANONYMOUS_USER) {
+    if (role !== DOMAIN_ROLES.ROLE_ANONYMOUS_USER) {
       yield put(
         createMemberSuccess({
           id: user.id,
@@ -146,7 +146,7 @@ export function* createMemberBatchSaga({ payload: { emailRolePairs } }) {
       (accumulator, userId, index) => {
         const member = members[index];
 
-        return member.domainRoles.includes(ROLE_ANONYMOUS_USER)
+        return member.domainRoles.includes(DOMAIN_ROLES.ROLE_ANONYMOUS_USER)
           ? accumulator
           : [
               ...accumulator,

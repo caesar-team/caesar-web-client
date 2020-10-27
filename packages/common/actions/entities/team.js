@@ -26,9 +26,6 @@ export const TOGGLE_PIN_TEAM_REQUEST = '@team/TOGGLE_PIN_TEAM_REQUEST';
 export const TOGGLE_PIN_TEAM_SUCCESS = '@team/TOGGLE_PIN_TEAM_SUCCESS';
 export const TOGGLE_PIN_TEAM_FAILURE = '@team/TOGGLE_PIN_TEAM_FAILURE';
 
-export const UPDATE_TEAM_MEMBERS_WITH_ROLES =
-  '@team/UPDATE_TEAM_MEMBERS_WITH_ROLES';
-
 export const UPDATE_TEAM_MEMBER_ROLE_REQUEST =
   '@team/UPDATE_TEAM_MEMBER_ROLE_REQUEST';
 export const UPDATE_TEAM_MEMBER_ROLE_SUCCESS =
@@ -269,14 +266,6 @@ export const addMemberToTeamList = (teamId, userId, role) => ({
     teamId,
     userId,
     role,
-  },
-});
-
-export const updateTeamMembersWithRoles = (teamId, members) => ({
-  type: UPDATE_TEAM_MEMBERS_WITH_ROLES,
-  payload: {
-    teamId,
-    members,
   },
 });
 

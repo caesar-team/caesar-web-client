@@ -15,10 +15,7 @@ import {
   removeTeamFromMember,
   LEAVE_TEAM_REQUEST,
 } from '@caesar/common/actions/entities/member';
-import {
-  updateTeamMembersWithRoles,
-  removeTeamMemberSuccess,
-} from '@caesar/common/actions/entities/team';
+import { removeTeamMemberSuccess } from '@caesar/common/actions/entities/team';
 import { currentUserIdSelector } from '@caesar/common/selectors/currentUser';
 import {
   getPublicKeyByEmailBatch,
@@ -232,8 +229,6 @@ export function* fetchTeamMembersSaga({ payload: { teamId } }) {
 
     const membersById = convertMembersToEntity(data);
     yield put(fetchTeamMembersSuccess(membersById));
-
-    yield put(updateTeamMembersWithRoles(teamId, data));
   } catch (e) {
     yield put(fetchTeamMembersFailure());
   }

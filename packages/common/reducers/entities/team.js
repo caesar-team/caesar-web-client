@@ -29,7 +29,6 @@ import {
   CREATE_TEAM_KEYS_REQUEST,
   CREATE_TEAM_KEYS_SUCCESS,
   CREATE_TEAM_KEYS_FAILURE,
-  UPDATE_TEAM_MEMBERS_WITH_ROLES,
   TOGGLE_PIN_TEAM_SUCCESS,
   RESET_TEAM_STATE,
   LOCK_TEAM,
@@ -257,22 +256,6 @@ export default createReducer(initialState, {
             ...state.byId[payload.teamId].members,
             { id: payload.userId, role: payload.role },
           ],
-        },
-      },
-    };
-  },
-  [UPDATE_TEAM_MEMBERS_WITH_ROLES](state, { payload }) {
-    return {
-      ...state,
-      byId: {
-        ...state.byId,
-        [payload.teamId]: {
-          ...state.byId[payload.teamId],
-          members: payload.members.map(({ id, role, _permissions }) => ({
-            id,
-            role,
-            _permissions,
-          })),
         },
       },
     };

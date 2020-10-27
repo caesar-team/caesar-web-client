@@ -53,7 +53,7 @@ export const teamMembersShortViewSelector = createSelector(
       const member = members[memberId];
 
       return [...acc, member];
-    }, []),
+    }, []) || [],
 );
 
 export const teamMembersFullViewSelector = createSelector(
@@ -64,9 +64,12 @@ export const teamMembersFullViewSelector = createSelector(
   (users, members, team, teamId) =>
     team[teamId]?.members?.reduce((acc, memberId) => {
       const member = members[memberId];
+
+      if (!member) return acc;
+
       const { avatar, email, id, name, publicKey } = users[member.userId];
       const user = { ...member, avatar, email, userId: id, name, publicKey };
 
       return [...acc, user];
-    }, []),
+    }, []) || [],
 );

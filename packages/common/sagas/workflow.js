@@ -36,12 +36,8 @@ import {
 import {
   addShareKeyPairBatch,
   addTeamKeyPairBatch,
-  ADD_TEAM_KEY_PAIR_BATCH,
 } from '@caesar/common/actions/keystore';
-import {
-  fetchUserSelfSaga,
-  fetchUserTeamsSaga,
-} from '@caesar/common/sagas/currentUser';
+import { fetchUserSelfSaga } from '@caesar/common/sagas/currentUser';
 import { fetchUsersSaga } from '@caesar/common/sagas/entities/user';
 import {
   createTeamKeyPairSaga,
@@ -289,7 +285,12 @@ function* checkTeamKeyPair(team) {
 }
 
 function* checkTeamsKeyPairs() {
-  const teams = yield select(teamListSelector);
+  const isUserDomainAdminOrManager = yield select(
+    isUserDomainAdminOrManagerSelector,
+  );
+  const teams = yield select(
+    isUserDomainAdminOrManager ? teamListSelector : currentUserTeamListSelector,
+  );
 
   const checkCalls = teams
     .filter(t => t.id !== TEAM_TYPE.PERSONAL)

@@ -19,8 +19,6 @@ import {
   REMOVE_TEAM_MEMBER_REQUEST,
   REMOVE_TEAM_MEMBER_SUCCESS,
   REMOVE_TEAM_MEMBER_FAILURE,
-  LEAVE_TEAM_SUCCESS,
-  LEAVE_TEAM_FAILURE,
   RESET_MEMBER_STATE,
 } from '@caesar/common/actions/entities/member';
 
@@ -160,12 +158,6 @@ export default createReducer(initialState, {
   },
   [REMOVE_TEAM_MEMBER_FAILURE](state) {
     return state;
-  },
-  [LEAVE_TEAM_SUCCESS](state) {
-    return state;
-  },
-  [LEAVE_TEAM_FAILURE](state) {
-    return { ...state, isError: true };
   },
   [RESET_MEMBER_STATE]() {
     return initialState;

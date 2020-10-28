@@ -10,11 +10,11 @@ import {
   teamSelector,
 } from '@caesar/common/selectors/entities/team';
 import { removeTeamRequest } from '@caesar/common/actions/entities/team';
+import { leaveTeamRequest } from '@caesar/common/actions/currentUser';
 import {
   addTeamMembersBatchRequest,
   removeTeamMemberRequest,
   updateTeamMemberRoleRequest,
-  leaveTeamRequest,
 } from '@caesar/common/actions/entities/member';
 import {
   Button,

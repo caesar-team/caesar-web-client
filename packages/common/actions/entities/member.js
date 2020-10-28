@@ -16,11 +16,11 @@ export const FETCH_TEAM_MEMBERS_FAILURE = '@member/FETCH_TEAM_MEMBERS_FAILURE';
 export const ADD_MEMBERS_BATCH = '@member/ADD_MEMBERS_BATCH';
 
 export const ADD_TEAM_MEMBERS_BATCH_REQUEST =
-  '@team/ADD_TEAM_MEMBERS_BATCH_REQUEST';
+  '@member/ADD_TEAM_MEMBERS_BATCH_REQUEST';
 export const ADD_TEAM_MEMBERS_BATCH_SUCCESS =
-  '@team/ADD_TEAM_MEMBERS_BATCH_SUCCESS';
+  '@member/ADD_TEAM_MEMBERS_BATCH_SUCCESS';
 export const ADD_TEAM_MEMBERS_BATCH_FAILURE =
-  '@team/ADD_TEAM_MEMBERS_BATCH_FAILURE';
+  '@member/ADD_TEAM_MEMBERS_BATCH_FAILURE';
 
 export const UPDATE_TEAM_MEMBER_ROLE_REQUEST =
   '@member/UPDATE_TEAM_MEMBER_ROLE_REQUEST';
@@ -32,10 +32,6 @@ export const UPDATE_TEAM_MEMBER_ROLE_FAILURE =
 export const REMOVE_TEAM_MEMBER_REQUEST = '@member/REMOVE_TEAM_MEMBER_REQUEST';
 export const REMOVE_TEAM_MEMBER_SUCCESS = '@member/REMOVE_TEAM_MEMBER_SUCCESS';
 export const REMOVE_TEAM_MEMBER_FAILURE = '@member/REMOVE_TEAM_MEMBER_FAILURE';
-
-export const LEAVE_TEAM_REQUEST = '@member/LEAVE_TEAM_REQUEST';
-export const LEAVE_TEAM_SUCCESS = '@member/LEAVE_TEAM_SUCCESS';
-export const LEAVE_TEAM_FAILURE = '@member/LEAVE_TEAM_FAILURE';
 
 export const RESET_MEMBER_STATE = '@member/RESET_MEMBER_STATE';
 
@@ -161,21 +157,6 @@ export const removeTeamMemberSuccess = memberId => ({
 
 export const removeTeamMemberFailure = () => ({
   type: REMOVE_TEAM_MEMBER_FAILURE,
-});
-
-export const leaveTeamRequest = teamId => ({
-  type: LEAVE_TEAM_REQUEST,
-  payload: {
-    teamId,
-  },
-});
-
-export const leaveTeamSuccess = () => ({
-  type: LEAVE_TEAM_SUCCESS,
-});
-
-export const leaveTeamFailure = () => ({
-  type: LEAVE_TEAM_FAILURE,
 });
 
 export const resetMemberState = () => ({

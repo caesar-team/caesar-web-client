@@ -16,8 +16,9 @@ export const SET_CURRENT_TEAM_ID = '@currentUser/SET_CURRENT_TEAM_ID';
 
 export const SET_DEFAULT_LIST_ID = '@currentUser/SET_DEFAULT_LIST_ID';
 
-export const ADD_MEMBER_TO_TEAM = '@currentUser/ADD_MEMBER_TO_TEAM';
-export const LEAVE_TEAM = '@currentUser/LEAVE_TEAM';
+export const LEAVE_TEAM_REQUEST = '@currentUser/LEAVE_TEAM_REQUEST';
+export const LEAVE_TEAM_SUCCESS = '@currentUser/LEAVE_TEAM_SUCCESS';
+export const LEAVE_TEAM_FAILURE = '@currentUser/LEAVE_TEAM_FAILURE';
 
 export const LOGOUT = '@currentUser/LOGOUT';
 
@@ -90,18 +91,22 @@ export const setCurrentTeamId = (teamId, withDecryption) => ({
   },
 });
 
-export const addMemberToTeam = teamId => ({
-  type: ADD_MEMBER_TO_TEAM,
+export const leaveTeamRequest = teamId => ({
+  type: LEAVE_TEAM_REQUEST,
   payload: {
     teamId,
   },
 });
 
-export const leaveTeam = teamId => ({
-  type: LEAVE_TEAM,
+export const leaveTeamSuccess = teamId => ({
+  type: LEAVE_TEAM_SUCCESS,
   payload: {
     teamId,
   },
+});
+
+export const leaveTeamFailure = () => ({
+  type: LEAVE_TEAM_FAILURE,
 });
 
 export const setDefaultListId = listId => ({

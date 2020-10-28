@@ -1,13 +1,15 @@
 import { connect } from 'react-redux';
 import { createStructuredSelector } from 'reselect';
-import { fetchKeyPairRequest } from '@caesar/common/actions/currentUser';
+import {
+  fetchKeyPairRequest,
+  leaveTeamRequest,
+} from '@caesar/common/actions/currentUser';
 import {
   createTeamRequest,
   editTeamRequest,
   removeTeamRequest,
   togglePinTeamRequest,
 } from '@caesar/common/actions/entities/team';
-import { leaveTeamRequest } from '@caesar/common/actions/entities/member';
 import {
   isLoadingTeamsSelector,
   teamSortedListSelector,

@@ -1,4 +1,3 @@
-import Router from 'next/router';
 import { call, put, takeLatest, all, select } from 'redux-saga/effects';
 import {
   CREATE_MEMBER_BATCH_REQUEST,
@@ -19,19 +18,14 @@ import {
   REMOVE_TEAM_MEMBER_REQUEST,
   removeTeamMemberSuccess,
   removeTeamMemberFailure,
-  LEAVE_TEAM_REQUEST,
-  leaveTeamFailure,
-  leaveTeamSuccess,
 } from '@caesar/common/actions/entities/member';
 import {
   addMembersToTeamList,
   removeMemberFromTeam,
 } from '@caesar/common/actions/entities/team';
-import { currentUserIdSelector } from '@caesar/common/selectors/currentUser';
 import {
   getPublicKeyByEmailBatch,
   getTeamMembers,
-  postLeaveTeam,
   postNewUser,
   postNewUserBatch,
   updateKey,
@@ -48,17 +42,13 @@ import {
 import {
   ENTITY_TYPE,
   DOMAIN_ROLES,
-  ROUTES,
   NOOP_NOTIFICATION,
 } from '@caesar/common/constants';
 import { updateGlobalNotification } from '@caesar/common/actions/application';
 import { getServerErrorMessage } from '@caesar/common/utils/error';
 import { teamKeyPairSelector } from '@caesar/common/selectors/keystore';
 import { usersBatchSelector } from '../../selectors/entities/user';
-import {
-  memberSelector,
-  memberByUserIdAndTeamIdSelector,
-} from '../../selectors/entities/member';
+import { memberSelector } from '../../selectors/entities/member';
 import { encryptMemberTeamKey } from './team';
 
 const setNewFlag = (members, isNew) =>
@@ -336,26 +326,6 @@ export function* removeTeamMemberSaga({ payload: { memberId } }) {
   }
 }
 
-export function* leaveTeamSaga({ payload: { teamId } }) {
-  try {
-    yield call(postLeaveTeam, teamId);
-    const userId = yield select(currentUserIdSelector);
-    const member = yield select(memberByUserIdAndTeamIdSelector, {
-      userId,
-      teamId,
-    });
-
-    yield put(leaveTeamSuccess());
-    yield put(removeTeamMemberSuccess(member.id));
-    yield put(removeMemberFromTeam(member.teamId, member.id));
-
-    yield call(Router.push, ROUTES.SETTINGS + ROUTES.TEAM);
-  } catch (e) {
-    yield put(updateGlobalNotification(getServerErrorMessage(e), false, true));
-    yield put(leaveTeamFailure());
-  }
-}
-
 export default function* memberSagas() {
   yield takeLatest(CREATE_MEMBER_REQUEST, createMemberSaga);
   yield takeLatest(CREATE_MEMBER_BATCH_REQUEST, createMemberBatchSaga);
@@ -366,5 +336,4 @@ export default function* memberSagas() {
   );
   yield takeLatest(UPDATE_TEAM_MEMBER_ROLE_REQUEST, updateTeamMemberRoleSaga);
   yield takeLatest(REMOVE_TEAM_MEMBER_REQUEST, removeTeamMemberSaga);
-  yield takeLatest(LEAVE_TEAM_REQUEST, leaveTeamSaga);
 }

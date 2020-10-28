@@ -23,7 +23,7 @@ import {
 import { addMembersBatch } from '@caesar/common/actions/entities/member';
 import {
   setCurrentTeamId,
-  leaveTeam,
+  leaveTeamSuccess,
 } from '@caesar/common/actions/currentUser';
 import { teamSelector } from '@caesar/common/selectors/entities/team';
 import {
@@ -59,10 +59,8 @@ import {
   encryptSecret,
   generateKeyPair,
 } from '@caesar/common/sagas/entities/item';
-import {
-  memberAdminsSelector,
-  memberSelector,
-} from '../../selectors/entities/member';
+import { memberAdminsSelector } from '../../selectors/entities/member';
+import { userSelector } from '../../selectors/entities/user';
 import { addTeamKeyPairBatch } from '../../actions/keystore';
 import { createVaultSuccess } from '../../actions/entities/vault';
 
@@ -101,6 +99,7 @@ export function* fetchTeamSaga({ payload: { teamId } }) {
     yield put(fetchTeamFailure());
   }
 }
+
 export function* removeTeamSaga({ payload: { teamId } }) {
   try {
     const team = yield select(teamSelector, { teamId });
@@ -110,7 +109,7 @@ export function* removeTeamSaga({ payload: { teamId } }) {
     yield call(deleteTeam, teamId);
 
     if (userTeamIds.includes(teamId)) {
-      yield put(leaveTeam(teamId));
+      yield put(leaveTeamSuccess(teamId));
     }
 
     if (teamId === currentTeamId) {
@@ -174,7 +173,6 @@ export function* createTeamKeyPairSaga({
 3. Create secrets (encrypted keypairs) from the members keypairs
 4. Save all secrets to the server
 5. Add the members to the team
-
 */
 export function* encryptMemberTeamKey({ member, keypair }) {
   const { id: userId, publicKey } = member;
@@ -206,7 +204,7 @@ export function* createTeamSaga({
     const currentUser = yield select(currentUserDataSelector);
     const userId = ownerId || currentUser.id;
 
-    const owner = yield select(memberSelector, { memberId: userId });
+    const owner = yield select(userSelector, { userId });
     const { publicKey } = owner;
 
     // Get updates

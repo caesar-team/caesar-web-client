@@ -38,7 +38,7 @@ export const convertShareItemsToEntities = ({
   ]);
 
   return {
-    itemsById: normalized.entities.byId || {},
+    itemsById: normalized.entities.shareItemById || {},
   };
 };
 
@@ -82,12 +82,12 @@ export const convertKeyPairToEntity = (keypairs, idAttribute = 'teamId') => {
   failIsNotAnArray(keypairs);
   const normalized = normalize(keypairs, [keypairSchema(idAttribute)]);
 
-  return normalized.entities.byId || {};
+  return normalized.entities.keyPairById || {};
 };
 
 export const convertKeyPairToItemEntity = keypairs => {
   failIsNotAnArray(keypairs);
   const normalized = normalize(keypairs, [keypairItemSchema]);
 
-  return normalized.entities.byId || {};
+  return normalized.entities.keyPairItemById || {};
 };

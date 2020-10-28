@@ -1,6 +1,6 @@
 /* eslint-disable no-console */
 import Router from 'next/router';
-import { put, call, takeLatest } from 'redux-saga/effects';
+import { put, call, select, takeLatest } from 'redux-saga/effects';
 import {
   FETCH_USER_SELF_REQUEST,
   FETCH_KEY_PAIR_REQUEST,
@@ -11,13 +11,25 @@ import {
   fetchKeyPairFailure,
   fetchUserTeamsSuccess,
   fetchUserTeamsFailure,
+  LEAVE_TEAM_REQUEST,
+  leaveTeamFailure,
+  leaveTeamSuccess,
 } from '@caesar/common/actions/currentUser';
 import { addPersonalKeyPair } from '@caesar/common/actions/keystore';
-import { resetStore } from '@caesar/common/actions/application';
+import {
+  updateGlobalNotification,
+  resetStore,
+} from '@caesar/common/actions/application';
+import { removeTeamMemberSuccess } from '@caesar/common/actions/entities/member';
+import { removeMemberFromTeam } from '@caesar/common/actions/entities/team';
+import { currentUserIdSelector } from '@caesar/common/selectors/currentUser';
+import { memberByUserIdAndTeamIdSelector } from '@caesar/common/selectors/entities/member';
+import { getServerErrorMessage } from '@caesar/common/utils/error';
 import {
   getUserSelf,
   getKeys,
   getUserTeams,
+  postLeaveTeam,
   postLogout,
 } from '@caesar/common/api';
 import { removeCookieValue, clearStorage } from '@caesar/common/utils/token';
@@ -71,6 +83,32 @@ export function* fetchUserTeamsSaga() {
   }
 }
 
+export function* leaveTeamSaga({ payload: { teamId } }) {
+  try {
+    yield call(postLeaveTeam, teamId);
+    const userId = yield select(currentUserIdSelector);
+    const member = yield select(memberByUserIdAndTeamIdSelector, {
+      userId,
+      teamId,
+    });
+
+    yield put(leaveTeamSuccess(teamId));
+    yield put(removeTeamMemberSuccess(member.id));
+    yield put(removeMemberFromTeam(member.teamId, member.id));
+
+    const {
+      router: { route },
+    } = Router;
+
+    if (route === `${ROUTES.SETTINGS}${ROUTES.TEAM}/[id]`) {
+      yield call(Router.push, ROUTES.SETTINGS + ROUTES.TEAM);
+    }
+  } catch (e) {
+    yield put(updateGlobalNotification(getServerErrorMessage(e), false, true));
+    yield put(leaveTeamFailure());
+  }
+}
+
 export function* logoutSaga() {
   try {
     yield call(postLogout);
@@ -88,5 +126,6 @@ export default function* currentUserSagas() {
   yield takeLatest(FETCH_USER_SELF_REQUEST, fetchUserSelfSaga);
   yield takeLatest(FETCH_KEY_PAIR_REQUEST, fetchKeyPairSaga);
   yield takeLatest(FETCH_USER_TEAMS_REQUEST, fetchUserTeamsSaga);
+  yield takeLatest(LEAVE_TEAM_REQUEST, leaveTeamSaga);
   yield takeLatest(LOGOUT, logoutSaga);
 }

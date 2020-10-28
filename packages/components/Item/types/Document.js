@@ -10,7 +10,7 @@ const DocumentComponent = ({
   itemSubject,
   onClickAcceptEdit,
   onClickShare,
-  isSharedItem,
+  isSharedItem = false,
   isVisibleDragZone,
 }) => {
   const { name, note, attachments, raws } = item.data;

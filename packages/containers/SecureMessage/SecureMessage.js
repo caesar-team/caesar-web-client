@@ -16,6 +16,7 @@ import {
   StyledLogo,
   Content,
   Title,
+  AdaptiveTitle,
   ButtonsWrapper,
   ButtonStyled,
   Footer,
@@ -67,8 +68,8 @@ const SecureMessageContainerComponent = ({ message, password }) => {
   };
 
   const title = decryptedMessage
-    ? 'It’s your secret'
-    : 'Enter the password to access the message';
+    ? <Title>It’s your secret</Title>
+    : <AdaptiveTitle>Enter the password to access the message</AdaptiveTitle>;
   const shouldShowButtons = !!decryptedMessage;
   const shouldShowDownloadButton =
     decryptedMessage &&
@@ -86,7 +87,7 @@ const SecureMessageContainerComponent = ({ message, password }) => {
         <StyledLogo name="logo-secure-message" width={114} height={32} />  
       </Header>
       <Content>
-        <Title>{title}</Title>
+        {title}
         {decryptedMessage ? (
           <MessageStep
             decryptedMessage={decryptedMessage}

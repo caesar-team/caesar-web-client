@@ -22,7 +22,7 @@ import {
 } from '@caesar/common/api';
 import { removeCookieValue, clearStorage } from '@caesar/common/utils/token';
 import { createPermissionsFromLinks } from '@caesar/common/utils/createPermissionsFromLinks';
-import { ROUTES, PERMISSION_ENTITY } from '@caesar/common/constants';
+import { ROUTES } from '@caesar/common/constants';
 
 export function* fetchUserSelfSaga() {
   try {
@@ -31,10 +31,7 @@ export function* fetchUserSelfSaga() {
     const fixedUser = {
       ...currentUser,
       _permissions: currentUser?._links
-        ? {
-            ...createPermissionsFromLinks(currentUser._links),
-            __typename: PERMISSION_ENTITY.TEAM_MEMBER,
-          }
+        ? createPermissionsFromLinks(currentUser._links)
         : {},
     };
 

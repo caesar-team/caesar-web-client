@@ -21,7 +21,7 @@ import {
 
 export const Item = ({
   id,
-  data: { name, attachments = [], website },
+  data: { name, attachments = [], website } = {},
   type,
   invited = [],
   isMultiItem = false,

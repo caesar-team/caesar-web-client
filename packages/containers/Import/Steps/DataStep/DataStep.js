@@ -63,17 +63,17 @@ const DataStep = ({
   const selectedRowsLength = denormalize(selectedRows).length;
   const isButtonDisabled = isSubmitting || !selectedRowsLength;
 
-  const teamOptions = teamsLists.flatMap(({ id, name }) =>
+  const teamOptions = teamsLists?.flatMap(({ id, name }) =>
     id === TEAM_TYPE.PERSONAL
       ? {
           value: id,
           label: name.toLowerCase(),
         }
       : [],
-  );
+  ) || [];
 
   const currentTeam = teamsLists.find(({ id }) => id === teamId);
-  const currentTeamListsOptions = currentTeam?.lists.flatMap(
+  const currentTeamListsOptions = currentTeam?.lists?.flatMap(
     ({ type, id, label }) =>
       type === LIST_TYPE.INBOX
         ? []
@@ -81,7 +81,7 @@ const DataStep = ({
             value: id,
             label: label.toLowerCase(),
           },
-  );
+  ) || [];
 
   const handleSearch = event => {
     event.preventDefault();
@@ -117,7 +117,7 @@ const DataStep = ({
     await waitIdle();
     onSubmit(listId, denormalize(selectedRows), setSubmitting);
   };
-
+  
   return (
     <>
       <Title>Select items to import data into Caesar</Title>
@@ -131,6 +131,7 @@ const DataStep = ({
           columns={columns}
           data={tableData}
           tableVisibleDataHeight={tableVisibleDataHeight}
+          itemSize={45}
         />
       </StyledTable>
       <SelectListWrapper>

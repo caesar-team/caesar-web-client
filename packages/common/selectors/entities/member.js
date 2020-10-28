@@ -1,6 +1,6 @@
 import { createSelector } from 'reselect';
 import { DOMAIN_ROLES } from '../../constants';
-import { usersByIdSelector } from './user';
+import { usersByIdSelector, userIdPropSelector } from './user';
 import { teamsByIdSelector, teamIdPropSelector } from './team';
 
 export const entitiesSelector = state => state.entities;
@@ -26,6 +26,16 @@ export const memberSelector = createSelector(
 export const memberListSelector = createSelector(
   membersByIdSelector,
   byId => Object.values(byId) || [],
+);
+
+export const memberByUserIdAndTeamIdSelector = createSelector(
+  memberListSelector,
+  userIdPropSelector,
+  teamIdPropSelector,
+  (members, userId, teamId) =>
+    members.find(
+      member => member.userId === userId && member.teamId === teamId,
+    ),
 );
 
 const memberIdsPropSelector = (_, props) => props.memberIds;

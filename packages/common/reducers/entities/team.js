@@ -15,17 +15,9 @@ import {
   REMOVE_TEAM_REQUEST,
   REMOVE_TEAM_SUCCESS,
   REMOVE_TEAM_FAILURE,
-  UPDATE_TEAM_MEMBER_ROLE_REQUEST,
-  UPDATE_TEAM_MEMBER_ROLE_SUCCESS,
-  UPDATE_TEAM_MEMBER_ROLE_FAILURE,
-  ADD_TEAM_MEMBERS_BATCH_REQUEST,
-  ADD_TEAM_MEMBERS_BATCH_SUCCESS,
-  ADD_TEAM_MEMBERS_BATCH_FAILURE,
-  REMOVE_TEAM_MEMBER_REQUEST,
-  REMOVE_TEAM_MEMBER_SUCCESS,
-  REMOVE_TEAM_MEMBER_FAILURE,
   ADD_TEAMS_BATCH,
-  ADD_TEAM_MEMBER,
+  ADD_TEAM_MEMBERS_BATCH,
+  REMOVE_MEMBER_FROM_TEAM,
   CREATE_TEAM_KEYS_REQUEST,
   CREATE_TEAM_KEYS_SUCCESS,
   CREATE_TEAM_KEYS_FAILURE,
@@ -162,36 +154,17 @@ export default createReducer(initialState, {
   [REMOVE_TEAM_FAILURE](state) {
     return state;
   },
-  [UPDATE_TEAM_MEMBER_ROLE_REQUEST](state) {
-    return state;
-  },
-  [UPDATE_TEAM_MEMBER_ROLE_SUCCESS](state, { payload }) {
+  [ADD_TEAMS_BATCH](state, { payload }) {
     return {
       ...state,
       byId: {
         ...state.byId,
-        [payload.teamId]: {
-          ...state.byId[payload.teamId],
-          members: state.byId[payload.teamId].members.map(user =>
-            user.id === payload.userId ? { ...user, role: payload.role } : user,
-          ),
-        },
+        ...payload.teamsById,
       },
     };
   },
-  [UPDATE_TEAM_MEMBER_ROLE_FAILURE](state) {
-    return state;
-  },
-  [ADD_TEAM_MEMBERS_BATCH_REQUEST](state) {
-    return state;
-  },
-  [ADD_TEAM_MEMBERS_BATCH_SUCCESS](state, { payload }) {
-    const {
-      members: membersById = {
-        membersById: {},
-      },
-    } = payload;
-    const memberIds = Object.keys(membersById);
+  [ADD_TEAM_MEMBERS_BATCH](state, { payload }) {
+    const memberIds = Object.keys(payload.membersById);
 
     if (memberIds.length <= 0) return state;
 
@@ -206,13 +179,7 @@ export default createReducer(initialState, {
       },
     };
   },
-  [ADD_TEAM_MEMBERS_BATCH_FAILURE](state) {
-    return state;
-  },
-  [REMOVE_TEAM_MEMBER_REQUEST](state) {
-    return state;
-  },
-  [REMOVE_TEAM_MEMBER_SUCCESS](state, { payload }) {
+  [REMOVE_MEMBER_FROM_TEAM](state, { payload }) {
     return {
       ...state,
       byId: {
@@ -220,35 +187,8 @@ export default createReducer(initialState, {
         [payload.teamId]: {
           ...state.byId[payload.teamId],
           members: state.byId[payload.teamId].members.filter(
-            ({ id }) => id !== payload.userId,
+            id => id !== payload.memberId,
           ),
-        },
-      },
-    };
-  },
-  [REMOVE_TEAM_MEMBER_FAILURE](state) {
-    return state;
-  },
-  [ADD_TEAMS_BATCH](state, { payload }) {
-    return {
-      ...state,
-      byId: {
-        ...state.byId,
-        ...payload.teamsById,
-      },
-    };
-  },
-  [ADD_TEAM_MEMBER](state, { payload }) {
-    return {
-      ...state,
-      byId: {
-        ...state.byId,
-        [payload.teamId]: {
-          ...state.byId[payload.teamId],
-          members: [
-            ...state.byId[payload.teamId].members,
-            { id: payload.userId, role: payload.role },
-          ],
         },
       },
     };

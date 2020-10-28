@@ -10,8 +10,15 @@ import {
   FETCH_TEAM_MEMBERS_SUCCESS,
   FETCH_TEAM_MEMBERS_FAILURE,
   ADD_MEMBERS_BATCH,
-  REMOVE_TEAM_FROM_MEMBER,
-  REMOVE_TEAM_FROM_MEMBERS_BATCH,
+  ADD_TEAM_MEMBERS_BATCH_REQUEST,
+  ADD_TEAM_MEMBERS_BATCH_SUCCESS,
+  ADD_TEAM_MEMBERS_BATCH_FAILURE,
+  UPDATE_TEAM_MEMBER_ROLE_REQUEST,
+  UPDATE_TEAM_MEMBER_ROLE_SUCCESS,
+  UPDATE_TEAM_MEMBER_ROLE_FAILURE,
+  REMOVE_TEAM_MEMBER_REQUEST,
+  REMOVE_TEAM_MEMBER_SUCCESS,
+  REMOVE_TEAM_MEMBER_FAILURE,
   LEAVE_TEAM_SUCCESS,
   LEAVE_TEAM_FAILURE,
   RESET_MEMBER_STATE,
@@ -101,39 +108,58 @@ export default createReducer(initialState, {
       },
     };
   },
-  [REMOVE_TEAM_FROM_MEMBER](state, { payload }) {
+  [ADD_TEAM_MEMBERS_BATCH_REQUEST](state) {
+    return state;
+  },
+  [ADD_TEAM_MEMBERS_BATCH_SUCCESS](state, { payload }) {
+    const {
+      members: membersById = {
+        membersById: {},
+      },
+    } = payload;
+
+    return {
+      ...state,
+      byId: {
+        ...state.byId,
+        ...membersById,
+      },
+    };
+  },
+  [ADD_TEAM_MEMBERS_BATCH_FAILURE](state) {
+    return state;
+  },
+  [UPDATE_TEAM_MEMBER_ROLE_REQUEST](state) {
+    return state;
+  },
+  [UPDATE_TEAM_MEMBER_ROLE_SUCCESS](state, { payload }) {
     return {
       ...state,
       byId: {
         ...state.byId,
         [payload.memberId]: {
           ...state.byId[payload.memberId],
-          teamIds: state.byId[payload.memberId].teamIds.filter(
-            teamId => teamId !== payload.teamId,
-          ),
+          teamRole: payload.teamRole,
         },
       },
     };
   },
-  [REMOVE_TEAM_FROM_MEMBERS_BATCH](state, { payload }) {
+  [UPDATE_TEAM_MEMBER_ROLE_FAILURE](state) {
+    return state;
+  },
+  [REMOVE_TEAM_MEMBER_REQUEST](state) {
+    return state;
+  },
+  [REMOVE_TEAM_MEMBER_SUCCESS](state, { payload }) {
+    const { [payload.memberId]: member, ...rest } = state.byId;
+
     return {
       ...state,
-      byId: {
-        ...state.byId,
-        ...payload.memberIds.reduce(
-          (accumulator, memberId) => ({
-            ...accumulator,
-            [memberId]: {
-              ...state.byId[memberId],
-              teamIds: state.byId[memberId].teamIds.filter(
-                teamId => teamId !== payload.teamId,
-              ),
-            },
-          }),
-          {},
-        ),
-      },
+      byId: rest,
     };
+  },
+  [REMOVE_TEAM_MEMBER_FAILURE](state) {
+    return state;
   },
   [LEAVE_TEAM_SUCCESS](state) {
     return state;

@@ -1,14 +1,10 @@
-/* eslint-disable no-unused-vars */
-import { put, call, takeLatest, select, all } from 'redux-saga/effects';
+import { put, call, takeLatest, select } from 'redux-saga/effects';
 import {
   FETCH_TEAMS_REQUEST,
   FETCH_TEAM_REQUEST,
   CREATE_TEAM_REQUEST,
   EDIT_TEAM_REQUEST,
   REMOVE_TEAM_REQUEST,
-  UPDATE_TEAM_MEMBER_ROLE_REQUEST,
-  ADD_TEAM_MEMBERS_BATCH_REQUEST,
-  REMOVE_TEAM_MEMBER_REQUEST,
   CREATE_TEAM_KEYS_REQUEST,
   TOGGLE_PIN_TEAM_REQUEST,
   fetchTeamsSuccess,
@@ -20,21 +16,11 @@ import {
   editTeamFailure,
   removeTeamSuccess,
   removeTeamFailure,
-  updateTeamMemberRoleSuccess,
-  updateTeamMemberRoleFailure,
-  addTeamMembersBatchSuccess,
-  addTeamMembersBatchFailure,
-  removeTeamMemberSuccess,
-  removeTeamMemberFailure,
   addTeamsBatch,
   togglePinTeamSuccess,
   togglePinTeamFailure,
 } from '@caesar/common/actions/entities/team';
-import {
-  addMembersBatch,
-  removeTeamFromMember,
-  removeTeamFromMembersBatch,
-} from '@caesar/common/actions/entities/member';
+import { addMembersBatch } from '@caesar/common/actions/entities/member';
 import {
   setCurrentTeamId,
   leaveTeam,
@@ -50,13 +36,11 @@ import {
   editTeam,
   deleteTeam,
   getTeam,
-  updateTeamMember,
-  deleteTeamMember,
   postCreateVault,
-  postAddTeamMemberBatch,
   pinTeam,
 } from '@caesar/common/api';
 import { fetchUsersSaga } from '@caesar/common/sagas/entities/user';
+import { addMemberToTeamListsBatchSaga } from '@caesar/common/sagas/entities/member';
 import {
   getServerErrorMessage,
   getServerErrors,
@@ -66,14 +50,8 @@ import {
   convertTeamNodesToEntities,
   convertKeyPairToEntity,
   convertKeyPairToItemEntity,
-  convertMembersToEntity,
 } from '@caesar/common/normalizers/normalizers';
-import {
-  TEAM_ROLES,
-  ENTITY_TYPE,
-  NOOP_NOTIFICATION,
-  TEAM_TYPE,
-} from '@caesar/common/constants';
+import { TEAM_ROLES, ENTITY_TYPE, TEAM_TYPE } from '@caesar/common/constants';
 import { updateGlobalNotification } from '@caesar/common/actions/application';
 import { finishIsLoading } from '@caesar/common/actions/workflow';
 import {
@@ -81,12 +59,10 @@ import {
   encryptSecret,
   generateKeyPair,
 } from '@caesar/common/sagas/entities/item';
-import { teamKeyPairSelector } from '@caesar/common/selectors/keystore';
 import {
   memberAdminsSelector,
   memberSelector,
 } from '../../selectors/entities/member';
-import { usersBatchSelector } from '../../selectors/entities/user';
 import { addTeamKeyPairBatch } from '../../actions/keystore';
 import { createVaultSuccess } from '../../actions/entities/vault';
 
@@ -143,9 +119,8 @@ export function* removeTeamSaga({ payload: { teamId } }) {
 
     yield put(removeTeamSuccess(teamId));
     if (team?.users) {
-      yield put(
-        removeTeamFromMembersBatch(teamId, team.users?.map(({ id }) => id)),
-      );
+      // TODO: Remove members batch
+      // yield put(action(teamId, team.users?.map(({ id }) => id)));
     }
   } catch (error) {
     // eslint-disable-next-line no-console
@@ -201,7 +176,7 @@ export function* createTeamKeyPairSaga({
 5. Add the members to the team
 
 */
-function* encryptMemberTeamKey({ member, keypair }) {
+export function* encryptMemberTeamKey({ member, keypair }) {
   const { id: userId, publicKey } = member;
 
   const itemKeyPair = Object.values(
@@ -221,38 +196,6 @@ function* encryptMemberTeamKey({ member, keypair }) {
     secret,
     teamRole,
   };
-}
-export function* addMemberToTeamListsBatchSaga({ payload: { teamId, users } }) {
-  try {
-    const keypair = yield select(teamKeyPairSelector, { teamId });
-    const userIds = users.map(user => user.id);
-    // Domain users
-    // TODO: Invite unregistered users
-    const newUsers = yield select(usersBatchSelector, { userIds });
-
-    const postDataSagas = newUsers.map(member =>
-      call(encryptMemberTeamKey, { member, keypair }),
-    );
-    const postData = yield all(postDataSagas);
-
-    const { data: serverMembers } = yield call(postAddTeamMemberBatch, {
-      members: postData,
-      teamId,
-    });
-
-    const membersById = convertMembersToEntity(serverMembers);
-    yield put(addTeamMembersBatchSuccess(teamId, membersById));
-    yield put(addMembersBatch(membersById));
-
-    yield put(updateGlobalNotification(NOOP_NOTIFICATION, false));
-  } catch (error) {
-    // eslint-disable-next-line no-console
-    console.error(error);
-    yield put(
-      updateGlobalNotification(getServerErrorMessage(error), false, true),
-    );
-    yield put(addTeamMembersBatchFailure());
-  }
 }
 
 export function* createTeamSaga({
@@ -371,40 +314,6 @@ export function* editTeamSaga({
   }
 }
 
-export function* updateTeamMemberRoleSaga({
-  payload: { teamId, userId, role },
-}) {
-  try {
-    yield call(updateTeamMember, { teamId, userId, role });
-
-    yield put(updateTeamMemberRoleSuccess(teamId, userId, role));
-  } catch (error) {
-    // eslint-disable-next-line no-console
-    console.error(error);
-    yield put(
-      updateGlobalNotification(getServerErrorMessage(error), false, true),
-    );
-    yield put(updateTeamMemberRoleFailure());
-  }
-}
-
-export function* removeTeamMemberSaga({ payload: { teamId, userId } }) {
-  try {
-    yield call(deleteTeamMember, { teamId, userId });
-    yield put(removeTeamMemberSuccess(teamId, userId));
-    yield put(removeTeamFromMember(teamId, userId));
-
-    yield put(updateGlobalNotification(NOOP_NOTIFICATION, false));
-  } catch (error) {
-    // eslint-disable-next-line no-console
-    console.error(error);
-    yield put(
-      updateGlobalNotification(getServerErrorMessage(error), false, true),
-    );
-    yield put(removeTeamMemberFailure());
-  }
-}
-
 export function* togglePinTeamSaga({ payload: { teamId, shouldPinned } }) {
   try {
     const {
@@ -429,11 +338,5 @@ export default function* teamSagas() {
   yield takeLatest(CREATE_TEAM_KEYS_REQUEST, createTeamKeyPairSaga);
   yield takeLatest(EDIT_TEAM_REQUEST, editTeamSaga);
   yield takeLatest(REMOVE_TEAM_REQUEST, removeTeamSaga);
-  yield takeLatest(UPDATE_TEAM_MEMBER_ROLE_REQUEST, updateTeamMemberRoleSaga);
-  yield takeLatest(
-    ADD_TEAM_MEMBERS_BATCH_REQUEST,
-    addMemberToTeamListsBatchSaga,
-  );
-  yield takeLatest(REMOVE_TEAM_MEMBER_REQUEST, removeTeamMemberSaga);
   yield takeLatest(TOGGLE_PIN_TEAM_REQUEST, togglePinTeamSaga);
 }

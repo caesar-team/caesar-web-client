@@ -148,9 +148,9 @@ export const postAddTeamMember = ({ teamId, userId, role, secret }) =>
     teamRole: role,
     secret,
   });
-export const updateTeamMember = ({ teamId, userId, role }) =>
+export const updateTeamMember = ({ teamId, userId, teamRole }) =>
   callApi.patch(`/teams/${teamId}/members/${userId}`, {
-    teamRole: role,
+    teamRole,
   });
 export const deleteTeamMember = ({ teamId, userId }) =>
   callApi.delete(`/teams/${teamId}/members/${userId}`);

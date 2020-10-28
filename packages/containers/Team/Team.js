@@ -9,13 +9,13 @@ import {
   isLoadingTeamsSelector,
   teamSelector,
 } from '@caesar/common/selectors/entities/team';
+import { removeTeamRequest } from '@caesar/common/actions/entities/team';
 import {
   addTeamMembersBatchRequest,
   removeTeamMemberRequest,
   updateTeamMemberRoleRequest,
-  removeTeamRequest,
-} from '@caesar/common/actions/entities/team';
-import { leaveTeamRequest } from '@caesar/common/actions/entities/member';
+  leaveTeamRequest,
+} from '@caesar/common/actions/entities/member';
 import {
   Button,
   SettingsWrapper,
@@ -97,12 +97,12 @@ export const TeamContainer = ({ currentUser, members }) => {
     {};
   const tableData = useMemo(() => members, [members]);
 
-  const handleChangeRole = userId => (_, value) => {
-    dispatch(updateTeamMemberRoleRequest(team.id, userId, value));
+  const handleChangeRole = memberId => (_, value) => {
+    dispatch(updateTeamMemberRoleRequest(memberId, value));
   };
 
-  const handleRemoveMember = userId => () => {
-    dispatch(removeTeamMemberRequest(team.id, userId));
+  const handleRemoveMember = memberId => () => {
+    dispatch(removeTeamMemberRequest(memberId));
   };
 
   const columns = useMemo(

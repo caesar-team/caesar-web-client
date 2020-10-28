@@ -4,7 +4,7 @@ import {
   itemsBatchSelector,
   itemSelector,
 } from '@caesar/common/selectors/entities/item';
-import { currentUserDataSelector } from '@caesar/common/selectors/user';
+import { currentUserDataSelector } from '@caesar/common/selectors/currentUser';
 import {
   shareKeyPairSelector,
   teamKeyPairSelector,

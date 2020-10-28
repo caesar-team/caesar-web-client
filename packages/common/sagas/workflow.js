@@ -1,5 +1,12 @@
-import { put, call, fork, takeLatest, select, all } from 'redux-saga/effects';
-import Router from 'next/router';
+import {
+  put,
+  call,
+  fork,
+  takeLatest,
+  takeEvery,
+  select,
+  all,
+} from 'redux-saga/effects';
 import {
   INIT_WORKFLOW,
   INIT_USERS_SETTINGS,
@@ -726,9 +733,10 @@ function* checkUpdatesForWIP({ payload: { itemsById } }) {
   const oldItem = yield select(workInProgressItemSelector);
   if (oldItem?.id) {
     const newItem = itemsById[(oldItem?.id)];
-    const isData = !!newItem?.data && !!oldItem?.data;
+    if (!newItem?.data) return;
+
     const isChanged = !deepequal(newItem, oldItem);
-    if (isData && isChanged) {
+    if (isChanged) {
       yield put(setWorkInProgressItem(newItem));
     }
   }
@@ -752,5 +760,5 @@ export default function* workflowSagas() {
   yield takeLatest(FINISH_PROCESSING_KEYPAIRS, vaultsReadySaga);
   // Wait for keypairs
   yield takeLatest(OPEN_CURRENT_VAULT, openCurrentVaultSaga);
-  yield takeLatest(ADD_ITEMS_BATCH, checkUpdatesForWIP);
+  yield takeEvery(ADD_ITEMS_BATCH, checkUpdatesForWIP);
 }

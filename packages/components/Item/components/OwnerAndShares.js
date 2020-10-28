@@ -3,7 +3,7 @@ import { useSelector } from 'react-redux';
 import styled from 'styled-components';
 import { PERMISSION } from '@caesar/common/constants';
 import { workInProgressItemOwnerSelector } from '@caesar/common/selectors/workflow';
-import { membersByIdSelector } from '@caesar/common/selectors/entities/member';
+import { membersBatchSelector } from '@caesar/common/selectors/entities/member';
 import { Can } from '../../Ability';
 import { Avatar, AvatarsList } from '../../Avatar';
 import { Icon } from '../../Icon';
@@ -78,19 +78,18 @@ const ShareButton = styled.button`
 
 export const OwnerAndShares = ({
   showShares,
-  invited,
+  invited = [],
   itemSubject,
   onClickShare,
 }) => {
   const owner = useSelector(workInProgressItemOwnerSelector);
-  const membersById = useSelector(membersByIdSelector);
 
-  const hasInvited = invited?.length > 0;
-
-  // TODO: Do not work with data in the component
-  const avatars = hasInvited
-    ? invited.map(invite => membersById[invite.userId])
-    : [];
+  const invitedMembers = useSelector(state =>
+    membersBatchSelector(state, {
+      memberIds: invited || [],
+    }),
+  );
+  const hasInvited = invitedMembers?.length > 0;
 
   return (
     <Wrapper>
@@ -111,7 +110,8 @@ export const OwnerAndShares = ({
             {allowed => (
               <InvitedMembersWrapper resetMargin={!allowed}>
                 {hasInvited ? (
-                  <AvatarsList avatars={avatars} />
+                  // TODO: Why avatars have the member object? The wrong name of property.
+                  <AvatarsList avatars={invitedMembers} />
                 ) : (
                   <NoMembers>
                     <Icon

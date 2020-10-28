@@ -251,3 +251,8 @@ export const getDefaultTeamMembers = () =>
 export const getMovableLists = () => callApi.get(`/lists/movable`);
 
 export const getUserItems = () => callApi.get('/items/all');
+
+export const postAddKeyPairBatch = items =>
+  callApi.post(`/items/batch/keypairs`, {
+    items,
+  });

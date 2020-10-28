@@ -209,8 +209,8 @@ class TeamListContainer extends Component {
     const favoriteTeamCards = this.renderTeamCards(favoriteTeams);
 
     const teamSubject = {
-      __typename: PERMISSION_ENTITY.TEAM,
       ...currentUser?._permissions,
+      __typename: PERMISSION_ENTITY.TEAM,
     };
 
     const teamsLength =

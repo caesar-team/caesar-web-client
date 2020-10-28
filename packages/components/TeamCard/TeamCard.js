@@ -131,14 +131,15 @@ const TeamCardComponent = ({
   onPinTeam = Function.prototype,
 }) => {
   const { id, icon, members, pinned, _permissions } = team || {};
-  const areMembersAvailable = members && members.length > 0;
+  const memberCounter = members?.length || 0;
+  const areMembersAvailable = memberCounter > 0;
   const teamMembers = useSelector(state =>
     teamMembersFullViewSelector(state, { teamId: id }),
   );
 
   const isCurrentUserTeamMember = useMemo(
-    () => !!members.find(member => member.userId === userId),
-    [members],
+    () => !!teamMembers.find(member => member.userId === userId),
+    [teamMembers],
   );
   const canEditTeam = ability.can(PERMISSION.EDIT, _permissions);
   const canRemoveTeam = ability.can(PERMISSION.DELETE, _permissions);
@@ -197,8 +198,8 @@ const TeamCardComponent = ({
               <TeamName>{getTeamTitle(team)}</TeamName>
               {areMembersAvailable && (
                 <TeamMembers>
-                  {members.length}{' '}
-                  {getPlural(members.length, ['member', 'members'])}
+                  {memberCounter}{' '}
+                  {getPlural(memberCounter, ['member', 'members'])}
                 </TeamMembers>
               )}
             </TeamInfo>

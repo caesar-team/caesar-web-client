@@ -98,7 +98,7 @@ import {
 import { passwordGenerator } from '@caesar/common/utils/passwordGenerator';
 import { generateKeys } from '@caesar/common/utils/key';
 import { addSystemItemsBatch } from '@caesar/common/actions/entities/system';
-import { memberSelector } from '../../selectors/entities/member';
+import { userSelector } from '../../selectors/entities/user';
 import {
   convertItemsToEntities,
   convertKeyPairToEntity,
@@ -549,7 +549,7 @@ export function* createIfNotExistKeyPair({ payload: { teamId, ownerId } }) {
   const currentUser = yield select(currentUserDataSelector);
   const userId = ownerId || currentUser.id;
 
-  const owner = yield select(memberSelector, { memberId: userId });
+  const owner = yield select(userSelector, { userId });
   const { publicKey } = owner;
 
   const systemKeyPairItem = yield select(teamKeyPairSelector, {
@@ -686,15 +686,17 @@ export function* createItemsBatchSaga({
       keyPair.publicKey,
     );
 
-    const preparedForRequestItems = items.map(({ type, name: title }, index) => ({
-      type,
-      listId,
-      title,
-      secret: JSON.stringify({
-        data: encryptedItems[index],
-        raws: null,
+    const preparedForRequestItems = items.map(
+      ({ type, name: title }, index) => ({
+        type,
+        listId,
+        title,
+        secret: JSON.stringify({
+          data: encryptedItems[index],
+          raws: null,
+        }),
       }),
-    }));
+    );
 
     const { data } = yield call(postCreateItemsBatch, {
       items: preparedForRequestItems,

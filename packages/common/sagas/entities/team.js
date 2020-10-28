@@ -59,8 +59,10 @@ import {
   encryptSecret,
   generateKeyPair,
 } from '@caesar/common/sagas/entities/item';
-import { memberAdminsSelector } from '../../selectors/entities/member';
-import { userSelector } from '../../selectors/entities/user';
+import {
+  userSelector,
+  userAdminsSelector,
+} from '../../selectors/entities/user';
 import { addTeamKeyPairBatch } from '../../actions/keystore';
 import { createVaultSuccess } from '../../actions/entities/vault';
 
@@ -209,7 +211,7 @@ export function* createTeamSaga({
 
     // Get updates
     yield call(fetchUsersSaga);
-    const adminMembers = yield select(memberAdminsSelector);
+    const adminMembers = yield select(userAdminsSelector);
     // Gathering admins except current
     const adminsToInvite = adminMembers.filter(({ id }) => id !== userId);
 
@@ -273,7 +275,7 @@ export function* createTeamSaga({
       yield call(addMemberToTeamListsBatchSaga, {
         payload: {
           teamId: serverTeam?.id,
-          members: adminsToInvite,
+          users: adminsToInvite,
         },
       });
     }

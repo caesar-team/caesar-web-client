@@ -97,10 +97,8 @@ import {
   teamSelector,
 } from '@caesar/common/selectors/entities/team';
 import { ADD_KEYPAIRS_BATCH } from '../actions/entities/keypair';
-import {
-  memberSelector,
-  teamMembersFullViewSelector,
-} from '../selectors/entities/member';
+import { teamMembersFullViewSelector } from '../selectors/entities/member';
+import { userSelector } from '../selectors/entities/user';
 import { fetchTeamMembersRequest } from '../actions/entities/member';
 
 export function decryptItemsByItemIdKeys(items, keyPairs) {
@@ -198,7 +196,7 @@ function* checkTeamPermissionsAndKeys(teamId, createKeyPair = false) {
       return false;
     }
 
-    const { publicKey } = yield select(memberSelector, { memberId: ownerId });
+    const { publicKey } = yield select(userSelector, { userId: ownerId });
 
     // eslint-disable-next-line no-console
     console.warn(

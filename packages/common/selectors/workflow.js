@@ -6,7 +6,7 @@ import {
   favoritesListSelector,
 } from '@caesar/common/selectors/entities/list';
 import { itemsByIdSelector } from '@caesar/common/selectors/entities/item';
-import { membersByIdSelector } from '@caesar/common/selectors/entities/member';
+import { usersByIdSelector } from '@caesar/common/selectors/entities/user';
 import { teamsByIdSelector } from '@caesar/common/selectors/entities/team';
 import { isGeneralItem } from '../utils/item';
 
@@ -51,10 +51,10 @@ export const workInProgressItemSelector = createSelector(
 
 export const workInProgressItemOwnerSelector = createSelector(
   workInProgressItemSelector,
-  membersByIdSelector,
-  (workInProgressItem, membersById) =>
-    workInProgressItem && Object.values(membersById).length
-      ? membersById[workInProgressItem.ownerId]
+  usersByIdSelector,
+  (workInProgressItem, usersById) =>
+    workInProgressItem && Object.values(usersById).length
+      ? usersById[workInProgressItem.ownerId]
       : null,
 );
 
@@ -92,9 +92,9 @@ export const workInProgressItemsSelector = createSelector(
 
 export const workInProgressItemSharedMembersSelector = createSelector(
   workInProgressItemSelector,
-  membersByIdSelector,
-  (workInProgressItem, membersById) =>
-    workInProgressItem?.invited?.map(({ userId }) => membersById[userId]) || [],
+  usersByIdSelector,
+  (workInProgressItem, usersById) =>
+    workInProgressItem?.invited?.map(({ userId }) => usersById[userId]) || [],
 );
 
 const createListItemsList = (children, itemsById) =>

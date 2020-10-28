@@ -46,14 +46,6 @@ export const membersBatchSelector = createSelector(
   (membersById, memberIds) => memberIds.map(memberId => membersById[memberId]),
 );
 
-export const memberAdminsSelector = createSelector(
-  memberListSelector,
-  membersList =>
-    membersList.filter(({ domainRoles }) =>
-      domainRoles?.includes(DOMAIN_ROLES.ROLE_ADMIN),
-    ),
-);
-
 export const teamMembersShortViewSelector = createSelector(
   membersByIdSelector,
   teamsByIdSelector,

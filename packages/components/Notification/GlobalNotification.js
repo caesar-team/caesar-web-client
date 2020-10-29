@@ -6,7 +6,7 @@ import { Icon } from '../Icon';
 const Wrapper = styled.div`
   background-color: ${({ isError, theme }) =>
     isError ? theme.color.snow : theme.color.emperor};
-  position: absolute;
+  position: fixed;
   bottom: 10px;
   right: 60px;
   z-index: ${({ theme }) => theme.zIndex.notification};

@@ -1,5 +1,4 @@
 import { createSelector } from 'reselect';
-import { DOMAIN_ROLES } from '../../constants';
 import { usersByIdSelector, userIdPropSelector } from './user';
 import { teamsByIdSelector, teamIdPropSelector } from './team';
 

@@ -5,10 +5,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import { useRouter } from 'next/router';
 import styled from 'styled-components';
 import { isLoadingSelector } from '@caesar/common/selectors/workflow';
-import {
-  isLoadingTeamsSelector,
-  teamSelector,
-} from '@caesar/common/selectors/entities/team';
+import { isLoadingTeamsSelector } from '@caesar/common/selectors/entities/team';
 import { removeTeamRequest } from '@caesar/common/actions/entities/team';
 import { leaveTeamRequest } from '@caesar/common/actions/currentUser';
 import {

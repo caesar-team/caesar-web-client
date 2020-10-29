@@ -5,17 +5,14 @@ import { useSelector, useDispatch } from 'react-redux';
 import { useRouter } from 'next/router';
 import styled from 'styled-components';
 import { isLoadingSelector } from '@caesar/common/selectors/workflow';
-import {
-  isLoadingTeamsSelector,
-  teamSelector,
-} from '@caesar/common/selectors/entities/team';
+import { isLoadingTeamsSelector } from '@caesar/common/selectors/entities/team';
+import { removeTeamRequest } from '@caesar/common/actions/entities/team';
+import { leaveTeamRequest } from '@caesar/common/actions/currentUser';
 import {
   addTeamMembersBatchRequest,
   removeTeamMemberRequest,
   updateTeamMemberRoleRequest,
-  removeTeamRequest,
-} from '@caesar/common/actions/entities/team';
-import { leaveTeamRequest } from '@caesar/common/actions/entities/member';
+} from '@caesar/common/actions/entities/member';
 import {
   Button,
   SettingsWrapper,
@@ -50,7 +47,7 @@ const AddMemberButton = styled(ButtonStyled)`
   margin-right: 0;
 `;
 
-export const TeamContainer = ({ user, members }) => {
+export const TeamContainer = ({ currentUser, team, members }) => {
   const router = useRouter();
   const dispatch = useDispatch();
   const [modalVisibilities, setModalVisibilities] = useState({
@@ -92,17 +89,14 @@ export const TeamContainer = ({ user, members }) => {
     return () => tableRowGroupNode.removeEventListener('scroll', handler);
   }, [tableRowGroupNode]);
 
-  const team =
-    useSelector(state => teamSelector(state, { teamId: router.query.id })) ||
-    {};
   const tableData = useMemo(() => members, [members]);
 
-  const handleChangeRole = userId => (_, value) => {
-    dispatch(updateTeamMemberRoleRequest(team.id, userId, value));
+  const handleChangeRole = memberId => (_, value) => {
+    dispatch(updateTeamMemberRoleRequest(memberId, value));
   };
 
-  const handleRemoveMember = userId => () => {
-    dispatch(removeTeamMemberRequest(team.id, userId));
+  const handleRemoveMember = memberId => () => {
+    dispatch(removeTeamMemberRequest(memberId));
   };
 
   const columns = useMemo(
@@ -131,8 +125,8 @@ export const TeamContainer = ({ user, members }) => {
     });
   };
 
-  const handleInvite = invitedMembers => {
-    dispatch(addTeamMembersBatchRequest(team.id, invitedMembers));
+  const handleInvite = invitedUsers => {
+    dispatch(addTeamMembersBatchRequest(team.id, invitedUsers));
     handleCloseModal(INVITE_MEMBER_MODAL)();
   };
 
@@ -163,6 +157,7 @@ export const TeamContainer = ({ user, members }) => {
       false,
   };
 
+  const mayAddMember = !team.locked;
   const isDomainTeam =
     team.type === TEAM_TYPE.DEFAULT ||
     team.title?.toLowerCase() === TEAM_TYPE.DEFAULT;
@@ -191,16 +186,18 @@ export const TeamContainer = ({ user, members }) => {
               />
             )}
           </Can>
-          <Can I={PERMISSION.ADD} a={teamMemberSubject}>
-            <AddMemberButton
-              withOfflineCheck
-              onClick={handleOpenModal(INVITE_MEMBER_MODAL)}
-              icon="plus"
-              color="black"
-            >
-              Add a member
-            </AddMemberButton>
-          </Can>
+          {mayAddMember && (
+            <Can I={PERMISSION.ADD} a={teamMemberSubject}>
+              <AddMemberButton
+                withOfflineCheck
+                onClick={handleOpenModal(INVITE_MEMBER_MODAL)}
+                icon="plus"
+                color="black"
+              >
+                Add a member
+              </AddMemberButton>
+            </Can>
+          )}
         </>
       }
     >
@@ -221,9 +218,9 @@ export const TeamContainer = ({ user, members }) => {
       </Table.Main>
       {modalVisibilities[INVITE_MEMBER_MODAL] && (
         <InviteModal
-          user={user}
+          currentUser={currentUser}
           teamId={team.id}
-          invitedMembers={members}
+          members={members}
           onRemoveMember={handleRemoveMember}
           onCancel={handleCloseModal(INVITE_MEMBER_MODAL)}
           onSubmit={handleInvite}

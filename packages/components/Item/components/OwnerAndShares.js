@@ -3,7 +3,7 @@ import { useSelector } from 'react-redux';
 import styled from 'styled-components';
 import { PERMISSION } from '@caesar/common/constants';
 import { workInProgressItemOwnerSelector } from '@caesar/common/selectors/workflow';
-import { membersBatchSelector } from '@caesar/common/selectors/entities/member';
+import { usersBatchSelector } from '@caesar/common/selectors/entities/user';
 import { Can } from '../../Ability';
 import { Avatar, AvatarsList } from '../../Avatar';
 import { Icon } from '../../Icon';
@@ -83,13 +83,14 @@ export const OwnerAndShares = ({
   onClickShare,
 }) => {
   const owner = useSelector(workInProgressItemOwnerSelector);
+  console.log('owner: ', owner);
 
-  const invitedMembers = useSelector(state =>
-    membersBatchSelector(state, {
-      memberIds: invited || [],
+  const invitedUsers = useSelector(state =>
+    usersBatchSelector(state, {
+      userIds: invited || [],
     }),
   );
-  const hasInvited = invitedMembers?.length > 0;
+  const hasInvited = invitedUsers?.length > 0;
 
   return (
     <Wrapper>
@@ -111,7 +112,7 @@ export const OwnerAndShares = ({
               <InvitedMembersWrapper resetMargin={!allowed}>
                 {hasInvited ? (
                   // TODO: Why avatars have the member object? The wrong name of property.
-                  <AvatarsList avatars={invitedMembers} />
+                  <AvatarsList avatars={invitedUsers} />
                 ) : (
                   <NoMembers>
                     <Icon

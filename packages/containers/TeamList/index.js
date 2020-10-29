@@ -1,6 +1,9 @@
 import { connect } from 'react-redux';
 import { createStructuredSelector } from 'reselect';
-import { fetchKeyPairRequest } from '@caesar/common/actions/user';
+import {
+  fetchKeyPairRequest,
+  leaveTeamRequest,
+} from '@caesar/common/actions/currentUser';
 import {
   createTeamRequest,
   editTeamRequest,
@@ -8,20 +11,15 @@ import {
   togglePinTeamRequest,
 } from '@caesar/common/actions/entities/team';
 import {
-  fetchMembersRequest,
-  leaveTeamRequest,
-} from '@caesar/common/actions/entities/member';
-import {
   isLoadingTeamsSelector,
   teamSortedListSelector,
 } from '@caesar/common/selectors/entities/team';
 import {
-  userDataSelector,
-  userTeamListSelector,
+  currentUserDataSelector,
+  currentUserTeamListSelector,
   isUserDomainAdminSelector,
   isUserDomainAdminOrManagerSelector,
-} from '@caesar/common/selectors/user';
-import { memberListSelector } from '@caesar/common/selectors/entities/member';
+} from '@caesar/common/selectors/currentUser';
 import { isLoadingSelector } from '@caesar/common/selectors/workflow';
 import { TeamList } from './TeamList';
 
@@ -29,16 +27,14 @@ const mapStateToProps = createStructuredSelector({
   isLoading: isLoadingSelector,
   isLoadingTeams: isLoadingTeamsSelector,
   teams: teamSortedListSelector,
-  user: userDataSelector,
-  userTeamList: userTeamListSelector,
+  currentUser: currentUserDataSelector,
+  userTeamList: currentUserTeamListSelector,
   isDomainAdmin: isUserDomainAdminSelector,
   isDomainAdminOrManager: isUserDomainAdminOrManagerSelector,
-  members: memberListSelector,
 });
 
 const mapDispatchToProps = {
   fetchKeyPairRequest,
-  fetchMembersRequest,
   createTeamRequest,
   editTeamRequest,
   leaveTeamRequest,

@@ -4,7 +4,7 @@ import { useSelector } from 'react-redux';
 import { TEAM_TYPE } from '@caesar/common/constants';
 import { sortByName } from '@caesar/common/utils/utils';
 import { transformListTitle } from '@caesar/common/utils/string';
-import { userVaultListSelector } from '@caesar/common/selectors/user';
+import { currentUserVaultListSelector } from '@caesar/common/selectors/currentUser';
 import { teamsByIdSelector } from '@caesar/common/selectors/entities/team';
 import { getTeamTitle } from '@caesar/common/utils/team';
 import { getMovableLists } from '../api';
@@ -15,7 +15,7 @@ const getListTitle = (listId, lists) =>
 export const useItemVaultAndListOptions = ({ teamId = null, listId }) => {
   // TODO: Hot fix for [CAES-1329]
   const vaults =
-    useSelector(userVaultListSelector).filter(
+    useSelector(currentUserVaultListSelector).filter(
       vault => typeof vault !== 'undefined',
     ) || [];
   const teamsById = useSelector(teamsByIdSelector);

@@ -8,7 +8,7 @@ import {
   PERMISSION_ENTITY,
   TEAM_TYPE,
 } from '@caesar/common/constants';
-import { currentTeamSelector } from '@caesar/common/selectors/user';
+import { currentTeamSelector } from '@caesar/common/selectors/currentUser';
 import { useListItemCounter } from '@caesar/common/hooks';
 import {
   personalListsByTypeSelector,

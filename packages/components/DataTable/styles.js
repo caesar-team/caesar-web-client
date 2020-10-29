@@ -72,6 +72,10 @@ const EmailCell = styled.div`
   color: ${({ theme }) => theme.color.gray};
 `;
 
+const RoleCell = styled.div`
+  padding: 0 16px;
+`;
+
 const DropdownCell = styled(Cell)`
   width: 100%;
   overflow: initial;
@@ -89,6 +93,7 @@ export const TableStyles = {
   HeaderInput,
   Cell,
   EmailCell,
+  RoleCell,
   DropdownCell,
   MenuCell,
   SearchIcon,

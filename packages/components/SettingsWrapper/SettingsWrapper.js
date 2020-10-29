@@ -18,7 +18,7 @@ const Wrapper = styled.div`
   display: flex;
   flex-direction: column;
   width: calc(100% - 287px);
-  padding: ${({ isCompact }) => isCompact ? '12px 40px' : '40px'};
+  padding: ${({ isCompact }) => (isCompact ? '12px 40px' : '40px')};
   background: ${({ theme }) => theme.color.alto};
 `;
 
@@ -27,7 +27,7 @@ const TopWrapper = styled.div`
   justify-content: space-between;
   align-items: center;
   width: 100%;
-  margin-bottom: ${({ isCompact }) => isCompact ? '16px' : '30px'};
+  margin-bottom: ${({ isCompact }) => (isCompact ? '16px' : '30px')};
 `;
 
 const Title = styled.div`

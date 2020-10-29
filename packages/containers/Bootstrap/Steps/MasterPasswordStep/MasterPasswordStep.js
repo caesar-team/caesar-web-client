@@ -34,7 +34,7 @@ const isSameKeyPair = (oldKeyPair, currentKeyPair) =>
 const MasterPasswordStepComponent = ({
   initialStep,
   navigationSteps,
-  user,
+  currentUser,
   masterPassword: masterPasswordProp,
   sharedMasterPassword,
   onFinish,
@@ -171,7 +171,7 @@ const MasterPasswordStepComponent = ({
           currentEncryptedPrivateKey,
         );
       } else {
-        const data = await generateKeys(confirmPassword, [user.email]);
+        const data = await generateKeys(confirmPassword, [currentUser.email]);
 
         // eslint-disable-next-line
         publicKey = data.publicKey;
@@ -255,11 +255,11 @@ const MasterPasswordStepComponent = ({
       <Head title="Master Password" />
       {state.step === MASTER_PASSWORD_CHECK ? (
         <MasterPasswordCheckForm
-          user={user}
+          currentUser={currentUser}
           onSubmit={handleSubmitCheckPassword}
         />
       ) : (
-        <BootstrapLayout user={user}>
+        <BootstrapLayout currentUser={currentUser}>
           <NavigationPanelStyled
             currentStep={state.step}
             steps={navigationSteps}

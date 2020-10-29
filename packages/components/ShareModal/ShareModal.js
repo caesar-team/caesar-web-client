@@ -4,7 +4,7 @@ import { useSelector } from 'react-redux';
 import copy from 'copy-text-to-clipboard';
 import styled from 'styled-components';
 import { useNotification } from '@caesar/common/hooks';
-import { userDataSelector } from '@caesar/common/selectors/user';
+import { currentUserDataSelector } from '@caesar/common/selectors/currentUser';
 import { Modal, ModalTitle } from '../Modal';
 import { UserSearchInput } from '../Input';
 import { Section } from '../Section';
@@ -89,7 +89,7 @@ export const ShareModal = ({
   const [isOpenedInvited, setOpenedInvited] = useState(false);
   const [link, setLink] = useState(null);
   const [isGeneratingLink, setGeneratingLink] = useState(false);
-  const user = useSelector(userDataSelector);
+  const currentUser = useSelector(currentUserDataSelector);
   const notification = useNotification();
 
   const handleAddMember = member => {
@@ -147,7 +147,7 @@ export const ShareModal = ({
   }, [anonymousLink]);
 
   const searchedBlackListMemberIds = [
-    user.id,
+    currentUser.id,
     ...members.map(({ id }) => id),
     ...sharedMembers.map(({ id }) => id),
   ];

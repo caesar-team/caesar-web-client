@@ -22,7 +22,7 @@ const shareItemSchema = (
   },
 ) =>
   new schema.Entity(
-    'byId',
+    'shareItemById',
     {},
     {
       processStrategy: entity => ({

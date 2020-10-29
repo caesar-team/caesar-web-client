@@ -40,6 +40,9 @@ const StyledWarningIcon = styled(Icon)`
   margin-right: 16px;
 `;
 const sortTeams = (a, b) => {
+  if (a.title.toLowerCase() === TEAM_TYPE.PERSONAL) return -1;
+  if (b.title.toLowerCase() === TEAM_TYPE.PERSONAL) return 1;
+
   if (a.title.toLowerCase() === TEAM_TYPE.DEFAULT) return 1;
   if (b.title.toLowerCase() === TEAM_TYPE.DEFAULT) return -1;
 

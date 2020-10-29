@@ -216,10 +216,10 @@ export const createItemsBatchRequest = (items, listId, setSubmitting) => ({
   },
 });
 
-export const createItemsBatchSuccess = items => ({
+export const createItemsBatchSuccess = itemsById => ({
   type: CREATE_ITEMS_BATCH_SUCCESS,
   payload: {
-    items,
+    itemsById,
   },
 });
 

@@ -31,6 +31,7 @@ import {
 import { shareItemBatchSaga } from '@caesar/common/sagas/common/share';
 import {
   addItemToList,
+  addItemsBatchToList,
   moveItemToList,
   moveItemsBatchToList,
   removeItemFromList,
@@ -706,8 +707,10 @@ export function* createItemsBatchSaga({
       data: preparedForEncryptingItems[index],
     }));
     const { itemsById } = convertItemsToEntities(preparedForStoreItems);
+    const itemIds = Object.keys(itemsById);
 
     yield put(createItemsBatchSuccess(itemsById));
+    yield put(addItemsBatchToList(itemIds, listId));
     yield put(updateGlobalNotification(NOOP_NOTIFICATION, false));
   } catch (error) {
     // eslint-disable-next-line no-console

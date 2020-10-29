@@ -50,7 +50,7 @@ const AddMemberButton = styled(ButtonStyled)`
   margin-right: 0;
 `;
 
-export const TeamContainer = ({ currentUser, members }) => {
+export const TeamContainer = ({ currentUser, team, members }) => {
   const router = useRouter();
   const dispatch = useDispatch();
   const [modalVisibilities, setModalVisibilities] = useState({
@@ -92,9 +92,6 @@ export const TeamContainer = ({ currentUser, members }) => {
     return () => tableRowGroupNode.removeEventListener('scroll', handler);
   }, [tableRowGroupNode]);
 
-  const team =
-    useSelector(state => teamSelector(state, { teamId: router.query.id })) ||
-    {};
   const tableData = useMemo(() => members, [members]);
 
   const handleChangeRole = memberId => (_, value) => {
@@ -163,6 +160,7 @@ export const TeamContainer = ({ currentUser, members }) => {
       false,
   };
 
+  const mayAddMember = !team.locked;
   const isDomainTeam =
     team.type === TEAM_TYPE.DEFAULT ||
     team.title?.toLowerCase() === TEAM_TYPE.DEFAULT;
@@ -191,16 +189,18 @@ export const TeamContainer = ({ currentUser, members }) => {
               />
             )}
           </Can>
-          <Can I={PERMISSION.ADD} a={teamMemberSubject}>
-            <AddMemberButton
-              withOfflineCheck
-              onClick={handleOpenModal(INVITE_MEMBER_MODAL)}
-              icon="plus"
-              color="black"
-            >
-              Add a member
-            </AddMemberButton>
-          </Can>
+          {mayAddMember && (
+            <Can I={PERMISSION.ADD} a={teamMemberSubject}>
+              <AddMemberButton
+                withOfflineCheck
+                onClick={handleOpenModal(INVITE_MEMBER_MODAL)}
+                icon="plus"
+                color="black"
+              >
+                Add a member
+              </AddMemberButton>
+            </Can>
+          )}
         </>
       }
     >

@@ -1,3 +1,4 @@
+import { omit } from 'lodash';
 import { createReducer } from '@caesar/common/utils/reducer';
 import {
   CREATE_MEMBER_REQUEST,
@@ -19,6 +20,7 @@ import {
   REMOVE_TEAM_MEMBER_REQUEST,
   REMOVE_TEAM_MEMBER_SUCCESS,
   REMOVE_TEAM_MEMBER_FAILURE,
+  REMOVE_TEAM_MEMBERS_BATCH,
   RESET_MEMBER_STATE,
 } from '@caesar/common/actions/entities/member';
 
@@ -158,6 +160,14 @@ export default createReducer(initialState, {
   },
   [REMOVE_TEAM_MEMBER_FAILURE](state) {
     return state;
+  },
+  [REMOVE_TEAM_MEMBERS_BATCH](state, { payload }) {
+    const byId = omit(state.byId, payload.memberIds);
+
+    return {
+      ...state,
+      byId,
+    };
   },
   [RESET_MEMBER_STATE]() {
     return initialState;

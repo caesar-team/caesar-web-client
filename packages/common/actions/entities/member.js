@@ -32,6 +32,7 @@ export const UPDATE_TEAM_MEMBER_ROLE_FAILURE =
 export const REMOVE_TEAM_MEMBER_REQUEST = '@member/REMOVE_TEAM_MEMBER_REQUEST';
 export const REMOVE_TEAM_MEMBER_SUCCESS = '@member/REMOVE_TEAM_MEMBER_SUCCESS';
 export const REMOVE_TEAM_MEMBER_FAILURE = '@member/REMOVE_TEAM_MEMBER_FAILURE';
+export const REMOVE_TEAM_MEMBERS_BATCH = '@member/REMOVE_TEAM_MEMBERS_BATCH';
 
 export const RESET_MEMBER_STATE = '@member/RESET_MEMBER_STATE';
 
@@ -157,6 +158,13 @@ export const removeTeamMemberSuccess = memberId => ({
 
 export const removeTeamMemberFailure = () => ({
   type: REMOVE_TEAM_MEMBER_FAILURE,
+});
+
+export const removeTeamMembersBatch = memberIds => ({
+  type: REMOVE_TEAM_MEMBERS_BATCH,
+  payload: {
+    memberIds,
+  },
 });
 
 export const resetMemberState = () => ({

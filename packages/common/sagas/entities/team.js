@@ -20,7 +20,10 @@ import {
   togglePinTeamSuccess,
   togglePinTeamFailure,
 } from '@caesar/common/actions/entities/team';
-import { addMembersBatch } from '@caesar/common/actions/entities/member';
+import {
+  addMembersBatch,
+  removeTeamMembersBatch,
+} from '@caesar/common/actions/entities/member';
 import {
   setCurrentTeamId,
   leaveTeamSuccess,
@@ -119,9 +122,8 @@ export function* removeTeamSaga({ payload: { teamId } }) {
     }
 
     yield put(removeTeamSuccess(teamId));
-    if (team?.users) {
-      // TODO: Remove members batch
-      // yield put(action(teamId, team.users?.map(({ id }) => id)));
+    if (team?.members) {
+      yield put(removeTeamMembersBatch(team?.members));
     }
   } catch (error) {
     // eslint-disable-next-line no-console

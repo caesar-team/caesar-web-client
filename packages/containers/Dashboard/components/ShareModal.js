@@ -28,10 +28,6 @@ export const ShareModal = ({
   const workInProgressItemSharedMembers = useSelector(
     workInProgressItemSharedMembersSelector,
   );
-  console.log(
-    'workInProgressItemSharedMembers: ',
-    workInProgressItemSharedMembers,
-  );
 
   const isMultiItem = workInProgressItemIds?.length > 0;
   const availableTeamsForSharing = userTeamList.filter(

@@ -9,7 +9,11 @@ import {
   Can,
   TableStyles as Table,
 } from '@caesar/components';
-import { PERMISSION, PERMISSION_ENTITY } from '@caesar/common/constants';
+import {
+  PERMISSION,
+  PERMISSION_ENTITY,
+  TEAM_ROLES_LABELS,
+} from '@caesar/common/constants';
 import {
   OPTIONS,
   ROLE_COLUMN_WIDTH,
@@ -133,7 +137,7 @@ export const createColumns = ({
             />
           </Can>
           <Can not I={PERMISSION.EDIT} of={getTeamMemberSubject(original)}>
-            {value}
+            {TEAM_ROLES_LABELS[value]}
           </Can>
         </Table.DropdownCell>
       );

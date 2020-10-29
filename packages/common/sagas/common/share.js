@@ -1,6 +1,9 @@
 import { call, select, all, takeLatest, put } from '@redux-saga/core/effects';
 import { getOrCreateMemberBatchSaga } from '@caesar/common/sagas/entities/member';
-import { itemsBatchSelector } from '@caesar/common/selectors/entities/item';
+import {
+  itemsBatchSelector,
+  itemSelector,
+} from '@caesar/common/selectors/entities/item';
 import { userDataSelector } from '@caesar/common/selectors/user';
 import {
   shareKeyPairSelector,
@@ -8,9 +11,8 @@ import {
 } from '@caesar/common/selectors/keystore';
 import {
   NOOP_NOTIFICATION,
-  ROLE_USER,
   SHARING_IN_PROGRESS_NOTIFICATION,
-  ROLE_ADMIN,
+  DOMAIN_ROLES,
   TEAM_TYPE,
 } from '@caesar/common/constants';
 import {
@@ -35,13 +37,18 @@ import { convertSystemItemToKeyPair } from '../../utils/item';
 import { getItem, getPublicKeyByEmailBatch, postItemShare } from '../../api';
 import { uuid4 } from '../../utils/uuid4';
 import { teamDefaultListSelector } from '../../selectors/entities/list';
-import { convertKeyPairToItemEntity } from '../../normalizers/normalizers';
+import {
+  convertItemsToEntities,
+  convertKeyPairToItemEntity,
+} from '../../normalizers/normalizers';
 
 export function* prepareUsersForSharing(members) {
   const emailRolePairs = members.map(({ email, domainRoles }) => ({
     email,
     role:
-      (domainRoles?.includes(ROLE_ADMIN) ? ROLE_ADMIN : ROLE_USER) || ROLE_USER,
+      (domainRoles?.includes(DOMAIN_ROLES.ROLE_ADMIN)
+        ? DOMAIN_ROLES.ROLE_ADMIN
+        : DOMAIN_ROLES.ROLE_USER) || DOMAIN_ROLES.ROLE_USER,
   }));
 
   return yield call(getOrCreateMemberBatchSaga, {
@@ -178,6 +185,17 @@ function* processMembersItemShare({ item, members }) {
     users: memberSecrets,
   });
 }
+export function* updateSharedItemFromServer({ payload: { itemId } }) {
+  const { data: itemFromServer } = yield call(getItem, itemId);
+  const itemFromState = yield select(itemSelector, { itemId });
+  const updatedItem = {
+    ...itemFromState,
+    invited: itemFromServer?.invited,
+    isShared: true,
+  };
+
+  return updatedItem;
+}
 
 // 1. Find or create the system keyPair item
 // 2. ReCrypt the item and update it with the system keyPair item
@@ -199,27 +217,17 @@ export function* shareItemBatchSaga({
       ),
     );
 
-    const workInProgressItem = yield select(workInProgressItemSelector);
-    if (workInProgressItem?.id) {
-      const { data: workInProgressItemFromServer } = yield call(
-        getItem,
-        workInProgressItem?.id,
-      );
+    const updateSharedItemsFromServer = yield all(
+      itemIds.map(itemId =>
+        call(updateSharedItemFromServer, {
+          payload: { itemId },
+        }),
+      ),
+    );
 
-      const updatedItem = {
-        ...workInProgressItem,
-        invited: workInProgressItemFromServer?.invited,
-        isShared: true,
-      };
+    const { itemsById } = convertItemsToEntities(updateSharedItemsFromServer);
+    yield put(addItemsBatch(itemsById));
 
-      if (updatedItem.id) {
-        yield put(
-          addItemsBatch({
-            [updatedItem.id]: updatedItem,
-          }),
-        );
-      }
-    }
     yield put(updateGlobalNotification(NOOP_NOTIFICATION, false));
   } catch (error) {
     // eslint-disable-next-line no-console

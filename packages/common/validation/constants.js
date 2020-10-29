@@ -22,7 +22,6 @@ export const ERROR = {
   INCORRECT_CREDENTIALS: 'Incorrect credentials',
 };
 
-
 export const GOOD_PASSWORD_RULES = [
   ...REGEXP_TEXT_MATCH,
   {

@@ -83,8 +83,6 @@ export const OwnerAndShares = ({
   onClickShare,
 }) => {
   const owner = useSelector(workInProgressItemOwnerSelector);
-  console.log('owner: ', owner);
-
   const invitedUsers = useSelector(state =>
     usersBatchSelector(state, {
       userIds: invited || [],

@@ -121,7 +121,7 @@ export const ListItem = ({
 
   const handleClickAcceptEdit = () => {
     if (isAcceptDisabled) {
-      return false;
+      return;
     }
 
     if (isCreatingMode) {

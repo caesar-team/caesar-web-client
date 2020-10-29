@@ -59,6 +59,7 @@ export const Option = styled.div`
     isDisabled ? theme.color.lightGray : theme.color.black};
   background-color: ${({ theme }) => theme.color.white};
   cursor: ${({ isDisabled }) => (isDisabled ? 'default' : 'pointer')};
+  white-space: nowrap;
   transition: background-color 0.2s;
 
   &:hover {

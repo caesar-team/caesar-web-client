@@ -13,12 +13,9 @@ import {
   SORT_LIST_SUCCESS,
   SORT_LIST_FAILURE,
   ADD_LISTS_BATCH,
-  ADD_ITEM_TO_LIST,
-  ADD_ITEMS_BATCH_TO_LIST,
-  MOVE_ITEM_TO_LIST,
-  MOVE_ITEMS_BATCH_TO_LIST,
-  REMOVE_ITEM_FROM_LIST,
-  REMOVE_ITEMS_BATCH_FROM_LIST,
+  ADD_ITEM_IDS_TO_LIST,
+  MOVE_ITEM_IDS_TO_LIST,
+  REMOVE_ITEM_IDS_FROM_LIST,
   RESET_LIST_STATE,
 } from '@caesar/common/actions/entities/list';
 
@@ -97,22 +94,7 @@ export default createReducer(initialState, {
       },
     };
   },
-  [ADD_ITEM_TO_LIST](state, { payload }) {
-    return {
-      ...state,
-      byId: {
-        ...state.byId,
-        [payload.item.listId]: {
-          ...state.byId[payload.item.listId],
-          children: [
-            ...state.byId[payload.item.listId].children,
-            payload.item.id,
-          ],
-        },
-      },
-    };
-  },
-  [ADD_ITEMS_BATCH_TO_LIST](state, { payload }) {
+  [ADD_ITEM_IDS_TO_LIST](state, { payload }) {
     return {
       ...state,
       byId: {
@@ -127,25 +109,7 @@ export default createReducer(initialState, {
       },
     };
   },
-  [MOVE_ITEM_TO_LIST](state, { payload }) {
-    return {
-      ...state,
-      byId: {
-        ...state.byId,
-        [payload.newListId]: {
-          ...state.byId[payload.newListId],
-          children: [...state.byId[payload.newListId].children, payload.itemId],
-        },
-        [payload.oldListId]: {
-          ...state.byId[payload.oldListId],
-          children: state.byId[payload.oldListId].children.filter(
-            id => id !== payload.itemId,
-          ),
-        },
-      },
-    };
-  },
-  [MOVE_ITEMS_BATCH_TO_LIST](state, { payload }) {
+  [MOVE_ITEM_IDS_TO_LIST](state, { payload }) {
     return {
       ...state,
       byId: {
@@ -166,21 +130,7 @@ export default createReducer(initialState, {
       },
     };
   },
-  [REMOVE_ITEM_FROM_LIST](state, { payload }) {
-    return {
-      ...state,
-      byId: {
-        ...state.byId,
-        [payload.listId]: {
-          ...state.byId[payload.listId],
-          children: state.byId[payload.listId].children.filter(
-            id => id !== payload.itemId,
-          ),
-        },
-      },
-    };
-  },
-  [REMOVE_ITEMS_BATCH_FROM_LIST](state, { payload }) {
+  [REMOVE_ITEM_IDS_FROM_LIST](state, { payload }) {
     return {
       ...state,
       byId: {

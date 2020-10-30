@@ -31,7 +31,8 @@ const userIdsPropSelector = (_, props) => props.userIds;
 export const usersBatchSelector = createSelector(
   usersByIdSelector,
   userIdsPropSelector,
-  (usersById, userIds) => userIds.map(userId => usersById[userId]),
+  (usersById, userIds) =>
+    userIds.map(userId => usersById[userId] || null).filter(u => u !== null),
 );
 
 export const userAdminsSelector = createSelector(

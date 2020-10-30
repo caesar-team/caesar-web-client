@@ -3,7 +3,10 @@ import { call, put, take } from 'redux-saga/effects';
 import { addItemsBatch } from '@caesar/common/actions/entities/item';
 import { addSystemItemsBatch } from '@caesar/common/actions/entities/system';
 import { addKeyPairsBatch } from '@caesar/common/actions/entities/keypair';
-import { updateWorkInProgressItemRaws } from '@caesar/common/actions/workflow';
+import {
+  decryptionEnd,
+  updateWorkInProgressItemRaws,
+} from '@caesar/common/actions/workflow';
 import { arrayToObject, chunk, match } from '@caesar/common/utils/utils';
 import {
   checkItemsAfterDecryption,
@@ -54,10 +57,12 @@ const taskAction = (items, raws, key, masterPassword) => async task => {
 
 export function* decryption({ items, raws, key, masterPassword, coresCount }) {
   const normalizerEvent = normalizeEvent(coresCount);
+
   const pool = Pool(() => spawn(new Worker('../../workers/decryption')), {
     name: 'decryption',
     size: coresCount,
   });
+
   const poolChannel = yield call(createPoolChannel, pool);
   while (poolChannel) {
     const event = yield take(poolChannel);
@@ -120,6 +125,7 @@ export function* decryption({ items, raws, key, masterPassword, coresCount }) {
           if (raws) {
             yield put(updateWorkInProgressItemRaws(event.returnValue));
           }
+          yield put(decryptionEnd());
           break;
         case POOL_QUEUE_FINISHED_EVENT_TYPE:
           poolChannel.close();

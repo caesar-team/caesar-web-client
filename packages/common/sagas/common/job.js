@@ -71,6 +71,13 @@ function* jobSaga({ id, coresCount, action }) {
 
 function* jobAction(action) {
   const queue = createQueue();
+
+  console.log(
+    'action.type %s, availableCoresCount = %s',
+    action.type,
+    action.payload.coresCount,
+  );
+
   if (isEndJob(action.type)) {
     yield put(increaseCoresCount(action.payload.coresCount));
 
@@ -92,7 +99,11 @@ function* jobAction(action) {
     }
   } else {
     const availableCoresCount = yield select(availableCoresCountSelector);
-
+    console.log(
+      'START %s, availableCoresCount = %s',
+      action.type,
+      availableCoresCount,
+    );
     if (canRunJobImmediately(availableCoresCount)) {
       const coresCount = getCoresCountFor(action, availableCoresCount);
       const job = prepareJob(action, coresCount);
@@ -100,6 +111,9 @@ function* jobAction(action) {
       yield put(decreaseCoresCount(coresCount));
       yield spawn(jobSaga, job);
     } else {
+      console.warn(
+        'Free threads have been exceeded! Will waiting for a free thread.',
+      );
       // cores count will be estimated when job will be pulled out from queue
       const job = prepareJob(action, null);
 

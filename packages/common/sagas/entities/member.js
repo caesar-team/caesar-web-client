@@ -1,4 +1,3 @@
-import Router from 'next/router';
 import { call, put, takeLatest, all, select } from 'redux-saga/effects';
 import {
   CREATE_MEMBER_BATCH_REQUEST,
@@ -7,33 +6,34 @@ import {
   createMemberBatchSuccess,
   createMemberFailure,
   createMemberSuccess,
-  FETCH_MEMBERS_REQUEST,
   FETCH_TEAM_MEMBERS_REQUEST,
-  fetchMembersFailure,
-  fetchMembersSuccess,
-  leaveTeamFailure,
-  leaveTeamSuccess,
-  removeTeamFromMember,
-  LEAVE_TEAM_REQUEST,
+  fetchTeamMembersFailure,
+  fetchTeamMembersSuccess,
+  ADD_TEAM_MEMBERS_BATCH_REQUEST,
+  addTeamMembersBatchSuccess,
+  addTeamMembersBatchFailure,
+  UPDATE_TEAM_MEMBER_ROLE_REQUEST,
+  updateTeamMemberRoleSuccess,
+  updateTeamMemberRoleFailure,
+  REMOVE_TEAM_MEMBER_REQUEST,
+  removeTeamMemberSuccess,
+  removeTeamMemberFailure,
 } from '@caesar/common/actions/entities/member';
 import {
-  updateTeamMembersWithRoles,
-  removeTeamMemberSuccess,
+  addMembersToTeamList,
+  removeMemberFromTeam,
 } from '@caesar/common/actions/entities/team';
-import { userIdSelector } from '@caesar/common/selectors/user';
 import {
-  getMembers,
   getPublicKeyByEmailBatch,
   getTeamMembers,
-  postLeaveTeam,
   postNewUser,
   postNewUserBatch,
   updateKey,
+  postAddTeamMemberBatch,
+  updateTeamMember,
+  deleteTeamMember,
 } from '@caesar/common/api';
-import {
-  convertMembersToEntity,
-  convertUsersToEntity,
-} from '@caesar/common/normalizers/normalizers';
+import { convertMembersToEntity } from '@caesar/common/normalizers/normalizers';
 import {
   generateSeedAndVerifier,
   generateUser,
@@ -42,10 +42,14 @@ import {
 import {
   ENTITY_TYPE,
   DOMAIN_ROLES,
-  ROUTES,
+  NOOP_NOTIFICATION,
 } from '@caesar/common/constants';
 import { updateGlobalNotification } from '@caesar/common/actions/application';
 import { getServerErrorMessage } from '@caesar/common/utils/error';
+import { teamKeyPairSelector } from '@caesar/common/selectors/keystore';
+import { usersBatchSelector } from '../../selectors/entities/user';
+import { memberSelector } from '../../selectors/entities/member';
+import { encryptMemberTeamKey } from './team';
 
 const setNewFlag = (members, isNew) =>
   members.map(member => ({
@@ -55,18 +59,6 @@ const setNewFlag = (members, isNew) =>
 
 const renameUserId = members =>
   members.map(({ userId, ...member }) => ({ id: userId, ...member }));
-
-export function* fetchMembersSaga() {
-  try {
-    const { data: members } = yield call(getMembers);
-
-    yield put(fetchMembersSuccess(convertUsersToEntity(members)));
-  } catch (error) {
-    // eslint-disable-next-line no-console
-    console.error(error);
-    yield put(fetchMembersFailure());
-  }
-}
 
 export function* createMemberSaga({ payload: { email, role } }) {
   try {
@@ -247,38 +239,101 @@ export function* getOrCreateMemberBatchSaga({ payload: { emailRolePairs } }) {
   }
 }
 
+export function* addMemberToTeamListsBatchSaga({ payload: { teamId, users } }) {
+  try {
+    const keypair = yield select(teamKeyPairSelector, { teamId });
+    const userIds = users.map(user => user.id);
+    // Domain users
+    // TODO: Invite unregistered users
+    const newUsers = yield select(usersBatchSelector, { userIds });
+
+    const postDataSagas = newUsers.map(member =>
+      call(encryptMemberTeamKey, { member, keypair }),
+    );
+    const postData = yield all(postDataSagas);
+
+    const { data: serverMembers } = yield call(postAddTeamMemberBatch, {
+      members: postData,
+      teamId,
+    });
+
+    const membersById = convertMembersToEntity(serverMembers);
+
+    yield put(addTeamMembersBatchSuccess(membersById));
+    yield put(addMembersToTeamList(teamId, membersById));
+
+    yield put(updateGlobalNotification(NOOP_NOTIFICATION, false));
+  } catch (error) {
+    // eslint-disable-next-line no-console
+    console.error(error);
+    yield put(
+      updateGlobalNotification(getServerErrorMessage(error), false, true),
+    );
+    yield put(addTeamMembersBatchFailure());
+  }
+}
+
 export function* fetchTeamMembersSaga({ payload: { teamId } }) {
   try {
     const { data } = yield call(getTeamMembers, teamId);
 
     const membersById = convertMembersToEntity(data);
-    yield put(fetchMembersSuccess(membersById));
-
-    yield put(updateTeamMembersWithRoles(teamId, data));
+    yield put(fetchTeamMembersSuccess(membersById));
   } catch (e) {
-    yield put(fetchMembersFailure());
+    yield put(fetchTeamMembersFailure());
   }
 }
 
-export function* leaveTeamSaga({ payload: { teamId } }) {
+export function* updateTeamMemberRoleSaga({ payload: { memberId, teamRole } }) {
   try {
-    yield call(postLeaveTeam, teamId);
-    const userId = yield select(userIdSelector);
+    const member = yield select(memberSelector, { memberId });
+    yield call(updateTeamMember, {
+      teamId: member.teamId,
+      userId: member.userId,
+      teamRole,
+    });
 
-    yield put(leaveTeamSuccess());
-    yield put(removeTeamMemberSuccess(teamId, userId));
-    yield put(removeTeamFromMember(teamId, userId));
-    yield call(Router.push, ROUTES.SETTINGS + ROUTES.TEAM);
-  } catch (e) {
-    yield put(updateGlobalNotification(getServerErrorMessage(e), false, true));
-    yield put(leaveTeamFailure());
+    yield put(updateTeamMemberRoleSuccess(memberId, teamRole));
+  } catch (error) {
+    // eslint-disable-next-line no-console
+    console.error(error);
+    yield put(
+      updateGlobalNotification(getServerErrorMessage(error), false, true),
+    );
+    yield put(updateTeamMemberRoleFailure());
+  }
+}
+
+export function* removeTeamMemberSaga({ payload: { memberId } }) {
+  try {
+    const member = yield select(memberSelector, { memberId });
+
+    yield call(deleteTeamMember, {
+      teamId: member.teamId,
+      userId: member.userId,
+    });
+    yield put(removeTeamMemberSuccess(memberId));
+    yield put(removeMemberFromTeam(member.teamId, memberId));
+
+    yield put(updateGlobalNotification(NOOP_NOTIFICATION, false));
+  } catch (error) {
+    // eslint-disable-next-line no-console
+    console.error(error);
+    yield put(
+      updateGlobalNotification(getServerErrorMessage(error), false, true),
+    );
+    yield put(removeTeamMemberFailure());
   }
 }
 
 export default function* memberSagas() {
-  yield takeLatest(FETCH_MEMBERS_REQUEST, fetchMembersSaga);
   yield takeLatest(CREATE_MEMBER_REQUEST, createMemberSaga);
   yield takeLatest(CREATE_MEMBER_BATCH_REQUEST, createMemberBatchSaga);
   yield takeLatest(FETCH_TEAM_MEMBERS_REQUEST, fetchTeamMembersSaga);
-  yield takeLatest(LEAVE_TEAM_REQUEST, leaveTeamSaga);
+  yield takeLatest(
+    ADD_TEAM_MEMBERS_BATCH_REQUEST,
+    addMemberToTeamListsBatchSaga,
+  );
+  yield takeLatest(UPDATE_TEAM_MEMBER_ROLE_REQUEST, updateTeamMemberRoleSaga);
+  yield takeLatest(REMOVE_TEAM_MEMBER_REQUEST, removeTeamMemberSaga);
 }

@@ -8,7 +8,7 @@ import {
   SettingsSidebar,
 } from '@caesar/components';
 import { ImportContainer } from '@caesar/containers';
-import { userDataSelector } from '@caesar/common/selectors/user';
+import { currentUserDataSelector } from '@caesar/common/selectors/currentUser';
 import { initImportSettings } from '@caesar/common/actions/workflow';
 
 class SettingsImportPage extends Component {
@@ -17,8 +17,8 @@ class SettingsImportPage extends Component {
   }
 
   render() {
-    const { userData } = this.props;
-    const shouldShowLoader = !userData;
+    const { currentUserData } = this.props;
+    const shouldShowLoader = !currentUserData;
 
     if (shouldShowLoader) {
       return <FullScreenLoader />;
@@ -27,7 +27,7 @@ class SettingsImportPage extends Component {
     return (
       <>
         <Head title="Import" />
-        <SettingsLayout user={userData}>
+        <SettingsLayout currentUser={currentUserData}>
           <>
             <SettingsSidebar />
             <ImportContainer />
@@ -39,7 +39,7 @@ class SettingsImportPage extends Component {
 }
 
 const mapStateToProps = createStructuredSelector({
-  userData: userDataSelector,
+  currentUserData: currentUserDataSelector,
 });
 
 const mapDispatchToProps = {

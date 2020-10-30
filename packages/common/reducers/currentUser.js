@@ -12,18 +12,18 @@ import {
   SET_MASTER_PASSWORD,
   SET_KEY_PAIR,
   SET_CURRENT_TEAM_ID,
-  LEAVE_TEAM,
-  ADD_MEMBER_TO_TEAM,
+  LEAVE_TEAM_REQUEST,
+  LEAVE_TEAM_SUCCESS,
+  LEAVE_TEAM_FAILURE,
   SET_DEFAULT_LIST_ID,
-  RESET_USER_STATE,
-} from '@caesar/common/actions/user';
+  RESET_CURRENT_USER_STATE,
+} from '@caesar/common/actions/currentUser';
 
 const initialState = {
   isLoading: false,
   isError: false,
   keyPair: null,
   masterPassword: null,
-  teamIds: [],
   currentTeamId: null,
   defaultListId: null,
   data: null,
@@ -40,13 +40,12 @@ export default createReducer(initialState, {
     return { ...state, isLoading: false, isError: true };
   },
   [FETCH_KEY_PAIR_REQUEST](state) {
-    return { ...state, isLoading: false, isError: true };
+    return { ...state, isLoading: false, isError: false };
   },
   [FETCH_KEY_PAIR_SUCCESS](state, { payload }) {
     return {
       ...state,
       isLoading: false,
-      isError: true,
       keyPair: payload.keyPair,
     };
   },
@@ -59,7 +58,10 @@ export default createReducer(initialState, {
   [FETCH_USER_TEAMS_SUCCESS](state, { payload }) {
     return {
       ...state,
-      teamIds: payload.teamIds,
+      data: {
+        ...state.data,
+        teamIds: payload.teamIds,
+      },
     };
   },
   [FETCH_USER_TEAMS_FAILURE](state) {
@@ -74,14 +76,20 @@ export default createReducer(initialState, {
   [SET_CURRENT_TEAM_ID](state, { payload }) {
     return { ...state, currentTeamId: payload.teamId };
   },
-  [ADD_MEMBER_TO_TEAM](state, { payload }) {
-    return { ...state, teamIds: [...state.teamIds, payload.teamId] };
+  [LEAVE_TEAM_REQUEST](state) {
+    return { ...state, isError: false };
   },
-  [LEAVE_TEAM](state, { payload }) {
+  [LEAVE_TEAM_SUCCESS](state, { payload }) {
     return {
       ...state,
-      teamIds: state.teamIds.filter(teamId => teamId !== payload.teamId),
+      data: {
+        ...state.data,
+        teamIds: state.data.teamIds.filter(teamId => teamId !== payload.teamId),
+      },
     };
+  },
+  [LEAVE_TEAM_FAILURE](state) {
+    return { ...state, isError: true };
   },
   [SET_DEFAULT_LIST_ID](state, { payload }) {
     return {
@@ -89,7 +97,7 @@ export default createReducer(initialState, {
       defaultListId: payload.listId,
     };
   },
-  [RESET_USER_STATE]() {
+  [RESET_CURRENT_USER_STATE]() {
     return initialState;
   },
 });

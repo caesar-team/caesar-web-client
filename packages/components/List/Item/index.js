@@ -21,9 +21,10 @@ import {
 
 export const Item = ({
   id,
-  data: { name, attachments = [], website },
+  title,
+  data,
   type,
-  invited,
+  invited = [],
   isMultiItem = false,
   isClosable = false,
   hasHover = true,
@@ -31,9 +32,9 @@ export const Item = ({
   favorite,
   style,
   teamId,
-  _permissions,
+  _permissions = {},
   index,
-  teamMembersCount,
+  teamMembersCount = 0,
   onClickClose = Function.prototype,
   onClickItem = Function.prototype,
   onSelectItem = Function.prototype,
@@ -41,8 +42,11 @@ export const Item = ({
   workInProgressItem,
   ...props
 }) => {
-  const sharedCount = invited.length + teamMembersCount - 1;
-  const shouldShowMembers = !!sharedCount;
+  const { attachments = [], website } = data || {};
+  const sharedCount =
+    invited?.length +
+    (teamMembersCount > 0 ? teamMembersCount - 1 : teamMembersCount);
+  const shouldShowMembers = sharedCount > 0;
   const shouldShowAttachments =
     attachments && Array.isArray(attachments) && attachments.length > 0;
 
@@ -106,7 +110,7 @@ export const Item = ({
           </TypeIconWrapper>
         )}
       </Can>
-      <Title>{name}</Title>
+      <Title>{title}</Title>
       {shouldShowAttachments && (
         <Addon isInModal={isInModal}>
           <Icon name="clip" width={16} height={16} />

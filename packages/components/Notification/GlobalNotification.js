@@ -6,7 +6,7 @@ import { Icon } from '../Icon';
 const Wrapper = styled.div`
   background-color: ${({ isError, theme }) =>
     isError ? theme.color.snow : theme.color.emperor};
-  position: absolute;
+  position: fixed;
   bottom: 10px;
   right: 60px;
   z-index: ${({ theme }) => theme.zIndex.notification};
@@ -32,8 +32,6 @@ const Text = styled.div`
   color: ${({ isError, theme }) =>
     isError ? theme.color.red : theme.color.white};
   margin-left: 20px;
-  text-overflow: ellipsis;
-  white-space: nowrap;
   overflow: hidden;
   max-width: 400px;
 `;

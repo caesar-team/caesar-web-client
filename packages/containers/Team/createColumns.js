@@ -140,7 +140,7 @@ export const createColumns = ({
             />
           </Can>
           <Can not I={PERMISSION.EDIT} of={getTeamMemberSubject(original)}>
-            {TEAM_ROLES_LABELS[value]}
+            <Table.RoleCell>{TEAM_ROLES_LABELS[value]}</Table.RoleCell>
           </Can>
         </Table.DropdownCell>
       );

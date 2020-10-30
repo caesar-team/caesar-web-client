@@ -6,7 +6,6 @@ import {
   TEAM_TYPE,
   TEAM_TEXT_TYPE,
   PERMISSION,
-  PERMISSION_ENTITY,
 } from '@caesar/common/constants';
 import { transformListTitle } from '@caesar/common/utils/string';
 import { getTeamTitle } from '@caesar/common/utils/team';

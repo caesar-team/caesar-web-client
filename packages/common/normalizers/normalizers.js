@@ -18,7 +18,7 @@ const failIsNotAnArray = arrayObject => {
 };
 export const convertItemsToEntities = items => {
   failIsNotAnArray(items);
-  const normalized = normalize(items, [itemSchema()]);
+  const normalized = normalize(items, [itemSchema]);
 
   return {
     itemsById: normalized.entities.itemsById || {},
@@ -38,60 +38,56 @@ export const convertShareItemsToEntities = ({
   ]);
 
   return {
-    itemsById: normalized.entities.byId || {},
+    itemsById: normalized.entities.shareItemById || {},
   };
 };
 
-export const convertListsToEntities = nodes => {
-  failIsNotAnArray(nodes);
-  const normalized = normalize(nodes, [listSchema]);
+export const convertListsToEntities = lists => {
+  const normalized = normalize(lists, [listSchema]);
 
-  return {
-    listsById: normalized.entities.listsById || {},
-  };
-};
-
-export const convertNodesToEntities = nodes => {
-  failIsNotAnArray(nodes);
-  const normalized = normalize(nodes, [listSchema]);
-
-  return {
-    listsById: normalized.entities.listsById || {},
-    itemsById: normalized.entities.itemsById || {},
-  };
+  return normalized.entities.listsById || {};
 };
 
 export const convertUsersToEntity = users => {
   failIsNotAnArray(users);
   const normalized = normalize(users, [userSchema]);
 
-  return normalized.entities.byId || {};
+  return normalized.entities.usersById || {};
 };
 
 export const convertMembersToEntity = members => {
   failIsNotAnArray(members);
   const normalized = normalize(members, [memberSchema]);
 
-  return normalized.entities.byId || {};
+  return normalized.entities.membersById || {};
 };
 
 export const convertTeamsToEntity = teams => {
   failIsNotAnArray(teams);
   const normalized = normalize(teams, [teamSchema]);
 
-  return normalized.entities.byId || {};
+  return normalized.entities.teamsById || {};
+};
+
+export const convertTeamNodesToEntities = teams => {
+  const normalized = normalize(teams, [teamSchema]);
+
+  return {
+    teams: normalized.entities.teamsById || {},
+    members: normalized.entities.membersById || {},
+  };
 };
 
 export const convertKeyPairToEntity = (keypairs, idAttribute = 'teamId') => {
   failIsNotAnArray(keypairs);
   const normalized = normalize(keypairs, [keypairSchema(idAttribute)]);
 
-  return normalized.entities.byId || {};
+  return normalized.entities.keyPairById || {};
 };
 
 export const convertKeyPairToItemEntity = keypairs => {
   failIsNotAnArray(keypairs);
   const normalized = normalize(keypairs, [keypairItemSchema]);
 
-  return normalized.entities.byId || {};
+  return normalized.entities.keyPairItemById || {};
 };

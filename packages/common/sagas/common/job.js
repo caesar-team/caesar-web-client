@@ -61,22 +61,11 @@ function prepareJob(action, coresCount) {
 // - action: { type, payload }
 function* jobSaga({ id, coresCount, action }) {
   const job = action.type === DECRYPTION ? decryption : encryption;
-
-  const endEventType =
-    action.type === DECRYPTION ? DECRYPTION_END : ENCRYPTION_END;
-
-  yield call(job, { coresCount, ...action.payload });
-  yield put({ type: endEventType, payload: { id, coresCount } });
+  yield call(job, { coresCount, id, ...action.payload });
 }
 
 function* jobAction(action) {
   const queue = createQueue();
-
-  console.log(
-    'action.type %s, availableCoresCount = %s',
-    action.type,
-    action.payload.coresCount,
-  );
 
   if (isEndJob(action.type)) {
     yield put(increaseCoresCount(action.payload.coresCount));
@@ -99,11 +88,7 @@ function* jobAction(action) {
     }
   } else {
     const availableCoresCount = yield select(availableCoresCountSelector);
-    console.log(
-      'START %s, availableCoresCount = %s',
-      action.type,
-      availableCoresCount,
-    );
+
     if (canRunJobImmediately(availableCoresCount)) {
       const coresCount = getCoresCountFor(action, availableCoresCount);
       const job = prepareJob(action, coresCount);
@@ -111,6 +96,7 @@ function* jobAction(action) {
       yield put(decreaseCoresCount(coresCount));
       yield spawn(jobSaga, job);
     } else {
+      // eslint-disable-next-line no-console
       console.warn(
         'Free threads have been exceeded! Will waiting for a free thread.',
       );

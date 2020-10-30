@@ -103,7 +103,7 @@ export const createColumns = ({
     Cell: ({ value }) => <Table.EmailCell>{value}</Table.EmailCell>,
   };
 
-  const roleColumn = {
+  const teamRoleColumn = {
     accessor: 'teamRole',
     width: ROLE_COLUMN_WIDTH,
     Filter: getColumnFilter('Role'),
@@ -129,7 +129,7 @@ export const createColumns = ({
         <Table.DropdownCell ref={cellRef}>
           <Can I={PERMISSION.EDIT} of={getTeamMemberSubject(original)}>
             <StyledSelect
-              name="role"
+              name="teamRole"
               value={value}
               options={OPTIONS}
               onChange={handleChangeRole(original.id)}
@@ -179,5 +179,5 @@ export const createColumns = ({
     },
   };
 
-  return [nameColumn, emailColumn, roleColumn, menuColumn];
+  return [nameColumn, emailColumn, teamRoleColumn, menuColumn];
 };

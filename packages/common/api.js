@@ -143,9 +143,9 @@ export const deleteTeam = teamId => callApi.delete(`/teams/${teamId}`);
 export const getTeamMembers = teamId => callApi.get(`/teams/${teamId}/members`);
 export const getDefaultTeamMembers = () =>
   callApi.get('/teams/default/members');
-export const postAddTeamMember = ({ teamId, userId, role, secret }) =>
+export const postAddTeamMember = ({ teamId, userId, teamRole, secret }) =>
   callApi.post(`/teams/${teamId}/members/${userId}`, {
-    teamRole: role,
+    teamRole,
     secret,
   });
 export const updateTeamMember = ({ teamId, userId, teamRole }) =>

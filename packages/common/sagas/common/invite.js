@@ -11,7 +11,7 @@ export function* inviteNewMemberBatchSaga({ payload: { members } }) {
         objectToBase64({
           e: email,
           p: password,
-          mp: masterPassword,
+          m: masterPassword,
         }),
       ),
     }));

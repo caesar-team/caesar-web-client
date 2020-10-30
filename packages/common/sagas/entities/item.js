@@ -611,7 +611,7 @@ export function* createItemSaga({
         (!teamId && currentTeamId === TEAM_TYPE.PERSONAL)) &&
       !isSystemItem
     ) {
-      yield put(addItemIdsToList([savedItem.id]));
+      yield put(addItemIdsToList([savedItem.id], savedItem.listId));
     }
 
     yield put(setCurrentTeamId(teamId || TEAM_TYPE.PERSONAL));

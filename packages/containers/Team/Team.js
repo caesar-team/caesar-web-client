@@ -67,7 +67,7 @@ export const TeamContainer = ({ currentUser, team, members }) => {
   const measuredRef = useCallback(node => {
     if (node !== null) {
       setTableWidth(node.getBoundingClientRect().width);
-      // To calculate where roleDropdown must be opened
+      // To calculate where teamRoleDropdown must be opened
       setTableRowGroupNode(node.children[0]?.children[1].children[0]);
     }
   }, []);

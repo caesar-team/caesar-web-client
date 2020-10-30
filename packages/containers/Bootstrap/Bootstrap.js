@@ -62,7 +62,7 @@ class Bootstrap extends Component {
         currentUser?.domainRoles?.includes(DOMAIN_ROLES.ROLE_ANONYMOUS_USER) ||
         currentUser?.domainRoles?.includes(DOMAIN_ROLES.ROLE_READ_ONLY_USER);
 
-      if (!currentUser || (isAnonymousOrReadOnlyUser && !shared?.mp)) {
+      if (!currentUser || (isAnonymousOrReadOnlyUser && !shared?.m)) {
         logout();
       }
 
@@ -216,7 +216,7 @@ class Bootstrap extends Component {
           initialStep={currentStep}
           navigationSteps={this.navigationPanelSteps}
           currentUser={this.currentUser}
-          sharedMasterPassword={shared.mp}
+          sharedMasterPassword={shared.m}
           masterPassword={IS_PROD ? null : this.props.masterPassword}
           onFinish={this.handleFinishMasterPassword}
         />
@@ -225,7 +225,7 @@ class Bootstrap extends Component {
 
     // if user is using sharing url and master password is included inside share
     // url we don't turn on LockScreen via SessionChecker(onFinishTimeout)
-    if (currentStep === BOOTSTRAP_FINISH && shared.mp) {
+    if (currentStep === BOOTSTRAP_FINISH && shared.m) {
       return (
         <PageComponent
           publicKey={currentKeyPair.publicKey}

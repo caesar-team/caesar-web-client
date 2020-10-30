@@ -43,7 +43,7 @@ import {
   pinTeam,
 } from '@caesar/common/api';
 import { fetchUsersSaga } from '@caesar/common/sagas/entities/user';
-import { addMemberToTeamListsBatchSaga } from '@caesar/common/sagas/entities/member';
+import { addTeamMembersBatchSaga } from '@caesar/common/sagas/entities/member';
 import {
   getServerErrorMessage,
   getServerErrors,
@@ -274,7 +274,7 @@ export function* createTeamSaga({
     );
 
     if (adminsToInvite.length > 0 && serverTeam?.id) {
-      yield call(addMemberToTeamListsBatchSaga, {
+      yield call(addTeamMembersBatchSaga, {
         payload: {
           teamId: serverTeam?.id,
           users: adminsToInvite,

@@ -4,7 +4,7 @@ import { Bootstrap, Invite } from '@caesar/containers';
 import { base64ToObject } from '@caesar/common/utils/base64';
 import { login } from '@caesar/common/utils/authUtils';
 
-const validFields = ['e', 'p', 'mp'];
+const validFields = ['e', 'p', 'm'];
 
 const validateFields = (data, fields) =>
   data && fields.every(field => !!data[field]);

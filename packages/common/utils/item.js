@@ -55,6 +55,9 @@ export const generateSystemItemEmail = entityName => {
   return `systems+${entityName}@${DOMAIN_HOSTNAME || getHostName()}`;
 };
 
+export const generateAnonymousEmail = itemId =>
+  `anonymous+${itemId}@${DOMAIN_HOSTNAME || getHostName()}`;
+
 export const extractKeysFromSystemItem = item => {
   const itemRaws = item.data?.raws || {
     publicKey: null,

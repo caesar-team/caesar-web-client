@@ -5,7 +5,7 @@ import { useFormik } from 'formik';
 import { useDispatch } from 'react-redux';
 import { Button, Head, LogoCaesarDomain, LockInput } from '@caesar/components';
 import { Avatar } from '@caesar/components/Avatar';
-import { logout } from '@caesar/common/actions/user';
+import { logout } from '@caesar/common/actions/currentUser';
 import { passwordSchema } from './schema';
 
 const Wrapper = styled.div`
@@ -58,7 +58,7 @@ const FormWrapper = styled.div`
   height: 100%;
 `;
 
-const MasterPasswordCheckForm = ({ user, onSubmit }) => {
+const MasterPasswordCheckForm = ({ currentUser, onSubmit }) => {
   const dispatch = useDispatch();
   const {
     values,
@@ -80,8 +80,8 @@ const MasterPasswordCheckForm = ({ user, onSubmit }) => {
       <Header>
         <LogoCaesarDomain color="lightGray" />
         <User>
-          <StyledAvatar {...user} width={32} fontSize="small" />
-          <UserName>{user.name}</UserName>
+          <StyledAvatar {...currentUser} width={32} fontSize="small" />
+          <UserName>{currentUser.name}</UserName>
           <Button color="gray" onClick={() => dispatch(logout())}>
             Log out
           </Button>

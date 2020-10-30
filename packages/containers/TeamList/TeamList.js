@@ -139,9 +139,8 @@ class TeamListContainer extends Component {
   };
 
   handleChangeMemberRole = (member, role) => {
-    const { selectedTeamId } = this.state;
-
-    this.props.updateTeamMemberRoleRequest(selectedTeamId, member.id, role);
+    // TODO: Need to implement UI. Use member.id instead of userId
+    this.props.updateTeamMemberRoleRequest(member.id, role);
   };
 
   handlePinTeam = (teamId, isPinned) => event => {
@@ -171,9 +170,9 @@ class TeamListContainer extends Component {
   }
 
   renderTeamCards(teams) {
-    const { members, user } = this.props;
+    const { currentUser } = this.props;
 
-    if (!teams.length) {
+    if (!teams || teams.length === 0) {
       return <div>No teams</div>;
     }
 
@@ -181,8 +180,7 @@ class TeamListContainer extends Component {
       <StyledTeamCard
         key={team.id}
         team={team}
-        members={members}
-        userId={user.id}
+        userId={currentUser.id}
         onClickEditTeam={this.handleClickEditTeam(team.id)}
         onClickLeaveTeam={this.handleClickLeaveTeam(team)}
         onClickRemoveTeam={this.handleClickRemoveTeam(team.id)}
@@ -199,7 +197,7 @@ class TeamListContainer extends Component {
       userTeamList,
       isDomainAdmin,
       isDomainAdminOrManager,
-      user,
+      currentUser,
     } = this.props;
 
     const { modalVisibilities, selectedTeamTitle, activeTabName } = this.state;
@@ -210,8 +208,8 @@ class TeamListContainer extends Component {
     const favoriteTeamCards = this.renderTeamCards(favoriteTeams);
 
     const teamSubject = {
+      ...currentUser?._permissions,
       __typename: PERMISSION_ENTITY.TEAM,
-      ...user?._permissions,
     };
 
     const teamsLength =

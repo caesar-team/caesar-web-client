@@ -1,5 +1,5 @@
 import { createSelector } from 'reselect';
-import { currentTeamSelector } from '@caesar/common/selectors/user';
+import { currentTeamSelector } from '@caesar/common/selectors/currentUser';
 import { generateSystemItemName } from '@caesar/common/utils/item';
 import { ENTITY_TYPE, REGEXP_TESTER } from '@caesar/common/constants';
 import { objectToArray } from '../../utils/utils';

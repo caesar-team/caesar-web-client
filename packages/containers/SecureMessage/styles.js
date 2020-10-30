@@ -31,6 +31,12 @@ export const Title = styled.div`
   margin-bottom: 23px;
 `;
 
+export const AdaptiveTitle = styled(Title)`
+  ${media.mobile`
+    font-size: ${({ theme }) => theme.font.size.small};
+  `}
+`;
+
 export const StyledLogo = styled(Icon)`
   fill: ${({ theme }) => theme.color.white};
 `;

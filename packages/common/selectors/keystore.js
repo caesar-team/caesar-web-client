@@ -2,8 +2,8 @@ import { createSelector } from 'reselect';
 import {
   currentTeamIdSelector,
   isUserAnonymousSelector,
-  userIdSelector,
-} from '@caesar/common/selectors/user';
+  currentUserIdSelector,
+} from '@caesar/common/selectors/currentUser';
 import { generateSystemItemName } from '@caesar/common/utils/item';
 import { KEY_TYPE, ENTITY_TYPE } from '@caesar/common/constants';
 
@@ -87,7 +87,7 @@ export const actualKeyPairSelector = createSelector(
   keyStoreSelector,
   currentTeamIdSelector,
   isUserAnonymousSelector,
-  userIdSelector,
+  currentUserIdSelector,
   (data, currentTeamId, isAnonymous, userId) => {
     switch (true) {
       case isAnonymous:

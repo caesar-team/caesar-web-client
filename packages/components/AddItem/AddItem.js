@@ -12,7 +12,7 @@ import {
   TEAM_TYPE,
 } from '@caesar/common/constants';
 import { workInProgressListSelector } from '@caesar/common/selectors/workflow';
-import { currentTeamSelector } from '@caesar/common/selectors/user';
+import { currentTeamSelector } from '@caesar/common/selectors/currentUser';
 import { Button } from '../Button';
 import { Icon } from '../Icon';
 import { Dropdown } from '../Dropdown';

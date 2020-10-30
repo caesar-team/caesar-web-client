@@ -1,8 +1,8 @@
+import Router from 'next/router';
 import {
   put,
   call,
   fork,
-  take,
   takeLatest,
   takeEvery,
   select,
@@ -40,23 +40,20 @@ import { updateGlobalNotification } from '@caesar/common/actions/application';
 import {
   SET_CURRENT_TEAM_ID,
   setCurrentTeamId,
-} from '@caesar/common/actions/user';
+} from '@caesar/common/actions/currentUser';
 import {
   addShareKeyPairBatch,
   addTeamKeyPairBatch,
-  ADD_TEAM_KEY_PAIR_BATCH,
 } from '@caesar/common/actions/keystore';
-import {
-  fetchUserSelfSaga,
-  fetchUserTeamsSaga,
-} from '@caesar/common/sagas/user';
-import { fetchMembersSaga } from '@caesar/common/sagas/entities/member';
+import { fetchUserSelfSaga } from '@caesar/common/sagas/currentUser';
+import { fetchUsersSaga } from '@caesar/common/sagas/entities/user';
 import {
   createTeamKeyPairSaga,
   fetchTeamsSaga,
+  fetchTeamSaga,
 } from '@caesar/common/sagas/entities/team';
+import { fetchTeamMembersSaga } from '@caesar/common/sagas/entities/member';
 import {
-  convertNodesToEntities,
   convertItemsToEntities,
   convertTeamsToEntity,
   convertListsToEntities,
@@ -72,12 +69,12 @@ import {
   favoritesListSelector,
 } from '@caesar/common/selectors/entities/list';
 import {
-  userDataSelector,
+  currentUserDataSelector,
   masterPasswordSelector,
   currentTeamIdSelector,
   isUserDomainAdminOrManagerSelector,
-  userTeamListSelector,
-} from '@caesar/common/selectors/user';
+  currentUserTeamListSelector,
+} from '@caesar/common/selectors/currentUser';
 import {
   itemSelector,
   nonDecryptedSharedItemsSelector,
@@ -100,14 +97,9 @@ import {
   teamSelector,
 } from '@caesar/common/selectors/entities/team';
 import { ADD_KEYPAIRS_BATCH } from '../actions/entities/keypair';
-import {
-  memberSelector,
-  memberTeamSelector,
-} from '../selectors/entities/member';
-import {
-  fetchTeamMembersRequest,
-  FETCH_MEMBERS_SUCCESS,
-} from '../actions/entities/member';
+import { teamMembersFullViewSelector } from '../selectors/entities/member';
+import { userSelector } from '../selectors/entities/user';
+import { fetchTeamMembersRequest } from '../actions/entities/member';
 
 export function decryptItemsByItemIdKeys(items, keyPairs) {
   try {
@@ -177,6 +169,7 @@ export function* processSharedItemsSaga() {
 }
 function* checkTeamPermissionsAndKeys(teamId, createKeyPair = false) {
   const teamKeyPairs = yield select(teamKeyPairSelector, { teamId });
+
   if (!teamKeyPairs) {
     if (teamId === TEAM_TYPE.PERSONAL) {
       // eslint-disable-next-line no-console
@@ -184,15 +177,14 @@ function* checkTeamPermissionsAndKeys(teamId, createKeyPair = false) {
 
       return false;
     }
+
     // Update the members list
     yield put(fetchTeamMembersRequest({ teamId }));
-    yield take(FETCH_MEMBERS_SUCCESS);
-    const { id: ownerId } = yield select(userDataSelector);
-
+    const { id: ownerId } = yield select(currentUserDataSelector);
     const team = yield select(teamSelector, { teamId });
-    const teamMembers = (yield select(memberTeamSelector, { teamId })).filter(
-      m => m.id !== ownerId,
-    );
+    const teamMembers = (yield select(teamMembersFullViewSelector, {
+      teamId,
+    })).filter(m => m.userId !== ownerId);
 
     if (teamMembers.length > 0) {
       // eslint-disable-next-line no-console
@@ -204,7 +196,7 @@ function* checkTeamPermissionsAndKeys(teamId, createKeyPair = false) {
       return false;
     }
 
-    const { publicKey } = yield select(memberSelector, { memberId: ownerId });
+    const { publicKey } = yield select(userSelector, { userId: ownerId });
 
     // eslint-disable-next-line no-console
     console.warn(
@@ -217,6 +209,7 @@ function* checkTeamPermissionsAndKeys(teamId, createKeyPair = false) {
           teamId} cause the publickey is null`,
       );
     }
+
     if (createKeyPair) {
       yield call(createTeamKeyPairSaga, {
         payload: { team, ownerId, publicKey },
@@ -276,7 +269,7 @@ function* initTeam(teamId) {
     if (!currentTeamId || currentTeamId === TEAM_TYPE.PERSONAL) return;
 
     const { data: lists } = yield call(getTeamLists, currentTeamId);
-    const { listsById } = convertNodesToEntities(lists);
+    const listsById = convertListsToEntities(lists);
 
     yield put(addListsBatch(listsById));
   } catch (error) {
@@ -298,7 +291,12 @@ function* checkTeamKeyPair(team) {
 }
 
 function* checkTeamsKeyPairs() {
-  const teams = yield select(teamListSelector);
+  const isUserDomainAdminOrManager = yield select(
+    isUserDomainAdminOrManagerSelector,
+  );
+  const teams = yield select(
+    isUserDomainAdminOrManager ? teamListSelector : currentUserTeamListSelector,
+  );
 
   const checkCalls = teams
     .filter(t => t.id !== TEAM_TYPE.PERSONAL)
@@ -315,25 +313,26 @@ export function* openCurrentVaultSaga() {
 function* initTeamsSaga() {
   try {
     // Load avaible teams
-    // const { data: teams } = yield call(getUserTeams);
+    yield call(fetchTeamsSaga);
+
     const isUserDomainAdminOrManager = yield select(
       isUserDomainAdminOrManagerSelector,
     );
 
     const teams = isUserDomainAdminOrManager
       ? yield select(teamListSelector)
-      : yield select(userTeamListSelector);
+      : yield select(currentUserTeamListSelector);
 
-    const userData = yield select(userDataSelector);
+    const currentUserData = yield select(currentUserDataSelector);
 
     teams.push({
       id: TEAM_TYPE.PERSONAL,
       title: upperFirst(TEAM_TYPE.PERSONAL),
       type: TEAM_TYPE.PERSONAL,
-      icon: userData?.avatar,
-      email: userData?.email,
+      icon: currentUserData?.avatar,
+      email: currentUserData?.email,
       teamRole: TEAM_ROLES.ROLE_ADMIN,
-      _links: userData?._links,
+      _links: currentUserData?._links,
     });
 
     const teamById = convertTeamsToEntity(teams);
@@ -398,11 +397,11 @@ function* loadKeyPairsAndPersonalItems() {
 
     // Load lists
     const { data: lists } = yield call(getLists);
-    const { listsById } = convertListsToEntities(lists);
+    const listsById = convertListsToEntities(lists);
     const defaultShareList = Object.values(listsById).find(
       list => list.type === LIST_TYPE.INBOX,
     );
-    const { id: currentUserId } = yield select(userDataSelector);
+    const { id: currentUserId } = yield select(currentUserDataSelector);
 
     const {
       data: {
@@ -523,15 +522,15 @@ function* initListsAndProgressEntities() {
 export function* initWorkflowSaga() {
   yield call(fetchUserSelfSaga);
   yield call(loadKeyPairsAndPersonalItems);
-  yield fork(fetchMembersSaga);
+  yield fork(fetchUsersSaga);
 }
 
 export function* openTeamVaultSaga({ payload: { teamId } }) {
   try {
-    const user = yield select(userDataSelector);
+    const currentUser = yield select(currentUserDataSelector);
 
-    // If there is no user we can't init even personal team
-    if (!user) return;
+    // If there is no currentUser we can't init even personal team
+    if (!currentUser) return;
 
     const team = yield select(teamSelector, { teamId });
     if (!team && teamId !== TEAM_TYPE.PERSONAL) {
@@ -663,7 +662,7 @@ function setWorkInProgressItemSaga({ payload: { item } }) {
 function* initDashboardSaga() {
   try {
     yield takeLatest(VAULTS_ARE_READY, openCurrentVaultSaga);
-    yield all([call(fetchUserTeamsSaga), call(initWorkflowSaga)]);
+    yield call(initWorkflowSaga);
   } catch (error) {
     // eslint-disable-next-line no-console
     console.error('error: ', error);
@@ -682,7 +681,6 @@ function* initCreatePageSaga() {
 function* initUsersSettingsSaga() {
   try {
     yield call(initWorkflowSaga);
-    yield put(finishIsLoading());
   } catch (error) {
     // eslint-disable-next-line no-console
     console.error('error: ', error);
@@ -692,7 +690,6 @@ function* initUsersSettingsSaga() {
 function* initTeamsSettingsSaga() {
   try {
     yield call(initWorkflowSaga);
-    yield call(fetchTeamsSaga);
   } catch (error) {
     // eslint-disable-next-line no-console
     console.error('error: ', error);
@@ -701,8 +698,15 @@ function* initTeamsSettingsSaga() {
 
 function* initTeamSettingsSaga() {
   try {
+    const {
+      router: {
+        query: { id: teamId },
+      },
+    } = Router;
+
     yield call(initWorkflowSaga);
-    yield call(fetchTeamsSaga);
+    yield call(fetchTeamSaga, { payload: { teamId } });
+    yield call(fetchTeamMembersSaga, { payload: { teamId } });
   } catch (error) {
     // eslint-disable-next-line no-console
     console.error('error: ', error);

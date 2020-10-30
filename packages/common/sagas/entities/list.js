@@ -100,7 +100,7 @@ export function* createListSaga({
       ...list,
     };
 
-    const { listsById } = convertListsToEntities([listData]);
+    const listsById = convertListsToEntities([listData]);
     const normalizedList = Object.values(listsById).shift();
 
     yield put(createListSuccess(listId, normalizedList));

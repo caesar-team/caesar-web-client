@@ -95,6 +95,10 @@ export default createReducer(initialState, {
     };
   },
   [ADD_ITEM_IDS_TO_LIST](state, { payload }) {
+    if (!payload.listId) {
+      throw new Error('Missed the list id parameter');
+    }
+
     return {
       ...state,
       byId: {
@@ -102,8 +106,8 @@ export default createReducer(initialState, {
         [payload.listId]: {
           ...state.byId[payload.listId],
           children: [
-            ...state.byId[payload.listId].children,
-            ...payload.itemIds,
+            ...(state.byId[payload.listId]?.children || []),
+            ...(payload.itemIds || []),
           ],
         },
       },

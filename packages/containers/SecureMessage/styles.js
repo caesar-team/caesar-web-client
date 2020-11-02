@@ -3,11 +3,11 @@ import { Icon, Button } from '@caesar/components';
 import { media } from '@caesar/assets/styles/media';
 
 export const Wrapper = styled.div`
+  position: absolute;
   display: flex;
   flex-direction: column;
   width: 100vw;
-  height: 100%;
-  min-height: 100vh;
+  min-height: 100%;
   background-color: ${({ theme }) => theme.color.emperor};
 `;
 

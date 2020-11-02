@@ -1,6 +1,5 @@
 import { put, call, takeLatest, select } from 'redux-saga/effects';
 import { workInProgressItemSelector } from '@caesar/common/selectors/workflow';
-import { encryptItem } from '@caesar/common/utils/cipherUtils';
 import { generateAnonymousEmail } from '@caesar/common/utils/item';
 import { createUserSaga } from '@caesar/common/sagas/entities/user';
 import { DOMAIN_ROLES } from '@caesar/common/constants';
@@ -17,12 +16,20 @@ import {
 import { updateWorkInProgressItem } from '@caesar/common/actions/workflow';
 import { updateGlobalNotification } from '@caesar/common/actions/application';
 import { getServerErrorMessage } from '@caesar/common/utils/error';
+import { shareItemBatchSaga } from './share';
 
 export function* createAnonymousLinkSaga() {
   try {
     const workInProgressItem = yield select(workInProgressItemSelector);
 
     const email = generateAnonymousEmail(workInProgressItem.id);
+
+    const createdUser = yield call(createUserSaga, {
+      payload: {
+        email,
+        domainRole: DOMAIN_ROLES.ROLE_ANONYMOUS_USER,
+      },
+    });
 
     const {
       id: userId,
@@ -31,27 +38,17 @@ export function* createAnonymousLinkSaga() {
       masterPassword,
       publicKey,
       domainRoles,
-    } = yield call(createUserSaga, {
+    } = createdUser;
+
+    yield call(shareItemBatchSaga, {
       payload: {
-        email,
-        domainRole: DOMAIN_ROLES.ROLE_ANONYMOUS_USER,
+        data: { itemIds: [workInProgressItem.id], members: [createdUser] },
       },
     });
 
-    const encryptedSecret = yield call(
-      encryptItem,
-      workInProgressItem.data,
-      publicKey,
-    );
-
-    const item = {
-      id: workInProgressItem.id,
-      secret: encryptedSecret,
-    };
-
     // TODO: Make shorted link
     const link = generateSharingUrl(
-      item.id,
+      workInProgressItem.id,
       objectToBase64({
         e: email,
         p: password,
@@ -60,7 +57,7 @@ export function* createAnonymousLinkSaga() {
     );
 
     const shared = {
-      id: item.id,
+      id: workInProgressItem.id,
       userId,
       email,
       name,

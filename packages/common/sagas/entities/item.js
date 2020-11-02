@@ -768,7 +768,7 @@ export function* updateItemSaga({ payload: { item } }) {
 
 export function* editItemSaga({
   payload: { item },
-  meta: { setSubmitting, notification },
+  meta: { setSubmitting = Function.prototype, notification } = {},
 }) {
   try {
     const {
@@ -804,9 +804,12 @@ export function* editItemSaga({
     }
 
     yield put(updateWorkInProgressItem(item.id));
-    yield call(notification.show, {
-      text: `The '${item.data.name}' has been updated`,
-    });
+
+    if (notification) {
+      yield call(notification.show, {
+        text: `The '${item.data.name}' has been updated`,
+      });
+    }
   } catch (error) {
     // eslint-disable-next-line no-console
     console.error(error);

@@ -311,11 +311,11 @@ export const createAnonymousLinkRequest = () => ({
   type: CREATE_ANONYMOUS_LINK_REQUEST,
 });
 
-export const createAnonymousLinkSuccess = (itemId, share) => ({
+export const createAnonymousLinkSuccess = (itemId, shared) => ({
   type: CREATE_ANONYMOUS_LINK_SUCCESS,
   payload: {
     itemId,
-    share,
+    shared,
   },
 });
 

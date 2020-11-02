@@ -75,7 +75,7 @@ export const ShareModal = ({
   sharedMembers,
   items,
   teams,
-  anonymousLink = [],
+  anonymousLink = {},
   isMultiMode = false,
   onActivateLink = Function.prototype,
   onDeactivateLink = Function.prototype,

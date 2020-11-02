@@ -60,6 +60,7 @@ const setNewFlag = (members, isNew) =>
 const renameUserId = members =>
   members.map(({ userId, ...member }) => ({ id: userId, ...member }));
 
+// TODO: replace with create user
 export function* createMemberSaga({ payload: { email, role } }) {
   try {
     const { password, masterPassword, publicKey, privateKey } = yield call(
@@ -102,6 +103,7 @@ export function* createMemberSaga({ payload: { email, role } }) {
   }
 }
 
+// TODO: replace with create user batch
 export function* createMemberBatchSaga({ payload: { emailRolePairs } }) {
   try {
     if (!emailRolePairs.length) {
@@ -176,6 +178,7 @@ export function* createMemberBatchSaga({ payload: { emailRolePairs } }) {
   }
 }
 
+// TODO: For what stuff do we need it?
 export function* getOrCreateMemberBatchSaga({ payload: { emailRolePairs } }) {
   try {
     const emailRoleObject = emailRolePairs.reduce(

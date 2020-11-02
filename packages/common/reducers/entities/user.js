@@ -3,6 +3,9 @@ import {
   FETCH_USERS_REQUEST,
   FETCH_USERS_SUCCESS,
   FETCH_USERS_FAILURE,
+  CREATE_USER_REQUEST,
+  CREATE_USER_SUCCESS,
+  CREATE_USER_FAILURE,
   RESET_USER_STATE,
 } from '@caesar/common/actions/entities/user';
 
@@ -26,6 +29,21 @@ export default createReducer(initialState, {
   },
   [FETCH_USERS_FAILURE](state) {
     return { ...state, isLoading: false, isError: true };
+  },
+  [CREATE_USER_REQUEST](state) {
+    return state;
+  },
+  [CREATE_USER_SUCCESS](state, { payload }) {
+    return {
+      ...state,
+      byId: {
+        ...state.byId,
+        [payload.user.id]: payload.user,
+      },
+    };
+  },
+  [CREATE_USER_FAILURE](state) {
+    return state;
   },
   [RESET_USER_STATE]() {
     return initialState;

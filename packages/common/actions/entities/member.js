@@ -58,11 +58,12 @@ export const fetchTeamMembersFailure = () => ({
   type: FETCH_TEAM_MEMBERS_FAILURE,
 });
 
-export const createMemberRequest = (email, role) => ({
+// @Deprecated
+export const createMemberRequest = (email, teamRole) => ({
   type: CREATE_MEMBER_REQUEST,
   payload: {
     email,
-    role,
+    teamRole,
   },
 });
 
@@ -77,11 +78,11 @@ export const createMemberFailure = () => ({
   type: CREATE_MEMBER_FAILURE,
 });
 
-export const createMemberBatchRequest = (email, role) => ({
+export const createMemberBatchRequest = (email, teamRole) => ({
   type: CREATE_MEMBER_BATCH_REQUEST,
   payload: {
     email,
-    role,
+    teamRole,
   },
 });
 

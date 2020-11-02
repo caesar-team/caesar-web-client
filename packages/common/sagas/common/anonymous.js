@@ -1,10 +1,8 @@
 import { put, call, takeLatest, select } from 'redux-saga/effects';
 import { workInProgressItemSelector } from '@caesar/common/selectors/workflow';
-import {
-  encryptItem,
-  generateAnonymousEmail,
-} from '@caesar/common/utils/cipherUtils';
-import { createMemberSaga } from '@caesar/common/sagas/entities/member';
+import { encryptItem } from '@caesar/common/utils/cipherUtils';
+import { generateAnonymousEmail } from '@caesar/common/utils/item';
+import { createUserSaga } from '@caesar/common/sagas/entities/user';
 import { DOMAIN_ROLES } from '@caesar/common/constants';
 import { generateSharingUrl } from '@caesar/common/utils/sharing';
 import { objectToBase64 } from '@caesar/common/utils/base64';
@@ -24,7 +22,7 @@ export function* createAnonymousLinkSaga() {
   try {
     const workInProgressItem = yield select(workInProgressItemSelector);
 
-    const email = generateAnonymousEmail();
+    const email = generateAnonymousEmail(workInProgressItem.id);
 
     const {
       id: userId,
@@ -32,15 +30,14 @@ export function* createAnonymousLinkSaga() {
       password,
       masterPassword,
       publicKey,
-    } = yield call(createMemberSaga, {
+      domainRoles,
+    } = yield call(createUserSaga, {
       payload: {
         email,
-        role: DOMAIN_ROLES.ROLE_ANONYMOUS_USER,
+        domainRole: DOMAIN_ROLES.ROLE_ANONYMOUS_USER,
       },
     });
 
-    // TODO: Add new flow of sharing with keipair.share
-    console.log('Anonym flow will be implemented soon');
     const encryptedSecret = yield call(
       encryptItem,
       workInProgressItem.data,
@@ -48,7 +45,7 @@ export function* createAnonymousLinkSaga() {
     );
 
     const item = {
-      id: 'itemId',
+      id: workInProgressItem.id,
       secret: encryptedSecret,
     };
 
@@ -58,11 +55,11 @@ export function* createAnonymousLinkSaga() {
       objectToBase64({
         e: email,
         p: password,
-        mp: masterPassword,
+        m: masterPassword,
       }),
     );
 
-    const share = {
+    const shared = {
       id: item.id,
       userId,
       email,
@@ -70,10 +67,11 @@ export function* createAnonymousLinkSaga() {
       link,
       publicKey,
       isAccepted: false,
-      domainRoles: [DOMAIN_ROLES.ROLE_ANONYMOUS_USER],
+      domainRoles,
     };
 
-    yield put(createAnonymousLinkSuccess(workInProgressItem.id, share));
+    // TODO: Add request to update 'shared' item
+    yield put(createAnonymousLinkSuccess(workInProgressItem.id, shared));
     yield put(updateWorkInProgressItem());
   } catch (error) {
     // eslint-disable-next-line no-console

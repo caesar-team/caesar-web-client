@@ -240,7 +240,7 @@ export default createReducer(initialState, {
         ...state.byId,
         [payload.itemId]: {
           ...state.byId[payload.itemId],
-          shared: payload.share,
+          shared: payload.shared,
         },
       },
     };

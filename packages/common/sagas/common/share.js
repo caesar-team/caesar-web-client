@@ -4,7 +4,7 @@ import {
   itemsBatchSelector,
   itemSelector,
 } from '@caesar/common/selectors/entities/item';
-import { userDataSelector } from '@caesar/common/selectors/user';
+import { currentUserDataSelector } from '@caesar/common/selectors/currentUser';
 import {
   shareKeyPairSelector,
   teamKeyPairSelector,
@@ -120,7 +120,7 @@ function* processMembersItemShare({ item, members }) {
     const { publicKey: ownerPublicKey } = yield select(teamKeyPairSelector, {
       teamId: item.teamId,
     });
-    const { id: ownerId } = yield select(userDataSelector);
+    const { id: ownerId } = yield select(currentUserDataSelector);
     const defaultList = yield select(teamDefaultListSelector, {
       teamId: item.teamId,
     });

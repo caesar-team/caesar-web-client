@@ -67,9 +67,11 @@ const SecureMessageContainerComponent = ({ message, password }) => {
     downloadAsZip(attachments);
   };
 
-  const title = decryptedMessage
-    ? <Title>It’s your secret</Title>
-    : <AdaptiveTitle>Enter the password to access the message</AdaptiveTitle>;
+  const title = decryptedMessage ? (
+    <Title>It’s your secret</Title>
+  ) : (
+    <AdaptiveTitle>Enter the password to access the message</AdaptiveTitle>
+  );
   const shouldShowButtons = !!decryptedMessage;
   const shouldShowDownloadButton =
     decryptedMessage &&
@@ -84,7 +86,7 @@ const SecureMessageContainerComponent = ({ message, password }) => {
   return (
     <Wrapper>
       <Header>
-        <StyledLogo name="logo-secure-message" width={114} height={32} />  
+        <StyledLogo name="logo-secure-message" width={114} height={32} />
       </Header>
       <Content>
         {title}

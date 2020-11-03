@@ -1,6 +1,6 @@
 /* eslint-disable no-console */
 import Router from 'next/router';
-import { put, call, takeLatest, select } from 'redux-saga/effects';
+import { put, call, select, takeLatest } from 'redux-saga/effects';
 import {
   FETCH_USER_SELF_REQUEST,
   FETCH_KEY_PAIR_REQUEST,
@@ -11,19 +11,25 @@ import {
   fetchKeyPairFailure,
   fetchUserTeamsSuccess,
   fetchUserTeamsFailure,
-  setCurrentTeamId,
-} from '@caesar/common/actions/user';
+  LEAVE_TEAM_REQUEST,
+  leaveTeamFailure,
+  leaveTeamSuccess,
+} from '@caesar/common/actions/currentUser';
 import { addPersonalKeyPair } from '@caesar/common/actions/keystore';
-import { addTeamsBatch } from '@caesar/common/actions/entities/team';
-import { addMembersBatch } from '@caesar/common/actions/entities/member';
-import { resetStore } from '@caesar/common/actions/application';
-import { membersByIdSelector } from '@caesar/common/selectors/entities/member';
-import { currentTeamIdSelector } from '@caesar/common/selectors/user';
-import { convertTeamsToEntity } from '@caesar/common/normalizers/normalizers';
+import {
+  updateGlobalNotification,
+  resetStore,
+} from '@caesar/common/actions/application';
+import { removeTeamMemberSuccess } from '@caesar/common/actions/entities/member';
+import { removeMemberFromTeam } from '@caesar/common/actions/entities/team';
+import { currentUserIdSelector } from '@caesar/common/selectors/currentUser';
+import { memberByUserIdAndTeamIdSelector } from '@caesar/common/selectors/entities/member';
+import { getServerErrorMessage } from '@caesar/common/utils/error';
 import {
   getUserSelf,
   getKeys,
   getUserTeams,
+  postLeaveTeam,
   postLogout,
 } from '@caesar/common/api';
 import { removeCookieValue, clearStorage } from '@caesar/common/utils/token';
@@ -32,19 +38,16 @@ import { ROUTES } from '@caesar/common/constants';
 
 export function* fetchUserSelfSaga() {
   try {
-    const { data: user } = yield call(getUserSelf);
-    const membersById = yield select(membersByIdSelector);
+    const { data: currentUser } = yield call(getUserSelf);
 
-    // TODO: Move to normalizr
     const fixedUser = {
-      ...membersById[user.id],
-      ...user,
-      _permissions: createPermissionsFromLinks(user._links),
-      teamIds: user.teamIds || [],
+      ...currentUser,
+      _permissions: currentUser?._links
+        ? createPermissionsFromLinks(currentUser._links)
+        : {},
     };
 
     yield put(fetchUserSelfSuccess(fixedUser));
-    yield put(addMembersBatch({ [fixedUser.id]: fixedUser }));
   } catch (error) {
     console.error('error', error);
     yield put(fetchUserSelfFailure());
@@ -73,17 +76,36 @@ export function* fetchUserTeamsSaga() {
 
     if (data.length) {
       yield put(fetchUserTeamsSuccess(data.map(({ id }) => id)));
-      // TODO: need fixes from BE
-      const teamsById = convertTeamsToEntity(data);
-
-      yield put(addTeamsBatch(teamsById));
-
-      const currentTeamId = yield select(currentTeamIdSelector);
-      put(setCurrentTeamId(currentTeamId || data[0].id));
     }
   } catch (error) {
     console.error('error', error);
     yield put(fetchUserTeamsFailure());
+  }
+}
+
+export function* leaveTeamSaga({ payload: { teamId } }) {
+  try {
+    yield call(postLeaveTeam, teamId);
+    const userId = yield select(currentUserIdSelector);
+    const member = yield select(memberByUserIdAndTeamIdSelector, {
+      userId,
+      teamId,
+    });
+
+    yield put(leaveTeamSuccess(teamId));
+    yield put(removeTeamMemberSuccess(member.id));
+    yield put(removeMemberFromTeam(member.teamId, member.id));
+
+    const {
+      router: { route },
+    } = Router;
+
+    if (route === `${ROUTES.SETTINGS}${ROUTES.TEAM}/[id]`) {
+      yield call(Router.push, ROUTES.SETTINGS + ROUTES.TEAM);
+    }
+  } catch (e) {
+    yield put(updateGlobalNotification(getServerErrorMessage(e), false, true));
+    yield put(leaveTeamFailure());
   }
 }
 
@@ -100,9 +122,10 @@ export function* logoutSaga() {
   }
 }
 
-export default function* userSagas() {
+export default function* currentUserSagas() {
   yield takeLatest(FETCH_USER_SELF_REQUEST, fetchUserSelfSaga);
   yield takeLatest(FETCH_KEY_PAIR_REQUEST, fetchKeyPairSaga);
   yield takeLatest(FETCH_USER_TEAMS_REQUEST, fetchUserTeamsSaga);
+  yield takeLatest(LEAVE_TEAM_REQUEST, leaveTeamSaga);
   yield takeLatest(LOGOUT, logoutSaga);
 }

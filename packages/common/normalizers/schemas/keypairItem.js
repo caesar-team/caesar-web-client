@@ -3,7 +3,7 @@ import { ITEM_TYPE } from '@caesar/common/constants';
 import { generateSystemItemName } from '../../utils/item';
 
 const itemSchema = new schema.Entity(
-  'byId',
+  'keyPairItemById',
   {},
   {
     processStrategy: ({

@@ -4,7 +4,7 @@ import {
   LIST_TYPE,
   NOT_SELECTABLE_LIST_TYPES,
 } from '@caesar/common/constants';
-import { currentTeamIdSelector } from '../user';
+import { currentTeamIdSelector } from '../currentUser';
 import { teamListSelector } from './team';
 import { itemListSelector } from './item';
 

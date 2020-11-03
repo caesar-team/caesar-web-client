@@ -1,6 +1,7 @@
-import React, { useEffect } from 'react';
+import React from 'react';
+import { useEffectOnce } from 'react-use';
 import { useRouter } from 'next/router';
-import { useDispatch, batch, useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { TeamContainer } from '@caesar/containers';
 import {
   Head,
@@ -8,11 +9,10 @@ import {
   SettingsSidebar,
   FullScreenLoader,
 } from '@caesar/components';
-
-import { userDataSelector } from '@caesar/common/selectors/user';
+import { currentUserDataSelector } from '@caesar/common/selectors/currentUser';
 import { initTeamSettings } from '@caesar/common/actions/workflow';
-import { fetchTeamMembersRequest } from '@caesar/common/actions/entities/member';
-import { memberTeamSelector } from '@caesar/common/selectors/entities/member';
+import { teamSelector } from '@caesar/common/selectors/entities/team';
+import { teamMembersFullViewSelector } from '@caesar/common/selectors/entities/member';
 
 const SettingsTeamPage = () => {
   const router = useRouter();
@@ -20,19 +20,17 @@ const SettingsTeamPage = () => {
 
   const { id } = router.query;
 
-  useEffect(() => {
-    batch(() => {
-      dispatch(initTeamSettings());
-      dispatch(fetchTeamMembersRequest({ teamId: id }));
-    });
-  }, [dispatch]);
+  useEffectOnce(() => {
+    dispatch(initTeamSettings());
+  });
 
+  const team = useSelector(state => teamSelector(state, { teamId: id })) || {};
   const members = useSelector(state =>
-    memberTeamSelector(state, { teamId: id }),
+    teamMembersFullViewSelector(state, { teamId: id }),
   );
-  const userData = useSelector(userDataSelector);
+  const currentUserData = useSelector(currentUserDataSelector);
 
-  const shouldShowLoader = !userData || !members;
+  const shouldShowLoader = !currentUserData || !team || !members;
 
   if (shouldShowLoader) {
     return <FullScreenLoader />;
@@ -41,10 +39,14 @@ const SettingsTeamPage = () => {
   return (
     <>
       <Head title="Team" />
-      <SettingsLayout user={userData}>
+      <SettingsLayout currentUser={currentUserData}>
         <>
           <SettingsSidebar />
-          <TeamContainer user={userData} members={members} />
+          <TeamContainer
+            currentUser={currentUserData}
+            team={team}
+            members={members}
+          />
         </>
       </SettingsLayout>
     </>

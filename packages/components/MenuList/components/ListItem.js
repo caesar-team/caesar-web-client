@@ -6,7 +6,7 @@ import styled from 'styled-components';
 import { transformListTitle } from '@caesar/common/utils/string';
 import { LIST_TYPE, PERMISSION } from '@caesar/common/constants';
 import { ERROR } from '@caesar/common/validation/constants';
-import { currentTeamSelector } from '@caesar/common/selectors/user';
+import { currentTeamSelector } from '@caesar/common/selectors/currentUser';
 import {
   createListRequest,
   editListRequest,
@@ -121,7 +121,7 @@ export const ListItem = ({
 
   const handleClickAcceptEdit = () => {
     if (isAcceptDisabled) {
-      return false;
+      return;
     }
 
     if (isCreatingMode) {

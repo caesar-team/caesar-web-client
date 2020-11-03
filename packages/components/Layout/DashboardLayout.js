@@ -4,9 +4,9 @@ import styled from 'styled-components';
 import ScrollLock from 'react-scrolllock';
 import { DASHBOARD_MODE } from '@caesar/common/constants';
 import {
-  userDataSelector,
+  currentUserDataSelector,
   currentTeamIdSelector,
-} from '@caesar/common/selectors/user';
+} from '@caesar/common/selectors/currentUser';
 import { teamKeyPairSelector } from '@caesar/common/selectors/keystore';
 import {
   setWorkInProgressItem,
@@ -28,7 +28,7 @@ const DashboardLayoutComponent = ({
   ...props
 }) => {
   const dispatch = useDispatch();
-  const user = useSelector(userDataSelector);
+  const currentUser = useSelector(currentUserDataSelector);
   const teamId = useSelector(currentTeamIdSelector);
   const keyPair = useSelector(state => teamKeyPairSelector(state, { teamId }));
 
@@ -57,7 +57,7 @@ const DashboardLayoutComponent = ({
     <LayoutConstructorStyled
       headerComponent={
         <PrimaryHeader
-          user={user}
+          currentUser={currentUser}
           searchedText={searchedText}
           showAddItemButton={!!keyPair}
           onSearch={handleSearch}

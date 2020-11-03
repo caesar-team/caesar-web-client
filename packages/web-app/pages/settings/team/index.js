@@ -8,7 +8,7 @@ import {
   SettingsSidebar,
   FullScreenLoader,
 } from '@caesar/components';
-import { userDataSelector } from '@caesar/common/selectors/user';
+import { currentUserDataSelector } from '@caesar/common/selectors/currentUser';
 import { initTeamsSettings } from '@caesar/common/actions/workflow';
 
 class SettingsTeamsPage extends Component {
@@ -17,9 +17,9 @@ class SettingsTeamsPage extends Component {
   }
 
   render() {
-    const { userData } = this.props;
+    const { currentUserData } = this.props;
 
-    const shouldShowLoader = !userData;
+    const shouldShowLoader = !currentUserData;
 
     if (shouldShowLoader) {
       return <FullScreenLoader />;
@@ -28,7 +28,7 @@ class SettingsTeamsPage extends Component {
     return (
       <>
         <Head title="Teams" />
-        <SettingsLayout user={userData}>
+        <SettingsLayout currentUser={currentUserData}>
           <>
             <SettingsSidebar />
             <TeamListContainer />
@@ -40,7 +40,7 @@ class SettingsTeamsPage extends Component {
 }
 
 const mapStateToProps = createStructuredSelector({
-  userData: userDataSelector,
+  currentUserData: currentUserDataSelector,
 });
 
 const mapDispatchToProps = {

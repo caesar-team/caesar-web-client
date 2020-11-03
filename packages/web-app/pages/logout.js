@@ -1,6 +1,6 @@
 import { useDispatch } from 'react-redux';
 import { useIsomorphicLayoutEffect } from 'react-use';
-import { logout } from '@caesar/common/actions/user';
+import { logout } from '@caesar/common/actions/currentUser';
 
 const LogoutPage = () => {
   const dispatch = useDispatch();

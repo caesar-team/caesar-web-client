@@ -1,18 +1,13 @@
 import { schema } from 'normalizr';
 import { ENTITY_TYPE, PERMISSION_ENTITY } from '../../constants';
 import { createPermissionsFromLinks } from '../../utils/createPermissionsFromLinks';
-import userSchema from './user';
 
 const memberSchema = new schema.Entity(
-  'byId',
+  'membersById',
+  {},
   {
-    user: userSchema,
-  },
-  {
-    idAttribute: 'userId',
     processStrategy: entity => ({
-      ...entity.user,
-      teamRole: entity.teamRole,
+      ...entity,
       __type: ENTITY_TYPE.MEMBER,
       _permissions: entity?._links
         ? {

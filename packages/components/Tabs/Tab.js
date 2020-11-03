@@ -1,18 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
 
-const getTabStyles = ({ isActive, theme }) => {
-  if (isActive) {
-    return `
-      background: ${theme.color.white};
-    `;
-  }
-
-  return `
-    background: transparent;
-  `;
-};
-
 const StyledTab = styled.li`
   display: inline-block;
   outline: 0;
@@ -20,11 +8,11 @@ const StyledTab = styled.li`
   margin-right: 32px;
   padding: 0 12px 4px;
   cursor: pointer;
-  border-bottom: 1px solid ${({ isActive, theme }) =>
-    isActive ? theme.color.black : 'transparent'};
-  fonts-size: ${({ theme }) => theme.font.size.main};
+  border-bottom: 1px solid
+    ${({ isActive, theme }) => (isActive ? theme.color.black : 'transparent')};
+  font-size: ${({ theme }) => theme.font.size.main};
   color: ${({ isActive, theme }) =>
-    isActive ? theme.color.black : theme.color.emperor};  
+    isActive ? theme.color.black : theme.color.emperor};
 `;
 
 const Tab = ({ title, component, disabled, isActive, onClick }) => {

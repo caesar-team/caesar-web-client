@@ -2,7 +2,7 @@ import React, { useState, useMemo, useCallback } from 'react';
 import { useSelector } from 'react-redux';
 import styled from 'styled-components';
 import { isLoadingSelector } from '@caesar/common/selectors/workflow';
-import { memberListSelector } from '@caesar/common/selectors/entities/member';
+import { userListSelector } from '@caesar/common/selectors/entities/user';
 import { teamsByIdSelector } from '@caesar/common/selectors/entities/team';
 import {
   SettingsWrapper,
@@ -91,7 +91,7 @@ export const Users = () => {
     }
   }, []);
 
-  const users = useSelector(memberListSelector);
+  const users = useSelector(userListSelector);
   const teamsById = useSelector(teamsByIdSelector);
   const tableData = useMemo(() => createTableData(users, teamsById), [
     users,

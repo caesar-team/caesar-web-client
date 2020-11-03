@@ -1,7 +1,7 @@
 import React from 'react';
 import { useSelector } from 'react-redux';
 import styled from 'styled-components';
-import { userDataSelector } from '@caesar/common/selectors/user';
+import { currentUserDataSelector } from '@caesar/common/selectors/currentUser';
 import LayoutConstructor from './LayoutConstructor';
 import { PrimaryHeader } from './PrimaryHeader';
 
@@ -23,11 +23,11 @@ const LayoutConstructorStyled = styled(LayoutConstructor)`
 `;
 
 export const CreateLayout = ({ children, ...props }) => {
-  const user = useSelector(userDataSelector);
+  const currentUser = useSelector(currentUserDataSelector);
 
   return (
     <LayoutConstructorStyled
-      headerComponent={<PrimaryHeader user={user} />}
+      headerComponent={<PrimaryHeader currentUser={currentUser} />}
       {...props}
     >
       {children}

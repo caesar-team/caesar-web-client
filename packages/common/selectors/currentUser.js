@@ -10,7 +10,7 @@ export const isLoadingSelector = createSelector(
 );
 
 export const getLastUpdatedSelector = createSelector(
-  userSelector,
+  currentUserSelector,
   user => user.lastUpdated,
 );
 

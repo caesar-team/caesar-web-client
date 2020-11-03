@@ -20,7 +20,7 @@ const Wrapper = styled.div`
 
 const InnerWrapper = styled.div`
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: center;
   padding: 16px 20px;
   position: relative;

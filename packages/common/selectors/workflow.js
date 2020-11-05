@@ -94,7 +94,7 @@ export const workInProgressItemSharedMembersSelector = createSelector(
   workInProgressItemSelector,
   usersByIdSelector,
   (workInProgressItem, usersById) =>
-    workInProgressItem?.invited?.map(({ userId }) => usersById[userId]) || [],
+    workInProgressItem?.invited?.map(userId => usersById[userId]) || [],
 );
 
 const createListItemsList = (children, itemsById) =>

@@ -3,13 +3,16 @@ import { useClickAway, useDebounce } from 'react-use';
 import styled from 'styled-components';
 import { getSearchUser } from '@caesar/common/api';
 import { uuid4 } from '@caesar/common/utils/uuid4';
-import { DEFAULT_ERROR_MESSAGE } from '@caesar/common/constants';
+import { getPlural } from '@caesar/common/utils/string';
+import {
+  DEFAULT_ERROR_MESSAGE,
+  // EMAIL_REGEX,
+} from '@caesar/common/constants';
 import { Input } from './Input';
 import { Icon } from '../Icon';
 import { CircleLoader } from '../Loader';
 import { MemberList } from '../MemberList';
-
-const EMAIL_REGEX = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+import { Hint } from '../Hint';
 
 const Wrapper = styled.div`
   display: flex;
@@ -87,7 +90,7 @@ const CloseIcon = styled(Icon)`
   }
 `;
 
-const createNewMember = email => ({
+const createNewUser = email => ({
   id: uuid4(),
   email,
   avatar: null,
@@ -98,20 +101,20 @@ const Prefix = <Icon name="search" width={16} height={16} color="gray" />;
 
 const Postfix = ({
   isLoading,
-  members,
+  users,
   filterText,
   handleClickReset,
-  handleAddNewMember,
+  handleAddNewUser,
 }) => {
   if (isLoading) {
     return <CircleLoader size={18} />;
   }
 
-  if (members.length && filterText) {
+  if (users.length && filterText) {
     return (
       <IconWrapper>
         <SearchedUsersCount>
-          {members.length} member{members.length === 1 ? '' : 's'}
+          {users.length} {getPlural(users.length, ['user', 'users'])}
         </SearchedUsersCount>
         <CloseIcon
           name="close"
@@ -124,12 +127,16 @@ const Postfix = ({
     );
   }
 
-  if (!isLoading && !members.length && filterText?.includes('@')) {
-    const isDisabled = !EMAIL_REGEX.test(filterText);
+  if (!isLoading && !users.length && filterText?.includes('@')) {
+    // TODO: Uncomment to enable invite users out of domain
+    // Also remove Hint
+    // const isDisabled = !EMAIL_REGEX.test(filterText);
 
     return (
-      <AddButton disabled={isDisabled} onClick={handleAddNewMember}>
-        <Icon name="plus" width={16} height={16} color="white" />
+      <AddButton disabled onClick={handleAddNewUser}>
+        <Hint text="You cannot share the item(-s) with unregistered users">
+          <Icon name="plus" width={16} height={16} color="white" />
+        </Hint>
       </AddButton>
     );
   }
@@ -139,7 +146,7 @@ const Postfix = ({
 
 const UserSearchInputComponent = ({ blackList, onClickAdd, className }) => {
   const [isLoading, setLoading] = useState(false);
-  const [members, setMembers] = useState([]);
+  const [users, setUsers] = useState([]);
   const [filterText, setFilterText] = useState('');
   const [serverError, setServerError] = useState(null);
   const ref = useRef(null);
@@ -164,7 +171,7 @@ const UserSearchInputComponent = ({ blackList, onClickAdd, className }) => {
           return;
         }
 
-        setMembers(data.filter(member => !blackList?.includes(member.id)));
+        setUsers(data.filter(user => !blackList?.includes(user.id)));
         setLoading(false);
         // eslint-disable-next-line no-empty
       } catch (error) {
@@ -184,32 +191,32 @@ const UserSearchInputComponent = ({ blackList, onClickAdd, className }) => {
     const { value } = event.target;
 
     setFilterText(value);
-    setMembers(!value ? [] : members);
+    setUsers(!value ? [] : users);
   };
 
-  const handleAddNewMember = () => {
+  const handleAddNewUser = () => {
     setFilterText('');
-    setMembers([]);
+    setUsers([]);
 
-    onClickAdd(createNewMember(filterText));
+    onClickAdd(createNewUser(filterText));
   };
 
   const handleClickReset = () => {
-    setMembers([]);
+    setUsers([]);
     setFilterText('');
   };
 
-  const handleClick = member => () => {
-    setMembers(members.filter(({ id }) => id !== member.id));
-    setFilterText(members.length === 1 ? '' : filterText);
+  const handleClick = user => () => {
+    setUsers(users.filter(({ id }) => id !== user.id));
+    setFilterText(users.length === 1 ? '' : filterText);
 
-    onClickAdd(member);
+    onClickAdd(user);
   };
 
-  const mappedMembers = members.map(({ name, ...member }) => member);
+  const mappedUsers = users.map(({ name, ...user }) => user);
 
   const shouldShowResultBox =
-    !isLoading && mappedMembers.length > 0 && filterText;
+    !isLoading && mappedUsers.length > 0 && filterText;
 
   return (
     <Wrapper className={className} ref={ref}>
@@ -222,10 +229,10 @@ const UserSearchInputComponent = ({ blackList, onClickAdd, className }) => {
         postfix={
           <Postfix
             isLoading={isLoading}
-            members={members}
+            users={users}
             filterText={filterText}
             handleClickReset={handleClickReset}
-            handleAddNewMember={handleAddNewMember}
+            handleAddNewUser={handleAddNewUser}
           />
         }
         error={serverError}
@@ -233,7 +240,7 @@ const UserSearchInputComponent = ({ blackList, onClickAdd, className }) => {
       {shouldShowResultBox && (
         <SearchedResultBox>
           <MemberList
-            members={mappedMembers}
+            members={mappedUsers}
             onClickAdd={handleClick}
             controlType="add"
             maxHeight={240}

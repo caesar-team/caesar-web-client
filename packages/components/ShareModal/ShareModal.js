@@ -10,7 +10,10 @@ import { UserSearchInput } from '../Input';
 import { Section } from '../Section';
 import { MemberList } from '../MemberList';
 import { Button } from '../Button';
-import { AnonymousLink, TeamList } from './components';
+import {
+  // AnonymousLink,
+  TeamList,
+} from './components';
 import { getAnonymousLink } from './utils';
 import { Scrollbar } from '../Scrollbar';
 import { ListItem } from '../List';
@@ -104,27 +107,27 @@ export const ShareModal = ({
     onShare(members, teamIds);
   };
 
-  const handleToggleAnonymousLink = () => {
-    if (link) {
-      onDeactivateLink();
-    } else {
-      setGeneratingLink(true);
-      onActivateLink();
-    }
-  };
+  // const handleToggleAnonymousLink = () => {
+  //   if (link) {
+  //     onDeactivateLink();
+  //   } else {
+  //     setGeneratingLink(true);
+  //     onActivateLink();
+  //   }
+  // };
 
-  const handleUpdateAnonymousLink = () => {
-    setGeneratingLink(true);
-    onActivateLink();
-  };
+  // const handleUpdateAnonymousLink = () => {
+  //   setGeneratingLink(true);
+  //   onActivateLink();
+  // };
 
-  const handleCopy = () => {
-    copy(link);
+  // const handleCopy = () => {
+  //   copy(link);
 
-    notification.show({
-      text: `The shared link has been copied`,
-    });
-  };
+  //   notification.show({
+  //     text: `The shared link has been copied`,
+  //   });
+  // };
 
   const handleDeleteItem = itemId => () => {
     onRemove(itemId);

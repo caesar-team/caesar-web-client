@@ -1,7 +1,7 @@
 import React, { useState, memo } from 'react';
 import { useEffectOnce, useUpdateEffect } from 'react-use';
 import styled from 'styled-components';
-import { getKeys, postKeys, postAcceptTwoFactor } from '@caesar/common/api';
+import { getKeys, postKeys } from '@caesar/common/api';
 import { matchStrict } from '@caesar/common/utils/match';
 import {
   validateKeys,
@@ -91,10 +91,6 @@ const MasterPasswordStepComponent = ({
         const {
           data: { publicKey, encryptedPrivateKey },
         } = await getKeys();
-
-        if (publicKey && encryptedPrivateKey) {
-          await postAcceptTwoFactor();
-        }
 
         initState.publicKey = publicKey;
         initState.encryptedPrivateKey = encryptedPrivateKey;

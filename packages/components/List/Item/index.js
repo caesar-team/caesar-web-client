@@ -1,6 +1,10 @@
 /* eslint-disable camelcase */
 import React from 'react';
-import { PERMISSION, PERMISSION_MESSAGES } from '@caesar/common/constants';
+import {
+  PERMISSION,
+  PERMISSION_MESSAGES,
+  TEAM_TYPE,
+} from "@caesar/common/constants";
 import { Icon } from '../../Icon';
 import { Can } from '../../Ability';
 import {
@@ -46,7 +50,7 @@ export const Item = ({
   const sharedCount =
     invited?.length +
     (teamMembersCount > 0 ? teamMembersCount - 1 : teamMembersCount);
-  const shouldShowMembers = sharedCount > 0;
+  const shouldShowMembers = teamId === TEAM_TYPE.PERSONAL && sharedCount > 0;
   const shouldShowAttachments =
     attachments && Array.isArray(attachments) && attachments.length > 0;
 

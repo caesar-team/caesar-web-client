@@ -1,19 +1,16 @@
 import React, { useState } from 'react';
 import { useEffectOnce, useUpdateEffect } from 'react-use';
 import { useSelector } from 'react-redux';
-// import copy from 'copy-text-to-clipboard';
+import copy from 'copy-text-to-clipboard';
 import styled from 'styled-components';
-// import { useNotification } from '@caesar/common/hooks';
+import { useNotification } from '@caesar/common/hooks';
 import { currentUserDataSelector } from '@caesar/common/selectors/currentUser';
 import { Modal, ModalTitle } from '../Modal';
 import { UserSearchInput } from '../Input';
 import { Section } from '../Section';
 import { MemberList } from '../MemberList';
 import { Button } from '../Button';
-import {
-  // AnonymousLink,
-  TeamList,
-} from './components';
+import { AnonymousLink, TeamList } from './components';
 import { getAnonymousLink } from './utils';
 import { Scrollbar } from '../Scrollbar';
 import { ListItem } from '../List';
@@ -80,20 +77,21 @@ export const ShareModal = ({
   teams,
   anonymousLink = [],
   isMultiMode = false,
-  // onActivateLink = Function.prototype,
-  // onDeactivateLink = Function.prototype,
+  onActivateLink = Function.prototype,
+  onDeactivateLink = Function.prototype,
   onShare = Function.prototype,
   onCancel = Function.prototype,
   onRevokeAccess = Function.prototype,
   onRemove = Function.prototype,
 }) => {
+  const disableAnonymLink = true;
   const [members, setMembers] = useState([]);
   const [teamIds, setTeamIds] = useState([]);
   const [isOpenedInvited, setOpenedInvited] = useState(false);
   const [link, setLink] = useState(null);
   const [isGeneratingLink, setGeneratingLink] = useState(false);
   const currentUser = useSelector(currentUserDataSelector);
-  // const notification = useNotification();
+  const notification = useNotification();
 
   const handleAddMember = member => {
     setMembers([...members, member]);
@@ -107,27 +105,27 @@ export const ShareModal = ({
     onShare(members, teamIds);
   };
 
-  // const handleToggleAnonymousLink = () => {
-  //   if (link) {
-  //     onDeactivateLink();
-  //   } else {
-  //     setGeneratingLink(true);
-  //     onActivateLink();
-  //   }
-  // };
+  const handleToggleAnonymousLink = () => {
+    if (link) {
+      onDeactivateLink();
+    } else {
+      setGeneratingLink(true);
+      onActivateLink();
+    }
+  };
 
-  // const handleUpdateAnonymousLink = () => {
-  //   setGeneratingLink(true);
-  //   onActivateLink();
-  // };
+  const handleUpdateAnonymousLink = () => {
+    setGeneratingLink(true);
+    onActivateLink();
+  };
 
-  // const handleCopy = () => {
-  //   copy(link);
+  const handleCopy = () => {
+    copy(link);
 
-  //   notification.show({
-  //     text: `The shared link has been copied`,
-  //   });
-  // };
+    notification.show({
+      text: `The shared link has been copied`,
+    });
+  };
 
   const handleDeleteItem = itemId => () => {
     onRemove(itemId);
@@ -207,8 +205,7 @@ export const ShareModal = ({
           </Section>
         </Row>
       )}
-      {/* TODO: Implement anonym sharing
-      {!isMultiMode && (
+      {!disableAnonymLink && !isMultiMode && (
         <Row>
           <AnonymousLink
             link={link}
@@ -218,7 +215,7 @@ export const ShareModal = ({
             onUpdate={handleUpdateAnonymousLink}
           />
         </Row>
-      )} */}
+      )}
       {isMultiMode && (
         <Items>
           <TextWithLinesStyled position="left" width={1}>

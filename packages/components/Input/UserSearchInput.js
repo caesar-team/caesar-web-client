@@ -4,10 +4,7 @@ import styled from 'styled-components';
 import { getSearchUser } from '@caesar/common/api';
 import { uuid4 } from '@caesar/common/utils/uuid4';
 import { getPlural } from '@caesar/common/utils/string';
-import {
-  DEFAULT_ERROR_MESSAGE,
-  // EMAIL_REGEX,
-} from '@caesar/common/constants';
+import { DEFAULT_ERROR_MESSAGE, EMAIL_REGEX } from '@caesar/common/constants';
 import { Input } from './Input';
 import { Icon } from '../Icon';
 import { CircleLoader } from '../Loader';
@@ -128,12 +125,15 @@ const Postfix = ({
   }
 
   if (!isLoading && !users.length && filterText?.includes('@')) {
-    // TODO: Uncomment to enable invite users out of domain
-    // Also remove Hint
-    // const isDisabled = !EMAIL_REGEX.test(filterText);
+    // TODO: Remove Hint when invite users will be enabled
+    const disableInviteUserToDomain = true;
+    const isDisabled = !EMAIL_REGEX.test(filterText);
 
     return (
-      <AddButton disabled onClick={handleAddNewUser}>
+      <AddButton
+        disabled={disableInviteUserToDomain || isDisabled}
+        onClick={handleAddNewUser}
+      >
         <Hint text="You cannot share the item(-s) with unregistered users">
           <Icon name="plus" width={16} height={16} color="white" />
         </Hint>

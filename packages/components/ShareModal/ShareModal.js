@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import { useEffectOnce, useUpdateEffect } from 'react-use';
 import { useSelector } from 'react-redux';
-import copy from 'copy-text-to-clipboard';
+// import copy from 'copy-text-to-clipboard';
 import styled from 'styled-components';
-import { useNotification } from '@caesar/common/hooks';
+// import { useNotification } from '@caesar/common/hooks';
 import { currentUserDataSelector } from '@caesar/common/selectors/currentUser';
 import { Modal, ModalTitle } from '../Modal';
 import { UserSearchInput } from '../Input';
@@ -80,8 +80,8 @@ export const ShareModal = ({
   teams,
   anonymousLink = [],
   isMultiMode = false,
-  onActivateLink = Function.prototype,
-  onDeactivateLink = Function.prototype,
+  // onActivateLink = Function.prototype,
+  // onDeactivateLink = Function.prototype,
   onShare = Function.prototype,
   onCancel = Function.prototype,
   onRevokeAccess = Function.prototype,
@@ -93,7 +93,7 @@ export const ShareModal = ({
   const [link, setLink] = useState(null);
   const [isGeneratingLink, setGeneratingLink] = useState(false);
   const currentUser = useSelector(currentUserDataSelector);
-  const notification = useNotification();
+  // const notification = useNotification();
 
   const handleAddMember = member => {
     setMembers([...members, member]);

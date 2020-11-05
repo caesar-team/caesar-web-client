@@ -64,8 +64,10 @@ import {
 import { arrayToObject, objectToArray } from '@caesar/common/utils/utils';
 import { upperFirst } from '@caesar/common/utils/string';
 import {
+  getKeypairs,
   getLastUpdatedUserItems,
   getLists,
+  getTeamKeyPair,
   getTeamLists,
 } from '@caesar/common/api';
 import { TEAM_TYPE, LIST_TYPE, TEAM_ROLES } from '@caesar/common/constants';
@@ -95,6 +97,7 @@ import {
   teamKeyPairSelector,
   shareKeyPairsSelector,
   shareItemKeyPairSelector,
+  isKeystoreEmpty,
 } from '@caesar/common/selectors/keystore';
 import { addTeamsBatch, lockTeam } from '@caesar/common/actions/entities/team';
 import { getServerErrorMessage } from '@caesar/common/utils/error';
@@ -149,6 +152,26 @@ export function decryptItemsByItemIdKeys(items, keyPairs) {
     return [];
   }
 }
+export function* decryptUserItems(items) {
+  const keyPair = yield select(teamKeyPairSelector, {
+    teamId: TEAM_TYPE.PERSONAL,
+  });
+
+  // decrypt the items
+  if (items?.length > 0) {
+    yield put(
+      decryption({
+        items,
+        key: keyPair.privateKey,
+        masterPassword: keyPair.password,
+      }),
+    );
+  }
+}
+
+function* isTeamKeypairExists(teamId) {
+  return !!(yield select(teamKeyPairSelector, { teamId }));
+}
 
 export function* processSharedItemsSaga() {
   try {
@@ -175,9 +198,9 @@ export function* processSharedItemsSaga() {
   }
 }
 function* checkTeamPermissionsAndKeys(teamId, createKeyPair = false) {
-  const teamKeyPairs = yield select(teamKeyPairSelector, { teamId });
+  const teamKeypairExists = yield call(isTeamKeypairExists, teamId);
 
-  if (!teamKeyPairs) {
+  if (!teamKeypairExists) {
     if (teamId === TEAM_TYPE.PERSONAL) {
       // eslint-disable-next-line no-console
       console.warn(`The key pair for the Personal team not found. `);
@@ -268,13 +291,21 @@ export function* processTeamsItemsSaga() {
     console.error(error);
   }
 }
+function* loadTeamKeypairIfNotExists(teamId) {
+  const teamKeypairExists = yield call(isTeamKeypairExists, teamId);
 
+  if (!teamKeypairExists) {
+    const { data: keypairItem } = yield call(getTeamKeyPair, teamId);
+    const { itemsById } = convertItemsToEntities([keypairItem]);
+    const items = Object.values(itemsById);
+    yield call(decryptUserItems, items);
+  }
+}
 function* initTeam(teamId) {
   try {
     const currentTeamId = teamId;
 
     if (!currentTeamId || currentTeamId === TEAM_TYPE.PERSONAL) return;
-
     const { data: lists } = yield call(getTeamLists, currentTeamId);
     const listsById = convertListsToEntities(lists);
 
@@ -392,11 +423,6 @@ const keyPairsEncryptedByTeamKeysFilter = keypair =>
   keypair.teamId !== TEAM_TYPE.PERSONAL && keypair.relatedItemId;
 function* loadKeyPairsAndPersonalItems() {
   try {
-    // Init personal keys
-    const keyPair = yield select(teamKeyPairSelector, {
-      teamId: TEAM_TYPE.PERSONAL,
-    });
-
     // Load lists
     const { data: lists } = yield call(getLists);
     const listsById = convertListsToEntities(lists);
@@ -444,13 +470,7 @@ function* loadKeyPairsAndPersonalItems() {
 
     // decrypt the items
     if (itemsEncryptedByUserKeys?.length > 0) {
-      yield put(
-        decryption({
-          items: itemsEncryptedByUserKeys,
-          key: keyPair.privateKey,
-          masterPassword: keyPair.password,
-        }),
-      );
+      yield call(decryptUserItems, itemsEncryptedByUserKeys);
     }
 
     // Inject shares into the defualt list
@@ -475,9 +495,22 @@ function* loadKeyPairsAndPersonalItems() {
         ...itemsEncryptedByTeamKeys,
       }),
     );
-
     if (!keypairsArray?.length) {
-      yield put(finishProcessingKeyPairs());
+      const isEmptyStore = yield select(isKeystoreEmpty);
+
+      if (isEmptyStore) {
+        const { data: serverKeypairs } = yield call(getKeypairs);
+        const { itemsById: serverKeypairsById = {} } = convertItemsToEntities(
+          serverKeypairs,
+        );
+
+        const serverKeypairsArray = objectToArray(serverKeypairsById);
+        if (serverKeypairsArray && serverKeypairsArray.length !== 0) {
+          yield call(decryptUserItems, serverKeypairsArray);
+        }
+      } else {
+        yield put(finishProcessingKeyPairs());
+      }
     }
   } catch (error) {
     // eslint-disable-next-line no-console
@@ -544,9 +577,24 @@ export function* openTeamVaultSaga({ payload: { teamId } }) {
 
       return;
     }
+
     if (!team) {
       throw new Error('Houston, we have a problem!');
     }
+
+    const isTeamHasKeypair = yield call(isTeamKeypairExists, teamId);
+
+    if (!isTeamHasKeypair) {
+      yield call(loadTeamKeypairIfNotExists, teamId);
+      // eslint-disable-next-line no-console
+      console.warn(
+        'Trying to load the team key from the server, the team: <b>%s</b>',
+        team.title,
+      );
+
+      return;
+    }
+
     yield call(initTeam, teamId);
     yield call(initListsAndProgressEntities);
     const checksResult = yield call(checkTeamPermissionsAndKeys, teamId);

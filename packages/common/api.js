@@ -222,3 +222,8 @@ export const updateMoveItemsBatch = (data, listId) =>
 
 // secure
 export const getSecureMessage = id => callApi.get(`/message/${id}`);
+
+// Keypairs
+export const getKeypairs = () => callApi.get(`/keypairs`);
+export const getTeamKeyPair = teamId =>
+  callApi.get(`/keypairs/personal/${teamId}`);

@@ -204,6 +204,7 @@ export const ShareModal = ({
           </Section>
         </Row>
       )}
+      {/* TODO: Implement anonym sharing
       {!isMultiMode && (
         <Row>
           <AnonymousLink
@@ -214,7 +215,7 @@ export const ShareModal = ({
             onUpdate={handleUpdateAnonymousLink}
           />
         </Row>
-      )}
+      )} */}
       {isMultiMode && (
         <Items>
           <TextWithLinesStyled position="left" width={1}>

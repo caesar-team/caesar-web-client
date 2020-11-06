@@ -12,12 +12,10 @@ import {
   workInProgressItemSelector,
   workInProgressItemIdsSelector,
   workInProgressListSelector,
-  visibleListItemsSelector,
 } from '@caesar/common/selectors/workflow';
 import {
   itemsByIdSelector,
   generalItemsSelector,
-  itemsGeneralListSelector,
 } from '@caesar/common/selectors/entities/item';
 import {
   trashListSelector,

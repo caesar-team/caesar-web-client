@@ -17,6 +17,7 @@ import {
 import {
   itemsByIdSelector,
   generalItemsSelector,
+  itemsGeneralListSelector,
 } from '@caesar/common/selectors/entities/item';
 import {
   trashListSelector,
@@ -36,6 +37,7 @@ import { MultiItem, List } from '@caesar/components';
 import { MODAL } from '../constants';
 import { filter } from '../utils';
 
+const visibleItemFilter = item => !!item.data;
 const MiddleColumnComponent = ({
   mode,
   searchedText,
@@ -47,7 +49,6 @@ const MiddleColumnComponent = ({
   const workInProgressItemIds = useSelector(workInProgressItemIdsSelector);
   const workInProgressList = useSelector(workInProgressListSelector);
   const workInProgressItem = useSelector(workInProgressItemSelector);
-  const visibleListItems = useSelector(visibleListItemsSelector);
   const trashList = useSelector(trashListSelector);
   const favoritesList = useSelector(favoritesListSelector);
   const teamsTrashLists = useSelector(teamsTrashListsSelector);
@@ -57,7 +58,8 @@ const MiddleColumnComponent = ({
   const teamMembers = useSelector(state =>
     teamMembersShortViewSelector(state, { teamId: currentTeamId }),
   );
-  const isFavoriteList = workInProgressList?.id === LIST_TYPE.FAVORITES;
+
+  const isFavoriteList = workInProgressList?.type === LIST_TYPE.FAVORITES;
   const generalItems = useSelector(state =>
     generalItemsSelector(state, {
       itemIds: isFavoriteList
@@ -65,6 +67,7 @@ const MiddleColumnComponent = ({
         : listsById[(workInProgressList?.id)]?.children,
     }),
   );
+  const visibleListItems = generalItems.filter(visibleItemFilter);
 
   const itemsLengthInList = generalItems.length;
   const visibleListItemsLength = visibleListItems.length;

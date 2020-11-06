@@ -23,19 +23,17 @@ import { actualKeyPairSelector } from '@caesar/common/selectors/keystore';
 // @Depricated
 export function* rehydrateStoreSaga() {
   try {
-    const isOnline = yield select(isOnlineSelector);
-
-    if (!isOnline) {
-      const items = yield select(itemListSelector);
-      const keyPair = yield select(actualKeyPairSelector);
-      const masterPassword = yield select(masterPasswordSelector);
-
-      yield fork(decryption, {
-        items,
-        key: keyPair.privateKey,
-        masterPassword,
-      });
-    }
+    // const isOnline = yield select(isOnlineSelector);
+    // if (!isOnline) {
+    // const items = yield select(itemListSelector);
+    // const keyPair = yield select(actualKeyPairSelector);
+    // const masterPassword = yield select(masterPasswordSelector);
+    // yield fork(decryption, {
+    //   items,
+    //   key: keyPair.privateKey,
+    //   masterPassword,
+    // });
+    // }
   } catch (error) {
     // eslint-disable-next-line no-console
     console.error(error);

@@ -108,6 +108,7 @@ const createListItemsList = (children, itemsById) =>
     }, [])
     .sort((a, b) => sortByDate(a.lastUpdated, b.lastUpdated, 'DESC')) || [];
 
+// @Depricated
 export const visibleListItemsSelector = createSelector(
   listsByIdSelector,
   itemsByIdSelector,

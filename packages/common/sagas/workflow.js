@@ -159,6 +159,7 @@ export function* decryptUserItems(items) {
 
   // decrypt the items
   if (items?.length > 0) {
+    console.log('decryptUserItems');
     yield put(
       decryption({
         items,
@@ -173,10 +174,12 @@ function* isTeamKeypairExists(teamId) {
   return !!(yield select(teamKeyPairSelector, { teamId }));
 }
 
-export function* processSharedItemsSaga() {
+export function* processSharedItemsSaga({ payload: { teamId } }) {
   try {
     const keyPairs = yield select(shareKeyPairsSelector);
-    const sharedItems = yield select(nonDecryptedSharedItemsSelector);
+    const sharedItems = yield select(nonDecryptedSharedItemsSelector, {
+      teamId,
+    });
 
     yield all(
       decryptItemsByItemIdKeys(
@@ -185,13 +188,20 @@ export function* processSharedItemsSaga() {
       ),
     );
 
-    // Remove undecrypttable items from the store
-    yield call(
-      removeItemsBatch,
-      sharedItems
-        .filter(sharedItem => !keyPairs[sharedItem.id])
-        .map(sharedItem => sharedItem.id),
-    );
+    const removeItemIds = sharedItems
+      .filter(sharedItem => !keyPairs[sharedItem.id])
+      .map(sharedItem => sharedItem.id);
+
+    if (removeItemIds.length) {
+      // eslint-disable-next-line no-console
+      console.warn(
+        `WARNING! These items cannot be decrypted as there are no keypairs and will remove from the store, the ids: %s`,
+        removeItemIds,
+      );
+
+      // Remove undecrypttable items from the store
+      yield put(removeItemsBatch(removeItemIds));
+    }
   } catch (error) {
     // eslint-disable-next-line no-console
     console.error(error);
@@ -259,7 +269,6 @@ export function* processTeamItemsSaga({ payload: { teamId } }) {
 
     const teamItems = yield select(nonDecryptedTeamItemsSelector, { teamId });
     if (teamItems.length <= 0 || !privateKey || !password) return;
-
     yield put(
       decryption({
         items: teamItems,
@@ -691,7 +700,7 @@ function* decryptItemRaws({ payload: { item } }) {
       !item.teamId && !item.isShared
         ? yield select(masterPasswordSelector)
         : keyPair.password;
-
+    console.log('decryptItemRaws');
     yield put(
       decryption({
         raws,

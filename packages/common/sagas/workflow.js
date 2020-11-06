@@ -507,6 +507,8 @@ function* loadKeyPairsAndPersonalItems() {
         const serverKeypairsArray = objectToArray(serverKeypairsById);
         if (serverKeypairsArray && serverKeypairsArray.length !== 0) {
           yield call(decryptUserItems, serverKeypairsArray);
+        } else {
+          yield put(finishProcessingKeyPairs());
         }
       } else {
         yield put(finishProcessingKeyPairs());

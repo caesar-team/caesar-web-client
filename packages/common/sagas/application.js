@@ -1,7 +1,5 @@
-import { put, fork, takeLatest, select } from 'redux-saga/effects';
-import { decryption } from '@caesar/common/sagas/common/decryption';
+import { put, takeLatest } from 'redux-saga/effects';
 import {
-  REHYDRATE_STORE,
   RESET_STORE,
   resetApplicationState,
 } from '@caesar/common/actions/application';
@@ -14,31 +12,6 @@ import { resetUserState } from '@caesar/common/actions/entities/user';
 import { resetCurrentUserState } from '@caesar/common/actions/currentUser';
 import { resetWorkflowState } from '@caesar/common/actions/workflow';
 import { resetKeystoreState } from '@caesar/common/actions/keystore';
-import { isOnlineSelector } from '@caesar/common/selectors/application';
-import { itemListSelector } from '@caesar/common/selectors/entities/item';
-import { masterPasswordSelector } from '@caesar/common/selectors/currentUser';
-import { actualKeyPairSelector } from '@caesar/common/selectors/keystore';
-
-// TODO: Is conflicting with next-offline?
-// @Depricated
-export function* rehydrateStoreSaga() {
-  try {
-    // const isOnline = yield select(isOnlineSelector);
-    // if (!isOnline) {
-    // const items = yield select(itemListSelector);
-    // const keyPair = yield select(actualKeyPairSelector);
-    // const masterPassword = yield select(masterPasswordSelector);
-    // yield fork(decryption, {
-    //   items,
-    //   key: keyPair.privateKey,
-    //   masterPassword,
-    // });
-    // }
-  } catch (error) {
-    // eslint-disable-next-line no-console
-    console.error(error);
-  }
-}
 
 function* resetStoreSaga() {
   try {
@@ -59,6 +32,5 @@ function* resetStoreSaga() {
 }
 
 export default function* applicationSagas() {
-  yield takeLatest(REHYDRATE_STORE, rehydrateStoreSaga);
   yield takeLatest(RESET_STORE, resetStoreSaga);
 }

@@ -159,7 +159,6 @@ export function* decryptUserItems(items) {
 
   // decrypt the items
   if (items?.length > 0) {
-    console.log('decryptUserItems');
     yield put(
       decryption({
         items,

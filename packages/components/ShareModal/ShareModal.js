@@ -84,6 +84,7 @@ export const ShareModal = ({
   onRevokeAccess = Function.prototype,
   onRemove = Function.prototype,
 }) => {
+  const disableAnonymLink = true;
   const [members, setMembers] = useState([]);
   const [teamIds, setTeamIds] = useState([]);
   const [isOpenedInvited, setOpenedInvited] = useState(false);
@@ -204,7 +205,7 @@ export const ShareModal = ({
           </Section>
         </Row>
       )}
-      {!isMultiMode && (
+      {!disableAnonymLink && !isMultiMode && (
         <Row>
           <AnonymousLink
             link={link}

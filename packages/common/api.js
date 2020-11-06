@@ -9,6 +9,8 @@ import {
 } from './utils/token';
 import { API_URI, API_BASE_PATH, ROUTES } from './constants';
 import { isClient } from './utils/isEnvironment';
+import { store } from './root/store';
+import { resetStore } from './actions/application';
 
 const { CancelToken } = axios;
 
@@ -16,6 +18,7 @@ const softExit = () => {
   if (isClient) {
     removeCookieValue('token');
     clearStorage();
+    store.dispatch(resetStore());
 
     if (Router.router.pathname !== ROUTES.SIGN_IN) {
       Router.push(ROUTES.SIGN_IN);

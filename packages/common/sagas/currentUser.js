@@ -113,6 +113,7 @@ export function* logoutSaga() {
   try {
     yield call(postLogout);
     yield call(removeCookieValue, 'token');
+    // TODO: Need to identify if we use this 'share' cookie or not
     yield call(removeCookieValue, 'share');
     yield call(clearStorage);
     yield put(resetStore());

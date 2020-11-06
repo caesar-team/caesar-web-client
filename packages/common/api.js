@@ -198,6 +198,15 @@ export const updateMoveItem = (itemId, data) =>
 export const toggleFavorite = id => callApi.post(`/items/${id}/favorite`);
 export const removeItem = itemId => callApi.delete(`/items/${itemId}`);
 
+export const getLastUpdatedUserItems = (
+  lastUpdated = Math.round(+new Date() / 1000),
+) =>
+  callApi.get('/items/all', {
+    params: {
+      lastUpdated,
+    },
+  });
+
 export const postItemShare = ({ itemId, users }) =>
   callApi.post(`/items/${itemId}/share`, { users });
 export const getCheckShare = id => callApi.get(`/anonymous/share/${id}/check`);
@@ -216,3 +225,8 @@ export const updateMoveItemsBatch = (data, listId) =>
 
 // secure
 export const getSecureMessage = id => callApi.get(`/message/${id}`);
+
+// Keypairs
+export const getKeypairs = () => callApi.get(`/keypairs`);
+export const getTeamKeyPair = teamId =>
+  callApi.get(`/keypairs/personal/${teamId}`);

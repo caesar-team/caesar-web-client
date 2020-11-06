@@ -5,7 +5,7 @@ import {
   currentUserIdSelector,
 } from '@caesar/common/selectors/currentUser';
 import { generateSystemItemName } from '@caesar/common/utils/item';
-import { KEY_TYPE, ENTITY_TYPE } from '@caesar/common/constants';
+import { KEY_TYPE, ENTITY_TYPE, TEAM_TYPE } from '@caesar/common/constants';
 
 const findSystemItemsTeamByItemName = (data, teamId) =>
   Object.values(data).find(
@@ -13,6 +13,15 @@ const findSystemItemsTeamByItemName = (data, teamId) =>
   ) || {};
 
 export const keyStoreSelector = state => state.keystore;
+export const isKeystoreEmpty = createSelector(
+  keyStoreSelector,
+  keystore =>
+    !Object.keys(keystore[KEY_TYPE.ANONYMOUS])?.length &&
+    !Object.keys(keystore[KEY_TYPE.TEAMS]).filter(
+      teamId => teamId !== TEAM_TYPE.PERSONAL,
+    )?.length &&
+    !Object.keys(keystore[KEY_TYPE.SHARES])?.length,
+);
 
 export const anonymousKeyPairsSelector = createSelector(
   keyStoreSelector,

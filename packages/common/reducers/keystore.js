@@ -35,7 +35,10 @@ export default createReducer(initialState, {
     return {
       ...state,
       [KEY_TYPE.TEAMS]: {
-        [TEAM_TYPE.PERSONAL]: { privateKey, publicKey, password },
+        ...state[KEY_TYPE.TEAMS],
+        ...{
+          [TEAM_TYPE.PERSONAL]: { privateKey, publicKey, password },
+        },
       },
     };
   },

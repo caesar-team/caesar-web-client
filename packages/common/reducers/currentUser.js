@@ -17,6 +17,7 @@ import {
   LEAVE_TEAM_FAILURE,
   SET_DEFAULT_LIST_ID,
   RESET_CURRENT_USER_STATE,
+  LAST_UPDATED_ITEMS_UNIXTIME,
 } from '@caesar/common/actions/currentUser';
 
 const initialState = {
@@ -26,10 +27,17 @@ const initialState = {
   masterPassword: null,
   currentTeamId: null,
   defaultListId: null,
+  lastUpdated: null,
   data: null,
 };
 
 export default createReducer(initialState, {
+  [LAST_UPDATED_ITEMS_UNIXTIME](state, { payload }) {
+    return {
+      ...state,
+      lastUpdated: payload.lastUpdated || null,
+    };
+  },
   [FETCH_USER_SELF_REQUEST](state) {
     return { ...state, isLoading: true };
   },

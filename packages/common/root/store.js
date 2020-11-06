@@ -8,6 +8,9 @@ import { rootReducer } from './reducers';
 import { rootSaga } from './sagas';
 import { persistOptions } from './persist';
 
+// eslint-disable-next-line import/no-mutable-exports
+let store;
+
 export function configureWebStore(preloadedState) {
   const composeEnhancers = composeWithDevTools({});
 
@@ -22,7 +25,7 @@ export function configureWebStore(preloadedState) {
     persistCallback: rehydrateStore,
   });
 
-  const store = createStore(
+  store = createStore(
     offlineEnhanceReducer(rootReducer),
     preloadedState,
     composeEnhancers(
@@ -60,7 +63,7 @@ export function configureExtensionStore(preloadedState) {
   const composeEnhancers = composeWithDevTools({});
   const sagaMiddleware = createSagaMiddleware();
 
-  const store = createStore(
+  store = createStore(
     rootReducer,
     preloadedState,
     composeEnhancers(applyMiddleware(sagaMiddleware)),
@@ -70,3 +73,5 @@ export function configureExtensionStore(preloadedState) {
 
   return store;
 }
+
+export { store };

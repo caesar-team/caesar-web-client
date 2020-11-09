@@ -10,7 +10,7 @@ export const schema = yup.object({
     raw: yup
       .string()
       .test('fileSize', `Maximum file size is ${MAX_SIZE}`, raw =>
-        checkFileSize(raw.length),
+        !raw?.length ? false : checkFileSize(raw.length, MAX_SIZE),
       ),
   }),
 });

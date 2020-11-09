@@ -9,6 +9,8 @@ import {
 } from './utils/token';
 import { API_URI, API_BASE_PATH, ROUTES } from './constants';
 import { isClient } from './utils/isEnvironment';
+import { store } from './root/store';
+import { resetStore } from './actions/application';
 
 const { CancelToken } = axios;
 
@@ -16,6 +18,7 @@ const softExit = () => {
   if (isClient) {
     removeCookieValue('token');
     clearStorage();
+    store.dispatch(resetStore());
 
     if (Router.router.pathname !== ROUTES.SIGN_IN) {
       Router.push(ROUTES.SIGN_IN);
@@ -195,6 +198,15 @@ export const updateMoveItem = (itemId, data) =>
 export const toggleFavorite = id => callApi.post(`/items/${id}/favorite`);
 export const removeItem = itemId => callApi.delete(`/items/${itemId}`);
 
+export const getLastUpdatedUserItems = (
+  lastUpdated = Math.round(+new Date() / 1000),
+) =>
+  callApi.get('/items/all', {
+    params: {
+      lastUpdated,
+    },
+  });
+
 export const postItemShare = ({ itemId, users }) =>
   callApi.post(`/items/${itemId}/share`, { users });
 export const getCheckShare = id => callApi.get(`/anonymous/share/${id}/check`);
@@ -213,3 +225,8 @@ export const updateMoveItemsBatch = (data, listId) =>
 
 // secure
 export const getSecureMessage = id => callApi.get(`/message/${id}`);
+
+// Keypairs
+export const getKeypairs = () => callApi.get(`/keypairs`);
+export const getTeamKeyPair = teamId =>
+  callApi.get(`/keypairs/personal/${teamId}`);

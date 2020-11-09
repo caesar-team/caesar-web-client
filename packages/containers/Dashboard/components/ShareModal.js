@@ -59,10 +59,10 @@ export const ShareModal = ({
     handleCloseModal();
   };
 
+  const canRevokeAccess = false;
   const handleRevokeAccess = member => {
     // TODO: Implement revoke share access
     // dispatch(removeShareRequest());
-    console.log('Revoke share access will be implemented soon.');
     console.log('member: ', member);
   };
 
@@ -82,7 +82,7 @@ export const ShareModal = ({
       anonymousLink={workInProgressItem?.shared}
       isMultiMode={isMultiItem}
       onShare={handleShare}
-      onRevokeAccess={handleRevokeAccess}
+      onRevokeAccess={canRevokeAccess ? handleRevokeAccess : null}
       onActivateLink={handleActivateLink}
       onDeactivateLink={handleDeactivateLink}
       onCancel={handleCloseModal}

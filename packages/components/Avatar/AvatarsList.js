@@ -20,6 +20,7 @@ const AvatarsList = ({
   size,
   fontSize,
   visibleCount = DEFAULT_VISIBLE_AVATARS_COUNT,
+  avatarHintPosition,
   ...props
 }) => {
   const visibleAvatars = avatars.length ? avatars.slice(0, visibleCount) : [];
@@ -30,6 +31,7 @@ const AvatarsList = ({
     .map(({ name, email, avatar }, index) => (
       <StyledAvatar
         hint={name || email}
+        hintPosition={avatarHintPosition}
         size={size}
         fontSize={fontSize}
         key={index}

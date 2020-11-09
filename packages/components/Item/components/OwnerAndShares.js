@@ -110,7 +110,10 @@ export const OwnerAndShares = ({
               <InvitedMembersWrapper resetMargin={!allowed}>
                 {hasInvited ? (
                   // TODO: Why avatars have the member object? The wrong name of property.
-                  <AvatarsList avatars={invitedUsers} />
+                  <AvatarsList
+                    avatars={invitedUsers}
+                    avatarHintPosition="left"
+                  />
                 ) : (
                   <NoMembers>
                     <Icon

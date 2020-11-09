@@ -23,6 +23,7 @@ import {
 import {
   addMembersBatch,
   removeTeamMembersBatch,
+  addTeamMembersBatchSuccess,
 } from '@caesar/common/actions/entities/member';
 import {
   setCurrentTeamId,
@@ -53,6 +54,7 @@ import {
   convertTeamNodesToEntities,
   convertKeyPairToEntity,
   convertKeyPairToItemEntity,
+  convertMembersToEntity,
 } from '@caesar/common/normalizers/normalizers';
 import { TEAM_ROLES, ENTITY_TYPE, TEAM_TYPE } from '@caesar/common/constants';
 import { updateGlobalNotification } from '@caesar/common/actions/application';
@@ -264,6 +266,12 @@ export function* createTeamSaga({
       );
 
       yield put(addTeamKeyPairBatch(keyPairsById));
+    }
+
+    if (serverTeam?.members.length > 0) {
+      const membersById = convertMembersToEntity(serverTeam?.members);
+
+      yield put(addTeamMembersBatchSuccess(membersById));
     }
 
     yield put(

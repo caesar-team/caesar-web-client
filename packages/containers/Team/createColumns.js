@@ -165,7 +165,7 @@ export const createColumns = ({
                 padding: '0px 0px',
                 flat: true,
                 zIndex: '1',
-                border: 0,
+                border: '0',
               }}
             >
               <MenuWrapper>

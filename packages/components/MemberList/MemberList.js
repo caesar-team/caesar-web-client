@@ -64,11 +64,11 @@ const MemberList = ({
         [REMOVE_CONTROL_TYPE]: (
           <RemoveControl member={member} onClick={onClickRemove(member)} />
         ),
-        [REVOKE_CONTROL_TYPE]: (
+        [REVOKE_CONTROL_TYPE]: onClickRevokeAccess ? (
           <RevokeAccessControl
             onClickRevoke={() => onClickRevokeAccess(member)}
           />
-        ),
+        ) : null,
         [INVITE_CONTROL_TYPE]: (
           <InviteControl
             teamId={teamId}

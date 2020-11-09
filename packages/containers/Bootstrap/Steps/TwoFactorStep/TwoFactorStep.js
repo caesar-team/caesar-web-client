@@ -3,6 +3,8 @@ import {
   getQrCode,
   postActivateTwoFactor,
   postCheckTwoFactor,
+  getKeys,
+  postAcceptTwoFactor,
 } from '@caesar/common/api';
 import {
   getTrustedDeviceToken,
@@ -79,8 +81,15 @@ class TwoFactorStep extends Component {
     }
   };
 
-  handleClickSaveBackups = () => {
+  handleClickSaveBackups = async () => {
     const { onFinish } = this.props;
+    const {
+      data: { publicKey, encryptedPrivateKey },
+    } = await getKeys();
+
+    if (publicKey && encryptedPrivateKey) {
+      await postAcceptTwoFactor();
+    }
 
     onFinish();
   };

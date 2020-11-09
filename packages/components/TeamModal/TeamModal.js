@@ -60,7 +60,6 @@ const TeamModal = ({
     touched,
     isSubmitting,
     isValid,
-    handleChange,
     handleBlur,
     handleSubmit,
     setFieldValue,
@@ -84,6 +83,11 @@ const TeamModal = ({
     validateField('icon');
   }, []);
 
+  const handleChangeTitle = async e => {
+    await setFieldValue('title', e.target.value);
+    validateField('title');
+  };
+
   return (
     <Modal
       isOpened
@@ -101,7 +105,7 @@ const TeamModal = ({
           autoFocus
           withBorder
           error={checkError(touched, errors, 'title')}
-          onChange={handleChange}
+          onChange={handleChangeTitle}
           onBlur={handleBlur}
         />
         <GroupAvatarsWrapper>

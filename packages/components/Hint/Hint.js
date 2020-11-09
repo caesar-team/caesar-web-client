@@ -1,6 +1,33 @@
 import React from 'react';
 import styled, { css } from 'styled-components';
 
+const POSITION = {
+  CENTER: 'center',
+  LEFT: 'left',
+  RIGHT: 'right',
+};
+
+const getHintPositioin = ({ position }) => {
+  switch (position) {
+    case POSITION.LEFT:
+      return `
+        right: 0;
+        transform: translate(0, -100%);
+      `;
+    case POSITION.RIGHT:
+      return `
+        left: 0;
+        transform: translate(0, -100%);
+      `;
+    case POSITION.CENTER:
+    default:
+      return `
+        left: 50%;
+        transform: translate(-50%, -100%);
+      `;
+  }
+};
+
 export const HintStyles = css`
   padding: 4px 8px;
   font-size: ${({ theme }) => theme.font.size.xs};
@@ -19,8 +46,7 @@ const Inner = styled.div`
   ${HintStyles};
   position: absolute;
   top: -8px;
-  left: 50%;
-  transform: translate(-50%, -100%);
+  ${getHintPositioin}
 `;
 
 const Wrapper = styled.div`
@@ -32,9 +58,9 @@ const Wrapper = styled.div`
   }
 `;
 
-export const Hint = ({ text, children }) => (
+export const Hint = ({ text, position = POSITION.CENTER, children }) => (
   <Wrapper>
     {children}
-    {text && <Inner>{text}</Inner>}
+    {text && <Inner position={position}>{text}</Inner>}
   </Wrapper>
 );

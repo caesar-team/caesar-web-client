@@ -50,6 +50,7 @@ const renderCircleIndicator = score => {
 const PasswordIndicatorComponent = ({
   score,
   type = INDICATOR_TYPE.CIRCLE,
+  withFixWidth,
   ...props
 }) => {
   const scoreName = SCORE_NAME_MAP[score];
@@ -61,7 +62,7 @@ const PasswordIndicatorComponent = ({
       ) : (
         <LineIndicators>{renderLineIndicators(score)}</LineIndicators>
       )}
-      <ScoreName>{scoreName}</ScoreName>
+      <ScoreName withFixWidth={withFixWidth}>{scoreName}</ScoreName>
     </Wrapper>
   );
 };

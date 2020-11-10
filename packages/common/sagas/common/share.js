@@ -33,6 +33,7 @@ import {
   saveItemSaga,
   saveShareKeyPairSaga,
 } from '@caesar/common/sagas/entities/item';
+import { addShareKeyPairBatch } from '@caesar/common/actions/keystore';
 import { convertSystemItemToKeyPair } from '../../utils/item';
 import { getItem, getPublicKeyByEmailBatch, postItemShare } from '../../api';
 import { uuid4 } from '../../utils/uuid4';
@@ -40,6 +41,7 @@ import { teamDefaultListSelector } from '../../selectors/entities/list';
 import {
   convertItemsToEntities,
   convertKeyPairToItemEntity,
+  convertKeyPairToEntity,
 } from '../../normalizers/normalizers';
 
 export function* prepareUsersForSharing(members) {
@@ -143,10 +145,16 @@ function* processMembersItemShare({ item, members }) {
     };
 
     // Need to save the new key to the owner's store
-    yield call(saveShareKeyPairSaga, {
+    const { data: serverShareKeyPairs } = yield call(saveShareKeyPairSaga, {
       item: ownerKey,
       publicKey: ownerPublicKey,
     });
+    const serverOwnerSharedKeypair = serverShareKeyPairs?.shift();
+    ownerKey.id = serverOwnerSharedKeypair?.keypairId;
+
+    // Add to local store
+    const shareKeysById = convertKeyPairToEntity([ownerKey], 'relatedItemId');
+    yield put(addShareKeyPairBatch(shareKeysById));
 
     // Re-encrypt the item with new keys
     yield call(saveItemSaga, {
@@ -166,7 +174,7 @@ function* processMembersItemShare({ item, members }) {
   );
 
   const { data: userPublicKeys } = yield call(getPublicKeyByEmailBatch, {
-    emails: usersToInvite.map(m => m.email),
+    emails: usersToInvite.map(member => member.email),
   });
 
   const membersSecretsCalls = userPublicKeys.map(

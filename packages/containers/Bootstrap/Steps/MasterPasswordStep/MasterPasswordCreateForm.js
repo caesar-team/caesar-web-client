@@ -146,6 +146,7 @@ const MasterPasswordCreateFormComponent = ({ initialValues, onSubmit }) => {
         <PasswordIndicatorStyled
           type={INDICATOR_TYPE.LINE}
           score={zxcvbn(values.password).score}
+          withFixWidth
         />
       )}
       <TipText>

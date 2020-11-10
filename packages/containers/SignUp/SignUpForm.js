@@ -191,6 +191,7 @@ const SignUpForm = ({ onSubmit }) => (
               <StyledPasswordIndicator
                 type={INDICATOR_TYPE.LINE}
                 score={zxcvbn(values.password).score}
+                withFixWidth
               />
             )}
             {checkError(touched, errors, 'password') && (

@@ -67,7 +67,7 @@ export const CircleIndicatorOverlay = styled.div`
 `;
 
 export const ScoreName = styled.div`
-  width: 80px;
+  width: ${({ withFixWidth }) => (withFixWidth ? '80px' : 'auto')};
   margin-left: 16px;
   font-size: ${({ theme }) => theme.font.size.xs};
   font-weight: 600;

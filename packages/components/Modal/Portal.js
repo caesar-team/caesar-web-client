@@ -35,6 +35,7 @@ const ContentWrapper = styled.div`
   outline: none;
 
   ${({ width }) => width && `width: ${width}px`};
+  max-height: 95%;
 `;
 
 class Portal extends Component {

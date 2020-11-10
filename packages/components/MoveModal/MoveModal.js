@@ -219,79 +219,81 @@ const MoveModalComponent = ({
       shouldCloseOnEsc
       shouldCloseOnOverlayClick
     >
-      <StyledModalTitle>
-        {isMultiMode
-          ? 'Move selected items to another vault or list'
-          : 'Move item to another vault or list'}
-      </StyledModalTitle>
-      <ListsWrapper>
-        <StyledSelectVisible
-          label="Vault"
-          active={
-            <>
-              <StyledTeamAvatar
-                size={24}
-                fontSize="xs"
-                avatar={teamAvatar}
-                email={teamEmail}
-              />
-              <Name>{checkedTeamTitle}</Name>
-            </>
-          }
-          options={teamOptionsRenderer}
-          searchPlaceholder="Search vault…"
-          searchValue={searchTeamValue}
-          setSearchValue={setSearchTeamValue}
-        />
-        <StyledSelectVisible
-          label="List"
-          active={
-            <>
-              <ListIcon name="list" width={16} height={16} color="white" />
-              <Name>{checkedListLabel}</Name>
-            </>
-          }
-          options={listOptionsRenderer}
-          searchPlaceholder="Search list…"
-          searchValue={searchListValue}
-          setSearchValue={setSearchListValue}
-        />
-      </ListsWrapper>
-      {isMultiMode && (
-        <Items>
-          <TextWithLinesStyled position="left" width={1}>
-            Selected items ({items.length})
-          </TextWithLinesStyled>
-          <ListItemsWrapper>
-            <Scrollbar autoHeight autoHeightMax={400}>
-              {items.map(listItem => (
-                <ListItemStyled
-                  isClosable
-                  key={listItem.id}
-                  onClickClose={handleDeleteItem(listItem.id)}
-                  hasHover={false}
-                  isInModal
-                  {...listItem}
+      <Scrollbar autoHeight autoHeightMin={500}>
+        <StyledModalTitle>
+          {isMultiMode
+            ? 'Move selected items to another vault or list'
+            : 'Move item to another vault or list'}
+        </StyledModalTitle>
+        <ListsWrapper>
+          <StyledSelectVisible
+            label="Vault"
+            active={
+              <>
+                <StyledTeamAvatar
+                  size={24}
+                  fontSize="xs"
+                  avatar={teamAvatar}
+                  email={teamEmail}
                 />
-              ))}
-            </Scrollbar>
-          </ListItemsWrapper>
-        </Items>
-      )}
-      <ButtonsWrapper>
-        <ButtonStyled color="white" onClick={closeModal}>
-          Cancel
-        </ButtonStyled>
-        <Button
-          onClick={handleClickAccept}
-          disabled={
-            checkedListId === listId ||
-            !listOptions.map(({ id }) => id).includes(checkedListId)
-          }
-        >
-          Accept
-        </Button>
-      </ButtonsWrapper>
+                <Name>{checkedTeamTitle}</Name>
+              </>
+            }
+            options={teamOptionsRenderer}
+            searchPlaceholder="Search vault…"
+            searchValue={searchTeamValue}
+            setSearchValue={setSearchTeamValue}
+          />
+          <StyledSelectVisible
+            label="List"
+            active={
+              <>
+                <ListIcon name="list" width={16} height={16} color="white" />
+                <Name>{checkedListLabel}</Name>
+              </>
+            }
+            options={listOptionsRenderer}
+            searchPlaceholder="Search list…"
+            searchValue={searchListValue}
+            setSearchValue={setSearchListValue}
+          />
+        </ListsWrapper>
+        {isMultiMode && (
+          <Items>
+            <TextWithLinesStyled position="left" width={1}>
+              Selected items ({items.length})
+            </TextWithLinesStyled>
+            <ListItemsWrapper>
+              <Scrollbar autoHeight autoHeightMax={400}>
+                {items.map(listItem => (
+                  <ListItemStyled
+                    isClosable
+                    key={listItem.id}
+                    onClickClose={handleDeleteItem(listItem.id)}
+                    hasHover={false}
+                    isInModal
+                    {...listItem}
+                  />
+                ))}
+              </Scrollbar>
+            </ListItemsWrapper>
+          </Items>
+        )}
+        <ButtonsWrapper>
+          <ButtonStyled color="white" onClick={closeModal}>
+            Cancel
+          </ButtonStyled>
+          <Button
+            onClick={handleClickAccept}
+            disabled={
+              checkedListId === listId ||
+              !listOptions.map(({ id }) => id).includes(checkedListId)
+            }
+          >
+            Accept
+          </Button>
+        </ButtonsWrapper>
+      </Scrollbar>
     </Modal>
   );
 };

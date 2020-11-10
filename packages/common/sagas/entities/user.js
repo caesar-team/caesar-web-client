@@ -41,9 +41,7 @@ export function* createUserSaga({ payload: { email, domainRole } }) {
       encryptedPrivateKey: privateKey,
       seed,
       verifier,
-      // TODO: replace with domainRoles when @aburov merges his pr
-      roles: [domainRole],
-      // domainRoles: [domainRole],
+      domainRoles: [domainRole],
     };
 
     const { data: user } = yield call(postNewUser, data);

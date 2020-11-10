@@ -655,7 +655,7 @@ function* getItemKeyPair({
 function* decryptItemRaws({ payload: { item } }) {
   try {
     // If item is null or aready had decypted attachments then do not dectrypt again!
-    if (!item || (item.data.raws && Object.values(item.data.raws) > 0)) return;
+    if (!item || (item?.data?.raws && Object.values(item?.data?.raws) > 0)) return;
 
     const { raws } = JSON.parse(item.secret);
 
@@ -683,11 +683,11 @@ function* decryptItemRaws({ payload: { item } }) {
   }
 }
 
-function setWorkInProgressItemSaga({ payload: { item } }) {
+function* setWorkInProgressItemSaga({ payload: { item } }) {
   try {
     if (!item) return;
 
-    decryptItemRaws({
+    yield call(decryptItemRaws, {
       payload: {
         item,
       },

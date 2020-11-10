@@ -16,6 +16,7 @@ import {
 import {
   itemsByIdSelector,
   itemsByListIdSelector,
+  teamItemsSelector,
 } from '@caesar/common/selectors/entities/item';
 import {
   trashListSelector,
@@ -69,7 +70,10 @@ const MiddleColumnComponent = ({
     workInProgressList?.id === trashList?.id ||
     teamsTrashLists?.map(({ id }) => id).includes(workInProgressList?.id);
 
-  const searchedItems = filter(Object.values(itemsById), searchedText);
+  const currentTeamItems = useSelector(state =>
+    teamItemsSelector(state, { teamId: currentTeamId }),
+  );
+  const searchedItems = filter(Object.values(currentTeamItems), searchedText);
 
   const areAllItemsSelected =
     mode === DASHBOARD_MODE.SEARCH

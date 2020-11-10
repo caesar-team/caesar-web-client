@@ -1,4 +1,5 @@
 import React from 'react';
+import { useEffectOnce } from 'react-use';
 import { useSelector } from 'react-redux';
 import styled from 'styled-components';
 import { useFormik } from 'formik';
@@ -59,10 +60,10 @@ const TeamModal = ({
     touched,
     isSubmitting,
     isValid,
-    handleChange,
     handleBlur,
     handleSubmit,
     setFieldValue,
+    validateField,
   } = useFormik({
     initialValues: getInitialValues(team),
     onSubmit: ({ title, icon }, { setErrors, setSubmitting }) =>
@@ -77,6 +78,15 @@ const TeamModal = ({
         : onCreateSubmit({ title, icon: icon.raw, setSubmitting, setErrors }),
     validationSchema: schema,
   });
+
+  useEffectOnce(() => {
+    validateField('icon');
+  }, []);
+
+  const handleChangeTitle = async e => {
+    await setFieldValue('title', e.target.value);
+    validateField('title');
+  };
 
   return (
     <Modal
@@ -95,7 +105,7 @@ const TeamModal = ({
           autoFocus
           withBorder
           error={checkError(touched, errors, 'title')}
-          onChange={handleChange}
+          onChange={handleChangeTitle}
           onBlur={handleBlur}
         />
         <GroupAvatarsWrapper>
@@ -103,7 +113,7 @@ const TeamModal = ({
           <GroupAvatarsTip>
             Choose an avatar or upload (160x160 pixels, not more than 8 MB)
           </GroupAvatarsTip>
-          {renderTeamAvatars(values, setFieldValue)}
+          {renderTeamAvatars({ values, setFieldValue, validateField })}
         </GroupAvatarsWrapper>
         {errors?.form?.map(error => <Error key={error}>{error}</Error>)}
         <ButtonWrapper>

@@ -1,6 +1,6 @@
 /* eslint-disable camelcase */
 import { schema } from 'normalizr';
-import { ENTITY_TYPE } from '@caesar/common/constants';
+import { ENTITY_TYPE, TEAM_TYPE } from '@caesar/common/constants';
 
 const keypairSchema = (idAttribute = 'teamId') =>
   new schema.Entity('keyPairById', undefined, {
@@ -23,7 +23,7 @@ const keypairSchema = (idAttribute = 'teamId') =>
       },
     }) => ({
       id,
-      teamId,
+      teamId: teamId || TEAM_TYPE.PERSONAL,
       password,
       publicKey,
       privateKey,

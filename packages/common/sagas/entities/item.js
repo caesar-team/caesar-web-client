@@ -44,7 +44,6 @@ import {
 } from '@caesar/common/selectors/entities/list';
 import { itemSelector } from '@caesar/common/selectors/entities/item';
 import {
-  currentTeamIdSelector,
   currentUserDataSelector,
   currentUserIdSelector,
 } from '@caesar/common/selectors/currentUser';

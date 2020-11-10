@@ -30,7 +30,10 @@ export function* fetchUsersSaga() {
 
 export function* createUserSaga({ payload: { email, domainRole } }) {
   try {
-    const { password, publicKey, privateKey } = yield call(generateUser, email);
+    const { password, masterPassword, publicKey, privateKey } = yield call(
+      generateUser,
+      email,
+    );
 
     const { seed, verifier } = generateSeedAndVerifier(email, password);
 
@@ -45,11 +48,13 @@ export function* createUserSaga({ payload: { email, domainRole } }) {
     };
 
     const { data: user } = yield call(postNewUser, data);
-    const convertedUser = convertUsersToEntity([{ ...data, ...user }]);
 
-    if (domainRole !== DOMAIN_ROLES.ROLE_ANONYMOUS_USER) {
-      yield put(createUserSuccess(convertedUser));
+    if (domainRole === DOMAIN_ROLES.ROLE_ANONYMOUS_USER) {
+      return { ...data, ...user, masterPassword };
     }
+
+    const convertedUser = convertUsersToEntity([{ ...data, ...user }]);
+    yield put(createUserSuccess(convertedUser));
 
     return convertedUser[user.id];
   } catch (error) {

@@ -34,7 +34,7 @@ export function* createAnonymousLinkSaga() {
     const {
       id: userId,
       name,
-      password,
+      plainPassword: password,
       masterPassword,
       publicKey,
       domainRoles,

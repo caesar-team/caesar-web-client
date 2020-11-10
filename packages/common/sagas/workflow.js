@@ -343,7 +343,6 @@ function* checkTeamsKeyPairs() {
     .filter(t => t.id !== TEAM_TYPE.PERSONAL)
     .map(checkTeamKeyPair);
   const checkedTeams = yield all(checkCalls);
-  console.log(checkedTeams);
   yield put(addTeamsBatch(arrayToObject(checkedTeams.filter(team => !!team))));
 }
 

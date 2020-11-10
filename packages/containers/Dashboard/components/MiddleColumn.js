@@ -16,6 +16,7 @@ import {
 import {
   itemsByIdSelector,
   generalItemsSelector,
+  teamItemListSelector,
 } from '@caesar/common/selectors/entities/item';
 import {
   trashListSelector,
@@ -66,6 +67,9 @@ const MiddleColumnComponent = ({
     }),
   );
   const visibleListItems = generalItems.filter(visibleItemFilter);
+  const currentTeamItems = useSelector(state =>
+    teamItemListSelector(state, { teamId: currentTeamId }),
+  );
 
   const itemsLengthInList = generalItems.length;
   const visibleListItemsLength = visibleListItems.length;
@@ -77,7 +81,7 @@ const MiddleColumnComponent = ({
     workInProgressList?.id === trashList?.id ||
     teamsTrashLists?.map(({ id }) => id).includes(workInProgressList?.id);
 
-  const searchedItems = filter(Object.values(itemsById), searchedText);
+  const searchedItems = filter(Object.values(currentTeamItems), searchedText);
 
   const areAllItemsSelected =
     mode === DASHBOARD_MODE.SEARCH

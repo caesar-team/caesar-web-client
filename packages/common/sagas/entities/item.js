@@ -29,11 +29,6 @@ import {
   updateItemField,
 } from '@caesar/common/actions/entities/item';
 import { shareItemBatchSaga } from '@caesar/common/sagas/common/share';
-import {
-  addItemIdsToList,
-  moveItemIdsToList,
-  removeItemIdsFromList,
-} from '@caesar/common/actions/entities/list';
 import { setCurrentTeamId } from '@caesar/common/actions/currentUser';
 import { updateGlobalNotification } from '@caesar/common/actions/application';
 import {
@@ -193,7 +188,6 @@ export function* removeItemSaga({ payload: { itemId, listId } }) {
 
     yield call(removeItem, itemId);
 
-    yield put(removeItemIdsFromList([itemId], listId));
     yield put(removeItemSuccess(itemId, listId));
 
     if (item.invited && item.invited.length > 0) {
@@ -234,8 +228,6 @@ export function* removeItemsBatchSaga({ payload: { listId } }) {
 
     yield put(setWorkInProgressItem(null));
     yield put(removeItemsBatchSuccess(workInProgressItemIds, listId));
-
-    yield put(removeItemIdsFromList(workInProgressItemIds, listId));
 
     yield put(updateGlobalNotification(NOOP_NOTIFICATION, false));
   } catch (error) {
@@ -285,7 +277,6 @@ export function* moveItemSaga({
       listId: newListId,
     });
     yield put(moveItemSuccess(item.id, item.listId, newListId));
-    yield put(moveItemIdsToList([item.id], item.listId, newListId));
 
     yield put(updateGlobalNotification(NOOP_NOTIFICATION, false));
 
@@ -357,7 +348,6 @@ export function* moveItemsBatchSaga({
     yield put(
       moveItemsBatchSuccess(itemIds, oldTeamId, oldListId, teamId, listId),
     );
-    yield put(moveItemIdsToList(itemIds, oldListId, listId));
 
     if (notification) {
       yield call(notification.show, {
@@ -604,16 +594,6 @@ export function* createItemSaga({
       yield put(createItemSuccess(savedItem));
     }
 
-    const currentTeamId = yield select(currentTeamIdSelector);
-
-    if (
-      (currentTeamId === teamId ||
-        (!teamId && currentTeamId === TEAM_TYPE.PERSONAL)) &&
-      !isSystemItem
-    ) {
-      yield put(addItemIdsToList([savedItem.id], savedItem.listId));
-    }
-
     yield put(setCurrentTeamId(teamId || TEAM_TYPE.PERSONAL));
 
     if (isSystemItem) {
@@ -704,10 +684,7 @@ export function* createItemsBatchSaga({
       data: preparedForEncryptingItems[index],
     }));
     const { itemsById } = convertItemsToEntities(preparedForStoreItems);
-    const itemIds = Object.keys(itemsById);
-
     yield put(createItemsBatchSuccess(itemsById));
-    yield put(addItemIdsToList(itemIds, listId));
     yield put(updateGlobalNotification(NOOP_NOTIFICATION, false));
   } catch (error) {
     // eslint-disable-next-line no-console

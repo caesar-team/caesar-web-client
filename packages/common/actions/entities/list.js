@@ -20,10 +20,6 @@ export const SORT_LIST_FAILURE = '@list/SORT_LIST_FAILURE';
 
 export const ADD_LISTS_BATCH = '@list/ADD_LISTS_BATCH';
 
-export const ADD_ITEM_IDS_TO_LIST = '@list/ADD_ITEM_IDS_TO_LIST';
-export const MOVE_ITEM_IDS_TO_LIST = '@list/MOVE_ITEM_IDS_TO_LIST';
-export const REMOVE_ITEM_IDS_FROM_LIST = '@list/REMOVE_ITEM_IDS_FROM_LIST';
-
 export const CLEAR_SERVER_ERRORS = '@list/CLEAR_SERVER_ERRORS';
 
 export const RESET_LIST_STATE = '@list/RESET_LIST_STATE';
@@ -110,31 +106,6 @@ export const addListsBatch = listsById => ({
   type: ADD_LISTS_BATCH,
   payload: {
     listsById,
-  },
-});
-
-export const addItemIdsToList = (itemIds, listId) => ({
-  type: ADD_ITEM_IDS_TO_LIST,
-  payload: {
-    itemIds,
-    listId,
-  },
-});
-
-export const moveItemIdsToList = (itemIds, oldListId, newListId) => ({
-  type: MOVE_ITEM_IDS_TO_LIST,
-  payload: {
-    itemIds,
-    oldListId,
-    newListId,
-  },
-});
-
-export const removeItemIdsFromList = (itemIds, listId) => ({
-  type: REMOVE_ITEM_IDS_FROM_LIST,
-  payload: {
-    itemIds,
-    listId,
   },
 });
 

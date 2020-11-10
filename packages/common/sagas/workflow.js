@@ -84,6 +84,7 @@ import {
   getLastUpdatedSelector,
 } from '@caesar/common/selectors/currentUser';
 import {
+  itemsByListIdsSelector,
   itemSelector,
   nonDecryptedSharedItemsSelector,
   nonDecryptedTeamItemsSelector,
@@ -473,19 +474,6 @@ function* loadKeyPairsAndPersonalItems() {
       yield call(decryptUserItems, itemsEncryptedByUserKeys);
     }
 
-    // Inject shares into the defualt list
-    // TODO: Remove that code in the future!
-    if (defaultShareList?.id) {
-      const notMineSharedItemsIds = Object.values(sharedItemsById)
-        .filter(i => i.ownerId !== currentUserId)
-        .map(i => i.id);
-
-      listsById[defaultShareList.id].children = [
-        ...listsById[defaultShareList.id].children,
-        ...notMineSharedItemsIds,
-      ];
-    }
-
     yield put(addListsBatch(listsById));
     // Put to the store the shared and the team items, wait for processing of keypairs
     yield put(
@@ -522,7 +510,7 @@ function* loadKeyPairsAndPersonalItems() {
     );
   }
 }
-
+const itemsListFilter = listId => item => item.listId === listId;
 function* initListsAndProgressEntities() {
   const currentTeamId = yield select(currentTeamIdSelector);
 
@@ -537,10 +525,20 @@ function* initListsAndProgressEntities() {
   const defaultList = lists.find(list => list.type === LIST_TYPE.DEFAULT);
   const inboxList = lists.find(list => list.type === LIST_TYPE.INBOX);
 
-  if (!workInProgressList) {
-    if (favoritesList?.children?.length > 0) {
+  const listItems = yield select(itemsByListIdsSelector, {
+    listIds: [favoritesList?.id, inboxList?.id],
+  });
+  const favoritesListCount =
+    listItems.filter(itemsListFilter(favoritesList?.id))?.length || 0;
+  const inboxListCount =
+    listItems.filter(itemsListFilter(inboxList?.id))?.length || 0;
+  const workInProgressListCount =
+    listItems.filter(itemsListFilter(workInProgressList))?.length || 0;
+
+  if (!workInProgressList || workInProgressListCount <= 0) {
+    if (favoritesListCount > 0) {
       yield put(setWorkInProgressListId(favoritesList.id));
-    } else if (inboxList?.children?.length > 0) {
+    } else if (inboxListCount > 0) {
       yield put(setWorkInProgressListId(inboxList.id));
     } else {
       yield put(setWorkInProgressListId(defaultList.id));

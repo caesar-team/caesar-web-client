@@ -11,6 +11,7 @@ export const isKeyPairItem = item =>
 export const isGeneralItem = item =>
   extractItemType(item) !== ITEM_TYPE.SYSTEM &&
   extractItemType(item) !== ITEM_TYPE.KEYPAIR;
+export const isDecryptedItem = item => !!item?.data;
 
 export const isValidItem = item => {
   // TODO: strengthen checks

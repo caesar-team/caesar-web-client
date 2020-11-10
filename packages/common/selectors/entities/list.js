@@ -6,7 +6,7 @@ import {
 } from '@caesar/common/constants';
 import { currentTeamIdSelector } from '../currentUser';
 import { teamListSelector } from './team';
-import { itemListSelector } from './item';
+import { itemArraySelector } from './item';
 
 export const entitiesSelector = state => state.entities;
 
@@ -53,7 +53,7 @@ export const trashListSelector = createSelector(
 );
 
 export const favoritesListSelector = createSelector(
-  itemListSelector,
+  itemArraySelector,
   currentTeamIdSelector,
   trashListSelector,
   (itemList, currentTeamId, trashList) => ({

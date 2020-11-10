@@ -13,7 +13,7 @@ export const itemsByIdSelector = createSelector(
   itemEntity => itemEntity.byId,
 );
 
-export const itemListSelector = createSelector(
+export const itemArraySelector = createSelector(
   itemsByIdSelector,
   byId => Object.values(byId) || [],
 );
@@ -79,7 +79,7 @@ export const nonDecryptedSharedItemsSelector = createSelector(
 );
 
 export const teamItemListSelector = createSelector(
-  itemListSelector,
+  itemArraySelector,
   teamIdPropSelector,
   (itemList, teamId) => itemList.filter(item => item.teamId === teamId),
 );
@@ -87,4 +87,30 @@ export const teamItemListSelector = createSelector(
 export const generalItemsSelector = createSelector(
   itemsBatchSelector,
   items => items.filter(isGeneralItem) || [],
+);
+
+const listIdPropSelector = (_, props) => props.listId;
+export const itemsByListIdSelector = createSelector(
+  itemArraySelector,
+  listIdPropSelector,
+  (itemList, listId) => itemList.filter(item => item.listId === listId),
+);
+
+const listIdsPropSelector = (_, props) => props.listIds;
+export const itemsByListIdsSelector = createSelector(
+  itemArraySelector,
+  listIdsPropSelector,
+  (itemList, listIds) =>
+    itemList.filter(
+      item => listIds.includes(item.listId) && isGeneralItem(item),
+    ),
+);
+
+export const itemsByListIdVisibleSelector = createSelector(
+  itemArraySelector,
+  listIdPropSelector,
+  (itemList, listId) =>
+    itemList.filter(
+      item => item.listId === listId && isGeneralItem(item) && !!item?.data,
+    ),
 );

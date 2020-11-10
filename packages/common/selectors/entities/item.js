@@ -100,10 +100,11 @@ const listIdsPropSelector = (_, props) => props.listIds;
 export const itemsByListIdsSelector = createSelector(
   itemArraySelector,
   listIdsPropSelector,
-  (itemList, listIds) =>
-    itemList.filter(
-      item => listIds.includes(item.listId) && isGeneralItem(item),
-    ),
+  (itemList, listIds) => {
+    return itemList?.filter(
+      item => listIds?.includes(item.listId) && isGeneralItem(item),
+    );
+  },
 );
 
 export const itemsByListIdVisibleSelector = createSelector(

@@ -70,11 +70,25 @@ import {
 } from '../../selectors/entities/user';
 import { addTeamKeyPairBatch } from '../../actions/keystore';
 import { createVaultSuccess } from '../../actions/entities/vault';
+import { upperFirst } from '../../utils/string';
 
 export function* fetchTeamsSaga() {
   try {
+    const currentUserData = yield select(currentUserDataSelector);
+    const personalTeam = {
+      id: TEAM_TYPE.PERSONAL,
+      title: upperFirst(TEAM_TYPE.PERSONAL),
+      type: TEAM_TYPE.PERSONAL,
+      icon: currentUserData?.avatar,
+      email: currentUserData?.email,
+      teamRole: TEAM_ROLES.ROLE_ADMIN,
+      _links: currentUserData?._links,
+    };
     const { data: teamList } = yield call(getTeams);
-    const { teams, members } = convertTeamNodesToEntities(teamList);
+    const { teams, members } = convertTeamNodesToEntities([
+      ...teamList,
+      personalTeam,
+    ]);
 
     yield put(fetchTeamsSuccess(teams));
     yield put(addMembersBatch(members));

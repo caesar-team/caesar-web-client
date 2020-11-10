@@ -158,7 +158,10 @@ export const listsIdTeamSelector = createSelector(
   listsSelector,
   teamIdPropSelector,
   (lists, teamId) =>
-    lists.filter(list => list.teamId === teamId).map(list => list.id),
+    lists
+      .filter(list => list.teamId === teamId)
+      .sort((a, b) => a.sort - b.sort)
+      .map(list => list.id),
 );
 
 export const teamListsSelector = createSelector(

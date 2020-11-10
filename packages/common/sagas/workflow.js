@@ -56,13 +56,11 @@ import {
 import { fetchTeamMembersSaga } from '@caesar/common/sagas/entities/member';
 import {
   convertItemsToEntities,
-  convertTeamsToEntity,
   convertListsToEntities,
   convertKeyPairToEntity,
   convertShareItemsToEntities,
 } from '@caesar/common/normalizers/normalizers';
 import { arrayToObject, objectToArray } from '@caesar/common/utils/utils';
-import { upperFirst } from '@caesar/common/utils/string';
 import {
   getKeypairs,
   getLastUpdatedUserItems,
@@ -70,7 +68,7 @@ import {
   getTeamKeyPair,
   getTeamLists,
 } from '@caesar/common/api';
-import { TEAM_TYPE, LIST_TYPE, TEAM_ROLES } from '@caesar/common/constants';
+import { TEAM_TYPE, LIST_TYPE } from '@caesar/common/constants';
 import {
   teamListsSelector,
   favoritesListSelector,
@@ -323,10 +321,14 @@ function* initTeam(teamId) {
 function* checkTeamKeyPair(team) {
   const check = yield call(checkTeamPermissionsAndKeys, team.id, true);
 
-  return {
-    ...team,
-    locked: !check,
-  };
+  if (team.locked === !check) {
+    return {
+      ...team,
+      locked: !check,
+    };
+  }
+
+  return null;
 }
 
 function* checkTeamsKeyPairs() {
@@ -341,7 +343,8 @@ function* checkTeamsKeyPairs() {
     .filter(t => t.id !== TEAM_TYPE.PERSONAL)
     .map(checkTeamKeyPair);
   const checkedTeams = yield all(checkCalls);
-  yield put(addTeamsBatch(arrayToObject(checkedTeams)));
+  console.log(checkedTeams);
+  yield put(addTeamsBatch(arrayToObject(checkedTeams.filter(team => !!team))));
 }
 
 function* initTeamsSaga() {
@@ -349,28 +352,6 @@ function* initTeamsSaga() {
     // Load avaible teams
     yield call(fetchTeamsSaga);
 
-    const isUserDomainAdminOrManager = yield select(
-      isUserDomainAdminOrManagerSelector,
-    );
-
-    const teams = isUserDomainAdminOrManager
-      ? yield select(teamListSelector)
-      : yield select(currentUserTeamListSelector);
-
-    const currentUserData = yield select(currentUserDataSelector);
-
-    teams.push({
-      id: TEAM_TYPE.PERSONAL,
-      title: upperFirst(TEAM_TYPE.PERSONAL),
-      type: TEAM_TYPE.PERSONAL,
-      icon: currentUserData?.avatar,
-      email: currentUserData?.email,
-      teamRole: TEAM_ROLES.ROLE_ADMIN,
-      _links: currentUserData?._links,
-    });
-
-    const teamById = convertTeamsToEntity(teams);
-    yield put(addTeamsBatch(teamById));
     yield call(checkTeamsKeyPairs);
   } catch (error) {
     // eslint-disable-next-line no-console

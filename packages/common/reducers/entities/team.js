@@ -155,6 +155,7 @@ export default createReducer(initialState, {
     return state;
   },
   [ADD_TEAMS_BATCH](state, { payload }) {
+    console.log(ADD_TEAMS_BATCH, payload);
     return {
       ...state,
       byId: {

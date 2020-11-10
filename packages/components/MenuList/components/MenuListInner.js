@@ -4,16 +4,13 @@ import { DragDropContext, Droppable } from 'react-beautiful-dnd';
 import styled from 'styled-components';
 import {
   DASHBOARD_MODE,
+  LIST_TYPE,
   PERMISSION,
   PERMISSION_ENTITY,
   TEAM_TYPE,
 } from '@caesar/common/constants';
 import { currentTeamSelector } from '@caesar/common/selectors/currentUser';
-import { useListItemCounter } from '@caesar/common/hooks';
-import {
-  personalListsByTypeSelector,
-  currentTeamListsSelector,
-} from '@caesar/common/selectors/entities/list';
+import { teamListsSelector } from '@caesar/common/selectors/entities/list';
 import { workInProgressListSelector } from '@caesar/common/selectors/workflow';
 import {
   setWorkInProgressItem,
@@ -21,6 +18,7 @@ import {
   resetWorkInProgressItemIds,
 } from '@caesar/common/actions/workflow';
 import { sortListRequest } from '@caesar/common/actions/entities/list';
+import { teamListsSizesByIdSelector } from '@caesar/common/selectors/counts';
 import { Can } from '../../Ability';
 import { Icon } from '../../Icon';
 import { Scrollbar } from '../../Scrollbar';
@@ -86,13 +84,25 @@ const MenuListInnerComponent = ({
 }) => {
   const dispatch = useDispatch();
   const currentTeam = useSelector(currentTeamSelector);
-  const isPersonal = currentTeam?.id === TEAM_TYPE.PERSONAL;
-  const personalLists = useSelector(personalListsByTypeSelector);
-  const teamLists = useSelector(currentTeamListsSelector);
   const workInProgressList = useSelector(workInProgressListSelector);
   const activeListId = workInProgressList && workInProgressList.id;
   const [isCreatingMode, setCreatingMode] = useState(false);
-  const inboxItemsCounter = useListItemCounter(personalLists.inbox?.children);
+
+  const teamLists = useSelector(state =>
+    teamListsSelector(state, { teamId: currentTeam?.id }),
+  );
+  const otherLists = teamLists.filter(list => list.type === LIST_TYPE.LIST);
+  const favoritesList = teamLists.find(
+    list => list.type === LIST_TYPE.FAVORITES,
+  );
+  const inboxList = teamLists.find(list => list.type === LIST_TYPE.INBOX);
+  const defaultList = teamLists.find(list => list.type === LIST_TYPE.DEFAULT);
+  const trashList = teamLists.find(list => list.type === LIST_TYPE.TRASH);
+
+  const listSizes = useSelector(state =>
+    teamListsSizesByIdSelector(state, { teamId: currentTeam?.id }),
+  );
+  const getListCount = id => listSizes[id] || 0;
 
   const handleClickMenuItem = id => {
     dispatch(setWorkInProgressListId(id));
@@ -131,20 +141,18 @@ const MenuListInnerComponent = ({
     dispatch(sortListRequest(draggableId, source.index, destination.index));
   };
 
-  const nestedLists = isPersonal ? personalLists.list : teamLists.list;
+  const nestedLists = [defaultList, ...otherLists];
   const menuList = [
     {
-      id: isPersonal ? personalLists.inbox?.id : null,
+      id: inboxList?.id || null,
       title: 'Shared with me',
-      length: isPersonal ? inboxItemsCounter : 0,
+      length: getListCount(inboxList?.id),
       icon: 'share',
     },
     {
-      id: isPersonal ? personalLists.favorites?.id : teamLists.favorites?.id,
+      id: favoritesList?.id,
       title: 'Favorites',
-      length: isPersonal
-        ? personalLists.favorites?.children?.length
-        : teamLists.favorites?.children?.length,
+      length: getListCount(favoritesList?.id),
       icon: 'favorite',
     },
     {
@@ -154,11 +162,9 @@ const MenuListInnerComponent = ({
       children: nestedLists,
     },
     {
-      id: isPersonal ? personalLists.trash?.id : teamLists.trash?.id,
+      id: trashList?.id,
       title: 'Trash',
-      length: isPersonal
-        ? personalLists.trash?.children?.length
-        : teamLists.trash?.children?.length,
+      length: getListCount(trashList?.id),
       icon: 'trash',
     },
     {
@@ -168,7 +174,10 @@ const MenuListInnerComponent = ({
     },
   ];
 
-  const nestedListsLabels = nestedLists.map(({ label }) => label.toLowerCase());
+  const nestedListsLabels = nestedLists?.map(({ label } = { label: null }) =>
+    label?.toLowerCase(),
+  );
+  // debugger;
   const { _permissions } = currentTeam || {};
   const listPermission = {
     ..._permissions,
@@ -245,6 +254,7 @@ const MenuListInnerComponent = ({
                         <ListItem
                           key={list.id}
                           list={list}
+                          itemCount={getListCount(list.id)}
                           activeListId={activeListId}
                           index={index}
                           nestedListsLabels={nestedListsLabels}

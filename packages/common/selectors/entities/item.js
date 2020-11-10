@@ -78,7 +78,7 @@ export const nonDecryptedSharedItemsSelector = createSelector(
   items => items.filter(item => item.isShared),
 );
 
-export const teamItemListSelector = createSelector(
+export const teamItemsSelector = createSelector(
   itemArraySelector,
   teamIdPropSelector,
   (itemList, teamId) => itemList.filter(item => item.teamId === teamId),

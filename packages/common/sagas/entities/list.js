@@ -34,6 +34,7 @@ import {
 import { ENTITY_TYPE, LIST_TYPE, TEAM_TYPE } from '@caesar/common/constants';
 import { getServerErrors } from '@caesar/common/utils/error';
 import { convertListsToEntities } from '@caesar/common/normalizers/normalizers';
+import { itemsByListIdSelector } from '../../selectors/entities/item';
 
 const reorder = (list, startIndex, endIndex) => {
   const result = Array.from(list);
@@ -151,7 +152,9 @@ export function* editListSaga({ payload: { list }, meta: { setEditMode } }) {
 export function* removeListSaga({ payload: { teamId, listId } }) {
   try {
     const list = yield select(listSelector, { listId });
-    const listItemIds = list.children;
+    const listItemIds = yield select(itemsByListIdSelector, { listId }).map(
+      item => item.id,
+    );
 
     const trashList = teamId
       ? yield select(currentTeamTrashListSelector)

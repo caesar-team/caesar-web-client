@@ -16,7 +16,9 @@ export const isLoadingTeamsSelector = createSelector(
 
 export const teamsByIdSelector = createSelector(
   teamEntitySelector,
-  teamEntity => teamEntity.byId,
+  teamEntity => {
+    return teamEntity.byId;
+  },
 );
 
 export const teamListSelector = createSelector(

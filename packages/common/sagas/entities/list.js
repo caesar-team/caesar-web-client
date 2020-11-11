@@ -16,8 +16,7 @@ import {
 import { updateGlobalNotification } from '@caesar/common/actions/application';
 import {
   listSelector,
-  personalListsByTypeSelector,
-  currentTeamListsSelector,
+  nestedListsSelector,
   currentTeamTrashListSelector,
   trashListSelector,
 } from '@caesar/common/selectors/entities/list';
@@ -50,11 +49,7 @@ export function* sortListSaga({
   payload: { listId, sourceIndex, destinationIndex },
 }) {
   try {
-    const personalListsByType = yield select(personalListsByTypeSelector);
-    const currentTeamLists = yield select(currentTeamListsSelector);
-    const lists = personalListsByType.list.length
-      ? personalListsByType.list
-      : currentTeamLists.list;
+    const lists = yield select(nestedListsSelector);
 
     yield put(
       sortListSuccess(
@@ -94,7 +89,6 @@ export function* createListSaga({
     const listData = {
       id: listId,
       type: LIST_TYPE.LIST,
-      children: [],
       sort: 0,
       __type: ENTITY_TYPE.LIST,
       _links,
@@ -106,12 +100,7 @@ export function* createListSaga({
 
     yield put(createListSuccess(listId, normalizedList));
 
-    const personalListsByType = yield select(personalListsByTypeSelector);
-    const currentTeamLists = yield select(currentTeamListsSelector);
-    const lists = personalListsByType.list.length
-      ? personalListsByType.list
-      : currentTeamLists.list;
-
+    const lists = yield select(nestedListsSelector);
     const firstListInOrder = lists.find(
       ({ id, sort }) => sort === 0 && id !== listId,
     );

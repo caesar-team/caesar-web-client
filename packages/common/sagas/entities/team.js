@@ -323,8 +323,9 @@ export function* editTeamSaga({
 }) {
   try {
     const { data: team } = yield call(editTeam, teamId, { title, icon });
+    const teamsById = convertTeamsToEntity([team]);
 
-    yield put(editTeamSuccess({ ...team, __type: ENTITY_TYPE.TEAM }));
+    yield put(editTeamSuccess({ ...team, ...teamsById[team.id] }));
     yield call(setSubmitting, false);
     yield call(handleCloseModal);
   } catch (error) {

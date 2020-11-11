@@ -2,7 +2,9 @@ import { createSelector } from 'reselect';
 import { teamsByIdSelector } from '@caesar/common/selectors/entities/team';
 import { DOMAIN_ROLES, TEAM_TYPE } from '@caesar/common/constants';
 
-export const currentUserSelector = state => state.currentUser;
+export const currentUserSelector = state => {
+  return state.currentUser;
+};
 
 export const isLoadingSelector = createSelector(
   currentUserSelector,
@@ -64,13 +66,15 @@ export const currentUserVaultListSelector = createSelector(
 
 export const currentTeamIdSelector = createSelector(
   currentUserSelector,
-  currentUser => currentUser.currentTeamId,
+  currentUser => currentUser.currentTeamId || TEAM_TYPE.PERSONAL,
 );
 
 export const currentTeamSelector = createSelector(
   currentTeamIdSelector,
   teamsByIdSelector,
-  (currentTeamId, teamsById) => teamsById[currentTeamId],
+  (currentTeamId, teamsById) => {
+    return teamsById[currentTeamId];
+  },
 );
 
 export const isUserAnonymousSelector = createSelector(

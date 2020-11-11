@@ -11,7 +11,8 @@ async function prepareLoginSRP(email, A, prepareLoginEndpoint) {
 
     return { B: publicEphemeralValue, seed };
   } catch (e) {
-    console.log(e.response);
+    // eslint-disable-next-line no-console
+    console.error(e.response);
     throw new Error(e);
   }
 }
@@ -27,7 +28,8 @@ async function loginSRP(email, matcher, loginEndpoint) {
 
     return { serverM2: secondMatcher, jwt };
   } catch (e) {
-    console.log(e.response);
+    // eslint-disable-next-line no-console
+    console.error(e.response);
     throw new Error(e);
   }
 }

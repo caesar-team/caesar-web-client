@@ -146,8 +146,9 @@ export function* removeListSaga({
 }) {
   try {
     const list = yield select(listSelector, { listId });
-    const listItems = yield select(itemsByListIdSelector, { listId });
-    const listItemIds = listItems.map(item => item.id);
+    const listItemIds = yield select(itemsByListIdSelector, { listId })?.map(
+      item => item.id,
+    ) || [];
 
     const trashList = teamId
       ? yield select(currentTeamTrashListSelector)

@@ -1,5 +1,7 @@
 import { createSelector } from 'reselect';
+import { allTrashListIdsSelector } from './list';
 import { isGeneralItem } from '../../utils/item';
+import { LIST_TYPE } from '../../constants';
 
 export const entitiesSelector = state => state.entities;
 
@@ -92,8 +94,17 @@ export const generalItemsSelector = createSelector(
 const listIdPropSelector = (_, props) => props.listId;
 export const itemsByListIdSelector = createSelector(
   itemArraySelector,
+  allTrashListIdsSelector,
   listIdPropSelector,
-  (itemList, listId) => itemList.filter(item => item.listId === listId),
+  (itemList, trashListIds, listId) => {
+    if (listId === LIST_TYPE.FAVORITES) {
+      return itemList.filter(
+        item => item.favorite && !trashListIds.includes(item.listId),
+      );
+    }
+
+    return itemList.filter(item => item.listId === listId);
+  },
 );
 
 const listIdsPropSelector = (_, props) => props.listIds;

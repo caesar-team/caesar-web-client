@@ -94,7 +94,7 @@ export const ListItem = ({
 }) => {
   const dispatch = useDispatch();
   const currentTeam = useSelector(currentTeamSelector);
-  const { id, label, type } = list;
+  const { id, label, type, _permissions } = list;
 
   const isDefault = type === LIST_TYPE.DEFAULT;
   const [isEditMode, setEditMode] = useState(isCreatingMode);
@@ -106,8 +106,6 @@ export const ListItem = ({
     value !== label && nestedListsLabels.includes(value?.toLowerCase());
 
   const isAcceptDisabled = !value || value === label || isListAlreadyExists;
-
-  const { _permissions } = list || {};
 
   const handleClickEdit = () => {
     setEditMode(true);

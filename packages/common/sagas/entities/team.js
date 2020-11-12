@@ -56,7 +56,7 @@ import {
   convertKeyPairToItemEntity,
   convertMembersToEntity,
 } from '@caesar/common/normalizers/normalizers';
-import { TEAM_ROLES, ENTITY_TYPE, TEAM_TYPE } from '@caesar/common/constants';
+import { TEAM_ROLES, TEAM_TYPE } from '@caesar/common/constants';
 import { updateGlobalNotification } from '@caesar/common/actions/application';
 import { finishIsLoading } from '@caesar/common/actions/workflow';
 import {

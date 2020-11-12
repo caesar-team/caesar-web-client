@@ -16,8 +16,7 @@ import {
 import { updateGlobalNotification } from '@caesar/common/actions/application';
 import {
   listSelector,
-  personalListsByTypeSelector,
-  currentTeamListsSelector,
+  nestedListsSelector,
   currentTeamTrashListSelector,
   trashListSelector,
 } from '@caesar/common/selectors/entities/list';
@@ -35,6 +34,7 @@ import { ENTITY_TYPE, LIST_TYPE, TEAM_TYPE } from '@caesar/common/constants';
 import { getServerErrors } from '@caesar/common/utils/error';
 import { convertListsToEntities } from '@caesar/common/normalizers/normalizers';
 import { itemsByListIdSelector } from '../../selectors/entities/item';
+import { currentTeamIdSelector } from '../../selectors/currentUser';
 
 const reorder = (list, startIndex, endIndex) => {
   const result = Array.from(list);
@@ -50,11 +50,8 @@ export function* sortListSaga({
   payload: { listId, sourceIndex, destinationIndex },
 }) {
   try {
-    const personalListsByType = yield select(personalListsByTypeSelector);
-    const currentTeamLists = yield select(currentTeamListsSelector);
-    const lists = personalListsByType.list.length
-      ? personalListsByType.list
-      : currentTeamLists.list;
+    const currentTeamId = yield select(currentTeamIdSelector);
+    const lists = yield select(nestedListsSelector, { teamId: currentTeamId });
 
     yield put(
       sortListSuccess(
@@ -94,7 +91,6 @@ export function* createListSaga({
     const listData = {
       id: listId,
       type: LIST_TYPE.LIST,
-      children: [],
       sort: 0,
       __type: ENTITY_TYPE.LIST,
       _links,
@@ -106,12 +102,8 @@ export function* createListSaga({
 
     yield put(createListSuccess(listId, normalizedList));
 
-    const personalListsByType = yield select(personalListsByTypeSelector);
-    const currentTeamLists = yield select(currentTeamListsSelector);
-    const lists = personalListsByType.list.length
-      ? personalListsByType.list
-      : currentTeamLists.list;
-
+    const currentTeamId = yield select(currentTeamIdSelector);
+    const lists = yield select(nestedListsSelector, { teamId: currentTeamId });
     const firstListInOrder = lists.find(
       ({ id, sort }) => sort === 0 && id !== listId,
     );
@@ -149,12 +141,13 @@ export function* editListSaga({ payload: { list }, meta: { setEditMode } }) {
   }
 }
 
-export function* removeListSaga({ payload: { teamId, listId } }) {
+export function* removeListSaga({
+  payload: { teamId = TEAM_TYPE.PERSONAL, listId },
+}) {
   try {
     const list = yield select(listSelector, { listId });
-    const listItemIds = yield select(itemsByListIdSelector, { listId }).map(
-      item => item.id,
-    );
+    const listItems = yield select(itemsByListIdSelector, { listId });
+    const listItemIds = listItems.map(item => item.id);
 
     const trashList = teamId
       ? yield select(currentTeamTrashListSelector)
@@ -163,9 +156,9 @@ export function* removeListSaga({ payload: { teamId, listId } }) {
     yield call(moveItemsBatchSaga, {
       payload: {
         itemIds: listItemIds,
-        oldTeamId: teamId || null,
+        oldTeamId: teamId,
         oldListId: list.id,
-        teamId: teamId || null,
+        teamId,
         listId: trashList?.id,
       },
     });

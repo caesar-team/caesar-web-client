@@ -34,6 +34,7 @@ import { ENTITY_TYPE, LIST_TYPE, TEAM_TYPE } from '@caesar/common/constants';
 import { getServerErrors } from '@caesar/common/utils/error';
 import { convertListsToEntities } from '@caesar/common/normalizers/normalizers';
 import { itemsByListIdSelector } from '../../selectors/entities/item';
+import { currentTeamIdSelector } from '../../selectors/currentUser';
 
 const reorder = (list, startIndex, endIndex) => {
   const result = Array.from(list);
@@ -49,7 +50,8 @@ export function* sortListSaga({
   payload: { listId, sourceIndex, destinationIndex },
 }) {
   try {
-    const lists = yield select(nestedListsSelector);
+    const currentTeamId = yield select(currentTeamIdSelector);
+    const lists = yield select(nestedListsSelector, { teamId: currentTeamId });
 
     yield put(
       sortListSuccess(
@@ -100,7 +102,8 @@ export function* createListSaga({
 
     yield put(createListSuccess(listId, normalizedList));
 
-    const lists = yield select(nestedListsSelector);
+    const currentTeamId = yield select(currentTeamIdSelector);
+    const lists = yield select(nestedListsSelector, { teamId: currentTeamId });
     const firstListInOrder = lists.find(
       ({ id, sort }) => sort === 0 && id !== listId,
     );

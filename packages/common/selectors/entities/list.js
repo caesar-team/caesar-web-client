@@ -6,7 +6,6 @@ import {
 } from '@caesar/common/constants';
 import { currentTeamIdSelector } from '../currentUser';
 import { teamListSelector } from './team';
-import { itemArraySelector } from './item';
 
 export const entitiesSelector = state => state.entities;
 

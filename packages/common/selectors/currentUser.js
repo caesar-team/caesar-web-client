@@ -64,6 +64,7 @@ export const currentUserVaultListSelector = createSelector(
   },
 );
 
+// TODO: Move to workflow
 export const currentTeamIdSelector = createSelector(
   currentUserSelector,
   currentUser => currentUser.currentTeamId || TEAM_TYPE.PERSONAL,

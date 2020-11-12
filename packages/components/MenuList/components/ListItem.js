@@ -12,7 +12,6 @@ import {
   editListRequest,
 } from '@caesar/common/actions/entities/list';
 import { Tooltip } from '@caesar/components/List/Item/styles';
-import { useListItemCounter } from '@caesar/common/hooks';
 import { Can } from '../../Ability';
 import { Icon } from '../../Icon';
 import { ListInput } from './ListInput';
@@ -84,6 +83,7 @@ const StyledTooltip = styled(Tooltip)`
 
 export const ListItem = ({
   list = {},
+  itemCount,
   nestedListsLabels = [],
   activeListId,
   index,
@@ -94,9 +94,7 @@ export const ListItem = ({
 }) => {
   const dispatch = useDispatch();
   const currentTeam = useSelector(currentTeamSelector);
-  const { id, label, type, children = [] } = list;
-
-  const itemCount = useListItemCounter(children);
+  const { id, label, type } = list;
 
   const isDefault = type === LIST_TYPE.DEFAULT;
   const [isEditMode, setEditMode] = useState(isCreatingMode);

@@ -15,7 +15,7 @@ import { resetCurrentUserState } from '@caesar/common/actions/currentUser';
 import { resetWorkflowState } from '@caesar/common/actions/workflow';
 import { resetKeystoreState } from '@caesar/common/actions/keystore';
 import { isOnlineSelector } from '@caesar/common/selectors/application';
-import { itemListSelector } from '@caesar/common/selectors/entities/item';
+import { itemArraySelector } from '@caesar/common/selectors/entities/item';
 import { masterPasswordSelector } from '@caesar/common/selectors/currentUser';
 import { actualKeyPairSelector } from '@caesar/common/selectors/keystore';
 
@@ -26,7 +26,7 @@ export function* rehydrateStoreSaga() {
     const isOnline = yield select(isOnlineSelector);
 
     if (!isOnline) {
-      const items = yield select(itemListSelector);
+      const items = yield select(itemArraySelector);
       const keyPair = yield select(actualKeyPairSelector);
       const masterPassword = yield select(masterPasswordSelector);
 

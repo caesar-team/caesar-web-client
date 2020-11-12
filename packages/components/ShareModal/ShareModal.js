@@ -16,6 +16,8 @@ import { Scrollbar } from '../Scrollbar';
 import { ListItem } from '../List';
 import { TextWithLines } from '../TextWithLines';
 
+const Wrapper = styled.div``;
+
 const Row = styled.div`
   margin-bottom: 20px;
 `;
@@ -156,7 +158,9 @@ export const ShareModal = ({
   const shouldShowAddedMembers = members.length > 0;
   const shouldShowTeamsSection = false;
   const shouldShowSharedMembers = sharedMembers.length > 0;
-
+  const visibleEntitiesCount = items.length + members.length;
+  const WrapperComponent = visibleEntitiesCount > 3 ? Scrollbar : Wrapper;
+  
   return (
     <Modal
       isOpened
@@ -165,84 +169,86 @@ export const ShareModal = ({
       shouldCloseOnEsc
       shouldCloseOnOverlayClick
     >
-      <StyledModalTitle>
-        {isMultiMode ? 'Share selected items' : 'Share the item'}
-      </StyledModalTitle>
-      <Row>
-        <UserSearchInput
-          blackList={searchedBlackListMemberIds}
-          onClickAdd={handleAddMember}
-        />
-      </Row>
-      {shouldShowAddedMembers && (
+      <WrapperComponent autoHeight autoHeightMin={200} autoHeightMax={400}>
+        <StyledModalTitle>
+          {isMultiMode ? 'Share selected items' : 'Share the item'}
+        </StyledModalTitle>
         <Row>
-          <StyledMemberList
-            maxHeight={200}
-            members={members}
-            controlType="remove"
-            onClickRemove={handleRemoveMember}
+          <UserSearchInput
+            blackList={searchedBlackListMemberIds}
+            onClickAdd={handleAddMember}
           />
         </Row>
-      )}
-      {shouldShowTeamsSection && (
-        <Row>
-          <TeamList teams={teams} teamIds={teamIds} setTeamIds={setTeamIds} />
-        </Row>
-      )}
-      {shouldShowSharedMembers && (
-        <Row>
-          <Section
-            name={`Invited (${sharedMembers.length})`}
-            isOpened={isOpenedInvited}
-            onToggleSection={() => setOpenedInvited(!isOpenedInvited)}
-          >
+        {shouldShowAddedMembers && (
+          <Row>
             <StyledMemberList
-              maxHeight={180}
-              members={sharedMembers}
-              controlType="revoke"
-              onClickRevokeAccess={onRevokeAccess}
+              maxHeight={200}
+              members={members}
+              controlType="remove"
+              onClickRemove={handleRemoveMember}
             />
-          </Section>
-        </Row>
-      )}
-      {!disableAnonymLink && !isMultiMode && (
-        <Row>
-          <AnonymousLink
-            link={link}
-            isLoading={isGeneratingLink}
-            onToggle={handleToggleAnonymousLink}
-            onCopy={handleCopy}
-            onUpdate={handleUpdateAnonymousLink}
-          />
-        </Row>
-      )}
-      {isMultiMode && (
-        <Items>
-          <TextWithLinesStyled position="left" width={1}>
-            Selected items ({items.length})
-          </TextWithLinesStyled>
-          <ListItemsWrapper>
-            <Scrollbar autoHeight autoHeightMax={400}>
-              {items.map(listItem => (
-                <ListItemStyled
-                  isClosable
-                  key={listItem.id}
-                  onClickClose={handleDeleteItem(listItem.id)}
-                  hasHover={false}
-                  isInModal
-                  {...listItem}
-                />
-              ))}
-            </Scrollbar>
-          </ListItemsWrapper>
-        </Items>
-      )}
-      <ButtonsWrapper>
-        <ButtonStyled color="white" onClick={onCancel}>
-          Cancel
-        </ButtonStyled>
-        <Button onClick={handleClickDone}>Done</Button>
-      </ButtonsWrapper>
+          </Row>
+        )}
+        {shouldShowTeamsSection && (
+          <Row>
+            <TeamList teams={teams} teamIds={teamIds} setTeamIds={setTeamIds} />
+          </Row>
+        )}
+        {shouldShowSharedMembers && (
+          <Row>
+            <Section
+              name={`Invited (${sharedMembers.length})`}
+              isOpened={isOpenedInvited}
+              onToggleSection={() => setOpenedInvited(!isOpenedInvited)}
+            >
+              <StyledMemberList
+                maxHeight={180}
+                members={sharedMembers}
+                controlType="revoke"
+                onClickRevokeAccess={onRevokeAccess}
+              />
+            </Section>
+          </Row>
+        )}
+        {!disableAnonymLink && !isMultiMode && (
+          <Row>
+            <AnonymousLink
+              link={link}
+              isLoading={isGeneratingLink}
+              onToggle={handleToggleAnonymousLink}
+              onCopy={handleCopy}
+              onUpdate={handleUpdateAnonymousLink}
+            />
+          </Row>
+        )}
+        {isMultiMode && (
+          <Items>
+            <TextWithLinesStyled position="left" width={1}>
+              Selected items ({items.length})
+            </TextWithLinesStyled>
+            <ListItemsWrapper>
+              <Scrollbar autoHeight autoHeightMax={400}>
+                {items.map(listItem => (
+                  <ListItemStyled
+                    isClosable
+                    key={listItem.id}
+                    onClickClose={handleDeleteItem(listItem.id)}
+                    hasHover={false}
+                    isInModal
+                    {...listItem}
+                  />
+                ))}
+              </Scrollbar>
+            </ListItemsWrapper>
+          </Items>
+        )}
+        <ButtonsWrapper>
+          <ButtonStyled color="white" onClick={onCancel}>
+            Cancel
+          </ButtonStyled>
+          <Button onClick={handleClickDone}>Done</Button>
+        </ButtonsWrapper>
+      </WrapperComponent>  
     </Modal>
   );
 };

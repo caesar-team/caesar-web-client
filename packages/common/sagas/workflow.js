@@ -14,6 +14,7 @@ import {
   INIT_TEAMS_SETTINGS,
   INIT_TEAM_SETTINGS,
   INIT_IMPORT_SETTINGS,
+  INIT_SHARE,
   UPDATE_WORK_IN_PROGRESS_ITEM,
   SET_WORK_IN_PROGRESS_ITEM,
   finishIsLoading,
@@ -655,7 +656,9 @@ function* getItemKeyPair({
 function* decryptItemRaws({ payload: { item } }) {
   try {
     // If item is null or aready had decypted attachments then do not dectrypt again!
-    if (!item || (item?.data?.raws && Object.values(item?.data?.raws) > 0)) return;
+    if (!item || (item?.data?.raws && Object.values(item?.data?.raws) > 0)) {
+      return;
+    }
 
     const { raws } = JSON.parse(item.secret);
 
@@ -762,6 +765,15 @@ function* initImportSettingsSaga() {
   }
 }
 
+function* initShareSaga() {
+  try {
+    console.log('Implement init share flow');
+  } catch (error) {
+    // eslint-disable-next-line no-console
+    console.error('error: ', error);
+  }
+}
+
 function* vaultsReadySaga() {
   yield call(initTeamsSaga);
   yield put(vaultsReady());
@@ -790,6 +802,7 @@ export default function* workflowSagas() {
   yield takeLatest(INIT_TEAMS_SETTINGS, initTeamsSettingsSaga);
   yield takeLatest(INIT_TEAM_SETTINGS, initTeamSettingsSaga);
   yield takeLatest(INIT_IMPORT_SETTINGS, initImportSettingsSaga);
+  yield takeLatest(INIT_SHARE, initShareSaga);
 
   yield takeLatest(SET_WORK_IN_PROGRESS_ITEM, setWorkInProgressItemSaga);
   yield takeLatest(UPDATE_WORK_IN_PROGRESS_ITEM, updateWorkInProgressItemSaga);

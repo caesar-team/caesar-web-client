@@ -3,7 +3,6 @@ import { Error, Head } from '@caesar/components';
 import { Bootstrap, Sharing } from '@caesar/containers';
 import { base64ToObject } from '@caesar/common/utils/base64';
 import { login } from '@caesar/common/utils/authUtils';
-import { getCheckShare } from '@caesar/common/api';
 
 const validFields = ['e', 'p'];
 
@@ -21,10 +20,7 @@ const SharePage = ({ statusCode, shared }) => (
   </>
 );
 
-SharePage.getInitialProps = async ({
-  res,
-  query: { encryption = '', shareId = '' },
-}) => {
+SharePage.getInitialProps = async ({ res, query: { encryption = '' } }) => {
   const shared = base64ToObject(encryption);
   const isFieldsValidated = validateFields(shared, validFields);
 
@@ -46,8 +42,6 @@ SharePage.getInitialProps = async ({
   }
 
   try {
-    await getCheckShare(shareId);
-
     const jwt = await login(shared.e, shared.p);
 
     res.cookie('token', jwt, { path: '/' });

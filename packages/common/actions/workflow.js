@@ -6,6 +6,7 @@ export const INIT_TEAM_SETTINGS = '@workflow/INIT_TEAM_SETTINGS';
 export const INIT_IMPORT_SETTINGS = '@workflow/INIT_IMPORT_SETTINGS';
 export const INIT_CREATE_PAGE = '@workflow/INIT_CREATE_PAGE';
 export const INIT_DASHBOARD = '@workflow/INIT_DASHBOARD';
+export const INIT_SHARE = '@workflow/INIT_SHARE';
 export const FINISH_PROCESSING_KEYPAIRS =
   '@workflow/FINISH_PROCESSING_KEYPAIRS';
 
@@ -67,6 +68,10 @@ export const initImportSettings = () => ({
 
 export const initDashboard = () => ({
   type: INIT_DASHBOARD,
+});
+
+export const initShare = () => ({
+  type: INIT_SHARE,
 });
 
 export const finishProcessingKeyPairs = () => ({

@@ -31,14 +31,7 @@ export function* createAnonymousLinkSaga() {
       },
     });
 
-    const {
-      id: userId,
-      name,
-      plainPassword: password,
-      masterPassword,
-      publicKey,
-      domainRoles,
-    } = createdUser;
+    const { plainPassword: password, masterPassword } = createdUser;
 
     yield call(shareItemBatchSaga, {
       payload: {
@@ -48,7 +41,6 @@ export function* createAnonymousLinkSaga() {
 
     // TODO: Make shorted link
     const link = generateSharingUrl(
-      workInProgressItem.id,
       objectToBase64({
         e: email,
         p: password,
@@ -56,16 +48,9 @@ export function* createAnonymousLinkSaga() {
       }),
     );
 
-    const shared = {
-      id: workInProgressItem.id,
-      userId,
-      email,
-      name,
-      link,
-      publicKey,
-      isAccepted: false,
-      domainRoles,
-    };
+    // TODO: Rename here and on backend to 'anonymLink' or move to secret
+    // TODO: Encrypt with user key => maybe in secret
+    const shared = link;
 
     // TODO: Add request to update 'shared' item
     yield put(createAnonymousLinkSuccess(workInProgressItem.id, shared));

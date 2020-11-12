@@ -209,7 +209,6 @@ export const getLastUpdatedUserItems = (
 
 export const postItemShare = ({ itemId, users }) =>
   callApi.post(`/items/${itemId}/share`, { users });
-export const getCheckShare = id => callApi.get(`/anonymous/share/${id}/check`);
 
 // item batch
 export const postCreateItemsBatch = data => callApi.post('/items/batch', data);

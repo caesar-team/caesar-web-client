@@ -141,12 +141,13 @@ export function* editListSaga({ payload: { list }, meta: { setEditMode } }) {
   }
 }
 
-export function* removeListSaga({ payload: { teamId, listId } }) {
+export function* removeListSaga({
+  payload: { teamId = TEAM_TYPE.PERSONAL, listId },
+}) {
   try {
     const list = yield select(listSelector, { listId });
-    const listItemIds = yield select(itemsByListIdSelector, { listId }).map(
-      item => item.id,
-    );
+    const listItems = yield select(itemsByListIdSelector, { listId });
+    const listItemIds = listItems.map(item => item.id);
 
     const trashList = teamId
       ? yield select(currentTeamTrashListSelector)
@@ -155,9 +156,9 @@ export function* removeListSaga({ payload: { teamId, listId } }) {
     yield call(moveItemsBatchSaga, {
       payload: {
         itemIds: listItemIds,
-        oldTeamId: teamId || null,
+        oldTeamId: teamId,
         oldListId: list.id,
-        teamId: teamId || null,
+        teamId,
         listId: trashList?.id,
       },
     });

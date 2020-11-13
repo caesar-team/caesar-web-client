@@ -155,6 +155,7 @@ export function* decryptUserItems(items) {
   const keyPair = yield select(teamKeyPairSelector, {
     teamId: TEAM_TYPE.PERSONAL,
   });
+  console.log('decryptUserItems size', items.length);
 
   // decrypt the items
   if (items?.length > 0) {
@@ -451,7 +452,7 @@ function* loadKeyPairsAndPersonalItems() {
     const itemsEncryptedByUserKeys = [
       ...keypairsArray.filter(keyPairsEncryptedByUserKeysFilter),
       ...systemItems,
-      ...userItems,
+      // ...userItems,
     ];
     const itemsEncryptedByTeamKeys = keypairsArray.filter(
       keyPairsEncryptedByTeamKeysFilter,
@@ -466,6 +467,7 @@ function* loadKeyPairsAndPersonalItems() {
     // Put to the store the shared and the team items, wait for processing of keypairs
     yield put(
       addItemsBatch({
+        ...itemsById,
         ...sharedItemsById,
         ...teamsItemsById,
         ...itemsEncryptedByTeamKeys,
@@ -590,17 +592,17 @@ export function* openTeamVaultSaga({ payload: { teamId } }) {
     if (checksResult) {
       yield put(lockTeam(teamId, false));
       // TODO: Here is opportunity to improve the calls
-      yield fork(processTeamItemsSaga, {
-        payload: {
-          teamId,
-        },
-      });
+      // yield fork(processTeamItemsSaga, {
+      //   payload: {
+      //     teamId,
+      //   },
+      // });
 
-      yield fork(processSharedItemsSaga, {
-        payload: {
-          teamId,
-        },
-      });
+      // yield fork(processSharedItemsSaga, {
+      //   payload: {
+      //     teamId,
+      //   },
+      // });
     } else {
       yield put(
         updateGlobalNotification(

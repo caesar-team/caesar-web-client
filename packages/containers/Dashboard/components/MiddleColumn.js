@@ -55,7 +55,7 @@ const MiddleColumnComponent = ({
   const visibleListItems = useMemo(
     () =>
       generalItems
-        .filter(isDecryptedItem)
+        // .filter(isDecryptedItem)
         .sort((a, b) => sortByDate(a.lastUpdated, b.lastUpdated, 'DESC')),
     [generalItems],
   );

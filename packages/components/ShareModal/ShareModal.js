@@ -16,6 +16,8 @@ import { Scrollbar } from '../Scrollbar';
 import { ListItem } from '../List';
 import { TextWithLines } from '../TextWithLines';
 
+const Wrapper = styled.div``;
+
 const Row = styled.div`
   margin-bottom: 20px;
 `;
@@ -156,7 +158,9 @@ export const ShareModal = ({
   const shouldShowAddedMembers = members.length > 0;
   const shouldShowTeamsSection = false;
   const shouldShowSharedMembers = sharedMembers.length > 0;
-
+  const visibleEntitiesCount = items.length + members.length;
+  const WrapperComponent = visibleEntitiesCount > 3 ? Scrollbar : Wrapper;
+  
   return (
     <Modal
       isOpened
@@ -165,7 +169,7 @@ export const ShareModal = ({
       shouldCloseOnEsc
       shouldCloseOnOverlayClick
     >
-      <Scrollbar autoHeight autoHeightMin={500}>
+      <WrapperComponent autoHeight autoHeightMin={200} autoHeightMax={400}>
         <StyledModalTitle>
           {isMultiMode ? 'Share selected items' : 'Share the item'}
         </StyledModalTitle>
@@ -244,7 +248,7 @@ export const ShareModal = ({
           </ButtonStyled>
           <Button onClick={handleClickDone}>Done</Button>
         </ButtonsWrapper>
-      </Scrollbar>
+      </WrapperComponent>  
     </Modal>
   );
 };

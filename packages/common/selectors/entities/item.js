@@ -107,7 +107,6 @@ export const generalItemsSelector = createSelector(
   items => items.filter(isGeneralItem) || [],
 );
 
-const listIdPropSelector = (_, props) => props.listId;
 export const itemsByListIdSelector = createSelector(
   itemArraySelector,
   allTrashListIdsSelector,

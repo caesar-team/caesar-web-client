@@ -56,7 +56,7 @@ const ItemComponent = ({
   const [isVisibleDragZone, setVisibleDragZone] = useState(false);
   const itemRef = useRef(null);
   const notification = useNotification();
-  const isDecryptionProcess = useSelector(isDecryptionProgressSelector);
+  const isDecryptionProgress = useSelector(isDecryptionProgressSelector);
 
   const handleDragEnter = useCallback(
     e => {
@@ -133,9 +133,9 @@ const ItemComponent = ({
             onClickAcceptEdit={!isTrashItem && handleClickAcceptEdit}
             onClickShare={onClickShare}
             isVisibleDragZone={isVisibleDragZone}
-            isDummy={isDecryptionProcess}
+            isDummy={isDecryptionProgress}
           />
-          {!isDecryptionProcess && (
+          {!isDecryptionProgress && (
             <>
               <Meta item={item} />
               <Can I={PERMISSION.TRASH} an={_permissions}>

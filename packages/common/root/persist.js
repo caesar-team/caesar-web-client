@@ -32,9 +32,19 @@ const currentUserTransform = createTransform(
   { whitelist: ['currentUser'] },
 );
 
+const workflowTransform = createTransform(
+  inboundState => {
+    const { isLoading, isError, isReady, ...workflow } = inboundState;
+
+    return workflow;
+  },
+  outboundState => outboundState,
+  { whitelist: ['workflow'] },
+);
+
 export const persistOptions = {
   key: 'root',
   localForage,
   blacklist: ['application'],
-  transforms: [itemTransform, currentUserTransform],
+  transforms: [itemTransform, currentUserTransform, workflowTransform],
 };

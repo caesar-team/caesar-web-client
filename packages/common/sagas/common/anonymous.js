@@ -40,7 +40,8 @@ export function* createAnonymousLinkSaga() {
     });
 
     // TODO: Add new flow of sharing with keipair.share
-    console.log('Anonym flow will be implemented soon');
+    // eslint-disable-next-line no-console
+    console.warn('Not yet implemented');
     const encryptedSecret = yield call(
       encryptItem,
       workInProgressItem.data,

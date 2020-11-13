@@ -90,12 +90,7 @@ const ListComponent = ({
   const isDashboardDefaultMode = mode === DASHBOARD_MODE.DEFAULT;
   const isEmpty = items.length === 0;
 
-  if (
-    isEmpty ||
-    (isDashboardDefaultMode &&
-      !workInProgressList &&
-      !workInProgressItemIds.length)
-  ) {
+  if (isDashboardDefaultMode && !workInProgressList) {
     return (
       <Wrapper isEmpty>
         <EmptyList />
@@ -116,15 +111,19 @@ const ListComponent = ({
           </ColumnTitle>
         </ColumnHeader>
       )}
-      <RenderedList
-        items={items}
-        isMultiItem={isMultiItem}
-        teamMembersCount={teamMembersCount}
-        onClickItem={onClickItem}
-        onSelectItem={onSelectItem}
-        workInProgressItemIds={workInProgressItemIds}
-        workInProgressItem={workInProgressItem}
-      />
+      {items.length === 0 && workInProgressItemIds.length === 0 ? (
+        <EmptyList />
+      ) : (
+        <RenderedList
+          items={items}
+          isMultiItem={isMultiItem}
+          teamMembersCount={teamMembersCount}
+          onClickItem={onClickItem}
+          onSelectItem={onSelectItem}
+          workInProgressItemIds={workInProgressItemIds}
+          workInProgressItem={workInProgressItem}
+        />
+      )}
     </Wrapper>
   );
 };

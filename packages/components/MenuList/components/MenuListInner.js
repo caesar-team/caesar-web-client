@@ -10,7 +10,11 @@ import {
   TEAM_TYPE,
 } from '@caesar/common/constants';
 import { currentTeamSelector } from '@caesar/common/selectors/currentUser';
-import { teamListsSelector } from '@caesar/common/selectors/entities/list';
+import {
+  teamListsSelector,
+  favoritesListSelector,
+} from '@caesar/common/selectors/entities/list';
+import { itemsByListIdSelector } from '@caesar/common/selectors/entities/item';
 import { workInProgressListSelector } from '@caesar/common/selectors/workflow';
 import {
   setWorkInProgressItem,
@@ -54,12 +58,12 @@ const ListAddIcon = styled(Icon)`
 
 const StyledMenuItemInner = styled(MenuItemInner)`
   &:hover {
-    background-color: ${({ withChildren, isEdit, theme }) =>
-      !withChildren && !isEdit && theme.color.snow};
-    border-top-color: ${({ withChildren, isEdit, theme }) =>
-      !withChildren && !isEdit && theme.color.gallery};
-    border-bottom-color: ${({ withChildren, isEdit, theme }) =>
-      !withChildren && !isEdit && theme.color.gallery};
+    background-color: ${({ withNested, isEdit, theme }) =>
+      !withNested && !isEdit && theme.color.snow};
+    border-top-color: ${({ withNested, isEdit, theme }) =>
+      !withNested && !isEdit && theme.color.gallery};
+    border-bottom-color: ${({ withNested, isEdit, theme }) =>
+      !withNested && !isEdit && theme.color.gallery};
 
     ${ListAddIcon} {
       opacity: 1;
@@ -91,12 +95,14 @@ const MenuListInnerComponent = ({
   const teamLists = useSelector(state =>
     teamListsSelector(state, { teamId: currentTeam?.id }),
   );
-  const otherLists = teamLists.filter(list => list.type === LIST_TYPE.LIST);
-  const favoritesList = teamLists.find(
-    list => list.type === LIST_TYPE.FAVORITES,
-  );
   const inboxList = teamLists.find(list => list.type === LIST_TYPE.INBOX);
-  const defaultList = teamLists.find(list => list.type === LIST_TYPE.DEFAULT);
+  const favoritesList = useSelector(favoritesListSelector);
+  const favoritesListItems = useSelector(state =>
+    itemsByListIdSelector(state, { listId: LIST_TYPE.FAVORITES }),
+  );
+  const nestedLists = teamLists
+    .filter(list => [LIST_TYPE.LIST, LIST_TYPE.DEFAULT].includes(list.type))
+    .sort((a, b) => a.sort - b.sort);
   const trashList = teamLists.find(list => list.type === LIST_TYPE.TRASH);
 
   const listSizes = useSelector(state =>
@@ -141,7 +147,6 @@ const MenuListInnerComponent = ({
     dispatch(sortListRequest(draggableId, source.index, destination.index));
   };
 
-  const nestedLists = [defaultList, ...otherLists];
   const menuList = [
     {
       id: inboxList?.id || null,
@@ -152,14 +157,14 @@ const MenuListInnerComponent = ({
     {
       id: favoritesList?.id,
       title: 'Favorites',
-      length: getListCount(favoritesList?.id),
+      length: favoritesListItems.length,
       icon: 'favorite',
     },
     {
       id: 'lists',
       title: 'Lists',
       icon: 'list',
-      children: nestedLists,
+      nested: nestedLists,
     },
     {
       id: trashList?.id,
@@ -177,7 +182,6 @@ const MenuListInnerComponent = ({
   const nestedListsLabels = nestedLists?.map(({ label } = { label: null }) =>
     label?.toLowerCase(),
   );
-  // debugger;
   const { _permissions } = currentTeam || {};
   const listPermission = {
     ..._permissions,
@@ -189,8 +193,8 @@ const MenuListInnerComponent = ({
 
   return (
     <Scrollbar>
-      {menuList.map(({ id, icon, title, length, children }) => {
-        const withChildren = id === 'lists';
+      {menuList.map(({ id, icon, title, length, nested }) => {
+        const withNested = !!nested;
 
         return (
           id && (
@@ -202,13 +206,13 @@ const MenuListInnerComponent = ({
                     : activeListId === id
                 }
                 fontWeight={id === SECURE_MESSAGE_MODE ? 600 : 400}
-                withChildren={withChildren}
+                withNested={withNested}
                 onClick={() => {
                   if (id === SECURE_MESSAGE_MODE) {
                     return handleClickSecureMessage();
                   }
 
-                  return withChildren
+                  return withNested
                     ? setListsOpened(!isListsOpened)
                     : handleClickMenuItem(id);
                 }}
@@ -220,7 +224,7 @@ const MenuListInnerComponent = ({
                     <MenuItemCounter>{length}</MenuItemCounter>
                   )}
                 </MenuItemTitle>
-                {withChildren && (
+                {withNested && (
                   <>
                     <Can I={PERMISSION.CREATE} a={listPermission}>
                       <ListAddIcon
@@ -248,9 +252,9 @@ const MenuListInnerComponent = ({
                       nestedListsLabels={nestedListsLabels}
                     />
                   )}
-                  {children &&
-                    (children.length <= 1 ? (
-                      children.map((list, index) => (
+                  {nested?.length > 0 &&
+                    (nested.length <= 1 ? (
+                      nested.map((list = {}, index) => (
                         <ListItem
                           key={list.id}
                           list={list}
@@ -266,17 +270,18 @@ const MenuListInnerComponent = ({
                         <Droppable
                           droppableId="droppable"
                           type="lists"
-                          key={children.length}
+                          key={nested.length}
                         >
                           {provided => (
                             <div
                               ref={provided.innerRef}
                               {...provided.droppableProps}
                             >
-                              {children.map((list, index) => (
+                              {nested.map((list, index) => (
                                 <ListItem
                                   key={list.id}
                                   list={list}
+                                  itemCount={getListCount(list.id)}
                                   activeListId={activeListId}
                                   index={index}
                                   isDraggable

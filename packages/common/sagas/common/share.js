@@ -210,7 +210,7 @@ export function* updateSharedItemFromServer({ payload: { itemId } }) {
 // 3. Share the system keyPair item to the new members
 export function* shareItemBatchSaga({
   payload: {
-    data: { itemIds = [], members = [] },
+    data: { itemIds = [], members = [], teamIds = [] },
   },
 }) {
   try {

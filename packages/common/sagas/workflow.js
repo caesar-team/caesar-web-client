@@ -663,7 +663,8 @@ function* getItemKeyPair({
 function* decryptItemRaws({ payload: { item } }) {
   try {
     // If item is null or aready had decypted attachments then do not dectrypt again!
-    if (!item || (item?.data?.raws && Object.values(item?.data?.raws) > 0)) return;
+    if (!item || (item?.data?.raws && Object.values(item?.data?.raws) > 0))
+      return;
 
     const { raws } = JSON.parse(item.secret);
 
@@ -677,7 +678,7 @@ function* decryptItemRaws({ payload: { item } }) {
       !item.teamId && !item.isShared
         ? yield select(masterPasswordSelector)
         : keyPair.password;
-    console.log('decryptItemRaws');
+
     yield put(
       decryption({
         raws,

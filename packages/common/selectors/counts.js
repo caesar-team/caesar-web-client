@@ -1,9 +1,9 @@
 import { createSelector } from 'reselect';
 import { itemsByListIdsSelector } from './entities/item';
-import { listsIdTeamSelector } from './entities/list';
+import { teamListIdsSelector } from './entities/list';
 
 export const listsItemsSelector = createSelector(
-  listsIdTeamSelector,
+  teamListIdsSelector,
   state => state,
   (listsId, state) => {
     return itemsByListIdsSelector(state, { listIds: listsId });
@@ -11,16 +11,16 @@ export const listsItemsSelector = createSelector(
 );
 
 export const teamListsSizesByIdSelector = createSelector(
-  listsIdTeamSelector,
+  teamListIdsSelector,
   listsItemsSelector,
-  (ids, items) => {
-    const listsArray = ids?.map(listId => [
-      listId,
-      items.filter(item => item.listId === listId)?.length || 0,
-    ]);
-
-    return Object.fromEntries(listsArray);
-  },
+  (ids, items) =>
+    ids?.reduce(
+      (acc, listId) => ({
+        ...acc,
+        [listId]: items.filter(item => item.listId === listId)?.length || 0,
+      }),
+      {},
+    ),
 );
 
 const listsIdPropSelector = (_, prop) => prop.listsId;

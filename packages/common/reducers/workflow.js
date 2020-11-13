@@ -17,12 +17,15 @@ import {
   INIT_TEAMS_SETTINGS,
   INIT_TEAM_SETTINGS,
   INIT_IMPORT_SETTINGS,
+  DECRYPTION,
+  DECRYPTION_END,
 } from '@caesar/common/actions/workflow';
 
 const initialState = {
   isLoading: true,
   isError: false,
   isReady: false,
+  isDecryptionProgress: false,
   workInProgressItem: null,
   workInProgressItemIds: [],
   workInProgressListId: null,
@@ -101,6 +104,18 @@ export default createReducer(initialState, {
     return {
       ...state,
       workInProgressItemIds: payload.itemIds,
+    };
+  },
+  [DECRYPTION](state) {
+    return {
+      ...state,
+      isDecryptionProgress: true,
+    };
+  },
+  [DECRYPTION_END](state) {
+    return {
+      ...state,
+      isDecryptionProgress: false,
     };
   },
   [RESET_WORK_IN_PROGRESS_ITEM_IDS](state) {

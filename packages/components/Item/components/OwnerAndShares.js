@@ -55,6 +55,7 @@ const NoMembers = styled.div`
 `;
 
 const ShareButton = styled.button`
+  flex: 0 0 40px;
   width: 40px;
   height: 40px;
   padding: 0;

@@ -77,9 +77,8 @@ app.prepare().then(() => {
     });
   });
 
-  server.get('/share/:shareId/:encryption', (req, res) => {
+  server.get('/share/:encryption', (req, res) => {
     app.render(req, res, '/share', {
-      shareId: req.params.shareId,
       encryption: req.params.encryption,
     });
   });

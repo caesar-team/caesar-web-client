@@ -146,9 +146,9 @@ export const deleteTeam = teamId => callApi.delete(`/teams/${teamId}`);
 export const getTeamMembers = teamId => callApi.get(`/teams/${teamId}/members`);
 export const getDefaultTeamMembers = () =>
   callApi.get('/teams/default/members');
-export const postAddTeamMember = ({ teamId, userId, role, secret }) =>
+export const postAddTeamMember = ({ teamId, userId, teamRole, secret }) =>
   callApi.post(`/teams/${teamId}/members/${userId}`, {
-    teamRole: role,
+    teamRole,
     secret,
   });
 export const updateTeamMember = ({ teamId, userId, teamRole }) =>
@@ -209,7 +209,6 @@ export const getLastUpdatedUserItems = (
 
 export const postItemShare = ({ itemId, users }) =>
   callApi.post(`/items/${itemId}/share`, { users });
-export const getCheckShare = id => callApi.get(`/anonymous/share/${id}/check`);
 
 // item batch
 export const postCreateItemsBatch = data => callApi.post('/items/batch', data);

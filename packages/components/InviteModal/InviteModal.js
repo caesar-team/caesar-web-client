@@ -50,11 +50,11 @@ class InviteModal extends Component {
     }));
   };
 
-  handleChangeRole = changedRoleMember => (_, role) => {
+  handleChangeRole = updatedMember => (_, teamRole) => {
     this.setState(prevState => ({
       ...prevState,
       users: prevState.users.map(member =>
-        member.id === changedRoleMember.id ? { ...member, role } : member,
+        member.id === updatedMember.id ? { ...member, role: teamRole } : member,
       ),
     }));
   };

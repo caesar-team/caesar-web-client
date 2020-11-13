@@ -1,7 +1,5 @@
 import * as openpgp from 'openpgp';
 import { generateKeys } from './key';
-import { getHostName } from './getDomainName';
-import { randomId } from './uuid4';
 import { objectToBase64, base64ToObject } from './base64';
 import { createSrp } from './srp';
 import { passwordGenerator } from './passwordGenerator';
@@ -111,9 +109,6 @@ export const generateUsersBatch = async emails => {
     ...keys,
   }));
 };
-
-export const generateAnonymousEmail = () =>
-  `anonymous_${randomId()}@${getHostName()}`;
 
 export const generateSeedAndVerifier = (email, password) => {
   const seed = srp.getRandomSeed();

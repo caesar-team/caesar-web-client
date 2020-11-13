@@ -92,7 +92,11 @@ export const workInProgressItemSharedMembersSelector = createSelector(
   workInProgressItemSelector,
   usersByIdSelector,
   (workInProgressItem, usersById) =>
-    workInProgressItem?.invited?.map(userId => usersById[userId]) || [],
+    workInProgressItem?.invited?.reduce((acc, userId) => {
+      const user = usersById[userId];
+
+      return user ? [...acc, user] : acc;
+    }, []) || [],
 );
 
 export const isDecryptionProgressSelector = createSelector(

@@ -138,9 +138,9 @@ class TeamListContainer extends Component {
     );
   };
 
-  handleChangeMemberRole = (member, role) => {
+  handleChangeMemberRole = (member, teamRole) => {
     // TODO: Need to implement UI. Use member.id instead of userId
-    this.props.updateTeamMemberRoleRequest(member.id, role);
+    this.props.updateTeamMemberRoleRequest(member.id, teamRole);
   };
 
   handlePinTeam = (teamId, isPinned) => event => {

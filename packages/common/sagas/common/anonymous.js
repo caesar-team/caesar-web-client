@@ -1,10 +1,7 @@
 import { put, call, takeLatest, select } from 'redux-saga/effects';
 import { workInProgressItemSelector } from '@caesar/common/selectors/workflow';
-import {
-  encryptItem,
-  generateAnonymousEmail,
-} from '@caesar/common/utils/cipherUtils';
-import { createMemberSaga } from '@caesar/common/sagas/entities/member';
+import { generateAnonymousEmail } from '@caesar/common/utils/item';
+import { createUserSaga } from '@caesar/common/sagas/entities/user';
 import { DOMAIN_ROLES } from '@caesar/common/constants';
 import { generateSharingUrl } from '@caesar/common/utils/sharing';
 import { objectToBase64 } from '@caesar/common/utils/base64';
@@ -19,62 +16,44 @@ import {
 import { updateWorkInProgressItem } from '@caesar/common/actions/workflow';
 import { updateGlobalNotification } from '@caesar/common/actions/application';
 import { getServerErrorMessage } from '@caesar/common/utils/error';
+import { shareItemBatchSaga } from './share';
 
 export function* createAnonymousLinkSaga() {
   try {
     const workInProgressItem = yield select(workInProgressItemSelector);
 
-    const email = generateAnonymousEmail();
+    const email = generateAnonymousEmail(workInProgressItem.id);
 
-    const {
-      id: userId,
-      name,
-      password,
-      masterPassword,
-      publicKey,
-    } = yield call(createMemberSaga, {
+    const createdUser = yield call(createUserSaga, {
       payload: {
         email,
-        role: DOMAIN_ROLES.ROLE_ANONYMOUS_USER,
+        domainRole: DOMAIN_ROLES.ROLE_ANONYMOUS_USER,
       },
     });
 
-    // TODO: Add new flow of sharing with keipair.share
-    // eslint-disable-next-line no-console
-    console.warn('Not yet implemented');
-    const encryptedSecret = yield call(
-      encryptItem,
-      workInProgressItem.data,
-      publicKey,
-    );
+    const { plainPassword: password, masterPassword } = createdUser;
 
-    const item = {
-      id: 'itemId',
-      secret: encryptedSecret,
-    };
+    yield call(shareItemBatchSaga, {
+      payload: {
+        data: { itemIds: [workInProgressItem.id], members: [createdUser] },
+      },
+    });
 
     // TODO: Make shorted link
     const link = generateSharingUrl(
-      item.id,
       objectToBase64({
         e: email,
         p: password,
-        mp: masterPassword,
+        m: masterPassword,
       }),
     );
 
-    const share = {
-      id: item.id,
-      userId,
-      email,
-      name,
-      link,
-      publicKey,
-      isAccepted: false,
-      domainRoles: [DOMAIN_ROLES.ROLE_ANONYMOUS_USER],
-    };
+    // TODO: Rename here and on backend to 'anonymLink' or move to secret
+    // TODO: Encrypt with user key => maybe in secret
+    const shared = link;
 
-    yield put(createAnonymousLinkSuccess(workInProgressItem.id, share));
+    // TODO: Add request to update 'shared' item
+    yield put(createAnonymousLinkSuccess(workInProgressItem.id, shared));
     yield put(updateWorkInProgressItem());
   } catch (error) {
     // eslint-disable-next-line no-console

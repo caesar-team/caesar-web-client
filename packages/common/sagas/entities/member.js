@@ -60,6 +60,7 @@ const setNewFlag = (members, isNew) =>
 const renameUserId = members =>
   members.map(({ userId, ...member }) => ({ id: userId, ...member }));
 
+// TODO: replace with create user
 export function* createMemberSaga({ payload: { email, role } }) {
   try {
     const { password, masterPassword, publicKey, privateKey } = yield call(
@@ -102,6 +103,7 @@ export function* createMemberSaga({ payload: { email, role } }) {
   }
 }
 
+// TODO: replace with create user batch
 export function* createMemberBatchSaga({ payload: { emailRolePairs } }) {
   try {
     if (!emailRolePairs.length) {
@@ -176,6 +178,7 @@ export function* createMemberBatchSaga({ payload: { emailRolePairs } }) {
   }
 }
 
+// TODO: For what stuff do we need it?
 export function* getOrCreateMemberBatchSaga({ payload: { emailRolePairs } }) {
   try {
     const emailRoleObject = emailRolePairs.reduce(
@@ -239,7 +242,7 @@ export function* getOrCreateMemberBatchSaga({ payload: { emailRolePairs } }) {
   }
 }
 
-export function* addMemberToTeamListsBatchSaga({ payload: { teamId, users } }) {
+export function* addTeamMembersBatchSaga({ payload: { teamId, users } }) {
   try {
     const keypair = yield select(teamKeyPairSelector, { teamId });
     const userIds = users.map(user => user.id);
@@ -330,10 +333,7 @@ export default function* memberSagas() {
   yield takeLatest(CREATE_MEMBER_REQUEST, createMemberSaga);
   yield takeLatest(CREATE_MEMBER_BATCH_REQUEST, createMemberBatchSaga);
   yield takeLatest(FETCH_TEAM_MEMBERS_REQUEST, fetchTeamMembersSaga);
-  yield takeLatest(
-    ADD_TEAM_MEMBERS_BATCH_REQUEST,
-    addMemberToTeamListsBatchSaga,
-  );
+  yield takeLatest(ADD_TEAM_MEMBERS_BATCH_REQUEST, addTeamMembersBatchSaga);
   yield takeLatest(UPDATE_TEAM_MEMBER_ROLE_REQUEST, updateTeamMemberRoleSaga);
   yield takeLatest(REMOVE_TEAM_MEMBER_REQUEST, removeTeamMemberSaga);
 }

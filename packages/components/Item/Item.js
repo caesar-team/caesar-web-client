@@ -56,7 +56,7 @@ const ItemComponent = ({
   const [isVisibleDragZone, setVisibleDragZone] = useState(false);
   const itemRef = useRef(null);
   const notification = useNotification();
-  const isDecryptionProgress = useSelector(isDecryptionProgressSelector);
+  const isDecryptionProgress = !item?.data;
 
   const handleDragEnter = useCallback(
     e => {

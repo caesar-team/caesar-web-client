@@ -397,6 +397,7 @@ export function* processKeyPairsSaga({ payload: { itemsById } }) {
     console.error(error);
   }
 }
+
 // If the teamId and  the relatedItemId are presented then the key belong the share item in the team
 const keyPairsEncryptedByUserKeysFilter = keypair =>
   keypair.teamId === TEAM_TYPE.PERSONAL || !keypair.relatedItemId;
@@ -490,6 +491,7 @@ function* loadKeyPairsAndPersonalItems() {
     );
   }
 }
+
 const itemsListFilter = listId => item => item.listId === listId;
 function* initListsAndProgressEntities() {
   const currentTeamId = yield select(currentTeamIdSelector);
@@ -524,6 +526,7 @@ function* initListsAndProgressEntities() {
       yield put(setWorkInProgressListId(defaultList.id));
     }
   }
+
   const workInProgressItem = yield select(workInProgressItemSelector);
   const itemFromStore = yield select(itemSelector, {
     itemId: workInProgressItem?.id,
@@ -655,7 +658,9 @@ function* getItemKeyPair({
 function* decryptItemRaws({ payload: { item } }) {
   try {
     // If item is null or aready had decypted attachments then do not dectrypt again!
-    if (!item || (item?.data?.raws && Object.values(item?.data?.raws) > 0)) return;
+    if (!item || (item?.data?.raws && Object.values(item?.data?.raws) > 0)) {
+      return;
+    }
 
     const { raws } = JSON.parse(item.secret);
 

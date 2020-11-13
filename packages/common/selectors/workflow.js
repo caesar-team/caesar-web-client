@@ -98,3 +98,8 @@ export const workInProgressItemSharedMembersSelector = createSelector(
       return user ? [...acc, user] : acc;
     }, []) || [],
 );
+
+export const isDecryptionProgressSelector = createSelector(
+  workflowSelector,
+  workflow => workflow.isDecryptionProgress,
+);

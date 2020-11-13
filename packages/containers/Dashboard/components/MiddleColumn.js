@@ -1,4 +1,4 @@
-import React, { memo, useRef, useEffect } from 'react';
+import React, { memo, useRef, useEffect, useMemo } from 'react';
 import { useClickAway } from 'react-use';
 import { useSelector, useDispatch } from 'react-redux';
 import {
@@ -32,6 +32,7 @@ import {
 import { updateGlobalNotification } from '@caesar/common/actions/application';
 import { MultiItem, List } from '@caesar/components';
 import { isDecryptedItem } from '@caesar/common/utils/item';
+import { sortByDate } from '@caesar/common/utils/dateUtils';
 import { MODAL } from '../constants';
 import { filter } from '../utils';
 
@@ -51,7 +52,13 @@ const MiddleColumnComponent = ({
       listId: workInProgressList?.id,
     }),
   );
-  const visibleListItems = generalItems.filter(isDecryptedItem);
+  const visibleListItems = useMemo(
+    () =>
+      generalItems
+        .filter(isDecryptedItem)
+        .sort((a, b) => sortByDate(a.lastUpdated, b.lastUpdated, 'DESC')),
+    [generalItems],
+  );
   const trashList = useSelector(trashListSelector);
   const teamsTrashLists = useSelector(teamsTrashListsSelector);
   const itemsById = useSelector(itemsByIdSelector);
@@ -73,7 +80,16 @@ const MiddleColumnComponent = ({
   const currentTeamItems = useSelector(state =>
     teamItemsSelector(state, { teamId: currentTeamId }),
   );
-  const searchedItems = filter(Object.values(currentTeamItems), searchedText);
+  const searchedItems = useMemo(
+    () =>
+      filter(
+        Object.values(currentTeamItems).sort((a, b) =>
+          sortByDate(a.lastUpdated, b.lastUpdated, 'DESC'),
+        ),
+        searchedText,
+      ),
+    [currentTeamItems, searchedText],
+  );
 
   const areAllItemsSelected =
     mode === DASHBOARD_MODE.SEARCH

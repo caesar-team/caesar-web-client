@@ -294,7 +294,7 @@ export function* processTeamsItemsSaga() {
 function* loadTeamKeypairIfNotExists(teamId) {
   const teamKeypairExists = yield call(isTeamKeypairExists, teamId);
 
-  if (!teamKeypairExists) {
+  if (!teamKeypairExists && teamId !== TEAM_TYPE.PERSONAL) {
     const { data: keypairItem } = yield call(getTeamKeyPair, teamId);
     const { itemsById } = convertItemsToEntities([keypairItem]);
     const items = Object.values(itemsById);
@@ -677,7 +677,8 @@ function* getItemKeyPair({
 function* decryptItemRaws({ payload: { item } }) {
   try {
     // If item is null or aready had decypted attachments then do not dectrypt again!
-    if (!item || (item?.data?.raws && Object.values(item?.data?.raws) > 0)) return;
+    if (!item || (item?.data?.raws && Object.values(item?.data?.raws) > 0))
+      return;
 
     const { raws } = JSON.parse(item.secret);
 

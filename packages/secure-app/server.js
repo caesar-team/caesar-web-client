@@ -32,7 +32,7 @@ const LOG_LEVEL =
     ? 'error'
     : 'debug';
 const fastify = require('fastify')({
-  pluginTimeout: 10000 * 2,
+  pluginTimeout: 10000 * 3,
   logger: ENABLE_SERVER_LOGGER ? { level: LOG_LEVEL } : false,
 });
 

@@ -25,6 +25,7 @@ const MemberWrapper = styled.div`
   justify-content: space-between;
   padding: 8px 20px;
   cursor: pointer;
+  transition: background-color 0.2s;
 
   &:hover {
     background-color: ${({ theme }) => theme.color.snow};
@@ -63,11 +64,11 @@ const MemberList = ({
         [REMOVE_CONTROL_TYPE]: (
           <RemoveControl member={member} onClick={onClickRemove(member)} />
         ),
-        [REVOKE_CONTROL_TYPE]: (
+        [REVOKE_CONTROL_TYPE]: onClickRevokeAccess ? (
           <RevokeAccessControl
             onClickRevoke={() => onClickRevokeAccess(member)}
           />
-        ),
+        ) : null,
         [INVITE_CONTROL_TYPE]: (
           <InviteControl
             teamId={teamId}

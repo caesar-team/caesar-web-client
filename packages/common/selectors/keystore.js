@@ -2,10 +2,10 @@ import { createSelector } from 'reselect';
 import {
   currentTeamIdSelector,
   isUserAnonymousSelector,
-  userIdSelector,
-} from '@caesar/common/selectors/user';
+  currentUserIdSelector,
+} from '@caesar/common/selectors/currentUser';
 import { generateSystemItemName } from '@caesar/common/utils/item';
-import { KEY_TYPE, TEAM_TYPE, ENTITY_TYPE } from '@caesar/common/constants';
+import { KEY_TYPE, ENTITY_TYPE, TEAM_TYPE } from '@caesar/common/constants';
 
 const findSystemItemsTeamByItemName = (data, teamId) =>
   Object.values(data).find(
@@ -13,6 +13,15 @@ const findSystemItemsTeamByItemName = (data, teamId) =>
   ) || {};
 
 export const keyStoreSelector = state => state.keystore;
+export const isKeystoreEmpty = createSelector(
+  keyStoreSelector,
+  keystore =>
+    !Object.keys(keystore[KEY_TYPE.ANONYMOUS])?.length &&
+    !Object.keys(keystore[KEY_TYPE.TEAMS]).filter(
+      teamId => teamId !== TEAM_TYPE.PERSONAL,
+    )?.length &&
+    !Object.keys(keystore[KEY_TYPE.SHARES])?.length,
+);
 
 export const anonymousKeyPairsSelector = createSelector(
   keyStoreSelector,
@@ -43,11 +52,6 @@ export const shareItemKeyPairSelector = createSelector(
 const teamIdPropSelector = (_, props) => props.teamId;
 
 const idsPropSelector = (_, props) => props.ids;
-
-export const personalKeyPairSelector = createSelector(
-  keyStoreSelector,
-  keystore => keystore[KEY_TYPE.PERSONAL] || {},
-);
 
 export const teamKeyPairSelector = createSelector(
   teamKeyPairsSelector,
@@ -91,10 +95,9 @@ export const idsKeyPairsSelector = createSelector(
 export const actualKeyPairSelector = createSelector(
   keyStoreSelector,
   currentTeamIdSelector,
-  personalKeyPairSelector,
   isUserAnonymousSelector,
-  userIdSelector,
-  (data, currentTeamId, personalKeyPair, isAnonymous, userId) => {
+  currentUserIdSelector,
+  (data, currentTeamId, isAnonymous, userId) => {
     switch (true) {
       case isAnonymous:
         return (
@@ -102,10 +105,8 @@ export const actualKeyPairSelector = createSelector(
             ({ id }) => id === userId,
           ) || {}
         );
-      case currentTeamId !== TEAM_TYPE.PERSONAL:
+      case !!currentTeamId:
         return findSystemItemsTeamByItemName(data, currentTeamId);
-      case currentTeamId === TEAM_TYPE.PERSONAL:
-        return personalKeyPair;
       default:
         return null;
     }

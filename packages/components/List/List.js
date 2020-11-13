@@ -36,23 +36,7 @@ const ColumnTitle = styled.div`
   color: ${({ theme }) => theme.color.black};
 `;
 
-const createItemData = memoize(
-  ({
-    items,
-    isMultiItem,
-    onClickItem,
-    onSelectItem,
-    workInProgressItemIds,
-    workInProgressItem,
-  }) => ({
-    items,
-    isMultiItem,
-    onClickItem,
-    onSelectItem,
-    workInProgressItemIds,
-    workInProgressItem,
-  }),
-);
+const createItemData = memoize(itemData => itemData);
 
 const RenderedList = ({
   items,
@@ -106,12 +90,7 @@ const ListComponent = ({
   const isDashboardDefaultMode = mode === DASHBOARD_MODE.DEFAULT;
   const isEmpty = items.length === 0;
 
-  if (
-    isEmpty ||
-    (isDashboardDefaultMode &&
-      !workInProgressList &&
-      !workInProgressItemIds.length)
-  ) {
+  if (isDashboardDefaultMode && !workInProgressList) {
     return (
       <Wrapper isEmpty>
         <EmptyList />
@@ -130,25 +109,21 @@ const ListComponent = ({
               ? listTitle
               : `Search results (${items.length} elements):`}
           </ColumnTitle>
-          {/* TODO: Add sharing list functional; Set condition when to show this button */}
-          {/* <Button
-            icon="share-network"
-            color="white"
-            onClick={() => {
-              console.log('Sharing modal');
-            }}
-          /> */}
         </ColumnHeader>
       )}
-      <RenderedList
-        items={items}
-        isMultiItem={isMultiItem}
-        teamMembersCount={teamMembersCount}
-        onClickItem={onClickItem}
-        onSelectItem={onSelectItem}
-        workInProgressItemIds={workInProgressItemIds}
-        workInProgressItem={workInProgressItem}
-      />
+      {items.length === 0 && workInProgressItemIds.length === 0 ? (
+        <EmptyList />
+      ) : (
+        <RenderedList
+          items={items}
+          isMultiItem={isMultiItem}
+          teamMembersCount={teamMembersCount}
+          onClickItem={onClickItem}
+          onSelectItem={onSelectItem}
+          workInProgressItemIds={workInProgressItemIds}
+          workInProgressItem={workInProgressItem}
+        />
+      )}
     </Wrapper>
   );
 };

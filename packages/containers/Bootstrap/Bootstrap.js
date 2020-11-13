@@ -6,6 +6,7 @@ import {
   DEFAULT_IDLE_TIMEOUT,
   NOOP_NOTIFICATION,
   IS_PROD,
+  DOMAIN_ROLES,
 } from '@caesar/common/constants';
 import {
   SessionChecker,
@@ -56,16 +57,18 @@ class Bootstrap extends Component {
 
     try {
       const { data: bootstrap } = await getUserBootstrap();
-      const { data: user } = await getUserSelf();
+      const { data: currentUser } = await getUserSelf();
+      const isAnonymousOrReadOnlyUser =
+        currentUser?.domainRoles?.includes(DOMAIN_ROLES.ROLE_ANONYMOUS_USER) ||
+        currentUser?.domainRoles?.includes(DOMAIN_ROLES.ROLE_READ_ONLY_USER);
 
-      if (!user || (user?.email.includes('anonymous') && !shared?.mp)) {
-        // TODO: Add namespaces into JWT token to avoid this dirty hack
+      if (!currentUser || (isAnonymousOrReadOnlyUser && !shared?.mp)) {
         logout();
       }
 
       this.bootstrap = getBootstrapStates(bootstrap);
       this.navigationPanelSteps = getNavigationPanelSteps(this.bootstrap);
-      this.user = user;
+      this.currentUser = currentUser;
 
       this.setState({
         currentStep: this.currentStepResolver(bootstrap),
@@ -185,7 +188,7 @@ class Bootstrap extends Component {
 
     if (TWO_FACTOR_STEPS.includes(currentStep)) {
       return (
-        <BootstrapLayout user={this.user}>
+        <BootstrapLayout currentUser={this.currentUser}>
           <TwoFactorStep
             initialStep={currentStep}
             navigationSteps={this.navigationPanelSteps}
@@ -197,7 +200,7 @@ class Bootstrap extends Component {
 
     if (PASSWORD_STEPS.includes(currentStep)) {
       return (
-        <BootstrapLayout user={this.user}>
+        <BootstrapLayout currentUser={this.currentUser}>
           <PasswordStep
             email={shared.e}
             navigationSteps={this.navigationPanelSteps}
@@ -212,7 +215,7 @@ class Bootstrap extends Component {
         <MasterPasswordStep
           initialStep={currentStep}
           navigationSteps={this.navigationPanelSteps}
-          user={this.user}
+          currentUser={this.currentUser}
           sharedMasterPassword={shared.mp}
           masterPassword={IS_PROD ? null : this.props.masterPassword}
           onFinish={this.handleFinishMasterPassword}

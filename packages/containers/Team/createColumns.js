@@ -9,7 +9,11 @@ import {
   Can,
   TableStyles as Table,
 } from '@caesar/components';
-import { PERMISSION, PERMISSION_ENTITY } from '@caesar/common/constants';
+import {
+  PERMISSION,
+  PERMISSION_ENTITY,
+  TEAM_ROLES_LABELS,
+} from '@caesar/common/constants';
 import {
   OPTIONS,
   ROLE_COLUMN_WIDTH,
@@ -34,19 +38,22 @@ const MenuWrapper = styled.div`
   position: absolute;
   width: 100%;
   min-height: 42px;
-  border: 1px solid ${({ theme }) => theme.color.gallery};
+  background-color: ${({ theme }) => theme.color.emperor}!important;
   border-radius: ${({ theme }) => theme.borderRadius};
+  right: 30px;
 `;
 
 const MenuButton = styled(Button)`
   width: 100%;
-  color: ${({ theme }) => theme.color.black};
-  border: none;
-  transition: background-color 0.2s;
+  color: ${({ theme }) => theme.color.lightGray};
+  background-color: transparent;
+  border: 0;
+  text-transform: none;
+  transition: color 0.2s;
 
   &:hover {
-    background-color: ${({ theme }) => theme.color.snow};
-    border: none;
+    color: ${({ theme }) => theme.color.white};
+    border: 0;
   }
 `;
 
@@ -64,8 +71,8 @@ const getColumnFilter = (placeholder = '') => ({
 );
 
 const getTeamMemberSubject = member => ({
-  __typename: PERMISSION_ENTITY.TEAM_MEMBER,
   ...member._permissions,
+  __typename: PERMISSION_ENTITY.TEAM_MEMBER,
 });
 
 export const createColumns = ({
@@ -100,7 +107,7 @@ export const createColumns = ({
   };
 
   const roleColumn = {
-    accessor: 'role',
+    accessor: 'teamRole',
     width: ROLE_COLUMN_WIDTH,
     Filter: getColumnFilter('Role'),
     Header: () => null,
@@ -133,7 +140,7 @@ export const createColumns = ({
             />
           </Can>
           <Can not I={PERMISSION.EDIT} of={getTeamMemberSubject(original)}>
-            {value}
+            <Table.RoleCell>{TEAM_ROLES_LABELS[value]}</Table.RoleCell>
           </Can>
         </Table.DropdownCell>
       );
@@ -146,31 +153,34 @@ export const createColumns = ({
     disableFilters: true,
     disableSortBy: true,
     Header: () => null,
-    Cell: ({ row: { original } }) => (
-      <Table.MenuCell>
-        <Can I={PERMISSION.DELETE} a={getTeamMemberSubject(original)}>
-          <DottedMenu
-            tooltipProps={{
-              textBoxWidth: '100px',
-              arrowAlign: 'start',
-              position: 'left center',
-              padding: '0px 0px',
-              flat: true,
-              zIndex: '1',
-            }}
-          >
-            <MenuWrapper>
-              <MenuButton
-                color="white"
-                onClick={handleRemoveMember(original.id)}
-              >
-                Remove
-              </MenuButton>
-            </MenuWrapper>
-          </DottedMenu>
-        </Can>
-      </Table.MenuCell>
-    ),
+    Cell: ({ row: { original } }) => {
+      return (
+        <Table.MenuCell>
+          <Can I={PERMISSION.DELETE} a={getTeamMemberSubject(original)}>
+            <DottedMenu
+              tooltipProps={{
+                textBoxWidth: '100px',
+                arrowAlign: 'end',
+                position: 'bottom right',
+                padding: '0px 0px',
+                flat: true,
+                zIndex: '1',
+                border: '0',
+              }}
+            >
+              <MenuWrapper>
+                <MenuButton
+                  color="white"
+                  onClick={handleRemoveMember(original.id)}
+                >
+                  Remove
+                </MenuButton>
+              </MenuWrapper>
+            </DottedMenu>
+          </Can>
+        </Table.MenuCell>
+      );
+    },
   };
 
   return [nameColumn, emailColumn, roleColumn, menuColumn];

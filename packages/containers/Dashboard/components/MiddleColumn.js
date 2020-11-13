@@ -1,4 +1,4 @@
-import React, { memo, useRef, useEffect } from 'react';
+import React, { memo, useRef, useEffect, useMemo } from 'react';
 import { useClickAway } from 'react-use';
 import { useSelector, useDispatch } from 'react-redux';
 import {
@@ -12,20 +12,18 @@ import {
   workInProgressItemSelector,
   workInProgressItemIdsSelector,
   workInProgressListSelector,
-  visibleListItemsSelector,
 } from '@caesar/common/selectors/workflow';
 import {
   itemsByIdSelector,
-  generalItemsSelector,
+  itemsByListIdSelector,
+  teamItemsSelector,
 } from '@caesar/common/selectors/entities/item';
 import {
   trashListSelector,
-  favoritesListSelector,
   teamsTrashListsSelector,
-  listsByIdSelector,
 } from '@caesar/common/selectors/entities/list';
-import { teamMembersSelector } from '@caesar/common/selectors/entities/team';
-import { currentTeamIdSelector } from '@caesar/common/selectors/user';
+import { teamMembersShortViewSelector } from '@caesar/common/selectors/entities/member';
+import { currentTeamIdSelector } from '@caesar/common/selectors/currentUser';
 import {
   setWorkInProgressItem,
   setWorkInProgressItemIds,
@@ -33,6 +31,8 @@ import {
 } from '@caesar/common/actions/workflow';
 import { updateGlobalNotification } from '@caesar/common/actions/application';
 import { MultiItem, List } from '@caesar/components';
+import { isDecryptedItem } from '@caesar/common/utils/item';
+import { sortByDate } from '@caesar/common/utils/dateUtils';
 import { MODAL } from '../constants';
 import { filter } from '../utils';
 
@@ -47,23 +47,24 @@ const MiddleColumnComponent = ({
   const workInProgressItemIds = useSelector(workInProgressItemIdsSelector);
   const workInProgressList = useSelector(workInProgressListSelector);
   const workInProgressItem = useSelector(workInProgressItemSelector);
-  const visibleListItems = useSelector(visibleListItemsSelector);
+  const generalItems = useSelector(state =>
+    itemsByListIdSelector(state, {
+      listId: workInProgressList?.id,
+    }),
+  );
+  const visibleListItems = useMemo(
+    () =>
+      generalItems
+        .filter(isDecryptedItem)
+        .sort((a, b) => sortByDate(a.lastUpdated, b.lastUpdated, 'DESC')),
+    [generalItems],
+  );
   const trashList = useSelector(trashListSelector);
-  const favoritesList = useSelector(favoritesListSelector);
   const teamsTrashLists = useSelector(teamsTrashListsSelector);
   const itemsById = useSelector(itemsByIdSelector);
-  const listsById = useSelector(listsByIdSelector);
   const currentTeamId = useSelector(currentTeamIdSelector);
   const teamMembers = useSelector(state =>
-    teamMembersSelector(state, { teamId: currentTeamId }),
-  );
-  const isFavoriteList = workInProgressList?.id === LIST_TYPE.FAVORITES;
-  const generalItems = useSelector(state =>
-    generalItemsSelector(state, {
-      itemIds: isFavoriteList
-        ? favoritesList.children
-        : listsById[(workInProgressList?.id)]?.children,
-    }),
+    teamMembersShortViewSelector(state, { teamId: currentTeamId }),
   );
 
   const itemsLengthInList = generalItems.length;
@@ -76,7 +77,19 @@ const MiddleColumnComponent = ({
     workInProgressList?.id === trashList?.id ||
     teamsTrashLists?.map(({ id }) => id).includes(workInProgressList?.id);
 
-  const searchedItems = filter(Object.values(itemsById), searchedText);
+  const currentTeamItems = useSelector(state =>
+    teamItemsSelector(state, { teamId: currentTeamId }),
+  );
+  const searchedItems = useMemo(
+    () =>
+      filter(
+        Object.values(currentTeamItems).sort((a, b) =>
+          sortByDate(a.lastUpdated, b.lastUpdated, 'DESC'),
+        ),
+        searchedText,
+      ),
+    [currentTeamItems, searchedText],
+  );
 
   const areAllItemsSelected =
     mode === DASHBOARD_MODE.SEARCH
@@ -135,6 +148,7 @@ const MiddleColumnComponent = ({
         <MultiItem
           isInboxItems={isInboxList}
           isTrashItems={isTrashList}
+          isPersonalTeam={isPersonalTeam}
           workInProgressItemIds={workInProgressItemIds}
           areAllItemsSelected={areAllItemsSelected}
           onClickMove={handleOpenModal(MODAL.MOVE_ITEM)}

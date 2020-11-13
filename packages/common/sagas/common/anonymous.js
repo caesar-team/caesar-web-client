@@ -5,7 +5,7 @@ import {
   generateAnonymousEmail,
 } from '@caesar/common/utils/cipherUtils';
 import { createMemberSaga } from '@caesar/common/sagas/entities/member';
-import { ROLE_ANONYMOUS_USER } from '@caesar/common/constants';
+import { DOMAIN_ROLES } from '@caesar/common/constants';
 import { generateSharingUrl } from '@caesar/common/utils/sharing';
 import { objectToBase64 } from '@caesar/common/utils/base64';
 import {
@@ -35,12 +35,13 @@ export function* createAnonymousLinkSaga() {
     } = yield call(createMemberSaga, {
       payload: {
         email,
-        role: ROLE_ANONYMOUS_USER,
+        role: DOMAIN_ROLES.ROLE_ANONYMOUS_USER,
       },
     });
 
     // TODO: Add new flow of sharing with keipair.share
-    console.log('Anonym flow will be implemented soon');
+    // eslint-disable-next-line no-console
+    console.warn('Not yet implemented');
     const encryptedSecret = yield call(
       encryptItem,
       workInProgressItem.data,
@@ -70,12 +71,13 @@ export function* createAnonymousLinkSaga() {
       link,
       publicKey,
       isAccepted: false,
-      roles: [ROLE_ANONYMOUS_USER],
+      domainRoles: [DOMAIN_ROLES.ROLE_ANONYMOUS_USER],
     };
 
     yield put(createAnonymousLinkSuccess(workInProgressItem.id, share));
     yield put(updateWorkInProgressItem());
   } catch (error) {
+    // eslint-disable-next-line no-console
     console.error(error);
     yield put(
       updateGlobalNotification(getServerErrorMessage(error), false, true),
@@ -92,6 +94,7 @@ export function* removeAnonymousLinkSaga() {
     yield put(removeAnonymousLinkSuccess(workInProgressItem.id));
     yield put(updateWorkInProgressItem());
   } catch (error) {
+    // eslint-disable-next-line no-console
     console.error(error);
     yield put(
       updateGlobalNotification(getServerErrorMessage(error), false, true),

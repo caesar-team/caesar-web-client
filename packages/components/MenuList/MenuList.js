@@ -2,14 +2,14 @@ import React, { memo, useState } from 'react';
 import { useSelector } from 'react-redux';
 import styled from 'styled-components';
 import { TEAM_TYPE, TEAM_TEXT_TYPE } from '@caesar/common/constants';
-import { currentTeamSelector } from '@caesar/common/selectors/user';
+import { currentTeamSelector } from '@caesar/common/selectors/currentUser';
 import { teamsByIdSelector } from '@caesar/common/selectors/entities/team';
 import { getTeamTitle } from '@caesar/common/utils/team';
 import { Scrollbar } from '../Scrollbar';
 import { Dropdown } from '../Dropdown';
 import { Avatar } from '../Avatar';
 import { Icon } from '../Icon';
-import { TeamsList } from '../TeamsList';
+import { VaultList } from '../VaultList';
 import { AppVersion } from '../AppVersion';
 import { Overlay } from '../Modal';
 import { MenuListInner } from './components/MenuListInner';
@@ -17,6 +17,11 @@ import { MenuListInner } from './components/MenuListInner';
 const StyledDropdown = styled(Dropdown)`
   ${Dropdown.Box} {
     width: 100%;
+    max-height: calc(100vh - 150px);
+  }
+
+  ${Dropdown.OptionsList} {
+    overflow: auto;
   }
 `;
 
@@ -80,8 +85,8 @@ const MenuListComponent = ({ mode, setSearchedText, setMode }) => {
       <Icon name="warning" width={32} height={32} />
     ) : (
       <Avatar
-        avatar={team.icon}
-        email={team.email}
+        avatar={team?.icon}
+        email={team?.email}
         size={32}
         fontSize="small"
       />
@@ -91,7 +96,7 @@ const MenuListComponent = ({ mode, setSearchedText, setMode }) => {
     <>
       <StyledDropdown
         renderOverlay={handleToggle => (
-          <TeamsList
+          <VaultList
             activeTeamId={activeTeamId}
             handleToggle={handleToggle}
             setListsOpened={setListsOpened}

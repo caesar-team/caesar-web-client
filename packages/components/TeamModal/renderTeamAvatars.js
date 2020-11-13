@@ -176,7 +176,7 @@ const checkErrors = rejectedFiles => {
   return null;
 };
 
-const RenderedAvatars = ({ icon, setFieldValue }) =>
+const RenderedAvatars = ({ icon, handleChangeIcon }) =>
   Object.keys(IMAGE_NAME_BASE64_MAP).map(name => {
     const currentIcon = IMAGE_NAME_BASE64_MAP[name];
     const isActive = icon && currentIcon === icon.raw;
@@ -184,7 +184,7 @@ const RenderedAvatars = ({ icon, setFieldValue }) =>
     return (
       <IconWrapper
         key={name}
-        onClick={() => setFieldValue('icon', { name, raw: currentIcon })}
+        onClick={() => handleChangeIcon({ name, raw: currentIcon })}
       >
         <IconStyled name={name} />
         {isActive && (
@@ -196,17 +196,26 @@ const RenderedAvatars = ({ icon, setFieldValue }) =>
     );
   });
 
-export const renderTeamAvatars = ({ icon = {} }, setFieldValue) => {
+export const renderTeamAvatars = ({
+  values: { icon = {} } = {},
+  setFieldValue,
+  validateField,
+}) => {
   const [errors, setErrors] = useState(null);
 
   const isDefaultIcon = icon.raw && IMAGE_BASE64_LIST.includes(icon.raw);
   const isCustomIcon = icon.raw && !isDefaultIcon;
   const shouldShowUploader = isDefaultIcon || !icon.raw;
 
+  const handleChangeIcon = async value => {
+    await setFieldValue('icon', value);
+    validateField('icon');
+  };
+
   return (
     <>
       <AvatarsWrapper>
-        <RenderedAvatars icon={icon} setFieldValue={setFieldValue} />
+        <RenderedAvatars icon={icon} handleChangeIcon={handleChangeIcon} />
         <UploaderHoverableWrapper
           shouldShowUploader={shouldShowUploader}
           shouldShowEdit={isCustomIcon}
@@ -216,7 +225,7 @@ export const renderTeamAvatars = ({ icon = {} }, setFieldValue) => {
             accept="image/*"
             maxSize={TEAM_AVATAR_MAX_SIZE}
             files={icon?.raw ? [icon] : []}
-            onChange={(_, file) => setFieldValue('icon', file)}
+            onChange={(_, file) => handleChangeIcon(file)}
           >
             {({ getRootProps, getInputProps, isDragActive, rejectedFiles }) => {
               const errorsList = checkErrors(rejectedFiles);

@@ -1,17 +1,18 @@
 import { call, select, all, takeLatest, put } from '@redux-saga/core/effects';
 import { getOrCreateMemberBatchSaga } from '@caesar/common/sagas/entities/member';
-import { itemsBatchSelector } from '@caesar/common/selectors/entities/item';
-import { userDataSelector } from '@caesar/common/selectors/user';
+import {
+  itemsBatchSelector,
+  itemSelector,
+} from '@caesar/common/selectors/entities/item';
+import { currentUserDataSelector } from '@caesar/common/selectors/currentUser';
 import {
   shareKeyPairSelector,
   teamKeyPairSelector,
 } from '@caesar/common/selectors/keystore';
 import {
   NOOP_NOTIFICATION,
-  ROLE_USER,
   SHARING_IN_PROGRESS_NOTIFICATION,
-  ENTITY_TYPE,
-  ROLE_ADMIN,
+  DOMAIN_ROLES,
   TEAM_TYPE,
 } from '@caesar/common/constants';
 import {
@@ -27,49 +28,34 @@ import { updateWorkInProgressItem } from '@caesar/common/actions/workflow';
 import { getServerErrorMessage } from '@caesar/common/utils/error';
 import { workInProgressItemSelector } from '@caesar/common/selectors/workflow';
 import {
-  createSystemItemKeyPair,
   encryptSecret,
   generateKeyPair,
   saveItemSaga,
+  saveShareKeyPairSaga,
 } from '@caesar/common/sagas/entities/item';
+import { addShareKeyPairBatch } from '@caesar/common/actions/keystore';
 import { convertSystemItemToKeyPair } from '../../utils/item';
 import { getItem, getPublicKeyByEmailBatch, postItemShare } from '../../api';
 import { uuid4 } from '../../utils/uuid4';
 import { teamDefaultListSelector } from '../../selectors/entities/list';
-import { convertKeyPairToItemEntity } from '../../normalizers/normalizers';
+import {
+  convertItemsToEntities,
+  convertKeyPairToItemEntity,
+  convertKeyPairToEntity,
+} from '../../normalizers/normalizers';
 
 export function* prepareUsersForSharing(members) {
-  const emailRolePairs = members.map(({ email, roles }) => ({
+  const emailRolePairs = members.map(({ email, domainRoles }) => ({
     email,
-    role: roles.includes(ROLE_ADMIN) ? ROLE_ADMIN : ROLE_USER,
+    role:
+      (domainRoles?.includes(DOMAIN_ROLES.ROLE_ADMIN)
+        ? DOMAIN_ROLES.ROLE_ADMIN
+        : DOMAIN_ROLES.ROLE_USER) || DOMAIN_ROLES.ROLE_USER,
   }));
 
   return yield call(getOrCreateMemberBatchSaga, {
     payload: { emailRolePairs },
   });
-}
-
-// @Deprecated
-export function* findOrCreateKeyPair({ payload: { item } }) {
-  let systemKeyPairItem = yield select(shareKeyPairSelector, {
-    itemId: item.id,
-  });
-  const { userId: ownerId, publicKey } = yield select(userDataSelector);
-
-  if (!systemKeyPairItem) {
-    const systemItem = yield call(createSystemItemKeyPair, {
-      payload: {
-        entityId: item.id,
-        entityOwnerId: ownerId,
-        entityTeamId: item.teamId,
-        entityType: ENTITY_TYPE.SHARE,
-        publicKey,
-      },
-    });
-    systemKeyPairItem = convertSystemItemToKeyPair(systemItem);
-  }
-
-  return systemKeyPairItem;
 }
 
 export function* encryptItemBySharedKey({ item, publicKey }) {
@@ -136,7 +122,7 @@ function* processMembersItemShare({ item, members }) {
     const { publicKey: ownerPublicKey } = yield select(teamKeyPairSelector, {
       teamId: item.teamId,
     });
-    const { id: ownerId } = yield select(userDataSelector);
+    const { id: ownerId } = yield select(currentUserDataSelector);
     const defaultList = yield select(teamDefaultListSelector, {
       teamId: item.teamId,
     });
@@ -147,6 +133,7 @@ function* processMembersItemShare({ item, members }) {
     const itemKeyPair = Object.values(
       convertKeyPairToItemEntity([sharedItemKeyPairKey]),
     ).shift();
+
     const ownerKey = {
       ...itemKeyPair,
       ...{
@@ -158,10 +145,16 @@ function* processMembersItemShare({ item, members }) {
     };
 
     // Need to save the new key to the owner's store
-    yield call(saveItemSaga, {
+    const { data: serverShareKeyPairs } = yield call(saveShareKeyPairSaga, {
       item: ownerKey,
       publicKey: ownerPublicKey,
     });
+    const serverOwnerSharedKeypair = serverShareKeyPairs?.shift();
+    ownerKey.id = serverOwnerSharedKeypair?.keypairId;
+
+    // Add to local store
+    const shareKeysById = convertKeyPairToEntity([ownerKey], 'relatedItemId');
+    yield put(addShareKeyPairBatch(shareKeysById));
 
     // Re-encrypt the item with new keys
     yield call(saveItemSaga, {
@@ -181,7 +174,7 @@ function* processMembersItemShare({ item, members }) {
   );
 
   const { data: userPublicKeys } = yield call(getPublicKeyByEmailBatch, {
-    emails: usersToInvite.map(m => m.email),
+    emails: usersToInvite.map(member => member.email),
   });
 
   const membersSecretsCalls = userPublicKeys.map(
@@ -199,6 +192,17 @@ function* processMembersItemShare({ item, members }) {
     itemId: item.id,
     users: memberSecrets,
   });
+}
+export function* updateSharedItemFromServer({ payload: { itemId } }) {
+  const { data: itemFromServer } = yield call(getItem, itemId);
+  const itemFromState = yield select(itemSelector, { itemId });
+  const updatedItem = {
+    ...itemFromState,
+    invited: itemFromServer?.invited,
+    isShared: true,
+  };
+
+  return updatedItem;
 }
 
 // 1. Find or create the system keyPair item
@@ -221,25 +225,17 @@ export function* shareItemBatchSaga({
       ),
     );
 
-    const workInProgressItem = yield select(workInProgressItemSelector);
-    if (workInProgressItem?.id) {
-      const { data: workInProgressItemFromServer } = yield call(
-        getItem,
-        workInProgressItem?.id,
-      );
+    const updateSharedItemsFromServer = yield all(
+      itemIds.map(itemId =>
+        call(updateSharedItemFromServer, {
+          payload: { itemId },
+        }),
+      ),
+    );
 
-      const updatedItem = {
-        ...workInProgressItem,
-        invited: workInProgressItemFromServer?.invited,
-      };
-      if (updatedItem.id) {
-        yield put(
-          addItemsBatch({
-            [updatedItem.id]: updatedItem,
-          }),
-        );
-      }
-    }
+    const { itemsById } = convertItemsToEntities(updateSharedItemsFromServer);
+    yield put(addItemsBatch(itemsById));
+
     yield put(updateGlobalNotification(NOOP_NOTIFICATION, false));
   } catch (error) {
     // eslint-disable-next-line no-console

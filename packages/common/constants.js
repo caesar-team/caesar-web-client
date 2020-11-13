@@ -41,7 +41,6 @@ export const DECRYPTION_CHUNK_SIZE = 25;
 export const ENCRYPTION_CHUNK_SIZE = 25;
 
 export const LIST_TYPE = {
-  ROOT: 'root',
   INBOX: 'inbox',
   LIST: 'list',
   TRASH: 'trash',
@@ -49,15 +48,17 @@ export const LIST_TYPE = {
   FAVORITES: 'favorites',
 };
 
-export const DEFAULT_LIST_TYPES_ARRAY = [
-  LIST_TYPE.ROOT,
+export const NOT_SELECTABLE_LIST_TYPES = [
   LIST_TYPE.INBOX,
   LIST_TYPE.TRASH,
-  LIST_TYPE.DEFAULT,
   LIST_TYPE.FAVORITES,
 ];
 
-export const LIST_TYPES_ARRAY = [...DEFAULT_LIST_TYPES_ARRAY, LIST_TYPE.LIST];
+export const LIST_TYPES_ARRAY = [
+  ...NOT_SELECTABLE_LIST_TYPES,
+  LIST_TYPE.DEFAULT,
+  LIST_TYPE.LIST,
+];
 
 export const TEAM_TYPE = {
   DEFAULT: 'default',
@@ -171,6 +172,7 @@ export const ENTITY_TYPE = {
   LIST: 'list',
   TEAM: 'team',
   MEMBER: 'member',
+  USER: 'user',
   SYSTEM: 'system',
   SHARE: 'share',
   KEYPAIR: 'keypair',
@@ -225,29 +227,35 @@ export const PERMISSION_ENTITY = {
   TEAM_LIST: 'team_list',
   ITEM: 'item',
   TEAM_ITEM: 'team_item',
+  DOMAIN: 'domain',
 };
-
-export const PERMISSION_READ = 'read';
-export const PERMISSION_WRITE = 'write';
-
-export const USER_ROLE_ADMIN = 'admin';
-export const USER_ROLE_MEMBER = 'member';
 
 export const TEAM_ROLES = {
-  USER_ROLE_ADMIN,
-  USER_ROLE_MEMBER,
+  ROLE_ADMIN: 'ROLE_ADMIN',
+  ROLE_MEMBER: 'ROLE_MEMBER',
+  ROLE_GUEST: 'ROLE_GUEST',
 };
 
-export const ROLE_USER = 'ROLE_USER';
-export const ROLE_ADMIN = 'ROLE_ADMIN';
-export const ROLE_READ_ONLY_USER = 'ROLE_READ_ONLY_USER';
-export const ROLE_ANONYMOUS_USER = 'ROLE_ANONYMOUS_USER';
+export const TEAM_ROLES_LABELS = {
+  ROLE_ADMIN: 'Admin',
+  ROLE_MEMBER: 'Member',
+  ROLE_GUEST: 'Guest',
+};
 
 export const DOMAIN_ROLES = {
-  ROLE_USER,
-  ROLE_ADMIN,
-  ROLE_READ_ONLY_USER,
-  ROLE_ANONYMOUS_USER,
+  ROLE_ADMIN: 'ROLE_ADMIN',
+  ROLE_MANAGER: 'ROLE_MANAGER',
+  ROLE_USER: 'ROLE_USER',
+  ROLE_READ_ONLY_USER: 'ROLE_READ_ONLY_USER',
+  ROLE_ANONYMOUS_USER: 'ROLE_ANONYMOUS_USER',
+};
+
+export const DOMAIN_ROLES_LABELS = {
+  ROLE_ADMIN: 'Admin',
+  ROLE_MANAGER: 'Manager',
+  ROLE_USER: 'Member',
+  ROLE_READ_ONLY_USER: 'Guest',
+  ROLE_ANONYMOUS_USER: 'Anonym',
 };
 
 export const PERMISSION_MESSAGES = {
@@ -265,6 +273,8 @@ export const KEY_TYPE = {
 export const TEAM_MESSAGES = {
   PIN: 'Enable/disable display the team in the list',
 };
+
+export const EMAIL_REGEX = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
 
 export const REGEXP_TESTER = {
   SYSTEM: {

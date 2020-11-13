@@ -1,5 +1,7 @@
 import { createSelector } from 'reselect';
+import { allTrashListIdsSelector } from './list';
 import { isGeneralItem } from '../../utils/item';
+import { LIST_TYPE } from '../../constants';
 
 export const entitiesSelector = state => state.entities;
 
@@ -13,7 +15,7 @@ export const itemsByIdSelector = createSelector(
   itemEntity => itemEntity.byId,
 );
 
-export const itemListSelector = createSelector(
+export const itemArraySelector = createSelector(
   itemsByIdSelector,
   byId => Object.values(byId) || [],
 );
@@ -32,6 +34,14 @@ export const itemsBatchSelector = createSelector(
   itemsByIdSelector,
   itemIdsPropSelector,
   (itemsById, itemIds = []) => itemIds.map(itemId => itemsById[itemId] || {}),
+);
+
+export const generalItemsBatchSelector = createSelector(
+  itemsByIdSelector,
+  itemIdsPropSelector,
+  (itemsById, itemIds = []) => {
+    return itemIds.map(itemId => itemsById[itemId] || {}).filter(isGeneralItem);
+  },
 );
 
 const teamIdPropSelector = (_, prop) => prop.teamId;
@@ -67,11 +77,27 @@ export const nonDecryptedItemsSelector = createSelector(
 
 export const nonDecryptedSharedItemsSelector = createSelector(
   nonDecryptedItemsSelector,
-  items => items.filter(item => item.isShared),
+  teamIdPropSelector,
+  (items, teamId) => {
+    return Object.values(items).filter(
+      item => !item?.data && item.isShared && item.teamId === teamId,
+    );
+  },
 );
 
-export const teamItemListSelector = createSelector(
-  itemListSelector,
+const listIdPropSelector = (_, prop) => prop.listId;
+export const itemsGeneralListSelector = createSelector(
+  itemsByIdSelector,
+  listIdPropSelector,
+  (items, listId) => {
+    return Object.values(items).filter(
+      item => listId === item.listId && isGeneralItem(item),
+    );
+  },
+);
+
+export const teamItemsSelector = createSelector(
+  itemArraySelector,
   teamIdPropSelector,
   (itemList, teamId) => itemList.filter(item => item.teamId === teamId),
 );
@@ -79,4 +105,39 @@ export const teamItemListSelector = createSelector(
 export const generalItemsSelector = createSelector(
   itemsBatchSelector,
   items => items.filter(isGeneralItem) || [],
+);
+
+export const itemsByListIdSelector = createSelector(
+  itemArraySelector,
+  allTrashListIdsSelector,
+  listIdPropSelector,
+  (itemList, trashListIds, listId) => {
+    if (listId === LIST_TYPE.FAVORITES) {
+      return itemList.filter(
+        item => item.favorite && !trashListIds.includes(item.listId),
+      );
+    }
+
+    return itemList.filter(item => item.listId === listId);
+  },
+);
+
+const listIdsPropSelector = (_, props) => props.listIds;
+export const itemsByListIdsSelector = createSelector(
+  itemArraySelector,
+  listIdsPropSelector,
+  (itemList, listIds) => {
+    return itemList?.filter(
+      item => listIds?.includes(item.listId) && isGeneralItem(item),
+    );
+  },
+);
+
+export const itemsByListIdVisibleSelector = createSelector(
+  itemArraySelector,
+  listIdPropSelector,
+  (itemList, listId) =>
+    itemList.filter(
+      item => item.listId === listId && isGeneralItem(item) && !!item?.data,
+    ),
 );

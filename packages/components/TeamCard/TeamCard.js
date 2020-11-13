@@ -1,9 +1,10 @@
 /* eslint-disable camelcase */
-import React from 'react';
+import React, { useMemo, memo } from 'react';
+import { useSelector } from 'react-redux';
 import styled from 'styled-components';
 import Link from 'next/link';
-import memoizeOne from 'memoize-one';
 import { ROUTES, PERMISSION, TEAM_MESSAGES } from '@caesar/common/constants';
+import { teamMembersFullViewSelector } from '@caesar/common/selectors/entities/member';
 import { ability } from '@caesar/common/ability';
 import { getPlural } from '@caesar/common/utils/string';
 import { getTeamTitle } from '@caesar/common/utils/team';
@@ -115,35 +116,35 @@ const ToggleWrapper = styled.div`
   &:hover {
     ${Tooltip} {
       display: flex;
-    }  
+    }
+  }
 `;
 
-const getMembers = memoizeOne((users, members) =>
-  users.reduce((accumulator, { id }) => {
-    const member = members.find(user => user.id === id);
-
-    return member ? [...accumulator, member] : accumulator;
-  }, []),
-);
-
-const TeamCard = ({
+const TeamCardComponent = ({
   className,
   team,
-  members,
+  userId,
   onClick = Function.prototype,
   onClickEditTeam = Function.prototype,
   onClickLeaveTeam = Function.prototype,
   onClickRemoveTeam = Function.prototype,
   onPinTeam = Function.prototype,
 }) => {
-  const { id, icon, users, pinned } = team;
-  const areMembersAvailable = users && users.length > 0;
+  const { id, icon, members, pinned, _permissions } = team || {};
+  const memberCounter = members?.length || 0;
+  const areMembersAvailable = memberCounter > 0;
+  const teamMembers = useSelector(state =>
+    teamMembersFullViewSelector(state, { teamId: id }),
+  );
 
-  const { _permissions } = team || {};
-
+  const isCurrentUserTeamMember = useMemo(
+    () => !!teamMembers.find(member => member.userId === userId),
+    [teamMembers],
+  );
   const canEditTeam = ability.can(PERMISSION.EDIT, _permissions);
   const canRemoveTeam = ability.can(PERMISSION.DELETE, _permissions);
-  const canLeaveTeam = ability.can(PERMISSION.LEAVE, _permissions);
+  const canLeaveTeam =
+    ability.can(PERMISSION.LEAVE, _permissions) && isCurrentUserTeamMember;
   const canPinTeam = ability.can(PERMISSION.PIN, _permissions);
   const shouldShowMenu = canLeaveTeam || canEditTeam || canRemoveTeam;
 
@@ -197,8 +198,8 @@ const TeamCard = ({
               <TeamName>{getTeamTitle(team)}</TeamName>
               {areMembersAvailable && (
                 <TeamMembers>
-                  {users.length}{' '}
-                  {getPlural(users.length, ['member', 'members'])}
+                  {memberCounter}{' '}
+                  {getPlural(memberCounter, ['member', 'members'])}
                 </TeamMembers>
               )}
             </TeamInfo>
@@ -210,7 +211,7 @@ const TeamCard = ({
           <AvatarsList
             size={32}
             fontSize="small"
-            avatars={getMembers(users, members)}
+            avatars={teamMembers}
             visibleCount={10}
           />
         )}
@@ -219,4 +220,4 @@ const TeamCard = ({
   );
 };
 
-export default TeamCard;
+export const TeamCard = memo(TeamCardComponent);

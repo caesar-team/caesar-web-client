@@ -4,7 +4,7 @@ import { useSelector } from 'react-redux';
 import { TEAM_TYPE } from '@caesar/common/constants';
 import { sortByName } from '@caesar/common/utils/utils';
 import { transformListTitle } from '@caesar/common/utils/string';
-import { userTeamListSelector } from '@caesar/common/selectors/user';
+import { currentUserVaultListSelector } from '@caesar/common/selectors/currentUser';
 import { teamsByIdSelector } from '@caesar/common/selectors/entities/team';
 import { getTeamTitle } from '@caesar/common/utils/team';
 import { getMovableLists } from '../api';
@@ -12,11 +12,11 @@ import { getMovableLists } from '../api';
 const getListTitle = (listId, lists) =>
   transformListTitle(lists.find(list => list.id === listId)?.label);
 
-export const useItemTeamAndListOptions = ({ teamId = null, listId }) => {
+export const useItemVaultAndListOptions = ({ teamId = null, listId }) => {
   // TODO: Hot fix for [CAES-1329]
-  const teams =
-    useSelector(userTeamListSelector).filter(
-      team => typeof team !== 'undefined',
+  const vaults =
+    useSelector(currentUserVaultListSelector).filter(
+      vault => typeof vault !== 'undefined',
     ) || [];
   const teamsById = useSelector(teamsByIdSelector);
   const [lists, setLists] = useState([]);
@@ -44,7 +44,9 @@ export const useItemTeamAndListOptions = ({ teamId = null, listId }) => {
 
   const teamOptions = useMemo(
     () =>
-      teams
+      // TODO: To enable move item between vaults remove 'id === teamId' condition
+      vaults
+        .filter(({ id, locked }) => !locked && id === teamId)
         .sort((a, b) => {
           if (a.title.toLowerCase() === TEAM_TYPE.PERSONAL) return -1;
           if (b.title.toLowerCase() === TEAM_TYPE.PERSONAL) return 1;
@@ -62,7 +64,7 @@ export const useItemTeamAndListOptions = ({ teamId = null, listId }) => {
               }
             : team,
         ),
-    [teams],
+    [vaults],
   );
 
   const listOptions = useMemo(

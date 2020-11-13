@@ -6,12 +6,11 @@ import styled from 'styled-components';
 import { transformListTitle } from '@caesar/common/utils/string';
 import { LIST_TYPE, PERMISSION } from '@caesar/common/constants';
 import { ERROR } from '@caesar/common/validation/constants';
-import { currentTeamSelector } from '@caesar/common/selectors/user';
+import { currentTeamSelector } from '@caesar/common/selectors/currentUser';
 import {
   createListRequest,
   editListRequest,
 } from '@caesar/common/actions/entities/list';
-import { generalItemsSelector } from '@caesar/common/selectors/entities/item';
 import { Tooltip } from '@caesar/components/List/Item/styles';
 import { Can } from '../../Ability';
 import { Icon } from '../../Icon';
@@ -77,10 +76,14 @@ const StyledTooltip = styled(Tooltip)`
   display: flex;
   top: -20px;
   left: auto;
+  bottom: auto;
+  z-index: ${({ theme }) => theme.zIndex.basic};
+  opacity: 1;
 `;
 
 export const ListItem = ({
   list = {},
+  itemCount,
   nestedListsLabels = [],
   activeListId,
   index,
@@ -91,16 +94,18 @@ export const ListItem = ({
 }) => {
   const dispatch = useDispatch();
   const currentTeam = useSelector(currentTeamSelector);
-  const { id, label, type, children = [] } = list;
-
-  const generalItems = useSelector(state =>
-    generalItemsSelector(state, { itemIds: children }),
-  );
+  const { id, label, type, _permissions } = list;
 
   const isDefault = type === LIST_TYPE.DEFAULT;
   const [isEditMode, setEditMode] = useState(isCreatingMode);
   const [isOpenedPopup, setOpenedPopup] = useState(false);
   const [value, setValue] = useState(label);
+
+  const listTitle = transformListTitle(label);
+  const isListAlreadyExists =
+    value !== label && nestedListsLabels.includes(value?.toLowerCase());
+
+  const isAcceptDisabled = !value || value === label || isListAlreadyExists;
 
   const handleClickEdit = () => {
     setEditMode(true);
@@ -111,6 +116,10 @@ export const ListItem = ({
   };
 
   const handleClickAcceptEdit = () => {
+    if (isAcceptDisabled) {
+      return;
+    }
+
     if (isCreatingMode) {
       dispatch(
         createListRequest(
@@ -136,14 +145,6 @@ export const ListItem = ({
     setEditMode(false);
     setValue(label);
   };
-
-  const listTitle = transformListTitle(label);
-  const isListAlreadyExists =
-    value !== label && nestedListsLabels.includes(value?.toLowerCase());
-
-  const isAcceptDisabled = !value || value === label || isListAlreadyExists;
-
-  const { _permissions } = list || {};
 
   const renderInner = dragHandleProps => (
     <>
@@ -173,10 +174,10 @@ export const ListItem = ({
           </div>
           <Title>{listTitle}</Title>
           <Can I={PERMISSION.EDIT} a={_permissions}>
-            <Counter>{generalItems.length}</Counter>
+            <Counter>{itemCount}</Counter>
           </Can>
           <Can not I={PERMISSION.EDIT} a={_permissions}>
-            <div>{generalItems.length}</div>
+            <div>{itemCount}</div>
           </Can>
           <Can I={PERMISSION.EDIT} a={_permissions}>
             <ActionIcon

@@ -4,13 +4,12 @@ import styled from 'styled-components';
 import ScrollLock from 'react-scrolllock';
 import { DASHBOARD_MODE } from '@caesar/common/constants';
 import {
-  userDataSelector,
+  currentUserDataSelector,
   currentTeamIdSelector,
-} from '@caesar/common/selectors/user';
+} from '@caesar/common/selectors/currentUser';
 import { teamKeyPairSelector } from '@caesar/common/selectors/keystore';
 import {
   setWorkInProgressItem,
-  setWorkInProgressListId,
   resetWorkInProgressItemIds,
 } from '@caesar/common/actions/workflow';
 import LayoutConstructor from './LayoutConstructor';
@@ -29,7 +28,7 @@ const DashboardLayoutComponent = ({
   ...props
 }) => {
   const dispatch = useDispatch();
-  const user = useSelector(userDataSelector);
+  const currentUser = useSelector(currentUserDataSelector);
   const teamId = useSelector(currentTeamIdSelector);
   const keyPair = useSelector(state => teamKeyPairSelector(state, { teamId }));
 
@@ -37,10 +36,10 @@ const DashboardLayoutComponent = ({
     event.preventDefault();
 
     dispatch(resetWorkInProgressItemIds());
-    dispatch(setWorkInProgressListId(null));
     dispatch(setWorkInProgressItem(null));
 
     setSearchedText(event.target.value);
+
     setMode(
       event.target.value ? DASHBOARD_MODE.SEARCH : DASHBOARD_MODE.DEFAULT,
     );
@@ -48,7 +47,6 @@ const DashboardLayoutComponent = ({
 
   const handleClickResetSearch = () => {
     dispatch(resetWorkInProgressItemIds());
-    dispatch(setWorkInProgressListId(null));
     dispatch(setWorkInProgressItem(null));
 
     setSearchedText('');
@@ -59,7 +57,7 @@ const DashboardLayoutComponent = ({
     <LayoutConstructorStyled
       headerComponent={
         <PrimaryHeader
-          user={user}
+          currentUser={currentUser}
           searchedText={searchedText}
           showAddItemButton={!!keyPair}
           onSearch={handleSearch}

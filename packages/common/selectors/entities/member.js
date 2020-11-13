@@ -1,11 +1,12 @@
 import { createSelector } from 'reselect';
-import { ROLE_ADMIN } from '../../constants';
+import { usersByIdSelector, userIdPropSelector } from './user';
+import { teamsByIdSelector, teamIdPropSelector } from './team';
 
 export const entitiesSelector = state => state.entities;
 
 export const memberEntitySelector = createSelector(
   entitiesSelector,
-  entities => entities.member,
+  entities => entities?.member || {},
 );
 
 export const membersByIdSelector = createSelector(
@@ -26,6 +27,16 @@ export const memberListSelector = createSelector(
   byId => Object.values(byId) || [],
 );
 
+export const memberByUserIdAndTeamIdSelector = createSelector(
+  memberListSelector,
+  userIdPropSelector,
+  teamIdPropSelector,
+  (members, userId, teamId) =>
+    members.find(
+      member => member.userId === userId && member.teamId === teamId,
+    ),
+);
+
 const memberIdsPropSelector = (_, props) => props.memberIds;
 
 export const membersBatchSelector = createSelector(
@@ -34,15 +45,32 @@ export const membersBatchSelector = createSelector(
   (membersById, memberIds) => memberIds.map(memberId => membersById[memberId]),
 );
 
-export const memberAdminsSelector = createSelector(
-  memberListSelector,
-  membersList => membersList.filter(({ roles }) => roles.includes(ROLE_ADMIN)),
+export const teamMembersShortViewSelector = createSelector(
+  membersByIdSelector,
+  teamsByIdSelector,
+  teamIdPropSelector,
+  (members, team, teamId) =>
+    team[teamId]?.members?.reduce((acc, memberId) => {
+      const member = members[memberId];
+
+      return [...acc, member];
+    }, []) || [],
 );
 
-export const teamIdPropSelector = (_, props) => props.teamId;
-export const memberTeamSelector = createSelector(
-  memberListSelector,
+export const teamMembersFullViewSelector = createSelector(
+  usersByIdSelector,
+  membersByIdSelector,
+  teamsByIdSelector,
   teamIdPropSelector,
-  (membersList, teamId) =>
-    membersList.filter(({ teamIds }) => teamIds.includes(teamId)),
+  (users, members, team, teamId) =>
+    team[teamId]?.members?.reduce((acc, memberId) => {
+      const member = members[memberId];
+
+      if (!member) return acc;
+
+      const { avatar, email, id, name, publicKey } = users[member.userId];
+      const user = { ...member, avatar, email, userId: id, name, publicKey };
+
+      return [...acc, user];
+    }, []) || [],
 );

@@ -21,20 +21,30 @@ const itemTransform = createTransform(
   { whitelist: ['entities'] },
 );
 
-const userTransform = createTransform(
+const currentUserTransform = createTransform(
   inboundState => {
     const { masterPassword, keyPair, ...cleanUser } = inboundState;
-    const { ...user } = inboundState;
+    const { ...currentUser } = inboundState;
 
-    return IS_PROD ? cleanUser : user;
+    return IS_PROD ? cleanUser : currentUser;
   },
   outboundState => outboundState,
-  { whitelist: ['user'] },
+  { whitelist: ['currentUser'] },
+);
+
+const workflowTransform = createTransform(
+  inboundState => {
+    const { isLoading, isError, isReady, ...workflow } = inboundState;
+
+    return workflow;
+  },
+  outboundState => outboundState,
+  { whitelist: ['workflow'] },
 );
 
 export const persistOptions = {
   key: 'root',
   localForage,
   blacklist: ['application'],
-  transforms: [itemTransform, userTransform],
+  transforms: [itemTransform, currentUserTransform, workflowTransform],
 };

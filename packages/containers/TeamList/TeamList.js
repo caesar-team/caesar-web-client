@@ -139,9 +139,8 @@ class TeamListContainer extends Component {
   };
 
   handleChangeMemberRole = (member, role) => {
-    const { selectedTeamId } = this.state;
-
-    this.props.updateTeamMemberRoleRequest(selectedTeamId, member.id, role);
+    // TODO: Need to implement UI. Use member.id instead of userId
+    this.props.updateTeamMemberRoleRequest(member.id, role);
   };
 
   handlePinTeam = (teamId, isPinned) => event => {
@@ -171,9 +170,9 @@ class TeamListContainer extends Component {
   }
 
   renderTeamCards(teams) {
-    const { members } = this.props;
+    const { currentUser } = this.props;
 
-    if (!teams.length) {
+    if (!teams || teams.length === 0) {
       return <div>No teams</div>;
     }
 
@@ -181,7 +180,7 @@ class TeamListContainer extends Component {
       <StyledTeamCard
         key={team.id}
         team={team}
-        members={members}
+        userId={currentUser.id}
         onClickEditTeam={this.handleClickEditTeam(team.id)}
         onClickLeaveTeam={this.handleClickLeaveTeam(team)}
         onClickRemoveTeam={this.handleClickRemoveTeam(team.id)}
@@ -191,21 +190,35 @@ class TeamListContainer extends Component {
   }
 
   render() {
-    const { isLoading, isLoadingTeams, teams, isDomainAdmin } = this.props;
+    const {
+      isLoading,
+      isLoadingTeams,
+      teams,
+      userTeamList,
+      isDomainAdmin,
+      isDomainAdminOrManager,
+      currentUser,
+    } = this.props;
+
     const { modalVisibilities, selectedTeamTitle, activeTabName } = this.state;
     const favoriteTeams = teams.filter(team => team.pinned);
-    const allTeamCards = this.renderTeamCards(teams);
+    const allTeamCards = this.renderTeamCards(
+      isDomainAdminOrManager ? teams : userTeamList,
+    );
     const favoriteTeamCards = this.renderTeamCards(favoriteTeams);
 
     const teamSubject = {
+      ...currentUser?._permissions,
       __typename: PERMISSION_ENTITY.TEAM,
-      ...this.props.user?._permissions,
     };
 
     const teamsLength =
+      // eslint-disable-next-line no-nested-ternary
       activeTabName === FAVORITES_TAB_NAME
         ? favoriteTeams.length
-        : teams.length;
+        : isDomainAdminOrManager
+        ? teams.length
+        : userTeamList.length;
 
     return (
       <SettingsWrapper

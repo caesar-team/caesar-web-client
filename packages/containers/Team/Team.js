@@ -3,22 +3,16 @@ import React, { useState, useCallback, useMemo } from 'react';
 import { useUpdateEffect } from 'react-use';
 import { useSelector, useDispatch } from 'react-redux';
 import { useRouter } from 'next/router';
-import memoizeOne from 'memoize-one';
 import styled from 'styled-components';
 import { isLoadingSelector } from '@caesar/common/selectors/workflow';
-import { userDataSelector } from '@caesar/common/selectors/user';
-import {
-  isLoadingTeamsSelector,
-  teamSelector,
-} from '@caesar/common/selectors/entities/team';
-import { membersByIdSelector } from '@caesar/common/selectors/entities/member';
+import { isLoadingTeamsSelector } from '@caesar/common/selectors/entities/team';
+import { removeTeamRequest } from '@caesar/common/actions/entities/team';
+import { leaveTeamRequest } from '@caesar/common/actions/currentUser';
 import {
   addTeamMembersBatchRequest,
   removeTeamMemberRequest,
   updateTeamMemberRoleRequest,
-  removeTeamRequest,
-} from '@caesar/common/actions/entities/team';
-import { leaveTeamRequest } from '@caesar/common/actions/entities/member';
+} from '@caesar/common/actions/entities/member';
 import {
   Button,
   SettingsWrapper,
@@ -33,10 +27,11 @@ import {
   PERMISSION,
   PERMISSION_ENTITY,
   ROUTES,
+  TEAM_ROLES,
   TEAM_TYPE,
-  USER_ROLE_ADMIN,
 } from '@caesar/common/constants';
 import { getTeamTitle } from '@caesar/common/utils/team';
+
 import {
   INVITE_MEMBER_MODAL,
   LEAVE_TEAM_MODAL,
@@ -52,21 +47,7 @@ const AddMemberButton = styled(ButtonStyled)`
   margin-right: 0;
 `;
 
-const getMemberList = memoizeOne((users = [], membersById) =>
-  users.reduce(
-    (accumulator, user) => [
-      ...accumulator,
-      {
-        ...membersById[user.id],
-        role: user.role,
-        _permissions: user._permissions,
-      },
-    ],
-    [],
-  ),
-);
-
-export const TeamContainer = () => {
+export const TeamContainer = ({ currentUser, team, members }) => {
   const router = useRouter();
   const dispatch = useDispatch();
   const [modalVisibilities, setModalVisibilities] = useState({
@@ -74,6 +55,7 @@ export const TeamContainer = () => {
     [LEAVE_TEAM_MODAL]: false,
     [REMOVE_TEAM_MODAL]: false,
   });
+
   const isLoading = useSelector(isLoadingSelector);
   const isLoadingTeams = useSelector(isLoadingTeamsSelector);
 
@@ -107,20 +89,14 @@ export const TeamContainer = () => {
     return () => tableRowGroupNode.removeEventListener('scroll', handler);
   }, [tableRowGroupNode]);
 
-  const user = useSelector(userDataSelector);
-  const team =
-    useSelector(state => teamSelector(state, { teamId: router.query.id })) ||
-    {};
-  const membersById = useSelector(membersByIdSelector);
-  const members = getMemberList(team.users, membersById);
   const tableData = useMemo(() => members, [members]);
 
-  const handleChangeRole = userId => (_, value) => {
-    dispatch(updateTeamMemberRoleRequest(team.id, userId, value));
+  const handleChangeRole = memberId => (_, value) => {
+    dispatch(updateTeamMemberRoleRequest(memberId, value));
   };
 
-  const handleRemoveMember = userId => () => {
-    dispatch(removeTeamMemberRequest(team.id, userId));
+  const handleRemoveMember = memberId => () => {
+    dispatch(removeTeamMemberRequest(memberId));
   };
 
   const columns = useMemo(
@@ -149,8 +125,8 @@ export const TeamContainer = () => {
     });
   };
 
-  const handleInvite = invitedMembers => {
-    dispatch(addTeamMembersBatchRequest(team.id, invitedMembers));
+  const handleInvite = invitedUsers => {
+    dispatch(addTeamMembersBatchRequest(team.id, invitedUsers));
     handleCloseModal(INVITE_MEMBER_MODAL)();
   };
 
@@ -170,17 +146,18 @@ export const TeamContainer = () => {
 
   const teamSubject = {
     __typename: PERMISSION_ENTITY.TEAM,
-    team_delete: team._permissions?.team_delete || false,
+    ...team._permissions,
   };
 
   const teamMemberSubject = {
     __typename: PERMISSION_ENTITY.TEAM_MEMBER,
     team_member_add:
       team._permissions?.team_member_add ||
-      team.userRole === USER_ROLE_ADMIN ||
+      team.teamRole === TEAM_ROLES.ROLE_ADMIN ||
       false,
   };
 
+  const mayAddMember = !team.locked;
   const isDomainTeam =
     team.type === TEAM_TYPE.DEFAULT ||
     team.title?.toLowerCase() === TEAM_TYPE.DEFAULT;
@@ -199,24 +176,28 @@ export const TeamContainer = () => {
               onClick={handleOpenModal(REMOVE_TEAM_MODAL)}
             />
           </Can>
-          {!isDomainTeam && (
-            <ButtonStyled
-              withOfflineCheck
-              icon="leave"
-              color="white"
-              onClick={handleOpenModal(LEAVE_TEAM_MODAL)}
-            />
-          )}
-          <Can I={PERMISSION.ADD} a={teamMemberSubject}>
-            <AddMemberButton
-              withOfflineCheck
-              onClick={handleOpenModal(INVITE_MEMBER_MODAL)}
-              icon="plus"
-              color="black"
-            >
-              Add a member
-            </AddMemberButton>
+          <Can I={PERMISSION.LEAVE} a={teamSubject}>
+            {!isDomainTeam && (
+              <ButtonStyled
+                withOfflineCheck
+                icon="leave"
+                color="white"
+                onClick={handleOpenModal(LEAVE_TEAM_MODAL)}
+              />
+            )}
           </Can>
+          {mayAddMember && (
+            <Can I={PERMISSION.ADD} a={teamMemberSubject}>
+              <AddMemberButton
+                withOfflineCheck
+                onClick={handleOpenModal(INVITE_MEMBER_MODAL)}
+                icon="plus"
+                color="black"
+              >
+                Add a member
+              </AddMemberButton>
+            </Can>
+          )}
         </>
       }
     >
@@ -237,9 +218,9 @@ export const TeamContainer = () => {
       </Table.Main>
       {modalVisibilities[INVITE_MEMBER_MODAL] && (
         <InviteModal
-          user={user}
+          currentUser={currentUser}
           teamId={team.id}
-          invitedMembers={members}
+          members={members}
           onRemoveMember={handleRemoveMember}
           onCancel={handleCloseModal(INVITE_MEMBER_MODAL)}
           onSubmit={handleInvite}

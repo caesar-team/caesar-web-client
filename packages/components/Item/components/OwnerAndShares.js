@@ -3,7 +3,7 @@ import { useSelector } from 'react-redux';
 import styled from 'styled-components';
 import { PERMISSION } from '@caesar/common/constants';
 import { workInProgressItemOwnerSelector } from '@caesar/common/selectors/workflow';
-import { membersByIdSelector } from '@caesar/common/selectors/entities/member';
+import { usersBatchSelector } from '@caesar/common/selectors/entities/user';
 import { Can } from '../../Ability';
 import { Avatar, AvatarsList } from '../../Avatar';
 import { Icon } from '../../Icon';
@@ -76,16 +76,19 @@ const ShareButton = styled.button`
   `}
 `;
 
-export const OwnerAndInvitation = ({ invited, itemSubject, onClickShare }) => {
+export const OwnerAndShares = ({
+  showShares,
+  invited = [],
+  itemSubject,
+  onClickShare,
+}) => {
   const owner = useSelector(workInProgressItemOwnerSelector);
-  const membersById = useSelector(membersByIdSelector);
-
-  const hasInvited = invited?.length > 0;
-
-  // TODO: Do not work with data in the component
-  const avatars = hasInvited
-    ? invited.map(invite => membersById[invite.userId])
-    : [];
+  const invitedUsers = useSelector(state =>
+    usersBatchSelector(state, {
+      userIds: invited || [],
+    }),
+  );
+  const hasInvited = invitedUsers?.length > 0;
 
   return (
     <Wrapper>
@@ -100,27 +103,40 @@ export const OwnerAndInvitation = ({ invited, itemSubject, onClickShare }) => {
           <OwnerStatus>owner</OwnerStatus>
         </Owner>
       </OwnerWrapper>
-      <Can I={PERMISSION.SHARE} an={itemSubject} passThrough>
-        {allowed => (
-          <InvitedMembersWrapper resetMargin={!allowed}>
-            {hasInvited ? (
-              <AvatarsList avatars={avatars} />
-            ) : (
-              <NoMembers>
-                <Icon name="members" width={16} height={16} color="lightGray" />
-              </NoMembers>
+      {showShares && (
+        <>
+          <Can I={PERMISSION.SHARE} an={itemSubject} passThrough>
+            {allowed => (
+              <InvitedMembersWrapper resetMargin={!allowed}>
+                {hasInvited ? (
+                  // TODO: Why avatars have the member object? The wrong name of property.
+                  <AvatarsList
+                    avatars={invitedUsers}
+                    avatarHintPosition="left"
+                  />
+                ) : (
+                  <NoMembers>
+                    <Icon
+                      name="members"
+                      width={16}
+                      height={16}
+                      color="lightGray"
+                    />
+                  </NoMembers>
+                )}
+              </InvitedMembersWrapper>
             )}
-          </InvitedMembersWrapper>
-        )}
-      </Can>
-      <Can I={PERMISSION.SHARE} an={itemSubject}>
-        <ShareButton
-          // disabled={!isOnline}
-          onClick={onClickShare}
-        >
-          <Icon withOfflineCheck name="plus" width={16} height={16} />
-        </ShareButton>
-      </Can>
+          </Can>
+          <Can I={PERMISSION.SHARE} an={itemSubject}>
+            <ShareButton
+              // disabled={!isOnline}
+              onClick={onClickShare}
+            >
+              <Icon withOfflineCheck name="plus" width={16} height={16} />
+            </ShareButton>
+          </Can>
+        </>
+      )}
     </Wrapper>
   );
 };

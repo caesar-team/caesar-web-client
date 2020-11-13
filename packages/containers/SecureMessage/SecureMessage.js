@@ -12,8 +12,11 @@ import { decryptSecretRaws } from '@caesar/common/utils/secret';
 import { MessageStep, PasswordStep } from './steps';
 import {
   Wrapper,
+  Header,
   StyledLogo,
+  Content,
   Title,
+  AdaptiveTitle,
   ButtonsWrapper,
   ButtonStyled,
   Footer,
@@ -64,9 +67,11 @@ const SecureMessageContainerComponent = ({ message, password }) => {
     downloadAsZip(attachments);
   };
 
-  const title = decryptedMessage
-    ? 'It’s your secret'
-    : 'Enter the password to access the message';
+  const title = decryptedMessage ? (
+    <Title>It’s your secret</Title>
+  ) : (
+    <AdaptiveTitle>Enter the password to access the message</AdaptiveTitle>
+  );
   const shouldShowButtons = !!decryptedMessage;
   const shouldShowDownloadButton =
     decryptedMessage &&
@@ -80,49 +85,53 @@ const SecureMessageContainerComponent = ({ message, password }) => {
 
   return (
     <Wrapper>
-      <StyledLogo name="logo-secure-message" width={214} height={60} />
-      <Title>{title}</Title>
-      {decryptedMessage ? (
-        <MessageStep
-          decryptedMessage={decryptedMessage}
-          onFileClick={handleClickDownloadFile}
-        />
-      ) : (
-        <PasswordStep
-          message={message}
-          password={password}
-          setDecryptedMessage={setDecryptedMessage}
-        />
-      )}
-      {shouldShowButtons && (
-        <ButtonsWrapper>
-          {shouldShowTextButton && (
-            <ButtonStyled
-              color="white"
-              icon="copy"
-              onClick={handleClickCopyText}
-            >
-              Copy the message
-            </ButtonStyled>
-          )}
-          {shouldShowDownloadButton && (
-            <ButtonStyled
-              color="white"
-              icon="download"
-              onClick={handleClickDownloadFiles}
-            >
-              Download all files
-            </ButtonStyled>
-          )}
-        </ButtonsWrapper>
-      )}
-      <Footer>
-        {shouldShowButtons && (
-          <Link passHref href={DOMAIN_SECURE_ROUTE}>
-            <StyledLink>Create Your Own Secure Message</StyledLink>
-          </Link>
+      <Header>
+        <StyledLogo name="logo-secure-message" width={114} height={32} />
+      </Header>
+      <Content>
+        {title}
+        {decryptedMessage ? (
+          <MessageStep
+            decryptedMessage={decryptedMessage}
+            onFileClick={handleClickDownloadFile}
+          />
+        ) : (
+          <PasswordStep
+            message={message}
+            password={password}
+            setDecryptedMessage={setDecryptedMessage}
+          />
         )}
-      </Footer>
+        {shouldShowButtons && (
+          <ButtonsWrapper>
+            {shouldShowTextButton && (
+              <ButtonStyled
+                color="white"
+                icon="copy"
+                onClick={handleClickCopyText}
+              >
+                Copy the message
+              </ButtonStyled>
+            )}
+            {shouldShowDownloadButton && (
+              <ButtonStyled
+                color="white"
+                icon="download"
+                onClick={handleClickDownloadFiles}
+              >
+                Download all files
+              </ButtonStyled>
+            )}
+          </ButtonsWrapper>
+        )}
+        <Footer>
+          {shouldShowButtons && (
+            <Link passHref href={DOMAIN_SECURE_ROUTE}>
+              <StyledLink>Create Your Own Secure Message</StyledLink>
+            </Link>
+          )}
+        </Footer>
+      </Content>
     </Wrapper>
   );
 };

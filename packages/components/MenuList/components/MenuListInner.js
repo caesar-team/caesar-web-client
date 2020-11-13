@@ -4,15 +4,17 @@ import { DragDropContext, Droppable } from 'react-beautiful-dnd';
 import styled from 'styled-components';
 import {
   DASHBOARD_MODE,
+  LIST_TYPE,
   PERMISSION,
   PERMISSION_ENTITY,
   TEAM_TYPE,
 } from '@caesar/common/constants';
-import { currentTeamSelector } from '@caesar/common/selectors/user';
+import { currentTeamSelector } from '@caesar/common/selectors/currentUser';
 import {
-  personalListsByTypeSelector,
-  currentTeamListsSelector,
+  teamListsSelector,
+  favoritesListSelector,
 } from '@caesar/common/selectors/entities/list';
+import { itemsByListIdSelector } from '@caesar/common/selectors/entities/item';
 import { workInProgressListSelector } from '@caesar/common/selectors/workflow';
 import {
   setWorkInProgressItem,
@@ -20,6 +22,7 @@ import {
   resetWorkInProgressItemIds,
 } from '@caesar/common/actions/workflow';
 import { sortListRequest } from '@caesar/common/actions/entities/list';
+import { teamListsSizesByIdSelector } from '@caesar/common/selectors/counts';
 import { Can } from '../../Ability';
 import { Icon } from '../../Icon';
 import { Scrollbar } from '../../Scrollbar';
@@ -55,12 +58,12 @@ const ListAddIcon = styled(Icon)`
 
 const StyledMenuItemInner = styled(MenuItemInner)`
   &:hover {
-    background-color: ${({ withChildren, isEdit, theme }) =>
-      !withChildren && !isEdit && theme.color.snow};
-    border-top-color: ${({ withChildren, isEdit, theme }) =>
-      !withChildren && !isEdit && theme.color.gallery};
-    border-bottom-color: ${({ withChildren, isEdit, theme }) =>
-      !withChildren && !isEdit && theme.color.gallery};
+    background-color: ${({ withNested, isEdit, theme }) =>
+      !withNested && !isEdit && theme.color.snow};
+    border-top-color: ${({ withNested, isEdit, theme }) =>
+      !withNested && !isEdit && theme.color.gallery};
+    border-bottom-color: ${({ withNested, isEdit, theme }) =>
+      !withNested && !isEdit && theme.color.gallery};
 
     ${ListAddIcon} {
       opacity: 1;
@@ -85,12 +88,27 @@ const MenuListInnerComponent = ({
 }) => {
   const dispatch = useDispatch();
   const currentTeam = useSelector(currentTeamSelector);
-  const isPersonal = currentTeam?.id === TEAM_TYPE.PERSONAL;
-  const personalLists = useSelector(personalListsByTypeSelector);
-  const teamLists = useSelector(currentTeamListsSelector);
   const workInProgressList = useSelector(workInProgressListSelector);
   const activeListId = workInProgressList && workInProgressList.id;
   const [isCreatingMode, setCreatingMode] = useState(false);
+
+  const teamLists = useSelector(state =>
+    teamListsSelector(state, { teamId: currentTeam?.id }),
+  );
+  const inboxList = teamLists.find(list => list.type === LIST_TYPE.INBOX);
+  const favoritesList = useSelector(favoritesListSelector);
+  const favoritesListItems = useSelector(state =>
+    itemsByListIdSelector(state, { listId: LIST_TYPE.FAVORITES }),
+  );
+  const nestedLists = teamLists
+    .filter(list => [LIST_TYPE.LIST, LIST_TYPE.DEFAULT].includes(list.type))
+    .sort((a, b) => a.sort - b.sort);
+  const trashList = teamLists.find(list => list.type === LIST_TYPE.TRASH);
+
+  const listSizes = useSelector(state =>
+    teamListsSizesByIdSelector(state, { teamId: currentTeam?.id }),
+  );
+  const getListCount = id => listSizes[id] || 0;
 
   const handleClickMenuItem = id => {
     dispatch(setWorkInProgressListId(id));
@@ -129,40 +147,29 @@ const MenuListInnerComponent = ({
     dispatch(sortListRequest(draggableId, source.index, destination.index));
   };
 
-  const nestedLists = isPersonal ? personalLists.list : teamLists.list;
   const menuList = [
     {
-      id: isPersonal ? personalLists.inbox?.id : null,
+      id: inboxList?.id || null,
       title: 'Shared with me',
-      length: isPersonal ? personalLists.inbox?.children?.length : null,
+      length: getListCount(inboxList?.id),
       icon: 'share',
     },
     {
-      id: isPersonal ? personalLists.favorites?.id : teamLists.favorites?.id,
+      id: favoritesList?.id,
       title: 'Favorites',
-      length: isPersonal
-        ? personalLists.favorites?.children?.length
-        : teamLists.favorites?.children?.length,
+      length: favoritesListItems.length,
       icon: 'favorite',
     },
     {
       id: 'lists',
       title: 'Lists',
       icon: 'list',
-      children: nestedLists,
+      nested: nestedLists,
     },
-    // TODO: Implement History feature
-    // {
-    //   id: 'history',
-    //   title: 'History',
-    //   icon: 'history',
-    // },
     {
-      id: isPersonal ? personalLists.trash?.id : teamLists.trash?.id,
+      id: trashList?.id,
       title: 'Trash',
-      length: isPersonal
-        ? personalLists.trash?.children?.length
-        : teamLists.trash?.children?.length,
+      length: getListCount(trashList?.id),
       icon: 'trash',
     },
     {
@@ -172,7 +179,9 @@ const MenuListInnerComponent = ({
     },
   ];
 
-  const nestedListsLabels = nestedLists.map(({ label }) => label.toLowerCase());
+  const nestedListsLabels = nestedLists?.map(({ label } = { label: null }) =>
+    label?.toLowerCase(),
+  );
   const { _permissions } = currentTeam || {};
   const listPermission = {
     ..._permissions,
@@ -184,8 +193,8 @@ const MenuListInnerComponent = ({
 
   return (
     <Scrollbar>
-      {menuList.map(({ id, icon, title, length, children }) => {
-        const withChildren = id === 'lists';
+      {menuList.map(({ id, icon, title, length, nested }) => {
+        const withNested = !!nested;
 
         return (
           id && (
@@ -197,13 +206,13 @@ const MenuListInnerComponent = ({
                     : activeListId === id
                 }
                 fontWeight={id === SECURE_MESSAGE_MODE ? 600 : 400}
-                withChildren={withChildren}
+                withNested={withNested}
                 onClick={() => {
                   if (id === SECURE_MESSAGE_MODE) {
                     return handleClickSecureMessage();
                   }
 
-                  return withChildren
+                  return withNested
                     ? setListsOpened(!isListsOpened)
                     : handleClickMenuItem(id);
                 }}
@@ -215,7 +224,7 @@ const MenuListInnerComponent = ({
                     <MenuItemCounter>{length}</MenuItemCounter>
                   )}
                 </MenuItemTitle>
-                {withChildren && (
+                {withNested && (
                   <>
                     <Can I={PERMISSION.CREATE} a={listPermission}>
                       <ListAddIcon
@@ -243,12 +252,13 @@ const MenuListInnerComponent = ({
                       nestedListsLabels={nestedListsLabels}
                     />
                   )}
-                  {children &&
-                    (children.length <= 1 ? (
-                      children.map((list, index) => (
+                  {nested?.length > 0 &&
+                    (nested.length <= 1 ? (
+                      nested.map((list = {}, index) => (
                         <ListItem
                           key={list.id}
                           list={list}
+                          itemCount={getListCount(list.id)}
                           activeListId={activeListId}
                           index={index}
                           nestedListsLabels={nestedListsLabels}
@@ -260,17 +270,18 @@ const MenuListInnerComponent = ({
                         <Droppable
                           droppableId="droppable"
                           type="lists"
-                          key={children.length}
+                          key={nested.length}
                         >
                           {provided => (
                             <div
                               ref={provided.innerRef}
                               {...provided.droppableProps}
                             >
-                              {children.map((list, index) => (
+                              {nested.map((list, index) => (
                                 <ListItem
                                   key={list.id}
                                   list={list}
+                                  itemCount={getListCount(list.id)}
                                   activeListId={activeListId}
                                   index={index}
                                   isDraggable

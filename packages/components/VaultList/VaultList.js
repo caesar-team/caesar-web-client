@@ -4,10 +4,10 @@ import styled from 'styled-components';
 import { sortByName } from '@caesar/common/utils/utils';
 import { TEAM_TYPE } from '@caesar/common/constants';
 import {
-  userTeamListSelector,
+  currentUserVaultListSelector,
   currentTeamSelector,
-} from '@caesar/common/selectors/user';
-import { setCurrentTeamId } from '@caesar/common/actions/user';
+} from '@caesar/common/selectors/currentUser';
+import { setCurrentTeamId } from '@caesar/common/actions/currentUser';
 import { getTeamTitle } from '@caesar/common/utils/team';
 import { Avatar } from '../Avatar';
 import { Icon } from '../Icon';
@@ -29,6 +29,10 @@ const Option = styled.div`
   }
 `;
 
+const DisabledOption = styled(Option)`
+  pointer-events: none;
+`;
+
 const StyledAvatar = styled(Avatar)`
   margin-right: 16px;
 `;
@@ -36,6 +40,9 @@ const StyledWarningIcon = styled(Icon)`
   margin-right: 16px;
 `;
 const sortTeams = (a, b) => {
+  if (a.title.toLowerCase() === TEAM_TYPE.PERSONAL) return -1;
+  if (b.title.toLowerCase() === TEAM_TYPE.PERSONAL) return 1;
+
   if (a.title.toLowerCase() === TEAM_TYPE.DEFAULT) return 1;
   if (b.title.toLowerCase() === TEAM_TYPE.DEFAULT) return -1;
 
@@ -53,22 +60,23 @@ const isTeamEnable = activeTeamId => team => {
   return (isPinnedTeams || isMustTeams) && isNonActiveTeam;
 };
 
-const TeamAvatar = ({ team }) =>
-  team?.locked ? (
+const VaultAvatar = ({ vault }) =>
+  vault?.locked ? (
     <StyledWarningIcon name="warning" width={32} height={32} />
   ) : (
     <StyledAvatar
-      avatar={team.icon}
-      email={team.email}
+      avatar={vault.icon}
+      email={vault.email}
       size={32}
       fontSize="small"
     />
   );
-const TeamsListComponent = ({ activeTeamId, handleToggle, setListsOpened }) => {
+
+const VaultListComponent = ({ activeTeamId, handleToggle, setListsOpened }) => {
   const dispatch = useDispatch();
   const currentTeam = useSelector(currentTeamSelector);
 
-  const teamList = useSelector(userTeamListSelector)
+  const vaultList = useSelector(currentUserVaultListSelector)
     .filter(isTeamEnable(activeTeamId))
     .sort(sortTeams);
 
@@ -81,23 +89,23 @@ const TeamsListComponent = ({ activeTeamId, handleToggle, setListsOpened }) => {
     }
   };
 
-  return (
-    <>
-      {teamList.map(team => {
-        return (
-          <Option
-            key={team.id}
-            onClick={() => {
-              handleChangeTeam(team.id);
-            }}
-          >
-            <TeamAvatar team={team} />
-            {getTeamTitle(team)}
-          </Option>
-        );
-      })}
-    </>
+  return vaultList.length ? (
+    vaultList.map(vault => {
+      return (
+        <Option
+          key={vault.id}
+          onClick={() => {
+            handleChangeTeam(vault.id);
+          }}
+        >
+          <VaultAvatar vault={vault} />
+          {getTeamTitle(vault)}
+        </Option>
+      );
+    })
+  ) : (
+    <DisabledOption>No team vaults available</DisabledOption>
   );
 };
 
-export const TeamsList = memo(TeamsListComponent);
+export const VaultList = memo(VaultListComponent);

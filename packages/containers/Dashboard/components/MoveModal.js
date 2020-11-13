@@ -5,7 +5,7 @@ import {
   workInProgressItemsSelector,
   workInProgressListIdSelector,
 } from '@caesar/common/selectors/workflow';
-import { currentTeamSelector } from '@caesar/common/selectors/user';
+import { currentTeamSelector } from '@caesar/common/selectors/currentUser';
 import { MoveModal as MoveModalComponent } from '@caesar/components';
 
 export const MoveModal = ({

@@ -1,14 +1,12 @@
 import { createSelector } from 'reselect';
 import { LIST_TYPE } from '@caesar/common/constants';
-import { sortByDate } from '@caesar/common/utils/dateUtils';
 import {
   listsByIdSelector,
   favoritesListSelector,
 } from '@caesar/common/selectors/entities/list';
 import { itemsByIdSelector } from '@caesar/common/selectors/entities/item';
-import { membersByIdSelector } from '@caesar/common/selectors/entities/member';
+import { usersByIdSelector } from '@caesar/common/selectors/entities/user';
 import { teamsByIdSelector } from '@caesar/common/selectors/entities/team';
-import { isGeneralItem } from '../utils/item';
 
 export const workflowSelector = state => state.workflow;
 
@@ -42,7 +40,7 @@ export const workInProgressItemSelector = createSelector(
     return workInProgressItem
       ? {
           ...workInProgressItem,
-          userRole: team ? team.userRole : null,
+          teamRole: team ? team.teamRole : null,
           listType: list ? list.type : null,
         }
       : null;
@@ -51,10 +49,10 @@ export const workInProgressItemSelector = createSelector(
 
 export const workInProgressItemOwnerSelector = createSelector(
   workInProgressItemSelector,
-  membersByIdSelector,
-  (workInProgressItem, membersById) =>
-    workInProgressItem && Object.values(membersById).length
-      ? membersById[workInProgressItem.ownerId]
+  usersByIdSelector,
+  (workInProgressItem, usersById) =>
+    workInProgressItem && Object.values(usersById).length
+      ? usersById[workInProgressItem.ownerId]
       : null,
 );
 
@@ -90,33 +88,9 @@ export const workInProgressItemsSelector = createSelector(
     workInProgressItemIds.map(itemId => itemsById[itemId]),
 );
 
-const createListItemsList = (children, itemsById) =>
-  children
-    .reduce((accumulator, itemId) => {
-      const item = itemsById[itemId];
-
-      return isGeneralItem(item) ? [...accumulator, item] : accumulator;
-    }, [])
-    .sort((a, b) => sortByDate(a.lastUpdated, b.lastUpdated, 'DESC')) || [];
-
-export const visibleListItemsSelector = createSelector(
-  listsByIdSelector,
-  itemsByIdSelector,
-  workInProgressListIdSelector,
-  favoritesListSelector,
-  (listsById, itemsById, workInProgressListId, favoriteList) => {
-    const isFavoriteList = workInProgressListId === favoriteList?.id;
-
-    switch (true) {
-      case isFavoriteList:
-        return createListItemsList(favoriteList.children, itemsById);
-      case !!listsById[workInProgressListId]:
-        return createListItemsList(
-          listsById[workInProgressListId].children,
-          itemsById,
-        );
-      default:
-        return [];
-    }
-  },
+export const workInProgressItemSharedMembersSelector = createSelector(
+  workInProgressItemSelector,
+  usersByIdSelector,
+  (workInProgressItem, usersById) =>
+    workInProgressItem?.invited?.map(userId => usersById[userId]) || [],
 );

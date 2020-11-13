@@ -1,7 +1,7 @@
 import React, { useState, memo } from 'react';
 import { useEffectOnce, useUpdateEffect } from 'react-use';
 import styled from 'styled-components';
-import { getKeys, postKeys, postAcceptTwoFactor } from '@caesar/common/api';
+import { getKeys, postKeys } from '@caesar/common/api';
 import { matchStrict } from '@caesar/common/utils/match';
 import {
   validateKeys,
@@ -34,7 +34,7 @@ const isSameKeyPair = (oldKeyPair, currentKeyPair) =>
 const MasterPasswordStepComponent = ({
   initialStep,
   navigationSteps,
-  user,
+  currentUser,
   masterPassword: masterPasswordProp,
   sharedMasterPassword,
   onFinish,
@@ -91,10 +91,6 @@ const MasterPasswordStepComponent = ({
         const {
           data: { publicKey, encryptedPrivateKey },
         } = await getKeys();
-
-        if (publicKey && encryptedPrivateKey) {
-          await postAcceptTwoFactor();
-        }
 
         initState.publicKey = publicKey;
         initState.encryptedPrivateKey = encryptedPrivateKey;
@@ -171,7 +167,7 @@ const MasterPasswordStepComponent = ({
           currentEncryptedPrivateKey,
         );
       } else {
-        const data = await generateKeys(confirmPassword, [user.email]);
+        const data = await generateKeys(confirmPassword, [currentUser.email]);
 
         // eslint-disable-next-line
         publicKey = data.publicKey;
@@ -255,11 +251,11 @@ const MasterPasswordStepComponent = ({
       <Head title="Master Password" />
       {state.step === MASTER_PASSWORD_CHECK ? (
         <MasterPasswordCheckForm
-          user={user}
+          currentUser={currentUser}
           onSubmit={handleSubmitCheckPassword}
         />
       ) : (
-        <BootstrapLayout user={user}>
+        <BootstrapLayout currentUser={currentUser}>
           <NavigationPanelStyled
             currentStep={state.step}
             steps={navigationSteps}

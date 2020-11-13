@@ -157,10 +157,7 @@ export default createReducer(initialState, {
       ...state,
       byId: {
         ...state.byId,
-        ...payload.items.reduce(
-          (accumulator, item) => ({ ...accumulator, [item.id]: item }),
-          {},
-        ),
+        ...payload.itemsById,
       },
     };
   },

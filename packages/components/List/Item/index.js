@@ -1,8 +1,11 @@
 /* eslint-disable camelcase */
 import React from 'react';
-import { PERMISSION, PERMISSION_MESSAGES } from '@caesar/common/constants';
+import {
+  PERMISSION,
+  PERMISSION_MESSAGES,
+  TEAM_TYPE,
+} from '@caesar/common/constants';
 import { Icon } from '../../Icon';
-import { ItemIcon } from '../../ItemIcon';
 import { Can } from '../../Ability';
 import {
   Row,
@@ -17,6 +20,7 @@ import {
   Addon,
   AddonText,
   CloseIcon,
+  WebsiteFavIcon,
 } from './styles';
 
 export const Item = ({
@@ -27,7 +31,7 @@ export const Item = ({
     website: null,
   },
   type,
-  invited,
+  invited = [],
   isMultiItem = false,
   isClosable = false,
   hasHover = true,
@@ -35,9 +39,9 @@ export const Item = ({
   favorite,
   style,
   teamId,
-  _permissions,
+  _permissions = {},
   index,
-  teamMembersCount,
+  teamMembersCount = 0,
   onClickClose = Function.prototype,
   onClickItem = Function.prototype,
   onSelectItem = Function.prototype,
@@ -45,8 +49,10 @@ export const Item = ({
   workInProgressItem,
   ...props
 }) => {
-  const sharedCount = invited.length + teamMembersCount - 1;
-  const shouldShowMembers = !!sharedCount;
+  const sharedCount =
+    invited?.length +
+    (teamMembersCount > 0 ? teamMembersCount - 1 : teamMembersCount);
+  const shouldShowMembers = teamId === TEAM_TYPE.PERSONAL && sharedCount > 0;
   const shouldShowAttachments =
     attachments && Array.isArray(attachments) && attachments.length > 0;
 
@@ -98,7 +104,11 @@ export const Item = ({
             )}
             <IconWrapper>
               {website ? (
-                <ItemIcon url={website} />
+                <WebsiteFavIcon
+                  website={website}
+                  src={`https://www.google.com/s2/favicons?domain=${website}`}
+                  alt={`The website favicon for address: ${website}`}
+                />
               ) : (
                 <ItemTypeIcon type={type} />
               )}

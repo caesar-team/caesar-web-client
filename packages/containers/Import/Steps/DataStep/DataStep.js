@@ -24,9 +24,12 @@ const DataStep = ({
   onSubmit,
   onCancel,
 }) => {
+  const personalTeamIndex =
+    teamsLists.findIndex(({ id }) => id === TEAM_TYPE.PERSONAL) || 0;
+
   const [state, setState] = useState({
-    teamId: teamsLists[0].id,
-    listId: teamsLists[0].lists[0].id,
+    teamId: teamsLists[personalTeamIndex]?.id || null,
+    listId: teamsLists[personalTeamIndex]?.lists[0]?.id || null,
     filterText: '',
     selectedRows: normalize(propData),
     data: propData,
@@ -43,7 +46,7 @@ const DataStep = ({
   } = state;
 
   // Window height minus stuff that takes vertical place (including table headers)
-  const tableVisibleDataHeight = window?.innerHeight - 575;
+  const tableVisibleDataHeight = window?.innerHeight - 450;
   const tableWrapperRef = useRef(null);
   const [tableWidth, setTableWidth] = useState(0);
 
@@ -60,25 +63,26 @@ const DataStep = ({
   const selectedRowsLength = denormalize(selectedRows).length;
   const isButtonDisabled = isSubmitting || !selectedRowsLength;
 
-  const teamOptions = teamsLists.flatMap(({ id, name }) =>
-    id === TEAM_TYPE.PERSONAL
-      ? {
-          value: id,
-          label: name.toLowerCase(),
-        }
-      : [],
-  );
+  const teamOptions =
+    teamsLists?.flatMap(({ id, name }) =>
+      id === TEAM_TYPE.PERSONAL
+        ? {
+            value: id,
+            label: name.toLowerCase(),
+          }
+        : [],
+    ) || [];
 
   const currentTeam = teamsLists.find(({ id }) => id === teamId);
-  const currentTeamListsOptions = currentTeam.lists.flatMap(
-    ({ type, id, label }) =>
+  const currentTeamListsOptions =
+    currentTeam?.lists?.flatMap(({ type, id, label }) =>
       type === LIST_TYPE.INBOX
         ? []
         : {
             value: id,
             label: label.toLowerCase(),
           },
-  );
+    ) || [];
 
   const handleSearch = event => {
     event.preventDefault();
@@ -91,7 +95,7 @@ const DataStep = ({
   const handleChangeTeamId = (_, value) => {
     setState({
       teamId: value,
-      listId: teamsLists.find(({ id }) => id === value).lists[0].id,
+      listId: teamsLists.find(({ id }) => id === value)?.lists[0].id,
     });
   };
 
@@ -128,6 +132,7 @@ const DataStep = ({
           columns={columns}
           data={tableData}
           tableVisibleDataHeight={tableVisibleDataHeight}
+          itemSize={45}
         />
       </StyledTable>
       <SelectListWrapper>

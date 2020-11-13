@@ -301,7 +301,7 @@ export function* processTeamsItemsSaga() {
 function* loadTeamKeypairIfNotExists(teamId) {
   const teamKeypairExists = yield call(isTeamKeypairExists, teamId);
 
-  if (!teamKeypairExists) {
+  if (!teamKeypairExists && teamId !== TEAM_TYPE.PERSONAL) {
     const { data: keypairItem } = yield call(getTeamKeyPair, teamId);
     const { itemsById } = convertItemsToEntities([keypairItem]);
     const items = Object.values(itemsById);

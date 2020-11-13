@@ -172,10 +172,12 @@ function* isTeamKeypairExists(teamId) {
   return !!(yield select(teamKeyPairSelector, { teamId }));
 }
 
-export function* processSharedItemsSaga() {
+export function* processSharedItemsSaga({ payload: { teamId } }) {
   try {
     const keyPairs = yield select(shareKeyPairsSelector);
-    const sharedItems = yield select(nonDecryptedSharedItemsSelector);
+    const sharedItems = yield select(nonDecryptedSharedItemsSelector, {
+      teamId,
+    });
 
     yield all(
       decryptItemsByItemIdKeys(
@@ -184,13 +186,20 @@ export function* processSharedItemsSaga() {
       ),
     );
 
-    // Remove undecrypttable items from the store
-    yield call(
-      removeItemsBatch,
-      sharedItems
-        .filter(sharedItem => !keyPairs[sharedItem.id])
-        .map(sharedItem => sharedItem.id),
-    );
+    const removeItemIds = sharedItems
+      .filter(sharedItem => !keyPairs[sharedItem.id])
+      .map(sharedItem => sharedItem.id);
+
+    if (removeItemIds.length) {
+      // eslint-disable-next-line no-console
+      console.warn(
+        `WARNING! These items cannot be decrypted as there are no keypairs and will remove from the store, the ids: %s`,
+        removeItemIds,
+      );
+
+      // Remove undecrypttable items from the store
+      yield put(removeItemsBatch(removeItemIds));
+    }
   } catch (error) {
     // eslint-disable-next-line no-console
     console.error(error);
@@ -258,7 +267,6 @@ export function* processTeamItemsSaga({ payload: { teamId } }) {
 
     const teamItems = yield select(nonDecryptedTeamItemsSelector, { teamId });
     if (teamItems.length <= 0 || !privateKey || !password) return;
-
     yield put(
       decryption({
         items: teamItems,
@@ -655,7 +663,8 @@ function* getItemKeyPair({
 function* decryptItemRaws({ payload: { item } }) {
   try {
     // If item is null or aready had decypted attachments then do not dectrypt again!
-    if (!item || (item?.data?.raws && Object.values(item?.data?.raws) > 0)) return;
+    if (!item || (item?.data?.raws && Object.values(item?.data?.raws) > 0))
+      return;
 
     const { raws } = JSON.parse(item.secret);
 

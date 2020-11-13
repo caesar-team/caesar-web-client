@@ -9,10 +9,17 @@ import { passwordGenerator } from './passwordGenerator';
 const srp = createSrp();
 
 export const unsealPrivateKeyObj = async (privateKey, password) => {
-  const privateKeyObj = (await openpgp.key.readArmored(privateKey)).keys[0];
-  await privateKeyObj.decrypt(password);
+  try {
+    const privateKeyObj = (await openpgp.key.readArmored(privateKey)).keys[0];
+    await privateKeyObj.decrypt(password);
 
-  return privateKeyObj;
+    return privateKeyObj;
+  } catch (error) {
+    // eslint-disable-next-line no-console
+    console.error(error);
+
+    return null;
+  }
 };
 
 export const testDecryptSecretArmored = async (

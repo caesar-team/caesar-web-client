@@ -43,13 +43,21 @@ const matchAndAddKeyPairs = ({ inbound, outbound }) => {
 };
 
 const taskAction = (items, raws, key, masterPassword) => async task => {
-  await task.init(key, masterPassword);
   let result = [];
 
-  if (items) {
-    result = await task.decryptAll(items);
-  } else if (raws) {
-    result = await task.decryptRaws(raws);
+  try {
+    await task.init(key, masterPassword);
+    if (items) {
+      result = await task.decryptAll(items);
+    } else if (raws) {
+      result = await task.decryptRaws(raws);
+    }
+  } catch (error) {
+    // eslint-disable-next-line no-console
+    console.error(
+      `Cannot unlock the key with the provided master password, these items or raws will be omitted`,
+      items?.map(item => item.id) || [],
+    );
   }
 
   return result;

@@ -1,6 +1,5 @@
 import { createSelector } from 'reselect';
 import { LIST_TYPE } from '@caesar/common/constants';
-import { sortByDate } from '@caesar/common/utils/dateUtils';
 import {
   listsByIdSelector,
   favoritesListSelector,
@@ -8,7 +7,6 @@ import {
 import { itemsByIdSelector } from '@caesar/common/selectors/entities/item';
 import { usersByIdSelector } from '@caesar/common/selectors/entities/user';
 import { teamsByIdSelector } from '@caesar/common/selectors/entities/team';
-import { isGeneralItem } from '../utils/item';
 
 export const workflowSelector = state => state.workflow;
 
@@ -95,38 +93,4 @@ export const workInProgressItemSharedMembersSelector = createSelector(
   usersByIdSelector,
   (workInProgressItem, usersById) =>
     workInProgressItem?.invited?.map(userId => usersById[userId]) || [],
-);
-
-const createListItemsList = (children, itemsById) =>
-  children
-    .reduce((accumulator, itemId) => {
-      const item = itemsById[itemId];
-
-      return item?.data && isGeneralItem(item)
-        ? [...accumulator, item]
-        : accumulator;
-    }, [])
-    .sort((a, b) => sortByDate(a.lastUpdated, b.lastUpdated, 'DESC')) || [];
-
-// @Depricated
-export const visibleListItemsSelector = createSelector(
-  listsByIdSelector,
-  itemsByIdSelector,
-  workInProgressListIdSelector,
-  favoritesListSelector,
-  (listsById, itemsById, workInProgressListId, favoriteList) => {
-    const isFavoriteList = workInProgressListId === favoriteList?.id;
-
-    switch (true) {
-      case isFavoriteList:
-        return createListItemsList(favoriteList.children, itemsById);
-      case !!listsById[workInProgressListId]:
-        return createListItemsList(
-          listsById[workInProgressListId].children,
-          itemsById,
-        );
-      default:
-        return [];
-    }
-  },
 );

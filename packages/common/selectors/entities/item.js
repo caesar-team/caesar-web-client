@@ -1,5 +1,7 @@
 import { createSelector } from 'reselect';
+import { allTrashListIdsSelector } from './list';
 import { isGeneralItem } from '../../utils/item';
+import { LIST_TYPE } from '../../constants';
 
 export const entitiesSelector = state => state.entities;
 
@@ -13,7 +15,7 @@ export const itemsByIdSelector = createSelector(
   itemEntity => itemEntity.byId,
 );
 
-export const itemListSelector = createSelector(
+export const itemArraySelector = createSelector(
   itemsByIdSelector,
   byId => Object.values(byId) || [],
 );
@@ -94,8 +96,8 @@ export const itemsGeneralListSelector = createSelector(
   },
 );
 
-export const teamItemListSelector = createSelector(
-  itemListSelector,
+export const teamItemsSelector = createSelector(
+  itemArraySelector,
   teamIdPropSelector,
   (itemList, teamId) => itemList.filter(item => item.teamId === teamId),
 );
@@ -103,4 +105,40 @@ export const teamItemListSelector = createSelector(
 export const generalItemsSelector = createSelector(
   itemsBatchSelector,
   items => items.filter(isGeneralItem) || [],
+);
+
+const listIdPropSelector = (_, props) => props.listId;
+export const itemsByListIdSelector = createSelector(
+  itemArraySelector,
+  allTrashListIdsSelector,
+  listIdPropSelector,
+  (itemList, trashListIds, listId) => {
+    if (listId === LIST_TYPE.FAVORITES) {
+      return itemList.filter(
+        item => item.favorite && !trashListIds.includes(item.listId),
+      );
+    }
+
+    return itemList.filter(item => item.listId === listId);
+  },
+);
+
+const listIdsPropSelector = (_, props) => props.listIds;
+export const itemsByListIdsSelector = createSelector(
+  itemArraySelector,
+  listIdsPropSelector,
+  (itemList, listIds) => {
+    return itemList?.filter(
+      item => listIds?.includes(item.listId) && isGeneralItem(item),
+    );
+  },
+);
+
+export const itemsByListIdVisibleSelector = createSelector(
+  itemArraySelector,
+  listIdPropSelector,
+  (itemList, listId) =>
+    itemList.filter(
+      item => item.listId === listId && isGeneralItem(item) && !!item?.data,
+    ),
 );

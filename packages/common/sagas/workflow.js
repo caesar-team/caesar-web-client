@@ -56,13 +56,11 @@ import {
 import { fetchTeamMembersSaga } from '@caesar/common/sagas/entities/member';
 import {
   convertItemsToEntities,
-  convertTeamsToEntity,
   convertListsToEntities,
   convertKeyPairToEntity,
   convertShareItemsToEntities,
 } from '@caesar/common/normalizers/normalizers';
 import { arrayToObject, objectToArray } from '@caesar/common/utils/utils';
-import { upperFirst } from '@caesar/common/utils/string';
 import {
   getKeypairs,
   getLastUpdatedUserItems,
@@ -70,7 +68,7 @@ import {
   getTeamKeyPair,
   getTeamLists,
 } from '@caesar/common/api';
-import { TEAM_TYPE, LIST_TYPE, TEAM_ROLES } from '@caesar/common/constants';
+import { TEAM_TYPE, LIST_TYPE } from '@caesar/common/constants';
 import {
   teamListsSelector,
   favoritesListSelector,
@@ -84,6 +82,7 @@ import {
   getLastUpdatedSelector,
 } from '@caesar/common/selectors/currentUser';
 import {
+  itemsByListIdsSelector,
   itemSelector,
   nonDecryptedSharedItemsSelector,
   nonDecryptedTeamItemsSelector,
@@ -330,10 +329,14 @@ function* initTeam(teamId) {
 function* checkTeamKeyPair(team) {
   const check = yield call(checkTeamPermissionsAndKeys, team.id, true);
 
-  return {
-    ...team,
-    locked: !check,
-  };
+  if (team.locked === !check) {
+    return {
+      ...team,
+      locked: !check,
+    };
+  }
+
+  return null;
 }
 
 function* checkTeamsKeyPairs() {
@@ -348,7 +351,7 @@ function* checkTeamsKeyPairs() {
     .filter(t => t.id !== TEAM_TYPE.PERSONAL)
     .map(checkTeamKeyPair);
   const checkedTeams = yield all(checkCalls);
-  yield put(addTeamsBatch(arrayToObject(checkedTeams)));
+  yield put(addTeamsBatch(arrayToObject(checkedTeams.filter(team => !!team))));
 }
 
 function* initTeamsSaga() {
@@ -356,28 +359,6 @@ function* initTeamsSaga() {
     // Load avaible teams
     yield call(fetchTeamsSaga);
 
-    const isUserDomainAdminOrManager = yield select(
-      isUserDomainAdminOrManagerSelector,
-    );
-
-    const teams = isUserDomainAdminOrManager
-      ? yield select(teamListSelector)
-      : yield select(currentUserTeamListSelector);
-
-    const currentUserData = yield select(currentUserDataSelector);
-
-    teams.push({
-      id: TEAM_TYPE.PERSONAL,
-      title: upperFirst(TEAM_TYPE.PERSONAL),
-      type: TEAM_TYPE.PERSONAL,
-      icon: currentUserData?.avatar,
-      email: currentUserData?.email,
-      teamRole: TEAM_ROLES.ROLE_ADMIN,
-      _links: currentUserData?._links,
-    });
-
-    const teamById = convertTeamsToEntity(teams);
-    yield put(addTeamsBatch(teamById));
     yield call(checkTeamsKeyPairs);
   } catch (error) {
     // eslint-disable-next-line no-console
@@ -481,19 +462,6 @@ function* loadKeyPairsAndPersonalItems() {
       yield call(decryptUserItems, itemsEncryptedByUserKeys);
     }
 
-    // Inject shares into the defualt list
-    // TODO: Remove that code in the future!
-    if (defaultShareList?.id) {
-      const notMineSharedItemsIds = Object.values(sharedItemsById)
-        .filter(i => i.ownerId !== currentUserId)
-        .map(i => i.id);
-
-      listsById[defaultShareList.id].children = [
-        ...listsById[defaultShareList.id].children,
-        ...notMineSharedItemsIds,
-      ];
-    }
-
     yield put(addListsBatch(listsById));
     // Put to the store the shared and the team items, wait for processing of keypairs
     yield put(
@@ -530,7 +498,7 @@ function* loadKeyPairsAndPersonalItems() {
     );
   }
 }
-
+const itemsListFilter = listId => item => item.listId === listId;
 function* initListsAndProgressEntities() {
   const currentTeamId = yield select(currentTeamIdSelector);
 
@@ -545,10 +513,20 @@ function* initListsAndProgressEntities() {
   const defaultList = lists.find(list => list.type === LIST_TYPE.DEFAULT);
   const inboxList = lists.find(list => list.type === LIST_TYPE.INBOX);
 
-  if (!workInProgressList) {
-    if (favoritesList?.children?.length > 0) {
+  const listItems = yield select(itemsByListIdsSelector, {
+    listIds: [favoritesList?.id, inboxList?.id],
+  });
+  const favoritesListCount =
+    listItems.filter(itemsListFilter(favoritesList?.id))?.length || 0;
+  const inboxListCount =
+    listItems.filter(itemsListFilter(inboxList?.id))?.length || 0;
+  const workInProgressListCount =
+    listItems.filter(itemsListFilter(workInProgressList))?.length || 0;
+
+  if (!workInProgressList || workInProgressListCount <= 0) {
+    if (favoritesListCount > 0) {
       yield put(setWorkInProgressListId(favoritesList.id));
-    } else if (inboxList?.children?.length > 0) {
+    } else if (inboxListCount > 0) {
       yield put(setWorkInProgressListId(inboxList.id));
     } else {
       yield put(setWorkInProgressListId(defaultList.id));

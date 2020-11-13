@@ -5,7 +5,10 @@ import { useSelector, useDispatch } from 'react-redux';
 import styled from 'styled-components';
 import { PERMISSION } from '@caesar/common/constants';
 import { useNotification } from '@caesar/common/hooks';
-import { workInProgressItemSelector } from '@caesar/common/selectors/workflow';
+import {
+  workInProgressItemSelector,
+  isDecryptionProgressSelector,
+} from '@caesar/common/selectors/workflow';
 import {
   trashListSelector,
   teamsTrashListsSelector,
@@ -53,6 +56,7 @@ const ItemComponent = ({
   const [isVisibleDragZone, setVisibleDragZone] = useState(false);
   const itemRef = useRef(null);
   const notification = useNotification();
+  const isDecryptionProcess = useSelector(isDecryptionProgressSelector);
 
   const handleDragEnter = useCallback(
     e => {
@@ -129,15 +133,20 @@ const ItemComponent = ({
             onClickAcceptEdit={!isTrashItem && handleClickAcceptEdit}
             onClickShare={onClickShare}
             isVisibleDragZone={isVisibleDragZone}
+            isDummy={isDecryptionProcess}
           />
-          <Meta item={item} />
-          <Can I={PERMISSION.TRASH} an={_permissions}>
-            {!isTrashItem && (
-              <Row>
-                <RemoveButton onClick={onClickMoveToTrash} />
-              </Row>
-            )}
-          </Can>
+          {!isDecryptionProcess && (
+            <>
+              <Meta item={item} />
+              <Can I={PERMISSION.TRASH} an={_permissions}>
+                {!isTrashItem && (
+                  <Row>
+                    <RemoveButton onClick={onClickMoveToTrash} />
+                  </Row>
+                )}
+              </Can>
+            </>
+          )}
         </Scrollbar>
       </InnerWrapper>
       {!isTrashItem && isMoveModalOpened && (

@@ -94,3 +94,8 @@ export const workInProgressItemSharedMembersSelector = createSelector(
   (workInProgressItem, usersById) =>
     workInProgressItem?.invited?.map(userId => usersById[userId]) || [],
 );
+
+export const isDecryptionProgressSelector = createSelector(
+  workflowSelector,
+  workflow => workflow.isDecryptionProgress,
+);

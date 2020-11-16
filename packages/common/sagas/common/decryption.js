@@ -71,6 +71,13 @@ export function* decryption({
   coresCount,
   id,
 }) {
+  // Nothing to do here
+  if (!raws && (!items || items.length <= 0)) {
+    yield put(decryptionEnd(id, coresCount));
+
+    return;
+  }
+
   const pool = Pool(() => spawn(new Worker('../../workers/decryption')), {
     name: 'decryption',
     size: coresCount,
@@ -95,8 +102,13 @@ export function* decryption({
     );
   }
 
+  // TODO: Raws should be an array instead of a string. If the app get a hundreds of attachments in one item then the app will be freezed.
   if (raws) {
-    pool.queue(taskAction(null, raws, key, masterPassword));
+    const rawsChunks = chunk([raws], DECRYPTION_CHUNK_SIZE);
+    chunkSize = rawsChunks.length;
+    rawsChunks.map(rawsChunk =>
+      pool.queue(taskAction(null, rawsChunk, key, masterPassword)),
+    );
   }
 
   const normalizerEvent = normalizeEvent(chunkSize);

@@ -75,7 +75,6 @@ import {
 } from '@caesar/common/selectors/entities/list';
 import {
   currentUserDataSelector,
-  masterPasswordSelector,
   currentTeamIdSelector,
   isUserDomainAdminOrManagerSelector,
   currentUserTeamListSelector,
@@ -109,6 +108,8 @@ import { teamMembersFullViewSelector } from '../selectors/entities/member';
 import { userSelector } from '../selectors/entities/user';
 import { fetchTeamMembersRequest } from '../actions/entities/member';
 import { getCurrentUnixtime } from '../utils/dateUtils';
+
+const ON_DEMAND_DECRYPTION = true;
 
 export function decryptItemsByItemIdKeys(items, keyPairs) {
   try {
@@ -165,6 +166,52 @@ export function* decryptUserItems(items) {
         masterPassword: keyPair.password,
       }),
     );
+  }
+}
+function* getItemKeyPair({
+  payload: {
+    item: { id: itemId, teamId, isShared },
+  },
+}) {
+  switch (true) {
+    case teamId:
+      return yield select(teamKeyPairSelector, { teamId });
+    case isShared:
+      return yield select(shareItemKeyPairSelector, { itemId });
+    default:
+      return yield select(teamKeyPairSelector, { teamId: TEAM_TYPE.PERSONAL });
+  }
+}
+export function* decryptItem(item, decryptRaws = false) {
+  const keyPair = yield call(getItemKeyPair, {
+    payload: {
+      item,
+    },
+  });
+
+  // decrypt the items
+  if (item && !item.data) {
+    yield put(
+      decryption({
+        items: [item],
+        key: keyPair.privateKey,
+        masterPassword: keyPair.password,
+      }),
+    );
+  }
+
+  if (decryptRaws) {
+    const { raws } = JSON.parse(item.secret);
+    // decrypt the items
+    if (raws) {
+      yield put(
+        decryption({
+          raws,
+          key: keyPair.privateKey,
+          masterPassword: keyPair.password,
+        }),
+      );
+    }
   }
 }
 
@@ -447,11 +494,9 @@ function* loadKeyPairsAndPersonalItems() {
 
     const keypairsArray = objectToArray(keypairsById);
     const systemItems = objectToArray(systemItemsById);
-    const userItems = objectToArray(itemsById);
     const itemsEncryptedByUserKeys = [
       ...keypairsArray.filter(keyPairsEncryptedByUserKeysFilter),
       ...systemItems,
-      ...userItems,
     ];
     const itemsEncryptedByTeamKeys = keypairsArray.filter(
       keyPairsEncryptedByTeamKeysFilter,
@@ -466,6 +511,7 @@ function* loadKeyPairsAndPersonalItems() {
     // Put to the store the shared and the team items, wait for processing of keypairs
     yield put(
       addItemsBatch({
+        ...itemsById,
         ...sharedItemsById,
         ...teamsItemsById,
         ...itemsEncryptedByTeamKeys,
@@ -589,18 +635,19 @@ export function* openTeamVaultSaga({ payload: { teamId } }) {
 
     if (checksResult) {
       yield put(lockTeam(teamId, false));
-      // TODO: Here is opportunity to improve the calls
-      yield fork(processTeamItemsSaga, {
-        payload: {
-          teamId,
-        },
-      });
 
-      yield fork(processSharedItemsSaga, {
-        payload: {
-          teamId,
-        },
-      });
+      if (!ON_DEMAND_DECRYPTION) {
+        yield fork(processTeamItemsSaga, {
+          payload: {
+            teamId,
+          },
+        });
+        yield fork(processSharedItemsSaga, {
+          payload: {
+            teamId,
+          },
+        });
+      }
     } else {
       yield put(
         updateGlobalNotification(
@@ -645,47 +692,31 @@ export function* updateWorkInProgressItemSaga({ payload: { itemId } }) {
   }
 }
 
-function* getItemKeyPair({
-  payload: {
-    item: { id: itemId, teamId, isShared },
-  },
-}) {
-  switch (true) {
-    case teamId:
-      return yield select(teamKeyPairSelector, { teamId });
-    case isShared:
-      return yield select(shareItemKeyPairSelector, { itemId });
-    default:
-      return yield select(teamKeyPairSelector, { teamId: TEAM_TYPE.PERSONAL });
-  }
-}
-
-function* decryptItemRaws({ payload: { item } }) {
+function* decryptItemOnDemand({ payload: { item } }) {
   try {
     // If item is null or aready had decypted attachments then do not dectrypt again!
     if (!item || (item?.data?.raws && Object.values(item?.data?.raws) > 0))
       return;
 
-    const { raws } = JSON.parse(item.secret);
+    yield fork(decryptItem, item, true);
+    // const keyPair = yield call(getItemKeyPair, {
+    //   payload: {
+    //     item,
+    //   },
+    // });
 
-    const keyPair = yield call(getItemKeyPair, {
-      payload: {
-        item,
-      },
-    });
+    // const masterPassword =
+    //   !item.teamId && !item.isShared
+    //     ? yield select(masterPasswordSelector)
+    //     : keyPair.password;
 
-    const masterPassword =
-      !item.teamId && !item.isShared
-        ? yield select(masterPasswordSelector)
-        : keyPair.password;
-
-    yield put(
-      decryption({
-        raws,
-        key: keyPair.privateKey,
-        masterPassword,
-      }),
-    );
+    // yield put(
+    //   decryption({
+    //     raws,
+    //     key: keyPair.privateKey,
+    //     masterPassword,
+    //   }),
+    // );
   } catch (error) {
     // eslint-disable-next-line no-console
     console.error('error: ', error);
@@ -696,7 +727,7 @@ function* setWorkInProgressItemSaga({ payload: { item } }) {
   try {
     if (!item) return;
 
-    yield call(decryptItemRaws, {
+    yield call(decryptItemOnDemand, {
       payload: {
         item,
       },
@@ -780,7 +811,9 @@ function* checkUpdatesForWIP({ payload: { itemsById } }) {
   const oldItem = yield select(workInProgressItemSelector);
   if (oldItem?.id) {
     const newItem = itemsById[(oldItem?.id)];
-    if (!newItem?.data) return;
+    if (!newItem?.data || !oldItem?.data) {
+      yield call(decryptItem, newItem, true);
+    }
 
     const isChanged = !deepequal(newItem, oldItem);
     if (isChanged) {

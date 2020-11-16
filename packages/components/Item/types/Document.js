@@ -4,8 +4,10 @@ import { TEAM_TYPE } from '@caesar/common/constants';
 import { Title, Note, Attachments } from '../../ItemFields/view';
 import { Row } from '../../ItemFields/common';
 import { OwnerAndShares } from '../components';
+import { DummyDocument } from './DummyDocument';
 
 const DocumentComponent = ({
+  isDummy,
   item,
   itemSubject,
   onClickAcceptEdit,
@@ -13,6 +15,10 @@ const DocumentComponent = ({
   isSharedItem = false,
   isVisibleDragZone,
 }) => {
+  if (isDummy || !item.data) {
+    return <DummyDocument isSharedItem />;
+  }
+
   const { name, note, attachments, raws } = item.data;
 
   return (

@@ -4,7 +4,7 @@ import {
   PERMISSION,
   PERMISSION_MESSAGES,
   TEAM_TYPE,
-} from "@caesar/common/constants";
+} from '@caesar/common/constants';
 import { Icon } from '../../Icon';
 import { Can } from '../../Ability';
 import {
@@ -26,7 +26,10 @@ import {
 export const Item = ({
   id,
   title,
-  data,
+  data: { attachments = [], website } = {
+    attachments: [],
+    website: null,
+  },
   type,
   invited = [],
   isMultiItem = false,
@@ -46,7 +49,6 @@ export const Item = ({
   workInProgressItem,
   ...props
 }) => {
-  const { attachments = [], website } = data || {};
   const sharedCount =
     invited?.length +
     (teamMembersCount > 0 ? teamMembersCount - 1 : teamMembersCount);

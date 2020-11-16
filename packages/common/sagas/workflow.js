@@ -492,11 +492,9 @@ function* loadKeyPairsAndPersonalItems() {
 
     const keypairsArray = objectToArray(keypairsById);
     const systemItems = objectToArray(systemItemsById);
-    // const userItems = objectToArray(itemsById);
     const itemsEncryptedByUserKeys = [
       ...keypairsArray.filter(keyPairsEncryptedByUserKeysFilter),
       ...systemItems,
-      // ...userItems,
     ];
     const itemsEncryptedByTeamKeys = keypairsArray.filter(
       keyPairsEncryptedByTeamKeysFilter,

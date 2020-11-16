@@ -31,7 +31,6 @@ import {
 } from '@caesar/common/actions/workflow';
 import { updateGlobalNotification } from '@caesar/common/actions/application';
 import { MultiItem, List } from '@caesar/components';
-import { isDecryptedItem } from '@caesar/common/utils/item';
 import { sortByDate } from '@caesar/common/utils/dateUtils';
 import { MODAL } from '../constants';
 import { filter } from '../utils';

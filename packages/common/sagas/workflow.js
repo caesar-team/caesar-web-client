@@ -109,6 +109,8 @@ import { userSelector } from '../selectors/entities/user';
 import { fetchTeamMembersRequest } from '../actions/entities/member';
 import { getCurrentUnixtime } from '../utils/dateUtils';
 
+const ON_DEMAND_DECRYPTION = true;
+
 export function decryptItemsByItemIdKeys(items, keyPairs) {
   try {
     const putSagas = items.map(item => {
@@ -633,18 +635,19 @@ export function* openTeamVaultSaga({ payload: { teamId } }) {
 
     if (checksResult) {
       yield put(lockTeam(teamId, false));
-      // TODO: Here is opportunity to improve the calls
-      // yield fork(processTeamItemsSaga, {
-      //   payload: {
-      //     teamId,
-      //   },
-      // });
 
-      // yield fork(processSharedItemsSaga, {
-      //   payload: {
-      //     teamId,
-      //   },
-      // });
+      if (!ON_DEMAND_DECRYPTION) {
+        yield fork(processTeamItemsSaga, {
+          payload: {
+            teamId,
+          },
+        });
+        yield fork(processSharedItemsSaga, {
+          payload: {
+            teamId,
+          },
+        });
+      }
     } else {
       yield put(
         updateGlobalNotification(

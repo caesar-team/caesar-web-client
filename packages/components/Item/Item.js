@@ -5,10 +5,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import styled from 'styled-components';
 import { PERMISSION } from '@caesar/common/constants';
 import { useNotification } from '@caesar/common/hooks';
-import {
-  workInProgressItemSelector,
-  isDecryptionProgressSelector,
-} from '@caesar/common/selectors/workflow';
+import { workInProgressItemSelector } from '@caesar/common/selectors/workflow';
 import {
   trashListSelector,
   teamsTrashListsSelector,
@@ -56,7 +53,7 @@ const ItemComponent = ({
   const [isVisibleDragZone, setVisibleDragZone] = useState(false);
   const itemRef = useRef(null);
   const notification = useNotification();
-  const isDecryptionProgress = useSelector(isDecryptionProgressSelector);
+  const isDecryptionProgress = !item?.data;
 
   const handleDragEnter = useCallback(
     e => {

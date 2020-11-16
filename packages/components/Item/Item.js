@@ -5,10 +5,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import styled from 'styled-components';
 import { PERMISSION } from '@caesar/common/constants';
 import { useNotification } from '@caesar/common/hooks';
-import {
-  workInProgressItemSelector,
-  isDecryptionProgressSelector,
-} from '@caesar/common/selectors/workflow';
+import { workInProgressItemSelector } from '@caesar/common/selectors/workflow';
 import {
   trashListSelector,
   teamsTrashListsSelector,

@@ -699,24 +699,6 @@ function* decryptItemOnDemand({ payload: { item } }) {
       return;
 
     yield fork(decryptItem, item, true);
-    // const keyPair = yield call(getItemKeyPair, {
-    //   payload: {
-    //     item,
-    //   },
-    // });
-
-    // const masterPassword =
-    //   !item.teamId && !item.isShared
-    //     ? yield select(masterPasswordSelector)
-    //     : keyPair.password;
-
-    // yield put(
-    //   decryption({
-    //     raws,
-    //     key: keyPair.privateKey,
-    //     masterPassword,
-    //   }),
-    // );
   } catch (error) {
     // eslint-disable-next-line no-console
     console.error('error: ', error);

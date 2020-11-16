@@ -793,13 +793,10 @@ function* vaultsReadySaga() {
 
 function* checkUpdatesForWIP({ payload: { itemsById } }) {
   const oldItem = yield select(workInProgressItemSelector);
-  const newItem = itemsById[(oldItem?.id)];
-
-  if (oldItem && newItem) {
-    if (!newItem?.data) {
+  if (oldItem?.id) {
+    const newItem = itemsById[(oldItem?.id)];
+    if (!newItem?.data || !oldItem?.data) {
       yield call(decryptItem, newItem, true);
-
-      return;
     }
 
     const isChanged = !deepequal(newItem, oldItem);

@@ -110,11 +110,15 @@ export const generalItemsSelector = createSelector(
 export const itemsByListIdSelector = createSelector(
   itemArraySelector,
   allTrashListIdsSelector,
+  teamIdPropSelector,
   listIdPropSelector,
-  (itemList, trashListIds, listId) => {
+  (itemList, trashListIds, teamId, listId) => {
     if (listId === LIST_TYPE.FAVORITES) {
       return itemList.filter(
-        item => item.favorite && !trashListIds.includes(item.listId),
+        item =>
+          item.favorite &&
+          item.teamId === teamId &&
+          !trashListIds.includes(item.listId),
       );
     }
 

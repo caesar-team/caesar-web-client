@@ -193,7 +193,7 @@ export function* decryptItem(item, decryptRaws = false) {
   });
 
   // decrypt the items
-  if (item && !item.data) {
+  if (!item.data) {
     yield put(
       decryption({
         items: [item],

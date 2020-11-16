@@ -217,11 +217,13 @@ export function* shareItemBatchSaga({
     yield put(updateGlobalNotification(SHARING_IN_PROGRESS_NOTIFICATION, true));
     // const currentTeamId = yield select(currentTeamIdSelector);
     const items = yield select(itemsBatchSelector, { itemIds });
-
+    const teamsMembers = yield select(teamsMembersSelector, { teamIds });
+    const allMembers = [...members, ...teamsMembers];
+    
     // Need To Go Deeper (c)
     yield all(
       yield all(
-        items.map(item => call(processMembersItemShare, { item, members })),
+        items.map(item => call(processMembersItemShare, { item, allMembers })),
       ),
     );
 

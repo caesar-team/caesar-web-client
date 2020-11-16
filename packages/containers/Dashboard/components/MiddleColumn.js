@@ -51,6 +51,7 @@ const MiddleColumnComponent = ({
       listId: workInProgressList?.id,
     }),
   );
+
   const visibleListItems = useMemo(
     () =>
       generalItems

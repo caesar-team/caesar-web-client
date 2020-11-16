@@ -168,21 +168,24 @@ export function* decryptUserItems(items) {
     );
   }
 }
+
 function* getItemKeyPair({
   payload: {
     item: { id: itemId, teamId, isShared },
   },
 }) {
-  switch (true) {
-    case teamId:
-      return yield select(teamKeyPairSelector, { teamId });
-    case isShared:
-      return yield select(shareItemKeyPairSelector, { itemId });
-    default:
-      return yield select(teamKeyPairSelector, { teamId: TEAM_TYPE.PERSONAL });
+  if (isShared) {
+    return yield select(shareItemKeyPairSelector, { itemId });
   }
+
+  return yield select(teamKeyPairSelector, {
+    teamId: teamId || TEAM_TYPE.PERSONAL,
+  });
 }
+
 export function* decryptItem(item, decryptRaws = false) {
+  if (!item || !('id' in item)) return;
+
   const keyPair = yield call(getItemKeyPair, {
     payload: {
       item,
@@ -190,7 +193,7 @@ export function* decryptItem(item, decryptRaws = false) {
   });
 
   // decrypt the items
-  if (item && !item.data) {
+  if (!item.data) {
     yield put(
       decryption({
         items: [item],
@@ -708,7 +711,6 @@ function* decryptItemOnDemand({ payload: { item } }) {
 function* setWorkInProgressItemSaga({ payload: { item } }) {
   try {
     if (!item) return;
-
     yield call(decryptItemOnDemand, {
       payload: {
         item,
@@ -791,10 +793,13 @@ function* vaultsReadySaga() {
 
 function* checkUpdatesForWIP({ payload: { itemsById } }) {
   const oldItem = yield select(workInProgressItemSelector);
-  if (oldItem?.id) {
-    const newItem = itemsById[(oldItem?.id)];
-    if (!newItem?.data || !oldItem?.data) {
+  const newItem = itemsById[(oldItem?.id)];
+
+  if (oldItem && newItem) {
+    if (!newItem?.data) {
       yield call(decryptItem, newItem, true);
+
+      return;
     }
 
     const isChanged = !deepequal(newItem, oldItem);

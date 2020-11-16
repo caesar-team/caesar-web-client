@@ -26,10 +26,7 @@ import {
 export const Item = ({
   id,
   title,
-  data: { attachments = [], website } = {
-    attachments: [],
-    website: null,
-  },
+  data = { attachments: [], website: null },
   type,
   invited = [],
   isMultiItem = false,
@@ -49,6 +46,7 @@ export const Item = ({
   workInProgressItem,
   ...props
 }) => {
+  const { attachments = [], website = null } = data;
   const sharedCount =
     invited?.length +
     (teamMembersCount > 0 ? teamMembersCount - 1 : teamMembersCount);

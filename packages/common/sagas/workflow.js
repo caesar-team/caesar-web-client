@@ -255,7 +255,7 @@ export function* processSharedItemsSaga({ payload: { teamId } }) {
     console.error(error);
   }
 }
-function* checkTeamPermissionsAndKeys(teamId, createKeyPair = false) {
+export function* checkTeamPermissionsAndKeys(teamId, createKeyPair = false) {
   const teamKeypairExists = yield call(isTeamKeypairExists, teamId);
 
   if (!teamKeypairExists) {

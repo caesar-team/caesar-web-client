@@ -1,4 +1,4 @@
-import { put, call, takeLatest, select } from 'redux-saga/effects';
+import { put, call, takeLatest, select, all } from 'redux-saga/effects';
 import {
   FETCH_TEAMS_REQUEST,
   FETCH_TEAM_REQUEST,
@@ -71,7 +71,14 @@ import {
 import { addTeamKeyPairBatch } from '../../actions/keystore';
 import { createVaultSuccess } from '../../actions/entities/vault';
 import { upperFirst } from '../../utils/string';
+import { lockTeam } from '../../actions/entities/team';
+import { checkTeamPermissionsAndKeys } from '../workflow';
 
+function* checkTeam(team) {
+  const checksResult = yield call(checkTeamPermissionsAndKeys, team.id);
+
+  yield put(lockTeam(team.id, !checksResult));
+}
 export function* fetchTeamsSaga() {
   try {
     const currentUserData = yield select(currentUserDataSelector);
@@ -91,6 +98,10 @@ export function* fetchTeamsSaga() {
     ]);
 
     yield put(fetchTeamsSuccess(teams));
+
+    const checkTeams = teamList.map(checkTeam);
+    yield all(checkTeams);
+
     yield put(addMembersBatch(members));
     yield put(finishIsLoading());
   } catch (error) {

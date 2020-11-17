@@ -1,4 +1,4 @@
-import { put, call, takeLatest, select, all } from 'redux-saga/effects';
+import { put, call, takeLatest, select } from 'redux-saga/effects';
 import {
   FETCH_TEAMS_REQUEST,
   FETCH_TEAM_REQUEST,
@@ -91,7 +91,6 @@ export function* fetchTeamsSaga() {
     ]);
 
     yield put(fetchTeamsSuccess(teams));
-
     yield put(addMembersBatch(members));
     yield put(finishIsLoading());
   } catch (error) {

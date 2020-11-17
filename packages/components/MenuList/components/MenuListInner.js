@@ -98,7 +98,10 @@ const MenuListInnerComponent = ({
   const inboxList = teamLists.find(list => list.type === LIST_TYPE.INBOX);
   const favoritesList = useSelector(favoritesListSelector);
   const favoritesListItems = useSelector(state =>
-    itemsByListIdSelector(state, { listId: LIST_TYPE.FAVORITES }),
+    itemsByListIdSelector(state, {
+      teamId: currentTeam.id,
+      listId: LIST_TYPE.FAVORITES,
+    }),
   );
   const nestedLists = teamLists
     .filter(list => [LIST_TYPE.LIST, LIST_TYPE.DEFAULT].includes(list.type))

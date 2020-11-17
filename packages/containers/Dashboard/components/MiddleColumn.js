@@ -48,15 +48,16 @@ const MiddleColumnComponent = ({
   const workInProgressItem = useSelector(workInProgressItemSelector);
   const generalItems = useSelector(state =>
     itemsByListIdSelector(state, {
+      teamId: workInProgressList?.teamId,
       listId: workInProgressList?.id,
     }),
   );
 
   const visibleListItems = useMemo(
     () =>
-      generalItems
-        // .filter(isDecryptedItem)
-        .sort((a, b) => sortByDate(a.lastUpdated, b.lastUpdated, 'DESC')),
+      generalItems.sort((a, b) =>
+        sortByDate(a.lastUpdated, b.lastUpdated, 'DESC'),
+      ),
     [generalItems],
   );
   const trashList = useSelector(trashListSelector);

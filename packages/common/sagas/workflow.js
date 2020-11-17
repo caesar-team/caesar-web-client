@@ -255,6 +255,7 @@ export function* processSharedItemsSaga({ payload: { teamId } }) {
     console.error(error);
   }
 }
+
 function* checkTeamPermissionsAndKeys(teamId, createKeyPair = false) {
   const teamKeypairExists = yield call(isTeamKeypairExists, teamId);
 
@@ -376,20 +377,25 @@ function* initTeam(teamId) {
   }
 }
 
-function* checkTeamKeyPair(team) {
-  const check = yield call(checkTeamPermissionsAndKeys, team.id, true);
+function* checkTeamKeyPair(team, createKeyPair = false) {
+  const haveTeamPermissionsAndKeys = yield call(
+    checkTeamPermissionsAndKeys,
+    team.id,
+    createKeyPair,
+  );
+  const needToLockTeam = !haveTeamPermissionsAndKeys;
 
-  if (team.locked === !check) {
+  if (team.locked !== needToLockTeam) {
     return {
       ...team,
-      locked: !check,
+      locked: needToLockTeam,
     };
   }
 
   return null;
 }
 
-function* checkTeamsKeyPairs() {
+function* checkTeamsKeyPairs(createKeyPair = false) {
   const isUserDomainAdminOrManager = yield select(
     isUserDomainAdminOrManagerSelector,
   );
@@ -399,7 +405,7 @@ function* checkTeamsKeyPairs() {
 
   const checkCalls = teams
     .filter(t => t.id !== TEAM_TYPE.PERSONAL)
-    .map(checkTeamKeyPair);
+    .map(team => checkTeamKeyPair(team, createKeyPair));
   const checkedTeams = yield all(checkCalls);
   yield put(addTeamsBatch(arrayToObject(checkedTeams.filter(team => !!team))));
 }
@@ -408,8 +414,7 @@ function* initTeamsSaga() {
   try {
     // Load avaible teams
     yield call(fetchTeamsSaga);
-
-    yield call(checkTeamsKeyPairs);
+    yield call(checkTeamsKeyPairs, true);
   } catch (error) {
     // eslint-disable-next-line no-console
     console.error(error);
@@ -455,6 +460,7 @@ export function* processKeyPairsSaga({ payload: { itemsById } }) {
     console.error(error);
   }
 }
+
 // If the teamId and  the relatedItemId are presented then the key belong the share item in the team
 const keyPairsEncryptedByUserKeysFilter = keypair =>
   keypair.teamId === TEAM_TYPE.PERSONAL || !keypair.relatedItemId;
@@ -547,6 +553,7 @@ function* loadKeyPairsAndPersonalItems() {
     );
   }
 }
+
 const itemsListFilter = listId => item => item.listId === listId;
 function* initListsAndProgressEntities() {
   const currentTeamId = yield select(currentTeamIdSelector);
@@ -581,6 +588,7 @@ function* initListsAndProgressEntities() {
       yield put(setWorkInProgressListId(defaultList.id));
     }
   }
+
   const workInProgressItem = yield select(workInProgressItemSelector);
   const itemFromStore = yield select(itemSelector, {
     itemId: workInProgressItem?.id,
@@ -698,8 +706,9 @@ export function* updateWorkInProgressItemSaga({ payload: { itemId } }) {
 function* decryptItemOnDemand({ payload: { item } }) {
   try {
     // If item is null or aready had decypted attachments then do not dectrypt again!
-    if (!item || (item?.data?.raws && Object.values(item?.data?.raws) > 0))
+    if (!item || (item?.data?.raws && Object.values(item?.data?.raws) > 0)) {
       return;
+    }
 
     yield fork(decryptItem, item, true);
   } catch (error) {
@@ -726,6 +735,7 @@ function* initDashboardSaga() {
   try {
     yield takeLatest(VAULTS_ARE_READY, openCurrentVaultSaga);
     yield call(initWorkflowSaga);
+    yield call(checkTeamsKeyPairs);
   } catch (error) {
     // eslint-disable-next-line no-console
     console.error('error: ', error);

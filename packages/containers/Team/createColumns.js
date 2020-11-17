@@ -110,7 +110,7 @@ export const createColumns = ({
   const roleColumn = {
     accessor: 'teamRole',
     width: ROLE_COLUMN_WIDTH,
-    Filter: getColumnFilter('Role'),
+    Filter: getColumnFilter('Team role'),
     Header: () => null,
     Cell: ({ value, row: { original } }) => {
       const [isDropdownUp, setDropdownUp] = useState(false);

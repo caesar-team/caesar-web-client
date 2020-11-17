@@ -376,20 +376,25 @@ function* initTeam(teamId) {
   }
 }
 
-function* checkTeamKeyPair(team) {
-  const check = yield call(checkTeamPermissionsAndKeys, team.id, true);
+function* checkTeamKeyPair(team, createKeyPair = false) {
+  const haveTeamPermissionsAndKeys = yield call(
+    checkTeamPermissionsAndKeys,
+    team.id,
+    createKeyPair,
+  );
+  const needToLockTeam = !haveTeamPermissionsAndKeys;
 
-  if (team.locked === !check) {
+  if (team.locked !== needToLockTeam) {
     return {
       ...team,
-      locked: !check,
+      locked: needToLockTeam,
     };
   }
 
   return null;
 }
 
-function* checkTeamsKeyPairs() {
+function* checkTeamsKeyPairs(createKeyPair = false) {
   const isUserDomainAdminOrManager = yield select(
     isUserDomainAdminOrManagerSelector,
   );
@@ -399,7 +404,7 @@ function* checkTeamsKeyPairs() {
 
   const checkCalls = teams
     .filter(t => t.id !== TEAM_TYPE.PERSONAL)
-    .map(checkTeamKeyPair);
+    .map(team => checkTeamKeyPair(team, createKeyPair));
   const checkedTeams = yield all(checkCalls);
   yield put(addTeamsBatch(arrayToObject(checkedTeams.filter(team => !!team))));
 }
@@ -408,8 +413,7 @@ function* initTeamsSaga() {
   try {
     // Load avaible teams
     yield call(fetchTeamsSaga);
-
-    yield call(checkTeamsKeyPairs);
+    yield call(checkTeamsKeyPairs, true);
   } catch (error) {
     // eslint-disable-next-line no-console
     console.error(error);
@@ -730,6 +734,7 @@ function* initDashboardSaga() {
   try {
     yield takeLatest(VAULTS_ARE_READY, openCurrentVaultSaga);
     yield call(initWorkflowSaga);
+    yield call(checkTeamsKeyPairs);
   } catch (error) {
     // eslint-disable-next-line no-console
     console.error('error: ', error);

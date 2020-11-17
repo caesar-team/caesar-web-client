@@ -769,7 +769,9 @@ function* initTeamSettingsSaga() {
 
     yield call(initWorkflowSaga);
     yield call(fetchTeamSaga, { payload: { teamId } });
-    yield call(fetchTeamMembersSaga, { payload: { teamId } });
+    yield call(fetchTeamMembersSaga, {
+      payload: { teamId, withoutKeys: true },
+    });
   } catch (error) {
     // eslint-disable-next-line no-console
     console.error('error: ', error);

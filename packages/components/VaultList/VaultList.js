@@ -27,6 +27,13 @@ const Option = styled.div`
     border-top-color: ${({ theme }) => theme.color.gallery};
     border-bottom-color: ${({ theme }) => theme.color.gallery};
   }
+
+  ${({ isDisabled, theme }) =>
+    isDisabled &&
+    `
+    color: ${theme.color.lightGray};
+    pointer-events: none;
+  `}
 `;
 
 const DisabledOption = styled(Option)`
@@ -97,6 +104,7 @@ const VaultListComponent = ({ activeTeamId, handleToggle, setListsOpened }) => {
           onClick={() => {
             handleChangeTeam(vault.id);
           }}
+          isDisabled={vault.locked}
         >
           <VaultAvatar vault={vault} />
           {getTeamTitle(vault)}

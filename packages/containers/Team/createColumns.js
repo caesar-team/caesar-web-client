@@ -14,6 +14,7 @@ import {
   PERMISSION_ENTITY,
   TEAM_ROLES_LABELS,
 } from '@caesar/common/constants';
+import { ability } from '@caesar/common/ability';
 import {
   OPTIONS,
   ROLE_COLUMN_WIDTH,
@@ -155,39 +156,44 @@ export const createColumns = ({
     disableSortBy: true,
     Header: () => null,
     Cell: ({ row: { original } }) => {
+      const _permissions = getTeamMemberSubject(original);
+      const canDeleteMember = ability.can(PERMISSION.DELETE, _permissions);
+      const isAvailableMenu = canDeleteMember || !original.accessGranted;
+
       return (
         <Table.MenuCell>
-          <DottedMenu
-            tooltipProps={{
-              textBoxWidth: '100px',
-              arrowAlign: 'end',
-              position: 'bottom right',
-              padding: '0px 0px',
-              flat: true,
-              zIndex: '1',
-              border: '0',
-            }}
-          >
-            <MenuWrapper>
-              <MenuButton color="white">¯\_(ツ)_/¯</MenuButton>
-              <Can I={PERMISSION.DELETE} a={getTeamMemberSubject(original)}>
-                <MenuButton
-                  color="white"
-                  onClick={handleRemoveMember(original.id)}
-                >
-                  Remove
-                </MenuButton>
-              </Can>
-              {!original.accessGranted && (
-                <MenuButton
-                  color="white"
-                  onClick={handleGrantAccessMember(original.id)}
-                >
-                  Grant access
-                </MenuButton>
-              )}
-            </MenuWrapper>
-          </DottedMenu>
+          {isAvailableMenu && (
+            <DottedMenu
+              tooltipProps={{
+                textBoxWidth: '100px',
+                arrowAlign: 'end',
+                position: 'bottom right',
+                padding: '0px 0px',
+                flat: true,
+                zIndex: '1',
+                border: '0',
+              }}
+            >
+              <MenuWrapper>
+                <Can I={PERMISSION.DELETE} a={_permissions}>
+                  <MenuButton
+                    color="white"
+                    onClick={handleRemoveMember(original.id)}
+                  >
+                    Remove
+                  </MenuButton>
+                </Can>
+                {!original.accessGranted && (
+                  <MenuButton
+                    color="white"
+                    onClick={handleGrantAccessMember(original.id)}
+                  >
+                    Grant access
+                  </MenuButton>
+                )}
+              </MenuWrapper>
+            </DottedMenu>
+          )}
         </Table.MenuCell>
       );
     },

@@ -1,7 +1,13 @@
+import styled from 'styled-components';
 import { Avatar } from '../Avatar';
 import { Hint } from '../Hint';
 import { Icon } from '../Icon';
 import { Wrapper } from '../Avatar/styles';
+
+const StyledIcon = styled(Icon)`
+  width: 100%;
+  height: 100%;
+`;
 
 export const TeamAvatar = props => {
   const {
@@ -17,7 +23,7 @@ export const TeamAvatar = props => {
       return (
         <Hint text={hint} position={hintPosition}>
           <Wrapper size={size} fontSize={fontSize} {...props}>
-            <Icon name="warning" width={40} height={40} color="black" />;
+            <StyledIcon name="warning" width={40} height={40} color="black" />
           </Wrapper>
         </Hint>
       );

@@ -104,6 +104,7 @@ export const createColumns = ({
   tableWidth,
   tableHeight,
   tableScrollTop,
+  canGrantAccessMember,
   handleChangeRole,
   handleRemoveMember,
   handleGrantAccessMember,
@@ -172,11 +173,12 @@ export const createColumns = ({
     Cell: ({ row: { original } }) => {
       const _permissions = getTeamMemberSubject(original);
       const canDeleteMember = ability.can(PERMISSION.DELETE, _permissions);
-      const isAvailableMenu = canDeleteMember || !original.accessGranted;
-      const optionLength = [canDeleteMember, !original.accessGranted].reduce(
+      const mayGrantAccess = canGrantAccessMember && !original.accessGranted;
+      const optionLength = [canDeleteMember, mayGrantAccess].reduce(
         (acc, option) => (option ? acc + 1 : acc),
         0,
       );
+      const isAvailableMenu = optionLength > 0;
 
       const { cellRef, isDropdownUp } = useDropdownDirection({
         tableScrollTop,
@@ -207,7 +209,7 @@ export const createColumns = ({
                     Remove
                   </MenuButton>
                 </Can>
-                {!original.accessGranted && (
+                {mayGrantAccess && (
                   <MenuButton
                     color="white"
                     onClick={handleGrantAccessMember(original.id)}

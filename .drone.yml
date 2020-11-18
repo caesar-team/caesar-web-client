@@ -128,7 +128,7 @@ globals:
   - &stepReleaseBuild
     image: plugins/docker
     settings:
-      tags: ['${DRONE_BRANCH}', 'qa']
+      tags: ['qa']
       <<: *confSaveBuild
 
   - &stepDevelopDeploy

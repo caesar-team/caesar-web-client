@@ -2,6 +2,7 @@ import React from 'react';
 import styled from 'styled-components';
 import { API_URI } from '@caesar/common/constants';
 import { Hint } from '../Hint';
+import { Icon } from '../Icon';
 
 const Wrapper = styled.div`
   position: relative;
@@ -33,6 +34,7 @@ export const Avatar = ({
   name,
   email,
   avatar,
+  accessGranted,
   children,
   size = 40,
   fontSize = 'main',
@@ -44,6 +46,10 @@ export const Avatar = ({
     switch (true) {
       case !!children:
         return children;
+
+      case !accessGranted: {
+        return <Icon name="warning" width={40} height={40} color="black" />;
+      }
 
       case !!avatar: {
         const avatarIcon = avatar.startsWith('data:')

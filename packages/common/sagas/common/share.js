@@ -5,7 +5,6 @@ import {
   itemSelector,
 } from '@caesar/common/selectors/entities/item';
 import { currentUserDataSelector } from '@caesar/common/selectors/currentUser';
-import { teamsMembersSelector } from '@caesar/common/selectors/entities/team';
 import { teamsMembersFullViewSelector } from '@caesar/common/selectors/entities/member';
 import {
   shareKeyPairSelector,

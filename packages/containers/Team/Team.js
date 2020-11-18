@@ -10,6 +10,7 @@ import { removeTeamRequest } from '@caesar/common/actions/entities/team';
 import { leaveTeamRequest } from '@caesar/common/actions/currentUser';
 import {
   addTeamMembersBatchRequest,
+  grantAccessTeamMemberRequest,
   removeTeamMemberRequest,
   updateTeamMemberRoleRequest,
 } from '@caesar/common/actions/entities/member';
@@ -99,6 +100,10 @@ export const TeamContainer = ({ currentUser, team, members }) => {
     dispatch(removeTeamMemberRequest(memberId));
   };
 
+  const handleGrantAccessMember = memberId => () => {
+    dispatch(grantAccessTeamMemberRequest(memberId));
+  };
+
   const columns = useMemo(
     () =>
       createColumns({
@@ -107,6 +112,7 @@ export const TeamContainer = ({ currentUser, team, members }) => {
         tableScrollTop,
         handleChangeRole,
         handleRemoveMember,
+        handleGrantAccessMember,
       }),
     [tableWidth, tableHeight, tableScrollTop],
   );

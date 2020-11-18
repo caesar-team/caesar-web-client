@@ -76,6 +76,30 @@ const getTeamMemberSubject = member => ({
   __typename: PERMISSION_ENTITY.TEAM_MEMBER,
 });
 
+const useDropdownDirection = ({
+  tableScrollTop,
+  tableHeight,
+  optionLength = 1,
+}) => {
+  const cellRef = useRef(null);
+  const [isDropdownUp, setDropdownUp] = useState(false);
+
+  useEffect(() => {
+    if (cellRef?.current) {
+      const rowScrolledTopPosition = cellRef.current.closest('[role="row"]')
+        ?.offsetTop;
+      const rowTopPositionRelativeToTable =
+        rowScrolledTopPosition - tableScrollTop;
+      const dropdownBottomPosition =
+        rowTopPositionRelativeToTable + (optionLength + 1) * 44 + 4;
+
+      setDropdownUp(dropdownBottomPosition >= tableHeight);
+    }
+  }, [cellRef, tableScrollTop]);
+
+  return { cellRef, isDropdownUp };
+};
+
 export const createColumns = ({
   tableWidth,
   tableHeight,
@@ -114,21 +138,11 @@ export const createColumns = ({
     Filter: getColumnFilter('Team role'),
     Header: () => null,
     Cell: ({ value, row: { original } }) => {
-      const [isDropdownUp, setDropdownUp] = useState(false);
-      const cellRef = useRef(null);
-
-      useEffect(() => {
-        if (cellRef?.current) {
-          const rowScrolledTopPosition = cellRef.current.closest('[role="row"]')
-            ?.offsetTop;
-          const rowTopPositionRelativeToTable =
-            rowScrolledTopPosition - tableScrollTop;
-          const dropdownBottomPosition =
-            rowTopPositionRelativeToTable + (OPTIONS.length + 1) * 44 + 4;
-
-          setDropdownUp(dropdownBottomPosition >= tableHeight);
-        }
-      }, [cellRef, tableScrollTop]);
+      const { cellRef, isDropdownUp } = useDropdownDirection({
+        tableScrollTop,
+        tableHeight,
+        optionLength: OPTIONS.length,
+      });
 
       return (
         <Table.DropdownCell ref={cellRef}>
@@ -159,15 +173,25 @@ export const createColumns = ({
       const _permissions = getTeamMemberSubject(original);
       const canDeleteMember = ability.can(PERMISSION.DELETE, _permissions);
       const isAvailableMenu = canDeleteMember || !original.accessGranted;
+      const optionLength = [canDeleteMember, !original.accessGranted].reduce(
+        (acc, option) => (option ? acc + 1 : acc),
+        0,
+      );
+
+      const { cellRef, isDropdownUp } = useDropdownDirection({
+        tableScrollTop,
+        tableHeight,
+        optionLength,
+      });
 
       return (
-        <Table.MenuCell>
+        <Table.MenuCell ref={cellRef}>
           {isAvailableMenu && (
             <DottedMenu
               tooltipProps={{
                 textBoxWidth: '100px',
                 arrowAlign: 'end',
-                position: 'bottom right',
+                position: `${isDropdownUp ? 'top' : 'bottom'} right`,
                 padding: '0px 0px',
                 flat: true,
                 zIndex: '1',

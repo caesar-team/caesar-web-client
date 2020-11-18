@@ -102,6 +102,7 @@ class InviteModal extends Component {
             <MemberListStyled
               maxHeight={200}
               members={users}
+              isNewMember
               controlType="remove"
               onClickRemove={this.handleRemoveMember}
               onChangeRole={this.handleChangeRole}

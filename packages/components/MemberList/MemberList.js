@@ -8,6 +8,7 @@ import {
   RemoveControl,
   InviteControl,
   RevokeAccessControl,
+  RoleSelector,
 } from './components';
 
 const MAX_HEIGHT = 400;
@@ -36,7 +37,7 @@ const ControlWrapper = styled.div`
   display: flex;
   align-items: center;
   justify-content: flex-end;
-  width: 100%;
+  ${({ isNewMember }) => !isNewMember && 'width: 100%'};
 `;
 
 const ADD_CONTROL_TYPE = 'add';
@@ -49,6 +50,7 @@ const MemberList = ({
   teamId,
   className,
   maxHeight = MAX_HEIGHT,
+  isNewMember = false,
   controlType,
   renderControl = Function.prototype,
   onClickAdd = Function.prototype,
@@ -90,7 +92,16 @@ const MemberList = ({
   const renderedMembers = members.map(member => (
     <MemberWrapper key={member.id} onClick={() => clickFn(member)}>
       <Member {...member} />
-      <ControlWrapper>{renderControlFn(member)}</ControlWrapper>
+      {isNewMember && (
+        <RoleSelector
+          member={member}
+          isNewMember
+          onChange={onChangeRole(member)}
+        />
+       )}
+      <ControlWrapper isNewMember={isNewMember}>
+        {renderControlFn(member)}
+      </ControlWrapper>
     </MemberWrapper>
   ));
 

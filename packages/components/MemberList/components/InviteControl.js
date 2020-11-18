@@ -30,6 +30,13 @@ const SelectStyled = styled(Select)`
   margin-right: 20px;
 `;
 
+const RoleSelector = styled(Select)`
+  width: 200px;
+  height: 40px;
+  border: 1px solid ${({ theme }) => theme.color.gallery};
+  margin-right: 20px;
+`;
+
 const OPTIONS = Object.values(TEAM_ROLES).map(role => ({
   value: role,
   label: role,
@@ -38,12 +45,25 @@ const OPTIONS = Object.values(TEAM_ROLES).map(role => ({
 const InviteControl = ({
   className,
   member,
+  isNewMember = false,
   teamId,
   onClickAdd,
   onClickRemove,
   onChange,
-}) =>
-  member.teamIds && member.teamIds.includes(teamId) ? (
+}) => {
+  if (isNewMember) {
+    return (
+      <RoleSelector
+        name="role"
+        value={member.role}
+        options={OPTIONS}
+        className={className}
+        onChange={onChange}
+      />
+    );    
+  }
+  
+  return member.teamIds && member.teamIds.includes(teamId) ? (
     <Wrapper>
       <SelectStyled
         name="role"
@@ -65,5 +85,6 @@ const InviteControl = ({
       <Icon name="plus" color="black" width={14} height={14} />
     </AddButton>
   );
+};
 
 export default InviteControl;

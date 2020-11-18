@@ -14,6 +14,7 @@ import {
   PERMISSION_ENTITY,
   TEAM_ROLES_LABELS,
 } from '@caesar/common/constants';
+import { ability } from '@caesar/common/ability';
 import {
   OPTIONS,
   ROLE_COLUMN_WIDTH,
@@ -75,10 +76,35 @@ const getTeamMemberSubject = member => ({
   __typename: PERMISSION_ENTITY.TEAM_MEMBER,
 });
 
+const useDropdownDirection = ({
+  tableScrollTop,
+  tableHeight,
+  optionLength = 1,
+}) => {
+  const cellRef = useRef(null);
+  const [isDropdownUp, setDropdownUp] = useState(false);
+
+  useEffect(() => {
+    if (cellRef?.current) {
+      const rowScrolledTopPosition = cellRef.current.closest('[role="row"]')
+        ?.offsetTop;
+      const rowTopPositionRelativeToTable =
+        rowScrolledTopPosition - tableScrollTop;
+      const dropdownBottomPosition =
+        rowTopPositionRelativeToTable + (optionLength + 1) * 44 + 4;
+
+      setDropdownUp(dropdownBottomPosition >= tableHeight);
+    }
+  }, [cellRef, tableScrollTop]);
+
+  return { cellRef, isDropdownUp };
+};
+
 export const createColumns = ({
   tableWidth,
   tableHeight,
   tableScrollTop,
+  canGrantAccessMember,
   handleChangeRole,
   handleRemoveMember,
   handleGrantAccessMember,
@@ -113,21 +139,11 @@ export const createColumns = ({
     Filter: getColumnFilter('Team role'),
     Header: () => null,
     Cell: ({ value, row: { original } }) => {
-      const [isDropdownUp, setDropdownUp] = useState(false);
-      const cellRef = useRef(null);
-
-      useEffect(() => {
-        if (cellRef?.current) {
-          const rowScrolledTopPosition = cellRef.current.closest('[role="row"]')
-            ?.offsetTop;
-          const rowTopPositionRelativeToTable =
-            rowScrolledTopPosition - tableScrollTop;
-          const dropdownBottomPosition =
-            rowTopPositionRelativeToTable + (OPTIONS.length + 1) * 44 + 4;
-
-          setDropdownUp(dropdownBottomPosition >= tableHeight);
-        }
-      }, [cellRef, tableScrollTop]);
+      const { cellRef, isDropdownUp } = useDropdownDirection({
+        tableScrollTop,
+        tableHeight,
+        optionLength: OPTIONS.length,
+      });
 
       return (
         <Table.DropdownCell ref={cellRef}>
@@ -155,39 +171,55 @@ export const createColumns = ({
     disableSortBy: true,
     Header: () => null,
     Cell: ({ row: { original } }) => {
+      const _permissions = getTeamMemberSubject(original);
+      const canDeleteMember = ability.can(PERMISSION.DELETE, _permissions);
+      const mayGrantAccess = canGrantAccessMember && !original.accessGranted;
+      const optionLength = [canDeleteMember, mayGrantAccess].reduce(
+        (acc, option) => (option ? acc + 1 : acc),
+        0,
+      );
+      const isAvailableMenu = optionLength > 0;
+
+      const { cellRef, isDropdownUp } = useDropdownDirection({
+        tableScrollTop,
+        tableHeight,
+        optionLength,
+      });
+
       return (
-        <Table.MenuCell>
-          <DottedMenu
-            tooltipProps={{
-              textBoxWidth: '100px',
-              arrowAlign: 'end',
-              position: 'bottom right',
-              padding: '0px 0px',
-              flat: true,
-              zIndex: '1',
-              border: '0',
-            }}
-          >
-            <MenuWrapper>
-              <MenuButton color="white">¯\_(ツ)_/¯</MenuButton>
-              <Can I={PERMISSION.DELETE} a={getTeamMemberSubject(original)}>
-                <MenuButton
-                  color="white"
-                  onClick={handleRemoveMember(original.id)}
-                >
-                  Remove
-                </MenuButton>
-              </Can>
-              {!original.accessGranted && (
-                <MenuButton
-                  color="white"
-                  onClick={handleGrantAccessMember(original.id)}
-                >
-                  Grant access
-                </MenuButton>
-              )}
-            </MenuWrapper>
-          </DottedMenu>
+        <Table.MenuCell ref={cellRef}>
+          {isAvailableMenu && (
+            <DottedMenu
+              tooltipProps={{
+                textBoxWidth: '100px',
+                arrowAlign: 'end',
+                position: `${isDropdownUp ? 'top' : 'bottom'} right`,
+                padding: '0px 0px',
+                flat: true,
+                zIndex: '1',
+                border: '0',
+              }}
+            >
+              <MenuWrapper>
+                <Can I={PERMISSION.DELETE} a={_permissions}>
+                  <MenuButton
+                    color="white"
+                    onClick={handleRemoveMember(original.id)}
+                  >
+                    Remove
+                  </MenuButton>
+                </Can>
+                {mayGrantAccess && (
+                  <MenuButton
+                    color="white"
+                    onClick={handleGrantAccessMember(original.id)}
+                  >
+                    Grant access
+                  </MenuButton>
+                )}
+              </MenuWrapper>
+            </DottedMenu>
+          )}
         </Table.MenuCell>
       );
     },

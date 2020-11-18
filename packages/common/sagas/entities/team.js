@@ -194,8 +194,8 @@ export function* createTeamKeyPairSaga({
 4. Save all secrets to the server
 5. Add the members to the team
 */
-export function* encryptMemberTeamKey({ member, keypair }) {
-  const { id: userId, publicKey } = member;
+export function* encryptMemberTeamKey({ user, keypair }) {
+  const { id: userId, publicKey } = user;
 
   const itemKeyPair = Object.values(
     convertKeyPairToItemEntity([keypair]),
@@ -205,8 +205,8 @@ export function* encryptMemberTeamKey({ member, keypair }) {
     item: itemKeyPair,
     publicKey,
   });
-  const memberRole = member?.role || TEAM_ROLES.ROLE_MEMBER;
-  const teamRole = member?.domainRoles?.includes(TEAM_ROLES.ROLE_ADMIN)
+  const memberRole = user?.role || TEAM_ROLES.ROLE_MEMBER;
+  const teamRole = user?.domainRoles?.includes(TEAM_ROLES.ROLE_ADMIN)
     ? TEAM_ROLES.ROLE_ADMIN
     : memberRole;
 

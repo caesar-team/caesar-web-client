@@ -64,13 +64,11 @@ export const teamAdminUsersSelector = createSelector(
 
 export const teamsMembersSelector = createSelector(
   teamsBatchSelector,
-  teams => {console.log(teams);
-    return teams.reduce(
-      (accumulator, team) => [
-        ...accumulator,
-        ...team.members || [],
-      ],
-      [],
-    );
-  },
+  teams => teams?.reduce(
+    (accumulator, team) => [
+      ...accumulator,
+      ...team.members || [],
+    ],
+    [],
+  ) || [],
 );

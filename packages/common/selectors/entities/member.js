@@ -91,7 +91,7 @@ export const teamsMembersFullViewSelector = createSelector(
   membersByIdSelector,
   teamsByIdSelector,
   teamIdsPropSelector,
-  (users, members, teams, teamIds) => teamIds.reduce((acc, teamId) => {
+  (users, members, teams, teamIds) => teamIds?.reduce((acc, teamId) => {
     const membersIds = teams[teamId]?.members || [];
     
     const userMembers = membersIds.map(memberId => {

@@ -5,6 +5,7 @@ export { AuthDescription } from './AuthDescription';
 export { AuthTitle } from './AuthTitle';
 export { AuthWrapper } from './AuthWrapper';
 export { Avatar, AvatarsList } from './Avatar';
+export { TeamAvatar } from './TeamAvatar';
 export { BackButton } from './BackButton';
 export { BackButtonWrapper } from './BackButtonWrapper';
 export { Badge } from './Badge';

@@ -3,7 +3,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import styled from 'styled-components';
 import {
   DottedMenu,
-  Avatar,
+  TeamAvatar,
   Select,
   Button,
   Can,
@@ -21,7 +21,7 @@ import {
   WIDTH_RATIO,
 } from './constants';
 
-const UserAvatar = styled(Avatar)`
+const UserAvatar = styled(TeamAvatar)`
   margin-right: 8px;
 `;
 
@@ -157,37 +157,37 @@ export const createColumns = ({
     Cell: ({ row: { original } }) => {
       return (
         <Table.MenuCell>
-          <Can I={PERMISSION.DELETE} a={getTeamMemberSubject(original)}>
-            <DottedMenu
-              tooltipProps={{
-                textBoxWidth: '100px',
-                arrowAlign: 'end',
-                position: 'bottom right',
-                padding: '0px 0px',
-                flat: true,
-                zIndex: '1',
-                border: '0',
-              }}
-            >
-              <MenuWrapper>
-                {!original.accessGranted && (
-                  <MenuButton
-                    color="white"
-                    onClick={handleGrantAccessMember(original.id)}
-                  >
-                    Grant access
-                  </MenuButton>
-                )}
-
+          <DottedMenu
+            tooltipProps={{
+              textBoxWidth: '100px',
+              arrowAlign: 'end',
+              position: 'bottom right',
+              padding: '0px 0px',
+              flat: true,
+              zIndex: '1',
+              border: '0',
+            }}
+          >
+            <MenuWrapper>
+              <MenuButton color="white">¯\_(ツ)_/¯</MenuButton>
+              <Can I={PERMISSION.DELETE} a={getTeamMemberSubject(original)}>
                 <MenuButton
                   color="white"
                   onClick={handleRemoveMember(original.id)}
                 >
                   Remove
                 </MenuButton>
-              </MenuWrapper>
-            </DottedMenu>
-          </Can>
+              </Can>
+              {!original.accessGranted && (
+                <MenuButton
+                  color="white"
+                  onClick={handleGrantAccessMember(original.id)}
+                >
+                  Grant access
+                </MenuButton>
+              )}
+            </MenuWrapper>
+          </DottedMenu>
         </Table.MenuCell>
       );
     },

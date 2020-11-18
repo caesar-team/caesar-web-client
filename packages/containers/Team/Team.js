@@ -97,7 +97,9 @@ export const TeamContainer = ({ currentUser, team, members }) => {
   };
 
   const handleRemoveMember = memberId => () => {
-    dispatch(removeTeamMemberRequest(memberId));
+    if (confirm('Do you really want to remove access from the team?')) {
+      dispatch(removeTeamMemberRequest(memberId));
+    }
   };
 
   const handleGrantAccessMember = memberId => () => {

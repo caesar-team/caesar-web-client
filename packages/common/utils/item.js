@@ -15,7 +15,7 @@ export const isDecryptedItem = item => !!item?.data;
 
 export const isValidItem = item => {
   // TODO: strengthen checks
-  if (!('data' in item)) {
+  if (!item.data) {
     // eslint-disable-next-line no-console
     console.error(
       `The item with ID: ${item.id} is broken. It doesn't contain the data after decryption.`,

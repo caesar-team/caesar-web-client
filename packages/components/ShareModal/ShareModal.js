@@ -160,7 +160,7 @@ export const ShareModal = ({
   const shouldShowSharedMembers = sharedMembers.length > 0;
   const visibleEntitiesCount = items.length + members.length;
   const WrapperComponent = visibleEntitiesCount > 3 ? Scrollbar : Wrapper;
-  
+
   return (
     <Modal
       isOpened
@@ -248,7 +248,7 @@ export const ShareModal = ({
           </ButtonStyled>
           <Button onClick={handleClickDone}>Done</Button>
         </ButtonsWrapper>
-      </WrapperComponent>  
+      </WrapperComponent>
     </Modal>
   );
 };

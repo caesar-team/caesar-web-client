@@ -75,7 +75,6 @@ import {
 } from '@caesar/common/selectors/entities/list';
 import {
   currentUserDataSelector,
-  masterPasswordSelector,
   currentTeamIdSelector,
   isUserDomainAdminOrManagerSelector,
   currentUserTeamListSelector,
@@ -109,6 +108,8 @@ import { teamMembersFullViewSelector } from '../selectors/entities/member';
 import { userSelector } from '../selectors/entities/user';
 import { fetchTeamMembersRequest } from '../actions/entities/member';
 import { getCurrentUnixtime } from '../utils/dateUtils';
+
+const ON_DEMAND_DECRYPTION = true;
 
 export function decryptItemsByItemIdKeys(items, keyPairs) {
   try {
@@ -168,6 +169,55 @@ export function* decryptUserItems(items) {
   }
 }
 
+function* getItemKeyPair({
+  payload: {
+    item: { id: itemId, teamId, isShared },
+  },
+}) {
+  if (isShared) {
+    return yield select(shareItemKeyPairSelector, { itemId });
+  }
+
+  return yield select(teamKeyPairSelector, {
+    teamId: teamId || TEAM_TYPE.PERSONAL,
+  });
+}
+
+export function* decryptItem(item, decryptRaws = false) {
+  if (!item || !('id' in item)) return;
+
+  const keyPair = yield call(getItemKeyPair, {
+    payload: {
+      item,
+    },
+  });
+
+  // decrypt the items
+  if (!item.data) {
+    yield put(
+      decryption({
+        items: [item],
+        key: keyPair.privateKey,
+        masterPassword: keyPair.password,
+      }),
+    );
+  }
+
+  if (decryptRaws) {
+    const { raws } = JSON.parse(item.secret);
+    // decrypt the items
+    if (raws) {
+      yield put(
+        decryption({
+          raws,
+          key: keyPair.privateKey,
+          masterPassword: keyPair.password,
+        }),
+      );
+    }
+  }
+}
+
 function* isTeamKeypairExists(teamId) {
   return !!(yield select(teamKeyPairSelector, { teamId }));
 }
@@ -205,6 +255,7 @@ export function* processSharedItemsSaga({ payload: { teamId } }) {
     console.error(error);
   }
 }
+
 function* checkTeamPermissionsAndKeys(teamId, createKeyPair = false) {
   const teamKeypairExists = yield call(isTeamKeypairExists, teamId);
 
@@ -326,20 +377,25 @@ function* initTeam(teamId) {
   }
 }
 
-function* checkTeamKeyPair(team) {
-  const check = yield call(checkTeamPermissionsAndKeys, team.id, true);
+function* checkTeamKeyPair(team, createKeyPair = false) {
+  const haveTeamPermissionsAndKeys = yield call(
+    checkTeamPermissionsAndKeys,
+    team.id,
+    createKeyPair,
+  );
+  const needToLockTeam = !haveTeamPermissionsAndKeys;
 
-  if (team.locked === !check) {
+  if (team.locked !== needToLockTeam) {
     return {
       ...team,
-      locked: !check,
+      locked: needToLockTeam,
     };
   }
 
   return null;
 }
 
-function* checkTeamsKeyPairs() {
+function* checkTeamsKeyPairs(createKeyPair = false) {
   const isUserDomainAdminOrManager = yield select(
     isUserDomainAdminOrManagerSelector,
   );
@@ -349,7 +405,7 @@ function* checkTeamsKeyPairs() {
 
   const checkCalls = teams
     .filter(t => t.id !== TEAM_TYPE.PERSONAL)
-    .map(checkTeamKeyPair);
+    .map(team => checkTeamKeyPair(team, createKeyPair));
   const checkedTeams = yield all(checkCalls);
   yield put(addTeamsBatch(arrayToObject(checkedTeams.filter(team => !!team))));
 }
@@ -358,8 +414,7 @@ function* initTeamsSaga() {
   try {
     // Load avaible teams
     yield call(fetchTeamsSaga);
-
-    yield call(checkTeamsKeyPairs);
+    yield call(checkTeamsKeyPairs, true);
   } catch (error) {
     // eslint-disable-next-line no-console
     console.error(error);
@@ -405,6 +460,7 @@ export function* processKeyPairsSaga({ payload: { itemsById } }) {
     console.error(error);
   }
 }
+
 // If the teamId and  the relatedItemId are presented then the key belong the share item in the team
 const keyPairsEncryptedByUserKeysFilter = keypair =>
   keypair.teamId === TEAM_TYPE.PERSONAL || !keypair.relatedItemId;
@@ -447,11 +503,9 @@ function* loadKeyPairsAndPersonalItems() {
 
     const keypairsArray = objectToArray(keypairsById);
     const systemItems = objectToArray(systemItemsById);
-    const userItems = objectToArray(itemsById);
     const itemsEncryptedByUserKeys = [
       ...keypairsArray.filter(keyPairsEncryptedByUserKeysFilter),
       ...systemItems,
-      ...userItems,
     ];
     const itemsEncryptedByTeamKeys = keypairsArray.filter(
       keyPairsEncryptedByTeamKeysFilter,
@@ -466,6 +520,7 @@ function* loadKeyPairsAndPersonalItems() {
     // Put to the store the shared and the team items, wait for processing of keypairs
     yield put(
       addItemsBatch({
+        ...itemsById,
         ...sharedItemsById,
         ...teamsItemsById,
         ...itemsEncryptedByTeamKeys,
@@ -498,6 +553,7 @@ function* loadKeyPairsAndPersonalItems() {
     );
   }
 }
+
 const itemsListFilter = listId => item => item.listId === listId;
 function* initListsAndProgressEntities() {
   const currentTeamId = yield select(currentTeamIdSelector);
@@ -532,6 +588,7 @@ function* initListsAndProgressEntities() {
       yield put(setWorkInProgressListId(defaultList.id));
     }
   }
+
   const workInProgressItem = yield select(workInProgressItemSelector);
   const itemFromStore = yield select(itemSelector, {
     itemId: workInProgressItem?.id,
@@ -589,18 +646,19 @@ export function* openTeamVaultSaga({ payload: { teamId } }) {
 
     if (checksResult) {
       yield put(lockTeam(teamId, false));
-      // TODO: Here is opportunity to improve the calls
-      yield fork(processTeamItemsSaga, {
-        payload: {
-          teamId,
-        },
-      });
 
-      yield fork(processSharedItemsSaga, {
-        payload: {
-          teamId,
-        },
-      });
+      if (!ON_DEMAND_DECRYPTION) {
+        yield fork(processTeamItemsSaga, {
+          payload: {
+            teamId,
+          },
+        });
+        yield fork(processSharedItemsSaga, {
+          payload: {
+            teamId,
+          },
+        });
+      }
     } else {
       yield put(
         updateGlobalNotification(
@@ -645,47 +703,14 @@ export function* updateWorkInProgressItemSaga({ payload: { itemId } }) {
   }
 }
 
-function* getItemKeyPair({
-  payload: {
-    item: { id: itemId, teamId, isShared },
-  },
-}) {
-  switch (true) {
-    case teamId:
-      return yield select(teamKeyPairSelector, { teamId });
-    case isShared:
-      return yield select(shareItemKeyPairSelector, { itemId });
-    default:
-      return yield select(teamKeyPairSelector, { teamId: TEAM_TYPE.PERSONAL });
-  }
-}
-
-function* decryptItemRaws({ payload: { item } }) {
+function* decryptItemOnDemand({ payload: { item } }) {
   try {
     // If item is null or aready had decypted attachments then do not dectrypt again!
-    if (!item || (item?.data?.raws && Object.values(item?.data?.raws) > 0))
+    if (!item || (item?.data?.raws && Object.values(item?.data?.raws) > 0)) {
       return;
+    }
 
-    const { raws } = JSON.parse(item.secret);
-
-    const keyPair = yield call(getItemKeyPair, {
-      payload: {
-        item,
-      },
-    });
-
-    const masterPassword =
-      !item.teamId && !item.isShared
-        ? yield select(masterPasswordSelector)
-        : keyPair.password;
-
-    yield put(
-      decryption({
-        raws,
-        key: keyPair.privateKey,
-        masterPassword,
-      }),
-    );
+    yield fork(decryptItem, item, true);
   } catch (error) {
     // eslint-disable-next-line no-console
     console.error('error: ', error);
@@ -695,8 +720,7 @@ function* decryptItemRaws({ payload: { item } }) {
 function* setWorkInProgressItemSaga({ payload: { item } }) {
   try {
     if (!item) return;
-
-    yield call(decryptItemRaws, {
+    yield call(decryptItemOnDemand, {
       payload: {
         item,
       },
@@ -711,6 +735,7 @@ function* initDashboardSaga() {
   try {
     yield takeLatest(VAULTS_ARE_READY, openCurrentVaultSaga);
     yield call(initWorkflowSaga);
+    yield call(checkTeamsKeyPairs);
   } catch (error) {
     // eslint-disable-next-line no-console
     console.error('error: ', error);
@@ -780,7 +805,9 @@ function* checkUpdatesForWIP({ payload: { itemsById } }) {
   const oldItem = yield select(workInProgressItemSelector);
   if (oldItem?.id) {
     const newItem = itemsById[(oldItem?.id)];
-    if (!newItem?.data) return;
+    if (!newItem?.data || !oldItem?.data) {
+      yield call(decryptItem, newItem, true);
+    }
 
     const isChanged = !deepequal(newItem, oldItem);
     if (isChanged) {

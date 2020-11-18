@@ -22,6 +22,7 @@ import {
   REMOVE_TEAM_MEMBER_FAILURE,
   REMOVE_TEAM_MEMBERS_BATCH,
   RESET_MEMBER_STATE,
+  GRANT_ACCESS_TEAM_MEMBER_REQUEST,
 } from '@caesar/common/actions/entities/member';
 
 const initialState = {
@@ -168,6 +169,9 @@ export default createReducer(initialState, {
       ...state,
       byId,
     };
+  },
+  [GRANT_ACCESS_TEAM_MEMBER_REQUEST](state) {
+    return state;
   },
   [RESET_MEMBER_STATE]() {
     return initialState;

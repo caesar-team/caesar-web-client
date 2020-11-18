@@ -143,7 +143,13 @@ export const pinTeam = (teamId, shouldPinned) =>
 export const deleteTeam = teamId => callApi.delete(`/teams/${teamId}`);
 
 // team member
-export const getTeamMembers = teamId => callApi.get(`/teams/${teamId}/members`);
+export const getTeamMembers = ({ teamId, withoutKeys = false }) =>
+  callApi.get(`/teams/${teamId}/members`, {
+    params: {
+      // eslint-disable-next-line camelcase
+      without_keypair: withoutKeys,
+    },
+  });
 export const getDefaultTeamMembers = () =>
   callApi.get('/teams/default/members');
 export const postAddTeamMember = ({ teamId, userId, role, secret }) =>

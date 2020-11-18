@@ -5,6 +5,8 @@ import {
   itemSelector,
 } from '@caesar/common/selectors/entities/item';
 import { currentUserDataSelector } from '@caesar/common/selectors/currentUser';
+import { teamsMembersSelector } from '@caesar/common/selectors/entities/team';
+import { teamsMembersFullViewSelector } from '@caesar/common/selectors/entities/member';
 import {
   shareKeyPairSelector,
   teamKeyPairSelector,
@@ -217,13 +219,19 @@ export function* shareItemBatchSaga({
     yield put(updateGlobalNotification(SHARING_IN_PROGRESS_NOTIFICATION, true));
     // const currentTeamId = yield select(currentTeamIdSelector);
     const items = yield select(itemsBatchSelector, { itemIds });
-    const teamsMembers = yield select(teamsMembersSelector, { teamIds });
+    const teamsMembers = yield select(teamsMembersFullViewSelector, {
+      teamIds,
+    });
+
     const allMembers = [...members, ...teamsMembers];
     
     // Need To Go Deeper (c)
     yield all(
       yield all(
-        items.map(item => call(processMembersItemShare, { item, allMembers })),
+        items.map(item => call(processMembersItemShare, {
+          item,
+          members: allMembers,
+        })),
       ),
     );
 

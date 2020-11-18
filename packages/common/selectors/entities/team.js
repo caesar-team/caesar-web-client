@@ -16,9 +16,7 @@ export const isLoadingTeamsSelector = createSelector(
 
 export const teamsByIdSelector = createSelector(
   teamEntitySelector,
-  teamEntity => {
-    return teamEntity.byId;
-  },
+  teamEntity => teamEntity.byId,
 );
 
 export const teamListSelector = createSelector(
@@ -48,7 +46,7 @@ export const teamSelector = createSelector(
   (byId, teamId) => byId[teamId],
 );
 
-const teamIdsPropSelector = (_, props) => props.teamIds;
+export const teamIdsPropSelector = (_, props) => props.teamIds;
 
 export const teamsBatchSelector = createSelector(
   teamsByIdSelector,
@@ -62,4 +60,17 @@ export const teamAdminUsersSelector = createSelector(
     team.members
       ?.filter(member => member.role === TEAM_ROLES.ROLE_ADMIN)
       .map(member => member.id) || [],
+);
+
+export const teamsMembersSelector = createSelector(
+  teamsBatchSelector,
+  teams => {console.log(teams);
+    return teams.reduce(
+      (accumulator, team) => [
+        ...accumulator,
+        ...team.members || [],
+      ],
+      [],
+    );
+  },
 );

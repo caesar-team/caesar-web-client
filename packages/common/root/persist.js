@@ -1,6 +1,15 @@
 import { createTransform } from 'redux-persist';
 import localForage from 'localforage';
+import memoryStorageDriver from 'localforage-memoryStorageDriver';
+
 import { IS_PROD } from '../constants';
+
+localForage.defineDriver(memoryStorageDriver);
+localForage.setDriver([
+  localForage.INDEXEDDB,
+  localForage.LOCALSTORAGE,
+  memoryStorageDriver._driver,
+]);
 
 const itemTransform = createTransform(
   inboundState => ({
@@ -44,7 +53,7 @@ const workflowTransform = createTransform(
 
 export const persistOptions = {
   key: 'root',
-  localForage,
+  storage: localForage,
   blacklist: ['application'],
   transforms: [itemTransform, currentUserTransform, workflowTransform],
 };

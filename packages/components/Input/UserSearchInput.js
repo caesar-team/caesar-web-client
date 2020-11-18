@@ -173,7 +173,7 @@ const UserSearchInputComponent = ({ blackList, onClickAdd, className }) => {
         // TODO: Create a user key if the user exists but doesn't have the key.
         setUsers(
           data.filter(
-            user => !blackList?.includes(user.id) || !!user.publicKey,
+            user => !blackList?.includes(user.id) && !!user.publicKey,
           ),
         );
         setLoading(false);

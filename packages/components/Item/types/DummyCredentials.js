@@ -32,17 +32,17 @@ export const DummyCredentials = ({ isSharedItem = false }) => (
       </OwnerWrapper>
     )}
     <DummyCred>
-      <DummyCredTitle width={65} height={12}></DummyCredTitle>
-      <DummyCredContent width={130} height={18}></DummyCredContent>
+      <DummyCredTitle width={65} height={12} />
+      <DummyCredContent width={130} height={18} />
     </DummyCred>
     <DummyCred>
-      <DummyCredTitle width={65} height={12}></DummyCredTitle>
-      <DummyCredContent width={130} height={18}></DummyCredContent>
+      <DummyCredTitle width={65} height={12} />
+      <DummyCredContent width={130} height={18} />
     </DummyCred>
     <DummyCred>
-      <DummyCredTitle width={65} height={12}></DummyCredTitle>
-      <DummyCredContent width={130} height={18}></DummyCredContent>
-    </DummyCred>    
+      <DummyCredTitle width={65} height={12} />
+      <DummyCredContent width={130} height={18} />
+    </DummyCred>
     <DummyRect height={120} />
     <Attachments width={100} height={24} />
     <DummyRect width={210} height={16} />

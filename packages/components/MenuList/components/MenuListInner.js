@@ -89,16 +89,20 @@ const MenuListInnerComponent = ({
   const dispatch = useDispatch();
   const currentTeam = useSelector(currentTeamSelector);
   const workInProgressList = useSelector(workInProgressListSelector);
-  const activeListId = workInProgressList && workInProgressList.id;
+  const currentTeamId = currentTeam?.id;
+  const activeListId = workInProgressList?.id;
   const [isCreatingMode, setCreatingMode] = useState(false);
 
   const teamLists = useSelector(state =>
-    teamListsSelector(state, { teamId: currentTeam?.id }),
+    teamListsSelector(state, { teamId: currentTeamId }),
   );
   const inboxList = teamLists.find(list => list.type === LIST_TYPE.INBOX);
   const favoritesList = useSelector(favoritesListSelector);
   const favoritesListItems = useSelector(state =>
-    itemsByListIdSelector(state, { listId: LIST_TYPE.FAVORITES }),
+    itemsByListIdSelector(state, {
+      teamId: currentTeamId,
+      listId: LIST_TYPE.FAVORITES,
+    }),
   );
   const nestedLists = teamLists
     .filter(list => [LIST_TYPE.LIST, LIST_TYPE.DEFAULT].includes(list.type))
@@ -106,7 +110,7 @@ const MenuListInnerComponent = ({
   const trashList = teamLists.find(list => list.type === LIST_TYPE.TRASH);
 
   const listSizes = useSelector(state =>
-    teamListsSizesByIdSelector(state, { teamId: currentTeam?.id }),
+    teamListsSizesByIdSelector(state, { teamId: currentTeamId }),
   );
   const getListCount = id => listSizes[id] || 0;
 
@@ -186,7 +190,7 @@ const MenuListInnerComponent = ({
   const listPermission = {
     ..._permissions,
     __typename:
-      (currentTeam?.id || TEAM_TYPE.PERSONAL) === TEAM_TYPE.PERSONAL
+      (currentTeamId || TEAM_TYPE.PERSONAL) === TEAM_TYPE.PERSONAL
         ? PERMISSION_ENTITY.LIST
         : PERMISSION_ENTITY.TEAM_LIST,
   };

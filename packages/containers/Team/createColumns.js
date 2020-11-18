@@ -81,6 +81,7 @@ export const createColumns = ({
   tableScrollTop,
   handleChangeRole,
   handleRemoveMember,
+  handleGrantAccessMember,
 }) => {
   const dynamicColumnsWidth =
     tableWidth - ROLE_COLUMN_WIDTH - MENU_COLUMN_WIDTH;
@@ -109,7 +110,7 @@ export const createColumns = ({
   const roleColumn = {
     accessor: 'teamRole',
     width: ROLE_COLUMN_WIDTH,
-    Filter: getColumnFilter('Role'),
+    Filter: getColumnFilter('Team role'),
     Header: () => null,
     Cell: ({ value, row: { original } }) => {
       const [isDropdownUp, setDropdownUp] = useState(false);
@@ -169,6 +170,15 @@ export const createColumns = ({
               }}
             >
               <MenuWrapper>
+                {!original.accessGranted && (
+                  <MenuButton
+                    color="white"
+                    onClick={handleGrantAccessMember(original.id)}
+                  >
+                    Grant access
+                  </MenuButton>
+                )}
+
                 <MenuButton
                   color="white"
                   onClick={handleRemoveMember(original.id)}

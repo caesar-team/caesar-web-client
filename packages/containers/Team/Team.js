@@ -90,6 +90,7 @@ export const TeamContainer = ({ currentUser, team, members }) => {
     return () => tableRowGroupNode.removeEventListener('scroll', handler);
   }, [tableRowGroupNode]);
 
+  const isTeamLocked = team.locked;
   const tableData = useMemo(() => members, [members]);
 
   const handleChangeRole = memberId => (_, value) => {
@@ -112,11 +113,12 @@ export const TeamContainer = ({ currentUser, team, members }) => {
         tableWidth,
         tableHeight,
         tableScrollTop,
+        canGrantAccessMember: !isTeamLocked,
         handleChangeRole,
         handleRemoveMember,
         handleGrantAccessMember,
       }),
-    [tableWidth, tableHeight, tableScrollTop],
+    [tableWidth, tableHeight, tableScrollTop, isTeamLocked],
   );
 
   const handleOpenModal = modal => () => {
@@ -165,7 +167,6 @@ export const TeamContainer = ({ currentUser, team, members }) => {
       false,
   };
 
-  const mayAddMember = !team.locked;
   const isDomainTeam =
     team.type === TEAM_TYPE.DEFAULT ||
     team.title?.toLowerCase() === TEAM_TYPE.DEFAULT;
@@ -194,7 +195,7 @@ export const TeamContainer = ({ currentUser, team, members }) => {
               />
             )}
           </Can>
-          {mayAddMember && (
+          {!isTeamLocked && (
             <Can I={PERMISSION.ADD} a={teamMemberSubject}>
               <AddMemberButton
                 withOfflineCheck

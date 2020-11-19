@@ -85,7 +85,6 @@ const CloseItemIcon = ({
 
 export const Item = ({
   id,
-  title,
   meta,
   type,
   invited = [],
@@ -106,7 +105,7 @@ export const Item = ({
   workInProgressItem,
   ...props
 }) => {
-  const { website, attachmentsCount } = getItemMetaData({ meta });
+  const { website, attachmentsCount, title } = getItemMetaData({ meta });
   const sharedCount = invited?.length;
   const isActive = workInProgressItem?.id === id;
   const isChecked = isMultiItem && workInProgressItemIds.includes(id);

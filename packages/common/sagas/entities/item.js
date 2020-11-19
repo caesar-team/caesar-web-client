@@ -400,20 +400,18 @@ export function* saveItemSaga({ item, publicKey }) {
   const { id = null, listId = null, type, favorite = false, ownerId } = item;
 
   const secret = yield call(encryptSecret, { item, publicKey });
-  const title = item?.data?.name;
   let serverItemData = {};
 
   if (id) {
     const { data: updatedItemData } = yield call(updateItem, id, {
       secret,
-      title,
+      meta: createItemMetaData(item),
     });
 
     serverItemData = updatedItemData || {};
   } else {
     const { data: updatedItemData } = yield call(postCreateItem, {
       listId,
-      title,
       meta: createItemMetaData(item),
       ownerId,
       type,
@@ -664,18 +662,15 @@ export function* createItemsBatchSaga({
       keyPair.publicKey,
     );
 
-    const preparedForRequestItems = items.map(
-      ({ type, name: title, data }, index) => ({
-        type,
-        listId,
-        meta: createItemMetaData({ data }),
-        title,
-        secret: JSON.stringify({
-          data: encryptedItems[index],
-          raws: null,
-        }),
+    const preparedForRequestItems = items.map(({ type, data }, index) => ({
+      type,
+      listId,
+      meta: createItemMetaData({ data }),
+      secret: JSON.stringify({
+        data: encryptedItems[index],
+        raws: null,
       }),
-    );
+    }));
 
     const { data: serverItems } = yield call(postCreateItemsBatch, {
       items: preparedForRequestItems,

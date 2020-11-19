@@ -127,22 +127,29 @@ export const decryptItemData = async (item, privateKeyObject) => {
 };
 
 export const createItemMetaData = ({
-  data: { attachments = [], website = null } = {
+  data: { attachments = [], website = null, name = null } = {
     attachments: [],
     website: null,
+    title: null,
   },
 }) => {
   return {
-    attachCount: attachments?.length || 0,
-    webSite: website,
+    attachmentsCount: attachments?.length || 0,
+    website,
+    title: name,
   };
 };
 
 export const getItemMetaData = ({
-  meta: { attachCount = 0, webSite = null } = { attachCount: 0, webSite: null },
+  meta: { attachmentsCount = 0, website = null, title } = {
+    attachmentsCount: 0,
+    website: null,
+    title: null,
+  },
 }) => {
   return {
-    attachmentsCount: attachCount || 0,
-    website: webSite,
+    attachmentsCount,
+    website,
+    title,
   };
 };

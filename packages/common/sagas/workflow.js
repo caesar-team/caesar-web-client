@@ -29,6 +29,8 @@ import {
   FINISH_PROCESSING_KEYPAIRS,
   INIT_CREATE_PAGE,
   INIT_PREFERENCES_SETTINGS,
+  DOWNLOAD_ITEM_ATTACHMENT,
+  DOWNLOAD_ITEM_ATTACHMENTS,
 } from '@caesar/common/actions/workflow';
 import { addListsBatch } from '@caesar/common/actions/entities/list';
 import deepequal from 'fast-deep-equal';
@@ -63,6 +65,7 @@ import {
 } from '@caesar/common/normalizers/normalizers';
 import { arrayToObject, objectToArray } from '@caesar/common/utils/utils';
 import {
+  getItemRaws,
   getKeypairs,
   getLastUpdatedUserItems,
   getLists,
@@ -109,8 +112,12 @@ import { teamMembersFullViewSelector } from '../selectors/entities/member';
 import { userSelector } from '../selectors/entities/user';
 import { fetchTeamMembersRequest } from '../actions/entities/member';
 import { getCurrentUnixtime } from '../utils/dateUtils';
+import { decryptData, unsealPrivateKeyObj } from '../utils/cipherUtils';
+import { downloadAsZip, downloadFile } from '../utils/file';
+import { getItemMetaData } from '../utils/item';
 
 const ON_DEMAND_DECRYPTION = true;
+// TODO: This saga is huge and must be refactored
 
 export function decryptItemsByItemIdKeys(items, keyPairs) {
   try {
@@ -184,7 +191,7 @@ function* getItemKeyPair({
   });
 }
 
-export function* decryptItem(item, decryptRaws = false) {
+export function* decryptItem(item) {
   if (!item || !('id' in item)) return;
   // decrypt the items
   if (!item.data) {
@@ -203,11 +210,71 @@ export function* decryptItem(item, decryptRaws = false) {
     );
   }
 }
+export function* decryptAttachmentRaw({ id, raw }, privateKeyObj) {
+  return {
+    id,
+    raw: yield Promise.resolve(decryptData(raw, privateKeyObj)),
+  };
+}
 
-export function* decryptItemRaws(item) {
-  if (!item || !('id' in item)) return;
+export function* downloadItemAttachmentSaga({
+  payload: { itemId, attachment = {} },
+}) {
+  if (!itemId) return;
+  const item = yield select(itemSelector, { itemId });
+  const keyPair = yield call(getItemKeyPair, {
+    payload: {
+      item,
+    },
+  });
 
-  const { data } = getItemRaws;
+  const { data: { raws } = { raws: [] } } = yield call(getItemRaws, itemId);
+  const itemRaws = JSON.parse(raws);
+
+  const { raw = null } = itemRaws[attachment.id] || null;
+
+  if (raw) {
+    const privateKeyObj = yield Promise.resolve(
+      unsealPrivateKeyObj(keyPair.privateKey, keyPair.password),
+    );
+    const rawFile = yield Promise.resolve(decryptData(raw, privateKeyObj));
+    const { name, ext } = attachment;
+    downloadFile(rawFile, `${name}.${ext}`);
+  }
+}
+
+export function* downloadItemAttachmentsSaga({ payload: { itemId } }) {
+  if (!itemId) return;
+  const item = yield select(itemSelector, { itemId });
+  const { title: itemName } = getItemMetaData(item);
+  const { attachments } = item.data;
+
+  const keyPair = yield call(getItemKeyPair, {
+    payload: {
+      item,
+    },
+  });
+
+  const { data: { raws } = { raws: [] } } = yield call(getItemRaws, itemId);
+  const itemRaws = JSON.parse(raws);
+
+  if (itemRaws) {
+    const privateKeyObj = yield Promise.resolve(
+      unsealPrivateKeyObj(keyPair.privateKey, keyPair.password),
+    );
+    const ids = Object.keys(itemRaws);
+    const decryptedRawsArray = yield all(
+      ids.map(id => decryptAttachmentRaw(itemRaws[id], privateKeyObj)),
+    );
+    const decryptedRaws = arrayToObject(decryptedRawsArray);
+
+    const files = attachments.map(attachment => ({
+      raw: decryptedRaws[attachment.id].raw,
+      name: `${attachment.name}.${attachment.ext}`,
+    }));
+    const filename = `${itemName}_attachments`;
+    downloadAsZip({ files, filename });
+  }
 }
 
 function* isTeamKeypairExists(teamId) {
@@ -834,9 +901,12 @@ export default function* workflowSagas() {
 
   yield takeLatest(SET_WORK_IN_PROGRESS_ITEM, setWorkInProgressItemSaga);
   yield takeLatest(UPDATE_WORK_IN_PROGRESS_ITEM, updateWorkInProgressItemSaga);
+  yield takeLatest(OPEN_CURRENT_VAULT, openCurrentVaultSaga);
   yield takeLatest(SET_CURRENT_TEAM_ID, initDashboardSaga);
   yield takeLatest(ADD_KEYPAIRS_BATCH, processKeyPairsSaga);
   yield takeLatest(FINISH_PROCESSING_KEYPAIRS, vaultsReadySaga);
+  yield takeLatest(DOWNLOAD_ITEM_ATTACHMENT, downloadItemAttachmentSaga);
+  yield takeLatest(DOWNLOAD_ITEM_ATTACHMENTS, downloadItemAttachmentsSaga);
   // Wait for keypairs
   yield takeLatest(OPEN_CURRENT_VAULT, openCurrentVaultSaga);
   yield takeEvery(ADD_ITEMS_BATCH, checkUpdatesForWIP);

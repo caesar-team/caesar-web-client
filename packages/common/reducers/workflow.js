@@ -19,6 +19,8 @@ import {
   INIT_IMPORT_SETTINGS,
   DECRYPTION,
   DECRYPTION_END,
+  DOWNLOAD_ITEM_ATTACHMENT,
+  DOWNLOAD_ITEM_ATTACHMENTS,
 } from '@caesar/common/actions/workflow';
 
 const initialState = {
@@ -66,6 +68,12 @@ export default createReducer(initialState, {
     return state;
   },
   [INIT_IMPORT_SETTINGS](state) {
+    return state;
+  },
+  [DOWNLOAD_ITEM_ATTACHMENT](state) {
+    return state;
+  },
+  [DOWNLOAD_ITEM_ATTACHMENTS](state) {
     return state;
   },
   [FINISH_PROCESSING_KEYPAIRS](state) {

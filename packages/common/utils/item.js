@@ -1,6 +1,6 @@
 import { getHostName } from '@caesar/common/utils/getDomainName';
 import { processUploadedFiles } from './attachment';
-import { decryptItem } from './cipherUtils';
+import { decryptData } from './cipherUtils';
 import { ITEM_TYPE, DOMAIN_HOSTNAME } from '../constants';
 
 export const extractItemType = item => item?.type || ITEM_TYPE.SYSTEM;
@@ -94,7 +94,7 @@ export const decryptItemData = async (item, privateKeyObject) => {
   try {
     const encryptedData = item.secret;
     const promises = [];
-    promises.push(decryptItem(encryptedData, privateKeyObject));
+    promises.push(decryptData(encryptedData, privateKeyObject));
 
     const [data] = await Promise.all(promises);
 

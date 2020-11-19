@@ -61,7 +61,7 @@ import { updateGlobalNotification } from '@caesar/common/actions/application';
 import { finishIsLoading } from '@caesar/common/actions/workflow';
 import {
   createKeyPair,
-  encryptSecret,
+  encryptItem,
   generateKeyPair,
 } from '@caesar/common/sagas/entities/item';
 import {
@@ -201,7 +201,7 @@ export function* encryptMemberTeamKey({ user, keypair }) {
     convertKeyPairToItemEntity([keypair]),
   ).shift();
 
-  const { data, raws } = yield call(encryptSecret, {
+  const { data, raws } = yield call(encryptItem, {
     item: itemKeyPair,
     publicKey,
   });
@@ -247,7 +247,7 @@ export function* createTeamSaga({
       throw new Error(`Can't create the team with the title: ${title}`);
     }
 
-    const { data, raws } = yield call(encryptSecret, {
+    const { data, raws } = yield call(encryptItem, {
       item: teamKeyPair,
       publicKey,
     });

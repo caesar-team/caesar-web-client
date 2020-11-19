@@ -35,6 +35,9 @@ export const ENCRYPTION_END = '@workflow/ENCRYPTION_END';
 export const OPEN_VAULT = '@workflow/OPEN_VAULT';
 export const OPEN_CURRENT_VAULT = '@workflow/OPEN_CURRENT_VAULT';
 
+export const DOWNLOAD_ITEM_ATTACHMENT = '@item/DOWNLOAD_ITEM_ATTACHMENT';
+export const DOWNLOAD_ITEM_ATTACHMENTS = '@item/DOWNLOAD_ITEM_ATTACHMENTS';
+
 export const initWorkflow = (withDecryption = true) => ({
   type: INIT_WORKFLOW,
   payload: {
@@ -170,5 +173,19 @@ export const encryptionEnd = (id, coresCount) => ({
   payload: {
     id,
     coresCount,
+  },
+});
+
+export const downloadItemAttachment = ({ itemId, attachment }) => ({
+  type: DOWNLOAD_ITEM_ATTACHMENT,
+  payload: {
+    itemId,
+    attachment,
+  },
+});
+export const downloadItemAttachments = ({ itemId }) => ({
+  type: DOWNLOAD_ITEM_ATTACHMENTS,
+  payload: {
+    itemId,
   },
 });

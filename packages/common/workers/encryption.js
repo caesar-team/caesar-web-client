@@ -1,5 +1,5 @@
 import { expose } from 'threads/worker';
-import { encryptItem } from '@caesar/common/utils/cipherUtils';
+import { encryptData } from '@caesar/common/utils/cipherUtils';
 
 // eslint-disable-next-line
 self.window = self;
@@ -10,7 +10,7 @@ const encryption = {
     return await Promise.all(
       pairs.map(async ({ item, user }) => {
         const { id, data, raws = {} } = item;
-        const encryptedItemData = await encryptItem(data, user.publicKey);
+        const encryptedItemData = await encryptData(data, user.publicKey);
 
         const encryptedItem = {
           data: encryptedItemData,

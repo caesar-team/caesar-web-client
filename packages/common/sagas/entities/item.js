@@ -60,11 +60,11 @@ import {
   updateMoveItemsBatch,
 } from '@caesar/common/api';
 import {
-  encryptItem,
-  encryptItemsBatch,
+  encryptData,
+  encryptDataBatch,
 } from '@caesar/common/utils/cipherUtils';
 import { getServerErrorMessage } from '@caesar/common/utils/error';
-import { chunk } from '@caesar/common/utils/utils';
+import { arrayToObject, chunk } from '@caesar/common/utils/utils';
 import {
   COMMON_PROGRESS_NOTIFICATION,
   CREATING_ITEM_NOTIFICATION,
@@ -365,17 +365,25 @@ export function* moveItemsBatchSaga({
     yield put(moveItemsBatchFailure());
   }
 }
-
-export function* encryptSecret({ item, publicKey }) {
+export function* encryptAttachmentRaw({ id, raw }, publicKey) {
+  return {
+    id,
+    raw: yield call(encryptData, raw, publicKey),
+  };
+}
+export function* encryptItem({ item, publicKey }) {
   const { data: { raws, ...data } = { raws: {} } } = item;
 
-  const encryptedItemData = yield call(encryptItem, data, publicKey);
-
+  const encryptedItemData = yield call(encryptData, data, publicKey);
+  const encryptedRawsArray = yield all(
+    Object.keys(raws).map(id =>
+      call(encryptAttachmentRaw, { id, raw: raws[id] }, publicKey),
+    ),
+  );
+  const encryptedRaws = arrayToObject(encryptedRawsArray);
   const encryptedItem = {
     data: encryptedItemData,
-    raws: Object.keys(raws).length
-      ? yield call(encryptItem, raws, publicKey)
-      : null,
+    raws: JSON.stringify(encryptedRaws),
   };
 
   return encryptedItem;
@@ -383,7 +391,7 @@ export function* encryptSecret({ item, publicKey }) {
 
 export function* saveShareKeyPairSaga({ item, publicKey }) {
   const { relatedItemId, ownerId } = item;
-  const { data, raws } = yield call(encryptSecret, { item, publicKey });
+  const { data, raws } = yield call(encryptItem, { item, publicKey });
 
   return yield call(postItemShare, {
     itemId: relatedItemId,
@@ -399,7 +407,7 @@ export function* saveShareKeyPairSaga({ item, publicKey }) {
 export function* saveItemSaga({ item, publicKey }) {
   const { id = null, listId = null, type, favorite = false, ownerId } = item;
 
-  const { data, raws } = yield call(encryptSecret, { item, publicKey });
+  const { data, raws } = yield call(encryptItem, { item, publicKey });
 
   let serverItemData = {};
 
@@ -469,6 +477,7 @@ export function* saveKeyPair(
   },
 ) {
   const keypairs = [{ ownerId, teamId, secret, raws, relatedItemId }];
+
   return yield call(postAddKeyPairBatch, keypairs);
 }
 
@@ -476,7 +485,7 @@ export function* saveItemKeyPair({
   item: { ownerId, teamId, data, relatedItemId },
   publicKey,
 }) {
-  const { data: secretData, raws } = yield call(encryptItem, data, publicKey);
+  const { data: secretData, raws } = yield call(encryptData, data, publicKey);
 
   return yield call(saveKeyPair, {
     ownerId,
@@ -524,7 +533,7 @@ export function* createKeyPair({
   const keypair = yield call(generateKeyPair, {
     name: entityTeamId || entityId,
   });
-  const { data, raws } = yield call(encryptSecret, {
+  const { data, raws } = yield call(encryptItem, {
     item: keypair,
     publicKey,
   });
@@ -674,7 +683,7 @@ export function* createItemsBatchSaga({
     );
 
     const encryptedItems = yield call(
-      encryptItemsBatch,
+      encryptDataBatch,
       preparedForEncryptingItems,
       keyPair.publicKey,
     );

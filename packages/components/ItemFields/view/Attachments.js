@@ -1,77 +1,29 @@
 import React, { useState, useEffect } from 'react';
 import { useUpdateEffect } from 'react-use';
+import { useDispatch } from 'react-redux';
 import equal from 'fast-deep-equal';
-import styled from 'styled-components';
-import {
-  downloadFile,
-  downloadAsZip,
-  getUniqueAndDublicates,
-} from '@caesar/common/utils/file';
+import { getUniqueAndDublicates } from '@caesar/common/utils/file';
 import { PERMISSION } from '@caesar/common/constants';
 import { isIterable } from '@caesar/common/utils/utils';
 import { processUploadedFiles } from '@caesar/common/utils/attachment';
+import {
+  downloadItemAttachment,
+  downloadItemAttachments,
+} from '@caesar/common/actions/workflow';
 import { Can } from '../../Ability';
-import { Icon } from '../../Icon';
 import { File } from '../../File';
 import { Uploader } from '../../Uploader';
 import { NewFilesModal } from './NewFilesModal';
 import { ConfirmDeleteAttachmentModal } from './ConfirmDeleteAttachmentModal';
 import { ItemDragZone } from '../common';
-
-const Wrapper = styled.div``;
-
-const Title = styled.div`
-  display: flex;
-  align-items: center;
-  margin-bottom: 8px;
-  font-weight: 600;
-`;
-
-const DownloadIcon = styled(Icon)`
-  margin-left: 16px;
-  cursor: pointer;
-
-  &:hover {
-    color: ${({ theme }) => theme.color.black};
-  }
-`;
-
-const Inner = styled.div`
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-  grid-gap: 16px 40px;
-`;
-
-const PlusIcon = styled(Icon)``;
-
-const AddNewAttach = styled.div`
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  align-self: center;
-  height: 40px;
-  border: 1px dashed ${({ theme }) => theme.color.gallery};
-  border-radius: ${({ theme }) => theme.borderRadius};
-  cursor: pointer;
-  transition: border-color 0.2s;
-
-  ${({ isDragActive, theme }) =>
-    isDragActive &&
-    `border-color: ${theme.color.black};
-
-    ${PlusIcon} {
-      color: ${theme.color.black};
-    }
-  `}
-
-  &:hover {
-    border-color: ${({ theme }) => theme.color.black};
-
-    ${PlusIcon} {
-      color: ${({ theme }) => theme.color.black};
-    }
-  }
-`;
+import {
+  Wrapper,
+  Title,
+  DownloadIcon,
+  Inner,
+  AddNewAttach,
+  PlusIcon,
+} from './styles';
 
 const MODAL = {
   NEW_FILES: 'new_files',
@@ -79,12 +31,14 @@ const MODAL = {
 };
 
 export const Attachments = ({
+  itemId,
   attachments = [],
   raws = {},
   itemSubject,
   onClickAcceptEdit,
   isVisibleDragZone,
 }) => {
+  const dispatch = useDispatch();
   const [newFiles, setNewFiles] = useState([]);
   const [itemRaws, setItemRaws] = useState(raws);
   const [itemAttachments, setItemAttachments] = useState(attachments);
@@ -108,21 +62,22 @@ export const Attachments = ({
 
   // TODO: Add loader if raws are not ready
   const handleClickDownloadFile = attachment => {
-    const { name, ext } = attachment;
-    const raw = itemRaws[attachment.id];
+    dispatch(downloadItemAttachment({ itemId, attachment }));
+    // const { name, ext } = attachment;
+    // const raw = itemRaws[attachment.id];
 
-    return typeof raw !== 'undefined'
-      ? downloadFile(raw, `${name}.${ext}`)
-      : false;
+    // return typeof raw !== 'undefined'
+    //   ? downloadFile(raw, `${name}.${ext}`)
+    //   : false;
   };
 
   const handleClickDownloadAll = () => {
-    const files = itemAttachments.map(attachment => ({
-      raw: raws[attachment.id],
-      name: `${attachment.name}.${attachment.ext}`,
-    }));
-
-    downloadAsZip(files);
+    dispatch(downloadItemAttachments({ itemId }));
+    // const files = itemAttachments.map(attachment => ({
+    //   raw: raws[attachment.id],
+    //   name: `${attachment.name}.${attachment.ext}`,
+    // }));
+    // downloadAsZip(files);
   };
 
   const onClickRemove = handleAttachment => {

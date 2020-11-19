@@ -1,5 +1,5 @@
 /* eslint-disable camelcase */
-import React, { useState, useCallback, useMemo } from 'react';
+import React, { useState, useCallback, useMemo, memo } from 'react';
 import { useUpdateEffect } from 'react-use';
 import { useSelector, useDispatch } from 'react-redux';
 import { useRouter } from 'next/router';
@@ -48,7 +48,7 @@ const AddMemberButton = styled(ButtonStyled)`
   margin-right: 0;
 `;
 
-export const TeamContainer = ({ currentUser, team, members }) => {
+export const TeamContainerComponent = ({ currentUser, team, members }) => {
   const router = useRouter();
   const dispatch = useDispatch();
   const [modalVisibilities, setModalVisibilities] = useState({
@@ -254,3 +254,5 @@ export const TeamContainer = ({ currentUser, team, members }) => {
     </SettingsWrapper>
   );
 };
+
+export const TeamContainer = memo(TeamContainerComponent);

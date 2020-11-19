@@ -292,6 +292,7 @@ export function* fetchTeamMembersSaga({ payload: { teamId, withoutKeys } }) {
       });
       membersWithoutKeysById = convertMembersToEntity(membersWithoutKeys);
     }
+
     const membersById = convertMembersToEntity(
       teamMembers.map(member => {
         if (membersWithoutKeysById[member.id]) {

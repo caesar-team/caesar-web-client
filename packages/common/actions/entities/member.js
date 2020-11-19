@@ -44,13 +44,10 @@ export const GRANT_ACCESS_MEMBERS_BATCH = '@member/GRANT_ACCESS_MEMBERS_BATCH';
 
 export const RESET_MEMBER_STATE = '@member/RESET_MEMBER_STATE';
 
-export const fetchTeamMembersRequest = ({
-  teamId,
-  needUpdateTeamMembers = false,
-}) => ({
+export const fetchTeamMembersRequest = ({ teamId, withoutKeys = false }) => ({
   type: FETCH_TEAM_MEMBERS_REQUEST,
   payload: {
-    needUpdateTeamMembers,
+    withoutKeys,
     teamId,
   },
 });

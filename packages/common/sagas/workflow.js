@@ -16,6 +16,7 @@ import {
   INIT_IMPORT_SETTINGS,
   UPDATE_WORK_IN_PROGRESS_ITEM,
   SET_WORK_IN_PROGRESS_ITEM,
+  startIsLoading,
   finishIsLoading,
   setWorkInProgressListId,
   setWorkInProgressItem,
@@ -268,7 +269,7 @@ function* checkTeamPermissionsAndKeys(teamId, createKeyPair = false) {
     }
 
     // Update the members list
-    yield put(fetchTeamMembersRequest({ teamId }));
+    yield put(fetchTeamMembersRequest({ teamId, withoutKeys: true }));
     const { id: ownerId } = yield select(currentUserDataSelector);
     const team = yield select(teamSelector, { teamId });
     const teamMembers = (yield select(teamMembersFullViewSelector, {
@@ -671,6 +672,7 @@ export function* openTeamVaultSaga({ payload: { teamId } }) {
       // eslint-disable-next-line no-console
       console.error(`The team checks weren't pass`);
     }
+
     yield put(finishIsLoading());
   } catch (error) {
     // eslint-disable-next-line no-console
@@ -771,6 +773,8 @@ function* initTeamsSettingsSaga() {
 
 function* initTeamSettingsSaga() {
   try {
+    yield put(startIsLoading());
+
     const {
       router: {
         query: { id: teamId },

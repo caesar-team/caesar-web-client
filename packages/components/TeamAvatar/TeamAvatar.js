@@ -16,21 +16,17 @@ export const TeamAvatar = props => {
     hint = '',
     hintPosition = 'center',
   } = props;
-  const renderInner = () => {
-    const accessGranted = 'accessGranted' in props ? props.accessGranted : true;
+  const accessGranted = 'accessGranted' in props ? props.accessGranted : true;
 
-    if (!accessGranted) {
-      return (
-        <Hint text={hint} position={hintPosition}>
-          <Wrapper size={size} fontSize={fontSize} {...props}>
-            <StyledIcon name="warning" width={40} height={40} color="black" />
-          </Wrapper>
-        </Hint>
-      );
-    }
+  if (!accessGranted) {
+    return (
+      <Hint text={hint} position={hintPosition}>
+        <Wrapper size={size} fontSize={fontSize} {...props}>
+          <StyledIcon name="warning" width={40} height={40} color="black" />
+        </Wrapper>
+      </Hint>
+    );
+  }
 
-    return <Avatar {...props} />;
-  };
-
-  return renderInner();
+  return <Avatar {...props} />;
 };

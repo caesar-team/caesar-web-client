@@ -110,7 +110,6 @@ export function* fetchTeamSaga({ payload: { teamId } }) {
     const teamsById = convertTeamsToEntity([team]);
 
     yield put(fetchTeamSuccess(teamsById[teamId]));
-    yield put(finishIsLoading());
   } catch (error) {
     // eslint-disable-next-line no-console
     console.error(error);

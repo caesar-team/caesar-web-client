@@ -201,7 +201,7 @@ export function* encryptMemberTeamKey({ user, keypair }) {
     convertKeyPairToItemEntity([keypair]),
   ).shift();
 
-  const secret = yield call(encryptSecret, {
+  const { data, raws } = yield call(encryptSecret, {
     item: itemKeyPair,
     publicKey,
   });
@@ -211,7 +211,8 @@ export function* encryptMemberTeamKey({ user, keypair }) {
 
   return {
     userId,
-    secret,
+    secret: data,
+    raws,
     teamRole,
   };
 }
@@ -246,7 +247,7 @@ export function* createTeamSaga({
       throw new Error(`Can't create the team with the title: ${title}`);
     }
 
-    const encryptedKeypair = yield call(encryptSecret, {
+    const { data, raws } = yield call(encryptSecret, {
       item: teamKeyPair,
       publicKey,
     });
@@ -254,7 +255,8 @@ export function* createTeamSaga({
     const serverPayload = {
       team,
       keypair: {
-        secret: encryptedKeypair,
+        secret: data,
+        raws,
       },
     };
 

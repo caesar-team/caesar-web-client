@@ -92,17 +92,11 @@ export const convertSystemItemToKeyPair = item => {
 
 export const decryptItemData = async (item, privateKeyObject) => {
   try {
-    const { data: encryptedData, raws: encryptedRaws } = JSON.parse(
-      item.secret,
-    );
+    const encryptedData = item.secret;
     const promises = [];
     promises.push(decryptItem(encryptedData, privateKeyObject));
 
-    if (!isGeneralItem(item) && encryptedRaws) {
-      promises.push(decryptItem(encryptedRaws, privateKeyObject));
-    }
-
-    const [data, raws = {}] = await Promise.all(promises);
+    const [data] = await Promise.all(promises);
 
     if (!data) {
       return {
@@ -113,7 +107,6 @@ export const decryptItemData = async (item, privateKeyObject) => {
     return {
       data: {
         ...data,
-        raws,
       },
     };
   } catch (error) {

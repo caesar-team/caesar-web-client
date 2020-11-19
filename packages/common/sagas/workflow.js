@@ -197,12 +197,17 @@ export function* decryptItem(item, decryptRaws = false) {
     yield put(
       decryption({
         items: [item],
-        raws: decryptRaws ? JSON.parse(item.secret)?.raws : null,
         key: keyPair.privateKey,
         masterPassword: keyPair.password,
       }),
     );
   }
+}
+
+export function* decryptItemRaws(item) {
+  if (!item || !('id' in item)) return;
+
+  const { data } = getItemRaws;
 }
 
 function* isTeamKeypairExists(teamId) {

@@ -378,19 +378,19 @@ export function* encryptSecret({ item, publicKey }) {
       : null,
   };
 
-  return JSON.stringify(encryptedItem);
+  return encryptedItem;
 }
 
 export function* saveShareKeyPairSaga({ item, publicKey }) {
   const { relatedItemId, ownerId } = item;
-  const secret = yield call(encryptSecret, { item, publicKey });
+  const { data, raws } = yield call(encryptSecret, { item, publicKey });
 
   return yield call(postItemShare, {
     itemId: relatedItemId,
     users: [
       {
         userId: ownerId,
-        secret,
+        secret: JSON.stringify({ data, raws }),
       },
     ],
   });
@@ -399,12 +399,14 @@ export function* saveShareKeyPairSaga({ item, publicKey }) {
 export function* saveItemSaga({ item, publicKey }) {
   const { id = null, listId = null, type, favorite = false, ownerId } = item;
 
-  const secret = yield call(encryptSecret, { item, publicKey });
+  const { data, raws } = yield call(encryptSecret, { item, publicKey });
+
   let serverItemData = {};
 
   if (id) {
     const { data: updatedItemData } = yield call(updateItem, id, {
-      secret,
+      secret: data,
+      raws,
       meta: createItemMetaData(item),
     });
 
@@ -416,17 +418,30 @@ export function* saveItemSaga({ item, publicKey }) {
       ownerId,
       type,
       favorite,
-      secret,
+      secret: data,
+      raws,
     });
 
     serverItemData = updatedItemData || {};
   }
 
-  const itemData = {
-    ...item,
-    ...serverItemData,
-    secret,
-  };
+  let itemData = null;
+
+  if (isGeneralItem(item)) {
+    itemData = {
+      ...item,
+      ...serverItemData,
+      secret: data,
+    };
+  } else {
+    itemData = {
+      ...item,
+      ...serverItemData,
+      secret: data,
+      raws,
+    };
+  }
+
   const { itemsById } = convertItemsToEntities([itemData]);
   const normalizedItem = Object.values(itemsById).shift();
 
@@ -448,13 +463,12 @@ export function* getKeyPairForTeam(teamId) {
 }
 
 export function* saveKeyPair(
-  { ownerId, teamId, secret, relatedItemId } = {
+  { ownerId, teamId, secret, raws, relatedItemId } = {
     teamId: null,
     relatedItemId: null,
   },
 ) {
-  const keypairs = [{ ownerId, teamId, secret, relatedItemId }];
-
+  const keypairs = [{ ownerId, teamId, secret, raws, relatedItemId }];
   return yield call(postAddKeyPairBatch, keypairs);
 }
 
@@ -462,12 +476,12 @@ export function* saveItemKeyPair({
   item: { ownerId, teamId, data, relatedItemId },
   publicKey,
 }) {
-  const secret = yield call(encryptItem, data, publicKey);
+  const { data: secretData, raws } = yield call(encryptItem, data, publicKey);
 
   return yield call(saveKeyPair, {
     ownerId,
     teamId,
-    secret,
+    secret: JSON.stringify({ data: secretData, raws }),
     relatedItemId,
   });
 }
@@ -510,12 +524,15 @@ export function* createKeyPair({
   const keypair = yield call(generateKeyPair, {
     name: entityTeamId || entityId,
   });
-  const secret = yield call(encryptSecret, { item: keypair, publicKey });
+  const { data, raws } = yield call(encryptSecret, {
+    item: keypair,
+    publicKey,
+  });
 
   const { data: serverKeyPairItems } = yield call(saveKeyPair, {
     ownerId,
     teamId,
-    secret,
+    secret: JSON.stringify({ data, raws }),
     relatedItemId: entityId,
   });
   const serverKeyPairItem = Object.values(serverKeyPairItems).shift();
@@ -667,8 +684,8 @@ export function* createItemsBatchSaga({
       listId,
       meta: createItemMetaData({ data }),
       secret: JSON.stringify({
-        data: encryptedItems[index],
-        raws: null,
+        data: encryptedItems[index]?.data,
+        raws: encryptedItems[index]?.raws || null,
       }),
     }));
 

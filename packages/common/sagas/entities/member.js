@@ -263,7 +263,9 @@ export function* addMemberToTeamListsBatchSaga({ payload: { teamId, users } }) {
       teamId,
     });
 
-    const membersById = convertMembersToEntity(serverMembers);
+    const membersById = convertMembersToEntity(
+      serverMembers.map(member => ({ ...member, accessGranted: true })),
+    );
 
     yield put(addTeamMembersBatchSuccess(membersById));
     yield put(addMembersToTeamList(teamId, membersById));

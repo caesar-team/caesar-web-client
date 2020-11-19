@@ -186,36 +186,22 @@ function* getItemKeyPair({
 
 export function* decryptItem(item, decryptRaws = false) {
   if (!item || !('id' in item)) return;
-
-  const keyPair = yield call(getItemKeyPair, {
-    payload: {
-      item,
-    },
-  });
-
   // decrypt the items
   if (!item.data) {
+    const keyPair = yield call(getItemKeyPair, {
+      payload: {
+        item,
+      },
+    });
+
     yield put(
       decryption({
         items: [item],
+        raws: decryptRaws ? JSON.parse(item.secret)?.raws : null,
         key: keyPair.privateKey,
         masterPassword: keyPair.password,
       }),
     );
-  }
-
-  if (decryptRaws) {
-    const { raws } = JSON.parse(item.secret);
-    // decrypt the items
-    if (raws) {
-      yield put(
-        decryption({
-          raws,
-          key: keyPair.privateKey,
-          masterPassword: keyPair.password,
-        }),
-      );
-    }
   }
 }
 

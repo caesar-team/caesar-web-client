@@ -28,10 +28,12 @@ export const isValidItem = item => {
 };
 
 export const checkItemsAfterDecryption = items => {
-  return items.reduce(
-    (accumulator, item) =>
-      isValidItem(item) ? [...accumulator, item] : accumulator,
-    [],
+  return (
+    items?.reduce(
+      (accumulator, item) =>
+        isValidItem(item) ? [...accumulator, item] : accumulator,
+      [],
+    ) || items
   );
 };
 

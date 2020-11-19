@@ -3,6 +3,7 @@ export const INIT_TEAMS = '@workflow/INIT_TEAMS';
 export const INIT_USERS_SETTINGS = '@workflow/INIT_USERS_SETTINGS';
 export const INIT_TEAMS_SETTINGS = '@workflow/INIT_TEAMS_SETTINGS';
 export const INIT_TEAM_SETTINGS = '@workflow/INIT_TEAM_SETTINGS';
+export const INIT_PREFERENCES_SETTINGS = '@workflow/INIT_PREFERENCES_SETTINGS ';
 export const INIT_IMPORT_SETTINGS = '@workflow/INIT_IMPORT_SETTINGS';
 export const INIT_CREATE_PAGE = '@workflow/INIT_CREATE_PAGE';
 export const INIT_DASHBOARD = '@workflow/INIT_DASHBOARD';
@@ -59,6 +60,10 @@ export const initTeamsSettings = () => ({
 
 export const initTeamSettings = () => ({
   type: INIT_TEAM_SETTINGS,
+});
+
+export const initPreferencesSettings = () => ({
+  type: INIT_PREFERENCES_SETTINGS,
 });
 
 export const initImportSettings = () => ({

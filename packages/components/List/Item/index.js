@@ -22,14 +22,71 @@ import {
   CloseIcon,
   WebsiteFavIcon,
 } from './styles';
+import { getItemMetaData } from '@caesar/common/utils/item';
+
+const ItemIcon = ({ website, type }) => {
+  return (
+    <IconWrapper>
+      {website ? (
+        <WebsiteFavIcon
+          website={website}
+          src={`https://www.google.com/s2/favicons?domain=${website}`}
+          alt={`The website favicon for address: ${website}`}
+        />
+      ) : (
+        <ItemTypeIcon type={type} />
+      )}
+    </IconWrapper>
+  );
+};
+
+const AttachmentsCount = ({ isInModal = false, attachmentsCount = 0 }) => {
+  if (attachmentsCount <= 0) return <></>;
+
+  return (
+    <Addon isInModal={isInModal}>
+      <Icon name="clip" width={16} height={16} />
+      <AddonText>{attachmentsCount}</AddonText>
+    </Addon>
+  );
+};
+
+const SharedUsersCount = ({ isInModal = false, sharedCount = 0 }) => {
+  if (sharedCount <= 0) return <></>;
+
+  return (
+    <Addon isInModal={isInModal}>
+      <Icon name="members" width={16} height={16} />
+      <AddonText>{sharedCount}</AddonText>
+    </Addon>
+  );
+};
+
+const FavItemIcon = ({ favorite = false, isClosable = true }) => {
+  if (!favorite || !isClosable) return <></>;
+
+  return (
+    <Addon>
+      <Icon name="favorite-active" width={16} height={16} color="emperor" />
+    </Addon>
+  );
+};
+
+const CloseItemIcon = ({
+  isClosable = true,
+  onClickClose = Function.prototype,
+}) => {
+  if (!isClosable) return <></>;
+
+  return (
+    <CloseIcon name="close" width={10} height={10} onClick={onClickClose} />
+  );
+};
 
 export const Item = ({
   id,
   title,
-  data: { attachments = [], website } = {
-    attachments: [],
-    website: null,
-  },
+  meta,
   type,
   invited = [],
   isMultiItem = false,
@@ -49,14 +106,8 @@ export const Item = ({
   workInProgressItem,
   ...props
 }) => {
-  const sharedCount =
-    invited?.length +
-    (teamMembersCount > 0 ? teamMembersCount - 1 : teamMembersCount);
-  const shouldShowMembers = teamId === TEAM_TYPE.PERSONAL && sharedCount > 0;
-  const shouldShowAttachments =
-    attachments && Array.isArray(attachments) && attachments?.length > 0;
-
-  const shouldShowFavoriteIcon = favorite && !isClosable;
+  const { website, attachmentsCount } = getItemMetaData({ meta });
+  const sharedCount = invited?.length;
   const isActive = workInProgressItem?.id === id;
   const isChecked = isMultiItem && workInProgressItemIds.includes(id);
 
@@ -102,41 +153,18 @@ export const Item = ({
                 </Tooltip>
               </NotEditIconWrapper>
             )}
-            <IconWrapper>
-              {website ? (
-                <WebsiteFavIcon
-                  website={website}
-                  src={`https://www.google.com/s2/favicons?domain=${website}`}
-                  alt={`The website favicon for address: ${website}`}
-                />
-              ) : (
-                <ItemTypeIcon type={type} />
-              )}
-            </IconWrapper>
+            <ItemIcon {...{ website, type }} />
           </TypeIconWrapper>
         )}
       </Can>
       <Title>{title}</Title>
-      {shouldShowAttachments && (
-        <Addon isInModal={isInModal}>
-          <Icon name="clip" width={16} height={16} />
-          <AddonText>{attachments?.length}</AddonText>
-        </Addon>
-      )}
-      {shouldShowMembers && (
-        <Addon isInModal={isInModal}>
-          <Icon name="members" width={16} height={16} />
-          <AddonText>{sharedCount}</AddonText>
-        </Addon>
-      )}
-      {shouldShowFavoriteIcon && (
-        <Addon>
-          <Icon name="favorite-active" width={16} height={16} color="emperor" />
-        </Addon>
-      )}
-      {isClosable && (
-        <CloseIcon name="close" width={10} height={10} onClick={onClickClose} />
-      )}
+      <AttachmentsCount
+        attachmentsCount={attachmentsCount}
+        isInModal={isInModal}
+      />
+      <SharedUsersCount isInModal={isInModal} sharedCount={sharedCount} />
+      <FavItemIcon favorite={favorite} isClosable={isClosable} />
+      <CloseItemIcon isClosable={isClosable} onClickClose={onClickClose} />
     </Row>
   );
 };

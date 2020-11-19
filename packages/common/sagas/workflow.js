@@ -28,6 +28,7 @@ import {
   finishProcessingKeyPairs,
   FINISH_PROCESSING_KEYPAIRS,
   INIT_CREATE_PAGE,
+  INIT_PREFERENCES_SETTINGS,
 } from '@caesar/common/actions/workflow';
 import { addListsBatch } from '@caesar/common/actions/entities/list';
 import deepequal from 'fast-deep-equal';
@@ -784,6 +785,16 @@ function* initImportSettingsSaga() {
   }
 }
 
+function* initPreferencesSettingsSaga() {
+  try {
+    yield call(fetchUserSelfSaga);
+    yield put(finishIsLoading());
+  } catch (error) {
+    // eslint-disable-next-line no-console
+    console.error('error: ', error);
+  }
+}
+
 function* vaultsReadySaga() {
   yield call(initTeamsSaga);
   yield put(vaultsReady());
@@ -814,6 +825,7 @@ export default function* workflowSagas() {
   yield takeLatest(INIT_TEAMS_SETTINGS, initTeamsSettingsSaga);
   yield takeLatest(INIT_TEAM_SETTINGS, initTeamSettingsSaga);
   yield takeLatest(INIT_IMPORT_SETTINGS, initImportSettingsSaga);
+  yield takeLatest(INIT_PREFERENCES_SETTINGS, initPreferencesSettingsSaga);
 
   yield takeLatest(SET_WORK_IN_PROGRESS_ITEM, setWorkInProgressItemSaga);
   yield takeLatest(UPDATE_WORK_IN_PROGRESS_ITEM, updateWorkInProgressItemSaga);

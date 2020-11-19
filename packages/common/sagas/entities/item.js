@@ -82,6 +82,7 @@ import {
 } from '@caesar/common/selectors/keystore';
 import {
   convertSystemItemToKeyPair,
+  createItemMetaData,
   generateSystemItemEmail,
   generateSystemItemName,
   isGeneralItem,
@@ -413,6 +414,7 @@ export function* saveItemSaga({ item, publicKey }) {
     const { data: updatedItemData } = yield call(postCreateItem, {
       listId,
       title,
+      meta: createItemMetaData(item),
       ownerId,
       type,
       favorite,
@@ -663,9 +665,10 @@ export function* createItemsBatchSaga({
     );
 
     const preparedForRequestItems = items.map(
-      ({ type, name: title }, index) => ({
+      ({ type, name: title, data }, index) => ({
         type,
         listId,
+        meta: createItemMetaData({ data }),
         title,
         secret: JSON.stringify({
           data: encryptedItems[index],

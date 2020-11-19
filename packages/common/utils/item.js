@@ -125,3 +125,24 @@ export const decryptItemData = async (item, privateKeyObject) => {
     };
   }
 };
+
+export const createItemMetaData = ({
+  data: { attachments = [], website = null } = {
+    attachments: [],
+    website: null,
+  },
+}) => {
+  return {
+    attachCount: attachments?.length || 0,
+    webSite: website,
+  };
+};
+
+export const getItemMetaData = ({
+  meta: { attachCount = 0, webSite = null } = { attachCount: 0, webSite: null },
+}) => {
+  return {
+    attachmentsCount: attachCount || 0,
+    website: webSite,
+  };
+};

@@ -1,6 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
-import { TEAM_ROLES } from '@caesar/common/constants';
+import { TEAM_ROLES_OPTIONS } from '@caesar/common/constants';
 import { Select } from '@caesar/components/Select';
 
 const StyledSelect = styled(Select)`
@@ -10,11 +10,6 @@ const StyledSelect = styled(Select)`
   margin-left: auto;
 `;
 
-const OPTIONS = Object.values(TEAM_ROLES).map(role => ({
-  value: role,
-  label: role,
-}));
-
 export const RoleSelector = ({
   className,
   member,
@@ -23,7 +18,7 @@ export const RoleSelector = ({
   <StyledSelect
     name="role"
     value={member.role}
-    options={OPTIONS}
+    options={TEAM_ROLES_OPTIONS}
     className={className}
     onChange={onChange}
   />

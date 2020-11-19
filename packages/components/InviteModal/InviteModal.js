@@ -103,6 +103,7 @@ class InviteModal extends Component {
               maxHeight={200}
               members={users}
               isNewMember
+              scrollbarDisplayCondition={users.length > 4}
               controlType="remove"
               onClickRemove={this.handleRemoveMember}
               onChangeRole={this.handleChangeRole}

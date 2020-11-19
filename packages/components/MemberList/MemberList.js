@@ -40,6 +40,8 @@ const ControlWrapper = styled.div`
   ${({ isNewMember }) => !isNewMember && 'width: 100%'};
 `;
 
+const SimpleMembersWrapper = styled.div``;
+
 const ADD_CONTROL_TYPE = 'add';
 const REMOVE_CONTROL_TYPE = 'remove';
 const REVOKE_CONTROL_TYPE = 'revoke';
@@ -52,6 +54,7 @@ const MemberList = ({
   maxHeight = MAX_HEIGHT,
   isNewMember = false,
   controlType,
+  scrollbarDisplayCondition = true,
   renderControl = Function.prototype,
   onClickAdd = Function.prototype,
   onClickRemove = Function.prototype,
@@ -104,12 +107,15 @@ const MemberList = ({
       </ControlWrapper>
     </MemberWrapper>
   ));
+  const WrapperComponent = scrollbarDisplayCondition
+    ? Scrollbars
+    : SimpleMembersWrapper;
 
   return (
     <Wrapper maxHeight={maxHeight} className={className}>
-      <Scrollbars autoHeight autoHeightMax={maxHeight}>
+      <WrapperComponent autoHeight autoHeightMax={maxHeight}>
         {renderedMembers}
-      </Scrollbars>
+      </WrapperComponent>
     </Wrapper>
   );
 };

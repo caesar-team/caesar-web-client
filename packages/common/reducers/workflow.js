@@ -88,7 +88,7 @@ export default createReducer(initialState, {
       workInProgressItem: {
         ...state.workInProgressItem,
         data: {
-          ...state.workInProgressItem?.data,
+          ...(state.workInProgressItem?.data || {}),
           raws: payload?.raws,
         },
       },

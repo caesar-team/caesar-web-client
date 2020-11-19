@@ -54,7 +54,7 @@ export const Item = ({
     (teamMembersCount > 0 ? teamMembersCount - 1 : teamMembersCount);
   const shouldShowMembers = teamId === TEAM_TYPE.PERSONAL && sharedCount > 0;
   const shouldShowAttachments =
-    attachments && Array.isArray(attachments) && attachments.length > 0;
+    attachments && Array.isArray(attachments) && attachments?.length > 0;
 
   const shouldShowFavoriteIcon = favorite && !isClosable;
   const isActive = workInProgressItem?.id === id;
@@ -120,7 +120,7 @@ export const Item = ({
       {shouldShowAttachments && (
         <Addon isInModal={isInModal}>
           <Icon name="clip" width={16} height={16} />
-          <AddonText>{attachments.length}</AddonText>
+          <AddonText>{attachments?.length}</AddonText>
         </Addon>
       )}
       {shouldShowMembers && (

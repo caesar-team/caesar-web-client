@@ -9,6 +9,7 @@ export const INIT_DASHBOARD = '@workflow/INIT_DASHBOARD';
 export const FINISH_PROCESSING_KEYPAIRS =
   '@workflow/FINISH_PROCESSING_KEYPAIRS';
 
+export const START_IS_LOADING = '@workflow/START_IS_LOADING';
 export const FINISH_IS_LOADING = '@workflow/FINISH_IS_LOADING';
 export const VAULTS_ARE_READY = '@workflow/VAULTS_ARE_READY';
 
@@ -82,6 +83,10 @@ export const openVault = teamId => ({
 
 export const openCurrentVault = () => ({
   type: OPEN_CURRENT_VAULT,
+});
+
+export const startIsLoading = () => ({
+  type: START_IS_LOADING,
 });
 
 export const finishIsLoading = () => ({

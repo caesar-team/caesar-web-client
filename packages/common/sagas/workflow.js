@@ -16,6 +16,7 @@ import {
   INIT_IMPORT_SETTINGS,
   UPDATE_WORK_IN_PROGRESS_ITEM,
   SET_WORK_IN_PROGRESS_ITEM,
+  startIsLoading,
   finishIsLoading,
   setWorkInProgressListId,
   setWorkInProgressItem,
@@ -771,6 +772,8 @@ function* initTeamsSettingsSaga() {
 
 function* initTeamSettingsSaga() {
   try {
+    yield put(startIsLoading());
+
     const {
       router: {
         query: { id: teamId },

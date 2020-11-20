@@ -767,11 +767,10 @@ function* initTeamSettingsSaga() {
       },
     } = Router;
 
-    yield call(fetchTeamSaga, { payload: { teamId } });
+    yield call(initWorkflowSaga);
     yield call(fetchTeamMembersSaga, {
       payload: { teamId, withoutKeys: true },
     });
-    yield call(initWorkflowSaga);
   } catch (error) {
     // eslint-disable-next-line no-console
     console.error('error: ', error);

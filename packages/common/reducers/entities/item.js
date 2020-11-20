@@ -45,6 +45,7 @@ import {
   REMOVE_SHARE_SUCCESS,
   ADD_ITEMS_BATCH,
   REMOVE_ITEMS_BATCH,
+  REMOVE_ITEMS_BATCH_BY_TEAM_IDS,
   REMOVE_ITEMS_DATA,
   UPDATE_ITEM_FIELD,
   RESET_ITEM_STATE,
@@ -74,6 +75,7 @@ export default createReducer(initialState, {
   [REMOVE_ITEMS_BATCH_REQUEST](state) {
     return state;
   },
+  // TODO: Remove Dublicated with REMOVE_ITEMS_BATCH
   [REMOVE_ITEMS_BATCH_SUCCESS](state, { payload }) {
     return {
       ...state,
@@ -321,6 +323,7 @@ export default createReducer(initialState, {
       },
     };
   },
+  // TODO: Remove Dublicated with REMOVE_ITEMS_BATCH_SUCCESS
   [REMOVE_ITEMS_BATCH](state, { payload }) {
     if (!state.byId || Object.keys(state.byId).length <= 0) return state;
 
@@ -331,6 +334,20 @@ export default createReducer(initialState, {
           payload.itemIds.includes(itemId)
             ? accumulator
             : { ...accumulator, [itemId]: state.byId[itemId] },
+        {},
+      ),
+    };
+  },
+  [REMOVE_ITEMS_BATCH_BY_TEAM_IDS](state, { payload }) {
+    if (!state.byId || Object.keys(state.byId).length <= 0) return state;
+
+    return {
+      ...state,
+      byId: Object.values(state.byId).reduce(
+        (accumulator, item) =>
+          payload.teamIds.includes(item.teamId)
+            ? accumulator
+            : { ...accumulator, [item.id]: state.byId[item.id] },
         {},
       ),
     };

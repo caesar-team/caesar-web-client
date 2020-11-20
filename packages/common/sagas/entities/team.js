@@ -68,8 +68,13 @@ import {
   userSelector,
   userAdminsSelector,
 } from '../../selectors/entities/user';
-import { addTeamKeyPairBatch } from '../../actions/keystore';
+import {
+  addTeamKeyPairBatch,
+  removeKeyPairBatchByTeamIds,
+} from '../../actions/keystore';
 import { createVaultSuccess } from '../../actions/entities/vault';
+import { removeItemsBatchByTeamIds } from '../../actions/entities/item';
+import { removeListsBatchByTeamIds } from '../../actions/entities/list';
 import { upperFirst } from '../../utils/string';
 
 export function* fetchTeamsSaga() {
@@ -353,6 +358,17 @@ export function* togglePinTeamSaga({ payload: { teamId, shouldPinned } }) {
       updateGlobalNotification(getServerErrorMessage(error), false, true),
     );
     yield put(togglePinTeamFailure());
+  }
+}
+
+export function* clearStateWhenLeaveTeam({ payload: { teamIds } }) {
+  try {
+    yield put(removeItemsBatchByTeamIds(teamIds));
+    yield put(removeListsBatchByTeamIds(teamIds));
+    yield put(removeKeyPairBatchByTeamIds([...teamIds, 'personal']));
+  } catch (error) {
+    // eslint-disable-next-line no-console
+    console.error(error);
   }
 }
 

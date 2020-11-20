@@ -35,6 +35,7 @@ import {
 import { removeCookieValue, clearStorage } from '@caesar/common/utils/token';
 import { createPermissionsFromLinks } from '@caesar/common/utils/createPermissionsFromLinks';
 import { ROUTES } from '@caesar/common/constants';
+import { clearStateWhenLeaveTeam } from './entities/team';
 
 export function* fetchUserSelfSaga() {
   try {
@@ -95,6 +96,7 @@ export function* leaveTeamSaga({ payload: { teamId } }) {
     yield put(leaveTeamSuccess(teamId));
     yield put(removeTeamMemberSuccess(member.id));
     yield put(removeMemberFromTeam(member.teamId, member.id));
+    yield call(clearStateWhenLeaveTeam, { payload: { teamIds: [teamId] } });
 
     const {
       router: { route },

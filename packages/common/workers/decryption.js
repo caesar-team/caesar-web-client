@@ -1,7 +1,7 @@
 import { expose } from 'threads/worker';
 import { decryptData, unsealPrivateKeyObj } from '../utils/cipherUtils';
 
-import { decryptItemData } from '../utils/item';
+import { decryptItemData, isGeneralItem } from '../utils/item';
 
 // eslint-disable-next-line
 self.window = self;

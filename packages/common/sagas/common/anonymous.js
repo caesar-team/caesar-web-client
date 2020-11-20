@@ -50,7 +50,7 @@ export function* createAnonymousLinkSaga() {
 
     const item = {
       id: 'itemId',
-      secret: encryptedSecret,
+      secret: JSON.stringify({ data: encryptedSecret }),
     };
 
     // TODO: Make shorted link

@@ -413,7 +413,7 @@ export function* saveItemSaga({ item, publicKey }) {
 
   if (id) {
     const { data: updatedItemData } = yield call(updateItem, id, {
-      secret: data,
+      secret: JSON.stringify({ data }),
       raws,
       meta: createItemMetaData(item),
     });
@@ -426,7 +426,7 @@ export function* saveItemSaga({ item, publicKey }) {
       ownerId,
       type,
       favorite,
-      secret: data,
+      secret: JSON.stringify({ data }),
       raws,
     });
 
@@ -439,13 +439,13 @@ export function* saveItemSaga({ item, publicKey }) {
     itemData = {
       ...item,
       ...serverItemData,
-      secret: data,
+      secret: JSON.stringify({ data }),
     };
   } else {
     itemData = {
       ...item,
       ...serverItemData,
-      secret: data,
+      secret: JSON.stringify({ data }),
       raws,
     };
   }

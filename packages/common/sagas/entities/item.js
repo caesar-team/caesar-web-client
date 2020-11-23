@@ -450,13 +450,26 @@ export function* saveShareKeyPairSaga({ item, publicKey }) {
 
 export function* saveItemSaga({ item, publicKey }) {
   const { id = null, listId = null, type, favorite = false, ownerId } = item;
+  const itemFromStore = yield select(itemSelector, { itemId: item.id });
 
-  const rawsFromServer = yield call(downloadAndDecryptRaws, {
-    payload: { itemId: item.id },
-  });
+  let isRawsChanged = isGeneralItem(item);
+  let itemToEncrypt = item;
 
-  const { data, raws } = yield call(encryptItem, {
-    item: {
+  if (
+    !!itemFromStore &&
+    deepequal(itemFromStore.data.attachments, item.data.attachments)
+  ) {
+    isRawsChanged = false;
+  }
+
+  if (isRawsChanged && isGeneralItem(item)) {
+    const rawsFromServer = id
+      ? yield call(downloadAndDecryptRaws, {
+          payload: { itemId: item.id },
+        })
+      : {};
+
+    itemToEncrypt = {
       // OMG :(
       ...item,
       data: {
@@ -466,19 +479,37 @@ export function* saveItemSaga({ item, publicKey }) {
           ...(rawsFromServer || {}),
         },
       },
-    },
+    };
+  }
+
+  const { data, raws } = yield call(encryptItem, {
+    item: itemToEncrypt,
     publicKey,
   });
 
   let serverItemData = {};
+  let secretDataAndRaws = {};
 
-  if (id) {
-    const { data: updatedItemData } = yield call(updateItem, id, {
-      secret: isGeneralItem(item)
+  if (isRawsChanged) {
+    // we need to save the raws to the item
+    secretDataAndRaws = {
+      secret: isGeneralItem(item) // save the raws inside the item if it's a non-general item
         ? JSON.stringify({ data })
         : JSON.stringify({ data, raws }),
       raws: isGeneralItem(item) ? raws : null,
+    };
+  } else {
+    secretDataAndRaws = {
+      secret: isGeneralItem(item)
+        ? JSON.stringify({ data })
+        : JSON.stringify({ data, raws }),
+    };
+  }
+
+  if (id) {
+    const { data: updatedItemData } = yield call(updateItem, id, {
       meta: createItemMetaData(item),
+      ...secretDataAndRaws,
     });
 
     serverItemData = updatedItemData || {};
@@ -489,10 +520,7 @@ export function* saveItemSaga({ item, publicKey }) {
       ownerId,
       type,
       favorite,
-      secret: isGeneralItem(item)
-        ? JSON.stringify({ data })
-        : JSON.stringify({ data, raws }),
-      raws: isGeneralItem(item) ? raws : null,
+      ...secretDataAndRaws,
     });
 
     serverItemData = updatedItemData || {};
@@ -517,7 +545,7 @@ export function* saveItemSaga({ item, publicKey }) {
 
   const { itemsById } = convertItemsToEntities([itemData]);
   const normalizedItem = Object.values(itemsById).shift();
-
+  debugger;
   return normalizedItem;
 }
 
@@ -831,15 +859,26 @@ export function* updateItemSaga({ payload: { item } }) {
 }
 
 export function* editItemSaga({
-  payload: { item },
+  payload: { itemId, patch },
   meta: { setSubmitting, notification },
 }) {
   try {
+    const item = yield select(itemSelector, { itemId });
+    if (!item) {
+      throw new Error(`Can't find the item ${itemId}`);
+    }
+
+    const patchedItem = {
+      ...item,
+      data: {
+        ...item.data,
+        ...patch,
+      },
+    };
     const {
-      id: itemId,
       listId,
       data: { raws, ...data },
-    } = item;
+    } = patchedItem;
 
     const itemInState = yield select(itemSelector, { itemId });
     const isDataChanged = !deepequal(itemInState.data, data);
@@ -864,7 +903,11 @@ export function* editItemSaga({
     }
 
     if (isDataChanged) {
-      yield call(updateItemSaga, { payload: { item } });
+      yield call(updateItemSaga, {
+        payload: {
+          item: patchedItem,
+        },
+      });
     }
 
     yield put(updateWorkInProgressItem(item.id));

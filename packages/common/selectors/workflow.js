@@ -1,5 +1,5 @@
 import { createSelector } from 'reselect';
-import { LIST_TYPE } from '@caesar/common/constants';
+import { LIST_TYPE, TEAM_TYPE } from '@caesar/common/constants';
 import {
   listsByIdSelector,
   favoritesListSelector,
@@ -22,28 +22,10 @@ export const isErrorSelector = createSelector(
 
 export const workInProgressItemSelector = createSelector(
   workflowSelector,
-  teamsByIdSelector,
-  listsByIdSelector,
-  (workflow, teamsById, listById) => {
+  workflow => {
     const { workInProgressItem } = workflow;
 
-    const list =
-      workInProgressItem && workInProgressItem.listId
-        ? listById[workInProgressItem.listId]
-        : null;
-
-    const team =
-      workInProgressItem && workInProgressItem.teamId
-        ? teamsById[workInProgressItem.teamId]
-        : null;
-
-    return workInProgressItem
-      ? {
-          ...workInProgressItem,
-          teamRole: team ? team.teamRole : null,
-          listType: list ? list.type : null,
-        }
-      : null;
+    return workInProgressItem;
   },
 );
 
@@ -68,10 +50,9 @@ export const workInProgressItemIdsSelector = createSelector(
 
 export const workInProgressListSelector = createSelector(
   listsByIdSelector,
-  teamsByIdSelector,
   workInProgressListIdSelector,
   favoritesListSelector,
-  (listsById, teamsById, workInProgressListId, favoritesList) => {
+  (listsById, workInProgressListId, favoritesList) => {
     const list =
       workInProgressListId === LIST_TYPE.FAVORITES
         ? favoritesList

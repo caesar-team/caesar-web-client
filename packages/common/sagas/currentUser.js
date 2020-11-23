@@ -1,6 +1,6 @@
 /* eslint-disable no-console */
 import Router from 'next/router';
-import { put, call, select, takeLatest } from 'redux-saga/effects';
+import { put, call, takeLatest } from 'redux-saga/effects';
 import {
   FETCH_USER_SELF_REQUEST,
   FETCH_KEY_PAIR_REQUEST,

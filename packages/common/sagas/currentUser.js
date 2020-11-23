@@ -21,8 +21,6 @@ import {
   resetStore,
 } from '@caesar/common/actions/application';
 import { editTeamSuccess } from '@caesar/common/actions/entities/team';
-import { currentUserIdSelector } from '@caesar/common/selectors/currentUser';
-import { memberByUserIdAndTeamIdSelector } from '@caesar/common/selectors/entities/member';
 import { getServerErrorMessage } from '@caesar/common/utils/error';
 import {
   getUserSelf,
@@ -86,11 +84,6 @@ export function* fetchUserTeamsSaga() {
 export function* leaveTeamSaga({ payload: { teamId } }) {
   try {
     const { data: team } = yield call(postLeaveTeam, teamId);
-    const userId = yield select(currentUserIdSelector);
-    const member = yield select(memberByUserIdAndTeamIdSelector, {
-      userId,
-      teamId,
-    });
     const teamsById = convertTeamsToEntity([team]);
 
     yield put(leaveTeamSuccess(teamId));

@@ -61,6 +61,7 @@ const Details = styled.div`
 `;
 
 const FileName = styled.div`
+  line-height: 1.25;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -119,7 +120,6 @@ const CloseIcon = styled(Icon)`
 const UploadedWrapper = styled.div`
   position: relative;
   display: flex;
-  align-items: center;
   padding: 8px 28px 8px 8px;
   border-radius: 4px;
   cursor: pointer;

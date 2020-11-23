@@ -161,17 +161,29 @@ export function decryptItemsByItemIdKeys(items, keyPairs) {
   }
 }
 export function* decryptUserItems(items) {
-  const keyPair = yield select(teamKeyPairSelector, {
-    teamId: TEAM_TYPE.PERSONAL,
-  });
+  const { privateKey = null, password = null } = yield select(
+    teamKeyPairSelector,
+    {
+      teamId: TEAM_TYPE.PERSONAL,
+    },
+  );
+
+  if (!privateKey || !password) {
+    // eslint-disable-next-line no-console
+    console.error(
+      "Warning! Can't decrypt user item! The keypair is missing or empty",
+    );
+
+    return;
+  }
 
   // decrypt the items
   if (items?.length > 0) {
     yield put(
       decryption({
         items,
-        key: keyPair.privateKey,
-        masterPassword: keyPair.password,
+        key: privateKey,
+        masterPassword: password,
       }),
     );
   }
@@ -577,14 +589,17 @@ function* loadKeyPairsAndPersonalItems() {
 
     yield put(addListsBatch(listsById));
     // Put to the store the shared and the team items, wait for processing of keypairs
-    yield put(
-      addItemsBatch({
-        ...itemsById,
-        ...sharedItemsById,
-        ...teamsItemsById,
-        ...itemsEncryptedByTeamKeys,
-      }),
-    );
+    const storedItems = {
+      ...itemsById,
+      ...sharedItemsById,
+      ...teamsItemsById,
+      ...itemsEncryptedByTeamKeys,
+    };
+
+    if (Object.keys(storedItems).length > 0) {
+      yield put(addItemsBatch(storedItems));
+    }
+
     if (!keypairsArray?.length) {
       const isEmptyStore = yield select(isKeystoreEmpty);
 

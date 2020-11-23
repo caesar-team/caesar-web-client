@@ -21,7 +21,10 @@ import {
   resetStore,
 } from '@caesar/common/actions/application';
 import { removeTeamMemberSuccess } from '@caesar/common/actions/entities/member';
-import { removeMemberFromTeam } from '@caesar/common/actions/entities/team';
+import {
+  removeMemberFromTeam,
+  editTeamSuccess,
+} from '@caesar/common/actions/entities/team';
 import { currentUserIdSelector } from '@caesar/common/selectors/currentUser';
 import { memberByUserIdAndTeamIdSelector } from '@caesar/common/selectors/entities/member';
 import { getServerErrorMessage } from '@caesar/common/utils/error';
@@ -85,7 +88,7 @@ export function* fetchUserTeamsSaga() {
 
 export function* leaveTeamSaga({ payload: { teamId } }) {
   try {
-    yield call(postLeaveTeam, teamId);
+    const { data: team } = yield call(postLeaveTeam, teamId);
     const userId = yield select(currentUserIdSelector);
     const member = yield select(memberByUserIdAndTeamIdSelector, {
       userId,
@@ -95,6 +98,7 @@ export function* leaveTeamSaga({ payload: { teamId } }) {
     yield put(leaveTeamSuccess(teamId));
     yield put(removeTeamMemberSuccess(member.id));
     yield put(removeMemberFromTeam(member.teamId, member.id));
+    yield put(editTeamSuccess(team));
 
     const {
       router: { route },

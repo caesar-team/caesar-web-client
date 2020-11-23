@@ -98,7 +98,10 @@ export function* leaveTeamSaga({ payload: { teamId } }) {
     yield put(leaveTeamSuccess(teamId));
     yield put(removeTeamMemberSuccess(member.id));
     yield put(removeMemberFromTeam(member.teamId, member.id));
-    yield put(editTeamSuccess(team));
+
+    if (team) {
+      yield put(editTeamSuccess(team));
+    }
 
     const {
       router: { route },

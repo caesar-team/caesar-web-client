@@ -2,7 +2,6 @@ import { getHostName } from '@caesar/common/utils/getDomainName';
 import { processUploadedFiles } from './attachment';
 import { decryptData } from './cipherUtils';
 import { ITEM_TYPE, DOMAIN_HOSTNAME } from '../constants';
-import { arrayToObject } from './utils';
 
 export const extractItemType = item => item?.type || ITEM_TYPE.SYSTEM;
 
@@ -105,13 +104,10 @@ const dectyptAttachment = async (rawObject, privateKeyObject) => {
     raw: await decryptData(rawObject.raw, privateKeyObject),
   };
 };
-const dectyptItemAttachments = async (item, privateKeyObject) => {
-  const { raws: encryptedRaws = {} } = JSON.parse(item.secret);
-  if (!isGeneralItem(item) && encryptedRaws) {
-    const encryptedRawsById = JSON.parse(encryptedRaws);
-
-    const rawsPromise = Object.keys(encryptedRawsById).map(async key =>
-      dectyptAttachment(encryptedRawsById[key], privateKeyObject),
+export const dectyptItemAttachments = async (raws, privateKeyObject) => {
+  if (raws) {
+    const rawsPromise = Object.keys(raws).map(async key =>
+      dectyptAttachment(raws[key], privateKeyObject),
     );
     const rawsArray = await Promise.all(rawsPromise);
 
@@ -122,14 +118,19 @@ const dectyptItemAttachments = async (item, privateKeyObject) => {
 };
 export const decryptItemData = async (item, privateKeyObject) => {
   try {
-    const { data: encryptedData } = JSON.parse(item.secret);
+    const { data: encryptedData, raws: encryptedRaws = {} } = JSON.parse(
+      item.secret,
+    );
     const promises = [];
-
     promises.push(decryptData(encryptedData, privateKeyObject));
-    promises.push(dectyptItemAttachments(item, privateKeyObject));
 
-    const [data, raws] = await Promise.all(promises);
-    console.log(raws);
+    if (!isGeneralItem(item))
+      // Decrypt keypairs or system items
+      promises.push(
+        dectyptItemAttachments(JSON.parse(encryptedRaws), privateKeyObject),
+      );
+
+    const [data, raws = {}] = await Promise.all(promises);
 
     if (!data) {
       return {

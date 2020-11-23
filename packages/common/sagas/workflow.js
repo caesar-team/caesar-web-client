@@ -2,7 +2,6 @@ import Router from 'next/router';
 import {
   put,
   call,
-  take,
   fork,
   takeLatest,
   takeEvery,
@@ -49,7 +48,6 @@ import {
 import {
   addShareKeyPairBatch,
   addTeamKeyPairBatch,
-  ADD_PERSONAL_KEY_PAIR,
 } from '@caesar/common/actions/keystore';
 import {
   fetchKeyPairSaga,
@@ -103,7 +101,6 @@ import {
 import {
   teamKeyPairSelector,
   shareKeyPairsSelector,
-  shareItemKeyPairSelector,
   isKeystoreEmpty,
 } from '@caesar/common/selectors/keystore';
 import { addTeamsBatch, lockTeam } from '@caesar/common/actions/entities/team';
@@ -120,6 +117,7 @@ import { getCurrentUnixtime } from '../utils/dateUtils';
 import { decryptData, unsealPrivateKeyObj } from '../utils/cipherUtils';
 import { downloadAsZip, downloadFile } from '../utils/file';
 import { getItemMetaData } from '../utils/item';
+import { getItemKeyPair } from './entities/item';
 
 const ON_DEMAND_DECRYPTION = true;
 // TODO: This saga is huge and must be refactored
@@ -199,7 +197,7 @@ export function* decryptUserItems(items) {
     console.error(
       "Warning! Can't decrypt user item! The keypair is missing or empty",
     );
-    console.log(personalKey);
+
     return;
   }
   // decrypt the items
@@ -212,20 +210,6 @@ export function* decryptUserItems(items) {
       }),
     );
   }
-}
-
-function* getItemKeyPair({
-  payload: {
-    item: { id: itemId, teamId, isShared },
-  },
-}) {
-  if (isShared) {
-    return yield select(shareItemKeyPairSelector, { itemId });
-  }
-
-  return yield select(teamKeyPairSelector, {
-    teamId: teamId || TEAM_TYPE.PERSONAL,
-  });
 }
 
 export function* decryptItem(item) {
@@ -247,6 +231,7 @@ export function* decryptItem(item) {
     );
   }
 }
+
 export function* decryptAttachmentRaw({ id, raw }, privateKeyObj) {
   return {
     id,
@@ -268,7 +253,7 @@ export function* downloadItemAttachmentSaga({
   const { data: { raws } = { raws: [] } } = yield call(getItemRaws, itemId);
   const itemRaws = JSON.parse(raws);
 
-  const { raw = null } = itemRaws[attachment.id] || null;
+  const { raw = null } = itemRaws[attachment.id] || {};
 
   if (raw) {
     const privateKeyObj = yield Promise.resolve(

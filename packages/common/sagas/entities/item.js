@@ -48,6 +48,7 @@ import {
   currentUserIdSelector,
 } from '@caesar/common/selectors/currentUser';
 import {
+  getItemRaws,
   postAddKeyPairBatch,
   postCreateItem,
   postCreateItemsBatch,
@@ -62,6 +63,7 @@ import {
 import {
   encryptData,
   encryptDataBatch,
+  unsealPrivateKeyObj,
 } from '@caesar/common/utils/cipherUtils';
 import { getServerErrorMessage } from '@caesar/common/utils/error';
 import { arrayToObject, chunk } from '@caesar/common/utils/utils';
@@ -77,12 +79,14 @@ import {
   ITEM_TYPE,
 } from '@caesar/common/constants';
 import {
+  shareItemKeyPairSelector,
   shareKeyPairSelector,
   teamKeyPairSelector,
 } from '@caesar/common/selectors/keystore';
 import {
   convertSystemItemToKeyPair,
   createItemMetaData,
+  dectyptItemAttachments,
   generateSystemItemEmail,
   generateSystemItemName,
   isGeneralItem,
@@ -365,22 +369,62 @@ export function* moveItemsBatchSaga({
     yield put(moveItemsBatchFailure());
   }
 }
+
+export function* getItemKeyPair({
+  payload: {
+    item: { id: itemId, teamId, isShared },
+  },
+}) {
+  if (isShared) {
+    return yield select(shareItemKeyPairSelector, { itemId });
+  }
+
+  return yield select(teamKeyPairSelector, {
+    teamId: teamId || TEAM_TYPE.PERSONAL,
+  });
+}
+
+export function* downloadAndDecryptRaws({ payload: { itemId } }) {
+  const { data: { raws } = { raws: {} } } = yield call(getItemRaws, itemId);
+  const encryptedRaws = JSON.parse(raws);
+
+  if (!encryptedRaws || Object.keys(encryptedRaws).length <= 0) return {};
+
+  const item = yield select(itemSelector, { itemId });
+  const keyPair = yield call(getItemKeyPair, {
+    payload: {
+      item,
+    },
+  });
+
+  const privateKeyObj = yield Promise.resolve(
+    unsealPrivateKeyObj(keyPair.privateKey, keyPair.password),
+  );
+
+  return yield call(dectyptItemAttachments, encryptedRaws, privateKeyObj);
+}
+
 export function* encryptAttachmentRaw({ id, raw }, publicKey) {
   return {
     id,
     raw: yield call(encryptData, raw, publicKey),
   };
 }
-export function* encryptItem({ item, publicKey }) {
-  const { data: { raws, ...data } = { raws: {} } } = item;
-
-  const encryptedItemData = yield call(encryptData, data, publicKey);
+export function* encryptRaws(raws, publicKey) {
   const encryptedRawsArray = yield all(
     Object.keys(raws).map(id =>
       call(encryptAttachmentRaw, { id, raw: raws[id] }, publicKey),
     ),
   );
-  const encryptedRaws = arrayToObject(encryptedRawsArray);
+
+  return arrayToObject(encryptedRawsArray);
+}
+export function* encryptItem({ item, publicKey }) {
+  const { data: { raws, ...data } = { raws: {} } } = item;
+
+  const encryptedItemData = yield call(encryptData, data, publicKey);
+  const encryptedRaws = yield call(encryptRaws, raws, publicKey);
+
   const encryptedItem = {
     data: encryptedItemData,
     raws: JSON.stringify(encryptedRaws),
@@ -407,7 +451,24 @@ export function* saveShareKeyPairSaga({ item, publicKey }) {
 export function* saveItemSaga({ item, publicKey }) {
   const { id = null, listId = null, type, favorite = false, ownerId } = item;
 
-  const { data, raws } = yield call(encryptItem, { item, publicKey });
+  const rawsFromServer = yield call(downloadAndDecryptRaws, {
+    payload: { itemId: item.id },
+  });
+
+  const { data, raws = {} } = yield call(encryptItem, {
+    item: {
+      // OMG :(
+      ...item,
+      data: {
+        ...item.data,
+        raws: {
+          ...(item.data?.raws || {}),
+          ...(rawsFromServer || {}),
+        },
+      },
+    },
+    publicKey,
+  });
 
   let serverItemData = {};
 
@@ -688,13 +749,12 @@ export function* createItemsBatchSaga({
       keyPair.publicKey,
     );
 
-    const preparedForRequestItems = items.map(({ type, data }, index) => ({
+    const preparedForRequestItems = items.map(({ type, ...data }, index) => ({
       type,
       listId,
       meta: createItemMetaData({ data }),
       secret: JSON.stringify({
-        data: encryptedItems[index]?.data,
-        raws: encryptedItems[index]?.raws || null,
+        data: encryptedItems[index],
       }),
     }));
 

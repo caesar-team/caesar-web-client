@@ -13,7 +13,7 @@ export const isLoadingSelector = createSelector(
 
 export const getLastUpdatedSelector = createSelector(
   currentUserSelector,
-  user => null, //user.lastUpdated,
+  user => user.lastUpdated,
 );
 
 export const keyPairSelector = createSelector(

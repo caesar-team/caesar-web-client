@@ -63,21 +63,10 @@ export const Attachments = ({
   // TODO: Add loader if raws are not ready
   const handleClickDownloadFile = attachment => {
     dispatch(downloadItemAttachment({ itemId, attachment }));
-    // const { name, ext } = attachment;
-    // const raw = itemRaws[attachment.id];
-
-    // return typeof raw !== 'undefined'
-    //   ? downloadFile(raw, `${name}.${ext}`)
-    //   : false;
   };
 
   const handleClickDownloadAll = () => {
     dispatch(downloadItemAttachments({ itemId }));
-    // const files = itemAttachments.map(attachment => ({
-    //   raw: raws[attachment.id],
-    //   name: `${attachment.name}.${attachment.ext}`,
-    // }));
-    // downloadAsZip(files);
   };
 
   const onClickRemove = handleAttachment => {

@@ -455,7 +455,7 @@ export function* saveItemSaga({ item, publicKey }) {
     payload: { itemId: item.id },
   });
 
-  const { data, raws = {} } = yield call(encryptItem, {
+  const { data, raws } = yield call(encryptItem, {
     item: {
       // OMG :(
       ...item,
@@ -474,8 +474,10 @@ export function* saveItemSaga({ item, publicKey }) {
 
   if (id) {
     const { data: updatedItemData } = yield call(updateItem, id, {
-      secret: JSON.stringify({ data }),
-      raws,
+      secret: isGeneralItem(item)
+        ? JSON.stringify({ data })
+        : JSON.stringify({ data, raws }),
+      raws: isGeneralItem(item) ? raws : null,
       meta: createItemMetaData(item),
     });
 
@@ -487,8 +489,10 @@ export function* saveItemSaga({ item, publicKey }) {
       ownerId,
       type,
       favorite,
-      secret: JSON.stringify({ data }),
-      raws,
+      secret: isGeneralItem(item)
+        ? JSON.stringify({ data })
+        : JSON.stringify({ data, raws }),
+      raws: isGeneralItem(item) ? raws : null,
     });
 
     serverItemData = updatedItemData || {};

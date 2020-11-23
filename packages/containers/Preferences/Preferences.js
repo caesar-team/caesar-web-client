@@ -1,9 +1,11 @@
+/* eslint-disable no-alert */
+/* eslint-disable no-restricted-globals */
 /* eslint-disable camelcase */
 import React from 'react';
-import { Button, SettingsWrapper } from '@caesar/components';
 import styled from 'styled-components';
 import { useDispatch } from 'react-redux';
 import { resetApplicationCache } from '@caesar/common/actions/application';
+import { Button, SettingsWrapper } from '@caesar/components';
 
 const ButtonStyled = styled(Button)`
   margin-right: 24px;
@@ -13,7 +15,7 @@ const ResetCacheButton = styled(ButtonStyled)`
   margin-right: 0;
 `;
 
-export const PreferencesContainer = ({ currentUser }) => {
+export const PreferencesContainer = () => {
   const dispatch = useDispatch();
 
   const handleClearCache = () => {

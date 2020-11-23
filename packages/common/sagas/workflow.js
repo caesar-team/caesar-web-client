@@ -58,7 +58,6 @@ import { fetchUsersSaga } from '@caesar/common/sagas/entities/user';
 import {
   createTeamKeyPairSaga,
   fetchTeamsSaga,
-  fetchTeamSaga,
 } from '@caesar/common/sagas/entities/team';
 import { fetchTeamMembersSaga } from '@caesar/common/sagas/entities/member';
 import {
@@ -320,19 +319,19 @@ export function* processSharedItemsSaga({ payload: { teamId } }) {
       ),
     );
 
-    const removedIdsItems = sharedItems
+    const removedItemsIds = sharedItems
       .filter(sharedItem => !keyPairs[sharedItem.id])
       .map(sharedItem => sharedItem.id);
 
-    if (removedIdsItems.length) {
+    if (removedItemsIds.length) {
       // eslint-disable-next-line no-console
       console.warn(
         `WARNING! These items cannot be decrypted as there are no keypairs and will remove from the store, the ids: %s`,
-        removedIdsItems,
+        removedItemsIds,
       );
 
       // Remove undecrypttable items from the store
-      yield put(removeItemsBatch(removedIdsItems));
+      yield put(removeItemsBatch(removedItemsIds));
     }
   } catch (error) {
     // eslint-disable-next-line no-console
@@ -343,14 +342,14 @@ export function* processSharedItemsSaga({ payload: { teamId } }) {
 function* syncRemovedItems() {
   const itemsById = yield select(itemsByIdSelector);
 
-  const { data: removedIdsItems } = yield call(
+  const { data: removedItemsIds } = yield call(
     getRemovedItems,
     Object.keys(itemsById),
   );
 
-  if (removedIdsItems.length) {
+  if (removedItemsIds.length) {
     // Remove undecrypttable items from the store
-    yield put(removeItemsBatch(removedIdsItems));
+    yield put(removeItemsBatch(removedItemsIds));
   }
 }
 

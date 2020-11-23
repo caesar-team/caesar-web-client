@@ -34,11 +34,18 @@ function* resetStoreSaga() {
     console.error(error);
   }
 }
+
+function refreshPage() {
+  if (window) window.location.reload();
+}
+
 export function* resetApplicationCacheSaga() {
   try {
     yield put(resetStore());
     yield call(Router.push, ROUTES.DASHBOARD);
+    refreshPage();
   } catch (error) {
+    // eslint-disable-next-line no-console
     console.error('error', error);
   }
 }

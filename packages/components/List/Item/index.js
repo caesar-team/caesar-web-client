@@ -1,10 +1,7 @@
 /* eslint-disable camelcase */
 import React from 'react';
-import {
-  PERMISSION,
-  PERMISSION_MESSAGES,
-  TEAM_TYPE,
-} from '@caesar/common/constants';
+import { PERMISSION, PERMISSION_MESSAGES } from '@caesar/common/constants';
+import { getItemMetaData } from '@caesar/common/utils/item';
 import { Icon } from '../../Icon';
 import { Can } from '../../Ability';
 import {
@@ -22,7 +19,6 @@ import {
   CloseIcon,
   WebsiteFavIcon,
 } from './styles';
-import { getItemMetaData } from '@caesar/common/utils/item';
 
 const ItemIcon = ({ website, type }) => {
   return (
@@ -97,7 +93,6 @@ export const Item = ({
   teamId,
   _permissions = {},
   index,
-  teamMembersCount = 0,
   onClickClose = Function.prototype,
   onClickItem = Function.prototype,
   onSelectItem = Function.prototype,

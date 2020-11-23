@@ -60,11 +60,10 @@ const isTeamEnable = activeTeamId => team => {
   // Don't show the active team
   const isNonActiveTeam = team?.id !== activeTeamId;
   // Always show the must and pinned teams
-  const isMustTeams =
-    team?.id === TEAM_TYPE.PERSONAL || team?.type === TEAM_TYPE.DEFAULT;
-  const isPinnedTeams = !!team?.pinned;
+  const isMustTeam = team?.id === TEAM_TYPE.PERSONAL;
+  const isPinnedTeam = !!team?.pinned;
 
-  return (isPinnedTeams || isMustTeams) && isNonActiveTeam;
+  return (isPinnedTeam || isMustTeam) && isNonActiveTeam;
 };
 
 const VaultAvatar = ({ vault }) =>

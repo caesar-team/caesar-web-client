@@ -13,6 +13,7 @@ import { currentUserDataSelector } from '@caesar/common/selectors/currentUser';
 import { initTeamSettings } from '@caesar/common/actions/workflow';
 import { teamSelector } from '@caesar/common/selectors/entities/team';
 import { teamMembersFullViewSelector } from '@caesar/common/selectors/entities/member';
+import { isLoadingSelector } from '@caesar/common/selectors/workflow';
 
 const SettingsTeamPage = () => {
   const router = useRouter();
@@ -24,13 +25,14 @@ const SettingsTeamPage = () => {
     dispatch(initTeamSettings());
   });
 
+  const isLoading = useSelector(isLoadingSelector);
   const team = useSelector(state => teamSelector(state, { teamId: id })) || {};
   const members = useSelector(state =>
     teamMembersFullViewSelector(state, { teamId: id }),
   );
   const currentUserData = useSelector(currentUserDataSelector);
 
-  const shouldShowLoader = !currentUserData || !team || !members;
+  const shouldShowLoader = isLoading || !currentUserData || !team || !members;
 
   if (shouldShowLoader) {
     return <FullScreenLoader />;

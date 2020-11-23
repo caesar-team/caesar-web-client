@@ -20,11 +20,7 @@ import {
   updateGlobalNotification,
   resetStore,
 } from '@caesar/common/actions/application';
-import { removeTeamMemberSuccess } from '@caesar/common/actions/entities/member';
-import {
-  removeMemberFromTeam,
-  editTeamSuccess,
-} from '@caesar/common/actions/entities/team';
+import { editTeamSuccess } from '@caesar/common/actions/entities/team';
 import { currentUserIdSelector } from '@caesar/common/selectors/currentUser';
 import { memberByUserIdAndTeamIdSelector } from '@caesar/common/selectors/entities/member';
 import { getServerErrorMessage } from '@caesar/common/utils/error';
@@ -38,6 +34,7 @@ import {
 import { removeCookieValue, clearStorage } from '@caesar/common/utils/token';
 import { createPermissionsFromLinks } from '@caesar/common/utils/createPermissionsFromLinks';
 import { ROUTES } from '@caesar/common/constants';
+import { convertTeamsToEntity } from '@caesar/common/normalizers/normalizers';
 
 export function* fetchUserSelfSaga() {
   try {
@@ -94,14 +91,10 @@ export function* leaveTeamSaga({ payload: { teamId } }) {
       userId,
       teamId,
     });
+    const teamsById = convertTeamsToEntity([team]);
 
     yield put(leaveTeamSuccess(teamId));
-    yield put(removeTeamMemberSuccess(member.id));
-    yield put(removeMemberFromTeam(member.teamId, member.id));
-
-    if (team) {
-      yield put(editTeamSuccess(team));
-    }
+    yield put(editTeamSuccess(teamsById[team.id]));
 
     const {
       router: { route },

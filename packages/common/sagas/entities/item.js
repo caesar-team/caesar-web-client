@@ -545,7 +545,7 @@ export function* saveItemSaga({ item, publicKey }) {
 
   const { itemsById } = convertItemsToEntities([itemData]);
   const normalizedItem = Object.values(itemsById).shift();
-  debugger;
+
   return normalizedItem;
 }
 

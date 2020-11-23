@@ -90,6 +90,14 @@ export const convertSystemItemToKeyPair = item => {
     privateKey,
   };
 };
+const rawArrayToObject = arr =>
+  arr.reduce(
+    (accumulator, rawObject) => ({
+      ...accumulator,
+      [rawObject.id]: rawObject.raw,
+    }),
+    {},
+  );
 
 const dectyptAttachment = async (rawObject, privateKeyObject) => {
   return {
@@ -107,7 +115,7 @@ const dectyptItemAttachments = async (item, privateKeyObject) => {
     );
     const rawsArray = await Promise.all(rawsPromise);
 
-    return arrayToObject(rawsArray);
+    return rawArrayToObject(rawsArray);
   }
 
   return {};
@@ -115,13 +123,13 @@ const dectyptItemAttachments = async (item, privateKeyObject) => {
 export const decryptItemData = async (item, privateKeyObject) => {
   try {
     const { data: encryptedData } = JSON.parse(item.secret);
-
     const promises = [];
 
-    promises.push(await decryptData(encryptedData, privateKeyObject));
+    promises.push(decryptData(encryptedData, privateKeyObject));
     promises.push(dectyptItemAttachments(item, privateKeyObject));
 
     const [data, raws] = await Promise.all(promises);
+    console.log(raws);
 
     if (!data) {
       return {

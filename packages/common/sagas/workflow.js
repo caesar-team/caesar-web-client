@@ -2,6 +2,7 @@ import Router from 'next/router';
 import {
   put,
   call,
+  take,
   fork,
   takeLatest,
   takeEvery,
@@ -48,8 +49,12 @@ import {
 import {
   addShareKeyPairBatch,
   addTeamKeyPairBatch,
+  ADD_PERSONAL_KEY_PAIR,
 } from '@caesar/common/actions/keystore';
-import { fetchUserSelfSaga } from '@caesar/common/sagas/currentUser';
+import {
+  fetchKeyPairSaga,
+  fetchUserSelfSaga,
+} from '@caesar/common/sagas/currentUser';
 import { fetchUsersSaga } from '@caesar/common/sagas/entities/user';
 import {
   createTeamKeyPairSaga,
@@ -160,30 +165,50 @@ export function decryptItemsByItemIdKeys(items, keyPairs) {
     return [];
   }
 }
-export function* decryptUserItems(items) {
-  const { privateKey = null, password = null } = yield select(
-    teamKeyPairSelector,
-    {
-      teamId: TEAM_TYPE.PERSONAL,
-    },
-  );
 
-  if (!privateKey || !password) {
+function* getPersonalKey() {
+  let keypair = yield select(teamKeyPairSelector, {
+    teamId: TEAM_TYPE.PERSONAL,
+  });
+
+  if (!keypair) {
+    // eslint-disable-next-line no-console
+    // Check if the keystore was reset.
+    keypair = yield call(fetchKeyPairSaga);
+  }
+
+  const { privateKey = null, password = null } = keypair;
+
+  if (!privateKey || !password) return null;
+
+  return {
+    password,
+    privateKey,
+  };
+}
+
+export function* decryptUserItems(items) {
+  let personalKey = yield call(getPersonalKey);
+
+  if (!personalKey) {
+    personalKey = yield call(getPersonalKey);
+  }
+
+  if (!personalKey) {
     // eslint-disable-next-line no-console
     console.error(
       "Warning! Can't decrypt user item! The keypair is missing or empty",
     );
-
+    console.log(personalKey);
     return;
   }
-
   // decrypt the items
   if (items?.length > 0) {
     yield put(
       decryption({
         items,
-        key: privateKey,
-        masterPassword: password,
+        key: personalKey.privateKey,
+        masterPassword: personalKey.password,
       }),
     );
   }

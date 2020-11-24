@@ -651,7 +651,7 @@ export function* createItemsBatchSaga({
       throw new Error(`Can't find or create the key pair for the items.`);
     }
 
-    const itemsChunks = chunk(items, 4);
+    const itemsChunks = chunk(items, IMPORT_CHUNK_SIZE);
     yield all(
       itemsChunks.map(itemChunk =>
         call(
@@ -666,18 +666,6 @@ export function* createItemsBatchSaga({
       ),
     );
 
-    // const { data: serverItems } = yield call(postCreateItemsBatch, {
-    //   items: preparedForRequestItems,
-    // });
-    //
-    // const preparedForStoreItems = serverItems.map((item, index) => ({
-    //   ...item,
-    //   data: preparedForEncryptingItems[index],
-    // }));
-    // const { itemsById } = convertItemsToEntities(preparedForStoreItems);
-    
-    
-    //yield put(createItemsBatchSuccess(itemsById));
     yield put(updateGlobalNotification(NOOP_NOTIFICATION, false));
   } catch (error) {
     // eslint-disable-next-line no-console
@@ -709,15 +697,19 @@ function* postCreateItemsChunk({ totalCount, items, keyPair, listId }) {
     ({ type, name: title }, index) => ({
       type,
       listId,
-      title,
       secret: JSON.stringify({
         data: encryptedItems[index],
         raws: null,
       }),
+      meta: {
+        title,
+      },
     }),
   );
   
-  const { data: serverItems } = yield call(postCreateItemsBatch, { items });
+  const { data: serverItems } = yield call(postCreateItemsBatch, {
+    items: preparedForRequestItems,
+  });
 
   const preparedForStoreItems = serverItems.map((item, index) => ({
     ...item,
@@ -726,7 +718,7 @@ function* postCreateItemsChunk({ totalCount, items, keyPair, listId }) {
   const { itemsById } = convertItemsToEntities(preparedForStoreItems);
 
   yield put(setImportProgressPercent(
-    Math.round(items.length / totalCount),
+    items.length / totalCount,
   ));
   yield put(createItemsBatchSuccess(itemsById));
 }

@@ -54,7 +54,6 @@ import {
 const initialState = {
   isLoading: true,
   isError: false,
-  isImportProgress: false,
   importProgressPercent: 0,
   byId: {},
 };
@@ -155,7 +154,7 @@ export default createReducer(initialState, {
   [CREATE_ITEMS_BATCH_REQUEST](state) {
     return {
       ...state,
-      isImportProgress: true,
+      importProgressPercent: 0,
     };
   },
   [CREATE_ITEMS_BATCH_SUCCESS](state, { payload }) {
@@ -170,13 +169,13 @@ export default createReducer(initialState, {
   [CREATE_ITEMS_BATCH_FAILURE](state) {
     return {
       ...state,
-      isImportProgress: false,
+      importProgressPercent: 0,
     };
   },
-  [SET_IMPORT_PROGRESS_PERCENT](state) {
+  [SET_IMPORT_PROGRESS_PERCENT](state, { payload }) {
     return {
       ...state,
-      importProgressPercent: payload.percent,
+      importProgressPercent: state.importProgressPercent + payload.percent,
     };
   },
   [EDIT_ITEM_REQUEST](state) {

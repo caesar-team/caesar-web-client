@@ -146,11 +146,6 @@ export const itemsByListIdVisibleSelector = createSelector(
     ),
 );
 
-export const isImportProgressSelector = createSelector(
-  itemEntitySelector,
-  itemEntity => itemEntity.isImportProgress,
-);
-
 export const importProgressPercentSelector = createSelector(
   itemEntitySelector,
   itemEntity => itemEntity.importProgressPercent,

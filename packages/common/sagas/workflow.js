@@ -46,7 +46,7 @@ import {
   addShareKeyPairBatch,
   addTeamKeyPairBatch,
 } from '@caesar/common/actions/keystore';
-import { fetchUserSelfSaga } from '@caesar/common/sagas/currentUser';
+import { checkIfUserWasKickedFromTeam } from '@caesar/common/sagas/currentUser';
 import { fetchUsersSaga } from '@caesar/common/sagas/entities/user';
 import {
   createTeamKeyPairSaga,
@@ -604,7 +604,7 @@ function* initListsAndProgressEntities() {
 }
 
 export function* initWorkflowSaga() {
-  yield call(fetchUserSelfSaga);
+  yield call(checkIfUserWasKickedFromTeam);
   yield call(loadKeyPairsAndPersonalItems);
   yield fork(fetchUsersSaga);
 }
@@ -675,6 +675,8 @@ export function* openTeamVaultSaga({ payload: { teamId } }) {
   } catch (error) {
     // eslint-disable-next-line no-console
     console.error(error);
+
+    yield call(checkIfUserWasKickedFromTeam);
   }
 }
 

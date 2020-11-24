@@ -1,6 +1,7 @@
 /* eslint-disable no-console */
 import Router from 'next/router';
-import { put, call, select, takeLatest } from 'redux-saga/effects';
+import { put, call, all, select, takeLatest } from 'redux-saga/effects';
+import { difference } from 'lodash';
 import {
   FETCH_USER_SELF_REQUEST,
   FETCH_KEY_PAIR_REQUEST,
@@ -22,7 +23,10 @@ import {
 } from '@caesar/common/actions/application';
 import { removeTeamMemberSuccess } from '@caesar/common/actions/entities/member';
 import { removeMemberFromTeam } from '@caesar/common/actions/entities/team';
-import { currentUserIdSelector } from '@caesar/common/selectors/currentUser';
+import {
+  currentUserIdSelector,
+  currentUserTeamIdsSelector,
+} from '@caesar/common/selectors/currentUser';
 import { memberByUserIdAndTeamIdSelector } from '@caesar/common/selectors/entities/member';
 import { getServerErrorMessage } from '@caesar/common/utils/error';
 import {
@@ -36,19 +40,43 @@ import { removeCookieValue, clearStorage } from '@caesar/common/utils/token';
 import { createPermissionsFromLinks } from '@caesar/common/utils/createPermissionsFromLinks';
 import { ROUTES } from '@caesar/common/constants';
 import { clearStateWhenLeaveTeam } from './entities/team';
+import { normalizeCurrentUser } from '@caesar/common/normalizers/normalizers';
+
+export function* checkIfUserWasKickedFromTeam(userTeamIdsFromRequest) {
+  try {
+    const userTeamIds = yield select(currentUserTeamIdsSelector);
+
+    if (!userTeamIds) return;
+
+    let validUserTeamIds = [];
+
+    if (userTeamIdsFromRequest) {
+      validUserTeamIds = userTeamIdsFromRequest;
+    } else {
+      const { data } = yield call(getUserTeams);
+
+      validUserTeamIds = data.map(({ id }) => id);
+    }
+
+    const diff = difference(userTeamIds, validUserTeamIds);
+
+    if (diff.length) {
+      yield call(clearStateWhenLeaveTeam, { payload: { teamIds: diff } });
+
+      yield all(diff.map(teamId => put(leaveTeamSuccess(teamId))));
+    }
+  } catch (error) {
+    // eslint-disable-next-line no-console
+    console.error(error);
+  }
+}
 
 export function* fetchUserSelfSaga() {
   try {
     const { data: currentUser } = yield call(getUserSelf);
 
-    const fixedUser = {
-      ...currentUser,
-      _permissions: currentUser?._links
-        ? createPermissionsFromLinks(currentUser._links)
-        : {},
-    };
-
-    yield put(fetchUserSelfSuccess(fixedUser));
+    yield call(checkIfUserWasKickedFromTeam, currentUser?.data?.teamIds);
+    yield put(fetchUserSelfSuccess(normalizeCurrentUser(currentUser)));
   } catch (error) {
     console.error('error', error);
     yield put(fetchUserSelfFailure());

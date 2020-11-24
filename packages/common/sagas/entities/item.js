@@ -76,7 +76,7 @@ import {
   ROUTES,
   TEAM_TYPE,
   ITEM_TYPE,
-  IMPORT_CHUNK_SIZE, ENCRYPTION_CHUNK_SIZE
+  IMPORT_CHUNK_SIZE,
 } from "@caesar/common/constants";
 import {
   shareKeyPairSelector,

@@ -382,7 +382,9 @@ function* checkTeamPermissionsAndKeys(teamId, createKeyPair = false) {
       return false;
     }
 
-    const { publicKey } = yield select(userSelector, { userId: ownerId });
+    const { publicKey = null } = yield select(userSelector, {
+      userId: ownerId,
+    }) || {};
 
     // eslint-disable-next-line no-console
     console.warn(

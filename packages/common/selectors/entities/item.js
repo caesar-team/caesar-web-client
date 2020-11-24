@@ -145,3 +145,13 @@ export const itemsByListIdVisibleSelector = createSelector(
       item => item.listId === listId && isGeneralItem(item) && !!item?.data,
     ),
 );
+
+export const isImportProgressSelector = createSelector(
+  itemEntitySelector,
+  itemEntity => itemEntity.isImportProgress,
+);
+
+export const importProgressPercentSelector = createSelector(
+  itemEntitySelector,
+  itemEntity => itemEntity.importProgressPercent,
+);

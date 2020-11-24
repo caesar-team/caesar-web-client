@@ -39,6 +39,7 @@ export const DEFAULT_CORES_COUNT = 4;
 
 export const DECRYPTION_CHUNK_SIZE = 25;
 export const ENCRYPTION_CHUNK_SIZE = 25;
+export const IMPORT_CHUNK_SIZE = 100;
 
 export const LIST_TYPE = {
   INBOX: 'inbox',

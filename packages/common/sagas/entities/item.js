@@ -27,6 +27,7 @@ import {
   removeItemsBatchSuccess,
   removeItemsBatchFailure,
   updateItemField,
+  setImportProgressPercent,
 } from '@caesar/common/actions/entities/item';
 import { shareItemBatchSaga } from '@caesar/common/sagas/common/share';
 import { setCurrentTeamId } from '@caesar/common/actions/currentUser';
@@ -75,7 +76,8 @@ import {
   ROUTES,
   TEAM_TYPE,
   ITEM_TYPE,
-} from '@caesar/common/constants';
+  IMPORT_CHUNK_SIZE, ENCRYPTION_CHUNK_SIZE
+} from "@caesar/common/constants";
 import {
   shareKeyPairSelector,
   teamKeyPairSelector,
@@ -649,41 +651,33 @@ export function* createItemsBatchSaga({
       throw new Error(`Can't find or create the key pair for the items.`);
     }
 
-    const preparedForEncryptingItems = items.map(
-      ({ attachments, type, ...data }) => ({
-        attachments,
-        ...data,
-      }),
+    const itemsChunks = chunk(items, 4);
+    yield all(
+      itemsChunks.map(itemChunk =>
+        call(
+          postCreateItemsChunk,
+          { 
+            totalCount: items.length, 
+            items: itemChunk,
+            keyPair,
+            listId,
+          },
+        ),
+      ),
     );
 
-    const encryptedItems = yield call(
-      encryptItemsBatch,
-      preparedForEncryptingItems,
-      keyPair.publicKey,
-    );
-
-    const preparedForRequestItems = items.map(
-      ({ type, name: title }, index) => ({
-        type,
-        listId,
-        title,
-        secret: JSON.stringify({
-          data: encryptedItems[index],
-          raws: null,
-        }),
-      }),
-    );
-
-    const { data: serverItems } = yield call(postCreateItemsBatch, {
-      items: preparedForRequestItems,
-    });
-
-    const preparedForStoreItems = serverItems.map((item, index) => ({
-      ...item,
-      data: preparedForEncryptingItems[index],
-    }));
-    const { itemsById } = convertItemsToEntities(preparedForStoreItems);
-    yield put(createItemsBatchSuccess(itemsById));
+    // const { data: serverItems } = yield call(postCreateItemsBatch, {
+    //   items: preparedForRequestItems,
+    // });
+    //
+    // const preparedForStoreItems = serverItems.map((item, index) => ({
+    //   ...item,
+    //   data: preparedForEncryptingItems[index],
+    // }));
+    // const { itemsById } = convertItemsToEntities(preparedForStoreItems);
+    
+    
+    //yield put(createItemsBatchSuccess(itemsById));
     yield put(updateGlobalNotification(NOOP_NOTIFICATION, false));
   } catch (error) {
     // eslint-disable-next-line no-console
@@ -695,6 +689,46 @@ export function* createItemsBatchSaga({
   } finally {
     setSubmitting(false);
   }
+}
+
+function* postCreateItemsChunk({ totalCount, items, keyPair, listId }) {
+  const preparedForEncryptingItems = items.map(
+    ({ attachments, type, ...data }) => ({
+      attachments,
+      ...data,
+    }),
+  );
+
+  const encryptedItems = yield call(
+    encryptItemsBatch,
+    preparedForEncryptingItems,
+    keyPair.publicKey,
+  );
+
+  const preparedForRequestItems = items.map(
+    ({ type, name: title }, index) => ({
+      type,
+      listId,
+      title,
+      secret: JSON.stringify({
+        data: encryptedItems[index],
+        raws: null,
+      }),
+    }),
+  );
+  
+  const { data: serverItems } = yield call(postCreateItemsBatch, { items });
+
+  const preparedForStoreItems = serverItems.map((item, index) => ({
+    ...item,
+    data: preparedForEncryptingItems[index],
+  }));
+  const { itemsById } = convertItemsToEntities(preparedForStoreItems);
+
+  yield put(setImportProgressPercent(
+    Math.round(items.length / totalCount),
+  ));
+  yield put(createItemsBatchSuccess(itemsById));
 }
 
 export function* getKeyPairForItem({ item }) {

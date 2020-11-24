@@ -73,6 +73,8 @@ export const REMOVE_ITEMS_DATA = '@item/REMOVE_ITEMS_DATA';
 
 export const RESET_ITEM_STATE = '@item/RESET_ITEM_STATE';
 
+export const SET_IMPORT_PROGRESS_PERCENT = '@item/SET_IMPORT_PROGRESS_PERCENT';
+
 export const removeItemRequest = (itemId, listId) => ({
   type: REMOVE_ITEM_REQUEST,
   payload: {
@@ -225,6 +227,13 @@ export const createItemsBatchSuccess = itemsById => ({
 
 export const createItemsBatchFailure = () => ({
   type: CREATE_ITEMS_BATCH_FAILURE,
+});
+
+export const setImportProgressPercent = percent => ({
+  type: SET_IMPORT_PROGRESS_PERCENT,
+  payload: {
+    percent,
+  },
 });
 
 export const editItemRequest = (item, setSubmitting, notification) => ({

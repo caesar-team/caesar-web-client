@@ -147,10 +147,16 @@ export const updateTeamMemberRoleFailure = () => ({
   type: UPDATE_TEAM_MEMBER_ROLE_FAILURE,
 });
 
-export const removeTeamMemberRequest = memberId => ({
+export const removeTeamMemberRequest = ({
+  memberId,
+  handleCloseRemoveMemberModal,
+}) => ({
   type: REMOVE_TEAM_MEMBER_REQUEST,
   payload: {
     memberId,
+  },
+  meta: {
+    handleCloseRemoveMemberModal,
   },
 });
 

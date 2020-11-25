@@ -18,7 +18,7 @@ import {
   currentUserDataSelector,
   currentUserTeamListSelector,
   isUserDomainAdminSelector,
-  isUserDomainAdminOrManagerSelector,
+  isUserDomainManagerSelector,
 } from '@caesar/common/selectors/currentUser';
 import { isLoadingSelector } from '@caesar/common/selectors/workflow';
 import { TeamList } from './TeamList';
@@ -30,7 +30,7 @@ const mapStateToProps = createStructuredSelector({
   currentUser: currentUserDataSelector,
   userTeamList: currentUserTeamListSelector,
   isDomainAdmin: isUserDomainAdminSelector,
-  isDomainAdminOrManager: isUserDomainAdminOrManagerSelector,
+  isDomainManager: isUserDomainManagerSelector,
 });
 
 const mapDispatchToProps = {

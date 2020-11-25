@@ -335,7 +335,10 @@ export function* updateTeamMemberRoleSaga({ payload: { memberId, teamRole } }) {
   }
 }
 
-export function* removeTeamMemberSaga({ payload: { memberId } }) {
+export function* removeTeamMemberSaga({
+  payload: { memberId },
+  meta: { handleCloseRemoveMemberModal },
+}) {
   try {
     const member = yield select(memberSelector, { memberId });
 
@@ -347,6 +350,7 @@ export function* removeTeamMemberSaga({ payload: { memberId } }) {
     yield put(removeMemberFromTeam(member.teamId, memberId));
 
     yield put(updateGlobalNotification(NOOP_NOTIFICATION, false));
+    yield call(handleCloseRemoveMemberModal);
   } catch (error) {
     // eslint-disable-next-line no-console
     console.error(error);
@@ -354,6 +358,7 @@ export function* removeTeamMemberSaga({ payload: { memberId } }) {
       updateGlobalNotification(getServerErrorMessage(error), false, true),
     );
     yield put(removeTeamMemberFailure());
+    yield call(handleCloseRemoveMemberModal);
   }
 }
 

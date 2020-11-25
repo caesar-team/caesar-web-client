@@ -23,6 +23,7 @@ import {
   InviteModal,
   ConfirmModal,
   ConfirmLeaveTeamModal,
+  ConfirmRemoveMemberModal,
 } from '@caesar/components';
 import {
   PERMISSION,
@@ -32,12 +33,7 @@ import {
   TEAM_TYPE,
 } from '@caesar/common/constants';
 import { getTeamTitle } from '@caesar/common/utils/team';
-
-import {
-  INVITE_MEMBER_MODAL,
-  LEAVE_TEAM_MODAL,
-  REMOVE_TEAM_MODAL,
-} from './constants';
+import { MODAL } from './constants';
 import { createColumns } from './createColumns';
 
 const ButtonStyled = styled(Button)`
@@ -52,10 +48,12 @@ export const TeamContainerComponent = ({ currentUser, team, members }) => {
   const router = useRouter();
   const dispatch = useDispatch();
   const [modalVisibilities, setModalVisibilities] = useState({
-    [INVITE_MEMBER_MODAL]: false,
-    [LEAVE_TEAM_MODAL]: false,
-    [REMOVE_TEAM_MODAL]: false,
+    [MODAL.INVITE_MEMBER]: false,
+    [MODAL.REMOVE_MEMBER]: false,
+    [MODAL.LEAVE_TEAM]: false,
+    [MODAL.REMOVE_TEAM]: false,
   });
+  const [manipulatedMember, setManipulatedMember] = useState(null);
 
   const isLoading = useSelector(isLoadingSelector);
   const isLoadingTeams = useSelector(isLoadingTeamsSelector);
@@ -93,34 +91,6 @@ export const TeamContainerComponent = ({ currentUser, team, members }) => {
   const isTeamLocked = team.locked;
   const tableData = useMemo(() => members, [members]);
 
-  const handleChangeRole = memberId => (_, value) => {
-    dispatch(updateTeamMemberRoleRequest(memberId, value));
-  };
-
-  const handleRemoveMember = memberId => () => {
-    if (confirm('Do you really want to remove access from the team?')) {
-      dispatch(removeTeamMemberRequest(memberId));
-    }
-  };
-
-  const handleGrantAccessMember = memberId => () => {
-    dispatch(grantAccessTeamMemberRequest(memberId));
-  };
-
-  const columns = useMemo(
-    () =>
-      createColumns({
-        tableWidth,
-        tableHeight,
-        tableScrollTop,
-        canGrantAccessMember: !isTeamLocked,
-        handleChangeRole,
-        handleRemoveMember,
-        handleGrantAccessMember,
-      }),
-    [tableWidth, tableHeight, tableScrollTop, isTeamLocked],
-  );
-
   const handleOpenModal = modal => () => {
     setModalVisibilities({
       ...modalVisibilities,
@@ -135,9 +105,50 @@ export const TeamContainerComponent = ({ currentUser, team, members }) => {
     });
   };
 
+  const handleChangeRole = memberId => (_, value) => {
+    dispatch(updateTeamMemberRoleRequest(memberId, value));
+  };
+
+  const handleGrantAccessMember = memberId => () => {
+    dispatch(grantAccessTeamMemberRequest(memberId));
+  };
+
+  const handleOpenRemoveMemberModal = member => () => {
+    setManipulatedMember(member);
+    handleOpenModal(MODAL.REMOVE_MEMBER)();
+  };
+
+  const handleCloseRemoveMemberModal = () => {
+    handleCloseModal(MODAL.REMOVE_MEMBER)();
+    setManipulatedMember(null);
+  };
+
+  const handleRemoveMember = () => {
+    dispatch(
+      removeTeamMemberRequest({
+        memberId: manipulatedMember.id,
+        handleCloseRemoveMemberModal,
+      }),
+    );
+  };
+
+  const columns = useMemo(
+    () =>
+      createColumns({
+        tableWidth,
+        tableHeight,
+        tableScrollTop,
+        canGrantAccessMember: !isTeamLocked,
+        handleChangeRole,
+        handleOpenRemoveMemberModal,
+        handleGrantAccessMember,
+      }),
+    [tableWidth, tableHeight, tableScrollTop, isTeamLocked],
+  );
+
   const handleInvite = invitedUsers => {
     dispatch(addTeamMembersBatchRequest(team.id, invitedUsers));
-    handleCloseModal(INVITE_MEMBER_MODAL)();
+    handleCloseModal(MODAL.INVITE_MEMBER)();
   };
 
   const handleLeaveTeam = () => {
@@ -182,7 +193,7 @@ export const TeamContainerComponent = ({ currentUser, team, members }) => {
               withOfflineCheck
               icon="trash"
               color="white"
-              onClick={handleOpenModal(REMOVE_TEAM_MODAL)}
+              onClick={handleOpenModal(MODAL.REMOVE_TEAM)}
             />
           </Can>
           <Can I={PERMISSION.LEAVE} a={teamSubject}>
@@ -191,7 +202,7 @@ export const TeamContainerComponent = ({ currentUser, team, members }) => {
                 withOfflineCheck
                 icon="leave"
                 color="white"
-                onClick={handleOpenModal(LEAVE_TEAM_MODAL)}
+                onClick={handleOpenModal(MODAL.LEAVE_TEAM)}
               />
             )}
           </Can>
@@ -199,7 +210,7 @@ export const TeamContainerComponent = ({ currentUser, team, members }) => {
             <Can I={PERMISSION.ADD} a={teamMemberSubject}>
               <AddMemberButton
                 withOfflineCheck
-                onClick={handleOpenModal(INVITE_MEMBER_MODAL)}
+                onClick={handleOpenModal(MODAL.INVITE_MEMBER)}
                 icon="plus"
                 color="black"
               >
@@ -225,30 +236,38 @@ export const TeamContainerComponent = ({ currentUser, team, members }) => {
           tableVisibleDataHeight={tableVisibleDataHeight}
         />
       </Table.Main>
-      {modalVisibilities[INVITE_MEMBER_MODAL] && (
+      {modalVisibilities[MODAL.INVITE_MEMBER] && (
         <InviteModal
           currentUser={currentUser}
           teamId={team.id}
           members={members}
           onRemoveMember={handleRemoveMember}
-          onCancel={handleCloseModal(INVITE_MEMBER_MODAL)}
+          onCancel={handleCloseModal(MODAL.INVITE_MEMBER)}
           onSubmit={handleInvite}
         />
       )}
-      {modalVisibilities[REMOVE_TEAM_MODAL] && (
+      {modalVisibilities[MODAL.REMOVE_TEAM] && (
         <ConfirmModal
           isOpened
           description="Are you sure you want to remove team?"
           onClickConfirm={handleRemoveTeam}
-          onClickCancel={handleCloseModal(REMOVE_TEAM_MODAL)}
+          onClickCancel={handleCloseModal(MODAL.REMOVE_TEAM)}
         />
       )}
-      {modalVisibilities[LEAVE_TEAM_MODAL] && (
+      {modalVisibilities[MODAL.LEAVE_TEAM] && (
         <ConfirmLeaveTeamModal
           isOpened
           teamTitle={team.title}
           onClickConfirm={handleLeaveTeam}
-          onClickCancel={handleCloseModal(LEAVE_TEAM_MODAL)}
+          onClickCancel={handleCloseModal(MODAL.LEAVE_TEAM)}
+        />
+      )}
+      {modalVisibilities[MODAL.REMOVE_MEMBER] && (
+        <ConfirmRemoveMemberModal
+          isOpened
+          memberName={manipulatedMember.name || manipulatedMember.email}
+          onClickConfirm={handleRemoveMember}
+          onClickCancel={handleCloseRemoveMemberModal}
         />
       )}
     </SettingsWrapper>

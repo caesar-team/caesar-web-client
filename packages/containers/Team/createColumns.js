@@ -106,7 +106,7 @@ export const createColumns = ({
   tableScrollTop,
   canGrantAccessMember,
   handleChangeRole,
-  handleRemoveMember,
+  handleOpenRemoveMemberModal,
   handleGrantAccessMember,
 }) => {
   const dynamicColumnsWidth =
@@ -204,7 +204,7 @@ export const createColumns = ({
                 <Can I={PERMISSION.DELETE} a={_permissions}>
                   <MenuButton
                     color="white"
-                    onClick={handleRemoveMember(original.id)}
+                    onClick={handleOpenRemoveMemberModal(original)}
                   >
                     Remove
                   </MenuButton>

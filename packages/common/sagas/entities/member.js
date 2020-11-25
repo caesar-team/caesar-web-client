@@ -259,7 +259,7 @@ export function* addMemberToTeamListsBatchSaga({ payload: { teamId, users } }) {
 
     const postDataSagas = newUsers.map(user =>
       call(encryptMemberTeamKey, {
-        member: {
+        user: {
           ...user,
           role: rolesById[user.id],
         },

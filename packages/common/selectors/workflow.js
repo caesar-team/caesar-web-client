@@ -1,12 +1,11 @@
 import { createSelector } from 'reselect';
-import { LIST_TYPE, TEAM_TYPE } from '@caesar/common/constants';
+import { LIST_TYPE } from '@caesar/common/constants';
 import {
   listsByIdSelector,
   favoritesListSelector,
 } from '@caesar/common/selectors/entities/list';
 import { itemsByIdSelector } from '@caesar/common/selectors/entities/item';
 import { usersByIdSelector } from '@caesar/common/selectors/entities/user';
-import { teamsByIdSelector } from '@caesar/common/selectors/entities/team';
 
 export const workflowSelector = state => state.workflow;
 

@@ -91,14 +91,17 @@ const ItemComponent = ({
 
   const handleClickAcceptEdit = patchData => {
     setSubmitting(true);
-    const updatedData = {
-      ...item,
-      data: {
-        ...item.data,
-        ...patchData,
-      },
-    };
-    dispatch(editItemRequest(updatedData, setSubmitting, notification));
+
+    dispatch(
+      editItemRequest(
+        {
+          itemId: item.id,
+          patch: patchData,
+        },
+        setSubmitting,
+        notification,
+      ),
+    );
   };
 
   const handleClickRestoreItem = async () => {

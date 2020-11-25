@@ -134,6 +134,7 @@ export const ROUTES = {
   CREATE: '/create',
   BOOTSTRAP: '/user/security/bootstrap',
   TWOFA: '/auth/2fa',
+  PREREFENCES: '/preferences',
 };
 
 export const DOMAIN_SECURE_ROUTE = IS_SECURE_APP ? ROUTES.MAIN : ROUTES.SECURE;
@@ -146,6 +147,7 @@ export const SHARED_ROUTES = [ROUTES.SHARE, ROUTES.INVITE];
 export const LOCKED_ROUTES = [
   ROUTES.DASHBOARD,
   ROUTES.IMPORT,
+  ROUTES.PREREFENCES,
   ROUTES.TEAM,
   ROUTES.USERS,
   ROUTES.CREATE,

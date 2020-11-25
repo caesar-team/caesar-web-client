@@ -3,6 +3,7 @@ export const INIT_TEAMS = '@workflow/INIT_TEAMS';
 export const INIT_USERS_SETTINGS = '@workflow/INIT_USERS_SETTINGS';
 export const INIT_TEAMS_SETTINGS = '@workflow/INIT_TEAMS_SETTINGS';
 export const INIT_TEAM_SETTINGS = '@workflow/INIT_TEAM_SETTINGS';
+export const INIT_PREFERENCES_SETTINGS = '@workflow/INIT_PREFERENCES_SETTINGS ';
 export const INIT_IMPORT_SETTINGS = '@workflow/INIT_IMPORT_SETTINGS';
 export const INIT_CREATE_PAGE = '@workflow/INIT_CREATE_PAGE';
 export const INIT_DASHBOARD = '@workflow/INIT_DASHBOARD';
@@ -35,6 +36,9 @@ export const ENCRYPTION_END = '@workflow/ENCRYPTION_END';
 export const OPEN_VAULT = '@workflow/OPEN_VAULT';
 export const OPEN_CURRENT_VAULT = '@workflow/OPEN_CURRENT_VAULT';
 
+export const DOWNLOAD_ITEM_ATTACHMENT = '@item/DOWNLOAD_ITEM_ATTACHMENT';
+export const DOWNLOAD_ITEM_ATTACHMENTS = '@item/DOWNLOAD_ITEM_ATTACHMENTS';
+
 export const initWorkflow = (withDecryption = true) => ({
   type: INIT_WORKFLOW,
   payload: {
@@ -60,6 +64,10 @@ export const initTeamsSettings = () => ({
 
 export const initTeamSettings = () => ({
   type: INIT_TEAM_SETTINGS,
+});
+
+export const initPreferencesSettings = () => ({
+  type: INIT_PREFERENCES_SETTINGS,
 });
 
 export const initImportSettings = () => ({
@@ -170,5 +178,19 @@ export const encryptionEnd = (id, coresCount) => ({
   payload: {
     id,
     coresCount,
+  },
+});
+
+export const downloadItemAttachment = ({ itemId, attachment }) => ({
+  type: DOWNLOAD_ITEM_ATTACHMENT,
+  payload: {
+    itemId,
+    attachment,
+  },
+});
+export const downloadItemAttachments = ({ itemId }) => ({
+  type: DOWNLOAD_ITEM_ATTACHMENTS,
+  payload: {
+    itemId,
   },
 });

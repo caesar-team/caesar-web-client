@@ -33,6 +33,7 @@ import {
   TEAM_TYPE,
 } from '@caesar/common/constants';
 import { getTeamTitle } from '@caesar/common/utils/team';
+import { ability } from '@caesar/common/ability';
 import { MODAL } from './constants';
 import { createColumns } from './createColumns';
 
@@ -89,6 +90,7 @@ export const TeamContainerComponent = ({ currentUser, team, members }) => {
   }, [tableRowGroupNode]);
 
   const isTeamLocked = team.locked;
+  const canEditTeam = ability.can(PERMISSION.EDIT, team._permissions);
   const tableData = useMemo(() => members, [members]);
 
   const handleOpenModal = modal => () => {
@@ -138,7 +140,7 @@ export const TeamContainerComponent = ({ currentUser, team, members }) => {
         tableWidth,
         tableHeight,
         tableScrollTop,
-        canGrantAccessMember: !isTeamLocked,
+        canGrantAccessMember: !isTeamLocked && canEditTeam,
         handleChangeRole,
         handleOpenRemoveMemberModal,
         handleGrantAccessMember,

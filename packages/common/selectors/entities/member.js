@@ -67,10 +67,14 @@ export const teamMembersFullViewSelector = createSelector(
       const member = members[memberId];
 
       if (!member) return acc;
+      const user = users[member.userId];
 
-      const { avatar, email, id, name, publicKey } = users[member.userId];
-      const user = { ...member, avatar, email, userId: id, name, publicKey };
+      if (!user) return acc;
 
-      return [...acc, user];
+      const { avatar, email, id, name, publicKey } = user;
+      return [
+        ...acc,
+        { ...member, avatar, email, userId: id, name, publicKey },
+      ];
     }, []) || [],
 );

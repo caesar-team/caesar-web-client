@@ -86,6 +86,7 @@ const CredentialsComponent = ({
       </Row>
       <Row marginBottom={24}>
         <Attachments
+          itemId={item.id}
           attachments={attachments}
           raws={raws}
           itemSubject={itemSubject}

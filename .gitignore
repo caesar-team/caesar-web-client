@@ -13,3 +13,4 @@ build
 .vscode
 /cypress/*
 cypress.json
+secrets.txt

@@ -56,15 +56,18 @@ export function* fetchKeyPairSaga() {
   try {
     const { data } = yield call(getKeys);
 
-    yield put(
-      addPersonalKeyPair({
-        privateKey: data.encryptedPrivateKey,
-        publicKey: data.publicKey,
-      }),
-    );
+    const keypair = {
+      privateKey: data.encryptedPrivateKey,
+      publicKey: data.publicKey,
+    };
+    yield put(addPersonalKeyPair(keypair));
+
+    return keypair;
   } catch (error) {
     console.error('error', error);
     yield put(fetchKeyPairFailure());
+
+    return null;
   }
 }
 

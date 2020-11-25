@@ -1,6 +1,6 @@
 /* eslint-disable no-console */
 import Router from 'next/router';
-import { put, call, select, takeLatest } from 'redux-saga/effects';
+import { put, call, takeLatest } from 'redux-saga/effects';
 import {
   FETCH_USER_SELF_REQUEST,
   FETCH_KEY_PAIR_REQUEST,
@@ -20,10 +20,7 @@ import {
   updateGlobalNotification,
   resetStore,
 } from '@caesar/common/actions/application';
-import { removeTeamMemberSuccess } from '@caesar/common/actions/entities/member';
-import { removeMemberFromTeam } from '@caesar/common/actions/entities/team';
-import { currentUserIdSelector } from '@caesar/common/selectors/currentUser';
-import { memberByUserIdAndTeamIdSelector } from '@caesar/common/selectors/entities/member';
+import { editTeamSuccess } from '@caesar/common/actions/entities/team';
 import { getServerErrorMessage } from '@caesar/common/utils/error';
 import {
   getUserSelf,
@@ -35,6 +32,7 @@ import {
 import { removeCookieValue, clearStorage } from '@caesar/common/utils/token';
 import { createPermissionsFromLinks } from '@caesar/common/utils/createPermissionsFromLinks';
 import { ROUTES } from '@caesar/common/constants';
+import { convertTeamsToEntity } from '@caesar/common/normalizers/normalizers';
 
 export function* fetchUserSelfSaga() {
   try {
@@ -88,16 +86,11 @@ export function* fetchUserTeamsSaga() {
 
 export function* leaveTeamSaga({ payload: { teamId } }) {
   try {
-    yield call(postLeaveTeam, teamId);
-    const userId = yield select(currentUserIdSelector);
-    const member = yield select(memberByUserIdAndTeamIdSelector, {
-      userId,
-      teamId,
-    });
+    const { data: team } = yield call(postLeaveTeam, teamId);
+    const teamsById = convertTeamsToEntity([team]);
 
     yield put(leaveTeamSuccess(teamId));
-    yield put(removeTeamMemberSuccess(member.id));
-    yield put(removeMemberFromTeam(member.teamId, member.id));
+    yield put(editTeamSuccess(teamsById[team.id]));
 
     const {
       router: { route },

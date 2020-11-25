@@ -81,6 +81,7 @@ const MiddleColumnComponent = ({
   const currentTeamItems = useSelector(state =>
     teamItemsSelector(state, { teamId: currentTeamId }),
   );
+
   const searchedItems = useMemo(
     () =>
       filter(

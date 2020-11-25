@@ -196,12 +196,15 @@ class TeamListContainer extends Component {
       teams,
       userTeamList,
       isDomainAdmin,
-      isDomainAdminOrManager,
+      isDomainManager,
       currentUser,
     } = this.props;
 
     const { modalVisibilities, selectedTeamTitle, activeTabName } = this.state;
-    const favoriteTeams = teams.filter(team => team.pinned);
+    const favoriteTeams = isDomainAdmin 
+      ? teams.filter(team => team.pinned)
+      : teams.filter(team => team?.members?.includes(currentUser.id));
+    const isDomainAdminOrManager = isDomainAdmin || isDomainManager;
     const allTeamCards = this.renderTeamCards(
       isDomainAdminOrManager ? teams : userTeamList,
     );
@@ -219,6 +222,8 @@ class TeamListContainer extends Component {
         : isDomainAdminOrManager
         ? teams.length
         : userTeamList.length;
+    
+    const tabName = isDomainAdmin ? "Favorites" : "My Teams";
 
     return (
       <SettingsWrapper
@@ -237,12 +242,12 @@ class TeamListContainer extends Component {
           </Can>
         }
       >
-        {isDomainAdmin ? (
+        {isDomainAdminOrManager ? (
           <Tabs activeTabName={activeTabName} onChange={this.handleChangeTab}>
             <Tab title="All" name={ALL_TAB_NAME}>
               <TeamListWrapper>{allTeamCards}</TeamListWrapper>
             </Tab>
-            <Tab title="Favorites" name={FAVORITES_TAB_NAME}>
+            <Tab title={tabName} name={FAVORITES_TAB_NAME}>
               <TeamListWrapper>{favoriteTeamCards}</TeamListWrapper>
             </Tab>
           </Tabs>

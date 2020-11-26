@@ -210,8 +210,7 @@ export function* encryptMemberTeamKey({ user, keypair }) {
 
   return {
     userId,
-    secret: JSON.stringify({ data }),
-    raws,
+    secret: JSON.stringify({ data, raws }),
     teamRole,
   };
 }
@@ -254,8 +253,7 @@ export function* createTeamSaga({
     const serverPayload = {
       team,
       keypair: {
-        secret: JSON.stringify({ data }),
-        raws,
+        secret: JSON.stringify({ data, raws }),
       },
     };
 

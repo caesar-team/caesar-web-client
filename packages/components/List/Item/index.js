@@ -59,7 +59,7 @@ const SharedUsersCount = ({ isInModal = false, sharedCount = 0 }) => {
 };
 
 const FavItemIcon = ({ favorite = false, isClosable = true }) => {
-  if (!favorite || !isClosable) return <></>;
+  if (!favorite || (isClosable && favorite)) return <></>;
 
   return (
     <Addon>

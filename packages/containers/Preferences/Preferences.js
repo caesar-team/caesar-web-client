@@ -12,6 +12,7 @@ const ButtonStyled = styled(Button)`
 `;
 
 const ResetCacheButton = styled(ButtonStyled)`
+  align-self: flex-start;
   margin-right: 0;
 `;
 
@@ -25,21 +26,10 @@ export const PreferencesContainer = () => {
   };
 
   return (
-    <SettingsWrapper
-      title="Preferences"
-      addonTopComponent={
-        <>
-          <ResetCacheButton
-            onClick={handleClearCache}
-            icon="update"
-            color="black"
-          >
-            Reset Application Cache
-          </ResetCacheButton>
-        </>
-      }
-    >
-      <>¯\_(ツ)_/¯</>
+    <SettingsWrapper title="Preferences">
+      <ResetCacheButton onClick={handleClearCache} icon="update" color="black">
+        Reset Application Cache
+      </ResetCacheButton>
     </SettingsWrapper>
   );
 };

@@ -6,7 +6,7 @@
   "license": "SEE LICENSE IN LICENSE",
   "dependencies": {
     "@caesar/assets": "1.0.0",
-    "pino": "^6.3.2",
-    "pino-pretty": "^4.0.0"
+    "pino": "6.7.0",
+    "pino-pretty": "4.3.0"
   }
 }

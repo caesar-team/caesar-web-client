@@ -5,7 +5,7 @@
   "author": "<ave@caesar.team>",
   "license": "SEE LICENSE IN LICENSE",
   "dependencies": {
-    "polished": "^3.5.2",
+    "polished": "3.6.7",
     "@caesar/assets": "1.0.0"
   }
 }

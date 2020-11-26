@@ -15,7 +15,7 @@
   "npmClient": "yarn",
   "useWorkspaces": true,
   "dependencies": {
-    "wait-on": "^5.2.0"
+    "wait-on": "5.2.0"
   },
   "engines": {
     "node": ">=14.15"

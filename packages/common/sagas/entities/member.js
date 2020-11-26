@@ -249,12 +249,22 @@ export function* addMemberToTeamListsBatchSaga({ payload: { teamId, users } }) {
   try {
     const keypair = yield select(teamKeyPairSelector, { teamId });
     const userIds = users.map(user => user.id);
+    const rolesById = users.reduce((acc, user) => {
+      acc[user.id] = user.role;
+      return acc;
+    }, {});
     // Domain users
     // TODO: Invite unregistered users
     const newUsers = yield select(usersBatchSelector, { userIds });
 
     const postDataSagas = newUsers.map(user =>
-      call(encryptMemberTeamKey, { user, keypair }),
+      call(encryptMemberTeamKey, {
+        user: {
+          ...user,
+          role: rolesById[user.id],
+        },
+        keypair,
+      }),
     );
     const postData = yield all(postDataSagas);
 

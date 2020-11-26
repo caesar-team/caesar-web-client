@@ -1,15 +1,24 @@
-import React from 'react';
+/* eslint-disable camelcase */
+import React, { useMemo, memo } from 'react';
+import { useSelector } from 'react-redux';
 import styled from 'styled-components';
 import Link from 'next/link';
-import memoizeOne from 'memoize-one';
-import { Button, AvatarsList, Can } from '@caesar/components';
-import { DELETE_PERMISSION, ROUTES } from '@caesar/common/constants';
+import { ROUTES, PERMISSION, TEAM_MESSAGES } from '@caesar/common/constants';
+import { teamMembersFullViewSelector } from '@caesar/common/selectors/entities/member';
+import { ability } from '@caesar/common/ability';
+import { getPlural } from '@caesar/common/utils/string';
+import { getTeamTitle } from '@caesar/common/utils/team';
+import { Button } from '../Button';
+import { AvatarsList } from '../Avatar';
+import { DottedMenu } from '../DottedMenu';
+import { Toggle } from '../Toggle';
 
 const Wrapper = styled.div`
+  position: relative;
   display: flex;
   flex-direction: column;
   padding: 20px;
-  border-radius: 3px;
+  border-radius: ${({ theme }) => theme.borderRadius};
   background-color: ${({ theme }) => theme.color.white};
 `;
 
@@ -18,7 +27,34 @@ const TeamWrapper = styled.div`
   justify-content: space-between;
   margin-bottom: 20px;
   padding-bottom: 20px;
-  border-bottom: 1px solid ${({ theme }) => theme.color.lightBlue};
+  border-bottom: 1px solid ${({ theme }) => theme.color.gallery};
+  cursor: pointer;
+`;
+
+const StyledDottedMenu = styled(DottedMenu)`
+  position: absolute;
+  top: 16px;
+  right: 16px;
+`;
+
+const MenuWrapper = styled.div`
+  position: absolute;
+  width: 100%;
+  min-height: 42px;
+  border: 1px solid ${({ theme }) => theme.color.gallery};
+  border-radius: ${({ theme }) => theme.borderRadius};
+`;
+
+const MenuButton = styled(Button)`
+  width: 100%;
+  color: ${({ theme }) => theme.color.black};
+  border: none;
+  transition: background-color 0.2s;
+
+  &:hover {
+    background-color: ${({ theme }) => theme.color.snow};
+    border: none;
+  }
 `;
 
 const TeamDetails = styled.div`
@@ -37,6 +73,7 @@ const TeamInfo = styled.div`
   display: flex;
   flex-direction: column;
   margin-left: 20px;
+  margin-right: 44px;
 `;
 
 const TeamName = styled.div`
@@ -56,27 +93,99 @@ const AvatarsWrapper = styled.div`
   justify-content: space-between;
 `;
 
-const getMembers = memoizeOne((users, members) =>
-  users.reduce((accumulator, { id }) => {
-    const member = members.find(user => user.id === id);
+const Tooltip = styled.div`
+  display: none;
+  position: absolute;
+  bottom: 20px;
+  left: 0;
+  padding: 4px 8px;
+  background-color: ${({ theme }) => theme.color.black};
+  color: ${({ theme }) => theme.color.white};
+  border-radius: 4px;
+  font-size: ${({ theme }) => theme.font.size.xs};
+  white-space: nowrap;
+  z-index: ${({ theme }) => theme.zIndex.basic};
+  transform: translate(-50%, 0);
+`;
 
-    return member ? [...accumulator, member] : accumulator;
-  }, []),
-);
+const ToggleWrapper = styled.div`
+  position: absolute;
+  top: 44px;
+  right: 20px;
 
-const TeamCard = ({
+  &:hover {
+    ${Tooltip} {
+      display: flex;
+    }
+  }
+`;
+
+const TeamCardComponent = ({
   className,
   team,
-  members,
-  isRemoveButtonVisible = false,
+  userId,
   onClick = Function.prototype,
+  onClickEditTeam = Function.prototype,
+  onClickLeaveTeam = Function.prototype,
   onClickRemoveTeam = Function.prototype,
+  onPinTeam = Function.prototype,
 }) => {
-  const { id, title, icon, users } = team;
-  const areMembersAvailable = users && users.length > 0;
+  const { id, icon, members, pinned, _permissions } = team || {};
+  const memberCounter = members?.length || 0;
+  const areMembersAvailable = memberCounter > 0;
+  const teamMembers = useSelector(state =>
+    teamMembersFullViewSelector(state, { teamId: id }),
+  );
+
+  const isCurrentUserTeamMember = useMemo(
+    () => !!teamMembers.find(member => member.userId === userId),
+    [teamMembers],
+  );
+  const canEditTeam = ability.can(PERMISSION.EDIT, _permissions);
+  const canRemoveTeam = ability.can(PERMISSION.DELETE, _permissions);
+  const canLeaveTeam =
+    ability.can(PERMISSION.LEAVE, _permissions) && isCurrentUserTeamMember;
+  const canPinTeam = ability.can(PERMISSION.PIN, _permissions);
+  const shouldShowMenu = canLeaveTeam || canEditTeam || canRemoveTeam;
 
   return (
     <Wrapper className={className} onClick={onClick}>
+      {shouldShowMenu && (
+        <StyledDottedMenu
+          tooltipProps={{
+            textBoxWidth: '100px',
+            arrowAlign: 'start',
+            position: 'left top',
+            padding: '0px 0px',
+            flat: true,
+            zIndex: '1',
+          }}
+        >
+          <MenuWrapper>
+            {canEditTeam && (
+              <MenuButton color="white" onClick={onClickEditTeam}>
+                Edit
+              </MenuButton>
+            )}
+            {canLeaveTeam && (
+              <MenuButton color="white" onClick={onClickLeaveTeam}>
+                Leave
+              </MenuButton>
+            )}
+            {canRemoveTeam && (
+              <MenuButton color="white" onClick={onClickRemoveTeam}>
+                Remove
+              </MenuButton>
+            )}
+          </MenuWrapper>
+        </StyledDottedMenu>
+      )}
+      {canPinTeam && (
+        <ToggleWrapper>
+          <Toggle onChange={onPinTeam} checked={pinned} />
+          <Tooltip>{TEAM_MESSAGES.PIN}</Tooltip>
+        </ToggleWrapper>
+      )}
       <Link
         key={id}
         href={`${ROUTES.SETTINGS}${ROUTES.TEAM}/[id]`}
@@ -86,9 +195,12 @@ const TeamCard = ({
           <TeamDetails>
             <TeamIcon src={icon} />
             <TeamInfo>
-              <TeamName>{title}</TeamName>
+              <TeamName>{getTeamTitle(team)}</TeamName>
               {areMembersAvailable && (
-                <TeamMembers>{users.length} members</TeamMembers>
+                <TeamMembers>
+                  {memberCounter}{' '}
+                  {getPlural(memberCounter, ['member', 'members'])}
+                </TeamMembers>
               )}
             </TeamInfo>
           </TeamDetails>
@@ -97,21 +209,15 @@ const TeamCard = ({
       <AvatarsWrapper>
         {areMembersAvailable && (
           <AvatarsList
-            isSmall
-            avatars={getMembers(users, members)}
+            size={32}
+            fontSize="small"
+            avatars={teamMembers}
             visibleCount={10}
           />
-        )}
-        {isRemoveButtonVisible && (
-          <Can I={DELETE_PERMISSION} of={team}>
-            <Button color="white" onClick={onClickRemoveTeam}>
-              Remove
-            </Button>
-          </Can>
         )}
       </AvatarsWrapper>
     </Wrapper>
   );
 };
 
-export default TeamCard;
+export const TeamCard = memo(TeamCardComponent);

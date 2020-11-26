@@ -9,11 +9,12 @@ const Wrapper = styled.div`
 `;
 
 const CloseIcon = styled(Icon)`
-  width: 10px;
-  height: 10px;
-  fill: ${({ theme }) => theme.color.gray};
-  cursor: pointer;
   margin-left: 20px;
+  cursor: pointer;
+
+  &:hover {
+    color: ${({ theme }) => theme.color.black};
+  }
 `;
 
 const WarningWrapper = styled.div`
@@ -30,7 +31,7 @@ const WarningIcon = styled(Icon)`
 const TooltipText = styled.div`
   display: flex;
   align-items: center;
-  border-radius: 3px;
+  border-radius: ${({ theme }) => theme.borderRadius};
   background-color: ${({ theme }) => theme.color.black};
   padding: 4px 10px;
   font-size: 12px;
@@ -76,7 +77,14 @@ class RemoveControl extends Component {
             </Tooltip>
           </WarningWrapper>
         )}
-        <CloseIcon name="close" className={className} onClick={onClick} />
+        <CloseIcon
+          name="close"
+          width={16}
+          height={16}
+          color="gray"
+          className={className}
+          onClick={onClick}
+        />
       </Wrapper>
     );
   }

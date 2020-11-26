@@ -1,13 +1,14 @@
 import { connect } from 'react-redux';
 import { createStructuredSelector } from 'reselect';
-import { setMasterPassword, setKeyPair } from '@caesar/common/actions/user';
-import { resetWorkflowStore } from '@caesar/common/actions/workflow';
+import { setMasterPassword, logout } from '@caesar/common/actions/currentUser';
+import { addPersonalKeyPair as setKeyPair } from '@caesar/common/actions/keystore';
+import { resetWorkflowState } from '@caesar/common/actions/workflow';
 import {
   initCoresCount,
   updateGlobalNotification,
 } from '@caesar/common/actions/application';
 import { removeItemsData } from '@caesar/common/actions/entities/item';
-import { masterPasswordSelector } from '@caesar/common/selectors/user';
+import { masterPasswordSelector } from '@caesar/common/selectors/currentUser';
 import {
   isLoadingGlobalNotificationSelector,
   isErrorGlobalNotificationSelector,
@@ -25,10 +26,11 @@ const mapStateToProps = createStructuredSelector({
 const mapDispatchToProps = {
   setMasterPassword,
   setKeyPair,
-  resetWorkflowStore,
+  resetWorkflowState,
   removeItemsData,
   initCoresCount,
   updateGlobalNotification,
+  logout,
 };
 
 export default connect(

@@ -43,7 +43,6 @@ class App extends Component {
       await validateKeys(password, privateKey);
 
       this.props.setMasterPassword(password);
-
       this.setState({
         currentStep: DASHBOARD_STEP,
       });
@@ -60,6 +59,7 @@ class App extends Component {
   };
 
   initOpenPGPWorker() {
+    // eslint-disable-next-line camelcase
     openpgp.config.aead_protect = false;
 
     this.worker = new OpenPGPWorker();

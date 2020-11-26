@@ -9,8 +9,15 @@
     "start:production": "yarn --cwd packages/web-app start:production",
     "secure:dev": "yarn --cwd packages/secure-app dev",
     "secure:build:production": "yarn --cwd packages/secure-app build:production",
-    "secure:start:production": "yarn --cwd packages/secure-app start:production"
+    "secure:start:production": "yarn --cwd packages/secure-app start:production",
+    "eslint": "yarn bin eslint"
   },
   "npmClient": "yarn",
-  "useWorkspaces": true
+  "useWorkspaces": true,
+  "dependencies": {
+    "wait-on": "^5.2.0"
+  },
+  "engines": {
+    "node": ">=14.15"
+  }
 }

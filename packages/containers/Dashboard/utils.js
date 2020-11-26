@@ -10,7 +10,7 @@ export const initialCredentials = listId => ({
   data: {
     name: '',
     login: '',
-    pass: '',
+    password: '',
     website: '',
     note: '',
     attachments: [],
@@ -39,18 +39,11 @@ export const initialItemData = (type, listId) =>
     {},
   );
 
-const searchFn = (obj, pattern) => fieldName =>
-  obj &&
-  pattern &&
-  obj[fieldName] &&
-  obj[fieldName].toLowerCase().includes(pattern.toLowerCase());
-
-const SECRET_SEARCH_FIELDS = ['name', 'note', 'website'];
+const searchFn = (obj, pattern) =>
+  obj && pattern && obj.toLowerCase().includes(pattern.toLowerCase());
 
 export const filter = memoize((data, pattern) =>
   pattern
-    ? data.filter(({ data: itemsData }) =>
-        SECRET_SEARCH_FIELDS.some(searchFn(itemsData, pattern)),
-      )
+    ? data.filter(({ meta: { title } }) => searchFn(title, pattern))
     : data,
 );

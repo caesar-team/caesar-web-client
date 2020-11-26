@@ -1,33 +1,42 @@
-import React from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import ContentEditable from 'react-contenteditable';
 
-class ReadOnlyContentEditable extends React.Component {
-  constructor(props) {
-    super(props);
-    this.contentEditable = React.createRef();
-    this.state = { html: props.html || '' };
-  }
+export const ContentEditableComponent = ({
+  content: contentProp = '',
+  disabled = false,
+  handleFocus = Function.prototype,
+  handleClick = Function.prototype,
+  className,
+}) => {
+  const [getContent, setContent] = useState(contentProp);
+  const contentEditable = useRef(null);
 
-  handleChange = evt => {
-    this.setState({ html: evt.target.value });
+  const handleChange = e => {
+    setContent(e.target.value);
   };
 
-  render = () => {
-    return (
-      <ContentEditable
-        style={{ outline: 'none' }}
-        onCut={() => false}
-        onPaste={() => false}
-        onKeyDown={event => {
-          return !event.metaKey ? event.preventDefault() : true;
-        }}
-        innerRef={this.contentEditable}
-        html={this.state.html}
-        disabled={false}
-        onChange={this.handleChange}
-      />
-    );
+  const handleReadOnlyFocus = e => {
+    e.target.blur();
   };
-}
 
-export default ReadOnlyContentEditable;
+  useEffect(() => {
+    setContent(contentProp);
+  }, [contentProp]);
+
+  return (
+    <ContentEditable
+      style={{ outline: 'none' }}
+      onCut={event => event.preventDefault()}
+      onPaste={event => event.preventDefault()}
+      className={className}
+      innerRef={contentEditable}
+      html={getContent}
+      disabled={disabled}
+      onChange={handleChange}
+      onClick={handleClick}
+      onFocus={disabled ? handleReadOnlyFocus : handleFocus}
+    />
+  );
+};
+
+export default ContentEditableComponent;

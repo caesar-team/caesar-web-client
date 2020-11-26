@@ -15,5 +15,6 @@ export const pastFromClipboard = e => {
   if (pastedData != null && pastedData.length > 0) {
     return pastedData;
   }
+
   return null;
 };

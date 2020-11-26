@@ -1,11 +1,14 @@
-import React from 'react';
+import React, { useState, memo } from 'react';
+import { useEffectOnce } from 'react-use';
 import styled from 'styled-components';
 import { FastField, Formik } from 'formik';
 import copy from 'copy-text-to-clipboard';
+import { getBackupCodes } from '@caesar/common/api';
+import { useNotification } from '@caesar/common/hooks';
 import { formatNumbersByColumns } from '@caesar/common/utils/format';
-import { Button, Checkbox, AuthTitle } from '@caesar/components';
 import { downloadTextData } from '@caesar/common/utils/download';
 import { printData } from '@caesar/common/utils/print';
+import { Button, Checkbox, AuthTitle, LogoLoader } from '@caesar/components';
 import { backupInitialValues } from './constants';
 import { agreeSchema } from './schema';
 
@@ -15,6 +18,10 @@ const Wrapper = styled.div`
   margin-right: auto;
   margin-left: auto;
   text-align: center;
+`;
+
+const StyledLogoLoader = styled(LogoLoader)`
+  margin: 40px auto;
 `;
 
 const Form = styled.form`
@@ -32,7 +39,7 @@ const Description = styled.div`
 const Codes = styled.div`
   display: flex;
   flex-wrap: wrap;
-  background: ${({ theme }) => theme.color.lightBlue};
+  background: ${({ theme }) => theme.color.alto};
   border-radius: 4px;
   margin: 50px 0 30px;
 `;
@@ -70,63 +77,94 @@ const NextButton = styled(Button)`
   margin-top: 30px;
 `;
 
-const TwoFactorBackupForm = ({ codes, onSubmit }) => (
-  <Wrapper>
-    <Formik
-      key="backupCodes"
-      initialValues={backupInitialValues}
-      validationSchema={agreeSchema}
-      onSubmit={onSubmit}
-    >
-      {({ handleSubmit, isSubmitting, isValid }) => (
-        <Form onSubmit={handleSubmit}>
-          <AuthTitle>Save your backup codes</AuthTitle>
-          <Description>
-            Backup codes let you access your account if lost your phone. Keep
-            these codes somewhere safe but accessible.
-          </Description>
-          <Codes id="codes">
-            {codes.map((code, index) => (
-              <Code key={index}>{code}</Code>
-            ))}
-          </Codes>
-          <ButtonsWrapper>
-            <StyledButton
-              color="white"
-              icon="copy"
-              onClick={() => copy(formatNumbersByColumns(codes, 4))}
-            >
-              COPY
-            </StyledButton>
-            <StyledButton
-              color="white"
-              icon="download"
-              onClick={() => downloadTextData(formatNumbersByColumns(codes, 4))}
-            >
-              DOWNLOAD
-            </StyledButton>
-            <StyledButton
-              color="white"
-              icon="print"
-              onClick={() => printData(formatNumbersByColumns(codes, 4))}
-            >
-              PRINT
-            </StyledButton>
-          </ButtonsWrapper>
-          <FastField name="agreeCheck">
-            {({ field }) => (
-              <StyledCheckbox {...field} checked={field.value}>
-                I have printed or saved these codes
-              </StyledCheckbox>
-            )}
-          </FastField>
-          <NextButton htmlType="submit" disabled={isSubmitting || !isValid}>
-            Continue
-          </NextButton>
-        </Form>
-      )}
-    </Formik>
-  </Wrapper>
-);
+const TwoFactorBackupFormComponent = ({ onSubmit }) => {
+  const [codes, setCodes] = useState([]);
+  const notification = useNotification();
+  const numbersByColumns = formatNumbersByColumns(codes, 4);
 
-export default TwoFactorBackupForm;
+  useEffectOnce(() => {
+    const setBackupCodes = async () => {
+      const { data } = await getBackupCodes();
+
+      setCodes(data);
+    };
+
+    setBackupCodes();
+  });
+
+  const handleClickCopyCodes = () => {
+    copy(numbersByColumns);
+
+    notification.show({
+      text: 'The backup codes have been copied',
+    });
+  };
+
+  return (
+    <Wrapper>
+      {codes.length === 0 ? (
+        <StyledLogoLoader textColor="black" />
+      ) : (
+        <Formik
+          key="backupCodes"
+          initialValues={backupInitialValues}
+          validationSchema={agreeSchema}
+          onSubmit={onSubmit}
+        >
+          {({ dirty, handleSubmit, isSubmitting, isValid }) => (
+            <Form onSubmit={handleSubmit}>
+              <AuthTitle>Save your backup codes</AuthTitle>
+              <Description>
+                Backup codes let you access your account if you lose your phone.
+                Keep these codes somewhere safe but accessible.
+              </Description>
+              <Codes id="codes">
+                {codes.map((code, index) => (
+                  <Code key={index}>{code}</Code>
+                ))}
+              </Codes>
+              <ButtonsWrapper>
+                <StyledButton
+                  color="white"
+                  icon="copy"
+                  onClick={handleClickCopyCodes}
+                >
+                  Copy
+                </StyledButton>
+                <StyledButton
+                  color="white"
+                  icon="download"
+                  onClick={() => downloadTextData(numbersByColumns)}
+                >
+                  Download
+                </StyledButton>
+                <StyledButton
+                  color="white"
+                  icon="print"
+                  onClick={() => printData(numbersByColumns)}
+                >
+                  Print
+                </StyledButton>
+              </ButtonsWrapper>
+              <FastField name="agreeCheck">
+                {({ field }) => (
+                  <StyledCheckbox {...field} checked={field.value}>
+                    I have printed or saved these codes
+                  </StyledCheckbox>
+                )}
+              </FastField>
+              <NextButton
+                htmlType="submit"
+                disabled={isSubmitting || !isValid || !dirty}
+              >
+                Continue
+              </NextButton>
+            </Form>
+          )}
+        </Formik>
+      )}
+    </Wrapper>
+  );
+};
+
+export const TwoFactorBackupForm = memo(TwoFactorBackupFormComponent);

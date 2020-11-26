@@ -1,12 +1,18 @@
 import React from 'react';
+import { useRouter } from 'next/router';
+import { useSelector } from 'react-redux';
 import styled from 'styled-components';
 import { useNavigatorOnline } from '@caesar/common/hooks';
 import {
+  ROUTES,
   ITEM_TYPE,
   ITEM_ICON_TYPE,
-  CREATE_PERMISSION,
-  ENTITY_TYPE,
+  PERMISSION,
+  PERMISSION_ENTITY,
+  TEAM_TYPE,
 } from '@caesar/common/constants';
+import { workInProgressListSelector } from '@caesar/common/selectors/workflow';
+import { currentTeamSelector } from '@caesar/common/selectors/currentUser';
 import { Button } from '../Button';
 import { Icon } from '../Icon';
 import { Dropdown } from '../Dropdown';
@@ -47,25 +53,37 @@ const renderAddItemOptions = (value, label) => (
   </AddItemOption>
 );
 
-export const AddItem = ({
-  workInProgressList,
-  onClickCreateItem,
-  className,
-}) => {
+export const AddItem = ({ className }) => {
+  const { push } = useRouter();
+  const currentTeam = useSelector(currentTeamSelector);
+  const workInProgressList = useSelector(workInProgressListSelector);
+
+  const handleClickAddItem = (_, value) => {
+    push(
+      `${ROUTES.CREATE}?type=${value}${
+        currentTeam ? `&teamId=${currentTeam?.id}` : ''
+      }&listId=${workInProgressList?.id}`,
+    );
+  };
+
   const isOnline = useNavigatorOnline();
 
-  const itemSubject = {
-    __type: ENTITY_TYPE.ITEM,
-    listType: workInProgressList?.type,
-    teamId: workInProgressList?.teamId,
-    userRole: workInProgressList?.userRole,
+  // Todo: The Can should get an entity itself
+  const { _permissions } = workInProgressList || {};
+
+  const itemPermission = {
+    ..._permissions,
+    __typename:
+      (currentTeam?.id || TEAM_TYPE.PERSONAL) === TEAM_TYPE.PERSONAL
+        ? PERMISSION_ENTITY.ITEM
+        : PERMISSION_ENTITY.TEAM_ITEM,
   };
 
   return (
-    <Can I={CREATE_PERMISSION} of={itemSubject}>
+    <Can I={PERMISSION.CREATE} an={itemPermission}>
       <Dropdown
         options={itemTypesOptions}
-        onClick={onClickCreateItem}
+        onClick={handleClickAddItem}
         optionRender={renderAddItemOptions}
         withTriangleAtTop
         ButtonElement={({ handleToggle }) => (
@@ -75,7 +93,7 @@ export const AddItem = ({
             icon="plus"
             onClick={handleToggle}
           >
-            Add item
+            Add an item
           </Button>
         )}
         className={className}

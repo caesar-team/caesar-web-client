@@ -1,1 +1,1 @@
-export { default as ReadOnlyContentEditable } from './ContentEditable';
+export { default as ContentEditable } from './ContentEditable';

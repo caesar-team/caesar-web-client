@@ -16,6 +16,7 @@ export const {
   APP_VERSION,
   IS_PROD,
   LOG_LEVEL,
+  DOMAIN_HOSTNAME,
 } = publicRuntimeConfig;
 
 export const PWA_WINDOW_SIZE = {
@@ -29,6 +30,8 @@ export const IS_SECURE_APP = APP_TYPE === 'secure';
 export const IS_EXTENSION_APP = APP_TYPE === 'extension';
 export const IS_GENERAL_APP = APP_TYPE === 'general';
 
+export const FINGERPRINT = 'trustedDevice';
+
 export const PORTAL_ID = 'portal';
 
 export const DEFAULT_IDLE_TIMEOUT = 5 * 60 * 1000;
@@ -38,7 +41,6 @@ export const DECRYPTION_CHUNK_SIZE = 25;
 export const ENCRYPTION_CHUNK_SIZE = 25;
 
 export const LIST_TYPE = {
-  ROOT: 'root',
   INBOX: 'inbox',
   LIST: 'list',
   TRASH: 'trash',
@@ -46,13 +48,16 @@ export const LIST_TYPE = {
   FAVORITES: 'favorites',
 };
 
-export const LIST_TYPES_ARRAY = [
-  LIST_TYPE.ROOT,
+export const NOT_SELECTABLE_LIST_TYPES = [
   LIST_TYPE.INBOX,
-  LIST_TYPE.LIST,
   LIST_TYPE.TRASH,
-  LIST_TYPE.DEFAULT,
   LIST_TYPE.FAVORITES,
+];
+
+export const LIST_TYPES_ARRAY = [
+  ...NOT_SELECTABLE_LIST_TYPES,
+  LIST_TYPE.DEFAULT,
+  LIST_TYPE.LIST,
 ];
 
 export const TEAM_TYPE = {
@@ -71,17 +76,13 @@ export const DASHBOARD_MODE = {
   TOOL: 'SECURE_MESSAGE_MODE',
 };
 
-export const ITEM_MODE = {
-  REVIEW: 'review',
-  WORKFLOW_EDIT: 'edit',
-  WORKFLOW_CREATE: 'create',
-};
-
 // mb some types are not included here, don't have enough information
 export const ITEM_TYPE = {
   CREDENTIALS: 'credentials',
   CREDIT_CARD: 'card',
   DOCUMENT: 'document',
+  SYSTEM: 'system',
+  KEYPAIR: 'keypair',
 };
 
 export const ITEM_TYPES_ARRAY = [
@@ -90,7 +91,7 @@ export const ITEM_TYPES_ARRAY = [
   ITEM_TYPE.DOCUMENT,
 ];
 
-export const ITEM_TEXT_TYPE = {
+export const ITEM_CONTENT_TYPE = {
   [ITEM_TYPE.CREDENTIALS]: 'credential',
   [ITEM_TYPE.DOCUMENT]: 'note',
 };
@@ -121,21 +122,38 @@ export const ROUTES = {
   SIGN_UP: '/signup',
   LOGOUT: '/logout',
   RESETTING: '/resetting',
-  MESSAGE: '/message',
   SECURE: '/secure',
+  SECURE_MESSAGE: '/secure/message/[id]',
   SHARE: '/share',
   INVITE: '/invite',
   DASHBOARD: '/',
   SETTINGS: '/settings',
   IMPORT: '/import',
   TEAM: '/team',
+  USERS: '/users',
+  CREATE: '/create',
+  BOOTSTRAP: '/user/security/bootstrap',
+  TWOFA: '/auth/2fa',
+  PREREFENCES: '/preferences',
 };
+
+export const DOMAIN_SECURE_ROUTE = IS_SECURE_APP ? ROUTES.MAIN : ROUTES.SECURE;
 
 export const SHARED_ROUTES = [ROUTES.SHARE, ROUTES.INVITE];
 
 // require bootstrap
 // TODO: figure out better naming
-export const LOCKED_ROUTES = [ROUTES.DASHBOARD, ROUTES.IMPORT, ROUTES.TEAM];
+
+export const LOCKED_ROUTES = [
+  ROUTES.DASHBOARD,
+  ROUTES.IMPORT,
+  ROUTES.PREREFENCES,
+  ROUTES.TEAM,
+  ROUTES.USERS,
+  ROUTES.CREATE,
+  ROUTES.BOOTSTRAP,
+  ROUTES.TWOFA,
+];
 
 // don't require bootstrap routes
 // TODO: figure out better naming
@@ -143,82 +161,148 @@ export const UNLOCKED_ROUTES = [
   ROUTES.SIGN_IN,
   ROUTES.SIGN_UP,
   ROUTES.RESETTING,
-  ROUTES.MESSAGE,
+  ROUTES.SECURE_MESSAGE,
   ROUTES.SECURE,
   ROUTES.SHARE,
   ROUTES.INVITE,
 ];
 
+export const TECH_ROUTES = [ROUTES.LOGOUT];
+
 export const ENTITY_TYPE = {
-  CHILD_ITEM: 'ChildItem',
-  ITEM: 'Item',
-  LIST: 'List',
-  TEAM: 'Team',
-  MEMBER: 'Member',
+  ITEM: 'item',
+  LIST: 'list',
+  TEAM: 'team',
+  MEMBER: 'member',
+  USER: 'user',
+  SYSTEM: 'system',
+  SHARE: 'share',
+  KEYPAIR: 'keypair',
 };
 
+export const COMMON_PROGRESS_NOTIFICATION = 'In progress...';
 export const ENCRYPTING_ITEM_NOTIFICATION = 'Encryption in progress...';
+export const DECRYPTING_ITEM_NOTIFICATION = 'Decryption in progress...';
 export const VERIFICATION_IN_PROGRESS_NOTIFICATION =
   'Verification in progress...';
 export const CREATING_ITEM_NOTIFICATION = 'The item is being created...';
 export const SHARING_IN_PROGRESS_NOTIFICATION = 'Sharing in progress...';
 export const CREATING_ITEMS_NOTIFICATION =
   'Import in progress. The items are being created...';
+export const FEATURE_IS_UNDER_DEVELOPMENT =
+  'Caution! This feature is under development';
 export const MOVING_IN_PROGRESS_NOTIFICATION = 'Moving in progress...';
 export const REMOVING_IN_PROGRESS_NOTIFICATION = 'Removing in progress...';
 export const REDIRECT_NOTIFICATION = 'Redirecting...';
 export const SAVE_NOTIFICATION = 'Saving...';
 export const NOOP_NOTIFICATION = '';
 
-export const PERMISSION_READ = 'read';
-export const PERMISSION_WRITE = 'write';
+export const UUID_REGEXP = /\b[0-9a-f]{8}\b-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-\b[0-9a-f]{12}\b/;
 
-export const USER_ROLE_ADMIN = 'admin';
-export const USER_ROLE_MEMBER = 'member';
+export const TEAM_AVATAR_MAX_SIZE = 8 * 1024 * 1024;
 
-export const COMMANDS_ROLES = {
-  USER_ROLE_ADMIN,
-  USER_ROLE_MEMBER,
+export const GOOD_PASSWORD_SCORE = 3;
+
+export const DEFAULT_ERROR_MESSAGE = 'Something wrong. Please, try again';
+
+export const PERMISSION = {
+  CREATE: 'create',
+  ADD: 'add',
+  EDIT: 'edit',
+  DELETE: 'delete',
+  SORT: 'sort',
+  MOVE: 'move',
+  SHARE: 'share',
+  FAVORITE: 'favorite',
+  TRASH: 'trash',
+  RESTORE: 'restore',
+  MULTISELECT: 'multiselect',
+  CRUD: 'crud',
+  PIN: 'pin',
+  LEAVE: 'leave',
 };
 
-export const ROLE_USER = 'ROLE_USER';
-export const ROLE_ADMIN = 'ROLE_ADMIN';
-export const ROLE_READ_ONLY_USER = 'ROLE_READ_ONLY_USER';
-export const ROLE_ANONYMOUS_USER = 'ROLE_ANONYMOUS_USER';
+export const PERMISSION_ENTITY = {
+  TEAM: 'team',
+  TEAM_MEMBER: 'team_member',
+  LIST: 'list',
+  TEAM_LIST: 'team_list',
+  ITEM: 'item',
+  TEAM_ITEM: 'team_item',
+  DOMAIN: 'domain',
+};
+
+export const TEAM_ROLES = {
+  ROLE_ADMIN: 'ROLE_ADMIN',
+  ROLE_MEMBER: 'ROLE_MEMBER',
+  ROLE_GUEST: 'ROLE_GUEST',
+};
+
+export const TEAM_ROLES_LABELS = {
+  ROLE_ADMIN: 'Admin',
+  ROLE_MEMBER: 'Member',
+  ROLE_GUEST: 'Guest',
+};
 
 export const DOMAIN_ROLES = {
-  ROLE_USER,
-  ROLE_ADMIN,
-  ROLE_READ_ONLY_USER,
-  ROLE_ANONYMOUS_USER,
+  ROLE_ADMIN: 'ROLE_ADMIN',
+  ROLE_MANAGER: 'ROLE_MANAGER',
+  ROLE_USER: 'ROLE_USER',
+  ROLE_READ_ONLY_USER: 'ROLE_READ_ONLY_USER',
+  ROLE_ANONYMOUS_USER: 'ROLE_ANONYMOUS_USER',
 };
 
-// casl permissions
-export const CRUD_PERMISSION = 'crud';
-export const CREATE_PERMISSION = 'create';
-export const READ_PERMISSION = 'read';
-export const UPDATE_PERMISSION = 'update';
-export const DELETE_PERMISSION = 'delete';
-
-// custom permissions
-export const CHANGE_TEAM_MEMBER_ROLE_PERMISSION = 'changeRole';
-export const JOIN_MEMBER_TO_TEAM = 'joinMember';
-export const LEAVE_MEMBER_FROM_TEAM = 'leaveMember';
-export const MOVE_ITEM_PERMISSION = 'moveItem';
-export const SHARE_ITEM_PERMISSION = 'share';
-
-export const PERMISSIONS = {
-  CRUD_PERMISSION,
-  CREATE_PERMISSION,
-  READ_PERMISSION,
-  UPDATE_PERMISSION,
-  DELETE_PERMISSION,
-
-  CHANGE_TEAM_MEMBER_ROLE_PERMISSION,
-  MOVE_ITEM_PERMISSION,
-  JOIN_MEMBER_TO_TEAM,
-  LEAVE_MEMBER_FROM_TEAM,
-  SHARE_ITEM_PERMISSION,
+export const DOMAIN_ROLES_LABELS = {
+  ROLE_ADMIN: 'Admin',
+  ROLE_MANAGER: 'Manager',
+  ROLE_USER: 'Member',
+  ROLE_READ_ONLY_USER: 'Guest',
+  ROLE_ANONYMOUS_USER: 'Anonym',
 };
 
-export const UUID_REGEXP = /\b[0-9a-f]{8}\b-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-\b[0-9a-f]{12}\b/;
+export const PERMISSION_MESSAGES = {
+  FORBIDDEN_SELECT: "You don't have permissions to select the item",
+};
+
+export const KEY_TYPE = {
+  PERSONAL: 'personal',
+  ENTITY: 'entity',
+  TEAMS: 'teams',
+  SHARES: 'shares',
+  ANONYMOUS: 'anonymous',
+};
+
+export const TEAM_MESSAGES = {
+  PIN: 'Enable/disable display the team in the list',
+};
+
+export const EMAIL_REGEX = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+
+export const REGEXP_TESTER = {
+  SYSTEM: {
+    IS_SHARE: name =>
+      /\b(share)-[0-9a-f]{8}\b-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-\b[0-9a-f]{12}\b/.test(
+        name,
+      ),
+    IS_TEAM: name =>
+      /\b(team)-[0-9a-f]{8}\b-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-\b[0-9a-f]{12}\b/.test(
+        name,
+      ),
+  },
+};
+
+export const REGEXP_MATCHER = {
+  SYSTEM: {
+    ITEM_ID: stringData =>
+      stringData
+        ? stringData?.match(
+            /\b(share|team)-([0-9a-f]{8}\b-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-\b[0-9a-f]{12})\b/,
+          )[1] || null
+        : null,
+  },
+};
+
+export const REGEXP_EXCTRACTOR = {
+  ID: stringData =>
+    stringData ? stringData?.match(UUID_REGEXP)[0] || null : null,
+};

@@ -4,7 +4,7 @@ import { withRouter } from 'next/router';
 import { matchStrict } from '@caesar/common/utils/match';
 import { parseFile } from '@caesar/common/utils/importUtils';
 import { ITEM_TYPE, ROUTES } from '@caesar/common/constants';
-import { NavigationPanel, LogoLoader } from '@caesar/components';
+import { NavigationPanel, SettingsWrapper } from '@caesar/components';
 import { DataStep, FieldsStep, FileStep, ImportingStep } from './Steps';
 import {
   DATA_STEP,
@@ -14,51 +14,27 @@ import {
   STEPS,
 } from './constants';
 
-const Wrapper = styled.div`
-  display: flex;
-  flex-direction: column;
-  background: ${({ theme }) => theme.color.lightBlue};
-  width: 100%;
-  padding: 60px;
-`;
-
-const LogoWrapper = styled.div`
-  display: flex;
-  flex-direction: column;
-  background: ${({ theme }) => theme.color.lightBlue};
-  width: 100%;
-  position: relative;
-  height: calc(100vh - 55px);
-  align-items: center;
-  justify-content: center;
-`;
-
-const Title = styled.div`
-  font-size: 36px;
-  color: ${({ theme }) => theme.color.black};
-  margin-bottom: 30px;
-`;
-
 const StepWrapper = styled.div`
   display: flex;
   flex-direction: column;
   background: ${({ theme }) => theme.color.white};
-  padding: 30px;
+  padding: 12px 24px;
 `;
 
 const StyledNavigationPanel = styled(NavigationPanel)`
   margin-top: 25px;
 `;
 
-const normalizeData = (rows, { name, login, pass, website, note }) =>
+const normalizeData = (rows, { name, login, password, website, note }) =>
   rows.map((row, index) => ({
     index,
     name: row[name],
     login: row[login],
-    pass: row[pass],
+    password: row[password],
     website: row[website],
     note: row[note],
-    type: row[pass] && row[login] ? ITEM_TYPE.CREDENTIALS : ITEM_TYPE.DOCUMENT,
+    type:
+      row[password] && row[login] ? ITEM_TYPE.CREDENTIALS : ITEM_TYPE.DOCUMENT,
   }));
 
 const pick = (object, keys) =>
@@ -71,14 +47,16 @@ const pick = (object, keys) =>
   }, {});
 
 const DOCUMENT_TYPE_FIELDS = ['name', 'note'];
-const CREDENTIALS_TYPE_FIELDS = ['name', 'login', 'pass', 'website', 'note'];
+const CREDENTIALS_TYPE_FIELDS = [
+  'name',
+  'login',
+  'password',
+  'website',
+  'note',
+];
 
 class Import extends Component {
   state = this.prepareInitialState();
-
-  componentDidMount() {
-    this.props.initWorkflow(false);
-  }
 
   handleOnload = ({ file }) => {
     const data = parseFile(file.raw);
@@ -209,24 +187,15 @@ class Import extends Component {
     const { isLoading } = this.props;
     const { currentStep } = this.state;
 
-    if (isLoading) {
-      return (
-        <LogoWrapper>
-          <LogoLoader textColor="black" />
-        </LogoWrapper>
-      );
-    }
-
     return (
-      <Wrapper>
-        <Title>Import</Title>
+      <SettingsWrapper isLoading={isLoading} isCompact title="Import">
         <StepWrapper>{this.renderStep()}</StepWrapper>
         <StyledNavigationPanel
           steps={STEPS}
           currentStep={currentStep}
           onClickStep={this.handleClickStep}
         />
-      </Wrapper>
+      </SettingsWrapper>
     );
   }
 }

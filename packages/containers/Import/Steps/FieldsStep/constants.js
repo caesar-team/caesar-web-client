@@ -1,7 +1,7 @@
 export const defaultValues = {
   name: null,
   login: null,
-  pass: null,
+  password: null,
   website: null,
   note: null,
 };

@@ -1,14 +1,14 @@
 import * as yup from 'yup';
 
-export const createSchema = ext =>
+export const createSchema = fileExt =>
   yup.object().shape({
     file: yup
       .object({
-        name: yup
+        ext: yup
           .string()
-          .test('isExt', `Only *.${ext} files can be uploaded`, value =>
-            new RegExp(`.${ext}$`).test(value),
-          ),
+          .test('isExt', `Only *.${fileExt} files can be uploaded`, ext => {
+            return new RegExp(`${fileExt}$`).test(ext);
+          }),
         raw: yup.string(),
       })
       .required(),

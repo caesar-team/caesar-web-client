@@ -1,11 +1,23 @@
 import { schema } from 'normalizr';
-import { ENTITY_TYPE } from '@caesar/common/constants';
+import { ENTITY_TYPE, PERMISSION_ENTITY } from '../../constants';
+import { createPermissionsFromLinks } from '../../utils/createPermissionsFromLinks';
 
-const memberSchema = new schema.Entity('byId', undefined, {
-  processStrategy: entity => ({
-    ...entity,
-    __type: ENTITY_TYPE.MEMBER,
-  }),
-});
+const memberSchema = new schema.Entity(
+  'membersById',
+  {},
+  {
+    processStrategy: entity => ({
+      ...entity,
+      accessGranted: 'accessGranted' in entity ? entity.accessGranted : true,
+      __type: ENTITY_TYPE.MEMBER,
+      _permissions: entity?._links
+        ? {
+            ...createPermissionsFromLinks(entity._links),
+            __typename: PERMISSION_ENTITY.TEAM_MEMBER,
+          }
+        : {},
+    }),
+  },
+);
 
 export default memberSchema;

@@ -6,8 +6,8 @@ import Member from './Member';
 import {
   AddControl,
   RemoveControl,
-  ShareControl,
   InviteControl,
+  RevokeAccessControl,
 } from './components';
 
 const MAX_HEIGHT = 400;
@@ -23,8 +23,9 @@ const MemberWrapper = styled.div`
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 10px 20px;
+  padding: 8px 20px;
   cursor: pointer;
+  transition: background-color 0.2s;
 
   &:hover {
     background-color: ${({ theme }) => theme.color.snow};
@@ -40,7 +41,7 @@ const ControlWrapper = styled.div`
 
 const ADD_CONTROL_TYPE = 'add';
 const REMOVE_CONTROL_TYPE = 'remove';
-const SHARE_CONTROL_TYPE = 'share';
+const REVOKE_CONTROL_TYPE = 'revoke';
 const INVITE_CONTROL_TYPE = 'invite';
 
 const MemberList = ({
@@ -52,6 +53,7 @@ const MemberList = ({
   renderControl = Function.prototype,
   onClickAdd = Function.prototype,
   onClickRemove = Function.prototype,
+  onClickRevokeAccess = Function.prototype,
   onChangeRole = Function.prototype,
 }) => {
   const renderControlFn = member =>
@@ -62,7 +64,11 @@ const MemberList = ({
         [REMOVE_CONTROL_TYPE]: (
           <RemoveControl member={member} onClick={onClickRemove(member)} />
         ),
-        [SHARE_CONTROL_TYPE]: <ShareControl member={member} />,
+        [REVOKE_CONTROL_TYPE]: onClickRevokeAccess ? (
+          <RevokeAccessControl
+            onClickRevoke={() => onClickRevokeAccess(member)}
+          />
+        ) : null,
         [INVITE_CONTROL_TYPE]: (
           <InviteControl
             teamId={teamId}
@@ -76,8 +82,13 @@ const MemberList = ({
       renderControl(member),
     );
 
+  const clickFn = member =>
+    match(controlType, {
+      [ADD_CONTROL_TYPE]: onClickAdd(member),
+    });
+
   const renderedMembers = members.map(member => (
-    <MemberWrapper key={member.id}>
+    <MemberWrapper key={member.id} onClick={() => clickFn(member)}>
       <Member {...member} />
       <ControlWrapper>{renderControlFn(member)}</ControlWrapper>
     </MemberWrapper>

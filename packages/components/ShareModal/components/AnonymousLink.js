@@ -3,7 +3,7 @@ import styled, { keyframes } from 'styled-components';
 import { Toggle } from '../../Toggle';
 import { Icon } from '../../Icon';
 import { Button } from '../../Button';
-import { hideLink, getAnonymousLink } from '../utils';
+import { hideLink } from '../utils';
 
 const spin = keyframes`
   0% {transform:rotate(0deg)}
@@ -13,9 +13,9 @@ const spin = keyframes`
 const AnonymousLinkWrapper = styled.div`
   display: flex;
   flex-direction: column;
-  border-radius: 3px;
-  background-color: ${({ theme }) => theme.color.snow};
-  padding: 10px 20px;
+  padding: 8px 16px;
+  background-color: ${({ theme }) => theme.color.alto};
+  border-radius: ${({ theme }) => theme.borderRadius};
 `;
 
 const ToggleWrapper = styled.div`
@@ -24,49 +24,46 @@ const ToggleWrapper = styled.div`
 `;
 
 const ToggleLabel = styled.div`
-  font-size: 14px;
+  font-size: ${({ theme }) => theme.font.size.small};
   color: ${({ isActive, theme }) =>
     isActive ? theme.color.black : theme.color.gray};
-  margin-left: 20px;
+  margin-left: 16px;
 `;
 
 const BottomWrapper = styled.div`
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-top: 10px;
+  margin-top: 8px;
 `;
 
 const LinkWrapper = styled.div`
-  margin-right: 20px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  height: 40px;
-  border-radius: 3px;
-  border: solid 1px ${({ theme }) => theme.color.gallery};
-  background-color: ${({ theme }) => theme.color.white};
-  padding: 10px 20px;
   width: 100%;
+  height: 40px;
+  padding: 8px 16px;
+  margin-right: 16px;
+  background-color: ${({ theme }) => theme.color.white};
+  border-radius: ${({ theme }) => theme.borderRadius};
+  border: solid 1px ${({ theme }) => theme.color.gallery};
 `;
 
 const LinkText = styled.div`
-  font-size: 14px;
+  width: 300px;
+  overflow: hidden;
+  font-size: ${({ theme }) => theme.font.size.small};
   color: ${({ theme }) => theme.color.emperor};
   text-overflow: ellipsis;
   white-space: nowrap;
-  overflow: hidden;
-  width: 300px;
 `;
 
 const UpdateIcon = styled(Icon)`
-  width: 20px;
-  height: 20px;
   cursor: pointer;
-  fill: ${({ theme }) => theme.color.emperor};
 
   &:hover {
-    fill: ${({ disabled, theme }) =>
+    color: ${({ disabled, theme }) =>
       disabled ? theme.color.emperor : theme.color.black};
   }
 `;
@@ -78,9 +75,15 @@ const UpdateIconLoading = styled(UpdateIcon)`
   animation-timing-function: linear;
 `;
 
-const AnonymousLink = ({ link, isLoading, onToggle, onCopy, onUpdate }) => {
+export const AnonymousLink = ({
+  link,
+  isLoading,
+  onToggle,
+  onCopy,
+  onUpdate,
+}) => {
   const isLinkActive = !!link;
-  const linkText = isLinkActive ? hideLink(getAnonymousLink(link)) : '';
+  const linkText = isLinkActive ? hideLink(link) : '';
 
   const isToggleLoading = !isLinkActive && isLoading;
 
@@ -96,7 +99,7 @@ const AnonymousLink = ({ link, isLoading, onToggle, onCopy, onUpdate }) => {
           onChange={onToggle}
         />
         <ToggleLabel isActive={isLinkActive}>
-          Share via a anonymous link:
+          Share via an anonymous link:
         </ToggleLabel>
       </ToggleWrapper>
       {isLinkActive && (
@@ -105,22 +108,18 @@ const AnonymousLink = ({ link, isLoading, onToggle, onCopy, onUpdate }) => {
             <LinkText>{linkText}</LinkText>
             <UpdateIconComponent
               name="update"
+              width={20}
+              height={20}
+              color="emperor"
               disabled={isLoading}
               onClick={onUpdate}
             />
           </LinkWrapper>
-          <Button
-            color="black"
-            icon="copy"
-            disabled={isLoading}
-            onClick={onCopy}
-          >
-            COPY
+          <Button icon="copy" disabled={isLoading} onClick={onCopy}>
+            Copy
           </Button>
         </BottomWrapper>
       )}
     </AnonymousLinkWrapper>
   );
 };
-
-export default AnonymousLink;

@@ -3,12 +3,12 @@ import { createStructuredSelector } from 'reselect';
 import {
   fetchKeyPairRequest,
   setMasterPassword,
-} from '../../../common/actions/user';
-import { keyPairSelector } from '../../../common/selectors/user';
+} from '@caesar/common/actions/user';
+import { personalKeyPairSelector } from '@caesar/common/selectors/keystore';
 import App from './App';
 
 const mapStateToProps = createStructuredSelector({
-  keyPair: keyPairSelector,
+  keyPair: personalKeyPairSelector,
 });
 
 const mapDispatchToProps = {

@@ -3,15 +3,15 @@ import styled from 'styled-components';
 const getPseudoStyles = ({ position = 'center', width = 2 }) => {
   if (position === 'left') {
     return `
-      &:before {
+      &::before {
         content: '';
         flex: 0;
       }
 
-      &:after {
+      &::after {
         content: '';
         border-top: ${width}px solid;
-        margin: 0 20px 0 20px;
+        margin: 0 16px 0 16px;
         flex: 1 0 20px;
       }
     `;
@@ -19,14 +19,14 @@ const getPseudoStyles = ({ position = 'center', width = 2 }) => {
 
   if (position === 'right') {
     return `
-      &:before {
+      &::before {
         content: '';
         border-top: ${width}px solid;
-        margin: 0 20px 0 20px;
+        margin: 0 16px 0 16px;
         flex: 1 0 20px;
       }
     
-      &:after {
+      &::after {
         content: '';
         flex: 0;
       }
@@ -34,29 +34,28 @@ const getPseudoStyles = ({ position = 'center', width = 2 }) => {
   }
 
   return `
-    &:before,
-    &:after {
+    &::before,
+    &::after {
       content: '';
       border-top: ${width}px solid;
-      margin: 0 20px 0 0;
+      margin: 0 16px 0 0;
       flex: 1 0 20px;
     }
   
-    &:after {
-      margin: 0 0 0 20px;
+    &::after {
+      margin: 0 0 0 16px;
     }
   `;
 };
 
 const TextWithLines = styled.div`
-  font-size: 14px;
-  font-weight: 600;
-  color: ${({ theme }) => theme.color.lightGray};
-  text-transform: uppercase;
   display: flex;
   width: 100%;
   justify-content: center;
   align-items: center;
+  font-size: ${({ theme }) => theme.font.size.small};
+  color: ${({ theme }) => theme.color.gray};
+  text-transform: uppercase;
   text-align: center;
 
   ${getPseudoStyles}

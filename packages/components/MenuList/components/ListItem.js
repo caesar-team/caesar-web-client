@@ -1,15 +1,20 @@
+/* eslint-disable camelcase */
 import React, { useState } from 'react';
-import { useDispatch } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import { Draggable } from 'react-beautiful-dnd';
 import styled from 'styled-components';
-import { upperFirst } from '@caesar/common/utils/string';
-import { LIST_TYPES_ARRAY } from '@caesar/common/constants';
+import { transformListTitle } from '@caesar/common/utils/string';
+import { LIST_TYPE, PERMISSION } from '@caesar/common/constants';
+import { ERROR } from '@caesar/common/validation/constants';
+import { currentTeamSelector } from '@caesar/common/selectors/currentUser';
 import {
   createListRequest,
   editListRequest,
 } from '@caesar/common/actions/entities/list';
+import { Tooltip } from '@caesar/components/List/Item/styles';
+import { Can } from '../../Ability';
 import { Icon } from '../../Icon';
-import { ListItemInput } from './ListItemInput';
+import { ListInput } from './ListInput';
 import { ConfirmRemoveListModal } from './ConfirmRemoveListModal';
 import { MenuItemInner } from './styledComponents';
 
@@ -33,11 +38,11 @@ const StyledIcon = styled(Icon)`
   }
 `;
 
-const ItemIcon = styled(StyledIcon)`
+const ActionIcon = styled(StyledIcon)`
   display: none;
 `;
 
-const DnDIcon = styled(ItemIcon)`
+const DnDIcon = styled(ActionIcon)`
   position: absolute;
   top: 50%;
   left: 24px;
@@ -58,7 +63,7 @@ const Wrapper = styled(MenuItemInner)`
     ${Counter} {
       ${({ isDefault }) => !isDefault && `display: none;`}
     }
-    ${ItemIcon} {
+    ${ActionIcon} {
       display: block;
     }
     ${DnDIcon} {
@@ -67,100 +72,140 @@ const Wrapper = styled(MenuItemInner)`
   }
 `;
 
+const StyledTooltip = styled(Tooltip)`
+  display: flex;
+  top: -20px;
+  left: auto;
+  bottom: auto;
+  z-index: ${({ theme }) => theme.zIndex.basic};
+  opacity: 1;
+`;
+
 export const ListItem = ({
-  item = {},
+  list = {},
+  itemCount,
+  nestedListsLabels = [],
   activeListId,
   index,
-  handleClickMenuItem = Function.prototype,
+  onClickMenuItem = Function.prototype,
   isCreatingMode,
-  setIsCreatingMode,
+  isDraggable,
+  setCreatingMode,
 }) => {
   const dispatch = useDispatch();
-  const { id, label, children = [] } = item;
-  const isDefault = label === 'default';
-  const [isEditMode, setIsEditMode] = useState(isCreatingMode);
-  const [isOpenedPopup, setIsOpenedPopup] = useState(false);
+  const currentTeam = useSelector(currentTeamSelector);
+  const { id, label, type, _permissions } = list;
+
+  const isDefault = type === LIST_TYPE.DEFAULT;
+  const [isEditMode, setEditMode] = useState(isCreatingMode);
+  const [isOpenedPopup, setOpenedPopup] = useState(false);
   const [value, setValue] = useState(label);
 
+  const listTitle = transformListTitle(label);
+  const isListAlreadyExists =
+    value !== label && nestedListsLabels.includes(value?.toLowerCase());
+
+  const isAcceptDisabled = !value || value === label || isListAlreadyExists;
+
   const handleClickEdit = () => {
-    setIsEditMode(true);
+    setEditMode(true);
   };
 
   const handleClickRemove = () => {
-    setIsOpenedPopup(true);
+    setOpenedPopup(true);
   };
 
   const handleClickAcceptEdit = () => {
-    if (isCreatingMode) {
-      dispatch(createListRequest({ label: value }));
-      setIsCreatingMode(false);
-    } else {
-      dispatch(editListRequest({ ...item, label: value }));
+    if (isAcceptDisabled) {
+      return;
     }
 
-    setIsEditMode(false);
+    if (isCreatingMode) {
+      dispatch(
+        createListRequest(
+          { label: value, teamId: currentTeam?.id || null },
+          { setCreatingMode },
+        ),
+      );
+    } else {
+      dispatch(
+        editListRequest(
+          { ...list, label: value, teamId: currentTeam?.id || null },
+          { setEditMode },
+        ),
+      );
+    }
   };
 
   const handleClickClose = () => {
     if (isCreatingMode) {
-      setIsCreatingMode(false);
+      setCreatingMode(false);
     }
 
-    setIsEditMode(false);
+    setEditMode(false);
     setValue(label);
   };
 
-  const itemTitle = LIST_TYPES_ARRAY.includes(label)
-    ? upperFirst(label)
-    : label;
-
-  const renderInner = () => (
+  const renderInner = dragHandleProps => (
     <>
       {isEditMode ? (
-        <ListItemInput
-          isEditMode={isEditMode}
-          setIsEditMode={setIsEditMode}
-          isCreatingMode={isCreatingMode}
-          setIsCreatingMode={setIsCreatingMode}
-          value={value}
-          setValue={setValue}
-          label={label}
-          handleClickAcceptEdit={handleClickAcceptEdit}
-          handleClickClose={handleClickClose}
-        />
-      ) : (
         <>
-          <DnDIcon name="drag-n-drop" width={16} height={16} color="gray" />
-          <Title>{itemTitle}</Title>
-          <Counter>{children.length}</Counter>
-          {!isDefault && (
-            <>
-              <ItemIcon
-                name="pencil"
-                width={16}
-                height={16}
-                color="gray"
-                onClick={handleClickEdit}
-              />
-              <ItemIcon
-                name="trash"
-                width={16}
-                height={16}
-                color="gray"
-                onClick={handleClickRemove}
-              />
-            </>
+          <ListInput
+            isEditMode={isEditMode}
+            setEditMode={setEditMode}
+            isCreatingMode={isCreatingMode}
+            setCreatingMode={setCreatingMode}
+            isAcceptDisabled={isAcceptDisabled}
+            value={value}
+            setValue={setValue}
+            onClickAcceptEdit={handleClickAcceptEdit}
+            onClickClose={handleClickClose}
+          />
+          {isListAlreadyExists && (
+            <StyledTooltip>{ERROR.LIST_ALREADY_EXISTS}</StyledTooltip>
           )}
         </>
+      ) : (
+        <>
+          <div {...dragHandleProps}>
+            <Can I={PERMISSION.SORT} a={_permissions}>
+              <DnDIcon name="drag-n-drop" width={16} height={16} color="gray" />
+            </Can>
+          </div>
+          <Title>{listTitle}</Title>
+          <Can I={PERMISSION.EDIT} a={_permissions}>
+            <Counter>{itemCount}</Counter>
+          </Can>
+          <Can not I={PERMISSION.EDIT} a={_permissions}>
+            <div>{itemCount}</div>
+          </Can>
+          <Can I={PERMISSION.EDIT} a={_permissions}>
+            <ActionIcon
+              name="pencil"
+              width={16}
+              height={16}
+              color="gray"
+              onClick={handleClickEdit}
+            />
+          </Can>
+          <Can I={PERMISSION.DELETE} a={_permissions}>
+            <ActionIcon
+              name="trash"
+              width={16}
+              height={16}
+              color="gray"
+              onClick={handleClickRemove}
+            />
+          </Can>
+        </>
       )}
-      <DnDIcon name="drag-n-drop" width={16} height={16} color="gray" />
     </>
   );
 
-  return isCreatingMode ? (
+  return isCreatingMode || !isDraggable ? (
     <Wrapper
       isActive={activeListId === id && !isEditMode}
-      onClick={() => handleClickMenuItem(id)}
+      onClick={() => onClickMenuItem(id)}
       isEdit={isEditMode}
       isDefault={isDefault}
     >
@@ -177,21 +222,21 @@ export const ListItem = ({
         {provided => (
           <Wrapper
             isActive={activeListId === id && !isEditMode}
-            onClick={() => handleClickMenuItem(id)}
+            onClick={() => onClickMenuItem(id)}
             isEdit={isEditMode}
             isDefault={isDefault}
             ref={provided.innerRef}
             {...provided.draggableProps}
-            {...provided.dragHandleProps}
           >
-            {renderInner()}
+            {renderInner(provided.dragHandleProps)}
           </Wrapper>
         )}
       </Draggable>
       <ConfirmRemoveListModal
-        item={item}
+        currentTeam={currentTeam}
+        list={list}
         isOpenedPopup={isOpenedPopup}
-        setIsOpenedPopup={setIsOpenedPopup}
+        setOpenedPopup={setOpenedPopup}
       />
     </>
   );

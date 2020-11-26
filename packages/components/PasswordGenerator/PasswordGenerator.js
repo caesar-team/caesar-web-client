@@ -1,6 +1,7 @@
 import React, { forwardRef } from 'react';
 import styled from 'styled-components';
-import { Checkbox, RangeInput } from '@caesar/components';
+import { Checkbox } from '../Checkbox';
+import { RangeInput } from '../RangeInput';
 
 const Wrapper = styled.div`
   margin: 10px 0;

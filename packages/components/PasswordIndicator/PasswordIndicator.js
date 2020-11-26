@@ -1,40 +1,12 @@
-import React from 'react';
-import styled from 'styled-components';
-
-const Wrapper = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-`;
-
-const Indicators = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  width: 100%;
-`;
-
-const Indicator = styled.div`
-  display: flex;
-  width: 100%;
-  margin-right: 10px;
-  border: 1px solid
-    ${({ isAcceptable, theme }) =>
-      isAcceptable ? theme.color.black : theme.color.lightGray};
-
-  &:last-child {
-    margin-right: 0;
-  }
-`;
-
-const ScoreName = styled.div`
-  font-size: 12px;
-  font-weight: 600;
-  color: ${({ theme }) => theme.color.black};
-  margin-left: 16px;
-  width: 80px;
-  text-align: right;
-`;
+import React, { memo } from 'react';
+import {
+  Wrapper,
+  LineIndicators,
+  LineIndicator,
+  CircleIndicator,
+  CircleIndicatorOverlay,
+  ScoreName,
+} from './styles';
 
 /*
 From zxcvbn docs: https://github.com/dropbox/zxcvbn
@@ -53,21 +25,50 @@ const SCORE_NAME_MAP = {
   4: 'Excellent',
 };
 
-const PasswordIndicator = ({ score, ...props }) => {
-  const scoreName = SCORE_NAME_MAP[score];
+export const INDICATOR_TYPE = {
+  LINE: 'line',
+  CIRCLE: 'circle',
+};
 
-  const renderedIndicators = Object.keys(SCORE_NAME_MAP).map(key => {
+const renderLineIndicators = score =>
+  Object.keys(SCORE_NAME_MAP).map(key => {
     const isAcceptable = key <= score;
 
-    return <Indicator key={key} isAcceptable={isAcceptable} />;
+    return <LineIndicator key={key} isAcceptable={isAcceptable} />;
   });
+
+const renderCircleIndicator = score => {
+  const percent = (score + 1) * 20;
+
+  return (
+    <CircleIndicator className={`percent-${percent}`}>
+      <CircleIndicatorOverlay />
+    </CircleIndicator>
+  );
+};
+
+const PasswordIndicatorComponent = ({
+  score,
+  type = INDICATOR_TYPE.CIRCLE,
+  withFixWidth,
+  ...props
+}) => {
+  const scoreName = SCORE_NAME_MAP[score];
 
   return (
     <Wrapper {...props}>
-      <Indicators>{renderedIndicators}</Indicators>
-      <ScoreName>{scoreName}</ScoreName>
+      {type === INDICATOR_TYPE.CIRCLE ? (
+        renderCircleIndicator(score)
+      ) : (
+        <LineIndicators>{renderLineIndicators(score)}</LineIndicators>
+      )}
+      <ScoreName withFixWidth={withFixWidth}>{scoreName}</ScoreName>
     </Wrapper>
   );
 };
 
-export default PasswordIndicator;
+const PasswordIndicator = memo(PasswordIndicatorComponent);
+
+PasswordIndicator.ScoreName = ScoreName;
+
+export { PasswordIndicator };

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { memo } from 'react';
 import styled from 'styled-components';
 import { Button } from '@caesar/components';
 import { Checkbox } from '../Checkbox';
@@ -45,9 +45,10 @@ const CheckboxStyled = styled(Checkbox)`
   }
 `;
 
-export const MultiItem = ({
+const MultiItemComponent = ({
   isInboxItems = false,
   isTrashItems = false,
+  isPersonalTeam,
   areAllItemsSelected = false,
   workInProgressItemIds,
   onClickMove = Function.prototype,
@@ -64,10 +65,12 @@ export const MultiItem = ({
     <Wrapper>
       <CheckboxStyled checked={areAllItemsSelected} onChange={onSelectAll} />
       <Title>{workInProgressItemIds.length} items</Title>
-      <ButtonStyled withOfflineCheck color="white" onClick={onClickMove}>
-        MOVE
-      </ButtonStyled>
-      {!isInboxItems && (
+      {!isTrashItems && (
+        <ButtonStyled withOfflineCheck color="white" onClick={onClickMove}>
+          Move
+        </ButtonStyled>
+      )}
+      {isPersonalTeam && !isInboxItems && !isTrashItems && (
         <ButtonStyled
           withOfflineCheck
           color="white"
@@ -84,3 +87,5 @@ export const MultiItem = ({
     </Wrapper>
   );
 };
+
+export const MultiItem = memo(MultiItemComponent);

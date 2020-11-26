@@ -19,19 +19,20 @@ const Loader = styled.div`
   height: 100px;
   background-image: url(${loaderImage});
   animation: ${play} 2s steps(17) infinite;
-  border-radius: 3px;
+  border-radius: ${({ theme }) => theme.borderRadius};
 `;
 
 const LoadingText = styled.div`
   font-size: 18px;
   margin-top: 20px;
-  color: ${({ theme, textColor }) => textColor || theme.color.white};
+  color: ${({ theme, textColor }) =>
+    theme.color[textColor] || theme.color.white};
   width: 100%;
   text-align: center;
 `;
 
-const LogoLoader = ({ textColor }) => (
-  <LoaderWrapper>
+const LogoLoader = ({ textColor, className }) => (
+  <LoaderWrapper className={className}>
     <Loader />
     <LoadingText textColor={textColor}>Loading…</LoadingText>
   </LoaderWrapper>

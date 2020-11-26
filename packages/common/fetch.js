@@ -1,4 +1,5 @@
 import { API_URI, API_BASE_PATH } from './constants';
+import { logger } from './utils/logger';
 
 const baseURL = `${API_URI || process.env.API_URI}/${API_BASE_PATH ||
   process.env.API_BASE_PATH}`;
@@ -15,7 +16,7 @@ const fetchApi = (url, options) =>
   })
     .then(response => response.json())
     .catch(error => {
-      console.error('Error:', error);
+      logger.error('Error: %o', error);
     });
 
 export const postSecureMessage = data =>

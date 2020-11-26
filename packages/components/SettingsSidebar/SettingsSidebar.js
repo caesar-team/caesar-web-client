@@ -5,29 +5,37 @@ import { ROUTES } from '@caesar/common/constants';
 import { Link } from '@caesar/components';
 
 const Wrapper = styled.div`
-  display: flex;
-  flex-direction: column;
-  min-width: 300px;
+  width: 287px;
   height: calc(100vh - 55px);
-  padding-top: 110px;
-  padding-left: 60px;
+  padding: 40px 0;
   border-right: 1px solid ${({ theme }) => theme.color.gallery};
 `;
 
 const StyledLink = styled(Link)`
-  font-size: 18px;
+  display: block;
+  width: 100%;
+  padding: 8px 24px;
+  color: ${({ isActive, theme }) =>
+    isActive ? theme.color.black : theme.color.emperor};
   font-weight: ${({ isActive }) => (isActive ? 600 : 'normal')};
-  margin-bottom: 25px;
   text-decoration: none;
+  background-color: ${({ isActive, theme }) =>
+    isActive ? theme.color.snow : 'transparent'};
+  border: 1px solid
+    ${({ isActive, theme }) => (isActive ? theme.color.gallery : 'transparent')};
+  border-right: none;
+  border-left: none;
 
-  &:last-child {
-    margin-bottom: 0;
+  &:hover {
+    color: ${({ theme }) => theme.color.black};
   }
 `;
 
 const LINKS = [
   { link: ROUTES.SETTINGS + ROUTES.TEAM, name: 'Teams' },
+  { link: ROUTES.SETTINGS + ROUTES.USERS, name: 'All users' },
   { link: ROUTES.SETTINGS + ROUTES.IMPORT, name: 'Import' },
+  { link: ROUTES.SETTINGS + ROUTES.PREREFENCES, name: 'Prerefences' },
 ];
 
 const SettingsSidebar = ({ router: { route } }) => {

@@ -16,5 +16,5 @@ export const schema = yup.object({
   confirmPassword: yup
     .string()
     .oneOf([yup.ref('password')], 'Passwords do not match')
-    .required('Confirm Password is required field'),
+    .required('Confirm password'),
 });

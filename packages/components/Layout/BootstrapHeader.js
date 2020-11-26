@@ -1,7 +1,7 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import styled from 'styled-components';
-import { logout } from '@caesar/common/actions/user';
+import { logout } from '@caesar/common/actions/currentUser';
 import { Avatar } from '../Avatar';
 import { Button } from '../Button';
 import { Logo } from './Logo';
@@ -37,15 +37,15 @@ const UserName = styled.div`
   margin-left: 20px;
 `;
 
-const BootstrapHeader = ({ user, ...props }) => (
+const BootstrapHeader = ({ currentUser, ...props }) => (
   <Wrapper>
     <LogoWrapper>
       <Logo href="/" />
     </LogoWrapper>
     <UserSection>
       <UserInfo>
-        <Avatar {...user} name={user.email} />
-        <UserName>{user.name}</UserName>
+        <Avatar {...currentUser} name={currentUser.email} />
+        <UserName>{currentUser.name}</UserName>
       </UserInfo>
       <Button color="white" onClick={props.logout}>
         Log out
@@ -54,13 +54,11 @@ const BootstrapHeader = ({ user, ...props }) => (
   </Wrapper>
 );
 
-const mapStateToProps = () => ({});
-
 const mapDispatchToProps = {
   logout,
 };
 
 export default connect(
-  mapStateToProps,
+  null,
   mapDispatchToProps,
 )(BootstrapHeader);

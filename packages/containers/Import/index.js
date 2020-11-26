@@ -1,24 +1,24 @@
 import { connect } from 'react-redux';
 import { createItemsBatchRequest } from '@caesar/common/actions/entities/item';
-import { initWorkflow } from '@caesar/common/actions/workflow';
+import { initDashboard } from '@caesar/common/actions/workflow';
 import {
   fetchKeyPairRequest,
   fetchUserSelfRequest,
-} from '@caesar/common/actions/user';
+} from '@caesar/common/actions/currentUser';
 import { createStructuredSelector } from 'reselect';
 import { selectableTeamsListsSelector } from '@caesar/common/selectors/entities/list';
-import { keyPairSelector } from '@caesar/common/selectors/user';
+import { actualKeyPairSelector } from '@caesar/common/selectors/keystore';
 import { isLoadingSelector } from '@caesar/common/selectors/workflow';
 import Import from './Import';
 
 const mapStateToProps = createStructuredSelector({
   teamsLists: selectableTeamsListsSelector,
-  keyPair: keyPairSelector,
+  keyPair: actualKeyPairSelector,
   isLoading: isLoadingSelector,
 });
 
 const mapDispatchToProps = {
-  initWorkflow,
+  initDashboard,
   fetchKeyPairRequest,
   fetchUserSelfRequest,
   createItemsBatchRequest,

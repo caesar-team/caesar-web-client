@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import styled from 'styled-components';
-import { Modal, ModalTitle, UserSearchInput } from '@caesar/components';
+import { Modal, ModalTitle } from '../Modal';
+import { UserSearchInput } from '../Input';
 import { MemberList } from '../MemberList';
 import { Button } from '../Button';
 
@@ -12,7 +13,7 @@ const MemberListStyled = styled(MemberList)`
   margin-bottom: 30px;
 
   ${MemberList.Member} {
-    background-color: ${({ theme }) => theme.color.lightBlue};
+    background-color: ${({ theme }) => theme.color.snow};
     margin-bottom: 4px;
 
     &:last-of-type {
@@ -38,21 +39,21 @@ class InviteModal extends Component {
   handleAddMember = member => {
     this.setState(prevState => ({
       ...prevState,
-      members: [...prevState.members, member],
+      users: [...prevState.users, member],
     }));
   };
 
   handleRemoveMember = member => () => {
     this.setState(prevState => ({
       ...prevState,
-      members: prevState.members.filter(({ id }) => id !== member.id),
+      users: prevState.users.filter(({ id }) => id !== member.id),
     }));
   };
 
   handleChangeRole = changedRoleMember => (_, role) => {
     this.setState(prevState => ({
       ...prevState,
-      members: prevState.members.map(member =>
+      users: prevState.users.map(member =>
         member.id === changedRoleMember.id ? { ...member, role } : member,
       ),
     }));
@@ -60,32 +61,32 @@ class InviteModal extends Component {
 
   handleClickDone = () => {
     const { onSubmit } = this.props;
-    const { members } = this.state;
+    const { users } = this.state;
 
-    onSubmit(members);
+    onSubmit(users);
   };
 
   prepareInitialState() {
     return {
-      members: [],
+      users: [],
     };
   }
 
   render() {
-    const { invitedMembers, user, onCancel } = this.props;
-    const { members } = this.state;
+    const { members, currentUser, onCancel } = this.props;
+    const { users } = this.state;
 
-    const shouldShowAddedMembers = members.length > 0;
+    const shouldShowAddedUsers = users.length > 0;
 
     const searchedBlackListMemberIds = [
-      user.id,
-      ...members.map(({ id }) => id),
-      ...invitedMembers.map(({ id }) => id),
+      currentUser.id,
+      ...users.map(({ id }) => id),
+      ...members.map(({ userId }) => userId),
     ];
 
     return (
       <Modal
-        isOpen
+        isOpened
         width={640}
         onRequestClose={onCancel}
         shouldCloseOnEsc
@@ -97,10 +98,10 @@ class InviteModal extends Component {
             blackList={searchedBlackListMemberIds}
             onClickAdd={this.handleAddMember}
           />
-          {shouldShowAddedMembers && (
+          {shouldShowAddedUsers && (
             <MemberListStyled
               maxHeight={200}
-              members={members}
+              members={users}
               controlType="remove"
               onClickRemove={this.handleRemoveMember}
               onChangeRole={this.handleChangeRole}
@@ -108,9 +109,9 @@ class InviteModal extends Component {
           )}
           <ButtonsWrapper>
             <ButtonStyled color="white" onClick={onCancel}>
-              CANCEL
+              Cancel
             </ButtonStyled>
-            <Button onClick={this.handleClickDone}>DONE</Button>
+            <Button onClick={this.handleClickDone}>Done</Button>
           </ButtonsWrapper>
         </Wrapper>
       </Modal>

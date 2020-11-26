@@ -1,30 +1,55 @@
-import { fork, takeLatest, select } from 'redux-saga/effects';
-import { decryption } from '@caesar/common/sagas/common/decryption';
-import { REHYDRATE_STORE } from '@caesar/common/actions/application';
-import { isOnlineSelector } from '@caesar/common/selectors/application';
-import { itemListSelector } from '@caesar/common/selectors/entities/item';
-import { keyPairSelector, masterPasswordSelector } from '../selectors/user';
+import { put, takeLatest, call } from 'redux-saga/effects';
+import Router from 'next/router';
+import {
+  RESET_STORE,
+  resetApplicationState,
+  RESET_APPLICATION_CACHE,
+  resetStore,
+} from '@caesar/common/actions/application';
+import { resetItemState } from '@caesar/common/actions/entities/item';
+import { resetListState } from '@caesar/common/actions/entities/list';
+import { resetMemberState } from '@caesar/common/actions/entities/member';
+import { resetTeamState } from '@caesar/common/actions/entities/team';
+import { resetSystemState } from '@caesar/common/actions/entities/system';
+import { resetUserState } from '@caesar/common/actions/entities/user';
+import { resetCurrentUserState } from '@caesar/common/actions/currentUser';
+import { resetWorkflowState } from '@caesar/common/actions/workflow';
+import { resetKeystoreState } from '@caesar/common/actions/keystore';
+import { ROUTES } from '@caesar/common/constants';
 
-export function* rehydrateStoreSaga() {
+function* resetStoreSaga() {
   try {
-    const isOnline = yield select(isOnlineSelector);
-
-    if (!isOnline) {
-      const items = yield select(itemListSelector);
-      const keyPair = yield select(keyPairSelector);
-      const masterPassword = yield select(masterPasswordSelector);
-
-      yield fork(decryption, {
-        items,
-        key: keyPair.privateKey,
-        masterPassword,
-      });
-    }
+    yield put(resetMemberState());
+    yield put(resetListState());
+    yield put(resetItemState());
+    yield put(resetTeamState());
+    yield put(resetSystemState());
+    yield put(resetApplicationState());
+    yield put(resetUserState());
+    yield put(resetWorkflowState());
+    yield put(resetKeystoreState());
+    yield put(resetCurrentUserState());
   } catch (error) {
-    console.log(error);
+    // eslint-disable-next-line no-console
+    console.error(error);
   }
 }
 
+function refreshPage() {
+  if (window) window.location.reload();
+}
+
+export function* resetApplicationCacheSaga() {
+  try {
+    yield put(resetStore());
+    yield call(Router.push, ROUTES.DASHBOARD);
+    refreshPage();
+  } catch (error) {
+    // eslint-disable-next-line no-console
+    console.error('error', error);
+  }
+}
 export default function* applicationSagas() {
-  yield takeLatest(REHYDRATE_STORE, rehydrateStoreSaga);
+  yield takeLatest(RESET_STORE, resetStoreSaga);
+  yield takeLatest(RESET_APPLICATION_CACHE, resetApplicationCacheSaga);
 }

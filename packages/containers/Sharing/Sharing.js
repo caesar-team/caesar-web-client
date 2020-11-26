@@ -1,16 +1,11 @@
-import React, { Component } from 'react';
+import React, { Component, memo } from 'react';
 import { getLists } from '@caesar/common/api';
-import { matchStrict } from '@caesar/common/utils/match';
+import { SharingLayout } from '@caesar/components';
+import { ItemByType } from '@caesar/components/Item/ItemByType';
+import { LIST_TYPE, PERMISSION_ENTITY } from '@caesar/common/constants';
 import {
-  SharingLayout,
-  Credentials,
-  Document,
-  withNotification,
-} from '@caesar/components';
-import { LIST_TYPE, ITEM_TYPE, ITEM_MODE } from '@caesar/common/constants';
-import {
-  getPrivateKeyObj,
-  decryptItem,
+  unsealPrivateKeyObj,
+  decryptData,
 } from '@caesar/common/utils/cipherUtils';
 
 const getInboxItem = list => {
@@ -23,7 +18,7 @@ const getInboxItem = list => {
   return inbox.children[0];
 };
 
-class Sharing extends Component {
+class SharingComponent extends Component {
   state = this.prepareInitialState();
 
   async componentDidMount() {
@@ -33,44 +28,39 @@ class Sharing extends Component {
 
     const item = getInboxItem(list);
 
-    const privateKeyObj = await getPrivateKeyObj(privateKey, password);
-    const decryptedSecret = await decryptItem(item.secret, privateKeyObj);
+    const privateKeyObj = await unsealPrivateKeyObj(privateKey, password);
+    const decryptedSecret = await decryptData(item.secret, privateKeyObj);
 
     this.setState({
-      item: { ...item, data: decryptedSecret, mode: ITEM_MODE.REVIEW },
+      item: { ...item, data: decryptedSecret },
     });
   }
 
   prepareInitialState() {
     return {
       item: null,
-      user: null,
     };
   }
 
   render() {
-    const { notification } = this.props;
     const { item } = this.state;
 
     if (!item) {
       return null;
     }
 
-    const renderedItem = matchStrict(
-      item.type,
-      {
-        [ITEM_TYPE.CREDENTIALS]: (
-          <Credentials isSharedItem item={item} notification={notification} />
-        ),
-        [ITEM_TYPE.DOCUMENT]: (
-          <Document isSharedItem item={item} notification={notification} />
-        ),
-      },
-      null,
-    );
+    const itemSubject = {
+      __typename: PERMISSION_ENTITY.ITEM,
+    };
 
-    return <SharingLayout>{renderedItem}</SharingLayout>;
+    return (
+      <SharingLayout>
+        <ItemByType item={item} itemSubject={itemSubject} isSharedItem />
+      </SharingLayout>
+    );
   }
 }
 
-export default withNotification(Sharing);
+const Sharing = memo(SharingComponent);
+
+export default Sharing;

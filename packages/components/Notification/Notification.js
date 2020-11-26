@@ -1,102 +1,75 @@
-import React, { PureComponent } from 'react';
+import React, { useState, memo } from 'react';
+import { useEffectOnce } from 'react-use';
 import styled from 'styled-components';
 import { Icon } from '../Icon';
 
 const Wrapper = styled.div`
+  position: fixed;
+  z-index: ${({ theme }) => theme.zIndex.notification};
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 11px 15px;
+  padding: 8px 16px;
   background: ${({ theme }) => theme.color.black};
-  position: relative;
-  border-radius: 3px;
-  box-shadow: 0 11px 23px 0 rgba(0, 0, 0, 0.08);
+  border-radius: ${({ theme }) => theme.borderRadius};
+  box-shadow: 0 11px 23px 0 ${({ theme }) => theme.color.blackBoxShadow};
+
+  ${({ position }) =>
+    position === 'top-center' &&
+    `
+      left: 50%;
+      top: 24px;
+      transform: translateX(-50%);
+  `};
+
+  ${({ position }) =>
+    position === 'bottom-right' &&
+    `
+      right: 24px;
+      bottom: 24px;
+  `};
 `;
 
 const StyledIcon = styled(Icon)`
   fill: ${({ theme }) => theme.color.white};
-  margin-right: 20px;
+  margin-right: 16px;
 `;
 
 const Text = styled.div`
-  font-size: 14px;
+  font-size: ${({ theme }) => theme.font.size.small};
   color: ${({ theme }) => theme.color.white};
 `;
 
-const ActionLink = styled.a`
-  text-transform: uppercase;
-  font-size: 16px;
-  color: ${({ theme }) => theme.color.white};
+const NotificationComponent = ({ notification, hide }) => {
+  const { text, icon, options } = notification;
+  const [timer, setTimer] = useState(null);
 
-  &:hover {
-    color: ${({ theme }) => theme.color.gray};
-  }
-`;
+  const stopTimer = () => {
+    if (timer) return;
 
-class Notification extends PureComponent {
-  actionRef = React.createRef();
-
-  previousFocus = null;
-
-  componentDidMount() {
-    const elButton = this.actionRef.current;
-
-    if (!elButton) return;
-
-    if (document.activeElement instanceof HTMLElement) {
-      this.previousFocus = document.activeElement;
-    }
-
-    elButton.focus();
-  }
-
-  componentWillUnmount() {
-    this.restoreFocus();
-  }
-
-  handleActionClick = event => {
-    const { onActionClick } = this.props;
-
-    if (onActionClick) onActionClick(event);
+    clearTimeout(timer);
   };
 
-  handleActionBlur = () => {
-    this.restoreFocus();
+  const startTimer = () => {
+    const {
+      options: { timeout },
+    } = notification;
+
+    if (timeout === 0) return;
+
+    setTimer(setTimeout(() => hide(stopTimer), timeout));
   };
 
-  restoreFocus = () => {
-    if (document.activeElement !== this.actionRef.current) return;
+  useEffectOnce(() => {
+    startTimer();
+  });
 
-    if (this.previousFocus && this.previousFocus.focus) {
-      const scrollPosition = window.pageYOffset;
+  return (
+    <Wrapper position={options.position}>
+      {icon && <StyledIcon name={icon} width={20} height={20} />}
+      <Text>{text}</Text>
+    </Wrapper>
+  );
+};
 
-      this.previousFocus.focus();
-
-      window.scrollTo({ top: scrollPosition });
-    }
-
-    this.previousFocus = null;
-  };
-
-  render() {
-    const { text, actionText, icon } = this.props;
-
-    return (
-      <Wrapper>
-        {icon && <StyledIcon name={icon} width={20} height={20} />}
-        <Text>{text}</Text>
-        {actionText && (
-          <ActionLink
-            onClick={this.handleActionClick}
-            onBlur={this.handleActionBlur}
-            ref={this.actionRef}
-          >
-            {actionText}
-          </ActionLink>
-        )}
-      </Wrapper>
-    );
-  }
-}
-
-export default Notification;
+export const Notification = memo(NotificationComponent);

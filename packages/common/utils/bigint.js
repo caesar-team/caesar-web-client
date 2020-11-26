@@ -127,6 +127,7 @@ export function findPrimes(n) {
   }
   ans = new Array(p);
   for (i = 0; i < p; i++) ans[i] = s[i];
+
   return ans;
 }
 
@@ -140,6 +141,7 @@ export function millerRabinInt(x, b) {
   }
 
   copyInt_(mr_a, b);
+
   return millerRabin(x, mr_a);
 }
 
@@ -191,6 +193,7 @@ export function millerRabin(x, b) {
       return 0;
     }
   }
+
   return 1;
 }
 
@@ -202,6 +205,7 @@ export function bitSize(x) {
   for (j = x.length - 1; x[j] == 0 && j > 0; j--);
   for (z = 0, w = x[j]; w; w >>= 1, z++);
   z += bpe * j;
+
   return z;
 }
 
@@ -209,6 +213,7 @@ export function bitSize(x) {
 export function expand(x, n) {
   const ans = int2bigInt(0, (x.length > n ? x.length : n) * bpe, 0);
   copy_(ans, x);
+
   return ans;
 }
 
@@ -216,6 +221,7 @@ export function expand(x, n) {
 export function randTruePrime(k) {
   const ans = int2bigInt(0, k, 0);
   randTruePrime_(ans, k);
+
   return trim(ans, 1);
 }
 
@@ -231,6 +237,7 @@ export function randProbPrime(k) {
   if (k >= 200) return randProbPrimeRounds(k, 15);
   if (k >= 150) return randProbPrimeRounds(k, 18);
   if (k >= 100) return randProbPrimeRounds(k, 27);
+
   return randProbPrimeRounds(k, 40); // number from HAC remark 4.26 (only an estimate)
 }
 
@@ -286,6 +293,7 @@ function randProbPrimeRounds(k, n) {
 export function mod(x, n) {
   const ans = dup(x);
   mod_(ans, n);
+
   return trim(ans, 1);
 }
 
@@ -293,6 +301,7 @@ export function mod(x, n) {
 export function addInt(x, n) {
   const ans = expand(x, x.length + 1);
   addInt_(ans, n);
+
   return trim(ans, 1);
 }
 
@@ -300,6 +309,7 @@ export function addInt(x, n) {
 export function mult(x, y) {
   const ans = expand(x, x.length + y.length);
   mult_(ans, y);
+
   return trim(ans, 1);
 }
 
@@ -307,6 +317,7 @@ export function mult(x, y) {
 export function powMod(x, y, n) {
   const ans = expand(x, n.length);
   powMod_(ans, trim(y, 2), trim(n, 2), 0); // this should work without the trim, but doesn't
+
   return trim(ans, 1);
 }
 
@@ -314,6 +325,7 @@ export function powMod(x, y, n) {
 export function sub(x, y) {
   const ans = expand(x, x.length > y.length ? x.length + 1 : y.length + 1);
   sub_(ans, y);
+
   return trim(ans, 1);
 }
 
@@ -321,6 +333,7 @@ export function sub(x, y) {
 export function add(x, y) {
   const ans = expand(x, x.length > y.length ? x.length + 1 : y.length + 1);
   add_(ans, y);
+
   return trim(ans, 1);
 }
 
@@ -329,6 +342,7 @@ export function inverseMod(x, n) {
   const ans = expand(x, n.length);
   let s;
   s = inverseMod_(ans, n);
+
   return s ? trim(ans, 1) : null;
 }
 
@@ -336,6 +350,7 @@ export function inverseMod(x, n) {
 export function multMod(x, y, n) {
   const ans = expand(x, n.length);
   multMod_(ans, y, n);
+
   return trim(ans, 1);
 }
 
@@ -401,6 +416,7 @@ export function randTruePrime_(ans, k) {
       }
     }
     carry_(ans);
+
     return;
   }
 
@@ -479,6 +495,7 @@ export function randTruePrime_(ans, k) {
         GCD_(s_d, s_n); // if s_b and s_n are relatively prime, then s_n is a prime
         if (equalsInt(s_d, 1)) {
           copy_(ans, s_aa);
+
           return; // if we've made it this far, then s_n is absolutely guaranteed to be prime
         }
       }
@@ -493,6 +510,7 @@ export function randBigInt(n, s) {
   a = Math.floor((n - 1) / bpe) + 2; // # array elements to hold the BigInt with a leading 0 element
   b = int2bigInt(0, 0, a);
   randBigInt_(b, n, s);
+
   return b;
 }
 
@@ -517,6 +535,7 @@ export function GCD(x, y) {
   xc = dup(x);
   yc = dup(y);
   GCD_(xc, yc);
+
   return xc;
 }
 
@@ -602,6 +621,7 @@ export function inverseMod_(x, n) {
   if (!(x[0] & 1) && !(n[0] & 1)) {
     // if both inputs are even, then inverse doesn't exist
     copyInt_(x, 0);
+
     return 0;
   }
 
@@ -673,8 +693,10 @@ export function inverseMod_(x, n) {
       if (!equalsInt(eg_v, 1)) {
         // if GCD_(x,n)!=1, then there is no inverse
         copyInt_(x, 0);
+
         return 0;
       }
+
       return 1;
     }
   }
@@ -782,6 +804,7 @@ export function eGCD_(x, y, v, a, b) {
       copy_(a, eg_C);
       copy_(b, eg_D);
       leftShift_(v, g);
+
       return;
     }
   }
@@ -805,6 +828,7 @@ export function greaterShift(x, y, shift) {
   for (i = k - 1; i >= shift; i--)
     if (x[i - shift] > y[i]) return 1;
     else if (x[i - shift] < y[i]) return 0;
+
   return 0;
 }
 
@@ -820,6 +844,7 @@ export function greater(x, y) {
   for (i = k - 1; i >= 0; i--)
     if (x[i] > y[i]) return 1;
     else if (x[i] < y[i]) return 0;
+
   return 0;
 }
 
@@ -922,6 +947,7 @@ export function modInt(x, n) {
   let i;
   let c = 0;
   for (i = x.length - 1; i >= 0; i--) c = (c * radix + x[i]) % n;
+
   return c;
 }
 
@@ -936,6 +962,7 @@ export function int2bigInt(t, bits, minSize) {
   k = minSize > k ? minSize : k;
   const buff = new Array(k);
   copyInt_(buff, t);
+
   return buff;
 }
 
@@ -976,8 +1003,10 @@ export function str2bigInt(s, b, minSize) {
     if (x.length < minSize) {
       y = new Array(minSize);
       copy_(y, x);
+
       return y;
     }
+
     return x;
   }
 
@@ -1002,6 +1031,7 @@ export function str2bigInt(s, b, minSize) {
   kk = k < x.length ? k : x.length;
   for (i = 0; i < kk; i++) y[i] = x[i];
   for (; i < k; i++) y[i] = 0;
+
   return y;
 }
 
@@ -1011,6 +1041,7 @@ export function equalsInt(x, y) {
   let i;
   if (x[0] != y) return 0;
   for (i = 1; i < x.length; i++) if (x[i]) return 0;
+
   return 1;
 }
 
@@ -1025,6 +1056,7 @@ export function equals(x, y) {
   } else {
     for (; i < y.length; i++) if (y[i]) return 0;
   }
+
   return 1;
 }
 
@@ -1032,6 +1064,7 @@ export function equals(x, y) {
 export function isZero(x) {
   let i;
   for (i = 0; i < x.length; i++) if (x[i]) return 0;
+
   return 1;
 }
 
@@ -1066,6 +1099,7 @@ export function bigInt2str(x, b) {
     }
   }
   if (s.length == 0) s = str[0];
+
   return s;
 }
 
@@ -1074,6 +1108,7 @@ export function dup(x) {
   let i;
   const buff = new Array(x.length);
   copy_(buff, x);
+
   return buff;
 }
 
@@ -1200,6 +1235,7 @@ export function divInt_(x, n) {
     x[i] = Math.floor(s / n);
     r = s % n;
   }
+
   return r;
 }
 
@@ -1391,6 +1427,7 @@ export function trim(x, k) {
   for (i = x.length; i > 0 && !x[i - 1]; i--);
   y = new Array(i + k);
   copy_(y, x);
+
   return y;
 }
 
@@ -1413,6 +1450,7 @@ export function powMod_(x, y, n) {
       divInt_(y, 2);
       squareMod_(s7, n);
     }
+
     return;
   }
 
@@ -1430,6 +1468,7 @@ export function powMod_(x, y, n) {
   if (y[k1] == 0) {
     // anything to the 0th power is 1
     copyInt_(x, 1);
+
     return;
   }
   for (k2 = 1 << (bpe - 1); k2 && !(y[k1] & k2); k2 >>= 1); // k2=position of first 1 bit in y[k1]
@@ -1439,6 +1478,7 @@ export function powMod_(x, y, n) {
       k1--;
       if (k1 < 0) {
         mont_(x, one, n, np);
+
         return;
       }
       k2 = 1 << (bpe - 1);

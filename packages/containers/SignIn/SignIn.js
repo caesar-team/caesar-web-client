@@ -8,6 +8,7 @@ import {
   REDIRECT_AUTH_ENDPOINT,
   ROUTES,
 } from '@caesar/common/constants';
+import { ERROR } from '@caesar/common/validation';
 import { isServer } from '@caesar/common/utils/isEnvironment';
 import {
   Icon,
@@ -18,10 +19,7 @@ import {
   SecondaryHeader,
 } from '@caesar/components';
 import { login } from '@caesar/common/utils/authUtils';
-import {
-  getTrustedDeviceToken,
-  setCookieValue,
-} from '@caesar/common/utils/token';
+import { setCookieValue } from '@caesar/common/utils/token';
 import SignInForm from './SignInForm';
 
 const AuthWrapper = styled.a`
@@ -33,7 +31,7 @@ const AuthWrapper = styled.a`
   width: 100%;
   text-decoration: none;
   cursor: pointer;
-  border-radius: 3px;
+  border-radius: ${({ theme }) => theme.borderRadius};
   box-shadow: 0 11px 23px 0 rgba(0, 0, 0, 0.1);
   background-color: ${({ theme }) => theme.color.black};
   transition: all 0.2s;
@@ -77,8 +75,7 @@ class SignInContainer extends Component {
   }
 
   generateGoogleAuthUrl = async () => {
-    const deviceToken = await getTrustedDeviceToken(true);
-    return `${API_URI}/${AUTH_ENDPOINT}?redirect_uri=${APP_URI}/${REDIRECT_AUTH_ENDPOINT}&fingerprint=${deviceToken}`;
+    return `${API_URI}/${AUTH_ENDPOINT}?redirect_uri=${APP_URI}/${REDIRECT_AUTH_ENDPOINT}`;
   };
 
   handleSubmit = async ({ email, password }, { setSubmitting, setErrors }) => {
@@ -89,7 +86,7 @@ class SignInContainer extends Component {
 
       Router.push(ROUTES.DASHBOARD);
     } catch (e) {
-      setErrors({ email: 'Wrong email', password: 'Wrong password' });
+      setErrors({ password: ERROR.INCORRECT_CREDENTIALS });
       setSubmitting(false);
     }
   };

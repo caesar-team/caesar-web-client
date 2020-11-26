@@ -20,16 +20,17 @@ const AddButton = styled.button`
   }
 `;
 
-const IconStyled = styled(Icon)`
-  width: 14px;
-  height: 14px;
-  fill: ${({ theme }) => theme.color.white};
-`;
+const AddControl = ({ className, onClick }) => {
+  const handleClick = e => {
+    e.stopPropagation();
+    onClick();
+  };
 
-const AddControl = ({ className, onClick }) => (
-  <AddButton className={className} onClick={onClick}>
-    <IconStyled name="plus" />
-  </AddButton>
-);
+  return (
+    <AddButton className={className} onClick={handleClick}>
+      <Icon name="plus" color="white" width={14} height={14} />
+    </AddButton>
+  );
+};
 
 export default AddControl;

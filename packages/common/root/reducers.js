@@ -1,26 +1,30 @@
 import { combineReducers } from 'redux';
 import {
-  memberReducer,
-  userReducer,
+  currentUserReducer,
   workflowReducer,
+  userReducer,
+  memberReducer,
+  teamReducer,
   listReducer,
   itemReducer,
-  childItemReducer,
-  teamReducer,
   applicationReducer,
+  keystoreReducer,
+  systemReducer,
 } from '../reducers';
 
 const entitiesReducer = combineReducers({
+  user: userReducer,
+  team: teamReducer,
   member: memberReducer,
   list: listReducer,
   item: itemReducer,
-  childItem: childItemReducer,
-  team: teamReducer,
+  system: systemReducer,
 });
 
 export const rootReducer = combineReducers({
   application: applicationReducer,
-  user: userReducer,
-  entities: entitiesReducer,
   workflow: workflowReducer,
+  currentUser: currentUserReducer,
+  entities: entitiesReducer,
+  keystore: keystoreReducer,
 });

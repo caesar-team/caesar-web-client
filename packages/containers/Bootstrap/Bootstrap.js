@@ -5,6 +5,8 @@ import { getUserBootstrap, getUserSelf } from '@caesar/common/api';
 import {
   DEFAULT_IDLE_TIMEOUT,
   NOOP_NOTIFICATION,
+  IS_PROD,
+  DOMAIN_ROLES,
 } from '@caesar/common/constants';
 import {
   SessionChecker,
@@ -13,8 +15,10 @@ import {
   GlobalNotification,
 } from '@caesar/components';
 // import OpenPGPWorker from 'openpgp/dist/openpgp.worker';
+// eslint-disable-next-line import/no-webpack-loader-syntax
 import OpenPGPWorker from 'worker-loader!openpgp/dist/openpgp.worker';
 import { isClient } from '@caesar/common/utils/isEnvironment';
+import { logger } from '@caesar/common/utils/logger';
 import { getBootstrapStates, getNavigationPanelSteps } from './utils';
 import {
   TWO_FACTOR_CHECK,
@@ -22,21 +26,13 @@ import {
   PASSWORD_CHANGE,
   MASTER_PASSWORD_CHECK,
   MASTER_PASSWORD_CREATE,
-  SHARED_ITEMS_CHECK,
-  SHARED_ITEMS_SKIP,
   BOOTSTRAP_FINISH,
 } from './constants';
-import {
-  TwoFactorStep,
-  PasswordStep,
-  MasterPasswordStep,
-  SharedItemsStep,
-} from './Steps';
+import { TwoFactorStep, PasswordStep, MasterPasswordStep } from './Steps';
 
 const TWO_FACTOR_STEPS = [TWO_FACTOR_CREATE, TWO_FACTOR_CHECK];
 const PASSWORD_STEPS = [PASSWORD_CHANGE];
 const MASTER_PASSWORD_STEPS = [MASTER_PASSWORD_CREATE, MASTER_PASSWORD_CHECK];
-const SHARED_ITEMS_STEPS = [SHARED_ITEMS_CHECK];
 
 class Bootstrap extends Component {
   state = this.prepareInitialState();
@@ -47,7 +43,6 @@ class Bootstrap extends Component {
 
   constructor(props) {
     super(props);
-
     // we don't need initialize it in componentDidMound
     // because openpgp must be initialized before children component will be
     // initialized via componentDidMount
@@ -57,18 +52,30 @@ class Bootstrap extends Component {
   }
 
   async componentDidMount() {
-    this.props.initCoresCount();
+    const { logout, initCoresCount, shared = {} } = this.props;
+    initCoresCount();
 
-    const { data: bootstrap } = await getUserBootstrap();
-    const { data: user } = await getUserSelf();
+    try {
+      const { data: bootstrap } = await getUserBootstrap();
+      const { data: currentUser } = await getUserSelf();
+      const isAnonymousOrReadOnlyUser =
+        currentUser?.domainRoles?.includes(DOMAIN_ROLES.ROLE_ANONYMOUS_USER) ||
+        currentUser?.domainRoles?.includes(DOMAIN_ROLES.ROLE_READ_ONLY_USER);
 
-    this.bootstrap = getBootstrapStates(bootstrap);
-    this.navigationPanelSteps = getNavigationPanelSteps(this.bootstrap);
-    this.user = user;
+      if (!currentUser || (isAnonymousOrReadOnlyUser && !shared?.mp)) {
+        logout();
+      }
 
-    this.setState({
-      currentStep: this.currentStepResolver(bootstrap),
-    });
+      this.bootstrap = getBootstrapStates(bootstrap);
+      this.navigationPanelSteps = getNavigationPanelSteps(this.bootstrap);
+      this.currentUser = currentUser;
+
+      this.setState({
+        currentStep: this.currentStepResolver(bootstrap),
+      });
+    } catch (e) {
+      logger.error(`Bootstrap failure`, e);
+    }
   }
 
   handleFinishTwoFactor = () => {
@@ -90,40 +97,23 @@ class Bootstrap extends Component {
     });
   };
 
-  handleFinishMasterPassword = ({
-    oldKeyPair,
-    currentKeyPair,
-    masterPassword,
-  }) => {
-    const { sharedItemsState } = this.bootstrap;
-
+  handleFinishMasterPassword = ({ currentKeyPair, masterPassword }) => {
     this.props.setMasterPassword(masterPassword);
     this.props.setKeyPair({
       publicKey: currentKeyPair.publicKey,
       privateKey: currentKeyPair.encryptedPrivateKey,
+      password: masterPassword,
     });
 
     this.setState({
-      oldKeyPair,
       currentKeyPair,
       masterPassword,
-      currentStep:
-        sharedItemsState === SHARED_ITEMS_CHECK
-          ? SHARED_ITEMS_CHECK
-          : BOOTSTRAP_FINISH,
-    });
-  };
-
-  handleFinishSharedItems = () => {
-    this.bootstrap.sharedItemsState = SHARED_ITEMS_SKIP;
-
-    this.setState({
       currentStep: BOOTSTRAP_FINISH,
     });
   };
 
   handleInactiveTimeout = () => {
-    this.props.resetWorkflowStore();
+    this.props.resetWorkflowState();
     this.props.removeItemsData();
 
     this.setState({
@@ -138,6 +128,7 @@ class Bootstrap extends Component {
   initOpenPGP() {
     const worker = new OpenPGPWorker();
 
+    // eslint-disable-next-line camelcase
     openpgp.config.aead_protect = false;
     openpgp.initWorker({ workers: [worker] });
   }
@@ -147,7 +138,6 @@ class Bootstrap extends Component {
       twoFactorAuthState,
       passwordState,
       masterPasswordState,
-      sharedItemsState,
     } = getBootstrapStates(bootstrap);
 
     if (TWO_FACTOR_STEPS.includes(twoFactorAuthState)) {
@@ -162,10 +152,6 @@ class Bootstrap extends Component {
       return masterPasswordState;
     }
 
-    if (SHARED_ITEMS_STEPS.includes(sharedItemsState)) {
-      return sharedItemsState;
-    }
-
     return MASTER_PASSWORD_CHECK;
   }
 
@@ -173,10 +159,6 @@ class Bootstrap extends Component {
     return {
       currentStep: null,
       masterPassword: null,
-      oldKeyPair: {
-        publicKey: null,
-        encryptedPrivateKey: null,
-      },
       currentKeyPair: {
         publicKey: null,
         encryptedPrivateKey: null,
@@ -192,22 +174,21 @@ class Bootstrap extends Component {
       component: PageComponent,
       router,
       shared = {},
+      updateGlobalNotification,
       ...props
     } = this.props;
-    const {
-      currentStep,
-      oldKeyPair,
-      currentKeyPair,
-      masterPassword,
-    } = this.state;
+    const { currentStep, currentKeyPair, masterPassword } = this.state;
 
     if (!currentStep) {
       return <FullScreenLoader />;
     }
 
+    const shouldShowGlobalNotification =
+      isLoadingGlobalNotification || isErrorGlobalNotification;
+
     if (TWO_FACTOR_STEPS.includes(currentStep)) {
       return (
-        <BootstrapLayout user={this.user}>
+        <BootstrapLayout currentUser={this.currentUser}>
           <TwoFactorStep
             initialStep={currentStep}
             navigationSteps={this.navigationPanelSteps}
@@ -219,7 +200,7 @@ class Bootstrap extends Component {
 
     if (PASSWORD_STEPS.includes(currentStep)) {
       return (
-        <BootstrapLayout user={this.user}>
+        <BootstrapLayout currentUser={this.currentUser}>
           <PasswordStep
             email={shared.e}
             navigationSteps={this.navigationPanelSteps}
@@ -234,25 +215,11 @@ class Bootstrap extends Component {
         <MasterPasswordStep
           initialStep={currentStep}
           navigationSteps={this.navigationPanelSteps}
-          user={this.user}
+          currentUser={this.currentUser}
           sharedMasterPassword={shared.mp}
+          masterPassword={IS_PROD ? null : this.props.masterPassword}
           onFinish={this.handleFinishMasterPassword}
         />
-      );
-    }
-
-    if (SHARED_ITEMS_STEPS.includes(currentStep)) {
-      return (
-        <BootstrapLayout user={this.user}>
-          <SharedItemsStep
-            navigationSteps={this.navigationPanelSteps}
-            oldKeyPair={oldKeyPair}
-            currentKeyPair={currentKeyPair}
-            oldMasterPassword={shared.mp}
-            currentMasterPassword={masterPassword}
-            onFinish={this.handleFinishSharedItems}
-          />
-        </BootstrapLayout>
       );
     }
 
@@ -268,9 +235,6 @@ class Bootstrap extends Component {
         />
       );
     }
-
-    const shouldShowGlobalNotification =
-      isLoadingGlobalNotification || isErrorGlobalNotification;
 
     // TODO: during refactoring to rename:
     // TODO: - password to masterPassword

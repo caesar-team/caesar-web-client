@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import styled from 'styled-components';
 import { KEY_CODES } from '@caesar/common/constants';
 import { media } from '@caesar/assets/styles/media';
-import Input from './Input';
+import { Input } from './Input';
 import { Icon } from '../Icon';
 
 const Wrapper = styled.div`
@@ -14,7 +14,7 @@ const InnerWrapper = styled.div`
   display: flex;
   align-items: center;
   height: 60px;
-  border-radius: 3px;
+  border-radius: ${({ theme }) => theme.borderRadius};
   background-color: ${({ theme }) => theme.color.darkGray};
   min-width: 400px;
 
@@ -62,7 +62,7 @@ class LockInput extends Component {
   onKeyDown = e => {
     const { isError, onBackspace } = this.props;
 
-    if (isError && e.keyCode === KEY_CODES.BACKSPACE) {
+    if (isError && e.keyCode === KEY_CODES.BACKSPACE && onBackspace) {
       onBackspace();
     }
   };
@@ -81,6 +81,7 @@ class LockInput extends Component {
             isError={isError}
             onKeyDown={this.onKeyDown}
             type="password"
+            autocomplete="off"
           />
           <StyledArrowIcon
             name="arrow"

@@ -1,9 +1,10 @@
 import React, { Component, Fragment } from 'react';
 import {
   getQrCode,
-  getBackupCodes,
   postActivateTwoFactor,
   postCheckTwoFactor,
+  getKeys,
+  postAcceptTwoFactor,
 } from '@caesar/common/api';
 import {
   getTrustedDeviceToken,
@@ -19,7 +20,7 @@ import {
 } from '../../constants';
 import TwoFactorForm from './TwoFactorForm';
 import { TwoFactorCheckForm } from './TwoFactorCheckForm';
-import TwoFactorBackupForm from './TwoFactorBackupForm';
+import { TwoFactorBackupForm } from './TwoFactorBackupForm';
 
 class TwoFactorStep extends Component {
   state = this.prepareInitialState();
@@ -32,24 +33,24 @@ class TwoFactorStep extends Component {
         data: { qr, code },
       } = await getQrCode();
 
-      const { data: codes } = await getBackupCodes();
-
       this.setState({
         qr,
         code,
-        codes,
       });
     }
   }
 
-  handleSubmit = async ({ code, fpCheck }, { setSubmitting, setErrors }) => {
+  handleSubmit = async (
+    { code, fpCheck, rememberDevice },
+    { setSubmitting, setErrors },
+  ) => {
     const { initialStep, onFinish } = this.props;
 
     const isCreateFlow = initialStep === TWO_FACTOR_CREATE;
 
     const post = { authCode: code };
 
-    if (fpCheck) {
+    if (fpCheck || rememberDevice) {
       post.fingerprint = await getTrustedDeviceToken(true);
     }
 
@@ -80,8 +81,15 @@ class TwoFactorStep extends Component {
     }
   };
 
-  handleClickSaveBackups = () => {
+  handleClickSaveBackups = async () => {
     const { onFinish } = this.props;
+    const {
+      data: { publicKey, encryptedPrivateKey },
+    } = await getKeys();
+
+    if (publicKey && encryptedPrivateKey) {
+      await postAcceptTwoFactor();
+    }
 
     onFinish();
   };
@@ -93,13 +101,12 @@ class TwoFactorStep extends Component {
       step: initialStep,
       qr: '',
       code: '',
-      codes: [],
     };
   }
 
   render() {
     const { navigationSteps } = this.props;
-    const { qr, code, codes, step } = this.state;
+    const { qr, code, step } = this.state;
 
     const renderedStep = matchStrict(
       step,
@@ -109,10 +116,7 @@ class TwoFactorStep extends Component {
         ),
         [TWO_FACTOR_CHECK]: <TwoFactorCheckForm onSubmit={this.handleSubmit} />,
         [TWO_FACTOR_BACKUPS]: (
-          <TwoFactorBackupForm
-            codes={codes}
-            onSubmit={this.handleClickSaveBackups}
-          />
+          <TwoFactorBackupForm onSubmit={this.handleClickSaveBackups} />
         ),
       },
       null,

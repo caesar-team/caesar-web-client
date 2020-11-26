@@ -1,5 +1,6 @@
 import { createSelector } from 'reselect';
-import { membersByIdSelector } from '@caesar/common/selectors/entities/member';
+import { TEAM_ROLES, TEAM_TYPE } from '@caesar/common/constants';
+import { sortByName } from '@caesar/common/utils/utils';
 
 export const entitiesSelector = state => state.entities;
 
@@ -8,14 +9,16 @@ export const teamEntitySelector = createSelector(
   entities => entities.team,
 );
 
-export const isLoadingSelector = createSelector(
+export const isLoadingTeamsSelector = createSelector(
   teamEntitySelector,
   teamEntity => teamEntity.isLoading,
 );
 
 export const teamsByIdSelector = createSelector(
   teamEntitySelector,
-  teamEntity => teamEntity.byId,
+  teamEntity => {
+    return teamEntity.byId;
+  },
 );
 
 export const teamListSelector = createSelector(
@@ -23,7 +26,21 @@ export const teamListSelector = createSelector(
   byId => Object.values(byId) || [],
 );
 
-const teamIdPropSelector = (_, props) => props.teamId;
+export const teamSortedListSelector = createSelector(
+  teamListSelector,
+  teams => {
+    const defaultTeam = teams.find(team => team.type === TEAM_TYPE.DEFAULT);
+    const otherTeams = teams
+      .filter(
+        team => ![TEAM_TYPE.DEFAULT, TEAM_TYPE.PERSONAL].includes(team.type),
+      )
+      .sort((a, b) => sortByName(a.title, b.title));
+
+    return defaultTeam ? [defaultTeam, ...otherTeams] : otherTeams;
+  },
+);
+
+export const teamIdPropSelector = (_, props) => props.teamId;
 
 export const teamSelector = createSelector(
   teamsByIdSelector,
@@ -39,25 +56,10 @@ export const teamsBatchSelector = createSelector(
   (teamsById, teamIds) => teamIds.map(teamId => teamsById[teamId]),
 );
 
-export const teamMembersSelector = createSelector(
+export const teamAdminUsersSelector = createSelector(
   teamSelector,
-  membersByIdSelector,
-  (team, membersById) => team.users.map(({ userId }) => membersById[userId]),
-);
-
-export const teamsMembersSelector = createSelector(
-  teamsBatchSelector,
-  membersByIdSelector,
-  (teams, membersById) => {
-    return teams.reduce(
-      (accumulator, team) => [
-        ...accumulator,
-        ...team.users.map(({ id }) => ({
-          ...membersById[id],
-          teamId: team.id,
-        })),
-      ],
-      [],
-    );
-  },
+  team =>
+    team.members
+      ?.filter(member => member.role === TEAM_ROLES.ROLE_ADMIN)
+      .map(member => member.id) || [],
 );

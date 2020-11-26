@@ -95,22 +95,17 @@ const SignInForm = ({ onSubmit }) => (
     onSubmit={onSubmit}
     initialValues={{ email: '', password: '' }}
     validationSchema={schema}
+    validateOnBlur={false}
+    validateOnChange={false}
   >
-    {({
-      errors,
-      touched,
-      handleSubmit,
-      setFieldTouched,
-      isSubmitting,
-      isValid,
-    }) => (
+    {({ errors, touched, handleSubmit, handleBlur, isSubmitting }) => (
       <Form onSubmit={handleSubmit}>
         <Row>
           <FastField name="email">
             {({ field }) => (
               <StyledEmailInput
                 {...field}
-                onBlur={setFieldTouched}
+                onBlur={handleBlur}
                 placeholder="Email"
                 prefix={EmailInputPrefix}
               />
@@ -125,7 +120,7 @@ const SignInForm = ({ onSubmit }) => (
             {({ field }) => (
               <StyledPasswordInput
                 {...field}
-                onBlur={setFieldTouched}
+                onBlur={handleBlur}
                 placeholder="Password"
                 prefix={PasswordInputPrefix}
               />
@@ -137,7 +132,7 @@ const SignInForm = ({ onSubmit }) => (
         </Row>
         <ButtonWrapper>
           {/* <StyledLink>Forgot password?</StyledLink> */}
-          <StyledButton htmlType="submit" disabled={isSubmitting || !isValid}>
+          <StyledButton htmlType="submit" disabled={isSubmitting}>
             Login
           </StyledButton>
         </ButtonWrapper>

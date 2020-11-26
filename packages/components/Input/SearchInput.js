@@ -1,6 +1,6 @@
-import React from 'react';
+import React, { memo } from 'react';
 import styled from 'styled-components';
-import Input from './Input';
+import { Input } from './Input';
 import { Icon } from '../Icon';
 
 const InputStyled = styled(Input)`
@@ -20,22 +20,26 @@ const CloseIcon = styled(Icon)`
   cursor: pointer;
 `;
 
-const SearchInput = ({
+const SearchIconComponent = (
+  <Icon name="search" width={20} height={20} color="gray" />
+);
+
+const CloseIconComponent = ({ onClickReset }) => (
+  <CloseIcon name="close" width={16} height={16} onClick={onClickReset} />
+);
+
+const SearchInputComponent = ({
   searchedText,
   onClickReset = Function.prototype,
   ...props
 }) => {
-  const SearchIconComponent = (
-    <Icon name="search" width={20} height={20} color="gray" />
+  const iconComponent = searchedText ? (
+    <CloseIconComponent onClickReset={onClickReset} />
+  ) : (
+    SearchIconComponent
   );
-
-  const CloseIconComponent = (
-    <CloseIcon name="close" width={18} height={18} onClick={onClickReset} />
-  );
-
-  const iconComponent = searchedText ? CloseIconComponent : SearchIconComponent;
 
   return <InputStyled prefix={iconComponent} value={searchedText} {...props} />;
 };
 
-export default SearchInput;
+export const SearchInput = memo(SearchInputComponent);

@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import styled from 'styled-components';
 import { copyToClipboard } from '@caesar-utils/utils/clipboard';
-import { Icon, Label } from '@caesar-ui';
 import {
   Wrapper,
   Row,
@@ -10,6 +9,7 @@ import {
   FieldValue,
   Title,
 } from '@caesar/components';
+import { Icon, Label } from '@caesar-ui';
 
 const StyledEyeIcon = styled(Icon)`
   margin-right: 20px;
@@ -48,7 +48,7 @@ class Credentials extends Component {
 
     const {
       item: {
-        data: { name, login, pass, website, note },
+        data: { name, login, password, website, note },
       },
     } = this.props;
 
@@ -56,7 +56,7 @@ class Credentials extends Component {
       website.startsWith('http://', 0) || website.startsWith('https://', 0)
         ? website
         : `http://${website}`;
-    const pwd = isPasswordVisible ? pass : pass.replace(/./g, '*');
+    const pwd = isPasswordVisible ? password : password.replace(/./g, '*');
     const eyeIconName = isPasswordVisible ? 'eye-off' : 'eye-on';
 
     const shouldShowWebsite = !!website;
@@ -96,7 +96,7 @@ class Credentials extends Component {
                     name="copy"
                     width={19}
                     height={19}
-                    onClick={this.handleCopy('pass')}
+                    onClick={this.handleCopy('password')}
                   />
                 </Row>
               </FieldValue>

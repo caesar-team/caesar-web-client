@@ -1,6 +1,7 @@
 import React from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { ITEM_TEXT_TYPE } from '@caesar/common/constants';
+import { useNotification } from '@caesar/common/hooks';
+import { getPlural } from '@caesar/common/utils/string';
 import {
   workInProgressItemSelector,
   workInProgressItemIdsSelector,
@@ -20,20 +21,17 @@ import {
 } from '@caesar/common/actions/entities/item';
 import { ConfirmModal } from '@caesar/components';
 
-export const ConfirmMoveToTrashModal = ({
-  notification,
-  isOpen,
-  handleCloseModal,
-}) => {
+export const ConfirmMoveToTrashModal = ({ isOpened, handleCloseModal }) => {
   const dispatch = useDispatch();
   const workInProgressItemIds = useSelector(workInProgressItemIdsSelector);
   const workInProgressList = useSelector(workInProgressListSelector);
   const workInProgressItem = useSelector(workInProgressItemSelector);
   const teamsTrashLists = useSelector(teamsTrashListsSelector);
   const trashList = useSelector(trashListSelector);
+  const notification = useNotification();
 
   const handleMoveToTrash = () => {
-    const isTeamList = workInProgressList && !!workInProgressList.teamId;
+    const isTeamList = !!workInProgressList?.teamId;
     const trashListId = isTeamList
       ? teamsTrashLists.find(
           ({ teamId }) => teamId === workInProgressList.teamId,
@@ -41,28 +39,55 @@ export const ConfirmMoveToTrashModal = ({
       : trashList.id;
 
     if (workInProgressItemIds.length > 0) {
-      dispatch(moveItemsBatchRequest(workInProgressItemIds, trashListId));
+      dispatch(
+        moveItemsBatchRequest(
+          workInProgressItemIds,
+          workInProgressList?.teamId || null,
+          workInProgressList.id,
+          workInProgressList?.teamId || null,
+          trashListId,
+          notification,
+          `The ${getPlural(workInProgressItemIds?.length, [
+            'item has',
+            'items have',
+          ])} been removed`,
+        ),
+      );
       dispatch(resetWorkInProgressItemIds());
-
-      notification.show({
-        text: `The items have been removed`,
-      });
     } else {
-      dispatch(moveItemRequest(workInProgressItem.id, trashListId));
+      dispatch(
+        moveItemRequest(
+          workInProgressItem.id,
+          workInProgressItem.teamId || null,
+          trashListId,
+          notification,
+          `The '${workInProgressItem.data.name}' has been removed`,
+        ),
+      );
       dispatch(setWorkInProgressItem(null));
-
-      notification.show({
-        text: `The ${ITEM_TEXT_TYPE[workInProgressItem.type]} has been removed`,
-      });
     }
 
     handleCloseModal();
   };
 
+  const pluralItemText = getPlural(workInProgressItemIds?.length, [
+    'item',
+    'items',
+  ]);
+
   return (
     <ConfirmModal
-      isOpen={isOpen}
-      description="Are you sure you want to move the item(-s) to trash?"
+      isOpened={isOpened}
+      title={`You are going to remove ${
+        workInProgressItem
+          ? `'${workInProgressItem.data.name}'`
+          : pluralItemText
+      }`}
+      description={`Are you sure you want to move the ${
+        workInProgressItem ? 'item' : pluralItemText
+      } to the trash?`}
+      icon="trash"
+      confirmBtnText="Remove"
       onClickConfirm={handleMoveToTrash}
       onClickCancel={handleCloseModal}
     />

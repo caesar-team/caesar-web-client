@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import styled from 'styled-components';
-import debounce from 'lodash.debounce';
+import { debounce } from 'lodash';
 import { formatNumber } from '@caesar/common/utils/number';
 
 const Wrapper = styled.div`
@@ -12,11 +12,11 @@ const Wrapper = styled.div`
 const RangeBase = styled.div`
   position: relative;
   height: 8px;
-  border-radius: 3px;
+  border-radius: ${({ theme }) => theme.borderRadius};
   border: 1px solid ${({ theme }) => theme.color.gallery};
   background-color: ${({ theme }) => theme.color.white};
 
-  &:before {
+  &::before {
     content: '${({ minValue }) => minValue}';
     position: absolute;
     top: 15px;
@@ -26,7 +26,7 @@ const RangeBase = styled.div`
     font-weight: 600;
   }
 
-  &:after {
+  &::after {
     content: '${({ maxValue }) => maxValue}';
     position: absolute;
     top: 15px;
@@ -87,7 +87,7 @@ const RangeActiveLine = styled.div`
   z-index: ${({ theme }) => theme.zIndex.basic};
   top: 0;
   height: 8px;
-  border-radius: 3px;
+  border-radius: ${({ theme }) => theme.borderRadius};
   background-color: ${({ theme }) => theme.color.black};
   border: 1px solid ${({ theme }) => theme.color.black};
 `;

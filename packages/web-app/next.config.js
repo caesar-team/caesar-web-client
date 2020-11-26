@@ -48,7 +48,11 @@ const publicRuntimeConfig = {
   AUTHORIZATION_ENABLE: process.env.AUTHORIZATION_ENABLE !== 'false',
   APP_TYPE: process.env.APP_TYPE || 'general',
   APP_VERSION: process.env.APP_VERSION,
-  LOG_LEVEL: process.env.LOG_LEVEL || process.env.NODE_ENV === 'production' ? 'error' : 'debug',
+  DOMAIN_HOSTNAME: process.env.DOMAIN_HOSTNAME,
+  LOG_LEVEL:
+    process.env.LOG_LEVEL || process.env.NODE_ENV === 'production'
+      ? 'error'
+      : 'debug',
 };
 
 const serverRuntimeConfig = {};
@@ -84,26 +88,24 @@ module.exports = withPlugins(
     publicRuntimeConfig,
     serverRuntimeConfig,
     workboxOpts: workboxOptions,
-    experimental: {
-      async rewrites() {
-        return [
-          {
-            source: '/service-worker.js',
-            destination: '/_next/static/service-worker.js',
-          },
-        ];
-      },
-    },
     webpack: (config, { isServer }) => {
-      config.output.globalObject = 'this';
+      config.output.globalObject = 'typeof self !== "object" ? self : this';
+
+      // Temporary fix for https://github.com/zeit/next.js/issues/8071
+      config.plugins.forEach(plugin => {
+        if (plugin.definitions && plugin.definitions['typeof window']) {
+          delete plugin.definitions['typeof window'];
+        }
+      });
 
       config.plugins.push(new ThreadsPlugin());
+      config.externals['tiny-worker'] = 'tiny-worker';
 
       //FIX: https://github.com/vercel/next.js/issues/7755#issuecomment-508633125
       if (!isServer) {
         config.node = {
-          fs: 'empty'
-        }
+          fs: 'empty',
+        };
       }
 
       return config;

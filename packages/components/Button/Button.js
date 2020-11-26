@@ -1,7 +1,7 @@
-import React, { forwardRef } from 'react';
+import React, { memo, forwardRef } from 'react';
 import styled from 'styled-components';
-import withOfflineDetection from '../Offline/withOfflineDetection';
-import Icon from '../Icon/Icon';
+import { useNavigatorOnline } from '@caesar/common/hooks';
+import { Icon } from '../Icon';
 
 const getButtonStyles = ({ color, theme }) => {
   const colorsMap = {
@@ -13,6 +13,11 @@ const getButtonStyles = ({ color, theme }) => {
       background-color: ${theme.color.white};
       color: ${theme.color.emperor};
       border: 1px solid ${theme.color.gallery};
+    `,
+    gray: `
+      color: ${theme.color.white};
+      background-color: transparent;
+      border: 1px solid ${theme.color.gray};
     `,
     transparent: `
       height: 22px;
@@ -89,7 +94,7 @@ const StyledButton = styled.button`
   font-size: ${({ isHigh }) => (isHigh ? '18px' : '14px')};
   letter-spacing: ${({ isHigh }) => (isHigh ? '0.6px' : '0.4px')};
   white-space: nowrap;
-  border-radius: 3px;
+  border-radius: ${({ theme }) => theme.borderRadius};
   border: 0;
   outline: none;
   cursor: pointer;
@@ -101,6 +106,7 @@ const StyledButton = styled.button`
     onlyIcon &&
     `
     width: 40px;
+    flex: 0 0 40px;
     padding: 0;
   `};
 
@@ -141,12 +147,12 @@ const ButtonComponent = forwardRef(
       children,
       disabled,
       withOfflineCheck = false,
-      isOnline,
       isHigh,
       ...props
     },
     ref,
   ) => {
+    const isOnline = useNavigatorOnline();
     const onlyIcon = !children;
     const withIcon = !!icon;
     const isDisabled = getButtonDisabledStatus(
@@ -172,4 +178,8 @@ const ButtonComponent = forwardRef(
   },
 );
 
-export const Button = withOfflineDetection(ButtonComponent);
+const Button = memo(ButtonComponent);
+
+Button.Text = Text;
+
+export { Button };

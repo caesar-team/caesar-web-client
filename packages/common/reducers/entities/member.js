@@ -1,8 +1,6 @@
+import { omit } from 'lodash';
 import { createReducer } from '@caesar/common/utils/reducer';
 import {
-  FETCH_MEMBERS_REQUEST,
-  FETCH_MEMBERS_SUCCESS,
-  FETCH_MEMBERS_FAILURE,
   CREATE_MEMBER_REQUEST,
   CREATE_MEMBER_SUCCESS,
   CREATE_MEMBER_FAILURE,
@@ -13,10 +11,18 @@ import {
   FETCH_TEAM_MEMBERS_SUCCESS,
   FETCH_TEAM_MEMBERS_FAILURE,
   ADD_MEMBERS_BATCH,
-  ADD_TEAM_TO_MEMBER,
-  REMOVE_TEAM_FROM_MEMBER,
-  REMOVE_TEAM_FROM_MEMBERS_BATCH,
-  ADD_TEAM_TO_MEMBERS_BATCH,
+  ADD_TEAM_MEMBERS_BATCH_REQUEST,
+  ADD_TEAM_MEMBERS_BATCH_SUCCESS,
+  ADD_TEAM_MEMBERS_BATCH_FAILURE,
+  UPDATE_TEAM_MEMBER_ROLE_REQUEST,
+  UPDATE_TEAM_MEMBER_ROLE_SUCCESS,
+  UPDATE_TEAM_MEMBER_ROLE_FAILURE,
+  REMOVE_TEAM_MEMBER_REQUEST,
+  REMOVE_TEAM_MEMBER_SUCCESS,
+  REMOVE_TEAM_MEMBER_FAILURE,
+  REMOVE_TEAM_MEMBERS_BATCH,
+  RESET_MEMBER_STATE,
+  GRANT_ACCESS_TEAM_MEMBER_REQUEST,
 } from '@caesar/common/actions/entities/member';
 
 const initialState = {
@@ -26,23 +32,6 @@ const initialState = {
 };
 
 export default createReducer(initialState, {
-  [FETCH_MEMBERS_REQUEST](state) {
-    return { ...state, isLoading: true };
-  },
-  [FETCH_MEMBERS_SUCCESS](state, { payload }) {
-    return {
-      ...state,
-      isLoading: false,
-      isError: false,
-      byId: {
-        ...state.byId,
-        ...payload.membersById,
-      },
-    };
-  },
-  [FETCH_MEMBERS_FAILURE](state) {
-    return { ...state, isLoading: false, isError: true };
-  },
   [CREATE_MEMBER_REQUEST](state) {
     return state;
   },
@@ -92,81 +81,99 @@ export default createReducer(initialState, {
     return state;
   },
   [ADD_MEMBERS_BATCH](state, { payload }) {
+    const updatedMembers = Object.keys(payload.membersById).reduce(
+      (acc, memberId) => {
+        const updated = {
+          ...state.byId[memberId],
+          ...payload.membersById[memberId],
+          _links: {
+            ...state.byId[memberId]?._links,
+            ...payload.membersById[memberId]._links,
+          },
+          _permissions: {
+            ...state.byId[memberId]?._permissions,
+            ...payload.membersById[memberId]._permissions,
+          },
+        };
+
+        return { ...acc, [memberId]: { ...updated } };
+      },
+      {},
+    );
+
     return {
       ...state,
       byId: {
         ...state.byId,
-        ...payload.membersById,
+        ...updatedMembers,
       },
     };
   },
-  [ADD_TEAM_TO_MEMBER](state, { payload }) {
+  [ADD_TEAM_MEMBERS_BATCH_REQUEST](state) {
+    return state;
+  },
+  [ADD_TEAM_MEMBERS_BATCH_SUCCESS](state, { payload }) {
+    const {
+      members: membersById = {
+        membersById: {},
+      },
+    } = payload;
+
+    return {
+      ...state,
+      byId: {
+        ...state.byId,
+        ...membersById,
+      },
+    };
+  },
+  [ADD_TEAM_MEMBERS_BATCH_FAILURE](state) {
+    return state;
+  },
+  [UPDATE_TEAM_MEMBER_ROLE_REQUEST](state) {
+    return state;
+  },
+  [UPDATE_TEAM_MEMBER_ROLE_SUCCESS](state, { payload }) {
     return {
       ...state,
       byId: {
         ...state.byId,
         [payload.memberId]: {
           ...state.byId[payload.memberId],
-          teamIds: [...state.byId[payload.memberId].teamIds, payload.teamId],
+          teamRole: payload.teamRole,
         },
       },
     };
   },
-  [ADD_TEAM_TO_MEMBERS_BATCH](state, { payload }) {
+  [UPDATE_TEAM_MEMBER_ROLE_FAILURE](state) {
+    return state;
+  },
+  [REMOVE_TEAM_MEMBER_REQUEST](state) {
+    return state;
+  },
+  [REMOVE_TEAM_MEMBER_SUCCESS](state, { payload }) {
+    const { [payload.memberId]: member, ...rest } = state.byId;
+
     return {
       ...state,
-      byId: {
-        ...state.byId,
-        ...payload.memberIds.reduce(
-          (accumulator, memberId) => ({
-            ...accumulator,
-            [memberId]: {
-              ...state.byId[memberId],
-              // TODO: this error because BE side doesn't return teamIds for searched user
-              teamIds: [
-                ...((state.byId[memberId] && state.byId[memberId].teamIds) ||
-                  []),
-                payload.teamId,
-              ],
-            },
-          }),
-          {},
-        ),
-      },
+      byId: rest,
     };
   },
-  [REMOVE_TEAM_FROM_MEMBER](state, { payload }) {
+  [REMOVE_TEAM_MEMBER_FAILURE](state) {
+    return state;
+  },
+  [REMOVE_TEAM_MEMBERS_BATCH](state, { payload }) {
+    const byId = omit(state.byId, payload.memberIds);
+
     return {
       ...state,
-      byId: {
-        ...state.byId,
-        [payload.memberId]: {
-          ...state.byId[payload.memberId],
-          teamIds: state.byId[payload.memberId].teamIds.filter(
-            teamId => teamId !== payload.teamId,
-          ),
-        },
-      },
+      byId,
     };
   },
-  [REMOVE_TEAM_FROM_MEMBERS_BATCH](state, { payload }) {
-    return {
-      ...state,
-      byId: {
-        ...state.byId,
-        ...payload.memberIds.reduce(
-          (accumulator, memberId) => ({
-            ...accumulator,
-            [memberId]: {
-              ...state.byId[memberId],
-              teamIds: state.byId[memberId].teamIds.filter(
-                teamId => teamId !== payload.teamId,
-              ),
-            },
-          }),
-          {},
-        ),
-      },
-    };
+  [GRANT_ACCESS_TEAM_MEMBER_REQUEST](state) {
+    return state;
+  },
+  [RESET_MEMBER_STATE]() {
+    return initialState;
   },
 });

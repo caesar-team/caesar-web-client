@@ -88,142 +88,163 @@ get:
   path: secret/data/notifications-4xxi
   name: icon_url
 ---
+kind: secret
+name: dockerconfig
+get:
+  path: secret/data/docker
+  name: config.json
+---
 kind: pipeline
 type: docker
 name: 4xxi
+
+image_pull_secrets:
+  - dockerconfig
 globals:
-- &confNoSaveBuild
-  dockerfile: Dockerfile
-  repo: plugins/docker
-  tag: fourxxi
-  dry_run: true
-  daemon_off: false
+  - &confNoSaveBuild
+    dockerfile: Dockerfile
+    repo: plugins/docker
+    tag: fourxxi
+    dry_run: true
+    daemon_off: false
 
-- &confSaveBuild
-  dockerfile: Dockerfile
-  repo: 
-    from_secret: repository
-  username:
-    from_secret: username
-  password:
-    from_secret: password
+  - &confSaveBuild
+    dockerfile: Dockerfile
+    repo:
+      from_secret: repository
+    username:
+      from_secret: username
+    password:
+      from_secret: password
 
-- &stepFeatureBuild
-  image: plugins/docker
-  settings:
-    <<: *confNoSaveBuild
+  - &stepFeatureBuild
+    image: plugins/docker
+    settings:
+      <<: *confNoSaveBuild
 
-- &stepDevelopBuild
-  image: plugins/docker
-  settings:
-    tags: ${DRONE_BRANCH}
-    <<: *confSaveBuild
+  - &stepDevelopBuild
+    image: plugins/docker
+    settings:
+      tags: ${DRONE_BRANCH}
+      <<: *confSaveBuild
 
-- &stepMasterBuild
-  image: plugins/docker
-  settings:
-    tags: [ "${DRONE_BRANCH}", "latest" ]
-    <<: *confSaveBuild
-  
-- &stepDevelopDeploy
-  name: deploy develop
-  image: sinlead/drone-kubectl
-  settings:
-    kubernetes_server:
-      from_secret: develop_url
-    kubernetes_token:
-      from_secret: develop_token
-    kubernetes_cert:
-      from_secret: develop_ca
-  environment:
-    NAMESPACE:
-      from_secret: develop_namespace
-    CICD_GIT_COMMIT: ${DRONE_COMMIT}
-    CICD_GIT_BRANCH: ${DRONE_BRANCH}
-  commands:
-  - sed -i "s/\$CICD_GIT_BRANCH/$CICD_GIT_BRANCH/g" deploy/*
-  - sed -i "s/\$CICD_GIT_COMMIT/$CICD_GIT_COMMIT/g" deploy/*
-  - kubectl apply -f deploy/* -n $NAMESPACE
+  - &stepMasterBuild
+    image: plugins/docker
+    settings:
+      tags: ['${DRONE_BRANCH}', 'latest']
+      <<: *confSaveBuild
 
-- &stepMasterDeploy
-  name: deploy staging
-  image: sinlead/drone-kubectl
-  settings:
-    kubernetes_server:
-      from_secret: staging_url
-    kubernetes_token: 
-      from_secret: staging_token
-    kubernetes_cert: 
-      from_secret: staging_ca
-  environment:
-    NAMESPACE:
-      from_secret: staging_namespace
-    CICD_GIT_COMMIT: ${DRONE_COMMIT}
-    CICD_GIT_BRANCH: ${DRONE_BRANCH}
-  commands:
-  - sed -i "s/\$CICD_GIT_BRANCH/$CICD_GIT_BRANCH/g" deploy/*
-  - sed -i "s/\$CICD_GIT_COMMIT/$CICD_GIT_COMMIT/g" deploy/*
-  - kubectl apply -f deploy/* -n $NAMESPACE
+  - &stepReleaseBuild
+    image: plugins/docker
+    settings:
+      tags: ['qa']
+      <<: *confSaveBuild
 
-- &stepNotifyToSlack
-  name: notify-to-slack
-  image: plugins/slack
-  pull: always
-  settings:
-    webhook:
-      from_secret: notifications
-    channel: caesar-builds
-    username: 
-      from_secret: notification_username
-    icon_url:
-      from_secret: notification_icon
-    template: >
-      {{#success build.status}}
-       *Event*: `{{build.event}}` {{build.status}}
-       *Repository*: `{{repo.name}}` to `{{build.branch}}`
-       *Commit*: `{{build.commit}}`
-       *Info*: {{build.number}} build was started {{since build.created}} and executed for {{since build.started}}
-      <{{build.link}}|*Build link*>
-      {{else}}
-       *Event*: `{{build.event}}` {{build.status}}
-       *Repository*: `{{repo.name}}` to `{{build.branch}}`
-       *Commit*: `{{build.commit}}`
-       *Info*: {{build.number}} build was started {{since build.created}} and executed for {{since build.started}}
-      <{{build.link}}|*Build link*>
-      {{/success}}
+  - &stepDevelopDeploy
+    name: deploy develop
+    image: sinlead/drone-kubectl
+    settings:
+      kubernetes_server:
+        from_secret: develop_url
+      kubernetes_token:
+        from_secret: develop_token
+      kubernetes_cert:
+        from_secret: develop_ca
+    environment:
+      NAMESPACE:
+        from_secret: develop_namespace
+      CICD_GIT_COMMIT: ${DRONE_COMMIT}
+      CICD_GIT_BRANCH: ${DRONE_BRANCH}
+    commands:
+      - sed -i "s/\$CICD_GIT_BRANCH/$CICD_GIT_BRANCH/g" deploy/*
+      - sed -i "s/\$CICD_GIT_COMMIT/$CICD_GIT_COMMIT/g" deploy/*
+      - kubectl apply -f deploy/* -n $NAMESPACE
+
+  - &stepMasterDeploy
+    name: deploy staging
+    image: sinlead/drone-kubectl
+    settings:
+      kubernetes_server:
+        from_secret: staging_url
+      kubernetes_token:
+        from_secret: staging_token
+      kubernetes_cert:
+        from_secret: staging_ca
+    environment:
+      NAMESPACE:
+        from_secret: staging_namespace
+      CICD_GIT_COMMIT: ${DRONE_COMMIT}
+      CICD_GIT_BRANCH: ${DRONE_BRANCH}
+    commands:
+      - sed -i "s/\$CICD_GIT_BRANCH/$CICD_GIT_BRANCH/g" deploy/*
+      - sed -i "s/\$CICD_GIT_COMMIT/$CICD_GIT_COMMIT/g" deploy/*
+      - kubectl apply -f deploy/* -n $NAMESPACE
+
+  - &stepNotifyToSlack
+    name: notify-to-slack
+    image: plugins/slack
+    pull: always
+    settings:
+      webhook:
+        from_secret: notifications
+      channel: caesar-builds
+      username:
+        from_secret: notification_username
+      icon_url:
+        from_secret: notification_icon
+      template: >
+        {{#success build.status}}
+         *Event*: `{{build.event}}` {{build.status}}
+         *Repository*: `{{repo.name}}` to `{{build.branch}}`
+         *Commit*: `{{build.commit}}`
+         *Info*: {{build.number}} build was started {{since build.created}} and executed for {{since build.started}}
+        <{{build.link}}|*Build link*>
+        {{else}}
+         *Event*: `{{build.event}}` {{build.status}}
+         *Repository*: `{{repo.name}}` to `{{build.branch}}`
+         *Commit*: `{{build.commit}}`
+         *Info*: {{build.number}} build was started {{since build.created}} and executed for {{since build.started}}
+        <{{build.link}}|*Build link*>
+        {{/success}}
 
 steps:
-- name: build feature
-  <<: *stepFeatureBuild
-  when:
-    branch: [ feature/* , hotfix/* ]
+  - name: build feature
+    <<: *stepFeatureBuild
+    when:
+      branch: [feature/*, hotfix/*]
 
-- name: build develop
-  <<: *stepDevelopBuild
-  when:
-    branch: [ develop ]
+  - name: build develop
+    <<: *stepDevelopBuild
+    when:
+      branch: [develop]
 
-- name: build master
-  <<: *stepMasterBuild
-  when:
-    branch: [ master ]
+  - name: build master
+    <<: *stepMasterBuild
+    when:
+      branch: [master]
 
-- <<: *stepDevelopDeploy
-  when:
-    branch: [ develop ]
+  - name: build release
+    <<: *stepReleaseBuild
+    when:
+      branch: [release/*]
 
-- <<: *stepMasterDeploy
-  when:
-    branch: [ master ]
+  - <<: *stepDevelopDeploy
+    when:
+      branch: [develop]
 
-- <<: *stepNotifyToSlack
-  when:
-    status: [ success, failure ]
-    branch: [ develop, master ]
+  - <<: *stepMasterDeploy
+    when:
+      branch: [master]
+
+  - <<: *stepNotifyToSlack
+    when:
+      status: [success, failure]
+      branch: [develop, master, release/*]
 
 trigger:
   branch:
-  - master
-  - develop
-  - feature/*
-  - hotfix/*
+    - master
+    - develop
+    - release/*
+    - feature/*
+    - hotfix/*

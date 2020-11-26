@@ -3,7 +3,7 @@ import { useDispatch } from 'react-redux';
 import equal from 'fast-deep-equal';
 import styled from 'styled-components';
 import Link from 'next/link';
-import { logout } from '@caesar/common/actions/user';
+import { logout } from '@caesar/common/actions/currentUser';
 import { ROUTES } from '@caesar/common/constants';
 import { Icon } from '../Icon';
 import { Dropdown } from '../Dropdown';
@@ -33,7 +33,12 @@ const RightWrapper = styled.div`
   padding: 0 24px;
 `;
 
+const StyledSearchInput = styled(SearchInput)`
+  margin-right: auto;
+`;
+
 const AddItemButton = styled(AddItem)`
+  margin-left: auto;
   margin-right: 10px;
 `;
 
@@ -45,9 +50,9 @@ const UserSection = styled.div`
 `;
 
 const UserName = styled.div`
-  font-size: 16px;
-  margin-left: 15px;
-  margin-right: 15px;
+  margin-left: 8px;
+  margin-right: 8px;
+  white-space: nowrap;
 `;
 
 const StyledDropdown = styled(Dropdown)`
@@ -89,23 +94,10 @@ const ArrowIcon = styled(Icon)`
   transition: transform 0.2s;
 `;
 
-const PrimaryHeaderComponent = ({
-  user,
-  searchedText,
-  onSearch,
-  onClickReset,
-  workInProgressList,
-  onClickCreateItem = Function.prototype,
-}) => {
+const Options = () => {
   const dispatch = useDispatch();
-  const [isDropdownOpened, setIsDropdownOpened] = useState(false);
-  const userName = (user && (user.name || user.email)) || '';
 
-  const handleToggleDropdown = () => {
-    setIsDropdownOpened(!isDropdownOpened);
-  };
-
-  const Options = (
+  return (
     <>
       <Option key="settings">
         <Link href={ROUTES.SETTINGS + ROUTES.TEAM}>
@@ -117,6 +109,22 @@ const PrimaryHeaderComponent = ({
       </Option>
     </>
   );
+};
+
+const PrimaryHeaderComponent = ({
+  currentUser,
+  searchedText,
+  showAddItemButton,
+  onSearch,
+  onClickReset,
+}) => {
+  const [isDropdownOpened, setDropdownOpened] = useState(false);
+  const userName =
+    (currentUser && (currentUser.name || currentUser.email)) || '';
+
+  const handleToggleDropdown = () => {
+    setDropdownOpened(!isDropdownOpened);
+  };
 
   return (
     <>
@@ -124,20 +132,21 @@ const PrimaryHeaderComponent = ({
         <LeftWrapper>
           <Logo href="/" />
         </LeftWrapper>
-        {!!user && (
+        {!!currentUser && (
           <RightWrapper>
-            <SearchInput
-              searchedText={searchedText}
-              onChange={onSearch}
-              onClickReset={onClickReset}
-            />
-            <AddItemButton
-              workInProgressList={workInProgressList}
-              onClickCreateItem={onClickCreateItem}
-            />
+            {onSearch && (
+              <StyledSearchInput
+                name="search"
+                autoComplete="nope"
+                searchedText={searchedText}
+                onChange={onSearch}
+                onClickReset={onClickReset}
+              />
+            )}
+            {showAddItemButton && <AddItemButton />}
             <UserSection>
               <StyledDropdown
-                renderOverlay={() => Options}
+                renderOverlay={Options}
                 onToggle={handleToggleDropdown}
                 withTriangleAtTop
               >
@@ -146,12 +155,12 @@ const PrimaryHeaderComponent = ({
                   name="arrow-triangle"
                   width={16}
                   height={16}
-                  color="middleGray"
+                  color="black"
                   isDropdownOpened={isDropdownOpened}
                 />
               </StyledDropdown>
             </UserSection>
-            {/* TODO: Add notifications */}
+            {/* TODO: Add notifications feature */}
           </RightWrapper>
         )}
       </Wrapper>

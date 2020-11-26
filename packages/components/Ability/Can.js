@@ -1,6 +1,4 @@
 import { createContextualCan } from '@casl/react';
-import { AbilityConsumer } from './AbilityProvider';
+import { AbilityContext } from './AbilityProvider';
 
-const Can = createContextualCan(AbilityConsumer);
-
-export default Can;
+export const Can = createContextualCan(AbilityContext.Consumer);

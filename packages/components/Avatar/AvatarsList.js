@@ -4,18 +4,12 @@ import { Avatar } from './Avatar';
 
 const Wrapper = styled.div`
   display: flex;
+  z-index: ${({ theme }) => theme.zIndex.basic};
 `;
 
 const StyledAvatar = styled(Avatar)`
-  margin-right: -10px;
-  border: 1px solid ${({ theme }) => theme.color.white};
-
-  &:last-child {
-    margin-right: 0;
-  }
-`;
-
-const AvatarNumberStyled = styled(Avatar)`
+  z-index: ${({ zIndex }) => zIndex};
+  margin-right: -8px;
   border: 1px solid ${({ theme }) => theme.color.white};
 `;
 
@@ -23,8 +17,10 @@ const DEFAULT_VISIBLE_AVATARS_COUNT = 3;
 
 const AvatarsList = ({
   avatars = [],
-  isSmall,
+  size,
+  fontSize,
   visibleCount = DEFAULT_VISIBLE_AVATARS_COUNT,
+  avatarHintPosition,
   ...props
 }) => {
   const visibleAvatars = avatars.length ? avatars.slice(0, visibleCount) : [];
@@ -34,18 +30,26 @@ const AvatarsList = ({
   const renderedAvatars = visibleAvatars
     .map(({ name, email, avatar }, index) => (
       <StyledAvatar
-        isSmall={isSmall}
+        hint={name || email}
+        hintPosition={avatarHintPosition}
+        size={size}
+        fontSize={fontSize}
         key={index}
         name={name}
         email={email}
         avatar={avatar}
+        zIndex={avatars.length - index}
       />
     ))
     .concat(
       shouldShowLast ? (
-        <AvatarNumberStyled isSmall={isSmall} key={visibleAvatars.length}>
+        <StyledAvatar
+          size={size}
+          fontSize={fontSize}
+          key={visibleAvatars.length}
+        >
           +{invisibleCount}
-        </AvatarNumberStyled>
+        </StyledAvatar>
       ) : null,
     );
 

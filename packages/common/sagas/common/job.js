@@ -1,4 +1,4 @@
-import { call, put, take, select, spawn } from 'redux-saga/effects';
+import { call, put, takeEvery, select, spawn } from 'redux-saga/effects';
 import { availableCoresCountSelector } from '@caesar/common/selectors/application';
 import {
   increaseCoresCount,
@@ -28,7 +28,7 @@ function getRequiredCoresCountFor(action) {
   const chunkSize =
     type === DECRYPTION ? DECRYPTION_CHUNK_SIZE : ENCRYPTION_CHUNK_SIZE;
 
-  return Math.ceil(payload.items.length / chunkSize);
+  return Math.ceil(payload.items?.length || 1 / chunkSize);
 }
 
 function canRunJobImmediately(availableCoresCount) {
@@ -61,54 +61,52 @@ function prepareJob(action, coresCount) {
 // - action: { type, payload }
 function* jobSaga({ id, coresCount, action }) {
   const job = action.type === DECRYPTION ? decryption : encryption;
-
-  const endEventType =
-    action.type === DECRYPTION ? DECRYPTION_END : ENCRYPTION_END;
-
-  yield call(job, { coresCount, ...action.payload });
-  yield put({ type: endEventType, payload: { id, coresCount } });
+  yield call(job, { coresCount, id, ...action.payload });
 }
 
-export function* jobLoadBalancerSaga() {
+function* jobAction(action) {
   const queue = createQueue();
 
-  while (true) {
-    const action = yield take(JOB_EVENTS);
+  if (isEndJob(action.type)) {
+    yield put(increaseCoresCount(action.payload.coresCount));
 
-    if (isEndJob(action.type)) {
-      yield put(increaseCoresCount(action.payload.coresCount));
+    const availableCoresCount = yield select(availableCoresCountSelector);
 
-      const availableCoresCount = yield select(availableCoresCountSelector);
-
-      if (!queue.isEmpty()) {
-        if (canRunJobImmediately(availableCoresCount)) {
-          const nextJob = queue.dequeue();
-
-          const coresCount = getCoresCountFor(
-            nextJob.action,
-            availableCoresCount,
-          );
-          const job = prepareJob(nextJob.action, coresCount);
-
-          yield put(decreaseCoresCount(coresCount));
-          yield spawn(jobSaga, job);
-        }
-      }
-    } else {
-      const availableCoresCount = yield select(availableCoresCountSelector);
-
+    if (!queue.isEmpty()) {
       if (canRunJobImmediately(availableCoresCount)) {
-        const coresCount = getCoresCountFor(action, availableCoresCount);
-        const job = prepareJob(action, coresCount);
+        const nextJob = queue.dequeue();
+
+        const coresCount = getCoresCountFor(
+          nextJob.action,
+          availableCoresCount,
+        );
+        const job = prepareJob(nextJob.action, coresCount);
 
         yield put(decreaseCoresCount(coresCount));
         yield spawn(jobSaga, job);
-      } else {
-        // cores count will be estimated when job will be pulled out from queue
-        const job = prepareJob(action, null);
-
-        queue.enqueue(job);
       }
     }
+  } else {
+    const availableCoresCount = yield select(availableCoresCountSelector);
+
+    if (canRunJobImmediately(availableCoresCount)) {
+      const coresCount = getCoresCountFor(action, availableCoresCount);
+      const job = prepareJob(action, coresCount);
+
+      yield put(decreaseCoresCount(coresCount));
+      yield spawn(jobSaga, job);
+    } else {
+      // eslint-disable-next-line no-console
+      console.warn(
+        'Free threads have been exceeded! Will waiting for a free thread.',
+      );
+      // cores count will be estimated when job will be pulled out from queue
+      const job = prepareJob(action, null);
+
+      queue.enqueue(job);
+    }
   }
+}
+export function* jobLoadBalancerSaga() {
+  yield takeEvery(JOB_EVENTS, jobAction);
 }

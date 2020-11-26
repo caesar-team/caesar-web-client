@@ -1,4 +1,4 @@
-import React, { Component, Fragment } from 'react';
+import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { createStructuredSelector } from 'reselect';
 import {
@@ -8,52 +8,42 @@ import {
   SettingsSidebar,
 } from '@caesar/components';
 import { ImportContainer } from '@caesar/containers';
-import {
-  currentTeamSelector,
-  userDataSelector,
-} from '@caesar/common/selectors/user';
-import {
-  fetchUserSelfRequest,
-  fetchUserTeamsRequest,
-} from '@caesar/common/actions/user';
+import { currentUserDataSelector } from '@caesar/common/selectors/currentUser';
+import { initImportSettings } from '@caesar/common/actions/workflow';
 
 class SettingsImportPage extends Component {
   componentDidMount() {
-    this.props.fetchUserSelfRequest();
-    this.props.fetchUserTeamsRequest();
+    this.props.initImportSettings();
   }
 
   render() {
-    const { userData, currentTeam } = this.props;
-
-    const shouldShowLoader = !userData;
+    const { currentUserData } = this.props;
+    const shouldShowLoader = !currentUserData;
 
     if (shouldShowLoader) {
       return <FullScreenLoader />;
     }
 
     return (
-      <Fragment>
+      <>
         <Head title="Import" />
-        <SettingsLayout user={userData} team={currentTeam}>
-          <Fragment>
+        <SettingsLayout currentUser={currentUserData}>
+          <>
             <SettingsSidebar />
             <ImportContainer />
-          </Fragment>
+          </>
         </SettingsLayout>
-      </Fragment>
+      </>
     );
   }
 }
 
 const mapStateToProps = createStructuredSelector({
-  userData: userDataSelector,
-  currentTeam: currentTeamSelector,
+  currentUserData: currentUserDataSelector,
 });
 
 const mapDispatchToProps = {
-  fetchUserSelfRequest,
-  fetchUserTeamsRequest,
+  initImportSettings,
 };
 
 export default connect(

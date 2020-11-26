@@ -1,6 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
-import { COMMANDS_ROLES } from '@caesar/common/constants';
+import { TEAM_ROLES } from '@caesar/common/constants';
 import { Icon } from '../../Icon';
 import { Select } from '../../Select';
 
@@ -23,13 +23,6 @@ const AddButton = styled.button`
   cursor: pointer;
 `;
 
-const IconStyled = styled(Icon)`
-  width: 14px;
-  height: 14px;
-  fill: ${({ theme }) => theme.color.black};
-  cursor: pointer;
-`;
-
 const SelectStyled = styled(Select)`
   width: 200px;
   height: 40px;
@@ -37,7 +30,7 @@ const SelectStyled = styled(Select)`
   margin-right: 20px;
 `;
 
-const OPTIONS = Object.values(COMMANDS_ROLES).map(role => ({
+const OPTIONS = Object.values(TEAM_ROLES).map(role => ({
   value: role,
   label: role,
 }));
@@ -59,11 +52,17 @@ const InviteControl = ({
         className={className}
         onChange={onChange}
       />
-      <IconStyled name="close" onClick={onClickRemove} />
+      <Icon
+        name="close"
+        color="black"
+        width={14}
+        height={14}
+        onClick={onClickRemove}
+      />
     </Wrapper>
   ) : (
     <AddButton className={className} onClick={onClickAdd}>
-      <IconStyled name="plus" />
+      <Icon name="plus" color="black" width={14} height={14} />
     </AddButton>
   );
 

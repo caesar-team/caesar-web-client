@@ -1,3 +1,6 @@
+/* eslint-disable no-param-reassign */
+/* eslint-disable no-use-before-define */
+/* eslint-disable func-names */
 // GPG4Browsers - An OpenPGP implementation in javascript
 // Copyright (C) 2011 Recurity Labs GmbH
 //
@@ -109,6 +112,7 @@ function seedRandom(buffer) {
 function delegate(id, method, options) {
   if (typeof openpgp[method] !== 'function') {
     response({ id, event: 'method-return', err: 'Unknown Worker Event' });
+
     return;
   }
   // construct ReadableStreams from MessagePorts

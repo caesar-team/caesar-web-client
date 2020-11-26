@@ -16,7 +16,7 @@ const Box = styled.div`
     withTriangleAtTop ? 'calc(100% + 19px)' : 'calc(100% - 1px)'};
   right: 0;
   z-index: ${({ theme }) => theme.zIndex.dropdown};
-  border-radius: 3px;
+  border-radius: ${({ theme }) => theme.borderRadius};
   background-color: ${({ theme }) => theme.color.white};
   border: 1px solid ${({ theme }) => theme.color.gallery};
 
@@ -35,15 +35,20 @@ const Box = styled.div`
   }
 `;
 
+const EmptyList = styled.div`
+  padding: 8px 16px;
+`;
+
 const OptionsList = styled.div`
   position: relative;
   background-color: ${({ theme }) => theme.color.white};
-  border-radius: 3px;
+  border-radius: ${({ theme }) => theme.borderRadius};
   overflow: hidden;
 `;
 
 const Option = styled.button`
-  padding: 10px 30px;
+  padding: 0;
+  font-size: ${({ theme }) => theme.font.size.main};
   border: none;
   background: none;
   cursor: pointer;
@@ -55,10 +60,11 @@ const Option = styled.button`
 `;
 
 const Button = styled.button`
+  padding: 0;
+  font-size: ${({ theme }) => theme.font.size.main};
   border: none;
   background-color: transparent;
   outline: none;
-  padding: 0;
   cursor: pointer;
 `;
 
@@ -74,10 +80,10 @@ const DropdownComponent = ({
   onToggle,
   className,
 }) => {
-  const [isOpened, setIsOpened] = useState(false);
+  const [isOpened, setOpened] = useState(false);
 
   const handleToggle = () => {
-    setIsOpened(!isOpened);
+    setOpened(!isOpened);
   };
 
   const handleClick = value => () => {
@@ -86,20 +92,23 @@ const DropdownComponent = ({
     if (onClick) onClick(name, value);
   };
 
-  const renderOptions = () => {
-    return options.map(({ label, value }, index) =>
-      optionRender ? (
-        cloneElement(optionRender(value, label), {
-          key: index,
-          onClick: handleClick(value),
-        })
-      ) : (
-        <Option key={index} onClick={handleClick(value)}>
-          {label}
-        </Option>
-      ),
+  const renderOptions = () =>
+    options.length ? (
+      options.map(({ label, value }, index) =>
+        optionRender ? (
+          cloneElement(optionRender(value, label), {
+            key: index,
+            onClick: handleClick(value),
+          })
+        ) : (
+          <Option key={index} onClick={handleClick(value)}>
+            {label}
+          </Option>
+        ),
+      )
+    ) : (
+      <EmptyList>No options</EmptyList>
     );
-  };
 
   useUpdateEffect(() => {
     if (onToggle) {
@@ -113,7 +122,9 @@ const DropdownComponent = ({
 
   const dropdownRef = useRef(null);
   useClickAway(dropdownRef, () => {
-    setIsOpened(false);
+    if (isOpened) {
+      setOpened(false);
+    }
   });
 
   return (
@@ -138,5 +149,7 @@ const Dropdown = memo(DropdownComponent);
 
 Dropdown.Button = Button;
 Dropdown.Box = Box;
+Dropdown.OptionsList = OptionsList;
+Dropdown.Option = Option;
 
 export { Dropdown };

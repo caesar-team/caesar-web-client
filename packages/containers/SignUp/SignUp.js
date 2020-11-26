@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { memo } from 'react';
 import { withTheme } from 'styled-components';
 import Router, { withRouter } from 'next/router';
 import { ROUTES } from '@caesar/common/constants';
@@ -8,36 +8,43 @@ import {
   AuthLayout,
   SecondaryHeader,
 } from '@caesar/components';
+import { useNotification } from '@caesar/common/hooks';
 import { registration } from '@caesar/common/utils/authUtils';
+import { getServerErrorsByName } from '@caesar/common/utils/error';
 import SignUpForm from './SignUpForm';
 
 const headerComponent = <SecondaryHeader buttonText="Sign In" url="/signin" />;
 
-class SignUpContainer extends Component {
-  handleSubmit = async ({ email, password }, { setSubmitting, setErrors }) => {
+const SignUpContainer = () => {
+  const notification = useNotification();
+
+  const handleSubmit = async (
+    { email, password },
+    { setSubmitting, setErrors },
+  ) => {
     try {
       await registration(email, password);
 
+      notification.show({
+        text: 'You have successfully signed up',
+      });
+
       Router.push(ROUTES.SIGN_IN);
     } catch (e) {
-      setErrors({
-        email: 'Wrong email',
-        password: 'Wrong password',
-        confirmPassword: 'Wrong password',
-      });
+      const serverErrorsByName = getServerErrorsByName(e);
+
+      setErrors(serverErrorsByName);
       setSubmitting(false);
     }
   };
 
-  render() {
-    return (
-      <AuthLayout headerComponent={headerComponent}>
-        <AuthTitle>Nice to meet you!</AuthTitle>
-        <AuthDescription>Welcome to Caesar.Team!</AuthDescription>
-        <SignUpForm onSubmit={this.handleSubmit} />
-      </AuthLayout>
-    );
-  }
-}
+  return (
+    <AuthLayout headerComponent={headerComponent}>
+      <AuthTitle>Nice to meet you!</AuthTitle>
+      <AuthDescription>Welcome to Caesar.Team!</AuthDescription>
+      <SignUpForm onSubmit={handleSubmit} />
+    </AuthLayout>
+  );
+};
 
-export default withTheme(withRouter(SignUpContainer));
+export default withTheme(withRouter(memo(SignUpContainer)));

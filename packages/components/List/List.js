@@ -1,15 +1,14 @@
 import React, { memo } from 'react';
-import styled from 'styled-components';
 import equal from 'fast-deep-equal';
 import memoize from 'memoize-one';
-import AutoSizer from 'react-virtualized-auto-sizer';
 import { FixedSizeList } from 'react-window';
-import { upperFirst } from '@caesar/common/utils/string';
-import { DASHBOARD_MODE, LIST_TYPES_ARRAY } from '@caesar/common/constants';
-import { Button } from '@caesar/components';
-import { FixedSizeItem } from './FixedSizeItem';
-import { ScrollbarVirtualList } from './ScrollbarVirtualList';
+import AutoSizer from 'react-virtualized-auto-sizer';
+import styled from 'styled-components';
+import { transformListTitle } from '@caesar/common/utils/string';
+import { DASHBOARD_MODE } from '@caesar/common/constants';
+import { Scrollbar } from '../Scrollbar';
 import { EmptyList } from './EmptyList';
+import { FixedSizeItem } from './FixedSizeItem';
 
 const Wrapper = styled.div`
   position: relative;
@@ -25,6 +24,7 @@ const ColumnHeader = styled.div`
   justify-content: space-between;
   align-items: center;
   height: 56px;
+  flex: 0 0 56px;
   padding: 8px 24px;
   background-color: ${({ theme }) => theme.color.alto};
   border-bottom: 1px solid ${({ theme }) => theme.color.gallery};
@@ -36,40 +36,61 @@ const ColumnTitle = styled.div`
   color: ${({ theme }) => theme.color.black};
 `;
 
-const ITEM_HEIGHT = 56;
+const createItemData = memoize(itemData => itemData);
 
-const createItemData = memoize(
-  (
+const RenderedList = ({
+  items,
+  isMultiItem,
+  teamMembersCount,
+  onClickItem,
+  onSelectItem,
+  workInProgressItemIds,
+  workInProgressItem,
+}) => {
+  const itemData = createItemData({
     items,
     isMultiItem,
+    teamMembersCount,
+    onClickItem,
+    onSelectItem,
     workInProgressItemIds,
     workInProgressItem,
-    onClickItem,
-  ) => ({
-    items,
-    isMultiItem,
-    workInProgressItemIds,
-    workInProgressItem,
-    onClickItem,
-  }),
-);
+  });
+
+  return (
+    <Scrollbar>
+      <AutoSizer>
+        {({ height, width }) => (
+          <FixedSizeList
+            height={height}
+            itemCount={items.length}
+            itemData={itemData}
+            itemSize={58}
+            width={width}
+          >
+            {FixedSizeItem}
+          </FixedSizeList>
+        )}
+      </AutoSizer>
+    </Scrollbar>
+  );
+};
 
 const ListComponent = ({
   mode,
   isMultiItem = false,
   workInProgressList = null,
-  workInProgressItem,
   workInProgressItemIds,
+  workInProgressItem,
   items = [],
+  teamMembersCount = 1,
   onClickItem = Function.prototype,
+  onSelectItem = Function.prototype,
 }) => {
   const isDashboardDefaultMode = mode === DASHBOARD_MODE.DEFAULT;
+  const isEmpty = items.length === 0;
 
-  if (
-    isDashboardDefaultMode &&
-    !workInProgressList &&
-    !workInProgressItemIds.length
-  ) {
+  if (isDashboardDefaultMode && !workInProgressList) {
     return (
       <Wrapper isEmpty>
         <EmptyList />
@@ -77,41 +98,7 @@ const ListComponent = ({
     );
   }
 
-  const isEmpty = items.length === 0;
-  const renderedList = () => {
-    if (isEmpty) {
-      return <EmptyList />;
-    }
-
-    const itemData = createItemData(
-      items,
-      isMultiItem,
-      workInProgressItemIds,
-      workInProgressItem,
-      onClickItem,
-    );
-
-    return (
-      <AutoSizer>
-        {({ height, width }) => (
-          <FixedSizeList
-            height={height}
-            itemCount={items.length}
-            itemData={itemData}
-            itemSize={ITEM_HEIGHT}
-            width={width}
-            outerElementType={ScrollbarVirtualList}
-          >
-            {FixedSizeItem}
-          </FixedSizeList>
-        )}
-      </AutoSizer>
-    );
-  };
-
-  const itemTitle = LIST_TYPES_ARRAY.includes(workInProgressList?.label)
-    ? upperFirst(workInProgressList?.label)
-    : workInProgressList?.label;
+  const listTitle = transformListTitle(workInProgressList?.label);
 
   return (
     <Wrapper isEmpty={isEmpty}>
@@ -119,20 +106,24 @@ const ListComponent = ({
         <ColumnHeader>
           <ColumnTitle>
             {isDashboardDefaultMode
-              ? itemTitle
+              ? listTitle
               : `Search results (${items.length} elements):`}
           </ColumnTitle>
-          {/* TODO: Add sharing list functional; Set condition when to show this button */}
-          {/* <Button
-            icon="share-network"
-            color="white"
-            onClick={() => {
-              console.log('Sharing modal');
-            }}
-          /> */}
         </ColumnHeader>
       )}
-      {renderedList()}
+      {items.length === 0 && workInProgressItemIds.length === 0 ? (
+        <EmptyList />
+      ) : (
+        <RenderedList
+          items={items}
+          isMultiItem={isMultiItem}
+          teamMembersCount={teamMembersCount}
+          onClickItem={onClickItem}
+          onSelectItem={onSelectItem}
+          workInProgressItemIds={workInProgressItemIds}
+          workInProgressItem={workInProgressItem}
+        />
+      )}
     </Wrapper>
   );
 };

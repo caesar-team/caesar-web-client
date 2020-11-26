@@ -1,1 +1,1 @@
-export { default as PasswordIndicator } from './PasswordIndicator';
+export { PasswordIndicator, INDICATOR_TYPE } from './PasswordIndicator';

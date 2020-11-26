@@ -13,20 +13,28 @@ import {
   sortListSuccess,
   sortListFailure,
 } from '@caesar/common/actions/entities/list';
-import { removeItemsBatch } from '@caesar/common/actions/entities/item';
-import { removeChildItemsBatch } from '@caesar/common/actions/entities/childItem';
+import { updateGlobalNotification } from '@caesar/common/actions/application';
 import {
   listSelector,
-  sortedCustomizableListsSelector,
+  nestedListsSelector,
+  currentTeamTrashListSelector,
+  trashListSelector,
 } from '@caesar/common/selectors/entities/list';
-import { itemsBatchSelector } from '@caesar/common/selectors/entities/item';
+import { moveItemsBatchSaga } from '@caesar/common/sagas/entities/item';
 import {
-  removeList,
   postCreateList,
-  patchListSort,
   patchList,
+  patchListSort,
+  removeList,
+  postCreateTeamList,
+  patchTeamList,
+  removeTeamList,
 } from '@caesar/common/api';
-import { ENTITY_TYPE, LIST_TYPE } from '@caesar/common/constants';
+import { ENTITY_TYPE, LIST_TYPE, TEAM_TYPE } from '@caesar/common/constants';
+import { getServerErrors } from '@caesar/common/utils/error';
+import { convertListsToEntities } from '@caesar/common/normalizers/normalizers';
+import { itemsByListIdSelector } from '../../selectors/entities/item';
+import { currentTeamIdSelector } from '../../selectors/currentUser';
 
 const reorder = (list, startIndex, endIndex) => {
   const result = Array.from(list);
@@ -38,85 +46,134 @@ const reorder = (list, startIndex, endIndex) => {
 
 const fixSort = lists => lists.map((list, index) => ({ ...list, sort: index }));
 
-export function* createListSaga({ payload: { list } }) {
-  try {
-    const {
-      data: { id: listId },
-    } = yield call(postCreateList, {
-      label: list.label,
-    });
-
-    yield put(
-      createListSuccess(listId, {
-        id: listId,
-        type: LIST_TYPE.LIST,
-        children: [],
-        sort: 0,
-        parentId: null,
-        __type: ENTITY_TYPE.LIST,
-        ...list,
-      }),
-    );
-  } catch (error) {
-    console.log(error);
-    yield put(createListFailure());
-  }
-}
-
-export function* editListSaga({ payload: { list } }) {
-  try {
-    yield call(patchList, list.id, { label: list.label });
-
-    yield put(editListSuccess(list));
-  } catch (error) {
-    console.log(error);
-    yield put(editListFailure());
-  }
-}
-
-export function* removeListSaga({ payload: { listId } }) {
-  try {
-    yield call(removeList, listId);
-
-    const list = yield select(listSelector, { listId });
-    const listItemIds = list.children;
-    const listItems = yield select(itemsBatchSelector, {
-      itemIds: listItemIds,
-    });
-    const childItemIds = listItems.reduce(
-      (accumulator, item) => [...accumulator, ...item.invited],
-      [],
-    );
-
-    yield put(removeChildItemsBatch(childItemIds));
-    yield put(removeItemsBatch(listItemIds));
-    yield put(removeListSuccess(listId));
-  } catch (error) {
-    console.log(error);
-    yield put(removeListFailure());
-  }
-}
-
 export function* sortListSaga({
   payload: { listId, sourceIndex, destinationIndex },
 }) {
   try {
-    const sortedCustomizableLists = yield select(
-      sortedCustomizableListsSelector,
-    );
+    const currentTeamId = yield select(currentTeamIdSelector);
+    const lists = yield select(nestedListsSelector, { teamId: currentTeamId });
 
     yield put(
       sortListSuccess(
-        fixSort(
-          reorder(sortedCustomizableLists, sourceIndex, destinationIndex),
-        ).reduce((acc, list) => ({ ...acc, [list.id]: list }), {}),
+        fixSort(reorder(lists, sourceIndex, destinationIndex)).reduce(
+          (acc, list) => ({ ...acc, [list.id]: list }),
+          {},
+        ),
       ),
     );
 
     yield call(patchListSort, listId, { sort: destinationIndex });
   } catch (error) {
-    console.log(error);
+    // eslint-disable-next-line no-console
+    console.error(error);
     yield put(sortListFailure());
+  }
+}
+
+export function* createListSaga({
+  payload: { list },
+  meta: { setCreatingMode },
+}) {
+  try {
+    const {
+      data: { id: listId, _links },
+    } =
+      list.teamId && list.teamId !== TEAM_TYPE.PERSONAL
+        ? yield call(postCreateTeamList, list.teamId, {
+            label: list.label,
+          })
+        : yield call(postCreateList, {
+            label: list.label,
+          });
+
+    yield call(setCreatingMode, false);
+
+    const listData = {
+      id: listId,
+      type: LIST_TYPE.LIST,
+      sort: 0,
+      __type: ENTITY_TYPE.LIST,
+      _links,
+      ...list,
+    };
+
+    const listsById = convertListsToEntities([listData]);
+    const normalizedList = Object.values(listsById).shift();
+
+    yield put(createListSuccess(listId, normalizedList));
+
+    const currentTeamId = yield select(currentTeamIdSelector);
+    const lists = yield select(nestedListsSelector, { teamId: currentTeamId });
+    const firstListInOrder = lists.find(
+      ({ id, sort }) => sort === 0 && id !== listId,
+    );
+
+    if (firstListInOrder) {
+      yield call(sortListSaga, {
+        payload: {
+          listId: firstListInOrder.id,
+          sourceIndex: 0,
+          destinationIndex: 1,
+        },
+      });
+    }
+  } catch (error) {
+    yield put(createListFailure());
+    yield put(updateGlobalNotification(getServerErrors(error), false, true));
+  }
+}
+
+export function* editListSaga({ payload: { list }, meta: { setEditMode } }) {
+  try {
+    if (list.teamId === TEAM_TYPE.PERSONAL) {
+      yield call(patchList, list.id, { label: list.label });
+    } else {
+      yield call(patchTeamList, list.teamId, list.id, { label: list.label });
+    }
+
+    yield call(setEditMode, false);
+    yield put(editListSuccess(list));
+  } catch (error) {
+    // eslint-disable-next-line no-console
+    console.error(error);
+    yield put(editListFailure());
+    yield put(updateGlobalNotification(getServerErrors(error), false, true));
+  }
+}
+
+export function* removeListSaga({
+  payload: { teamId = TEAM_TYPE.PERSONAL, listId },
+}) {
+  try {
+    const list = yield select(listSelector, { listId });
+    const listItems = yield select(itemsByListIdSelector, { listId });
+    const listItemIds = listItems?.map(item => item.id) || [];
+
+    const trashList = teamId
+      ? yield select(currentTeamTrashListSelector)
+      : yield select(trashListSelector);
+
+    yield call(moveItemsBatchSaga, {
+      payload: {
+        itemIds: listItemIds,
+        oldTeamId: teamId,
+        oldListId: list.id,
+        teamId,
+        listId: trashList?.id,
+      },
+    });
+
+    if (teamId === TEAM_TYPE.PERSONAL) {
+      yield call(removeList, listId);
+    } else {
+      yield call(removeTeamList, teamId, listId);
+    }
+
+    yield put(removeListSuccess(listId));
+  } catch (error) {
+    // eslint-disable-next-line no-console
+    console.error(error);
+    yield put(removeListFailure());
   }
 }
 

@@ -32,17 +32,14 @@ export const objectToArray = obj => Object.values(obj);
 export const arrayToObject = (arr, id = 'id') =>
   arr.reduce((accumulator, item) => ({ ...accumulator, [item[id]]: item }), {});
 
-export const match = (obj, arr, idField = 'id') =>
-  arr.reduce(
-    (accumulator, { [idField]: id, data }) => ({
-      ...accumulator,
-      [id]: {
-        ...obj[id],
-        data,
-      },
-    }),
-    {},
+export const match = (inboundItems, outboundItems, idField = 'id') => {
+  if (Object.keys(inboundItems).length === 0) return [];
+  const results = outboundItems.filter(outboundItem =>
+    inboundItems[outboundItem[idField]] ? outboundItem[idField] : null,
   );
+
+  return results;
+};
 
 export const sortByName = (a, b) => {
   const nameA = a.toLowerCase();
@@ -57,3 +54,5 @@ export const sortByName = (a, b) => {
 
   return 0;
 };
+
+export const isIterable = obj => (obj ? Symbol.iterator in Object(obj) : false);

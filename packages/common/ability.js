@@ -1,122 +1,117 @@
-import { AbilityBuilder } from '@casl/ability';
-import {
-  COMMANDS_ROLES,
-  DOMAIN_ROLES,
-  PERMISSIONS,
-  ENTITY_TYPE,
-  LIST_TYPE,
-} from './constants';
+/* eslint-disable camelcase */
+import { defineAbility } from '@casl/ability';
+import { PERMISSION, PERMISSION_ENTITY } from './constants';
 
-const {
-  CRUD_PERMISSION,
-  CREATE_PERMISSION,
-  READ_PERMISSION,
-  UPDATE_PERMISSION,
-  DELETE_PERMISSION,
-  CHANGE_TEAM_MEMBER_ROLE_PERMISSION,
-  JOIN_MEMBER_TO_TEAM,
-  LEAVE_MEMBER_FROM_TEAM,
-  MOVE_ITEM_PERMISSION,
-  SHARE_ITEM_PERMISSION,
-} = PERMISSIONS;
-
-const ALL = 'all';
-
-function subjectName(subject) {
-  // console.log('subject', subject);
+const subjectName = subject => {
   if (!subject || typeof subject === 'string') {
     return subject;
   }
 
-  return subject.__type;
-}
-
-const defineRulesForUnknownUser = cannot => cannot(CRUD_PERMISSION, ALL);
-
-const defineRulesForAdminUser = can => {
-  can(CRUD_PERMISSION, ENTITY_TYPE.TEAM);
-  can(CRUD_PERMISSION, ENTITY_TYPE.LIST, { type: LIST_TYPE.LIST });
-  can(
-    [READ_PERMISSION, UPDATE_PERMISSION, DELETE_PERMISSION],
-    ENTITY_TYPE.ITEM,
-  );
-  can(CREATE_PERMISSION, ENTITY_TYPE.ITEM, { listType: LIST_TYPE.LIST });
-  can(CRUD_PERMISSION, ENTITY_TYPE.TEAM);
-
-  can(CHANGE_TEAM_MEMBER_ROLE_PERMISSION, ENTITY_TYPE.TEAM);
-  can(JOIN_MEMBER_TO_TEAM, ENTITY_TYPE.TEAM);
-  can(LEAVE_MEMBER_FROM_TEAM, ENTITY_TYPE.TEAM);
-  can(MOVE_ITEM_PERMISSION, ENTITY_TYPE.ITEM);
-  can(SHARE_ITEM_PERMISSION, ENTITY_TYPE.ITEM);
+  return subject.__typename;
 };
 
-const defineCommandSubjectRules = (user, can) => {
-  // command admin rules
-  can(CHANGE_TEAM_MEMBER_ROLE_PERMISSION, ENTITY_TYPE.TEAM, {
-    userRole: COMMANDS_ROLES.USER_ROLE_ADMIN,
+export const ability = defineAbility({ subjectName }, can => {
+  can(PERMISSION.CREATE, PERMISSION_ENTITY.TEAM, {
+    team_create: true,
   });
-
-  can(JOIN_MEMBER_TO_TEAM, ENTITY_TYPE.TEAM, {
-    userRole: COMMANDS_ROLES.USER_ROLE_ADMIN,
+  can([PERMISSION.EDIT, PERMISSION.CRUD], PERMISSION_ENTITY.TEAM, {
+    team_edit: true,
   });
-
-  can(LEAVE_MEMBER_FROM_TEAM, ENTITY_TYPE.TEAM, {
-    userRole: COMMANDS_ROLES.USER_ROLE_ADMIN,
+  can([PERMISSION.DELETE, PERMISSION.CRUD], PERMISSION_ENTITY.TEAM, {
+    team_delete: true,
   });
-
-  can(CRUD_PERMISSION, ENTITY_TYPE.ITEM, {
-    userRole: COMMANDS_ROLES.USER_ROLE_ADMIN,
-    teamId: { $ne: null },
-    listType: LIST_TYPE.LIST,
+  can(PERMISSION.PIN, PERMISSION_ENTITY.TEAM, {
+    team_pinned: true,
   });
-
-  can(SHARE_ITEM_PERMISSION, ENTITY_TYPE.ITEM, {
-    userRole: COMMANDS_ROLES.USER_ROLE_ADMIN,
-    teamId: { $ne: null },
+  can(PERMISSION.LEAVE, PERMISSION_ENTITY.TEAM, {
+    team_leave: true,
   });
-
-  can(MOVE_ITEM_PERMISSION, ENTITY_TYPE.ITEM, {
-    userRole: COMMANDS_ROLES.USER_ROLE_ADMIN,
-    teamId: { $ne: null },
+  can(PERMISSION.ADD, PERMISSION_ENTITY.TEAM_MEMBER, {
+    team_member_add: true,
   });
-};
-
-const definePersonalSubjectRules = (user, can) => {
-  can(MOVE_ITEM_PERMISSION, ENTITY_TYPE.ITEM, {
-    teamId: null,
+  can(PERMISSION.EDIT, PERMISSION_ENTITY.TEAM_MEMBER, {
+    team_member_edit: true,
   });
-
-  can(CREATE_PERMISSION, ENTITY_TYPE.ITEM, {
-    teamId: null,
-    listType: LIST_TYPE.LIST,
+  can(PERMISSION.DELETE, PERMISSION_ENTITY.TEAM_MEMBER, {
+    team_member_remove: true,
   });
-
-  can(UPDATE_PERMISSION, ENTITY_TYPE.ITEM, {
-    teamId: null,
-    ownerId: user.id,
+  can(PERMISSION.CREATE, PERMISSION_ENTITY.LIST, {
+    create_list: true,
   });
-
-  can(DELETE_PERMISSION, ENTITY_TYPE.ITEM, {
-    teamId: null,
+  can(PERMISSION.EDIT, PERMISSION_ENTITY.LIST, {
+    edit_list: true,
   });
-
-  can(SHARE_ITEM_PERMISSION, ENTITY_TYPE.ITEM, {
-    teamId: null,
-    ownerId: user.id,
+  can(PERMISSION.SORT, PERMISSION_ENTITY.LIST, {
+    sort_list: true,
   });
-};
-
-export const createAbility = user => {
-  if (!user) {
-    return AbilityBuilder.define(defineRulesForUnknownUser);
-  }
-
-  if (user.roles.includes(DOMAIN_ROLES.ROLE_ADMIN)) {
-    return AbilityBuilder.define({ subjectName }, defineRulesForAdminUser);
-  }
-
-  return AbilityBuilder.define({ subjectName }, can => {
-    definePersonalSubjectRules(user, can);
-    defineCommandSubjectRules(user, can);
+  can(PERMISSION.DELETE, PERMISSION_ENTITY.LIST, {
+    delete_list: true,
   });
-};
+  can(PERMISSION.CREATE, PERMISSION_ENTITY.TEAM_LIST, {
+    team_create_list: true,
+  });
+  can(PERMISSION.EDIT, PERMISSION_ENTITY.TEAM_LIST, {
+    team_edit_list: true,
+  });
+  can(PERMISSION.SORT, PERMISSION_ENTITY.TEAM_LIST, {
+    team_sort_list: true,
+  });
+  can(PERMISSION.DELETE, PERMISSION_ENTITY.TEAM_LIST, {
+    team_delete_list: true,
+  });
+  can(PERMISSION.CREATE, PERMISSION_ENTITY.ITEM, {
+    create_item: true,
+  });
+  can(PERMISSION.EDIT, PERMISSION_ENTITY.ITEM, {
+    edit_item: true,
+  });
+  can(PERMISSION.MOVE, PERMISSION_ENTITY.ITEM, {
+    move_item: true,
+  });
+  can(PERMISSION.SHARE, PERMISSION_ENTITY.ITEM, {
+    share_item: true,
+  });
+  can(PERMISSION.FAVORITE, PERMISSION_ENTITY.ITEM, {
+    favorite_item_toggle: true,
+  });
+  can([PERMISSION.TRASH, PERMISSION.RESTORE], PERMISSION_ENTITY.ITEM, {
+    move_item: true,
+    delete_item: true,
+  });
+  can(PERMISSION.DELETE, PERMISSION_ENTITY.ITEM, {
+    delete_item: true,
+  });
+  can(PERMISSION.MULTISELECT, PERMISSION_ENTITY.ITEM, {
+    edit_item: true,
+    move_item: true,
+    delete_item: true,
+  });
+  can(PERMISSION.CREATE, PERMISSION_ENTITY.TEAM_ITEM, {
+    team_create_item: true,
+  });
+  can(PERMISSION.EDIT, PERMISSION_ENTITY.TEAM_ITEM, {
+    team_edit_item: true,
+  });
+  can(PERMISSION.MOVE, PERMISSION_ENTITY.TEAM_ITEM, {
+    team_move_item: true,
+  });
+  can(PERMISSION.SHARE, PERMISSION_ENTITY.TEAM_ITEM, {
+    team_share_item: true,
+    block_this_feature: true,
+  });
+  can(PERMISSION.FAVORITE, PERMISSION_ENTITY.TEAM_ITEM, {
+    team_favorite_item_toggle: true,
+  });
+  can([PERMISSION.TRASH, PERMISSION.RESTORE], PERMISSION_ENTITY.TEAM_ITEM, {
+    team_move_item: true,
+    team_delete_item: true,
+  });
+  can(PERMISSION.DELETE, PERMISSION_ENTITY.TEAM_ITEM, {
+    team_delete_item: true,
+  });
+  can(PERMISSION.MULTISELECT, PERMISSION_ENTITY.TEAM_ITEM, {
+    team_edit_item: true,
+    team_move_item: true,
+    team_delete_item: true,
+  });
+});

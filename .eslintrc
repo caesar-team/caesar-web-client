@@ -1,6 +1,6 @@
 {
-  "extends": ["airbnb", "prettier", "prettier/react"],
-  "plugins": ["prettier"],
+  "extends": ["airbnb", "prettier", "prettier/react", "eslint:recommended"],
+  "plugins": ["prettier", "unused-imports"],
   "parser": "babel-eslint",
   "parserOptions": {
     "ecmaFeatures": {
@@ -39,8 +39,9 @@
     "no-confusing-arrow": 0,
     "no-underscore-dangle": 0,
     "class-methods-use-this": 0,
-    "camelcase": ["error", { "properties": "always" } ],
-    "newline-before-return": 1
+    "camelcase": ["error", { "properties": "always" }],
+    "newline-before-return": 1,
+    "no-multiple-empty-lines": ["error", { "max": 1 }]
   },
   "env": {
     "browser": true,

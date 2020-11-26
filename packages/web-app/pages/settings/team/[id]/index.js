@@ -1,6 +1,7 @@
-import React, { Component, Fragment } from 'react';
-import { connect } from 'react-redux';
-import { createStructuredSelector } from 'reselect';
+import React from 'react';
+import { useEffectOnce } from 'react-use';
+import { useRouter } from 'next/router';
+import { useDispatch, useSelector } from 'react-redux';
 import { TeamContainer } from '@caesar/containers';
 import {
   Head,
@@ -8,55 +9,50 @@ import {
   SettingsSidebar,
   FullScreenLoader,
 } from '@caesar/components';
-import {
-  fetchUserSelfRequest,
-  fetchUserTeamsRequest,
-} from '@caesar/common/actions/user';
-import {
-  userDataSelector,
-  currentTeamSelector,
-} from '@caesar/common/selectors/user';
+import { currentUserDataSelector } from '@caesar/common/selectors/currentUser';
+import { initTeamSettings } from '@caesar/common/actions/workflow';
+import { teamSelector } from '@caesar/common/selectors/entities/team';
+import { teamMembersFullViewSelector } from '@caesar/common/selectors/entities/member';
+import { isLoadingSelector } from '@caesar/common/selectors/workflow';
 
-class SettingsTeamPage extends Component {
-  componentDidMount() {
-    this.props.fetchUserSelfRequest();
-    this.props.fetchUserTeamsRequest();
+const SettingsTeamPage = () => {
+  const router = useRouter();
+  const dispatch = useDispatch();
+
+  const { id } = router.query;
+
+  useEffectOnce(() => {
+    dispatch(initTeamSettings());
+  });
+
+  const isLoading = useSelector(isLoadingSelector);
+  const team = useSelector(state => teamSelector(state, { teamId: id })) || {};
+  const members = useSelector(state =>
+    teamMembersFullViewSelector(state, { teamId: id }),
+  );
+  const currentUserData = useSelector(currentUserDataSelector);
+
+  const shouldShowLoader = isLoading || !currentUserData || !team || !members;
+
+  if (shouldShowLoader) {
+    return <FullScreenLoader />;
   }
 
-  render() {
-    const { userData, currentTeam } = this.props;
-
-    const shouldShowLoader = !userData;
-
-    if (shouldShowLoader) {
-      return <FullScreenLoader />;
-    }
-
-    return (
-      <Fragment>
-        <Head title="Team" />
-        <SettingsLayout user={userData} team={currentTeam}>
-          <Fragment>
-            <SettingsSidebar />
-            <TeamContainer />
-          </Fragment>
-        </SettingsLayout>
-      </Fragment>
-    );
-  }
-}
-
-const mapStateToProps = createStructuredSelector({
-  userData: userDataSelector,
-  currentTeam: currentTeamSelector,
-});
-
-const mapDispatchToProps = {
-  fetchUserSelfRequest,
-  fetchUserTeamsRequest,
+  return (
+    <>
+      <Head title="Team" />
+      <SettingsLayout currentUser={currentUserData}>
+        <>
+          <SettingsSidebar />
+          <TeamContainer
+            currentUser={currentUserData}
+            team={team}
+            members={members}
+          />
+        </>
+      </SettingsLayout>
+    </>
+  );
 };
 
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps,
-)(SettingsTeamPage);
+export default SettingsTeamPage;

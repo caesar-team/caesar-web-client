@@ -1,121 +1,127 @@
-import React, { memo } from 'react';
+import React, { memo, useRef, useEffect, useMemo } from 'react';
+import { useClickAway } from 'react-use';
 import { useSelector, useDispatch } from 'react-redux';
 import {
   DASHBOARD_MODE,
-  ITEM_MODE,
   LIST_TYPE,
-  MOVE_ITEM_PERMISSION,
-  SHARE_ITEM_PERMISSION,
-  DELETE_PERMISSION,
+  DECRYPTING_ITEM_NOTIFICATION,
+  NOOP_NOTIFICATION,
+  TEAM_TYPE,
 } from '@caesar/common/constants';
 import {
   workInProgressItemSelector,
   workInProgressItemIdsSelector,
   workInProgressListSelector,
-  visibleListItemsSelector,
 } from '@caesar/common/selectors/workflow';
-import { itemsByIdSelector } from '@caesar/common/selectors/entities/item';
+import {
+  itemsByIdSelector,
+  itemsByListIdSelector,
+  teamItemsSelector,
+} from '@caesar/common/selectors/entities/item';
 import {
   trashListSelector,
   teamsTrashListsSelector,
 } from '@caesar/common/selectors/entities/list';
+import { teamMembersShortViewSelector } from '@caesar/common/selectors/entities/member';
+import { currentTeamIdSelector } from '@caesar/common/selectors/currentUser';
 import {
   setWorkInProgressItem,
   setWorkInProgressItemIds,
   resetWorkInProgressItemIds,
 } from '@caesar/common/actions/workflow';
+import { updateGlobalNotification } from '@caesar/common/actions/application';
 import { MultiItem, List } from '@caesar/components';
+import { sortByDate } from '@caesar/common/utils/dateUtils';
 import { MODAL } from '../constants';
 import { filter } from '../utils';
 
 const MiddleColumnComponent = ({
   mode,
   searchedText,
+  hasOpenedModal = false,
   handleOpenModal,
-  startCtrlShiftSelectionItemId,
-  setStartCtrlShiftSelectionItemId,
   handleCtrlSelectionItemBehaviour,
 }) => {
   const dispatch = useDispatch();
   const workInProgressItemIds = useSelector(workInProgressItemIdsSelector);
   const workInProgressList = useSelector(workInProgressListSelector);
   const workInProgressItem = useSelector(workInProgressItemSelector);
-  const visibleListItems = useSelector(visibleListItemsSelector);
+  const generalItems = useSelector(state =>
+    itemsByListIdSelector(state, {
+      teamId: workInProgressList?.teamId,
+      listId: workInProgressList?.id,
+    }),
+  );
+
+  const visibleListItems = useMemo(
+    () =>
+      generalItems.sort((a, b) =>
+        sortByDate(a.lastUpdated, b.lastUpdated, 'DESC'),
+      ),
+    [generalItems],
+  );
   const trashList = useSelector(trashListSelector);
   const teamsTrashLists = useSelector(teamsTrashListsSelector);
   const itemsById = useSelector(itemsByIdSelector);
+  const currentTeamId = useSelector(currentTeamIdSelector);
+  const teamMembers = useSelector(state =>
+    teamMembersShortViewSelector(state, { teamId: currentTeamId }),
+  );
 
-  const isMultiItem = workInProgressItemIds && workInProgressItemIds.length > 0;
-  const isInboxList =
-    workInProgressList && workInProgressList.type === LIST_TYPE.INBOX;
+  const itemsLengthInList = generalItems.length;
+  const visibleListItemsLength = visibleListItems.length;
+
+  const isPersonalTeam = currentTeamId === TEAM_TYPE.PERSONAL;
+  const isMultiItem = workInProgressItemIds?.length > 0;
+  const isInboxList = workInProgressList?.type === LIST_TYPE.INBOX;
   const isTrashList =
-    workInProgressList &&
-    (workInProgressList.id === trashList.id ||
-      teamsTrashLists.map(({ id }) => id).includes(workInProgressList.id));
+    workInProgressList?.id === trashList?.id ||
+    teamsTrashLists?.map(({ id }) => id).includes(workInProgressList?.id);
 
-  const searchedItems = filter(Object.values(itemsById), searchedText);
+  const currentTeamItems = useSelector(state =>
+    teamItemsSelector(state, { teamId: currentTeamId }),
+  );
+
+  const searchedItems = useMemo(
+    () =>
+      filter(
+        Object.values(currentTeamItems).sort((a, b) =>
+          sortByDate(a.lastUpdated, b.lastUpdated, 'DESC'),
+        ),
+        searchedText,
+      ),
+    [currentTeamItems, searchedText],
+  );
 
   const areAllItemsSelected =
     mode === DASHBOARD_MODE.SEARCH
       ? searchedItems.length === workInProgressItemIds.length
-      : visibleListItems.length === workInProgressItemIds.length;
+      : visibleListItemsLength === workInProgressItemIds.length;
+  const ref = useRef(null);
 
-  const handleDefaultSelectionItemBehaviour = itemId => {
-    dispatch(resetWorkInProgressItemIds());
-    dispatch(setWorkInProgressItem(itemsById[itemId], ITEM_MODE.REVIEW));
-  };
+  useEffect(() => {
+    if (itemsLengthInList !== visibleListItemsLength) {
+      dispatch(updateGlobalNotification(DECRYPTING_ITEM_NOTIFICATION, true));
 
-  const handleCtrlShiftSelectionItemBehaviour = itemId => {
-    if (!startCtrlShiftSelectionItemId) {
-      setStartCtrlShiftSelectionItemId(itemId);
-
-      dispatch(setWorkInProgressItem(null));
-      dispatch(setWorkInProgressItemIds([itemId]));
-    } else {
-      setStartCtrlShiftSelectionItemId(null);
-
-      const startIndex = visibleListItems.findIndex(
-        ({ id }) => id === startCtrlShiftSelectionItemId,
-      );
-      const endIndex = visibleListItems.findIndex(({ id }) => id === itemId);
-
-      const slicedItems = visibleListItems.slice(
-        Math.min(startIndex, endIndex),
-        Math.max(startIndex, endIndex) + 1,
-      );
-
-      dispatch(setWorkInProgressItemIds(slicedItems.map(({ id }) => id)));
-    }
-  };
-
-  const handleClickItem = itemId => event => {
-    const item = itemsById[itemId];
-
-    const itemSubject = {
-      ...item,
-      listType: workInProgressList && workInProgressList.type,
-      userRole: workInProgressList && workInProgressList.userRole,
-    };
-
-    // TODO:
-    // const teamItemGuard =
-    //   this.context.can(MOVE_ITEM_PERMISSION, itemSubject) &&
-    //   this.context.can(SHARE_ITEM_PERMISSION, itemSubject) &&
-    //   this.context.can(DELETE_PERMISSION, itemSubject);
-
-    // if (itemSubject.teamId && !teamItemGuard) {
-    if (itemSubject.teamId) {
-      handleDefaultSelectionItemBehaviour(itemId);
       return;
     }
 
-    if ((event.ctrlKey || event.metaKey) && event.shiftKey) {
-      handleCtrlShiftSelectionItemBehaviour(itemId);
-    } else if (event.ctrlKey || event.metaKey) {
-      handleCtrlSelectionItemBehaviour(itemId);
-    } else {
-      handleDefaultSelectionItemBehaviour(itemId);
+    dispatch(updateGlobalNotification(NOOP_NOTIFICATION, false));
+  }, [itemsLengthInList, visibleListItemsLength]);
+
+  useClickAway(ref, () => {
+    if (isMultiItem && !hasOpenedModal) {
+      dispatch(setWorkInProgressItemIds([]));
     }
+  });
+
+  const handleDefaultSelectionItemBehaviour = itemId => {
+    dispatch(resetWorkInProgressItemIds());
+    dispatch(setWorkInProgressItem(itemsById[itemId]));
+  };
+
+  const handleClickItem = itemId => () => {
+    handleDefaultSelectionItemBehaviour(itemId);
   };
 
   const handleSelectAllListItems = event => {
@@ -139,11 +145,12 @@ const MiddleColumnComponent = ({
   };
 
   return (
-    <>
+    <div ref={ref}>
       {isMultiItem && (
         <MultiItem
           isInboxItems={isInboxList}
           isTrashItems={isTrashList}
+          isPersonalTeam={isPersonalTeam}
           workInProgressItemIds={workInProgressItemIds}
           areAllItemsSelected={areAllItemsSelected}
           onClickMove={handleOpenModal(MODAL.MOVE_ITEM)}
@@ -162,9 +169,11 @@ const MiddleColumnComponent = ({
         items={
           mode === DASHBOARD_MODE.DEFAULT ? visibleListItems : searchedItems
         }
+        teamMembersCount={isPersonalTeam ? 1 : teamMembers.length}
         onClickItem={handleClickItem}
+        onSelectItem={handleCtrlSelectionItemBehaviour}
       />
-    </>
+    </div>
   );
 };
 

@@ -18,6 +18,7 @@ export function* inviteNewMemberBatchSaga({ payload: { members } }) {
 
     yield call(postInvitationBatch, { messages: invites });
   } catch (error) {
-    console.log(error);
+    // eslint-disable-next-line no-console
+    console.error(error);
   }
 }

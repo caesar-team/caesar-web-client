@@ -13,13 +13,7 @@ import {
   SORT_LIST_SUCCESS,
   SORT_LIST_FAILURE,
   ADD_LISTS_BATCH,
-  ADD_ITEM_TO_LIST,
-  ADD_ITEMS_BATCH_TO_LIST,
-  MOVE_ITEM_TO_LIST,
-  MOVE_ITEMS_BATCH_TO_LIST,
-  REMOVE_ITEM_FROM_LIST,
-  REMOVE_ITEMS_BATCH_FROM_LIST,
-  TOGGLE_ITEM_TO_FAVORITE_LIST,
+  RESET_LIST_STATE,
 } from '@caesar/common/actions/entities/list';
 
 const initialState = {
@@ -97,117 +91,7 @@ export default createReducer(initialState, {
       },
     };
   },
-  [ADD_ITEM_TO_LIST](state, { payload }) {
-    return {
-      ...state,
-      byId: {
-        ...state.byId,
-        [payload.item.listId]: {
-          ...state.byId[payload.item.listId],
-          children: [
-            ...state.byId[payload.item.listId].children,
-            payload.item.id,
-          ],
-        },
-      },
-    };
-  },
-  [ADD_ITEMS_BATCH_TO_LIST](state, { payload }) {
-    return {
-      ...state,
-      byId: {
-        ...state.byId,
-        [payload.listId]: {
-          ...state.byId[payload.listId],
-          children: [
-            ...state.byId[payload.listId].children,
-            ...payload.itemIds,
-          ],
-        },
-      },
-    };
-  },
-  [MOVE_ITEM_TO_LIST](state, { payload }) {
-    return {
-      ...state,
-      byId: {
-        ...state.byId,
-        [payload.newListId]: {
-          ...state.byId[payload.newListId],
-          children: [...state.byId[payload.newListId].children, payload.itemId],
-        },
-        [payload.oldListId]: {
-          ...state.byId[payload.oldListId],
-          children: state.byId[payload.oldListId].children.filter(
-            id => id !== payload.itemId,
-          ),
-        },
-      },
-    };
-  },
-  [MOVE_ITEMS_BATCH_TO_LIST](state, { payload }) {
-    return {
-      ...state,
-      byId: {
-        ...state.byId,
-        [payload.newListId]: {
-          ...state.byId[payload.newListId],
-          children: [
-            ...state.byId[payload.newListId].children,
-            ...payload.itemIds,
-          ],
-        },
-        [payload.oldListId]: {
-          ...state.byId[payload.oldListId],
-          children: state.byId[payload.oldListId].children.filter(
-            id => !payload.itemIds.includes(id),
-          ),
-        },
-      },
-    };
-  },
-  [REMOVE_ITEM_FROM_LIST](state, { payload }) {
-    return {
-      ...state,
-      byId: {
-        ...state.byId,
-        [payload.listId]: {
-          ...state.byId[payload.listId],
-          children: state.byId[payload.listId].children.filter(
-            id => id !== payload.itemId,
-          ),
-        },
-      },
-    };
-  },
-  [REMOVE_ITEMS_BATCH_FROM_LIST](state, { payload }) {
-    return {
-      ...state,
-      byId: {
-        ...state.byId,
-        [payload.listId]: {
-          ...state.byId[payload.listId],
-          children: state.byId[payload.listId].children.filter(
-            id => !payload.itemIds.includes(id),
-          ),
-        },
-      },
-    };
-  },
-  [TOGGLE_ITEM_TO_FAVORITE_LIST](state, { payload }) {
-    return {
-      ...state,
-      byId: {
-        ...state.byId,
-        [payload.favoritesListId]: {
-          ...state.byId[payload.favoritesListId],
-          children: payload.isFavorite
-            ? [...state.byId[payload.favoritesListId].children, payload.itemId]
-            : state.byId[payload.favoritesListId].children.filter(
-                id => id !== payload.itemId,
-              ),
-        },
-      },
-    };
+  [RESET_LIST_STATE]() {
+    return initialState;
   },
 });

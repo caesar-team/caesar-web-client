@@ -1,6 +1,6 @@
-import React, { Component, Fragment } from 'react';
+import React, { useState, memo } from 'react';
+import { useEffectOnce, useUpdateEffect } from 'react-use';
 import styled from 'styled-components';
-import copy from 'copy-text-to-clipboard';
 import { getKeys, postKeys } from '@caesar/common/api';
 import { matchStrict } from '@caesar/common/utils/match';
 import {
@@ -18,12 +18,8 @@ import {
   MASTER_PASSWORD_CONFIRM,
 } from '../../constants';
 import MasterPasswordCheckForm from './MasterPasswordCheckForm';
-import MasterPasswordCreateForm from './MasterPasswordCreateForm';
+import { MasterPasswordCreateForm } from './MasterPasswordCreateForm';
 import MasterPasswordConfirmForm from './MasterPasswordConfirmForm';
-
-const isSameKeyPair = (oldKeyPair, currentKeyPair) =>
-  oldKeyPair.publicKey === currentKeyPair.publicKey &&
-  oldKeyPair.encryptedPrivateKey === currentKeyPair.encryptedPrivateKey;
 
 const Wrapper = styled.div`
   max-width: 400px;
@@ -31,74 +27,31 @@ const Wrapper = styled.div`
   margin: 0 auto;
 `;
 
-class MasterPasswordStep extends Component {
-  state = this.prepareInitialState();
+const isSameKeyPair = (oldKeyPair, currentKeyPair) =>
+  oldKeyPair.publicKey === currentKeyPair.publicKey &&
+  oldKeyPair.encryptedPrivateKey === currentKeyPair.encryptedPrivateKey;
 
-  async componentDidMount() {
-    const { initialStep, sharedMasterPassword } = this.props;
+const MasterPasswordStepComponent = ({
+  initialStep,
+  navigationSteps,
+  currentUser,
+  masterPassword: masterPasswordProp,
+  sharedMasterPassword,
+  onFinish,
+}) => {
+  const [state, setState] = useState({
+    step: null,
+    publicKey: null,
+    encryptedPrivateKey: null,
+    masterPassword: masterPasswordProp || null,
+    sharedMasterPassword,
+  });
 
-    const state = {
-      step: initialStep,
-      publicKey: null,
-      encryptedPrivateKey: null,
-      masterPassword: '',
-    };
-
-    if (initialStep === MASTER_PASSWORD_CREATE) {
-      // it's readonly situation and new invited user
-      if (sharedMasterPassword) {
-        const {
-          data: { publicKey, encryptedPrivateKey },
-        } = await getKeys();
-
-        state.publicKey = publicKey;
-        state.encryptedPrivateKey = encryptedPrivateKey;
-      }
-    }
-
-    if (initialStep === MASTER_PASSWORD_CHECK) {
-      const {
-        data: { publicKey, encryptedPrivateKey },
-      } = await getKeys();
-
-      state.publicKey = publicKey;
-      state.encryptedPrivateKey = encryptedPrivateKey;
-
-      // it's anonymous situation
-      if (sharedMasterPassword) {
-        try {
-          await validateKeys(sharedMasterPassword, state.encryptedPrivateKey);
-
-          return this.onFinishMasterPassword({
-            currentKeyPair: {
-              publicKey: state.publicKey,
-              encryptedPrivateKey: state.encryptedPrivateKey,
-            },
-            masterPassword: sharedMasterPassword,
-          });
-        } catch (e) {
-          state.step = MASTER_PASSWORD_CHECK;
-        }
-      }
-    }
-
-    return this.setState(state);
-  }
-
-  // TODO: mb best solution is creating Favicon component
-  componentDidUpdate() {
-    if (this.state.step === MASTER_PASSWORD_CHECK) {
-      setFaviconTag('/public/images/favicon/favicon-locked.ico');
-    }
-  }
-
-  componentWillUnmount() {
-    setFaviconTag('/public/images/favicon/favicon.ico');
-  }
-
-  async onFinishMasterPassword({ oldKeyPair, currentKeyPair, masterPassword }) {
-    const { onFinish } = this.props;
-
+  const onFinishMasterPassword = async ({
+    oldKeyPair,
+    currentKeyPair,
+    masterPassword,
+  }) => {
     if (oldKeyPair && !isSameKeyPair(oldKeyPair, currentKeyPair)) {
       await postKeys({
         publicKey: currentKeyPair.publicKey,
@@ -111,49 +64,94 @@ class MasterPasswordStep extends Component {
       currentKeyPair,
       masterPassword,
     });
-  }
+  };
 
-  handleSubmitCheckPassword = async (
-    { password },
-    { setSubmitting, setErrors },
-  ) => {
-    const { onFinish } = this.props;
-    const { publicKey, encryptedPrivateKey } = this.state;
+  useEffectOnce(() => {
+    async function generateMasterPasswordState() {
+      const initState = {
+        step: initialStep,
+        publicKey: null,
+        encryptedPrivateKey: null,
+        masterPassword: masterPasswordProp,
+      };
 
-    try {
-      await validateKeys(password, encryptedPrivateKey);
+      if (initialStep === MASTER_PASSWORD_CREATE) {
+        // it's readonly situation and new invited user
+        if (sharedMasterPassword) {
+          const {
+            data: { publicKey, encryptedPrivateKey },
+          } = await getKeys();
 
-      onFinish({
-        currentKeyPair: { publicKey, encryptedPrivateKey },
-        masterPassword: password,
-      });
-    } catch (error) {
-      setErrors({ password: 'Wrong password' });
-      setSubmitting(false);
+          initState.publicKey = publicKey;
+          initState.encryptedPrivateKey = encryptedPrivateKey;
+        }
+      }
+
+      if (initialStep === MASTER_PASSWORD_CHECK) {
+        const {
+          data: { publicKey, encryptedPrivateKey },
+        } = await getKeys();
+
+        initState.publicKey = publicKey;
+        initState.encryptedPrivateKey = encryptedPrivateKey;
+
+        const currentMasterPassword =
+          sharedMasterPassword || initState.masterPassword || null;
+
+        // it's anonymous situation
+        if (currentMasterPassword) {
+          try {
+            await validateKeys(
+              currentMasterPassword,
+              initState.encryptedPrivateKey,
+            );
+
+            return onFinishMasterPassword({
+              currentKeyPair: {
+                publicKey: initState.publicKey,
+                encryptedPrivateKey: initState.encryptedPrivateKey,
+              },
+              masterPassword: currentMasterPassword,
+            });
+          } catch (e) {
+            initState.step = MASTER_PASSWORD_CHECK;
+          }
+        }
+      }
+
+      return setState({ ...state, ...initState });
     }
+
+    generateMasterPasswordState();
+
+    return () => {
+      setFaviconTag('/public/images/favicon/favicon.ico');
+    };
+  });
+
+  useUpdateEffect(() => {
+    if (state.step === MASTER_PASSWORD_CHECK) {
+      setFaviconTag('/public/images/favicon/favicon-locked.ico');
+    }
+  }, [state.step]);
+
+  const handleSubmitCreatePassword = ({ password }) => {
+    setState({
+      ...state,
+      masterPassword: password,
+      step: MASTER_PASSWORD_CONFIRM,
+    });
   };
 
-  handleSubmitCreatePassword = ({ password }) => {
-    this.setState(
-      {
-        masterPassword: password,
-        step: MASTER_PASSWORD_CONFIRM,
-      },
-      () => copy(password),
-    );
-  };
-
-  handleSubmitConfirmPassword = async (
+  const handleSubmitConfirmPassword = async (
     { confirmPassword },
     { setSubmitting, setErrors },
   ) => {
-    const { sharedMasterPassword, user } = this.props;
-
     const {
       masterPassword,
       publicKey: currentPublicKey,
       encryptedPrivateKey: currentEncryptedPrivateKey,
-    } = this.state;
+    } = state;
 
     // otherwise, formik doesn't have time to set isSubmitting flag
     await waitIdle();
@@ -169,14 +167,14 @@ class MasterPasswordStep extends Component {
           currentEncryptedPrivateKey,
         );
       } else {
-        const data = await generateKeys(confirmPassword, [user.email]);
+        const data = await generateKeys(confirmPassword, [currentUser.email]);
 
         // eslint-disable-next-line
         publicKey = data.publicKey;
         encryptedPrivateKey = data.privateKey;
       }
 
-      return this.onFinishMasterPassword({
+      return onFinishMasterPassword({
         oldKeyPair: {
           publicKey: currentPublicKey,
           encryptedPrivateKey: currentEncryptedPrivateKey,
@@ -188,74 +186,85 @@ class MasterPasswordStep extends Component {
         masterPassword,
       });
     } catch (error) {
-      console.log('error', error);
+      // eslint-disable-next-line no-console
+      console.error('error', error);
       setErrors({ confirmPassword: 'Something wrong' });
+
       return setSubmitting(false);
     }
   };
 
-  handleClickReturn = () => {
-    this.setState({
+  const handleSubmitCheckPassword = async (
+    { password },
+    { setSubmitting, setErrors },
+  ) => {
+    const { publicKey, encryptedPrivateKey } = state;
+
+    try {
+      await validateKeys(password, encryptedPrivateKey);
+
+      onFinish({
+        currentKeyPair: { publicKey, encryptedPrivateKey },
+        masterPassword: password,
+      });
+    } catch (error) {
+      setErrors({ password: 'Wrong password' });
+      setSubmitting(false);
+    }
+  };
+
+  const handleClickReturn = () => {
+    setState({
+      ...state,
       step: MASTER_PASSWORD_CREATE,
     });
   };
 
-  prepareInitialState() {
-    return {
-      step: null,
-      publicKey: null,
-      encryptedPrivateKey: null,
-      masterPassword: '',
-      sharedMasterPassword: this.props.sharedMasterPassword,
-    };
+  if (!state.step) {
+    return null;
   }
 
-  render() {
-    const { navigationSteps, user } = this.props;
-    const { step, masterPassword } = this.state;
+  const renderedStep = matchStrict(
+    state.step,
+    {
+      [MASTER_PASSWORD_CREATE]: (
+        <MasterPasswordCreateForm
+          initialValues={{
+            password: state.masterPassword || '',
+          }}
+          onSubmit={handleSubmitCreatePassword}
+        />
+      ),
+      [MASTER_PASSWORD_CONFIRM]: (
+        <MasterPasswordConfirmForm
+          masterPassword={state.masterPassword}
+          onClickReturn={handleClickReturn}
+          onSubmit={handleSubmitConfirmPassword}
+        />
+      ),
+    },
+    null,
+  );
 
-    if (!step) {
-      return null;
-    }
-
-    const initialValues = {
-      password: masterPassword,
-    };
-
-    const renderedStep = matchStrict(
-      step,
-      {
-        [MASTER_PASSWORD_CREATE]: (
-          <MasterPasswordCreateForm
-            initialValues={initialValues}
-            onSubmit={this.handleSubmitCreatePassword}
+  return (
+    <>
+      <Head title="Master Password" />
+      {state.step === MASTER_PASSWORD_CHECK ? (
+        <MasterPasswordCheckForm
+          currentUser={currentUser}
+          onSubmit={handleSubmitCheckPassword}
+        />
+      ) : (
+        <BootstrapLayout currentUser={currentUser}>
+          <NavigationPanelStyled
+            currentStep={state.step}
+            steps={navigationSteps}
           />
-        ),
-        [MASTER_PASSWORD_CONFIRM]: (
-          <MasterPasswordConfirmForm
-            masterPassword={masterPassword}
-            onClickReturn={this.handleClickReturn}
-            onSubmit={this.handleSubmitConfirmPassword}
-          />
-        ),
-      },
-      null,
-    );
+          <Wrapper>{renderedStep}</Wrapper>
+        </BootstrapLayout>
+      )}
+    </>
+  );
+};
 
-    return (
-      <Fragment>
-        <Head title="Master Password" />
-        {step === MASTER_PASSWORD_CHECK ? (
-          <MasterPasswordCheckForm onSubmit={this.handleSubmitCheckPassword} />
-        ) : (
-          <BootstrapLayout user={user}>
-            <NavigationPanelStyled currentStep={step} steps={navigationSteps} />
-            <Wrapper>{renderedStep}</Wrapper>
-          </BootstrapLayout>
-        )}
-      </Fragment>
-    );
-  }
-}
-
-export default MasterPasswordStep;
+export const MasterPasswordStep = memo(MasterPasswordStepComponent);

@@ -9,13 +9,11 @@ const StyledInput = styled.input`
   margin-right: 5px;
   font-size: 35px;
   text-align: center;
-  border-radius: 3px;
+  border-radius: ${({ theme }) => theme.borderRadius};
   border: none;
   outline: none;
   background: ${({ errors, theme }) =>
-    Object.keys(errors).length === 0
-      ? theme.color.lightBlue
-      : theme.color.lightRed};
+    Object.keys(errors).length === 0 ? theme.color.snow : theme.color.lightRed};
 
   &:last-child {
     margin-right: 0;

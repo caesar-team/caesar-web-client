@@ -1,78 +1,17 @@
 import React from 'react';
-import styled from 'styled-components';
 import Dropzone from 'react-dropzone';
-import { filesToBase64 } from '@caesar/common/utils/file';
+import {
+  filesToBase64,
+  splitFilesToUniqAndDuplicates,
+} from '@caesar/common/utils/file';
+import { makeAttachemntFromFile } from '@caesar/common/utils/attachment';
 import { useMedia } from '@caesar/common/hooks';
-import { TOTAL_MAX_UPLOADING_FILES_SIZES } from '@caesar/common/constants';
-import { Icon } from '../Icon';
+import {
+  TOTAL_MAX_UPLOADING_FILES_SIZES,
+  MAX_UPLOADING_FILE_SIZE,
+} from '@caesar/common/constants';
 
-const Container = styled.div`
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  background-color: ${({ theme }) => theme.color.snow};
-  border: 1px dashed
-    ${({ theme, isDragActive }) =>
-      isDragActive ? theme.color.black : theme.color.gray};
-  width: 100%;
-  padding: 16px 5px;
-  cursor: ${({ isDisabled }) => (isDisabled ? 'not-allowed' : 'pointer')};
-  outline: none;
-  transition: all 0.2s;
-
-  ${({ isDisabled }) => isDisabled && `opacity: 0.3;`}
-`;
-
-const Text = styled.span`
-  margin-bottom: 5px;
-  font-size: 16px;
-  text-align: center;
-  color: ${({ theme }) => theme.color.emperor};
-`;
-
-const HintText = styled.div`
-  font-size: 14px;
-  color: ${({ theme }) => theme.color.gray};
-`;
-
-const Link = styled.a`
-  color: ${({ theme }) => theme.color.black};
-`;
-
-const StyledIcon = styled(Icon)`
-  fill: ${({ theme, isDragActive }) =>
-    isDragActive ? theme.color.gray : theme.color.black};
-  transition: all 0.2s;
-  margin-right: 15px;
-`;
-
-const Error = styled.div`
-  margin-top: 8px;
-  font-size: 14px;
-  color: ${({ theme }) => theme.color.red};
-`;
-
-const splitFilesToUniqAndDuplicates = files => {
-  const uniqFiles = [];
-  const duplicatedFiles = [];
-
-  const map = new Map();
-
-  // eslint-disable-next-line no-restricted-syntax
-  for (const file of files) {
-    const checkLabel = `${file.name}_${file.raw.length}`;
-
-    if (!map.has(checkLabel)) {
-      map.set(checkLabel, true);
-      uniqFiles.push(file);
-    } else {
-      duplicatedFiles.push(file);
-    }
-  }
-
-  return { uniqFiles, duplicatedFiles };
-};
+import { Container, Text, HintText, Link, StyledIcon, Error } from './styles';
 
 const getNotificationText = files =>
   files.length > 1
@@ -84,7 +23,7 @@ const Uploader = ({
   multiple = false,
   accept,
   onChange,
-  hintText = `Not more than ${TOTAL_MAX_UPLOADING_FILES_SIZES}`,
+  hintText = `${TOTAL_MAX_UPLOADING_FILES_SIZES} for all files, ${MAX_UPLOADING_FILE_SIZE} for one file`,
   error,
   files: previousFiles = [],
   notification,
@@ -97,13 +36,15 @@ const Uploader = ({
 
   const handleDrop = async acceptedFiles => {
     const previews = await filesToBase64(acceptedFiles);
-    const files = acceptedFiles.map(({ name: fileName }, index) => ({
-      name: fileName,
-      raw: previews[index],
-    }));
+    const files = acceptedFiles.map(({ name: fileName }, index) =>
+      makeAttachemntFromFile({
+        name: fileName,
+        raw: previews[index],
+      }),
+    );
 
     const preparedFiles = splitFilesToUniqAndDuplicates([
-      ...previousFiles,
+      ...(Array.isArray(previousFiles) ? previousFiles : [previousFiles]),
       ...files,
     ]);
 
@@ -124,9 +65,9 @@ const Uploader = ({
       onDrop={handleDrop}
       {...props}
     >
-      {({ getRootProps, getInputProps, isDragActive }) =>
+      {({ getRootProps, getInputProps, isDragActive, rejectedFiles }) =>
         children ? (
-          children({ getRootProps, getInputProps, isDragActive })
+          children({ getRootProps, getInputProps, isDragActive, rejectedFiles })
         ) : (
           <Container
             {...getRootProps()}
@@ -142,11 +83,12 @@ const Uploader = ({
                 height={16}
                 isDragActive={isDragActive}
               />
-              <Link>Upload File</Link>
-              {!isWideMobile && !isMobile && ' or drag and drop your file here'}
+              <Link>Upload files</Link>
+              {!isWideMobile &&
+                !isMobile &&
+                ' or drag and drop your files here'}
             </Text>
-            <HintText>{hintText}</HintText>
-            {error && <Error>{error}</Error>}
+            {error ? <Error>{error}</Error> : <HintText>{hintText}</HintText>}
           </Container>
         )
       }

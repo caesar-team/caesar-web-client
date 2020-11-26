@@ -2,37 +2,41 @@ import React from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import {
   workInProgressItemSelector,
+  workInProgressItemsSelector,
   workInProgressItemIdsSelector,
   workInProgressItemSharedMembersSelector,
 } from '@caesar/common/selectors/workflow';
-import { userTeamListSelector } from '@caesar/common/selectors/user';
+import { currentUserTeamListSelector } from '@caesar/common/selectors/currentUser';
 import { resetWorkInProgressItemIds } from '@caesar/common/actions/workflow';
 import {
   createAnonymousLinkRequest,
   removeAnonymousLinkRequest,
   shareItemBatchRequest,
-  removeShareRequest,
+  // removeShareRequest,
 } from '@caesar/common/actions/entities/item';
 import { ShareModal as ShareModalComponent } from '@caesar/components';
 
-export const ShareModal = ({ notification, handleCloseModal }) => {
+export const ShareModal = ({
+  handleCloseModal,
+  handleCtrlSelectionItemBehaviour,
+}) => {
   const dispatch = useDispatch();
+  const workInProgressItems = useSelector(workInProgressItemsSelector);
   const workInProgressItem = useSelector(workInProgressItemSelector);
   const workInProgressItemIds = useSelector(workInProgressItemIdsSelector);
-  const userTeamList = useSelector(userTeamListSelector);
+  const userTeamList = useSelector(currentUserTeamListSelector);
   const workInProgressItemSharedMembers = useSelector(
     workInProgressItemSharedMembersSelector,
   );
 
-  const isTeamItem = workInProgressItem && workInProgressItem.teamId;
-  const isMultiItem = workInProgressItemIds && workInProgressItemIds.length > 0;
-  const availableTeamsForSharing = isTeamItem
-    ? userTeamList.filter(({ id }) => id !== workInProgressItem.teamId)
-    : userTeamList;
+  const isMultiItem = workInProgressItemIds?.length > 0;
+  const availableTeamsForSharing = userTeamList.filter(
+    ({ id }) => id !== workInProgressItem?.teamId && id !== null,
+  );
 
   const handleShare = (members, teamIds) => {
     if (members.length > 0 || teamIds.length > 0) {
-      if (workInProgressItemIds && workInProgressItemIds.length > 0) {
+      if (isMultiItem) {
         dispatch(
           shareItemBatchRequest({
             itemIds: workInProgressItemIds,
@@ -44,7 +48,7 @@ export const ShareModal = ({ notification, handleCloseModal }) => {
       } else {
         dispatch(
           shareItemBatchRequest({
-            itemIds: [workInProgressItem.id],
+            itemIds: [workInProgressItem?.id],
             members,
             teamIds,
           }),
@@ -55,8 +59,12 @@ export const ShareModal = ({ notification, handleCloseModal }) => {
     handleCloseModal();
   };
 
-  const handleRemoveShare = shareId => () => {
-    dispatch(removeShareRequest(shareId));
+  const canRevokeAccess = false;
+  const handleRevokeAccess = member => {
+    // TODO: Implement revoke share access
+    // dispatch(removeShareRequest());
+    // eslint-disable-next-line no-alert
+    alert('Not yet implemented.', member);
   };
 
   const handleActivateLink = () => {
@@ -69,16 +77,17 @@ export const ShareModal = ({ notification, handleCloseModal }) => {
 
   return (
     <ShareModalComponent
+      items={workInProgressItems}
       teams={availableTeamsForSharing}
       sharedMembers={workInProgressItemSharedMembers}
-      anonymousLink={workInProgressItem && workInProgressItem.shared}
-      withAnonymousLink={!isMultiItem}
+      anonymousLink={workInProgressItem?.shared}
+      isMultiMode={isMultiItem}
       onShare={handleShare}
-      onRemove={handleRemoveShare}
+      onRevokeAccess={canRevokeAccess ? handleRevokeAccess : null}
       onActivateLink={handleActivateLink}
       onDeactivateLink={handleDeactivateLink}
       onCancel={handleCloseModal}
-      notification={notification}
+      onRemove={handleCtrlSelectionItemBehaviour}
     />
   );
 };

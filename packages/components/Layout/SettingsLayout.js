@@ -11,9 +11,9 @@ const LayoutConstructorStyled = styled(LayoutConstructor)`
   }
 `;
 
-const SettingsLayout = ({ user, team, ...props }) => (
+const SettingsLayout = ({ currentUser, ...props }) => (
   <LayoutConstructorStyled
-    headerComponent={<PrimaryHeader user={user} team={team} />}
+    headerComponent={<PrimaryHeader currentUser={currentUser} />}
     {...props}
   />
 );

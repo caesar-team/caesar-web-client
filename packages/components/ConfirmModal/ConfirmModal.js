@@ -34,8 +34,8 @@ const StyledButton = styled(Button)`
   margin-right: 20px;
 `;
 
-const ConfirmModal = ({
-  isOpen,
+export const ConfirmModal = ({
+  isOpened,
   title = 'Warning',
   description,
   icon,
@@ -44,7 +44,7 @@ const ConfirmModal = ({
   onClickCancel,
 }) => (
   <Modal
-    isOpen={isOpen}
+    isOpened={isOpened}
     shouldCloseOnEsc
     shouldCloseOnOverlayClick
     onRequestClose={onClickCancel}
@@ -66,5 +66,3 @@ const ConfirmModal = ({
     </Wrapper>
   </Modal>
 );
-
-export default ConfirmModal;

@@ -1,3 +1,7 @@
+export const GET_LIST_REQUEST = '@list/GET_LIST_REQUEST';
+export const GET_LIST_SUCCESS = '@list/GET_LIST_SUCCESS';
+export const GET_LIST_FAILURE = '@list/GET_LIST_FAILURE';
+
 export const CREATE_LIST_REQUEST = '@list/CREATE_LIST_REQUEST';
 export const CREATE_LIST_SUCCESS = '@list/CREATE_LIST_SUCCESS';
 export const CREATE_LIST_FAILURE = '@list/CREATE_LIST_FAILURE';
@@ -15,21 +19,17 @@ export const SORT_LIST_SUCCESS = '@list/SORT_LIST_SUCCESS';
 export const SORT_LIST_FAILURE = '@list/SORT_LIST_FAILURE';
 
 export const ADD_LISTS_BATCH = '@list/ADD_LISTS_BATCH';
-export const ADD_ITEM_TO_LIST = '@list/ADD_ITEM_TO_LIST';
-export const ADD_ITEMS_BATCH_TO_LIST = '@list/ADD_ITEMS_BATCH_TO_LIST';
-export const MOVE_ITEM_TO_LIST = '@list/MOVE_ITEM_TO_LIST';
-export const MOVE_ITEMS_BATCH_TO_LIST = '@list/MOVE_ITEMS_BATCH_TO_LIST';
-export const REMOVE_ITEM_FROM_LIST = '@list/REMOVE_ITEM_FROM_LIST';
-export const REMOVE_ITEMS_BATCH_FROM_LIST =
-  '@list/REMOVE_ITEMS_BATCH_FROM_LIST';
-export const TOGGLE_ITEM_TO_FAVORITE_LIST =
-  '@list/TOGGLE_ITEM_TO_FAVORITE_LIST';
 
-export const createListRequest = list => ({
+export const CLEAR_SERVER_ERRORS = '@list/CLEAR_SERVER_ERRORS';
+
+export const RESET_LIST_STATE = '@list/RESET_LIST_STATE';
+
+export const createListRequest = (list, meta) => ({
   type: CREATE_LIST_REQUEST,
   payload: {
     list,
   },
+  meta,
 });
 
 export const createListSuccess = (listId, list) => ({
@@ -44,11 +44,12 @@ export const createListFailure = () => ({
   type: CREATE_LIST_FAILURE,
 });
 
-export const editListRequest = list => ({
+export const editListRequest = (list, meta) => ({
   type: EDIT_LIST_REQUEST,
   payload: {
     list,
   },
+  meta,
 });
 
 export const editListSuccess = list => ({
@@ -62,9 +63,10 @@ export const editListFailure = () => ({
   type: EDIT_LIST_FAILURE,
 });
 
-export const removeListRequest = listId => ({
+export const removeListRequest = (teamId, listId) => ({
   type: REMOVE_LIST_REQUEST,
   payload: {
+    teamId,
     listId,
   },
 });
@@ -107,64 +109,10 @@ export const addListsBatch = listsById => ({
   },
 });
 
-export const addItemToList = item => ({
-  type: ADD_ITEM_TO_LIST,
-  payload: {
-    item,
-  },
+export const clearServerErrors = () => ({
+  type: CLEAR_SERVER_ERRORS,
 });
 
-export const addItemsBatchToList = (itemIds, listId) => ({
-  type: ADD_ITEMS_BATCH_TO_LIST,
-  payload: {
-    itemIds,
-    listId,
-  },
-});
-
-export const moveItemToList = (itemId, oldListId, newListId) => ({
-  type: MOVE_ITEM_TO_LIST,
-  payload: {
-    itemId,
-    oldListId,
-    newListId,
-  },
-});
-
-export const moveItemsBatchToList = (itemIds, oldListId, newListId) => ({
-  type: MOVE_ITEMS_BATCH_TO_LIST,
-  payload: {
-    itemIds,
-    oldListId,
-    newListId,
-  },
-});
-
-export const removeItemFromList = (itemId, listId) => ({
-  type: REMOVE_ITEM_FROM_LIST,
-  payload: {
-    itemId,
-    listId,
-  },
-});
-
-export const removeItemsBatchFromList = (itemIds, listId) => ({
-  type: REMOVE_ITEMS_BATCH_FROM_LIST,
-  payload: {
-    itemIds,
-    listId,
-  },
-});
-
-export const toggleItemToFavoriteList = (
-  itemId,
-  favoritesListId,
-  isFavorite,
-) => ({
-  type: TOGGLE_ITEM_TO_FAVORITE_LIST,
-  payload: {
-    itemId,
-    favoritesListId,
-    isFavorite,
-  },
+export const resetListState = () => ({
+  type: RESET_LIST_STATE,
 });

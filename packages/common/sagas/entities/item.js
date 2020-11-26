@@ -1,31 +1,16 @@
-import {
-  put,
-  call,
-  takeLatest,
-  select,
-  fork,
-  take,
-  all,
-} from 'redux-saga/effects';
+import Router from 'next/router';
+import { put, call, takeLatest, select, fork, all } from 'redux-saga/effects';
 import deepequal from 'fast-deep-equal';
 import {
-  ACCEPT_ITEM_UPDATE_REQUEST,
   CREATE_ITEM_REQUEST,
   CREATE_ITEMS_BATCH_REQUEST,
   EDIT_ITEM_REQUEST,
   UPDATE_ITEM_REQUEST,
   MOVE_ITEM_REQUEST,
   MOVE_ITEMS_BATCH_REQUEST,
-  REJECT_ITEM_UPDATE_REQUEST,
   REMOVE_ITEM_REQUEST,
   REMOVE_ITEMS_BATCH_REQUEST,
   TOGGLE_ITEM_TO_FAVORITE_REQUEST,
-  CREATE_ANONYMOUS_LINK_REQUEST,
-  REMOVE_ANONYMOUS_LINK_REQUEST,
-  SHARE_ITEM_BATCH_REQUEST,
-  REMOVE_SHARE_REQUEST,
-  acceptItemUpdateSuccess,
-  acceptItemUpdateFailure,
   createItemSuccess,
   createItemFailure,
   createItemsBatchSuccess,
@@ -35,119 +20,167 @@ import {
   updateItemFailure,
   moveItemSuccess,
   moveItemFailure,
+  moveItemsBatchSuccess,
   moveItemsBatchFailure,
-  rejectItemUpdateSuccess,
-  rejectItemUpdateFailure,
   removeItemSuccess,
   removeItemFailure,
   removeItemsBatchSuccess,
   removeItemsBatchFailure,
-  toggleItemToFavoriteSuccess,
-  toggleItemToFavoriteFailure,
-  createAnonymousLinkSuccess,
-  createAnonymousLinkFailure,
-  removeAnonymousLinkSuccess,
-  removeAnonymousLinkFailure,
-  removeChildItemFromItem,
-  removeChildItemsBatchFromItem,
-  shareItemBatchSuccess,
-  shareItemBatchFailure,
-  removeShareSuccess,
-  removeShareFailure,
-  addChildItemsBatchToItems,
   updateItemField,
 } from '@caesar/common/actions/entities/item';
-import {
-  addItemToList,
-  addItemsBatchToList,
-  moveItemToList,
-  removeItemFromList,
-  removeItemsBatchFromList,
-  toggleItemToFavoriteList,
-} from '@caesar/common/actions/entities/list';
-import {
-  CREATE_CHILD_ITEM_BATCH_FINISHED_EVENT,
-  removeChildItemsBatch,
-} from '@caesar/common/actions/entities/childItem';
+import { shareItemBatchSaga } from '@caesar/common/sagas/common/share';
+import { setCurrentTeamId } from '@caesar/common/actions/currentUser';
 import { updateGlobalNotification } from '@caesar/common/actions/application';
-import {
-  createChildItemBatchSaga,
-  updateChildItemsBatchSaga,
-} from '@caesar/common/sagas/entities/childItem';
-import {
-  prepareUsersForSharing,
-  getItemUserPairs,
-} from '@caesar/common/sagas/common/share';
-import { inviteNewMemberBatchSaga } from '@caesar/common/sagas/common/invite';
 import {
   setWorkInProgressItem,
   updateWorkInProgressItem,
+  setWorkInProgressListId,
 } from '@caesar/common/actions/workflow';
+import { workInProgressItemIdsSelector } from '@caesar/common/selectors/workflow';
 import {
-  workInProgressItemSelector,
-  workInProgressItemIdsSelector,
-} from '@caesar/common/selectors/workflow';
-import {
-  favoritesSelector,
   listSelector,
-  allTrashListIdsSelector,
+  defaultListSelector,
+  currentTeamDefaultListSelector,
 } from '@caesar/common/selectors/entities/list';
+import { itemSelector } from '@caesar/common/selectors/entities/item';
 import {
-  itemsBatchSelector,
-  itemSelector,
-} from '@caesar/common/selectors/entities/item';
-import { membersBatchSelector } from '@caesar/common/selectors/entities/member';
+  currentUserDataSelector,
+  currentUserIdSelector,
+} from '@caesar/common/selectors/currentUser';
 import {
-  keyPairSelector,
-  masterPasswordSelector,
-  userDataSelector,
-} from '@caesar/common/selectors/user';
-import {
-  teamSelector,
-  teamsMembersSelector,
-} from '@caesar/common/selectors/entities/team';
-import {
-  acceptUpdateItem,
-  patchChildItem,
-  postCreateChildItem,
+  getItemRaws,
+  postAddKeyPairBatch,
   postCreateItem,
   postCreateItemsBatch,
-  rejectUpdateItem,
-  deleteChildItem,
+  postItemShare,
   removeItem,
   removeItemsBatch,
   toggleFavorite,
   updateItem,
   updateMoveItem,
+  updateMoveItemsBatch,
 } from '@caesar/common/api';
 import {
-  decryptItem,
-  encryptItem,
-  encryptItemsBatch,
-  generateAnonymousEmail,
-  getPrivateKeyObj,
+  encryptData,
+  encryptDataBatch,
+  unsealPrivateKeyObj,
 } from '@caesar/common/utils/cipherUtils';
 import { getServerErrorMessage } from '@caesar/common/utils/error';
-import { objectToBase64 } from '@caesar/common/utils/base64';
-import { chunk } from '@caesar/common/utils/utils';
+import { arrayToObject, chunk } from '@caesar/common/utils/utils';
 import {
-  ROLE_ANONYMOUS_USER,
-  ITEM_MODE,
-  PERMISSION_READ,
-  SHARE_TYPE,
-  ENTITY_TYPE,
+  COMMON_PROGRESS_NOTIFICATION,
   CREATING_ITEM_NOTIFICATION,
-  CREATING_ITEMS_NOTIFICATION,
-  SHARING_IN_PROGRESS_NOTIFICATION,
   ENCRYPTING_ITEM_NOTIFICATION,
   MOVING_IN_PROGRESS_NOTIFICATION,
   REMOVING_IN_PROGRESS_NOTIFICATION,
   NOOP_NOTIFICATION,
+  ROUTES,
+  TEAM_TYPE,
+  ITEM_TYPE,
 } from '@caesar/common/constants';
-import { generateSharingUrl } from '@caesar/common/utils/sharing';
-import { createMemberSaga } from './member';
+import {
+  shareItemKeyPairSelector,
+  shareKeyPairSelector,
+  teamKeyPairSelector,
+} from '@caesar/common/selectors/keystore';
+import {
+  convertSystemItemToKeyPair,
+  createItemMetaData,
+  dectyptItemAttachments,
+  generateSystemItemEmail,
+  generateSystemItemName,
+  isGeneralItem,
+} from '@caesar/common/utils/item';
+import { passwordGenerator } from '@caesar/common/utils/passwordGenerator';
+import { generateKeys } from '@caesar/common/utils/key';
+import { addSystemItemsBatch } from '@caesar/common/actions/entities/system';
+import { userSelector } from '../../selectors/entities/user';
+import {
+  convertItemsToEntities,
+  convertKeyPairToEntity,
+} from '../../normalizers/normalizers';
+import { uuid4 } from '../../utils/uuid4';
 
 const ITEMS_CHUNK_SIZE = 50;
+
+// TODO: move to the system item sage
+export function* generateSystemItem(entityType, listId, entityId) {
+  const masterPassword = yield call(passwordGenerator);
+  const systemItemName = yield call(
+    generateSystemItemName,
+    entityType,
+    entityId,
+  );
+  const systemItemEmail = yield call(generateSystemItemEmail, systemItemName);
+
+  const { publicKey, privateKey } = yield call(generateKeys, masterPassword, [
+    systemItemEmail,
+  ]);
+
+  const systemItemData = {
+    type: entityType,
+    listId,
+    data: {
+      attachments: [
+        {
+          id: 'publicKey',
+          name: 'publicKey',
+        },
+        {
+          id: 'privateKey',
+          name: 'privateKey',
+        },
+      ],
+      raws: {
+        privateKey,
+        publicKey,
+      },
+      password: masterPassword,
+      name: systemItemName,
+    },
+  };
+
+  return systemItemData;
+}
+
+export function* generateKeyPair({ name }) {
+  const masterPassword = yield call(passwordGenerator);
+  const systemItemName = yield call(
+    generateSystemItemName,
+    ITEM_TYPE.KEYPAIR,
+    encodeURIComponent(name),
+  );
+
+  const systemItemEmail = yield call(generateSystemItemEmail, systemItemName);
+
+  const { publicKey, privateKey } = yield call(generateKeys, masterPassword, [
+    systemItemEmail,
+  ]);
+
+  const systemItemData = {
+    type: ITEM_TYPE.KEYPAIR,
+    data: {
+      attachments: [
+        {
+          id: 'publicKey',
+          name: 'publicKey',
+        },
+        {
+          id: 'privateKey',
+          name: 'privateKey',
+        },
+      ],
+      raws: {
+        privateKey,
+        publicKey,
+      },
+      password: masterPassword,
+      name: systemItemName,
+    },
+  };
+
+  return systemItemData;
+}
 
 export function* removeItemSaga({ payload: { itemId, listId } }) {
   try {
@@ -159,22 +192,18 @@ export function* removeItemSaga({ payload: { itemId, listId } }) {
 
     yield call(removeItem, itemId);
 
-    yield put(removeItemFromList(itemId, listId));
     yield put(removeItemSuccess(itemId, listId));
 
     if (item.invited && item.invited.length > 0) {
-      yield put(removeChildItemsBatch(item.invited));
-    }
-
-    if (item.favorite) {
-      const favoriteList = yield select(favoritesSelector);
-      yield put(removeItemFromList(itemId, favoriteList.id));
+      // TODO: Implement remove share access
+      // If user delete item all shares must be deleted
     }
 
     yield put(setWorkInProgressItem(null));
     yield put(updateGlobalNotification(NOOP_NOTIFICATION, false));
   } catch (error) {
-    console.log(error);
+    // eslint-disable-next-line no-console
+    console.error(error);
     yield put(
       updateGlobalNotification(getServerErrorMessage(error), false, true),
     );
@@ -204,11 +233,10 @@ export function* removeItemsBatchSaga({ payload: { listId } }) {
     yield put(setWorkInProgressItem(null));
     yield put(removeItemsBatchSuccess(workInProgressItemIds, listId));
 
-    yield put(removeItemsBatchFromList(workInProgressItemIds, listId));
-
     yield put(updateGlobalNotification(NOOP_NOTIFICATION, false));
   } catch (error) {
-    console.log(error);
+    // eslint-disable-next-line no-console
+    console.error(error);
     yield put(
       updateGlobalNotification(getServerErrorMessage(error), false, true),
     );
@@ -216,158 +244,63 @@ export function* removeItemsBatchSaga({ payload: { listId } }) {
   }
 }
 
-export function* shareItemBatchSaga({
-  payload: {
-    data: { itemIds = [], members = [], teamIds = [] },
-    options: { includeIniciator = true },
-  },
-}) {
+export function* toggleItemToFavoriteSaga({ payload: { item } }) {
   try {
-    yield put(updateGlobalNotification(SHARING_IN_PROGRESS_NOTIFICATION, true));
-
-    const user = yield select(userDataSelector);
-    const items = yield select(itemsBatchSelector, { itemIds });
-
-    const preparedMembers = yield call(prepareUsersForSharing, members);
-
-    const newMembers = preparedMembers.filter(({ isNew }) => isNew);
-
-    const directMembers = preparedMembers.map(member => ({
-      ...member,
-      teamId: null,
-    }));
-
-    const teamsMembers = yield select(teamsMembersSelector, { teamIds });
-
-    const preparedTeamsMembers = includeIniciator
-      ? teamsMembers
-      : teamsMembers.filter(member => member.id !== user.id);
-
-    const allMembers = [...directMembers, ...preparedTeamsMembers];
-
-    const itemUserPairs = yield call(getItemUserPairs, {
-      items,
-      members: allMembers,
-    });
-
-    if (newMembers.length > 0) {
-      yield fork(inviteNewMemberBatchSaga, {
-        payload: { members: newMembers },
-      });
-    }
-
-    if (itemUserPairs.length > 0) {
-      yield fork(createChildItemBatchSaga, { payload: { itemUserPairs } });
-
-      const {
-        payload: { childItems },
-      } = yield take(CREATE_CHILD_ITEM_BATCH_FINISHED_EVENT);
-
-      const shares = childItems.reduce(
-        (accumulator, item) => [
-          ...accumulator,
-          {
-            itemId: item.originalItemId,
-            childItemIds: item.items.map(({ id }) => id),
-          },
-        ],
-        [],
-      );
-
-      yield put(shareItemBatchSuccess(shares));
-
-      yield put(updateWorkInProgressItem());
-    }
-
-    yield put(updateGlobalNotification(NOOP_NOTIFICATION, false));
-  } catch (error) {
-    console.log(error);
-    yield put(
-      updateGlobalNotification(getServerErrorMessage(error), false, true),
-    );
-    yield put(shareItemBatchFailure());
-  }
-}
-
-export function* removeShareSaga({ payload: { shareId } }) {
-  try {
-    const workInProgressItem = yield select(workInProgressItemSelector);
-
-    yield call(deleteChildItem, shareId);
-
-    yield put(removeChildItemFromItem(workInProgressItem.id, shareId));
-    yield put(removeShareSuccess(workInProgressItem.id, shareId));
-    yield put(updateWorkInProgressItem());
-
-    yield put(updateGlobalNotification(NOOP_NOTIFICATION, false));
-  } catch (error) {
-    console.log(error);
-    yield put(
-      updateGlobalNotification(getServerErrorMessage(error), false, true),
-    );
-    yield put(removeShareFailure());
-  }
-}
-
-export function* toggleItemToFavoriteSaga({ payload: { itemId } }) {
-  try {
-    const favoritesList = yield select(favoritesSelector);
-
     const {
-      data: { favorite: isFavorite },
-    } = yield call(toggleFavorite, itemId);
-
-    yield put(
-      toggleItemToFavoriteSuccess(itemId, favoritesList.id, isFavorite),
-    );
-    yield put(toggleItemToFavoriteList(itemId, favoritesList.id, isFavorite));
-    yield put(updateWorkInProgressItem(itemId));
+      data: { favorite },
+    } = yield call(toggleFavorite, item.id);
+    yield put(updateItemField(item.id, 'favorite', favorite));
+    yield put(updateWorkInProgressItem(item.id));
   } catch (error) {
-    console.log(error);
+    // eslint-disable-next-line no-console
+    console.error(error);
     yield put(
       updateGlobalNotification(getServerErrorMessage(error), false, true),
     );
-    yield put(toggleItemToFavoriteFailure());
   }
 }
 
-export function* moveItemSaga({ payload: { itemId, listId } }) {
+export function* moveItemSaga({
+  payload: { itemId, teamId, listId },
+  meta: { notification, notificationText } = {},
+}) {
   try {
     yield put(updateGlobalNotification(MOVING_IN_PROGRESS_NOTIFICATION, true));
 
+    const list = yield select(listSelector, { listId });
+
+    const defaultList = teamId
+      ? yield select(currentTeamDefaultListSelector)
+      : yield select(defaultListSelector);
+
+    const newListId = list ? listId : defaultList?.id;
+
     const item = yield select(itemSelector, { itemId });
-    const childItemIds = item.invited;
-
-    const allTrashListIds = yield select(allTrashListIdsSelector);
-
-    const oldList = yield select(listSelector, {
-      listId: item.listId,
-    });
-    const newList = yield select(listSelector, { listId });
 
     yield call(updateMoveItem, item.id, {
-      listId,
+      listId: newListId,
     });
-    yield put(moveItemSuccess(item.id, item.listId, listId));
-    yield put(moveItemToList(item.id, item.listId, listId));
+    yield put(moveItemSuccess(item.id, item.listId, newListId));
 
     yield put(updateGlobalNotification(NOOP_NOTIFICATION, false));
 
-    if (item.favorite && allTrashListIds.includes(listId)) {
-      yield fork(toggleItemToFavoriteSaga, { payload: { itemId } });
+    if (notification) {
+      yield call(notification.show, {
+        text: notificationText || `The '${item.data.name}' has been moved`,
+      });
     }
 
-    if (oldList.teamId !== newList.teamId) {
-      yield put(updateItemField(item.id, 'teamId', newList.teamId));
+    if (item.teamId !== teamId) {
+      yield put(updateItemField(item.id, 'teamId', teamId));
     }
 
-    if (!oldList.teamId && newList.teamId) {
+    if (!item.teamId && teamId) {
       yield fork(shareItemBatchSaga, {
         payload: {
           data: {
             itemIds: [item.id],
             members: [],
-            teamIds: [newList.teamId],
+            teamIds: [teamId],
           },
           options: {
             includeIniciator: false,
@@ -376,23 +309,17 @@ export function* moveItemSaga({ payload: { itemId, listId } }) {
       });
     }
 
-    if (oldList.teamId && !newList.teamId) {
-      yield put(removeChildItemsBatchFromItem(item.id, childItemIds));
-      yield put(removeChildItemsBatch(childItemIds));
-
-      yield put(updateGlobalNotification(NOOP_NOTIFICATION, false));
+    if (item.teamId && !teamId) {
+      // TODO: Implement share access rights when moving item
     }
 
-    if (oldList.teamId && newList.teamId && oldList.teamId !== newList.teamId) {
-      yield put(removeChildItemsBatchFromItem(item.id, childItemIds));
-      yield put(removeChildItemsBatch(childItemIds));
-
+    if (item.teamId && teamId && item.teamId !== teamId) {
       yield fork(shareItemBatchSaga, {
         payload: {
           data: {
             itemIds: [item.id],
             members: [],
-            teamIds: [newList.teamId],
+            teamIds: [teamId],
           },
           options: {
             includeIniciator: false,
@@ -401,20 +328,41 @@ export function* moveItemSaga({ payload: { itemId, listId } }) {
       });
     }
   } catch (error) {
-    console.log(error);
+    // eslint-disable-next-line no-console
+    console.error(error);
     yield put(moveItemFailure());
   }
 }
 
-export function* moveItemsBatchSaga({ payload: { itemIds, listId } }) {
+export function* moveItemsBatchSaga({
+  payload: { itemIds, oldTeamId, oldListId, teamId, listId },
+  meta: { notification, notificationText } = {},
+}) {
   try {
+    yield put(updateGlobalNotification(COMMON_PROGRESS_NOTIFICATION, true));
+
+    const itemIdsChunks = chunk(itemIds, ITEMS_CHUNK_SIZE);
+
     yield all(
-      itemIds.map(itemId =>
-        call(moveItemSaga, { payload: { itemId, listId } }),
+      itemIdsChunks.map(itemIdsChunk =>
+        call(updateMoveItemsBatch, { items: itemIdsChunk }, listId),
       ),
     );
+
+    yield put(
+      moveItemsBatchSuccess(itemIds, oldTeamId, oldListId, teamId, listId),
+    );
+
+    if (notification) {
+      yield call(notification.show, {
+        text: notificationText || 'The items have been moved',
+      });
+    }
+
+    yield put(updateGlobalNotification(NOOP_NOTIFICATION, false));
   } catch (error) {
-    console.log(error);
+    // eslint-disable-next-line no-console
+    console.error(error);
     yield put(
       updateGlobalNotification(getServerErrorMessage(error), false, true),
     );
@@ -422,98 +370,364 @@ export function* moveItemsBatchSaga({ payload: { itemIds, listId } }) {
   }
 }
 
-export function* createItemSaga({
-  payload: { item },
-  meta: { setSubmitting },
+export function* getItemKeyPair({
+  payload: {
+    item: { id: itemId, teamId, isShared },
+  },
 }) {
-  try {
-    yield put(updateGlobalNotification(ENCRYPTING_ITEM_NOTIFICATION, true));
+  if (isShared) {
+    return yield select(shareItemKeyPairSelector, { itemId });
+  }
 
-    const { listId, attachments, type, ...data } = item;
+  return yield select(teamKeyPairSelector, {
+    teamId: teamId || TEAM_TYPE.PERSONAL,
+  });
+}
 
-    const list = yield select(listSelector, { listId });
-    const keyPair = yield select(keyPairSelector);
-    const user = yield select(userDataSelector);
+export function* downloadAndDecryptRaws({ payload: { itemId } }) {
+  const { data: { raws } = { raws: {} } } = yield call(getItemRaws, itemId);
+  const encryptedRaws = JSON.parse(raws);
 
-    const encryptedItem = yield call(
-      encryptItem,
-      { attachments, ...data },
-      keyPair.publicKey,
-    );
+  if (!encryptedRaws || Object.keys(encryptedRaws).length <= 0) return {};
 
-    yield put(updateGlobalNotification(CREATING_ITEM_NOTIFICATION, true));
+  const item = yield select(itemSelector, { itemId });
+  const keyPair = yield call(getItemKeyPair, {
+    payload: {
+      item,
+    },
+  });
 
-    const {
-      data: { id: itemId, lastUpdated },
-    } = yield call(postCreateItem, {
-      listId,
-      type,
-      secret: encryptedItem,
+  const privateKeyObj = yield Promise.resolve(
+    unsealPrivateKeyObj(keyPair.privateKey, keyPair.password),
+  );
+
+  return yield call(dectyptItemAttachments, encryptedRaws, privateKeyObj);
+}
+
+export function* encryptAttachmentRaw({ id, raw }, publicKey) {
+  return {
+    id,
+    raw: yield call(encryptData, raw, publicKey),
+  };
+}
+export function* encryptRaws(raws, publicKey) {
+  const encryptedRawsArray = yield all(
+    Object.keys(raws).map(id =>
+      call(encryptAttachmentRaw, { id, raw: raws[id] }, publicKey),
+    ),
+  );
+
+  return arrayToObject(encryptedRawsArray);
+}
+export function* encryptItem({ item, publicKey }) {
+  const { data: { raws, ...data } = { raws: {} } } = item;
+
+  const encryptedItemData = yield call(encryptData, data, publicKey);
+  const encryptedRaws = yield call(encryptRaws, raws, publicKey);
+
+  const encryptedItem = {
+    data: encryptedItemData,
+    raws: JSON.stringify(encryptedRaws),
+  };
+
+  return encryptedItem;
+}
+
+export function* saveShareKeyPairSaga({ item, publicKey }) {
+  const { relatedItemId, ownerId } = item;
+  const { data, raws } = yield call(encryptItem, { item, publicKey });
+
+  return yield call(postItemShare, {
+    itemId: relatedItemId,
+    users: [
+      {
+        userId: ownerId,
+        secret: JSON.stringify({ data, raws }),
+      },
+    ],
+  });
+}
+
+export function* saveItemSaga({ item, publicKey }) {
+  const { id = null, listId = null, type, favorite = false, ownerId } = item;
+  const itemFromStore = yield select(itemSelector, { itemId: item.id });
+
+  let isRawsChanged = isGeneralItem(item);
+  let itemToEncrypt = item;
+
+  if (
+    !!itemFromStore &&
+    deepequal(itemFromStore.data.attachments, item.data.attachments)
+  ) {
+    isRawsChanged = false;
+  }
+
+  if (isRawsChanged && isGeneralItem(item)) {
+    const rawsFromServer = id
+      ? yield call(downloadAndDecryptRaws, {
+          payload: { itemId: item.id },
+        })
+      : {};
+
+    itemToEncrypt = {
+      // OMG :(
+      ...item,
+      data: {
+        ...item.data,
+        raws: {
+          ...(item.data?.raws || {}),
+          ...(rawsFromServer || {}),
+        },
+      },
+    };
+  }
+
+  const { data, raws } = yield call(encryptItem, {
+    item: itemToEncrypt,
+    publicKey,
+  });
+
+  let serverItemData = {};
+  let secretDataAndRaws = {};
+
+  if (isRawsChanged) {
+    // we need to save the raws to the item
+    secretDataAndRaws = {
+      secret: isGeneralItem(item) // save the raws inside the item if it's a non-general item
+        ? JSON.stringify({ data })
+        : JSON.stringify({ data, raws }),
+      raws: isGeneralItem(item) ? raws : null,
+    };
+  } else {
+    secretDataAndRaws = {
+      secret: isGeneralItem(item)
+        ? JSON.stringify({ data })
+        : JSON.stringify({ data, raws }),
+    };
+  }
+
+  if (id) {
+    const { data: updatedItemData } = yield call(updateItem, id, {
+      meta: createItemMetaData(item),
+      ...secretDataAndRaws,
     });
 
-    const newItem = {
-      id: itemId,
+    serverItemData = updatedItemData || {};
+  } else {
+    const { data: updatedItemData } = yield call(postCreateItem, {
       listId,
-      lastUpdated,
+      meta: createItemMetaData(item),
+      ownerId,
       type,
-      favorite: false,
-      invited: [],
-      shared: null,
-      tags: [],
-      teamId: list.teamId,
-      ownerId: user.id,
-      secret: encryptedItem,
-      data: { attachments, ...data },
-      __type: ENTITY_TYPE.ITEM,
+      favorite,
+      ...secretDataAndRaws,
+    });
+
+    serverItemData = updatedItemData || {};
+  }
+
+  let itemData = null;
+
+  if (isGeneralItem(item)) {
+    itemData = {
+      ...item,
+      ...serverItemData,
+      secret: JSON.stringify({ data }),
     };
+  } else {
+    itemData = {
+      ...item,
+      ...serverItemData,
+      secret: JSON.stringify({ data }),
+      raws,
+    };
+  }
 
-    yield put(createItemSuccess(newItem));
-    yield put(addItemToList(newItem));
-    yield put(updateWorkInProgressItem(itemId, ITEM_MODE.REVIEW));
+  const { itemsById } = convertItemsToEntities([itemData]);
+  const normalizedItem = Object.values(itemsById).shift();
 
-    if (list.teamId) {
-      yield put(
-        updateGlobalNotification(SHARING_IN_PROGRESS_NOTIFICATION, true),
+  return normalizedItem;
+}
+
+export function* getKeyPairForTeam(teamId) {
+  const teamKeyPair = yield select(teamKeyPairSelector, {
+    teamId,
+  });
+
+  if (teamKeyPair) {
+    return teamKeyPair;
+  }
+
+  return yield select(teamKeyPairSelector, {
+    teamId: TEAM_TYPE.PERSONAL,
+  });
+}
+
+export function* saveKeyPair(
+  { ownerId, teamId, secret, raws, relatedItemId } = {
+    teamId: null,
+    relatedItemId: null,
+  },
+) {
+  const keypairs = [{ ownerId, teamId, secret, raws, relatedItemId }];
+
+  return yield call(postAddKeyPairBatch, keypairs);
+}
+
+export function* saveItemKeyPair({
+  item: { ownerId, teamId, data, relatedItemId },
+  publicKey,
+}) {
+  const { data: secretData, raws } = yield call(encryptData, data, publicKey);
+
+  return yield call(saveKeyPair, {
+    ownerId,
+    teamId,
+    secret: JSON.stringify({ data: secretData, raws }),
+    relatedItemId,
+  });
+}
+
+export function* generateItemKeyPairKeyByName(name) {
+  const generatedKeyPair = yield call(generateKeyPair, {
+    name,
+  });
+  const keypair = {
+    id: uuid4(),
+    ...generatedKeyPair,
+  };
+
+  return convertSystemItemToKeyPair(keypair);
+}
+
+export function* createKeyPair({
+  payload: {
+    entityId = null,
+    entityTeamId = null,
+    publicKey,
+    entityOwnerId = null,
+  } = {
+    entityId: null,
+    entityTeamId: null,
+    entityOwnerId: null,
+  },
+}) {
+  // The deafult values
+  const currentUserId = yield select(currentUserIdSelector);
+  const ownerId = entityOwnerId || currentUserId;
+  const teamId =
+    entityTeamId !== TEAM_TYPE.PERSONAL || entityTeamId ? entityTeamId : null;
+
+  if (!teamId && !entityId) {
+    throw new Error(`The team or the related item can not be null`);
+  }
+
+  // Create an empty item
+  const keypair = yield call(generateKeyPair, {
+    name: entityTeamId || entityId,
+  });
+  const { data, raws } = yield call(encryptItem, {
+    item: keypair,
+    publicKey,
+  });
+
+  const { data: serverKeyPairItems } = yield call(saveKeyPair, {
+    ownerId,
+    teamId,
+    secret: JSON.stringify({ data, raws }),
+    relatedItemId: entityId,
+  });
+  const serverKeyPairItem = Object.values(serverKeyPairItems).shift();
+  const keyPairsById = convertKeyPairToEntity([
+    {
+      ...serverKeyPairItem,
+      ...keypair,
+    },
+  ]);
+
+  return keyPairsById;
+}
+
+export function* createIfNotExistKeyPair({ payload: { teamId, ownerId } }) {
+  if (!teamId) return;
+
+  const currentUser = yield select(currentUserDataSelector);
+  const userId = ownerId || currentUser.id;
+
+  const owner = yield select(userSelector, { userId });
+  const { publicKey } = owner;
+
+  const systemKeyPairItem = yield select(teamKeyPairSelector, {
+    teamId,
+  });
+
+  if (!systemKeyPairItem) {
+    yield call(createKeyPair, {
+      payload: {
+        entityId: teamId,
+        entityTeamId: teamId,
+        entityOwnerId: userId,
+        publicKey,
+      },
+    });
+  }
+}
+
+export function* createItemSaga({
+  payload: { item },
+  meta: { setSubmitting = Function.prototype },
+}) {
+  try {
+    const { teamId = TEAM_TYPE.PERSONAL, listId } = item;
+
+    const keyPair = yield select(teamKeyPairSelector, {
+      teamId,
+    });
+
+    if (!keyPair) {
+      throw new Error(`Can't find or create the key pair for the items.`);
+    }
+
+    const notificationText = !isGeneralItem(item)
+      ? COMMON_PROGRESS_NOTIFICATION
+      : ENCRYPTING_ITEM_NOTIFICATION;
+
+    const { publicKey } = keyPair;
+
+    yield put(updateGlobalNotification(notificationText, true));
+
+    if (!publicKey) {
+      // Nothing to do here
+      throw new Error(
+        `Can't find the publicKey in the key pair for the team ${teamId}`,
       );
+    }
+    const isSystemItem = !isGeneralItem(item);
+    if (!isSystemItem) {
+      yield put(updateGlobalNotification(CREATING_ITEM_NOTIFICATION, true));
+    }
 
-      const team = yield select(teamSelector, { teamId: list.teamId });
-      const memberIds = team.users.map(({ id }) => id);
-      const members = yield select(membersBatchSelector, { memberIds });
+    const savedItem = yield call(saveItemSaga, { item, publicKey });
+    if (!isSystemItem) {
+      yield put(createItemSuccess(savedItem));
+    }
 
-      const itemUserPairs = members
-        .filter(({ id }) => id !== user.id)
-        .map(({ id, publicKey }) => ({
-          item: { id: itemId, data: newItem.data },
-          user: { id, publicKey, teamId: list.teamId },
-        }));
+    yield put(setCurrentTeamId(teamId || TEAM_TYPE.PERSONAL));
 
-      if (itemUserPairs.length > 0) {
-        yield fork(createChildItemBatchSaga, {
-          payload: { itemUserPairs },
-        });
-
-        const {
-          payload: { childItems },
-        } = yield take(CREATE_CHILD_ITEM_BATCH_FINISHED_EVENT);
-
-        const shares = childItems.reduce(
-          // eslint-disable-next-line
-          (accumulator, item) => [
-            ...accumulator,
-            {
-              itemId: item.originalItemId,
-              childItemIds: item.items.map(({ id }) => id),
-            },
-          ],
-          [],
-        );
-
-        yield put(addChildItemsBatchToItems(shares));
-        yield put(updateWorkInProgressItem());
-      }
+    if (isSystemItem) {
+      yield put(
+        addSystemItemsBatch({
+          [savedItem.id]: savedItem,
+        }),
+      );
+    } else {
+      yield put(setWorkInProgressListId(listId));
+      yield put(setWorkInProgressItem(savedItem));
+      yield call(Router.push, ROUTES.DASHBOARD);
     }
   } catch (error) {
-    console.log(error);
+    // eslint-disable-next-line no-console
+    console.error(error);
     yield put(
       updateGlobalNotification(getServerErrorMessage(error), false, true),
     );
@@ -524,16 +738,35 @@ export function* createItemSaga({
   }
 }
 
+// TODO: Need to be updated to the sepated raws feature
 export function* createItemsBatchSaga({
-  payload: { items, listId },
+  payload: { items, listId, ownerId = null },
   meta: { setSubmitting },
 }) {
   try {
-    yield put(updateGlobalNotification(CREATING_ITEMS_NOTIFICATION, true));
+    if (items.length <= 0) {
+      throw new Error('The items list is empty');
+    }
 
-    const list = yield select(listSelector, { listId });
-    const keyPair = yield select(keyPairSelector);
-    const user = yield select(userDataSelector);
+    yield put(updateGlobalNotification(ENCRYPTING_ITEM_NOTIFICATION, true));
+
+    const currentUserId = yield select(currentUserIdSelector);
+    const { teamId = TEAM_TYPE.PERSONAL } = items[0];
+
+    yield call(createIfNotExistKeyPair, {
+      payload: {
+        teamId,
+        ownerId: ownerId || currentUserId,
+      },
+    });
+
+    const keyPair = yield select(teamKeyPairSelector, {
+      teamId,
+    });
+
+    if (!keyPair) {
+      throw new Error(`Can't find or create the key pair for the items.`);
+    }
 
     const preparedForEncryptingItems = items.map(
       ({ attachments, type, ...data }) => ({
@@ -543,54 +776,34 @@ export function* createItemsBatchSaga({
     );
 
     const encryptedItems = yield call(
-      encryptItemsBatch,
+      encryptDataBatch,
       preparedForEncryptingItems,
       keyPair.publicKey,
     );
 
-    const preparedForRequestItems = items.map(({ type }, index) => ({
+    const preparedForRequestItems = items.map(({ type, ...data }, index) => ({
       type,
       listId,
-      secret: encryptedItems[index],
+      meta: createItemMetaData({ data }),
+      secret: JSON.stringify({
+        data: encryptedItems[index],
+      }),
     }));
 
-    const { data } = yield call(postCreateItemsBatch, {
+    const { data: serverItems } = yield call(postCreateItemsBatch, {
       items: preparedForRequestItems,
     });
 
-    const preparedForStoreItems = data.map((item, index) => ({
-      id: item.id,
-      listId,
-      lastUpdated: item.lastUpdated,
-      favorite: false,
-      invited: [],
-      shared: null,
-      tags: [],
-      owner: user.id,
+    const preparedForStoreItems = serverItems.map((item, index) => ({
+      ...item,
       data: preparedForEncryptingItems[index],
-      type: items[index].type,
     }));
-
-    yield put(createItemsBatchSuccess(preparedForStoreItems));
-    yield put(addItemsBatchToList(data.map(({ id }) => id), listId));
-
-    if (list.teamId) {
-      yield fork(shareItemBatchSaga, {
-        payload: {
-          data: {
-            itemIds: data.map(({ id }) => id),
-            teamIds: [list.teamId],
-          },
-          options: {
-            includeIniciator: false,
-          },
-        },
-      });
-    } else {
-      yield put(updateGlobalNotification(NOOP_NOTIFICATION, false));
-    }
+    const { itemsById } = convertItemsToEntities(preparedForStoreItems);
+    yield put(createItemsBatchSuccess(itemsById));
+    yield put(updateGlobalNotification(NOOP_NOTIFICATION, false));
   } catch (error) {
-    console.log(error);
+    // eslint-disable-next-line no-console
+    console.error(error);
     yield put(
       updateGlobalNotification(getServerErrorMessage(error), false, true),
     );
@@ -600,27 +813,44 @@ export function* createItemsBatchSaga({
   }
 }
 
+export function* getKeyPairForItem({ item }) {
+  let keypair;
+
+  if (item.isShared) {
+    keypair = yield select(shareKeyPairSelector, { itemId: item.id });
+  } else {
+    let { teamId } = item;
+
+    if (!teamId) {
+      const list = yield select(listSelector, { listId: item.listId });
+      teamId = list.teamId;
+    }
+
+    keypair = yield select(teamKeyPairSelector, {
+      teamId: teamId || TEAM_TYPE.PERSONAL,
+    });
+  }
+
+  return keypair;
+}
 export function* updateItemSaga({ payload: { item } }) {
   try {
     yield put(updateGlobalNotification(ENCRYPTING_ITEM_NOTIFICATION, true));
 
-    const keyPair = yield select(keyPairSelector);
+    const itemKeyPair = yield call(getKeyPairForItem, { item });
+    if (!itemKeyPair?.publicKey) {
+      throw new Error(`Can't get the publicKey for the item ${item.id}`);
+    }
 
-    const encryptedItemSecret = yield call(
-      encryptItem,
-      item.data,
-      keyPair.publicKey,
-    );
+    const { publicKey } = itemKeyPair;
+    const updatedItem = yield call(saveItemSaga, { item, publicKey });
 
-    yield call(updateItem, item.id, { item: { secret: encryptedItemSecret } });
-
-    yield put(updateItemSuccess({ ...item, secret: encryptedItemSecret }));
-
-    yield put(updateWorkInProgressItem());
-
+    yield put(updateItemSuccess(updatedItem));
+    yield put(setWorkInProgressItem(updatedItem));
     yield put(updateGlobalNotification(NOOP_NOTIFICATION, false));
   } catch (error) {
-    console.log(error);
+    // eslint-disable-next-line no-console
+    console.error(error);
     yield put(
       updateGlobalNotification(getServerErrorMessage(error), false, true),
     );
@@ -628,192 +858,71 @@ export function* updateItemSaga({ payload: { item } }) {
   }
 }
 
-export function* editItemSaga({ payload: { item }, meta: { setSubmitting } }) {
+export function* editItemSaga({
+  payload: { itemId, patch },
+  meta: { setSubmitting, notification },
+}) {
   try {
-    const { listId, attachments, type, ...data } = item;
+    const item = yield select(itemSelector, { itemId });
+    if (!item) {
+      throw new Error(`Can't find the item ${itemId}`);
+    }
 
-    const workInProgressItem = yield select(workInProgressItemSelector);
-    const originalItem = yield select(itemSelector, {
-      itemId: workInProgressItem.id,
-    });
-
-    const editedItemData = {
-      attachments,
-      ...data,
+    const patchedItem = {
+      ...item,
+      data: {
+        ...item.data,
+        ...patch,
+      },
     };
-
-    const editedItem = {
-      ...originalItem,
+    const {
       listId,
-      data: editedItemData,
-    };
+      data: { raws, ...data },
+    } = patchedItem;
 
-    const isDataChanged = !deepequal(workInProgressItem.data, editedItemData);
-    const isListIdChanged = listId !== workInProgressItem.listId;
+    const itemInState = yield select(itemSelector, { itemId });
+    const isDataChanged = !deepequal(itemInState.data, data);
+
+    if (!isDataChanged) {
+      setSubmitting(false);
+      yield put(
+        updateGlobalNotification(
+          `The '${item.data.name}' has not been updated`,
+          false,
+          true,
+        ),
+      );
+
+      return;
+    }
+
+    const isListIdChanged = listId !== itemInState.listId;
 
     if (isListIdChanged) {
       yield call(moveItemSaga, { payload: { listId } });
     }
 
     if (isDataChanged) {
-      yield call(updateItemSaga, { payload: { item: editedItem } });
-
-      if (originalItem.invited.length) {
-        yield call(updateChildItemsBatchSaga, {
-          payload: { item: editedItem },
-        });
-      }
+      yield call(updateItemSaga, {
+        payload: {
+          item: patchedItem,
+        },
+      });
     }
 
-    yield put(updateWorkInProgressItem(editedItem.id, ITEM_MODE.REVIEW));
+    yield put(updateWorkInProgressItem(item.id));
+    yield call(notification.show, {
+      text: `The '${item.data.name}' has been updated`,
+    });
   } catch (error) {
-    console.log(error);
+    // eslint-disable-next-line no-console
+    console.error(error);
     yield put(
       updateGlobalNotification(getServerErrorMessage(error), false, true),
     );
     yield put(editItemFailure());
   } finally {
     setSubmitting(false);
-  }
-}
-
-export function* acceptItemSaga({ payload: { id } }) {
-  try {
-    const keyPair = yield select(keyPairSelector);
-    const masterPassword = yield select(masterPasswordSelector);
-
-    const {
-      data: { secret, ...itemData },
-    } = yield call(acceptUpdateItem, id);
-
-    const privateKeyObj = yield call(
-      getPrivateKeyObj,
-      keyPair.privateKey,
-      masterPassword,
-    );
-
-    const decryptedItemSecret = yield decryptItem(secret, privateKeyObj);
-
-    const newItem = {
-      ...itemData,
-      secret,
-      data: decryptedItemSecret,
-      invited: itemData.invited.map(({ id: childId }) => childId),
-    };
-
-    yield put(acceptItemUpdateSuccess(newItem));
-    yield put(updateWorkInProgressItem());
-  } catch (error) {
-    console.error(error);
-    yield put(
-      updateGlobalNotification(getServerErrorMessage(error), false, true),
-    );
-    yield put(acceptItemUpdateFailure(error));
-  }
-}
-
-export function* rejectItemSaga({ payload: { id } }) {
-  try {
-    yield call(rejectUpdateItem, id);
-
-    yield put(rejectItemUpdateSuccess(id));
-    yield put(updateWorkInProgressItem());
-  } catch (error) {
-    console.log(error);
-    yield put(
-      updateGlobalNotification(getServerErrorMessage(error), false, true),
-    );
-    yield put(rejectItemUpdateFailure(error));
-  }
-}
-
-export function* createAnonymousLinkSaga() {
-  try {
-    const workInProgressItem = yield select(workInProgressItemSelector);
-
-    const email = generateAnonymousEmail();
-
-    const {
-      id: userId,
-      name,
-      password,
-      masterPassword,
-      publicKey,
-    } = yield call(createMemberSaga, {
-      payload: {
-        email,
-        role: ROLE_ANONYMOUS_USER,
-      },
-    });
-
-    const encryptedSecret = yield call(
-      encryptItem,
-      workInProgressItem.data,
-      publicKey,
-    );
-
-    const {
-      data: { items },
-    } = yield call(postCreateChildItem, workInProgressItem.id, {
-      items: [
-        {
-          userId,
-          secret: encryptedSecret,
-          cause: SHARE_TYPE,
-          access: PERMISSION_READ,
-        },
-      ],
-    });
-
-    const link = generateSharingUrl(
-      items[0].id,
-      objectToBase64({
-        e: email,
-        p: password,
-        mp: masterPassword,
-      }),
-    );
-
-    yield call(patchChildItem, workInProgressItem.id, {
-      items: [{ userId, link, secret: encryptedSecret }],
-    });
-
-    const share = {
-      id: items[0].id,
-      userId,
-      email,
-      name,
-      link,
-      publicKey,
-      isAccepted: false,
-      roles: [ROLE_ANONYMOUS_USER],
-    };
-
-    yield put(createAnonymousLinkSuccess(workInProgressItem.id, share));
-    yield put(updateWorkInProgressItem());
-  } catch (error) {
-    console.log(error);
-    yield put(
-      updateGlobalNotification(getServerErrorMessage(error), false, true),
-    );
-    yield put(createAnonymousLinkFailure());
-  }
-}
-
-export function* removeAnonymousLinkSaga() {
-  try {
-    const workInProgressItem = yield select(workInProgressItemSelector);
-
-    yield call(deleteChildItem, workInProgressItem.shared.id);
-
-    yield put(removeAnonymousLinkSuccess(workInProgressItem.id));
-    yield put(updateWorkInProgressItem());
-  } catch (error) {
-    console.log(error);
-    yield put(
-      updateGlobalNotification(getServerErrorMessage(error), false, true),
-    );
-    yield put(removeAnonymousLinkFailure());
   }
 }
 
@@ -826,11 +935,5 @@ export default function* itemSagas() {
   yield takeLatest(CREATE_ITEMS_BATCH_REQUEST, createItemsBatchSaga);
   yield takeLatest(EDIT_ITEM_REQUEST, editItemSaga);
   yield takeLatest(UPDATE_ITEM_REQUEST, updateItemSaga);
-  yield takeLatest(ACCEPT_ITEM_UPDATE_REQUEST, acceptItemSaga);
-  yield takeLatest(REJECT_ITEM_UPDATE_REQUEST, rejectItemSaga);
   yield takeLatest(TOGGLE_ITEM_TO_FAVORITE_REQUEST, toggleItemToFavoriteSaga);
-  yield takeLatest(CREATE_ANONYMOUS_LINK_REQUEST, createAnonymousLinkSaga);
-  yield takeLatest(REMOVE_ANONYMOUS_LINK_REQUEST, removeAnonymousLinkSaga);
-  yield takeLatest(SHARE_ITEM_BATCH_REQUEST, shareItemBatchSaga);
-  yield takeLatest(REMOVE_SHARE_REQUEST, removeShareSaga);
 }

@@ -3,82 +3,57 @@ import styled from 'styled-components';
 import {
   Button,
   TeamCard,
-  LogoLoader,
-  NewTeamModal,
+  SettingsWrapper,
+  TeamModal,
   ConfirmModal,
+  ConfirmLeaveTeamModal,
   Can,
+  Tabs,
+  Tab,
 } from '@caesar/components';
-import {
-  TEAM_TYPE,
-  CREATE_PERMISSION,
-  ENTITY_TYPE,
-} from '@caesar/common/constants';
-
-const LogoWrapper = styled.div`
-  display: flex;
-  flex-direction: column;
-  background: ${({ theme }) => theme.color.lightBlue};
-  width: 100%;
-  position: relative;
-  height: calc(100vh - 55px);
-  align-items: center;
-  justify-content: center;
-`;
-
-const Wrapper = styled.div`
-  display: flex;
-  flex-direction: column;
-  background: ${({ theme }) => theme.color.lightBlue};
-  width: 100%;
-  padding: 60px;
-  position: relative;
-`;
-
-const TopWrapper = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 30px;
-`;
-
-const Title = styled.div`
-  font-size: 36px;
-  color: ${({ theme }) => theme.color.black};
-`;
+import { PERMISSION, PERMISSION_ENTITY } from '@caesar/common/constants';
 
 const TeamListWrapper = styled.div`
   display: flex;
-  padding: 30px;
+  justify-content: space-between;
   flex-wrap: wrap;
-
-  > {
-    &:nth-child(2n + 1) {
-      margin-right: 60px;
-    }
-  }
+  width: 100%;
 `;
 
-const TeamCardStyled = styled(TeamCard)`
-  width: calc((100% - 60px) / 2);
-  margin-bottom: 30px;
-  cursor: pointer;
+const StyledTeamCard = styled(TeamCard)`
+  width: calc((100% - 24px) / 2);
+  margin-bottom: 24px;
 `;
 
 const NEW_TEAM_MODAL = 'newTeamModal';
+const LEAVE_TEAM_MODAL = 'leaveTeamModal';
 const REMOVE_TEAM_MODAL = 'removeTeamModal';
+
+const ALL_TAB_NAME = 'all';
+const FAVORITES_TAB_NAME = 'favorites';
 
 class TeamListContainer extends Component {
   state = this.prepareInitialState();
 
-  componentDidMount() {
-    this.props.fetchTeamsRequest();
-    this.props.fetchMembersRequest();
-  }
+  handleCreateSubmit = ({ title, icon, setSubmitting, setErrors }) => {
+    this.props.createTeamRequest(
+      title,
+      icon,
+      this.handleCloseModal(NEW_TEAM_MODAL),
+      setSubmitting,
+      setErrors,
+    );
+  };
 
-  handleCreateSubmit = ({ title, icon }) => {
-    this.props.createTeamRequest(title, icon);
-
-    this.handleCloseModal(NEW_TEAM_MODAL)();
+  handleEditSubmit = ({ teamId, title, icon, setSubmitting, setErrors }) => {
+    this.props.editTeamRequest(
+      teamId,
+      title,
+      icon,
+      this.handleCloseModal(NEW_TEAM_MODAL),
+      setSubmitting,
+      setErrors,
+    );
   };
 
   handleOpenModal = modal => () => {
@@ -94,11 +69,24 @@ class TeamListContainer extends Component {
   handleCloseModal = modal => () => {
     this.setState(prevState => ({
       ...prevState,
+      selectedTeamId: null,
       modalVisibilities: {
         ...prevState.modalVisibilities,
         [modal]: false,
       },
     }));
+  };
+
+  handleClickEditTeam = teamId => event => {
+    event.preventDefault();
+    event.stopPropagation();
+
+    this.setState(
+      {
+        selectedTeamId: teamId,
+      },
+      this.handleOpenModal(NEW_TEAM_MODAL),
+    );
   };
 
   handleClickRemoveTeam = teamId => event => {
@@ -110,6 +98,32 @@ class TeamListContainer extends Component {
         selectedTeamId: teamId,
       },
       this.handleOpenModal(REMOVE_TEAM_MODAL),
+    );
+  };
+
+  handleClickLeaveTeam = team => event => {
+    event.preventDefault();
+    event.stopPropagation();
+    const { id, title } = team;
+
+    this.setState(
+      {
+        selectedTeamId: id,
+        selectedTeamTitle: title,
+      },
+      this.handleOpenModal(LEAVE_TEAM_MODAL),
+    );
+  };
+
+  handleLeaveTeam = () => {
+    this.props.leaveTeamRequest(this.state.selectedTeamId);
+
+    this.setState(
+      {
+        selectedTeamId: null,
+        selectedTeamTitle: null,
+      },
+      this.handleCloseModal(LEAVE_TEAM_MODAL),
     );
   };
 
@@ -125,80 +139,139 @@ class TeamListContainer extends Component {
   };
 
   handleChangeMemberRole = (member, role) => {
-    const { selectedTeamId } = this.state;
+    // TODO: Need to implement UI. Use member.id instead of userId
+    this.props.updateTeamMemberRoleRequest(member.id, role);
+  };
 
-    this.props.updateTeamMemberRoleRequest(selectedTeamId, member.id, role);
+  handlePinTeam = (teamId, isPinned) => event => {
+    event.preventDefault();
+    event.stopPropagation();
+
+    this.props.togglePinTeamRequest(teamId, !isPinned);
+  };
+
+  handleChangeTab = (name, tabName) => {
+    this.setState({
+      activeTabName: tabName,
+    });
   };
 
   prepareInitialState() {
     return {
       selectedTeamId: null,
+      selectedTeamTitle: null,
       modalVisibilities: {
         [NEW_TEAM_MODAL]: false,
+        [LEAVE_TEAM_MODAL]: false,
         [REMOVE_TEAM_MODAL]: false,
       },
+      activeTabName: ALL_TAB_NAME,
     };
   }
 
-  renderTeamCards() {
-    const { teams, members } = this.props;
+  renderTeamCards(teams) {
+    const { currentUser } = this.props;
+
+    if (!teams || teams.length === 0) {
+      return <div>No teams</div>;
+    }
 
     return teams.map(team => (
-      <TeamCardStyled
+      <StyledTeamCard
         key={team.id}
         team={team}
-        members={members}
-        isRemoveButtonVisible={team.type !== TEAM_TYPE.DEFAULT}
+        userId={currentUser.id}
+        onClickEditTeam={this.handleClickEditTeam(team.id)}
+        onClickLeaveTeam={this.handleClickLeaveTeam(team)}
         onClickRemoveTeam={this.handleClickRemoveTeam(team.id)}
+        onPinTeam={this.handlePinTeam(team.id, team.pinned)}
       />
     ));
   }
 
   render() {
-    const { isLoading } = this.props;
-    const { modalVisibilities } = this.state;
+    const {
+      isLoading,
+      isLoadingTeams,
+      teams,
+      userTeamList,
+      isDomainAdmin,
+      isDomainAdminOrManager,
+      currentUser,
+    } = this.props;
 
-    if (isLoading) {
-      return (
-        <LogoWrapper>
-          <LogoLoader textColor="black" />
-        </LogoWrapper>
-      );
-    }
+    const { modalVisibilities, selectedTeamTitle, activeTabName } = this.state;
+    const favoriteTeams = teams.filter(team => team.pinned);
+    const allTeamCards = this.renderTeamCards(
+      isDomainAdminOrManager ? teams : userTeamList,
+    );
+    const favoriteTeamCards = this.renderTeamCards(favoriteTeams);
 
-    const renderedTeamCards = this.renderTeamCards();
+    const teamSubject = {
+      ...currentUser?._permissions,
+      __typename: PERMISSION_ENTITY.TEAM,
+    };
+
+    const teamsLength =
+      // eslint-disable-next-line no-nested-ternary
+      activeTabName === FAVORITES_TAB_NAME
+        ? favoriteTeams.length
+        : isDomainAdminOrManager
+        ? teams.length
+        : userTeamList.length;
 
     return (
-      <Wrapper>
-        <TopWrapper>
-          <Title>Teams</Title>
-          <Can I={CREATE_PERMISSION} of={ENTITY_TYPE.TEAM}>
+      <SettingsWrapper
+        isLoading={isLoading || isLoadingTeams}
+        title={`Teams (${teamsLength})`}
+        addonTopComponent={
+          <Can I={PERMISSION.CREATE} a={teamSubject}>
             <Button
               withOfflineCheck
               onClick={this.handleOpenModal(NEW_TEAM_MODAL)}
               icon="plus"
               color="black"
             >
-              Add team
+              Add a team
             </Button>
           </Can>
-        </TopWrapper>
-        <TeamListWrapper>{renderedTeamCards}</TeamListWrapper>
+        }
+      >
+        {isDomainAdmin ? (
+          <Tabs activeTabName={activeTabName} onChange={this.handleChangeTab}>
+            <Tab title="All" name={ALL_TAB_NAME}>
+              <TeamListWrapper>{allTeamCards}</TeamListWrapper>
+            </Tab>
+            <Tab title="Favorites" name={FAVORITES_TAB_NAME}>
+              <TeamListWrapper>{favoriteTeamCards}</TeamListWrapper>
+            </Tab>
+          </Tabs>
+        ) : (
+          <TeamListWrapper>{allTeamCards}</TeamListWrapper>
+        )}
         {modalVisibilities[NEW_TEAM_MODAL] && (
-          <NewTeamModal
-            onSubmit={this.handleCreateSubmit}
+          <TeamModal
+            teamId={this.state.selectedTeamId}
+            onCreateSubmit={this.handleCreateSubmit}
+            onEditSubmit={this.handleEditSubmit}
             onCancel={this.handleCloseModal(NEW_TEAM_MODAL)}
           />
         )}
         <ConfirmModal
-          isOpen={modalVisibilities[REMOVE_TEAM_MODAL]}
+          isOpened={modalVisibilities[REMOVE_TEAM_MODAL]}
           description="Are you sure you want to remove team?"
           onClickConfirm={this.handleRemoveTeam}
           onClickCancel={this.handleCloseModal(REMOVE_TEAM_MODAL)}
         />
-      </Wrapper>
+        <ConfirmLeaveTeamModal
+          isOpened={modalVisibilities[LEAVE_TEAM_MODAL]}
+          teamTitle={selectedTeamTitle}
+          onClickConfirm={this.handleLeaveTeam}
+          onClickCancel={this.handleCloseModal(LEAVE_TEAM_MODAL)}
+        />
+      </SettingsWrapper>
     );
   }
 }
 
-export default TeamListContainer;
+export { TeamListContainer as TeamList };

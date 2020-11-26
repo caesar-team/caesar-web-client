@@ -1,19 +1,47 @@
 import * as openpgp from 'openpgp';
-import { generateKeys } from '@caesar/common/utils/key';
-import { randomId } from '@caesar/common/utils/uuid4';
+import { generateKeys } from './key';
+import { getHostName } from './getDomainName';
+import { randomId } from './uuid4';
+import { objectToBase64, base64ToObject } from './base64';
 import { createSrp } from './srp';
 import { passwordGenerator } from './passwordGenerator';
 
 const srp = createSrp();
 
-export const getPrivateKeyObj = async (privateKey, password) => {
-  const privateKeyObj = (await openpgp.key.readArmored(privateKey)).keys[0];
-  await privateKeyObj.decrypt(password);
+export const unsealPrivateKeyObj = async (privateKey, password) => {
+  try {
+    const privateKeyObj = (await openpgp.key.readArmored(privateKey)).keys[0];
+    await privateKeyObj.decrypt(password);
 
-  return privateKeyObj;
+    return privateKeyObj;
+  } catch (error) {
+    // eslint-disable-next-line no-console
+    console.error(error);
+
+    return null;
+  }
 };
 
-export const decryptItem = async (secretArmored, privateKeyObj) => {
+export const testDecryptSecretArmored = async (
+  secretArmored,
+  privateKeyObj,
+) => {
+  try {
+    await openpgp.decrypt({
+      message: await openpgp.message.readArmored(secretArmored),
+      privateKeys: [privateKeyObj],
+    });
+
+    return true;
+  } catch (error) {
+    // eslint-disable-next-line no-console
+    console.error('decryption error %s', error);
+
+    return false;
+  }
+};
+
+export const decryptData = async (secretArmored, privateKeyObj) => {
   try {
     const secret = await openpgp.message.readArmored(secretArmored);
     const { data } = await openpgp.decrypt({
@@ -21,31 +49,36 @@ export const decryptItem = async (secretArmored, privateKeyObj) => {
       privateKeys: [privateKeyObj],
     });
 
-    return JSON.parse(data);
+    return base64ToObject(data);
   } catch (error) {
-    console.log('decryption error', error);
+    // eslint-disable-next-line no-console
+    console.error('decryption error %s', error);
 
     return null;
   }
 };
 
-export const encryptItem = async (data, key) => {
+export const encryptData = async (data, key) => {
   const encrypted = await openpgp.encrypt({
-    message: openpgp.message.fromText(JSON.stringify(data)),
+    message: openpgp.message.fromBinary(
+      openpgp.util.str_to_Uint8Array(objectToBase64(data)),
+    ),
     publicKeys: (await openpgp.key.readArmored(key)).keys,
   });
 
   return encrypted.data;
 };
 
-export const encryptItemsBatch = async (dataSet, key) => {
+export const encryptDataBatch = async (dataSet, key) => {
   // eslint-disable-next-line
-  return Promise.all(dataSet.map(async data => await encryptItem(data, key)));
+  return Promise.all(dataSet.map(async data => await encryptData(data, key)));
 };
 
 export const encryptByPassword = async (data, password) => {
   const encrypted = await openpgp.encrypt({
-    message: openpgp.message.fromText(JSON.stringify(data)),
+    message: openpgp.message.fromBinary(
+      openpgp.util.str_to_Uint8Array(objectToBase64(data)),
+    ),
     passwords: [password],
   });
 
@@ -60,7 +93,7 @@ export const decryptByPassword = async (secretArmored, password) => {
     passwords: [password],
   });
 
-  return JSON.parse(data);
+  return base64ToObject(data);
 };
 
 export const generateUser = async email => {
@@ -87,7 +120,7 @@ export const generateUsersBatch = async emails => {
 };
 
 export const generateAnonymousEmail = () =>
-  `anonymous_${randomId()}@caesar.team`;
+  `anonymous_${randomId()}@${getHostName()}`;
 
 export const generateSeedAndVerifier = (email, password) => {
   const seed = srp.getRandomSeed();

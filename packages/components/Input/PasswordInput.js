@@ -1,11 +1,15 @@
 import React, { PureComponent } from 'react';
 import styled from 'styled-components';
-import Input from './Input';
+import { Input } from './Input';
 import { Icon } from '../Icon';
 import { HoldClickBehaviour } from '../HoldClickBehaviour';
 
-const StyledIcon = styled(Icon)`
+const EyeIcon = styled(Icon)`
   cursor: pointer;
+
+  &:hover {
+    color: ${({ theme }) => theme.color.black};
+  }
 `;
 
 class PasswordInput extends PureComponent {
@@ -21,7 +25,12 @@ class PasswordInput extends PureComponent {
 
   render() {
     const { visible } = this.state;
-    const { value, isAlwaysVisibleIcon = false, ...props } = this.props;
+    const {
+      value,
+      addonPostfix,
+      isAlwaysVisibleIcon = false,
+      ...props
+    } = this.props;
 
     const type = visible ? 'text' : 'password';
     const iconName = visible ? 'eye-off' : 'eye-on';
@@ -34,14 +43,17 @@ class PasswordInput extends PureComponent {
         value={value}
         type={type}
         postfix={
-          shouldShowIcon && (
-            <HoldClickBehaviour
-              onHoldStart={this.handleToggleVisible(true)}
-              onHoldEnd={this.handleToggleVisible(false)}
-            >
-              <StyledIcon name={iconName} width={18} height={18} />
-            </HoldClickBehaviour>
-          )
+          <>
+            {addonPostfix}
+            {shouldShowIcon && (
+              <HoldClickBehaviour
+                onHoldStart={this.handleToggleVisible(true)}
+                onHoldEnd={this.handleToggleVisible(false)}
+              >
+                <EyeIcon name={iconName} width={16} height={16} color="gray" />
+              </HoldClickBehaviour>
+            )}
+          </>
         }
       />
     );

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, memo } from 'react';
 import { useEffectOnce } from 'react-use';
 import { useSelector, useDispatch } from 'react-redux';
 import styled from 'styled-components';
@@ -7,18 +7,13 @@ import {
   workInProgressItemIdsSelector,
 } from '@caesar/common/selectors/workflow';
 import {
-  fetchUserSelfRequest,
-  fetchUserTeamsRequest,
-} from '@caesar/common/actions/user';
-import {
-  initWorkflow,
+  initDashboard,
   setWorkInProgressItem,
   setWorkInProgressItemIds,
 } from '@caesar/common/actions/workflow';
 import {
   Item,
   MenuList,
-  withNotification,
   DashboardLayout,
   SecureMessage,
   FullScreenLoader,
@@ -48,22 +43,26 @@ const MiddleColumnWrapper = styled.div`
   display: flex;
   flex-direction: column;
   flex: 0 0 431px;
-  background: ${({ theme }) => theme.color.lightBlue};
+  background: ${({ theme }) => theme.color.alto};
   border-right: 1px solid ${({ theme }) => theme.color.gallery};
 `;
 
 const RightColumnWrapper = styled.div`
   position: relative;
   flex-grow: 1;
+  max-width: calc(100% - 287px - 431px);
 `;
 
-const DashboardComponent = ({ notification }) => {
+const StyledSecureMessage = styled(SecureMessage)`
+  max-width: 848px;
+  padding-right: 24px;
+  padding-left: 24px;
+  margin: 0 auto;
+`;
+
+const DashboardComponent = () => {
   const dispatch = useDispatch();
   const [mode, setMode] = useState(DASHBOARD_MODE.DEFAULT);
-  const [
-    startCtrlShiftSelectionItemId,
-    setStartCtrlShiftSelectionItemId,
-  ] = useState(null);
   const [searchedText, setSearchedText] = useState('');
   const [openedModal, setOpenedModal] = useState(null);
   const isLoading = useSelector(isLoadingSelector);
@@ -87,9 +86,7 @@ const DashboardComponent = ({ notification }) => {
   };
 
   useEffectOnce(() => {
-    dispatch(fetchUserSelfRequest());
-    dispatch(fetchUserTeamsRequest());
-    dispatch(initWorkflow());
+    dispatch(initDashboard());
   });
 
   if (isLoading) {
@@ -112,18 +109,15 @@ const DashboardComponent = ({ notification }) => {
             />
           </Sidebar>
           {mode === DASHBOARD_MODE.TOOL ? (
-            <SecureMessage withScroll />
+            <StyledSecureMessage withScroll />
           ) : (
             <>
               <MiddleColumnWrapper>
                 <MiddleColumn
                   mode={mode}
                   searchedText={searchedText}
+                  hasOpenedModal={openedModal}
                   handleOpenModal={handleOpenModal}
-                  startCtrlShiftSelectionItemId={startCtrlShiftSelectionItemId}
-                  setStartCtrlShiftSelectionItemId={
-                    setStartCtrlShiftSelectionItemId
-                  }
                   handleCtrlSelectionItemBehaviour={
                     handleCtrlSelectionItemBehaviour
                   }
@@ -131,7 +125,6 @@ const DashboardComponent = ({ notification }) => {
               </MiddleColumnWrapper>
               <RightColumnWrapper>
                 <Item
-                  notification={notification}
                   onClickShare={handleOpenModal(MODAL.SHARE)}
                   onClickMoveToTrash={handleOpenModal(MODAL.MOVE_TO_TRASH)}
                   onClickRemoveItem={handleOpenModal(MODAL.REMOVE_ITEM)}
@@ -143,31 +136,24 @@ const DashboardComponent = ({ notification }) => {
       </DashboardLayout>
       {openedModal === MODAL.SHARE && (
         <ShareModal
-          notification={notification}
-          handleCloseModal={handleCloseModal}
-        />
-      )}
-      {openedModal === MODAL.MOVE_ITEM && (
-        <MoveModal
-          notification={notification}
           handleCloseModal={handleCloseModal}
           handleCtrlSelectionItemBehaviour={handleCtrlSelectionItemBehaviour}
         />
       )}
-      <ConfirmMoveToTrashModal
-        notification={notification}
-        isOpen={openedModal === MODAL.MOVE_TO_TRASH}
-        handleCloseModal={handleCloseModal}
-      />
-      <ConfirmRemoveItemModal
-        isOpen={openedModal === MODAL.REMOVE_ITEM}
-        handleCloseModal={handleCloseModal}
-      />
+      {openedModal === MODAL.MOVE_ITEM && (
+        <MoveModal
+          handleCloseModal={handleCloseModal}
+          handleCtrlSelectionItemBehaviour={handleCtrlSelectionItemBehaviour}
+        />
+      )}
+      {openedModal === MODAL.MOVE_TO_TRASH && (
+        <ConfirmMoveToTrashModal isOpened handleCloseModal={handleCloseModal} />
+      )}
+      {openedModal === MODAL.REMOVE_ITEM && (
+        <ConfirmRemoveItemModal isOpened handleCloseModal={handleCloseModal} />
+      )}
     </>
   );
 };
 
-// TODO: Replace with smth else?
-// DashboardComponent.contextType = AbilityContext;
-
-export const Dashboard = withNotification(DashboardComponent);
+export const Dashboard = memo(DashboardComponent);

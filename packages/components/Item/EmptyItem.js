@@ -1,35 +1,29 @@
 import React from 'react';
 import styled from 'styled-components';
-import { Icon } from '@caesar/components';
-import EmptyLeftImg from '@caesar/assets/images/empty-left.png';
-import EmptyRightImg from '@caesar/assets/images/empty-right.png';
+import { Icon } from '../Icon';
 
-const ImageLeft = styled.img`
-  position: absolute;
-  top: 60px;
-  left: 0;
-`;
+const Wrapper = styled.div`
+  display: flex;
+  height: 100%;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+  background-image: url('/images/empty-item.png');
+  background-size: 672px auto;
+  background-position: center center;
+  background-repeat: no-repeat;
 
-const ImageRight = styled.img`
-  position: absolute;
-  bottom: 0;
-  right: 0;
-`;
+  @media (min-resolution: 144dpi) and (min-resolution: 1.5dppx) {
+    background-image: url('/images/empty-item@2x.png');
+  }
 
-const StyledIcon = styled(Icon)`
-  position: absolute;
-  left: 0;
-  right: 0;
-  top: 0;
-  bottom: 0;
-  margin: auto auto;
-  fill: ${({ theme }) => theme.color.emperor};
+  @media (min-resolution: 288dpi) and (min-resolution: 3dppx) {
+    background-image: url('/images/empty-item@3x.png');
+  }
 `;
 
 export const EmptyItem = () => (
-  <>
-    {/* <ImageLeft src={EmptyLeftImg} /> */}
-    <StyledIcon name="logo-caesar" width={205} height={46} />
-    {/* <ImageRight src={EmptyRightImg} /> */}
-  </>
+  <Wrapper>
+    <Icon name="logo-caesar-team" color="black" width={188} height={40} />
+  </Wrapper>
 );

@@ -1,34 +1,42 @@
 import React from 'react';
-import { useDispatch } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
+import { getPlural } from '@caesar/common/utils/string';
+import { itemsByListIdSelector } from '@caesar/common/selectors/entities/item';
 import { removeListRequest } from '@caesar/common/actions/entities/list';
 import { ConfirmModal } from '@caesar/components';
 
 export const ConfirmRemoveListModal = ({
-  item,
+  currentTeam,
+  list,
   isOpenedPopup,
-  setIsOpenedPopup,
+  setOpenedPopup,
 }) => {
   const dispatch = useDispatch();
-  const { id, label, children = [] } = item;
+  const { id, label } = list;
+
+  const listItemsCounter =
+    useSelector(state => itemsByListIdSelector(state, { listId: id }))
+      ?.length || 0;
 
   const handleClickConfirmRemove = () => {
-    dispatch(removeListRequest(id));
-    setIsOpenedPopup(false);
+    dispatch(removeListRequest(currentTeam?.id || null, id));
+    setOpenedPopup(false);
   };
 
   return (
     <ConfirmModal
-      isOpen={!!isOpenedPopup}
+      isOpened={!!isOpenedPopup}
       title={`You are going to remove «${label}» list`}
       // TODO: Full text when share list will be implemented
       // 'You delete 20 items and 15 people lose access'
-      description={`You will delete ${children?.length} item${
-        children?.length === 1 ? '' : 's'
-      }`}
+      description={`Are you sure you want to move ${listItemsCounter} ${getPlural(
+        listItemsCounter,
+        ['item', 'items'],
+      )} to the trash?`}
       icon="trash"
       confirmBtnText="Remove"
       onClickConfirm={handleClickConfirmRemove}
-      onClickCancel={() => setIsOpenedPopup(false)}
+      onClickCancel={() => setOpenedPopup(false)}
     />
   );
 };

@@ -1,7 +1,12 @@
 import React from 'react';
 import { useFormik } from 'formik';
 import { LockInput } from '@caesar/components';
-import { decryptByPassword } from '@caesar/common/utils/cipherUtils';
+import {
+  decryptSecretMessage,
+  getDecodedSecret,
+} from '@caesar/common/utils/secret';
+
+import { logger } from '@caesar/common/utils/logger';
 import { schema } from '../schema';
 
 export const PasswordStep = ({ message, password, setDecryptedMessage }) => {
@@ -10,18 +15,16 @@ export const PasswordStep = ({ message, password, setDecryptedMessage }) => {
     { setSubmitting, setErrors },
   ) => {
     try {
-      const decryptedMessage = await decryptByPassword(
-        message,
-        messagePassword,
-      );
-      setDecryptedMessage(decryptedMessage);
       setSubmitting(false);
+      setDecryptedMessage(
+        getDecodedSecret(await decryptSecretMessage(message, messagePassword)),
+      );
     } catch (error) {
-      console.log('error: ', error);
+      logger.error('error: ', error);
+      setSubmitting(false);
       setErrors({
         password: 'Sorry, but the password is wrong :(',
       });
-      setSubmitting(false);
     }
   };
 
@@ -31,7 +34,7 @@ export const PasswordStep = ({ message, password, setDecryptedMessage }) => {
     handleChange,
     handleSubmit,
     submitForm,
-    resetForm,
+    setErrors,
   } = useFormik({
     initialValues: { messagePassword: password },
     validationSchema: schema,
@@ -45,9 +48,11 @@ export const PasswordStep = ({ message, password, setDecryptedMessage }) => {
         autoFocus
         name="messagePassword"
         value={values.messagePassword}
-        onChange={handleChange}
+        onChange={e => {
+          if (Object.keys(errors).length) setErrors({});
+          handleChange(e);
+        }}
         onClick={submitForm}
-        onBackspace={resetForm}
         isError={Object.keys(errors).length !== 0}
       />
     </form>

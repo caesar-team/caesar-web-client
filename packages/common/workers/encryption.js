@@ -1,21 +1,40 @@
 import { expose } from 'threads/worker';
-import { encryptItem } from '@caesar/common/utils/cipherUtils';
+import { encryptData } from '@caesar/common/utils/cipherUtils';
+import { isGeneralItem } from '../utils/item';
 
 // eslint-disable-next-line
 self.window = self;
 
 const encryption = {
-  async encryptAll(pairs) {
+  async encryptAll(items) {
     // eslint-disable-next-line
     return await Promise.all(
-      pairs.map(async ({ item, user }) => {
-        const data = await encryptItem(item.data, user.publicKey);
+      items.map(async ({ item, user }) => {
+        const { id, data, raws = {} } = item;
+        const encryptedItemData = await encryptData(data, user.publicKey);
+
+        if (isGeneralItem(item)) {
+          return {
+            itemId: id,
+            userId: user.id,
+            teamId: user.teamId,
+            secret: JSON.stringify({ data: encryptedItemData }),
+            raws: Object.keys(raws).length
+              ? await encryptData(raws, user.publicKey)
+              : null,
+          };
+        }
 
         return {
-          itemId: item.id,
+          itemId: id,
           userId: user.id,
           teamId: user.teamId,
-          secret: data,
+          secret: JSON.stringify({
+            data: encryptedItemData,
+            raws: Object.keys(raws).length
+              ? await encryptData(raws, user.publicKey)
+              : null,
+          }),
         };
       }),
     );

@@ -6,7 +6,10 @@ import { useRouter } from 'next/router';
 import styled from 'styled-components';
 import { isLoadingSelector } from '@caesar/common/selectors/workflow';
 import { isLoadingTeamsSelector } from '@caesar/common/selectors/entities/team';
-import { removeTeamRequest } from '@caesar/common/actions/entities/team';
+import {
+  removeTeamRequest,
+  editTeamRequest,
+} from '@caesar/common/actions/entities/team';
 import { leaveTeamRequest } from '@caesar/common/actions/currentUser';
 import {
   addTeamMembersBatchRequest,
@@ -23,7 +26,8 @@ import {
   InviteModal,
   ConfirmModal,
   ConfirmLeaveTeamModal,
-} from '@caesar/components';
+  TeamModal,
+} from "@caesar/components";
 import {
   PERMISSION,
   PERMISSION_ENTITY,
@@ -34,6 +38,7 @@ import {
 import { getTeamTitle } from '@caesar/common/utils/team';
 
 import {
+  NEW_TEAM_MODAL,
   INVITE_MEMBER_MODAL,
   LEAVE_TEAM_MODAL,
   REMOVE_TEAM_MODAL,
@@ -52,6 +57,7 @@ export const TeamContainer = ({ currentUser, team, members }) => {
   const router = useRouter();
   const dispatch = useDispatch();
   const [modalVisibilities, setModalVisibilities] = useState({
+    [NEW_TEAM_MODAL]: false,
     [INVITE_MEMBER_MODAL]: false,
     [LEAVE_TEAM_MODAL]: false,
     [REMOVE_TEAM_MODAL]: false,
@@ -144,6 +150,17 @@ export const TeamContainer = ({ currentUser, team, members }) => {
     dispatch(removeTeamRequest(team.id));
   };
 
+  const handleEdit = ({ teamId, title, icon, setSubmitting, setErrors }) => {
+    dispatch(editTeamRequest(
+      teamId,
+      title,
+      icon,
+      handleCloseModal(NEW_TEAM_MODAL),
+      setSubmitting,
+      setErrors,
+    ));
+  };  
+
   if (!team.id && !isLoadingTeams) {
     router.push(ROUTES.SETTINGS + ROUTES.TEAM);
 
@@ -174,6 +191,14 @@ export const TeamContainer = ({ currentUser, team, members }) => {
       title={`${getTeamTitle(team)} (${members.length})`}
       addonTopComponent={
         <>
+          <Can I={PERMISSION.EDIT} a={teamSubject}>
+            <ButtonStyled
+              withOfflineCheck
+              icon="pencil"
+              color="white"
+              onClick={handleOpenModal(NEW_TEAM_MODAL)}
+            />
+          </Can>          
           <Can I={PERMISSION.DELETE} a={teamSubject}>
             <ButtonStyled
               withOfflineCheck
@@ -222,6 +247,13 @@ export const TeamContainer = ({ currentUser, team, members }) => {
           tableVisibleDataHeight={tableVisibleDataHeight}
         />
       </Table.Main>
+      {modalVisibilities[NEW_TEAM_MODAL] && (
+        <TeamModal
+          teamId={team.id}
+          onEditSubmit={handleEdit}
+          onCancel={handleCloseModal(NEW_TEAM_MODAL)}
+        />
+      )}
       {modalVisibilities[INVITE_MEMBER_MODAL] && (
         <InviteModal
           currentUser={currentUser}

@@ -1,5 +1,6 @@
 import { TEAM_ROLES, TEAM_ROLES_LABELS } from '@caesar/common/constants';
 
+export const NEW_TEAM_MODAL = 'newTeamModal';
 export const INVITE_MEMBER_MODAL = 'inviteMemberModal';
 export const LEAVE_TEAM_MODAL = 'leaveTeamModal';
 export const REMOVE_TEAM_MODAL = 'removeTeamModal';

@@ -204,9 +204,10 @@ export function* encryptMemberTeamKey({ user, keypair }) {
     item: itemKeyPair,
     publicKey,
   });
+  const memberRole = user?.role || TEAM_ROLES.ROLE_MEMBER;
   const teamRole = user?.domainRoles?.includes(TEAM_ROLES.ROLE_ADMIN)
     ? TEAM_ROLES.ROLE_ADMIN
-    : TEAM_ROLES.ROLE_MEMBER;
+    : memberRole;
 
   return {
     userId,

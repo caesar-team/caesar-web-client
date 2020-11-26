@@ -7,6 +7,7 @@ export const Avatar = ({
   name,
   email,
   avatar,
+  accessGranted,
   children,
   size = 40,
   fontSize = 'main',
@@ -36,6 +37,7 @@ export const Avatar = ({
       }
     }
   };
+
   return (
     <Hint text={hint} position={hintPosition}>
       <Wrapper size={size} fontSize={fontSize} {...props}>

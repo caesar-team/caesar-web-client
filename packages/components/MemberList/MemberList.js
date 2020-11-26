@@ -8,6 +8,7 @@ import {
   RemoveControl,
   InviteControl,
   RevokeAccessControl,
+  RoleSelector,
 } from './components';
 
 const MAX_HEIGHT = 400;
@@ -36,8 +37,10 @@ const ControlWrapper = styled.div`
   display: flex;
   align-items: center;
   justify-content: flex-end;
-  width: 100%;
+  ${({ isNewMember }) => !isNewMember && 'width: 100%'};
 `;
+
+const SimpleMembersWrapper = styled.div``;
 
 const ADD_CONTROL_TYPE = 'add';
 const REMOVE_CONTROL_TYPE = 'remove';
@@ -49,7 +52,9 @@ const MemberList = ({
   teamId,
   className,
   maxHeight = MAX_HEIGHT,
+  isNewMember = false,
   controlType,
+  scrollbarDisplayCondition = true,
   renderControl = Function.prototype,
   onClickAdd = Function.prototype,
   onClickRemove = Function.prototype,
@@ -90,15 +95,27 @@ const MemberList = ({
   const renderedMembers = members.map(member => (
     <MemberWrapper key={member.id} onClick={() => clickFn(member)}>
       <Member {...member} />
-      <ControlWrapper>{renderControlFn(member)}</ControlWrapper>
+      {isNewMember && (
+        <RoleSelector
+          member={member}
+          isNewMember
+          onChange={onChangeRole(member)}
+        />
+       )}
+      <ControlWrapper isNewMember={isNewMember}>
+        {renderControlFn(member)}
+      </ControlWrapper>
     </MemberWrapper>
   ));
+  const WrapperComponent = scrollbarDisplayCondition
+    ? Scrollbars
+    : SimpleMembersWrapper;
 
   return (
     <Wrapper maxHeight={maxHeight} className={className}>
-      <Scrollbars autoHeight autoHeightMax={maxHeight}>
+      <WrapperComponent autoHeight autoHeightMax={maxHeight}>
         {renderedMembers}
-      </Scrollbars>
+      </WrapperComponent>
     </Wrapper>
   );
 };

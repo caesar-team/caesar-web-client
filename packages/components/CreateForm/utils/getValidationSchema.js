@@ -13,6 +13,7 @@ export const getValidationSchema = type => {
         website: SCHEMA.WEBSITE,
         note: yup.string(),
         attachments: SCHEMA.ATTACHMENTS,
+        raws: SCHEMA.RAWS,
       });
     case ITEM_TYPE.DOCUMENT:
       return yup.object({

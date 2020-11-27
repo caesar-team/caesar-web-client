@@ -88,9 +88,18 @@ get:
   path: secret/data/notifications-4xxi
   name: icon_url
 ---
+kind: secret
+name: dockerconfig
+get:
+  path: secret/data/docker
+  name: config.json
+---
 kind: pipeline
 type: docker
 name: 4xxi
+
+image_pull_secrets:
+  - dockerconfig
 globals:
   - &confNoSaveBuild
     dockerfile: Dockerfile
@@ -128,7 +137,7 @@ globals:
   - &stepReleaseBuild
     image: plugins/docker
     settings:
-      tags: ['${DRONE_BRANCH}', 'qa']
+      tags: ['qa']
       <<: *confSaveBuild
 
   - &stepDevelopDeploy
@@ -230,7 +239,7 @@ steps:
   - <<: *stepNotifyToSlack
     when:
       status: [success, failure]
-      branch: [develop, master, release]
+      branch: [develop, master, release/*]
 
 trigger:
   branch:

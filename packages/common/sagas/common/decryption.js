@@ -42,15 +42,24 @@ const matchAndAddKeyPairs = ({ inbound, outbound }) => {
   return addKeyPairsBatch(matchInboundAndOutbound({ inbound, outbound }));
 };
 
+const TASK_ACTION_TYPE = {
+  ITEMS: 'ITEMS',
+  RAWS: 'RAWS',
+  EMPTY: 'EMPTY',
+};
+
 const taskAction = (items, raws, key, masterPassword) => async task => {
-  let result = [];
+  let value = null;
+  let type = TASK_ACTION_TYPE.EMPTY;
 
   try {
     await task.init(key, masterPassword);
     if (items) {
-      result = await task.decryptAll(items);
+      value = await task.decryptAll(items);
+      type = TASK_ACTION_TYPE.ITEMS;
     } else if (raws) {
-      result = await task.decryptRaws(raws);
+      value = await task.decryptRaws(raws);
+      type = TASK_ACTION_TYPE.RAWS;
     }
   } catch (error) {
     // eslint-disable-next-line no-console
@@ -60,7 +69,10 @@ const taskAction = (items, raws, key, masterPassword) => async task => {
     );
   }
 
-  return result;
+  return {
+    type,
+    value,
+  };
 };
 
 export function* decryption({
@@ -107,7 +119,7 @@ export function* decryption({
     const rawsChunks = chunk([raws], DECRYPTION_CHUNK_SIZE);
     chunkSize = rawsChunks.length;
     rawsChunks.map(rawsChunk =>
-      pool.queue(taskAction(null, rawsChunk, key, masterPassword)),
+      pool.queue(taskAction(null, rawsChunk?.shift(), key, masterPassword)),
     );
   }
 
@@ -119,7 +131,8 @@ export function* decryption({
 
       switch (event.type) {
         case TASK_QUEUE_COMPLETED_EVENT_TYPE:
-          if (items) {
+          if (event.returnValue?.type === TASK_ACTION_TYPE.ITEMS) {
+            const { value } = event.returnValue;
             const systemItems = items.filter(isSystemItem);
             const keyPairsItems = items.filter(isKeyPairItem);
             const generalItems = items.filter(isGeneralItem);
@@ -128,7 +141,7 @@ export function* decryption({
               yield put(
                 matchAndAddSystemItems({
                   inbound: systemItems,
-                  outbound: event.returnValue,
+                  outbound: value,
                 }),
               );
             }
@@ -137,7 +150,7 @@ export function* decryption({
               yield put(
                 matchAndAddKeyPairs({
                   inbound: keyPairsItems,
-                  outbound: event.returnValue,
+                  outbound: value,
                 }),
               );
             }
@@ -146,14 +159,15 @@ export function* decryption({
               yield put(
                 matchAndAddItems({
                   inbound: generalItems,
-                  outbound: event.returnValue,
+                  outbound: value,
                 }),
               );
             }
           }
 
-          if (raws) {
-            yield put(updateWorkInProgressItemRaws(event.returnValue));
+          if (event.returnValue?.type === TASK_ACTION_TYPE.RAWS) {
+            const { value } = event.returnValue;
+            yield put(updateWorkInProgressItemRaws(value));
           }
 
           break;

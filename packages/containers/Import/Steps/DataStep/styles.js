@@ -59,6 +59,13 @@ export const StyledSelect = styled(Select)`
   }
 `;
 
+export const StyledListSelect = styled(Select)`
+  ${Select.Option} {
+    white-space: normal;
+    word-break: break-word;
+  }
+`;
+
 export const TypeSelect = styled(StyledSelect)`
   margin: 0;
 

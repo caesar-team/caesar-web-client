@@ -29,7 +29,7 @@ import { updateWorkInProgressItem } from '@caesar/common/actions/workflow';
 import { getServerErrorMessage } from '@caesar/common/utils/error';
 import { workInProgressItemSelector } from '@caesar/common/selectors/workflow';
 import {
-  encryptSecret,
+  encryptItem,
   generateKeyPair,
   saveItemSaga,
   saveShareKeyPairSaga,
@@ -93,14 +93,14 @@ function* generateItemShareKey(item) {
 
 function* generateUserPostData({ keypair, userId, publicKey }) {
   const item = Object.values(convertKeyPairToItemEntity([keypair])).shift();
-  const secret = yield call(encryptSecret, {
+  const { data, raws } = yield call(encryptItem, {
     item,
     publicKey,
   });
 
   return {
     userId,
-    secret,
+    secret: JSON.stringify({ data, raws }),
   };
 }
 function* getSharedItemKeyPairKey(item) {

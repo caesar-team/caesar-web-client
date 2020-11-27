@@ -63,7 +63,10 @@ export const downloadFile = (url, filename) => {
   saveAs(blob, filename);
 };
 
-export const downloadAsZip = files => {
+export const downloadAsZip = ({
+  files,
+  filename = `attachments${Date.now()}`,
+}) => {
   const zip = new JSZip();
 
   files.forEach(({ name, raw }) => {
@@ -73,7 +76,7 @@ export const downloadAsZip = files => {
 
   zip
     .generateAsync({ type: 'blob' })
-    .then(blob => saveAs(blob, `attachments${Date.now()}.zip`));
+    .then(blob => saveAs(blob, `${filename}.zip`));
 };
 
 export const getUniqueAndDublicates = (newFiles = [], existFiles = []) => {

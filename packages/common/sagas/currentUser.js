@@ -21,13 +21,9 @@ import {
   updateGlobalNotification,
   resetStore,
 } from '@caesar/common/actions/application';
-import { removeTeamMemberSuccess } from '@caesar/common/actions/entities/member';
-import { removeMemberFromTeam } from '@caesar/common/actions/entities/team';
-import {
-  currentUserIdSelector,
-  currentUserTeamIdsSelector,
-} from '@caesar/common/selectors/currentUser';
+import { currentUserTeamIdsSelector } from '@caesar/common/selectors/currentUser';
 import { memberByUserIdAndTeamIdSelector } from '@caesar/common/selectors/entities/member';
+import { editTeamSuccess } from '@caesar/common/actions/entities/team';
 import { getServerErrorMessage } from '@caesar/common/utils/error';
 import {
   getUserSelf,
@@ -39,8 +35,9 @@ import {
 import { removeCookieValue, clearStorage } from '@caesar/common/utils/token';
 import { createPermissionsFromLinks } from '@caesar/common/utils/createPermissionsFromLinks';
 import { ROUTES } from '@caesar/common/constants';
-import { clearStateWhenLeaveTeam } from './entities/team';
 import { normalizeCurrentUser } from '@caesar/common/normalizers/normalizers';
+import { convertTeamsToEntity } from '@caesar/common/normalizers/normalizers';
+import { clearStateWhenLeaveTeam } from './entities/team';
 
 export function* checkIfUserWasKickedFromTeam(userTeamIdsFromRequest) {
   try {
@@ -87,15 +84,18 @@ export function* fetchKeyPairSaga() {
   try {
     const { data } = yield call(getKeys);
 
-    yield put(
-      addPersonalKeyPair({
-        privateKey: data.encryptedPrivateKey,
-        publicKey: data.publicKey,
-      }),
-    );
+    const keypair = {
+      privateKey: data.encryptedPrivateKey,
+      publicKey: data.publicKey,
+    };
+    yield put(addPersonalKeyPair(keypair));
+
+    return keypair;
   } catch (error) {
     console.error('error', error);
     yield put(fetchKeyPairFailure());
+
+    return null;
   }
 }
 
@@ -114,16 +114,11 @@ export function* fetchUserTeamsSaga() {
 
 export function* leaveTeamSaga({ payload: { teamId } }) {
   try {
-    yield call(postLeaveTeam, teamId);
-    const userId = yield select(currentUserIdSelector);
-    const member = yield select(memberByUserIdAndTeamIdSelector, {
-      userId,
-      teamId,
-    });
+    const { data: team } = yield call(postLeaveTeam, teamId);
+    const teamsById = convertTeamsToEntity([team]);
 
     yield put(leaveTeamSuccess(teamId));
-    yield put(removeTeamMemberSuccess(member.id));
-    yield put(removeMemberFromTeam(member.teamId, member.id));
+    yield put(editTeamSuccess(teamsById[team.id]));
     yield call(clearStateWhenLeaveTeam, { payload: { teamIds: [teamId] } });
 
     const {

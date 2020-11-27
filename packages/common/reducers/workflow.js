@@ -1,5 +1,6 @@
 import { createReducer } from '@caesar/common/utils/reducer';
 import {
+  START_IS_LOADING,
   FINISH_IS_LOADING,
   RESET_WORK_IN_PROGRESS_ITEM_IDS,
   SET_WORK_IN_PROGRESS_ITEM,
@@ -19,6 +20,8 @@ import {
   INIT_IMPORT_SETTINGS,
   DECRYPTION,
   DECRYPTION_END,
+  DOWNLOAD_ITEM_ATTACHMENT,
+  DOWNLOAD_ITEM_ATTACHMENTS,
 } from '@caesar/common/actions/workflow';
 
 const initialState = {
@@ -32,6 +35,12 @@ const initialState = {
 };
 
 export default createReducer(initialState, {
+  [START_IS_LOADING](state) {
+    return {
+      ...state,
+      isLoading: true,
+    };
+  },
   [FINISH_IS_LOADING](state) {
     return {
       ...state,
@@ -68,6 +77,12 @@ export default createReducer(initialState, {
   [INIT_IMPORT_SETTINGS](state) {
     return state;
   },
+  [DOWNLOAD_ITEM_ATTACHMENT](state) {
+    return state;
+  },
+  [DOWNLOAD_ITEM_ATTACHMENTS](state) {
+    return state;
+  },
   [FINISH_PROCESSING_KEYPAIRS](state) {
     return state;
   },
@@ -88,7 +103,7 @@ export default createReducer(initialState, {
       workInProgressItem: {
         ...state.workInProgressItem,
         data: {
-          ...state.workInProgressItem?.data,
+          ...(state.workInProgressItem?.data || {}),
           raws: payload?.raws,
         },
       },

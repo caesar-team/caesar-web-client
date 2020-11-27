@@ -1,6 +1,10 @@
 import { createSelector } from 'reselect';
 import { usersByIdSelector, userIdPropSelector } from './user';
-import { teamsByIdSelector, teamIdPropSelector } from './team';
+import {
+  teamsByIdSelector,
+  teamIdPropSelector,
+  teamIdsPropSelector,
+} from './team';
 
 export const entitiesSelector = state => state.entities;
 
@@ -45,6 +49,13 @@ export const membersBatchSelector = createSelector(
   (membersById, memberIds) => memberIds.map(memberId => membersById[memberId]),
 );
 
+export const membersWithInfoBatchSelector = createSelector(
+  usersByIdSelector,
+  membersByIdSelector,
+  memberIdsPropSelector,
+  (membersById, memberIds) => memberIds.map(memberId => membersById[memberId]),
+);
+
 export const teamMembersShortViewSelector = createSelector(
   membersByIdSelector,
   teamsByIdSelector,
@@ -67,10 +78,32 @@ export const teamMembersFullViewSelector = createSelector(
       const member = members[memberId];
 
       if (!member) return acc;
+      const user = users[member.userId];
 
-      const { avatar, email, id, name, publicKey } = users[member.userId];
-      const user = { ...member, avatar, email, userId: id, name, publicKey };
+      if (!user) return acc;
 
-      return [...acc, user];
+      const { avatar, email, id, name, publicKey } = user;
+      return [
+        ...acc,
+        { ...member, avatar, email, userId: id, name, publicKey },
+      ];
     }, []) || [],
+);
+
+export const teamsMembersFullViewSelector = createSelector(
+  usersByIdSelector,
+  membersByIdSelector,
+  teamsByIdSelector,
+  teamIdsPropSelector,
+  (users, members, teams, teamIds) => teamIds?.reduce((acc, teamId) => {
+    const membersIds = teams[teamId]?.members || [];
+    
+    const userMembers = membersIds.map(memberId => {
+      const { id, email } = users[members[memberId]?.userId];
+      return { id, email };
+    });
+    
+    return [...acc, ...userMembers];
+    
+  }, []) || [],
 );

@@ -48,6 +48,7 @@ import {
   currentUserIdSelector,
 } from '@caesar/common/selectors/currentUser';
 import {
+  getItemRaws,
   postAddKeyPairBatch,
   postCreateItem,
   postCreateItemsBatch,
@@ -60,11 +61,12 @@ import {
   updateMoveItemsBatch,
 } from '@caesar/common/api';
 import {
-  encryptItem,
-  encryptItemsBatch,
+  encryptData,
+  encryptDataBatch,
+  unsealPrivateKeyObj,
 } from '@caesar/common/utils/cipherUtils';
 import { getServerErrorMessage } from '@caesar/common/utils/error';
-import { chunk } from '@caesar/common/utils/utils';
+import { arrayToObject, chunk } from '@caesar/common/utils/utils';
 import {
   COMMON_PROGRESS_NOTIFICATION,
   CREATING_ITEM_NOTIFICATION,
@@ -77,11 +79,14 @@ import {
   ITEM_TYPE,
 } from '@caesar/common/constants';
 import {
+  shareItemKeyPairSelector,
   shareKeyPairSelector,
   teamKeyPairSelector,
 } from '@caesar/common/selectors/keystore';
 import {
   convertSystemItemToKeyPair,
+  createItemMetaData,
+  dectyptItemAttachments,
   generateSystemItemEmail,
   generateSystemItemName,
   isGeneralItem,
@@ -365,31 +370,79 @@ export function* moveItemsBatchSaga({
   }
 }
 
-export function* encryptSecret({ item, publicKey }) {
+export function* getItemKeyPair({
+  payload: {
+    item: { id: itemId, teamId, isShared },
+  },
+}) {
+  if (isShared) {
+    return yield select(shareItemKeyPairSelector, { itemId });
+  }
+
+  return yield select(teamKeyPairSelector, {
+    teamId: teamId || TEAM_TYPE.PERSONAL,
+  });
+}
+
+export function* downloadAndDecryptRaws({ payload: { itemId } }) {
+  const { data: { raws } = { raws: {} } } = yield call(getItemRaws, itemId);
+  const encryptedRaws = JSON.parse(raws);
+
+  if (!encryptedRaws || Object.keys(encryptedRaws).length <= 0) return {};
+
+  const item = yield select(itemSelector, { itemId });
+  const keyPair = yield call(getItemKeyPair, {
+    payload: {
+      item,
+    },
+  });
+
+  const privateKeyObj = yield Promise.resolve(
+    unsealPrivateKeyObj(keyPair.privateKey, keyPair.password),
+  );
+
+  return yield call(dectyptItemAttachments, encryptedRaws, privateKeyObj);
+}
+
+export function* encryptAttachmentRaw({ id, raw }, publicKey) {
+  return {
+    id,
+    raw: yield call(encryptData, raw, publicKey),
+  };
+}
+export function* encryptRaws(raws, publicKey) {
+  const encryptedRawsArray = yield all(
+    Object.keys(raws).map(id =>
+      call(encryptAttachmentRaw, { id, raw: raws[id] }, publicKey),
+    ),
+  );
+
+  return arrayToObject(encryptedRawsArray);
+}
+export function* encryptItem({ item, publicKey }) {
   const { data: { raws, ...data } = { raws: {} } } = item;
 
-  const encryptedItemData = yield call(encryptItem, data, publicKey);
+  const encryptedItemData = yield call(encryptData, data, publicKey);
+  const encryptedRaws = yield call(encryptRaws, raws, publicKey);
 
   const encryptedItem = {
     data: encryptedItemData,
-    raws: Object.keys(raws).length
-      ? yield call(encryptItem, raws, publicKey)
-      : null,
+    raws: JSON.stringify(encryptedRaws),
   };
 
-  return JSON.stringify(encryptedItem);
+  return encryptedItem;
 }
 
 export function* saveShareKeyPairSaga({ item, publicKey }) {
   const { relatedItemId, ownerId } = item;
-  const secret = yield call(encryptSecret, { item, publicKey });
+  const { data, raws } = yield call(encryptItem, { item, publicKey });
 
   return yield call(postItemShare, {
     itemId: relatedItemId,
     users: [
       {
         userId: ownerId,
-        secret,
+        secret: JSON.stringify({ data, raws }),
       },
     ],
   });
@@ -397,36 +450,99 @@ export function* saveShareKeyPairSaga({ item, publicKey }) {
 
 export function* saveItemSaga({ item, publicKey }) {
   const { id = null, listId = null, type, favorite = false, ownerId } = item;
+  const itemFromStore = yield select(itemSelector, { itemId: item.id });
 
-  const secret = yield call(encryptSecret, { item, publicKey });
-  const title = item?.data?.name;
+  let isRawsChanged = isGeneralItem(item);
+  let itemToEncrypt = item;
+
+  if (
+    !!itemFromStore &&
+    deepequal(itemFromStore.data.attachments, item.data.attachments)
+  ) {
+    isRawsChanged = false;
+  }
+
+  if (isRawsChanged && isGeneralItem(item)) {
+    const rawsFromServer = id
+      ? yield call(downloadAndDecryptRaws, {
+          payload: { itemId: item.id },
+        })
+      : {};
+
+    itemToEncrypt = {
+      // OMG :(
+      ...item,
+      data: {
+        ...item.data,
+        raws: {
+          ...(item.data?.raws || {}),
+          ...(rawsFromServer || {}),
+        },
+      },
+    };
+  }
+
+  const { data, raws } = yield call(encryptItem, {
+    item: itemToEncrypt,
+    publicKey,
+  });
+
   let serverItemData = {};
+  let secretDataAndRaws = {};
+
+  if (isRawsChanged) {
+    // we need to save the raws to the item
+    secretDataAndRaws = {
+      secret: isGeneralItem(item) // save the raws inside the item if it's a non-general item
+        ? JSON.stringify({ data })
+        : JSON.stringify({ data, raws }),
+      raws: isGeneralItem(item) ? raws : null,
+    };
+  } else {
+    secretDataAndRaws = {
+      secret: isGeneralItem(item)
+        ? JSON.stringify({ data })
+        : JSON.stringify({ data, raws }),
+    };
+  }
 
   if (id) {
     const { data: updatedItemData } = yield call(updateItem, id, {
-      secret,
-      title,
+      meta: createItemMetaData(item),
+      ...secretDataAndRaws,
     });
 
     serverItemData = updatedItemData || {};
   } else {
     const { data: updatedItemData } = yield call(postCreateItem, {
       listId,
-      title,
+      meta: createItemMetaData(item),
       ownerId,
       type,
       favorite,
-      secret,
+      ...secretDataAndRaws,
     });
 
     serverItemData = updatedItemData || {};
   }
 
-  const itemData = {
-    ...item,
-    ...serverItemData,
-    secret,
-  };
+  let itemData = null;
+
+  if (isGeneralItem(item)) {
+    itemData = {
+      ...item,
+      ...serverItemData,
+      secret: JSON.stringify({ data }),
+    };
+  } else {
+    itemData = {
+      ...item,
+      ...serverItemData,
+      secret: JSON.stringify({ data }),
+      raws,
+    };
+  }
+
   const { itemsById } = convertItemsToEntities([itemData]);
   const normalizedItem = Object.values(itemsById).shift();
 
@@ -448,12 +564,12 @@ export function* getKeyPairForTeam(teamId) {
 }
 
 export function* saveKeyPair(
-  { ownerId, teamId, secret, relatedItemId } = {
+  { ownerId, teamId, secret, raws, relatedItemId } = {
     teamId: null,
     relatedItemId: null,
   },
 ) {
-  const keypairs = [{ ownerId, teamId, secret, relatedItemId }];
+  const keypairs = [{ ownerId, teamId, secret, raws, relatedItemId }];
 
   return yield call(postAddKeyPairBatch, keypairs);
 }
@@ -462,12 +578,12 @@ export function* saveItemKeyPair({
   item: { ownerId, teamId, data, relatedItemId },
   publicKey,
 }) {
-  const secret = yield call(encryptItem, data, publicKey);
+  const { data: secretData, raws } = yield call(encryptData, data, publicKey);
 
   return yield call(saveKeyPair, {
     ownerId,
     teamId,
-    secret,
+    secret: JSON.stringify({ data: secretData, raws }),
     relatedItemId,
   });
 }
@@ -510,12 +626,15 @@ export function* createKeyPair({
   const keypair = yield call(generateKeyPair, {
     name: entityTeamId || entityId,
   });
-  const secret = yield call(encryptSecret, { item: keypair, publicKey });
+  const { data, raws } = yield call(encryptItem, {
+    item: keypair,
+    publicKey,
+  });
 
   const { data: serverKeyPairItems } = yield call(saveKeyPair, {
     ownerId,
     teamId,
-    secret,
+    secret: JSON.stringify({ data, raws }),
     relatedItemId: entityId,
   });
   const serverKeyPairItem = Object.values(serverKeyPairItems).shift();
@@ -657,22 +776,19 @@ export function* createItemsBatchSaga({
     );
 
     const encryptedItems = yield call(
-      encryptItemsBatch,
+      encryptDataBatch,
       preparedForEncryptingItems,
       keyPair.publicKey,
     );
 
-    const preparedForRequestItems = items.map(
-      ({ type, name: title }, index) => ({
-        type,
-        listId,
-        title,
-        secret: JSON.stringify({
-          data: encryptedItems[index],
-          raws: null,
-        }),
+    const preparedForRequestItems = items.map(({ type, ...data }, index) => ({
+      type,
+      listId,
+      meta: createItemMetaData({ data }),
+      secret: JSON.stringify({
+        data: encryptedItems[index],
       }),
-    );
+    }));
 
     const { data: serverItems } = yield call(postCreateItemsBatch, {
       items: preparedForRequestItems,
@@ -743,15 +859,26 @@ export function* updateItemSaga({ payload: { item } }) {
 }
 
 export function* editItemSaga({
-  payload: { item },
+  payload: { itemId, patch },
   meta: { setSubmitting, notification },
 }) {
   try {
+    const item = yield select(itemSelector, { itemId });
+    if (!item) {
+      throw new Error(`Can't find the item ${itemId}`);
+    }
+
+    const patchedItem = {
+      ...item,
+      data: {
+        ...item.data,
+        ...patch,
+      },
+    };
     const {
-      id: itemId,
       listId,
       data: { raws, ...data },
-    } = item;
+    } = patchedItem;
 
     const itemInState = yield select(itemSelector, { itemId });
     const isDataChanged = !deepequal(itemInState.data, data);
@@ -776,7 +903,11 @@ export function* editItemSaga({
     }
 
     if (isDataChanged) {
-      yield call(updateItemSaga, { payload: { item } });
+      yield call(updateItemSaga, {
+        payload: {
+          item: patchedItem,
+        },
+      });
     }
 
     yield put(updateWorkInProgressItem(item.id));

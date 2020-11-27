@@ -1,6 +1,6 @@
 import { getHostName } from '@caesar/common/utils/getDomainName';
 import { processUploadedFiles } from './attachment';
-import { decryptItem } from './cipherUtils';
+import { decryptData } from './cipherUtils';
 import { ITEM_TYPE, DOMAIN_HOSTNAME } from '../constants';
 
 export const extractItemType = item => item?.type || ITEM_TYPE.SYSTEM;
@@ -28,10 +28,12 @@ export const isValidItem = item => {
 };
 
 export const checkItemsAfterDecryption = items => {
-  return items.reduce(
-    (accumulator, item) =>
-      isValidItem(item) ? [...accumulator, item] : accumulator,
-    [],
+  return (
+    items?.reduce(
+      (accumulator, item) =>
+        isValidItem(item) ? [...accumulator, item] : accumulator,
+      [],
+    ) || items
   );
 };
 
@@ -87,18 +89,46 @@ export const convertSystemItemToKeyPair = item => {
     privateKey,
   };
 };
+const rawArrayToObject = arr =>
+  arr.reduce(
+    (accumulator, rawObject) => ({
+      ...accumulator,
+      [rawObject.id]: rawObject.raw,
+    }),
+    {},
+  );
 
+const dectyptAttachment = async (rawObject, privateKeyObject) => {
+  return {
+    id: rawObject.id,
+    raw: await decryptData(rawObject.raw, privateKeyObject),
+  };
+};
+export const dectyptItemAttachments = async (raws, privateKeyObject) => {
+  if (raws) {
+    const rawsPromise = Object.keys(raws).map(async key =>
+      dectyptAttachment(raws[key], privateKeyObject),
+    );
+    const rawsArray = await Promise.all(rawsPromise);
+
+    return rawArrayToObject(rawsArray);
+  }
+
+  return {};
+};
 export const decryptItemData = async (item, privateKeyObject) => {
   try {
-    const { data: encryptedData, raws: encryptedRaws } = JSON.parse(
+    const { data: encryptedData, raws: encryptedRaws = {} } = JSON.parse(
       item.secret,
     );
     const promises = [];
-    promises.push(decryptItem(encryptedData, privateKeyObject));
+    promises.push(decryptData(encryptedData, privateKeyObject));
 
-    if (!isGeneralItem(item) && encryptedRaws) {
-      promises.push(decryptItem(encryptedRaws, privateKeyObject));
-    }
+    if (!isGeneralItem(item))
+      // Decrypt keypairs or system items
+      promises.push(
+        dectyptItemAttachments(JSON.parse(encryptedRaws), privateKeyObject),
+      );
 
     const [data, raws = {}] = await Promise.all(promises);
 
@@ -122,4 +152,32 @@ export const decryptItemData = async (item, privateKeyObject) => {
       data: null,
     };
   }
+};
+
+export const createItemMetaData = ({
+  data: { attachments = [], website = null, name = null } = {
+    attachments: [],
+    website: null,
+    title: null,
+  },
+}) => {
+  return {
+    attachmentsCount: attachments?.length || 0,
+    website,
+    title: name,
+  };
+};
+
+export const getItemMetaData = ({
+  meta: { attachmentsCount = 0, website = null, title } = {
+    attachmentsCount: 0,
+    website: null,
+    title: null,
+  },
+}) => {
+  return {
+    attachmentsCount,
+    website,
+    title,
+  };
 };

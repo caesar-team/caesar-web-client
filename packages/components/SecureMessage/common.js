@@ -42,8 +42,11 @@ export const makePasswordlessLink = (messageId, password) => {
     messageId,
     password,
   });
+  const shortEncodedObject = objectToBase64(`${messageId},${password}`);
+  console.log(encodedObject.length);
+  console.log(shortEncodedObject.length);
 
-  return `${getDefaultSecureMessageRoute()}/${encodedObject}`;
+  return `${getDefaultSecureMessageRoute()}/${shortEncodedObject}`;
 };
 
 export const makeMessageLink = messageId => {

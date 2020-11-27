@@ -114,5 +114,6 @@ const SelectComponent = ({
 
 SelectComponent.ValueText = ValueText;
 SelectComponent.SelectedOption = SelectedOption;
+SelectComponent.Option = Option;
 
 export const Select = memo(SelectComponent);

@@ -5,6 +5,7 @@ import {
   itemSelector,
 } from '@caesar/common/selectors/entities/item';
 import { currentUserDataSelector } from '@caesar/common/selectors/currentUser';
+import { teamsMembersFullViewSelector } from '@caesar/common/selectors/entities/member';
 import {
   shareKeyPairSelector,
   teamKeyPairSelector,
@@ -28,7 +29,7 @@ import { updateWorkInProgressItem } from '@caesar/common/actions/workflow';
 import { getServerErrorMessage } from '@caesar/common/utils/error';
 import { workInProgressItemSelector } from '@caesar/common/selectors/workflow';
 import {
-  encryptSecret,
+  encryptItem,
   generateKeyPair,
   saveItemSaga,
   saveShareKeyPairSaga,
@@ -92,14 +93,14 @@ function* generateItemShareKey(item) {
 
 function* generateUserPostData({ keypair, userId, publicKey }) {
   const item = Object.values(convertKeyPairToItemEntity([keypair])).shift();
-  const secret = yield call(encryptSecret, {
+  const { data, raws } = yield call(encryptItem, {
     item,
     publicKey,
   });
 
   return {
     userId,
-    secret,
+    secret: JSON.stringify({ data, raws }),
   };
 }
 function* getSharedItemKeyPairKey(item) {
@@ -210,18 +211,26 @@ export function* updateSharedItemFromServer({ payload: { itemId } }) {
 // 3. Share the system keyPair item to the new members
 export function* shareItemBatchSaga({
   payload: {
-    data: { itemIds = [], members = [] },
+    data: { itemIds = [], members = [], teamIds = [] },
   },
 }) {
   try {
     yield put(updateGlobalNotification(SHARING_IN_PROGRESS_NOTIFICATION, true));
     // const currentTeamId = yield select(currentTeamIdSelector);
     const items = yield select(itemsBatchSelector, { itemIds });
+    const teamsMembers = yield select(teamsMembersFullViewSelector, {
+      teamIds,
+    });
 
+    const allMembers = [...members, ...teamsMembers];
+    
     // Need To Go Deeper (c)
     yield all(
       yield all(
-        items.map(item => call(processMembersItemShare, { item, members })),
+        items.map(item => call(processMembersItemShare, {
+          item,
+          members: allMembers,
+        })),
       ),
     );
 

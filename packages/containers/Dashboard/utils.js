@@ -43,5 +43,7 @@ const searchFn = (obj, pattern) =>
   obj && pattern && obj.toLowerCase().includes(pattern.toLowerCase());
 
 export const filter = memoize((data, pattern) =>
-  pattern ? data.filter(({ title }) => searchFn(title, pattern)) : data,
+  pattern
+    ? data.filter(({ meta: { title } }) => searchFn(title, pattern))
+    : data,
 );

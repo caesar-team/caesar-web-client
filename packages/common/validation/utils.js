@@ -20,7 +20,7 @@ export const convertSizeNameToNumber = sizeName =>
   );
 
 export const checkFileSize = raw =>
-  raw.length * BASE_64_LENGTH_BYTE_RATE <=
+  (typeof raw === 'number' ? raw : raw.length) * BASE_64_LENGTH_BYTE_RATE <=
   convertSizeNameToNumber(MAX_UPLOADING_FILE_SIZE);
 
 export const checkAllFileSizes = files =>

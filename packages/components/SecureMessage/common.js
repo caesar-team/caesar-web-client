@@ -20,7 +20,7 @@ export const stripHtml = html => {
 };
 
 export const getDefaultSecureMessageRoute = () =>
-  `${APP_URI}/${IS_GENERAL_APP ? 'secure/message' : 'message'}`;
+  `${APP_URI}/${IS_GENERAL_APP ? 's/m' : 'm'}`;
 
 export const getExpireDate = seconds => {
   switch (seconds) {
@@ -38,15 +38,9 @@ export const getExpireDate = seconds => {
 };
 
 export const makePasswordlessLink = (messageId, password) => {
-  const encodedObject = objectToBase64({
-    messageId,
-    password,
-  });
-  const shortEncodedObject = objectToBase64(`${messageId},${password}`);
-  console.log(encodedObject.length);
-  console.log(shortEncodedObject.length);
+  const encodedObject = objectToBase64(`${messageId},${password}`);
 
-  return `${getDefaultSecureMessageRoute()}/${shortEncodedObject}`;
+  return `${getDefaultSecureMessageRoute()}/${encodedObject}`;
 };
 
 export const makeMessageLink = messageId => {

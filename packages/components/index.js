@@ -5,6 +5,7 @@ export { AuthDescription } from './AuthDescription';
 export { AuthTitle } from './AuthTitle';
 export { AuthWrapper } from './AuthWrapper';
 export { Avatar, AvatarsList } from './Avatar';
+export { TeamAvatar } from './TeamAvatar';
 export { BackButton } from './BackButton';
 export { BackButtonWrapper } from './BackButtonWrapper';
 export { Badge } from './Badge';
@@ -14,7 +15,11 @@ export { Carousel } from './Carousel';
 export { Checkbox } from './Checkbox';
 export { CodeInput } from './CodeInput';
 export { ContentEditable } from './Common';
-export { ConfirmModal, ConfirmLeaveTeamModal } from './ConfirmModal';
+export {
+  ConfirmModal,
+  ConfirmLeaveTeamModal,
+  ConfirmRemoveMemberModal,
+} from './ConfirmModal';
 export { CreateForm } from './CreateForm';
 export { DataTable, TableStyles } from './DataTable';
 export { DottedMenu } from './DottedMenu';

@@ -252,14 +252,14 @@ export function* addMemberToTeamListsBatchSaga({ payload: { teamId, users } }) {
     const rolesById = users.reduce((acc, user) => {
       acc[user.id] = user.role;
       return acc;
-    }, {})
+    }, {});
     // Domain users
     // TODO: Invite unregistered users
     const newUsers = yield select(usersBatchSelector, { userIds });
 
     const postDataSagas = newUsers.map(user =>
       call(encryptMemberTeamKey, {
-        member: {
+        user: {
           ...user,
           role: rolesById[user.id],
         },
@@ -302,6 +302,7 @@ export function* fetchTeamMembersSaga({ payload: { teamId, withoutKeys } }) {
       });
       membersWithoutKeysById = convertMembersToEntity(membersWithoutKeys);
     }
+
     const membersById = convertMembersToEntity(
       teamMembers.map(member => {
         if (membersWithoutKeysById[member.id]) {
@@ -344,7 +345,10 @@ export function* updateTeamMemberRoleSaga({ payload: { memberId, teamRole } }) {
   }
 }
 
-export function* removeTeamMemberSaga({ payload: { memberId } }) {
+export function* removeTeamMemberSaga({
+  payload: { memberId },
+  meta: { handleCloseRemoveMemberModal },
+}) {
   try {
     const member = yield select(memberSelector, { memberId });
 
@@ -356,6 +360,7 @@ export function* removeTeamMemberSaga({ payload: { memberId } }) {
     yield put(removeMemberFromTeam(member.teamId, memberId));
 
     yield put(updateGlobalNotification(NOOP_NOTIFICATION, false));
+    yield call(handleCloseRemoveMemberModal);
   } catch (error) {
     // eslint-disable-next-line no-console
     console.error(error);
@@ -363,6 +368,7 @@ export function* removeTeamMemberSaga({ payload: { memberId } }) {
       updateGlobalNotification(getServerErrorMessage(error), false, true),
     );
     yield put(removeTeamMemberFailure());
+    yield call(handleCloseRemoveMemberModal);
   }
 }
 

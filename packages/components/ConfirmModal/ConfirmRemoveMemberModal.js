@@ -1,17 +1,17 @@
 import React from 'react';
 import { ConfirmModal } from './ConfirmModal';
 
-export const ConfirmLeaveTeamModal = ({
+export const ConfirmRemoveMemberModal = ({
   isOpened,
-  teamTitle,
+  memberName,
   onClickConfirm,
   onClickCancel,
 }) => (
   <ConfirmModal
     isOpened={isOpened}
-    title={`You are going to leave "${teamTitle}" team`}
-    description="You will lose access to the team items. Are you sure?"
-    confirmBtnText="Yes, leave team"
+    title={`You're going to remove ${memberName} from the team`}
+    description={`${memberName} will lose access to the team items. Are you sure?`}
+    confirmBtnText="Remove"
     onClickConfirm={onClickConfirm}
     onClickCancel={onClickCancel}
   />

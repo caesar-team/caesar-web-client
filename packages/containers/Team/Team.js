@@ -1,5 +1,5 @@
 /* eslint-disable camelcase */
-import React, { useState, useCallback, useMemo } from 'react';
+import React, { useState, useCallback, useMemo, memo } from 'react';
 import { useUpdateEffect } from 'react-use';
 import { useSelector, useDispatch } from 'react-redux';
 import { useRouter } from 'next/router';
@@ -26,6 +26,7 @@ import {
   InviteModal,
   ConfirmModal,
   ConfirmLeaveTeamModal,
+  ConfirmRemoveMemberModal,
   TeamModal,
 } from "@caesar/components";
 import {
@@ -36,13 +37,8 @@ import {
   TEAM_TYPE,
 } from '@caesar/common/constants';
 import { getTeamTitle } from '@caesar/common/utils/team';
-
-import {
-  NEW_TEAM_MODAL,
-  INVITE_MEMBER_MODAL,
-  LEAVE_TEAM_MODAL,
-  REMOVE_TEAM_MODAL,
-} from './constants';
+import { ability } from '@caesar/common/ability';
+import { MODAL } from './constants';
 import { createColumns } from './createColumns';
 
 const ButtonStyled = styled(Button)`
@@ -53,15 +49,17 @@ const AddMemberButton = styled(ButtonStyled)`
   margin-right: 0;
 `;
 
-export const TeamContainer = ({ currentUser, team, members }) => {
+export const TeamContainerComponent = ({ currentUser, team, members }) => {
   const router = useRouter();
   const dispatch = useDispatch();
   const [modalVisibilities, setModalVisibilities] = useState({
-    [NEW_TEAM_MODAL]: false,
-    [INVITE_MEMBER_MODAL]: false,
-    [LEAVE_TEAM_MODAL]: false,
-    [REMOVE_TEAM_MODAL]: false,
+    [MODAL.INVITE_MEMBER]: false,
+    [MODAL.REMOVE_MEMBER]: false,
+    [MODAL.LEAVE_TEAM]: false,
+    [MODAL.REMOVE_TEAM]: false,
+    [MODAL.NEW_TEAM]: false,
   });
+  const [manipulatedMember, setManipulatedMember] = useState(null);
 
   const isLoading = useSelector(isLoadingSelector);
   const isLoadingTeams = useSelector(isLoadingTeamsSelector);
@@ -96,32 +94,9 @@ export const TeamContainer = ({ currentUser, team, members }) => {
     return () => tableRowGroupNode.removeEventListener('scroll', handler);
   }, [tableRowGroupNode]);
 
+  const isTeamLocked = team.locked;
+  const canEditTeam = ability.can(PERMISSION.EDIT, team._permissions);
   const tableData = useMemo(() => members, [members]);
-
-  const handleChangeRole = memberId => (_, value) => {
-    dispatch(updateTeamMemberRoleRequest(memberId, value));
-  };
-
-  const handleRemoveMember = memberId => () => {
-    dispatch(removeTeamMemberRequest(memberId));
-  };
-
-  const handleGrantAccessMember = memberId => () => {
-    dispatch(grantAccessTeamMemberRequest(memberId));
-  };
-
-  const columns = useMemo(
-    () =>
-      createColumns({
-        tableWidth,
-        tableHeight,
-        tableScrollTop,
-        handleChangeRole,
-        handleRemoveMember,
-        handleGrantAccessMember,
-      }),
-    [tableWidth, tableHeight, tableScrollTop],
-  );
 
   const handleOpenModal = modal => () => {
     setModalVisibilities({
@@ -137,9 +112,50 @@ export const TeamContainer = ({ currentUser, team, members }) => {
     });
   };
 
+  const handleChangeRole = memberId => (_, value) => {
+    dispatch(updateTeamMemberRoleRequest(memberId, value));
+  };
+
+  const handleGrantAccessMember = memberId => () => {
+    dispatch(grantAccessTeamMemberRequest(memberId));
+  };
+
+  const handleOpenRemoveMemberModal = member => () => {
+    setManipulatedMember(member);
+    handleOpenModal(MODAL.REMOVE_MEMBER)();
+  };
+
+  const handleCloseRemoveMemberModal = () => {
+    handleCloseModal(MODAL.REMOVE_MEMBER)();
+    setManipulatedMember(null);
+  };
+
+  const handleRemoveMember = () => {
+    dispatch(
+      removeTeamMemberRequest({
+        memberId: manipulatedMember.id,
+        handleCloseRemoveMemberModal,
+      }),
+    );
+  };
+
+  const columns = useMemo(
+    () =>
+      createColumns({
+        tableWidth,
+        tableHeight,
+        tableScrollTop,
+        canGrantAccessMember: !isTeamLocked && canEditTeam,
+        handleChangeRole,
+        handleOpenRemoveMemberModal,
+        handleGrantAccessMember,
+      }),
+    [tableWidth, tableHeight, tableScrollTop, isTeamLocked],
+  );
+
   const handleInvite = invitedUsers => {
     dispatch(addTeamMembersBatchRequest(team.id, invitedUsers));
-    handleCloseModal(INVITE_MEMBER_MODAL)();
+    handleCloseModal(MODAL.INVITE_MEMBER)();
   };
 
   const handleLeaveTeam = () => {
@@ -180,7 +196,6 @@ export const TeamContainer = ({ currentUser, team, members }) => {
       false,
   };
 
-  const mayAddMember = !team.locked;
   const isDomainTeam =
     team.type === TEAM_TYPE.DEFAULT ||
     team.title?.toLowerCase() === TEAM_TYPE.DEFAULT;
@@ -196,7 +211,7 @@ export const TeamContainer = ({ currentUser, team, members }) => {
               withOfflineCheck
               icon="pencil"
               color="white"
-              onClick={handleOpenModal(NEW_TEAM_MODAL)}
+              onClick={handleOpenModal(MODAL.NEW_TEAM)}
             />
           </Can>          
           <Can I={PERMISSION.DELETE} a={teamSubject}>
@@ -204,7 +219,7 @@ export const TeamContainer = ({ currentUser, team, members }) => {
               withOfflineCheck
               icon="trash"
               color="white"
-              onClick={handleOpenModal(REMOVE_TEAM_MODAL)}
+              onClick={handleOpenModal(MODAL.REMOVE_TEAM)}
             />
           </Can>
           <Can I={PERMISSION.LEAVE} a={teamSubject}>
@@ -213,15 +228,15 @@ export const TeamContainer = ({ currentUser, team, members }) => {
                 withOfflineCheck
                 icon="leave"
                 color="white"
-                onClick={handleOpenModal(LEAVE_TEAM_MODAL)}
+                onClick={handleOpenModal(MODAL.LEAVE_TEAM)}
               />
             )}
           </Can>
-          {mayAddMember && (
+          {!isTeamLocked && (
             <Can I={PERMISSION.ADD} a={teamMemberSubject}>
               <AddMemberButton
                 withOfflineCheck
-                onClick={handleOpenModal(INVITE_MEMBER_MODAL)}
+                onClick={handleOpenModal(MODAL.INVITE_MEMBER)}
                 icon="plus"
                 color="black"
               >
@@ -247,39 +262,49 @@ export const TeamContainer = ({ currentUser, team, members }) => {
           tableVisibleDataHeight={tableVisibleDataHeight}
         />
       </Table.Main>
-      {modalVisibilities[NEW_TEAM_MODAL] && (
+      {modalVisibilities[MODAL.NEW_TEAM] && (
         <TeamModal
           teamId={team.id}
           onEditSubmit={handleEdit}
-          onCancel={handleCloseModal(NEW_TEAM_MODAL)}
+          onCancel={handleCloseModal(MODAL.NEW_TEAM)}
         />
-      )}
-      {modalVisibilities[INVITE_MEMBER_MODAL] && (
+      )}      
+      {modalVisibilities[MODAL.INVITE_MEMBER] && (
         <InviteModal
           currentUser={currentUser}
           teamId={team.id}
           members={members}
           onRemoveMember={handleRemoveMember}
-          onCancel={handleCloseModal(INVITE_MEMBER_MODAL)}
+          onCancel={handleCloseModal(MODAL.INVITE_MEMBER)}
           onSubmit={handleInvite}
         />
       )}
-      {modalVisibilities[REMOVE_TEAM_MODAL] && (
+      {modalVisibilities[MODAL.REMOVE_TEAM] && (
         <ConfirmModal
           isOpened
           description="Are you sure you want to remove team?"
           onClickConfirm={handleRemoveTeam}
-          onClickCancel={handleCloseModal(REMOVE_TEAM_MODAL)}
+          onClickCancel={handleCloseModal(MODAL.REMOVE_TEAM)}
         />
       )}
-      {modalVisibilities[LEAVE_TEAM_MODAL] && (
+      {modalVisibilities[MODAL.LEAVE_TEAM] && (
         <ConfirmLeaveTeamModal
           isOpened
           teamTitle={team.title}
           onClickConfirm={handleLeaveTeam}
-          onClickCancel={handleCloseModal(LEAVE_TEAM_MODAL)}
+          onClickCancel={handleCloseModal(MODAL.LEAVE_TEAM)}
+        />
+      )}
+      {modalVisibilities[MODAL.REMOVE_MEMBER] && (
+        <ConfirmRemoveMemberModal
+          isOpened
+          memberName={manipulatedMember.name || manipulatedMember.email}
+          onClickConfirm={handleRemoveMember}
+          onClickCancel={handleCloseRemoveMemberModal}
         />
       )}
     </SettingsWrapper>
   );
 };
+
+export const TeamContainer = memo(TeamContainerComponent);

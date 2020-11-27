@@ -196,7 +196,10 @@ export const removeTeamList = (teamId, listId) =>
 // item
 export const getUserItems = () => callApi.get('/items/all');
 export const getItem = itemId => callApi.get(`/items/${itemId}`);
+export const getItemRaws = itemId => callApi.get(`/items/${itemId}/raws`);
 export const postCreateItem = data => callApi.post('/items', data);
+export const getRemovedItems = itemsIds =>
+  callApi.post('/items/unexists', { items: itemsIds });
 export const updateItem = (itemId, data) =>
   callApi.patch(`/items/${itemId}`, data);
 export const updateMoveItem = (itemId, data) =>

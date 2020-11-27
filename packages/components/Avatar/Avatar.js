@@ -7,7 +7,6 @@ export const Avatar = ({
   name,
   email,
   avatar,
-  accessGranted,
   children,
   size = 40,
   fontSize = 'main',

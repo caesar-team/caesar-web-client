@@ -61,7 +61,7 @@ import { updateGlobalNotification } from '@caesar/common/actions/application';
 import { finishIsLoading } from '@caesar/common/actions/workflow';
 import {
   createKeyPair,
-  encryptSecret,
+  encryptItem,
   generateKeyPair,
 } from '@caesar/common/sagas/entities/item';
 import {
@@ -110,7 +110,6 @@ export function* fetchTeamSaga({ payload: { teamId } }) {
     const teamsById = convertTeamsToEntity([team]);
 
     yield put(fetchTeamSuccess(teamsById[teamId]));
-    yield put(finishIsLoading());
   } catch (error) {
     // eslint-disable-next-line no-console
     console.error(error);
@@ -201,7 +200,7 @@ export function* encryptMemberTeamKey({ user, keypair }) {
     convertKeyPairToItemEntity([keypair]),
   ).shift();
 
-  const secret = yield call(encryptSecret, {
+  const { data, raws } = yield call(encryptItem, {
     item: itemKeyPair,
     publicKey,
   });
@@ -212,7 +211,7 @@ export function* encryptMemberTeamKey({ user, keypair }) {
 
   return {
     userId,
-    secret,
+    secret: JSON.stringify({ data, raws }),
     teamRole,
   };
 }
@@ -247,7 +246,7 @@ export function* createTeamSaga({
       throw new Error(`Can't create the team with the title: ${title}`);
     }
 
-    const encryptedKeypair = yield call(encryptSecret, {
+    const { data, raws } = yield call(encryptItem, {
       item: teamKeyPair,
       publicKey,
     });
@@ -255,7 +254,7 @@ export function* createTeamSaga({
     const serverPayload = {
       team,
       keypair: {
-        secret: encryptedKeypair,
+        secret: JSON.stringify({ data, raws }),
       },
     };
 

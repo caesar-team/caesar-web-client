@@ -64,7 +64,7 @@ const SecureMessageContainerComponent = ({ message, password }) => {
       raw: raws[attachment.id],
     }));
 
-    downloadAsZip(attachments);
+    downloadAsZip({ files: attachments });
   };
 
   const title = decryptedMessage ? (

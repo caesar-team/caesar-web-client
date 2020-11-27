@@ -1,6 +1,5 @@
 import React, { memo } from 'react';
 import { areEqual } from 'react-window';
-
 import { Item } from './Item';
 
 const FixedSizeItemComponent = ({ data, index, style }) => {

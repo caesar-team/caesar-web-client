@@ -35,6 +35,7 @@ const LINKS = [
   { link: ROUTES.SETTINGS + ROUTES.TEAM, name: 'Teams' },
   { link: ROUTES.SETTINGS + ROUTES.USERS, name: 'All users' },
   { link: ROUTES.SETTINGS + ROUTES.IMPORT, name: 'Import' },
+  { link: ROUTES.SETTINGS + ROUTES.PREREFENCES, name: 'Prerefences' },
 ];
 
 const SettingsSidebar = ({ router: { route } }) => {

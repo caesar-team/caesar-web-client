@@ -22,7 +22,6 @@ import {
   resetStore,
 } from '@caesar/common/actions/application';
 import { currentUserTeamIdsSelector } from '@caesar/common/selectors/currentUser';
-import { memberByUserIdAndTeamIdSelector } from '@caesar/common/selectors/entities/member';
 import { editTeamSuccess } from '@caesar/common/actions/entities/team';
 import { getServerErrorMessage } from '@caesar/common/utils/error';
 import {
@@ -33,7 +32,6 @@ import {
   postLogout,
 } from '@caesar/common/api';
 import { removeCookieValue, clearStorage } from '@caesar/common/utils/token';
-import { createPermissionsFromLinks } from '@caesar/common/utils/createPermissionsFromLinks';
 import { ROUTES } from '@caesar/common/constants';
 import { normalizeCurrentUser } from '@caesar/common/normalizers/normalizers';
 import { convertTeamsToEntity } from '@caesar/common/normalizers/normalizers';

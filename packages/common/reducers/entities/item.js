@@ -49,11 +49,13 @@ import {
   REMOVE_ITEMS_DATA,
   UPDATE_ITEM_FIELD,
   RESET_ITEM_STATE,
+  SET_IMPORT_PROGRESS_PERCENT,
 } from '@caesar/common/actions/entities/item';
 
 const initialState = {
   isLoading: true,
   isError: false,
+  importProgressPercent: 0,
   byId: {},
 };
 
@@ -152,7 +154,10 @@ export default createReducer(initialState, {
     return state;
   },
   [CREATE_ITEMS_BATCH_REQUEST](state) {
-    return state;
+    return {
+      ...state,
+      importProgressPercent: 0,
+    };
   },
   [CREATE_ITEMS_BATCH_SUCCESS](state, { payload }) {
     return {
@@ -164,7 +169,16 @@ export default createReducer(initialState, {
     };
   },
   [CREATE_ITEMS_BATCH_FAILURE](state) {
-    return state;
+    return {
+      ...state,
+      importProgressPercent: 0,
+    };
+  },
+  [SET_IMPORT_PROGRESS_PERCENT](state, { payload }) {
+    return {
+      ...state,
+      importProgressPercent: state.importProgressPercent + payload.percent,
+    };
   },
   [EDIT_ITEM_REQUEST](state) {
     return state;

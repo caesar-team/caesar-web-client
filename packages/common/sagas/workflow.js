@@ -570,14 +570,14 @@ function* initListsAndProgressEntities() {
   const inboxList = lists.find(list => list.type === LIST_TYPE.INBOX);
 
   const listItems = yield select(itemsByListIdsSelector, {
-    listIds: [favoritesList?.id, inboxList?.id],
+    listIds: [favoritesList?.id, inboxList?.id, workInProgressList?.id],
   });
   const favoritesListCount =
     listItems.filter(itemsListFilter(favoritesList?.id))?.length || 0;
   const inboxListCount =
     listItems.filter(itemsListFilter(inboxList?.id))?.length || 0;
   const workInProgressListCount =
-    listItems.filter(itemsListFilter(workInProgressList))?.length || 0;
+    listItems.filter(itemsListFilter(workInProgressList?.id))?.length || 0;
 
   if (!workInProgressList || workInProgressListCount <= 0) {
     if (favoritesListCount > 0) {

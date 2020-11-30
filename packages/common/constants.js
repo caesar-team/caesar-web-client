@@ -261,7 +261,7 @@ export const DOMAIN_ROLES_LABELS = {
   ROLE_ANONYMOUS_USER: 'Anonym',
 };
 
-export const TEAM_ROLES_OPTIONS = 
+export const TEAM_ROLES_OPTIONS =
   Object.values(TEAM_ROLES).map(role => ({
     value: role,
     label: TEAM_ROLES_LABELS[role],

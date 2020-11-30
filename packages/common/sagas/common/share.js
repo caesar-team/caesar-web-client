@@ -4,8 +4,8 @@ import {
   itemsBatchSelector,
   itemSelector,
 } from '@caesar/common/selectors/entities/item';
-import { currentUserDataSelector } from '@caesar/common/selectors/currentUser';
 import { teamsMembersFullViewSelector } from '@caesar/common/selectors/entities/member';
+import { currentUserDataSelector } from '@caesar/common/selectors/currentUser';
 import {
   shareKeyPairSelector,
   teamKeyPairSelector,
@@ -223,7 +223,7 @@ export function* shareItemBatchSaga({
     });
 
     const allMembers = [...members, ...teamsMembers];
-    
+
     // Need To Go Deeper (c)
     yield all(
       yield all(

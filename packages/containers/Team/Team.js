@@ -167,14 +167,14 @@ export const TeamContainerComponent = ({ currentUser, team, members }) => {
   };
 
   const handleEdit = ({ teamId, title, icon, setSubmitting, setErrors }) => {
-    dispatch(editTeamRequest(
+    dispatch(editTeamRequest({
       teamId,
       title,
       icon,
-      handleCloseModal(NEW_TEAM_MODAL),
+      handleCloseModal: handleCloseModal(NEW_TEAM_MODAL),
       setSubmitting,
       setErrors,
-    ));
+    }));
   };  
 
   if (!team.id && !isLoadingTeams) {

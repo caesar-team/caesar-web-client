@@ -36,7 +36,6 @@ export const Avatar = ({
       }
     }
   };
-
   return (
     <Hint text={hint} position={hintPosition}>
       <Wrapper size={size} fontSize={fontSize} {...props}>

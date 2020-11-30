@@ -137,7 +137,7 @@ const DataStep = ({
         />
       </StyledTable>
       <SelectListWrapper>
-        <MoveToText>Select list of importing:</MoveToText>
+        <MoveToText>Select team and list of importing:</MoveToText>
         <StyledSelect
           boxDirection="up"
           options={teamOptions}

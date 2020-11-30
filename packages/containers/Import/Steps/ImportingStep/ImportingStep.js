@@ -38,7 +38,7 @@ const TwoItemsWrapper = styled.div`
 `;
 
 const renderText = progress =>
-  progress < 1
+  progress < 0.99999
     ? `Waiting... ${parseFloat(progress * 100).toFixed(2)}%`
     : 'Done!';
 

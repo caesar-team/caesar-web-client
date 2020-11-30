@@ -263,3 +263,4 @@ trigger:
     - hotfix/*
   event:
     - tag
+    - push

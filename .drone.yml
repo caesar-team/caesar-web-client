@@ -134,6 +134,12 @@ globals:
       tags: ['${DRONE_BRANCH}', 'latest']
       <<: *confSaveBuild
 
+  - &stepTagBuild
+    image: plugins/docker
+    settings:
+      auto_tag: true
+      <<: *confSaveBuild
+
   - &stepReleaseBuild
     image: plugins/docker
     settings:
@@ -222,6 +228,13 @@ steps:
     <<: *stepMasterBuild
     when:
       branch: [master]
+      event: [push]
+
+  - name: build tag
+    <<: *stepTagBuild
+    when:
+      branch: [master]
+      event: [tag]
 
   - name: build release
     <<: *stepReleaseBuild
@@ -248,3 +261,6 @@ trigger:
     - release/*
     - feature/*
     - hotfix/*
+  event:
+    - tag
+    - push

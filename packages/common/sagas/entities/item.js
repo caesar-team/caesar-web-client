@@ -101,7 +101,7 @@ import {
   convertItemsToEntities,
   convertKeyPairToEntity,
 } from '../../normalizers/normalizers';
-import { uuid4 } from '../../utils/uuid4';
+import { uuid4 } from '@caesar/common/utils/uuid4';
 
 const ITEMS_CHUNK_SIZE = 50;
 

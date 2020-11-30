@@ -69,6 +69,14 @@ export function* checkIfUserWasKickedFromTeam(userTeamIdsFromRequest) {
       yield call(clearStateWhenLeaveTeam, { payload: { teamIds: diff } });
 
       yield all(diff.map(teamId => put(leaveTeamSuccess(teamId))));
+
+      const currentTeamId = yield select(currentTeamIdSelector);
+
+      if (diff.includes(currentTeamId)) {
+        yield put(setCurrentTeamId(TEAM_TYPE.PERSONAL));
+        yield put(setWorkInProgressListId(null));
+        yield put(setWorkInProgressItem(null));
+      }
     }
   } catch (error) {
     // eslint-disable-next-line no-console
@@ -128,14 +136,6 @@ export function* leaveTeamSaga({ payload: { teamId } }) {
     yield put(leaveTeamSuccess(teamId));
     yield put(editTeamSuccess(teamsById[team.id]));
     yield call(clearStateWhenLeaveTeam, { payload: { teamIds: [teamId] } });
-
-    const currentTeamId = yield select(currentTeamIdSelector);
-
-    if (currentTeamId === teamId) {
-      yield put(setCurrentTeamId(TEAM_TYPE.PERSONAL));
-      yield put(setWorkInProgressListId(null));
-      yield put(setWorkInProgressItem(null));
-    }
 
     const {
       router: { route },

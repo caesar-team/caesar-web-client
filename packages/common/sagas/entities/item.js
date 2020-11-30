@@ -79,7 +79,7 @@ import {
   TEAM_TYPE,
   ITEM_TYPE,
   IMPORT_CHUNK_SIZE,
-} from "@caesar/common/constants";
+} from '@caesar/common/constants';
 import {
   shareItemKeyPairSelector,
   shareKeyPairSelector,
@@ -806,36 +806,42 @@ function* postCreateItemsChunk({ totalCount, items, keyPair, listId }) {
     }),
   );
 
-  const encryptedItems = yield call(
-    encryptDataBatch,
-    preparedForEncryptingItems,
-    keyPair.publicKey,
-  );
+    const encryptedItems = yield call(
+      encryptDataBatch,
+      preparedForEncryptingItems,
+      keyPair.publicKey,
+    );
 
-  const preparedForRequestItems = items.map(({ type, ...data }, index) => ({
-    type,
-    listId,
-    meta: createItemMetaData({ data }),
-    secret: JSON.stringify({
-      data: encryptedItems[index],
-    }),
-  }));
-  
-  const { data: serverItems } = yield call(postCreateItemsBatch, {
-    items: preparedForRequestItems,
-  });
+    const preparedForRequestItems = items.map(({ type, ...data }, index) => ({
+      type,
+      listId,
+      meta: createItemMetaData({ data }),
+      secret: JSON.stringify({
+        data: encryptedItems[index],
+      }),
+    }));
 
-  const preparedForStoreItems = serverItems.map((item, index) => ({
-    ...item,
-    data: preparedForEncryptingItems[index],
-  }));
-  const { itemsById } = convertItemsToEntities(preparedForStoreItems);
+    const { data: serverItems } = yield call(postCreateItemsBatch, {
+      items: preparedForRequestItems,
+    });
 
-  yield put(setImportProgressPercent(
-    items.length / totalCount,
-  ));
-  yield put(createItemsBatchSuccess(itemsById));
-}
+    const preparedForStoreItems = serverItems.map((item, index) => ({
+      ...item,
+      data: preparedForEncryptingItems[index],
+    }));
+    const { itemsById } = convertItemsToEntities(preparedForStoreItems);
+    yield put(createItemsBatchSuccess(itemsById));
+    yield put(updateGlobalNotification(NOOP_NOTIFICATION, false));
+  } catch (error) {
+    // eslint-disable-next-line no-console
+    console.error(error);
+    yield put(
+      updateGlobalNotification(getServerErrorMessage(error), false, true),
+    );
+    yield put(createItemsBatchFailure());
+  } finally {
+    setSubmitting(false);
+  }
 
 export function* getKeyPairForItem({ item }) {
   let keypair;
@@ -857,6 +863,7 @@ export function* getKeyPairForItem({ item }) {
 
   return keypair;
 }
+
 export function* updateItemSaga({ payload: { item } }) {
   try {
     yield put(updateGlobalNotification(ENCRYPTING_ITEM_NOTIFICATION, true));

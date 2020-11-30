@@ -6,12 +6,9 @@ import { Credentials, Document } from './types';
 const ITEM_COMPONENT_TYPE = {
   [ITEM_TYPE.CREDENTIALS]: props => <Credentials {...props} />,
   [ITEM_TYPE.DOCUMENT]: props => <Document {...props} />,
+  ['undefined']: props => <TextError>Unknown type</TextError>,
 };
 
 export const ItemByType = props => {
-  const itemComponent = ITEM_COMPONENT_TYPE[props.item.type](props) || (
-    <TextError>Unknown type</TextError>
-  );
-
-  return itemComponent;
+  return ITEM_COMPONENT_TYPE[props.item.type](props);
 };

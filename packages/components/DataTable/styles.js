@@ -70,6 +70,7 @@ const Cell = styled.div`
 
 const EmailCell = styled.div`
   color: ${({ theme }) => theme.color.gray};
+  white-space: nowrap;
 `;
 
 const RoleCell = styled.div`

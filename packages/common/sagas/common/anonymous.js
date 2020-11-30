@@ -1,7 +1,7 @@
 import { put, call, takeLatest, select } from 'redux-saga/effects';
 import { workInProgressItemSelector } from '@caesar/common/selectors/workflow';
 import {
-  encryptItem,
+  encryptData,
   generateAnonymousEmail,
 } from '@caesar/common/utils/cipherUtils';
 import { createMemberSaga } from '@caesar/common/sagas/entities/member';
@@ -43,14 +43,14 @@ export function* createAnonymousLinkSaga() {
     // eslint-disable-next-line no-console
     console.warn('Not yet implemented');
     const encryptedSecret = yield call(
-      encryptItem,
+      encryptData,
       workInProgressItem.data,
       publicKey,
     );
 
     const item = {
       id: 'itemId',
-      secret: encryptedSecret,
+      secret: JSON.stringify({ data: encryptedSecret }),
     };
 
     // TODO: Make shorted link

@@ -79,7 +79,7 @@ import {
   TEAM_TYPE,
   ITEM_TYPE,
   IMPORT_CHUNK_SIZE,
-} from "@caesar/common/constants";
+} from '@caesar/common/constants';
 import {
   shareItemKeyPairSelector,
   shareKeyPairSelector,
@@ -101,7 +101,7 @@ import {
   convertItemsToEntities,
   convertKeyPairToEntity,
 } from '../../normalizers/normalizers';
-import { uuid4 } from '../../utils/uuid4';
+import { uuid4 } from '@caesar/common/utils/uuid4';
 
 const ITEMS_CHUNK_SIZE = 50;
 
@@ -820,7 +820,7 @@ function* postCreateItemsChunk({ totalCount, items, keyPair, listId }) {
       data: encryptedItems[index],
     }),
   }));
-  
+
   const { data: serverItems } = yield call(postCreateItemsBatch, {
     items: preparedForRequestItems,
   });
@@ -830,7 +830,6 @@ function* postCreateItemsChunk({ totalCount, items, keyPair, listId }) {
     data: preparedForEncryptingItems[index],
   }));
   const { itemsById } = convertItemsToEntities(preparedForStoreItems);
-
   yield put(setImportProgressPercent(
     items.length / totalCount,
   ));
@@ -857,6 +856,7 @@ export function* getKeyPairForItem({ item }) {
 
   return keypair;
 }
+
 export function* updateItemSaga({ payload: { item } }) {
   try {
     yield put(updateGlobalNotification(ENCRYPTING_ITEM_NOTIFICATION, true));

@@ -15,13 +15,21 @@ import {
   LEAVE_TEAM_REQUEST,
   leaveTeamFailure,
   leaveTeamSuccess,
+  setCurrentTeamId,
 } from '@caesar/common/actions/currentUser';
 import { addPersonalKeyPair } from '@caesar/common/actions/keystore';
 import {
   updateGlobalNotification,
   resetStore,
 } from '@caesar/common/actions/application';
-import { currentUserTeamIdsSelector } from '@caesar/common/selectors/currentUser';
+import {
+  setWorkInProgressListId,
+  setWorkInProgressItem,
+} from '@caesar/common/actions/workflow';
+import {
+  currentUserTeamIdsSelector,
+  currentTeamIdSelector,
+} from '@caesar/common/selectors/currentUser';
 import { editTeamSuccess } from '@caesar/common/actions/entities/team';
 import { getServerErrorMessage } from '@caesar/common/utils/error';
 import {
@@ -32,9 +40,11 @@ import {
   postLogout,
 } from '@caesar/common/api';
 import { removeCookieValue, clearStorage } from '@caesar/common/utils/token';
-import { ROUTES } from '@caesar/common/constants';
-import { normalizeCurrentUser } from '@caesar/common/normalizers/normalizers';
-import { convertTeamsToEntity } from '@caesar/common/normalizers/normalizers';
+import { ROUTES, TEAM_TYPE } from '@caesar/common/constants';
+import {
+  normalizeCurrentUser,
+  convertTeamsToEntity,
+} from '@caesar/common/normalizers/normalizers';
 import { clearStateWhenLeaveTeam } from './entities/team';
 
 export function* checkIfUserWasKickedFromTeam(userTeamIdsFromRequest) {
@@ -118,6 +128,14 @@ export function* leaveTeamSaga({ payload: { teamId } }) {
     yield put(leaveTeamSuccess(teamId));
     yield put(editTeamSuccess(teamsById[team.id]));
     yield call(clearStateWhenLeaveTeam, { payload: { teamIds: [teamId] } });
+
+    const currentTeamId = yield select(currentTeamIdSelector);
+
+    if (currentTeamId === teamId) {
+      yield put(setCurrentTeamId(TEAM_TYPE.PERSONAL));
+      yield put(setWorkInProgressListId(null));
+      yield put(setWorkInProgressItem(null));
+    }
 
     const {
       router: { route },

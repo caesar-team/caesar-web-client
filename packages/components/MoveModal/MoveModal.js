@@ -279,21 +279,21 @@ const MoveModalComponent = ({
             </ListItemsWrapper>
           </Items>
         )}
-        <ButtonsWrapper>
-          <ButtonStyled color="white" onClick={closeModal}>
-            Cancel
-          </ButtonStyled>
-          <Button
-            onClick={handleClickAccept}
-            disabled={
-              checkedListId === listId ||
-              !listOptions.map(({ id }) => id).includes(checkedListId)
-            }
-          >
-            Accept
-          </Button>
-        </ButtonsWrapper>
       </Scrollbar>
+      <ButtonsWrapper>
+        <ButtonStyled color="white" onClick={closeModal}>
+          Cancel
+        </ButtonStyled>
+        <Button
+          onClick={handleClickAccept}
+          disabled={
+            checkedListId === listId ||
+            !listOptions.map(({ id }) => id).includes(checkedListId)
+          }
+        >
+          Accept
+        </Button>
+      </ButtonsWrapper>      
     </Modal>
   );
 };

@@ -1,5 +1,5 @@
 import Router from 'next/router';
-import { put, call, takeLatest, select, fork, all } from 'redux-saga/effects';
+import { put, call, takeLatest, select, all } from 'redux-saga/effects';
 import deepequal from 'fast-deep-equal';
 import {
   CREATE_ITEM_REQUEST,
@@ -29,7 +29,6 @@ import {
   updateItemField,
   setImportProgressPercent,
 } from '@caesar/common/actions/entities/item';
-import { shareItemBatchSaga } from '@caesar/common/sagas/common/share';
 import { setCurrentTeamId } from '@caesar/common/actions/currentUser';
 import { updateGlobalNotification } from '@caesar/common/actions/application';
 import {

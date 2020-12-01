@@ -41,19 +41,22 @@ const MenuWrapper = styled.div`
   position: absolute;
   width: 100%;
   min-height: 42px;
-  border: 1px solid ${({ theme }) => theme.color.gallery};
+  background-color: ${({ theme }) => theme.color.emperor}!important;
   border-radius: ${({ theme }) => theme.borderRadius};
+  right: 30px;
 `;
 
 const MenuButton = styled(Button)`
   width: 100%;
-  color: ${({ theme }) => theme.color.black};
-  border: none;
-  transition: background-color 0.2s;
+  color: ${({ theme }) => theme.color.lightGray};
+  background-color: transparent;
+  border: 0;
+  text-transform: none;
+  transition: color 0.2s;
 
   &:hover {
-    background-color: ${({ theme }) => theme.color.snow};
-    border: none;
+    color: ${({ theme }) => theme.color.white};
+    border: 0;
   }
 `;
 
@@ -155,11 +158,12 @@ const TeamCardComponent = ({
         <StyledDottedMenu
           tooltipProps={{
             textBoxWidth: '100px',
-            arrowAlign: 'start',
-            position: 'left top',
+            arrowAlign: 'end',
+            position: 'bottom right',
             padding: '0px 0px',
             flat: true,
-            zIndex: '1',
+            zIndex: '10',
+            border: '0',
           }}
         >
           <MenuWrapper>

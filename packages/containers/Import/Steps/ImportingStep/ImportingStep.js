@@ -37,9 +37,11 @@ const TwoItemsWrapper = styled.div`
   justify-content: space-between;
 `;
 
+const PROGRESS_THRESHOLD = 0.99999; 
+
 const renderText = progress =>
-  progress < 1
-    ? `Waiting... ${parseFloat(progress * 100).toFixed(2)}%`
+  progress < PROGRESS_THRESHOLD
+    ? `Waiting... ${Math.round(progress * 100)}%`
     : 'Done!';
 
 const ImportingStep = ({ progress, onClickToDashboard }) => (
@@ -59,7 +61,7 @@ const ImportingStep = ({ progress, onClickToDashboard }) => (
       </TwoItemsWrapper>
       <Button
         color="white"
-        disabled={progress !== 1}
+        disabled={progress < PROGRESS_THRESHOLD}
         onClick={onClickToDashboard}
       >
         GO TO DASHBOARD

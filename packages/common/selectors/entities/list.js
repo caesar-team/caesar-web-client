@@ -52,13 +52,15 @@ export const trashListSelector = createSelector(
 );
 
 const teamIdPropSelector = (_, props) => props?.teamId;
-export const favoritesListSelector = createSelector(() => {
-  return {
+export const favoritesListSelector = createSelector(
+  currentTeamIdSelector,
+  currentTeamId => ({
     id: LIST_TYPE.FAVORITES,
     label: LIST_TYPE.FAVORITES,
     type: LIST_TYPE.FAVORITES,
-  };
-});
+    teamId: currentTeamId || TEAM_TYPE.PERSONAL,
+  }),
+);
 
 export const teamListsSelector = createSelector(
   listsSelector,

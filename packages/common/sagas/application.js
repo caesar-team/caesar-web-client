@@ -1,9 +1,10 @@
-import { put, fork, takeLatest, select } from 'redux-saga/effects';
-import { decryption } from '@caesar/common/sagas/common/decryption';
+import { put, takeLatest, call } from 'redux-saga/effects';
+import Router from 'next/router';
 import {
-  REHYDRATE_STORE,
   RESET_STORE,
   resetApplicationState,
+  RESET_APPLICATION_CACHE,
+  resetStore,
 } from '@caesar/common/actions/application';
 import { resetItemState } from '@caesar/common/actions/entities/item';
 import { resetListState } from '@caesar/common/actions/entities/list';
@@ -14,33 +15,7 @@ import { resetUserState } from '@caesar/common/actions/entities/user';
 import { resetCurrentUserState } from '@caesar/common/actions/currentUser';
 import { resetWorkflowState } from '@caesar/common/actions/workflow';
 import { resetKeystoreState } from '@caesar/common/actions/keystore';
-import { isOnlineSelector } from '@caesar/common/selectors/application';
-import { itemArraySelector } from '@caesar/common/selectors/entities/item';
-import { masterPasswordSelector } from '@caesar/common/selectors/currentUser';
-import { actualKeyPairSelector } from '@caesar/common/selectors/keystore';
-
-// TODO: Is conflicting with next-offline?
-// @Depricated
-export function* rehydrateStoreSaga() {
-  try {
-    const isOnline = yield select(isOnlineSelector);
-
-    if (!isOnline) {
-      const items = yield select(itemArraySelector);
-      const keyPair = yield select(actualKeyPairSelector);
-      const masterPassword = yield select(masterPasswordSelector);
-
-      yield fork(decryption, {
-        items,
-        key: keyPair.privateKey,
-        masterPassword,
-      });
-    }
-  } catch (error) {
-    // eslint-disable-next-line no-console
-    console.error(error);
-  }
-}
+import { ROUTES } from '@caesar/common/constants';
 
 function* resetStoreSaga() {
   try {
@@ -60,7 +35,21 @@ function* resetStoreSaga() {
   }
 }
 
+function refreshPage() {
+  if (window) window.location.reload();
+}
+
+export function* resetApplicationCacheSaga() {
+  try {
+    yield put(resetStore());
+    yield call(Router.push, ROUTES.DASHBOARD);
+    refreshPage();
+  } catch (error) {
+    // eslint-disable-next-line no-console
+    console.error('error', error);
+  }
+}
 export default function* applicationSagas() {
-  yield takeLatest(REHYDRATE_STORE, rehydrateStoreSaga);
   yield takeLatest(RESET_STORE, resetStoreSaga);
+  yield takeLatest(RESET_APPLICATION_CACHE, resetApplicationCacheSaga);
 }

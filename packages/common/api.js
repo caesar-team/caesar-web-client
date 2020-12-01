@@ -143,7 +143,13 @@ export const pinTeam = (teamId, shouldPinned) =>
 export const deleteTeam = teamId => callApi.delete(`/teams/${teamId}`);
 
 // team member
-export const getTeamMembers = teamId => callApi.get(`/teams/${teamId}/members`);
+export const getTeamMembers = ({ teamId, withoutKeys = false }) =>
+  callApi.get(`/teams/${teamId}/members`, {
+    params: {
+      // eslint-disable-next-line camelcase
+      without_keypair: withoutKeys,
+    },
+  });
 export const getDefaultTeamMembers = () =>
   callApi.get('/teams/default/members');
 export const postAddTeamMember = ({ teamId, userId, role, secret }) =>
@@ -190,7 +196,10 @@ export const removeTeamList = (teamId, listId) =>
 // item
 export const getUserItems = () => callApi.get('/items/all');
 export const getItem = itemId => callApi.get(`/items/${itemId}`);
+export const getItemRaws = itemId => callApi.get(`/items/${itemId}/raws`);
 export const postCreateItem = data => callApi.post('/items', data);
+export const getRemovedItems = itemsIds =>
+  callApi.post('/items/unexists', { items: itemsIds });
 export const updateItem = (itemId, data) =>
   callApi.patch(`/items/${itemId}`, data);
 export const updateMoveItem = (itemId, data) =>

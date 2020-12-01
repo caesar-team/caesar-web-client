@@ -53,6 +53,7 @@ const ItemComponent = ({
   const [isVisibleDragZone, setVisibleDragZone] = useState(false);
   const itemRef = useRef(null);
   const notification = useNotification();
+  const isDecryptionProgress = !item?.data;
 
   const handleDragEnter = useCallback(
     e => {
@@ -90,14 +91,17 @@ const ItemComponent = ({
 
   const handleClickAcceptEdit = patchData => {
     setSubmitting(true);
-    const updatedData = {
-      ...item,
-      data: {
-        ...item.data,
-        ...patchData,
-      },
-    };
-    dispatch(editItemRequest(updatedData, setSubmitting, notification));
+
+    dispatch(
+      editItemRequest(
+        {
+          itemId: item.id,
+          patch: patchData,
+        },
+        setSubmitting,
+        notification,
+      ),
+    );
   };
 
   const handleClickRestoreItem = async () => {
@@ -129,15 +133,20 @@ const ItemComponent = ({
             onClickAcceptEdit={!isTrashItem && handleClickAcceptEdit}
             onClickShare={onClickShare}
             isVisibleDragZone={isVisibleDragZone}
+            isDummy={isDecryptionProgress}
           />
-          <Meta item={item} />
-          <Can I={PERMISSION.TRASH} an={_permissions}>
-            {!isTrashItem && (
-              <Row>
-                <RemoveButton onClick={onClickMoveToTrash} />
-              </Row>
-            )}
-          </Can>
+          {!isDecryptionProgress && (
+            <>
+              <Meta item={item} />
+              <Can I={PERMISSION.TRASH} an={_permissions}>
+                {!isTrashItem && (
+                  <Row>
+                    <RemoveButton onClick={onClickMoveToTrash} />
+                  </Row>
+                )}
+              </Can>
+            </>
+          )}
         </Scrollbar>
       </InnerWrapper>
       {!isTrashItem && isMoveModalOpened && (

@@ -18,6 +18,7 @@ import {
   REMOVE_TEAM_MEMBER_REQUEST,
   removeTeamMemberSuccess,
   removeTeamMemberFailure,
+  GRANT_ACCESS_TEAM_MEMBER_REQUEST,
 } from '@caesar/common/actions/entities/member';
 import {
   addMembersToTeamList,
@@ -43,13 +44,18 @@ import {
   ENTITY_TYPE,
   DOMAIN_ROLES,
   NOOP_NOTIFICATION,
+  COMMON_PROGRESS_NOTIFICATION,
 } from '@caesar/common/constants';
 import { updateGlobalNotification } from '@caesar/common/actions/application';
 import { getServerErrorMessage } from '@caesar/common/utils/error';
 import { teamKeyPairSelector } from '@caesar/common/selectors/keystore';
-import { usersBatchSelector } from '../../selectors/entities/user';
+import {
+  usersBatchSelector,
+  userSelector,
+} from '../../selectors/entities/user';
 import { memberSelector } from '../../selectors/entities/member';
 import { encryptMemberTeamKey } from './team';
+import { saveKeyPair } from './item';
 
 const setNewFlag = (members, isNew) =>
   members.map(member => ({
@@ -243,12 +249,22 @@ export function* addMemberToTeamListsBatchSaga({ payload: { teamId, users } }) {
   try {
     const keypair = yield select(teamKeyPairSelector, { teamId });
     const userIds = users.map(user => user.id);
+    const rolesById = users.reduce((acc, user) => {
+      acc[user.id] = user.role;
+      return acc;
+    }, {});
     // Domain users
     // TODO: Invite unregistered users
     const newUsers = yield select(usersBatchSelector, { userIds });
 
-    const postDataSagas = newUsers.map(member =>
-      call(encryptMemberTeamKey, { member, keypair }),
+    const postDataSagas = newUsers.map(user =>
+      call(encryptMemberTeamKey, {
+        user: {
+          ...user,
+          role: rolesById[user.id],
+        },
+        keypair,
+      }),
     );
     const postData = yield all(postDataSagas);
 
@@ -273,11 +289,36 @@ export function* addMemberToTeamListsBatchSaga({ payload: { teamId, users } }) {
   }
 }
 
-export function* fetchTeamMembersSaga({ payload: { teamId } }) {
+export function* fetchTeamMembersSaga({ payload: { teamId, withoutKeys } }) {
   try {
-    const { data } = yield call(getTeamMembers, teamId);
+    const { data: teamMembers } = yield call(getTeamMembers, { teamId });
 
-    const membersById = convertMembersToEntity(data);
+    let membersWithoutKeysById = {};
+
+    if (withoutKeys) {
+      const { data: membersWithoutKeys } = yield call(getTeamMembers, {
+        teamId,
+        withoutKeys,
+      });
+      membersWithoutKeysById = convertMembersToEntity(membersWithoutKeys);
+    }
+
+    const membersById = convertMembersToEntity(
+      teamMembers.map(member => {
+        if (membersWithoutKeysById[member.id]) {
+          return {
+            ...member,
+            accessGranted: false,
+          };
+        }
+
+        return {
+          ...member,
+          accessGranted: true,
+        };
+      }),
+    );
+
     yield put(fetchTeamMembersSuccess(membersById));
   } catch (e) {
     yield put(fetchTeamMembersFailure());
@@ -304,7 +345,10 @@ export function* updateTeamMemberRoleSaga({ payload: { memberId, teamRole } }) {
   }
 }
 
-export function* removeTeamMemberSaga({ payload: { memberId } }) {
+export function* removeTeamMemberSaga({
+  payload: { memberId },
+  meta: { handleCloseRemoveMemberModal },
+}) {
   try {
     const member = yield select(memberSelector, { memberId });
 
@@ -314,6 +358,44 @@ export function* removeTeamMemberSaga({ payload: { memberId } }) {
     });
     yield put(removeTeamMemberSuccess(memberId));
     yield put(removeMemberFromTeam(member.teamId, memberId));
+
+    yield put(updateGlobalNotification(NOOP_NOTIFICATION, false));
+    yield call(handleCloseRemoveMemberModal);
+  } catch (error) {
+    // eslint-disable-next-line no-console
+    console.error(error);
+    yield put(
+      updateGlobalNotification(getServerErrorMessage(error), false, true),
+    );
+    yield put(removeTeamMemberFailure());
+    yield call(handleCloseRemoveMemberModal);
+  }
+}
+
+export function* grantAccessTeamMemberSaga({ payload: { memberId } }) {
+  try {
+    yield put(updateGlobalNotification(COMMON_PROGRESS_NOTIFICATION, false));
+
+    const { teamId, userId } = yield select(memberSelector, { memberId });
+    const user = yield select(userSelector, { userId });
+    const keypair = yield select(teamKeyPairSelector, {
+      teamId,
+    });
+
+    const { secret } = yield call(encryptMemberTeamKey, {
+      user,
+      keypair,
+    });
+
+    yield call(saveKeyPair, {
+      ownerId: userId,
+      teamId,
+      secret,
+    });
+
+    yield call(fetchTeamMembersSaga, {
+      payload: { teamId, withoutKeys: true },
+    });
 
     yield put(updateGlobalNotification(NOOP_NOTIFICATION, false));
   } catch (error) {
@@ -336,4 +418,5 @@ export default function* memberSagas() {
   );
   yield takeLatest(UPDATE_TEAM_MEMBER_ROLE_REQUEST, updateTeamMemberRoleSaga);
   yield takeLatest(REMOVE_TEAM_MEMBER_REQUEST, removeTeamMemberSaga);
+  yield takeLatest(GRANT_ACCESS_TEAM_MEMBER_REQUEST, grantAccessTeamMemberSaga);
 }

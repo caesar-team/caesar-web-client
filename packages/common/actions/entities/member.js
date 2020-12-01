@@ -34,15 +34,20 @@ export const REMOVE_TEAM_MEMBER_SUCCESS = '@member/REMOVE_TEAM_MEMBER_SUCCESS';
 export const REMOVE_TEAM_MEMBER_FAILURE = '@member/REMOVE_TEAM_MEMBER_FAILURE';
 export const REMOVE_TEAM_MEMBERS_BATCH = '@member/REMOVE_TEAM_MEMBERS_BATCH';
 
+export const GRANT_ACCESS_TEAM_MEMBER_REQUEST =
+  '@member/GRANT_ACCESS_MEMBER_REQUEST';
+export const GRANT_ACCESS_MEMBER_SUCCESS =
+  '@member/GRANT_ACCESS_MEMBER_SUCCESS';
+export const GRANT_ACCESS_MEMBER_FAILURE =
+  '@member/GRANT_ACCESS_MEMBER_FAILURE';
+export const GRANT_ACCESS_MEMBERS_BATCH = '@member/GRANT_ACCESS_MEMBERS_BATCH';
+
 export const RESET_MEMBER_STATE = '@member/RESET_MEMBER_STATE';
 
-export const fetchTeamMembersRequest = ({
-  teamId,
-  needUpdateTeamMembers = false,
-}) => ({
+export const fetchTeamMembersRequest = ({ teamId, withoutKeys = false }) => ({
   type: FETCH_TEAM_MEMBERS_REQUEST,
   payload: {
-    needUpdateTeamMembers,
+    withoutKeys,
     teamId,
   },
 });
@@ -142,10 +147,16 @@ export const updateTeamMemberRoleFailure = () => ({
   type: UPDATE_TEAM_MEMBER_ROLE_FAILURE,
 });
 
-export const removeTeamMemberRequest = memberId => ({
+export const removeTeamMemberRequest = ({
+  memberId,
+  handleCloseRemoveMemberModal,
+}) => ({
   type: REMOVE_TEAM_MEMBER_REQUEST,
   payload: {
     memberId,
+  },
+  meta: {
+    handleCloseRemoveMemberModal,
   },
 });
 
@@ -162,6 +173,31 @@ export const removeTeamMemberFailure = () => ({
 
 export const removeTeamMembersBatch = memberIds => ({
   type: REMOVE_TEAM_MEMBERS_BATCH,
+  payload: {
+    memberIds,
+  },
+});
+
+export const grantAccessTeamMemberRequest = memberId => ({
+  type: GRANT_ACCESS_TEAM_MEMBER_REQUEST,
+  payload: {
+    memberId,
+  },
+});
+
+export const grantAccessTeamMemberSuccess = memberId => ({
+  type: GRANT_ACCESS_MEMBER_SUCCESS,
+  payload: {
+    memberId,
+  },
+});
+
+export const grantAccessTeamMemberFailure = () => ({
+  type: GRANT_ACCESS_MEMBER_FAILURE,
+});
+
+export const grantAccessTeamMembersBatch = memberIds => ({
+  type: GRANT_ACCESS_MEMBERS_BATCH,
   payload: {
     memberIds,
   },

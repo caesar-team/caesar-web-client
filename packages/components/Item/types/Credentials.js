@@ -12,6 +12,7 @@ import {
 } from '../../ItemFields/view';
 import { Row } from '../../ItemFields/common';
 import { OwnerAndShares } from '../components';
+import { DummyCredentials } from './DummyCredentials';
 
 const PasswordRow = styled(Row)`
   position: relative;
@@ -19,6 +20,7 @@ const PasswordRow = styled(Row)`
 `;
 
 const CredentialsComponent = ({
+  isDummy,
   item,
   itemSubject,
   onClickAcceptEdit,
@@ -26,6 +28,10 @@ const CredentialsComponent = ({
   isSharedItem,
   isVisibleDragZone,
 }) => {
+  if (isDummy || !item.data) {
+    return <DummyCredentials isSharedItem />;
+  }
+
   const { name, login, password, website, note, attachments, raws } = item.data;
 
   return (
@@ -80,6 +86,7 @@ const CredentialsComponent = ({
       </Row>
       <Row marginBottom={24}>
         <Attachments
+          itemId={item.id}
           attachments={attachments}
           raws={raws}
           itemSubject={itemSubject}

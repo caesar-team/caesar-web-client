@@ -8,6 +8,7 @@ const memberSchema = new schema.Entity(
   {
     processStrategy: entity => ({
       ...entity,
+      accessGranted: 'accessGranted' in entity ? entity.accessGranted : true,
       __type: ENTITY_TYPE.MEMBER,
       _permissions: entity?._links
         ? {

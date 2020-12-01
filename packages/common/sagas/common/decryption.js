@@ -42,17 +42,37 @@ const matchAndAddKeyPairs = ({ inbound, outbound }) => {
   return addKeyPairsBatch(matchInboundAndOutbound({ inbound, outbound }));
 };
 
-const taskAction = (items, raws, key, masterPassword) => async task => {
-  await task.init(key, masterPassword);
-  let result = [];
+const TASK_ACTION_TYPE = {
+  ITEMS: 'ITEMS',
+  RAWS: 'RAWS',
+  EMPTY: 'EMPTY',
+};
 
-  if (items) {
-    result = await task.decryptAll(items);
-  } else if (raws) {
-    result = await task.decryptRaws(raws);
+const taskAction = (items, raws, key, masterPassword) => async task => {
+  let value = null;
+  let type = TASK_ACTION_TYPE.EMPTY;
+
+  try {
+    await task.init(key, masterPassword);
+    if (items) {
+      value = await task.decryptAll(items);
+      type = TASK_ACTION_TYPE.ITEMS;
+    } else if (raws) {
+      value = await task.decryptRaws(raws);
+      type = TASK_ACTION_TYPE.RAWS;
+    }
+  } catch (error) {
+    // eslint-disable-next-line no-console
+    console.error(
+      `Cannot unlock the key with the provided master password, these items or raws will be omitted`,
+      items?.map(item => item.id) || [],
+    );
   }
 
-  return result;
+  return {
+    type,
+    value,
+  };
 };
 
 export function* decryption({
@@ -63,6 +83,13 @@ export function* decryption({
   coresCount,
   id,
 }) {
+  // Nothing to do here
+  if (!raws && (!items || items.length <= 0)) {
+    yield put(decryptionEnd(id, coresCount));
+
+    return;
+  }
+
   const pool = Pool(() => spawn(new Worker('../../workers/decryption')), {
     name: 'decryption',
     size: coresCount,
@@ -87,8 +114,13 @@ export function* decryption({
     );
   }
 
+  // TODO: Raws should be an array instead of a string. If the app get a hundreds of attachments in one item then the app will be freezed.
   if (raws) {
-    pool.queue(taskAction(null, raws, key, masterPassword));
+    const rawsChunks = chunk([raws], DECRYPTION_CHUNK_SIZE);
+    chunkSize = rawsChunks.length;
+    rawsChunks.map(rawsChunk =>
+      pool.queue(taskAction(null, rawsChunk?.shift(), key, masterPassword)),
+    );
   }
 
   const normalizerEvent = normalizeEvent(chunkSize);
@@ -99,7 +131,8 @@ export function* decryption({
 
       switch (event.type) {
         case TASK_QUEUE_COMPLETED_EVENT_TYPE:
-          if (items) {
+          if (event.returnValue?.type === TASK_ACTION_TYPE.ITEMS) {
+            const { value } = event.returnValue;
             const systemItems = items.filter(isSystemItem);
             const keyPairsItems = items.filter(isKeyPairItem);
             const generalItems = items.filter(isGeneralItem);
@@ -108,7 +141,7 @@ export function* decryption({
               yield put(
                 matchAndAddSystemItems({
                   inbound: systemItems,
-                  outbound: event.returnValue,
+                  outbound: value,
                 }),
               );
             }
@@ -117,7 +150,7 @@ export function* decryption({
               yield put(
                 matchAndAddKeyPairs({
                   inbound: keyPairsItems,
-                  outbound: event.returnValue,
+                  outbound: value,
                 }),
               );
             }
@@ -126,14 +159,15 @@ export function* decryption({
               yield put(
                 matchAndAddItems({
                   inbound: generalItems,
-                  outbound: event.returnValue,
+                  outbound: value,
                 }),
               );
             }
           }
 
-          if (raws) {
-            yield put(updateWorkInProgressItemRaws(event.returnValue));
+          if (event.returnValue?.type === TASK_ACTION_TYPE.RAWS) {
+            const { value } = event.returnValue;
+            yield put(updateWorkInProgressItemRaws(value));
           }
 
           break;

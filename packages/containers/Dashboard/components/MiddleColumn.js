@@ -31,7 +31,6 @@ import {
 } from '@caesar/common/actions/workflow';
 import { updateGlobalNotification } from '@caesar/common/actions/application';
 import { MultiItem, List } from '@caesar/components';
-import { isDecryptedItem } from '@caesar/common/utils/item';
 import { sortByDate } from '@caesar/common/utils/dateUtils';
 import { MODAL } from '../constants';
 import { filter } from '../utils';
@@ -49,14 +48,16 @@ const MiddleColumnComponent = ({
   const workInProgressItem = useSelector(workInProgressItemSelector);
   const generalItems = useSelector(state =>
     itemsByListIdSelector(state, {
+      teamId: workInProgressList?.teamId,
       listId: workInProgressList?.id,
     }),
   );
+
   const visibleListItems = useMemo(
     () =>
-      generalItems
-        .filter(isDecryptedItem)
-        .sort((a, b) => sortByDate(a.lastUpdated, b.lastUpdated, 'DESC')),
+      generalItems.sort((a, b) =>
+        sortByDate(a.lastUpdated, b.lastUpdated, 'DESC'),
+      ),
     [generalItems],
   );
   const trashList = useSelector(trashListSelector);
@@ -80,6 +81,7 @@ const MiddleColumnComponent = ({
   const currentTeamItems = useSelector(state =>
     teamItemsSelector(state, { teamId: currentTeamId }),
   );
+
   const searchedItems = useMemo(
     () =>
       filter(

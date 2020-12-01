@@ -9,6 +9,8 @@ export const REHYDRATE_STORE = '@workflow/REHYDRATE_STORE';
 export const RESET_STORE = '@workflow/RESET_STORE';
 export const RESET_APPLICATION_STATE = '@app/RESET_APPLICATION_STATE';
 
+export const RESET_APPLICATION_CACHE = '@app/RESET_APPLICATION_CACHE';
+
 export const ENCRYPTION_FINISHED_EVENT = '@app/ENCRYPTION_FINISHED_EVENT';
 export const DECRYPTION_FINISHED = '@app/DECRYPTION_FINISHED';
 
@@ -66,4 +68,8 @@ export const encryptionFinishedEvent = sets => ({
 
 export const resetApplicationState = () => ({
   type: RESET_APPLICATION_STATE,
+});
+
+export const resetApplicationCache = () => ({
+  type: RESET_APPLICATION_CACHE,
 });

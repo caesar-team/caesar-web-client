@@ -1,5 +1,5 @@
 import React from 'react';
-import { ConfirmModal } from '@caesar/components';
+import { ConfirmModal } from './ConfirmModal';
 
 export const ConfirmLeaveTeamModal = ({
   isOpened,

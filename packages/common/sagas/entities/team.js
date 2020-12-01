@@ -61,7 +61,7 @@ import { updateGlobalNotification } from '@caesar/common/actions/application';
 import { finishIsLoading } from '@caesar/common/actions/workflow';
 import {
   createKeyPair,
-  encryptSecret,
+  encryptItem,
   generateKeyPair,
 } from '@caesar/common/sagas/entities/item';
 import {
@@ -110,7 +110,6 @@ export function* fetchTeamSaga({ payload: { teamId } }) {
     const teamsById = convertTeamsToEntity([team]);
 
     yield put(fetchTeamSuccess(teamsById[teamId]));
-    yield put(finishIsLoading());
   } catch (error) {
     // eslint-disable-next-line no-console
     console.error(error);
@@ -194,24 +193,25 @@ export function* createTeamKeyPairSaga({
 4. Save all secrets to the server
 5. Add the members to the team
 */
-export function* encryptMemberTeamKey({ member, keypair }) {
-  const { id: userId, publicKey } = member;
+export function* encryptMemberTeamKey({ user, keypair }) {
+  const { id: userId, publicKey } = user;
 
   const itemKeyPair = Object.values(
     convertKeyPairToItemEntity([keypair]),
   ).shift();
 
-  const secret = yield call(encryptSecret, {
+  const { data, raws } = yield call(encryptItem, {
     item: itemKeyPair,
     publicKey,
   });
-  const teamRole = member?.domainRoles?.includes(TEAM_ROLES.ROLE_ADMIN)
+  const memberRole = user?.role || TEAM_ROLES.ROLE_MEMBER;
+  const teamRole = user?.domainRoles?.includes(TEAM_ROLES.ROLE_ADMIN)
     ? TEAM_ROLES.ROLE_ADMIN
-    : TEAM_ROLES.ROLE_MEMBER;
+    : memberRole;
 
   return {
     userId,
-    secret,
+    secret: JSON.stringify({ data, raws }),
     teamRole,
   };
 }
@@ -246,7 +246,7 @@ export function* createTeamSaga({
       throw new Error(`Can't create the team with the title: ${title}`);
     }
 
-    const encryptedKeypair = yield call(encryptSecret, {
+    const { data, raws } = yield call(encryptItem, {
       item: teamKeyPair,
       publicKey,
     });
@@ -254,7 +254,7 @@ export function* createTeamSaga({
     const serverPayload = {
       team,
       keypair: {
-        secret: encryptedKeypair,
+        secret: JSON.stringify({ data, raws }),
       },
     };
 

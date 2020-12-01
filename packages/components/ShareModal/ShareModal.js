@@ -156,11 +156,11 @@ export const ShareModal = ({
   ];
 
   const shouldShowAddedMembers = members.length > 0;
-  const shouldShowTeamsSection = false;
+  const shouldShowTeamsSection = teams.length > 0;
   const shouldShowSharedMembers = sharedMembers.length > 0;
   const visibleEntitiesCount = items.length + members.length;
   const WrapperComponent = visibleEntitiesCount > 3 ? Scrollbar : Wrapper;
-  
+
   return (
     <Modal
       isOpened
@@ -248,7 +248,7 @@ export const ShareModal = ({
           </ButtonStyled>
           <Button onClick={handleClickDone}>Done</Button>
         </ButtonsWrapper>
-      </WrapperComponent>  
+      </WrapperComponent>
     </Modal>
   );
 };

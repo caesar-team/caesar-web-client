@@ -9,10 +9,17 @@ import { passwordGenerator } from './passwordGenerator';
 const srp = createSrp();
 
 export const unsealPrivateKeyObj = async (privateKey, password) => {
-  const privateKeyObj = (await openpgp.key.readArmored(privateKey)).keys[0];
-  await privateKeyObj.decrypt(password);
+  try {
+    const privateKeyObj = (await openpgp.key.readArmored(privateKey)).keys[0];
+    await privateKeyObj.decrypt(password);
 
-  return privateKeyObj;
+    return privateKeyObj;
+  } catch (error) {
+    // eslint-disable-next-line no-console
+    console.error(error);
+
+    return null;
+  }
 };
 
 export const testDecryptSecretArmored = async (
@@ -34,7 +41,7 @@ export const testDecryptSecretArmored = async (
   }
 };
 
-export const decryptItem = async (secretArmored, privateKeyObj) => {
+export const decryptData = async (secretArmored, privateKeyObj) => {
   try {
     const secret = await openpgp.message.readArmored(secretArmored);
     const { data } = await openpgp.decrypt({
@@ -51,7 +58,7 @@ export const decryptItem = async (secretArmored, privateKeyObj) => {
   }
 };
 
-export const encryptItem = async (data, key) => {
+export const encryptData = async (data, key) => {
   const encrypted = await openpgp.encrypt({
     message: openpgp.message.fromBinary(
       openpgp.util.str_to_Uint8Array(objectToBase64(data)),
@@ -62,9 +69,9 @@ export const encryptItem = async (data, key) => {
   return encrypted.data;
 };
 
-export const encryptItemsBatch = async (dataSet, key) => {
+export const encryptDataBatch = async (dataSet, key) => {
   // eslint-disable-next-line
-  return Promise.all(dataSet.map(async data => await encryptItem(data, key)));
+  return Promise.all(dataSet.map(async data => await encryptData(data, key)));
 };
 
 export const encryptByPassword = async (data, password) => {

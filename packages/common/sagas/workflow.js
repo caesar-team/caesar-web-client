@@ -16,6 +16,7 @@ import {
   INIT_IMPORT_SETTINGS,
   UPDATE_WORK_IN_PROGRESS_ITEM,
   SET_WORK_IN_PROGRESS_ITEM,
+  startIsLoading,
   finishIsLoading,
   setWorkInProgressListId,
   setWorkInProgressItem,
@@ -28,6 +29,9 @@ import {
   finishProcessingKeyPairs,
   FINISH_PROCESSING_KEYPAIRS,
   INIT_CREATE_PAGE,
+  INIT_PREFERENCES_SETTINGS,
+  DOWNLOAD_ITEM_ATTACHMENT,
+  DOWNLOAD_ITEM_ATTACHMENTS,
 } from '@caesar/common/actions/workflow';
 import { addListsBatch } from '@caesar/common/actions/entities/list';
 import deepequal from 'fast-deep-equal';
@@ -46,12 +50,14 @@ import {
   addShareKeyPairBatch,
   addTeamKeyPairBatch,
 } from '@caesar/common/actions/keystore';
-import { fetchUserSelfSaga } from '@caesar/common/sagas/currentUser';
+import {
+  fetchKeyPairSaga,
+  fetchUserSelfSaga,
+} from '@caesar/common/sagas/currentUser';
 import { fetchUsersSaga } from '@caesar/common/sagas/entities/user';
 import {
   createTeamKeyPairSaga,
   fetchTeamsSaga,
-  fetchTeamSaga,
 } from '@caesar/common/sagas/entities/team';
 import { fetchTeamMembersSaga } from '@caesar/common/sagas/entities/member';
 import {
@@ -62,9 +68,11 @@ import {
 } from '@caesar/common/normalizers/normalizers';
 import { arrayToObject, objectToArray } from '@caesar/common/utils/utils';
 import {
+  getItemRaws,
   getKeypairs,
   getLastUpdatedUserItems,
   getLists,
+  getRemovedItems,
   getTeamKeyPair,
   getTeamLists,
 } from '@caesar/common/api';
@@ -75,13 +83,13 @@ import {
 } from '@caesar/common/selectors/entities/list';
 import {
   currentUserDataSelector,
-  masterPasswordSelector,
   currentTeamIdSelector,
   isUserDomainAdminOrManagerSelector,
   currentUserTeamListSelector,
   getLastUpdatedSelector,
 } from '@caesar/common/selectors/currentUser';
 import {
+  itemsByIdSelector,
   itemsByListIdsSelector,
   itemSelector,
   nonDecryptedSharedItemsSelector,
@@ -95,7 +103,6 @@ import {
 import {
   teamKeyPairSelector,
   shareKeyPairsSelector,
-  shareItemKeyPairSelector,
   isKeystoreEmpty,
 } from '@caesar/common/selectors/keystore';
 import { addTeamsBatch, lockTeam } from '@caesar/common/actions/entities/team';
@@ -109,6 +116,13 @@ import { teamMembersFullViewSelector } from '../selectors/entities/member';
 import { userSelector } from '../selectors/entities/user';
 import { fetchTeamMembersRequest } from '../actions/entities/member';
 import { getCurrentUnixtime } from '../utils/dateUtils';
+import { decryptData, unsealPrivateKeyObj } from '../utils/cipherUtils';
+import { downloadAsZip, downloadFile } from '../utils/file';
+import { getItemMetaData } from '../utils/item';
+import { getItemKeyPair } from './entities/item';
+
+const ON_DEMAND_DECRYPTION = true;
+// TODO: This saga is huge and must be refactored
 
 export function decryptItemsByItemIdKeys(items, keyPairs) {
   try {
@@ -151,16 +165,68 @@ export function decryptItemsByItemIdKeys(items, keyPairs) {
     return [];
   }
 }
-export function* decryptUserItems(items) {
-  const keyPair = yield select(teamKeyPairSelector, {
+
+function* getPersonalKey() {
+  let keypair = yield select(teamKeyPairSelector, {
     teamId: TEAM_TYPE.PERSONAL,
   });
 
+  if (!keypair) {
+    // eslint-disable-next-line no-console
+    // Check if the keystore was reset.
+    keypair = yield call(fetchKeyPairSaga);
+  }
+
+  const { privateKey = null, password = null } = keypair;
+
+  if (!privateKey || !password) return null;
+
+  return {
+    password,
+    privateKey,
+  };
+}
+
+export function* decryptUserItems(items) {
+  let personalKey = yield call(getPersonalKey);
+
+  if (!personalKey) {
+    personalKey = yield call(getPersonalKey);
+  }
+
+  if (!personalKey) {
+    // eslint-disable-next-line no-console
+    console.error(
+      "Warning! Can't decrypt user item! The keypair is missing or empty",
+    );
+
+    return;
+  }
   // decrypt the items
   if (items?.length > 0) {
     yield put(
       decryption({
         items,
+        key: personalKey.privateKey,
+        masterPassword: personalKey.password,
+      }),
+    );
+  }
+}
+
+export function* decryptItem(item) {
+  if (!item || !('id' in item)) return;
+  // decrypt the items
+  if (!item.data) {
+    const keyPair = yield call(getItemKeyPair, {
+      payload: {
+        item,
+      },
+    });
+
+    yield put(
+      decryption({
+        items: [item],
         key: keyPair.privateKey,
         masterPassword: keyPair.password,
       }),
@@ -168,14 +234,83 @@ export function* decryptUserItems(items) {
   }
 }
 
+export function* decryptAttachmentRaw({ id, raw }, privateKeyObj) {
+  return {
+    id,
+    raw: yield Promise.resolve(decryptData(raw, privateKeyObj)),
+  };
+}
+
+export function* downloadItemAttachmentSaga({
+  payload: { itemId, attachment = {} },
+}) {
+  if (!itemId) return;
+  const item = yield select(itemSelector, { itemId });
+  const keyPair = yield call(getItemKeyPair, {
+    payload: {
+      item,
+    },
+  });
+
+  const { data: { raws } = { raws: [] } } = yield call(getItemRaws, itemId);
+  const itemRaws = JSON.parse(raws);
+
+  const { raw = null } = itemRaws[attachment.id] || {};
+
+  if (raw) {
+    const privateKeyObj = yield Promise.resolve(
+      unsealPrivateKeyObj(keyPair.privateKey, keyPair.password),
+    );
+    const rawFile = yield Promise.resolve(decryptData(raw, privateKeyObj));
+    const { name, ext } = attachment;
+    downloadFile(rawFile, `${name}.${ext}`);
+  }
+}
+
+export function* downloadItemAttachmentsSaga({ payload: { itemId } }) {
+  if (!itemId) return;
+  const item = yield select(itemSelector, { itemId });
+  const { title: itemName } = getItemMetaData(item);
+  const { attachments } = item.data;
+
+  const keyPair = yield call(getItemKeyPair, {
+    payload: {
+      item,
+    },
+  });
+
+  const { data: { raws } = { raws: [] } } = yield call(getItemRaws, itemId);
+  const itemRaws = JSON.parse(raws);
+
+  if (itemRaws) {
+    const privateKeyObj = yield Promise.resolve(
+      unsealPrivateKeyObj(keyPair.privateKey, keyPair.password),
+    );
+    const ids = Object.keys(itemRaws);
+    const decryptedRawsArray = yield all(
+      ids.map(id => decryptAttachmentRaw(itemRaws[id], privateKeyObj)),
+    );
+    const decryptedRaws = arrayToObject(decryptedRawsArray);
+
+    const files = attachments.map(attachment => ({
+      raw: decryptedRaws[attachment.id].raw,
+      name: `${attachment.name}.${attachment.ext}`,
+    }));
+    const filename = `${itemName}_attachments`;
+    downloadAsZip({ files, filename });
+  }
+}
+
 function* isTeamKeypairExists(teamId) {
   return !!(yield select(teamKeyPairSelector, { teamId }));
 }
 
-export function* processSharedItemsSaga() {
+export function* processSharedItemsSaga({ payload: { teamId } }) {
   try {
     const keyPairs = yield select(shareKeyPairsSelector);
-    const sharedItems = yield select(nonDecryptedSharedItemsSelector);
+    const sharedItems = yield select(nonDecryptedSharedItemsSelector, {
+      teamId,
+    });
 
     yield all(
       decryptItemsByItemIdKeys(
@@ -184,18 +319,40 @@ export function* processSharedItemsSaga() {
       ),
     );
 
-    // Remove undecrypttable items from the store
-    yield call(
-      removeItemsBatch,
-      sharedItems
-        .filter(sharedItem => !keyPairs[sharedItem.id])
-        .map(sharedItem => sharedItem.id),
-    );
+    const removedItemsIds = sharedItems
+      .filter(sharedItem => !keyPairs[sharedItem.id])
+      .map(sharedItem => sharedItem.id);
+
+    if (removedItemsIds.length) {
+      // eslint-disable-next-line no-console
+      console.warn(
+        `WARNING! These items cannot be decrypted as there are no keypairs and will remove from the store, the ids: %s`,
+        removedItemsIds,
+      );
+
+      // Remove undecrypttable items from the store
+      yield put(removeItemsBatch(removedItemsIds));
+    }
   } catch (error) {
     // eslint-disable-next-line no-console
     console.error(error);
   }
 }
+
+function* syncRemovedItems() {
+  const itemsById = yield select(itemsByIdSelector);
+
+  const { data: removedItemsIds } = yield call(
+    getRemovedItems,
+    Object.keys(itemsById),
+  );
+
+  if (removedItemsIds.length) {
+    // Remove undecrypttable items from the store
+    yield put(removeItemsBatch(removedItemsIds));
+  }
+}
+
 function* checkTeamPermissionsAndKeys(teamId, createKeyPair = false) {
   const teamKeypairExists = yield call(isTeamKeypairExists, teamId);
 
@@ -208,7 +365,7 @@ function* checkTeamPermissionsAndKeys(teamId, createKeyPair = false) {
     }
 
     // Update the members list
-    yield put(fetchTeamMembersRequest({ teamId }));
+    yield put(fetchTeamMembersRequest({ teamId, withoutKeys: true }));
     const { id: ownerId } = yield select(currentUserDataSelector);
     const team = yield select(teamSelector, { teamId });
     const teamMembers = (yield select(teamMembersFullViewSelector, {
@@ -225,7 +382,9 @@ function* checkTeamPermissionsAndKeys(teamId, createKeyPair = false) {
       return false;
     }
 
-    const { publicKey } = yield select(userSelector, { userId: ownerId });
+    const { publicKey = null } = yield select(userSelector, {
+      userId: ownerId,
+    }) || {};
 
     // eslint-disable-next-line no-console
     console.warn(
@@ -258,7 +417,6 @@ export function* processTeamItemsSaga({ payload: { teamId } }) {
 
     const teamItems = yield select(nonDecryptedTeamItemsSelector, { teamId });
     if (teamItems.length <= 0 || !privateKey || !password) return;
-
     yield put(
       decryption({
         items: teamItems,
@@ -293,7 +451,7 @@ export function* processTeamsItemsSaga() {
 function* loadTeamKeypairIfNotExists(teamId) {
   const teamKeypairExists = yield call(isTeamKeypairExists, teamId);
 
-  if (!teamKeypairExists) {
+  if (!teamKeypairExists && teamId !== TEAM_TYPE.PERSONAL) {
     const { data: keypairItem } = yield call(getTeamKeyPair, teamId);
     const { itemsById } = convertItemsToEntities([keypairItem]);
     const items = Object.values(itemsById);
@@ -318,20 +476,25 @@ function* initTeam(teamId) {
   }
 }
 
-function* checkTeamKeyPair(team) {
-  const check = yield call(checkTeamPermissionsAndKeys, team.id, true);
+function* checkTeamKeyPair(team, createKeyPair = false) {
+  const haveTeamPermissionsAndKeys = yield call(
+    checkTeamPermissionsAndKeys,
+    team.id,
+    createKeyPair,
+  );
+  const needToLockTeam = !haveTeamPermissionsAndKeys;
 
-  if (team.locked === !check) {
+  if (team.locked !== needToLockTeam) {
     return {
       ...team,
-      locked: !check,
+      locked: needToLockTeam,
     };
   }
 
   return null;
 }
 
-function* checkTeamsKeyPairs() {
+function* checkTeamsKeyPairs(createKeyPair = false) {
   const isUserDomainAdminOrManager = yield select(
     isUserDomainAdminOrManagerSelector,
   );
@@ -341,17 +504,28 @@ function* checkTeamsKeyPairs() {
 
   const checkCalls = teams
     .filter(t => t.id !== TEAM_TYPE.PERSONAL)
-    .map(checkTeamKeyPair);
+    .map(team => checkTeamKeyPair(team, createKeyPair));
   const checkedTeams = yield all(checkCalls);
   yield put(addTeamsBatch(arrayToObject(checkedTeams.filter(team => !!team))));
+}
+
+function* checkWIPItem() {
+  const WIPItem = yield select(workInProgressItemSelector);
+  if (!WIPItem) return;
+
+  const itemInStore = yield select(itemSelector, { itemId: WIPItem.id });
+
+  if (!deepequal(WIPItem.data, itemInStore.data)) {
+    // The data is mismatced, update
+    yield put(setWorkInProgressItem(itemInStore));
+  }
 }
 
 function* initTeamsSaga() {
   try {
     // Load avaible teams
     yield call(fetchTeamsSaga);
-
-    yield call(checkTeamsKeyPairs);
+    yield call(checkTeamsKeyPairs, true);
   } catch (error) {
     // eslint-disable-next-line no-console
     console.error(error);
@@ -440,11 +614,9 @@ function* loadKeyPairsAndPersonalItems() {
 
     const keypairsArray = objectToArray(keypairsById);
     const systemItems = objectToArray(systemItemsById);
-    const userItems = objectToArray(itemsById);
     const itemsEncryptedByUserKeys = [
       ...keypairsArray.filter(keyPairsEncryptedByUserKeysFilter),
       ...systemItems,
-      ...userItems,
     ];
     const itemsEncryptedByTeamKeys = keypairsArray.filter(
       keyPairsEncryptedByTeamKeysFilter,
@@ -457,13 +629,17 @@ function* loadKeyPairsAndPersonalItems() {
 
     yield put(addListsBatch(listsById));
     // Put to the store the shared and the team items, wait for processing of keypairs
-    yield put(
-      addItemsBatch({
-        ...sharedItemsById,
-        ...teamsItemsById,
-        ...itemsEncryptedByTeamKeys,
-      }),
-    );
+    const storedItems = {
+      ...itemsById,
+      ...sharedItemsById,
+      ...teamsItemsById,
+      ...itemsEncryptedByTeamKeys,
+    };
+
+    if (Object.keys(storedItems).length > 0) {
+      yield put(addItemsBatch(storedItems));
+    }
+
     if (!keypairsArray?.length) {
       const isEmptyStore = yield select(isKeystoreEmpty);
 
@@ -584,18 +760,19 @@ export function* openTeamVaultSaga({ payload: { teamId } }) {
 
     if (checksResult) {
       yield put(lockTeam(teamId, false));
-      // TODO: Here is opportunity to improve the calls
-      yield fork(processTeamItemsSaga, {
-        payload: {
-          teamId,
-        },
-      });
 
-      yield fork(processSharedItemsSaga, {
-        payload: {
-          teamId,
-        },
-      });
+      if (!ON_DEMAND_DECRYPTION) {
+        yield fork(processTeamItemsSaga, {
+          payload: {
+            teamId,
+          },
+        });
+        yield fork(processSharedItemsSaga, {
+          payload: {
+            teamId,
+          },
+        });
+      }
     } else {
       yield put(
         updateGlobalNotification(
@@ -608,6 +785,7 @@ export function* openTeamVaultSaga({ payload: { teamId } }) {
       // eslint-disable-next-line no-console
       console.error(`The team checks weren't pass`);
     }
+
     yield put(finishIsLoading());
   } catch (error) {
     // eslint-disable-next-line no-console
@@ -618,6 +796,7 @@ export function* openTeamVaultSaga({ payload: { teamId } }) {
 export function* openCurrentVaultSaga() {
   const teamId = yield select(currentTeamIdSelector) || TEAM_TYPE.PERSONAL;
   yield call(openTeamVaultSaga, { payload: { teamId } });
+  yield call(syncRemovedItems);
 }
 
 export function* updateWorkInProgressItemSaga({ payload: { itemId } }) {
@@ -640,48 +819,14 @@ export function* updateWorkInProgressItemSaga({ payload: { itemId } }) {
   }
 }
 
-function* getItemKeyPair({
-  payload: {
-    item: { id: itemId, teamId, isShared },
-  },
-}) {
-  switch (true) {
-    case teamId:
-      return yield select(teamKeyPairSelector, { teamId });
-    case isShared:
-      return yield select(shareItemKeyPairSelector, { itemId });
-    default:
-      return yield select(teamKeyPairSelector, { teamId: TEAM_TYPE.PERSONAL });
-  }
-}
-
-function* decryptItemRaws({ payload: { item } }) {
+function* decryptItemOnDemand({ payload: { item } }) {
   try {
     // If item is null or aready had decypted attachments then do not dectrypt again!
     if (!item || (item?.data?.raws && Object.values(item?.data?.raws) > 0)) {
       return;
     }
 
-    const { raws } = JSON.parse(item.secret);
-
-    const keyPair = yield call(getItemKeyPair, {
-      payload: {
-        item,
-      },
-    });
-
-    const masterPassword =
-      !item.teamId && !item.isShared
-        ? yield select(masterPasswordSelector)
-        : keyPair.password;
-
-    yield put(
-      decryption({
-        raws,
-        key: keyPair.privateKey,
-        masterPassword,
-      }),
-    );
+    yield fork(decryptItem, item, true);
   } catch (error) {
     // eslint-disable-next-line no-console
     console.error('error: ', error);
@@ -691,8 +836,7 @@ function* decryptItemRaws({ payload: { item } }) {
 function* setWorkInProgressItemSaga({ payload: { item } }) {
   try {
     if (!item) return;
-
-    yield call(decryptItemRaws, {
+    yield call(decryptItemOnDemand, {
       payload: {
         item,
       },
@@ -707,6 +851,8 @@ function* initDashboardSaga() {
   try {
     yield takeLatest(VAULTS_ARE_READY, openCurrentVaultSaga);
     yield call(initWorkflowSaga);
+    yield call(checkTeamsKeyPairs);
+    yield call(checkWIPItem);
   } catch (error) {
     // eslint-disable-next-line no-console
     console.error('error: ', error);
@@ -742,6 +888,8 @@ function* initTeamsSettingsSaga() {
 
 function* initTeamSettingsSaga() {
   try {
+    yield put(startIsLoading());
+
     const {
       router: {
         query: { id: teamId },
@@ -749,8 +897,9 @@ function* initTeamSettingsSaga() {
     } = Router;
 
     yield call(initWorkflowSaga);
-    yield call(fetchTeamSaga, { payload: { teamId } });
-    yield call(fetchTeamMembersSaga, { payload: { teamId } });
+    yield call(fetchTeamMembersSaga, {
+      payload: { teamId, withoutKeys: true },
+    });
   } catch (error) {
     // eslint-disable-next-line no-console
     console.error('error: ', error);
@@ -767,6 +916,16 @@ function* initImportSettingsSaga() {
   }
 }
 
+function* initPreferencesSettingsSaga() {
+  try {
+    yield call(fetchUserSelfSaga);
+    yield put(finishIsLoading());
+  } catch (error) {
+    // eslint-disable-next-line no-console
+    console.error('error: ', error);
+  }
+}
+
 function* vaultsReadySaga() {
   yield call(initTeamsSaga);
   yield put(vaultsReady());
@@ -776,7 +935,9 @@ function* checkUpdatesForWIP({ payload: { itemsById } }) {
   const oldItem = yield select(workInProgressItemSelector);
   if (oldItem?.id) {
     const newItem = itemsById[(oldItem?.id)];
-    if (!newItem?.data) return;
+    if (!newItem?.data || !oldItem?.data) {
+      yield call(decryptItem, newItem, true);
+    }
 
     const isChanged = !deepequal(newItem, oldItem);
     if (isChanged) {
@@ -795,12 +956,16 @@ export default function* workflowSagas() {
   yield takeLatest(INIT_TEAMS_SETTINGS, initTeamsSettingsSaga);
   yield takeLatest(INIT_TEAM_SETTINGS, initTeamSettingsSaga);
   yield takeLatest(INIT_IMPORT_SETTINGS, initImportSettingsSaga);
+  yield takeLatest(INIT_PREFERENCES_SETTINGS, initPreferencesSettingsSaga);
 
   yield takeLatest(SET_WORK_IN_PROGRESS_ITEM, setWorkInProgressItemSaga);
   yield takeLatest(UPDATE_WORK_IN_PROGRESS_ITEM, updateWorkInProgressItemSaga);
+  yield takeLatest(OPEN_CURRENT_VAULT, openCurrentVaultSaga);
   yield takeLatest(SET_CURRENT_TEAM_ID, initDashboardSaga);
   yield takeLatest(ADD_KEYPAIRS_BATCH, processKeyPairsSaga);
   yield takeLatest(FINISH_PROCESSING_KEYPAIRS, vaultsReadySaga);
+  yield takeLatest(DOWNLOAD_ITEM_ATTACHMENT, downloadItemAttachmentSaga);
+  yield takeLatest(DOWNLOAD_ITEM_ATTACHMENTS, downloadItemAttachmentsSaga);
   // Wait for keypairs
   yield takeLatest(OPEN_CURRENT_VAULT, openCurrentVaultSaga);
   yield takeEvery(ADD_ITEMS_BATCH, checkUpdatesForWIP);

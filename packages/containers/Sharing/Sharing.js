@@ -5,7 +5,7 @@ import { ItemByType } from '@caesar/components/Item/ItemByType';
 import { LIST_TYPE, PERMISSION_ENTITY } from '@caesar/common/constants';
 import {
   unsealPrivateKeyObj,
-  decryptItem,
+  decryptData,
 } from '@caesar/common/utils/cipherUtils';
 
 const getInboxItem = list => {
@@ -29,7 +29,7 @@ class SharingComponent extends Component {
     const item = getInboxItem(list);
 
     const privateKeyObj = await unsealPrivateKeyObj(privateKey, password);
-    const decryptedSecret = await decryptItem(item.secret, privateKeyObj);
+    const decryptedSecret = await decryptData(item.secret, privateKeyObj);
 
     this.setState({
       item: { ...item, data: decryptedSecret },

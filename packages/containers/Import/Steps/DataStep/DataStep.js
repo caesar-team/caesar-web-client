@@ -12,6 +12,7 @@ import {
   SelectListWrapper,
   MoveToText,
   StyledSelect,
+  StyledListSelect,
   StyledTable,
 } from './styles';
 import { normalize, denormalize, filter } from './utils';
@@ -136,14 +137,14 @@ const DataStep = ({
         />
       </StyledTable>
       <SelectListWrapper>
-        <MoveToText>Select list of importing:</MoveToText>
+        <MoveToText>Select team and list of importing:</MoveToText>
         <StyledSelect
           boxDirection="up"
           options={teamOptions}
           value={teamId}
           onChange={handleChangeTeamId}
         />
-        <StyledSelect
+        <StyledListSelect
           boxDirection="up"
           options={currentTeamListsOptions}
           value={listId}

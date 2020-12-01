@@ -77,7 +77,23 @@ export const nonDecryptedItemsSelector = createSelector(
 
 export const nonDecryptedSharedItemsSelector = createSelector(
   nonDecryptedItemsSelector,
-  items => items.filter(item => item.isShared),
+  teamIdPropSelector,
+  (items, teamId) => {
+    return Object.values(items).filter(
+      item => !item?.data && item.isShared && item.teamId === teamId,
+    );
+  },
+);
+
+const listIdPropSelector = (_, prop) => prop.listId;
+export const itemsGeneralListSelector = createSelector(
+  itemsByIdSelector,
+  listIdPropSelector,
+  (items, listId) => {
+    return Object.values(items).filter(
+      item => listId === item.listId && isGeneralItem(item),
+    );
+  },
 );
 
 export const teamItemsSelector = createSelector(
@@ -91,15 +107,18 @@ export const generalItemsSelector = createSelector(
   items => items.filter(isGeneralItem) || [],
 );
 
-const listIdPropSelector = (_, props) => props.listId;
 export const itemsByListIdSelector = createSelector(
   itemArraySelector,
   allTrashListIdsSelector,
+  teamIdPropSelector,
   listIdPropSelector,
-  (itemList, trashListIds, listId) => {
+  (itemList, trashListIds, teamId, listId) => {
     if (listId === LIST_TYPE.FAVORITES) {
       return itemList.filter(
-        item => item.favorite && !trashListIds.includes(item.listId),
+        item =>
+          item.favorite &&
+          item.teamId === teamId &&
+          !trashListIds.includes(item.listId),
       );
     }
 
@@ -125,4 +144,9 @@ export const itemsByListIdVisibleSelector = createSelector(
     itemList.filter(
       item => item.listId === listId && isGeneralItem(item) && !!item?.data,
     ),
+);
+
+export const importProgressPercentSelector = createSelector(
+  itemEntitySelector,
+  itemEntity => itemEntity.importProgressPercent,
 );

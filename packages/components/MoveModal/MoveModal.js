@@ -171,8 +171,8 @@ const MoveModalComponent = ({
         )
         .map(team => (
           <StyledRadio
-            key={team.id || team.title}
-            value={team.id || getTeamTitle(team)}
+            key={team.id}
+            value={team.id}
             label={
               <>
                 <StyledTeamAvatar

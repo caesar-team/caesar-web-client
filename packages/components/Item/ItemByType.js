@@ -3,13 +3,12 @@ import { ITEM_TYPE } from '@caesar/common/constants';
 import { TextError } from '../Error';
 import { Credentials, Document } from './types';
 
+const ITEM_COMPONENT_TYPE = {
+  [ITEM_TYPE.CREDENTIALS]: props => <Credentials {...props} />,
+  [ITEM_TYPE.DOCUMENT]: props => <Document {...props} />,
+  ['undefined']: props => <TextError>Unknown type</TextError>,
+};
+
 export const ItemByType = props => {
-  switch (props.item.type) {
-    case ITEM_TYPE.CREDENTIALS:
-      return <Credentials {...props} />;
-    case ITEM_TYPE.DOCUMENT:
-      return <Document {...props} />;
-    default:
-      return <TextError>Unknown type</TextError>;
-  }
+  return ITEM_COMPONENT_TYPE[props.item.type](props);
 };

@@ -22,7 +22,6 @@ import {
 } from './styles';
 
 const ItemIcon = ({ website, type }) => {
-  console.log(website);
   const websiteUrl = website ? getOriginDomain(website) : null;
 
   return (

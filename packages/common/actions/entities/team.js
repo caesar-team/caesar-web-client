@@ -116,14 +116,14 @@ export const createTeamKeysFailure = () => ({
   type: CREATE_TEAM_KEYS_FAILURE,
 });
 
-export const editTeamRequest = (
+export const editTeamRequest = ({
   teamId,
   title,
   icon,
   handleCloseModal,
   setSubmitting,
   setErrors,
-) => ({
+}) => ({
   type: EDIT_TEAM_REQUEST,
   payload: {
     teamId,

@@ -114,13 +114,13 @@ export const removeItemsBatchFailure = () => ({
   type: REMOVE_ITEMS_BATCH_FAILURE,
 });
 
-export const moveItemRequest = (
+export const moveItemRequest = ({
   itemId,
   teamId,
   listId,
   notification,
   notificationText,
-) => ({
+}) => ({
   type: MOVE_ITEM_REQUEST,
   payload: {
     itemId,
@@ -143,7 +143,7 @@ export const moveItemFailure = () => ({
   type: MOVE_ITEM_FAILURE,
 });
 
-export const moveItemsBatchRequest = (
+export const moveItemsBatchRequest = ({
   itemIds,
   oldTeamId,
   oldListId,
@@ -151,7 +151,7 @@ export const moveItemsBatchRequest = (
   listId,
   notification,
   notificationText,
-) => ({
+}) => ({
   type: MOVE_ITEMS_BATCH_REQUEST,
   payload: {
     itemIds,

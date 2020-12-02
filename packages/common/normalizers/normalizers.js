@@ -8,6 +8,7 @@ import {
   keypairItemSchema,
   shareItemSchema,
   memberSchema,
+  currentUserSchema,
 } from '@caesar/common/normalizers/schemas';
 
 const failIsNotAnArray = arrayObject => {
@@ -90,4 +91,10 @@ export const convertKeyPairToItemEntity = keypairs => {
   const normalized = normalize(keypairs, [keypairItemSchema]);
 
   return normalized.entities.keyPairItemById || {};
+};
+
+export const normalizeCurrentUser = currentUser => {
+  const normalized = normalize([currentUser], [currentUserSchema]);
+
+  return normalized.entities.user[currentUser.id] || {};
 };

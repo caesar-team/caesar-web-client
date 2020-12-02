@@ -29,3 +29,5 @@ export const GOOD_PASSWORD_RULES = [
     regexp: 'zxcvbn',
   },
 ];
+
+export const MAX_PASSWORD_LENGTH = 24;

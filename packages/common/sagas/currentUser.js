@@ -1,6 +1,7 @@
 /* eslint-disable no-console */
 import Router from 'next/router';
-import { put, call, takeLatest } from 'redux-saga/effects';
+import { put, call, all, select, takeLatest } from 'redux-saga/effects';
+import { difference } from 'lodash';
 import {
   FETCH_USER_SELF_REQUEST,
   FETCH_KEY_PAIR_REQUEST,
@@ -14,12 +15,21 @@ import {
   LEAVE_TEAM_REQUEST,
   leaveTeamFailure,
   leaveTeamSuccess,
+  setCurrentTeamId,
 } from '@caesar/common/actions/currentUser';
 import { addPersonalKeyPair } from '@caesar/common/actions/keystore';
 import {
   updateGlobalNotification,
   resetStore,
 } from '@caesar/common/actions/application';
+import {
+  setWorkInProgressListId,
+  setWorkInProgressItem,
+} from '@caesar/common/actions/workflow';
+import {
+  currentUserTeamIdsSelector,
+  currentTeamIdSelector,
+} from '@caesar/common/selectors/currentUser';
 import { editTeamSuccess } from '@caesar/common/actions/entities/team';
 import { getServerErrorMessage } from '@caesar/common/utils/error';
 import {
@@ -30,22 +40,56 @@ import {
   postLogout,
 } from '@caesar/common/api';
 import { removeCookieValue, clearStorage } from '@caesar/common/utils/token';
-import { createPermissionsFromLinks } from '@caesar/common/utils/createPermissionsFromLinks';
-import { ROUTES } from '@caesar/common/constants';
-import { convertTeamsToEntity } from '@caesar/common/normalizers/normalizers';
+import { ROUTES, TEAM_TYPE } from '@caesar/common/constants';
+import {
+  normalizeCurrentUser,
+  convertTeamsToEntity,
+} from '@caesar/common/normalizers/normalizers';
+import { clearStateWhenLeaveTeam } from './entities/team';
+
+export function* checkIfUserWasKickedFromTeam(userTeamIdsFromRequest) {
+  try {
+    const userTeamIds = yield select(currentUserTeamIdsSelector);
+
+    if (!userTeamIds) return;
+
+    let validUserTeamIds = [];
+
+    if (userTeamIdsFromRequest) {
+      validUserTeamIds = userTeamIdsFromRequest;
+    } else {
+      const { data } = yield call(getUserTeams);
+
+      validUserTeamIds = data.map(({ id }) => id);
+    }
+
+    const diff = difference(userTeamIds, validUserTeamIds);
+
+    if (diff.length) {
+      yield call(clearStateWhenLeaveTeam, { payload: { teamIds: diff } });
+
+      yield all(diff.map(teamId => put(leaveTeamSuccess(teamId))));
+
+      const currentTeamId = yield select(currentTeamIdSelector);
+
+      if (diff.includes(currentTeamId)) {
+        yield put(setCurrentTeamId(TEAM_TYPE.PERSONAL));
+        yield put(setWorkInProgressListId(null));
+        yield put(setWorkInProgressItem(null));
+      }
+    }
+  } catch (error) {
+    // eslint-disable-next-line no-console
+    console.error(error);
+  }
+}
 
 export function* fetchUserSelfSaga() {
   try {
     const { data: currentUser } = yield call(getUserSelf);
 
-    const fixedUser = {
-      ...currentUser,
-      _permissions: currentUser?._links
-        ? createPermissionsFromLinks(currentUser._links)
-        : {},
-    };
-
-    yield put(fetchUserSelfSuccess(fixedUser));
+    yield call(checkIfUserWasKickedFromTeam, currentUser?.data?.teamIds);
+    yield put(fetchUserSelfSuccess(normalizeCurrentUser(currentUser)));
   } catch (error) {
     console.error('error', error);
     yield put(fetchUserSelfFailure());
@@ -91,6 +135,7 @@ export function* leaveTeamSaga({ payload: { teamId } }) {
 
     yield put(leaveTeamSuccess(teamId));
     yield put(editTeamSuccess(teamsById[team.id]));
+    yield call(clearStateWhenLeaveTeam, { payload: { teamIds: [teamId] } });
 
     const {
       router: { route },

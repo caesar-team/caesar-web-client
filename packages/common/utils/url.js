@@ -10,7 +10,6 @@ export const parseUrl = url => {
     
     return urlObject;
   } catch(error) {
-    console.warn(`URL ${url} is invalid`);
     return {};
   }
 }

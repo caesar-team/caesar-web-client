@@ -68,6 +68,7 @@ const TeamDetails = styled.div`
 const TeamIcon = styled.img`
   object-fit: cover;
   width: 80px;
+  flex: 0 0 80px;
   height: 80px;
   border-radius: 50%;
 `;

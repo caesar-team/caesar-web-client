@@ -10,6 +10,7 @@ import {
   REMOVE_ANONYMOUS_KEY_PAIR,
   ADD_TEAM_KEY_PAIR_BATCH,
   ADD_SHARE_KEY_PAIR_BATCH,
+  REMOVE_KEY_PAIR_BATCH_BY_TEAM_IDS,
   RESET_KEYSTORE_STATE,
 } from '@caesar/common/actions/keystore';
 
@@ -180,6 +181,25 @@ export default createReducer(initialState, {
     return {
       ...state,
       [KEY_TYPE.ANONYMOUS]: newState,
+    };
+  },
+  [REMOVE_KEY_PAIR_BATCH_BY_TEAM_IDS](state, { payload }) {
+    return {
+      ...state,
+      [KEY_TYPE.TEAMS]: Object.keys(state[KEY_TYPE.TEAMS]).reduce(
+        (accumulator, itemId) =>
+          payload.teamIds.includes(state[KEY_TYPE.TEAMS][itemId].teamId)
+            ? accumulator
+            : { ...accumulator, [itemId]: state[KEY_TYPE.TEAMS][itemId] },
+        {},
+      ),
+      [KEY_TYPE.SHARES]: Object.keys(state[KEY_TYPE.SHARES]).reduce(
+        (accumulator, itemId) =>
+          payload.teamIds.includes(state[KEY_TYPE.SHARES][itemId].teamId)
+            ? accumulator
+            : { ...accumulator, [itemId]: state[KEY_TYPE.SHARES][itemId] },
+        {},
+      ),
     };
   },
   [RESET_KEYSTORE_STATE]() {

@@ -17,7 +17,10 @@ import {
   Tooltip,
   StrengthIndicator,
 } from '@caesar/components';
-import { GOOD_PASSWORD_RULES } from '@caesar/common/validation/constants';
+import {
+  GOOD_PASSWORD_RULES,
+  MAX_PASSWORD_LENGTH,
+} from '@caesar/common/validation/constants';
 import { INDICATOR_TYPE } from '@caesar/components/PasswordIndicator';
 import { passwordSchema } from './schema';
 
@@ -122,6 +125,7 @@ const MasterPasswordCreateFormComponent = ({ initialValues, onSubmit }) => {
           placeholder="Type password…"
           isAlwaysVisibleIcon
           autoFocus
+          maxLength={MAX_PASSWORD_LENGTH}
           error={dirty ? checkError(touched, errors, 'password') : null}
           onChange={handleChange}
           onBlur={handleBlur}

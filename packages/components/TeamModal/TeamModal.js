@@ -115,7 +115,11 @@ const TeamModal = ({
           </GroupAvatarsTip>
           {renderTeamAvatars({ values, setFieldValue, validateField })}
         </GroupAvatarsWrapper>
-        {errors?.form?.map(error => <Error key={error}>{error}</Error>)}
+        {typeof errors?.form === 'string' ? (
+          <Error>{errors?.form}</Error>
+        ) : (
+          errors?.form?.map(error => <Error key={error}>{error}</Error>)
+        )}
         <ButtonWrapper>
           <Button
             disabled={!dirty || isSubmitting || !isValid}

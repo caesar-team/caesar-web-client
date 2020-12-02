@@ -41,7 +41,7 @@ const ButtonsWrapper = styled.div`
   display: flex;
   align-items: center;
   justify-content: flex-end;
-  margin-top: 40px;
+  margin-top: 20px;
 `;
 
 const ButtonStyled = styled(Button)`
@@ -242,13 +242,13 @@ export const ShareModal = ({
             </ListItemsWrapper>
           </Items>
         )}
-        <ButtonsWrapper>
-          <ButtonStyled color="white" onClick={onCancel}>
-            Cancel
-          </ButtonStyled>
-          <Button onClick={handleClickDone}>Done</Button>
-        </ButtonsWrapper>
       </WrapperComponent>
+      <ButtonsWrapper>
+        <ButtonStyled color="white" onClick={onCancel}>
+          Cancel
+        </ButtonStyled>
+        <Button onClick={handleClickDone}>Done</Button>
+      </ButtonsWrapper>      
     </Modal>
   );
 };

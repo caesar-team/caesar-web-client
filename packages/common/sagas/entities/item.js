@@ -1,5 +1,5 @@
 import Router from 'next/router';
-import { put, call, takeLatest, select, fork, all } from 'redux-saga/effects';
+import { put, call, takeLatest, select, all } from 'redux-saga/effects';
 import deepequal from 'fast-deep-equal';
 import {
   CREATE_ITEM_REQUEST,
@@ -29,7 +29,7 @@ import {
   updateItemField,
   setImportProgressPercent,
 } from '@caesar/common/actions/entities/item';
-import { shareItemBatchSaga } from '@caesar/common/sagas/common/share';
+import { checkIfUserWasKickedFromTeam } from '@caesar/common/sagas/currentUser';
 import { setCurrentTeamId } from '@caesar/common/actions/currentUser';
 import { updateGlobalNotification } from '@caesar/common/actions/application';
 import {
@@ -101,7 +101,7 @@ import {
   convertItemsToEntities,
   convertKeyPairToEntity,
 } from '../../normalizers/normalizers';
-import { uuid4 } from '@caesar/common/utils/uuid4';
+import { uuid4 } from '../../utils/uuid4';
 
 const ITEMS_CHUNK_SIZE = 50;
 
@@ -210,6 +210,10 @@ export function* removeItemSaga({ payload: { itemId, listId } }) {
       updateGlobalNotification(getServerErrorMessage(error), false, true),
     );
     yield put(removeItemFailure());
+
+    if (error.status === 403) {
+      yield call(checkIfUserWasKickedFromTeam);
+    }
   }
 }
 
@@ -243,6 +247,10 @@ export function* removeItemsBatchSaga({ payload: { listId } }) {
       updateGlobalNotification(getServerErrorMessage(error), false, true),
     );
     yield put(removeItemsBatchFailure());
+
+    if (error.status === 403) {
+      yield call(checkIfUserWasKickedFromTeam);
+    }
   }
 }
 
@@ -259,80 +267,10 @@ export function* toggleItemToFavoriteSaga({ payload: { item } }) {
     yield put(
       updateGlobalNotification(getServerErrorMessage(error), false, true),
     );
-  }
-}
 
-export function* moveItemSaga({
-  payload: { itemId, teamId, listId },
-  meta: { notification, notificationText } = {},
-}) {
-  try {
-    yield put(updateGlobalNotification(MOVING_IN_PROGRESS_NOTIFICATION, true));
-
-    const list = yield select(listSelector, { listId });
-
-    const defaultList = teamId
-      ? yield select(currentTeamDefaultListSelector)
-      : yield select(defaultListSelector);
-
-    const newListId = list ? listId : defaultList?.id;
-
-    const item = yield select(itemSelector, { itemId });
-
-    yield call(updateMoveItem, item.id, {
-      listId: newListId,
-    });
-    yield put(moveItemSuccess(item.id, item.listId, newListId));
-
-    yield put(updateGlobalNotification(NOOP_NOTIFICATION, false));
-
-    if (notification) {
-      yield call(notification.show, {
-        text: notificationText || `The '${item.data.name}' has been moved`,
-      });
+    if (error.status === 403) {
+      yield call(checkIfUserWasKickedFromTeam);
     }
-
-    if (item.teamId !== teamId) {
-      yield put(updateItemField(item.id, 'teamId', teamId));
-    }
-
-    if (!item.teamId && teamId) {
-      yield fork(shareItemBatchSaga, {
-        payload: {
-          data: {
-            itemIds: [item.id],
-            members: [],
-            teamIds: [teamId],
-          },
-          options: {
-            includeIniciator: false,
-          },
-        },
-      });
-    }
-
-    if (item.teamId && !teamId) {
-      // TODO: Implement share access rights when moving item
-    }
-
-    if (item.teamId && teamId && item.teamId !== teamId) {
-      yield fork(shareItemBatchSaga, {
-        payload: {
-          data: {
-            itemIds: [item.id],
-            members: [],
-            teamIds: [teamId],
-          },
-          options: {
-            includeIniciator: false,
-          },
-        },
-      });
-    }
-  } catch (error) {
-    // eslint-disable-next-line no-console
-    console.error(error);
-    yield put(moveItemFailure());
   }
 }
 
@@ -369,6 +307,10 @@ export function* moveItemsBatchSaga({
       updateGlobalNotification(getServerErrorMessage(error), false, true),
     );
     yield put(moveItemsBatchFailure());
+
+    if (error.status === 403) {
+      yield call(checkIfUserWasKickedFromTeam);
+    }
   }
 }
 
@@ -412,6 +354,7 @@ export function* encryptAttachmentRaw({ id, raw }, publicKey) {
     raw: yield call(encryptData, raw, publicKey),
   };
 }
+
 export function* encryptRaws(raws, publicKey) {
   const encryptedRawsArray = yield all(
     Object.keys(raws).map(id =>
@@ -421,6 +364,7 @@ export function* encryptRaws(raws, publicKey) {
 
   return arrayToObject(encryptedRawsArray);
 }
+
 export function* encryptItem({ item, publicKey }) {
   const { data: { raws, ...data } = { raws: {} } } = item;
 
@@ -549,6 +493,70 @@ export function* saveItemSaga({ item, publicKey }) {
   const normalizedItem = Object.values(itemsById).shift();
 
   return normalizedItem;
+}
+
+export function* moveItemSaga({
+  payload: { itemId, teamId, listId },
+  meta: { notification, notificationText } = {},
+}) {
+  try {
+    yield put(updateGlobalNotification(MOVING_IN_PROGRESS_NOTIFICATION, true));
+
+    const list = yield select(listSelector, { listId });
+
+    const defaultList = teamId
+      ? yield select(currentTeamDefaultListSelector)
+      : yield select(defaultListSelector);
+
+    const newListId = list ? listId : defaultList?.id;
+
+    const item = yield select(itemSelector, { itemId });
+
+    yield call(updateMoveItem, item.id, {
+      listId: newListId,
+    });
+
+    if (item.teamId !== teamId) {
+      yield put(updateItemField(item.id, 'teamId', teamId));
+
+      const keyPair = yield select(teamKeyPairSelector, {
+        teamId,
+      });
+
+      if (!keyPair) {
+        throw new Error(`Can't find or create the key pair for the items.`);
+      }
+
+      const { publicKey } = keyPair;
+
+      if (!publicKey) {
+        // Nothing to do here
+        throw new Error(
+          `Can't find the publicKey in the key pair for the team ${teamId}`,
+        );
+      }
+
+      yield call(saveItemSaga, { item, publicKey });
+    }
+
+    yield put(moveItemSuccess(item.id, item.listId, newListId));
+
+    yield put(updateGlobalNotification(NOOP_NOTIFICATION, false));
+
+    if (notification) {
+      yield call(notification.show, {
+        text: notificationText || `The '${item.meta.title}' has been moved`,
+      });
+    }
+  } catch (error) {
+    // eslint-disable-next-line no-console
+    console.error(error);
+    yield put(moveItemFailure());
+
+    if (error.status === 403) {
+      yield call(checkIfUserWasKickedFromTeam);
+    }
+  }
 }
 
 export function* getKeyPairForTeam(teamId) {
@@ -734,66 +742,12 @@ export function* createItemSaga({
       updateGlobalNotification(getServerErrorMessage(error), false, true),
     );
     yield put(createItemFailure());
+
+    if (error.status === 403) {
+      yield call(checkIfUserWasKickedFromTeam);
+    }
   } finally {
     yield put(updateGlobalNotification(NOOP_NOTIFICATION, false));
-    setSubmitting(false);
-  }
-}
-
-// TODO: Need to be updated to the sepated raws feature
-export function* createItemsBatchSaga({
-  payload: { items, listId, ownerId = null },
-  meta: { setSubmitting },
-}) {
-  try {
-    if (items.length <= 0) {
-      throw new Error('The items list is empty');
-    }
-
-    yield put(updateGlobalNotification(ENCRYPTING_ITEM_NOTIFICATION, true));
-
-    const currentUserId = yield select(currentUserIdSelector);
-    const { teamId = TEAM_TYPE.PERSONAL } = items[0];
-
-    yield call(createIfNotExistKeyPair, {
-      payload: {
-        teamId,
-        ownerId: ownerId || currentUserId,
-      },
-    });
-
-    const keyPair = yield select(teamKeyPairSelector, {
-      teamId,
-    });
-
-    if (!keyPair) {
-      throw new Error(`Can't find or create the key pair for the items.`);
-    }
-
-    const itemsChunks = chunk(items, IMPORT_CHUNK_SIZE);
-    yield all(
-      itemsChunks.map(itemChunk =>
-        call(
-          postCreateItemsChunk,
-          { 
-            totalCount: items.length, 
-            items: itemChunk,
-            keyPair,
-            listId,
-          },
-        ),
-      ),
-    );
-
-    yield put(updateGlobalNotification(NOOP_NOTIFICATION, false));
-  } catch (error) {
-    // eslint-disable-next-line no-console
-    console.error(error);
-    yield put(
-      updateGlobalNotification(getServerErrorMessage(error), false, true),
-    );
-    yield put(createItemsBatchFailure());
-  } finally {
     setSubmitting(false);
   }
 }
@@ -830,10 +784,68 @@ function* postCreateItemsChunk({ totalCount, items, keyPair, listId }) {
     data: preparedForEncryptingItems[index],
   }));
   const { itemsById } = convertItemsToEntities(preparedForStoreItems);
-  yield put(setImportProgressPercent(
-    items.length / totalCount,
-  ));
+
+  yield put(setImportProgressPercent(items.length / totalCount));
   yield put(createItemsBatchSuccess(itemsById));
+}
+
+// TODO: Need to be updated to the sepated raws feature
+export function* createItemsBatchSaga({
+  payload: { items, listId, ownerId = null },
+  meta: { setSubmitting },
+}) {
+  try {
+    if (items.length <= 0) {
+      throw new Error('The items list is empty');
+    }
+
+    yield put(updateGlobalNotification(ENCRYPTING_ITEM_NOTIFICATION, true));
+
+    const currentUserId = yield select(currentUserIdSelector);
+    const { teamId = TEAM_TYPE.PERSONAL } = items[0];
+
+    yield call(createIfNotExistKeyPair, {
+      payload: {
+        teamId,
+        ownerId: ownerId || currentUserId,
+      },
+    });
+
+    const keyPair = yield select(teamKeyPairSelector, {
+      teamId,
+    });
+
+    if (!keyPair) {
+      throw new Error(`Can't find or create the key pair for the items.`);
+    }
+
+    const itemsChunks = chunk(items, IMPORT_CHUNK_SIZE);
+    yield all(
+      itemsChunks.map(itemChunk =>
+        call(postCreateItemsChunk, {
+          totalCount: items.length,
+          items: itemChunk,
+          keyPair,
+          listId,
+        }),
+      ),
+    );
+
+    yield put(updateGlobalNotification(NOOP_NOTIFICATION, false));
+  } catch (error) {
+    // eslint-disable-next-line no-console
+    console.error(error);
+    yield put(
+      updateGlobalNotification(getServerErrorMessage(error), false, true),
+    );
+    yield put(createItemsBatchFailure());
+
+    if (error.status === 403) {
+      yield call(checkIfUserWasKickedFromTeam);
+    }
+  } finally {
+    setSubmitting(false);
+  }
 }
 
 export function* getKeyPairForItem({ item }) {
@@ -879,6 +891,10 @@ export function* updateItemSaga({ payload: { item } }) {
       updateGlobalNotification(getServerErrorMessage(error), false, true),
     );
     yield put(updateItemFailure());
+
+    if (error.status === 403) {
+      yield call(checkIfUserWasKickedFromTeam);
+    }
   }
 }
 
@@ -945,6 +961,10 @@ export function* editItemSaga({
       updateGlobalNotification(getServerErrorMessage(error), false, true),
     );
     yield put(editItemFailure());
+
+    if (error.status === 403) {
+      yield call(checkIfUserWasKickedFromTeam);
+    }
   } finally {
     setSubmitting(false);
   }

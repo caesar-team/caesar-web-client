@@ -4,7 +4,7 @@ import memoize from 'memoize-one';
 import { FixedSizeList } from 'react-window';
 import AutoSizer from 'react-virtualized-auto-sizer';
 import styled from 'styled-components';
-import { transformListTitle } from '@caesar/common/utils/string';
+import { transformListTitle, getPlural } from '@caesar/common/utils/string';
 import { DASHBOARD_MODE } from '@caesar/common/constants';
 import { Scrollbar } from '../Scrollbar';
 import { EmptyList } from './EmptyList';
@@ -31,9 +31,7 @@ const ColumnHeader = styled.div`
 `;
 
 const ColumnTitle = styled.div`
-  font-size: 16px;
   font-weight: bold;
-  color: ${({ theme }) => theme.color.black};
 `;
 
 const createItemData = memoize(itemData => itemData);
@@ -107,7 +105,10 @@ const ListComponent = ({
           <ColumnTitle>
             {isDashboardDefaultMode
               ? listTitle
-              : `Search results (${items.length} elements):`}
+              : `Search results (${items.length} ${getPlural(items.length, [
+                  'element',
+                  'elements',
+                ])}):`}
           </ColumnTitle>
         </ColumnHeader>
       )}

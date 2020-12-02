@@ -68,6 +68,8 @@ export const REMOVE_SHARE_FAILURE = '@item/REMOVE_SHARE_FAILURE';
 export const UPDATE_ITEM_FIELD = '@item/UPDATE_ITEM_FIELD';
 export const ADD_ITEMS_BATCH = '@item/ADD_ITEMS_BATCH';
 export const REMOVE_ITEMS_BATCH = '@item/REMOVE_ITEMS_BATCH';
+export const REMOVE_ITEMS_BATCH_BY_TEAM_IDS =
+  '@item/REMOVE_ITEMS_BATCH_BY_TEAM_IDS';
 
 export const REMOVE_ITEMS_DATA = '@item/REMOVE_ITEMS_DATA';
 
@@ -114,13 +116,13 @@ export const removeItemsBatchFailure = () => ({
   type: REMOVE_ITEMS_BATCH_FAILURE,
 });
 
-export const moveItemRequest = (
+export const moveItemRequest = ({
   itemId,
   teamId,
   listId,
   notification,
   notificationText,
-) => ({
+}) => ({
   type: MOVE_ITEM_REQUEST,
   payload: {
     itemId,
@@ -143,7 +145,7 @@ export const moveItemFailure = () => ({
   type: MOVE_ITEM_FAILURE,
 });
 
-export const moveItemsBatchRequest = (
+export const moveItemsBatchRequest = ({
   itemIds,
   oldTeamId,
   oldListId,
@@ -151,7 +153,7 @@ export const moveItemsBatchRequest = (
   listId,
   notification,
   notificationText,
-) => ({
+}) => ({
   type: MOVE_ITEMS_BATCH_REQUEST,
   payload: {
     itemIds,
@@ -380,6 +382,13 @@ export const removeItemsBatch = itemIds => ({
   type: REMOVE_ITEMS_BATCH,
   payload: {
     itemIds,
+  },
+});
+
+export const removeItemsBatchByTeamIds = teamIds => ({
+  type: REMOVE_ITEMS_BATCH_BY_TEAM_IDS,
+  payload: {
+    teamIds,
   },
 });
 

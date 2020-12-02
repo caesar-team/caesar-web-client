@@ -112,6 +112,7 @@ function* getSharedItemKeyPairKey(item) {
 
   return convertSystemItemToKeyPair(keypair);
 }
+
 // Todo: Some code for refacting
 function* processMembersItemShare({ item, members }) {
   // Checking if the item already has shared
@@ -227,10 +228,12 @@ export function* shareItemBatchSaga({
     // Need To Go Deeper (c)
     yield all(
       yield all(
-        items.map(item => call(processMembersItemShare, {
-          item,
-          members: allMembers,
-        })),
+        items.map(item =>
+          call(processMembersItemShare, {
+            item,
+            members: allMembers,
+          }),
+        ),
       ),
     );
 

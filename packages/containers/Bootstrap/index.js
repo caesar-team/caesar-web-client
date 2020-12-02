@@ -1,6 +1,10 @@
 import { connect } from 'react-redux';
 import { createStructuredSelector } from 'reselect';
-import { setMasterPassword, logout } from '@caesar/common/actions/currentUser';
+import {
+  setMasterPassword,
+  fetchUserSelfSuccess,
+  logout,
+} from '@caesar/common/actions/currentUser';
 import { addPersonalKeyPair as setKeyPair } from '@caesar/common/actions/keystore';
 import { resetWorkflowState } from '@caesar/common/actions/workflow';
 import {
@@ -24,6 +28,7 @@ const mapStateToProps = createStructuredSelector({
 });
 
 const mapDispatchToProps = {
+  fetchUserSelfSuccess,
   setMasterPassword,
   setKeyPair,
   resetWorkflowState,

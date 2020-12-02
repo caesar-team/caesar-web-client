@@ -66,13 +66,13 @@ export const fetchTeamFailure = () => ({
   type: FETCH_TEAM_FAILURE,
 });
 
-export const createTeamRequest = (
+export const createTeamRequest = ({
   title,
   icon,
   handleCloseModal,
   setSubmitting,
   setErrors,
-) => ({
+}) => ({
   type: CREATE_TEAM_REQUEST,
   payload: {
     title,

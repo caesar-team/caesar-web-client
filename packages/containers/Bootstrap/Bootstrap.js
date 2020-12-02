@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import * as openpgp from 'openpgp';
 import { withRouter } from 'next/router';
 import { getUserBootstrap, getUserSelf } from '@caesar/common/api';
+import { normalizeCurrentUser } from '@caesar/common/normalizers/normalizers';
 import {
   DEFAULT_IDLE_TIMEOUT,
   NOOP_NOTIFICATION,
@@ -52,7 +53,12 @@ class Bootstrap extends Component {
   }
 
   async componentDidMount() {
-    const { logout, initCoresCount, shared = {} } = this.props;
+    const {
+      logout,
+      fetchUserSelfSuccess,
+      initCoresCount,
+      shared = {},
+    } = this.props;
     initCoresCount();
 
     try {
@@ -65,6 +71,8 @@ class Bootstrap extends Component {
       if (!currentUser || (isAnonymousOrReadOnlyUser && !shared?.mp)) {
         logout();
       }
+
+      fetchUserSelfSuccess(normalizeCurrentUser(currentUser));
 
       this.bootstrap = getBootstrapStates(bootstrap);
       this.navigationPanelSteps = getNavigationPanelSteps(this.bootstrap);

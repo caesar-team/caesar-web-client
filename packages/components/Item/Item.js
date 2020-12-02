@@ -106,7 +106,13 @@ const ItemComponent = ({
 
   const handleClickRestoreItem = async () => {
     dispatch(
-      moveItemRequest(item.id, item.teamId || null, item.previousListId),
+      moveItemRequest({
+        itemId: item.id,
+        teamId: item.teamId || null,
+        listId: item.previousListId,
+        notification,
+        notificationText: `The item "${item?.meta?.title}" has been restored`,
+      }),
     );
     dispatch(setWorkInProgressItem(null));
   };

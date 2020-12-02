@@ -1,5 +1,5 @@
 import Router from 'next/router';
-import { put, call, takeLatest, select, fork, all } from 'redux-saga/effects';
+import { put, call, takeLatest, select, all } from 'redux-saga/effects';
 import deepequal from 'fast-deep-equal';
 import {
   CREATE_ITEM_REQUEST,
@@ -29,7 +29,6 @@ import {
   updateItemField,
   setImportProgressPercent,
 } from '@caesar/common/actions/entities/item';
-import { shareItemBatchSaga } from '@caesar/common/sagas/common/share';
 import { checkIfUserWasKickedFromTeam } from '@caesar/common/sagas/currentUser';
 import { setCurrentTeamId } from '@caesar/common/actions/currentUser';
 import { updateGlobalNotification } from '@caesar/common/actions/application';
@@ -275,84 +274,6 @@ export function* toggleItemToFavoriteSaga({ payload: { item } }) {
   }
 }
 
-export function* moveItemSaga({
-  payload: { itemId, teamId, listId },
-  meta: { notification, notificationText } = {},
-}) {
-  try {
-    yield put(updateGlobalNotification(MOVING_IN_PROGRESS_NOTIFICATION, true));
-
-    const list = yield select(listSelector, { listId });
-
-    const defaultList = teamId
-      ? yield select(currentTeamDefaultListSelector)
-      : yield select(defaultListSelector);
-
-    const newListId = list ? listId : defaultList?.id;
-
-    const item = yield select(itemSelector, { itemId });
-
-    yield call(updateMoveItem, item.id, {
-      listId: newListId,
-    });
-    yield put(moveItemSuccess(item.id, item.listId, newListId));
-
-    yield put(updateGlobalNotification(NOOP_NOTIFICATION, false));
-
-    if (notification) {
-      yield call(notification.show, {
-        text: notificationText || `The '${item.data.name}' has been moved`,
-      });
-    }
-
-    if (item.teamId !== teamId) {
-      yield put(updateItemField(item.id, 'teamId', teamId));
-    }
-
-    if (!item.teamId && teamId) {
-      yield fork(shareItemBatchSaga, {
-        payload: {
-          data: {
-            itemIds: [item.id],
-            members: [],
-            teamIds: [teamId],
-          },
-          options: {
-            includeIniciator: false,
-          },
-        },
-      });
-    }
-
-    if (item.teamId && !teamId) {
-      // TODO: Implement share access rights when moving item
-    }
-
-    if (item.teamId && teamId && item.teamId !== teamId) {
-      yield fork(shareItemBatchSaga, {
-        payload: {
-          data: {
-            itemIds: [item.id],
-            members: [],
-            teamIds: [teamId],
-          },
-          options: {
-            includeIniciator: false,
-          },
-        },
-      });
-    }
-  } catch (error) {
-    // eslint-disable-next-line no-console
-    console.error(error);
-    yield put(moveItemFailure());
-
-    if (error.status === 403) {
-      yield call(checkIfUserWasKickedFromTeam);
-    }
-  }
-}
-
 export function* moveItemsBatchSaga({
   payload: { itemIds, oldTeamId, oldListId, teamId, listId },
   meta: { notification, notificationText } = {},
@@ -572,6 +493,70 @@ export function* saveItemSaga({ item, publicKey }) {
   const normalizedItem = Object.values(itemsById).shift();
 
   return normalizedItem;
+}
+
+export function* moveItemSaga({
+  payload: { itemId, teamId, listId },
+  meta: { notification, notificationText } = {},
+}) {
+  try {
+    yield put(updateGlobalNotification(MOVING_IN_PROGRESS_NOTIFICATION, true));
+
+    const list = yield select(listSelector, { listId });
+
+    const defaultList = teamId
+      ? yield select(currentTeamDefaultListSelector)
+      : yield select(defaultListSelector);
+
+    const newListId = list ? listId : defaultList?.id;
+
+    const item = yield select(itemSelector, { itemId });
+
+    yield call(updateMoveItem, item.id, {
+      listId: newListId,
+    });
+
+    if (item.teamId !== teamId) {
+      yield put(updateItemField(item.id, 'teamId', teamId));
+
+      const keyPair = yield select(teamKeyPairSelector, {
+        teamId,
+      });
+
+      if (!keyPair) {
+        throw new Error(`Can't find or create the key pair for the items.`);
+      }
+
+      const { publicKey } = keyPair;
+
+      if (!publicKey) {
+        // Nothing to do here
+        throw new Error(
+          `Can't find the publicKey in the key pair for the team ${teamId}`,
+        );
+      }
+
+      yield call(saveItemSaga, { item, publicKey });
+    }
+
+    yield put(moveItemSuccess(item.id, item.listId, newListId));
+
+    yield put(updateGlobalNotification(NOOP_NOTIFICATION, false));
+
+    if (notification) {
+      yield call(notification.show, {
+        text: notificationText || `The '${item.meta.title}' has been moved`,
+      });
+    }
+  } catch (error) {
+    // eslint-disable-next-line no-console
+    console.error(error);
+    yield put(moveItemFailure());
+
+    if (error.status === 403) {
+      yield call(checkIfUserWasKickedFromTeam);
+    }
+  }
 }
 
 export function* getKeyPairForTeam(teamId) {

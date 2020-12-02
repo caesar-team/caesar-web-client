@@ -73,7 +73,7 @@ class RemoveControl extends Component {
               textBoxWidth="256px"
               backgroundColor="black"
             >
-              <TooltipText>User isn’t registered in your domain.</TooltipText>
+              <TooltipText>User isn’t registered in your domain</TooltipText>
             </Tooltip>
           </WarningWrapper>
         )}

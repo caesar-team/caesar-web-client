@@ -1,10 +1,14 @@
 import { call, select, all, takeLatest, put } from '@redux-saga/core/effects';
-import { getOrCreateMemberBatchSaga } from '@caesar/common/sagas/entities/member';
+import {
+  fetchUsersSaga,
+  getOrCreateUserBatchSaga,
+} from '@caesar/common/sagas/entities/user';
 import {
   itemsBatchSelector,
   itemSelector,
 } from '@caesar/common/selectors/entities/item';
 import { teamsMembersFullViewSelector } from '@caesar/common/selectors/entities/member';
+import { userIdsSelector } from '@caesar/common/selectors/entities/user';
 import { currentUserDataSelector } from '@caesar/common/selectors/currentUser';
 import {
   shareKeyPairSelector,
@@ -54,7 +58,7 @@ export function* prepareUsersForSharing(members) {
         : DOMAIN_ROLES.ROLE_USER) || DOMAIN_ROLES.ROLE_USER,
   }));
 
-  return yield call(getOrCreateMemberBatchSaga, {
+  return yield call(getOrCreateUserBatchSaga, {
     payload: { emailRolePairs },
   });
 }
@@ -114,7 +118,7 @@ function* getSharedItemKeyPairKey(item) {
 }
 
 // Todo: Some code for refacting
-function* processMembersItemShare({ item, members }) {
+function* processMembersItemShare({ item, users }) {
   // Checking if the item already has shared
   let sharedItemKeyPairKey = yield select(shareKeyPairSelector, {
     itemId: item.id,
@@ -171,15 +175,13 @@ function* processMembersItemShare({ item, members }) {
 
   // Check duplicates members
   const invitedUserIds = item?.invited.map(invited => invited.userId);
-  const usersToInvite = members.filter(
-    member => !invitedUserIds.includes(member.id),
-  );
+  const usersToInvite = users.filter(user => !invitedUserIds.includes(user.id));
 
   const { data: userPublicKeys } = yield call(getPublicKeyByEmailBatch, {
-    emails: usersToInvite.map(member => member.email),
+    emails: usersToInvite.map(user => user.email),
   });
 
-  const membersSecretsCalls = userPublicKeys.map(
+  const usersSecretsCalls = userPublicKeys.map(
     ({ userId, publicKey: userPublicKey }) =>
       call(generateUserPostData, {
         keypair: sharedItemKeyPairKey,
@@ -188,13 +190,14 @@ function* processMembersItemShare({ item, members }) {
       }),
   );
 
-  const memberSecrets = yield all(membersSecretsCalls);
+  const userSecrets = yield all(usersSecretsCalls);
 
   return call(postItemShare, {
     itemId: item.id,
-    users: memberSecrets,
+    users: userSecrets,
   });
 }
+
 export function* updateSharedItemFromServer({ payload: { itemId } }) {
   const { data: itemFromServer } = yield call(getItem, itemId);
   const itemFromState = yield select(itemSelector, { itemId });
@@ -212,18 +215,32 @@ export function* updateSharedItemFromServer({ payload: { itemId } }) {
 // 3. Share the system keyPair item to the new members
 export function* shareItemBatchSaga({
   payload: {
-    data: { itemIds = [], members = [], teamIds = [] },
+    data: { itemIds = [], users = [], teamIds = [] },
   },
 }) {
   try {
     yield put(updateGlobalNotification(SHARING_IN_PROGRESS_NOTIFICATION, true));
-    // const currentTeamId = yield select(currentTeamIdSelector);
-    const items = yield select(itemsBatchSelector, { itemIds });
+
+    // Update domain user list before create new domain user
+    yield call(fetchUsersSaga);
+
+    const domainUserIds = yield select(userIdsSelector);
+    const domainUsers = users.filter(user => domainUserIds.includes(user.id));
+    const notDomainUsers = users.filter(
+      user => !domainUserIds.includes(user.id),
+    );
+
+    if (notDomainUsers.length) {
+      yield all([
+        // call(createUserSaga)
+      ]);
+    }
+
     const teamsMembers = yield select(teamsMembersFullViewSelector, {
       teamIds,
     });
-
-    const allMembers = [...members, ...teamsMembers];
+    const allUsers = [...domainUsers, ...teamsMembers];
+    const items = yield select(itemsBatchSelector, { itemIds });
 
     // Need To Go Deeper (c)
     yield all(
@@ -231,7 +248,7 @@ export function* shareItemBatchSaga({
         items.map(item =>
           call(processMembersItemShare, {
             item,
-            members: allMembers,
+            users: allUsers,
           }),
         ),
       ),

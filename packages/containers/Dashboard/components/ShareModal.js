@@ -34,13 +34,13 @@ export const ShareModal = ({
     ({ id }) => id !== workInProgressItem?.teamId && id !== null,
   );
 
-  const handleShare = (members, teamIds) => {
-    if (members.length > 0 || teamIds.length > 0) {
+  const handleShare = (users, teamIds) => {
+    if (users.length > 0 || teamIds.length > 0) {
       if (isMultiItem) {
         dispatch(
           shareItemBatchRequest({
             itemIds: workInProgressItemIds,
-            members,
+            users,
             teamIds,
           }),
         );
@@ -49,7 +49,7 @@ export const ShareModal = ({
         dispatch(
           shareItemBatchRequest({
             itemIds: [workInProgressItem?.id],
-            members,
+            users,
             teamIds,
           }),
         );

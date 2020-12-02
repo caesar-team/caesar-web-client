@@ -4,7 +4,7 @@ import {
   encryptData,
   generateAnonymousEmail,
 } from '@caesar/common/utils/cipherUtils';
-import { createMemberSaga } from '@caesar/common/sagas/entities/member';
+import { createUserSaga } from '@caesar/common/sagas/entities/user';
 import { DOMAIN_ROLES } from '@caesar/common/constants';
 import { generateSharingUrl } from '@caesar/common/utils/sharing';
 import { objectToBase64 } from '@caesar/common/utils/base64';
@@ -32,7 +32,7 @@ export function* createAnonymousLinkSaga() {
       password,
       masterPassword,
       publicKey,
-    } = yield call(createMemberSaga, {
+    } = yield call(createUserSaga, {
       payload: {
         email,
         role: DOMAIN_ROLES.ROLE_ANONYMOUS_USER,

@@ -9,7 +9,6 @@ import { Input } from './Input';
 import { Icon } from '../Icon';
 import { CircleLoader } from '../Loader';
 import { MemberList } from '../MemberList';
-import { Hint } from '../Hint';
 
 const Wrapper = styled.div`
   display: flex;
@@ -125,18 +124,11 @@ const Postfix = ({
   }
 
   if (!isLoading && !users.length && filterText?.includes('@')) {
-    // TODO: Remove Hint when invite users will be enabled
-    const disableInviteUserToDomain = true;
     const isDisabled = !EMAIL_REGEX.test(filterText);
 
     return (
-      <AddButton
-        disabled={disableInviteUserToDomain || isDisabled}
-        onClick={handleAddNewUser}
-      >
-        <Hint text="You cannot share the item(-s) with unregistered users">
-          <Icon name="plus" width={16} height={16} color="white" />
-        </Hint>
+      <AddButton disabled={isDisabled} onClick={handleAddNewUser}>
+        <Icon name="plus" width={16} height={16} color="white" />
       </AddButton>
     );
   }

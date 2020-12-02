@@ -248,7 +248,7 @@ export const ShareModal = ({
           Cancel
         </ButtonStyled>
         <Button onClick={handleClickDone}>Done</Button>
-      </ButtonsWrapper>      
+      </ButtonsWrapper>
     </Modal>
   );
 };

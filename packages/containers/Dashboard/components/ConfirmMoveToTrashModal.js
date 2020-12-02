@@ -40,29 +40,29 @@ export const ConfirmMoveToTrashModal = ({ isOpened, handleCloseModal }) => {
 
     if (workInProgressItemIds.length > 0) {
       dispatch(
-        moveItemsBatchRequest(
-          workInProgressItemIds,
-          workInProgressList?.teamId || null,
-          workInProgressList.id,
-          workInProgressList?.teamId || null,
-          trashListId,
+        moveItemsBatchRequest({
+          itemIds: workInProgressItemIds,
+          oldTeamId: workInProgressList?.teamId || null,
+          oldListId: workInProgressList.id,
+          teamId: workInProgressList?.teamId || null,
+          listId: trashListId,
           notification,
-          `The ${getPlural(workInProgressItemIds?.length, [
+          notificationText: `The ${getPlural(workInProgressItemIds?.length, [
             'item has',
             'items have',
           ])} been removed`,
-        ),
+        }),
       );
       dispatch(resetWorkInProgressItemIds());
     } else {
       dispatch(
-        moveItemRequest(
-          workInProgressItem.id,
-          workInProgressItem.teamId || null,
-          trashListId,
+        moveItemRequest({
+          itemId: workInProgressItem.id,
+          teamId: workInProgressItem.teamId || null,
+          listId: trashListId,
           notification,
-          `The '${workInProgressItem.data.name}' has been removed`,
-        ),
+          notificationText: `The '${workInProgressItem.data.name}' has been removed`,
+        }),
       );
       dispatch(setWorkInProgressItem(null));
     }

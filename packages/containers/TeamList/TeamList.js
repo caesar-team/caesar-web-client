@@ -36,13 +36,13 @@ class TeamListContainer extends Component {
   state = this.prepareInitialState();
 
   handleCreateSubmit = ({ title, icon, setSubmitting, setErrors }) => {
-    this.props.createTeamRequest(
+    this.props.createTeamRequest({
       title,
       icon,
-      this.handleCloseModal(NEW_TEAM_MODAL),
+      handleCloseModal: this.handleCloseModal(NEW_TEAM_MODAL),
       setSubmitting,
       setErrors,
-    );
+    });
   };
 
   handleEditSubmit = ({ teamId, title, icon, setSubmitting, setErrors }) => {

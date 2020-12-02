@@ -6,7 +6,6 @@ import { useDispatch } from 'react-redux';
 import { Button, Head, LogoCaesarDomain, LockInput } from '@caesar/components';
 import { Avatar } from '@caesar/components/Avatar';
 import { logout } from '@caesar/common/actions/currentUser';
-import { MAX_PASSWORD_LENGTH } from '@caesar/common/validation/constants';
 import { passwordSchema } from './schema';
 
 const Wrapper = styled.div`
@@ -95,7 +94,6 @@ const MasterPasswordCheckForm = ({ currentUser, onSubmit }) => {
             name="password"
             value={values.password}
             autoFocus
-            maxLength={MAX_PASSWORD_LENGTH}
             onChange={handleChange}
             onClick={submitForm}
             onBackspace={resetForm}

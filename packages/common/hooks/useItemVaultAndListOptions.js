@@ -44,9 +44,8 @@ export const useItemVaultAndListOptions = ({ teamId = null, listId }) => {
 
   const teamOptions = useMemo(
     () =>
-      // TODO: To enable move item between vaults remove 'id === teamId' condition
       vaults
-        .filter(({ id, locked }) => !locked && id === teamId)
+        .filter(({ locked }) => !locked)
         .sort((a, b) => {
           if (a.title.toLowerCase() === TEAM_TYPE.PERSONAL) return -1;
           if (b.title.toLowerCase() === TEAM_TYPE.PERSONAL) return 1;

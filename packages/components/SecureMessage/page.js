@@ -2,7 +2,7 @@ import React from 'react';
 import { Error, Head } from '@caesar/components';
 import { SecureMessageContainer } from '@caesar/containers';
 import { getSecureMessage } from '@caesar/common/api';
-import { UUID_REGEXP } from '@caesar/common/constants';
+import { SECURE_MESSAGE_REGEXP, UUID_REGEXP } from '@caesar/common/constants';
 import { base64ToObject } from '@caesar/common/utils/base64';
 import { logger } from '@caesar/common/utils/logger';
 
@@ -22,16 +22,22 @@ MessagePage.getInitialProps = async ({ query }) => {
   let password;
 
   if (id.length > 0 && !UUID_REGEXP.test(id)) {
-    const plObject = base64ToObject(id);
+    const credLink = base64ToObject(id);
 
-    if (!plObject || typeof plObject.messageId === 'undefined') {
+    const [
+      credData = null,
+      messageId = null,
+      messagePassword = null,
+    ] = credLink.match(SECURE_MESSAGE_REGEXP);
+
+    if (!credData || !messageId) {
       logger.error(`The messageId not found, args: %o`, query);
 
       return { statusCode: 404 };
     }
 
-    id = plObject.messageId;
-    password = plObject.password;
+    id = messageId;
+    password = messagePassword;
   }
 
   try {

@@ -39,6 +39,7 @@ export const DEFAULT_CORES_COUNT = 4;
 
 export const DECRYPTION_CHUNK_SIZE = 25;
 export const ENCRYPTION_CHUNK_SIZE = 25;
+export const IMPORT_CHUNK_SIZE = 100;
 
 export const LIST_TYPE = {
   INBOX: 'inbox',
@@ -123,7 +124,7 @@ export const ROUTES = {
   LOGOUT: '/logout',
   RESETTING: '/resetting',
   SECURE: '/secure',
-  SECURE_MESSAGE: '/secure/message/[id]',
+  SECURE_MESSAGE: '/s/m/[id]',
   SHARE: '/share',
   INVITE: '/invite',
   DASHBOARD: '/',
@@ -198,7 +199,7 @@ export const SAVE_NOTIFICATION = 'Saving...';
 export const NOOP_NOTIFICATION = '';
 
 export const UUID_REGEXP = /\b[0-9a-f]{8}\b-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-\b[0-9a-f]{12}\b/;
-
+export const SECURE_MESSAGE_REGEXP = /(\b[0-9a-f]{8}\b-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-\b[0-9a-f]{12}\b)+,(.*)/;
 export const TEAM_AVATAR_MAX_SIZE = 8 * 1024 * 1024;
 
 export const GOOD_PASSWORD_SCORE = 3;
@@ -260,11 +261,11 @@ export const DOMAIN_ROLES_LABELS = {
   ROLE_ANONYMOUS_USER: 'Anonym',
 };
 
-export const TEAM_ROLES_OPTIONS = 
+export const TEAM_ROLES_OPTIONS =
   Object.values(TEAM_ROLES).map(role => ({
     value: role,
     label: TEAM_ROLES_LABELS[role],
-  }));
+}));
 
 export const PERMISSION_MESSAGES = {
   FORBIDDEN_SELECT: "You don't have permissions to select the item",

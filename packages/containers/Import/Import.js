@@ -111,7 +111,6 @@ class Import extends Component {
     this.setState(this.prepareInitialState());
   };
 
-  // TODO: do progress bar in saga
   importing(listId, data, setSubmitting) {
     const items = data.map(({ type, ...secret }) => {
       const fields = pick(
@@ -129,10 +128,6 @@ class Import extends Component {
     });
 
     this.props.createItemsBatchRequest(items, listId, setSubmitting);
-
-    this.setState({
-      progress: 1,
-    });
   }
 
   prepareInitialState() {
@@ -143,13 +138,12 @@ class Import extends Component {
         rows: [],
       },
       matchings: {},
-      progress: 0,
     };
   }
 
   renderStep() {
-    const { teamsLists } = this.props;
-    const { currentStep, data, matchings, progress } = this.state;
+    const { teamsLists, importProgress } = this.props;
+    const { currentStep, data, matchings } = this.state;
 
     return matchStrict(
       currentStep,
@@ -174,7 +168,7 @@ class Import extends Component {
         ),
         IMPORTING_STEP: (
           <ImportingStep
-            progress={progress}
+            progress={importProgress}
             onClickToDashboard={this.handleClickToDashboard}
           />
         ),

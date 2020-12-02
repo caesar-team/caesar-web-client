@@ -41,7 +41,7 @@ const ButtonsWrapper = styled.div`
   display: flex;
   align-items: center;
   justify-content: flex-end;
-  margin-top: 40px;
+  margin-top: 20px;
 `;
 
 const ButtonStyled = styled(Button)`
@@ -156,7 +156,7 @@ export const ShareModal = ({
   ];
 
   const shouldShowAddedMembers = members.length > 0;
-  const shouldShowTeamsSection = false;
+  const shouldShowTeamsSection = teams.length > 0;
   const shouldShowSharedMembers = sharedMembers.length > 0;
   const visibleEntitiesCount = items.length + members.length;
   const WrapperComponent = visibleEntitiesCount > 3 ? Scrollbar : Wrapper;
@@ -242,13 +242,13 @@ export const ShareModal = ({
             </ListItemsWrapper>
           </Items>
         )}
-        <ButtonsWrapper>
-          <ButtonStyled color="white" onClick={onCancel}>
-            Cancel
-          </ButtonStyled>
-          <Button onClick={handleClickDone}>Done</Button>
-        </ButtonsWrapper>
       </WrapperComponent>
+      <ButtonsWrapper>
+        <ButtonStyled color="white" onClick={onCancel}>
+          Cancel
+        </ButtonStyled>
+        <Button onClick={handleClickDone}>Done</Button>
+      </ButtonsWrapper>      
     </Modal>
   );
 };

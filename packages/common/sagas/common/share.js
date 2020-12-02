@@ -4,6 +4,7 @@ import {
   itemsBatchSelector,
   itemSelector,
 } from '@caesar/common/selectors/entities/item';
+import { teamsMembersFullViewSelector } from '@caesar/common/selectors/entities/member';
 import { currentUserDataSelector } from '@caesar/common/selectors/currentUser';
 import {
   shareKeyPairSelector,
@@ -111,6 +112,7 @@ function* getSharedItemKeyPairKey(item) {
 
   return convertSystemItemToKeyPair(keypair);
 }
+
 // Todo: Some code for refacting
 function* processMembersItemShare({ item, members }) {
   // Checking if the item already has shared
@@ -210,18 +212,28 @@ export function* updateSharedItemFromServer({ payload: { itemId } }) {
 // 3. Share the system keyPair item to the new members
 export function* shareItemBatchSaga({
   payload: {
-    data: { itemIds = [], members = [] },
+    data: { itemIds = [], members = [], teamIds = [] },
   },
 }) {
   try {
     yield put(updateGlobalNotification(SHARING_IN_PROGRESS_NOTIFICATION, true));
     // const currentTeamId = yield select(currentTeamIdSelector);
     const items = yield select(itemsBatchSelector, { itemIds });
+    const teamsMembers = yield select(teamsMembersFullViewSelector, {
+      teamIds,
+    });
+
+    const allMembers = [...members, ...teamsMembers];
 
     // Need To Go Deeper (c)
     yield all(
       yield all(
-        items.map(item => call(processMembersItemShare, { item, members })),
+        items.map(item =>
+          call(processMembersItemShare, {
+            item,
+            members: allMembers,
+          }),
+        ),
       ),
     );
 

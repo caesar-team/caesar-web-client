@@ -1,6 +1,7 @@
 import React, { memo } from 'react';
 import styled from 'styled-components';
 import { Button } from '@caesar/components';
+import { getPlural } from '@caesar/common/utils/string';
 import { Checkbox } from '../Checkbox';
 
 const Wrapper = styled.div`
@@ -64,7 +65,10 @@ const MultiItemComponent = ({
   return (
     <Wrapper>
       <CheckboxStyled checked={areAllItemsSelected} onChange={onSelectAll} />
-      <Title>{workInProgressItemIds.length} items</Title>
+      <Title>
+        {workInProgressItemIds.length}{' '}
+        {getPlural(workInProgressItemIds.length, ['item', 'items'])}
+      </Title>
       {!isTrashItems && (
         <ButtonStyled withOfflineCheck color="white" onClick={onClickMove}>
           Move

@@ -136,19 +136,24 @@ const MoveModalComponent = ({
   const handleClickAccept = () => {
     if (isMultiMode) {
       dispatch(
-        moveItemsBatchRequest(
-          workInProgressItemIds,
-          teamId,
-          listId,
-          checkedTeamId,
-          checkedListId,
+        moveItemsBatchRequest({
+          itemIds: workInProgressItemIds,
+          oldTeamId: teamId,
+          oldListId: listId,
+          teamId: checkedTeamId,
+          listId: checkedListId,
           notification,
-        ),
+        }),
       );
       dispatch(resetWorkInProgressItemIds());
     } else {
       dispatch(
-        moveItemRequest(item.id, checkedTeamId, checkedListId, notification),
+        moveItemRequest({
+          itemId: item.id,
+          teamId: checkedTeamId,
+          listId: checkedListId,
+          notification,
+        }),
       );
       dispatch(setWorkInProgressItem(null));
     }

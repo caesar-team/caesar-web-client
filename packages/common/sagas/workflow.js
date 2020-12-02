@@ -694,14 +694,17 @@ function* initListsAndProgressEntities() {
   const workInProgressListCount =
     listItems.filter(itemsListFilter(workInProgressList?.id))?.length || 0;
 
+  let listIdToSet = workInProgressListId;
   if (!workInProgressList || workInProgressListCount <= 0) {
     if (favoritesListCount > 0) {
-      yield put(setWorkInProgressListId(favoritesList.id));
+      listIdToSet = favoritesList.id;
     } else if (inboxListCount > 0) {
-      yield put(setWorkInProgressListId(inboxList.id));
+      listIdToSet = inboxList.id;
     } else {
-      yield put(setWorkInProgressListId(defaultList.id));
+      listIdToSet = defaultList.id;
     }
+
+    yield put(setWorkInProgressListId(listIdToSet));
   }
 
   const workInProgressItem = yield select(workInProgressItemSelector);
@@ -712,7 +715,8 @@ function* initListsAndProgressEntities() {
 
   if (
     !isItemExists ||
-    ![currentTeamId, null].includes(workInProgressItem?.teamId)
+    ![currentTeamId, null].includes(workInProgressItem?.teamId) ||
+    workInProgressItem?.listId !== listIdToSet
   ) {
     yield put(setWorkInProgressItem(null));
   }

@@ -13,6 +13,7 @@ import {
   SORT_LIST_SUCCESS,
   SORT_LIST_FAILURE,
   ADD_LISTS_BATCH,
+  REMOVE_LISTS_BATCH_BY_TEAM_IDS,
   RESET_LIST_STATE,
 } from '@caesar/common/actions/entities/list';
 
@@ -89,6 +90,20 @@ export default createReducer(initialState, {
         ...state.byId,
         ...payload.listsById,
       },
+    };
+  },
+  [REMOVE_LISTS_BATCH_BY_TEAM_IDS](state, { payload }) {
+    if (!state.byId || Object.keys(state.byId).length <= 0) return state;
+
+    return {
+      ...state,
+      byId: Object.values(state.byId).reduce(
+        (accumulator, list) =>
+          payload.teamIds.includes(list.teamId)
+            ? accumulator
+            : { ...accumulator, [list.id]: state.byId[list.id] },
+        {},
+      ),
     };
   },
   [RESET_LIST_STATE]() {

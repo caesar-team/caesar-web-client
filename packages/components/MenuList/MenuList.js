@@ -41,8 +41,7 @@ const ColumnHeader = styled.div`
 
 const ColumnTitle = styled.div`
   margin-left: 16px;
-  font-size: 16px;
-  color: ${({ theme }) => theme.color.black};
+  text-align: left;
 `;
 
 const DropdownIcon = styled(Icon)`

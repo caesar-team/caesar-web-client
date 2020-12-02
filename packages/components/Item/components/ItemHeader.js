@@ -46,6 +46,7 @@ const PathButton = styled(Button)`
 `;
 
 const PathWrapper = styled.div`
+  display: flex;
   margin-right: auto;
 `;
 

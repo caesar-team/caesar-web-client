@@ -29,6 +29,7 @@ import {
   updateItemField,
   setImportProgressPercent,
 } from '@caesar/common/actions/entities/item';
+import { checkIfUserWasKickedFromTeam } from '@caesar/common/sagas/currentUser';
 import { setCurrentTeamId } from '@caesar/common/actions/currentUser';
 import { updateGlobalNotification } from '@caesar/common/actions/application';
 import {
@@ -100,7 +101,7 @@ import {
   convertItemsToEntities,
   convertKeyPairToEntity,
 } from '../../normalizers/normalizers';
-import { uuid4 } from '@caesar/common/utils/uuid4';
+import { uuid4 } from '../../utils/uuid4';
 
 const ITEMS_CHUNK_SIZE = 50;
 
@@ -209,6 +210,10 @@ export function* removeItemSaga({ payload: { itemId, listId } }) {
       updateGlobalNotification(getServerErrorMessage(error), false, true),
     );
     yield put(removeItemFailure());
+
+    if (error.status === 403) {
+      yield call(checkIfUserWasKickedFromTeam);
+    }
   }
 }
 
@@ -242,6 +247,10 @@ export function* removeItemsBatchSaga({ payload: { listId } }) {
       updateGlobalNotification(getServerErrorMessage(error), false, true),
     );
     yield put(removeItemsBatchFailure());
+
+    if (error.status === 403) {
+      yield call(checkIfUserWasKickedFromTeam);
+    }
   }
 }
 
@@ -258,6 +267,10 @@ export function* toggleItemToFavoriteSaga({ payload: { item } }) {
     yield put(
       updateGlobalNotification(getServerErrorMessage(error), false, true),
     );
+
+    if (error.status === 403) {
+      yield call(checkIfUserWasKickedFromTeam);
+    }
   }
 }
 
@@ -294,6 +307,10 @@ export function* moveItemsBatchSaga({
       updateGlobalNotification(getServerErrorMessage(error), false, true),
     );
     yield put(moveItemsBatchFailure());
+
+    if (error.status === 403) {
+      yield call(checkIfUserWasKickedFromTeam);
+    }
   }
 }
 
@@ -337,6 +354,7 @@ export function* encryptAttachmentRaw({ id, raw }, publicKey) {
     raw: yield call(encryptData, raw, publicKey),
   };
 }
+
 export function* encryptRaws(raws, publicKey) {
   const encryptedRawsArray = yield all(
     Object.keys(raws).map(id =>
@@ -346,6 +364,7 @@ export function* encryptRaws(raws, publicKey) {
 
   return arrayToObject(encryptedRawsArray);
 }
+
 export function* encryptItem({ item, publicKey }) {
   const { data: { raws, ...data } = { raws: {} } } = item;
 
@@ -533,6 +552,10 @@ export function* moveItemSaga({
     // eslint-disable-next-line no-console
     console.error(error);
     yield put(moveItemFailure());
+
+    if (error.status === 403) {
+      yield call(checkIfUserWasKickedFromTeam);
+    }
   }
 }
 
@@ -719,10 +742,51 @@ export function* createItemSaga({
       updateGlobalNotification(getServerErrorMessage(error), false, true),
     );
     yield put(createItemFailure());
+
+    if (error.status === 403) {
+      yield call(checkIfUserWasKickedFromTeam);
+    }
   } finally {
     yield put(updateGlobalNotification(NOOP_NOTIFICATION, false));
     setSubmitting(false);
   }
+}
+
+function* postCreateItemsChunk({ totalCount, items, keyPair, listId }) {
+  const preparedForEncryptingItems = items.map(
+    ({ attachments, type, ...data }) => ({
+      attachments,
+      ...data,
+    }),
+  );
+
+  const encryptedItems = yield call(
+    encryptDataBatch,
+    preparedForEncryptingItems,
+    keyPair.publicKey,
+  );
+
+  const preparedForRequestItems = items.map(({ type, ...data }, index) => ({
+    type,
+    listId,
+    meta: createItemMetaData({ data }),
+    secret: JSON.stringify({
+      data: encryptedItems[index],
+    }),
+  }));
+
+  const { data: serverItems } = yield call(postCreateItemsBatch, {
+    items: preparedForRequestItems,
+  });
+
+  const preparedForStoreItems = serverItems.map((item, index) => ({
+    ...item,
+    data: preparedForEncryptingItems[index],
+  }));
+  const { itemsById } = convertItemsToEntities(preparedForStoreItems);
+
+  yield put(setImportProgressPercent(items.length / totalCount));
+  yield put(createItemsBatchSuccess(itemsById));
 }
 
 // TODO: Need to be updated to the sepated raws feature
@@ -775,45 +839,13 @@ export function* createItemsBatchSaga({
       updateGlobalNotification(getServerErrorMessage(error), false, true),
     );
     yield put(createItemsBatchFailure());
+
+    if (error.status === 403) {
+      yield call(checkIfUserWasKickedFromTeam);
+    }
   } finally {
     setSubmitting(false);
   }
-}
-
-function* postCreateItemsChunk({ totalCount, items, keyPair, listId }) {
-  const preparedForEncryptingItems = items.map(
-    ({ attachments, type, ...data }) => ({
-      attachments,
-      ...data,
-    }),
-  );
-
-  const encryptedItems = yield call(
-    encryptDataBatch,
-    preparedForEncryptingItems,
-    keyPair.publicKey,
-  );
-
-  const preparedForRequestItems = items.map(({ type, ...data }, index) => ({
-    type,
-    listId,
-    meta: createItemMetaData({ data }),
-    secret: JSON.stringify({
-      data: encryptedItems[index],
-    }),
-  }));
-
-  const { data: serverItems } = yield call(postCreateItemsBatch, {
-    items: preparedForRequestItems,
-  });
-
-  const preparedForStoreItems = serverItems.map((item, index) => ({
-    ...item,
-    data: preparedForEncryptingItems[index],
-  }));
-  const { itemsById } = convertItemsToEntities(preparedForStoreItems);
-  yield put(setImportProgressPercent(items.length / totalCount));
-  yield put(createItemsBatchSuccess(itemsById));
 }
 
 export function* getKeyPairForItem({ item }) {
@@ -859,6 +891,10 @@ export function* updateItemSaga({ payload: { item } }) {
       updateGlobalNotification(getServerErrorMessage(error), false, true),
     );
     yield put(updateItemFailure());
+
+    if (error.status === 403) {
+      yield call(checkIfUserWasKickedFromTeam);
+    }
   }
 }
 
@@ -925,6 +961,10 @@ export function* editItemSaga({
       updateGlobalNotification(getServerErrorMessage(error), false, true),
     );
     yield put(editItemFailure());
+
+    if (error.status === 403) {
+      yield call(checkIfUserWasKickedFromTeam);
+    }
   } finally {
     setSubmitting(false);
   }

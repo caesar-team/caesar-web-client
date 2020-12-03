@@ -13,10 +13,10 @@ import {
   PERMISSION,
   PERMISSION_ENTITY,
   TEAM_ROLES_LABELS,
+  TEAM_ROLES_OPTIONS,
 } from '@caesar/common/constants';
 import { ability } from '@caesar/common/ability';
 import {
-  OPTIONS,
   ROLE_COLUMN_WIDTH,
   MENU_COLUMN_WIDTH,
   WIDTH_RATIO,
@@ -142,7 +142,7 @@ export const createColumns = ({
       const { cellRef, isDropdownUp } = useDropdownDirection({
         tableScrollTop,
         tableHeight,
-        optionLength: OPTIONS.length,
+        optionLength: TEAM_ROLES_OPTIONS.length,
       });
 
       return (
@@ -151,7 +151,7 @@ export const createColumns = ({
             <StyledSelect
               name="role"
               value={value}
-              options={OPTIONS}
+              options={TEAM_ROLES_OPTIONS}
               onChange={handleChangeRole(original.id)}
               boxDirection={isDropdownUp ? 'up' : 'down'}
             />

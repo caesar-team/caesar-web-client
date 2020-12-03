@@ -166,12 +166,12 @@ export const TeamContainerComponent = ({ currentUser, team, members }) => {
     dispatch(removeTeamRequest(team.id));
   };
 
-  const handleEdit = ({ teamId, title, icon, setSubmitting, setErrors }) => {
+  const handleEditTeam = ({ teamId, title, icon, setSubmitting, setErrors }) => {
     dispatch(editTeamRequest({
       teamId,
       title,
       icon,
-      handleCloseModal: handleCloseModal(NEW_TEAM_MODAL),
+      handleCloseModal: handleCloseModal(MODAL.NEW_TEAM),
       setSubmitting,
       setErrors,
     }));
@@ -265,7 +265,7 @@ export const TeamContainerComponent = ({ currentUser, team, members }) => {
       {modalVisibilities[MODAL.NEW_TEAM] && (
         <TeamModal
           teamId={team.id}
-          onEditSubmit={handleEdit}
+          onEditSubmit={handleEditTeam}
           onCancel={handleCloseModal(MODAL.NEW_TEAM)}
         />
       )}      

@@ -119,7 +119,7 @@ function* getSharedItemKeyPairKey(item) {
 }
 
 // Todo: Some code for refacting
-function* processMembersItemShare({ item, users }) {
+function* processUsersItemShare({ item, users }) {
   // Checking if the item already has shared
   let sharedItemKeyPairKey = yield select(shareKeyPairSelector, {
     itemId: item.id,
@@ -255,7 +255,7 @@ export function* shareItemBatchSaga({
     yield all(
       yield all(
         items.map(item =>
-          call(processMembersItemShare, {
+          call(processUsersItemShare, {
             item,
             users: allUsers,
           }),

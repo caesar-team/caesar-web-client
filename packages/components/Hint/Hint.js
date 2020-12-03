@@ -2,26 +2,64 @@ import React from 'react';
 import styled, { css } from 'styled-components';
 
 const POSITION = {
-  CENTER: 'center',
-  LEFT: 'left',
-  RIGHT: 'right',
+  TOP_LEFT: 'top_left',
+  TOP_CENTER: 'top_center',
+  TOP_RIGHT: 'top_right',
+  CENTER_LEFT: 'center_left',
+  CENTER_RIGHT: 'center_right',
+  BOTTOM_LEFT: 'bottom_left',
+  BOTTOM_CENTER: 'bottom_center',
+  BOTTOM_RIGHT: 'bottom_right',
 };
 
-const getHintPositioin = ({ position }) => {
+const getHintPosition = ({ position }) => {
   switch (position) {
-    case POSITION.LEFT:
+    case POSITION.BOTTOM_LEFT:
       return `
+        bottom: 0;
         right: 0;
-        transform: translate(0, -100%);
+        transform: translate(0, 100%);
       `;
-    case POSITION.RIGHT:
+    case POSITION.BOTTOM_RIGHT:
       return `
+        bottom: 0;
+        left: 0;
+        transform: translate(0, 100%);
+      `;
+    case POSITION.BOTTOM_CENTER:
+      return `
+        bottom: 0;
+        left: 50%;
+        transform: translate(-50%, 100%);
+      `;
+    case POSITION.CENTER_LEFT:
+      return `
+        top: 50%;
+        right: calc(100% + 4px);
+        transform: translate(0, -50%);
+      `;
+    case POSITION.CENTER_RIGHT:
+      return `
+        top: 50%;
+        left: calc(100% + 4px);
+        transform: translate(0, -50%);
+      `;
+    case POSITION.TOP_LEFT:
+      return `
+        top: -8px;
+        right: calc(-100% - 4px);
+        transform: translate(-100%, -100%);
+      `;
+    case POSITION.TOP_RIGHT:
+      return `
+        top: -8px;
         left: 0;
         transform: translate(0, -100%);
       `;
-    case POSITION.CENTER:
+    case POSITION.TOP_CENTER:
     default:
       return `
+        top: -8px;
         left: 50%;
         transform: translate(-50%, -100%);
       `;
@@ -45,8 +83,7 @@ export const HintStyles = css`
 const Inner = styled.div`
   ${HintStyles};
   position: absolute;
-  top: -8px;
-  ${getHintPositioin}
+  ${getHintPosition}
 `;
 
 const Wrapper = styled.div`
@@ -58,7 +95,7 @@ const Wrapper = styled.div`
   }
 `;
 
-export const Hint = ({ text, position = POSITION.CENTER, children }) => (
+export const Hint = ({ text, position = POSITION.TOP_CENTER, children }) => (
   <Wrapper>
     {children}
     {text && <Inner position={position}>{text}</Inner>}

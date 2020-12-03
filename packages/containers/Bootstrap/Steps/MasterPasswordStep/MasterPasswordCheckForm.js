@@ -94,7 +94,6 @@ const MasterPasswordCheckForm = ({ currentUser, onSubmit }) => {
             name="password"
             value={values.password}
             autoFocus
-            maxLength={24}
             onChange={handleChange}
             onClick={submitForm}
             onBackspace={resetForm}

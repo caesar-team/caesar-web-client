@@ -715,7 +715,7 @@ function* initListsAndProgressEntities() {
 
   if (
     !isItemExists ||
-    ![currentTeamId, null].includes(workInProgressItem?.teamId) ||
+    currentTeamId !== workInProgressItem?.teamId ||
     workInProgressItem?.listId !== listIdToSet
   ) {
     yield put(setWorkInProgressItem(null));

@@ -46,7 +46,7 @@ export function* fetchUsersSaga() {
   }
 }
 
-export function* createUserSaga({ payload: { email, role } }) {
+export function* createUserSaga({ payload: { email, domainRole } }) {
   try {
     const { password, masterPassword, publicKey, privateKey } = yield call(
       generateUser,
@@ -62,25 +62,19 @@ export function* createUserSaga({ payload: { email, role } }) {
       encryptedPrivateKey: privateKey,
       seed,
       verifier,
-      domainRoles: [role],
+      domainRoles: [domainRole],
     };
 
     const { data: user } = yield call(postNewUser, data);
 
-    if (role !== DOMAIN_ROLES.ROLE_ANONYMOUS_USER) {
-      yield put(
-        createUserSuccess({
-          id: user.id,
-          email,
-          name: email,
-          avatar: null,
-          publicKey,
-          domainRoles: [role],
-        }),
-      );
+    if (domainRole === DOMAIN_ROLES.ROLE_ANONYMOUS_USER) {
+      return { ...data, ...user, masterPassword };
     }
 
-    return { ...data, name: email, masterPassword, id: user.id, password };
+    const convertedUser = convertUsersToEntity([user])[user.id] || {};
+    yield put(createUserSuccess(convertedUser));
+
+    return convertedUser;
   } catch (error) {
     yield put(createUserFailure());
 

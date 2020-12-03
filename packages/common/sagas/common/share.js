@@ -1,6 +1,7 @@
 import { call, select, all, takeLatest, put } from '@redux-saga/core/effects';
 import {
   fetchUsersSaga,
+  createUserSaga,
   getOrCreateUserBatchSaga,
 } from '@caesar/common/sagas/entities/user';
 import {
@@ -229,17 +230,23 @@ export function* shareItemBatchSaga({
     const notDomainUsers = users.filter(
       user => !domainUserIds.includes(user.id),
     );
+    let newUsers = [];
 
     if (notDomainUsers.length) {
-      yield all([
-        // call(createUserSaga)
-      ]);
+      const newUser = yield call(createUserSaga, {
+        payload: {
+          email: notDomainUsers[0].email,
+          domainRole: DOMAIN_ROLES.ROLE_USER,
+        },
+      });
+
+      newUsers = [...newUsers, newUser];
     }
 
     const teamsMembers = yield select(teamsMembersFullViewSelector, {
       teamIds,
     });
-    const allUsers = [...domainUsers, ...teamsMembers];
+    const allUsers = [...newUsers, ...domainUsers, ...teamsMembers];
     const items = yield select(itemsBatchSelector, { itemIds });
 
     // Need To Go Deeper (c)

@@ -47,8 +47,8 @@ const getHintPosition = ({ position }) => {
     case POSITION.TOP_LEFT:
       return `
         top: -8px;
-        right: calc(-100% - 4px);
-        transform: translate(-100%, -100%);
+        right: 0;
+        transform: translate(0, -100%);
       `;
     case POSITION.TOP_RIGHT:
       return `

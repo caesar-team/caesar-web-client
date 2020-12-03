@@ -3,7 +3,7 @@ import { useSelector } from 'react-redux';
 import styled from 'styled-components';
 import { TEAM_TYPE, TEAM_TEXT_TYPE } from '@caesar/common/constants';
 import { currentTeamSelector } from '@caesar/common/selectors/currentUser';
-import { teamsByIdSelector } from '@caesar/common/selectors/entities/team';
+import { teamSelector } from '@caesar/common/selectors/entities/team';
 import { getTeamTitle } from '@caesar/common/utils/team';
 import { Scrollbar } from '../Scrollbar';
 import { Dropdown } from '../Dropdown';
@@ -64,11 +64,13 @@ const StyledAppVersion = styled(AppVersion)`
 `;
 
 const MenuListComponent = ({ mode, setSearchedText, setMode }) => {
-  const currentTeam = useSelector(currentTeamSelector);
-  const teamList = useSelector(teamsByIdSelector);
+  const selectedVault =
+    useSelector(currentTeamSelector) ||
+    useSelector(teamSelector, { teamId: TEAM_TYPE.PERSONAL });
+
   const [isDropdownOpened, setDropdownOpened] = useState(false);
   const [isListsOpened, setListsOpened] = useState(true);
-  const activeTeamId = currentTeam?.id || TEAM_TYPE.PERSONAL;
+  const activeTeamId = selectedVault?.id;
 
   const handleToggleDropdown = isOpened => {
     setDropdownOpened(isOpened);
@@ -77,7 +79,7 @@ const MenuListComponent = ({ mode, setSearchedText, setMode }) => {
   const getColumnTitle = () =>
     activeTeamId === TEAM_TYPE.PERSONAL
       ? TEAM_TEXT_TYPE[TEAM_TYPE.PERSONAL]
-      : getTeamTitle(teamList[activeTeamId]);
+      : getTeamTitle(selectedVault);
 
   const TeamAvatar = ({ team }) =>
     team?.locked ? (
@@ -107,7 +109,7 @@ const MenuListComponent = ({ mode, setSearchedText, setMode }) => {
           bgColor={isDropdownOpened ? 'white' : 'alto'}
           isDropdownOpened={isDropdownOpened}
         >
-          <TeamAvatar team={teamList[activeTeamId]} />
+          <TeamAvatar team={selectedVault} />
           <ColumnTitle>{getColumnTitle()}</ColumnTitle>
           <DropdownIcon
             name="arrow-triangle"

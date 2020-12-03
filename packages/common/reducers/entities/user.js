@@ -56,10 +56,7 @@ export default createReducer(initialState, {
       ...state,
       byId: {
         ...state.byId,
-        ...payload.users.reduce(
-          (accumulator, user) => ({ ...accumulator, [user.id]: user }),
-          {},
-        ),
+        ...payload.users,
       },
     };
   },

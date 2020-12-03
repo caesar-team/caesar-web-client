@@ -90,65 +90,33 @@ export function* createUserBatchSaga({ payload: { emailRolePairs } }) {
 
     const emails = emailRolePairs.map(({ email }) => email);
     const emailRoleObject = emailRolePairs.reduce(
-      (accumulator, { email, role }) => ({
+      (accumulator, { email, domainRole }) => ({
         ...accumulator,
-        [email]: role,
+        [email]: domainRole,
       }),
       {},
     );
 
     const generatedUsers = yield call(generateUsersBatch, emails);
 
-    const members = generatedUsers.map(
+    const users = generatedUsers.map(
       ({ email, password, publicKey, privateKey }) => ({
         email,
+        plainPassword: password,
         publicKey,
         encryptedPrivateKey: privateKey,
-        plainPassword: password,
         domainRoles: [emailRoleObject[email]],
         ...generateSeedAndVerifier(email, password),
       }),
     );
 
-    const { data: users } = yield call(postNewUserBatch, { users: members });
+    const { data: serverUsers } = yield call(postNewUserBatch, { users });
 
-    const userIds = users.map(({ id }) => id);
+    const convertedUsers = convertUsersToEntity(serverUsers) || {};
 
-    const preparedUsersForStore = userIds.reduce(
-      (accumulator, userId, index) => {
-        const member = members[index];
+    yield put(createUserBatchSuccess(convertedUsers));
 
-        return member.domainRoles.includes(DOMAIN_ROLES.ROLE_ANONYMOUS_USER)
-          ? accumulator
-          : [
-              ...accumulator,
-              {
-                id: userId,
-                email: member.email,
-                name: member.email,
-                avatar: null,
-                publicKey: member.publicKey,
-                domainRoles: [emailRoleObject[member.email]],
-                teamIds: [],
-                __type: ENTITY_TYPE.MEMBER,
-              },
-            ];
-      },
-      [],
-    );
-
-    yield put(createUserBatchSuccess(preparedUsersForStore));
-
-    return userIds.map((userId, index) => {
-      const member = members[index];
-
-      return {
-        ...member,
-        userId,
-        masterPassword: generatedUsers[index].masterPassword,
-        password: generatedUsers[index].password,
-      };
-    });
+    return Object.values(convertedUsers);
   } catch (error) {
     yield put(createUserBatchFailure());
 
@@ -159,9 +127,9 @@ export function* createUserBatchSaga({ payload: { emailRolePairs } }) {
 export function* getOrCreateUserBatchSaga({ payload: { emailRolePairs } }) {
   try {
     const emailRoleObject = emailRolePairs.reduce(
-      (accumulator, { email, role }) => ({
+      (accumulator, { email, domainRole }) => ({
         ...accumulator,
-        [email]: role,
+        [email]: domainRole,
       }),
       {},
     );
@@ -197,7 +165,7 @@ export function* getOrCreateUserBatchSaga({ payload: { emailRolePairs } }) {
 
     const newMemberEmailRolePairs = notExistedMemberEmails.map(email => ({
       email,
-      role: emailRoleObject[email],
+      domainRole: emailRoleObject[email],
     }));
 
     const newMembers = yield call(createUserBatchSaga, {

@@ -128,6 +128,7 @@ const TeamCardComponent = ({
   className,
   team,
   userId,
+  forceClosedMenu,
   onClick = Function.prototype,
   onClickEditTeam = Function.prototype,
   onClickLeaveTeam = Function.prototype,
@@ -165,6 +166,7 @@ const TeamCardComponent = ({
             zIndex: '10',
             border: '0',
           }}
+          forceClosed={forceClosedMenu}
         >
           <MenuWrapper>
             {canEditTeam && (

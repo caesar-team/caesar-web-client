@@ -156,7 +156,7 @@ export const ShareModal = ({
   ];
 
   const shouldShowAddedMembers = members.length > 0;
-  const shouldShowTeamsSection = teams.length > 0;
+  const shouldShowTeamsSection = false;
   const shouldShowSharedMembers = sharedMembers.length > 0;
   const visibleEntitiesCount = items.length + members.length;
   const WrapperComponent = visibleEntitiesCount > 3 ? Scrollbar : Wrapper;

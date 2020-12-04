@@ -54,14 +54,14 @@ class DottedMenu extends Component {
 
   render() {
     const { isOpened } = this.state;
-    const { className, children, tooltipProps = {} } = this.props;
+    const { className, children, tooltipProps = {}, forceClosed } = this.props;
 
     return (
       <Wrapper className={className}>
         <DottedWrapper onClick={this.handleToggle}>
           <MoreIcon name="more" color="gray" width={16} height={16} />
         </DottedWrapper>
-        <Tooltip {...tooltipProps} show={isOpened}>
+        <Tooltip {...tooltipProps} show={isOpened && !forceClosed}>
           {children}
         </Tooltip>
       </Wrapper>

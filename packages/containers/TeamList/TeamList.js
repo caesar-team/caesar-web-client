@@ -59,6 +59,7 @@ class TeamListContainer extends Component {
   handleOpenModal = modal => () => {
     this.setState(prevState => ({
       ...prevState,
+      forceClosedMenu: true,
       modalVisibilities: {
         ...prevState.modalVisibilities,
         [modal]: true,
@@ -69,6 +70,7 @@ class TeamListContainer extends Component {
   handleCloseModal = modal => () => {
     this.setState(prevState => ({
       ...prevState,
+      forceClosedMenu: false,
       selectedTeamId: null,
       modalVisibilities: {
         ...prevState.modalVisibilities,
@@ -166,10 +168,12 @@ class TeamListContainer extends Component {
         [REMOVE_TEAM_MODAL]: false,
       },
       activeTabName: ALL_TAB_NAME,
+      forceClosedMenu: false,
     };
   }
 
   renderTeamCards(teams) {
+    const { forceClosedMenu } = this.state;
     const { currentUser } = this.props;
 
     if (!teams || teams.length === 0) {
@@ -181,6 +185,7 @@ class TeamListContainer extends Component {
         key={team.id}
         team={team}
         userId={currentUser.id}
+        forceClosedMenu={forceClosedMenu}
         onClickEditTeam={this.handleClickEditTeam(team.id)}
         onClickLeaveTeam={this.handleClickLeaveTeam(team)}
         onClickRemoveTeam={this.handleClickRemoveTeam(team.id)}

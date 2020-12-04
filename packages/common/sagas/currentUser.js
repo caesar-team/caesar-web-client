@@ -137,6 +137,14 @@ export function* leaveTeamSaga({ payload: { teamId } }) {
     yield put(editTeamSuccess(teamsById[team.id]));
     yield call(clearStateWhenLeaveTeam, { payload: { teamIds: [teamId] } });
 
+    const currentTeamId = yield select(currentTeamIdSelector);
+
+    if (currentTeamId === teamId) {
+      yield put(setCurrentTeamId(TEAM_TYPE.PERSONAL));
+      yield put(setWorkInProgressListId(null));
+      yield put(setWorkInProgressItem(null));
+    }
+
     const {
       router: { route },
     } = Router;

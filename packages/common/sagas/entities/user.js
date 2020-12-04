@@ -23,7 +23,8 @@ import {
   generateUser,
   generateUsersBatch,
 } from '@caesar/common/utils/cipherUtils';
-import { ENTITY_TYPE, DOMAIN_ROLES } from '@caesar/common/constants';
+import { DOMAIN_ROLES } from '@caesar/common/constants';
+import { inviteNewUserBatchSaga } from '../common/invite';
 
 const setNewFlag = (users, isNew) =>
   users.map(user => ({
@@ -74,6 +75,14 @@ export function* createUserSaga({ payload: { email, domainRole } }) {
     const convertedUser = convertUsersToEntity([user])[user.id] || {};
     yield put(createUserSuccess(convertedUser));
 
+    const inviteUser = {
+      email,
+      plainPassword: password,
+      masterPassword,
+    };
+
+    yield call(inviteNewUserBatchSaga, { payload: { users: [inviteUser] } });
+
     return convertedUser;
   } catch (error) {
     yield put(createUserFailure());
@@ -111,6 +120,16 @@ export function* createUserBatchSaga({ payload: { emailRolePairs } }) {
     );
 
     const { data: serverUsers } = yield call(postNewUserBatch, { users });
+
+    const inviteUsers = generatedUsers.map(
+      ({ email, password, masterPassword }) => ({
+        email,
+        plainPassword: password,
+        masterPassword,
+      }),
+    );
+
+    yield call(inviteNewUserBatchSaga, { payload: { users: inviteUsers } });
 
     const convertedUsers = convertUsersToEntity(serverUsers) || {};
 

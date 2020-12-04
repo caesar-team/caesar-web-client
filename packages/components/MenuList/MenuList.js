@@ -1,7 +1,7 @@
 import React, { memo, useState } from 'react';
 import { useSelector } from 'react-redux';
 import styled from 'styled-components';
-import { TEAM_TYPE, TEAM_TEXT_TYPE } from '@caesar/common/constants';
+import { TEAM_TYPE } from '@caesar/common/constants';
 import { currentTeamSelector } from '@caesar/common/selectors/currentUser';
 import { teamSelector } from '@caesar/common/selectors/entities/team';
 import { getTeamTitle } from '@caesar/common/utils/team';
@@ -63,6 +63,18 @@ const StyledAppVersion = styled(AppVersion)`
   margin-top: auto;
 `;
 
+const TeamAvatar = ({ team }) =>
+  team?.locked ? (
+    <Icon name="warning" width={32} height={32} />
+  ) : (
+    <Avatar
+      avatar={team?.icon}
+      email={team?.email}
+      size={32}
+      fontSize="small"
+    />
+  );
+
 const MenuListComponent = ({ mode, setSearchedText, setMode }) => {
   const selectedVault =
     useSelector(currentTeamSelector) ||
@@ -75,23 +87,6 @@ const MenuListComponent = ({ mode, setSearchedText, setMode }) => {
   const handleToggleDropdown = isOpened => {
     setDropdownOpened(isOpened);
   };
-
-  const getColumnTitle = () =>
-    activeTeamId === TEAM_TYPE.PERSONAL
-      ? TEAM_TEXT_TYPE[TEAM_TYPE.PERSONAL]
-      : getTeamTitle(selectedVault);
-
-  const TeamAvatar = ({ team }) =>
-    team?.locked ? (
-      <Icon name="warning" width={32} height={32} />
-    ) : (
-      <Avatar
-        avatar={team?.icon}
-        email={team?.email}
-        size={32}
-        fontSize="small"
-      />
-    );
 
   return (
     <>
@@ -110,7 +105,7 @@ const MenuListComponent = ({ mode, setSearchedText, setMode }) => {
           isDropdownOpened={isDropdownOpened}
         >
           <TeamAvatar team={selectedVault} />
-          <ColumnTitle>{getColumnTitle()}</ColumnTitle>
+          <ColumnTitle>{getTeamTitle(selectedVault)}</ColumnTitle>
           <DropdownIcon
             name="arrow-triangle"
             width={16}

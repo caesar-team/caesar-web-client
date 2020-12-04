@@ -59,7 +59,7 @@ export function* createAnonymousLinkSaga() {
       objectToBase64({
         e: email,
         p: password,
-        mp: masterPassword,
+        m: masterPassword,
       }),
     );
 

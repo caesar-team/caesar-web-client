@@ -152,7 +152,7 @@ export const ShareModal = ({
   const searchedBlackListMemberIds = [
     currentUser.id,
     ...members.map(({ id }) => id),
-    ...sharedMembers.map(({ id }) => id),
+    ...sharedMembers.map(({ id } = {}) => id),
   ];
 
   const shouldShowAddedMembers = members.length > 0;

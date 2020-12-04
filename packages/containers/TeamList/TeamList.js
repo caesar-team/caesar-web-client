@@ -81,7 +81,7 @@ class TeamListContainer extends Component {
 
   handleClickEditTeam = teamId => event => {
     event.preventDefault();
-    //event.stopPropagation();
+    event.stopPropagation();
 
     this.setState(
       {

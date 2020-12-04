@@ -6,7 +6,10 @@ import { useRouter } from 'next/router';
 import styled from 'styled-components';
 import { isLoadingSelector } from '@caesar/common/selectors/workflow';
 import { isLoadingTeamsSelector } from '@caesar/common/selectors/entities/team';
-import { removeTeamRequest } from '@caesar/common/actions/entities/team';
+import {
+  removeTeamRequest,
+  editTeamRequest,
+} from '@caesar/common/actions/entities/team';
 import { leaveTeamRequest } from '@caesar/common/actions/currentUser';
 import {
   addTeamMembersBatchRequest,
@@ -24,7 +27,8 @@ import {
   ConfirmModal,
   ConfirmLeaveTeamModal,
   ConfirmRemoveMemberModal,
-} from '@caesar/components';
+  TeamModal,
+} from "@caesar/components";
 import {
   PERMISSION,
   PERMISSION_ENTITY,
@@ -53,6 +57,7 @@ export const TeamContainerComponent = ({ currentUser, team, members }) => {
     [MODAL.REMOVE_MEMBER]: false,
     [MODAL.LEAVE_TEAM]: false,
     [MODAL.REMOVE_TEAM]: false,
+    [MODAL.NEW_TEAM]: false,
   });
   const [manipulatedMember, setManipulatedMember] = useState(null);
 
@@ -161,6 +166,17 @@ export const TeamContainerComponent = ({ currentUser, team, members }) => {
     dispatch(removeTeamRequest(team.id));
   };
 
+  const handleEditTeam = ({ teamId, title, icon, setSubmitting, setErrors }) => {
+    dispatch(editTeamRequest({
+      teamId,
+      title,
+      icon,
+      handleCloseModal: handleCloseModal(MODAL.NEW_TEAM),
+      setSubmitting,
+      setErrors,
+    }));
+  };  
+
   if (!team.id && !isLoadingTeams) {
     router.push(ROUTES.SETTINGS + ROUTES.TEAM);
 
@@ -190,6 +206,14 @@ export const TeamContainerComponent = ({ currentUser, team, members }) => {
       title={`${getTeamTitle(team)} (${members.length})`}
       addonTopComponent={
         <>
+          <Can I={PERMISSION.EDIT} a={teamSubject}>
+            <ButtonStyled
+              withOfflineCheck
+              icon="pencil"
+              color="white"
+              onClick={handleOpenModal(MODAL.NEW_TEAM)}
+            />
+          </Can>          
           <Can I={PERMISSION.DELETE} a={teamSubject}>
             <ButtonStyled
               withOfflineCheck
@@ -238,6 +262,13 @@ export const TeamContainerComponent = ({ currentUser, team, members }) => {
           tableVisibleDataHeight={tableVisibleDataHeight}
         />
       </Table.Main>
+      {modalVisibilities[MODAL.NEW_TEAM] && (
+        <TeamModal
+          teamId={team.id}
+          onEditSubmit={handleEditTeam}
+          onCancel={handleCloseModal(MODAL.NEW_TEAM)}
+        />
+      )}      
       {modalVisibilities[MODAL.INVITE_MEMBER] && (
         <InviteModal
           currentUser={currentUser}

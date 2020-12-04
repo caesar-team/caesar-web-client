@@ -2,6 +2,7 @@
 import React from 'react';
 import { PERMISSION, PERMISSION_MESSAGES } from '@caesar/common/constants';
 import { getItemMetaData } from '@caesar/common/utils/item';
+import { getOriginDomain } from '@caesar/common/utils/url';
 import { Icon } from '../../Icon';
 import { Can } from '../../Ability';
 import {
@@ -21,13 +22,15 @@ import {
 } from './styles';
 
 const ItemIcon = ({ website, type }) => {
+  const websiteUrl = website ? getOriginDomain(website) : null;
+
   return (
     <IconWrapper>
-      {website ? (
+      {websiteUrl ? (
         <WebsiteFavIcon
-          website={website}
-          src={`https://www.google.com/s2/favicons?domain=${website}`}
-          alt={`The website favicon for address: ${website}`}
+          website={websiteUrl}
+          src={`https://www.google.com/s2/favicons?domain=${websiteUrl}`}
+          alt={`The website favicon for address: ${websiteUrl}`}
         />
       ) : (
         <ItemTypeIcon type={type} />

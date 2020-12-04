@@ -19,6 +19,8 @@ export const SORT_LIST_SUCCESS = '@list/SORT_LIST_SUCCESS';
 export const SORT_LIST_FAILURE = '@list/SORT_LIST_FAILURE';
 
 export const ADD_LISTS_BATCH = '@list/ADD_LISTS_BATCH';
+export const REMOVE_LISTS_BATCH_BY_TEAM_IDS =
+  '@list/REMOVE_LISTS_BATCH_BY_TEAM_IDS';
 
 export const CLEAR_SERVER_ERRORS = '@list/CLEAR_SERVER_ERRORS';
 
@@ -106,6 +108,13 @@ export const addListsBatch = listsById => ({
   type: ADD_LISTS_BATCH,
   payload: {
     listsById,
+  },
+});
+
+export const removeListsBatchByTeamIds = teamIds => ({
+  type: REMOVE_LISTS_BATCH_BY_TEAM_IDS,
+  payload: {
+    teamIds,
   },
 });
 

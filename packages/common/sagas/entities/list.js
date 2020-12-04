@@ -21,6 +21,7 @@ import {
   trashListSelector,
 } from '@caesar/common/selectors/entities/list';
 import { moveItemsBatchSaga } from '@caesar/common/sagas/entities/item';
+import { checkIfUserWasKickedFromTeam } from '@caesar/common/sagas/currentUser';
 import {
   postCreateList,
   patchList,
@@ -67,6 +68,10 @@ export function* sortListSaga({
     // eslint-disable-next-line no-console
     console.error(error);
     yield put(sortListFailure());
+
+    if (error.status === 403) {
+      yield call(checkIfUserWasKickedFromTeam);
+    }
   }
 }
 
@@ -120,6 +125,10 @@ export function* createListSaga({
   } catch (error) {
     yield put(createListFailure());
     yield put(updateGlobalNotification(getServerErrors(error), false, true));
+
+    if (error.status === 403) {
+      yield call(checkIfUserWasKickedFromTeam);
+    }
   }
 }
 
@@ -138,6 +147,10 @@ export function* editListSaga({ payload: { list }, meta: { setEditMode } }) {
     console.error(error);
     yield put(editListFailure());
     yield put(updateGlobalNotification(getServerErrors(error), false, true));
+
+    if (error.status === 403) {
+      yield call(checkIfUserWasKickedFromTeam);
+    }
   }
 }
 
@@ -174,6 +187,10 @@ export function* removeListSaga({
     // eslint-disable-next-line no-console
     console.error(error);
     yield put(removeListFailure());
+
+    if (error.status === 403) {
+      yield call(checkIfUserWasKickedFromTeam);
+    }
   }
 }
 

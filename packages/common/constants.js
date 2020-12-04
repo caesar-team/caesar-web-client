@@ -261,11 +261,16 @@ export const DOMAIN_ROLES_LABELS = {
   ROLE_ANONYMOUS_USER: 'Anonym',
 };
 
-export const TEAM_ROLES_OPTIONS =
-  Object.values(TEAM_ROLES).map(role => ({
-    value: role,
-    label: TEAM_ROLES_LABELS[role],
-}));
+export const TEAM_ROLES_OPTIONS =[
+  {
+    value: TEAM_ROLES.ROLE_ADMIN,
+    label: TEAM_ROLES_LABELS.ROLE_ADMIN,
+  },
+  {
+    value: TEAM_ROLES.ROLE_MEMBER,
+    label: TEAM_ROLES_LABELS.ROLE_MEMBER,
+  },
+];
 
 export const PERMISSION_MESSAGES = {
   FORBIDDEN_SELECT: "You don't have permissions to select the item",

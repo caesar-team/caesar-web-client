@@ -383,9 +383,19 @@ function* checkTeamPermissionsAndKeys(teamId, createKeyPair = false) {
       return false;
     }
 
-    const { publicKey = null } = yield select(userSelector, {
+    let publicKey = null;
+
+    const currentUser = yield select(userSelector, {
       userId: ownerId,
-    }) || {};
+    });
+
+    if (currentUser && 'publicKey' in currentUser) {
+      publicKey = currentUser.publicKey;
+    } else {
+      // for some reason the user key didn't load
+      const userKeypair = yield call(fetchKeyPairSaga);
+      publicKey = userKeypair?.publicKey;
+    }
 
     // eslint-disable-next-line no-console
     console.warn(

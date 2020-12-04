@@ -23,7 +23,7 @@ export const userIdPropSelector = (_, props) => props.userId;
 export const userSelector = createSelector(
   usersByIdSelector,
   userIdPropSelector,
-  (usersById, userId) => usersById[userId],
+  (usersById, userId) => usersById[userId] || null,
 );
 
 const userIdsPropSelector = (_, props) => props.userIds;

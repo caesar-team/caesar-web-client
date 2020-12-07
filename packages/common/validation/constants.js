@@ -15,7 +15,7 @@ export const ERROR = {
     currentSize = 0,
     maxAllFilesSize = TOTAL_MAX_UPLOADING_FILES_SIZES,
   ) =>
-    `All attachments must be less than ${maxAllFilesSize}. Please, delete some attachmnets`,
+    `All attachments must be less than ${maxAllFilesSize}. Please, delete some attachments`,
   WEBSITE: 'Must be an url',
   IMAGE_UPLOAD: 'Please, upload an image',
   LIST_ALREADY_EXISTS: 'List with such label already exists',

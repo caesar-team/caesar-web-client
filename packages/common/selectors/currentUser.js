@@ -73,9 +73,7 @@ export const currentTeamIdSelector = createSelector(
 export const currentTeamSelector = createSelector(
   currentTeamIdSelector,
   teamsByIdSelector,
-  (currentTeamId, teamsById) => {
-    return teamsById[currentTeamId];
-  },
+  (currentTeamId, teamsById) => teamsById[currentTeamId] || {},
 );
 
 export const isUserAnonymousSelector = createSelector(

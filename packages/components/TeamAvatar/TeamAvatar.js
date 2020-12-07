@@ -1,3 +1,4 @@
+import React from 'react';
 import styled from 'styled-components';
 import { Avatar } from '../Avatar';
 import { Hint } from '../Hint';
@@ -14,7 +15,7 @@ export const TeamAvatar = props => {
     size = 40,
     fontSize = 'main',
     hint = '',
-    hintPosition = 'center',
+    hintPosition = 'top_center',
   } = props;
   const accessGranted = 'accessGranted' in props ? props.accessGranted : true;
 

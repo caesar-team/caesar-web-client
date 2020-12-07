@@ -1,12 +1,6 @@
 import { omit } from 'lodash';
 import { createReducer } from '@caesar/common/utils/reducer';
 import {
-  CREATE_MEMBER_REQUEST,
-  CREATE_MEMBER_SUCCESS,
-  CREATE_MEMBER_FAILURE,
-  CREATE_MEMBER_BATCH_REQUEST,
-  CREATE_MEMBER_BATCH_SUCCESS,
-  CREATE_MEMBER_BATCH_FAILURE,
   FETCH_TEAM_MEMBERS_REQUEST,
   FETCH_TEAM_MEMBERS_SUCCESS,
   FETCH_TEAM_MEMBERS_FAILURE,
@@ -32,39 +26,6 @@ const initialState = {
 };
 
 export default createReducer(initialState, {
-  [CREATE_MEMBER_REQUEST](state) {
-    return state;
-  },
-  [CREATE_MEMBER_SUCCESS](state, { payload }) {
-    return {
-      ...state,
-      byId: {
-        ...state.byId,
-        [payload.member.id]: payload.member,
-      },
-    };
-  },
-  [CREATE_MEMBER_FAILURE](state) {
-    return state;
-  },
-  [CREATE_MEMBER_BATCH_REQUEST](state) {
-    return state;
-  },
-  [CREATE_MEMBER_BATCH_SUCCESS](state, { payload }) {
-    return {
-      ...state,
-      byId: {
-        ...state.byId,
-        ...payload.members.reduce(
-          (accumulator, member) => ({ ...accumulator, [member.id]: member }),
-          {},
-        ),
-      },
-    };
-  },
-  [CREATE_MEMBER_BATCH_FAILURE](state) {
-    return state;
-  },
   [FETCH_TEAM_MEMBERS_REQUEST](state) {
     return state;
   },

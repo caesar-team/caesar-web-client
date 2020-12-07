@@ -13,6 +13,11 @@ export const usersByIdSelector = createSelector(
   userEntity => userEntity.byId || {},
 );
 
+export const userIdsSelector = createSelector(
+  userEntitySelector,
+  userEntity => Object.keys(userEntity.byId) || [],
+);
+
 export const userListSelector = createSelector(
   usersByIdSelector,
   byId => Object.values(byId) || [],

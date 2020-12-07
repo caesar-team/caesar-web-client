@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { memo } from 'react';
 import styled from 'styled-components';
 
 const RevokeButton = styled.button`
@@ -21,10 +21,10 @@ const MinusIcon = styled.div`
   cursor: pointer;
 `;
 
-const RevokeAccessControl = ({ onClickRevoke, className }) => (
+const RevokeAccessControlComponent = ({ onClickRevoke, className }) => (
   <RevokeButton className={className} onClick={onClickRevoke}>
     <MinusIcon />
   </RevokeButton>
 );
 
-export default RevokeAccessControl;
+export const RevokeAccessControl = memo(RevokeAccessControlComponent);

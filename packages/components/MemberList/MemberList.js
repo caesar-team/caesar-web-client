@@ -101,7 +101,7 @@ const MemberList = ({
           isNewMember
           onChange={onChangeRole(member)}
         />
-       )}
+      )}
       <ControlWrapper isNewMember={isNewMember}>
         {renderControlFn(member)}
       </ControlWrapper>

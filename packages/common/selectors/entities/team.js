@@ -43,7 +43,7 @@ export const teamIdPropSelector = (_, props) => props.teamId;
 export const teamSelector = createSelector(
   teamsByIdSelector,
   teamIdPropSelector,
-  (byId, teamId) => byId[teamId],
+  (byId, teamId) => byId[teamId] || {},
 );
 
 export const teamIdsPropSelector = (_, props) => props.teamIds;
@@ -64,11 +64,9 @@ export const teamAdminUsersSelector = createSelector(
 
 export const teamsMembersSelector = createSelector(
   teamsBatchSelector,
-  teams => teams?.reduce(
-    (accumulator, team) => [
-      ...accumulator,
-      ...team.members || [],
-    ],
-    [],
-  ) || [],
+  teams =>
+    teams?.reduce(
+      (accumulator, team) => [...accumulator, ...(team.members || [])],
+      [],
+    ) || [],
 );

@@ -11,7 +11,7 @@ export const Avatar = ({
   size = 40,
   fontSize = 'main',
   hint = '',
-  hintPosition = 'center',
+  hintPosition = 'top_center',
   ...props
 }) => {
   const renderInner = () => {
@@ -36,6 +36,7 @@ export const Avatar = ({
       }
     }
   };
+
   return (
     <Hint text={hint} position={hintPosition}>
       <Wrapper size={size} fontSize={fontSize} {...props}>

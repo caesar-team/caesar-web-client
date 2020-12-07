@@ -112,7 +112,7 @@ export const OwnerAndShares = ({
                   // TODO: Why avatars have the member object? The wrong name of property.
                   <AvatarsList
                     avatars={invitedUsers}
-                    avatarHintPosition="left"
+                    avatarHintPosition="top_left"
                   />
                 ) : (
                   <NoMembers>

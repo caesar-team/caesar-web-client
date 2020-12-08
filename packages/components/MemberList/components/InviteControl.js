@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { memo } from 'react';
 import styled from 'styled-components';
 import { TEAM_ROLES_OPTIONS } from '@caesar/common/constants';
 import { Icon } from '../../Icon';
@@ -30,14 +30,15 @@ const SelectStyled = styled(Select)`
   margin-right: 20px;
 `;
 
-const InviteControl = ({
-  className,
+const InviteControlComponent = ({
   member,
   teamId,
   onClickAdd,
   onClickRemove,
   onChange,
-}) => member?.teamIds?.includes(teamId) ? (
+  className,
+}) =>
+  member?.teamIds?.includes(teamId) ? (
     <Wrapper>
       <SelectStyled
         name="role"
@@ -60,4 +61,4 @@ const InviteControl = ({
     </AddButton>
   );
 
-export default InviteControl;
+export const InviteControl = memo(InviteControlComponent);

@@ -1,5 +1,5 @@
-export { default as AddControl } from './AddControl';
-export { default as InviteControl } from './InviteControl';
-export { default as RemoveControl } from './RemoveControl';
-export { default as RevokeAccessControl } from './RevokeAccessControl';
+export { AddControl } from './AddControl';
+export { InviteControl } from './InviteControl';
+export { RemoveControl } from './RemoveControl';
+export { RevokeAccessControl } from './RevokeAccessControl';
 export { RoleSelector } from './RoleSelector';

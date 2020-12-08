@@ -397,14 +397,14 @@ export const removeItemsData = () => ({
 });
 
 export const shareItemBatchRequest = (
-  { itemIds, members, teamIds },
+  { itemIds, users, teamIds },
   options = {},
 ) => ({
   type: SHARE_ITEM_BATCH_REQUEST,
   payload: {
     data: {
       itemIds,
-      members,
+      users,
       teamIds,
     },
     options,

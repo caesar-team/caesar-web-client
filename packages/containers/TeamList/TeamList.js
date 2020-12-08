@@ -208,7 +208,7 @@ class TeamListContainer extends Component {
     const { modalVisibilities, selectedTeamTitle, activeTabName } = this.state;
     const favoriteTeams = isDomainAdmin
       ? teams.filter(team => team.pinned)
-      : teams.filter(team => team?.members?.includes(currentUser.id));
+      : userTeamList;
     const isDomainAdminOrManager = isDomainAdmin || isDomainManager;
     const allTeamCards = this.renderTeamCards(
       isDomainAdminOrManager ? teams : userTeamList,

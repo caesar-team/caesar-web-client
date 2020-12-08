@@ -15,8 +15,8 @@ import { Container, Text, HintText, Link, StyledIcon, Error } from './styles';
 
 const getNotificationText = files =>
   files.length > 1
-    ? `${files.map(({ name }) => name).join(', ')} have already added`
-    : `The file with name ${files[0].name} has already added`;
+    ? `${files.map(({ name }) => name).join(', ')} have been added before`
+    : `The file "${files[0].name}" has been added before`;
 
 const Uploader = ({
   name,

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { memo } from 'react';
 import styled from 'styled-components';
 import { Icon } from '../../Icon';
 
@@ -20,7 +20,7 @@ const AddButton = styled.button`
   }
 `;
 
-const AddControl = ({ className, onClick }) => {
+const AddControlComponent = ({ onClick, className }) => {
   const handleClick = e => {
     e.stopPropagation();
     onClick();
@@ -33,4 +33,4 @@ const AddControl = ({ className, onClick }) => {
   );
 };
 
-export default AddControl;
+export const AddControl = memo(AddControlComponent);

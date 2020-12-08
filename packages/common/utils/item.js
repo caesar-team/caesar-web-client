@@ -116,6 +116,7 @@ export const dectyptItemAttachments = async (raws, privateKeyObject) => {
 
   return {};
 };
+
 export const decryptItemData = async (item, privateKeyObject) => {
   try {
     const { data: encryptedData, raws: encryptedRaws = {} } = JSON.parse(

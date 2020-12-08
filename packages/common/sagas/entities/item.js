@@ -27,6 +27,7 @@ import {
   removeItemsBatchSuccess,
   removeItemsBatchFailure,
   updateItemField,
+  updateItemBatchField,
   setImportProgressPercent,
 } from '@caesar/common/actions/entities/item';
 import { checkIfUserWasKickedFromTeam } from '@caesar/common/sagas/currentUser';
@@ -43,7 +44,10 @@ import {
   defaultListSelector,
   currentTeamDefaultListSelector,
 } from '@caesar/common/selectors/entities/list';
-import { itemSelector } from '@caesar/common/selectors/entities/item';
+import {
+  itemSelector,
+  itemsBatchSelector,
+} from '@caesar/common/selectors/entities/item';
 import {
   currentUserDataSelector,
   currentUserIdSelector,
@@ -274,46 +278,6 @@ export function* toggleItemToFavoriteSaga({ payload: { item } }) {
   }
 }
 
-export function* moveItemsBatchSaga({
-  payload: { itemIds, oldTeamId, oldListId, teamId, listId },
-  meta: { notification, notificationText } = {},
-}) {
-  try {
-    yield put(updateGlobalNotification(COMMON_PROGRESS_NOTIFICATION, true));
-
-    const itemIdsChunks = chunk(itemIds, ITEMS_CHUNK_SIZE);
-
-    yield all(
-      itemIdsChunks.map(itemIdsChunk =>
-        call(updateMoveItemsBatch, { items: itemIdsChunk }, listId),
-      ),
-    );
-
-    yield put(
-      moveItemsBatchSuccess(itemIds, oldTeamId, oldListId, teamId, listId),
-    );
-
-    if (notification) {
-      yield call(notification.show, {
-        text: notificationText || 'The items have been moved',
-      });
-    }
-
-    yield put(updateGlobalNotification(NOOP_NOTIFICATION, false));
-  } catch (error) {
-    // eslint-disable-next-line no-console
-    console.error(error);
-    yield put(
-      updateGlobalNotification(getServerErrorMessage(error), false, true),
-    );
-    yield put(moveItemsBatchFailure());
-
-    if (error.status === 403) {
-      yield call(checkIfUserWasKickedFromTeam);
-    }
-  }
-}
-
 export function* getItemKeyPair({
   payload: {
     item: { id: itemId, teamId, isShared },
@@ -398,12 +362,17 @@ export function* saveItemSaga({ item, publicKey }) {
   const { id = null, listId = null, type, favorite = false, ownerId } = item;
   const itemFromStore = yield select(itemSelector, { itemId: item.id });
 
+  if (!item?.data || !itemFromStore?.data) {
+    // TODO: Need to get data here
+    // yield call(decryptItem, item);
+  }
+
   let isRawsChanged = isGeneralItem(item);
   let itemToEncrypt = item;
 
   if (
     !!itemFromStore &&
-    deepequal(itemFromStore.data.attachments, item.data.attachments)
+    deepequal(itemFromStore.data?.attachments, item.data?.attachments)
   ) {
     isRawsChanged = false;
   }
@@ -504,6 +473,8 @@ export function* moveItemSaga({
 
     const list = yield select(listSelector, { listId });
 
+    // TODO: Change selector to just team default list selector
+    // Also TODO: Add such logic into moveBatch
     const defaultList = teamId
       ? yield select(currentTeamDefaultListSelector)
       : yield select(defaultListSelector);
@@ -540,7 +511,6 @@ export function* moveItemSaga({
     }
 
     yield put(moveItemSuccess(item.id, item.listId, newListId));
-
     yield put(updateGlobalNotification(NOOP_NOTIFICATION, false));
 
     if (notification) {
@@ -552,6 +522,70 @@ export function* moveItemSaga({
     // eslint-disable-next-line no-console
     console.error(error);
     yield put(moveItemFailure());
+
+    if (error.status === 403) {
+      yield call(checkIfUserWasKickedFromTeam);
+    }
+  }
+}
+
+export function* moveItemsBatchSaga({
+  payload: { itemIds, oldTeamId, oldListId, teamId, listId },
+  meta: { notification, notificationText } = {},
+}) {
+  try {
+    yield put(updateGlobalNotification(MOVING_IN_PROGRESS_NOTIFICATION, true));
+
+    const itemIdsChunks = chunk(itemIds, ITEMS_CHUNK_SIZE);
+
+    yield all(
+      itemIdsChunks.map(itemIdsChunk =>
+        call(updateMoveItemsBatch, { items: itemIdsChunk }, listId),
+      ),
+    );
+
+    if (oldTeamId !== teamId) {
+      yield put(updateItemBatchField(itemIds, 'teamId', teamId));
+
+      const keyPair = yield select(teamKeyPairSelector, {
+        teamId,
+      });
+
+      if (!keyPair) {
+        throw new Error(`Can't find or create the key pair for the items.`);
+      }
+
+      const { publicKey } = keyPair;
+
+      if (!publicKey) {
+        // Nothing to do here
+        throw new Error(
+          `Can't find the publicKey in the key pair for the team ${teamId}`,
+        );
+      }
+
+      const items = yield select(itemsBatchSelector, { itemIds });
+
+      yield all(items.map(item => call(saveItemSaga, { item, publicKey })));
+    }
+
+    yield put(
+      moveItemsBatchSuccess(itemIds, oldTeamId, oldListId, teamId, listId),
+    );
+    yield put(updateGlobalNotification(NOOP_NOTIFICATION, false));
+
+    if (notification) {
+      yield call(notification.show, {
+        text: notificationText || 'The items have been moved',
+      });
+    }
+  } catch (error) {
+    // eslint-disable-next-line no-console
+    console.error(error);
+    yield put(
+      updateGlobalNotification(getServerErrorMessage(error), false, true),
+    );
+    yield put(moveItemsBatchFailure());
 
     if (error.status === 403) {
       yield call(checkIfUserWasKickedFromTeam);

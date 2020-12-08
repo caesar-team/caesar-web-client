@@ -32,14 +32,6 @@ export const UPDATE_ITEM_REQUEST = '@item/UPDATE_ITEM_REQUEST';
 export const UPDATE_ITEM_SUCCESS = '@item/UPDATE_ITEM_SUCCESS';
 export const UPDATE_ITEM_FAILURE = '@item/UPDATE_ITEM_FAILURE';
 
-export const ACCEPT_ITEM_UPDATE_REQUEST = '@item/ACCEPT_ITEM_UPDATE_REQUEST';
-export const ACCEPT_ITEM_UPDATE_SUCCESS = '@item/ACCEPT_ITEM_UPDATE_SUCCESS';
-export const ACCEPT_ITEM_UPDATE_FAILURE = '@item/ACCEPT_ITEM_UPDATE_FAILURE';
-
-export const REJECT_ITEM_UPDATE_REQUEST = '@item/REJECT_ITEM_UPDATE_REQUEST';
-export const REJECT_ITEM_UPDATE_SUCCESS = '@item/REJECT_ITEM_UPDATE_SUCCESS';
-export const REJECT_ITEM_UPDATE_FAILURE = '@item/REJECT_ITEM_UPDATE_FAILURE';
-
 export const TOGGLE_ITEM_TO_FAVORITE_REQUEST =
   '@item/TOGGLE_ITEM_TO_FAVORITE_REQUEST';
 
@@ -66,6 +58,7 @@ export const REMOVE_SHARE_SUCCESS = '@item/REMOVE_SHARE_SUCCESS';
 export const REMOVE_SHARE_FAILURE = '@item/REMOVE_SHARE_FAILURE';
 
 export const UPDATE_ITEM_FIELD = '@item/UPDATE_ITEM_FIELD';
+export const UPDATE_ITEM_BATCH_FIELD = '@item/UPDATE_ITEM_BATCH_FIELD';
 export const ADD_ITEMS_BATCH = '@item/ADD_ITEMS_BATCH';
 export const REMOVE_ITEMS_BATCH = '@item/REMOVE_ITEMS_BATCH';
 export const REMOVE_ITEMS_BATCH_BY_TEAM_IDS =
@@ -280,42 +273,6 @@ export const updateItemFailure = () => ({
   type: UPDATE_ITEM_FAILURE,
 });
 
-export const acceptItemUpdateRequest = id => ({
-  type: ACCEPT_ITEM_UPDATE_REQUEST,
-  payload: {
-    id,
-  },
-});
-
-export const acceptItemUpdateSuccess = item => ({
-  type: ACCEPT_ITEM_UPDATE_SUCCESS,
-  payload: {
-    item,
-  },
-});
-
-export const acceptItemUpdateFailure = () => ({
-  type: REJECT_ITEM_UPDATE_FAILURE,
-});
-
-export const rejectItemUpdateRequest = id => ({
-  type: REJECT_ITEM_UPDATE_REQUEST,
-  payload: {
-    id,
-  },
-});
-
-export const rejectItemUpdateSuccess = itemId => ({
-  type: REJECT_ITEM_UPDATE_SUCCESS,
-  payload: {
-    itemId,
-  },
-});
-
-export const rejectItemUpdateFailure = () => ({
-  type: REJECT_ITEM_UPDATE_FAILURE,
-});
-
 export const toggleItemToFavoriteRequest = item => ({
   type: TOGGLE_ITEM_TO_FAVORITE_REQUEST,
   payload: {
@@ -358,6 +315,15 @@ export const updateItemField = (itemId, key, value) => ({
   type: UPDATE_ITEM_FIELD,
   payload: {
     itemId,
+    key,
+    value,
+  },
+});
+
+export const updateItemBatchField = (itemIds, key, value) => ({
+  type: UPDATE_ITEM_BATCH_FIELD,
+  payload: {
+    itemIds,
     key,
     value,
   },

@@ -9,12 +9,16 @@ const Wrapper = styled.div`
 `;
 
 const CloseIcon = styled(Icon)`
-  margin-left: 20px;
+  margin-left: 16px;
   cursor: pointer;
 
   &:hover {
     color: ${({ theme }) => theme.color.black};
   }
+`;
+
+const StyledHint = styled(Hint)`
+  margin-left: 16px;
 `;
 
 const WarningIcon = styled(Icon)`
@@ -24,9 +28,12 @@ const WarningIcon = styled(Icon)`
 const RemoveControlComponent = ({ member, onClick, className }) => (
   <Wrapper>
     {member.isNew && (
-      <Hint text="User isn’t registered in your domain" position="center_left">
+      <StyledHint
+        text="User isn’t registered in your domain"
+        position="center_left"
+      >
         <WarningIcon name="warning" width={20} height={20} />
-      </Hint>
+      </StyledHint>
     )}
     <CloseIcon
       name="close"

@@ -46,14 +46,14 @@ class TeamListContainer extends Component {
   };
 
   handleEditSubmit = ({ teamId, title, icon, setSubmitting, setErrors }) => {
-    this.props.editTeamRequest(
+    this.props.editTeamRequest({
       teamId,
       title,
       icon,
-      this.handleCloseModal(NEW_TEAM_MODAL),
+      handleCloseModal: this.handleCloseModal(NEW_TEAM_MODAL),
       setSubmitting,
       setErrors,
-    );
+    });
   };
 
   handleOpenModal = modal => () => {

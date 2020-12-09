@@ -41,7 +41,6 @@ import {
 import { workInProgressItemIdsSelector } from '@caesar/common/selectors/workflow';
 import {
   listSelector,
-  defaultListSelector,
   currentTeamDefaultListSelector,
 } from '@caesar/common/selectors/entities/list';
 import {
@@ -472,13 +471,7 @@ export function* moveItemSaga({
     yield put(updateGlobalNotification(MOVING_IN_PROGRESS_NOTIFICATION, true));
 
     const list = yield select(listSelector, { listId });
-
-    // TODO: Change selector to just team default list selector
-    // Also TODO: Add such logic into moveBatch
-    const defaultList = teamId
-      ? yield select(currentTeamDefaultListSelector)
-      : yield select(defaultListSelector);
-
+    const defaultList = yield select(currentTeamDefaultListSelector);
     const newListId = list ? listId : defaultList?.id;
 
     const item = yield select(itemSelector, { itemId });

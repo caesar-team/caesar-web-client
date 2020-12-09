@@ -41,11 +41,6 @@ export const inboxListSelector = createSelector(
   lists => lists.find(({ type }) => type === LIST_TYPE.INBOX) || {},
 );
 
-export const defaultListSelector = createSelector(
-  personalListsSelector,
-  lists => lists.find(({ label }) => label === LIST_TYPE.DEFAULT) || {},
-);
-
 export const trashListSelector = createSelector(
   personalListsSelector,
   lists => lists.find(({ type }) => type === LIST_TYPE.TRASH) || {},
@@ -104,8 +99,8 @@ export const currentTeamDefaultListSelector = createSelector(
   currentTeamIdSelector,
   (lists, currentTeamId) =>
     lists.find(
-      ({ teamId, label }) =>
-        teamId === currentTeamId && label === LIST_TYPE.DEFAULT,
+      ({ teamId, type }) =>
+        teamId === currentTeamId && type === LIST_TYPE.DEFAULT,
     ) || {},
 );
 
@@ -114,8 +109,8 @@ export const currentTeamTrashListSelector = createSelector(
   currentTeamIdSelector,
   (lists, currentTeamId) =>
     lists.find(
-      ({ teamId, label }) =>
-        teamId === currentTeamId && label === LIST_TYPE.TRASH,
+      ({ teamId, type }) =>
+        teamId === currentTeamId && type === LIST_TYPE.TRASH,
     ) || {},
 );
 

@@ -15,7 +15,6 @@ import {
   LEAVE_TEAM_REQUEST,
   LEAVE_TEAM_SUCCESS,
   LEAVE_TEAM_FAILURE,
-  SET_DEFAULT_LIST_ID,
   RESET_CURRENT_USER_STATE,
   LAST_UPDATED_ITEMS_UNIXTIME,
   ADD_TEAM_TO_TEAMS_LIST,
@@ -99,12 +98,6 @@ export default createReducer(initialState, {
   },
   [LEAVE_TEAM_FAILURE](state) {
     return { ...state, isError: true };
-  },
-  [SET_DEFAULT_LIST_ID](state, { payload }) {
-    return {
-      ...state,
-      defaultListId: payload.listId,
-    };
   },
   [ADD_TEAM_TO_TEAMS_LIST](state, { payload }) {
     return {

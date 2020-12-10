@@ -10,11 +10,7 @@ const StyledSelect = styled(Select)`
   margin-left: auto;
 `;
 
-export const RoleSelector = ({
-  className,
-  member,
-  onChange,
-}) => (
+export const RoleSelector = ({ className, member, onChange }) => (
   <StyledSelect
     name="role"
     value={member.role || TEAM_ROLES.ROLE_MEMBER}

@@ -14,8 +14,6 @@ export const SET_MASTER_PASSWORD = '@currentUser/SET_MASTER_PASSWORD';
 export const SET_KEY_PAIR = '@currentUser/SET_KEY_PAIR';
 export const SET_CURRENT_TEAM_ID = '@currentUser/SET_CURRENT_TEAM_ID';
 
-export const SET_DEFAULT_LIST_ID = '@currentUser/SET_DEFAULT_LIST_ID';
-
 export const LEAVE_TEAM_REQUEST = '@currentUser/LEAVE_TEAM_REQUEST';
 export const LEAVE_TEAM_SUCCESS = '@currentUser/LEAVE_TEAM_SUCCESS';
 export const LEAVE_TEAM_FAILURE = '@currentUser/LEAVE_TEAM_FAILURE';
@@ -116,13 +114,6 @@ export const leaveTeamSuccess = teamId => ({
 
 export const leaveTeamFailure = () => ({
   type: LEAVE_TEAM_FAILURE,
-});
-
-export const setDefaultListId = listId => ({
-  type: SET_DEFAULT_LIST_ID,
-  payload: {
-    listId,
-  },
 });
 
 export const logout = () => ({

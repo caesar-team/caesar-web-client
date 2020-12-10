@@ -17,7 +17,7 @@ import {
   LEAVE_TEAM_FAILURE,
   RESET_CURRENT_USER_STATE,
   LAST_UPDATED_ITEMS_UNIXTIME,
-  ADD_TEAM_TO_TEAMS_LIST,
+  ADD_TEAM_TO_CURRENT_USER_TEAMS_LIST,
 } from '@caesar/common/actions/currentUser';
 
 const initialState = {
@@ -99,7 +99,7 @@ export default createReducer(initialState, {
   [LEAVE_TEAM_FAILURE](state) {
     return { ...state, isError: true };
   },
-  [ADD_TEAM_TO_TEAMS_LIST](state, { payload }) {
+  [ADD_TEAM_TO_CURRENT_USER_TEAMS_LIST](state, { payload }) {
     return {
       ...state,
       data: {

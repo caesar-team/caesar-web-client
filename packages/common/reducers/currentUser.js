@@ -18,6 +18,7 @@ import {
   SET_DEFAULT_LIST_ID,
   RESET_CURRENT_USER_STATE,
   LAST_UPDATED_ITEMS_UNIXTIME,
+  ADD_TEAM_TO_TEAMS_LIST,
 } from '@caesar/common/actions/currentUser';
 
 const initialState = {
@@ -103,6 +104,15 @@ export default createReducer(initialState, {
     return {
       ...state,
       defaultListId: payload.listId,
+    };
+  },
+  [ADD_TEAM_TO_TEAMS_LIST](state, { payload }) {
+    return {
+      ...state,
+      data: {
+        ...state.data,
+        teamIds: [...state.data.teamIds, payload.teamId],
+      },
     };
   },
   [RESET_CURRENT_USER_STATE]() {

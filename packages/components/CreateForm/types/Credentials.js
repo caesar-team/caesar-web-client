@@ -40,7 +40,7 @@ export const Credentials = ({ formik }) => {
           disabled={isSubmitting}
         />
       </Row>
-      <Row marginBottom={32}>
+      <Row marginBottom={40}>
         <Input
           name="login"
           label="Login"
@@ -53,7 +53,7 @@ export const Credentials = ({ formik }) => {
           disabled={isSubmitting}
         />
       </Row>
-      <PasswordRow marginBottom={32}>
+      <PasswordRow marginBottom={40}>
         <Password
           name="password"
           label="Password"
@@ -67,7 +67,7 @@ export const Credentials = ({ formik }) => {
           setFieldValue={setFieldValue}
         />
       </PasswordRow>
-      <Row marginBottom={32}>
+      <Row marginBottom={40}>
         <Input
           name="website"
           label="Website"

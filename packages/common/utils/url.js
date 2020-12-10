@@ -1,7 +1,7 @@
 export const parseUrl = url => {
   let prefix = '';
 
-  if (!/^https:\/\//.test(url)) {
+  if (!/^https?:\/\//.test(url)) {
     prefix = 'https://';
   } 
     

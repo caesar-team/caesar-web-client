@@ -7,7 +7,7 @@ import { Select } from '../../Select';
 const Wrapper = styled.div`
   display: flex;
   align-items: center;
-  margin-right: 10px;
+  margin-right: 8px;
 `;
 
 const AddButton = styled.button`
@@ -27,7 +27,7 @@ const SelectStyled = styled(Select)`
   width: 200px;
   height: 40px;
   border: 1px solid ${({ theme }) => theme.color.gallery};
-  margin-right: 20px;
+  margin-right: 16px;
 `;
 
 const InviteControlComponent = ({

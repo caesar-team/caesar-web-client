@@ -95,8 +95,13 @@ const Wrapper = styled.div`
   }
 `;
 
-export const Hint = ({ text, position = POSITION.TOP_CENTER, children }) => (
-  <Wrapper>
+export const Hint = ({
+  text,
+  position = POSITION.TOP_CENTER,
+  children,
+  className,
+}) => (
+  <Wrapper className={className}>
     {children}
     {text && <Inner position={position}>{text}</Inner>}
   </Wrapper>

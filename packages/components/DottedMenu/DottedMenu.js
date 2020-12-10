@@ -1,7 +1,6 @@
-import React, { Component } from 'react';
+import React, { useState, useRef, memo } from 'react';
 import styled from 'styled-components';
-// TODO: Replace with import {useClickAway} from 'react-use';
-import enhanceWithClickOutside from 'react-click-outside';
+import { useClickAway } from 'react-use';
 import { Icon } from '../Icon';
 import { Tooltip } from '../Tooltip';
 
@@ -30,43 +29,35 @@ const DottedWrapper = styled.button`
   }
 `;
 
-class DottedMenu extends Component {
-  state = this.prepareInitialState();
+const DottedMenuComponent = ({
+  tooltipProps = {},
+  forceClosed,
+  children,
+  className,
+}) => {
+  const [isOpened, setOpened] = useState(false);
+  const menuRef = useRef(null);
 
-  handleToggle = event => {
+  useClickAway(menuRef, () => {
+    setOpened(false);
+  });
+
+  const handleToggle = event => {
     event.preventDefault();
     event.stopPropagation();
-
-    this.setState(prevState => ({
-      isOpened: !prevState.isOpened,
-    }));
+    setOpened(!isOpened);
   };
 
-  handleClickOutside() {
-    this.setState({ isOpened: false });
-  }
+  return (
+    <Wrapper ref={menuRef} className={className}>
+      <DottedWrapper onClick={handleToggle}>
+        <MoreIcon name="more" color="gray" width={16} height={16} />
+      </DottedWrapper>
+      <Tooltip {...tooltipProps} show={isOpened && !forceClosed}>
+        {children}
+      </Tooltip>
+    </Wrapper>
+  );
+};
 
-  prepareInitialState() {
-    return {
-      isOpened: false,
-    };
-  }
-
-  render() {
-    const { isOpened } = this.state;
-    const { className, children, tooltipProps = {}, forceClosed } = this.props;
-
-    return (
-      <Wrapper className={className}>
-        <DottedWrapper onClick={this.handleToggle}>
-          <MoreIcon name="more" color="gray" width={16} height={16} />
-        </DottedWrapper>
-        <Tooltip {...tooltipProps} show={isOpened && !forceClosed}>
-          {children}
-        </Tooltip>
-      </Wrapper>
-    );
-  }
-}
-
-export default enhanceWithClickOutside(DottedMenu);
+export const DottedMenu = memo(DottedMenuComponent);

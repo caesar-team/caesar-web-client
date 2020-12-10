@@ -224,7 +224,7 @@ const MoveModalComponent = ({
       shouldCloseOnEsc
       shouldCloseOnOverlayClick
     >
-      <Scrollbar autoHeight autoHeightMin={500}>
+      <Scrollbar autoHeight autoHeightMax={500}>
         <StyledModalTitle>
           {isMultiMode
             ? 'Move selected items to another vault or list'
@@ -298,7 +298,7 @@ const MoveModalComponent = ({
         >
           Accept
         </Button>
-      </ButtonsWrapper>      
+      </ButtonsWrapper>
     </Modal>
   );
 };

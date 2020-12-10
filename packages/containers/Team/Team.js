@@ -28,7 +28,7 @@ import {
   ConfirmLeaveTeamModal,
   ConfirmRemoveMemberModal,
   TeamModal,
-} from "@caesar/components";
+} from '@caesar/components';
 import {
   PERMISSION,
   PERMISSION_ENTITY,
@@ -166,16 +166,24 @@ export const TeamContainerComponent = ({ currentUser, team, members }) => {
     dispatch(removeTeamRequest(team.id));
   };
 
-  const handleEditTeam = ({ teamId, title, icon, setSubmitting, setErrors }) => {
-    dispatch(editTeamRequest({
-      teamId,
-      title,
-      icon,
-      handleCloseModal: handleCloseModal(MODAL.NEW_TEAM),
-      setSubmitting,
-      setErrors,
-    }));
-  };  
+  const handleEditTeam = ({
+    teamId,
+    title,
+    icon,
+    setSubmitting,
+    setErrors,
+  }) => {
+    dispatch(
+      editTeamRequest({
+        teamId,
+        title,
+        icon,
+        handleCloseModal: handleCloseModal(MODAL.NEW_TEAM),
+        setSubmitting,
+        setErrors,
+      }),
+    );
+  };
 
   if (!team.id && !isLoadingTeams) {
     router.push(ROUTES.SETTINGS + ROUTES.TEAM);
@@ -213,7 +221,7 @@ export const TeamContainerComponent = ({ currentUser, team, members }) => {
               color="white"
               onClick={handleOpenModal(MODAL.NEW_TEAM)}
             />
-          </Can>          
+          </Can>
           <Can I={PERMISSION.DELETE} a={teamSubject}>
             <ButtonStyled
               withOfflineCheck
@@ -268,7 +276,7 @@ export const TeamContainerComponent = ({ currentUser, team, members }) => {
           onEditSubmit={handleEditTeam}
           onCancel={handleCloseModal(MODAL.NEW_TEAM)}
         />
-      )}      
+      )}
       {modalVisibilities[MODAL.INVITE_MEMBER] && (
         <InviteModal
           currentUser={currentUser}

@@ -39,18 +39,23 @@ import {
 import { memberSelector } from '../../selectors/entities/member';
 import { encryptMemberTeamKey } from './team';
 import { saveKeyPair } from './item';
+import { getOrCreateUserBatchSaga } from './user';
 
 export function* addUserToTeamListBatchSaga({ payload: { teamId, users } }) {
   try {
+    const { domainUsers, createdUsers } = yield call(
+      getOrCreateUserBatchSaga,
+      users,
+    );
+
     const keypair = yield select(teamKeyPairSelector, { teamId });
-    const userIds = users.map(user => user.id);
-    const rolesById = users.reduce((acc, user) => {
+    const allUsers = [...createdUsers, ...domainUsers];
+    const userIds = allUsers.map(user => user.id);
+    const rolesById = allUsers.reduce((acc, user) => {
       acc[user.id] = user.role;
 
       return acc;
     }, {});
-    // Domain users
-    // TODO: Invite unregistered users
     const newUsers = yield select(usersBatchSelector, { userIds });
 
     const postDataSagas = newUsers.map(user =>

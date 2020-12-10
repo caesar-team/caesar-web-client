@@ -110,7 +110,7 @@ export default createReducer(initialState, {
   [CREATE_TEAM_REQUEST](state) {
     return state;
   },
-  [CREATE_TEAM_SUCCESS](state, { payload }) {console.log('reducer');
+  [CREATE_TEAM_SUCCESS](state, { payload }) {
     return {
       ...state,
       byId: {

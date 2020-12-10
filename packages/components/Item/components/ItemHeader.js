@@ -17,6 +17,7 @@ import {
 import { teamsByIdSelector } from '@caesar/common/selectors/entities/team';
 import { setWorkInProgressItem } from '@caesar/common/actions/workflow';
 import { toggleItemToFavoriteRequest } from '@caesar/common/actions/entities/item';
+import { Hint } from '@caesar/components';
 import { Button } from '../../Button';
 import { Can } from '../../Ability';
 
@@ -36,7 +37,6 @@ const Empty = styled.div`
 `;
 
 const PathButton = styled(Button)`
-  margin-right: auto;
   font-size: ${({ theme }) => theme.font.size.main};
   text-transform: initial;
 
@@ -62,6 +62,14 @@ const Delimeter = styled.span`
 `;
 
 const ActionButton = styled(Button)`
+  margin-left: 16px;
+`;
+
+const PathHintWrapper = styled.div`
+  margin-right: auto;
+`;
+
+const HintWrapper = styled.div`
   margin-left: 16px;
 `;
 
@@ -111,21 +119,27 @@ const ItemHeaderComponent = ({
             </ActionButton>
           </Can>
           <Can I={PERMISSION.DELETE} an={_permissions}>
-            <ActionButton
-              icon="trash"
-              color="white"
-              onClick={onClickRemoveItem}
-            />
+            <Hint text="Remove the item">
+              <ActionButton
+                icon="trash"
+                color="white"
+                onClick={onClickRemoveItem}
+              />
+            </Hint>
           </Can>
         </>
       ) : (
         <>
           <Can I={PERMISSION.MOVE} an={_permissions}>
-            <PathButton color="white" onClick={onClickMove}>
-              <PathText>{teamTitle}</PathText>
-              <Delimeter>|</Delimeter>
-              <PathText>{listTitle}</PathText>
-            </PathButton>
+            <PathHintWrapper>
+              <Hint text="Move the item">
+                <PathButton color="white" onClick={onClickMove}>
+                  <PathText>{teamTitle}</PathText>
+                  <Delimeter>|</Delimeter>
+                  <PathText>{listTitle}</PathText>
+                </PathButton>
+              </Hint>
+            </PathHintWrapper>  
           </Can>
           <Can not I={PERMISSION.MOVE} an={_permissions}>
             <PathWrapper>
@@ -135,18 +149,30 @@ const ItemHeaderComponent = ({
             </PathWrapper>
           </Can>
           <Can I={PERMISSION.SHARE} an={_permissions}>
-            <ActionButton icon="share" color="white" onClick={onClickShare} />
+            <HintWrapper>
+              <Hint text="Share the item">
+                <Button icon="share" color="white" onClick={onClickShare} />
+              </Hint>
+            </HintWrapper>  
           </Can>
           <Can I={PERMISSION.FAVORITE} an={_permissions}>
-            <ActionButton
-              icon={item.favorite ? 'favorite-active' : 'favorite'}
-              color="white"
-              onClick={handleToggleFavorites}
-            />
+            <HintWrapper>
+              <Hint text="Favorite">
+                <Button
+                  icon={item.favorite ? 'favorite-active' : 'favorite'}
+                  color="white"
+                  onClick={handleToggleFavorites}
+                />
+              </Hint>
+            </HintWrapper>  
           </Can>
         </>
       )}
-      <ActionButton icon="close" color="white" onClick={handleClickCloseItem} />
+      <HintWrapper>
+        <Hint text="Close the item" position="top_left">
+          <Button icon="close" color="white" onClick={handleClickCloseItem} />
+        </Hint>
+      </HintWrapper>  
     </ColumnHeader>
   );
 };

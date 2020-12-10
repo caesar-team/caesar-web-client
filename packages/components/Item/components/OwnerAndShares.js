@@ -4,6 +4,7 @@ import styled from 'styled-components';
 import { PERMISSION } from '@caesar/common/constants';
 import { workInProgressItemOwnerSelector } from '@caesar/common/selectors/workflow';
 import { usersBatchSelector } from '@caesar/common/selectors/entities/user';
+import { Hint } from '@caesar/components';
 import { Can } from '../../Ability';
 import { Avatar, AvatarsList } from '../../Avatar';
 import { Icon } from '../../Icon';
@@ -128,12 +129,14 @@ export const OwnerAndShares = ({
             )}
           </Can>
           <Can I={PERMISSION.SHARE} an={itemSubject}>
-            <ShareButton
-              // disabled={!isOnline}
-              onClick={onClickShare}
-            >
-              <Icon withOfflineCheck name="plus" width={16} height={16} />
-            </ShareButton>
+            <Hint text="Share the item" position="top_left">
+              <ShareButton
+                // disabled={!isOnline}
+                onClick={onClickShare}
+              >
+                <Icon withOfflineCheck name="plus" width={16} height={16} />
+              </ShareButton>
+            </Hint>
           </Can>
         </>
       )}

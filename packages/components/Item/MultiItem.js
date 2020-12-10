@@ -1,6 +1,6 @@
 import React, { memo } from 'react';
 import styled from 'styled-components';
-import { Button } from '@caesar/components';
+import { Button, Hint } from '@caesar/components';
 import { getPlural } from '@caesar/common/utils/string';
 import { Checkbox } from '../Checkbox';
 
@@ -75,19 +75,23 @@ const MultiItemComponent = ({
         </ButtonStyled>
       )}
       {isPersonalTeam && !isInboxItems && !isTrashItems && (
+        <Hint text="Share">
+          <ButtonStyled
+            withOfflineCheck
+            color="white"
+            icon="share"
+            onClick={onClickShare}
+          />
+        </Hint>
+      )}
+      <Hint text="Remove">
         <ButtonStyled
           withOfflineCheck
           color="white"
-          icon="share"
-          onClick={onClickShare}
+          icon="trash"
+          onClick={isTrashItems ? onClickRemove : onClickMoveToTrash}
         />
-      )}
-      <ButtonStyled
-        withOfflineCheck
-        color="white"
-        icon="trash"
-        onClick={isTrashItems ? onClickRemove : onClickMoveToTrash}
-      />
+      </Hint>
     </Wrapper>
   );
 };

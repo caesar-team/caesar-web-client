@@ -28,6 +28,7 @@ import {
   ConfirmLeaveTeamModal,
   ConfirmRemoveMemberModal,
   TeamModal,
+  Hint,
 } from "@caesar/components";
 import {
   PERMISSION,
@@ -207,29 +208,35 @@ export const TeamContainerComponent = ({ currentUser, team, members }) => {
       addonTopComponent={
         <>
           <Can I={PERMISSION.EDIT} a={teamSubject}>
-            <ButtonStyled
-              withOfflineCheck
-              icon="pencil"
-              color="white"
-              onClick={handleOpenModal(MODAL.NEW_TEAM)}
-            />
+            <Hint text="Edit the team">
+              <ButtonStyled
+                withOfflineCheck
+                icon="pencil"
+                color="white"
+                onClick={handleOpenModal(MODAL.NEW_TEAM)}
+              />
+            </Hint>
           </Can>          
           <Can I={PERMISSION.DELETE} a={teamSubject}>
-            <ButtonStyled
-              withOfflineCheck
-              icon="trash"
-              color="white"
-              onClick={handleOpenModal(MODAL.REMOVE_TEAM)}
-            />
+            <Hint text="Remove the team">
+              <ButtonStyled
+                withOfflineCheck
+                icon="trash"
+                color="white"
+                onClick={handleOpenModal(MODAL.REMOVE_TEAM)}
+              />
+            </Hint>
           </Can>
           <Can I={PERMISSION.LEAVE} a={teamSubject}>
             {!isDomainTeam && (
-              <ButtonStyled
-                withOfflineCheck
-                icon="leave"
-                color="white"
-                onClick={handleOpenModal(MODAL.LEAVE_TEAM)}
-              />
+              <Hint text="Leave">
+                <ButtonStyled
+                  withOfflineCheck
+                  icon="leave"
+                  color="white"
+                  onClick={handleOpenModal(MODAL.LEAVE_TEAM)}
+                />
+              </Hint>
             )}
           </Can>
           {!isTeamLocked && (

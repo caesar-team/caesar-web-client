@@ -60,7 +60,7 @@ export const StyledSelect = styled(Select)`
 `;
 
 export const StyledListSelect = styled(Select)`
-  && ${Select.Option} {
+  ${Select.Option} {
     white-space: normal;
     word-break: break-word;
   }

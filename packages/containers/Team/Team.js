@@ -49,7 +49,7 @@ const AddMemberButton = styled(ButtonStyled)`
   margin-right: 0;
 `;
 
-export const TeamContainerComponent = ({ currentUser, team, members }) => {
+export const TeamContainerComponent = ({ currentUser, team, teams, members }) => {
   const router = useRouter();
   const dispatch = useDispatch();
   const [modalVisibilities, setModalVisibilities] = useState({
@@ -273,6 +273,7 @@ export const TeamContainerComponent = ({ currentUser, team, members }) => {
       {modalVisibilities[MODAL.NEW_TEAM] && (
         <TeamModal
           teamId={team.id}
+          teams={Object.values(teams)}
           onEditSubmit={handleEditTeam}
           onCancel={handleCloseModal(MODAL.NEW_TEAM)}
         />

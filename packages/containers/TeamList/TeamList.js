@@ -262,6 +262,7 @@ class TeamListContainer extends Component {
         {modalVisibilities[NEW_TEAM_MODAL] && (
           <TeamModal
             teamId={this.state.selectedTeamId}
+            teams={teams}
             onCreateSubmit={this.handleCreateSubmit}
             onEditSubmit={this.handleEditSubmit}
             onCancel={this.handleCloseModal(NEW_TEAM_MODAL)}

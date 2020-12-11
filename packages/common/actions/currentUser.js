@@ -18,6 +18,8 @@ export const LEAVE_TEAM_REQUEST = '@currentUser/LEAVE_TEAM_REQUEST';
 export const LEAVE_TEAM_SUCCESS = '@currentUser/LEAVE_TEAM_SUCCESS';
 export const LEAVE_TEAM_FAILURE = '@currentUser/LEAVE_TEAM_FAILURE';
 
+export const ADD_TEAM_TO_CURRENT_USER_TEAMS_LIST = '@currentUser/ADD_TEAM_TO_CURRENT_USER_TEAMS_LIST';
+
 export const LOGOUT = '@currentUser/LOGOUT';
 
 export const RESET_CURRENT_USER_STATE = '@currentUser/RESET_CURRENT_USER_STATE';
@@ -114,6 +116,13 @@ export const leaveTeamSuccess = teamId => ({
 
 export const leaveTeamFailure = () => ({
   type: LEAVE_TEAM_FAILURE,
+});
+
+export const addTeamToCurrentUserTeamsList = teamId => ({
+  type: ADD_TEAM_TO_CURRENT_USER_TEAMS_LIST,
+  payload: {
+    teamId,
+  },
 });
 
 export const logout = () => ({

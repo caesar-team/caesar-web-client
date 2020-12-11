@@ -59,6 +59,7 @@ import {
 import { TEAM_ROLES, TEAM_TYPE } from '@caesar/common/constants';
 import { updateGlobalNotification } from '@caesar/common/actions/application';
 import { finishIsLoading } from '@caesar/common/actions/workflow';
+import { addTeamToCurrentUserTeamsList } from '@caesar/common/actions/currentUser';
 import {
   createKeyPair,
   encryptItem,
@@ -271,6 +272,7 @@ export function* createTeamSaga({
     if (serverTeam?.id) {
       const teamsById = convertTeamsToEntity([serverTeam]);
       yield put(addTeamsBatch(teamsById));
+      yield put(addTeamToCurrentUserTeamsList(serverTeam?.id));
     }
 
     if (serverKeypair?.id) {

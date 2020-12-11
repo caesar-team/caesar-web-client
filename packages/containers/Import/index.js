@@ -1,12 +1,5 @@
 import { connect } from 'react-redux';
-import {
-  createItemsBatchRequest,
-} from '@caesar/common/actions/entities/item';
-import { initDashboard } from '@caesar/common/actions/workflow';
-import {
-  fetchKeyPairRequest,
-  fetchUserSelfRequest,
-} from '@caesar/common/actions/currentUser';
+import { createItemsBatchRequest } from '@caesar/common/actions/entities/item';
 import { createStructuredSelector } from 'reselect';
 import { selectableTeamsListsSelector } from '@caesar/common/selectors/entities/list';
 import { importProgressPercentSelector } from '@caesar/common/selectors/entities/item';
@@ -22,9 +15,6 @@ const mapStateToProps = createStructuredSelector({
 });
 
 const mapDispatchToProps = {
-  initDashboard,
-  fetchKeyPairRequest,
-  fetchUserSelfRequest,
   createItemsBatchRequest,
 };
 

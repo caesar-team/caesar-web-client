@@ -588,7 +588,7 @@ const keyPairsEncryptedByUserKeysFilter = keypair =>
   keypair.teamId === TEAM_TYPE.PERSONAL || !keypair.relatedItemId;
 const keyPairsEncryptedByTeamKeysFilter = keypair =>
   keypair.teamId !== TEAM_TYPE.PERSONAL && keypair.relatedItemId;
-function* loadKeyPairsAndPersonalItems() {
+export function* loadKeyPairsAndPersonalItems() {
   try {
     // Load lists
     const { data: lists } = yield call(getLists);
@@ -733,7 +733,7 @@ function* initListsAndProgressEntities() {
 }
 
 export function* initWorkflowSaga() {
-  yield call(checkIfUserWasKickedFromTeam);
+  yield call(fetchUserSelfSaga);
   yield call(loadKeyPairsAndPersonalItems);
   yield fork(fetchUsersSaga);
 }

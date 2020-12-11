@@ -1,6 +1,7 @@
-import React, { Component, Fragment } from 'react';
-import styled, { withTheme } from 'styled-components';
-import Router, { withRouter } from 'next/router';
+import React, { useState, memo } from 'react';
+import { useEffectOnce } from 'react-use';
+import Router from 'next/router';
+import styled from 'styled-components';
 import {
   API_URI,
   APP_URI,
@@ -17,6 +18,7 @@ import {
   TextWithLines,
   AuthLayout,
   SecondaryHeader,
+  GlobalNotification,
 } from '@caesar/components';
 import { login } from '@caesar/common/utils/authUtils';
 import { setCookieValue } from '@caesar/common/utils/token';
@@ -59,26 +61,19 @@ const GoogleAuthText = styled.div`
 
 const headerComponent = <SecondaryHeader buttonText="Sign Up" url="/signup" />;
 
-class SignInContainer extends Component {
-  state = {
-    googleAuthUrl: '',
-  };
+const generateGoogleAuthUrl = async () => {
+  return `${API_URI}/${AUTH_ENDPOINT}?redirect_uri=${APP_URI}/${REDIRECT_AUTH_ENDPOINT}`;
+};
 
-  async componentDidMount() {
-    if (isServer) return;
+const SignInContainerComponent = ({ error = null }) => {
+  const [googleAuthError, setGoogleAuthError] = useState(error);
+  const [googleAuthUrl, setGoogleAuthUrl] = useState('');
+  const isLinkShown = googleAuthUrl !== '';
 
-    const url = await this.generateGoogleAuthUrl();
-
-    if (this.state.googleAuthUrl === '') {
-      this.setState({ googleAuthUrl: url });
-    }
-  }
-
-  generateGoogleAuthUrl = async () => {
-    return `${API_URI}/${AUTH_ENDPOINT}?redirect_uri=${APP_URI}/${REDIRECT_AUTH_ENDPOINT}`;
-  };
-
-  handleSubmit = async ({ email, password }, { setSubmitting, setErrors }) => {
+  const handleSubmit = async (
+    { email, password },
+    { setSubmitting, setErrors },
+  ) => {
     try {
       const jwt = await login(email, password);
 
@@ -91,29 +86,50 @@ class SignInContainer extends Component {
     }
   };
 
-  render() {
-    const { googleAuthUrl } = this.state;
-    const isLinkShown = googleAuthUrl !== '';
+  useEffectOnce(() => {
+    const generateAndSetGoogleAuthUrl = async () => {
+      if (isServer) return;
 
-    return (
-      <AuthLayout headerComponent={headerComponent}>
-        <AuthTitle>Nice to meet you!</AuthTitle>
-        <AuthDescription>Welcome to Caesar.Team!</AuthDescription>
-        <SignInForm onSubmit={this.handleSubmit} />
-        {isLinkShown && (
-          <Fragment>
-            <TextWithLines width={1}>OR</TextWithLines>
-            <AuthWrapper href={googleAuthUrl}>
-              <GoogleLogoWrapper>
-                <Icon name="google" width={20} height={20} />
-              </GoogleLogoWrapper>
-              <GoogleAuthText>Log in with Google</GoogleAuthText>
-            </AuthWrapper>
-          </Fragment>
-        )}
-      </AuthLayout>
-    );
-  }
-}
+      const url = await generateGoogleAuthUrl();
 
-export default withTheme(withRouter(SignInContainer));
+      if (googleAuthUrl === '') {
+        setGoogleAuthUrl(url);
+      }
+    };
+
+    generateAndSetGoogleAuthUrl();
+  });
+
+  const handleCloseNotification = () => {
+    setGoogleAuthError(null);
+    Router.push(ROUTES.SIGN_IN);
+  };
+
+  return (
+    <AuthLayout headerComponent={headerComponent}>
+      <AuthTitle>Nice to meet you!</AuthTitle>
+      <AuthDescription>Welcome to Caesar.Team!</AuthDescription>
+      <SignInForm onSubmit={handleSubmit} />
+      {isLinkShown && (
+        <>
+          <TextWithLines width={1}>OR</TextWithLines>
+          <AuthWrapper href={googleAuthUrl}>
+            <GoogleLogoWrapper>
+              <Icon name="google" width={20} height={20} />
+            </GoogleLogoWrapper>
+            <GoogleAuthText>Log in with Google</GoogleAuthText>
+          </AuthWrapper>
+        </>
+      )}
+      {googleAuthError && (
+        <GlobalNotification
+          text={googleAuthError}
+          isError
+          onClose={handleCloseNotification}
+        />
+      )}
+    </AuthLayout>
+  );
+};
+
+export const SignInContainer = memo(SignInContainerComponent);

@@ -28,6 +28,7 @@ import {
 import {
   setCurrentTeamId,
   leaveTeamSuccess,
+  addTeamToCurrentUserTeamsList,
 } from '@caesar/common/actions/currentUser';
 import { teamSelector } from '@caesar/common/selectors/entities/team';
 import {
@@ -59,7 +60,6 @@ import {
 import { TEAM_ROLES, TEAM_TYPE } from '@caesar/common/constants';
 import { updateGlobalNotification } from '@caesar/common/actions/application';
 import { finishIsLoading } from '@caesar/common/actions/workflow';
-import { addTeamToCurrentUserTeamsList } from '@caesar/common/actions/currentUser';
 import {
   createKeyPair,
   encryptItem,
@@ -77,6 +77,7 @@ import { createVaultSuccess } from '../../actions/entities/vault';
 import { removeItemsBatchByTeamIds } from '../../actions/entities/item';
 import { removeListsBatchByTeamIds } from '../../actions/entities/list';
 import { upperFirst } from '../../utils/string';
+import { resetDashboardWorkflow } from '../workflow';
 
 export function* fetchTeamsSaga() {
   try {
@@ -133,6 +134,7 @@ export function* removeTeamSaga({ payload: { teamId } }) {
     const currentTeamId = yield select(currentTeamIdSelector);
 
     yield call(deleteTeam, teamId);
+    yield call(resetDashboardWorkflow, teamId);
 
     if (userTeamIds.includes(teamId)) {
       yield put(leaveTeamSuccess(teamId));

@@ -46,7 +46,7 @@ const StyledHint = styled(Hint)`
   margin-right: 24px;
 `;
 
-export const TeamContainerComponent = ({ currentUser, team, members }) => {
+export const TeamContainerComponent = ({ currentUser, team, teams, members }) => {
   const router = useRouter();
   const dispatch = useDispatch();
   const [modalVisibilities, setModalVisibilities] = useState({

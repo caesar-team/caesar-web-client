@@ -77,7 +77,9 @@ const TeamModal = ({
             setErrors,
           })
         : onCreateSubmit({ title, icon: icon.raw, setSubmitting, setErrors }),
-    validationSchema: getValidationSchema(teams.map(item => item.title)),
+    validationSchema: getValidationSchema(
+      teams.filter(({ id }) => id !== teamId).map(item => item.title),
+    ),
   });
 
   useEffectOnce(() => {

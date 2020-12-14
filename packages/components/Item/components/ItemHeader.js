@@ -65,11 +65,11 @@ const ActionButton = styled(Button)`
   margin-left: 16px;
 `;
 
-const PathHintWrapper = styled.div`
+const StyledHintPath = styled(Hint)`
   margin-right: auto;
 `;
 
-const HintWrapper = styled.div`
+const StyledHint = styled(Hint)`
   margin-left: 16px;
 `;
 
@@ -131,15 +131,13 @@ const ItemHeaderComponent = ({
       ) : (
         <>
           <Can I={PERMISSION.MOVE} an={_permissions}>
-            <PathHintWrapper>
-              <Hint text="Move the item">
-                <PathButton color="white" onClick={onClickMove}>
-                  <PathText>{teamTitle}</PathText>
-                  <Delimeter>|</Delimeter>
-                  <PathText>{listTitle}</PathText>
-                </PathButton>
-              </Hint>
-            </PathHintWrapper>  
+            <StyledHintPath text="Move the item">
+              <PathButton color="white" onClick={onClickMove}>
+                <PathText>{teamTitle}</PathText>
+                <Delimeter>|</Delimeter>
+                <PathText>{listTitle}</PathText>
+              </PathButton>
+            </StyledHintPath>
           </Can>
           <Can not I={PERMISSION.MOVE} an={_permissions}>
             <PathWrapper>
@@ -149,30 +147,24 @@ const ItemHeaderComponent = ({
             </PathWrapper>
           </Can>
           <Can I={PERMISSION.SHARE} an={_permissions}>
-            <HintWrapper>
-              <Hint text="Share the item">
-                <Button icon="share" color="white" onClick={onClickShare} />
-              </Hint>
-            </HintWrapper>  
+            <StyledHint text="Share the item">
+              <Button icon="share" color="white" onClick={onClickShare} />
+            </StyledHint>
           </Can>
           <Can I={PERMISSION.FAVORITE} an={_permissions}>
-            <HintWrapper>
-              <Hint text="Favorite">
-                <Button
-                  icon={item.favorite ? 'favorite-active' : 'favorite'}
-                  color="white"
-                  onClick={handleToggleFavorites}
-                />
-              </Hint>
-            </HintWrapper>  
+            <StyledHint text="Favorite">
+              <Button
+                icon={item.favorite ? 'favorite-active' : 'favorite'}
+                color="white"
+                onClick={handleToggleFavorites}
+              />
+            </StyledHint>
           </Can>
         </>
       )}
-      <HintWrapper>
-        <Hint text="Close the item" position="top_left">
-          <Button icon="close" color="white" onClick={handleClickCloseItem} />
-        </Hint>
-      </HintWrapper>  
+      <StyledHint text="Close the item" position="top_left">
+        <Button icon="close" color="white" onClick={handleClickCloseItem} />
+      </StyledHint>
     </ColumnHeader>
   );
 };

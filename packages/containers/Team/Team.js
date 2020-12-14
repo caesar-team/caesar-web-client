@@ -42,12 +42,8 @@ import { ability } from '@caesar/common/ability';
 import { MODAL } from './constants';
 import { createColumns } from './createColumns';
 
-const ButtonStyled = styled(Button)`
+const StyledHint = styled(Hint)`
   margin-right: 24px;
-`;
-
-const AddMemberButton = styled(ButtonStyled)`
-  margin-right: 0;
 `;
 
 export const TeamContainerComponent = ({ currentUser, team, members }) => {
@@ -216,47 +212,47 @@ export const TeamContainerComponent = ({ currentUser, team, members }) => {
       addonTopComponent={
         <>
           <Can I={PERMISSION.EDIT} a={teamSubject}>
-            <Hint text="Edit the team">
-              <ButtonStyled
+            <StyledHint text="Edit the team">
+              <Button
                 withOfflineCheck
                 icon="pencil"
                 color="white"
                 onClick={handleOpenModal(MODAL.NEW_TEAM)}
               />
-            </Hint>
+            </StyledHint>
           </Can>
           <Can I={PERMISSION.DELETE} a={teamSubject}>
-            <Hint text="Remove the team">
-              <ButtonStyled
+            <StyledHint text="Remove the team">
+              <Button
                 withOfflineCheck
                 icon="trash"
                 color="white"
                 onClick={handleOpenModal(MODAL.REMOVE_TEAM)}
               />
-            </Hint>
+            </StyledHint>
           </Can>
           <Can I={PERMISSION.LEAVE} a={teamSubject}>
             {!isDomainTeam && (
-              <Hint text="Leave">
-                <ButtonStyled
+              <StyledHint text="Leave">
+                <Button
                   withOfflineCheck
                   icon="leave"
                   color="white"
                   onClick={handleOpenModal(MODAL.LEAVE_TEAM)}
                 />
-              </Hint>
+              </StyledHint>
             )}
           </Can>
           {!isTeamLocked && (
             <Can I={PERMISSION.ADD} a={teamMemberSubject}>
-              <AddMemberButton
+              <Button
                 withOfflineCheck
                 onClick={handleOpenModal(MODAL.INVITE_MEMBER)}
                 icon="plus"
                 color="black"
               >
                 Add a member
-              </AddMemberButton>
+              </Button>
             </Can>
           )}
         </>

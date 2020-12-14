@@ -5,7 +5,6 @@ import { SCHEMA } from '@caesar/common/validation/schema';
 const MAX_SIZE = '8MB';
 
 export const getValidationSchema = existedTeams => {
-  //const yupObject = 
   return yup.object({
     title: SCHEMA
       .REQUIRED_LIMITED_STRING()

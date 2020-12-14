@@ -235,23 +235,26 @@ export const Attachments = ({
       uniqNewFiles.map(file => [file.id, splitedFiles.raws[file.id]]),
     );
 
-    const allAttachments = [...itemAttachments, ...uniqNewFiles];
-    const allRaws = { ...itemRaws, ...uniqNewRaws };
-
     setNewFiles([
       ...erroredFiles,
       ...processedDuplicatedFiles,
       ...uniqNewFiles,
     ]);
 
-    setItemRaws(allRaws);
-    setItemAttachments(allAttachments);
-
     setOpenedModal(MODAL.NEW_FILES);
-    syncStateWithServer({
-      attachments: allAttachments,
-      raws: allRaws,
-    });
+
+    if (uniqNewFiles.length || uniqNewRaws.length) {
+      const allAttachments = [...itemAttachments, ...uniqNewFiles];
+      const allRaws = { ...itemRaws, ...uniqNewRaws };
+
+      setItemRaws(allRaws);
+      setItemAttachments(allAttachments);
+
+      syncStateWithServer({
+        attachments: allAttachments,
+        raws: allRaws,
+      });
+    }
   };
 
   return Array.isArray(itemAttachments) && itemAttachments.length === 0 ? (

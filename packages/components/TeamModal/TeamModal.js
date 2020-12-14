@@ -8,7 +8,7 @@ import { Modal, FormInput, Button, Label } from '@caesar/components';
 import { checkError } from '@caesar/common/utils/formikUtils';
 import { TextError as Error } from '../Error';
 import { renderTeamAvatars } from './renderTeamAvatars';
-import { schema } from './schema';
+import { getValidationSchema } from './schema';
 
 const FormTitle = styled.div`
   padding-bottom: 24px;
@@ -48,6 +48,7 @@ const getInitialValues = team => ({
 
 const TeamModal = ({
   teamId,
+  teams,
   onCreateSubmit,
   onEditSubmit,
   onCancel = Function.prototype,
@@ -76,7 +77,9 @@ const TeamModal = ({
             setErrors,
           })
         : onCreateSubmit({ title, icon: icon.raw, setSubmitting, setErrors }),
-    validationSchema: schema,
+    validationSchema: getValidationSchema(
+      teams.filter(({ id }) => id !== teamId).map(item => item.title),
+    ),
   });
 
   useEffectOnce(() => {

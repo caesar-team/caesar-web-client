@@ -28,7 +28,8 @@ import {
   ConfirmLeaveTeamModal,
   ConfirmRemoveMemberModal,
   TeamModal,
-} from "@caesar/components";
+  Hint,  
+} from '@caesar/components';
 import {
   PERMISSION,
   PERMISSION_ENTITY,
@@ -41,15 +42,11 @@ import { ability } from '@caesar/common/ability';
 import { MODAL } from './constants';
 import { createColumns } from './createColumns';
 
-const ButtonStyled = styled(Button)`
+const StyledHint = styled(Hint)`
   margin-right: 24px;
 `;
 
-const AddMemberButton = styled(ButtonStyled)`
-  margin-right: 0;
-`;
-
-export const TeamContainerComponent = ({ currentUser, team, members }) => {
+export const TeamContainerComponent = ({ currentUser, team, teams, members }) => {
   const router = useRouter();
   const dispatch = useDispatch();
   const [modalVisibilities, setModalVisibilities] = useState({
@@ -166,16 +163,24 @@ export const TeamContainerComponent = ({ currentUser, team, members }) => {
     dispatch(removeTeamRequest(team.id));
   };
 
-  const handleEditTeam = ({ teamId, title, icon, setSubmitting, setErrors }) => {
-    dispatch(editTeamRequest({
-      teamId,
-      title,
-      icon,
-      handleCloseModal: handleCloseModal(MODAL.NEW_TEAM),
-      setSubmitting,
-      setErrors,
-    }));
-  };  
+  const handleEditTeam = ({
+    teamId,
+    title,
+    icon,
+    setSubmitting,
+    setErrors,
+  }) => {
+    dispatch(
+      editTeamRequest({
+        teamId,
+        title,
+        icon,
+        handleCloseModal: handleCloseModal(MODAL.NEW_TEAM),
+        setSubmitting,
+        setErrors,
+      }),
+    );
+  };
 
   if (!team.id && !isLoadingTeams) {
     router.push(ROUTES.SETTINGS + ROUTES.TEAM);
@@ -207,41 +212,47 @@ export const TeamContainerComponent = ({ currentUser, team, members }) => {
       addonTopComponent={
         <>
           <Can I={PERMISSION.EDIT} a={teamSubject}>
-            <ButtonStyled
-              withOfflineCheck
-              icon="pencil"
-              color="white"
-              onClick={handleOpenModal(MODAL.NEW_TEAM)}
-            />
-          </Can>          
+            <StyledHint text="Edit the team">
+              <Button
+                withOfflineCheck
+                icon="pencil"
+                color="white"
+                onClick={handleOpenModal(MODAL.NEW_TEAM)}
+              />
+            </StyledHint>
+          </Can>
           <Can I={PERMISSION.DELETE} a={teamSubject}>
-            <ButtonStyled
-              withOfflineCheck
-              icon="trash"
-              color="white"
-              onClick={handleOpenModal(MODAL.REMOVE_TEAM)}
-            />
+            <StyledHint text="Remove the team">
+              <Button
+                withOfflineCheck
+                icon="trash"
+                color="white"
+                onClick={handleOpenModal(MODAL.REMOVE_TEAM)}
+              />
+            </StyledHint>
           </Can>
           <Can I={PERMISSION.LEAVE} a={teamSubject}>
             {!isDomainTeam && (
-              <ButtonStyled
-                withOfflineCheck
-                icon="leave"
-                color="white"
-                onClick={handleOpenModal(MODAL.LEAVE_TEAM)}
-              />
+              <StyledHint text="Leave">
+                <Button
+                  withOfflineCheck
+                  icon="leave"
+                  color="white"
+                  onClick={handleOpenModal(MODAL.LEAVE_TEAM)}
+                />
+              </StyledHint>
             )}
           </Can>
           {!isTeamLocked && (
             <Can I={PERMISSION.ADD} a={teamMemberSubject}>
-              <AddMemberButton
+              <Button
                 withOfflineCheck
                 onClick={handleOpenModal(MODAL.INVITE_MEMBER)}
                 icon="plus"
                 color="black"
               >
                 Add a member
-              </AddMemberButton>
+              </Button>
             </Can>
           )}
         </>
@@ -265,10 +276,11 @@ export const TeamContainerComponent = ({ currentUser, team, members }) => {
       {modalVisibilities[MODAL.NEW_TEAM] && (
         <TeamModal
           teamId={team.id}
+          teams={teams}
           onEditSubmit={handleEditTeam}
           onCancel={handleCloseModal(MODAL.NEW_TEAM)}
         />
-      )}      
+      )}
       {modalVisibilities[MODAL.INVITE_MEMBER] && (
         <InviteModal
           currentUser={currentUser}

@@ -1,15 +1,9 @@
 import { call, select, all, takeLatest, put } from '@redux-saga/core/effects';
-import {
-  fetchUsersSaga,
-  createUserBatchSaga,
-  getOrCreateUserBatchSaga,
-} from '@caesar/common/sagas/entities/user';
+import { getOrCreateUserBatchSaga } from '@caesar/common/sagas/entities/user';
 import {
   itemsBatchSelector,
   itemSelector,
 } from '@caesar/common/selectors/entities/item';
-import { teamsMembersFullViewSelector } from '@caesar/common/selectors/entities/member';
-import { userIdsSelector } from '@caesar/common/selectors/entities/user';
 import { currentUserDataSelector } from '@caesar/common/selectors/currentUser';
 import {
   shareKeyPairSelector,
@@ -18,7 +12,6 @@ import {
 import {
   NOOP_NOTIFICATION,
   SHARING_IN_PROGRESS_NOTIFICATION,
-  DOMAIN_ROLES,
   TEAM_TYPE,
 } from '@caesar/common/constants';
 import {
@@ -49,20 +42,6 @@ import {
   convertKeyPairToItemEntity,
   convertKeyPairToEntity,
 } from '../../normalizers/normalizers';
-
-export function* prepareUsersForSharing(members) {
-  const emailRolePairs = members.map(({ email, domainRoles }) => ({
-    email,
-    role:
-      (domainRoles?.includes(DOMAIN_ROLES.ROLE_ADMIN)
-        ? DOMAIN_ROLES.ROLE_ADMIN
-        : DOMAIN_ROLES.ROLE_USER) || DOMAIN_ROLES.ROLE_USER,
-  }));
-
-  return yield call(getOrCreateUserBatchSaga, {
-    payload: { emailRolePairs },
-  });
-}
 
 export function* encryptItemBySharedKey({ item, publicKey }) {
   if (!publicKey) {
@@ -222,33 +201,14 @@ export function* shareItemBatchSaga({
   try {
     yield put(updateGlobalNotification(SHARING_IN_PROGRESS_NOTIFICATION, true));
 
-    // Update domain user list before create new domain user
-    yield call(fetchUsersSaga);
-
-    const domainUserIds = yield select(userIdsSelector);
-    const domainUsers = users.filter(user => domainUserIds.includes(user.id));
-    const notDomainUsers = users.filter(
-      user => !domainUserIds.includes(user.id),
+    const { domainUsers, createdUsers } = yield call(
+      getOrCreateUserBatchSaga,
+      users,
     );
-    let createdUsers = [];
 
-    if (notDomainUsers.length) {
-      const newUsers = yield call(createUserBatchSaga, {
-        payload: {
-          emailRolePairs: notDomainUsers.map(user => ({
-            email: user.email,
-            domainRole: DOMAIN_ROLES.ROLE_USER,
-          })),
-        },
-      });
+    // TODO: Implement share to team
 
-      createdUsers = newUsers;
-    }
-
-    const teamsMembers = yield select(teamsMembersFullViewSelector, {
-      teamIds,
-    });
-    const allUsers = [...createdUsers, ...domainUsers, ...teamsMembers];
+    const allUsers = [...createdUsers, ...domainUsers];
     const items = yield select(itemsBatchSelector, { itemIds });
 
     // Need To Go Deeper (c)

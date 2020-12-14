@@ -1,4 +1,4 @@
-import { call, put, takeLatest, all } from 'redux-saga/effects';
+import { call, put, takeLatest, select } from 'redux-saga/effects';
 import {
   FETCH_USERS_REQUEST,
   fetchUsersSuccess,
@@ -10,13 +10,8 @@ import {
   createUserBatchFailure,
   createUserBatchSuccess,
 } from '@caesar/common/actions/entities/user';
-import {
-  getUsers,
-  getPublicKeyByEmailBatch,
-  postNewUser,
-  postNewUserBatch,
-  updateKey,
-} from '@caesar/common/api';
+import { userIdsSelector } from '@caesar/common/selectors/entities/user';
+import { getUsers, postNewUser, postNewUserBatch } from '@caesar/common/api';
 import { convertUsersToEntity } from '@caesar/common/normalizers/normalizers';
 import {
   generateSeedAndVerifier,
@@ -25,15 +20,6 @@ import {
 } from '@caesar/common/utils/cipherUtils';
 import { DOMAIN_ROLES } from '@caesar/common/constants';
 import { inviteNewUserBatchSaga } from '../common/invite';
-
-const setNewFlag = (users, isNew) =>
-  users.map(user => ({
-    ...user,
-    isNew,
-  }));
-
-const renameUserId = users =>
-  users.map(({ userId, ...user }) => ({ id: userId, ...user }));
 
 export function* fetchUsersSaga() {
   try {
@@ -143,66 +129,37 @@ export function* createUserBatchSaga({ payload: { emailRolePairs } }) {
   }
 }
 
-export function* getOrCreateUserBatchSaga({ payload: { emailRolePairs } }) {
+export function* getOrCreateUserBatchSaga(users) {
   try {
-    const emailRoleObject = emailRolePairs.reduce(
-      (accumulator, { email, domainRole }) => ({
-        ...accumulator,
-        [email]: domainRole,
-      }),
-      {},
+    // Update domain user list before create new domain user
+    yield call(fetchUsersSaga);
+
+    const domainUserIds = yield select(userIdsSelector);
+    const domainUsers = users.filter(user => domainUserIds.includes(user.id));
+    const notDomainUsers = users.filter(
+      user => !domainUserIds.includes(user.id),
     );
-    const emails = emailRolePairs.map(({ email }) => email);
+    let createdUsers = [];
 
-    const { data: existedMembers } = yield call(getPublicKeyByEmailBatch, {
-      emails,
-    });
+    if (notDomainUsers.length) {
+      const newUsers = yield call(createUserBatchSaga, {
+        payload: {
+          emailRolePairs: notDomainUsers.map(user => ({
+            email: user.email,
+            domainRole: DOMAIN_ROLES.ROLE_USER,
+          })),
+        },
+      });
 
-    const existedMemberEmails = existedMembers.map(({ email }) => email);
-    const notExistedMemberEmails = emails.filter(
-      email => !existedMemberEmails.includes(email),
-    );
-    const existedMembersWithoutKeysEmails = existedMembers
-      .filter(member => !member.publicKey)
-      .map(({ email }) => email);
-
-    if (existedMembersWithoutKeysEmails.length) {
-      const generatedUsers = yield call(
-        generateUsersBatch,
-        existedMembersWithoutKeysEmails,
-      );
-
-      yield all(
-        generatedUsers.map(({ email, publicKey, privateKey }) =>
-          call(updateKey, email, {
-            publicKey,
-            encryptedPrivateKey: privateKey,
-          }),
-        ),
-      );
+      createdUsers = newUsers;
     }
 
-    const newMemberEmailRolePairs = notExistedMemberEmails.map(email => ({
-      email,
-      domainRole: emailRoleObject[email],
-    }));
-
-    const newMembers = yield call(createUserBatchSaga, {
-      payload: {
-        emailRolePairs: newMemberEmailRolePairs,
-      },
-    });
-
-    // TODO: change userId to id on BE side
-    return [
-      ...setNewFlag(renameUserId(existedMembers), false),
-      ...setNewFlag(renameUserId(newMembers), true),
-    ];
-  } catch (e) {
+    return { domainUsers, createdUsers };
+  } catch (error) {
     // eslint-disable-next-line no-console
-    console.error(e);
+    console.error('error: ', error);
 
-    return [];
+    return null;
   }
 }
 

@@ -1,1 +1,1 @@
-export { default as DottedMenu } from './DottedMenu';
+export { DottedMenu } from './DottedMenu';

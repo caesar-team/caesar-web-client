@@ -46,14 +46,14 @@ class TeamListContainer extends Component {
   };
 
   handleEditSubmit = ({ teamId, title, icon, setSubmitting, setErrors }) => {
-    this.props.editTeamRequest(
+    this.props.editTeamRequest({
       teamId,
       title,
       icon,
-      this.handleCloseModal(NEW_TEAM_MODAL),
+      handleCloseModal: this.handleCloseModal(NEW_TEAM_MODAL),
       setSubmitting,
       setErrors,
-    );
+    });
   };
 
   handleOpenModal = modal => () => {
@@ -262,6 +262,7 @@ class TeamListContainer extends Component {
         {modalVisibilities[NEW_TEAM_MODAL] && (
           <TeamModal
             teamId={this.state.selectedTeamId}
+            teams={teams}
             onCreateSubmit={this.handleCreateSubmit}
             onEditSubmit={this.handleEditSubmit}
             onCancel={this.handleCloseModal(NEW_TEAM_MODAL)}

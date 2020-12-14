@@ -61,12 +61,13 @@ app.prepare().then(() => {
 
   server.get('/check_auth', (req, res) => {
     const token = req.query && req.query.jwt;
+    const error = req.query && req.query.error;
 
     if (token) {
       res.cookie('token', token, { path: '/' });
       res.redirect('/');
     } else {
-      res.redirect('/signin');
+      res.redirect(`/signin${error ? `?error=${error}` : ''}`);
     }
   });
 

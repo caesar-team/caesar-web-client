@@ -1,6 +1,5 @@
 import React, { memo } from 'react';
-import { withTheme } from 'styled-components';
-import Router, { withRouter } from 'next/router';
+import Router from 'next/router';
 import { ROUTES } from '@caesar/common/constants';
 import {
   AuthTitle,
@@ -47,4 +46,4 @@ const SignUpContainer = () => {
   );
 };
 
-export default withTheme(withRouter(memo(SignUpContainer)));
+export default memo(SignUpContainer);

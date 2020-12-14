@@ -5,9 +5,10 @@ import { SCHEMA } from '@caesar/common/validation/schema';
 const MAX_SIZE = '8MB';
 
 export const getValidationSchema = existedTeams => {
+  //const yupObject = 
   return yup.object({
     title: SCHEMA
-      .REQUIRED_FIELD
+      .REQUIRED_LIMITED_STRING()
       .notOneOf(existedTeams, 'You already have a team with the same name'),
     icon: yup.object({
       raw: yup

@@ -4,7 +4,7 @@ import { Input } from './Input';
 
 const StyledInput = styled(Input)`
   ${Input.InputField} {
-    padding: 0;
+    padding: 0 80px 0 0;
     font-size: ${({ theme }) => theme.font.size.big};
     line-height: ${({ theme }) => theme.font.lineHeight.big};
     background-color: ${({ theme }) => theme.color.white};

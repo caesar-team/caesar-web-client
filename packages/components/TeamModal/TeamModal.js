@@ -63,7 +63,6 @@ const TeamModal = ({
     isSubmitting,
     isValid,
     handleBlur,
-    handleChange,
     handleSubmit,
     setFieldValue,
     setFieldTouched,

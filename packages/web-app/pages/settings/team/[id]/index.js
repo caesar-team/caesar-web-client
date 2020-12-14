@@ -13,7 +13,7 @@ import { currentUserDataSelector } from '@caesar/common/selectors/currentUser';
 import { initTeamSettings } from '@caesar/common/actions/workflow';
 import {
   teamSelector,
-  teamsByIdSelector,
+  teamListSelector,
 } from '@caesar/common/selectors/entities/team';
 import { teamMembersFullViewSelector } from '@caesar/common/selectors/entities/member';
 import { isLoadingSelector } from '@caesar/common/selectors/workflow';
@@ -33,7 +33,7 @@ const SettingsTeamPage = () => {
   const members = useSelector(state =>
     teamMembersFullViewSelector(state, { teamId: id }),
   );
-  const teams = useSelector(teamsByIdSelector);
+  const teams = useSelector(teamListSelector);
   const currentUserData = useSelector(currentUserDataSelector);
 
   const shouldShowLoader = isLoading || !currentUserData || !team || !members;

@@ -273,7 +273,7 @@ export const TeamContainerComponent = ({ currentUser, team, teams, members }) =>
       {modalVisibilities[MODAL.NEW_TEAM] && (
         <TeamModal
           teamId={team.id}
-          teams={Object.values(teams)}
+          teams={teams}
           onEditSubmit={handleEditTeam}
           onCancel={handleCloseModal(MODAL.NEW_TEAM)}
         />

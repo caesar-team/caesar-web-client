@@ -6,6 +6,7 @@ import { useFormik } from 'formik';
 import { teamSelector } from '@caesar/common/selectors/entities/team';
 import { Modal, FormInput, Button, Label } from '@caesar/components';
 import { checkError } from '@caesar/common/utils/formikUtils';
+import { MAX_TEAM_TITLE_LENGTH } from '@caesar/common/validation/constants';
 import { TextError as Error } from '../Error';
 import { renderTeamAvatars } from './renderTeamAvatars';
 import { getValidationSchema } from './schema';
@@ -64,6 +65,7 @@ const TeamModal = ({
     handleBlur,
     handleSubmit,
     setFieldValue,
+    setFieldTouched,
     validateField,
   } = useFormik({
     initialValues: getInitialValues(team),
@@ -88,6 +90,7 @@ const TeamModal = ({
 
   const handleChangeTitle = async e => {
     await setFieldValue('title', e.target.value);
+    setFieldTouched('title');
     validateField('title');
   };
 
@@ -107,6 +110,7 @@ const TeamModal = ({
           value={values.title}
           autoFocus
           withBorder
+          maxLength={MAX_TEAM_TITLE_LENGTH}
           error={checkError(touched, errors, 'title')}
           onChange={handleChangeTitle}
           onBlur={handleBlur}

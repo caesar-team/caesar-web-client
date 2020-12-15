@@ -8,7 +8,7 @@ export const ERROR = {
   REQUIRED: 'This field is required',
   REQUIRED_TEXT:
     'The field can not be empty. Please enter at least 1 character',
-  MAX_LENGTH: max => `No more than ${max} characters`,
+  MAX_LENGTH: max => `Maximum ${max} characters`,
   FILE_SIZE: (currentSize = 0, maxFileSize = MAX_UPLOADING_FILE_SIZE) =>
     `Must be less than ${maxFileSize}`,
   ALL_FILES_SIZE: (
@@ -31,3 +31,4 @@ export const GOOD_PASSWORD_RULES = [
 ];
 
 export const MAX_PASSWORD_LENGTH = 24;
+export const MAX_TEAM_TITLE_LENGTH = 100;

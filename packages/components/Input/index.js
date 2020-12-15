@@ -7,4 +7,4 @@ export { default as PasswordInput } from './PasswordInput';
 export { SearchInput } from './SearchInput';
 export { default as StrengthIndicator } from './StrengthIndicator';
 export { TextArea } from './TextArea';
-export { default as UserSearchInput } from './UserSearchInput';
+export { UserSearchInput } from './UserSearchInput';

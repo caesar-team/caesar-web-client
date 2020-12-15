@@ -6,6 +6,8 @@ export const FETCH_KEY_PAIR_REQUEST = '@currentUser/FETCH_KEY_PAIR_REQUEST';
 export const FETCH_KEY_PAIR_SUCCESS = '@currentUser/FETCH_KEY_PAIR_SUCCESS';
 export const FETCH_KEY_PAIR_FAILURE = '@currentUser/FETCH_KEY_PAIR_FAILURE';
 
+export const CHECK_USER_TEAMS = '@currentUser/CHECK_USER_TEAMS';
+
 export const FETCH_USER_TEAMS_REQUEST = '@currentUser/FETCH_USER_TEAMS_REQUEST';
 export const FETCH_USER_TEAMS_SUCCESS = '@currentUser/FETCH_USER_TEAMS_SUCCESS';
 export const FETCH_USER_TEAMS_FAILURE = '@currentUser/FETCH_USER_TEAMS_FAILURE';
@@ -61,6 +63,13 @@ export const fetchKeyPairSuccess = keyPair => ({
 
 export const fetchKeyPairFailure = () => ({
   type: FETCH_KEY_PAIR_FAILURE,
+});
+
+export const checkUserTeams = userTeamIdsFromRequest => ({
+  type: CHECK_USER_TEAMS,
+  payload: {
+    userTeamIdsFromRequest,
+  },
 });
 
 export const fetchUserTeamsRequest = () => ({

@@ -91,6 +91,7 @@ const InputComponent = ({
   autoComplete,
   withCopyButton = true,
   withEllipsis,
+  allowBlankValue = false,
   addonIcons,
   addonPostfix,
   onClickAcceptEdit,
@@ -136,6 +137,9 @@ const InputComponent = ({
     return result;
   }, [value, schema]);
 
+  const isAcceptIconDisabled = (!value && !allowBlankValue) ||
+    validationState?.error?.message;
+
   return (
     <Wrapper withLabel={label} className={className}>
       {isEdit ? (
@@ -147,7 +151,7 @@ const InputComponent = ({
           error={validationState?.error?.message}
           placeholder={placeholder}
           autoComplete={autoComplete}
-          isAcceptIconDisabled={!value || validationState?.error?.message}
+          isAcceptIconDisabled={isAcceptIconDisabled}
           onChange={handleChange}
           onClickAcceptEdit={() => {
             onClickAcceptEdit(makeObject(name, value));

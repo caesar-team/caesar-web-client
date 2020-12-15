@@ -488,7 +488,7 @@ export function* moveItemSaga({
 
     if (item.teamId !== teamId) {
       if (!item.data) {
-        // TODO: Decrypt item here if data does not exist
+        // TODO: Decrypt item here
       }
 
       const keyPair = yield select(teamKeyPairSelector, {
@@ -564,19 +564,12 @@ export function* moveItemsBatchSaga({
   try {
     yield put(updateGlobalNotification(MOVING_IN_PROGRESS_NOTIFICATION, true));
 
-    const itemIdsChunks = chunk(itemIds, ITEMS_CHUNK_SIZE);
-
-    yield all(
-      itemIdsChunks.map(itemIdsChunk =>
-        call(
-          updateMoveItemsBatch,
-          { items: itemIdsChunk.map(itemId => ({ itemId })) },
-          listId,
-        ),
-      ),
-    );
+    const items = yield select(itemsBatchSelector, { itemIds });
+    let reencryptedItems = null;
 
     if (oldTeamId !== teamId) {
+      // TODO: Decrypt item secret here if data does not exist
+
       const keyPair = yield select(teamKeyPairSelector, {
         teamId,
       });
@@ -594,10 +587,42 @@ export function* moveItemsBatchSaga({
         );
       }
 
-      const items = yield select(itemsBatchSelector, { itemIds });
+      const reencryptedItemSecrets = yield all(
+        items.map(item => ({
+          ...call(reencryptItemSecretSaga, {
+            item,
+            publicKey,
+          }),
+          itemId: item.id,
+        })),
+      );
 
-      yield all(items.map(item => call(saveItemSaga, { item, publicKey })));
+      reencryptedItems = items.map((item, index) => ({
+        itemId: item.id,
+        data: reencryptedItemSecrets[index].data,
+        secret: reencryptedItemSecrets[index].secretDataAndRaws.secret,
+      }));
     }
+
+    const itemChunks = chunk(reencryptedItems || items, ITEMS_CHUNK_SIZE);
+
+    yield all(
+      itemChunks.map(itemChunk =>
+        call(updateMoveItemsBatch, listId, {
+          items: itemChunk.map(({ id, itemId, secret }) =>
+            reencryptedItems ? { itemId, secret } : { itemId: id },
+          ),
+        }),
+      ),
+    );
+
+    const itemSecrets =
+      reencryptedItems?.reduce((acc, item) => {
+        return {
+          ...acc,
+          [item.itemId]: item.secret,
+        };
+      }, {}) || {};
 
     yield put(
       moveItemsBatchSuccess({
@@ -606,6 +631,7 @@ export function* moveItemsBatchSaga({
         previousListId,
         newTeamId: teamId,
         newListId: listId,
+        itemSecrets,
       }),
     );
     yield put(updateGlobalNotification(NOOP_NOTIFICATION, false));

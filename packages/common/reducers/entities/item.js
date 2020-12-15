@@ -123,6 +123,7 @@ export default createReducer(initialState, {
               ...state.byId[itemId],
               listId: payload.newListId,
               previousListId: payload.previousListId,
+              secret: payload.itemSecrets[itemId] || state.byId[itemId].secret,
             },
           }),
           {},

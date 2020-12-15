@@ -229,7 +229,7 @@ export const postAddKeyPairBatch = items =>
 // TODO: Refactor: use body instead of query (change together with backend)
 export const removeItemsBatch = query =>
   callApi.delete(`/items/batch?${query}`);
-export const updateMoveItemsBatch = (data, listId) =>
+export const updateMoveItemsBatch = (listId, data) =>
   callApi.patch(`/items/batch/move/list/${listId}`, data);
 
 // secure

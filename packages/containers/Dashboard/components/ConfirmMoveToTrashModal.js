@@ -42,9 +42,9 @@ export const ConfirmMoveToTrashModal = ({ isOpened, handleCloseModal }) => {
       dispatch(
         moveItemsBatchRequest({
           itemIds: workInProgressItemIds,
-          oldTeamId: workInProgressList?.teamId || null,
+          oldTeamId: workInProgressList?.teamId,
           previousListId: workInProgressList.id,
-          teamId: workInProgressList?.teamId || null,
+          teamId: workInProgressList?.teamId,
           listId: trashListId,
           notification,
           notificationText: `The ${getPlural(workInProgressItemIds?.length, [
@@ -58,7 +58,7 @@ export const ConfirmMoveToTrashModal = ({ isOpened, handleCloseModal }) => {
       dispatch(
         moveItemRequest({
           itemId: workInProgressItem.id,
-          teamId: workInProgressItem.teamId || null,
+          teamId: workInProgressItem.teamId,
           listId: trashListId,
           notification,
           notificationText: `The '${workInProgressItem.data.name}' has been removed`,

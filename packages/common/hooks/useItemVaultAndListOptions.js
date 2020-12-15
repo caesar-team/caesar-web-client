@@ -12,7 +12,10 @@ import { getMovableLists } from '../api';
 const getListTitle = (listId, lists) =>
   transformListTitle(lists.find(list => list.id === listId)?.label);
 
-export const useItemVaultAndListOptions = ({ teamId = null, listId }) => {
+export const useItemVaultAndListOptions = ({
+  teamId = TEAM_TYPE.PERSONAL,
+  listId,
+}) => {
   // TODO: Hot fix for [CAES-1329]
   const vaults =
     useSelector(currentUserVaultListSelector).filter(

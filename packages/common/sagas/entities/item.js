@@ -535,7 +535,7 @@ export function* moveItemSaga({
         listId,
         teamId,
         secret: reencryptedData
-          ? JSON.stringify({ reencryptedData })
+          ? JSON.stringify({ data: reencryptedData })
           : item.secret,
       }),
     );

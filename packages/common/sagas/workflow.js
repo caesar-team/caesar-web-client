@@ -963,6 +963,21 @@ function* checkUpdatesForWIP({ payload: { itemsById } }) {
   }
 }
 
+export function* resetDashboardWorkflow(teamId) {
+  try {
+    const currentTeamId = yield select(currentTeamIdSelector);
+
+    if (currentTeamId === teamId) {
+      yield put(setCurrentTeamId(TEAM_TYPE.PERSONAL));
+      yield put(setWorkInProgressListId(null));
+      yield put(setWorkInProgressItem(null));
+    }
+  } catch (error) {
+    // eslint-disable-next-line no-console
+    console.error('error', error);
+  }
+}
+
 export default function* workflowSagas() {
   // Init (get all items, keys, etc)
   yield takeLatest(INIT_WORKFLOW, initWorkflowSaga);

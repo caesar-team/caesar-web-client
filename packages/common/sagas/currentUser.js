@@ -46,6 +46,7 @@ import {
   convertTeamsToEntity,
 } from '@caesar/common/normalizers/normalizers';
 import { clearStateWhenLeaveTeam } from './entities/team';
+import { resetDashboardWorkflow } from './workflow';
 
 export function* checkIfUserWasKickedFromTeam(userTeamIdsFromRequest) {
   try {
@@ -136,14 +137,7 @@ export function* leaveTeamSaga({ payload: { teamId } }) {
     yield put(leaveTeamSuccess(teamId));
     yield put(editTeamSuccess(teamsById[team.id]));
     yield call(clearStateWhenLeaveTeam, { payload: { teamIds: [teamId] } });
-
-    const currentTeamId = yield select(currentTeamIdSelector);
-
-    if (currentTeamId === teamId) {
-      yield put(setCurrentTeamId(TEAM_TYPE.PERSONAL));
-      yield put(setWorkInProgressListId(null));
-      yield put(setWorkInProgressItem(null));
-    }
+    yield call(resetDashboardWorkflow, teamId);
 
     const {
       router: { route },

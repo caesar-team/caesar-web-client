@@ -176,6 +176,7 @@ export const ShareModal = ({
         <Row>
           <UserSearchInput
             blackList={searchedBlackListMemberIds}
+            autoFocus
             onClickAdd={handleAddMember}
           />
         </Row>

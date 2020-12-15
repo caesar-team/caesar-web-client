@@ -136,7 +136,12 @@ const Postfix = ({
   return null;
 };
 
-const UserSearchInputComponent = ({ blackList, onClickAdd, className }) => {
+const UserSearchInputComponent = ({
+  blackList,
+  autoFocus,
+  onClickAdd,
+  className,
+}) => {
   const [isLoading, setLoading] = useState(false);
   const [users, setUsers] = useState([]);
   const [filterText, setFilterText] = useState('');
@@ -219,6 +224,7 @@ const UserSearchInputComponent = ({ blackList, onClickAdd, className }) => {
       <InputStyled
         placeholder="Enter email addresses…"
         autoComplete="off"
+        autoFocus={autoFocus}
         value={filterText}
         onChange={handleChange}
         prefix={Prefix}
@@ -247,6 +253,4 @@ const UserSearchInputComponent = ({ blackList, onClickAdd, className }) => {
   );
 };
 
-const UserSearchInput = memo(UserSearchInputComponent);
-
-export default UserSearchInput;
+export const UserSearchInput = memo(UserSearchInputComponent);

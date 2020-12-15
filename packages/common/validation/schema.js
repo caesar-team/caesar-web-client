@@ -19,13 +19,7 @@ export const attachmentSchema = yup.object({
     .number()
     .test(
       'fileSize',
-      size =>
-        ERROR.FILE_SIZE(
-          humanizeSize(
-            size.value ? getRealFileSizeForBase64enc(size.value) : 0,
-            true,
-          ),
-        ),
+      size => ERROR.FILE_SIZE(humanizeSize(size.value || 0, true)),
       checkFileSize,
     ),
 });

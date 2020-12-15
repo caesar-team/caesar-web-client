@@ -92,14 +92,15 @@ export default createReducer(initialState, {
     return state;
   },
   [MOVE_ITEM_SUCCESS](state, { payload }) {
+    const { itemId, ...itemData } = payload;
+
     return {
       ...state,
       byId: {
         ...state.byId,
-        [payload.itemId]: {
-          ...state.byId[payload.itemId],
-          listId: payload.newListId,
-          previousListId: payload.oldListId,
+        [itemId]: {
+          ...state.byId[itemId],
+          ...itemData,
         },
       },
     };
@@ -121,7 +122,7 @@ export default createReducer(initialState, {
             [itemId]: {
               ...state.byId[itemId],
               listId: payload.newListId,
-              previousListId: payload.oldListId,
+              previousListId: payload.previousListId,
             },
           }),
           {},

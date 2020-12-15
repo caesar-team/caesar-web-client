@@ -27,7 +27,6 @@ import {
   removeItemsBatchSuccess,
   removeItemsBatchFailure,
   updateItemField,
-  updateItemBatchField,
   setImportProgressPercent,
 } from '@caesar/common/actions/entities/item';
 import { checkIfUserWasKickedFromTeam } from '@caesar/common/sagas/currentUser';
@@ -357,14 +356,9 @@ export function* saveShareKeyPairSaga({ item, publicKey }) {
   });
 }
 
-export function* saveItemSaga({ item, publicKey }) {
-  const { id = null, listId = null, type, favorite = false, ownerId } = item;
+export function* reencryptItemSecretSaga({ item, publicKey }) {
+  const { id = null } = item;
   const itemFromStore = yield select(itemSelector, { itemId: item.id });
-
-  if (!item?.data || !itemFromStore?.data) {
-    // TODO: Need to get data here
-    // yield call(decryptItem, item);
-  }
 
   let isRawsChanged = isGeneralItem(item);
   let itemToEncrypt = item;
@@ -401,7 +395,6 @@ export function* saveItemSaga({ item, publicKey }) {
     publicKey,
   });
 
-  let serverItemData = {};
   let secretDataAndRaws = {};
 
   if (isRawsChanged) {
@@ -419,6 +412,22 @@ export function* saveItemSaga({ item, publicKey }) {
         : JSON.stringify({ data, raws }),
     };
   }
+
+  return { data, raws, secretDataAndRaws } || {};
+}
+
+export function* saveItemSaga({ item, publicKey }) {
+  const { id = null, listId = null, type, favorite = false, ownerId } = item;
+
+  const { data, raws, secretDataAndRaws } = yield call(
+    reencryptItemSecretSaga,
+    {
+      item,
+      publicKey,
+    },
+  );
+
+  let serverItemData = {};
 
   if (id) {
     const { data: updatedItemData } = yield call(updateItem, id, {
@@ -473,15 +482,14 @@ export function* moveItemSaga({
     const list = yield select(listSelector, { listId });
     const defaultList = yield select(currentTeamDefaultListSelector);
     const newListId = list ? listId : defaultList?.id;
-
     const item = yield select(itemSelector, { itemId });
-
-    yield call(updateMoveItem, item.id, {
-      listId: newListId,
-    });
+    let reencryptedData = null;
+    let reencryptedSecretDataAndRaws = null;
 
     if (item.teamId !== teamId) {
-      yield put(updateItemField(item.id, 'teamId', teamId));
+      if (!item.data) {
+        // TODO: Decrypt item here if data does not exist
+      }
 
       const keyPair = yield select(teamKeyPairSelector, {
         teamId,
@@ -500,10 +508,37 @@ export function* moveItemSaga({
         );
       }
 
-      yield call(saveItemSaga, { item, publicKey });
+      const { data, secretDataAndRaws } = yield call(reencryptItemSecretSaga, {
+        item,
+        publicKey,
+      });
+
+      reencryptedData = data || {};
+      reencryptedSecretDataAndRaws = secretDataAndRaws || {};
     }
 
-    yield put(moveItemSuccess(item.id, item.listId, newListId));
+    yield call(
+      updateMoveItem,
+      item.id,
+      reencryptedSecretDataAndRaws
+        ? {
+            listId: newListId,
+            ...reencryptedSecretDataAndRaws,
+          }
+        : { listId: newListId },
+    );
+
+    yield put(
+      moveItemSuccess({
+        itemId: item.id,
+        previousListId: item.listId,
+        listId,
+        teamId,
+        secret: reencryptedData
+          ? JSON.stringify({ reencryptedData })
+          : item.secret,
+      }),
+    );
     yield put(updateGlobalNotification(NOOP_NOTIFICATION, false));
 
     if (notification) {
@@ -523,7 +558,7 @@ export function* moveItemSaga({
 }
 
 export function* moveItemsBatchSaga({
-  payload: { itemIds, oldTeamId, oldListId, teamId, listId },
+  payload: { itemIds, oldTeamId, previousListId, teamId, listId },
   meta: { notification, notificationText } = {},
 }) {
   try {
@@ -533,13 +568,15 @@ export function* moveItemsBatchSaga({
 
     yield all(
       itemIdsChunks.map(itemIdsChunk =>
-        call(updateMoveItemsBatch, { items: itemIdsChunk }, listId),
+        call(
+          updateMoveItemsBatch,
+          { items: itemIdsChunk.map(itemId => ({ itemId })) },
+          listId,
+        ),
       ),
     );
 
     if (oldTeamId !== teamId) {
-      yield put(updateItemBatchField(itemIds, 'teamId', teamId));
-
       const keyPair = yield select(teamKeyPairSelector, {
         teamId,
       });
@@ -563,7 +600,13 @@ export function* moveItemsBatchSaga({
     }
 
     yield put(
-      moveItemsBatchSuccess(itemIds, oldTeamId, oldListId, teamId, listId),
+      moveItemsBatchSuccess({
+        itemIds,
+        oldTeamId,
+        previousListId,
+        newTeamId: teamId,
+        newListId: listId,
+      }),
     );
     yield put(updateGlobalNotification(NOOP_NOTIFICATION, false));
 

@@ -43,7 +43,7 @@ export const ConfirmMoveToTrashModal = ({ isOpened, handleCloseModal }) => {
         moveItemsBatchRequest({
           itemIds: workInProgressItemIds,
           oldTeamId: workInProgressList?.teamId || null,
-          oldListId: workInProgressList.id,
+          previousListId: workInProgressList.id,
           teamId: workInProgressList?.teamId || null,
           listId: trashListId,
           notification,

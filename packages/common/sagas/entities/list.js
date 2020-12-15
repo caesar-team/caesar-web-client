@@ -170,7 +170,7 @@ export function* removeListSaga({
       payload: {
         itemIds: listItemIds,
         oldTeamId: teamId,
-        oldListId: list.id,
+        previousListId: list.id,
         teamId,
         listId: trashList?.id,
       },

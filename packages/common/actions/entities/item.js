@@ -125,13 +125,9 @@ export const moveItemRequest = ({
   meta: { notification, notificationText },
 });
 
-export const moveItemSuccess = (itemId, oldListId, newListId) => ({
+export const moveItemSuccess = payload => ({
   type: MOVE_ITEM_SUCCESS,
-  payload: {
-    itemId,
-    oldListId,
-    newListId,
-  },
+  payload,
 });
 
 export const moveItemFailure = () => ({
@@ -141,7 +137,7 @@ export const moveItemFailure = () => ({
 export const moveItemsBatchRequest = ({
   itemIds,
   oldTeamId,
-  oldListId,
+  previousListId,
   teamId,
   listId,
   notification,
@@ -151,25 +147,25 @@ export const moveItemsBatchRequest = ({
   payload: {
     itemIds,
     oldTeamId,
-    oldListId,
+    previousListId,
     teamId,
     listId,
   },
   meta: { notification, notificationText },
 });
 
-export const moveItemsBatchSuccess = (
+export const moveItemsBatchSuccess = ({
   itemIds,
   oldTeamId,
-  oldListId,
+  previousListId,
   newTeamId,
   newListId,
-) => ({
+}) => ({
   type: MOVE_ITEMS_BATCH_SUCCESS,
   payload: {
     itemIds,
     oldTeamId,
-    oldListId,
+    previousListId,
     newTeamId,
     newListId,
   },

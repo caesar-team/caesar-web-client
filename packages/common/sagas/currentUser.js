@@ -6,6 +6,7 @@ import {
   FETCH_USER_SELF_REQUEST,
   FETCH_KEY_PAIR_REQUEST,
   FETCH_USER_TEAMS_REQUEST,
+  CHECK_USER_TEAMS,
   LOGOUT,
   fetchUserSelfSuccess,
   fetchUserSelfFailure,
@@ -16,6 +17,7 @@ import {
   leaveTeamFailure,
   leaveTeamSuccess,
   setCurrentTeamId,
+  setLastUpdatedUnixtime,
 } from '@caesar/common/actions/currentUser';
 import { addPersonalKeyPair } from '@caesar/common/actions/keystore';
 import {
@@ -26,6 +28,7 @@ import {
   setWorkInProgressListId,
   setWorkInProgressItem,
 } from '@caesar/common/actions/workflow';
+import { loadKeyPairsAndPersonalItems } from '@caesar/common/sagas/workflow';
 import {
   currentUserTeamIdsSelector,
   currentTeamIdSelector,
@@ -46,6 +49,7 @@ import {
   convertTeamsToEntity,
 } from '@caesar/common/normalizers/normalizers';
 import { clearStateWhenLeaveTeam } from './entities/team';
+import { resetDashboardWorkflow } from './workflow';
 
 export function* checkIfUserWasKickedFromTeam(userTeamIdsFromRequest) {
   try {
@@ -84,11 +88,41 @@ export function* checkIfUserWasKickedFromTeam(userTeamIdsFromRequest) {
   }
 }
 
+export function* checkIfUserWasAddedToTeam(userTeamIdsFromRequest) {
+  try {
+    const userTeamIds = yield select(currentUserTeamIdsSelector) || [];
+
+    if (!userTeamIdsFromRequest) return;
+
+    const diff = difference(userTeamIdsFromRequest, userTeamIds);
+
+    if (!diff.length) return;
+
+    yield put(setLastUpdatedUnixtime(null));
+    yield call(loadKeyPairsAndPersonalItems);
+  } catch (error) {
+    // eslint-disable-next-line no-console
+    console.error(error);
+  }
+}
+
+function* checkUserTeams({ payload: { userTeamIdsFromRequest } }) {
+  try {
+    yield call(checkIfUserWasKickedFromTeam, userTeamIdsFromRequest);
+    yield call(checkIfUserWasAddedToTeam, userTeamIdsFromRequest);
+  } catch (error) {
+    // eslint-disable-next-line no-console
+    console.error(error);
+  }
+}
+
 export function* fetchUserSelfSaga() {
   try {
     const { data: currentUser } = yield call(getUserSelf);
 
-    yield call(checkIfUserWasKickedFromTeam, currentUser?.data?.teamIds);
+    yield call(checkUserTeams, {
+      payload: { userTeamIdsFromRequest: currentUser?.data?.teamIds },
+    });
     yield put(fetchUserSelfSuccess(normalizeCurrentUser(currentUser)));
   } catch (error) {
     console.error('error', error);
@@ -136,14 +170,7 @@ export function* leaveTeamSaga({ payload: { teamId } }) {
     yield put(leaveTeamSuccess(teamId));
     yield put(editTeamSuccess(teamsById[team.id]));
     yield call(clearStateWhenLeaveTeam, { payload: { teamIds: [teamId] } });
-
-    const currentTeamId = yield select(currentTeamIdSelector);
-
-    if (currentTeamId === teamId) {
-      yield put(setCurrentTeamId(TEAM_TYPE.PERSONAL));
-      yield put(setWorkInProgressListId(null));
-      yield put(setWorkInProgressItem(null));
-    }
+    yield call(resetDashboardWorkflow, teamId);
 
     const {
       router: { route },
@@ -173,6 +200,7 @@ export function* logoutSaga() {
 }
 
 export default function* currentUserSagas() {
+  yield takeLatest(CHECK_USER_TEAMS, checkUserTeams);
   yield takeLatest(FETCH_USER_SELF_REQUEST, fetchUserSelfSaga);
   yield takeLatest(FETCH_KEY_PAIR_REQUEST, fetchKeyPairSaga);
   yield takeLatest(FETCH_USER_TEAMS_REQUEST, fetchUserTeamsSaga);

@@ -96,6 +96,7 @@ class InviteModal extends Component {
           <ModalTitle>Add Members</ModalTitle>
           <UserSearchInput
             blackList={searchedBlackListMemberIds}
+            autoFocus
             onClickAdd={this.handleAddMember}
           />
           {shouldShowAddedUsers && (

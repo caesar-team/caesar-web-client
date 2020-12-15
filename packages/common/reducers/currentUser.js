@@ -6,6 +6,7 @@ import {
   FETCH_KEY_PAIR_REQUEST,
   FETCH_KEY_PAIR_SUCCESS,
   FETCH_KEY_PAIR_FAILURE,
+  CHECK_USER_TEAMS,
   FETCH_USER_TEAMS_REQUEST,
   FETCH_USER_TEAMS_SUCCESS,
   FETCH_USER_TEAMS_FAILURE,
@@ -59,6 +60,9 @@ export default createReducer(initialState, {
   },
   [FETCH_KEY_PAIR_FAILURE](state) {
     return { ...state, isLoading: false, isError: true };
+  },
+  [CHECK_USER_TEAMS](state) {
+    return state;
   },
   [FETCH_USER_TEAMS_REQUEST](state) {
     return state;

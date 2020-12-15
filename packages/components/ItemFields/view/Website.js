@@ -14,7 +14,7 @@ const GoToIcon = styled(Icon)`
 `;
 
 export const Website = ({ value, itemSubject, schema, onClickAcceptEdit }) => {
-  const handleclickGoTo = () => {
+  const handleClickGoTo = () => {
     const url = value.match(/^https?:/) ? value : `//${value}`;
 
     window.open(url, '_blank');
@@ -28,6 +28,7 @@ export const Website = ({ value, itemSubject, schema, onClickAcceptEdit }) => {
       itemSubject={itemSubject}
       schema={schema}
       withEllipsis
+      allowBlankValue
       onClickAcceptEdit={onClickAcceptEdit}
       addonIcons={
         value && (
@@ -36,7 +37,7 @@ export const Website = ({ value, itemSubject, schema, onClickAcceptEdit }) => {
             color="gray"
             width={20}
             height={20}
-            onClick={handleclickGoTo}
+            onClick={handleClickGoTo}
           />
         )
       }

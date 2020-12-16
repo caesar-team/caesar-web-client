@@ -853,6 +853,7 @@ function* decryptItemOnDemand({ payload: { item } }) {
 function* setWorkInProgressItemSaga({ payload: { item } }) {
   try {
     if (!item) return;
+
     yield call(decryptItemOnDemand, {
       payload: {
         item,

@@ -24,12 +24,6 @@ import {
   UPDATE_ITEM_REQUEST,
   UPDATE_ITEM_SUCCESS,
   UPDATE_ITEM_FAILURE,
-  ACCEPT_ITEM_UPDATE_REQUEST,
-  ACCEPT_ITEM_UPDATE_SUCCESS,
-  ACCEPT_ITEM_UPDATE_FAILURE,
-  REJECT_ITEM_UPDATE_REQUEST,
-  REJECT_ITEM_UPDATE_SUCCESS,
-  REJECT_ITEM_UPDATE_FAILURE,
   TOGGLE_ITEM_TO_FAVORITE_REQUEST,
   CREATE_ANONYMOUS_LINK_FAILURE,
   CREATE_ANONYMOUS_LINK_REQUEST,
@@ -48,6 +42,7 @@ import {
   REMOVE_ITEMS_BATCH_BY_TEAM_IDS,
   REMOVE_ITEMS_DATA,
   UPDATE_ITEM_FIELD,
+  UPDATE_ITEM_BATCH_FIELD,
   RESET_ITEM_STATE,
   SET_IMPORT_PROGRESS_PERCENT,
 } from '@caesar/common/actions/entities/item';
@@ -97,14 +92,15 @@ export default createReducer(initialState, {
     return state;
   },
   [MOVE_ITEM_SUCCESS](state, { payload }) {
+    const { itemId, ...itemData } = payload;
+
     return {
       ...state,
       byId: {
         ...state.byId,
-        [payload.itemId]: {
-          ...state.byId[payload.itemId],
-          listId: payload.newListId,
-          previousListId: payload.oldListId,
+        [itemId]: {
+          ...state.byId[itemId],
+          ...itemData,
         },
       },
     };
@@ -125,9 +121,9 @@ export default createReducer(initialState, {
             ...accumulator,
             [itemId]: {
               ...state.byId[itemId],
-              teamId: payload.newTeamId,
               listId: payload.newListId,
-              previousListId: payload.oldListId,
+              previousListId: payload.previousListId,
+              secret: payload.itemSecrets[itemId] || state.byId[itemId].secret,
             },
           }),
           {},
@@ -208,39 +204,6 @@ export default createReducer(initialState, {
     };
   },
   [UPDATE_ITEM_FAILURE](state) {
-    return state;
-  },
-  [ACCEPT_ITEM_UPDATE_REQUEST](state) {
-    return state;
-  },
-  [ACCEPT_ITEM_UPDATE_SUCCESS](state, { payload }) {
-    return {
-      ...state,
-      byId: {
-        ...state.byId,
-        [payload.item.id]: payload.item,
-      },
-    };
-  },
-  [ACCEPT_ITEM_UPDATE_FAILURE](state) {
-    return state;
-  },
-  [REJECT_ITEM_UPDATE_REQUEST](state) {
-    return state;
-  },
-  [REJECT_ITEM_UPDATE_SUCCESS](state, { payload }) {
-    return {
-      ...state,
-      byId: {
-        ...state.byId,
-        [payload.itemId]: {
-          ...state.byId[payload.itemId],
-          update: null,
-        },
-      },
-    };
-  },
-  [REJECT_ITEM_UPDATE_FAILURE](state) {
     return state;
   },
   [TOGGLE_ITEM_TO_FAVORITE_REQUEST](state) {
@@ -390,6 +353,24 @@ export default createReducer(initialState, {
           ...state.byId[payload.itemId],
           [payload.key]: payload.value,
         },
+      },
+    };
+  },
+  [UPDATE_ITEM_BATCH_FIELD](state, { payload }) {
+    return {
+      ...state,
+      byId: {
+        ...state.byId,
+        ...payload.itemIds.reduce(
+          (accumulator, itemId) => ({
+            ...accumulator,
+            [itemId]: {
+              ...state.byId[itemId],
+              [payload.key]: payload.value,
+            },
+          }),
+          {},
+        ),
       },
     };
   },

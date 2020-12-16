@@ -573,12 +573,11 @@ function* decryptItemSync(item) {
       ),
     );
 
-    return yield call(decryptItemData, item, privateKeyObj);
+    const { data } = yield call(decryptItemData, item, privateKeyObj);
+    yield put(updateItemField(item.id, 'data', data));
   } catch (error) {
     // eslint-disable-next-line no-console
     console.error('error: ', error);
-
-    return null;
   }
 }
 
@@ -616,8 +615,10 @@ export function* moveItemsBatchSaga({
         );
       }
 
+      const decryptedItems = yield select(itemsBatchSelector, { itemIds });
+
       const reencryptedItemSecrets = yield all(
-        items.map(item => ({
+        decryptedItems.map(item => ({
           ...call(reencryptItemSecretSaga, {
             item,
             publicKey,
@@ -626,7 +627,7 @@ export function* moveItemsBatchSaga({
         })),
       );
 
-      reencryptedItems = items.map((item, index) => ({
+      reencryptedItems = decryptedItems.map((item, index) => ({
         id: item.id,
         data: reencryptedItemSecrets[index].data,
         secret: reencryptedItemSecrets[index].secretDataAndRaws.secret,

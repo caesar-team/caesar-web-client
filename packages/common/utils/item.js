@@ -127,11 +127,12 @@ export const decryptItemData = async (item, privateKeyObject) => {
     const promises = [];
     promises.push(decryptData(encryptedData, privateKeyObject));
 
-    if (!isGeneralItem(item))
+    if (!isGeneralItem(item)) {
       // Decrypt keypairs or system items
       promises.push(
         dectyptItemAttachments(JSON.parse(encryptedRaws), privateKeyObject),
       );
+    }
 
     const [data, raws = {}] = await Promise.all(promises);
 

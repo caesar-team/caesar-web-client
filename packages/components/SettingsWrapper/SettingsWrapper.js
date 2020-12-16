@@ -32,11 +32,9 @@ const TopWrapper = styled.div`
 
 const Title = styled.div`
   margin-right: auto;
-  overflow: hidden;
   font-size: ${({ theme }) => theme.font.size.large};
   color: ${({ theme }) => theme.color.black};
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  word-break: break-all;
 `;
 
 export const SettingsWrapper = forwardRef(

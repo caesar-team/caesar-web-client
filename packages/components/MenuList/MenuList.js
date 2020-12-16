@@ -31,7 +31,7 @@ const ColumnHeader = styled.div`
     isDropdownOpened && theme.zIndex.dropdown};
   display: flex;
   align-items: center;
-  height: 56px;
+  min-height: 56px;
   flex: 0 0 56px;
   padding: 8px 24px;
   background-color: ${({ bgColor, theme }) =>
@@ -41,7 +41,9 @@ const ColumnHeader = styled.div`
 
 const ColumnTitle = styled.div`
   margin-left: 16px;
+  margin-right: 8px;
   text-align: left;
+  word-break: break-all;
 `;
 
 const DropdownIcon = styled(Icon)`

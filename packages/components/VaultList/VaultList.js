@@ -21,6 +21,7 @@ const Option = styled.div`
   border-bottom: 1px solid transparent;
   cursor: pointer;
   transition: all 0.2s;
+  word-break: break-all;
 
   &:hover {
     background-color: ${({ theme }) => theme.color.snow};

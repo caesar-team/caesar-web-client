@@ -89,6 +89,7 @@ export const convertSystemItemToKeyPair = item => {
     privateKey,
   };
 };
+
 const rawArrayToObject = arr =>
   arr.reduce(
     (accumulator, rawObject) => ({
@@ -104,6 +105,7 @@ const dectyptAttachment = async (rawObject, privateKeyObject) => {
     raw: await decryptData(rawObject.raw, privateKeyObject),
   };
 };
+
 export const dectyptItemAttachments = async (raws, privateKeyObject) => {
   if (raws) {
     const rawsPromise = Object.keys(raws).map(async key =>

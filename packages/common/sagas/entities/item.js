@@ -94,6 +94,7 @@ import {
   generateSystemItemEmail,
   generateSystemItemName,
   isGeneralItem,
+  decryptItemData,
 } from '@caesar/common/utils/item';
 import { passwordGenerator } from '@caesar/common/utils/passwordGenerator';
 import { generateKeys } from '@caesar/common/utils/key';
@@ -557,6 +558,30 @@ export function* moveItemSaga({
   }
 }
 
+function* decryptItemSync(item) {
+  try {
+    const keyPairToDecrypt = yield call(getItemKeyPair, {
+      payload: {
+        item,
+      },
+    });
+
+    const privateKeyObj = yield Promise.resolve(
+      unsealPrivateKeyObj(
+        keyPairToDecrypt.privateKey,
+        keyPairToDecrypt.password,
+      ),
+    );
+
+    return yield call(decryptItemData, item, privateKeyObj);
+  } catch (error) {
+    // eslint-disable-next-line no-console
+    console.error('error: ', error);
+
+    return null;
+  }
+}
+
 export function* moveItemsBatchSaga({
   payload: { itemIds, oldTeamId, previousListId, teamId, listId },
   meta: { notification, notificationText } = {},
@@ -565,10 +590,14 @@ export function* moveItemsBatchSaga({
     yield put(updateGlobalNotification(MOVING_IN_PROGRESS_NOTIFICATION, true));
 
     const items = yield select(itemsBatchSelector, { itemIds });
+    const itemsNeedToDecrypt = items.filter(item => !item.data);
     let reencryptedItems = null;
 
     if (oldTeamId !== teamId) {
-      // TODO: Decrypt item secret here if data does not exist
+      // Decrypt item secret here if data does not exist
+      if (itemsNeedToDecrypt.length) {
+        yield all(itemsNeedToDecrypt.map(item => call(decryptItemSync, item)));
+      }
 
       const keyPair = yield select(teamKeyPairSelector, {
         teamId,
@@ -598,7 +627,7 @@ export function* moveItemsBatchSaga({
       );
 
       reencryptedItems = items.map((item, index) => ({
-        itemId: item.id,
+        id: item.id,
         data: reencryptedItemSecrets[index].data,
         secret: reencryptedItemSecrets[index].secretDataAndRaws.secret,
       }));
@@ -609,8 +638,8 @@ export function* moveItemsBatchSaga({
     yield all(
       itemChunks.map(itemChunk =>
         call(updateMoveItemsBatch, listId, {
-          items: itemChunk.map(({ id, itemId, secret }) =>
-            reencryptedItems ? { itemId, secret } : { itemId: id },
+          items: itemChunk.map(({ id, secret }) =>
+            reencryptedItems ? { itemId: id, secret } : { itemId: id },
           ),
         }),
       ),

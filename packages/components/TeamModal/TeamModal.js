@@ -1,5 +1,4 @@
 import React from 'react';
-import { useEffectOnce } from 'react-use';
 import { useSelector } from 'react-redux';
 import styled from 'styled-components';
 import { useFormik } from 'formik';
@@ -66,7 +65,6 @@ const TeamModal = ({
     handleSubmit,
     setFieldValue,
     setFieldTouched,
-    validateField,
   } = useFormik({
     initialValues: getInitialValues(team),
     onSubmit: ({ title, icon }, { setErrors, setSubmitting }) =>
@@ -84,14 +82,9 @@ const TeamModal = ({
     ),
   });
 
-  useEffectOnce(() => {
-    validateField('icon');
-  }, []);
-
-  const handleChangeTitle = async e => {
-    await setFieldValue('title', e.target.value);
+  const handleChangeTitle = e => {
+    setFieldValue('title', e.target.value, true);
     setFieldTouched('title');
-    validateField('title');
   };
 
   return (
@@ -120,7 +113,13 @@ const TeamModal = ({
           <GroupAvatarsTip>
             Choose an avatar or upload (160x160 pixels, not more than 8 MB)
           </GroupAvatarsTip>
-          {renderTeamAvatars({ values, setFieldValue, validateField })}
+          {renderTeamAvatars({
+            touched,
+            values,
+            errors,
+            setFieldValue,
+            setFieldTouched,
+          })}
         </GroupAvatarsWrapper>
         {typeof errors?.form === 'string' ? (
           <Error>{errors?.form}</Error>

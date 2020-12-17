@@ -1,7 +1,6 @@
 import * as yup from 'yup';
 import { ERROR } from './constants';
 import { checkFileSize, checkAllFileSizes } from './utils';
-
 import {
   getRealFileSizeForBase64enc,
   humanizeSize,
@@ -28,18 +27,19 @@ const attachmentsSchema = yup
   .array(
     yup.object({
       name: yup.string().required(),
-      raw: yup.string().test(
-        'fileSize',
-        file => {
-          return ERROR.FILE_SIZE(
-            humanizeSize(
-              file.value ? getRealFileSizeForBase64enc(file.value.length) : 0,
-              true,
+      raw: yup
+        .string()
+        .test(
+          'fileSize',
+          file =>
+            ERROR.FILE_SIZE(
+              humanizeSize(
+                file.value ? getRealFileSizeForBase64enc(file.value.length) : 0,
+                true,
+              ),
             ),
-          );
-        },
-        checkFileSize,
-      ),
+          checkFileSize,
+        ),
     }),
   )
   .test(

@@ -32,3 +32,4 @@ export const GOOD_PASSWORD_RULES = [
 
 export const MAX_PASSWORD_LENGTH = 24;
 export const MAX_TEAM_TITLE_LENGTH = 100;
+export const MAX_TEAM_AVATAR_SIZE = '8MB';

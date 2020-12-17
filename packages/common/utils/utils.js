@@ -17,7 +17,13 @@ export const get = (obj, path, defaultValue) => {
   return result === undefined || result === obj ? defaultValue : result;
 };
 
-export const waitIdle = () => new Promise(requestIdleCallback);
+export const waitIdle = () => {
+  if (window.requestIdleCallback) {
+    return new Promise(requestIdleCallback);
+  }
+
+  return new Promise(setTimeout);
+};
 
 export const chunk = (input, size) => {
   return input.reduce((arr, item, idx) => {

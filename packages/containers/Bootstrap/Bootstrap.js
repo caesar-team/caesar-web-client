@@ -53,12 +53,7 @@ class Bootstrap extends Component {
   }
 
   async componentDidMount() {
-    const {
-      logout,
-      fetchUserSelfSuccess,
-      initCoresCount,
-      shared = {},
-    } = this.props;
+    const { logout, initCoresCount, shared = {} } = this.props;
     initCoresCount();
 
     try {
@@ -71,8 +66,6 @@ class Bootstrap extends Component {
       if (!currentUser || (isAnonymousOrReadOnlyUser && !shared?.m)) {
         logout();
       }
-
-      fetchUserSelfSuccess(normalizeCurrentUser(currentUser));
 
       this.bootstrap = getBootstrapStates(bootstrap);
       this.navigationPanelSteps = getNavigationPanelSteps(this.bootstrap);

@@ -108,7 +108,7 @@ const ItemComponent = ({
     dispatch(
       moveItemRequest({
         itemId: item.id,
-        teamId: item.teamId || null,
+        teamId: item.teamId,
         listId: item.previousListId,
         notification,
         notificationText: `The item "${item?.meta?.title}" has been restored`,

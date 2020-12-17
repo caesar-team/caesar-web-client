@@ -139,7 +139,7 @@ const MoveModalComponent = ({
         moveItemsBatchRequest({
           itemIds: workInProgressItemIds,
           oldTeamId: teamId,
-          oldListId: listId,
+          previousListId: listId,
           teamId: checkedTeamId,
           listId: checkedListId,
           notification,

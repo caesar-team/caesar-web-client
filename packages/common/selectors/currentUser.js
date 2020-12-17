@@ -78,7 +78,7 @@ export const currentTeamSelector = createSelector(
 
 export const isUserAnonymousSelector = createSelector(
   currentUserDataSelector,
-  data => data.domainRoles?.includes(DOMAIN_ROLES.ROLE_ANONYMOUS_USER),
+  data => data?.domainRoles?.includes(DOMAIN_ROLES.ROLE_ANONYMOUS_USER),
 );
 
 export const currentUserIdSelector = createSelector(
@@ -88,12 +88,12 @@ export const currentUserIdSelector = createSelector(
 
 export const isUserDomainAdminSelector = createSelector(
   currentUserDataSelector,
-  data => data.domainRoles?.includes(DOMAIN_ROLES.ROLE_ADMIN),
+  data => data?.domainRoles?.includes(DOMAIN_ROLES.ROLE_ADMIN),
 );
 
 export const isUserDomainManagerSelector = createSelector(
   currentUserDataSelector,
-  data => data.domainRoles?.includes(DOMAIN_ROLES.ROLE_MANAGER),
+  data => data?.domainRoles?.includes(DOMAIN_ROLES.ROLE_MANAGER),
 );
 
 export const isUserDomainAdminOrManagerSelector = createSelector(

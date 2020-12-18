@@ -85,7 +85,6 @@ import {
 import {
   currentUserDataSelector,
   currentTeamIdSelector,
-  isUserDomainAdminOrManagerSelector,
   currentUserTeamListSelector,
   getLastUpdatedSelector,
 } from '@caesar/common/selectors/currentUser';
@@ -506,12 +505,7 @@ function* checkTeamKeyPair(team, createKeyPair = false) {
 }
 
 function* checkTeamsKeyPairs(createKeyPair = false) {
-  const isUserDomainAdminOrManager = yield select(
-    isUserDomainAdminOrManagerSelector,
-  );
-  const teams = yield select(
-    isUserDomainAdminOrManager ? teamListSelector : currentUserTeamListSelector,
-  );
+  const teams = yield select(currentUserTeamListSelector);
 
   const checkCalls = teams
     .filter(t => t.id !== TEAM_TYPE.PERSONAL)

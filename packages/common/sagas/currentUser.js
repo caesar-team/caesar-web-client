@@ -120,10 +120,11 @@ export function* fetchUserSelfSaga() {
   try {
     const { data: currentUser } = yield call(getUserSelf);
 
+    yield put(fetchUserSelfSuccess(normalizeCurrentUser(currentUser)));
+
     yield call(checkUserTeams, {
       payload: { userTeamIdsFromRequest: currentUser?.teamIds },
     });
-    yield put(fetchUserSelfSuccess(normalizeCurrentUser(currentUser)));
   } catch (error) {
     console.error('error', error);
     yield put(fetchUserSelfFailure());

@@ -6,6 +6,8 @@ import { useFormik } from 'formik';
 import { teamSelector } from '@caesar/common/selectors/entities/team';
 import { Modal, FormInput, Button, Label } from '@caesar/components';
 import { checkError } from '@caesar/common/utils/formikUtils';
+import { getTeamTitle } from '@caesar/common/utils/team';
+import { TEAM_TYPE } from '@caesar/common/constants';
 import { TextError as Error } from '../Error';
 import { renderTeamAvatars } from './renderTeamAvatars';
 import { getValidationSchema } from './schema';
@@ -17,6 +19,10 @@ const FormTitle = styled.div`
   font-weight: 700;
   color: ${({ theme }) => theme.color.black};
   text-transform: uppercase;
+`;
+
+const DefaultTeamTitle = styled.div`
+  margin-top: 4px;
 `;
 
 const GroupAvatarsWrapper = styled.div`
@@ -104,15 +110,19 @@ const TeamModal = ({
       <FormTitle>{teamId ? 'Edit' : 'Add'} team</FormTitle>
       <form onSubmit={handleSubmit}>
         <Label>Name</Label>
-        <FormInput
-          name="title"
-          value={values.title}
-          autoFocus
-          withBorder
-          error={checkError(touched, errors, 'title')}
-          onChange={handleChangeTitle}
-          onBlur={handleBlur}
-        />
+        {team.type === TEAM_TYPE.DEFAULT ? (
+          <DefaultTeamTitle>{getTeamTitle(team)}</DefaultTeamTitle>
+        ) : (
+          <FormInput
+            name="title"
+            value={values.title}
+            autoFocus
+            withBorder
+            error={checkError(touched, errors, 'title')}
+            onChange={handleChangeTitle}
+            onBlur={handleBlur}
+          />
+        )}
         <GroupAvatarsWrapper>
           <GroupAvatarsTitle>Avatar</GroupAvatarsTitle>
           <GroupAvatarsTip>

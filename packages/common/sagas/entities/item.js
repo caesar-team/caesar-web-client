@@ -1062,12 +1062,6 @@ export function* editItemSaga({
       return;
     }
 
-    const isListIdChanged = listId !== itemInState.listId;
-
-    if (isListIdChanged) {
-      yield call(moveItemSaga, { payload: { listId } });
-    }
-
     if (isDataChanged) {
       yield call(updateItemSaga, {
         payload: {

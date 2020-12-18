@@ -6,5 +6,5 @@ export const schema = yup.object({
   password: yup.string(),
   requestsLimit: yup.number().required(),
   secondsLimit: yup.number().required(),
-  attachments: SCHEMA.ATTACHMENTS,
+  attachments: SCHEMA.ARRAY_OF_ATTACHMENTS,
 });

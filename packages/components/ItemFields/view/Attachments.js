@@ -38,6 +38,8 @@ const AttachmentsComponent = memo(
     newFiles,
     itemSubject,
     isVisibleDragZone,
+    newFilesModalError,
+    setNewFilesModalError,
     openedModal,
     setOpenedModal,
     handleChange,
@@ -126,7 +128,11 @@ const AttachmentsComponent = memo(
       {openedModal === MODAL.NEW_FILES && (
         <NewFilesModal
           files={newFiles}
-          closeModal={() => setOpenedModal(null)}
+          error={newFilesModalError}
+          closeModal={() => {
+            setOpenedModal(null);
+            setNewFilesModalError(null);
+          }}
         />
       )}
     </Wrapper>
@@ -138,6 +144,8 @@ export const Attachments = ({
   attachments = [],
   raws = {},
   itemSubject,
+  singleAttachmentSchema,
+  allAttachmentsSchema,
   onClickAcceptEdit,
   isVisibleDragZone,
 }) => {
@@ -146,6 +154,7 @@ export const Attachments = ({
   const [itemRaws, setItemRaws] = useState(raws);
   const [itemAttachments, setItemAttachments] = useState(attachments);
   const [openedModal, setOpenedModal] = useState(null);
+  const [newFilesModalError, setNewFilesModalError] = useState(null);
 
   const syncStateWithServer = newItemData => {
     onClickAcceptEdit(newItemData);
@@ -189,105 +198,110 @@ export const Attachments = ({
   };
 
   const handleChange = (name, files) => {
-    const splitedFiles = processUploadedFiles(files);
+    try {
+      setNewFilesModalError(null);
 
-    const {
-      validated: validatedFiles,
-      errored: erroredFiles,
-    } = splitedFiles.attachments.reduce(
-      (acc, file) => {
-        try {
-          SCHEMA.ATTACHMENT.validateSync(splitedFiles.raws[file.id]);
-        } catch (error) {
-          // eslint-disable-next-line no-param-reassign
-          file.error = error.message;
-        }
+      if (allAttachmentsSchema) {
+        allAttachmentsSchema.validateSync([...attachments, ...files]);
+      }
 
-        if (file.error) {
+      const splitedFiles = processUploadedFiles(files);
+
+      const {
+        validated: validatedFiles,
+        errored: erroredFiles,
+      } = splitedFiles.attachments.reduce(
+        (acc, file) => {
+          try {
+            if (singleAttachmentSchema) {
+              SCHEMA.SINGLE_ATTACHMENT.validateSync(splitedFiles.raws[file.id]);
+            }
+          } catch (error) {
+            // eslint-disable-next-line no-param-reassign
+            file.error = error.message;
+          }
+
+          if (file.error) {
+            return {
+              ...acc,
+              errored: [...acc.errored, file],
+            };
+          }
+
           return {
             ...acc,
-            errored: [...acc.errored, file],
+            validated: [...acc.validated, file],
           };
-        }
+        },
+        {
+          validated: [],
+          errored: [],
+        },
+      );
 
-        return {
-          ...acc,
-          validated: [...acc.validated, file],
-        };
-      },
-      {
-        validated: [],
-        errored: [],
-      },
-    );
+      const { uniqNewFiles, duplicatedFiles } = getUniqueAndDublicates(
+        validatedFiles,
+        itemAttachments,
+      );
 
-    const { uniqNewFiles, duplicatedFiles } = getUniqueAndDublicates(
-      validatedFiles,
-      itemAttachments,
-    );
+      const processedDuplicatedFiles = duplicatedFiles.map(file => ({
+        ...file,
+        error: 'The file already exists',
+      }));
 
-    const processedDuplicatedFiles = duplicatedFiles.map(file => ({
-      ...file,
-      error: 'The file already exists',
-    }));
+      const uniqNewRaws = Object.fromEntries(
+        uniqNewFiles.map(file => [file.id, splitedFiles.raws[file.id]]),
+      );
 
-    const uniqNewRaws = Object.fromEntries(
-      uniqNewFiles.map(file => [file.id, splitedFiles.raws[file.id]]),
-    );
+      setNewFiles([
+        ...erroredFiles,
+        ...processedDuplicatedFiles,
+        ...uniqNewFiles,
+      ]);
 
-    setNewFiles([
-      ...erroredFiles,
-      ...processedDuplicatedFiles,
-      ...uniqNewFiles,
-    ]);
+      setOpenedModal(MODAL.NEW_FILES);
 
-    setOpenedModal(MODAL.NEW_FILES);
+      if (uniqNewFiles.length || uniqNewRaws.length) {
+        const allAttachments = [...itemAttachments, ...uniqNewFiles];
+        const allRaws = { ...itemRaws, ...uniqNewRaws };
 
-    if (uniqNewFiles.length || uniqNewRaws.length) {
-      const allAttachments = [...itemAttachments, ...uniqNewFiles];
-      const allRaws = { ...itemRaws, ...uniqNewRaws };
+        setItemRaws(allRaws);
+        setItemAttachments(allAttachments);
 
-      setItemRaws(allRaws);
-      setItemAttachments(allAttachments);
-
-      syncStateWithServer({
-        attachments: allAttachments,
-        raws: allRaws,
-      });
+        syncStateWithServer({
+          attachments: allAttachments,
+          raws: allRaws,
+        });
+      }
+    } catch (error) {
+      setNewFiles(files);
+      setNewFilesModalError(error.message);
+      setOpenedModal(MODAL.NEW_FILES);
     }
+  };
+
+  const attachmentsComponentProps = {
+    attachments,
+    itemAttachments,
+    newFiles,
+    itemSubject,
+    isVisibleDragZone,
+    newFilesModalError,
+    setNewFilesModalError,
+    openedModal,
+    setOpenedModal,
+    handleChange,
+    handleClickDownloadAll,
+    handleClickDownloadFile,
+    onClickAcceptEdit,
+    onClickRemove,
   };
 
   return Array.isArray(itemAttachments) && itemAttachments.length === 0 ? (
     <Can I={PERMISSION.EDIT} an={itemSubject}>
-      <AttachmentsComponent
-        attachments={attachments}
-        itemAttachments={itemAttachments}
-        newFiles={newFiles}
-        itemSubject={itemSubject}
-        isVisibleDragZone={isVisibleDragZone}
-        openedModal={openedModal}
-        setOpenedModal={setOpenedModal}
-        handleChange={handleChange}
-        handleClickDownloadAll={handleClickDownloadAll}
-        handleClickDownloadFile={handleClickDownloadFile}
-        onClickAcceptEdit={onClickAcceptEdit}
-        onClickRemove={onClickRemove}
-      />
+      <AttachmentsComponent {...attachmentsComponentProps} />
     </Can>
   ) : (
-    <AttachmentsComponent
-      attachments={attachments}
-      itemAttachments={itemAttachments}
-      newFiles={newFiles}
-      itemSubject={itemSubject}
-      isVisibleDragZone={isVisibleDragZone}
-      openedModal={openedModal}
-      setOpenedModal={setOpenedModal}
-      handleChange={handleChange}
-      handleClickDownloadAll={handleClickDownloadAll}
-      handleClickDownloadFile={handleClickDownloadFile}
-      onClickAcceptEdit={onClickAcceptEdit}
-      onClickRemove={onClickRemove}
-    />
+    <AttachmentsComponent {...attachmentsComponentProps} />
   );
 };

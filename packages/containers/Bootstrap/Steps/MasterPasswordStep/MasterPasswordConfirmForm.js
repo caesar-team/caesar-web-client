@@ -1,6 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
-import { Formik, FastField } from 'formik';
+import { useFormik } from 'formik';
+import { useEffectOnce } from 'react-use';
 import { checkError } from '@caesar/common/utils/formikUtils';
 import {
   AuthTitle,
@@ -8,7 +9,7 @@ import {
   MasterPasswordInput,
   Button,
 } from '@caesar/components';
-import { createConfirmPasswordSchema } from './schema';
+import { createConfirmPasswordSchema } from "./schema";
 import { BackLink } from '../../components';
 
 const Form = styled.form`
@@ -30,43 +31,55 @@ const ButtonsWrapper = styled.div`
   margin-top: 30px;
 `;
 
-const MasterPasswordConfirmForm = ({
+const  MasterPasswordConfirmForm = ({
   masterPassword,
   onSubmit,
   onClickReturn,
-}) => (
-  <Formik
-    key="confirmPassword"
-    initialValues={{ confirmPassword: '' }}
-    validationSchema={createConfirmPasswordSchema(masterPassword)}
-    onSubmit={onSubmit}
-  >
-    {({ errors, touched, handleSubmit, isSubmitting, isValid }) => (
-      <Form onSubmit={handleSubmit}>
-        <AuthTitle>Confirmation</AuthTitle>
-        <AuthDescription>Confirm your master password</AuthDescription>
-        <FastField name="confirmPassword">
-          {({ field }) => (
-            <MasterPasswordInput
-              {...field}
-              autoFocus
-              isAlwaysVisibleIcon
-              placeholder="Repeat password…"
-              error={checkError(touched, errors, 'confirmPassword')}
-            />
-          )}
-        </FastField>
-        <ButtonsWrapper>
-          <BackLink disabled={isSubmitting} onClick={onClickReturn}>
-            Change password
-          </BackLink>
-          <StyledButton htmlType="submit" disabled={isSubmitting || !isValid}>
-            Confirm
-          </StyledButton>
-        </ButtonsWrapper>
-      </Form>
-    )}
-  </Formik>
-);
+}) => {
+  const {
+    errors,
+    touched,
+    isSubmitting,
+    isValid,
+    dirty,
+    values,
+    handleSubmit,
+    handleChange,
+    handleBlur,
+    validateForm,
+  } = useFormik({
+    initialValues: { confirmPassword: '' },
+    validationSchema: createConfirmPasswordSchema(masterPassword),
+    onSubmit,
+  });
+  useEffectOnce(() => {
+    validateForm();
+  });
+
+  return (
+    <Form onSubmit={handleSubmit}>
+      <AuthTitle>Confirmation</AuthTitle>
+      <AuthDescription>Confirm your master password</AuthDescription>
+      <MasterPasswordInput
+        name="confirmPassword"
+        value={values.confirmPassword}
+        autoFocus
+        isAlwaysVisibleIcon
+        placeholder="Repeat password…"
+        error={dirty ? checkError(touched, errors, 'confirmPassword') : null}
+        onChange={handleChange}
+        onBlur={handleBlur}        
+      />
+      <ButtonsWrapper>
+        <BackLink disabled={isSubmitting} onClick={onClickReturn}>
+          Change password
+        </BackLink>
+        <StyledButton htmlType="submit" disabled={isSubmitting || !isValid}>
+          Confirm
+        </StyledButton>
+      </ButtonsWrapper>      
+    </Form>
+  );
+};
 
 export default MasterPasswordConfirmForm;

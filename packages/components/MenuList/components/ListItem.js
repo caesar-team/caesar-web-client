@@ -167,11 +167,18 @@ export const ListItem = ({
         </>
       ) : (
         <>
-          <div {...dragHandleProps}>
-            <Can I={PERMISSION.SORT} a={_permissions}>
-              <DnDIcon name="drag-n-drop" width={16} height={16} color="gray" />
-            </Can>
-          </div>
+          {dragHandleProps && (
+            <div {...dragHandleProps}>
+              <Can I={PERMISSION.SORT} a={_permissions}>
+                <DnDIcon
+                  name="drag-n-drop"
+                  width={16}
+                  height={16}
+                  color="gray"
+                />
+              </Can>
+            </div>
+          )}
           <Title>{listTitle}</Title>
           <Can I={PERMISSION.EDIT} a={_permissions}>
             <Counter>{itemCount}</Counter>

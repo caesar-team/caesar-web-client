@@ -1,13 +1,10 @@
-import React, { useState } from 'react';
-import equal from 'fast-deep-equal';
+import React from 'react';
 import styled from 'styled-components';
 import IconTeam1 from '@caesar/assets/icons/svg/icon-team-ava-1.svg';
 import IconTeam2 from '@caesar/assets/icons/svg/icon-team-ava-2.svg';
 import IconTeam3 from '@caesar/assets/icons/svg/icon-team-ava-3.svg';
 import IconTeam4 from '@caesar/assets/icons/svg/icon-team-ava-4.svg';
 import IconTeam5 from '@caesar/assets/icons/svg/icon-team-ava-5.svg';
-import { TEAM_AVATAR_MAX_SIZE } from '@caesar/common/constants';
-import { ERROR } from '@caesar/common/validation';
 import { TextError as Error } from '../Error';
 import { Icon } from '../Icon';
 import { Uploader } from '../Uploader';
@@ -156,26 +153,6 @@ const UploaderHoverableWrapper = styled.div`
   }
 `;
 
-const checkErrors = rejectedFiles => {
-  if (rejectedFiles.length > 0) {
-    const errors = [];
-
-    if (!rejectedFiles[0].type.includes('image/')) {
-      errors.push(ERROR.IMAGE_UPLOAD);
-    }
-
-    if (rejectedFiles[0].size > TEAM_AVATAR_MAX_SIZE) {
-      errors.push(
-        ERROR.FILE_SIZE(`${Math.round(TEAM_AVATAR_MAX_SIZE / 1024 / 1024)}MB`),
-      );
-    }
-
-    return errors;
-  }
-
-  return null;
-};
-
 const RenderedAvatars = ({ icon, handleChangeIcon }) =>
   Object.keys(IMAGE_NAME_BASE64_MAP).map(name => {
     const currentIcon = IMAGE_NAME_BASE64_MAP[name];
@@ -197,19 +174,19 @@ const RenderedAvatars = ({ icon, handleChangeIcon }) =>
   });
 
 export const renderTeamAvatars = ({
+  touched = {},
   values: { icon = {} } = {},
+  errors = {},
   setFieldValue,
-  validateField,
+  setFieldTouched,
 }) => {
-  const [errors, setErrors] = useState(null);
-
   const isDefaultIcon = icon.raw && IMAGE_BASE64_LIST.includes(icon.raw);
   const isCustomIcon = icon.raw && !isDefaultIcon;
   const shouldShowUploader = isDefaultIcon || !icon.raw;
 
-  const handleChangeIcon = async value => {
-    await setFieldValue('icon', value);
-    validateField('icon');
+  const handleChangeIcon = value => {
+    setFieldValue('icon', value, true);
+    setFieldTouched('icon');
   };
 
   return (
@@ -223,43 +200,34 @@ export const renderTeamAvatars = ({
           <Uploader
             name="icon"
             accept="image/*"
-            maxSize={TEAM_AVATAR_MAX_SIZE}
             files={icon?.raw ? [icon] : []}
             onChange={(_, file) => handleChangeIcon(file)}
           >
-            {({ getRootProps, getInputProps, isDragActive, rejectedFiles }) => {
-              const errorsList = checkErrors(rejectedFiles);
-
-              if (!equal(errors, errorsList)) {
-                setErrors(errorsList);
-              }
-
-              return (
-                <>
-                  <UploaderWrapper
-                    {...getRootProps()}
-                    isDragActive={isDragActive}
-                  >
-                    <input {...getInputProps()} />
-                    {isCustomIcon ? (
-                      <AddImgIcon
-                        name="pencil"
-                        color="gray"
-                        width={16}
-                        height={16}
-                      />
-                    ) : (
-                      <AddImgIcon
-                        name="plus"
-                        color="gray"
-                        width={16}
-                        height={16}
-                      />
-                    )}
-                  </UploaderWrapper>
-                </>
-              );
-            }}
+            {({ getRootProps, getInputProps, isDragActive }) => (
+              <>
+                <UploaderWrapper
+                  {...getRootProps()}
+                  isDragActive={isDragActive}
+                >
+                  <input {...getInputProps()} />
+                  {isCustomIcon ? (
+                    <AddImgIcon
+                      name="pencil"
+                      color="gray"
+                      width={16}
+                      height={16}
+                    />
+                  ) : (
+                    <AddImgIcon
+                      name="plus"
+                      color="gray"
+                      width={16}
+                      height={16}
+                    />
+                  )}
+                </UploaderWrapper>
+              </>
+            )}
           </Uploader>
           <UploadedImageWrapper>
             <UploadedImage src={icon.raw} />
@@ -269,7 +237,7 @@ export const renderTeamAvatars = ({
           </UploadedImageWrapper>
         </UploaderHoverableWrapper>
       </AvatarsWrapper>
-      {errors && errors.map(error => <Error>{error}</Error>)}
+      {touched?.icon && errors?.icon?.raw && <Error>{errors?.icon?.raw}</Error>}
     </>
   );
 };

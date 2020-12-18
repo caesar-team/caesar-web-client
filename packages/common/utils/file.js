@@ -1,9 +1,5 @@
 import { saveAs } from 'file-saver';
 import JSZip from 'jszip';
-import {
-  MAX_UPLOADING_FILE_SIZE,
-  TOTAL_MAX_UPLOADING_FILES_SIZES,
-} from '../constants';
 
 export const BASE_64_LENGTH_BYTE_RATE = 3 / 4;
 
@@ -195,15 +191,3 @@ export const convertSizeNameToNumber = sizeName =>
   sizeName.replace(/(\d+)(B|KB|MB)/, (match, size, type) =>
     size && type ? Number(size) * SIZE_NAME_RATE_MAP[type] : 0,
   );
-
-export const checkFileSize = (size, maxSize = MAX_UPLOADING_FILE_SIZE) =>
-  size * BASE_64_LENGTH_BYTE_RATE <= convertSizeNameToNumber(maxSize);
-
-export const checkAllFileSizes = (
-  files,
-  totalMaxSize = TOTAL_MAX_UPLOADING_FILES_SIZES,
-) =>
-  files
-    ? getRealFileSizesForBase64enc(files) <=
-      convertSizeNameToNumber(totalMaxSize)
-    : true;

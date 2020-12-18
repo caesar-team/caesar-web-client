@@ -197,7 +197,7 @@ export const Attachments = ({
     } = splitedFiles.attachments.reduce(
       (acc, file) => {
         try {
-          SCHEMA.ATTACHMENT.validateSync(file);
+          SCHEMA.ATTACHMENT.validateSync(splitedFiles.raws[file.id]);
         } catch (error) {
           // eslint-disable-next-line no-param-reassign
           file.error = error.message;
@@ -246,9 +246,6 @@ export const Attachments = ({
     if (uniqNewFiles.length || uniqNewRaws.length) {
       const allAttachments = [...itemAttachments, ...uniqNewFiles];
       const allRaws = { ...itemRaws, ...uniqNewRaws };
-
-      setItemRaws(allRaws);
-      setItemAttachments(allAttachments);
 
       syncStateWithServer({
         attachments: allAttachments,

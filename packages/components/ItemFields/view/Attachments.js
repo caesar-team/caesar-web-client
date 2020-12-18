@@ -247,9 +247,6 @@ export const Attachments = ({
       const allAttachments = [...itemAttachments, ...uniqNewFiles];
       const allRaws = { ...itemRaws, ...uniqNewRaws };
 
-      setItemRaws(allRaws);
-      setItemAttachments(allAttachments);
-
       syncStateWithServer({
         attachments: allAttachments,
         raws: allRaws,

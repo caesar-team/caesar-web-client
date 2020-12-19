@@ -558,7 +558,7 @@ export function* moveItemSaga({
   }
 }
 
-function* decryptItemSync(item) {
+export function* decryptItemSync(item) {
   try {
     const keyPairToDecrypt = yield call(getItemKeyPair, {
       payload: {

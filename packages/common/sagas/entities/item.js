@@ -647,12 +647,13 @@ export function* moveItemsBatchSaga({
     );
 
     const itemSecrets =
-      reencryptedItems?.reduce((acc, item) => {
-        return {
+      reencryptedItems?.reduce(
+        (acc, item) => ({
           ...acc,
-          [item.itemId]: item.secret,
-        };
-      }, {}) || {};
+          [item.id]: item.secret,
+        }),
+        {},
+      ) || {};
 
     yield put(
       moveItemsBatchSuccess({

@@ -1,12 +1,12 @@
 import React from 'react';
-import { useEffectOnce } from 'react-use';
 import { useSelector } from 'react-redux';
 import styled from 'styled-components';
 import { useFormik } from 'formik';
 import { teamSelector } from '@caesar/common/selectors/entities/team';
 import { Modal, FormInput, Button, Label } from '@caesar/components';
 import { checkError } from '@caesar/common/utils/formikUtils';
-import { MAX_TEAM_TITLE_LENGTH } from '@caesar/common/validation/constants';
+import { getTeamTitle } from '@caesar/common/utils/team';
+import { TEAM_TYPE } from '@caesar/common/constants';
 import { TextError as Error } from '../Error';
 import { renderTeamAvatars } from './renderTeamAvatars';
 import { getValidationSchema } from './schema';
@@ -18,6 +18,10 @@ const FormTitle = styled.div`
   font-weight: 700;
   color: ${({ theme }) => theme.color.black};
   text-transform: uppercase;
+`;
+
+const DefaultTeamTitle = styled.div`
+  margin-top: 4px;
 `;
 
 const GroupAvatarsWrapper = styled.div`
@@ -66,7 +70,6 @@ const TeamModal = ({
     handleSubmit,
     setFieldValue,
     setFieldTouched,
-    validateField,
   } = useFormik({
     initialValues: getInitialValues(team),
     onSubmit: ({ title, icon }, { setErrors, setSubmitting }) =>
@@ -84,14 +87,9 @@ const TeamModal = ({
     ),
   });
 
-  useEffectOnce(() => {
-    validateField('icon');
-  }, []);
-
-  const handleChangeTitle = async e => {
-    await setFieldValue('title', e.target.value);
+  const handleChangeTitle = e => {
+    setFieldValue('title', e.target.value, true);
     setFieldTouched('title');
-    validateField('title');
   };
 
   return (
@@ -105,22 +103,31 @@ const TeamModal = ({
       <FormTitle>{teamId ? 'Edit' : 'Add'} team</FormTitle>
       <form onSubmit={handleSubmit}>
         <Label>Name</Label>
-        <FormInput
-          name="title"
-          value={values.title}
-          autoFocus
-          withBorder
-          maxLength={MAX_TEAM_TITLE_LENGTH}
-          error={checkError(touched, errors, 'title')}
-          onChange={handleChangeTitle}
-          onBlur={handleBlur}
-        />
+        {team.type === TEAM_TYPE.DEFAULT ? (
+          <DefaultTeamTitle>{getTeamTitle(team)}</DefaultTeamTitle>
+        ) : (
+          <FormInput
+            name="title"
+            value={values.title}
+            autoFocus
+            withBorder
+            error={checkError(touched, errors, 'title')}
+            onChange={handleChangeTitle}
+            onBlur={handleBlur}
+          />
+        )}
         <GroupAvatarsWrapper>
           <GroupAvatarsTitle>Avatar</GroupAvatarsTitle>
           <GroupAvatarsTip>
             Choose an avatar or upload (160x160 pixels, not more than 8 MB)
           </GroupAvatarsTip>
-          {renderTeamAvatars({ values, setFieldValue, validateField })}
+          {renderTeamAvatars({
+            touched,
+            values,
+            errors,
+            setFieldValue,
+            setFieldTouched,
+          })}
         </GroupAvatarsWrapper>
         {typeof errors?.form === 'string' ? (
           <Error>{errors?.form}</Error>

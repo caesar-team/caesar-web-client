@@ -200,7 +200,6 @@ export const NOOP_NOTIFICATION = '';
 
 export const UUID_REGEXP = /\b[0-9a-f]{8}\b-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-\b[0-9a-f]{12}\b/;
 export const SECURE_MESSAGE_REGEXP = /(\b[0-9a-f]{8}\b-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-\b[0-9a-f]{12}\b)+,(.*)/;
-export const TEAM_AVATAR_MAX_SIZE = 8 * 1024 * 1024;
 
 export const GOOD_PASSWORD_SCORE = 3;
 
@@ -261,7 +260,7 @@ export const DOMAIN_ROLES_LABELS = {
   ROLE_ANONYMOUS_USER: 'Anonym',
 };
 
-export const TEAM_ROLES_OPTIONS =[
+export const TEAM_ROLES_OPTIONS = [
   {
     value: TEAM_ROLES.ROLE_ADMIN,
     label: TEAM_ROLES_LABELS.ROLE_ADMIN,

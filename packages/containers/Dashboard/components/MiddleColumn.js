@@ -32,6 +32,7 @@ import {
 import { updateGlobalNotification } from '@caesar/common/actions/application';
 import { MultiItem, List } from '@caesar/components';
 import { sortByDate } from '@caesar/common/utils/dateUtils';
+import { sortByName } from '@caesar/common/utils/utils';
 import { MODAL } from '../constants';
 import { filter } from '../utils';
 
@@ -55,8 +56,10 @@ const MiddleColumnComponent = ({
 
   const visibleListItems = useMemo(
     () =>
-      generalItems.sort((a, b) =>
-        sortByDate(a.lastUpdated, b.lastUpdated, 'DESC'),
+      generalItems.sort(
+        (a, b) =>
+          sortByDate(a.lastUpdated, b.lastUpdated, 'DESC') ||
+          sortByName(a.id, b.id),
       ),
     [generalItems],
   );
@@ -85,8 +88,10 @@ const MiddleColumnComponent = ({
   const searchedItems = useMemo(
     () =>
       filter(
-        Object.values(currentTeamItems).sort((a, b) =>
-          sortByDate(a.lastUpdated, b.lastUpdated, 'DESC'),
+        Object.values(currentTeamItems).sort(
+          (a, b) =>
+            sortByDate(a.lastUpdated, b.lastUpdated, 'DESC') ||
+            sortByName(a.id, b.id),
         ),
         searchedText,
       ),

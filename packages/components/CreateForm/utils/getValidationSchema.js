@@ -12,7 +12,7 @@ export const getValidationSchema = type => {
         password: SCHEMA.REQUIRED_LIMITED_STRING(),
         website: SCHEMA.WEBSITE,
         note: yup.string(),
-        attachments: SCHEMA.ATTACHMENTS,
+        attachments: SCHEMA.ARRAY_OF_ATTACHMENTS,
         raws: SCHEMA.RAWS,
       });
     case ITEM_TYPE.DOCUMENT:
@@ -20,7 +20,7 @@ export const getValidationSchema = type => {
         listId: SCHEMA.REQUIRED_FIELD,
         name: SCHEMA.REQUIRED_LIMITED_STRING(),
         note: yup.string(),
-        attachments: SCHEMA.ATTACHMENTS,
+        attachments: SCHEMA.ARRAY_OF_ATTACHMENTS,
         raws: SCHEMA.RAWS,
       });
     default:

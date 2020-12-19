@@ -21,8 +21,9 @@ const Header = styled.div`
   align-items: center;
   padding: 16px;
   font-size: ${({ theme }) => theme.font.size.small};
-  color: ${({ theme }) => theme.color.white};
-  background-color: ${({ theme }) => theme.color.black};
+  color: ${({ error, theme }) => (error ? theme.color.red : theme.color.white)};
+  background-color: ${({ error, theme }) =>
+    error ? theme.color.gallery : theme.color.black};
 `;
 
 const HeaderText = styled.div`
@@ -45,7 +46,7 @@ const Inner = styled.div`
   background-color: ${({ theme }) => theme.color.white};
 `;
 
-export const NewFilesModal = ({ files, closeModal }) => {
+export const NewFilesModal = ({ files, error, closeModal }) => {
   const [isDropdownOpened, setDropdownOpened] = useState(true);
 
   const handleToggleDropdown = () => {
@@ -54,13 +55,14 @@ export const NewFilesModal = ({ files, closeModal }) => {
 
   return (
     <Wrapper>
-      <Header>
-        <HeaderText>
-          {files.length} {getPlural(files.length, ['upload', 'uploads'])}
+      <Header error={error}>
+        <HeaderText error={error}>
+          {error ||
+            `${files.length} ${getPlural(files.length, ['upload', 'uploads'])}`}
         </HeaderText>
         <ArrowIcon
           name="arrow-triangle"
-          color="white"
+          color={error ? 'black' : 'white'}
           width={16}
           height={16}
           isDropdownOpened={isDropdownOpened}
@@ -68,7 +70,7 @@ export const NewFilesModal = ({ files, closeModal }) => {
         />
         <StyledIcon
           name="close"
-          color="white"
+          color={error ? 'black' : 'white'}
           width={16}
           height={16}
           onClick={closeModal}

@@ -13,17 +13,32 @@ const WEBSITE_MAX_LENGTH = 2048;
 // eslint-disable-next-line no-useless-escape
 const rUrl = /(((([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:)*@)?(((\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5])\.(\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5])\.(\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5])\.(\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5]))|((([a-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(([a-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])*([a-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])))\.)+(([a-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(([a-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])*([a-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])))\.?)(:\d*)?)(\/((([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)+(\/(([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)*)*)?)?(\?((([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)|[\uE000-\uF8FF]|\/|\?)*)?(\#((([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)|\/|\?)*)?$/i;
 
-export const attachmentSchema = yup.object({
-  size: yup
-    .number()
-    .test(
-      'fileSize',
-      size => ERROR.FILE_SIZE(humanizeSize(size.value || 0, true)),
-      checkFileSize,
-    ),
-});
+export const singleAttachmentSchema = yup
+  .string()
+  .test(
+    'fileSize',
+    raw =>
+      ERROR.FILE_SIZE(
+        humanizeSize(
+          raw.value ? getRealFileSizeForBase64enc(raw.value.length) : 0,
+          true,
+        ),
+      ),
+    checkFileSize,
+  );
 
-const attachmentsSchema = yup
+const allAttachmentsSchema = yup
+  .array()
+  .test(
+    'allFilesSize',
+    raw =>
+      ERROR.ALL_FILES_SIZE(
+        humanizeSize(getRealFileSizesForBase64enc(raw.value), true),
+      ),
+    checkAllFileSizes,
+  );
+
+const arrayOfAttachmentsSchema = yup
   .array(
     yup.object({
       name: yup.string().required(),
@@ -44,11 +59,10 @@ const attachmentsSchema = yup
   )
   .test(
     'allFilesSize',
-    raw => {
-      return ERROR.ALL_FILES_SIZE(
+    raw =>
+      ERROR.ALL_FILES_SIZE(
         humanizeSize(getRealFileSizesForBase64enc(raw.value), true),
-      );
-    },
+      ),
     checkAllFileSizes,
   );
 
@@ -73,7 +87,8 @@ export const SCHEMA = {
       excludeEmptyString: true,
     })
     .max(WEBSITE_MAX_LENGTH, ERROR.MAX_LENGTH(WEBSITE_MAX_LENGTH)),
-  ATTACHMENT: attachmentSchema,
-  ATTACHMENTS: attachmentsSchema,
+  SINGLE_ATTACHMENT: singleAttachmentSchema,
+  ALL_ATTACHMENTS: allAttachmentsSchema,
+  ARRAY_OF_ATTACHMENTS: arrayOfAttachmentsSchema,
   RAWS: yup.string(),
 };

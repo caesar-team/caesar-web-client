@@ -9,7 +9,7 @@ import {
   MasterPasswordInput,
   Button,
 } from '@caesar/components';
-import { createConfirmPasswordSchema } from "./schema";
+import { createConfirmPasswordSchema } from './schema';
 import { BackLink } from '../../components';
 
 const Form = styled.form`
@@ -41,7 +41,6 @@ const  MasterPasswordConfirmForm = ({
     touched,
     isSubmitting,
     isValid,
-    dirty,
     values,
     handleSubmit,
     handleChange,
@@ -66,7 +65,7 @@ const  MasterPasswordConfirmForm = ({
         autoFocus
         isAlwaysVisibleIcon
         placeholder="Repeat password…"
-        error={dirty ? checkError(touched, errors, 'confirmPassword') : null}
+        error={checkError(touched, errors, 'confirmPassword')}
         onChange={handleChange}
         onBlur={handleBlur}        
       />

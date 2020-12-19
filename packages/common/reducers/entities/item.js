@@ -121,6 +121,7 @@ export default createReducer(initialState, {
             ...accumulator,
             [itemId]: {
               ...state.byId[itemId],
+              teamId: payload.newTeamId,
               listId: payload.newListId,
               previousListId: payload.previousListId,
               secret: payload.itemSecrets[itemId] || state.byId[itemId].secret,

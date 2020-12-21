@@ -31,6 +31,7 @@ import {
   generateKeyPair,
   saveItemSaga,
   saveShareKeyPairSaga,
+  decryptItemSync,
 } from '@caesar/common/sagas/entities/item';
 import { addShareKeyPairBatch } from '@caesar/common/actions/keystore';
 import { convertSystemItemToKeyPair } from '../../utils/item';
@@ -210,11 +211,18 @@ export function* shareItemBatchSaga({
 
     const allUsers = [...createdUsers, ...domainUsers];
     const items = yield select(itemsBatchSelector, { itemIds });
+    const itemsNeedToDecrypt = items.filter(item => !item.data);
+
+    if (itemsNeedToDecrypt.length) {
+      yield all(itemsNeedToDecrypt.map(item => call(decryptItemSync, item)));
+    }
+
+    const decryptedItems = yield select(itemsBatchSelector, { itemIds });
 
     // Need To Go Deeper (c)
     yield all(
       yield all(
-        items.map(item =>
+        decryptedItems.map(item =>
           call(processUsersItemShare, {
             item,
             users: allUsers,

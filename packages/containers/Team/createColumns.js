@@ -105,6 +105,7 @@ export const createColumns = ({
   tableHeight,
   tableScrollTop,
   canGrantAccessMember,
+  currentUserId,
   handleChangeRole,
   handleOpenRemoveMemberModal,
   handleGrantAccessMember,
@@ -144,10 +145,13 @@ export const createColumns = ({
         tableHeight,
         optionLength: TEAM_ROLES_OPTIONS.length,
       });
+      const canChangeRole = 
+        ability.can(PERMISSION.EDIT, getTeamMemberSubject(original)) &&
+        currentUserId !== original.userId;
 
       return (
         <Table.DropdownCell ref={cellRef}>
-          <Can I={PERMISSION.EDIT} of={getTeamMemberSubject(original)}>
+          {canChangeRole ? (
             <StyledSelect
               name="role"
               value={value}
@@ -155,10 +159,7 @@ export const createColumns = ({
               onChange={handleChangeRole(original.id)}
               boxDirection={isDropdownUp ? 'up' : 'down'}
             />
-          </Can>
-          <Can not I={PERMISSION.EDIT} of={getTeamMemberSubject(original)}>
-            <Table.RoleCell>{TEAM_ROLES_LABELS[value]}</Table.RoleCell>
-          </Can>
+          ) : <Table.RoleCell>{TEAM_ROLES_LABELS[value]}</Table.RoleCell>}
         </Table.DropdownCell>
       );
     },

@@ -7,6 +7,7 @@ import {
   DECRYPTING_ITEM_NOTIFICATION,
   NOOP_NOTIFICATION,
   TEAM_TYPE,
+  PERMISSION,
 } from '@caesar/common/constants';
 import {
   workInProgressItemSelector,
@@ -32,6 +33,7 @@ import {
 import { updateGlobalNotification } from '@caesar/common/actions/application';
 import { MultiItem, List } from '@caesar/components';
 import { sortItems } from '@caesar/common/utils/sort';
+import { ability } from '@caesar/common/ability';
 import { MODAL } from '../constants';
 import { filter } from '../utils';
 
@@ -105,6 +107,11 @@ const MiddleColumnComponent = ({
     }
   });
 
+  const filterForbiddenItem = ({ _permissions }) =>
+    ability.can(PERMISSION.MOVE, _permissions) &&
+    ability.can(PERMISSION.SHARE, _permissions) &&
+    ability.can(PERMISSION.TRASH, _permissions);
+
   const handleDefaultSelectionItemBehaviour = itemId => {
     dispatch(resetWorkInProgressItemIds());
     dispatch(setWorkInProgressItem(itemsById[itemId]));
@@ -121,14 +128,18 @@ const MiddleColumnComponent = ({
       dispatch(
         setWorkInProgressItemIds(
           checked
-            ? filter(Object.values(itemsById), searchedText).map(({ id }) => id)
+            ? filter(Object.values(itemsById), searchedText)
+                .filter(filterForbiddenItem)
+                .map(({ id }) => id)
             : [],
         ),
       );
     } else {
       dispatch(
         setWorkInProgressItemIds(
-          checked ? visibleListItems.map(({ id }) => id) : [],
+          checked
+            ? visibleListItems.filter(filterForbiddenItem).map(({ id }) => id)
+            : [],
         ),
       );
     }

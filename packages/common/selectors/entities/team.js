@@ -1,6 +1,6 @@
 import { createSelector } from 'reselect';
 import { TEAM_ROLES, TEAM_TYPE } from '@caesar/common/constants';
-import { sortByName } from '@caesar/common/utils/utils';
+import { sortByName } from '@caesar/common/utils/sort';
 
 export const entitiesSelector = state => state.entities;
 

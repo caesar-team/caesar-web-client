@@ -1,7 +1,7 @@
 import React, { memo } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import styled from 'styled-components';
-import { sortByName } from '@caesar/common/utils/utils';
+import { sortByName } from '@caesar/common/utils/sort';
 import { TEAM_TYPE } from '@caesar/common/constants';
 import {
   currentUserVaultListSelector,

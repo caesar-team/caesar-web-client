@@ -31,8 +31,7 @@ import {
 } from '@caesar/common/actions/workflow';
 import { updateGlobalNotification } from '@caesar/common/actions/application';
 import { MultiItem, List } from '@caesar/components';
-import { sortByDate } from '@caesar/common/utils/dateUtils';
-import { sortByName } from '@caesar/common/utils/utils';
+import { sortItems } from '@caesar/common/utils/sort';
 import { MODAL } from '../constants';
 import { filter } from '../utils';
 
@@ -54,15 +53,9 @@ const MiddleColumnComponent = ({
     }),
   );
 
-  const visibleListItems = useMemo(
-    () =>
-      generalItems.sort(
-        (a, b) =>
-          sortByDate(a.lastUpdated, b.lastUpdated, 'DESC') ||
-          sortByName(a.id, b.id),
-      ),
-    [generalItems],
-  );
+  const visibleListItems = useMemo(() => generalItems.sort(sortItems), [
+    generalItems,
+  ]);
   const trashList = useSelector(trashListSelector);
   const teamsTrashLists = useSelector(teamsTrashListsSelector);
   const itemsById = useSelector(itemsByIdSelector);
@@ -86,15 +79,7 @@ const MiddleColumnComponent = ({
   );
 
   const searchedItems = useMemo(
-    () =>
-      filter(
-        Object.values(currentTeamItems).sort(
-          (a, b) =>
-            sortByDate(a.lastUpdated, b.lastUpdated, 'DESC') ||
-            sortByName(a.id, b.id),
-        ),
-        searchedText,
-      ),
+    () => filter(Object.values(currentTeamItems).sort(sortItems), searchedText),
     [currentTeamItems, searchedText],
   );
 

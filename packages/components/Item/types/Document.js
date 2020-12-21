@@ -51,6 +51,8 @@ const DocumentComponent = ({
           attachments={attachments}
           raws={raws}
           itemSubject={itemSubject}
+          singleAttachmentSchema={SCHEMA.SINGLE_ATTACHMENT}
+          allAttachmentsSchema={SCHEMA.ALL_ATTACHMENTS}
           onClickAcceptEdit={onClickAcceptEdit}
           isVisibleDragZone={isVisibleDragZone}
         />

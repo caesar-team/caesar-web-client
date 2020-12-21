@@ -1,5 +1,5 @@
 import React, { memo } from 'react';
-import { SCHEMA } from '@caesar/common/validation';
+import { SCHEMA, MAX_ITEM_NOTE_LENGTH } from '@caesar/common/validation';
 import { TEAM_TYPE } from '@caesar/common/constants';
 import { Title, Note, Attachments } from '../../ItemFields/view';
 import { Row } from '../../ItemFields/common';
@@ -42,6 +42,7 @@ const DocumentComponent = ({
         <Note
           value={note}
           itemSubject={itemSubject}
+          schema={SCHEMA.LIMITED_STRING(MAX_ITEM_NOTE_LENGTH)}
           onClickAcceptEdit={onClickAcceptEdit}
         />
       </Row>

@@ -1,6 +1,7 @@
 import React, { useRef } from 'react';
 import { useUpdateEffect } from 'react-use';
 import styled from 'styled-components';
+import { TextError } from '../Error';
 
 const Label = styled.label`
   position: relative;
@@ -45,12 +46,6 @@ const TextAreaField = styled.textarea`
   }
 `;
 
-const Error = styled.div`
-  margin-top: 8px;
-  font-size: 14px;
-  color: ${({ theme }) => theme.color.red};
-`;
-
 const TextArea = ({
   className,
   error,
@@ -81,7 +76,7 @@ const TextArea = ({
         disabled={isDisabled}
         {...props}
       />
-      {error && <Error>{error}</Error>}
+      {error && <TextError marginTop={8}>{error}</TextError>}
     </Label>
   );
 };

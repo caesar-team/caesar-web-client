@@ -7,6 +7,7 @@ import { Can } from '../../Ability';
 import { Icon } from '../../Icon';
 import { FormTextArea } from '../../Input';
 import { Button } from '../../Button';
+import { TextError } from '../../Error';
 
 const StyledFormTextArea = styled(FormTextArea)`
   ${FormTextArea.IconsWrapper} {
@@ -57,10 +58,16 @@ const Wrapper = styled.div`
   }
 `;
 
-export const Note = ({ value: propValue, itemSubject, onClickAcceptEdit }) => {
+export const Note = ({
+  value: propValue,
+  schema,
+  itemSubject,
+  onClickAcceptEdit,
+}) => {
   const [isEdit, setEdit] = useState(false);
   const [isFocused, setFocused] = useState(false);
   const [value, setValue] = useState(propValue);
+  const [error, setError] = useState(null);
 
   useUpdateEffect(() => {
     if (propValue !== value) {
@@ -81,6 +88,22 @@ export const Note = ({ value: propValue, itemSubject, onClickAcceptEdit }) => {
     onClickAcceptEdit(makeObject('note', ''));
   };
 
+  const handleChange = event => {
+    const val = event.target.value;
+
+    setValue(val);
+
+    if (!schema) return;
+
+    setError(null);
+
+    try {
+      schema.validateSync(val);
+    } catch (e) {
+      setError(e.message);
+    }
+  };
+
   return (
     <Wrapper>
       {propValue || isEdit ? (
@@ -89,7 +112,7 @@ export const Note = ({ value: propValue, itemSubject, onClickAcceptEdit }) => {
             <StyledFormTextArea
               label="Notes"
               value={value}
-              onChange={e => setValue(e.target.value)}
+              onChange={handleChange}
               onFocus={onClickAcceptEdit && (() => setEdit(true))}
               onClickAcceptEdit={() => {
                 onClickAcceptEdit(makeObject('note', value));
@@ -137,6 +160,7 @@ export const Note = ({ value: propValue, itemSubject, onClickAcceptEdit }) => {
           )}
         </Can>
       )}
+      {error && <TextError marginTop={4}>{error}</TextError>}
     </Wrapper>
   );
 };

@@ -10,6 +10,7 @@ import {
   Tooltip,
   StrengthIndicator,
   PasswordIndicator,
+  TextError,
 } from '@caesar/components';
 import { checkError } from '@caesar/common/utils/formikUtils';
 import { GOOD_PASSWORD_RULES } from '@caesar/common/validation/constants';
@@ -67,12 +68,6 @@ const Prefix = styled.div`
   align-items: center;
   justify-content: center;
   border-right: 1px solid ${({ theme }) => theme.color.lightGray};
-`;
-
-const Error = styled.div`
-  margin-top: 8px;
-  font-size: 14px;
-  color: ${({ theme }) => theme.color.red};
 `;
 
 const StyledButton = styled(Button)`
@@ -159,7 +154,7 @@ const SignUpForm = ({ onSubmit }) => (
               )}
             </FastField>
             {checkError(touched, errors, 'email') && (
-              <Error>{errors.email}</Error>
+              <TextError marginTop={8}>{errors.email}</TextError>
             )}
           </Row>
           <Row>
@@ -195,7 +190,7 @@ const SignUpForm = ({ onSubmit }) => (
               />
             )}
             {checkError(touched, errors, 'password') && (
-              <Error>{errors.password}</Error>
+              <TextError marginTop={8}>{errors.password}</TextError>
             )}
           </Row>
           <Row>
@@ -210,7 +205,7 @@ const SignUpForm = ({ onSubmit }) => (
               )}
             </FastField>
             {checkError(touched, errors, 'confirmPassword') && (
-              <Error>{errors.confirmPassword}</Error>
+              <TextError marginTop={8}>{errors.confirmPassword}</TextError>
             )}
           </Row>
           <ButtonWrapper>

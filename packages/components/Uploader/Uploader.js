@@ -10,8 +10,8 @@ import {
   TOTAL_MAX_UPLOADING_FILES_SIZES,
   MAX_UPLOADING_FILE_SIZE,
 } from '@caesar/common/constants';
-
-import { Container, Text, HintText, Link, StyledIcon, Error } from './styles';
+import { TextError } from '../Error';
+import { Container, Text, HintText, Link, StyledIcon } from './styles';
 
 const getNotificationText = files =>
   files.length > 1
@@ -88,7 +88,11 @@ const Uploader = ({
                 !isMobile &&
                 ' or drag and drop your files here'}
             </Text>
-            {error ? <Error>{error}</Error> : <HintText>{hintText}</HintText>}
+            {error ? (
+              <TextError>{error}</TextError>
+            ) : (
+              <HintText>{hintText}</HintText>
+            )}
           </Container>
         )
       }

@@ -32,7 +32,7 @@ import {
 } from '@caesar/common/actions/workflow';
 import { updateGlobalNotification } from '@caesar/common/actions/application';
 import { MultiItem, List } from '@caesar/components';
-import { sortByDate } from '@caesar/common/utils/dateUtils';
+import { sortItems } from '@caesar/common/utils/sort';
 import { ability } from '@caesar/common/ability';
 import { MODAL } from '../constants';
 import { filter } from '../utils';
@@ -55,13 +55,9 @@ const MiddleColumnComponent = ({
     }),
   );
 
-  const visibleListItems = useMemo(
-    () =>
-      generalItems.sort((a, b) =>
-        sortByDate(a.lastUpdated, b.lastUpdated, 'DESC'),
-      ),
-    [generalItems],
-  );
+  const visibleListItems = useMemo(() => generalItems.sort(sortItems), [
+    generalItems,
+  ]);
   const trashList = useSelector(trashListSelector);
   const teamsTrashLists = useSelector(teamsTrashListsSelector);
   const itemsById = useSelector(itemsByIdSelector);
@@ -85,13 +81,7 @@ const MiddleColumnComponent = ({
   );
 
   const searchedItems = useMemo(
-    () =>
-      filter(
-        Object.values(currentTeamItems).sort((a, b) =>
-          sortByDate(a.lastUpdated, b.lastUpdated, 'DESC'),
-        ),
-        searchedText,
-      ),
+    () => filter(Object.values(currentTeamItems).sort(sortItems), searchedText),
     [currentTeamItems, searchedText],
   );
 
@@ -116,11 +106,11 @@ const MiddleColumnComponent = ({
       dispatch(setWorkInProgressItemIds([]));
     }
   });
-  
+
   const filterForbiddenItem = ({ _permissions }) =>
-    ability.can(PERMISSION.MOVE, _permissions) && 
-    ability.can(PERMISSION.SHARE, _permissions) && 
-    ability.can(PERMISSION.TRASH, _permissions); 
+    ability.can(PERMISSION.MOVE, _permissions) &&
+    ability.can(PERMISSION.SHARE, _permissions) &&
+    ability.can(PERMISSION.TRASH, _permissions);
 
   const handleDefaultSelectionItemBehaviour = itemId => {
     dispatch(resetWorkInProgressItemIds());
@@ -139,18 +129,16 @@ const MiddleColumnComponent = ({
         setWorkInProgressItemIds(
           checked
             ? filter(Object.values(itemsById), searchedText)
-              .filter(filterForbiddenItem)
-              .map(({ id }) => id)
+                .filter(filterForbiddenItem)
+                .map(({ id }) => id)
             : [],
         ),
       );
     } else {
       dispatch(
         setWorkInProgressItemIds(
-          checked 
-            ? visibleListItems
-              .filter(filterForbiddenItem)
-              .map(({ id }) => id) 
+          checked
+            ? visibleListItems.filter(filterForbiddenItem).map(({ id }) => id)
             : [],
         ),
       );

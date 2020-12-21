@@ -107,6 +107,10 @@ class Import extends Component {
     this.props.router.push(ROUTES.DASHBOARD);
   };
 
+  handleClickToStart = () => {
+    this.props.router.push(ROUTES.SETTINGS + ROUTES.IMPORT);
+  };  
+
   handleCancelFlow = () => {
     this.setState(this.prepareInitialState());
   };
@@ -170,6 +174,7 @@ class Import extends Component {
           <ImportingStep
             progress={importProgress}
             onClickToDashboard={this.handleClickToDashboard}
+            onClickToStart={() => this.handleClickStep(FILE_STEP)}
           />
         ),
       },

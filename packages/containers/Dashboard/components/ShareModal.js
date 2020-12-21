@@ -61,10 +61,7 @@ export const ShareModal = ({
 
   const canRevokeAccess = false;
   const handleRevokeAccess = member => {
-    // TODO: Implement revoke share access
-    // dispatch(removeShareRequest());
-    // eslint-disable-next-line no-alert
-    alert('Not yet implemented.', member);
+    dispatch(removeShareRequest());
   };
 
   const handleActivateLink = () => {

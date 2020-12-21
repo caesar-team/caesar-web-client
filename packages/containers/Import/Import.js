@@ -107,10 +107,6 @@ class Import extends Component {
     this.props.router.push(ROUTES.DASHBOARD);
   };
 
-  handleClickToStart = () => {
-    this.props.router.push(ROUTES.SETTINGS + ROUTES.IMPORT);
-  };  
-
   handleCancelFlow = () => {
     this.setState(this.prepareInitialState());
   };

@@ -2,6 +2,7 @@ import React from 'react';
 import styled from 'styled-components';
 import PasswordInput from './PasswordInput';
 import { Icon } from '../Icon';
+import { TextError } from '../Error';
 
 const Wrapper = styled.div`
   position: relative;
@@ -36,11 +37,9 @@ const StyledPasswordInput = styled(PasswordInput)`
   }
 `;
 
-const Error = styled.div`
+const Error = styled(TextError)`
   position: absolute;
   top: 68px;
-  font-size: 14px;
-  color: ${({ theme }) => theme.color.red};
 `;
 
 const MasterPasswordInput = ({ error, ...props }) => {

@@ -1,5 +1,5 @@
 import React, { useState, memo } from 'react';
-import { useAsync, useUpdateEffect } from 'react-use';
+import { useUpdateEffect } from 'react-use';
 import copy from 'copy-text-to-clipboard';
 import equal from 'fast-deep-equal';
 import styled from 'styled-components';
@@ -100,6 +100,7 @@ const InputComponent = ({
 }) => {
   const [isEdit, setEdit] = useState(false);
   const [value, setValue] = useState(propValue);
+  const [error, setError] = useState(null);
   const notification = useNotification();
 
   useUpdateEffect(() => {
@@ -122,23 +123,24 @@ const InputComponent = ({
     setEdit(false);
   };
 
-  const handleChange = e => {
-    const val = e.target.value;
+  const handleChange = event => {
+    const val = event.target.value;
 
     setValue(val);
     onChange(val);
+
+    if (!schema) return;
+
+    setError(null);
+
+    try {
+      schema.validateSync(value);
+    } catch (e) {
+      setError(e.message);
+    }
   };
 
-  const validationState = useAsync(async () => {
-    if (!schema) return null;
-
-    const result = await schema.validate(value);
-
-    return result;
-  }, [value, schema]);
-
-  const isAcceptIconDisabled = (!value && !allowBlankValue) ||
-    validationState?.error?.message;
+  const isAcceptIconDisabled = (!value && !allowBlankValue) || error;
 
   return (
     <Wrapper withLabel={label} className={className}>
@@ -148,7 +150,7 @@ const InputComponent = ({
           type={type}
           label={label}
           value={value}
-          error={validationState?.error?.message}
+          error={error}
           placeholder={placeholder}
           autoComplete={autoComplete}
           isAcceptIconDisabled={isAcceptIconDisabled}

@@ -2,6 +2,7 @@ import React, { useState, useRef, memo } from 'react';
 import { useClickAway, useKeyPressEvent } from 'react-use';
 import styled from 'styled-components';
 import { Icon } from '../Icon';
+import { TextError } from '../Error';
 
 const Label = styled.label`
   display: block;
@@ -93,13 +94,11 @@ const StyledIcon = styled(Icon)`
   }
 `;
 
-const Error = styled.div`
+const Error = styled(TextError)`
   position: absolute;
   top: 100%;
   left: 0;
   padding-left: 16px;
-  font-size: 14px;
-  color: ${({ theme }) => theme.color.red};
 `;
 
 const InputComponent = ({

@@ -85,6 +85,7 @@ export const Credentials = ({ formik }) => {
           label="Notes"
           placeholder="Write here something…"
           value={values.note}
+          error={checkError(touched, errors, 'note')}
           onChange={handleChange}
           onBlur={handleBlur}
           disabled={isSubmitting}

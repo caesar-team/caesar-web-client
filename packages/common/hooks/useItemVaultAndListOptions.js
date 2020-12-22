@@ -2,7 +2,7 @@ import { useState, useMemo } from 'react';
 import { useEffectOnce, useUpdateEffect } from 'react-use';
 import { useSelector } from 'react-redux';
 import { TEAM_TYPE } from '@caesar/common/constants';
-import { sortByName } from '@caesar/common/utils/utils';
+import { sortByName } from '@caesar/common/utils/sort';
 import { transformListTitle } from '@caesar/common/utils/string';
 import { currentUserVaultListSelector } from '@caesar/common/selectors/currentUser';
 import { teamsByIdSelector } from '@caesar/common/selectors/entities/team';

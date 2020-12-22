@@ -143,6 +143,7 @@ export const TeamContainerComponent = ({ currentUser, team, teams, members }) =>
         tableHeight,
         tableScrollTop,
         canGrantAccessMember: !isTeamLocked && canEditTeam,
+        currentUserId: currentUser.id,
         handleChangeRole,
         handleOpenRemoveMemberModal,
         handleGrantAccessMember,

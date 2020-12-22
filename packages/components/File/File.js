@@ -7,6 +7,7 @@ import { PERMISSION } from '@caesar/common/constants';
 import { humanizeSize } from '@caesar/common/utils/file';
 import { Can } from '../Ability';
 import { Icon } from '../Icon';
+import { TextError } from '../Error';
 
 const FileIcon = styled.div`
   position: relative;
@@ -77,10 +78,8 @@ const FileSize = styled.div`
   `}
 `;
 
-const Error = styled.div`
+const Error = styled(TextError)`
   display: none;
-  font-size: ${({ theme }) => theme.font.size.small};
-  color: ${({ theme }) => theme.color.red};
 
   ${media.tablet`
     display: block;

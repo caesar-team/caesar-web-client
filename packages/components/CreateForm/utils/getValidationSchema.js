@@ -1,6 +1,6 @@
 import * as yup from 'yup';
 import { ITEM_TYPE } from '@caesar/common/constants';
-import { SCHEMA } from '@caesar/common/validation';
+import { SCHEMA, MAX_ITEM_NOTE_LENGTH } from '@caesar/common/validation';
 
 export const getValidationSchema = type => {
   switch (type) {
@@ -11,7 +11,7 @@ export const getValidationSchema = type => {
         login: SCHEMA.REQUIRED_LIMITED_STRING(),
         password: SCHEMA.REQUIRED_LIMITED_STRING(),
         website: SCHEMA.WEBSITE,
-        note: yup.string(),
+        note: SCHEMA.LIMITED_STRING(MAX_ITEM_NOTE_LENGTH),
         attachments: SCHEMA.ARRAY_OF_ATTACHMENTS,
         raws: SCHEMA.RAWS,
       });
@@ -19,7 +19,7 @@ export const getValidationSchema = type => {
       return yup.object({
         listId: SCHEMA.REQUIRED_FIELD,
         name: SCHEMA.REQUIRED_LIMITED_STRING(),
-        note: yup.string(),
+        note: SCHEMA.LIMITED_STRING(MAX_ITEM_NOTE_LENGTH),
         attachments: SCHEMA.ARRAY_OF_ATTACHMENTS,
         raws: SCHEMA.RAWS,
       });

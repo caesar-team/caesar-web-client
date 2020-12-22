@@ -1,7 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
 import { Formik, FastField } from 'formik';
-import { PasswordInput, Button, Icon } from '@caesar/components';
+import { PasswordInput, Button, Icon, TextError } from '@caesar/components';
 import { checkError } from '@caesar/common/utils/formikUtils';
 import { schema } from './schema';
 
@@ -39,12 +39,6 @@ const Prefix = styled.div`
   align-items: center;
   justify-content: center;
   border-right: 1px solid ${({ theme }) => theme.color.lightGray};
-`;
-
-const Error = styled.div`
-  margin-top: 8px;
-  font-size: 14px;
-  color: ${({ theme }) => theme.color.red};
 `;
 
 const StyledButton = styled(Button)`
@@ -88,7 +82,7 @@ const ResetPasswordForm = ({ onSubmit }) => (
             )}
           </FastField>
           {checkError(touched, errors, 'password') && (
-            <Error>{errors.password}</Error>
+            <TextError marginTop={8}>{errors.password}</TextError>
           )}
         </Row>
         <Row>
@@ -103,7 +97,7 @@ const ResetPasswordForm = ({ onSubmit }) => (
             )}
           </FastField>
           {checkError(touched, errors, 'confirmPassword') && (
-            <Error>{errors.confirmPassword}</Error>
+            <TextError marginTop={8}>{errors.confirmPassword}</TextError>
           )}
         </Row>
         <ButtonWrapper>

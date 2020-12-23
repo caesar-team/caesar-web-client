@@ -104,6 +104,12 @@ export const Note = ({
     }
   };
 
+  const handleCloseEditMode = () => {
+    setEdit(false);
+    setError(null);
+    setValue(null);
+  };
+
   return (
     <Wrapper>
       {propValue || isEdit ? (
@@ -118,11 +124,12 @@ export const Note = ({
                 onClickAcceptEdit(makeObject('note', value));
                 setEdit(false);
               }}
-              onClickAway={() => setEdit(false)}
-              onClickClose={() => setEdit(false)}
+              onClickAway={handleCloseEditMode}
+              onClickClose={handleCloseEditMode}
               isFocused={isFocused}
               isEdit={isEdit}
               isDisabled={!onClickAcceptEdit}
+              isAcceptIconDisabled={!!error}
             />
           </Can>
           <Can not I={PERMISSION.EDIT} an={itemSubject}>

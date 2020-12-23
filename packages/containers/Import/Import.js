@@ -170,6 +170,7 @@ class Import extends Component {
           <ImportingStep
             progress={importProgress}
             onClickToDashboard={this.handleClickToDashboard}
+            onClickToStart={() => this.handleClickStep(FILE_STEP)}
           />
         ),
       },

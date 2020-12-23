@@ -8,6 +8,7 @@ import {
   NOOP_NOTIFICATION,
   TEAM_TYPE,
   PERMISSION,
+  PERMISSION_ENTITY,
 } from '@caesar/common/constants';
 import {
   workInProgressItemSelector,
@@ -67,7 +68,19 @@ const MiddleColumnComponent = ({
   );
 
   const itemsLengthInList = generalItems.length;
+
+  const filterForbiddenItem = ({ _permissions }) => {
+    const teamPermissions = {
+      ..._permissions,
+      __typename: PERMISSION_ENTITY.TEAM_ITEM,
+    };
+
+    return (ability.can(PERMISSION.MULTISELECT, _permissions)
+      || ability.can(PERMISSION.MULTISELECT, teamPermissions));
+  };
+
   const visibleListItemsLength = visibleListItems.length;
+  const filteredVisibleListItemsLength = visibleListItems.filter(filterForbiddenItem).length;
 
   const isPersonalTeam = currentTeamId === TEAM_TYPE.PERSONAL;
   const isMultiItem = workInProgressItemIds?.length > 0;
@@ -84,11 +97,12 @@ const MiddleColumnComponent = ({
     () => filter(Object.values(currentTeamItems).sort(sortItems), searchedText),
     [currentTeamItems, searchedText],
   );
+  const filteredSearchedItems = searchedItems.filter(filterForbiddenItem);
 
   const areAllItemsSelected =
     mode === DASHBOARD_MODE.SEARCH
-      ? searchedItems.length === workInProgressItemIds.length
-      : visibleListItemsLength === workInProgressItemIds.length;
+      ? filteredSearchedItems.length === workInProgressItemIds.length
+      : filteredVisibleListItemsLength === workInProgressItemIds.length;
   const ref = useRef(null);
 
   useEffect(() => {
@@ -106,11 +120,6 @@ const MiddleColumnComponent = ({
       dispatch(setWorkInProgressItemIds([]));
     }
   });
-
-  const filterForbiddenItem = ({ _permissions }) =>
-    ability.can(PERMISSION.MOVE, _permissions) &&
-    ability.can(PERMISSION.SHARE, _permissions) &&
-    ability.can(PERMISSION.TRASH, _permissions);
 
   const handleDefaultSelectionItemBehaviour = itemId => {
     dispatch(resetWorkInProgressItemIds());

@@ -37,6 +37,11 @@ const TwoItemsWrapper = styled.div`
   justify-content: space-between;
 `;
 
+const StyledButton = styled(Button)`
+  margin-left: auto;
+  margin-right: 12px;
+`;
+
 const PROGRESS_THRESHOLD = 0.99999; 
 
 const renderText = progress =>
@@ -44,7 +49,7 @@ const renderText = progress =>
     ? `Waiting... ${Math.round(progress * 100)}%`
     : 'Done!';
 
-const ImportingStep = ({ progress, onClickToDashboard }) => (
+const ImportingStep = ({ progress, onClickToDashboard, onClickToStart }) => (
   <Wrapper>
     <Text>CSV Import</Text>
     <CenterWrapper>
@@ -59,6 +64,13 @@ const ImportingStep = ({ progress, onClickToDashboard }) => (
           Don’t close the browser because migration process will stop!
         </WarningText>
       </TwoItemsWrapper>
+      <StyledButton
+        color="white"
+        disabled={progress < PROGRESS_THRESHOLD}
+        onClick={onClickToStart}
+      >
+        IMPORT ONE MORE *.CSV
+      </StyledButton>      
       <Button
         color="white"
         disabled={progress < PROGRESS_THRESHOLD}

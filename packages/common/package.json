@@ -6,6 +6,7 @@
   "license": "SEE LICENSE IN LICENSE",
   "dependencies": {
     "@caesar/assets": "1.0.0",
+    "axios-debug-log": "^0.8.2",
     "pino": "^6.3.2",
     "pino-pretty": "^4.0.0"
   }

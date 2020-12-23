@@ -1,5 +1,6 @@
 // TODO: Rewrite all this requests with fetch 'packages/common/fetch.js'
 import Router from 'next/router';
+import 'axios-debug-log';
 import axios from 'axios';
 import {
   removeCookieValue,

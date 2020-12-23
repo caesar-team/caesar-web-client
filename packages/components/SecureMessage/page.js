@@ -41,9 +41,15 @@ MessagePage.getInitialProps = async ({ query }) => {
   }
 
   try {
-    const { data } = await getSecureMessage(id);
+    const { data: { message } = { message: null } } = (await getSecureMessage(
+      id,
+    )) || { data: {} };
 
-    return { message: data.message, password };
+    if (message) {
+      return { message, password };
+    }
+
+    return { statusCode: 404 };
   } catch (e) {
     logger.error(
       'The error caused by the getSecureMessage, the error: %o',

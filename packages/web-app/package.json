@@ -26,6 +26,7 @@
     "@zeit/next-workers": "^1.0.0",
     "atob": "^2.1.2",
     "axios": "^0.19.0",
+    "axios-debug-log": "^0.8.2",
     "cookie-parser": "^1.4.4",
     "copy-text-to-clipboard": "^2.1.0",
     "cross-env": "^7.0.2",

@@ -41,6 +41,7 @@ import { workInProgressItemIdsSelector } from '@caesar/common/selectors/workflow
 import {
   listSelector,
   currentTeamDefaultListSelector,
+  teamDefaultListSelector,
 } from '@caesar/common/selectors/entities/list';
 import {
   itemSelector,
@@ -99,10 +100,12 @@ import {
 import { passwordGenerator } from '@caesar/common/utils/passwordGenerator';
 import { generateKeys } from '@caesar/common/utils/key';
 import { addSystemItemsBatch } from '@caesar/common/actions/entities/system';
+import { updateShareKeyPair } from '@caesar/common/actions/keystore';
 import { userSelector } from '../../selectors/entities/user';
 import {
   convertItemsToEntities,
   convertKeyPairToEntity,
+  convertKeyPairToItemEntity,
 } from '../../normalizers/normalizers';
 import { uuid4 } from '../../utils/uuid4';
 
@@ -277,11 +280,9 @@ export function* toggleItemToFavoriteSaga({ payload: { item } }) {
   }
 }
 
-export function* getItemKeyPair({
-  payload: {
-    item: { id: itemId, teamId, isShared },
-  },
-}) {
+export function* getItemKeyPair({ payload: { item = {} } }) {
+  const { id: itemId, teamId, isShared } = item;
+
   if (isShared) {
     return yield select(shareItemKeyPairSelector, { itemId });
   }
@@ -487,6 +488,8 @@ export function* moveItemSaga({
     let reencryptedData = null;
     let reencryptedSecretDataAndRaws = null;
 
+    let itemToReencrypt = item;
+
     if (item.teamId !== teamId) {
       if (!item.data) {
         // TODO: Decrypt item here
@@ -509,8 +512,21 @@ export function* moveItemSaga({
         );
       }
 
+      if (item.isShared) {
+        const sharedItemKeyPairKey = yield select(shareItemKeyPairSelector, {
+          itemId: item.id,
+        });
+
+        itemToReencrypt = {
+          id: sharedItemKeyPairKey.id,
+          ...Object.values(
+            convertKeyPairToItemEntity([sharedItemKeyPairKey]),
+          ).shift(),
+        };
+      }
+
       const { data, secretDataAndRaws } = yield call(reencryptItemSecretSaga, {
-        item,
+        item: itemToReencrypt,
         publicKey,
       });
 
@@ -518,28 +534,52 @@ export function* moveItemSaga({
       reencryptedSecretDataAndRaws = secretDataAndRaws || {};
     }
 
-    yield call(
-      updateMoveItem,
-      item.id,
-      reencryptedSecretDataAndRaws
-        ? {
-            listId: newListId,
-            ...reencryptedSecretDataAndRaws,
-          }
-        : { listId: newListId },
-    );
+    const teamDefaultList = yield select(teamDefaultListSelector, { teamId });
 
-    yield put(
-      moveItemSuccess({
-        itemId: item.id,
-        previousListId: item.listId,
-        listId,
-        teamId,
-        secret: reencryptedData
-          ? JSON.stringify({ data: reencryptedData })
-          : item.secret,
-      }),
-    );
+    if (item.teamId !== teamId && item.isShared) {
+      yield call(updateMoveItem, item.id, { listId: newListId });
+      yield call(updateMoveItem, itemToReencrypt.id, {
+        listId: teamDefaultList.id,
+        ...reencryptedSecretDataAndRaws,
+      });
+      yield put(
+        moveItemSuccess({
+          itemId: item.id,
+          previousListId: item.listId,
+          listId: newListId,
+          teamId,
+        }),
+      );
+      yield put(
+        updateShareKeyPair({
+          relatedItemId: item.id,
+          teamId,
+        }),
+      );
+    } else {
+      yield call(
+        updateMoveItem,
+        item.id,
+        reencryptedSecretDataAndRaws
+          ? {
+              listId: newListId,
+              ...reencryptedSecretDataAndRaws,
+            }
+          : { listId: newListId },
+      );
+      yield put(
+        moveItemSuccess({
+          itemId: item.id,
+          previousListId: item.listId,
+          listId: newListId,
+          teamId,
+          secret: reencryptedData
+            ? JSON.stringify({ data: reencryptedData })
+            : item.secret,
+        }),
+      );
+    }
+
     yield put(updateGlobalNotification(NOOP_NOTIFICATION, false));
 
     if (notification) {
@@ -589,10 +629,11 @@ export function* moveItemsBatchSaga({
     yield put(updateGlobalNotification(MOVING_IN_PROGRESS_NOTIFICATION, true));
 
     const items = yield select(itemsBatchSelector, { itemIds });
-    const itemsNeedToDecrypt = items.filter(item => !item.data);
     let reencryptedItems = null;
 
     if (oldTeamId !== teamId) {
+      const itemsNeedToDecrypt = items.filter(item => !item.data);
+
       // Decrypt item secret here if data does not exist
       if (itemsNeedToDecrypt.length) {
         yield all(itemsNeedToDecrypt.map(item => call(decryptItemSync, item)));

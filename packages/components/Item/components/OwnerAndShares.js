@@ -78,7 +78,7 @@ const ShareButton = styled.button`
 `;
 
 export const OwnerAndShares = ({
-  showShares,
+  showShareButton,
   invited = [],
   itemSubject,
   onClickShare,
@@ -104,41 +104,34 @@ export const OwnerAndShares = ({
           <OwnerStatus>owner</OwnerStatus>
         </Owner>
       </OwnerWrapper>
-      {showShares && (
-        <>
-          <Can I={PERMISSION.SHARE} an={itemSubject} passThrough>
-            {allowed => (
-              <InvitedMembersWrapper resetMargin={!allowed}>
-                {hasInvited ? (
-                  // TODO: Why avatars have the member object? The wrong name of property.
-                  <AvatarsList
-                    avatars={invitedUsers}
-                    avatarHintPosition="top_left"
-                  />
-                ) : (
-                  <NoMembers>
-                    <Icon
-                      name="members"
-                      width={16}
-                      height={16}
-                      color="lightGray"
-                    />
-                  </NoMembers>
-                )}
-              </InvitedMembersWrapper>
+      <Can I={PERMISSION.SHARE} an={itemSubject} passThrough>
+        {allowed => (
+          <InvitedMembersWrapper resetMargin={!allowed}>
+            {hasInvited ? (
+              // TODO: Why avatars have the member object? The wrong name of property.
+              <AvatarsList
+                avatars={invitedUsers}
+                avatarHintPosition="top_left"
+              />
+            ) : (
+              <NoMembers>
+                <Icon name="members" width={16} height={16} color="lightGray" />
+              </NoMembers>
             )}
-          </Can>
-          <Can I={PERMISSION.SHARE} an={itemSubject}>
-            <Hint text="Share the item" position="top_left">
-              <ShareButton
-                // disabled={!isOnline}
-                onClick={onClickShare}
-              >
-                <Icon withOfflineCheck name="plus" width={16} height={16} />
-              </ShareButton>
-            </Hint>
-          </Can>
-        </>
+          </InvitedMembersWrapper>
+        )}
+      </Can>
+      {showShareButton && (
+        <Can I={PERMISSION.SHARE} an={itemSubject}>
+          <Hint text="Share the item" position="top_left">
+            <ShareButton
+              // disabled={!isOnline}
+              onClick={onClickShare}
+            >
+              <Icon withOfflineCheck name="plus" width={16} height={16} />
+            </ShareButton>
+          </Hint>
+        </Can>
       )}
     </Wrapper>
   );

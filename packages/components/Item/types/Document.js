@@ -32,7 +32,7 @@ const DocumentComponent = ({
       />
       {!isSharedItem && (
         <OwnerAndShares
-          showShares={item.teamId === TEAM_TYPE.PERSONAL}
+          showShareButton={item.teamId === TEAM_TYPE.PERSONAL}
           invited={item.invited}
           itemSubject={itemSubject}
           onClickShare={onClickShare}

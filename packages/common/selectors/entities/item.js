@@ -15,6 +15,11 @@ export const itemsByIdSelector = createSelector(
   itemEntity => itemEntity.byId,
 );
 
+export const itemIdsSelector = createSelector(
+  itemsByIdSelector,
+  itemsById => Object.keys(itemsById),
+);
+
 export const itemArraySelector = createSelector(
   itemsByIdSelector,
   byId => Object.values(byId) || [],
@@ -100,6 +105,11 @@ export const teamItemsSelector = createSelector(
   itemArraySelector,
   teamIdPropSelector,
   (itemList, teamId) => itemList.filter(item => item.teamId === teamId),
+);
+
+export const teamItemIdsSelector = createSelector(
+  teamItemsSelector,
+  teamItems => teamItems.map(({ id }) => id),
 );
 
 export const generalItemsSelector = createSelector(

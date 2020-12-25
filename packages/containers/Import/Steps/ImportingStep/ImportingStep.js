@@ -1,6 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
 import { ProgressBar, Icon, Button } from '@caesar/components';
+import { IMPORT_PROGRESS_THRESHOLD } from '@caesar/common/constants';
 
 const Wrapper = styled.div``;
 
@@ -37,19 +38,12 @@ const TwoItemsWrapper = styled.div`
   justify-content: space-between;
 `;
 
-const StyledButton = styled(Button)`
-  margin-left: auto;
-  margin-right: 12px;
-`;
-
-const PROGRESS_THRESHOLD = 0.99999; 
-
 const renderText = progress =>
-  progress < PROGRESS_THRESHOLD
+  progress < IMPORT_PROGRESS_THRESHOLD
     ? `Waiting... ${Math.round(progress * 100)}%`
     : 'Done!';
 
-const ImportingStep = ({ progress, onClickToDashboard, onClickToStart }) => (
+const ImportingStep = ({ progress, onClickToDashboard }) => (
   <Wrapper>
     <Text>CSV Import</Text>
     <CenterWrapper>
@@ -64,19 +58,12 @@ const ImportingStep = ({ progress, onClickToDashboard, onClickToStart }) => (
           Don’t close the browser because migration process will stop!
         </WarningText>
       </TwoItemsWrapper>
-      <StyledButton
-        color="white"
-        disabled={progress < PROGRESS_THRESHOLD}
-        onClick={onClickToStart}
-      >
-        IMPORT ONE MORE *.CSV
-      </StyledButton>      
       <Button
         color="white"
-        disabled={progress < PROGRESS_THRESHOLD}
+        disabled={progress < IMPORT_PROGRESS_THRESHOLD}
         onClick={onClickToDashboard}
       >
-        GO TO DASHBOARD
+        Go to dashboard
       </Button>
     </TwoItemsWrapper>
   </Wrapper>

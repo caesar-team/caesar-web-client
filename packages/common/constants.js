@@ -317,3 +317,5 @@ export const REGEXP_EXCTRACTOR = {
   ID: stringData =>
     stringData ? stringData?.match(UUID_REGEXP)[0] || null : null,
 };
+
+export const IMPORT_PROGRESS_THRESHOLD = 0.99999;

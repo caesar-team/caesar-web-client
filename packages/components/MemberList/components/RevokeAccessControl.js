@@ -1,5 +1,7 @@
 import React, { memo } from 'react';
 import styled from 'styled-components';
+import { Hint } from '@caesar/components/Hint';
+import { Icon } from '@caesar/components/Icon';
 
 const RevokeButton = styled.button`
   display: flex;
@@ -21,10 +23,26 @@ const MinusIcon = styled.div`
   cursor: pointer;
 `;
 
-const RevokeAccessControlComponent = ({ onClickRevoke, className }) => (
-  <RevokeButton className={className} onClick={onClickRevoke}>
-    <MinusIcon />
-  </RevokeButton>
-);
+const ResendIcon = styled(Icon)`
+  width: 20px;
+  height: 20px;
+`;
+
+const RevokeAccessControlComponent = ({
+  isAddedToRevoke,
+  onClickRevoke,
+  className,
+}) => isAddedToRevoke
+  ? (
+    <Hint text="Resend">
+      <ResendIcon name="update" />
+    </Hint>
+  ) : (
+    <Hint text="Revoke access">
+      <RevokeButton className={className} onClick={onClickRevoke}>
+        <MinusIcon />
+      </RevokeButton>
+    </Hint>
+  );
 
 export const RevokeAccessControl = memo(RevokeAccessControlComponent);

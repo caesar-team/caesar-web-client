@@ -35,7 +35,12 @@ import {
 } from '@caesar/common/sagas/entities/item';
 import { addShareKeyPairBatch } from '@caesar/common/actions/keystore';
 import { convertSystemItemToKeyPair } from '../../utils/item';
-import { getItem, getPublicKeyByEmailBatch, postItemShare } from '../../api';
+import {
+  getItem,
+  getPublicKeyByEmailBatch,
+  postItemShare,
+  removeItemsBatch,
+} from '../../api';
 import { uuid4 } from '../../utils/uuid4';
 import { teamDefaultListSelector } from '../../selectors/entities/list';
 import {
@@ -253,12 +258,11 @@ export function* shareItemBatchSaga({
   }
 }
 
-export function* removeShareSaga({ payload: { shareId } }) {
+export function* removeShareSaga({ payload: { itemId, members } }) {
   try {
-    // TODO: Implement remove sharing
-    // eslint-disable-next-line no-console
-    console.warn('Remove sharing will be implemented.');
-    const workInProgressItem = yield select(workInProgressItemSelector);
+    let sharedItemKeyPairKey = yield select(shareKeyPairSelector, {
+      itemId,
+    });
 
     yield put(removeShareSuccess(workInProgressItem.id, shareId));
     yield put(updateWorkInProgressItem());

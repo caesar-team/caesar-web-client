@@ -59,9 +59,9 @@ export const ShareModal = ({
     handleCloseModal();
   };
 
-  const canRevokeAccess = false;
-  const handleRevokeAccess = member => {
-    dispatch(removeShareRequest());
+  const canRevokeAccess = true;
+  const handleRevokeAccess = members => {
+    dispatch(removeShareRequest(members));
   };
 
   const handleActivateLink = () => {

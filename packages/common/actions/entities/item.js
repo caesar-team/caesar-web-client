@@ -386,10 +386,11 @@ export const shareItemBatchFailure = () => ({
   type: SHARE_ITEM_BATCH_FAILURE,
 });
 
-export const removeShareRequest = shareId => ({
+export const removeShareRequest = (itemId, members) => ({
   type: REMOVE_SHARE_REQUEST,
   payload: {
-    shareId,
+    itemId,
+    members,
   },
 });
 

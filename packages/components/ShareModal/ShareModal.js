@@ -88,6 +88,7 @@ export const ShareModal = ({
 }) => {
   const disableAnonymLink = true;
   const [members, setMembers] = useState([]);
+  const [membersToRevoke, setMembersToRevoke] = useState([]);
   const [teamIds, setTeamIds] = useState([]);
   const [isOpenedInvited, setOpenedInvited] = useState(false);
   const [link, setLink] = useState(null);
@@ -131,6 +132,11 @@ export const ShareModal = ({
 
   const handleDeleteItem = itemId => () => {
     onRemove(itemId);
+  };
+  
+  const addMemberToRevoke = memberId => {
+    const newMembersToRevoke = [...membersToRevoke, memberId];
+    setMembersToRevoke(newMembersToRevoke);
   };
 
   useEffectOnce(() => {
@@ -205,8 +211,9 @@ export const ShareModal = ({
               <StyledMemberList
                 maxHeight={180}
                 members={sharedMembers}
+                membersToRevoke={membersToRevoke}
+                onClickAddMemberToRevoke={addMemberToRevoke}
                 controlType="revoke"
-                onClickRevokeAccess={onRevokeAccess}
               />
             </Section>
           </Row>

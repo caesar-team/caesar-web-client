@@ -89,12 +89,13 @@ import {
   getLastUpdatedSelector,
 } from '@caesar/common/selectors/currentUser';
 import {
-  itemsByIdSelector,
   itemsByListIdsSelector,
   itemSelector,
   nonDecryptedSharedItemsSelector,
   nonDecryptedTeamItemsSelector,
   nonDecryptedTeamsItemsSelector,
+  itemIdsSelector,
+  teamItemIdsSelector,
 } from '@caesar/common/selectors/entities/item';
 import {
   workInProgressListIdSelector,
@@ -339,12 +340,16 @@ export function* processSharedItemsSaga({ payload: { teamId } }) {
   }
 }
 
-function* syncRemovedItems() {
-  const itemsById = yield select(itemsByIdSelector);
+function* syncRemovedItems(teamId) {
+  const isPersonal = teamId === TEAM_TYPE.PERSONAL;
+  const itemIds = isPersonal
+    ? yield select(itemIdsSelector)
+    : yield select(teamItemIdsSelector, { teamId });
 
   const { data: removedItemsIds } = yield call(
     getRemovedItems,
-    Object.keys(itemsById),
+    itemIds,
+    isPersonal ? null : teamId,
   );
 
   if (removedItemsIds.length) {
@@ -807,7 +812,7 @@ export function* openTeamVaultSaga({ payload: { teamId } }) {
 export function* openCurrentVaultSaga() {
   const teamId = yield select(currentTeamIdSelector) || TEAM_TYPE.PERSONAL;
   yield call(openTeamVaultSaga, { payload: { teamId } });
-  yield call(syncRemovedItems);
+  yield call(syncRemovedItems, teamId);
 }
 
 export function* updateWorkInProgressItemSaga({ payload: { itemId } }) {
@@ -987,7 +992,6 @@ export default function* workflowSagas() {
 
   yield takeLatest(SET_WORK_IN_PROGRESS_ITEM, setWorkInProgressItemSaga);
   yield takeLatest(UPDATE_WORK_IN_PROGRESS_ITEM, updateWorkInProgressItemSaga);
-  yield takeLatest(OPEN_CURRENT_VAULT, openCurrentVaultSaga);
   yield takeLatest(SET_CURRENT_TEAM_ID, initDashboardSaga);
   yield takeLatest(ADD_KEYPAIRS_BATCH, processKeyPairsSaga);
   yield takeLatest(FINISH_PROCESSING_KEYPAIRS, vaultsReadySaga);

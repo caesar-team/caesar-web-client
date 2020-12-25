@@ -11,7 +11,7 @@ import {
   ADD_TEAM_KEY_PAIR_BATCH,
   ADD_SHARE_KEY_PAIR_BATCH,
   REMOVE_KEY_PAIR_BATCH_BY_TEAM_IDS,
-  UPDATE_SHARE_KEY_PAIR,
+  UPDATE_SHARE_KEY_PAIR_BATCH,
   RESET_KEYSTORE_STATE,
 } from '@caesar/common/actions/keystore';
 
@@ -203,15 +203,22 @@ export default createReducer(initialState, {
       ),
     };
   },
-  [UPDATE_SHARE_KEY_PAIR](state, { payload }) {
+  [UPDATE_SHARE_KEY_PAIR_BATCH](state, { payload }) {
+    const byId = payload.updatedShareKeyPairs.reduce((acc, keypair) => {
+      return {
+        ...acc,
+        [keypair.relatedItemId]: {
+          ...state[KEY_TYPE.SHARES][keypair.relatedItemId],
+          teamId: keypair.teamId,
+        },
+      };
+    }, {});
+
     return {
       ...state,
       [KEY_TYPE.SHARES]: {
         ...state[KEY_TYPE.SHARES],
-        [payload.relatedItemId]: {
-          ...state[KEY_TYPE.SHARES][payload.relatedItemId],
-          teamId: payload.teamId,
-        },
+        ...byId,
       },
     };
   },

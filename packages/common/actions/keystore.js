@@ -9,7 +9,8 @@ export const ADD_ANONYMOUS_KEY_PAIR = '@keystore/ADD_ANONYMOUS_KEY_PAIR';
 export const REMOVE_ANONYMOUS_KEY_PAIR = '@keystore/REMOVE_ANONYMOUS_KEY_PAIR';
 export const REMOVE_KEY_PAIR_BATCH_BY_TEAM_IDS =
   '@keystore/REMOVE_KEY_PAIR_BATCH_BY_TEAM_IDS';
-export const UPDATE_SHARE_KEY_PAIR = '@keystore/UPDATE_SHARE_KEY_PAIR';
+export const UPDATE_SHARE_KEY_PAIR_BATCH =
+  '@keystore/UPDATE_SHARE_KEY_PAIR_BATCH';
 export const RESET_KEYSTORE_STATE = '@keystore/RESET_KEYSTORE_STATE';
 
 export const addPersonalKeyPair = data => ({
@@ -86,7 +87,7 @@ export const resetKeystoreState = () => ({
   type: RESET_KEYSTORE_STATE,
 });
 
-export const updateShareKeyPair = payload => ({
-  type: UPDATE_SHARE_KEY_PAIR,
+export const updateShareKeyPairBatch = payload => ({
+  type: UPDATE_SHARE_KEY_PAIR_BATCH,
   payload,
 });

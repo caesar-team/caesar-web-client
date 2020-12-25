@@ -106,7 +106,7 @@ export const OwnerAndShares = ({
       </OwnerWrapper>
       <Can I={PERMISSION.SHARE} an={itemSubject} passThrough>
         {allowed => (
-          <InvitedMembersWrapper resetMargin={!allowed}>
+          <InvitedMembersWrapper resetMargin={!allowed || !showShareButton}>
             {hasInvited ? (
               // TODO: Why avatars have the member object? The wrong name of property.
               <AvatarsList

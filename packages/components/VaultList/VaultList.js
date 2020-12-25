@@ -17,10 +17,12 @@ const Option = styled.div`
   align-items: center;
   padding: 8px 24px;
   font-size: 16px;
+  line-height: ${({ theme }) => theme.font.lineHeight.big};
   border-top: 1px solid transparent;
   border-bottom: 1px solid transparent;
   cursor: pointer;
   transition: all 0.2s;
+  word-break: break-word;
 
   &:hover {
     background-color: ${({ theme }) => theme.color.snow};

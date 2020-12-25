@@ -235,6 +235,12 @@ export function* decryptItem(item) {
   }
 }
 
+export function* decryptTeamItems(items) {
+  if (items?.length > 0) {
+    yield all(items.map(decryptItem));
+  }
+}
+
 export function* decryptAttachmentRaw({ id, raw }, privateKeyObj) {
   return {
     id,
@@ -548,10 +554,13 @@ function* initTeamsSaga() {
 export function* processKeyPairsSaga({ payload: { itemsById } }) {
   try {
     if (!itemsById) return;
+
     const keyPairs = objectToArray(itemsById);
+
     if (keyPairs.length > 0) {
       const teamKeys = [];
       const shareKeys = [];
+
       keyPairs.forEach(keyPair => {
         if (!keyPair?.data) return null;
 
@@ -561,6 +570,7 @@ export function* processKeyPairsSaga({ payload: { itemsById } }) {
       });
 
       const putSagas = [];
+
       if (teamKeys.length > 0) {
         const teamKeyPairsById = convertKeyPairToEntity(teamKeys, 'teamId');
         putSagas.push(put(addTeamKeyPairBatch(teamKeyPairsById)));
@@ -573,6 +583,7 @@ export function* processKeyPairsSaga({ payload: { itemsById } }) {
         );
         putSagas.push(put(addShareKeyPairBatch(shareKeysById)));
       }
+
       yield all(putSagas);
       yield put(finishProcessingKeyPairs());
     }
@@ -624,17 +635,17 @@ export function* loadKeyPairsAndPersonalItems() {
 
     const keypairsArray = objectToArray(keypairsById);
     const systemItems = objectToArray(systemItemsById);
-    const itemsEncryptedByUserKeys = [
+    const keypairsEncryptedByUserKeys = [
       ...keypairsArray.filter(keyPairsEncryptedByUserKeysFilter),
       ...systemItems,
     ];
-    const itemsEncryptedByTeamKeys = keypairsArray.filter(
+    const keypairsEncryptedByTeamKeys = keypairsArray.filter(
       keyPairsEncryptedByTeamKeysFilter,
     );
 
     // decrypt the items
-    if (itemsEncryptedByUserKeys?.length > 0) {
-      yield call(decryptUserItems, itemsEncryptedByUserKeys);
+    if (keypairsEncryptedByUserKeys?.length > 0) {
+      yield call(decryptUserItems, keypairsEncryptedByUserKeys);
     }
 
     yield put(addListsBatch(listsById));
@@ -643,11 +654,14 @@ export function* loadKeyPairsAndPersonalItems() {
       ...itemsById,
       ...sharedItemsById,
       ...teamsItemsById,
-      ...itemsEncryptedByTeamKeys,
     };
 
     if (Object.keys(storedItems).length > 0) {
       yield put(addItemsBatch(storedItems));
+    }
+
+    if (keypairsEncryptedByTeamKeys?.length > 0) {
+      yield call(decryptTeamItems, keypairsEncryptedByTeamKeys);
     }
 
     if (!keypairsArray?.length) {

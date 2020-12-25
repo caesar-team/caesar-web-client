@@ -84,6 +84,7 @@ const TeamName = styled.div`
   display: flex;
   flex-direction: column;
   font-size: 18px;
+  word-break: break-word;
 `;
 
 const TeamMembers = styled.div`

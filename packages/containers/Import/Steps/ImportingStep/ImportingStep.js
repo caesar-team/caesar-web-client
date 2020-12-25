@@ -63,7 +63,7 @@ const ImportingStep = ({ progress, onClickToDashboard }) => (
         disabled={progress < IMPORT_PROGRESS_THRESHOLD}
         onClick={onClickToDashboard}
       >
-        GO TO DASHBOARD
+        Go to dashboard
       </Button>
     </TwoItemsWrapper>
   </Wrapper>

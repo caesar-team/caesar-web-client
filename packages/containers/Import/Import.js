@@ -200,7 +200,7 @@ class Import extends Component {
               disabled={importProgress < IMPORT_PROGRESS_THRESHOLD}
               onClick={this.handleCancelFlow}
             >
-              IMPORT ONE MORE *.CSV
+              Import one more *.csv
             </Button>
           </ButtonWrapper>
         )}

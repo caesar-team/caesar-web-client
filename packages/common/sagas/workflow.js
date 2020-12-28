@@ -359,6 +359,12 @@ function* syncRemovedItems(teamId) {
   );
 
   if (removedItemsIds.length) {
+    const workInProgressItem = yield select(workInProgressItemSelector);
+
+    if (removedItemsIds.includes(workInProgressItem.id)) {
+      yield put(setWorkInProgressItem(null));
+    }
+
     // Remove undecrypttable items from the store
     yield put(removeItemsBatch(removedItemsIds));
   }

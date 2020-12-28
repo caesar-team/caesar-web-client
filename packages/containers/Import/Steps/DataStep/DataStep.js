@@ -12,7 +12,6 @@ import {
   SelectListWrapper,
   MoveToText,
   StyledSelect,
-  StyledListSelect,
   StyledTable,
 } from './styles';
 import { normalize, denormalize, filter } from './utils';

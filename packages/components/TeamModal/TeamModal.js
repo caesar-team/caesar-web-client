@@ -97,7 +97,7 @@ const TeamModal = ({
       isOpened
       shouldCloseOnEsc
       shouldCloseOnOverlayClick
-      width="560"
+      width={560}
       onRequestClose={onCancel}
     >
       <FormTitle>{teamId ? 'Edit' : 'Add'} team</FormTitle>

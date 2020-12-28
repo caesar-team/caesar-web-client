@@ -28,7 +28,9 @@ import {
   ConfirmLeaveTeamModal,
   ConfirmRemoveMemberModal,
   TeamModal,
-  Hint,  
+  CropModal,
+  MODAL,
+  Hint,
 } from '@caesar/components';
 import {
   PERMISSION,
@@ -39,14 +41,18 @@ import {
 } from '@caesar/common/constants';
 import { getTeamTitle } from '@caesar/common/utils/team';
 import { ability } from '@caesar/common/ability';
-import { MODAL } from './constants';
 import { createColumns } from './createColumns';
 
 const StyledHint = styled(Hint)`
   margin-right: 24px;
 `;
 
-export const TeamContainerComponent = ({ currentUser, team, teams, members }) => {
+export const TeamContainerComponent = ({
+  currentUser,
+  team,
+  teams,
+  members,
+}) => {
   const router = useRouter();
   const dispatch = useDispatch();
   const [modalVisibilities, setModalVisibilities] = useState({
@@ -55,6 +61,7 @@ export const TeamContainerComponent = ({ currentUser, team, teams, members }) =>
     [MODAL.LEAVE_TEAM]: false,
     [MODAL.REMOVE_TEAM]: false,
     [MODAL.NEW_TEAM]: false,
+    [MODAL.CROP_IMAGE]: false,
   });
   const [manipulatedMember, setManipulatedMember] = useState(null);
 
@@ -281,6 +288,9 @@ export const TeamContainerComponent = ({ currentUser, team, teams, members }) =>
           onEditSubmit={handleEditTeam}
           onCancel={handleCloseModal(MODAL.NEW_TEAM)}
         />
+      )}
+      {modalVisibilities[MODAL.CROP_IMAGE] && (
+        <CropModal onCancel={handleCloseModal(MODAL.CROP_IMAGE)} />
       )}
       {modalVisibilities[MODAL.INVITE_MEMBER] && (
         <InviteModal

@@ -28,7 +28,6 @@ import {
   ConfirmLeaveTeamModal,
   ConfirmRemoveMemberModal,
   TeamModal,
-  CropModal,
   MODAL,
   Hint,
 } from '@caesar/components';
@@ -61,7 +60,6 @@ export const TeamContainerComponent = ({
     [MODAL.LEAVE_TEAM]: false,
     [MODAL.REMOVE_TEAM]: false,
     [MODAL.NEW_TEAM]: false,
-    [MODAL.CROP_IMAGE]: false,
   });
   const [manipulatedMember, setManipulatedMember] = useState(null);
 
@@ -288,9 +286,6 @@ export const TeamContainerComponent = ({
           onEditSubmit={handleEditTeam}
           onCancel={handleCloseModal(MODAL.NEW_TEAM)}
         />
-      )}
-      {modalVisibilities[MODAL.CROP_IMAGE] && (
-        <CropModal onCancel={handleCloseModal(MODAL.CROP_IMAGE)} />
       )}
       {modalVisibilities[MODAL.INVITE_MEMBER] && (
         <InviteModal

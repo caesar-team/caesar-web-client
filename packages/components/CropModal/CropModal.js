@@ -1,12 +1,18 @@
-import React, { memo } from 'react';
+import React, { useRef, memo } from 'react';
+import Cropper from 'react-cropper';
 import styled from 'styled-components';
 import { Modal, ModalTitle } from '../Modal';
 import { Button } from '../Button';
 
+import 'cropperjs/dist/cropper.css';
+import './cropper.overrides.css';
+
 const ImageWrapper = styled.div`
   width: 100%;
   height: 400px;
-  border: 1px solid black; // TODO: Remove this prop
+  display: flex;
+  justify-content: center;
+  align-items: center;
 `;
 
 const ButtonsWrapper = styled.div`
@@ -24,12 +30,66 @@ const StyledButton = styled(Button)`
   margin-left: 16px;
 `;
 
+const getRoundedCanvas = sourceCanvas => {
+  const canvas = document.createElement('canvas');
+  const context = canvas.getContext('2d');
+  const { width, height } = sourceCanvas;
+
+  canvas.width = width;
+  canvas.height = height;
+  context.imageSmoothingEnabled = true;
+  context.drawImage(sourceCanvas, 0, 0, width, height);
+  context.globalCompositeOperation = 'destination-in';
+  context.beginPath();
+  context.arc(
+    width / 2,
+    height / 2,
+    Math.min(width, height) / 2,
+    0,
+    2 * Math.PI,
+    true,
+  );
+  context.fill();
+
+  return canvas;
+};
+
 const CropModalComponent = ({
+  src = null,
   handleClickAccept = Function.prototype,
   onCancel = Function.prototype,
 }) => {
   const handleChoosePicture = () => {
+    // TODO
     console.log('handleChoosePicture');
+  };
+
+  const resultRef = useRef(null);
+  const cropperRef = useRef(null);
+
+  const onCrop = () => {
+    const imageElement = cropperRef?.current;
+    const cropper = imageElement?.cropper;
+
+    let croppedCanvas = null;
+    let roundedCanvas = null;
+    let roundedImage = null;
+
+    // Crop
+    croppedCanvas = cropper.getCroppedCanvas();
+
+    // Round
+    roundedCanvas = getRoundedCanvas(croppedCanvas);
+
+    // Show
+    roundedImage = document.createElement('img');
+    roundedImage.src = roundedCanvas.toDataURL();
+
+    resultRef.current.innerHTML = '';
+    resultRef.current.appendChild(roundedImage);
+
+    // TODO
+    // handleClickAccept()
   };
 
   return (
@@ -41,7 +101,20 @@ const CropModalComponent = ({
       width={640}
     >
       <ModalTitle>Crop the image</ModalTitle>
-      <ImageWrapper />
+      <ImageWrapper>
+        <Cropper
+          src={src}
+          style={{
+            width: '100%',
+          }}
+          guides={false}
+          // TODO: Add custom cropper by max width or height of image
+          aspectRatio={1 / 1}
+          viewMode={2}
+          background={false}
+          ref={cropperRef}
+        />
+      </ImageWrapper>
       <ButtonsWrapper>
         <LeftButton color="white" onClick={handleChoosePicture}>
           Choose a picture
@@ -49,8 +122,9 @@ const CropModalComponent = ({
         <StyledButton color="white" onClick={onCancel}>
           Cancel
         </StyledButton>
-        <StyledButton onClick={handleClickAccept}>Accept</StyledButton>
+        <StyledButton onClick={onCrop}>Accept</StyledButton>
       </ButtonsWrapper>
+      <div ref={resultRef} />
     </Modal>
   );
 };

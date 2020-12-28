@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useCallback } from 'react';
 import styled from 'styled-components';
 import IconTeam1 from '@caesar/assets/icons/svg/icon-team-ava-1.svg';
 import IconTeam2 from '@caesar/assets/icons/svg/icon-team-ava-2.svg';
@@ -8,6 +8,7 @@ import IconTeam5 from '@caesar/assets/icons/svg/icon-team-ava-5.svg';
 import { TextError as Error } from '../Error';
 import { Icon } from '../Icon';
 import { Uploader } from '../Uploader';
+import { CropModal } from '../CropModal';
 
 const IMAGE_BASE64_LIST = [
   IconTeam1,
@@ -180,13 +181,28 @@ export const renderTeamAvatars = ({
   setFieldValue,
   setFieldTouched,
 }) => {
+  const [isCropModalOpened, setCropModalOpened] = useState(false);
+  const [cropModalSrc, setCropModalSrc] = useState(icon?.raw);
   const isDefaultIcon = icon.raw && IMAGE_BASE64_LIST.includes(icon.raw);
   const isCustomIcon = icon.raw && !isDefaultIcon;
   const shouldShowUploader = isDefaultIcon || !icon.raw;
 
-  const handleChangeIcon = value => {
+  const handleChangeIcon = useCallback(value => {
+    setCropModalSrc(null);
     setFieldValue('icon', value, true);
     setFieldTouched('icon');
+
+    if (!IMAGE_BASE64_LIST.includes(value.raw)) {
+      setCropModalSrc(value.raw);
+      setCropModalOpened(true);
+    }
+  }, []);
+
+  const handleCloseCropModal = () => {
+    setCropModalOpened(false);
+    setCropModalSrc(null);
+    setFieldValue('icon', { raw: null }, true);
+    setFieldTouched('icon', false);
   };
 
   return (
@@ -238,6 +254,13 @@ export const renderTeamAvatars = ({
         </UploaderHoverableWrapper>
       </AvatarsWrapper>
       {touched?.icon && errors?.icon?.raw && <Error>{errors?.icon?.raw}</Error>}
+      {isCropModalOpened && !errors?.icon?.raw && (
+        <CropModal
+          src={cropModalSrc}
+          handleClickAccept={Function.prototype}
+          onCancel={handleCloseCropModal}
+        />
+      )}
     </>
   );
 };

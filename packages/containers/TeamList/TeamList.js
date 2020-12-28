@@ -5,7 +5,6 @@ import {
   TeamCard,
   SettingsWrapper,
   TeamModal,
-  CropModal,
   ConfirmModal,
   ConfirmLeaveTeamModal,
   MODAL,
@@ -164,7 +163,6 @@ class TeamListContainer extends Component {
         [MODAL.NEW_TEAM]: false,
         [MODAL.LEAVE_TEAM]: false,
         [MODAL.REMOVE_TEAM]: false,
-        [MODAL.CROP_IMAGE]: false,
       },
       activeTabName: ALL_TAB_NAME,
       forceClosedMenu: false,
@@ -266,9 +264,6 @@ class TeamListContainer extends Component {
             onEditSubmit={this.handleEditSubmit}
             onCancel={this.handleCloseModal(MODAL.NEW_TEAM)}
           />
-        )}
-        {modalVisibilities[MODAL.CROP_IMAGE] && (
-          <CropModal onCancel={this.handleCloseModal(MODAL.CROP_IMAGE)} />
         )}
         <ConfirmModal
           isOpened={modalVisibilities[MODAL.REMOVE_TEAM]}

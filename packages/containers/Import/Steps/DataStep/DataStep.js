@@ -144,8 +144,9 @@ const DataStep = ({
           value={teamId}
           onChange={handleChangeTeamId}
         />
-        <StyledListSelect
+        <StyledSelect
           boxDirection="up"
+          shouldBreakTextLines
           options={currentTeamListsOptions}
           value={listId}
           onChange={handleChangeListId}

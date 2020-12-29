@@ -200,7 +200,7 @@ class Portal extends Component {
           {...props}
         >
           <CloseButton onClick={this.handleClickCloseButton}>
-            <CloseIcon name="close" width="12" height="12" />
+            <CloseIcon name="close" width={12} height={12} />
           </CloseButton>
           {children}
         </ContentWrapper>

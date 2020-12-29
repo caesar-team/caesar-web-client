@@ -66,7 +66,7 @@ const ButtonsWrapper = styled.div`
   margin-top: 16px;
 `;
 
-const ButtonStyled = styled(Button)`
+const StyledButton = styled(Button)`
   margin-right: 16px;
 `;
 
@@ -286,9 +286,9 @@ const MoveModalComponent = ({
         )}
       </Scrollbar>
       <ButtonsWrapper>
-        <ButtonStyled color="white" onClick={closeModal}>
+        <StyledButton color="white" onClick={closeModal}>
           Cancel
-        </ButtonStyled>
+        </StyledButton>
         <Button
           onClick={handleClickAccept}
           disabled={

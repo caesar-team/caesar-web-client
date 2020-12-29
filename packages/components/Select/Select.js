@@ -11,12 +11,13 @@ import {
   ArrowIcon,
 } from './styles';
 
+const BOX_DIRECTION_UP = 'up';
 const BOX_DIRECTION_DOWN = 'down';
 
 const DEFAULT_TOP_OFFSET = 40;
 const DEFAULT_OPTION_SIZE = 40;
 
-const renderOptions = ({ value, options, handleClickOption }) =>
+const renderOptions = ({ value, options, shouldBreakTextLines, handleClickOption }) =>
   options.map(({ value: optionValue, label, isDisabled = false }) => {
     const isActive = value === optionValue;
 
@@ -25,6 +26,7 @@ const renderOptions = ({ value, options, handleClickOption }) =>
         key={optionValue}
         isActive={isActive}
         isDisabled={isDisabled}
+        shouldBreakTextLines={shouldBreakTextLines}
         onClick={
           isDisabled ? Function.prototype : handleClickOption(optionValue)
         }
@@ -42,6 +44,7 @@ const SelectComponent = ({
   isCancellable,
   boxOffset = DEFAULT_TOP_OFFSET,
   boxDirection = BOX_DIRECTION_DOWN,
+  shouldBreakTextLines = false,
   onChange = Function.prototype,
   className,
 }) => {
@@ -78,7 +81,11 @@ const SelectComponent = ({
   const topOffset =
     boxDirection === BOX_DIRECTION_DOWN
       ? boxOffset
-      : options.length * DEFAULT_OPTION_SIZE * -1;
+      : null;
+  const bottomOffset =
+    boxDirection === BOX_DIRECTION_UP
+      ? DEFAULT_OPTION_SIZE
+      : null;
 
   return (
     <Wrapper ref={dropdownRef} className={className}>
@@ -102,9 +109,9 @@ const SelectComponent = ({
         />
       </SelectedOption>
       {isDropdownOpened && (
-        <Box top={topOffset}>
+        <Box top={topOffset} bottom={bottomOffset}>
           <OptionsList>
-            {renderOptions({ value, options, handleClickOption })}
+            {renderOptions({ value, options, shouldBreakTextLines, handleClickOption })}
           </OptionsList>
         </Box>
       )}

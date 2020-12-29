@@ -41,9 +41,14 @@ const GroupAvatarsTip = styled.div`
 `;
 
 const ButtonWrapper = styled.div`
-  margin-top: 40px;
   display: flex;
   justify-content: center;
+  justify-content: flex-end;
+  margin-top: 40px;
+`;
+
+const StyledButton = styled(Button)`
+  margin-right: 16px;
 `;
 
 const getInitialValues = team => ({
@@ -135,6 +140,9 @@ const TeamModal = ({
           errors?.form?.map(error => <Error key={error}>{error}</Error>)
         )}
         <ButtonWrapper>
+          <StyledButton color="white" onClick={onCancel}>
+            Cancel
+          </StyledButton>
           <Button
             disabled={!dirty || isSubmitting || !isValid}
             color="black"

@@ -182,7 +182,8 @@ export const renderTeamAvatars = ({
   setFieldTouched,
 }) => {
   const [isCropModalOpened, setCropModalOpened] = useState(false);
-  const [cropModalSrc, setCropModalSrc] = useState(icon?.raw);
+  const [uploadedImageSrc, setUploadedImageSrc] = useState(icon.raw);
+  const [cropModalSrc, setCropModalSrc] = useState(null);
   const isDefaultIcon = icon.raw && IMAGE_BASE64_LIST.includes(icon.raw);
   const isCustomIcon = icon.raw && !isDefaultIcon;
   const shouldShowUploader = isDefaultIcon || !icon.raw;
@@ -198,10 +199,18 @@ export const renderTeamAvatars = ({
     }
   }, []);
 
+  const handleAcceptCroppedImage = raw => {
+    setFieldValue('icon', { raw }, true);
+    setFieldTouched('icon');
+    setUploadedImageSrc(raw);
+    setCropModalOpened(false);
+    setCropModalSrc(null);
+  };
+
   const handleCloseCropModal = () => {
     setCropModalOpened(false);
     setCropModalSrc(null);
-    setFieldValue('icon', { raw: null }, true);
+    setFieldValue('icon', { raw: icon?.raw || null }, true);
     setFieldTouched('icon', false);
   };
 
@@ -246,7 +255,7 @@ export const renderTeamAvatars = ({
             )}
           </Uploader>
           <UploadedImageWrapper>
-            <UploadedImage src={icon.raw} />
+            <UploadedImage src={uploadedImageSrc} />
             <SelectedIconWrapper>
               <TopIconStyled name="checkmark" />
             </SelectedIconWrapper>
@@ -257,7 +266,7 @@ export const renderTeamAvatars = ({
       {isCropModalOpened && !errors?.icon?.raw && (
         <CropModal
           src={cropModalSrc}
-          handleClickAccept={Function.prototype}
+          handleClickAccept={handleAcceptCroppedImage}
           onCancel={handleCloseCropModal}
         />
       )}

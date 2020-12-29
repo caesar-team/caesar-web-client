@@ -64,32 +64,16 @@ const CropModalComponent = ({
     console.log('handleChoosePicture');
   };
 
-  const resultRef = useRef(null);
   const cropperRef = useRef(null);
 
   const onCrop = () => {
     const imageElement = cropperRef?.current;
     const cropper = imageElement?.cropper;
 
-    let croppedCanvas = null;
-    let roundedCanvas = null;
-    let roundedImage = null;
+    const croppedCanvas = cropper.getCroppedCanvas();
+    const roundedCanvas = getRoundedCanvas(croppedCanvas);
 
-    // Crop
-    croppedCanvas = cropper.getCroppedCanvas();
-
-    // Round
-    roundedCanvas = getRoundedCanvas(croppedCanvas);
-
-    // Show
-    roundedImage = document.createElement('img');
-    roundedImage.src = roundedCanvas.toDataURL();
-
-    resultRef.current.innerHTML = '';
-    resultRef.current.appendChild(roundedImage);
-
-    // TODO
-    // handleClickAccept()
+    handleClickAccept(roundedCanvas.toDataURL());
   };
 
   return (
@@ -106,9 +90,11 @@ const CropModalComponent = ({
           src={src}
           style={{
             width: '100%',
+            minWidth: '100%',
+            maxHeight: '100%',
+            objectFit: 'contain',
           }}
           guides={false}
-          // TODO: Add custom cropper by max width or height of image
           aspectRatio={1 / 1}
           viewMode={2}
           background={false}
@@ -124,7 +110,6 @@ const CropModalComponent = ({
         </StyledButton>
         <StyledButton onClick={onCrop}>Accept</StyledButton>
       </ButtonsWrapper>
-      <div ref={resultRef} />
     </Modal>
   );
 };

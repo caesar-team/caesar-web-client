@@ -64,6 +64,7 @@
     "prop-types": "^15.7.2",
     "react": "^16.8.6",
     "react-beautiful-dnd": "^11.0.4",
+    "react-cropper": "^2.1.4",
     "react-custom-scrollbars": "^4.2.1",
     "react-dom": "^16.8.6",
     "react-dropzone": "^10.1.5",

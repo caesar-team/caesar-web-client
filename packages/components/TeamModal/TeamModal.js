@@ -72,6 +72,7 @@ const TeamModal = ({
     isSubmitting,
     isValid,
     handleBlur,
+    handleChange,
     handleSubmit,
     setFieldValue,
     setFieldTouched,
@@ -91,11 +92,6 @@ const TeamModal = ({
       teams.filter(({ id }) => id !== teamId).map(item => item.title),
     ),
   });
-
-  const handleChangeTitle = e => {
-    setFieldValue('title', e.target.value, true);
-    setFieldTouched('title');
-  };
 
   return (
     <Modal
@@ -117,7 +113,7 @@ const TeamModal = ({
             autoFocus
             withBorder
             error={checkError(touched, errors, 'title')}
-            onChange={handleChangeTitle}
+            onChange={handleChange}
             onBlur={handleBlur}
           />
         )}

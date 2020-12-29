@@ -229,29 +229,19 @@ export const renderTeamAvatars = ({
             onChange={(_, file) => handleChangeIcon(file)}
           >
             {({ getRootProps, getInputProps, isDragActive }) => (
-              <>
-                <UploaderWrapper
-                  {...getRootProps()}
-                  isDragActive={isDragActive}
-                >
-                  <input {...getInputProps()} />
-                  {isCustomIcon ? (
-                    <AddImgIcon
-                      name="pencil"
-                      color="gray"
-                      width={16}
-                      height={16}
-                    />
-                  ) : (
-                    <AddImgIcon
-                      name="plus"
-                      color="gray"
-                      width={16}
-                      height={16}
-                    />
-                  )}
-                </UploaderWrapper>
-              </>
+              <UploaderWrapper {...getRootProps()} isDragActive={isDragActive}>
+                <input {...getInputProps()} />
+                {isCustomIcon ? (
+                  <AddImgIcon
+                    name="pencil"
+                    color="gray"
+                    width={16}
+                    height={16}
+                  />
+                ) : (
+                  <AddImgIcon name="plus" color="gray" width={16} height={16} />
+                )}
+              </UploaderWrapper>
             )}
           </Uploader>
           <UploadedImageWrapper>
@@ -266,6 +256,7 @@ export const renderTeamAvatars = ({
       {isCropModalOpened && !errors?.icon?.raw && (
         <CropModal
           src={cropModalSrc}
+          handleChangeIcon={handleChangeIcon}
           handleClickAccept={handleAcceptCroppedImage}
           onCancel={handleCloseCropModal}
         />

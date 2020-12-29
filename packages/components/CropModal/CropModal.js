@@ -3,6 +3,7 @@ import Cropper from 'react-cropper';
 import styled from 'styled-components';
 import { Modal, ModalTitle } from '../Modal';
 import { Button } from '../Button';
+import { Uploader } from '../Uploader';
 
 import 'cropperjs/dist/cropper.css';
 import './cropper.overrides.css';
@@ -56,14 +57,10 @@ const getRoundedCanvas = sourceCanvas => {
 
 const CropModalComponent = ({
   src = null,
+  handleChangeIcon = Function.prototype,
   handleClickAccept = Function.prototype,
   onCancel = Function.prototype,
 }) => {
-  const handleChoosePicture = () => {
-    // TODO
-    console.log('handleChoosePicture');
-  };
-
   const cropperRef = useRef(null);
 
   const onCrop = () => {
@@ -102,9 +99,19 @@ const CropModalComponent = ({
         />
       </ImageWrapper>
       <ButtonsWrapper>
-        <LeftButton color="white" onClick={handleChoosePicture}>
-          Choose a picture
-        </LeftButton>
+        <Uploader
+          name="icon"
+          accept="image/*"
+          files={[]}
+          onChange={(_, file) => handleChangeIcon(file)}
+        >
+          {({ getRootProps, getInputProps }) => (
+            <LeftButton color="white" {...getRootProps()}>
+              <input {...getInputProps()} />
+              Choose a picture
+            </LeftButton>
+          )}
+        </Uploader>
         <StyledButton color="white" onClick={onCancel}>
           Cancel
         </StyledButton>

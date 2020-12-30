@@ -64,8 +64,9 @@ const Cell = styled.div`
   position: relative;
   display: flex;
   align-items: center;
-  overflow: hidden;
   white-space: nowrap;
+
+  ${({ overflowHidden = true }) => overflowHidden && `overflow: hidden;`}
 `;
 
 const EmailCell = styled.div`

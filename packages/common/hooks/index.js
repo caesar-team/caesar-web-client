@@ -1,3 +1,4 @@
+export { useDirection } from './useDirection';
 export { useItemVaultAndListOptions } from './useItemVaultAndListOptions';
 export { useNotification } from './useNotification';
 export { useMedia } from './useMedia';

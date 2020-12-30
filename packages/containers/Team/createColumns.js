@@ -1,5 +1,5 @@
 /* eslint-disable camelcase */
-import React, { useState, useRef, useEffect } from 'react';
+import React from 'react';
 import styled from 'styled-components';
 import {
   DottedMenu,
@@ -16,11 +16,8 @@ import {
   TEAM_ROLES_OPTIONS,
 } from '@caesar/common/constants';
 import { ability } from '@caesar/common/ability';
-import {
-  ROLE_COLUMN_WIDTH,
-  MENU_COLUMN_WIDTH,
-  WIDTH_RATIO,
-} from './constants';
+import { useDirection } from '@caesar/common/hooks';
+import { ROLE_COLUMN_WIDTH, MENU_COLUMN_WIDTH, WIDTH_RATIO } from './constants';
 
 const UserAvatar = styled(TeamAvatar)`
   margin-right: 8px;
@@ -76,30 +73,6 @@ const getTeamMemberSubject = member => ({
   __typename: PERMISSION_ENTITY.TEAM_MEMBER,
 });
 
-const useDropdownDirection = ({
-  tableScrollTop,
-  tableHeight,
-  optionLength = 1,
-}) => {
-  const cellRef = useRef(null);
-  const [isDropdownUp, setDropdownUp] = useState(false);
-
-  useEffect(() => {
-    if (cellRef?.current) {
-      const rowScrolledTopPosition = cellRef.current.closest('[role="row"]')
-        ?.offsetTop;
-      const rowTopPositionRelativeToTable =
-        rowScrolledTopPosition - tableScrollTop;
-      const dropdownBottomPosition =
-        rowTopPositionRelativeToTable + (optionLength + 1) * 44 + 4;
-
-      setDropdownUp(dropdownBottomPosition >= tableHeight);
-    }
-  }, [cellRef, tableScrollTop]);
-
-  return { cellRef, isDropdownUp };
-};
-
 export const createColumns = ({
   tableWidth,
   tableHeight,
@@ -140,12 +113,12 @@ export const createColumns = ({
     Filter: getColumnFilter('Team role'),
     Header: () => null,
     Cell: ({ value, row: { original } }) => {
-      const { cellRef, isDropdownUp } = useDropdownDirection({
+      const { cellRef, isUp: isDropdownUp } = useDirection({
         tableScrollTop,
         tableHeight,
         optionLength: TEAM_ROLES_OPTIONS.length,
       });
-      const canChangeRole = 
+      const canChangeRole =
         ability.can(PERMISSION.EDIT, getTeamMemberSubject(original)) &&
         currentUserId !== original.userId;
 
@@ -159,7 +132,9 @@ export const createColumns = ({
               onChange={handleChangeRole(original.id)}
               boxDirection={isDropdownUp ? 'up' : 'down'}
             />
-          ) : <Table.RoleCell>{TEAM_ROLES_LABELS[value]}</Table.RoleCell>}
+          ) : (
+            <Table.RoleCell>{TEAM_ROLES_LABELS[value]}</Table.RoleCell>
+          )}
         </Table.DropdownCell>
       );
     },
@@ -181,7 +156,7 @@ export const createColumns = ({
       );
       const isAvailableMenu = optionLength > 0;
 
-      const { cellRef, isDropdownUp } = useDropdownDirection({
+      const { cellRef, isUp: isDropdownUp } = useDirection({
         tableScrollTop,
         tableHeight,
         optionLength,

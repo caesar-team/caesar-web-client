@@ -47,7 +47,7 @@ export const OptionsList = styled.div`
   position: relative;
   display: flex;
   flex-direction: column;
-  width: 100%;
+  width: 100%;                                                                                            
   border: 1px solid ${({ theme }) => theme.color.gallery};
   border-radius: ${({ theme }) => theme.borderRadius};
 `;
@@ -60,7 +60,8 @@ export const Option = styled.div`
     isDisabled ? theme.color.lightGray : theme.color.black};
   background-color: ${({ theme }) => theme.color.white};
   cursor: ${({ isDisabled }) => (isDisabled ? 'default' : 'pointer')};
-  ${({ shouldBreakTextLines }) => (!shouldBreakTextLines && 'white-space: nowrap')};
+  ${({ shouldBreakTextLines }) =>
+    !shouldBreakTextLines ? 'white-space: nowrap' : 'word-break: break-word'};
   transition: background-color 0.2s;
 
   &:hover {

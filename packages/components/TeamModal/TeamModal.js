@@ -120,7 +120,7 @@ const TeamModal = ({
         <GroupAvatarsWrapper>
           <GroupAvatarsTitle>Avatar</GroupAvatarsTitle>
           <GroupAvatarsTip>
-            Choose an avatar or upload (160x160 pixels, not more than 8 MB)
+            Choose an avatar or upload (not more than 8 MB)
           </GroupAvatarsTip>
           {renderTeamAvatars({
             touched,

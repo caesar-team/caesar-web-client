@@ -1,4 +1,5 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useMemo, useCallback } from 'react';
+import { useUpdateEffect } from 'react-use';
 import styled from 'styled-components';
 import IconTeam1 from '@caesar/assets/icons/svg/icon-team-ava-1.svg';
 import IconTeam2 from '@caesar/assets/icons/svg/icon-team-ava-2.svg';
@@ -181,12 +182,13 @@ export const renderTeamAvatars = ({
   setFieldValue,
   setFieldTouched,
 }) => {
+  const initValue = useMemo(() => icon.raw, []);
   const [isCropModalOpened, setCropModalOpened] = useState(false);
-  const [uploadedImageSrc, setUploadedImageSrc] = useState(icon.raw);
+  const [uploadedImageSrc, setUploadedImageSrc] = useState(icon.raw || null);
   const [cropModalSrc, setCropModalSrc] = useState(null);
   const isDefaultIcon = icon.raw && IMAGE_BASE64_LIST.includes(icon.raw);
   const isCustomIcon = icon.raw && !isDefaultIcon;
-  const shouldShowUploader = isDefaultIcon || !icon.raw;
+  const shouldShowUploader = isDefaultIcon || !uploadedImageSrc;
 
   const handleChangeIcon = useCallback(value => {
     setCropModalSrc(null);
@@ -210,9 +212,16 @@ export const renderTeamAvatars = ({
   const handleCloseCropModal = () => {
     setCropModalOpened(false);
     setCropModalSrc(null);
-    setFieldValue('icon', { raw: icon?.raw || null }, true);
+    setFieldValue('icon', { raw: initValue || null }, true);
     setFieldTouched('icon', false);
   };
+
+  useUpdateEffect(() => {
+    if (errors?.icon?.raw) {
+      setCropModalOpened(false);
+      setCropModalSrc(null);
+    }
+  }, [errors]);
 
   return (
     <>
@@ -253,7 +262,7 @@ export const renderTeamAvatars = ({
         </UploaderHoverableWrapper>
       </AvatarsWrapper>
       {touched?.icon && errors?.icon?.raw && <Error>{errors?.icon?.raw}</Error>}
-      {isCropModalOpened && !errors?.icon?.raw && (
+      {isCropModalOpened && (
         <CropModal
           src={cropModalSrc}
           handleChangeIcon={handleChangeIcon}

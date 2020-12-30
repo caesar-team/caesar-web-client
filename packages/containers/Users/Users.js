@@ -91,8 +91,8 @@ const createColumns = ({ tableWidth, tableScrollTop, tableHeight }) => [
       const visibleSymbols = (columnWidth - 48 - 50 - 12) / SYMBOL_WIDTH;
       const visibleText = value.slice(0, visibleSymbols);
       const hiddenText = value.slice(visibleSymbols);
-      // 80 - symbols in one raw, 18 - height of a raw, 30 - padding from the top of a raw to top of a hint
-      const modalHeight = Math.ceil(hiddenText.length / 80) * 18 + 30;
+      // 80 - symbols in one raw, 18 - height of a raw, 30 - padding from the top of a raw to top of a hint, 8 - vertical hint paddings
+      const modalHeight = Math.ceil(hiddenText.length / 80) * 18 + 30 + 8;
 
       const { cellRef, isUp } = useDirection({
         tableScrollTop,

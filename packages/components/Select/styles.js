@@ -47,7 +47,7 @@ export const OptionsList = styled.div`
   position: relative;
   display: flex;
   flex-direction: column;
-  width: 100%;                                                                                            
+  width: 100%;
   border: 1px solid ${({ theme }) => theme.color.gallery};
   border-radius: ${({ theme }) => theme.borderRadius};
 `;

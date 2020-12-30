@@ -9,6 +9,7 @@ import {
   DataTable,
   TableStyles as Table,
   Avatar,
+  Hint,
 } from '@caesar/components';
 import { getTeamTitle } from '@caesar/common/utils/team';
 
@@ -16,11 +17,19 @@ const UserAvatar = styled(Avatar)`
   margin-right: 8px;
 `;
 
+const StyledHint = styled(Hint)`
+  margin-left: 4px;
+  border-bottom: 1px dashed ${({ theme }) => theme.color.black};
+  cursor: pointer;
+`;
+
 const WIDTH_RATIO = {
   name: 0.35,
   email: 0.35,
   team: 0.3,
 };
+
+const SYMBOL_WIDTH = 8; // this is width of 'm' letter
 
 const getColumnFilter = (placeholder = '') => ({
   column: { filterValue, setFilter },
@@ -74,7 +83,28 @@ const createColumns = tableWidth => [
     Filter: getColumnFilter('Team'),
     disableSortBy: true,
     Header: () => null,
-    Cell: ({ value }) => <Table.Cell>{value}</Table.Cell>,
+    Cell: ({ value }) => {
+      const columnWidth = tableWidth * WIDTH_RATIO.team;
+      const visibleSymbols = (columnWidth - 48 - 50 - 12) / SYMBOL_WIDTH; // 48 - horizontal paddings, 50 - width of 'more' text, 12 - width of ellipsis
+      const visibleText = value.slice(0, visibleSymbols);
+      const hiddenText = value.slice(visibleSymbols);
+
+      return (
+        <Table.Cell overflowHidden={false}>
+          {visibleText}
+          {hiddenText && '...'}
+          {hiddenText && (
+            <StyledHint
+              text={hiddenText}
+              position="bottom_left"
+              hintMaxWidth={480}
+            >
+              more
+            </StyledHint>
+          )}
+        </Table.Cell>
+      );
+    },
   },
 ];
 

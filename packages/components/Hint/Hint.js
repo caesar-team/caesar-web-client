@@ -67,6 +67,7 @@ const getHintPosition = ({ position }) => {
 };
 
 export const HintStyles = css`
+  z-index: ${({ theme }) => theme.zIndex.hidden};
   padding: 4px 8px;
   font-size: ${({ theme }) => theme.font.size.xs};
   font-weight: 600;
@@ -75,7 +76,6 @@ export const HintStyles = css`
   color: ${({ theme }) => theme.color.white};
   background-color: ${({ theme }) => theme.color.black};
   border-radius: 4px;
-  z-index: ${({ theme }) => theme.zIndex.hidden};
   opacity: 0;
   transition: z-index 0.2s, opacity 0.2s;
 `;
@@ -84,6 +84,13 @@ const Inner = styled.div`
   ${HintStyles};
   position: absolute;
   ${getHintPosition}
+  ${({ hintMaxWidth }) =>
+    hintMaxWidth &&
+    `
+      width: max-content;
+      max-width: ${hintMaxWidth}px;
+      white-space: normal;
+    `}
 `;
 
 const Wrapper = styled.div`
@@ -98,11 +105,16 @@ const Wrapper = styled.div`
 export const Hint = ({
   text,
   position = POSITION.TOP_CENTER,
+  hintMaxWidth,
   children,
   className,
 }) => (
   <Wrapper className={className}>
     {children}
-    {text && <Inner position={position}>{text}</Inner>}
+    {text && (
+      <Inner position={position} hintMaxWidth={hintMaxWidth}>
+        {text}
+      </Inner>
+    )}
   </Wrapper>
 );

@@ -16,11 +16,7 @@ import {
   TEAM_ROLES_OPTIONS,
 } from '@caesar/common/constants';
 import { ability } from '@caesar/common/ability';
-import {
-  ROLE_COLUMN_WIDTH,
-  MENU_COLUMN_WIDTH,
-  WIDTH_RATIO,
-} from './constants';
+import { ROLE_COLUMN_WIDTH, MENU_COLUMN_WIDTH, WIDTH_RATIO } from './constants';
 
 const UserAvatar = styled(TeamAvatar)`
   margin-right: 8px;
@@ -145,7 +141,7 @@ export const createColumns = ({
         tableHeight,
         optionLength: TEAM_ROLES_OPTIONS.length,
       });
-      const canChangeRole = 
+      const canChangeRole =
         ability.can(PERMISSION.EDIT, getTeamMemberSubject(original)) &&
         currentUserId !== original.userId;
 
@@ -159,7 +155,9 @@ export const createColumns = ({
               onChange={handleChangeRole(original.id)}
               boxDirection={isDropdownUp ? 'up' : 'down'}
             />
-          ) : <Table.RoleCell>{TEAM_ROLES_LABELS[value]}</Table.RoleCell>}
+          ) : (
+            <Table.RoleCell>{TEAM_ROLES_LABELS[value]}</Table.RoleCell>
+          )}
         </Table.DropdownCell>
       );
     },

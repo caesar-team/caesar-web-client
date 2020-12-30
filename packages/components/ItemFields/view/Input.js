@@ -125,7 +125,7 @@ const InputComponent = ({
 
   const handleChange = event => {
     const val = event.target.value;
-
+console.log(val);
     setValue(val);
     onChange(val);
 

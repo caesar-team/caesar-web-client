@@ -146,7 +146,7 @@ class Import extends Component {
   }
 
   renderStep() {
-    const { teamsLists, importProgress } = this.props;
+    const { teamsLists, importProgress, currentUserTeamsList } = this.props;
     const { currentStep, data, matchings } = this.state;
 
     return matchStrict(
@@ -164,6 +164,7 @@ class Import extends Component {
         DATA_STEP: (
           <DataStep
             teamsLists={teamsLists}
+            currentUserTeamsList={currentUserTeamsList}
             data={normalizeData(data.rows, matchings)}
             headings={matchings}
             onSubmit={this.handleFinishDataStep}

@@ -185,10 +185,9 @@ export const CloseIcon = styled(Icon)`
   right: 28px;
   bottom: 0;
   margin: auto;
-  fill: ${({ theme }) => theme.color.gray};
   cursor: pointer;
 
   &:hover {
-    fill: ${({ theme }) => theme.color.black};
+    color: ${({ theme }) => theme.color.black};
   }
 `;

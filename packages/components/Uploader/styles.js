@@ -36,8 +36,5 @@ export const Link = styled.a`
 `;
 
 export const StyledIcon = styled(Icon)`
-  fill: ${({ theme, isDragActive }) =>
-    isDragActive ? theme.color.gray : theme.color.black};
-  transition: all 0.2s;
   margin-right: 15px;
 `;

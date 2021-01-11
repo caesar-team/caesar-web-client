@@ -183,6 +183,7 @@ export const renderTeamAvatars = ({
   const isDefaultIcon = icon.raw && IMAGE_BASE64_LIST.includes(icon.raw);
   const isCustomIcon = icon.raw && !isDefaultIcon;
   const shouldShowUploader = isDefaultIcon || !uploadedImageSrc;
+  const customIconError = useMemo(() => errors?.icon?.raw || null, [errors]);
 
   const handleChangeIcon = useCallback(value => {
     setCropModalSrc(null);
@@ -211,11 +212,11 @@ export const renderTeamAvatars = ({
   };
 
   useUpdateEffect(() => {
-    if (errors?.icon?.raw) {
+    if (customIconError) {
       setCropModalOpened(false);
       setCropModalSrc(null);
     }
-  }, [errors]);
+  }, [cropModalSrc, customIconError]);
 
   return (
     <>
@@ -234,7 +235,7 @@ export const renderTeamAvatars = ({
             {({ getRootProps, getInputProps, isDragActive }) => (
               <UploaderWrapper {...getRootProps()} isDragActive={isDragActive}>
                 <input {...getInputProps()} />
-                {isCustomIcon ? (
+                {isCustomIcon && !customIconError ? (
                   <AddImgIcon
                     name="pencil"
                     color="gray"
@@ -255,7 +256,7 @@ export const renderTeamAvatars = ({
           </UploadedImageWrapper>
         </UploaderHoverableWrapper>
       </AvatarsWrapper>
-      {touched?.icon && errors?.icon?.raw && <Error>{errors?.icon?.raw}</Error>}
+      {touched?.icon && customIconError && <Error>{customIconError}</Error>}
       {isCropModalOpened && (
         <CropModal
           src={cropModalSrc}

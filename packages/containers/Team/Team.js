@@ -28,7 +28,8 @@ import {
   ConfirmLeaveTeamModal,
   ConfirmRemoveMemberModal,
   TeamModal,
-  Hint,  
+  MODAL,
+  Hint,
 } from '@caesar/components';
 import {
   PERMISSION,
@@ -39,14 +40,18 @@ import {
 } from '@caesar/common/constants';
 import { getTeamTitle } from '@caesar/common/utils/team';
 import { ability } from '@caesar/common/ability';
-import { MODAL } from './constants';
 import { createColumns } from './createColumns';
 
 const StyledHint = styled(Hint)`
   margin-right: 24px;
 `;
 
-export const TeamContainerComponent = ({ currentUser, team, teams, members }) => {
+export const TeamContainerComponent = ({
+  currentUser,
+  team,
+  teams,
+  members,
+}) => {
   const router = useRouter();
   const dispatch = useDispatch();
   const [modalVisibilities, setModalVisibilities] = useState({

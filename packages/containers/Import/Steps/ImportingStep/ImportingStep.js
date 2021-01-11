@@ -1,6 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
 import { ProgressBar, Icon, Button } from '@caesar/components';
+import { IMPORT_PROGRESS_THRESHOLD } from '@caesar/common/constants';
 
 const Wrapper = styled.div``;
 
@@ -37,10 +38,8 @@ const TwoItemsWrapper = styled.div`
   justify-content: space-between;
 `;
 
-const PROGRESS_THRESHOLD = 0.99999; 
-
 const renderText = progress =>
-  progress < PROGRESS_THRESHOLD
+  progress < IMPORT_PROGRESS_THRESHOLD
     ? `Waiting... ${Math.round(progress * 100)}%`
     : 'Done!';
 
@@ -61,10 +60,10 @@ const ImportingStep = ({ progress, onClickToDashboard }) => (
       </TwoItemsWrapper>
       <Button
         color="white"
-        disabled={progress < PROGRESS_THRESHOLD}
+        disabled={progress < IMPORT_PROGRESS_THRESHOLD}
         onClick={onClickToDashboard}
       >
-        GO TO DASHBOARD
+        Go to dashboard
       </Button>
     </TwoItemsWrapper>
   </Wrapper>

@@ -20,7 +20,7 @@ const Wrapper = styled.div`
 `;
 
 const Text = styled.div`
-  margin-right: 8px;
+  margin-left: 8px;
 `;
 
 const OfflineNotificationComponent = ({ isOnLightBg = true }) => {
@@ -29,13 +29,13 @@ const OfflineNotificationComponent = ({ isOnLightBg = true }) => {
   return (
     !isOnline && (
       <Wrapper isOnLightBg={isOnLightBg}>
-        <Text>You are currently offline.</Text>
         <Icon
           name="warning"
           width={20}
           height={20}
           color={isOnLightBg ? 'white' : 'black'}
         />
+        <Text>You are currently offline.</Text>
       </Wrapper>
     )
   );

@@ -41,9 +41,14 @@ const GroupAvatarsTip = styled.div`
 `;
 
 const ButtonWrapper = styled.div`
-  margin-top: 40px;
   display: flex;
   justify-content: center;
+  justify-content: flex-end;
+  margin-top: 40px;
+`;
+
+const StyledButton = styled(Button)`
+  margin-right: 16px;
 `;
 
 const getInitialValues = team => ({
@@ -67,6 +72,7 @@ const TeamModal = ({
     isSubmitting,
     isValid,
     handleBlur,
+    handleChange,
     handleSubmit,
     setFieldValue,
     setFieldTouched,
@@ -87,17 +93,12 @@ const TeamModal = ({
     ),
   });
 
-  const handleChangeTitle = e => {
-    setFieldValue('title', e.target.value, true);
-    setFieldTouched('title');
-  };
-
   return (
     <Modal
       isOpened
       shouldCloseOnEsc
       shouldCloseOnOverlayClick
-      width="560"
+      width={560}
       onRequestClose={onCancel}
     >
       <FormTitle>{teamId ? 'Edit' : 'Add'} team</FormTitle>
@@ -112,14 +113,14 @@ const TeamModal = ({
             autoFocus
             withBorder
             error={checkError(touched, errors, 'title')}
-            onChange={handleChangeTitle}
+            onChange={handleChange}
             onBlur={handleBlur}
           />
         )}
         <GroupAvatarsWrapper>
           <GroupAvatarsTitle>Avatar</GroupAvatarsTitle>
           <GroupAvatarsTip>
-            Choose an avatar or upload (160x160 pixels, not more than 8 MB)
+            Choose an avatar or upload (not more than 8 MB)
           </GroupAvatarsTip>
           {renderTeamAvatars({
             touched,
@@ -135,6 +136,9 @@ const TeamModal = ({
           errors?.form?.map(error => <Error key={error}>{error}</Error>)
         )}
         <ButtonWrapper>
+          <StyledButton color="white" onClick={onCancel}>
+            Cancel
+          </StyledButton>
           <Button
             disabled={!dirty || isSubmitting || !isValid}
             color="black"

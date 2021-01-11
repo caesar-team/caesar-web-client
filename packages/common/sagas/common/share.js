@@ -128,12 +128,10 @@ function* processUsersItemShare({ item, users }) {
 
     const ownerKey = {
       ...itemKeyPair,
-      ...{
-        ownerId,
-        listId: defaultList.id,
-        relatedItemId: item.id,
-        teamId: item.teamId !== TEAM_TYPE.PERSONAL ? item.teamId : null,
-      },
+      ownerId,
+      listId: defaultList.id,
+      relatedItemId: item.id,
+      teamId: item.teamId !== TEAM_TYPE.PERSONAL ? item.teamId : null,
     };
 
     // Need to save the new key to the owner's store

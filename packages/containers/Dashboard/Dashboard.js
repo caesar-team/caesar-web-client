@@ -4,6 +4,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import styled from 'styled-components';
 import {
   isLoadingSelector,
+  workInProgressItemSelector,
   workInProgressItemIdsSelector,
 } from '@caesar/common/selectors/workflow';
 import {
@@ -66,6 +67,7 @@ const DashboardComponent = () => {
   const [searchedText, setSearchedText] = useState('');
   const [openedModal, setOpenedModal] = useState(null);
   const isLoading = useSelector(isLoadingSelector);
+  const workInProgressItem = useSelector(workInProgressItemSelector);
   const workInProgressItemIds = useSelector(workInProgressItemIdsSelector);
 
   const handleOpenModal = modal => () => {
@@ -81,7 +83,10 @@ const DashboardComponent = () => {
       ? workInProgressItemIds.filter(id => id !== itemId)
       : [...workInProgressItemIds, itemId];
 
-    dispatch(setWorkInProgressItem(null));
+    if (workInProgressItem) {
+      dispatch(setWorkInProgressItem(null));
+    }
+
     dispatch(setWorkInProgressItemIds(ids));
   };
 

@@ -1,4 +1,5 @@
-import React from 'react';
+import React, { useState, useMemo, useCallback } from 'react';
+import { useUpdateEffect } from 'react-use';
 import styled from 'styled-components';
 import IconTeam1 from '@caesar/assets/icons/svg/icon-team-ava-1.svg';
 import IconTeam2 from '@caesar/assets/icons/svg/icon-team-ava-2.svg';
@@ -8,6 +9,7 @@ import IconTeam5 from '@caesar/assets/icons/svg/icon-team-ava-5.svg';
 import { TextError as Error } from '../Error';
 import { Icon } from '../Icon';
 import { Uploader } from '../Uploader';
+import { CropModal } from '../CropModal';
 
 const IMAGE_BASE64_LIST = [
   IconTeam1,
@@ -180,14 +182,47 @@ export const renderTeamAvatars = ({
   setFieldValue,
   setFieldTouched,
 }) => {
+  const initValue = useMemo(() => icon.raw, []);
+  const [isCropModalOpened, setCropModalOpened] = useState(false);
+  const [uploadedImageSrc, setUploadedImageSrc] = useState(icon.raw || null);
+  const [cropModalSrc, setCropModalSrc] = useState(null);
   const isDefaultIcon = icon.raw && IMAGE_BASE64_LIST.includes(icon.raw);
   const isCustomIcon = icon.raw && !isDefaultIcon;
-  const shouldShowUploader = isDefaultIcon || !icon.raw;
+  const shouldShowUploader = isDefaultIcon || !uploadedImageSrc;
+  const customIconError = useMemo(() => errors?.icon?.raw || null, [errors]);
 
-  const handleChangeIcon = value => {
+  const handleChangeIcon = useCallback(value => {
+    setCropModalSrc(null);
     setFieldValue('icon', value, true);
     setFieldTouched('icon');
+
+    if (!IMAGE_BASE64_LIST.includes(value.raw)) {
+      setCropModalSrc(value.raw);
+      setCropModalOpened(true);
+    }
+  }, []);
+
+  const handleAcceptCroppedImage = raw => {
+    setFieldValue('icon', { raw }, true);
+    setFieldTouched('icon');
+    setUploadedImageSrc(raw);
+    setCropModalOpened(false);
+    setCropModalSrc(null);
   };
+
+  const handleCloseCropModal = () => {
+    setCropModalOpened(false);
+    setCropModalSrc(null);
+    setFieldValue('icon', { raw: initValue || null }, true);
+    setFieldTouched('icon', false);
+  };
+
+  useUpdateEffect(() => {
+    if (customIconError) {
+      setCropModalOpened(false);
+      setCropModalSrc(null);
+    }
+  }, [cropModalSrc, customIconError]);
 
   return (
     <>
@@ -204,40 +239,38 @@ export const renderTeamAvatars = ({
             onChange={(_, file) => handleChangeIcon(file)}
           >
             {({ getRootProps, getInputProps, isDragActive }) => (
-              <>
-                <UploaderWrapper
-                  {...getRootProps()}
-                  isDragActive={isDragActive}
-                >
-                  <input {...getInputProps()} />
-                  {isCustomIcon ? (
-                    <AddImgIcon
-                      name="pencil"
-                      color="gray"
-                      width={16}
-                      height={16}
-                    />
-                  ) : (
-                    <AddImgIcon
-                      name="plus"
-                      color="gray"
-                      width={16}
-                      height={16}
-                    />
-                  )}
-                </UploaderWrapper>
-              </>
+              <UploaderWrapper {...getRootProps()} isDragActive={isDragActive}>
+                <input {...getInputProps()} />
+                {isCustomIcon && !customIconError ? (
+                  <AddImgIcon
+                    name="pencil"
+                    color="gray"
+                    width={16}
+                    height={16}
+                  />
+                ) : (
+                  <AddImgIcon name="plus" color="gray" width={16} height={16} />
+                )}
+              </UploaderWrapper>
             )}
           </Uploader>
           <UploadedImageWrapper>
-            <UploadedImage src={icon.raw} />
+            <UploadedImage src={uploadedImageSrc} />
             <SelectedIconWrapper>
               <TopIconStyled name="checkmark" />
             </SelectedIconWrapper>
           </UploadedImageWrapper>
         </UploaderHoverableWrapper>
       </AvatarsWrapper>
-      {touched?.icon && errors?.icon?.raw && <Error>{errors?.icon?.raw}</Error>}
+      {touched?.icon && customIconError && <Error>{customIconError}</Error>}
+      {isCropModalOpened && (
+        <CropModal
+          src={cropModalSrc}
+          handleChangeIcon={handleChangeIcon}
+          handleClickAccept={handleAcceptCroppedImage}
+          onCancel={handleCloseCropModal}
+        />
+      )}
     </>
   );
 };

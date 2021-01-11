@@ -89,12 +89,13 @@ import {
   getLastUpdatedSelector,
 } from '@caesar/common/selectors/currentUser';
 import {
-  itemsByIdSelector,
   itemsByListIdsSelector,
   itemSelector,
   nonDecryptedSharedItemsSelector,
   nonDecryptedTeamItemsSelector,
   nonDecryptedTeamsItemsSelector,
+  itemIdsSelector,
+  teamItemIdsSelector,
 } from '@caesar/common/selectors/entities/item';
 import {
   workInProgressListIdSelector,
@@ -234,6 +235,12 @@ export function* decryptItem(item) {
   }
 }
 
+export function* decryptTeamItems(items) {
+  if (items?.length > 0) {
+    yield all(items.map(decryptItem));
+  }
+}
+
 export function* decryptAttachmentRaw({ id, raw }, privateKeyObj) {
   return {
     id,
@@ -339,15 +346,25 @@ export function* processSharedItemsSaga({ payload: { teamId } }) {
   }
 }
 
-function* syncRemovedItems() {
-  const itemsById = yield select(itemsByIdSelector);
+function* syncRemovedItems(teamId) {
+  const isPersonal = teamId === TEAM_TYPE.PERSONAL;
+  const itemIds = isPersonal
+    ? yield select(itemIdsSelector)
+    : yield select(teamItemIdsSelector, { teamId });
 
   const { data: removedItemsIds } = yield call(
     getRemovedItems,
-    Object.keys(itemsById),
+    itemIds,
+    isPersonal ? null : teamId,
   );
 
   if (removedItemsIds.length) {
+    const workInProgressItem = yield select(workInProgressItemSelector);
+
+    if (workInProgressItem && removedItemsIds.includes(workInProgressItem.id)) {
+      yield put(setWorkInProgressItem(null));
+    }
+
     // Remove undecrypttable items from the store
     yield put(removeItemsBatch(removedItemsIds));
   }
@@ -543,10 +560,13 @@ function* initTeamsSaga() {
 export function* processKeyPairsSaga({ payload: { itemsById } }) {
   try {
     if (!itemsById) return;
+
     const keyPairs = objectToArray(itemsById);
+
     if (keyPairs.length > 0) {
       const teamKeys = [];
       const shareKeys = [];
+
       keyPairs.forEach(keyPair => {
         if (!keyPair?.data) return null;
 
@@ -556,6 +576,7 @@ export function* processKeyPairsSaga({ payload: { itemsById } }) {
       });
 
       const putSagas = [];
+
       if (teamKeys.length > 0) {
         const teamKeyPairsById = convertKeyPairToEntity(teamKeys, 'teamId');
         putSagas.push(put(addTeamKeyPairBatch(teamKeyPairsById)));
@@ -568,6 +589,7 @@ export function* processKeyPairsSaga({ payload: { itemsById } }) {
         );
         putSagas.push(put(addShareKeyPairBatch(shareKeysById)));
       }
+
       yield all(putSagas);
       yield put(finishProcessingKeyPairs());
     }
@@ -619,17 +641,17 @@ export function* loadKeyPairsAndPersonalItems() {
 
     const keypairsArray = objectToArray(keypairsById);
     const systemItems = objectToArray(systemItemsById);
-    const itemsEncryptedByUserKeys = [
+    const keypairsEncryptedByUserKeys = [
       ...keypairsArray.filter(keyPairsEncryptedByUserKeysFilter),
       ...systemItems,
     ];
-    const itemsEncryptedByTeamKeys = keypairsArray.filter(
+    const keypairsEncryptedByTeamKeys = keypairsArray.filter(
       keyPairsEncryptedByTeamKeysFilter,
     );
 
     // decrypt the items
-    if (itemsEncryptedByUserKeys?.length > 0) {
-      yield call(decryptUserItems, itemsEncryptedByUserKeys);
+    if (keypairsEncryptedByUserKeys?.length > 0) {
+      yield call(decryptUserItems, keypairsEncryptedByUserKeys);
     }
 
     yield put(addListsBatch(listsById));
@@ -638,11 +660,14 @@ export function* loadKeyPairsAndPersonalItems() {
       ...itemsById,
       ...sharedItemsById,
       ...teamsItemsById,
-      ...itemsEncryptedByTeamKeys,
     };
 
     if (Object.keys(storedItems).length > 0) {
       yield put(addItemsBatch(storedItems));
+    }
+
+    if (keypairsEncryptedByTeamKeys?.length > 0) {
+      yield call(decryptTeamItems, keypairsEncryptedByTeamKeys);
     }
 
     if (!keypairsArray?.length) {
@@ -807,7 +832,7 @@ export function* openTeamVaultSaga({ payload: { teamId } }) {
 export function* openCurrentVaultSaga() {
   const teamId = yield select(currentTeamIdSelector) || TEAM_TYPE.PERSONAL;
   yield call(openTeamVaultSaga, { payload: { teamId } });
-  yield call(syncRemovedItems);
+  yield call(syncRemovedItems, teamId);
 }
 
 export function* updateWorkInProgressItemSaga({ payload: { itemId } }) {
@@ -987,7 +1012,6 @@ export default function* workflowSagas() {
 
   yield takeLatest(SET_WORK_IN_PROGRESS_ITEM, setWorkInProgressItemSaga);
   yield takeLatest(UPDATE_WORK_IN_PROGRESS_ITEM, updateWorkInProgressItemSaga);
-  yield takeLatest(OPEN_CURRENT_VAULT, openCurrentVaultSaga);
   yield takeLatest(SET_CURRENT_TEAM_ID, initDashboardSaga);
   yield takeLatest(ADD_KEYPAIRS_BATCH, processKeyPairsSaga);
   yield takeLatest(FINISH_PROCESSING_KEYPAIRS, vaultsReadySaga);

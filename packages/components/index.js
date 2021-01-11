@@ -21,6 +21,7 @@ export {
   ConfirmRemoveMemberModal,
 } from './ConfirmModal';
 export { CreateForm } from './CreateForm';
+export { CropModal } from './CropModal';
 export { DataTable, TableStyles } from './DataTable';
 export { DottedMenu } from './DottedMenu';
 export { Dropdown } from './Dropdown';
@@ -61,7 +62,7 @@ export { Loader, CircleLoader, FullScreenLoader, LogoLoader } from './Loader';
 export { LogoCaesarDomain } from './LogoCaesarDomain';
 export { MemberList } from './MemberList';
 export { MenuList } from './MenuList';
-export { Modal, ModalTitle, ModalSubtitle } from './Modal';
+export { Modal, ModalTitle, ModalSubtitle, MODAL } from './Modal';
 export { MoveModal } from './MoveModal';
 export { NavigationPanel } from './NavigationPanel';
 export { TeamModal } from './TeamModal';

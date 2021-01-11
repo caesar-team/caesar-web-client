@@ -3,8 +3,8 @@ import styled from 'styled-components';
 import { withRouter } from 'next/router';
 import { matchStrict } from '@caesar/common/utils/match';
 import { parseFile } from '@caesar/common/utils/importUtils';
-import { ITEM_TYPE, ROUTES } from '@caesar/common/constants';
-import { NavigationPanel, SettingsWrapper } from '@caesar/components';
+import { ITEM_TYPE, ROUTES, IMPORT_PROGRESS_THRESHOLD } from '@caesar/common/constants';
+import { Button, NavigationPanel, SettingsWrapper } from '@caesar/components';
 import { DataStep, FieldsStep, FileStep, ImportingStep } from './Steps';
 import {
   DATA_STEP,
@@ -23,6 +23,10 @@ const StepWrapper = styled.div`
 
 const StyledNavigationPanel = styled(NavigationPanel)`
   margin-top: 25px;
+`;
+
+const ButtonWrapper = styled.div`
+  margin-top: 24px;
 `;
 
 const normalizeData = (rows, { name, login, password, website, note }) =>
@@ -178,7 +182,7 @@ class Import extends Component {
   }
 
   render() {
-    const { isLoading } = this.props;
+    const { isLoading, importProgress } = this.props;
     const { currentStep } = this.state;
 
     return (
@@ -189,6 +193,17 @@ class Import extends Component {
           currentStep={currentStep}
           onClickStep={this.handleClickStep}
         />
+        {currentStep === IMPORTING_STEP && (
+          <ButtonWrapper>
+            <Button
+              color="white"
+              disabled={importProgress < IMPORT_PROGRESS_THRESHOLD}
+              onClick={this.handleCancelFlow}
+            >
+              Import one more *.csv
+            </Button>
+          </ButtonWrapper>
+        )}
       </SettingsWrapper>
     );
   }

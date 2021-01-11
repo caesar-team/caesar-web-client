@@ -36,7 +36,8 @@ export const IconCloseStyled = styled(Icon)`
 
 export const Box = styled.div`
   position: absolute;
-  top: ${({ top }) => `${top - 2}px`};
+  top: ${({ top }) => top && `${top - 2}px`};
+  bottom: ${({ bottom }) => bottom && `${bottom}px`};
   left: -1px;
   z-index: ${({ theme }) => theme.zIndex.basic};
   width: calc(100% + 2px);
@@ -59,7 +60,8 @@ export const Option = styled.div`
     isDisabled ? theme.color.lightGray : theme.color.black};
   background-color: ${({ theme }) => theme.color.white};
   cursor: ${({ isDisabled }) => (isDisabled ? 'default' : 'pointer')};
-  white-space: nowrap;
+  ${({ shouldBreakTextLines }) =>
+    !shouldBreakTextLines ? 'white-space: nowrap' : 'word-break: break-word'};
   transition: background-color 0.2s;
 
   &:hover {

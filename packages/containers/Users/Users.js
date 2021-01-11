@@ -13,6 +13,7 @@ import {
   Hint,
 } from '@caesar/components';
 import { getTeamTitle } from '@caesar/common/utils/team';
+import { sortTeams } from '@caesar/common/utils/sort';
 import { useDirection } from '@caesar/common/hooks';
 
 const UserAvatar = styled(Avatar)`
@@ -48,8 +49,9 @@ const getColumnFilter = (placeholder = '') => ({
 
 const createTableData = (users, teamsById) =>
   users.map(({ email, name, avatar, teamIds }) => {
-    const userTeamsByName =
-      teamIds?.map(id => getTeamTitle(teamsById[id])) || [];
+    const userTeamsByName = sortTeams(
+      teamIds?.map(id => teamsById[id]) || [],
+    ).map(getTeamTitle);
 
     return {
       email,

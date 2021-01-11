@@ -125,7 +125,7 @@ const InputComponent = ({
 
   const handleChange = event => {
     const val = event.target.value;
-console.log(val);
+
     setValue(val);
     onChange(val);
 
@@ -134,7 +134,7 @@ console.log(val);
     setError(null);
 
     try {
-      schema.validateSync(value);
+      schema.validateSync(val);
     } catch (e) {
       setError(e.message);
     }

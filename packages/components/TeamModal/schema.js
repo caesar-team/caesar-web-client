@@ -12,16 +12,15 @@ export const getValidationSchema = existedTeams => {
       existedTeams,
       'You already have a team with the same name',
     ),
-    icon: yup.object({
-      raw: yup
-        .string()
-        .required('Please, upload the image')
-        .test('fileExt', ERROR.IMAGE_UPLOAD, raw =>
-          !raw ? false : raw.includes('image/'),
-        )
-        .test('fileSize', `Maximum file size is ${MAX_TEAM_AVATAR_SIZE}`, raw =>
-          !raw ? false : checkFileSize(raw, MAX_TEAM_AVATAR_SIZE),
-        ),
-    }),
+    icon: yup
+      .string()
+      .required('Please, upload the image')
+      .nullable()
+      .test('fileExt', ERROR.IMAGE_UPLOAD, raw =>
+        !raw ? false : raw.includes('image/'),
+      )
+      .test('fileSize', `Maximum file size is ${MAX_TEAM_AVATAR_SIZE}`, raw =>
+        !raw ? false : checkFileSize(raw, MAX_TEAM_AVATAR_SIZE),
+      ),
   });
 };

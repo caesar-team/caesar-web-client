@@ -31,7 +31,6 @@ const Wrapper = styled.div`
 `;
 
 const StyledIcon = styled(Icon)`
-  fill: ${({ theme }) => theme.color.white};
   margin-right: 16px;
 `;
 
@@ -66,7 +65,7 @@ const NotificationComponent = ({ notification, hide }) => {
 
   return (
     <Wrapper position={options.position}>
-      {icon && <StyledIcon name={icon} width={20} height={20} />}
+      {icon && <StyledIcon name={icon} width={20} height={20} color="white" />}
       <Text>{text}</Text>
     </Wrapper>
   );

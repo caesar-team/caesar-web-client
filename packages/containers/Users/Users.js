@@ -11,8 +11,10 @@ import {
   TableStyles as Table,
   Avatar,
   Hint,
+  HINT_POSITION,
 } from '@caesar/components';
 import { getTeamTitle } from '@caesar/common/utils/team';
+import { sortTeams } from '@caesar/common/utils/sort';
 import { useDirection } from '@caesar/common/hooks';
 
 const UserAvatar = styled(Avatar)`
@@ -23,6 +25,11 @@ const TeamHint = styled(Hint)`
   margin-left: 4px;
   border-bottom: 1px dashed ${({ theme }) => theme.color.black};
   cursor: pointer;
+
+  ${Hint.Hint} {
+    ${({ position }) =>
+      position === HINT_POSITION.BOTTOM_LEFT && 'bottom: -16px;'}
+  }
 `;
 
 const WIDTH_RATIO = {
@@ -48,8 +55,9 @@ const getColumnFilter = (placeholder = '') => ({
 
 const createTableData = (users, teamsById) =>
   users.map(({ email, name, avatar, teamIds }) => {
-    const userTeamsByName =
-      teamIds?.map(id => getTeamTitle(teamsById[id])) || [];
+    const userTeamsByName = sortTeams(
+      teamIds?.map(id => teamsById[id]) || [],
+    ).map(getTeamTitle);
 
     return {
       email,
@@ -86,13 +94,21 @@ const createColumns = ({ tableWidth, tableScrollTop, tableHeight }) => [
     disableSortBy: true,
     Header: () => null,
     Cell: ({ value }) => {
-      const columnWidth = tableWidth * WIDTH_RATIO.team;
+      if (!value) {
+        return <Table.Cell />;
+      }
+
+      const columnWidth = useMemo(() => tableWidth * WIDTH_RATIO.team, [
+        tableWidth,
+      ]);
       // 48 - horizontal paddings, 50 - width of 'more' text, 12 - width of ellipsis
       const visibleSymbols = (columnWidth - 48 - 50 - 12) / SYMBOL_WIDTH;
       const visibleText = value.slice(0, visibleSymbols);
       const hiddenText = value.slice(visibleSymbols);
-      // 80 - symbols in one raw, 18 - height of a raw, 30 - padding from the top of a raw to top of a hint
-      const modalHeight = Math.ceil(hiddenText.length / 80) * 18 + 30;
+      // 80 - symbols in one raw, 18 - height of a raw, 54 - padding from the top of a raw to top of a hint, 8 - vertical hint paddings
+      const modalHeight = hiddenText
+        ? Math.ceil(hiddenText.length / 80) * 18 + 54 + 8
+        : 0;
 
       const { cellRef, isUp } = useDirection({
         tableScrollTop,
@@ -107,7 +123,9 @@ const createColumns = ({ tableWidth, tableScrollTop, tableHeight }) => [
           {hiddenText && (
             <TeamHint
               text={`...${hiddenText}`}
-              position={isUp ? 'top_left' : 'bottom_left'}
+              position={
+                isUp ? HINT_POSITION.TOP_LEFT : HINT_POSITION.BOTTOM_LEFT
+              }
               hintMaxWidth={480}
             >
               more

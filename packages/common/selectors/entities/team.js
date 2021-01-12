@@ -1,6 +1,6 @@
 import { createSelector } from 'reselect';
-import { TEAM_ROLES, TEAM_TYPE } from '@caesar/common/constants';
-import { sortByName } from '@caesar/common/utils/sort';
+import { TEAM_ROLES } from '@caesar/common/constants';
+import { sortTeams } from '@caesar/common/utils/sort';
 
 export const entitiesSelector = state => state.entities;
 
@@ -26,16 +26,7 @@ export const teamListSelector = createSelector(
 
 export const teamSortedListSelector = createSelector(
   teamListSelector,
-  teams => {
-    const defaultTeam = teams.find(team => team.type === TEAM_TYPE.DEFAULT);
-    const otherTeams = teams
-      .filter(
-        team => ![TEAM_TYPE.DEFAULT, TEAM_TYPE.PERSONAL].includes(team.type),
-      )
-      .sort((a, b) => sortByName(a.title, b.title));
-
-    return defaultTeam ? [defaultTeam, ...otherTeams] : otherTeams;
-  },
+  sortTeams,
 );
 
 export const teamIdPropSelector = (_, props) => props.teamId;

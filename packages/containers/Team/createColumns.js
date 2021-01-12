@@ -149,7 +149,7 @@ export const createColumns = ({
     Cell: ({ row: { original } }) => {
       const _permissions = getTeamMemberSubject(original);
       const canDeleteMember = ability.can(PERMISSION.DELETE, _permissions);
-      const mayGrantAccess = canGrantAccessMember && !original.accessGranted;
+      const mayGrantAccess = canGrantAccessMember && !original.hasKeypair;
       const optionLength = [canDeleteMember, mayGrantAccess].reduce(
         (acc, option) => (option ? acc + 1 : acc),
         0,

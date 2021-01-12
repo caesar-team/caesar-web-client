@@ -16,10 +16,10 @@ export const TeamAvatar = props => {
     fontSize = 'main',
     hint = '',
     hintPosition = HINT_POSITION.TOP_CENTER,
+    hasKeypair = true,
   } = props;
-  const accessGranted = 'accessGranted' in props ? props.accessGranted : true;
 
-  if (!accessGranted) {
+  if (!hasKeypair) {
     return (
       <Hint text={hint} position={hintPosition}>
         <Wrapper size={size} fontSize={fontSize} {...props}>

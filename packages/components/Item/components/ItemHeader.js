@@ -17,7 +17,7 @@ import {
 import { teamsByIdSelector } from '@caesar/common/selectors/entities/team';
 import { setWorkInProgressItem } from '@caesar/common/actions/workflow';
 import { toggleItemToFavoriteRequest } from '@caesar/common/actions/entities/item';
-import { Hint } from '@caesar/components';
+import { Hint, HINT_POSITION } from '../../Hint';
 import { Button } from '../../Button';
 import { Can } from '../../Ability';
 
@@ -162,7 +162,7 @@ const ItemHeaderComponent = ({
           </Can>
         </>
       )}
-      <StyledHint text="Close the item" position="top_left">
+      <StyledHint text="Close the item" position={HINT_POSITION.TOP_LEFT}>
         <Button icon="close" color="white" onClick={handleClickCloseItem} />
       </StyledHint>
     </ColumnHeader>

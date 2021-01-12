@@ -78,7 +78,13 @@ const CloseItemIcon = ({
   if (!isClosable) return <></>;
 
   return (
-    <CloseIcon name="close" width={10} height={10} onClick={onClickClose} />
+    <CloseIcon
+      name="close"
+      width={10}
+      height={10}
+      color="gray"
+      onClick={onClickClose}
+    />
   );
 };
 

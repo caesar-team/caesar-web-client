@@ -81,7 +81,7 @@ const Uploader = ({
                 name="download"
                 width={16}
                 height={16}
-                isDragActive={isDragActive}
+                color={isDragActive ? 'gray' : 'black'}
               />
               <Link>Upload files</Link>
               {!isWideMobile &&

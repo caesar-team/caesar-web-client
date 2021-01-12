@@ -225,6 +225,7 @@ export const renderTeamAvatars = ({
 
   useUpdateEffect(() => {
     if (customIconError) {
+      setUploadedImageSrc(null);
       setCropModalOpened(false);
       setCropModalSrc(null);
     }
@@ -247,7 +248,7 @@ export const renderTeamAvatars = ({
             {({ getRootProps, getInputProps, isDragActive }) => (
               <UploaderWrapper {...getRootProps()} isDragActive={isDragActive}>
                 <input {...getInputProps()} />
-                {isCustomIcon ? (
+                {isCustomIcon && uploadedImageSrc ? (
                   <AddImgIcon
                     name="pencil"
                     color="gray"

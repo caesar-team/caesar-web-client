@@ -101,7 +101,7 @@ export const OwnerAndShares = ({
         />
         <Owner>
           <OwnerName>{owner ? owner.name : ''}</OwnerName>
-          <OwnerStatus>owner</OwnerStatus>
+          <OwnerStatus>Owner</OwnerStatus>
         </Owner>
       </OwnerWrapper>
       <Can I={PERMISSION.SHARE} an={itemSubject} passThrough>

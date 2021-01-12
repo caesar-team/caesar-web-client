@@ -382,7 +382,7 @@ function* checkTeamPermissionsAndKeys(teamId, createKeyPair = false) {
     }
 
     // Update the members list
-    yield put(fetchTeamMembersRequest({ teamId, withoutKeys: true }));
+    yield put(fetchTeamMembersRequest({ teamId }));
     const { id: ownerId } = yield select(currentUserDataSelector);
     const team = yield select(teamSelector, { teamId });
     const teamMembers = (yield select(teamMembersFullViewSelector, {
@@ -936,9 +936,7 @@ function* initTeamSettingsSaga() {
     } = Router;
 
     yield call(initWorkflowSaga);
-    yield call(fetchTeamMembersSaga, {
-      payload: { teamId, withoutKeys: true },
-    });
+    yield call(fetchTeamMembersSaga, { payload: { teamId } });
   } catch (error) {
     // eslint-disable-next-line no-console
     console.error('error: ', error);

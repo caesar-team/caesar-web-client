@@ -475,6 +475,7 @@ export function* processTeamsItemsSaga() {
     console.error(error);
   }
 }
+
 function* loadTeamKeypairIfNotExists(teamId) {
   const teamKeypairExists = yield call(isTeamKeypairExists, teamId);
 
@@ -485,6 +486,7 @@ function* loadTeamKeypairIfNotExists(teamId) {
     yield call(decryptUserItems, items);
   }
 }
+
 function* initTeam(teamId) {
   try {
     const currentTeamId = teamId;

@@ -134,7 +134,7 @@ const InputComponent = ({
     setError(null);
 
     try {
-      schema.validateSync(value);
+      schema.validateSync(val);
     } catch (e) {
       setError(e.message);
     }

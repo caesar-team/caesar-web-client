@@ -82,6 +82,7 @@ export const SCHEMA = {
       .max(max, ERROR.MAX_LENGTH(max)),
   WEBSITE: yup
     .string()
+    .nullable()
     .matches(rUrl, {
       message: ERROR.WEBSITE,
       excludeEmptyString: true,

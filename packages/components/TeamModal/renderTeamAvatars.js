@@ -61,12 +61,6 @@ const IconStyled = styled(Icon)`
   position: absolute;
 `;
 
-const TopIconStyled = styled(Icon)`
-  width: 12px;
-  height: 12px;
-  fill: ${({ theme }) => theme.color.white};
-`;
-
 const SelectedIconWrapper = styled.div`
   display: flex;
   align-items: center;
@@ -164,7 +158,7 @@ const RenderedAvatars = ({ icon, handleChangeIcon }) =>
         <IconStyled name={name} />
         {isActive && (
           <SelectedIconWrapper>
-            <TopIconStyled name="checkmark" />
+            <Icon name="checkmark" width={12} height={12} color="white" />
           </SelectedIconWrapper>
         )}
       </IconWrapper>
@@ -264,7 +258,7 @@ export const renderTeamAvatars = ({
           <UploadedImageWrapper>
             <UploadedImage src={uploadedImageSrc} />
             <SelectedIconWrapper>
-              <TopIconStyled name="checkmark" />
+              <Icon name="checkmark" width={12} height={12} color="white" />
             </SelectedIconWrapper>
           </UploadedImageWrapper>
         </UploaderHoverableWrapper>

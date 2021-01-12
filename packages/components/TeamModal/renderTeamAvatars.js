@@ -179,6 +179,8 @@ export const renderTeamAvatars = ({
   const isDefaultIcon = icon && IMAGE_BASE64_LIST.includes(icon);
   const isCustomIcon = icon && !isDefaultIcon;
   const shouldShowUploader = isDefaultIcon || !uploadedImageSrc;
+  const shouldShowEdit = isCustomIcon && !!uploadedImageSrc;
+
   const customIconError = useMemo(
     () => (touched?.icon ? errors?.icon || null : null),
     [touched, errors],
@@ -213,7 +215,7 @@ export const renderTeamAvatars = ({
   const handleCloseCropModal = () => {
     setCropModalOpened(false);
     setCropModalSrc(null);
-    setFieldValue('icon', initValue || null, true);
+    setFieldValue('icon', uploadedImageSrc || initValue || null, true);
     setFieldTouched('icon', false);
   };
 
@@ -231,7 +233,7 @@ export const renderTeamAvatars = ({
         <RenderedAvatars icon={icon} handleChangeIcon={handleChangeIcon} />
         <UploaderHoverableWrapper
           shouldShowUploader={shouldShowUploader}
-          shouldShowEdit={isCustomIcon}
+          shouldShowEdit={shouldShowEdit}
         >
           <Uploader
             name="icon"
@@ -242,7 +244,7 @@ export const renderTeamAvatars = ({
             {({ getRootProps, getInputProps, isDragActive }) => (
               <UploaderWrapper {...getRootProps()} isDragActive={isDragActive}>
                 <input {...getInputProps()} />
-                {isCustomIcon && uploadedImageSrc ? (
+                {shouldShowEdit ? (
                   <AddImgIcon
                     name="pencil"
                     color="gray"

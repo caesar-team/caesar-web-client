@@ -41,7 +41,6 @@ import { workInProgressItemIdsSelector } from '@caesar/common/selectors/workflow
 import {
   listSelector,
   currentTeamDefaultListSelector,
-  teamDefaultListSelector,
 } from '@caesar/common/selectors/entities/list';
 import {
   itemSelector,

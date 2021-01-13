@@ -123,6 +123,7 @@ const MiddleColumnComponent = ({
 
   const handleDefaultSelectionItemBehaviour = itemId => {
     dispatch(resetWorkInProgressItemIds());
+    console.log(itemsById[itemId]);
     dispatch(setWorkInProgressItem(itemsById[itemId]));
   };
 

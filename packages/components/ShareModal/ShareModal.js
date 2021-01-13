@@ -75,6 +75,7 @@ const Items = styled.div`
 
 export const ShareModal = ({
   sharedMembers,
+  item,
   items,
   teams,
   anonymousLink = [],
@@ -106,6 +107,10 @@ export const ShareModal = ({
 
   const handleClickDone = () => {
     onShare(members, teamIds);
+
+    if (membersToRevoke.length) {
+      onRevokeAccess(item.id, membersToRevoke);
+    }
   };
 
   const handleToggleAnonymousLink = () => {
@@ -134,8 +139,11 @@ export const ShareModal = ({
     onRemove(itemId);
   };
   
-  const addMemberToRevoke = memberId => {
-    const newMembersToRevoke = [...membersToRevoke, memberId];
+  const handleAddMemberToRevoke = memberId => {
+    const newMembersToRevoke = membersToRevoke.includes(memberId)
+      ? membersToRevoke.filter(id => id !== memberId)
+      : [...membersToRevoke, memberId];
+
     setMembersToRevoke(newMembersToRevoke);
   };
 
@@ -166,6 +174,7 @@ export const ShareModal = ({
   const shouldShowSharedMembers = sharedMembers.length > 0;
   const visibleEntitiesCount = items.length + members.length;
   const WrapperComponent = visibleEntitiesCount > 3 ? Scrollbar : Wrapper;
+  const isDoneButtonDisabled = !membersToRevoke.length && !members.length;
 
   return (
     <Modal
@@ -212,7 +221,7 @@ export const ShareModal = ({
                 maxHeight={180}
                 members={sharedMembers}
                 membersToRevoke={membersToRevoke}
-                onClickAddMemberToRevoke={addMemberToRevoke}
+                onClickAddMemberToRevoke={handleAddMemberToRevoke}
                 controlType="revoke"
               />
             </Section>
@@ -255,7 +264,9 @@ export const ShareModal = ({
         <ButtonStyled color="white" onClick={onCancel}>
           Cancel
         </ButtonStyled>
-        <Button onClick={handleClickDone}>Done</Button>
+        <Button onClick={handleClickDone} disabled={isDoneButtonDisabled}>
+          Done
+        </Button>
       </ButtonsWrapper>
     </Modal>
   );

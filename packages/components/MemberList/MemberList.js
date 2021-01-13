@@ -34,6 +34,7 @@ const MemberWrapper = styled.div`
 `;
 
 const ControlWrapper = styled.div`
+  position: relative;
   display: flex;
   align-items: center;
   justify-content: flex-end;

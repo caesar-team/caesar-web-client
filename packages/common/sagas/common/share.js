@@ -256,13 +256,17 @@ export function* shareItemBatchSaga({
   }
 }
 
-export function* removeShareSaga({ payload: { itemId, members } }) {
+export function* removeShareSaga({ payload: { itemId, memberIds = [] } }) {
   try {
-    let sharedItemKeyPairKey = yield select(shareKeyPairSelector, {
-      itemId,
-    });
+    const workInProgressItem = yield select(workInProgressItemSelector);
+    const sharedKeyPairs = memberIds.map(memberId => workInProgressItem.membersKeys[memberId]);
 
-    yield put(removeShareSuccess(workInProgressItem.id, shareId));
+    yield call(
+      removeItemsBatch,
+      sharedKeyPairs.map(id => `items[]=${id}`).join('&'),
+    );
+
+    yield put(removeShareSuccess(itemId, memberIds));
     yield put(updateWorkInProgressItem());
 
     yield put(updateGlobalNotification(NOOP_NOTIFICATION, false));

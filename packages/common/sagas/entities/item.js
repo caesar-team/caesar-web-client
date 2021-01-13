@@ -481,10 +481,13 @@ export function* moveItemSaga({
   try {
     yield put(updateGlobalNotification(MOVING_IN_PROGRESS_NOTIFICATION, true));
 
+    const item = yield select(itemSelector, { itemId });
     const list = yield select(listSelector, { listId });
     const defaultList = yield select(currentTeamDefaultListSelector);
-    const newListId = list ? listId : defaultList?.id;
-    const item = yield select(itemSelector, { itemId });
+    // newListId is using to restore item from trash and when original list was deleted
+    const newListId =
+      item.teamId === teamId && !list ? defaultList?.id : listId;
+
     let reencryptedData = null;
     let reencryptedSecretDataAndRaws = null;
 

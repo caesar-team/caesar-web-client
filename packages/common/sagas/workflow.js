@@ -527,7 +527,7 @@ function* checkTeamsKeyPairs(createKeyPair = false) {
   const teams = yield select(currentUserTeamListSelector);
 
   const checkCalls = teams
-    .filter(t => t.id !== TEAM_TYPE.PERSONAL)
+    .filter(t => t?.id !== TEAM_TYPE.PERSONAL)
     .map(team => checkTeamKeyPair(team, createKeyPair));
   const checkedTeams = yield all(checkCalls);
   yield put(addTeamsBatch(arrayToObject(checkedTeams.filter(team => !!team))));

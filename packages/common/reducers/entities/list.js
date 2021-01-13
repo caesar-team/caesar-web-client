@@ -87,7 +87,7 @@ export default createReducer(initialState, {
     return {
       ...state,
       byId: {
-        ...state.byId,
+        // We don't use lists from not current vault
         ...payload.listsById,
       },
     };

@@ -28,7 +28,7 @@ export { Dropdown } from './Dropdown';
 export { Error, TextError } from './Error';
 export { File } from './File';
 export { Head } from './Head';
-export { Hint } from './Hint';
+export { Hint, HINT_POSITION } from './Hint';
 export { HoldClickBehaviour } from './HoldClickBehaviour';
 export { Icon } from './Icon';
 export {

@@ -31,18 +31,12 @@ const IconWrapper = styled.div`
   min-width: 60px;
 `;
 
-const StyledIcon = styled(Icon)`
-  fill: ${({ isError, theme }) =>
-    isError ? theme.color.red : theme.color.white};
-`;
-
 const StyledArrowIcon = styled(Icon)`
-  fill: ${({ theme }) => theme.color.lightGray};
   margin-right: 24px;
   cursor: pointer;
 
   &:hover {
-    fill: ${({ theme }) => theme.color.white};
+    color: ${({ theme }) => theme.color.white};
   }
 `;
 
@@ -74,7 +68,12 @@ class LockInput extends Component {
       <Wrapper>
         <InnerWrapper isError={isError}>
           <IconWrapper isError={isError}>
-            <StyledIcon name="lock" width={24} height={24} isError={isError} />
+            <Icon
+              name="lock"
+              width={24}
+              height={24}
+              color={isError ? 'red' : 'white'}
+            />
           </IconWrapper>
           <StyledInput
             {...props}
@@ -87,6 +86,7 @@ class LockInput extends Component {
             name="arrow"
             width={20}
             height={20}
+            color="lightGray"
             onClick={onClick}
           />
         </InnerWrapper>

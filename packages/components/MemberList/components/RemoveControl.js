@@ -1,6 +1,6 @@
 import React, { memo } from 'react';
 import styled from 'styled-components';
-import { Hint } from '../../Hint';
+import { Hint, HINT_POSITION } from '../../Hint';
 import { Icon } from '../../Icon';
 
 const Wrapper = styled.div`
@@ -30,7 +30,7 @@ const RemoveControlComponent = ({ member, onClick, className }) => (
     {member.isNew && (
       <StyledHint
         text="User isn’t registered in your domain"
-        position="center_left"
+        position={HINT_POSITION.CENTER_LEFT}
       >
         <WarningIcon name="warning" width={20} height={20} />
       </StyledHint>

@@ -90,35 +90,11 @@ export function* addUserToTeamListBatchSaga({ payload: { teamId, users } }) {
   }
 }
 
-export function* fetchTeamMembersSaga({ payload: { teamId, withoutKeys } }) {
+export function* fetchTeamMembersSaga({ payload: { teamId } }) {
   try {
     const { data: teamMembers } = yield call(getTeamMembers, { teamId });
 
-    let membersWithoutKeysById = {};
-
-    if (withoutKeys) {
-      const { data: membersWithoutKeys } = yield call(getTeamMembers, {
-        teamId,
-        withoutKeys,
-      });
-      membersWithoutKeysById = convertMembersToEntity(membersWithoutKeys);
-    }
-
-    const membersById = convertMembersToEntity(
-      teamMembers.map(member => {
-        if (membersWithoutKeysById[member.id]) {
-          return {
-            ...member,
-            accessGranted: false,
-          };
-        }
-
-        return {
-          ...member,
-          accessGranted: true,
-        };
-      }),
-    );
+    const membersById = convertMembersToEntity(teamMembers);
 
     yield put(fetchTeamMembersSuccess(membersById));
   } catch (e) {
@@ -194,9 +170,7 @@ export function* grantAccessTeamMemberSaga({ payload: { memberId } }) {
       secret,
     });
 
-    yield call(fetchTeamMembersSaga, {
-      payload: { teamId, withoutKeys: true },
-    });
+    yield call(fetchTeamMembersSaga, { payload: { teamId } });
 
     yield put(updateGlobalNotification(NOOP_NOTIFICATION, false));
   } catch (error) {

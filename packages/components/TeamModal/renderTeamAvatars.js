@@ -19,13 +19,13 @@ const IMAGE_BASE64_LIST = [
   IconTeam5,
 ];
 
-const IMAGE_NAME_BASE64_MAP = {
-  'team-ava-1': IconTeam1,
-  'team-ava-2': IconTeam2,
-  'team-ava-3': IconTeam3,
-  'team-ava-4': IconTeam4,
-  'team-ava-5': IconTeam5,
-};
+const IMAGE_NAME_BASE64_MAP = [
+  { name: 'team-ava-1', raw: IconTeam1 },
+  { name: 'team-ava-2', raw: IconTeam2 },
+  { name: 'team-ava-3', raw: IconTeam3 },
+  { name: 'team-ava-4', raw: IconTeam4 },
+  { name: 'team-ava-5', raw: IconTeam5 },
+];
 
 const AvatarsWrapper = styled.div`
   display: flex;
@@ -59,12 +59,6 @@ const IconStyled = styled(Icon)`
   height: 56px;
   cursor: pointer;
   position: absolute;
-`;
-
-const TopIconStyled = styled(Icon)`
-  width: 12px;
-  height: 12px;
-  fill: ${({ theme }) => theme.color.white};
 `;
 
 const SelectedIconWrapper = styled.div`
@@ -156,19 +150,15 @@ const UploaderHoverableWrapper = styled.div`
 `;
 
 const RenderedAvatars = ({ icon, handleChangeIcon }) =>
-  Object.keys(IMAGE_NAME_BASE64_MAP).map(name => {
-    const currentIcon = IMAGE_NAME_BASE64_MAP[name];
-    const isActive = icon && currentIcon === icon.raw;
+  IMAGE_NAME_BASE64_MAP.map(({ name, raw }) => {
+    const isActive = raw === icon;
 
     return (
-      <IconWrapper
-        key={name}
-        onClick={() => handleChangeIcon({ name, raw: currentIcon })}
-      >
+      <IconWrapper key={name} onClick={() => handleChangeIcon({ raw })}>
         <IconStyled name={name} />
         {isActive && (
           <SelectedIconWrapper>
-            <TopIconStyled name="checkmark" />
+            <Icon name="checkmark" width={12} height={12} color="white" />
           </SelectedIconWrapper>
         )}
       </IconWrapper>
@@ -177,33 +167,45 @@ const RenderedAvatars = ({ icon, handleChangeIcon }) =>
 
 export const renderTeamAvatars = ({
   touched = {},
-  values: { icon = {} } = {},
+  values: { icon = null } = {},
   errors = {},
   setFieldValue,
   setFieldTouched,
 }) => {
-  const initValue = useMemo(() => icon.raw, []);
+  const initValue = useMemo(() => icon, []);
   const [isCropModalOpened, setCropModalOpened] = useState(false);
-  const [uploadedImageSrc, setUploadedImageSrc] = useState(icon.raw || null);
+  const [uploadedImageSrc, setUploadedImageSrc] = useState(icon);
   const [cropModalSrc, setCropModalSrc] = useState(null);
-  const isDefaultIcon = icon.raw && IMAGE_BASE64_LIST.includes(icon.raw);
-  const isCustomIcon = icon.raw && !isDefaultIcon;
+  const isDefaultIcon = icon && IMAGE_BASE64_LIST.includes(icon);
+  const isCustomIcon = icon && !isDefaultIcon;
   const shouldShowUploader = isDefaultIcon || !uploadedImageSrc;
-  const customIconError = useMemo(() => errors?.icon?.raw || null, [errors]);
+  const shouldShowEdit = isCustomIcon && !!uploadedImageSrc;
 
-  const handleChangeIcon = useCallback(value => {
-    setCropModalSrc(null);
-    setFieldValue('icon', value, true);
-    setFieldTouched('icon');
+  const customIconError = useMemo(
+    () => (touched?.icon ? errors?.icon || null : null),
+    [touched, errors],
+  );
 
-    if (!IMAGE_BASE64_LIST.includes(value.raw)) {
-      setCropModalSrc(value.raw);
-      setCropModalOpened(true);
-    }
-  }, []);
+  const handleChangeIcon = useCallback(
+    value => {
+      const { raw } = value;
+
+      if (raw === icon) return;
+
+      setCropModalSrc(null);
+      setFieldValue('icon', raw, true);
+      setFieldTouched('icon');
+
+      if (!IMAGE_BASE64_LIST.includes(raw)) {
+        setCropModalSrc(raw);
+        setCropModalOpened(true);
+      }
+    },
+    [icon],
+  );
 
   const handleAcceptCroppedImage = raw => {
-    setFieldValue('icon', { raw }, true);
+    setFieldValue('icon', raw, true);
     setFieldTouched('icon');
     setUploadedImageSrc(raw);
     setCropModalOpened(false);
@@ -213,16 +215,17 @@ export const renderTeamAvatars = ({
   const handleCloseCropModal = () => {
     setCropModalOpened(false);
     setCropModalSrc(null);
-    setFieldValue('icon', { raw: initValue || null }, true);
+    setFieldValue('icon', uploadedImageSrc || initValue || null, true);
     setFieldTouched('icon', false);
   };
 
   useUpdateEffect(() => {
     if (customIconError) {
+      setUploadedImageSrc(null);
       setCropModalOpened(false);
       setCropModalSrc(null);
     }
-  }, [cropModalSrc, customIconError]);
+  }, [customIconError]);
 
   return (
     <>
@@ -230,18 +233,18 @@ export const renderTeamAvatars = ({
         <RenderedAvatars icon={icon} handleChangeIcon={handleChangeIcon} />
         <UploaderHoverableWrapper
           shouldShowUploader={shouldShowUploader}
-          shouldShowEdit={isCustomIcon}
+          shouldShowEdit={shouldShowEdit}
         >
           <Uploader
             name="icon"
             accept="image/*"
-            files={icon?.raw ? [icon] : []}
+            files={icon ? [icon] : []}
             onChange={(_, file) => handleChangeIcon(file)}
           >
             {({ getRootProps, getInputProps, isDragActive }) => (
               <UploaderWrapper {...getRootProps()} isDragActive={isDragActive}>
                 <input {...getInputProps()} />
-                {isCustomIcon && !customIconError ? (
+                {shouldShowEdit ? (
                   <AddImgIcon
                     name="pencil"
                     color="gray"
@@ -257,12 +260,12 @@ export const renderTeamAvatars = ({
           <UploadedImageWrapper>
             <UploadedImage src={uploadedImageSrc} />
             <SelectedIconWrapper>
-              <TopIconStyled name="checkmark" />
+              <Icon name="checkmark" width={12} height={12} color="white" />
             </SelectedIconWrapper>
           </UploadedImageWrapper>
         </UploaderHoverableWrapper>
       </AvatarsWrapper>
-      {touched?.icon && customIconError && <Error>{customIconError}</Error>}
+      {customIconError && <Error>{customIconError}</Error>}
       {isCropModalOpened && (
         <CropModal
           src={cropModalSrc}

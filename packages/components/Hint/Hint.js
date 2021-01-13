@@ -1,7 +1,7 @@
 import React, { memo } from 'react';
 import styled, { css } from 'styled-components';
 
-export const POSITION = {
+const POSITION = {
   TOP_LEFT: 'top_left',
   TOP_CENTER: 'top_center',
   TOP_RIGHT: 'top_right',

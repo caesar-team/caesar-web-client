@@ -42,7 +42,6 @@ import { workInProgressItemIdsSelector } from '@caesar/common/selectors/workflow
 import {
   listSelector,
   currentTeamDefaultListSelector,
-  teamDefaultListSelector,
 } from '@caesar/common/selectors/entities/list';
 import {
   itemSelector,
@@ -475,16 +474,19 @@ export function* saveItemSaga({ item, publicKey }) {
 }
 
 export function* moveItemSaga({
-  payload: { itemId, teamId, listId },
+  payload: { itemId, teamId, listId, teamDefaultListId },
   meta: { notification, notificationText } = {},
 }) {
   try {
     yield put(updateGlobalNotification(MOVING_IN_PROGRESS_NOTIFICATION, true));
 
+    const item = yield select(itemSelector, { itemId });
     const list = yield select(listSelector, { listId });
     const defaultList = yield select(currentTeamDefaultListSelector);
-    const newListId = list ? listId : defaultList?.id;
-    const item = yield select(itemSelector, { itemId });
+    // newListId is using to restore item from trash and when original list was deleted
+    const newListId =
+      item.teamId === teamId && !list ? defaultList?.id : listId;
+
     let reencryptedData = null;
     let reencryptedSecretDataAndRaws = null;
 
@@ -535,14 +537,12 @@ export function* moveItemSaga({
     }
 
     if (item.teamId !== teamId && item.isShared) {
-      const teamDefaultList = yield select(teamDefaultListSelector, { teamId });
-
       // Move item into another list
       yield call(updateMoveItem, item.id, { listId: newListId });
       // Reencrypt shared keypair with team keypair instead personal
       // Move shared keypair into default list of the vault
       yield call(updateMoveItem, itemToReencrypt.id, {
-        listId: teamDefaultList.id,
+        listId: teamDefaultListId,
         ...reencryptedSecretDataAndRaws,
       });
 
@@ -643,7 +643,14 @@ function* reencryptSharedKeypair(item) {
 }
 
 export function* moveItemsBatchSaga({
-  payload: { itemIds, oldTeamId, previousListId, teamId, listId },
+  payload: {
+    itemIds,
+    oldTeamId,
+    previousListId,
+    teamId,
+    listId,
+    teamDefaultListId,
+  },
   meta: { notification, notificationText } = {},
 }) {
   try {
@@ -758,13 +765,10 @@ export function* moveItemsBatchSaga({
         );
         const itemChunks = chunk(sharedItems, ITEMS_CHUNK_SIZE);
         const sharedItemIds = sharedItems.map(({ id }) => id);
-        const teamDefaultList = yield select(teamDefaultListSelector, {
-          teamId,
-        });
 
         yield all(
           keypairChunks.map(keypairChunk =>
-            call(updateMoveItemsBatch, teamDefaultList.id, {
+            call(updateMoveItemsBatch, teamDefaultListId, {
               items: keypairChunk.map(({ id, secret }) => ({
                 itemId: id,
                 secret,

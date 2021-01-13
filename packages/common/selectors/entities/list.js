@@ -131,7 +131,7 @@ export const teamDefaultListSelector = createSelector(
     return (
       lists.find(
         list => list.teamId === teamId && list.type === LIST_TYPE.DEFAULT,
-      ) || []
+      ) || {}
     );
   },
 );

@@ -53,6 +53,10 @@ export const StyledSelect = styled(Select)`
   margin: 0 8px;
   border-bottom: 0;
 
+  ${Select.OptionsList} {
+    width: max-content;
+  }
+
   ${Select.ValueText} {
     padding: 0;
     margin-right: 16px;

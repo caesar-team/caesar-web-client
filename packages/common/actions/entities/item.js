@@ -113,6 +113,7 @@ export const moveItemRequest = ({
   itemId,
   teamId,
   listId,
+  teamDefaultListId,
   notification,
   notificationText,
 }) => ({
@@ -121,6 +122,7 @@ export const moveItemRequest = ({
     itemId,
     teamId,
     listId,
+    teamDefaultListId,
   },
   meta: { notification, notificationText },
 });
@@ -140,6 +142,7 @@ export const moveItemsBatchRequest = ({
   previousListId,
   teamId,
   listId,
+  teamDefaultListId,
   notification,
   notificationText,
 }) => ({
@@ -150,6 +153,7 @@ export const moveItemsBatchRequest = ({
     previousListId,
     teamId,
     listId,
+    teamDefaultListId,
   },
   meta: { notification, notificationText },
 });

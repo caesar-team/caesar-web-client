@@ -17,7 +17,12 @@ const BOX_DIRECTION_DOWN = 'down';
 const DEFAULT_TOP_OFFSET = 40;
 const DEFAULT_OPTION_SIZE = 40;
 
-const renderOptions = ({ value, options, shouldBreakTextLines, handleClickOption }) =>
+const renderOptions = ({
+  value,
+  options,
+  shouldBreakTextLines,
+  handleClickOption,
+}) =>
   options.map(({ value: optionValue, label, isDisabled = false }) => {
     const isActive = value === optionValue;
 
@@ -78,14 +83,9 @@ const SelectComponent = ({
         .label
     : placeholder;
 
-  const topOffset =
-    boxDirection === BOX_DIRECTION_DOWN
-      ? boxOffset
-      : null;
+  const topOffset = boxDirection === BOX_DIRECTION_DOWN ? boxOffset : null;
   const bottomOffset =
-    boxDirection === BOX_DIRECTION_UP
-      ? DEFAULT_OPTION_SIZE
-      : null;
+    boxDirection === BOX_DIRECTION_UP ? DEFAULT_OPTION_SIZE : null;
 
   return (
     <Wrapper ref={dropdownRef} className={className}>
@@ -111,7 +111,12 @@ const SelectComponent = ({
       {isDropdownOpened && (
         <Box top={topOffset} bottom={bottomOffset}>
           <OptionsList>
-            {renderOptions({ value, options, shouldBreakTextLines, handleClickOption })}
+            {renderOptions({
+              value,
+              options,
+              shouldBreakTextLines,
+              handleClickOption,
+            })}
           </OptionsList>
         </Box>
       )}
@@ -121,6 +126,7 @@ const SelectComponent = ({
 
 SelectComponent.ValueText = ValueText;
 SelectComponent.SelectedOption = SelectedOption;
+SelectComponent.OptionsList = OptionsList;
 SelectComponent.Option = Option;
 
 export const Select = memo(SelectComponent);

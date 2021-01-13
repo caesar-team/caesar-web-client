@@ -11,6 +11,7 @@ import {
   setWorkInProgressItem,
   resetWorkInProgressItemIds,
 } from '@caesar/common/actions/workflow';
+import { LIST_TYPE } from '@caesar/common/constants';
 import { getTeamTitle } from '@caesar/common/utils/team';
 import {
   useItemVaultAndListOptions,
@@ -134,6 +135,9 @@ const MoveModalComponent = ({
   });
 
   const handleClickAccept = () => {
+    const teamDefaultListId =
+      listOptions.find(({ type }) => type === LIST_TYPE.DEFAULT)?.id || null;
+
     if (isMultiMode) {
       dispatch(
         moveItemsBatchRequest({
@@ -142,6 +146,7 @@ const MoveModalComponent = ({
           previousListId: listId,
           teamId: checkedTeamId,
           listId: checkedListId,
+          teamDefaultListId,
           notification,
         }),
       );
@@ -152,6 +157,7 @@ const MoveModalComponent = ({
           itemId: item.id,
           teamId: checkedTeamId,
           listId: checkedListId,
+          teamDefaultListId,
           notification,
         }),
       );

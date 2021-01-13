@@ -9,11 +9,11 @@ import {
 import { DOMAIN_SECURE_ROUTE } from '@caesar/common/constants';
 import { useNotification } from '@caesar/common/hooks';
 import { decryptSecretRaws } from '@caesar/common/utils/secret';
+import { Icon } from '@caesar/components';
 import { MessageStep, PasswordStep } from './steps';
 import {
   Wrapper,
   Header,
-  StyledLogo,
   Content,
   Title,
   AdaptiveTitle,
@@ -86,7 +86,12 @@ const SecureMessageContainerComponent = ({ message, password }) => {
   return (
     <Wrapper>
       <Header>
-        <StyledLogo name="logo-secure-message" width={114} height={32} />
+        <Icon
+          name="logo-secure-message"
+          width={114}
+          height={32}
+          color="white"
+        />
       </Header>
       <Content>
         {title}

@@ -1,6 +1,6 @@
 import React, { useState, useMemo, useRef } from 'react';
 import { useEffectOnce } from 'react-use';
-import { waitIdle } from '@caesar/common/utils/utils';
+import { arrayToObject, waitIdle } from '@caesar/common/utils/utils';
 import { TEAM_TYPE, LIST_TYPE } from '@caesar/common/constants';
 import { Icon, DataTable } from '@caesar/components';
 import {
@@ -21,6 +21,7 @@ const DataStep = ({
   data: propData,
   headings,
   teamsLists,
+  currentUserTeamsList,
   onSubmit,
   onCancel,
 }) => {
@@ -62,16 +63,14 @@ const DataStep = ({
 
   const selectedRowsLength = denormalize(selectedRows).length;
   const isButtonDisabled = isSubmitting || !selectedRowsLength;
+  const teamListsObject = arrayToObject(teamsLists);
 
   const teamOptions =
-    teamsLists?.flatMap(({ id, name }) =>
-      id === TEAM_TYPE.PERSONAL
-        ? {
-            value: id,
-            label: name.toLowerCase(),
-          }
-        : [],
-    ) || [];
+    currentUserTeamsList?.filter(({ id, locked }) => !locked && teamListsObject[id].lists.length > 0)
+      .map(({ id, title }) => ({
+        value: id,
+        label: title,
+      })) || [];
 
   const currentTeam = teamsLists.find(({ id }) => id === teamId);
   const currentTeamListsOptions =
@@ -94,6 +93,7 @@ const DataStep = ({
 
   const handleChangeTeamId = (_, value) => {
     setState({
+      ...state,
       teamId: value,
       listId: teamsLists.find(({ id }) => id === value)?.lists[0].id,
     });
@@ -139,6 +139,7 @@ const DataStep = ({
         <MoveToText>Select team and list of importing:</MoveToText>
         <StyledSelect
           boxDirection="up"
+          shouldBreakTextLines
           options={teamOptions}
           value={teamId}
           onChange={handleChangeTeamId}

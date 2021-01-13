@@ -1,6 +1,6 @@
 import React, { memo } from 'react';
 import styled from 'styled-components';
-import { Hint } from '@caesar/components/Hint';
+import { Hint, POSITION } from '@caesar/components/Hint';
 import { Icon } from '@caesar/components/Icon';
 
 const RevokeButton = styled.button`
@@ -34,11 +34,11 @@ const RevokeAccessControlComponent = ({
   className,
 }) => isAddedToRevoke
   ? (
-    <Hint text="Resend" position="center_left">
+    <Hint text="Resend" position={POSITION.CENTER_LEFT}>
       <ResendIcon name="update" onClick={onClickRevoke} />
     </Hint>
   ) : (
-    <Hint text="Revoke access" position="center_left">
+    <Hint text="Revoke access" position={POSITION.CENTER_LEFT}>
       <RevokeButton className={className} onClick={onClickRevoke}>
         <MinusIcon />
       </RevokeButton>

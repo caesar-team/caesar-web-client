@@ -538,14 +538,12 @@ export function* moveItemSaga({
     }
 
     if (item.teamId !== teamId && item.isShared) {
-      const teamDefaultList = yield select(teamDefaultListSelector, { teamId });
-
       // Move item into another list
       yield call(updateMoveItem, item.id, { listId: newListId });
       // Reencrypt shared keypair with team keypair instead personal
       // Move shared keypair into default list of the vault
       yield call(updateMoveItem, itemToReencrypt.id, {
-        listId: teamDefaultListId || teamDefaultList.id,
+        listId: teamDefaultListId,
         ...reencryptedSecretDataAndRaws,
       });
 
@@ -768,22 +766,15 @@ export function* moveItemsBatchSaga({
         );
         const itemChunks = chunk(sharedItems, ITEMS_CHUNK_SIZE);
         const sharedItemIds = sharedItems.map(({ id }) => id);
-        const teamDefaultList = yield select(teamDefaultListSelector, {
-          teamId,
-        });
 
         yield all(
           keypairChunks.map(keypairChunk =>
-            call(
-              updateMoveItemsBatch,
-              teamDefaultListId || teamDefaultList.id,
-              {
-                items: keypairChunk.map(({ id, secret }) => ({
-                  itemId: id,
-                  secret,
-                })),
-              },
-            ),
+            call(updateMoveItemsBatch, teamDefaultListId, {
+              items: keypairChunk.map(({ id, secret }) => ({
+                itemId: id,
+                secret,
+              })),
+            }),
           ),
         );
         yield all(

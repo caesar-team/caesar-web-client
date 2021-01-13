@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { memo } from 'react';
 import { useSelector } from 'react-redux';
 import styled from 'styled-components';
 import { useFormik } from 'formik';
@@ -53,10 +53,10 @@ const StyledButton = styled(Button)`
 
 const getInitialValues = team => ({
   title: team?.title || '',
-  icon: { raw: team?.icon || null },
+  icon: team?.icon || null,
 });
 
-const TeamModal = ({
+const TeamModalComponent = ({
   teamId,
   teams,
   onCreateSubmit,
@@ -83,11 +83,11 @@ const TeamModal = ({
         ? onEditSubmit({
             teamId,
             title,
-            icon: icon.raw,
+            icon,
             setSubmitting,
             setErrors,
           })
-        : onCreateSubmit({ title, icon: icon.raw, setSubmitting, setErrors }),
+        : onCreateSubmit({ title, icon, setSubmitting, setErrors }),
     validationSchema: getValidationSchema(
       teams.filter(({ id }) => id !== teamId).map(item => item.title),
     ),
@@ -152,4 +152,4 @@ const TeamModal = ({
   );
 };
 
-export default TeamModal;
+export const TeamModal = memo(TeamModalComponent);

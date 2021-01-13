@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { memo } from 'react';
 import styled, { css } from 'styled-components';
 
 export const POSITION = {
@@ -102,7 +102,7 @@ const Wrapper = styled.div`
   }
 `;
 
-export const Hint = ({
+const HintComponent = ({
   text,
   position = POSITION.TOP_CENTER,
   hintMaxWidth,
@@ -118,3 +118,9 @@ export const Hint = ({
     )}
   </Wrapper>
 );
+
+const Hint = memo(HintComponent);
+
+Hint.Hint = Inner;
+
+export { Hint, POSITION as HINT_POSITION };

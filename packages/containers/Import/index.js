@@ -5,10 +5,12 @@ import { selectableTeamsListsSelector } from '@caesar/common/selectors/entities/
 import { importProgressPercentSelector } from '@caesar/common/selectors/entities/item';
 import { actualKeyPairSelector } from '@caesar/common/selectors/keystore';
 import { isLoadingSelector } from '@caesar/common/selectors/workflow';
+import { currentUserVaultListSelector } from '@caesar/common/selectors/currentUser';
 import Import from './Import';
 
 const mapStateToProps = createStructuredSelector({
   teamsLists: selectableTeamsListsSelector,
+  currentUserTeamsList: currentUserVaultListSelector,
   keyPair: actualKeyPairSelector,
   isLoading: isLoadingSelector,
   importProgress: importProgressPercentSelector,

@@ -1,5 +1,5 @@
 import styled from 'styled-components';
-import { Icon, Button } from '@caesar/components';
+import { Button } from '@caesar/components';
 import { media } from '@caesar/assets/styles/media';
 
 export const Wrapper = styled.div`
@@ -35,10 +35,6 @@ export const AdaptiveTitle = styled(Title)`
   ${media.mobile`
     font-size: ${({ theme }) => theme.font.size.small};
   `}
-`;
-
-export const StyledLogo = styled(Icon)`
-  fill: ${({ theme }) => theme.color.white};
 `;
 
 export const ButtonsWrapper = styled.div`

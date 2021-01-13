@@ -475,7 +475,7 @@ export function* saveItemSaga({ item, publicKey }) {
 }
 
 export function* moveItemSaga({
-  payload: { itemId, teamId, listId },
+  payload: { itemId, teamId, listId, teamDefaultListId },
   meta: { notification, notificationText } = {},
 }) {
   try {
@@ -542,7 +542,7 @@ export function* moveItemSaga({
       // Reencrypt shared keypair with team keypair instead personal
       // Move shared keypair into default list of the vault
       yield call(updateMoveItem, itemToReencrypt.id, {
-        listId: teamDefaultList.id,
+        listId: teamDefaultListId || teamDefaultList.id,
         ...reencryptedSecretDataAndRaws,
       });
 
@@ -643,7 +643,14 @@ function* reencryptSharedKeypair(item) {
 }
 
 export function* moveItemsBatchSaga({
-  payload: { itemIds, oldTeamId, previousListId, teamId, listId },
+  payload: {
+    itemIds,
+    oldTeamId,
+    previousListId,
+    teamId,
+    listId,
+    teamDefaultListId,
+  },
   meta: { notification, notificationText } = {},
 }) {
   try {
@@ -764,12 +771,16 @@ export function* moveItemsBatchSaga({
 
         yield all(
           keypairChunks.map(keypairChunk =>
-            call(updateMoveItemsBatch, teamDefaultList.id, {
-              items: keypairChunk.map(({ id, secret }) => ({
-                itemId: id,
-                secret,
-              })),
-            }),
+            call(
+              updateMoveItemsBatch,
+              teamDefaultListId || teamDefaultList.id,
+              {
+                items: keypairChunk.map(({ id, secret }) => ({
+                  itemId: id,
+                  secret,
+                })),
+              },
+            ),
           ),
         );
         yield all(

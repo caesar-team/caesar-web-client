@@ -74,7 +74,14 @@ callApi.interceptors.response.use(
 
 // currentUser
 export const getUserSelf = () => callApi.get('/users/self');
-export const getUserBootstrap = () => callApi.get('/user/security/bootstrap');
+export const getUserBootstrap = () =>
+  callApi.get('/user/security/bootstrap', {
+    headers: {
+      'Cache-Control': 'no-cache',
+      Pragma: 'no-cache',
+      Expires: '0',
+    },
+  });
 export const getUserTeams = () => callApi.get('/user/teams');
 
 // keys

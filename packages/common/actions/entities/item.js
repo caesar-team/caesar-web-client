@@ -390,18 +390,19 @@ export const shareItemBatchFailure = () => ({
   type: SHARE_ITEM_BATCH_FAILURE,
 });
 
-export const removeShareRequest = shareId => ({
+export const removeShareRequest = (itemId, memberIds) => ({
   type: REMOVE_SHARE_REQUEST,
   payload: {
-    shareId,
+    itemId,
+    memberIds,
   },
 });
 
-export const removeShareSuccess = (itemId, shareId) => ({
+export const removeShareSuccess = (itemId, memberIds) => ({
   type: REMOVE_SHARE_SUCCESS,
   payload: {
     itemId,
-    shareId,
+    memberIds,
   },
 });
 

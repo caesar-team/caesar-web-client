@@ -281,7 +281,7 @@ export default createReducer(initialState, {
         [payload.itemId]: {
           ...state.byId[payload.itemId],
           invited: state.byId[payload.itemId].invited.filter(
-            invite => invite.id !== payload.shareId,
+            inviteId => !payload.memberIds.includes(inviteId),
           ),
         },
       },

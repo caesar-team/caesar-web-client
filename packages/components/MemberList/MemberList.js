@@ -34,6 +34,7 @@ const MemberWrapper = styled.div`
 `;
 
 const ControlWrapper = styled.div`
+  position: relative;
   display: flex;
   align-items: center;
   justify-content: flex-end;
@@ -49,6 +50,7 @@ const INVITE_CONTROL_TYPE = 'invite';
 
 const MemberList = ({
   members,
+  membersToRevoke = [],
   teamId,
   className,
   maxHeight = MAX_HEIGHT,
@@ -58,7 +60,7 @@ const MemberList = ({
   renderControl = Function.prototype,
   onClickAdd = Function.prototype,
   onClickRemove = Function.prototype,
-  onClickRevokeAccess = Function.prototype,
+  onClickAddMemberToRevoke = Function.prototype,
   onChangeRole = Function.prototype,
 }) => {
   const renderControlFn = member =>
@@ -69,9 +71,10 @@ const MemberList = ({
         [REMOVE_CONTROL_TYPE]: (
           <RemoveControl member={member} onClick={onClickRemove(member)} />
         ),
-        [REVOKE_CONTROL_TYPE]: onClickRevokeAccess ? (
+        [REVOKE_CONTROL_TYPE]: onClickAddMemberToRevoke ? (
           <RevokeAccessControl
-            onClickRevoke={() => onClickRevokeAccess(member)}
+            onClickRevoke={() => onClickAddMemberToRevoke(member.id)}
+            isAddedToRevoke={membersToRevoke.includes(member.id)}
           />
         ) : null,
         [INVITE_CONTROL_TYPE]: (

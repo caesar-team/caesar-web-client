@@ -28,6 +28,7 @@ import {
   removeItemsBatchFailure,
   updateItemField,
   setImportProgressPercent,
+  removeShareRequest,
 } from '@caesar/common/actions/entities/item';
 import { checkIfUserWasKickedFromTeam } from '@caesar/common/sagas/currentUser';
 import { setCurrentTeamId } from '@caesar/common/actions/currentUser';
@@ -202,8 +203,7 @@ export function* removeItemSaga({ payload: { itemId, listId } }) {
     yield put(removeItemSuccess(itemId, listId));
 
     if (item.invited && item.invited.length > 0) {
-      // TODO: Implement remove share access
-      // If user delete item all shares must be deleted
+      yield put(removeShareRequest(itemId, invited));
     }
 
     yield put(setWorkInProgressItem(null));

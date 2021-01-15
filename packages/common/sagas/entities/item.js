@@ -203,7 +203,7 @@ export function* removeItemSaga({ payload: { itemId, listId } }) {
     yield put(removeItemSuccess(itemId, listId));
 
     if (item.invited && item.invited.length > 0) {
-      yield put(removeShareRequest(itemId, invited));
+      yield put(removeShareRequest(itemId, item.invited));
     }
 
     yield put(setWorkInProgressItem(null));

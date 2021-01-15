@@ -1,7 +1,7 @@
 import React, { useState, useMemo, useRef } from 'react';
 import { useEffectOnce, useUpdateEffect } from 'react-use';
 import { useDispatch } from 'react-redux';
-import { arrayToObject, waitIdle } from '@caesar/common/utils/utils';
+import { waitIdle } from '@caesar/common/utils/utils';
 import { TEAM_TYPE, LIST_TYPE } from '@caesar/common/constants';
 import { Icon, DataTable } from '@caesar/components';
 import {

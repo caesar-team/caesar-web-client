@@ -35,7 +35,12 @@ import {
 } from '@caesar/common/sagas/entities/item';
 import { addShareKeyPairBatch } from '@caesar/common/actions/keystore';
 import { convertSystemItemToKeyPair } from '../../utils/item';
-import { getItem, getPublicKeyByEmailBatch, postItemShare } from '../../api';
+import {
+  getItem,
+  getPublicKeyByEmailBatch,
+  postItemShare,
+  removeItemsBatch,
+} from '../../api';
 import { uuid4 } from '../../utils/uuid4';
 import { teamDefaultListSelector } from '../../selectors/entities/list';
 import {
@@ -251,14 +256,17 @@ export function* shareItemBatchSaga({
   }
 }
 
-export function* removeShareSaga({ payload: { shareId } }) {
+export function* removeShareSaga({ payload: { itemId, memberIds = [] } }) {
   try {
-    // TODO: Implement remove sharing
-    // eslint-disable-next-line no-console
-    console.warn('Remove sharing will be implemented.');
     const workInProgressItem = yield select(workInProgressItemSelector);
+    const sharedKeyPairs = memberIds.map(memberId => workInProgressItem.membersKeys[memberId]);
 
-    yield put(removeShareSuccess(workInProgressItem.id, shareId));
+    yield call(
+      removeItemsBatch,
+      sharedKeyPairs.map(id => `items[]=${id}`).join('&'),
+    );
+
+    yield put(removeShareSuccess(itemId, memberIds));
     yield put(updateWorkInProgressItem());
 
     yield put(updateGlobalNotification(NOOP_NOTIFICATION, false));

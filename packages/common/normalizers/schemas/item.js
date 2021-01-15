@@ -15,6 +15,10 @@ const itemSchema = new schema.Entity(
   {
     processStrategy: entity => ({
       ...entity,
+      membersKeys: entity.invited?.reduce((accumulator, item) => ({
+        ...accumulator,
+        [item.userId]: item.id,
+      }), {}) || {},
       _permissions: {
         ...createPermissionsFromLinks(entity._links),
         __typename:

@@ -114,7 +114,7 @@ class Import extends Component {
   handleCancelFlow = () => {
     this.setState(this.prepareInitialState());
   };
-
+  
   importing(listId, data, setSubmitting) {
     const items = data.map(({ type, ...secret }) => {
       const fields = pick(
@@ -146,7 +146,12 @@ class Import extends Component {
   }
 
   renderStep() {
-    const { teamsLists, importProgress, currentUserTeamsList } = this.props;
+    const {
+      teamsLists,
+      importProgress,
+      currentUserTeamsList,
+      fetchTeamListsRequest,
+    } = this.props;
     const { currentStep, data, matchings } = this.state;
 
     return matchStrict(
@@ -167,6 +172,7 @@ class Import extends Component {
             currentUserTeamsList={currentUserTeamsList}
             data={normalizeData(data.rows, matchings)}
             headings={matchings}
+            fetchTeamListsRequest={fetchTeamListsRequest}
             onSubmit={this.handleFinishDataStep}
             onCancel={this.handleCancelFlow}
           />

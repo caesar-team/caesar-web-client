@@ -12,7 +12,7 @@ import {
   createAnonymousLinkRequest,
   removeAnonymousLinkRequest,
   shareItemBatchRequest,
-  // removeShareRequest,
+  removeShareRequest,
 } from '@caesar/common/actions/entities/item';
 import { ShareModal as ShareModalComponent } from '@caesar/components';
 
@@ -59,12 +59,9 @@ export const ShareModal = ({
     handleCloseModal();
   };
 
-  const canRevokeAccess = false;
-  const handleRevokeAccess = member => {
-    // TODO: Implement revoke share access
-    // dispatch(removeShareRequest());
-    // eslint-disable-next-line no-alert
-    alert('Not yet implemented.', member);
+  const canRevokeAccess = true;
+  const handleRevokeAccess = (itemId, memberIds) => {
+    dispatch(removeShareRequest(itemId, memberIds));
   };
 
   const handleActivateLink = () => {
@@ -77,6 +74,7 @@ export const ShareModal = ({
 
   return (
     <ShareModalComponent
+      item={workInProgressItem}
       items={workInProgressItems}
       teams={availableTeamsForSharing}
       sharedMembers={workInProgressItemSharedMembers}

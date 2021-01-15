@@ -74,7 +74,6 @@ const DataStep = ({
 
   const selectedRowsLength = denormalize(selectedRows).length;
   const isButtonDisabled = isSubmitting || !selectedRowsLength;
-  const teamListsObject = arrayToObject(teamsLists);
   const teamOptions =
     currentUserTeamsList?.filter(({ id, locked }) => !locked)
       .map(({ id, title }) => ({

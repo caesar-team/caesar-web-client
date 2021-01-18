@@ -124,8 +124,9 @@ export const decryptItemData = async (item, privateKeyObject) => {
     const { data: encryptedData, raws: encryptedRaws = {} } = JSON.parse(
       item.secret,
     );
+
     const promises = [];
-    promises.push(decryptData(encryptedData, privateKeyObject));
+    promises.push(decryptData(encryptedData, privateKeyObject, item.id));
 
     if (!isGeneralItem(item)) {
       // Decrypt keypairs or system items

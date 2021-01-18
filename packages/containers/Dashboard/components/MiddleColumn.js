@@ -75,12 +75,16 @@ const MiddleColumnComponent = ({
       __typename: PERMISSION_ENTITY.TEAM_ITEM,
     };
 
-    return (ability.can(PERMISSION.MULTISELECT, _permissions)
-      || ability.can(PERMISSION.MULTISELECT, teamPermissions));
+    return (
+      ability.can(PERMISSION.MULTISELECT, _permissions) ||
+      ability.can(PERMISSION.MULTISELECT, teamPermissions)
+    );
   };
 
   const visibleListItemsLength = visibleListItems.length;
-  const filteredVisibleListItemsLength = visibleListItems.filter(filterForbiddenItem).length;
+  const filteredVisibleListItemsLength = visibleListItems.filter(
+    filterForbiddenItem,
+  ).length;
 
   const isPersonalTeam = currentTeamId === TEAM_TYPE.PERSONAL;
   const isMultiItem = workInProgressItemIds?.length > 0;

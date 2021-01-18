@@ -12,7 +12,7 @@ import {
   setWorkInProgressItem,
   resetWorkInProgressItemIds,
 } from '@caesar/common/actions/workflow';
-import { LIST_TYPE } from '@caesar/common/constants';
+import { TEAM_TYPE, LIST_TYPE } from '@caesar/common/constants';
 import { getTeamTitle } from '@caesar/common/utils/team';
 import {
   useItemVaultAndListOptions,
@@ -185,8 +185,11 @@ const MoveModalComponent = ({
               ?.toLowerCase()
               .includes(searchTeamValue?.toLowerCase()) &&
             // TODO: Remove this condition to enable moving between vaults for everyone after release 2.2
-            (item.ownerId === currentUserId ||
-              (item.ownerId !== currentUserId && team.id === checkedTeamId)),
+            (item
+              ? item.ownerId === currentUserId ||
+                (item.ownerId !== currentUserId && team.id === teamId)
+              : teamId === TEAM_TYPE.PERSONAL ||
+                (teamId !== TEAM_TYPE.PERSONAL && team.id === teamId)),
         )
         .map(team => (
           <StyledRadio

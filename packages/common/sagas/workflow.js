@@ -219,22 +219,27 @@ export function* decryptUserItems(items) {
 }
 
 export function* decryptItem(item) {
-  if (!item || !('id' in item)) return;
-  // decrypt the items
-  if (!item.data) {
-    const keyPair = yield call(getItemKeyPair, {
-      payload: {
-        item,
-      },
-    });
+  try {
+    if (!item || !('id' in item)) return;
+    // decrypt the items
+    if (!item.data) {
+      const keyPair = yield call(getItemKeyPair, {
+        payload: {
+          item,
+        },
+      });
 
-    yield put(
-      decryption({
-        items: [item],
-        key: keyPair.privateKey,
-        masterPassword: keyPair.password,
-      }),
-    );
+      yield put(
+        decryption({
+          items: [item],
+          key: keyPair.privateKey,
+          masterPassword: keyPair.password,
+        }),
+      );
+    }
+  } catch (error) {
+    // eslint-disable-next-line no-console
+    console.error('item ID: ', item.id, ', error:', error);
   }
 }
 
@@ -644,6 +649,7 @@ export function* processKeyPairsSaga({ payload: { itemsById } }) {
       yield all(putSagas);
 
       const notDecryptedKeyPairs = yield select(notDecryptedKeyPairsSelector);
+      // console.log('notDecryptedKeyPairs: ', notDecryptedKeyPairs);
 
       if (notDecryptedKeyPairs.length > 0) {
         yield call(decryptNotDecryptedKeyPairs, notDecryptedKeyPairs);

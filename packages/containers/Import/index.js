@@ -6,6 +6,7 @@ import { importProgressPercentSelector } from '@caesar/common/selectors/entities
 import { actualKeyPairSelector } from '@caesar/common/selectors/keystore';
 import { isLoadingSelector } from '@caesar/common/selectors/workflow';
 import { currentUserVaultListSelector } from '@caesar/common/selectors/currentUser';
+import { fetchTeamListsRequest } from '@caesar/common/actions/entities/team';
 import Import from './Import';
 
 const mapStateToProps = createStructuredSelector({
@@ -18,6 +19,7 @@ const mapStateToProps = createStructuredSelector({
 
 const mapDispatchToProps = {
   createItemsBatchRequest,
+  fetchTeamListsRequest,
 };
 
 export default connect(

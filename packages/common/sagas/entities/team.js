@@ -7,6 +7,7 @@ import {
   REMOVE_TEAM_REQUEST,
   CREATE_TEAM_KEYS_REQUEST,
   TOGGLE_PIN_TEAM_REQUEST,
+  FETCH_TEAM_LISTS_REQUEST,
   fetchTeamsSuccess,
   fetchTeamsFailure,
   fetchTeamSuccess,
@@ -43,7 +44,9 @@ import {
   getTeam,
   postCreateVault,
   pinTeam,
-} from '@caesar/common/api';
+  getTeamLists,
+  getLists,
+} from "@caesar/common/api";
 import { fetchUsersSaga } from '@caesar/common/sagas/entities/user';
 import { addUserToTeamListBatchSaga } from '@caesar/common/sagas/entities/member';
 import {
@@ -56,7 +59,8 @@ import {
   convertKeyPairToEntity,
   convertKeyPairToItemEntity,
   convertMembersToEntity,
-} from '@caesar/common/normalizers/normalizers';
+  convertListsToEntities,
+} from "@caesar/common/normalizers/normalizers";
 import { TEAM_ROLES, TEAM_TYPE } from '@caesar/common/constants';
 import { updateGlobalNotification } from '@caesar/common/actions/application';
 import { finishIsLoading } from '@caesar/common/actions/workflow';
@@ -75,7 +79,10 @@ import {
 } from '../../actions/keystore';
 import { createVaultSuccess } from '../../actions/entities/vault';
 import { removeItemsBatchByTeamIds } from '../../actions/entities/item';
-import { removeListsBatchByTeamIds } from '../../actions/entities/list';
+import {
+  addListsBatch,
+  removeListsBatchByTeamIds,
+} from '../../actions/entities/list';
 import { upperFirst } from '../../utils/string';
 import { resetDashboardWorkflow } from '../workflow';
 
@@ -376,6 +383,25 @@ export function* clearStateWhenLeaveTeam({ payload: { teamIds } }) {
   }
 }
 
+export function* fetchTeamListsSaga({ payload: { teamId } }) {
+  try {
+    const isPersonal = !teamId || teamId === TEAM_TYPE.PERSONAL; 
+      const { data } = isPersonal 
+        ? yield call(getLists)
+        : yield call(getTeamLists, teamId);  
+
+    const listsById = convertListsToEntities(data);
+
+    yield put(addListsBatch(listsById));
+  } catch (error) {
+    // eslint-disable-next-line no-console
+    console.error(error);
+    yield put(
+      updateGlobalNotification(getServerErrorMessage(error), false, true),
+    );
+  }
+}
+
 export default function* teamSagas() {
   yield takeLatest(FETCH_TEAMS_REQUEST, fetchTeamsSaga);
   yield takeLatest(FETCH_TEAM_REQUEST, fetchTeamSaga);
@@ -384,4 +410,5 @@ export default function* teamSagas() {
   yield takeLatest(EDIT_TEAM_REQUEST, editTeamSaga);
   yield takeLatest(REMOVE_TEAM_REQUEST, removeTeamSaga);
   yield takeLatest(TOGGLE_PIN_TEAM_REQUEST, togglePinTeamSaga);
+  yield takeLatest(FETCH_TEAM_LISTS_REQUEST, fetchTeamListsSaga);
 }

@@ -649,7 +649,6 @@ export function* processKeyPairsSaga({ payload: { itemsById } }) {
       yield all(putSagas);
 
       const notDecryptedKeyPairs = yield select(notDecryptedKeyPairsSelector);
-      // console.log('notDecryptedKeyPairs: ', notDecryptedKeyPairs);
 
       if (notDecryptedKeyPairs.length > 0) {
         yield call(decryptNotDecryptedKeyPairs, notDecryptedKeyPairs);

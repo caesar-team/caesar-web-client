@@ -30,6 +30,8 @@ export const ADD_TEAMS_BATCH = '@team/ADD_TEAMS_BATCH';
 export const ADD_TEAM_MEMBERS_BATCH = '@team/ADD_TEAM_MEMBERS_BATCH';
 export const REMOVE_MEMBER_FROM_TEAM = '@team/REMOVE_MEMBER_FROM_TEAM';
 
+export const FETCH_TEAM_LISTS_REQUEST = '@team/FETCH_TEAM_LISTS_REQUEST';
+
 export const RESET_TEAM_STATE = '@team/RESET_TEAM_STATE';
 export const LOCK_TEAM = '@team/LOCK_TEAM';
 
@@ -219,4 +221,11 @@ export const togglePinTeamSuccess = (teamId, isPinned) => ({
 
 export const togglePinTeamFailure = () => ({
   type: TOGGLE_PIN_TEAM_FAILURE,
+});
+
+export const fetchTeamListsRequest = teamId => ({
+  type: FETCH_TEAM_LISTS_REQUEST,
+  payload: {
+    teamId,
+  },
 });

@@ -14,13 +14,13 @@
 
 ## Prerequisites
 
-- node >=12.13
+- node >=14.15
 
 ## Stack
 
 - react: ^16.8.6
 - redux: ^4.0.4
-- next: ^9.0.5
+- next: ^9.5.3
 - express: ^4.17.1
 - styled-components: ^4.3.2
 - openpgp: ^4.10.7

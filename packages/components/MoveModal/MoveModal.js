@@ -2,6 +2,7 @@ import React, { useState, useMemo, memo } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import equal from 'fast-deep-equal';
 import styled from 'styled-components';
+import { currentUserIdSelector } from '@caesar/common/selectors/currentUser';
 import { teamsByIdSelector } from '@caesar/common/selectors/entities/team';
 import {
   moveItemRequest,
@@ -112,6 +113,7 @@ const MoveModalComponent = ({
   onRemove = Function.prototype,
 }) => {
   const dispatch = useDispatch();
+  const currentUserId = useSelector(currentUserIdSelector);
   const teamsById = useSelector(teamsByIdSelector);
   const teamId = isMultiMode ? currentTeamId : item.teamId;
   const listId = isMultiMode ? currentListId : item.listId;
@@ -177,8 +179,14 @@ const MoveModalComponent = ({
   const teamOptionsRenderer = useMemo(
     () =>
       teamOptions
-        .filter(team =>
-          team?.title?.toLowerCase().includes(searchTeamValue?.toLowerCase()),
+        .filter(
+          team =>
+            team?.title
+              ?.toLowerCase()
+              .includes(searchTeamValue?.toLowerCase()) &&
+            // TODO: Remove this condition to enable moving between vaults for everyone after release 2.2
+            (item.ownerId === currentUserId ||
+              (item.ownerId !== currentUserId && team.id === checkedTeamId)),
         )
         .map(team => (
           <StyledRadio

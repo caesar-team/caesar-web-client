@@ -64,9 +64,9 @@ function* jobSaga({ id, coresCount, action }) {
   yield call(job, { coresCount, id, ...action.payload });
 }
 
-function* jobAction(action) {
-  const queue = createQueue();
+const queue = createQueue();
 
+function* jobAction(action) {
   if (isEndJob(action.type)) {
     yield put(increaseCoresCount(action.payload.coresCount));
 

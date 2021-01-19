@@ -62,7 +62,9 @@ import {
   toggleFavorite,
   updateItem,
   updateMoveItem,
+  updateMoveTeamItem,
   updateMoveItemsBatch,
+  updateMoveTeamItemsBatch,
 } from '@caesar/common/api';
 import {
   encryptData,

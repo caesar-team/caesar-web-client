@@ -12,6 +12,8 @@ import {
   ADD_SHARE_KEY_PAIR_BATCH,
   REMOVE_KEY_PAIR_BATCH_BY_TEAM_IDS,
   UPDATE_SHARE_KEY_PAIR_BATCH,
+  ADD_NOT_DECRYPTED_KEY_PAIR_BATCH,
+  CLEAR_NOT_DECRYPTED_KEY_PAIRS,
   RESET_KEYSTORE_STATE,
 } from '@caesar/common/actions/keystore';
 
@@ -21,6 +23,7 @@ const initialState = {
   [KEY_TYPE.TEAMS]: {},
   [KEY_TYPE.SHARES]: {},
   [KEY_TYPE.ANONYMOUS]: {},
+  notDecrypted: [],
   isLoading: false,
   isError: false,
 };
@@ -155,6 +158,18 @@ export default createReducer(initialState, {
           privateKey,
         },
       },
+    };
+  },
+  [ADD_NOT_DECRYPTED_KEY_PAIR_BATCH](state, { payload }) {
+    return {
+      ...state,
+      notDecrypted: [...state.notDecrypted, ...payload.keypairs],
+    };
+  },
+  [CLEAR_NOT_DECRYPTED_KEY_PAIRS](state) {
+    return {
+      ...state,
+      notDecrypted: [],
     };
   },
   [REMOVE_TEAM_KEY_PAIR](state, { payload }) {

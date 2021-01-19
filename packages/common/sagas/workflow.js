@@ -49,6 +49,8 @@ import {
 import {
   addShareKeyPairBatch,
   addTeamKeyPairBatch,
+  addNotDecryptedKeypairBatch,
+  clearNotDecryptedKeypairs,
 } from '@caesar/common/actions/keystore';
 import {
   fetchKeyPairSaga,
@@ -105,6 +107,7 @@ import {
   teamKeyPairSelector,
   shareKeyPairsSelector,
   isKeystoreEmpty,
+  notDecryptedKeyPairsSelector,
 } from '@caesar/common/selectors/keystore';
 import { addTeamsBatch, lockTeam } from '@caesar/common/actions/entities/team';
 import { getServerErrorMessage } from '@caesar/common/utils/error';
@@ -216,28 +219,27 @@ export function* decryptUserItems(items) {
 }
 
 export function* decryptItem(item) {
-  if (!item || !('id' in item)) return;
-  // decrypt the items
-  if (!item.data) {
-    const keyPair = yield call(getItemKeyPair, {
-      payload: {
-        item,
-      },
-    });
+  try {
+    if (!item || !('id' in item)) return;
+    // decrypt the items
+    if (!item.data) {
+      const keyPair = yield call(getItemKeyPair, {
+        payload: {
+          item,
+        },
+      });
 
-    yield put(
-      decryption({
-        items: [item],
-        key: keyPair.privateKey,
-        masterPassword: keyPair.password,
-      }),
-    );
-  }
-}
-
-export function* decryptTeamItems(items) {
-  if (items?.length > 0) {
-    yield all(items.map(decryptItem));
+      yield put(
+        decryption({
+          items: [item],
+          key: keyPair.privateKey,
+          masterPassword: keyPair.password,
+        }),
+      );
+    }
+  } catch (error) {
+    // eslint-disable-next-line no-console
+    console.error('item ID: ', item.id, ', error:', error);
   }
 }
 
@@ -559,6 +561,58 @@ function* initTeamsSaga() {
   }
 }
 
+function divideNotDecryptedKeyPairsByTeams(keypairs) {
+  return keypairs.reduce((acc, keypair) => {
+    const { teamId } = keypair;
+
+    return {
+      ...acc,
+      [teamId]: acc[teamId] ? [...acc[teamId], keypair] : [keypair],
+    };
+  }, {});
+}
+
+function* decryptKeypairsByTeamKeipairs(teamId, keypairs) {
+  try {
+    const teamKeyPair = yield select(teamKeyPairSelector, { teamId });
+
+    yield put(
+      decryption({
+        items: keypairs,
+        key: teamKeyPair.privateKey,
+        masterPassword: teamKeyPair.password,
+      }),
+    );
+  } catch (error) {
+    // eslint-disable-next-line no-console
+    console.error('error: ', error);
+  }
+}
+
+function* decryptNotDecryptedKeyPairs(notDecryptedKeyPairs) {
+  try {
+    const dividedByTeamKeypairs = yield call(
+      divideNotDecryptedKeyPairsByTeams,
+      notDecryptedKeyPairs,
+    );
+
+    yield all(
+      Object.keys(dividedByTeamKeypairs).map(teamKeypair =>
+        call(
+          decryptKeypairsByTeamKeipairs,
+          teamKeypair,
+          dividedByTeamKeypairs[teamKeypair],
+        ),
+      ),
+    );
+
+    yield put(clearNotDecryptedKeypairs());
+  } catch (error) {
+    // eslint-disable-next-line no-console
+    console.error('error: ', error);
+  }
+}
+
 export function* processKeyPairsSaga({ payload: { itemsById } }) {
   try {
     if (!itemsById) return;
@@ -593,6 +647,13 @@ export function* processKeyPairsSaga({ payload: { itemsById } }) {
       }
 
       yield all(putSagas);
+
+      const notDecryptedKeyPairs = yield select(notDecryptedKeyPairsSelector);
+
+      if (notDecryptedKeyPairs.length > 0) {
+        yield call(decryptNotDecryptedKeyPairs, notDecryptedKeyPairs);
+      }
+
       yield put(finishProcessingKeyPairs());
     }
   } catch (error) {
@@ -611,6 +672,9 @@ export function* loadKeyPairsAndPersonalItems() {
     // Load lists
     const { data: lists } = yield call(getLists);
     const listsById = convertListsToEntities(lists);
+
+    yield put(addListsBatch(listsById));
+
     const defaultShareList = Object.values(listsById).find(
       list => list.type === LIST_TYPE.INBOX,
     );
@@ -656,7 +720,6 @@ export function* loadKeyPairsAndPersonalItems() {
       yield call(decryptUserItems, keypairsEncryptedByUserKeys);
     }
 
-    yield put(addListsBatch(listsById));
     // Put to the store the shared and the team items, wait for processing of keypairs
     const storedItems = {
       ...itemsById,
@@ -669,7 +732,11 @@ export function* loadKeyPairsAndPersonalItems() {
     }
 
     if (keypairsEncryptedByTeamKeys?.length > 0) {
-      yield call(decryptTeamItems, keypairsEncryptedByTeamKeys);
+      yield put(
+        addNotDecryptedKeypairBatch({
+          keypairs: keypairsEncryptedByTeamKeys,
+        }),
+      );
     }
 
     if (!keypairsArray?.length) {

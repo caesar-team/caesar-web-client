@@ -1,6 +1,7 @@
 import React, { useState, useMemo, useRef } from 'react';
-import { useEffectOnce } from 'react-use';
-import { arrayToObject, waitIdle } from '@caesar/common/utils/utils';
+import { useEffectOnce, useUpdateEffect } from 'react-use';
+import { useDispatch } from 'react-redux';
+import { waitIdle } from '@caesar/common/utils/utils';
 import { TEAM_TYPE, LIST_TYPE } from '@caesar/common/constants';
 import { Icon, DataTable } from '@caesar/components';
 import {
@@ -24,7 +25,9 @@ const DataStep = ({
   currentUserTeamsList,
   onSubmit,
   onCancel,
+  fetchTeamListsRequest,
 }) => {
+  const dispatch = useDispatch();
   const personalTeamIndex =
     teamsLists.findIndex(({ id }) => id === TEAM_TYPE.PERSONAL) || 0;
 
@@ -55,6 +58,14 @@ const DataStep = ({
     setTableWidth(tableWrapperRef?.current?.offsetWidth);
   });
 
+  useUpdateEffect(() => {
+    const lists = teamsLists.find(({ id }) => id === teamId)?.lists || [];
+    setState({
+      ...state,
+      listId: lists[0]?.id || null,
+    });
+  }, [teamsLists]);
+
   const tableData = useMemo(() => filter(data, filterText), [data, filterText]);
   const columns = useMemo(
     () => createColumns({ state, setState, headings, tableWidth }),
@@ -63,15 +74,12 @@ const DataStep = ({
 
   const selectedRowsLength = denormalize(selectedRows).length;
   const isButtonDisabled = isSubmitting || !selectedRowsLength;
-  const teamListsObject = arrayToObject(teamsLists);
-
   const teamOptions =
-    currentUserTeamsList?.filter(({ id, locked }) => !locked && teamListsObject[id].lists.length > 0)
+    currentUserTeamsList?.filter(({ id, locked }) => !locked)
       .map(({ id, title }) => ({
         value: id,
         label: title,
       })) || [];
-
   const currentTeam = teamsLists.find(({ id }) => id === teamId);
   const currentTeamListsOptions =
     currentTeam?.lists?.flatMap(({ type, id, label }) =>
@@ -92,11 +100,22 @@ const DataStep = ({
   };
 
   const handleChangeTeamId = (_, value) => {
-    setState({
-      ...state,
-      teamId: value,
-      listId: teamsLists.find(({ id }) => id === value)?.lists[0].id,
-    });
+    const lists = teamsLists.find(({ id }) => id === value)?.lists || [];
+    
+    if (!lists.length) {
+      dispatch(fetchTeamListsRequest(value));
+      setState({
+        ...state,
+        teamId: value,
+      });
+      
+    } else {
+      setState({
+        ...state,
+        teamId: value,
+        listId: lists[0].id,
+      });
+    }
   };
 
   const handleChangeListId = (_, value) => {
@@ -136,7 +155,7 @@ const DataStep = ({
         />
       </StyledTable>
       <SelectListWrapper>
-        <MoveToText>Select team and list of importing:</MoveToText>
+        <MoveToText>Select a vault and a list:</MoveToText>
         <StyledSelect
           boxDirection="up"
           shouldBreakTextLines

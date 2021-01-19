@@ -13,6 +13,7 @@ const findSystemItemsTeamByItemName = (data, teamId) =>
   ) || {};
 
 export const keyStoreSelector = state => state.keystore;
+
 export const isKeystoreEmpty = createSelector(
   keyStoreSelector,
   keystore =>
@@ -35,9 +36,12 @@ export const teamKeyPairsSelector = createSelector(
 
 export const shareKeyPairsSelector = createSelector(
   keyStoreSelector,
-  keystore => {
-    return keystore[KEY_TYPE.SHARES];
-  },
+  keystore => keystore[KEY_TYPE.SHARES],
+);
+
+export const notDecryptedKeyPairsSelector = createSelector(
+  keyStoreSelector,
+  keystore => keystore.notDecrypted || [],
 );
 
 const itemIdPropSelector = (_, props) => props.itemId;

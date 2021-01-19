@@ -205,7 +205,7 @@ export function* removeItemSaga({ payload: { itemId, listId } }) {
     yield put(removeItemSuccess(itemId, listId));
 
     if (item.invited && item.invited.length > 0) {
-      yield put(removeShareRequest(itemId, invited));
+      yield put(removeShareRequest(itemId, item.invited));
     }
 
     yield put(setWorkInProgressItem(null));
@@ -631,16 +631,26 @@ export function* decryptItemSync(item) {
   }
 }
 
-function* reencryptSharedKeypair(item) {
+function* reencryptSharedKeypair(item, publicKey) {
   const sharedItemKeyPairKey = yield select(shareItemKeyPairSelector, {
     itemId: item.id,
   });
 
-  return {
+  const itemToReencrypt = {
     id: sharedItemKeyPairKey.id,
     ...Object.values(
       convertKeyPairToItemEntity([sharedItemKeyPairKey]),
     ).shift(),
+  };
+
+  const { secretDataAndRaws } = yield call(reencryptItemSecretSaga, {
+    item: itemToReencrypt,
+    publicKey,
+  });
+
+  return {
+    id: sharedItemKeyPairKey.id,
+    ...secretDataAndRaws,
   };
 }
 
@@ -719,7 +729,7 @@ export function* moveItemsBatchSaga({
 
       if (sharedItems.length) {
         reencryptedSharedKeypairs = yield all(
-          sharedItems.map(reencryptSharedKeypair),
+          sharedItems.map(item => reencryptSharedKeypair(item, publicKey)),
         );
       }
 

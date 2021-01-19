@@ -11,6 +11,10 @@ export const REMOVE_KEY_PAIR_BATCH_BY_TEAM_IDS =
   '@keystore/REMOVE_KEY_PAIR_BATCH_BY_TEAM_IDS';
 export const UPDATE_SHARE_KEY_PAIR_BATCH =
   '@keystore/UPDATE_SHARE_KEY_PAIR_BATCH';
+export const ADD_NOT_DECRYPTED_KEY_PAIR_BATCH =
+  '@keystore/ADD_NOT_DECRYPTED_KEY_PAIR_BATCH';
+export const CLEAR_NOT_DECRYPTED_KEY_PAIRS =
+  '@keystore/CLEAR_NOT_DECRYPTED_KEY_PAIRS';
 export const RESET_KEYSTORE_STATE = '@keystore/RESET_KEYSTORE_STATE';
 
 export const addPersonalKeyPair = data => ({
@@ -83,11 +87,21 @@ export const removeKeyPairBatchByTeamIds = teamIds => ({
   },
 });
 
-export const resetKeystoreState = () => ({
-  type: RESET_KEYSTORE_STATE,
-});
-
 export const updateShareKeyPairBatch = payload => ({
   type: UPDATE_SHARE_KEY_PAIR_BATCH,
   payload,
+});
+
+export const addNotDecryptedKeypairBatch = payload => ({
+  type: ADD_NOT_DECRYPTED_KEY_PAIR_BATCH,
+  payload,
+});
+
+export const clearNotDecryptedKeypairs = payload => ({
+  type: CLEAR_NOT_DECRYPTED_KEY_PAIRS,
+  payload,
+});
+
+export const resetKeystoreState = () => ({
+  type: RESET_KEYSTORE_STATE,
 });

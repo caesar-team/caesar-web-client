@@ -3,7 +3,7 @@ import { useEffectOnce, useUpdateEffect } from 'react-use';
 import { useDispatch } from 'react-redux';
 import { waitIdle } from '@caesar/common/utils/utils';
 import { transformListTitle } from '@caesar/common/utils/string';
-import { TEAM_TYPE, LIST_TYPE } from '@caesar/common/constants';
+import { LIST_TYPE } from '@caesar/common/constants';
 import { Icon, DataTable } from '@caesar/components';
 import {
   Title,

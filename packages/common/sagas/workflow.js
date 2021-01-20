@@ -494,6 +494,7 @@ function* initTeam(teamId) {
     const currentTeamId = teamId;
 
     if (!currentTeamId || currentTeamId === TEAM_TYPE.PERSONAL) return;
+
     const { data: lists } = yield call(getTeamLists, currentTeamId);
     const listsById = convertListsToEntities(lists);
 
@@ -576,6 +577,15 @@ function* decryptKeypairsByTeamKeipairs(teamId, keypairs) {
   try {
     const teamKeyPair = yield select(teamKeyPairSelector, { teamId });
 
+    if (!teamKeyPair) {
+      // eslint-disable-next-line no-console
+      console.warn(
+        `The key pair for the team with teamId ${teamId} not found. Ask team admin to add you in team.`,
+      );
+
+      return;
+    }
+
     yield put(
       decryption({
         items: keypairs,
@@ -585,7 +595,12 @@ function* decryptKeypairsByTeamKeipairs(teamId, keypairs) {
     );
   } catch (error) {
     // eslint-disable-next-line no-console
-    console.error('error: ', error);
+    console.error(
+      'There is no decrypted keypair of team with ID: ',
+      teamId,
+      ', error: ',
+      error,
+    );
   }
 }
 

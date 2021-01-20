@@ -2,6 +2,7 @@ import React, { useState, useMemo, useRef } from 'react';
 import { useEffectOnce, useUpdateEffect } from 'react-use';
 import { useDispatch } from 'react-redux';
 import { waitIdle } from '@caesar/common/utils/utils';
+import { transformListTitle } from '@caesar/common/utils/string';
 import { TEAM_TYPE, LIST_TYPE } from '@caesar/common/constants';
 import { Icon, DataTable } from '@caesar/components';
 import {
@@ -22,18 +23,18 @@ const DataStep = ({
   data: propData,
   headings,
   teamsLists,
+  currentUserTeamId,
+  currentListId,
+  currentTeamDefaultList,
   currentUserTeamsList,
   onSubmit,
   onCancel,
   fetchTeamListsRequest,
 }) => {
   const dispatch = useDispatch();
-  const personalTeamIndex =
-    teamsLists.findIndex(({ id }) => id === TEAM_TYPE.PERSONAL) || 0;
-
   const [state, setState] = useState({
-    teamId: teamsLists[personalTeamIndex]?.id || null,
-    listId: teamsLists[personalTeamIndex]?.lists[0]?.id || null,
+    teamId: currentUserTeamId,
+    listId: currentListId || currentTeamDefaultList.id,
     filterText: '',
     selectedRows: normalize(propData),
     data: propData,
@@ -87,7 +88,7 @@ const DataStep = ({
         ? []
         : {
             value: id,
-            label: label.toLowerCase(),
+            label: transformListTitle(label),
           },
     ) || [];
 
@@ -108,7 +109,6 @@ const DataStep = ({
         ...state,
         teamId: value,
       });
-      
     } else {
       setState({
         ...state,
@@ -135,7 +135,7 @@ const DataStep = ({
   const handleSubmit = async () => {
     setSubmitting(true);
     await waitIdle();
-    onSubmit(listId, denormalize(selectedRows), setSubmitting);
+    onSubmit(teamId, listId, denormalize(selectedRows), setSubmitting);
   };
 
   return (

@@ -78,7 +78,7 @@ class Import extends Component {
     });
   };
 
-  handleFinishDataStep = (listId, values, setSubmitting) => {
+  handleFinishDataStep = (teamId, listId, values, setSubmitting) => {
     const omittedFields = ['index'];
     const cleared = values.map(row => {
       const keys = Object.keys(row);
@@ -96,7 +96,7 @@ class Import extends Component {
         currentStep: IMPORTING_STEP,
       },
       () => {
-        this.importing(listId, cleared, setSubmitting);
+        this.importing(teamId, listId, cleared, setSubmitting);
       },
     );
   };
@@ -115,7 +115,7 @@ class Import extends Component {
     this.setState(this.prepareInitialState());
   };
   
-  importing(listId, data, setSubmitting) {
+  importing(teamId, listId, data, setSubmitting) {
     const items = data.map(({ type, ...secret }) => {
       const fields = pick(
         secret,
@@ -126,6 +126,7 @@ class Import extends Component {
 
       return {
         ...fields,
+        teamId,
         type,
         attachments: [],
       };
@@ -148,6 +149,9 @@ class Import extends Component {
   renderStep() {
     const {
       teamsLists,
+      currentUserTeamId,
+      currentListId,
+      currentTeamDefaultList,
       importProgress,
       currentUserTeamsList,
       fetchTeamListsRequest,
@@ -169,6 +173,9 @@ class Import extends Component {
         DATA_STEP: (
           <DataStep
             teamsLists={teamsLists}
+            currentUserTeamId={currentUserTeamId}
+            currentListId={currentListId}
+            currentTeamDefaultList={currentTeamDefaultList}
             currentUserTeamsList={currentUserTeamsList}
             data={normalizeData(data.rows, matchings)}
             headings={matchings}

@@ -189,6 +189,7 @@ export function* updateSharedItemFromServer({ payload: { itemId } }) {
     ...itemFromState,
     invited: itemFromServer?.invited,
     isShared: true,
+    lastUpdated: itemFromServer?.lastUpdated,
   };
 
   return updatedItem;
@@ -259,7 +260,9 @@ export function* shareItemBatchSaga({
 export function* removeShareSaga({ payload: { itemId, memberIds = [] } }) {
   try {
     const workInProgressItem = yield select(workInProgressItemSelector);
-    const sharedKeyPairs = memberIds.map(memberId => workInProgressItem.membersKeys[memberId]);
+    const sharedKeyPairs = memberIds.map(
+      memberId => workInProgressItem.membersKeys[memberId],
+    );
 
     yield call(
       removeItemsBatch,

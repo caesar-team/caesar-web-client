@@ -73,6 +73,7 @@ export const useItemVaultAndListOptions = ({
     () =>
       lists
         .filter(list => list.teamId === checkedTeamId)
+        .sort((a, b) => sortByName(a.label, b.label))
         .map(list => ({
           ...list,
           label: transformListTitle(list.label),

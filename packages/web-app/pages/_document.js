@@ -32,12 +32,12 @@ export default class Document extends NextDocument {
           <link
             rel="icon"
             type="image/svg+xml"
-            href="/public/images/favicon/safari-pinned-tab.svg"
+            href="/public/images/favicon/safari-favicon.svg"
           />
           <link
             rel="apple-touch-icon"
             sizes="180x180"
-            href="/public/images/favicon/apple-touch-icon.png"
+            href="/public/images/favicon/apple-touch-favicon.png"
           />
           <link rel="manifest" href="/manifest.json" />
         </Head>

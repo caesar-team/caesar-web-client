@@ -9,7 +9,7 @@ import { importProgressPercentSelector } from '@caesar/common/selectors/entities
 import { actualKeyPairSelector } from '@caesar/common/selectors/keystore';
 import {
   isLoadingSelector,
-  workInProgressListIdSelector,
+  workInProgressListSelector,
 } from '@caesar/common/selectors/workflow';
 import {
   currentUserVaultListSelector,
@@ -25,7 +25,7 @@ const mapStateToProps = createStructuredSelector({
   isLoading: isLoadingSelector,
   importProgress: importProgressPercentSelector,
   currentUserTeamId: currentTeamIdSelector,
-  currentListId: workInProgressListIdSelector,
+  currentList: workInProgressListSelector,
   currentTeamDefaultList: currentTeamDefaultListSelector,
 });
 

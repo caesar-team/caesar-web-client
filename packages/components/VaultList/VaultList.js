@@ -2,7 +2,7 @@ import React, { memo } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import styled from 'styled-components';
 import { sortByName } from '@caesar/common/utils/sort';
-import { TEAM_TYPE } from '@caesar/common/constants';
+import { DASHBOARD_MODE, TEAM_TYPE } from '@caesar/common/constants';
 import {
   currentUserVaultListSelector,
   currentTeamSelector,
@@ -80,7 +80,13 @@ const VaultAvatar = ({ vault }) =>
     />
   );
 
-const VaultListComponent = ({ activeTeamId, handleToggle, setListsOpened }) => {
+const VaultListComponent = ({
+  activeTeamId,
+  handleToggle,
+  setListsOpened,
+  setSearchedText,
+  setMode, 
+}) => {
   const dispatch = useDispatch();
   const currentTeam = useSelector(currentTeamSelector);
 
@@ -94,6 +100,9 @@ const VaultListComponent = ({ activeTeamId, handleToggle, setListsOpened }) => {
 
     if (currentTeam?.id !== teamId) {
       dispatch(setCurrentTeamId(teamId));
+
+      setMode(DASHBOARD_MODE.DEFAULT);
+      setSearchedText('');
     }
   };
 

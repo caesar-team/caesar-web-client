@@ -98,7 +98,7 @@ const MiddleColumnComponent = ({
   );
 
   const searchedItems = useMemo(
-    () => filter(Object.values(currentTeamItems).sort(sortItems), searchedText),
+    () => filter(currentTeamItems.sort(sortItems), searchedText),
     [currentTeamItems, searchedText],
   );
   const filteredSearchedItems = searchedItems.filter(filterForbiddenItem);
@@ -141,7 +141,7 @@ const MiddleColumnComponent = ({
       dispatch(
         setWorkInProgressItemIds(
           checked
-            ? filter(Object.values(itemsById), searchedText)
+            ? filter(currentTeamItems, searchedText)
                 .filter(filterForbiddenItem)
                 .map(({ id }) => id)
             : [],

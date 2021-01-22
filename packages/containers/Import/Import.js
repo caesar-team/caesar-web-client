@@ -150,7 +150,7 @@ class Import extends Component {
     const {
       teamsLists,
       currentUserTeamId,
-      currentListId,
+      currentList,
       currentTeamDefaultList,
       importProgress,
       currentUserTeamsList,
@@ -174,7 +174,7 @@ class Import extends Component {
           <DataStep
             teamsLists={teamsLists}
             currentUserTeamId={currentUserTeamId}
-            currentListId={currentListId}
+            currentList={currentList}
             currentTeamDefaultList={currentTeamDefaultList}
             currentUserTeamsList={currentUserTeamsList}
             data={normalizeData(data.rows, matchings)}

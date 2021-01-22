@@ -489,7 +489,7 @@ function* loadTeamKeypairIfNotExists(teamId) {
   }
 }
 
-function* initTeam(teamId) {
+function* initTeam(teamId) {console.log('init team');
   try {
     const currentTeamId = teamId;
 
@@ -847,7 +847,7 @@ export function* initWorkflowSaga() {
   yield fork(fetchUsersSaga);
 }
 
-export function* openTeamVaultSaga({ payload: { teamId } }) {
+export function* openTeamVaultSaga({ payload: { teamId } }) {console.log('open');
   try {
     const currentUser = yield select(currentUserDataSelector);
 
@@ -909,7 +909,7 @@ export function* openTeamVaultSaga({ payload: { teamId } }) {
       // eslint-disable-next-line no-console
       console.error(`The team checks weren't pass`);
     }
-
+console.log('close');
     yield put(finishIsLoading());
   } catch (error) {
     // eslint-disable-next-line no-console
@@ -976,10 +976,13 @@ function* setWorkInProgressItemSaga({ payload: { item } }) {
 
 function* initDashboardSaga() {
   try {
+    console.log('Dash init');
     yield takeLatest(VAULTS_ARE_READY, openCurrentVaultSaga);
+    yield put(setWorkInProgressItem(null));
     yield call(initWorkflowSaga);
     yield call(checkTeamsKeyPairs);
-    yield call(checkWIPItem);
+    //yield call(checkWIPItem);
+    console.log('dash close');
   } catch (error) {
     // eslint-disable-next-line no-console
     console.error('error: ', error);

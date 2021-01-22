@@ -15,7 +15,10 @@ import {
   favoritesListSelector,
 } from '@caesar/common/selectors/entities/list';
 import { itemsByListIdSelector } from '@caesar/common/selectors/entities/item';
-import { workInProgressListSelector } from '@caesar/common/selectors/workflow';
+import {
+  workInProgressListSelector,
+  isLoadingSelector,
+} from '@caesar/common/selectors/workflow';
 import {
   setWorkInProgressItem,
   setWorkInProgressListId,
@@ -92,7 +95,7 @@ const MenuListInnerComponent = ({
   const currentTeamId = currentTeam?.id;
   const activeListId = workInProgressList?.id;
   const [isCreatingMode, setCreatingMode] = useState(false);
-
+  const isLoading = useSelector(isLoadingSelector);
   const teamLists = useSelector(state =>
     teamListsSelector(state, { teamId: currentTeamId }),
   );
@@ -195,11 +198,14 @@ const MenuListInnerComponent = ({
         : PERMISSION_ENTITY.TEAM_LIST,
   };
 
+  if (isLoading) {
+    return <>Loading</>;
+  }
   return (
     <Scrollbar>
       {menuList.map(({ id, icon, title, length, nested }) => {
         const withNested = !!nested;
-
+        
         return (
           id && (
             <MenuItem key={id}>

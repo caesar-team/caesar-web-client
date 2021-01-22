@@ -125,13 +125,13 @@ const MasterPasswordStepComponent = ({
     generateMasterPasswordState();
 
     return () => {
-      setFaviconTag('/public/images/favicon/favicon.ico');
+      setFaviconTag('favicon');
     };
   });
 
   useUpdateEffect(() => {
     if (state.step === MASTER_PASSWORD_CHECK) {
-      setFaviconTag('/public/images/favicon/favicon-locked.ico');
+      setFaviconTag('favicon-locked');
     }
   }, [state.step]);
 

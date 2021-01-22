@@ -104,7 +104,7 @@ export const itemsGeneralListSelector = createSelector(
 export const teamItemsSelector = createSelector(
   itemArraySelector,
   teamIdPropSelector,
-  (itemList, teamId) => itemList.filter(item => item.teamId === teamId),
+  (itemList, teamId) => itemList.filter(item => item.teamId === teamId) || [],
 );
 
 export const teamItemIdsSelector = createSelector(

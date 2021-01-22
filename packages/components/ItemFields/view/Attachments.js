@@ -2,6 +2,7 @@ import React, { useState, useEffect, memo } from 'react';
 import { useUpdateEffect } from 'react-use';
 import { useDispatch } from 'react-redux';
 import equal from 'fast-deep-equal';
+import { omit } from 'lodash';
 import { getUniqueAndDublicates } from '@caesar/common/utils/file';
 import { PERMISSION } from '@caesar/common/constants';
 import { SCHEMA } from '@caesar/common/validation';
@@ -182,18 +183,16 @@ export const Attachments = ({
   };
 
   const onClickRemove = handleAttachment => {
-    const attachmentIndex = itemAttachments.findIndex(
-      attachment => attachment.id === handleAttachment.id,
+    const updatedItemAttachments = itemAttachments.filter(
+      attach => attach.id !== handleAttachment.id,
     );
+    const updatedItemRaws = omit(itemRaws, [[handleAttachment.id]]);
 
-    itemAttachments.splice(attachmentIndex, 1);
-    delete itemRaws[handleAttachment.id];
-
-    setItemAttachments(itemAttachments);
-    setItemRaws(itemRaws);
+    setItemAttachments(updatedItemAttachments);
+    setItemRaws(updatedItemRaws);
     syncStateWithServer({
-      attachments: itemAttachments,
-      raws: itemRaws,
+      attachments: updatedItemAttachments,
+      raws: updatedItemRaws,
     });
   };
 

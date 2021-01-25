@@ -1,9 +1,5 @@
 import { schema } from 'normalizr';
-import {
-  ENTITY_TYPE,
-  PERMISSION_ENTITY,
-  TEAM_TYPE,
-} from '@caesar/common/constants';
+import { PERMISSION_ENTITY, TEAM_TYPE } from '@caesar/common/constants';
 import { createPermissionsFromLinks } from '@caesar/common/utils/createPermissionsFromLinks';
 import invitedUserSchema from './invitedUser';
 
@@ -31,7 +27,7 @@ const itemSchema = new schema.Entity(
             : PERMISSION_ENTITY.TEAM_ITEM,
       },
       teamId: entity.teamId || TEAM_TYPE.PERSONAL, // If item is personal, it does not have enough time to normalize list data. Need to set 'personal' teamId explicitly
-      __type: ENTITY_TYPE.ITEM,
+      listId: entity.teamListId || entity.listId,
     }),
   },
 );

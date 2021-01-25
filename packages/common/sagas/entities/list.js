@@ -30,7 +30,7 @@ import {
   patchTeamList,
   removeTeamList,
 } from '@caesar/common/api';
-import { ENTITY_TYPE, LIST_TYPE, TEAM_TYPE } from '@caesar/common/constants';
+import { LIST_TYPE, TEAM_TYPE } from '@caesar/common/constants';
 import { getServerErrors } from '@caesar/common/utils/error';
 import { convertListsToEntities } from '@caesar/common/normalizers/normalizers';
 import { itemsByListIdSelector } from '../../selectors/entities/item';
@@ -96,7 +96,6 @@ export function* createListSaga({
       id: listId,
       type: LIST_TYPE.LIST,
       sort: 0,
-      __type: ENTITY_TYPE.LIST,
       _links,
       ...list,
     };

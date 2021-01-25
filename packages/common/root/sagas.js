@@ -10,6 +10,7 @@ import {
   teamSagas,
 } from '@caesar/common/sagas';
 import { jobLoadBalancerSaga } from '@caesar/common/sagas/common/job';
+import { moveItemSagas } from '@caesar/common/sagas/common/move';
 import { shareItemSagas } from '@caesar/common/sagas/common/share';
 import { anonymousSagas } from '@caesar/common/sagas/common/anonymous';
 import { isClient } from '@caesar/common/utils/isEnvironment';
@@ -23,6 +24,7 @@ const sagas = [
   listSagas,
   itemSagas,
   teamSagas,
+  moveItemSagas,
   shareItemSagas,
   anonymousSagas,
 ];

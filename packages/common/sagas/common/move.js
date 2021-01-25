@@ -1,0 +1,449 @@
+import { put, call, takeLatest, select, all } from 'redux-saga/effects';
+import {
+  MOVE_ITEM_REQUEST,
+  MOVE_ITEMS_BATCH_REQUEST,
+  moveItemSuccess,
+  moveItemFailure,
+  moveItemsBatchSuccess,
+  moveItemsBatchFailure,
+} from '@caesar/common/actions/entities/item';
+import { checkIfUserWasKickedFromTeam } from '@caesar/common/sagas/currentUser';
+import { updateGlobalNotification } from '@caesar/common/actions/application';
+import {
+  listSelector,
+  currentTeamDefaultListSelector,
+} from '@caesar/common/selectors/entities/list';
+import {
+  itemSelector,
+  itemsBatchSelector,
+} from '@caesar/common/selectors/entities/item';
+import {
+  updateMoveItem,
+  updateMoveTeamItem,
+  updateMoveItemsBatch,
+  updateMoveTeamItemsBatch,
+} from '@caesar/common/api';
+import { getServerErrorMessage } from '@caesar/common/utils/error';
+import { chunk } from '@caesar/common/utils/utils';
+import {
+  MOVING_IN_PROGRESS_NOTIFICATION,
+  NOOP_NOTIFICATION,
+  TEAM_TYPE,
+} from '@caesar/common/constants';
+import {
+  shareItemKeyPairSelector,
+  teamKeyPairSelector,
+} from '@caesar/common/selectors/keystore';
+import { getItemListKey } from '@caesar/common/utils/item';
+import { updateShareKeyPairBatch } from '@caesar/common/actions/keystore';
+import { reencryptItemSecretSaga, decryptItemSync } from '../entities/item';
+import { convertKeyPairToItemEntity } from '../../normalizers/normalizers';
+
+const ITEMS_CHUNK_SIZE = 50;
+
+export function* moveItemSaga({
+  payload: { itemId, teamId, listId, teamDefaultListId },
+  meta: { notification, notificationText } = {},
+}) {
+  try {
+    yield put(updateGlobalNotification(MOVING_IN_PROGRESS_NOTIFICATION, true));
+
+    const item = yield select(itemSelector, { itemId });
+    const list = yield select(listSelector, { listId });
+    const defaultList = yield select(currentTeamDefaultListSelector);
+    // newListId is using to restore item from trash and when original list was deleted
+    const newListId =
+      item.teamId === teamId && !list ? defaultList?.id : listId;
+    const isPersonal = !item.teamId || item.teamId === TEAM_TYPE.PERSONAL;
+
+    let reencryptedData = null;
+    let reencryptedSecretDataAndRaws = null;
+
+    let itemToReencrypt = item;
+
+    if (item.teamId !== teamId) {
+      if (!item.data) {
+        // TODO: Decrypt item here
+      }
+
+      const keyPair = yield select(teamKeyPairSelector, {
+        teamId,
+      });
+
+      if (!keyPair) {
+        throw new Error(`Can't find or create the key pair for the items.`);
+      }
+
+      const { publicKey } = keyPair;
+
+      if (!publicKey) {
+        // Nothing to do here
+        throw new Error(
+          `Can't find the publicKey in the key pair for the team ${teamId}`,
+        );
+      }
+
+      if (item.isShared) {
+        const sharedItemKeyPairKey = yield select(shareItemKeyPairSelector, {
+          itemId: item.id,
+        });
+
+        itemToReencrypt = {
+          id: sharedItemKeyPairKey.id,
+          ...Object.values(
+            convertKeyPairToItemEntity([sharedItemKeyPairKey]),
+          ).shift(),
+        };
+      }
+
+      const { data, secretDataAndRaws } = yield call(reencryptItemSecretSaga, {
+        item: itemToReencrypt,
+        publicKey,
+      });
+
+      reencryptedData = data || {};
+      reencryptedSecretDataAndRaws = secretDataAndRaws || {};
+    }
+
+    if (item.teamId !== teamId && item.isShared) {
+      const sharedPayload = {
+        listId: teamDefaultListId,
+        ...reencryptedSecretDataAndRaws,
+      };
+
+      if (isPersonal) {
+        // Move item into another list
+        yield call(updateMoveItem, item.id, { listId: newListId });
+        // Reencrypt shared keypair with team keypair instead personal
+        // Move shared keypair into default list of the vault
+        yield call(updateMoveItem, itemToReencrypt.id, sharedPayload);
+      } else {
+        yield call(updateMoveTeamItem, item.teamId, item.id, {
+          listId: newListId,
+        });
+        yield call(
+          updateMoveTeamItem,
+          item.teamId,
+          itemToReencrypt.id,
+          sharedPayload,
+        );
+      }
+
+      yield put(
+        moveItemSuccess({
+          itemId: item.id,
+          previousListId: item[getItemListKey(item)],
+          [getItemListKey(item)]: newListId,
+          // previousListId: item.listId,
+          // listId: newListId,
+          teamId,
+        }),
+      );
+      yield put(
+        updateShareKeyPairBatch({
+          updatedShareKeyPairs: [
+            {
+              relatedItemId: item.id,
+              teamId,
+            },
+          ],
+        }),
+      );
+    } else {
+      const dataPayload = reencryptedSecretDataAndRaws
+        ? {
+            [getItemListKey(item)]: newListId,
+            // listId: newListId,
+            ...reencryptedSecretDataAndRaws,
+          }
+        : { [getItemListKey(item)]: newListId };
+      // : { listId: newListId };
+
+      if (isPersonal) {
+        yield call(updateMoveItem, item.id, dataPayload);
+      } else {
+        yield call(updateMoveTeamItem, item.teamId, item.id, dataPayload);
+      }
+      yield put(
+        moveItemSuccess({
+          itemId: item.id,
+          previousListId: item[getItemListKey(item)],
+          [getItemListKey(item)]: newListId,
+          // previousListId: item.listId,
+          // listId: newListId,
+          teamId,
+          secret: reencryptedData
+            ? JSON.stringify({ data: reencryptedData })
+            : item.secret,
+        }),
+      );
+    }
+
+    yield put(updateGlobalNotification(NOOP_NOTIFICATION, false));
+
+    if (notification) {
+      yield call(notification.show, {
+        text: notificationText || `The '${item.meta.title}' has been moved`,
+      });
+    }
+  } catch (error) {
+    // eslint-disable-next-line no-console
+    console.error(error);
+    yield put(moveItemFailure());
+
+    if (error.status === 403) {
+      yield call(checkIfUserWasKickedFromTeam);
+    }
+  }
+}
+
+function* reencryptSharedKeypair(item, publicKey) {
+  const sharedItemKeyPairKey = yield select(shareItemKeyPairSelector, {
+    itemId: item.id,
+  });
+
+  const itemToReencrypt = {
+    id: sharedItemKeyPairKey.id,
+    ...Object.values(
+      convertKeyPairToItemEntity([sharedItemKeyPairKey]),
+    ).shift(),
+  };
+
+  const { secretDataAndRaws } = yield call(reencryptItemSecretSaga, {
+    item: itemToReencrypt,
+    publicKey,
+  });
+
+  return {
+    id: sharedItemKeyPairKey.id,
+    ...secretDataAndRaws,
+  };
+}
+
+export function* moveItemsBatchSaga({
+  payload: {
+    itemIds,
+    oldTeamId,
+    previousListId,
+    teamId,
+    listId,
+    teamDefaultListId,
+  },
+  meta: { notification, notificationText } = {},
+}) {
+  try {
+    yield put(updateGlobalNotification(MOVING_IN_PROGRESS_NOTIFICATION, true));
+
+    const items = yield select(itemsBatchSelector, { itemIds });
+    const isPersonal = !oldTeamId || oldTeamId === TEAM_TYPE.PERSONAL;
+    let reencryptedItems = null;
+    let reencryptedSharedKeypairs = null;
+
+    if (oldTeamId !== teamId) {
+      // Need to reencrypt items
+      const notSharedItems = items.filter(item => !item.isShared);
+      const sharedItems = items.filter(item => item.isShared);
+
+      const keyPair = yield select(teamKeyPairSelector, {
+        teamId,
+      });
+
+      if (!keyPair) {
+        throw new Error(`Can't find or create the key pair for the items.`);
+      }
+
+      const { publicKey } = keyPair;
+
+      if (!publicKey) {
+        // Nothing to do here
+        throw new Error(
+          `Can't find the publicKey in the key pair for the team ${teamId}`,
+        );
+      }
+
+      if (notSharedItems.length) {
+        // Need to decrypt item secrets just which are not shared
+        const itemsNeedToDecrypt = notSharedItems.filter(item => !item.data);
+        const notSharedItemIds = notSharedItems.map(({ id }) => id);
+
+        // Decrypt item secret here if data does not exist
+        if (itemsNeedToDecrypt.length) {
+          yield all(
+            itemsNeedToDecrypt.map(item => call(decryptItemSync, item)),
+          );
+        }
+
+        const decryptedItems = yield select(itemsBatchSelector, {
+          itemIds: notSharedItemIds,
+        });
+
+        const reencryptedItemSecrets = yield all(
+          decryptedItems.map(item => ({
+            ...call(reencryptItemSecretSaga, {
+              item,
+              publicKey,
+            }),
+            itemId: item.id,
+          })),
+        );
+
+        reencryptedItems = decryptedItems.map((item, index) => ({
+          id: item.id,
+          data: reencryptedItemSecrets[index].data,
+          secret: reencryptedItemSecrets[index].secretDataAndRaws.secret,
+        }));
+      }
+
+      if (sharedItems.length) {
+        reencryptedSharedKeypairs = yield all(
+          sharedItems.map(item => reencryptSharedKeypair(item, publicKey)),
+        );
+      }
+
+      if (reencryptedItems) {
+        // Send to server updated data about not shared items
+        const itemChunks = chunk(reencryptedItems, ITEMS_CHUNK_SIZE);
+
+        yield all(
+          itemChunks.map(itemChunk =>
+            isPersonal
+              ? call(updateMoveItemsBatch, listId, {
+                  items: itemChunk.map(({ id, secret }) => ({
+                    itemId: id,
+                    secret,
+                  })),
+                })
+              : call(updateMoveTeamItemsBatch, oldTeamId, listId, {
+                  items: itemChunk.map(({ id, secret }) => ({
+                    itemId: id,
+                    secret,
+                  })),
+                }),
+          ),
+        );
+
+        const itemSecrets =
+          reencryptedItems.reduce(
+            (acc, item) => ({
+              ...acc,
+              [item.id]: item.secret,
+            }),
+            {},
+          ) || {};
+
+        yield put(
+          moveItemsBatchSuccess({
+            itemIds,
+            oldTeamId,
+            previousListId,
+            newTeamId: teamId,
+            newListId: listId,
+            itemSecrets,
+          }),
+        );
+      }
+
+      if (reencryptedSharedKeypairs) {
+        // Send to server updated data about shared items
+        const keypairChunks = chunk(
+          reencryptedSharedKeypairs,
+          ITEMS_CHUNK_SIZE,
+        );
+        const itemChunks = chunk(sharedItems, ITEMS_CHUNK_SIZE);
+        const sharedItemIds = sharedItems.map(({ id }) => id);
+
+        yield all(
+          keypairChunks.map(keypairChunk =>
+            isPersonal
+              ? call(updateMoveItemsBatch, teamDefaultListId, {
+                  items: keypairChunk.map(({ id, secret }) => ({
+                    itemId: id,
+                    secret,
+                  })),
+                })
+              : call(updateMoveTeamItemsBatch, oldTeamId, teamDefaultListId, {
+                  items: keypairChunk.map(({ id, secret }) => ({
+                    itemId: id,
+                    secret,
+                  })),
+                }),
+          ),
+        );
+        yield all(
+          itemChunks.map(itemChunk =>
+            isPersonal
+              ? call(updateMoveItemsBatch, listId, {
+                  items: itemChunk.map(({ id }) => ({ itemId: id })),
+                })
+              : call(updateMoveTeamItemsBatch, oldTeamId, listId, {
+                  items: itemChunk.map(({ id }) => ({ itemId: id })),
+                }),
+          ),
+        );
+
+        const updatedShareKeyPairs = reencryptedSharedKeypairs.map(keypair => ({
+          relatedItemId: keypair.relatedItemId,
+          teamId,
+        }));
+
+        yield put(updateShareKeyPairBatch({ updatedShareKeyPairs }));
+        yield put(
+          moveItemsBatchSuccess({
+            itemIds: sharedItemIds,
+            oldTeamId,
+            previousListId,
+            newTeamId: teamId,
+            newListId: listId,
+          }),
+        );
+      }
+    }
+
+    if (!reencryptedItems && !reencryptedSharedKeypairs) {
+      // Send data to server about items moved within one vault
+      const itemChunks = chunk(items, ITEMS_CHUNK_SIZE);
+
+      yield all(
+        itemChunks.map(itemChunk =>
+          call(updateMoveItemsBatch, listId, {
+            items: itemChunk.map(({ id }) => ({ itemId: id })),
+          }),
+        ),
+      );
+
+      yield put(
+        moveItemsBatchSuccess({
+          itemIds,
+          oldTeamId,
+          previousListId,
+          newTeamId: teamId,
+          newListId: listId,
+        }),
+      );
+    }
+
+    yield put(updateGlobalNotification(NOOP_NOTIFICATION, false));
+
+    if (notification) {
+      yield call(notification.show, {
+        text: notificationText || 'The items have been moved',
+      });
+    }
+  } catch (error) {
+    // eslint-disable-next-line no-console
+    console.error(error);
+    yield put(
+      updateGlobalNotification(getServerErrorMessage(error), false, true),
+    );
+    yield put(moveItemsBatchFailure());
+
+    if (error.status === 403) {
+      yield call(checkIfUserWasKickedFromTeam);
+    }
+  }
+}
+
+export function* moveItemSagas() {
+  yield takeLatest(MOVE_ITEM_REQUEST, moveItemSaga);
+  yield takeLatest(MOVE_ITEMS_BATCH_REQUEST, moveItemsBatchSaga);
+}

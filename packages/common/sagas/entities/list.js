@@ -19,7 +19,7 @@ import {
   nestedListsSelector,
   currentTeamTrashListSelector,
 } from '@caesar/common/selectors/entities/list';
-import { moveItemsBatchSaga } from '@caesar/common/sagas/entities/item';
+import { moveItemsBatchSaga } from '@caesar/common/sagas/common/move';
 import { checkIfUserWasKickedFromTeam } from '@caesar/common/sagas/currentUser';
 import {
   postCreateList,

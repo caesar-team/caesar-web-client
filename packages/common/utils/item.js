@@ -1,7 +1,7 @@
 import { getHostName } from '@caesar/common/utils/getDomainName';
 import { processUploadedFiles } from './attachment';
 import { decryptData } from './cipherUtils';
-import { ITEM_TYPE, DOMAIN_HOSTNAME } from '../constants';
+import { TEAM_TYPE, ITEM_TYPE, DOMAIN_HOSTNAME } from '../constants';
 
 export const extractItemType = item => item?.type || ITEM_TYPE.SYSTEM;
 
@@ -186,3 +186,6 @@ export const getItemMetaData = ({
     title,
   };
 };
+
+export const getItemListKey = item =>
+  item.teamId === TEAM_TYPE.PERSONAL ? 'listId' : 'teamListId';

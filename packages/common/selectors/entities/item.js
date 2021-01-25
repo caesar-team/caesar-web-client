@@ -1,6 +1,6 @@
 import { createSelector } from 'reselect';
 import { allTrashListIdsSelector } from './list';
-import { isGeneralItem } from '../../utils/item';
+import { getItemListKey, isGeneralItem } from '../../utils/item';
 import { LIST_TYPE } from '../../constants';
 
 export const entitiesSelector = state => state.entities;
@@ -123,16 +123,18 @@ export const itemsByListIdSelector = createSelector(
   teamIdPropSelector,
   listIdPropSelector,
   (itemList, trashListIds, teamId, listId) => {
+    const listKey = getItemListKey({ teamId });
+
     if (listId === LIST_TYPE.FAVORITES) {
       return itemList.filter(
         item =>
           item.favorite &&
           item.teamId === teamId &&
-          !trashListIds.includes(item.listId),
+          !trashListIds.includes(item[listKey]),
       );
     }
 
-    return itemList.filter(item => item.listId === listId);
+    return itemList.filter(item => item[listKey] === listId);
   },
 );
 
@@ -140,20 +142,11 @@ const listIdsPropSelector = (_, props) => props.listIds;
 export const itemsByListIdsSelector = createSelector(
   itemArraySelector,
   listIdsPropSelector,
-  (itemList, listIds) => {
-    return itemList?.filter(
-      item => listIds?.includes(item.listId) && isGeneralItem(item),
-    );
-  },
-);
-
-export const itemsByListIdVisibleSelector = createSelector(
-  itemArraySelector,
-  listIdPropSelector,
-  (itemList, listId) =>
-    itemList.filter(
-      item => item.listId === listId && isGeneralItem(item) && !!item?.data,
-    ),
+  (itemList, listIds) =>
+    itemList?.filter(
+      item =>
+        listIds?.includes(item[getItemListKey(item)]) && isGeneralItem(item),
+    ) || [],
 );
 
 export const importProgressPercentSelector = createSelector(

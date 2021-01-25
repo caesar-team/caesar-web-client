@@ -1,12 +1,13 @@
 import { createSelector } from 'reselect';
+import { getItemListKey } from '../utils/item';
 import { itemsByListIdsSelector } from './entities/item';
 import { teamListIdsSelector } from './entities/list';
 
 export const listsItemsSelector = createSelector(
   teamListIdsSelector,
   state => state,
-  (listsId, state) => {
-    return itemsByListIdsSelector(state, { listIds: listsId });
+  (listIds, state) => {
+    return itemsByListIdsSelector(state, { listIds });
   },
 );
 
@@ -17,10 +18,12 @@ export const teamListsSizesByIdSelector = createSelector(
     ids?.reduce(
       (acc, listId) => ({
         ...acc,
-        [listId]: items.filter(item => item.listId === listId)?.length || 0,
+        [listId]:
+          items.filter(item => item[getItemListKey(item)] === listId)?.length ||
+          0,
       }),
       {},
-    ),
+    ) || {},
 );
 
 const listsIdPropSelector = (_, prop) => prop.listsId;

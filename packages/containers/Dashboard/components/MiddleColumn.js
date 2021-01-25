@@ -126,7 +126,10 @@ const MiddleColumnComponent = ({
   });
 
   const handleDefaultSelectionItemBehaviour = itemId => {
-    dispatch(resetWorkInProgressItemIds());
+    if (isMultiItem) {
+      dispatch(resetWorkInProgressItemIds());
+    }
+
     dispatch(setWorkInProgressItem(itemsById[itemId]));
   };
 

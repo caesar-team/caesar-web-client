@@ -538,18 +538,6 @@ function* checkTeamsKeyPairs(createKeyPair = false) {
   yield put(addTeamsBatch(arrayToObject(checkedTeams.filter(team => !!team))));
 }
 
-function* checkWIPItem() {
-  const WIPItem = yield select(workInProgressItemSelector);
-  if (!WIPItem) return;
-
-  const itemInStore = yield select(itemSelector, { itemId: WIPItem.id });
-
-  if (!deepequal(WIPItem.data, itemInStore.data)) {
-    // The data is mismatced, update
-    yield put(setWorkInProgressItem(itemInStore));
-  }
-}
-
 function* initTeamsSaga() {
   try {
     // Load avaible teams

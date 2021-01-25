@@ -380,15 +380,22 @@ export function* reencryptItemSecretSaga({ item, publicKey }) {
         })
       : {};
 
+    const allRaws = {
+      ...(item.data?.raws || {}),
+      ...(rawsFromServer || {}),
+    };
+
+    const raws = item.data.attachments.reduce(
+      (acc, { id: attachId }) => ({ ...acc, [attachId]: allRaws[attachId] }),
+      {},
+    );
+
     itemToEncrypt = {
       // OMG :(
       ...item,
       data: {
         ...item.data,
-        raws: {
-          ...(item.data?.raws || {}),
-          ...(rawsFromServer || {}),
-        },
+        raws,
       },
     };
   }
@@ -400,19 +407,20 @@ export function* reencryptItemSecretSaga({ item, publicKey }) {
 
   let secretDataAndRaws = {};
 
+  // Save the raws inside the item if it's a non-general item
+  const secret = isGeneralItem(item)
+    ? JSON.stringify({ data })
+    : JSON.stringify({ data, raws });
+
   if (isRawsChanged) {
     // we need to save the raws to the item
     secretDataAndRaws = {
-      secret: isGeneralItem(item) // save the raws inside the item if it's a non-general item
-        ? JSON.stringify({ data })
-        : JSON.stringify({ data, raws }),
+      secret,
       raws: isGeneralItem(item) ? raws : null,
     };
   } else {
     secretDataAndRaws = {
-      secret: isGeneralItem(item)
-        ? JSON.stringify({ data })
-        : JSON.stringify({ data, raws }),
+      secret,
     };
   }
 
@@ -1241,6 +1249,7 @@ export function* editItemSaga({
 }) {
   try {
     const item = yield select(itemSelector, { itemId });
+
     if (!item) {
       throw new Error(`Can't find the item ${itemId}`);
     }
@@ -1253,12 +1262,10 @@ export function* editItemSaga({
       },
     };
     const {
-      listId,
       data: { raws, ...data },
     } = patchedItem;
 
-    const itemInState = yield select(itemSelector, { itemId });
-    const isDataChanged = !deepequal(itemInState.data, data);
+    const isDataChanged = !deepequal(item.data, data);
 
     if (!isDataChanged) {
       setSubmitting(false);

@@ -32,7 +32,9 @@ import {
   INIT_PREFERENCES_SETTINGS,
   DOWNLOAD_ITEM_ATTACHMENT,
   DOWNLOAD_ITEM_ATTACHMENTS,
-} from '@caesar/common/actions/workflow';
+  vaultStartLoading,
+  vaultFinishLoading,
+} from "@caesar/common/actions/workflow";
 import { addListsBatch } from '@caesar/common/actions/entities/list';
 import deepequal from 'fast-deep-equal';
 import {
@@ -489,7 +491,7 @@ function* loadTeamKeypairIfNotExists(teamId) {
   }
 }
 
-function* initTeam(teamId) {console.log('init team');
+function* initTeam(teamId) {
   try {
     const currentTeamId = teamId;
 
@@ -847,7 +849,7 @@ export function* initWorkflowSaga() {
   yield fork(fetchUsersSaga);
 }
 
-export function* openTeamVaultSaga({ payload: { teamId } }) {console.log('open');
+export function* openTeamVaultSaga({ payload: { teamId } }) {
   try {
     const currentUser = yield select(currentUserDataSelector);
 
@@ -909,7 +911,7 @@ export function* openTeamVaultSaga({ payload: { teamId } }) {console.log('open')
       // eslint-disable-next-line no-console
       console.error(`The team checks weren't pass`);
     }
-console.log('close');
+    yield put(vaultFinishLoading());
     yield put(finishIsLoading());
   } catch (error) {
     // eslint-disable-next-line no-console
@@ -976,13 +978,11 @@ function* setWorkInProgressItemSaga({ payload: { item } }) {
 
 function* initDashboardSaga() {
   try {
-    console.log('Dash init');
+    yield put(vaultStartLoading());
     yield takeLatest(VAULTS_ARE_READY, openCurrentVaultSaga);
     yield put(setWorkInProgressItem(null));
     yield call(initWorkflowSaga);
     yield call(checkTeamsKeyPairs);
-    //yield call(checkWIPItem);
-    console.log('dash close');
   } catch (error) {
     // eslint-disable-next-line no-console
     console.error('error: ', error);

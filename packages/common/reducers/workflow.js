@@ -22,6 +22,8 @@ import {
   DECRYPTION_END,
   DOWNLOAD_ITEM_ATTACHMENT,
   DOWNLOAD_ITEM_ATTACHMENTS,
+  VAULT_START_LOADING,
+  VAULT_FINISH_LOADING,
 } from '@caesar/common/actions/workflow';
 
 const initialState = {
@@ -29,6 +31,7 @@ const initialState = {
   isError: false,
   isReady: false,
   isDecryptionProgress: false,
+  isVaultLoading: false,
   workInProgressItem: null,
   workInProgressItemIds: [],
   workInProgressListId: null,
@@ -131,6 +134,18 @@ export default createReducer(initialState, {
     return {
       ...state,
       isDecryptionProgress: false,
+    };
+  },
+  [VAULT_START_LOADING](state) {
+    return {
+      ...state,
+      isVaultLoading: true,
+    };
+  },
+  [VAULT_FINISH_LOADING](state) {
+    return {
+      ...state,
+      isVaultLoading: false,
     };
   },
   [RESET_WORK_IN_PROGRESS_ITEM_IDS](state) {

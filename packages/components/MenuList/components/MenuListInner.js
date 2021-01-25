@@ -17,7 +17,7 @@ import {
 import { itemsByListIdSelector } from '@caesar/common/selectors/entities/item';
 import {
   workInProgressListSelector,
-  isLoadingSelector,
+  isVaultLoadingSelector,
 } from '@caesar/common/selectors/workflow';
 import {
   setWorkInProgressItem,
@@ -30,6 +30,7 @@ import { Can } from '../../Ability';
 import { Icon } from '../../Icon';
 import { Scrollbar } from '../../Scrollbar';
 import { ListItem } from './ListItem';
+import { DummyLists } from './DummyLists';
 import { MenuItemInner } from './styledComponents';
 
 const MenuItem = styled.div``;
@@ -95,7 +96,7 @@ const MenuListInnerComponent = ({
   const currentTeamId = currentTeam?.id;
   const activeListId = workInProgressList?.id;
   const [isCreatingMode, setCreatingMode] = useState(false);
-  const isLoading = useSelector(isLoadingSelector);
+  const isVaultLoading = useSelector(isVaultLoadingSelector);
   const teamLists = useSelector(state =>
     teamListsSelector(state, { teamId: currentTeamId }),
   );
@@ -198,8 +199,8 @@ const MenuListInnerComponent = ({
         : PERMISSION_ENTITY.TEAM_LIST,
   };
 
-  if (isLoading) {
-    return <>Loading</>;
+  if (isVaultLoading) {
+    return <DummyLists />;
   }
   return (
     <Scrollbar>

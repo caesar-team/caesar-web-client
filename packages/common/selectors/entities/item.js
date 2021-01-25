@@ -1,5 +1,5 @@
 import { createSelector } from 'reselect';
-import { allTrashListIdsSelector } from './list';
+import { currentTeamTrashListSelector } from './list';
 import { getItemListKey, isGeneralItem } from '../../utils/item';
 import { LIST_TYPE } from '../../constants';
 
@@ -119,10 +119,10 @@ export const generalItemsSelector = createSelector(
 
 export const itemsByListIdSelector = createSelector(
   itemArraySelector,
-  allTrashListIdsSelector,
+  currentTeamTrashListSelector,
   teamIdPropSelector,
   listIdPropSelector,
-  (itemList, trashListIds, teamId, listId) => {
+  (itemList, currentTeamTrashList, teamId, listId) => {
     const listKey = getItemListKey({ teamId });
 
     if (listId === LIST_TYPE.FAVORITES) {
@@ -130,7 +130,7 @@ export const itemsByListIdSelector = createSelector(
         item =>
           item.favorite &&
           item.teamId === teamId &&
-          !trashListIds.includes(item[listKey]),
+          item[listKey] !== currentTeamTrashList.id,
       );
     }
 

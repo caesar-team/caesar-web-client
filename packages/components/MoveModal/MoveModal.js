@@ -14,6 +14,7 @@ import {
 } from '@caesar/common/actions/workflow';
 import { TEAM_TYPE, LIST_TYPE } from '@caesar/common/constants';
 import { getTeamTitle } from '@caesar/common/utils/team';
+import { getItemListKey } from '@caesar/common/utils/item';
 import {
   useItemVaultAndListOptions,
   useNotification,
@@ -115,8 +116,13 @@ const MoveModalComponent = ({
   const dispatch = useDispatch();
   const currentUserId = useSelector(currentUserIdSelector);
   const teamsById = useSelector(teamsByIdSelector);
-  const teamId = isMultiMode ? currentTeamId : item.teamId;
-  const listId = isMultiMode ? currentListId : item.listId;
+  const teamId = useMemo(() => (isMultiMode ? currentTeamId : item.teamId), [
+    isMultiMode,
+  ]);
+  const listId = useMemo(
+    () => (isMultiMode ? currentListId : item[getItemListKey(item)]),
+    [isMultiMode],
+  );
   const notification = useNotification();
 
   const [searchTeamValue, setSearchTeamValue] = useState('');

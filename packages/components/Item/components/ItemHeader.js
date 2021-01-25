@@ -9,10 +9,10 @@ import {
 } from '@caesar/common/constants';
 import { transformListTitle } from '@caesar/common/utils/string';
 import { getTeamTitle } from '@caesar/common/utils/team';
+import { getItemListKey } from '@caesar/common/utils/item';
 import {
   listsByIdSelector,
-  trashListSelector,
-  teamsTrashListsSelector,
+  currentTeamTrashListSelector,
 } from '@caesar/common/selectors/entities/list';
 import { teamsByIdSelector } from '@caesar/common/selectors/entities/team';
 import { setWorkInProgressItem } from '@caesar/common/actions/workflow';
@@ -81,8 +81,7 @@ const ItemHeaderComponent = ({
   onClickRemoveItem,
 }) => {
   const dispatch = useDispatch();
-  const trashList = useSelector(trashListSelector);
-  const teamsTrashLists = useSelector(teamsTrashListsSelector);
+  const trashList = useSelector(currentTeamTrashListSelector);
   const teamsById = useSelector(teamsByIdSelector);
   const listsById = useSelector(listsByIdSelector);
 
@@ -90,12 +89,11 @@ const ItemHeaderComponent = ({
     ? getTeamTitle(teamsById[item.teamId])
     : TEAM_TEXT_TYPE[TEAM_TYPE.PERSONAL];
 
-  const listTitle = transformListTitle(listsById[item.listId]?.label);
+  const listTitle = transformListTitle(
+    listsById[item[getItemListKey(item)]]?.label,
+  );
 
-  const isTrashItem =
-    item &&
-    (item.listId === trashList?.id ||
-      teamsTrashLists.map(({ id: listId }) => listId).includes(item.listId));
+  const isTrashItem = item && item[getItemListKey(item)] === trashList?.id;
 
   const handleToggleFavorites = () => {
     dispatch(toggleItemToFavoriteRequest(item));

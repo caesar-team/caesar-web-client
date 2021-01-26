@@ -27,7 +27,6 @@ const itemSchema = new schema.Entity(
             : PERMISSION_ENTITY.TEAM_ITEM,
       },
       teamId: entity.teamId || TEAM_TYPE.PERSONAL, // If item is personal, it does not have enough time to normalize list data. Need to set 'personal' teamId explicitly
-      listId: entity.teamListId || entity.listId,
     }),
   },
 );

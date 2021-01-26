@@ -1,7 +1,8 @@
 import { createSelector } from 'reselect';
 import { currentTeamTrashListSelector } from './list';
-import { getItemListKey, isGeneralItem } from '../../utils/item';
-import { LIST_TYPE } from '../../constants';
+import { currentTeamIdSelector } from '../currentUser';
+import { isGeneralItem } from '../../utils/item';
+import { TEAM_TYPE, LIST_TYPE } from '../../constants';
 
 export const entitiesSelector = state => state.entities;
 
@@ -12,7 +13,28 @@ export const itemEntitySelector = createSelector(
 
 export const itemsByIdSelector = createSelector(
   itemEntitySelector,
-  itemEntity => itemEntity.byId,
+  currentTeamIdSelector,
+  (itemEntity, currentTeamId) => {
+    if (!Object.keys(itemEntity.byId).length) return {};
+
+    const isPersonal = !currentTeamId || currentTeamId === TEAM_TYPE.PERSONAL;
+
+    if (isPersonal) {
+      return itemEntity.byId;
+    }
+
+    return Object.keys(itemEntity.byId).reduce((acc, id) => {
+      const item = itemEntity.byId[id];
+
+      return {
+        ...acc,
+        [id]: {
+          ...item,
+          listId: item.teamListId,
+        },
+      };
+    }, {});
+  },
 );
 
 export const itemIdsSelector = createSelector(
@@ -123,18 +145,16 @@ export const itemsByListIdSelector = createSelector(
   teamIdPropSelector,
   listIdPropSelector,
   (itemList, currentTeamTrashList, teamId, listId) => {
-    const listKey = getItemListKey({ teamId });
-
     if (listId === LIST_TYPE.FAVORITES) {
       return itemList.filter(
         item =>
           item.favorite &&
           item.teamId === teamId &&
-          item[listKey] !== currentTeamTrashList.id,
+          item.listId !== currentTeamTrashList.id,
       );
     }
 
-    return itemList.filter(item => item[listKey] === listId);
+    return itemList.filter(item => item.listId === listId);
   },
 );
 
@@ -144,8 +164,7 @@ export const itemsByListIdsSelector = createSelector(
   listIdsPropSelector,
   (itemList, listIds) =>
     itemList?.filter(
-      item =>
-        listIds?.includes(item[getItemListKey(item)]) && isGeneralItem(item),
+      item => listIds?.includes(item.listId) && isGeneralItem(item),
     ) || [],
 );
 

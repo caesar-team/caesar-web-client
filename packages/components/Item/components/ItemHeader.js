@@ -9,7 +9,6 @@ import {
 } from '@caesar/common/constants';
 import { transformListTitle } from '@caesar/common/utils/string';
 import { getTeamTitle } from '@caesar/common/utils/team';
-import { getItemListKey } from '@caesar/common/utils/item';
 import {
   listsByIdSelector,
   currentTeamTrashListSelector,
@@ -89,11 +88,9 @@ const ItemHeaderComponent = ({
     ? getTeamTitle(teamsById[item.teamId])
     : TEAM_TEXT_TYPE[TEAM_TYPE.PERSONAL];
 
-  const listTitle = transformListTitle(
-    listsById[item[getItemListKey(item)]]?.label,
-  );
+  const listTitle = transformListTitle(listsById[item.listId]?.label);
 
-  const isTrashItem = item && item[getItemListKey(item)] === trashList?.id;
+  const isTrashItem = item && item.listId === trashList?.id;
 
   const handleToggleFavorites = () => {
     dispatch(toggleItemToFavoriteRequest(item));

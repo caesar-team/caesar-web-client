@@ -34,12 +34,43 @@ import {
   shareItemKeyPairSelector,
   teamKeyPairSelector,
 } from '@caesar/common/selectors/keystore';
-import { getItemListKey } from '@caesar/common/utils/item';
 import { updateShareKeyPairBatch } from '@caesar/common/actions/keystore';
 import { reencryptItemSecretSaga, decryptItemSync } from '../entities/item';
 import { convertKeyPairToItemEntity } from '../../normalizers/normalizers';
 
 const ITEMS_CHUNK_SIZE = 50;
+
+function* getPublicKeyToEncrypt(teamId) {
+  const keyPair = yield select(teamKeyPairSelector, {
+    teamId,
+  });
+
+  if (!keyPair) {
+    throw new Error(`Can't find or create the key pair for the items.`);
+  }
+
+  const { publicKey } = keyPair;
+
+  if (!publicKey) {
+    // Nothing to do here
+    throw new Error(
+      `Can't find the publicKey in the key pair for the team ${teamId}.`,
+    );
+  }
+
+  return publicKey;
+}
+
+const callMoveItemRoute = (item, dataPayload) => {
+  // TODO: Use here currentVault instead of item.teamId prop
+  const isPersonal = !item.teamId || item.teamId === TEAM_TYPE.PERSONAL;
+
+  if (isPersonal) {
+    return updateMoveItem(item.id, dataPayload);
+  }
+
+  return updateMoveTeamItem(item.teamId, item.id, dataPayload);
+};
 
 export function* moveItemSaga({
   payload: { itemId, teamId, listId, teamDefaultListId },
@@ -62,26 +93,12 @@ export function* moveItemSaga({
     let itemToReencrypt = item;
 
     if (item.teamId !== teamId) {
+      // We must reencrypt item or shared keypair if we move item between vaults
       if (!item.data) {
         // TODO: Decrypt item here
       }
 
-      const keyPair = yield select(teamKeyPairSelector, {
-        teamId,
-      });
-
-      if (!keyPair) {
-        throw new Error(`Can't find or create the key pair for the items.`);
-      }
-
-      const { publicKey } = keyPair;
-
-      if (!publicKey) {
-        // Nothing to do here
-        throw new Error(
-          `Can't find the publicKey in the key pair for the team ${teamId}`,
-        );
-      }
+      const publicKey = yield call(getPublicKeyToEncrypt, teamId);
 
       if (item.isShared) {
         const sharedItemKeyPairKey = yield select(shareItemKeyPairSelector, {
@@ -132,10 +149,8 @@ export function* moveItemSaga({
       yield put(
         moveItemSuccess({
           itemId: item.id,
-          previousListId: item[getItemListKey(item)],
-          [getItemListKey(item)]: newListId,
-          // previousListId: item.listId,
-          // listId: newListId,
+          previousListId: item.listId,
+          listId: newListId,
           teamId,
         }),
       );
@@ -152,25 +167,18 @@ export function* moveItemSaga({
     } else {
       const dataPayload = reencryptedSecretDataAndRaws
         ? {
-            [getItemListKey(item)]: newListId,
-            // listId: newListId,
+            listId: newListId,
             ...reencryptedSecretDataAndRaws,
           }
-        : { [getItemListKey(item)]: newListId };
-      // : { listId: newListId };
+        : { listId: newListId };
 
-      if (isPersonal) {
-        yield call(updateMoveItem, item.id, dataPayload);
-      } else {
-        yield call(updateMoveTeamItem, item.teamId, item.id, dataPayload);
-      }
+      yield call(callMoveItemRoute, item, dataPayload);
+
       yield put(
         moveItemSuccess({
           itemId: item.id,
-          previousListId: item[getItemListKey(item)],
-          [getItemListKey(item)]: newListId,
-          // previousListId: item.listId,
-          // listId: newListId,
+          previousListId: item.listId,
+          listId: newListId,
           teamId,
           secret: reencryptedData
             ? JSON.stringify({ data: reencryptedData })
@@ -244,22 +252,7 @@ export function* moveItemsBatchSaga({
       const notSharedItems = items.filter(item => !item.isShared);
       const sharedItems = items.filter(item => item.isShared);
 
-      const keyPair = yield select(teamKeyPairSelector, {
-        teamId,
-      });
-
-      if (!keyPair) {
-        throw new Error(`Can't find or create the key pair for the items.`);
-      }
-
-      const { publicKey } = keyPair;
-
-      if (!publicKey) {
-        // Nothing to do here
-        throw new Error(
-          `Can't find the publicKey in the key pair for the team ${teamId}`,
-        );
-      }
+      const publicKey = yield call(getPublicKeyToEncrypt, teamId);
 
       if (notSharedItems.length) {
         // Need to decrypt item secrets just which are not shared

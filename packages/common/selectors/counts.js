@@ -1,5 +1,4 @@
 import { createSelector } from 'reselect';
-import { getItemListKey } from '../utils/item';
 import { itemsByListIdsSelector } from './entities/item';
 import { teamListIdsSelector } from './entities/list';
 
@@ -18,9 +17,7 @@ export const teamListsSizesByIdSelector = createSelector(
     ids?.reduce(
       (acc, listId) => ({
         ...acc,
-        [listId]:
-          items.filter(item => item[getItemListKey(item)] === listId)?.length ||
-          0,
+        [listId]: items.filter(item => item.listId === listId)?.length || 0,
       }),
       {},
     ) || {},

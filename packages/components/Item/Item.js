@@ -4,7 +4,6 @@ import { useEvent } from 'react-use';
 import { useSelector, useDispatch } from 'react-redux';
 import styled from 'styled-components';
 import { PERMISSION } from '@caesar/common/constants';
-import { getItemListKey } from '@caesar/common/utils/item';
 import { useNotification } from '@caesar/common/hooks';
 import { workInProgressItemSelector } from '@caesar/common/selectors/workflow';
 import { currentTeamTrashListSelector } from '@caesar/common/selectors/entities/list';
@@ -81,7 +80,7 @@ const ItemComponent = ({
     return <EmptyItem />;
   }
 
-  const isTrashItem = item && item[getItemListKey(item)] === trashList?.id;
+  const isTrashItem = item && item.listId === trashList?.id;
 
   const handleClickAcceptEdit = patchData => {
     setSubmitting(true);

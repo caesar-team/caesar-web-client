@@ -107,7 +107,7 @@ export const Note = ({
   const handleCloseEditMode = () => {
     setEdit(false);
     setError(null);
-    setValue(null);
+    setValue(propValue);
   };
 
   return (

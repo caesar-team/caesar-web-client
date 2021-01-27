@@ -108,6 +108,7 @@ export function* moveItemSaga({
 
         itemToReencrypt = {
           id: sharedItemKeyPairKey.id,
+          teamId: sharedItemKeyPairKey.teamId,
           ...Object.values(
             convertKeyPairToItemEntity([sharedItemKeyPairKey]),
           ).shift(),
@@ -129,29 +130,28 @@ export function* moveItemSaga({
         ...reencryptedSecretDataAndRaws,
       };
 
-      if (currentIsPersonal) {
-        // Move item into another list
-        yield call(moveItem, item.id, { listId: newListId });
-        // Reencrypt shared keypair with team keypair instead personal
-        // Move shared keypair into default list of the vault
-        yield call(moveItem, itemToReencrypt.id, sharedPayload);
-      } else {
-        yield call(moveTeamItem, item.teamId, item.id, {
-          listId: newListId,
-        });
-        yield call(
-          moveTeamItem,
-          item.teamId,
-          itemToReencrypt.id,
-          sharedPayload,
-        );
-      }
+      // Move item into another list
+      yield call(
+        callMoveItemRoute,
+        { id: item.id, teamId: item.teamId },
+        { listId: newListId },
+        currentIsPersonal,
+      );
+      // Reencrypt shared keypair with team keypair instead personal
+      // Move shared keypair into default list of the vault
+      yield call(
+        callMoveItemRoute,
+        { id: itemToReencrypt.id, teamId: itemToReencrypt.teamId },
+        sharedPayload,
+        currentIsPersonal,
+      );
 
       yield put(
         moveItemSuccess({
           itemId: item.id,
           previousListId: item.listId,
-          listId: newListId,
+          listId: newIsPersonal ? newListId : null,
+          teamListId: newIsPersonal ? null : newListId,
           teamId,
         }),
       );

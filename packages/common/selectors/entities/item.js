@@ -1,8 +1,8 @@
 import { createSelector } from 'reselect';
 import { currentTeamTrashListSelector } from './list';
-import { currentTeamIdSelector } from '../currentUser';
+import { isCurrentTeamPersonalSelector } from '../currentUser';
 import { isGeneralItem } from '../../utils/item';
-import { TEAM_TYPE, LIST_TYPE } from '../../constants';
+import { LIST_TYPE } from '../../constants';
 
 export const entitiesSelector = state => state.entities;
 
@@ -13,11 +13,9 @@ export const itemEntitySelector = createSelector(
 
 export const itemsByIdSelector = createSelector(
   itemEntitySelector,
-  currentTeamIdSelector,
-  (itemEntity, currentTeamId) => {
+  isCurrentTeamPersonalSelector,
+  (itemEntity, isPersonal) => {
     if (!Object.keys(itemEntity.byId).length) return {};
-
-    const isPersonal = !currentTeamId || currentTeamId === TEAM_TYPE.PERSONAL;
 
     if (isPersonal) {
       return itemEntity.byId;

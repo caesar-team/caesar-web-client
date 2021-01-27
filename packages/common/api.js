@@ -207,9 +207,9 @@ export const getRemovedItems = (itemsIds, teamId) =>
   });
 export const updateItem = (itemId, data) =>
   callApi.patch(`/items/${itemId}`, data);
-export const updateMoveItem = (itemId, data) =>
+export const moveItem = (itemId, data) =>
   callApi.patch(`/items/${itemId}/move`, data);
-export const updateMoveTeamItem = (teamId, itemId, data) =>
+export const moveTeamItem = (teamId, itemId, data) =>
   callApi.patch(`/teams/${teamId}/items/${itemId}/move`, data);
 export const toggleFavorite = id => callApi.post(`/items/${id}/favorite`);
 export const removeItem = itemId => callApi.delete(`/items/${itemId}`);
@@ -236,10 +236,10 @@ export const postAddKeyPairBatch = items =>
 // TODO: Refactor: use body instead of query (change together with backend)
 export const removeItemsBatch = query =>
   callApi.delete(`/items/batch?${query}`);
-export const updateMoveItemsBatch = (listId, data) =>
+export const moveItemsBatch = (listId, data) =>
   callApi.patch(`/items/batch/move/list/${listId}`, data);
-export const updateMoveTeamItemsBatch = (teamId, listId, data) =>
-  callApi.patch(`/teams/${teamId}/items/batch/move/list/${listId}`, data);
+export const moveTeamItemsBatch = (teamId, listId, data) =>
+  callApi.patch(`/teams/${teamId}/batch/move/list/${listId}`, data);
 
 // secure
 export const getSecureMessage = id => callApi.get(`/message/${id}`);

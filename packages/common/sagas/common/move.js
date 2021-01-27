@@ -9,6 +9,7 @@ import {
 } from '@caesar/common/actions/entities/item';
 import { checkIfUserWasKickedFromTeam } from '@caesar/common/sagas/currentUser';
 import { updateGlobalNotification } from '@caesar/common/actions/application';
+import { isCurrentTeamPersonalSelector } from '@caesar/common/selectors/currentUser';
 import {
   listSelector,
   currentTeamDefaultListSelector,
@@ -18,17 +19,16 @@ import {
   itemsBatchSelector,
 } from '@caesar/common/selectors/entities/item';
 import {
-  updateMoveItem,
-  updateMoveTeamItem,
-  updateMoveItemsBatch,
-  updateMoveTeamItemsBatch,
+  moveItem,
+  moveTeamItem,
+  moveItemsBatch,
+  moveTeamItemsBatch,
 } from '@caesar/common/api';
 import { getServerErrorMessage } from '@caesar/common/utils/error';
 import { chunk } from '@caesar/common/utils/utils';
 import {
   MOVING_IN_PROGRESS_NOTIFICATION,
   NOOP_NOTIFICATION,
-  TEAM_TYPE,
 } from '@caesar/common/constants';
 import {
   shareItemKeyPairSelector,
@@ -61,16 +61,15 @@ function* getPublicKeyToEncrypt(teamId) {
   return publicKey;
 }
 
-const callMoveItemRoute = (item, dataPayload) => {
-  // TODO: Use here currentVault instead of item.teamId prop
-  const isPersonal = !item.teamId || item.teamId === TEAM_TYPE.PERSONAL;
+const callMoveItemRoute = (item, dataPayload, isPersonal) =>
+  isPersonal
+    ? moveItem(item.id, dataPayload)
+    : moveTeamItem(item.teamId, item.id, dataPayload);
 
-  if (isPersonal) {
-    return updateMoveItem(item.id, dataPayload);
-  }
-
-  return updateMoveTeamItem(item.teamId, item.id, dataPayload);
-};
+const callMoveItemBatchRoute = (listId, payload, isPersonal, oldTeamId) =>
+  isPersonal
+    ? moveItemsBatch(listId, payload)
+    : moveTeamItemsBatch(oldTeamId, listId, payload);
 
 export function* moveItemSaga({
   payload: { itemId, teamId, listId, teamDefaultListId },
@@ -85,7 +84,7 @@ export function* moveItemSaga({
     // newListId is using to restore item from trash and when original list was deleted
     const newListId =
       item.teamId === teamId && !list ? defaultList?.id : listId;
-    const isPersonal = !item.teamId || item.teamId === TEAM_TYPE.PERSONAL;
+    const isPersonal = yield select(isCurrentTeamPersonalSelector);
 
     let reencryptedData = null;
     let reencryptedSecretDataAndRaws = null;
@@ -130,16 +129,16 @@ export function* moveItemSaga({
 
       if (isPersonal) {
         // Move item into another list
-        yield call(updateMoveItem, item.id, { listId: newListId });
+        yield call(moveItem, item.id, { listId: newListId });
         // Reencrypt shared keypair with team keypair instead personal
         // Move shared keypair into default list of the vault
-        yield call(updateMoveItem, itemToReencrypt.id, sharedPayload);
+        yield call(moveItem, itemToReencrypt.id, sharedPayload);
       } else {
-        yield call(updateMoveTeamItem, item.teamId, item.id, {
+        yield call(moveTeamItem, item.teamId, item.id, {
           listId: newListId,
         });
         yield call(
-          updateMoveTeamItem,
+          moveTeamItem,
           item.teamId,
           itemToReencrypt.id,
           sharedPayload,
@@ -172,13 +171,14 @@ export function* moveItemSaga({
           }
         : { listId: newListId };
 
-      yield call(callMoveItemRoute, item, dataPayload);
+      yield call(callMoveItemRoute, item, dataPayload, isPersonal);
 
       yield put(
         moveItemSuccess({
           itemId: item.id,
           previousListId: item.listId,
-          listId: newListId,
+          listId: isPersonal ? newListId : item.listId,
+          teamListId: isPersonal ? item.teamListId : newListId,
           teamId,
           secret: reencryptedData
             ? JSON.stringify({ data: reencryptedData })
@@ -243,7 +243,7 @@ export function* moveItemsBatchSaga({
     yield put(updateGlobalNotification(MOVING_IN_PROGRESS_NOTIFICATION, true));
 
     const items = yield select(itemsBatchSelector, { itemIds });
-    const isPersonal = !oldTeamId || oldTeamId === TEAM_TYPE.PERSONAL;
+    const isPersonal = yield select(isCurrentTeamPersonalSelector);
     let reencryptedItems = null;
     let reencryptedSharedKeypairs = null;
 
@@ -300,13 +300,13 @@ export function* moveItemsBatchSaga({
         yield all(
           itemChunks.map(itemChunk =>
             isPersonal
-              ? call(updateMoveItemsBatch, listId, {
+              ? call(moveItemsBatch, listId, {
                   items: itemChunk.map(({ id, secret }) => ({
                     itemId: id,
                     secret,
                   })),
                 })
-              : call(updateMoveTeamItemsBatch, oldTeamId, listId, {
+              : call(moveTeamItemsBatch, oldTeamId, listId, {
                   items: itemChunk.map(({ id, secret }) => ({
                     itemId: id,
                     secret,
@@ -327,7 +327,6 @@ export function* moveItemsBatchSaga({
         yield put(
           moveItemsBatchSuccess({
             itemIds,
-            oldTeamId,
             previousListId,
             newTeamId: teamId,
             newListId: listId,
@@ -348,13 +347,13 @@ export function* moveItemsBatchSaga({
         yield all(
           keypairChunks.map(keypairChunk =>
             isPersonal
-              ? call(updateMoveItemsBatch, teamDefaultListId, {
+              ? call(moveItemsBatch, teamDefaultListId, {
                   items: keypairChunk.map(({ id, secret }) => ({
                     itemId: id,
                     secret,
                   })),
                 })
-              : call(updateMoveTeamItemsBatch, oldTeamId, teamDefaultListId, {
+              : call(moveTeamItemsBatch, oldTeamId, teamDefaultListId, {
                   items: keypairChunk.map(({ id, secret }) => ({
                     itemId: id,
                     secret,
@@ -365,10 +364,10 @@ export function* moveItemsBatchSaga({
         yield all(
           itemChunks.map(itemChunk =>
             isPersonal
-              ? call(updateMoveItemsBatch, listId, {
+              ? call(moveItemsBatch, listId, {
                   items: itemChunk.map(({ id }) => ({ itemId: id })),
                 })
-              : call(updateMoveTeamItemsBatch, oldTeamId, listId, {
+              : call(moveTeamItemsBatch, oldTeamId, listId, {
                   items: itemChunk.map(({ id }) => ({ itemId: id })),
                 }),
           ),
@@ -383,7 +382,6 @@ export function* moveItemsBatchSaga({
         yield put(
           moveItemsBatchSuccess({
             itemIds: sharedItemIds,
-            oldTeamId,
             previousListId,
             newTeamId: teamId,
             newListId: listId,
@@ -398,19 +396,23 @@ export function* moveItemsBatchSaga({
 
       yield all(
         itemChunks.map(itemChunk =>
-          call(updateMoveItemsBatch, listId, {
-            items: itemChunk.map(({ id }) => ({ itemId: id })),
-          }),
+          call(
+            callMoveItemBatchRoute,
+            listId,
+            { items: itemChunk.map(({ id }) => ({ itemId: id })) },
+            isPersonal,
+            oldTeamId,
+          ),
         ),
       );
 
       yield put(
         moveItemsBatchSuccess({
           itemIds,
-          oldTeamId,
           previousListId,
           newTeamId: teamId,
-          newListId: listId,
+          newListId: isPersonal ? listId : null,
+          newTeamListId: isPersonal ? null : listId,
         }),
       );
     }

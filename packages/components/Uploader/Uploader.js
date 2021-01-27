@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React from 'react';
 import Dropzone from 'react-dropzone';
 import {
   filesToBase64,

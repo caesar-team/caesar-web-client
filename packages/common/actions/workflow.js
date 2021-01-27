@@ -14,6 +14,9 @@ export const START_IS_LOADING = '@workflow/START_IS_LOADING';
 export const FINISH_IS_LOADING = '@workflow/FINISH_IS_LOADING';
 export const VAULTS_ARE_READY = '@workflow/VAULTS_ARE_READY';
 
+export const VAULT_START_LOADING = '@workflow/VAULT_START_LOADING';
+export const VAULT_FINISH_LOADING = '@workflow/VAULT_FINISH_LOADING';
+
 export const SET_WORK_IN_PROGRESS_ITEM = '@workflow/SET_WORK_IN_PROGRESS_ITEM';
 export const UPDATE_WORK_IN_PROGRESS_ITEM =
   '@workflow/UPDATE_WORK_IN_PROGRESS_ITEM';
@@ -188,9 +191,18 @@ export const downloadItemAttachment = ({ itemId, attachment }) => ({
     attachment,
   },
 });
+
 export const downloadItemAttachments = ({ itemId }) => ({
   type: DOWNLOAD_ITEM_ATTACHMENTS,
   payload: {
     itemId,
   },
+});
+
+export const vaultStartLoading = () => ({
+  type: VAULT_START_LOADING,
+});
+
+export const vaultFinishLoading = () => ({
+  type: VAULT_FINISH_LOADING,
 });

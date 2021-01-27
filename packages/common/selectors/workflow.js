@@ -79,3 +79,8 @@ export const isDecryptionProgressSelector = createSelector(
   workflowSelector,
   workflow => workflow.isDecryptionProgress,
 );
+
+export const isVaultLoadingSelector = createSelector(
+  workflowSelector,
+  workflow => workflow.isVaultLoading,
+);

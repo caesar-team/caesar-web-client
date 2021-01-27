@@ -15,7 +15,10 @@ import {
   favoritesListSelector,
 } from '@caesar/common/selectors/entities/list';
 import { itemsByListIdSelector } from '@caesar/common/selectors/entities/item';
-import { workInProgressListSelector } from '@caesar/common/selectors/workflow';
+import {
+  workInProgressListSelector,
+  isVaultLoadingSelector,
+} from '@caesar/common/selectors/workflow';
 import {
   setWorkInProgressItem,
   setWorkInProgressListId,
@@ -27,6 +30,7 @@ import { Can } from '../../Ability';
 import { Icon } from '../../Icon';
 import { Scrollbar } from '../../Scrollbar';
 import { ListItem } from './ListItem';
+import { DummyLists } from './DummyLists';
 import { MenuItemInner } from './styledComponents';
 
 const MenuItem = styled.div``;
@@ -92,7 +96,7 @@ const MenuListInnerComponent = ({
   const currentTeamId = currentTeam?.id;
   const activeListId = workInProgressList?.id;
   const [isCreatingMode, setCreatingMode] = useState(false);
-
+  const isVaultLoading = useSelector(isVaultLoadingSelector);
   const teamLists = useSelector(state =>
     teamListsSelector(state, { teamId: currentTeamId }),
   );
@@ -195,11 +199,14 @@ const MenuListInnerComponent = ({
         : PERMISSION_ENTITY.TEAM_LIST,
   };
 
+  if (isVaultLoading) {
+    return <DummyLists />;
+  }
   return (
     <Scrollbar>
       {menuList.map(({ id, icon, title, length, nested }) => {
         const withNested = !!nested;
-
+        
         return (
           id && (
             <MenuItem key={id}>

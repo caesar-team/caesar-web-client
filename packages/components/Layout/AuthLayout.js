@@ -15,7 +15,7 @@ const LayoutConstructorStyled = styled(LayoutConstructor)`
 `;
 
 const AuthLayout = props => (
-  <LayoutConstructorStyled withImages footerComponent={Footer} {...props} />
+  <LayoutConstructorStyled footerComponent={Footer} {...props} />
 );
 
 export default AuthLayout;

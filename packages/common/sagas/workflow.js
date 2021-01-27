@@ -254,6 +254,7 @@ export function* downloadItemAttachmentSaga({
   payload: { itemId, attachment = {} },
 }) {
   if (!itemId) return;
+
   const item = yield select(itemSelector, { itemId });
   const keyPair = yield call(getItemKeyPair, {
     payload: {
@@ -272,6 +273,7 @@ export function* downloadItemAttachmentSaga({
     );
     const rawFile = yield Promise.resolve(decryptData(raw, privateKeyObj));
     const { name, ext } = attachment;
+
     downloadFile(rawFile, `${name}.${ext}`);
   }
 }
@@ -577,22 +579,24 @@ function* decryptKeypairsByTeamKeipairs(teamId, keypairs) {
   try {
     const teamKeyPair = yield select(teamKeyPairSelector, { teamId });
 
-    if (!teamKeyPair) {
-      // eslint-disable-next-line no-console
-      console.warn(
-        `The key pair for the team with teamId ${teamId} not found. Ask team admin to add you in team.`,
+    if (teamKeyPair) {
+      yield put(
+        decryption({
+          items: keypairs,
+          key: teamKeyPair.privateKey,
+          masterPassword: teamKeyPair.password,
+        }),
       );
 
-      return;
+      return true;
     }
 
-    yield put(
-      decryption({
-        items: keypairs,
-        key: teamKeyPair.privateKey,
-        masterPassword: teamKeyPair.password,
-      }),
+    // eslint-disable-next-line no-console
+    console.warn(
+      `The key pair for the team with teamId ${teamId} not found. Ask team admin to add you in team.`,
     );
+
+    return false;
   } catch (error) {
     // eslint-disable-next-line no-console
     console.error(
@@ -602,6 +606,8 @@ function* decryptKeypairsByTeamKeipairs(teamId, keypairs) {
       error,
     );
   }
+
+  return false;
 }
 
 function* decryptNotDecryptedKeyPairs(notDecryptedKeyPairs) {
@@ -611,7 +617,7 @@ function* decryptNotDecryptedKeyPairs(notDecryptedKeyPairs) {
       notDecryptedKeyPairs,
     );
 
-    yield all(
+    const isDecryptedArray = yield all(
       Object.keys(dividedByTeamKeypairs).map(teamKeypair =>
         call(
           decryptKeypairsByTeamKeipairs,
@@ -620,6 +626,12 @@ function* decryptNotDecryptedKeyPairs(notDecryptedKeyPairs) {
         ),
       ),
     );
+
+    const canDecryptItems = isDecryptedArray.includes(true);
+
+    if (!canDecryptItems) {
+      yield put(finishProcessingKeyPairs());
+    }
 
     yield put(clearNotDecryptedKeypairs());
   } catch (error) {

@@ -9,7 +9,6 @@ import {
 } from '@caesar/common/actions/entities/item';
 import { checkIfUserWasKickedFromTeam } from '@caesar/common/sagas/currentUser';
 import { updateGlobalNotification } from '@caesar/common/actions/application';
-import { isCurrentTeamPersonalSelector } from '@caesar/common/selectors/currentUser';
 import {
   listSelector,
   currentTeamDefaultListSelector,
@@ -29,6 +28,7 @@ import { chunk } from '@caesar/common/utils/utils';
 import {
   MOVING_IN_PROGRESS_NOTIFICATION,
   NOOP_NOTIFICATION,
+  TEAM_TYPE,
 } from '@caesar/common/constants';
 import {
   shareItemKeyPairSelector,
@@ -84,7 +84,9 @@ export function* moveItemSaga({
     // newListId is using to restore item from trash and when original list was deleted
     const newListId =
       item.teamId === teamId && !list ? defaultList?.id : listId;
-    const isPersonal = yield select(isCurrentTeamPersonalSelector);
+    const currentIsPersonal =
+      !item.teamId || item.teamId === TEAM_TYPE.PERSONAL;
+    const newIsPersonal = !teamId || teamId === TEAM_TYPE.PERSONAL;
 
     let reencryptedData = null;
     let reencryptedSecretDataAndRaws = null;
@@ -127,7 +129,7 @@ export function* moveItemSaga({
         ...reencryptedSecretDataAndRaws,
       };
 
-      if (isPersonal) {
+      if (currentIsPersonal) {
         // Move item into another list
         yield call(moveItem, item.id, { listId: newListId });
         // Reencrypt shared keypair with team keypair instead personal
@@ -171,14 +173,14 @@ export function* moveItemSaga({
           }
         : { listId: newListId };
 
-      yield call(callMoveItemRoute, item, dataPayload, isPersonal);
+      yield call(callMoveItemRoute, item, dataPayload, currentIsPersonal);
 
       yield put(
         moveItemSuccess({
           itemId: item.id,
           previousListId: item.listId,
-          listId: isPersonal ? newListId : item.listId,
-          teamListId: isPersonal ? item.teamListId : newListId,
+          listId: newIsPersonal ? newListId : item.listId,
+          teamListId: newIsPersonal ? item.teamListId : newListId,
           teamId,
           secret: reencryptedData
             ? JSON.stringify({ data: reencryptedData })
@@ -243,7 +245,8 @@ export function* moveItemsBatchSaga({
     yield put(updateGlobalNotification(MOVING_IN_PROGRESS_NOTIFICATION, true));
 
     const items = yield select(itemsBatchSelector, { itemIds });
-    const isPersonal = yield select(isCurrentTeamPersonalSelector);
+    const currentIsPersonal = !oldTeamId || oldTeamId === TEAM_TYPE.PERSONAL;
+    const newIsPersonal = !teamId || teamId === TEAM_TYPE.PERSONAL;
     let reencryptedItems = null;
     let reencryptedSharedKeypairs = null;
 
@@ -299,7 +302,7 @@ export function* moveItemsBatchSaga({
 
         yield all(
           itemChunks.map(itemChunk =>
-            isPersonal
+            currentIsPersonal
               ? call(moveItemsBatch, listId, {
                   items: itemChunk.map(({ id, secret }) => ({
                     itemId: id,
@@ -346,7 +349,7 @@ export function* moveItemsBatchSaga({
 
         yield all(
           keypairChunks.map(keypairChunk =>
-            isPersonal
+            currentIsPersonal
               ? call(moveItemsBatch, teamDefaultListId, {
                   items: keypairChunk.map(({ id, secret }) => ({
                     itemId: id,
@@ -363,7 +366,7 @@ export function* moveItemsBatchSaga({
         );
         yield all(
           itemChunks.map(itemChunk =>
-            isPersonal
+            currentIsPersonal
               ? call(moveItemsBatch, listId, {
                   items: itemChunk.map(({ id }) => ({ itemId: id })),
                 })
@@ -400,7 +403,7 @@ export function* moveItemsBatchSaga({
             callMoveItemBatchRoute,
             listId,
             { items: itemChunk.map(({ id }) => ({ itemId: id })) },
-            isPersonal,
+            currentIsPersonal,
             oldTeamId,
           ),
         ),
@@ -411,8 +414,8 @@ export function* moveItemsBatchSaga({
           itemIds,
           previousListId,
           newTeamId: teamId,
-          newListId: isPersonal ? listId : null,
-          newTeamListId: isPersonal ? null : listId,
+          newListId: newIsPersonal ? listId : null,
+          newTeamListId: newIsPersonal ? null : listId,
         }),
       );
     }

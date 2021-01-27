@@ -61,6 +61,7 @@ export function* encryptItemBySharedKey({ item, publicKey }) {
     const updatedItemFromServer = yield call(saveItemSaga, {
       item,
       publicKey,
+      updateRawsCertainly: true,
     });
 
     return {
@@ -150,6 +151,7 @@ function* processUsersItemShare({ item, users }) {
     yield call(saveItemSaga, {
       item,
       publicKey: sharedItemKeyPairKey.publicKey,
+      updateRawsCertainly: true,
     });
   }
 
@@ -259,7 +261,9 @@ export function* shareItemBatchSaga({
 export function* removeShareSaga({ payload: { itemId, memberIds = [] } }) {
   try {
     const workInProgressItem = yield select(workInProgressItemSelector);
-    const sharedKeyPairs = memberIds.map(memberId => workInProgressItem.membersKeys[memberId]);
+    const sharedKeyPairs = memberIds.map(
+      memberId => workInProgressItem.membersKeys[memberId],
+    );
 
     yield call(
       removeItemsBatch,

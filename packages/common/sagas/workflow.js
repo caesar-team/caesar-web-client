@@ -34,7 +34,7 @@ import {
   DOWNLOAD_ITEM_ATTACHMENTS,
   vaultStartLoading,
   vaultFinishLoading,
-} from "@caesar/common/actions/workflow";
+} from '@caesar/common/actions/workflow';
 import { addListsBatch } from '@caesar/common/actions/entities/list';
 import deepequal from 'fast-deep-equal';
 import {
@@ -255,26 +255,33 @@ export function* decryptAttachmentRaw({ id, raw }, privateKeyObj) {
 export function* downloadItemAttachmentSaga({
   payload: { itemId, attachment = {} },
 }) {
-  if (!itemId) return;
-  const item = yield select(itemSelector, { itemId });
-  const keyPair = yield call(getItemKeyPair, {
-    payload: {
-      item,
-    },
-  });
+  try {
+    if (!itemId) return;
 
-  const { data: { raws } = { raws: [] } } = yield call(getItemRaws, itemId);
-  const itemRaws = JSON.parse(raws);
+    const item = yield select(itemSelector, { itemId });
+    const keyPair = yield call(getItemKeyPair, {
+      payload: {
+        item,
+      },
+    });
 
-  const { raw = null } = itemRaws[attachment.id] || {};
+    const { data: { raws } = { raws: [] } } = yield call(getItemRaws, itemId);
+    const itemRaws = JSON.parse(raws);
 
-  if (raw) {
-    const privateKeyObj = yield Promise.resolve(
-      unsealPrivateKeyObj(keyPair.privateKey, keyPair.password),
-    );
-    const rawFile = yield Promise.resolve(decryptData(raw, privateKeyObj));
-    const { name, ext } = attachment;
-    downloadFile(rawFile, `${name}.${ext}`);
+    const { raw = null } = itemRaws[attachment.id] || {};
+
+    if (raw) {
+      const privateKeyObj = yield Promise.resolve(
+        unsealPrivateKeyObj(keyPair.privateKey, keyPair.password),
+      );
+      const rawFile = yield Promise.resolve(decryptData(raw, privateKeyObj));
+      const { name, ext } = attachment;
+
+      downloadFile(rawFile, `${name}.${ext}`);
+    }
+  } catch (error) {
+    // eslint-disable-next-line no-console
+    console.error('error: ', error);
   }
 }
 
@@ -822,7 +829,7 @@ function* initListsAndProgressEntities() {
     } else if (inboxListCount > 0) {
       listIdToSet = inboxList.id;
     } else {
-      listIdToSet = defaultList.id;
+      listIdToSet = defaultList?.id || null;
     }
 
     yield put(setWorkInProgressListId(listIdToSet));

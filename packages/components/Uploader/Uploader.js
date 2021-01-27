@@ -76,14 +76,14 @@ const Uploader = ({
             className={className}
           >
             <input {...getInputProps()} />
-            <Text>
+            <Text isDragActive={isDragActive}>
               <StyledIcon
                 name="download"
                 width={16}
                 height={16}
-                color={isDragActive ? 'gray' : 'black'}
+                color={isDragActive ? 'lightGray' : 'black'}
               />
-              <Link>Upload files</Link>
+              <Link isDragActive={isDragActive}>Upload files</Link>
               {!isWideMobile &&
                 !isMobile &&
                 ' or drag and drop your files here'}
@@ -91,7 +91,7 @@ const Uploader = ({
             {error ? (
               <TextError>{error}</TextError>
             ) : (
-              <HintText>{hintText}</HintText>
+              <HintText isDragActive={isDragActive}>{hintText}</HintText>
             )}
           </Container>
         )

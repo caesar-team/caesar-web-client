@@ -179,8 +179,8 @@ export function* moveItemSaga({
         moveItemSuccess({
           itemId: item.id,
           previousListId: item.listId,
-          listId: newIsPersonal ? newListId : item.listId,
-          teamListId: newIsPersonal ? item.teamListId : newListId,
+          listId: newIsPersonal ? newListId : null,
+          teamListId: newIsPersonal ? null : newListId,
           teamId,
           secret: reencryptedData
             ? JSON.stringify({ data: reencryptedData })
@@ -290,31 +290,24 @@ export function* moveItemsBatchSaga({
         }));
       }
 
-      if (sharedItems.length) {
-        reencryptedSharedKeypairs = yield all(
-          sharedItems.map(item => reencryptSharedKeypair(item, publicKey)),
-        );
-      }
-
       if (reencryptedItems) {
         // Send to server updated data about not shared items
         const itemChunks = chunk(reencryptedItems, ITEMS_CHUNK_SIZE);
 
         yield all(
           itemChunks.map(itemChunk =>
-            currentIsPersonal
-              ? call(moveItemsBatch, listId, {
-                  items: itemChunk.map(({ id, secret }) => ({
-                    itemId: id,
-                    secret,
-                  })),
-                })
-              : call(moveTeamItemsBatch, oldTeamId, listId, {
-                  items: itemChunk.map(({ id, secret }) => ({
-                    itemId: id,
-                    secret,
-                  })),
-                }),
+            call(
+              callMoveItemBatchRoute,
+              listId,
+              {
+                items: itemChunk.map(({ id, secret }) => ({
+                  itemId: id,
+                  secret,
+                })),
+              },
+              currentIsPersonal,
+              oldTeamId,
+            ),
           ),
         );
 
@@ -332,9 +325,16 @@ export function* moveItemsBatchSaga({
             itemIds,
             previousListId,
             newTeamId: teamId,
-            newListId: listId,
+            newListId: newIsPersonal ? listId : null,
+            newTeamListId: newIsPersonal ? null : listId,
             itemSecrets,
           }),
+        );
+      }
+
+      if (sharedItems.length) {
+        reencryptedSharedKeypairs = yield all(
+          sharedItems.map(item => reencryptSharedKeypair(item, publicKey)),
         );
       }
 
@@ -412,8 +412,8 @@ export function* moveItemsBatchSaga({
       yield put(
         moveItemsBatchSuccess({
           itemIds,
-          previousListId,
           newTeamId: teamId,
+          previousListId,
           newListId: newIsPersonal ? listId : null,
           newTeamListId: newIsPersonal ? null : listId,
         }),

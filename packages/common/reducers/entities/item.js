@@ -112,10 +112,6 @@ export default createReducer(initialState, {
     return state;
   },
   [MOVE_ITEMS_BATCH_SUCCESS](state, { payload }) {
-    const newListIdData = payload.newTeamListId
-      ? { teamListId: payload.newTeamListId }
-      : { listId: payload.newListId };
-
     return {
       ...state,
       byId: {
@@ -128,7 +124,8 @@ export default createReducer(initialState, {
               teamId: payload.newTeamId,
               previousListId: payload.previousListId,
               secret: payload.itemSecrets[itemId] || state.byId[itemId].secret,
-              ...newListIdData,
+              teamListId: payload.newTeamListId,
+              listId: payload.newListId,
             },
           }),
           {},

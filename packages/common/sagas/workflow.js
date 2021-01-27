@@ -802,7 +802,9 @@ function* initListsAndProgressEntities() {
     listItems.filter(itemsListFilter(inboxList?.id))?.length || 0;
   const workInProgressListCount =
     listItems.filter(itemsListFilter(workInProgressList?.id))?.length || 0;
-
+console.log(favoritesList);
+console.log(listItems);
+console.log(favoritesListCount);
   let listIdToSet = workInProgressListId;
   if (!workInProgressList || workInProgressListCount <= 0) {
     if (favoritesListCount > 0) {

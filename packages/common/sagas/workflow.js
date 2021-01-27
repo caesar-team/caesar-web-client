@@ -32,6 +32,8 @@ import {
   INIT_PREFERENCES_SETTINGS,
   DOWNLOAD_ITEM_ATTACHMENT,
   DOWNLOAD_ITEM_ATTACHMENTS,
+  vaultStartLoading,
+  vaultFinishLoading,
 } from '@caesar/common/actions/workflow';
 import { addListsBatch } from '@caesar/common/actions/entities/list';
 import deepequal from 'fast-deep-equal';
@@ -253,26 +255,33 @@ export function* decryptAttachmentRaw({ id, raw }, privateKeyObj) {
 export function* downloadItemAttachmentSaga({
   payload: { itemId, attachment = {} },
 }) {
-  if (!itemId) return;
-  const item = yield select(itemSelector, { itemId });
-  const keyPair = yield call(getItemKeyPair, {
-    payload: {
-      item,
-    },
-  });
+  try {
+    if (!itemId) return;
 
-  const { data: { raws } = { raws: [] } } = yield call(getItemRaws, itemId);
-  const itemRaws = JSON.parse(raws);
+    const item = yield select(itemSelector, { itemId });
+    const keyPair = yield call(getItemKeyPair, {
+      payload: {
+        item,
+      },
+    });
 
-  const { raw = null } = itemRaws[attachment.id] || {};
+    const { data: { raws } = { raws: [] } } = yield call(getItemRaws, itemId);
+    const itemRaws = JSON.parse(raws);
 
-  if (raw) {
-    const privateKeyObj = yield Promise.resolve(
-      unsealPrivateKeyObj(keyPair.privateKey, keyPair.password),
-    );
-    const rawFile = yield Promise.resolve(decryptData(raw, privateKeyObj));
-    const { name, ext } = attachment;
-    downloadFile(rawFile, `${name}.${ext}`);
+    const { raw = null } = itemRaws[attachment.id] || {};
+
+    if (raw) {
+      const privateKeyObj = yield Promise.resolve(
+        unsealPrivateKeyObj(keyPair.privateKey, keyPair.password),
+      );
+      const rawFile = yield Promise.resolve(decryptData(raw, privateKeyObj));
+      const { name, ext } = attachment;
+
+      downloadFile(rawFile, `${name}.${ext}`);
+    }
+  } catch (error) {
+    // eslint-disable-next-line no-console
+    console.error('error: ', error);
   }
 }
 
@@ -534,18 +543,6 @@ function* checkTeamsKeyPairs(createKeyPair = false) {
     .map(team => checkTeamKeyPair(team, createKeyPair));
   const checkedTeams = yield all(checkCalls);
   yield put(addTeamsBatch(arrayToObject(checkedTeams.filter(team => !!team))));
-}
-
-function* checkWIPItem() {
-  const WIPItem = yield select(workInProgressItemSelector);
-  if (!WIPItem) return;
-
-  const itemInStore = yield select(itemSelector, { itemId: WIPItem.id });
-
-  if (!deepequal(WIPItem.data, itemInStore.data)) {
-    // The data is mismatced, update
-    yield put(setWorkInProgressItem(itemInStore));
-  }
 }
 
 function* initTeamsSaga() {
@@ -820,7 +817,7 @@ function* initListsAndProgressEntities() {
     } else if (inboxListCount > 0) {
       listIdToSet = inboxList.id;
     } else {
-      listIdToSet = defaultList.id;
+      listIdToSet = defaultList?.id || null;
     }
 
     yield put(setWorkInProgressListId(listIdToSet));
@@ -909,7 +906,7 @@ export function* openTeamVaultSaga({ payload: { teamId } }) {
       // eslint-disable-next-line no-console
       console.error(`The team checks weren't pass`);
     }
-
+    yield put(vaultFinishLoading());
     yield put(finishIsLoading());
   } catch (error) {
     // eslint-disable-next-line no-console
@@ -976,10 +973,11 @@ function* setWorkInProgressItemSaga({ payload: { item } }) {
 
 function* initDashboardSaga() {
   try {
+    yield put(vaultStartLoading());
     yield takeLatest(VAULTS_ARE_READY, openCurrentVaultSaga);
+    yield put(setWorkInProgressItem(null));
     yield call(initWorkflowSaga);
     yield call(checkTeamsKeyPairs);
-    yield call(checkWIPItem);
   } catch (error) {
     // eslint-disable-next-line no-console
     console.error('error: ', error);

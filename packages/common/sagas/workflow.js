@@ -822,7 +822,7 @@ function* initListsAndProgressEntities() {
     listIds: [favoritesList?.id, inboxList?.id, workInProgressList?.id],
   });
   const favoritesListCount =
-    listItems.filter(itemsListFilter(favoritesList?.id))?.length || 0;
+    listItems.filter(item => item.favorite)?.length || 0;
   const inboxListCount =
     listItems.filter(itemsListFilter(inboxList?.id))?.length || 0;
   const workInProgressListCount =

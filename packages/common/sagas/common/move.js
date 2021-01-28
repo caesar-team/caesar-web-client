@@ -349,30 +349,31 @@ export function* moveItemsBatchSaga({
 
         yield all(
           keypairChunks.map(keypairChunk =>
-            currentIsPersonal
-              ? call(moveItemsBatch, teamDefaultListId, {
-                  items: keypairChunk.map(({ id, secret }) => ({
-                    itemId: id,
-                    secret,
-                  })),
-                })
-              : call(moveTeamItemsBatch, oldTeamId, teamDefaultListId, {
-                  items: keypairChunk.map(({ id, secret }) => ({
-                    itemId: id,
-                    secret,
-                  })),
-                }),
+            call(
+              callMoveItemBatchRoute,
+              teamDefaultListId,
+              {
+                items: keypairChunk.map(({ id, secret }) => ({
+                  itemId: id,
+                  secret,
+                })),
+              },
+              currentIsPersonal,
+              oldTeamId,
+            ),
           ),
         );
         yield all(
           itemChunks.map(itemChunk =>
-            currentIsPersonal
-              ? call(moveItemsBatch, listId, {
-                  items: itemChunk.map(({ id }) => ({ itemId: id })),
-                })
-              : call(moveTeamItemsBatch, oldTeamId, listId, {
-                  items: itemChunk.map(({ id }) => ({ itemId: id })),
-                }),
+            call(
+              callMoveItemBatchRoute,
+              listId,
+              {
+                items: itemChunk.map(({ id }) => ({ itemId: id })),
+              },
+              currentIsPersonal,
+              oldTeamId,
+            ),
           ),
         );
 
@@ -387,7 +388,8 @@ export function* moveItemsBatchSaga({
             itemIds: sharedItemIds,
             previousListId,
             newTeamId: teamId,
-            newListId: listId,
+            newListId: newIsPersonal ? listId : null,
+            newTeamListId: newIsPersonal ? null : listId,
           }),
         );
       }

@@ -8,7 +8,6 @@ const Label = styled.label`
   display: block;
   position: relative;
   width: 100%;
-  ${({ isError }) => isError && 'margin-bottom: 24px;'}
 `;
 
 const LabelText = styled.div`
@@ -95,9 +94,6 @@ const StyledIcon = styled(Icon)`
 `;
 
 const Error = styled(TextError)`
-  position: absolute;
-  top: 100%;
-  left: 0;
   padding-left: 16px;
 `;
 
@@ -139,52 +135,54 @@ const InputComponent = ({
   useKeyPressEvent('Escape', onClickClose);
 
   return (
-    <Label ref={inputRef} isError={!!error} className={className}>
-      {label && (
-        <LabelText isFocused={isFocused} value={value}>
-          {label}
-        </LabelText>
-      )}
-      {prefix && <Prefix>{prefix}</Prefix>}
-      <InputField
-        {...props}
-        autoComplete={autoComplete}
-        type={type}
-        name={name}
-        value={value}
-        isError={!!error}
-        isFocused={isFocused}
-        withBorder={withBorder}
-        withIcons={onClickAcceptEdit || onClickClose}
-        onFocus={handleFocus}
-        onBlur={handleBlur}
-      />
-      {(postfix || onClickAcceptEdit || onClickClose) && (
-        <PostFix>
-          {postfix}
-          {onClickAcceptEdit && (
-            <StyledIcon
-              name="checkmark"
-              width={16}
-              height={16}
-              color="gray"
-              isDisabled={isAcceptIconDisabled}
-              onClick={onClickAcceptEdit}
-            />
-          )}
-          {onClickClose && (
-            <StyledIcon
-              name="close"
-              width={16}
-              height={16}
-              color="gray"
-              onClick={onClickClose}
-            />
-          )}
-        </PostFix>
-      )}
+    <>
+      <Label ref={inputRef} className={className}>
+        {label && (
+          <LabelText isFocused={isFocused} value={value}>
+            {label}
+          </LabelText>
+        )}
+        {prefix && <Prefix>{prefix}</Prefix>}
+        <InputField
+          {...props}
+          autoComplete={autoComplete}
+          type={type}
+          name={name}
+          value={value}
+          isError={!!error}
+          isFocused={isFocused}
+          withBorder={withBorder}
+          withIcons={onClickAcceptEdit || onClickClose}
+          onFocus={handleFocus}
+          onBlur={handleBlur}
+        />
+        {(postfix || onClickAcceptEdit || onClickClose) && (
+          <PostFix>
+            {postfix}
+            {onClickAcceptEdit && (
+              <StyledIcon
+                name="checkmark"
+                width={16}
+                height={16}
+                color="gray"
+                isDisabled={isAcceptIconDisabled}
+                onClick={onClickAcceptEdit}
+              />
+            )}
+            {onClickClose && (
+              <StyledIcon
+                name="close"
+                width={16}
+                height={16}
+                color="gray"
+                onClick={onClickClose}
+              />
+            )}
+          </PostFix>
+        )}
+      </Label>
       {error && <Error>{error}</Error>}
-    </Label>
+    </>  
   );
 };
 

@@ -29,6 +29,7 @@ import {
   MOVING_IN_PROGRESS_NOTIFICATION,
   NOOP_NOTIFICATION,
   TEAM_TYPE,
+  ENCRYPTION_CHUNK_SIZE,
 } from '@caesar/common/constants';
 import {
   shareItemKeyPairSelector,
@@ -37,8 +38,6 @@ import {
 import { updateShareKeyPairBatch } from '@caesar/common/actions/keystore';
 import { reencryptItemSecretSaga, decryptItemSync } from '../entities/item';
 import { convertKeyPairToItemEntity } from '../../normalizers/normalizers';
-
-const ITEMS_CHUNK_SIZE = 50;
 
 function* getPublicKeyToEncrypt(teamId) {
   const keyPair = yield select(teamKeyPairSelector, {
@@ -292,7 +291,7 @@ export function* moveItemsBatchSaga({
 
       if (reencryptedItems) {
         // Send to server updated data about not shared items
-        const itemChunks = chunk(reencryptedItems, ITEMS_CHUNK_SIZE);
+        const itemChunks = chunk(reencryptedItems, ENCRYPTION_CHUNK_SIZE);
 
         yield all(
           itemChunks.map(itemChunk =>
@@ -342,9 +341,9 @@ export function* moveItemsBatchSaga({
         // Send to server updated data about shared items
         const keypairChunks = chunk(
           reencryptedSharedKeypairs,
-          ITEMS_CHUNK_SIZE,
+          ENCRYPTION_CHUNK_SIZE,
         );
-        const itemChunks = chunk(sharedItems, ITEMS_CHUNK_SIZE);
+        const itemChunks = chunk(sharedItems, ENCRYPTION_CHUNK_SIZE);
         const sharedItemIds = sharedItems.map(({ id }) => id);
 
         yield all(
@@ -397,7 +396,7 @@ export function* moveItemsBatchSaga({
 
     if (!reencryptedItems && !reencryptedSharedKeypairs) {
       // Send data to server about items moved within one vault
-      const itemChunks = chunk(items, ITEMS_CHUNK_SIZE);
+      const itemChunks = chunk(items, ENCRYPTION_CHUNK_SIZE);
 
       yield all(
         itemChunks.map(itemChunk =>

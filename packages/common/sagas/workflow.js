@@ -615,20 +615,26 @@ function* decryptKeypairsByTeamKeipairs(teamId, keypairs) {
 
 function* decryptNotDecryptedKeyPairs(notDecryptedKeyPairs) {
   try {
-    const dividedByTeamKeypairs = yield call(
+    const dividedByTeamIdKeypairs = yield call(
       divideNotDecryptedKeyPairsByTeams,
       notDecryptedKeyPairs,
     );
 
-    yield all(
-      Object.keys(dividedByTeamKeypairs).map(teamKeypair =>
+    const isDecryptedArray = yield all(
+      Object.keys(dividedByTeamIdKeypairs).map(teamId =>
         call(
           decryptKeypairsByTeamKeipairs,
-          teamKeypair,
-          dividedByTeamKeypairs[teamKeypair],
+          teamId,
+          dividedByTeamIdKeypairs[teamId],
         ),
       ),
     );
+
+    const canDecryptItems = isDecryptedArray.includes(true);
+
+    if (!canDecryptItems) {
+      yield put(finishProcessingKeyPairs());
+    }
 
     yield put(clearNotDecryptedKeypairs());
   } catch (error) {
@@ -674,7 +680,7 @@ export function* processKeyPairsSaga({ payload: { itemsById } }) {
 
       const notDecryptedKeyPairs = yield select(notDecryptedKeyPairsSelector);
 
-      if (notDecryptedKeyPairs.length > 0) {
+      if (teamKeys.length > 0 && notDecryptedKeyPairs.length > 0) {
         yield call(decryptNotDecryptedKeyPairs, notDecryptedKeyPairs);
       }
 

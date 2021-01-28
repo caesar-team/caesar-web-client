@@ -5,7 +5,7 @@ import { DummyRect, Loader } from '../../Item/types/styles';
 
 const Wrapper = styled.div`
   position: relative;
-  height: 150px;
+  height: 100%;
   padding-top: 24px;
 `;
 

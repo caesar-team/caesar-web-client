@@ -398,11 +398,11 @@ export const removeShareRequest = (itemId, memberIds) => ({
   },
 });
 
-export const removeShareSuccess = (itemId, memberIds) => ({
+export const removeShareSuccess = (itemId, updatedItemData) => ({
   type: REMOVE_SHARE_SUCCESS,
   payload: {
     itemId,
-    memberIds,
+    updatedItemData,
   },
 });
 

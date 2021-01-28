@@ -23,16 +23,19 @@ export const Text = styled.span`
   margin-bottom: 5px;
   font-size: 16px;
   text-align: center;
-  color: ${({ theme }) => theme.color.emperor};
+  color: ${({ theme, isDragActive }) =>
+    isDragActive ? theme.color.lighterGray : theme.color.emperor};
 `;
 
 export const HintText = styled.div`
   font-size: 14px;
-  color: ${({ theme }) => theme.color.gray};
+  color: ${({ theme, isDragActive }) =>
+    isDragActive ? theme.color.lighterGray : theme.color.gray};
 `;
 
 export const Link = styled.a`
-  color: ${({ theme }) => theme.color.black};
+  color: ${({ theme, isDragActive }) =>
+    isDragActive ? theme.color.lighterGray : theme.color.black};
 `;
 
 export const StyledIcon = styled(Icon)`

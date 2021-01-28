@@ -113,7 +113,6 @@ const MoveModalComponent = ({
   onRemove = Function.prototype,
 }) => {
   const dispatch = useDispatch();
-  const currentUserId = useSelector(currentUserIdSelector);
   const teamsById = useSelector(teamsByIdSelector);
   const teamId = useMemo(() => (isMultiMode ? currentTeamId : item.teamId), [
     isMultiMode,

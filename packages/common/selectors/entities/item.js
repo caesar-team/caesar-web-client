@@ -140,7 +140,7 @@ const listIdsPropSelector = (_, props) => props.listIds;
 export const itemsByListIdsSelector = createSelector(
   itemArraySelector,
   listIdsPropSelector,
-  (itemList, listIds) => {console.log(itemList);console.log(listIds);
+  (itemList, listIds) => {
     return itemList?.filter(
       item => listIds?.includes(item.listId) && isGeneralItem(item),
     );

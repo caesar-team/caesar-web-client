@@ -797,14 +797,12 @@ function* initListsAndProgressEntities() {
     listIds: [favoritesList?.id, inboxList?.id, workInProgressList?.id],
   });
   const favoritesListCount =
-    listItems.filter(itemsListFilter(favoritesList?.id))?.length || 0;
+    listItems.filter(item => item.favorite)?.length || 0;
   const inboxListCount =
     listItems.filter(itemsListFilter(inboxList?.id))?.length || 0;
   const workInProgressListCount =
     listItems.filter(itemsListFilter(workInProgressList?.id))?.length || 0;
-console.log(favoritesList);
-console.log(listItems);
-console.log(favoritesListCount);
+
   let listIdToSet = workInProgressListId;
   if (!workInProgressList || workInProgressListCount <= 0) {
     if (favoritesListCount > 0) {

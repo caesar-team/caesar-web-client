@@ -1,5 +1,5 @@
 import { schema } from 'normalizr';
-import { ENTITY_TYPE, PERMISSION_ENTITY } from '../../constants';
+import { PERMISSION_ENTITY } from '../../constants';
 import { createPermissionsFromLinks } from '../../utils/createPermissionsFromLinks';
 
 const memberSchema = new schema.Entity(
@@ -8,7 +8,6 @@ const memberSchema = new schema.Entity(
   {
     processStrategy: entity => ({
       ...entity,
-      __type: ENTITY_TYPE.MEMBER,
       _permissions: entity?._links
         ? {
             ...createPermissionsFromLinks(entity._links),

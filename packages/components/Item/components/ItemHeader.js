@@ -11,8 +11,7 @@ import { transformListTitle } from '@caesar/common/utils/string';
 import { getTeamTitle } from '@caesar/common/utils/team';
 import {
   listsByIdSelector,
-  trashListSelector,
-  teamsTrashListsSelector,
+  currentTeamTrashListSelector,
 } from '@caesar/common/selectors/entities/list';
 import { teamsByIdSelector } from '@caesar/common/selectors/entities/team';
 import { setWorkInProgressItem } from '@caesar/common/actions/workflow';
@@ -81,8 +80,7 @@ const ItemHeaderComponent = ({
   onClickRemoveItem,
 }) => {
   const dispatch = useDispatch();
-  const trashList = useSelector(trashListSelector);
-  const teamsTrashLists = useSelector(teamsTrashListsSelector);
+  const trashList = useSelector(currentTeamTrashListSelector);
   const teamsById = useSelector(teamsByIdSelector);
   const listsById = useSelector(listsByIdSelector);
 
@@ -92,10 +90,7 @@ const ItemHeaderComponent = ({
 
   const listTitle = transformListTitle(listsById[item.listId]?.label);
 
-  const isTrashItem =
-    item &&
-    (item.listId === trashList?.id ||
-      teamsTrashLists.map(({ id: listId }) => listId).includes(item.listId));
+  const isTrashItem = item && item.listId === trashList?.id;
 
   const handleToggleFavorites = () => {
     dispatch(toggleItemToFavoriteRequest(item));

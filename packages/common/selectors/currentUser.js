@@ -70,6 +70,12 @@ export const currentTeamIdSelector = createSelector(
   currentUser => currentUser.currentTeamId || TEAM_TYPE.PERSONAL,
 );
 
+// TODO: Find other cases where is used currentTeamId === TEAM_TYPE.PERSONAL and replace with this selector
+export const isCurrentTeamPersonalSelector = createSelector(
+  currentTeamIdSelector,
+  currentTeamId => !currentTeamId || currentTeamId === TEAM_TYPE.PERSONAL,
+);
+
 export const currentTeamSelector = createSelector(
   currentTeamIdSelector,
   teamsByIdSelector,

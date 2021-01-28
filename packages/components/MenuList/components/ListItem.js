@@ -2,7 +2,6 @@
 import React, { useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { Draggable } from 'react-beautiful-dnd';
-import styled from 'styled-components';
 import { transformListTitle } from '@caesar/common/utils/string';
 import { LIST_TYPE, PERMISSION } from '@caesar/common/constants';
 import { ERROR } from '@caesar/common/validation/constants';
@@ -11,75 +10,17 @@ import {
   createListRequest,
   editListRequest,
 } from '@caesar/common/actions/entities/list';
-import { Tooltip } from '@caesar/components/List/Item/styles';
 import { Can } from '../../Ability';
-import { Icon } from '../../Icon';
 import { ListInput } from './ListInput';
 import { ConfirmRemoveListModal } from './ConfirmRemoveListModal';
-import { MenuItemInner } from './styledComponents';
-
-const Title = styled.div`
-  margin-right: auto;
-  overflow: hidden;
-  white-space: nowrap;
-  text-overflow: ellipsis;
-`;
-
-const Counter = styled.div``;
-
-const StyledIcon = styled(Icon)`
-  flex: 0 0 16px;
-  margin-left: 16px;
-  transition: color 0.2s, opacity 0.2s;
-  cursor: pointer;
-
-  &:hover {
-    color: ${({ theme }) => theme.color.black};
-  }
-`;
-
-const ActionIcon = styled(StyledIcon)`
-  display: none;
-`;
-
-const DnDIcon = styled(ActionIcon)`
-  position: absolute;
-  top: 50%;
-  left: 24px;
-  margin-left: 0;
-  transform: translateY(-50%);
-  cursor: grab;
-`;
-
-const Wrapper = styled(MenuItemInner)`
-  position: relative;
-  padding: ${({ isEdit }) => (isEdit ? '0 24px 0 40px' : '7px 24px 7px 56px')};
-  color: ${({ isActive, theme }) =>
-    isActive ? theme.color.black : theme.color.gray};
-
-  &:hover {
-    color: ${({ theme }) => theme.color.black};
-
-    ${Counter} {
-      ${({ isDefault }) => !isDefault && `display: none;`}
-    }
-    ${ActionIcon} {
-      display: block;
-    }
-    ${DnDIcon} {
-      display: ${({ isEdit }) => (isEdit ? 'none' : 'block')};
-    }
-  }
-`;
-
-const StyledTooltip = styled(Tooltip)`
-  display: flex;
-  top: -20px;
-  left: auto;
-  bottom: auto;
-  z-index: ${({ theme }) => theme.zIndex.basic};
-  opacity: 1;
-`;
+import {
+  Title,
+  Counter,
+  ActionIcon,
+  DnDIcon,
+  Wrapper,
+  StyledTooltip,
+} from './styles';
 
 export const ListItem = ({
   list = {},

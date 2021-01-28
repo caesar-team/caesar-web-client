@@ -41,11 +41,6 @@ export const inboxListSelector = createSelector(
   lists => lists.find(({ type }) => type === LIST_TYPE.INBOX) || {},
 );
 
-export const trashListSelector = createSelector(
-  personalListsSelector,
-  lists => lists.find(({ type }) => type === LIST_TYPE.TRASH) || {},
-);
-
 const teamIdPropSelector = (_, props) => props?.teamId;
 export const favoritesListSelector = createSelector(
   currentTeamIdSelector,
@@ -81,17 +76,6 @@ export const nestedListsSelector = createSelector(
 export const teamIdsListSelector = createSelector(
   listsSelector,
   lists => lists.filter(list => list.teamId),
-);
-
-export const teamsTrashListsSelector = createSelector(
-  teamIdsListSelector,
-  lists => lists.filter(({ type }) => type === LIST_TYPE.TRASH) || [],
-);
-
-export const allTrashListIdsSelector = createSelector(
-  listsSelector,
-  lists =>
-    lists.filter(list => list.type === LIST_TYPE.TRASH).map(({ id }) => id),
 );
 
 export const currentTeamDefaultListSelector = createSelector(

@@ -2,7 +2,6 @@ import React, { useState, useMemo, memo } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import equal from 'fast-deep-equal';
 import styled from 'styled-components';
-import { currentUserIdSelector } from '@caesar/common/selectors/currentUser';
 import { teamsByIdSelector } from '@caesar/common/selectors/entities/team';
 import {
   moveItemRequest,
@@ -12,7 +11,7 @@ import {
   setWorkInProgressItem,
   resetWorkInProgressItemIds,
 } from '@caesar/common/actions/workflow';
-import { TEAM_TYPE, LIST_TYPE } from '@caesar/common/constants';
+import { LIST_TYPE } from '@caesar/common/constants';
 import { getTeamTitle } from '@caesar/common/utils/team';
 import {
   useItemVaultAndListOptions,
@@ -113,10 +112,13 @@ const MoveModalComponent = ({
   onRemove = Function.prototype,
 }) => {
   const dispatch = useDispatch();
-  const currentUserId = useSelector(currentUserIdSelector);
   const teamsById = useSelector(teamsByIdSelector);
-  const teamId = isMultiMode ? currentTeamId : item.teamId;
-  const listId = isMultiMode ? currentListId : item.listId;
+  const teamId = useMemo(() => (isMultiMode ? currentTeamId : item.teamId), [
+    isMultiMode,
+  ]);
+  const listId = useMemo(() => (isMultiMode ? currentListId : item.listId), [
+    isMultiMode,
+  ]);
   const notification = useNotification();
 
   const [searchTeamValue, setSearchTeamValue] = useState('');
@@ -179,17 +181,8 @@ const MoveModalComponent = ({
   const teamOptionsRenderer = useMemo(
     () =>
       teamOptions
-        .filter(
-          team =>
-            team?.title
-              ?.toLowerCase()
-              .includes(searchTeamValue?.toLowerCase()) &&
-            // TODO: Remove this condition to enable moving between vaults for everyone after release 2.2
-            (item
-              ? item.ownerId === currentUserId ||
-                (item.ownerId !== currentUserId && team.id === teamId)
-              : teamId === TEAM_TYPE.PERSONAL ||
-                (teamId !== TEAM_TYPE.PERSONAL && team.id === teamId)),
+        .filter(team =>
+          team?.title?.toLowerCase().includes(searchTeamValue?.toLowerCase()),
         )
         .map(team => (
           <StyledRadio

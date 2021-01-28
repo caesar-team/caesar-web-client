@@ -545,6 +545,18 @@ function* checkTeamsKeyPairs(createKeyPair = false) {
   yield put(addTeamsBatch(arrayToObject(checkedTeams.filter(team => !!team))));
 }
 
+function* checkWIPItem() {
+  const WIPItem = yield select(workInProgressItemSelector);
+  if (!WIPItem) return;
+
+  const itemInStore = yield select(itemSelector, { itemId: WIPItem.id });
+
+  if (!deepequal(WIPItem.data, itemInStore.data)) {
+    // The data is mismatced, update
+    yield put(setWorkInProgressItem(itemInStore));
+  }
+}
+
 function* initTeamsSaga() {
   try {
     // Load avaible teams
@@ -975,9 +987,9 @@ function* initDashboardSaga() {
   try {
     yield put(vaultStartLoading());
     yield takeLatest(VAULTS_ARE_READY, openCurrentVaultSaga);
-    yield put(setWorkInProgressItem(null));
     yield call(initWorkflowSaga);
     yield call(checkTeamsKeyPairs);
+    yield call(checkWIPItem);
   } catch (error) {
     // eslint-disable-next-line no-console
     console.error('error: ', error);

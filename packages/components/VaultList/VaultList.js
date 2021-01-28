@@ -7,6 +7,10 @@ import {
   currentUserVaultListSelector,
   currentTeamSelector,
 } from '@caesar/common/selectors/currentUser';
+import {
+  setWorkInProgressItem,
+  setWorkInProgressListId,
+} from '@caesar/common/actions/workflow';
 import { setCurrentTeamId } from '@caesar/common/actions/currentUser';
 import { getTeamTitle } from '@caesar/common/utils/team';
 import { Avatar } from '../Avatar';
@@ -99,6 +103,9 @@ const VaultListComponent = ({
     setListsOpened(true);
 
     if (currentTeam?.id !== teamId) {
+
+      dispatch(setWorkInProgressItem(null));
+      dispatch(setWorkInProgressListId(null));
       dispatch(setCurrentTeamId(teamId));
 
       setMode(DASHBOARD_MODE.DEFAULT);

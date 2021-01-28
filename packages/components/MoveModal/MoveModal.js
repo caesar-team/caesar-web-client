@@ -2,7 +2,6 @@ import React, { useState, useMemo, memo } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import equal from 'fast-deep-equal';
 import styled from 'styled-components';
-import { currentUserIdSelector } from '@caesar/common/selectors/currentUser';
 import { teamsByIdSelector } from '@caesar/common/selectors/entities/team';
 import {
   moveItemRequest,

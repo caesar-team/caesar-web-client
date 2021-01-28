@@ -23,7 +23,11 @@ import {
   StyledLink,
 } from './styles';
 
-const SecureMessageContainerComponent = ({ message, password }) => {
+const SecureMessageContainerComponent = ({
+  message,
+  password: passwordFromLink,
+}) => {
+  const [password, setPassword] = useState(passwordFromLink);
   const notification = useNotification();
   const [decryptedMessage, setDecryptedMessage] = useState(null);
   // const [encryptedRaws, setEncryptedRaws] = useState(null);
@@ -104,6 +108,7 @@ const SecureMessageContainerComponent = ({ message, password }) => {
           <PasswordStep
             message={message}
             password={password}
+            setPassword={setPassword}
             setDecryptedMessage={setDecryptedMessage}
           />
         )}

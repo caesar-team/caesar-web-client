@@ -9,7 +9,7 @@ import {
   shareItemSchema,
   memberSchema,
   currentUserSchema,
-} from '@caesar/common/normalizers/schemas';
+} from './schemas';
 
 const failIsNotAnArray = arrayObject => {
   if (!Array.isArray(arrayObject))

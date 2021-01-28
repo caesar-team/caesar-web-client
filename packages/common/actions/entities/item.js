@@ -160,19 +160,19 @@ export const moveItemsBatchRequest = ({
 
 export const moveItemsBatchSuccess = ({
   itemIds,
-  oldTeamId,
   previousListId,
   newTeamId,
   newListId,
+  newTeamListId,
   itemSecrets = {},
 }) => ({
   type: MOVE_ITEMS_BATCH_SUCCESS,
   payload: {
     itemIds,
-    oldTeamId,
     previousListId,
     newTeamId,
     newListId,
+    newTeamListId,
     itemSecrets,
   },
 });

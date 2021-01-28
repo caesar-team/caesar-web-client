@@ -1,7 +1,7 @@
 import { useState, useMemo } from 'react';
 import { useEffectOnce, useUpdateEffect } from 'react-use';
 import { useSelector } from 'react-redux';
-import { TEAM_TYPE } from '@caesar/common/constants';
+import { TEAM_TYPE, LIST_TYPE } from '@caesar/common/constants';
 import { sortByName } from '@caesar/common/utils/sort';
 import { transformListTitle } from '@caesar/common/utils/string';
 import { currentUserVaultListSelector } from '@caesar/common/selectors/currentUser';
@@ -39,7 +39,7 @@ export const useItemVaultAndListOptions = ({
 
   useUpdateEffect(() => {
     const defaultTeamListId = lists.find(
-      list => list.teamId === checkedTeamId && list.label === 'default',
+      list => list.teamId === checkedTeamId && list.type === LIST_TYPE.DEFAULT,
     )?.id;
 
     setCheckedListId(defaultTeamListId);

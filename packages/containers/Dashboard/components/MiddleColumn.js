@@ -20,10 +20,7 @@ import {
   itemsByListIdSelector,
   teamItemsSelector,
 } from '@caesar/common/selectors/entities/item';
-import {
-  trashListSelector,
-  teamsTrashListsSelector,
-} from '@caesar/common/selectors/entities/list';
+import { currentTeamTrashListSelector } from '@caesar/common/selectors/entities/list';
 import { teamMembersShortViewSelector } from '@caesar/common/selectors/entities/member';
 import { currentTeamIdSelector } from '@caesar/common/selectors/currentUser';
 import {
@@ -59,8 +56,7 @@ const MiddleColumnComponent = ({
   const visibleListItems = useMemo(() => generalItems.sort(sortItems), [
     generalItems,
   ]);
-  const trashList = useSelector(trashListSelector);
-  const teamsTrashLists = useSelector(teamsTrashListsSelector);
+  const trashList = useSelector(currentTeamTrashListSelector);
   const itemsById = useSelector(itemsByIdSelector);
   const currentTeamId = useSelector(currentTeamIdSelector);
   const teamMembers = useSelector(state =>
@@ -89,9 +85,7 @@ const MiddleColumnComponent = ({
   const isPersonalTeam = currentTeamId === TEAM_TYPE.PERSONAL;
   const isMultiItem = workInProgressItemIds?.length > 0;
   const isInboxList = workInProgressList?.type === LIST_TYPE.INBOX;
-  const isTrashList =
-    workInProgressList?.id === trashList?.id ||
-    teamsTrashLists?.map(({ id }) => id).includes(workInProgressList?.id);
+  const isTrashList = workInProgressList?.id === trashList?.id;
 
   const currentTeamItems = useSelector(state =>
     teamItemsSelector(state, { teamId: currentTeamId }),
@@ -126,7 +120,10 @@ const MiddleColumnComponent = ({
   });
 
   const handleDefaultSelectionItemBehaviour = itemId => {
-    dispatch(resetWorkInProgressItemIds());
+    if (isMultiItem) {
+      dispatch(resetWorkInProgressItemIds());
+    }
+
     dispatch(setWorkInProgressItem(itemsById[itemId]));
   };
 

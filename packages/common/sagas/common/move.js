@@ -117,6 +117,7 @@ export function* moveItemSaga({
       const { data, secretDataAndRaws } = yield call(reencryptItemSecretSaga, {
         item: itemToReencrypt,
         publicKey,
+        updateRawsCertainly: !item.isShared,
       });
 
       reencryptedData = data || {};
@@ -277,6 +278,7 @@ export function* moveItemsBatchSaga({
             ...call(reencryptItemSecretSaga, {
               item,
               publicKey,
+              updateRawsCertainly: !item.isShared,
             }),
             itemId: item.id,
           })),

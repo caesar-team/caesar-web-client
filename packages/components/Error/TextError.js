@@ -7,6 +7,8 @@ const Wrapper = styled.div`
   color: ${({ theme }) => theme.color.red};
 `;
 
-export const TextError = ({ marginTop = 0, children }) => (
-  <Wrapper marginTop={marginTop}>{children}</Wrapper>
+export const TextError = ({ marginTop = 0, children, className }) => (
+  <Wrapper marginTop={marginTop} className={className}>
+    {children}
+  </Wrapper>
 );

@@ -204,7 +204,7 @@ const MoveModalComponent = ({
             onChange={() => setCheckedTeamId(team.id)}
           />
         )),
-    [teamOptions, checkedTeamId],
+    [teamOptions, checkedTeamId, searchTeamValue],
   );
 
   const listOptionsRenderer = useMemo(
@@ -223,7 +223,7 @@ const MoveModalComponent = ({
             onChange={() => setCheckedListId(list.id)}
           />
         )),
-    [listOptions, checkedListId],
+    [listOptions, checkedListId, searchListValue],
   );
 
   return (

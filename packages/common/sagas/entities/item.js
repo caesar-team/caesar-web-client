@@ -67,6 +67,7 @@ import {
   TEAM_TYPE,
   ITEM_TYPE,
   IMPORT_CHUNK_SIZE,
+  REMOVE_CHUNK_SIZE,
 } from '@caesar/common/constants';
 import {
   shareItemKeyPairSelector,
@@ -91,8 +92,6 @@ import {
   convertKeyPairToEntity,
 } from '../../normalizers/normalizers';
 import { uuid4 } from '../../utils/uuid4';
-
-const ITEMS_CHUNK_SIZE = 50;
 
 // TODO: move to the system item sage
 export function* generateSystemItem(entityType, listId, entityId) {
@@ -213,7 +212,7 @@ export function* removeItemsBatchSaga({ payload: { listId } }) {
 
     const workInProgressItemIds = yield select(workInProgressItemIdsSelector);
 
-    const itemIdsChunks = chunk(workInProgressItemIds, ITEMS_CHUNK_SIZE);
+    const itemIdsChunks = chunk(workInProgressItemIds, REMOVE_CHUNK_SIZE);
 
     yield all(
       itemIdsChunks.map(itemIdsChunk =>

@@ -258,7 +258,6 @@ trigger:
   branch:
     - master
     - develop
-    - release/*
     - feature/*
     - hotfix/*
   event:

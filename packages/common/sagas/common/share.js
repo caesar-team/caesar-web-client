@@ -61,6 +61,7 @@ export function* encryptItemBySharedKey({ item, publicKey }) {
     const updatedItemFromServer = yield call(saveItemSaga, {
       item,
       publicKey,
+      updateRawsCertainly: true,
     });
 
     return {
@@ -150,6 +151,7 @@ function* processUsersItemShare({ item, users }) {
     yield call(saveItemSaga, {
       item,
       publicKey: sharedItemKeyPairKey.publicKey,
+      updateRawsCertainly: true,
     });
   }
 

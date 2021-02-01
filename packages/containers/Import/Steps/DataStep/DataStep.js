@@ -3,7 +3,7 @@ import { useEffectOnce, useUpdateEffect } from 'react-use';
 import { useDispatch } from 'react-redux';
 import { waitIdle } from '@caesar/common/utils/utils';
 import { transformListTitle } from '@caesar/common/utils/string';
-import { LIST_TYPE } from '@caesar/common/constants';
+import { LIST_TYPE, NOT_SELECTABLE_LIST_TYPES } from '@caesar/common/constants';
 import { Icon, DataTable } from '@caesar/components';
 import {
   Title,
@@ -24,7 +24,7 @@ const DataStep = ({
   headings,
   teamsLists,
   currentUserTeamId,
-  currentListId,
+  currentList,
   currentTeamDefaultList,
   currentUserTeamsList,
   onSubmit,
@@ -34,7 +34,9 @@ const DataStep = ({
   const dispatch = useDispatch();
   const [state, setState] = useState({
     teamId: currentUserTeamId,
-    listId: currentListId || currentTeamDefaultList.id,
+    listId: currentList && !NOT_SELECTABLE_LIST_TYPES.includes(currentList.type)
+      ? currentList.id
+      : currentTeamDefaultList.id,
     filterText: '',
     selectedRows: normalize(propData),
     data: propData,

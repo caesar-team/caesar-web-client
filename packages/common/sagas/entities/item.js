@@ -339,7 +339,11 @@ export function* saveShareKeyPairSaga({ item, publicKey }) {
   });
 }
 
-export function* reencryptItemSecretSaga({ item, publicKey }) {
+export function* reencryptItemSecretSaga({
+  item,
+  publicKey,
+  updateRawsCertainly = false,
+}) {
   const { id = null } = item;
   const itemFromStore = yield select(itemSelector, { itemId: item.id });
 
@@ -353,7 +357,9 @@ export function* reencryptItemSecretSaga({ item, publicKey }) {
     isRawsChanged = false;
   }
 
-  if (isRawsChanged && isGeneralItem(item)) {
+  if (updateRawsCertainly || (isRawsChanged && isGeneralItem(item))) {
+    isRawsChanged = true;
+
     const rawsFromServer = id
       ? yield call(downloadAndDecryptRaws, {
           payload: { itemId: item.id },
@@ -407,7 +413,7 @@ export function* reencryptItemSecretSaga({ item, publicKey }) {
   return { data, raws, secretDataAndRaws } || {};
 }
 
-export function* saveItemSaga({ item, publicKey }) {
+export function* saveItemSaga({ item, publicKey, updateRawsCertainly }) {
   const { id = null, listId = null, type, ownerId } = item;
 
   const { data, raws, secretDataAndRaws } = yield call(
@@ -415,6 +421,7 @@ export function* saveItemSaga({ item, publicKey }) {
     {
       item,
       publicKey,
+      updateRawsCertainly,
     },
   );
 

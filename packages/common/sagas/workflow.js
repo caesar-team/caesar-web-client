@@ -586,22 +586,24 @@ function* decryptKeypairsByTeamKeipairs(teamId, keypairs) {
   try {
     const teamKeyPair = yield select(teamKeyPairSelector, { teamId });
 
-    if (!teamKeyPair) {
-      // eslint-disable-next-line no-console
-      console.warn(
-        `The key pair for the team with teamId ${teamId} not found. Ask team admin to add you in team.`,
+    if (teamKeyPair) {
+      yield put(
+        decryption({
+          items: keypairs,
+          key: teamKeyPair.privateKey,
+          masterPassword: teamKeyPair.password,
+        }),
       );
 
-      return;
+      return true;
     }
 
-    yield put(
-      decryption({
-        items: keypairs,
-        key: teamKeyPair.privateKey,
-        masterPassword: teamKeyPair.password,
-      }),
+    // eslint-disable-next-line no-console
+    console.warn(
+      `The key pair for the team with teamId ${teamId} not found. Ask team admin to add you in team.`,
     );
+
+    return false;
   } catch (error) {
     // eslint-disable-next-line no-console
     console.error(
@@ -611,6 +613,8 @@ function* decryptKeypairsByTeamKeipairs(teamId, keypairs) {
       error,
     );
   }
+
+  return false;
 }
 
 function* decryptNotDecryptedKeyPairs(notDecryptedKeyPairs) {

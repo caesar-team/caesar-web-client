@@ -9,12 +9,18 @@ import {
 import { logger } from '@caesar/common/utils/logger';
 import { schema } from '../schema';
 
-export const PasswordStep = ({ message, password, setDecryptedMessage }) => {
+export const PasswordStep = ({
+  message,
+  password,
+  setPassword,
+  setDecryptedMessage,
+}) => {
   const handleSubmitPassword = async (
     { messagePassword },
     { setSubmitting, setErrors },
   ) => {
     try {
+      setPassword(messagePassword);
       setSubmitting(false);
       setDecryptedMessage(
         getDecodedSecret(await decryptSecretMessage(message, messagePassword)),

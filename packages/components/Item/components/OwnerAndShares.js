@@ -2,6 +2,7 @@ import React from 'react';
 import { useSelector } from 'react-redux';
 import styled from 'styled-components';
 import { PERMISSION } from '@caesar/common/constants';
+import { isCurrentTeamPersonalSelector } from '@caesar/common/selectors/currentUser';
 import { workInProgressItemOwnerSelector } from '@caesar/common/selectors/workflow';
 import { usersBatchSelector } from '@caesar/common/selectors/entities/user';
 import { Hint, HINT_POSITION } from '../../Hint';
@@ -90,6 +91,7 @@ export const OwnerAndShares = ({
     }),
   );
   const hasInvited = invitedUsers?.length > 0;
+  const isPersonal = useSelector(isCurrentTeamPersonalSelector);
 
   return (
     <Wrapper>
@@ -114,9 +116,16 @@ export const OwnerAndShares = ({
                 avatarHintPosition="top_left"
               />
             ) : (
-              <NoMembers>
-                <Icon name="members" width={16} height={16} color="lightGray" />
-              </NoMembers>
+              isPersonal && (
+                <NoMembers>
+                  <Icon
+                    name="members"
+                    width={16}
+                    height={16}
+                    color="lightGray"
+                  />
+                </NoMembers>
+              )
             )}
           </InvitedMembersWrapper>
         )}

@@ -96,6 +96,7 @@ export function* decryption({
   });
 
   const poolChannel = yield call(createPoolChannel, pool);
+
   while (poolChannel) {
     const event = yield take(poolChannel);
 
@@ -104,11 +105,9 @@ export function* decryption({
     }
   }
 
-  let chunkSize = 1;
-
   if (items) {
     const chunks = chunk(items, DECRYPTION_CHUNK_SIZE);
-    chunkSize = chunks.length;
+
     chunks.map(itemsChunk =>
       pool.queue(taskAction(itemsChunk, null, key, masterPassword)),
     );
@@ -117,13 +116,13 @@ export function* decryption({
   // TODO: Raws should be an array instead of a string. If the app get a hundreds of attachments in one item then the app will be freezed.
   if (raws) {
     const rawsChunks = chunk([raws], DECRYPTION_CHUNK_SIZE);
-    chunkSize = rawsChunks.length;
+
     rawsChunks.map(rawsChunk =>
       pool.queue(taskAction(null, rawsChunk?.shift(), key, masterPassword)),
     );
   }
 
-  const normalizerEvent = normalizeEvent(chunkSize);
+  const normalizerEvent = normalizeEvent(coresCount);
 
   while (poolChannel) {
     try {

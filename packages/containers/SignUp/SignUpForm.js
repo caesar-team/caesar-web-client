@@ -208,6 +208,7 @@ const SignUpForm = ({ onSubmit }) => (
               <TextError marginTop={8}>{errors.confirmPassword}</TextError>
             )}
           </Row>
+          {errors?.form && <TextError marginTop={30}>{errors.form}</TextError>}
           <ButtonWrapper>
             <StyledButton htmlType="submit" disabled={isSubmitting || !isValid}>
               Sign Up

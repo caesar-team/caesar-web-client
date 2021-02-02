@@ -1,8 +1,8 @@
 import { DEFAULT_ERROR_MESSAGE } from '@caesar/common/constants';
 
 export function getServerErrorMessage(error) {
-  if ([400, 403, 404].includes(error?.data?.error?.code)) {
-    return error?.data?.error?.message ?? DEFAULT_ERROR_MESSAGE;
+  if ([400, 403, 404].includes(error?.data?.code)) {
+    return error?.data?.message ?? DEFAULT_ERROR_MESSAGE;
   }
 
   return DEFAULT_ERROR_MESSAGE;
@@ -48,7 +48,7 @@ export function getServerErrorsByName(error) {
   const children = error?.data?.errors?.children;
 
   if (!children) {
-    return DEFAULT_ERROR_MESSAGE;
+    return null;
   }
 
   return getChildrenErrors(children);

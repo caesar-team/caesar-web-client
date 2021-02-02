@@ -25,7 +25,11 @@ const SignUpContainer = () => {
       await registration(email, password);
 
       notification.show({
-        text: 'You have successfully signed up',
+        text:
+          'You will recieve a registration link via email. Please check your Inbox',
+        options: {
+          timeout: 10000,
+        },
       });
 
       Router.push(ROUTES.SIGN_IN);

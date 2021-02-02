@@ -4,6 +4,7 @@ import styled from 'styled-components';
 import { getSearchUser } from '@caesar/common/api';
 import { uuid4 } from '@caesar/common/utils/uuid4';
 import { getPlural } from '@caesar/common/utils/string';
+import { getServerErrorMessage } from '@caesar/common/utils/error';
 import { DEFAULT_ERROR_MESSAGE, EMAIL_REGEX } from '@caesar/common/constants';
 import { Input } from './Input';
 import { Icon } from '../Icon';
@@ -176,7 +177,7 @@ const UserSearchInputComponent = ({
         setLoading(false);
         // eslint-disable-next-line no-empty
       } catch (error) {
-        const errorText = error?.data?.error?.message;
+        const errorText = getServerErrorMessage(error);
 
         setServerError(
           typeof errorText === 'string' ? errorText : DEFAULT_ERROR_MESSAGE,

@@ -15,7 +15,7 @@ export const SHARED_ITEMS_SKIP = 'SHARED_ITEMS_SKIP';
 
 export const BOOTSTRAP_FINISH = 'BOOTSTRAP_FINISH';
 
-const REGEXP_AT_LEAST_ONE_SPECIAL_CHARACTER = /[-/\\^$*+?!@#%&.()|[\]{}]/;
+const REGEXP_AT_LEAST_ONE_SPECIAL_CHARACTER = /[-/\\^$*+?!@#%&.()|[\]{}_]/;
 const REGEXP_AT_LEAST_ONE_NUMBER = /[0-9]/;
 const REGEXP_MINIMUM_LENGTH = /.{8,}/;
 

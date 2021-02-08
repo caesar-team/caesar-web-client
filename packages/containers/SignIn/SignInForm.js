@@ -71,7 +71,7 @@ const ButtonWrapper = styled.div`
   align-items: center;
   justify-content: center;
   margin-top: 30px;
-  margin-bottom: 60px;
+  margin-bottom: 30px;
 `;
 
 const StyledLink = styled(Link)`

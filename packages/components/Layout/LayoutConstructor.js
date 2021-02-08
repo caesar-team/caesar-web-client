@@ -6,7 +6,7 @@ const Wrapper = styled.div`
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  padding: 60px 60px 30px;
+  padding: 30px 60px;
   background-color: ${({ theme }) => theme.color.white};
   flex: 1;
   overflow: auto;

@@ -6,7 +6,7 @@ import Footer from './Footer';
 const LayoutConstructorStyled = styled(LayoutConstructor)`
   ${LayoutConstructor.TopWrapper} {
     justify-content: space-between;
-    margin-bottom: 100px;
+    margin-bottom: 40px;
   }
 
   ${LayoutConstructor.MainWrapper} {

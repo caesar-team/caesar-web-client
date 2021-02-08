@@ -28,7 +28,7 @@ const AuthWrapper = styled.a`
   display: flex;
   justify-content: center;
   align-items: center;
-  margin-top: 20px;
+  margin-top: 10px;
   height: 60px;
   width: 100%;
   text-decoration: none;

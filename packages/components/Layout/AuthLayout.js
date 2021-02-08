@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import LayoutConstructor from './LayoutConstructor';
 
 const LayoutConstructorStyled = styled(LayoutConstructor)`
-  padding-top: 15px;
+  padding-top: 16px;
 
   ${LayoutConstructor.TopWrapper} {
     justify-content: space-between;

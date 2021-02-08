@@ -1,9 +1,10 @@
 import React from 'react';
 import styled from 'styled-components';
 import LayoutConstructor from './LayoutConstructor';
-import Footer from './Footer';
 
 const LayoutConstructorStyled = styled(LayoutConstructor)`
+  padding-top: 15px;
+
   ${LayoutConstructor.TopWrapper} {
     justify-content: space-between;
     margin-bottom: 40px;
@@ -15,7 +16,7 @@ const LayoutConstructorStyled = styled(LayoutConstructor)`
 `;
 
 const AuthLayout = props => (
-  <LayoutConstructorStyled footerComponent={Footer} {...props} />
+  <LayoutConstructorStyled {...props} />
 );
 
 export default AuthLayout;

@@ -99,6 +99,11 @@ export const ITEM_CONTENT_TYPE = {
   [ITEM_TYPE.DOCUMENT]: 'note',
 };
 
+export const ITEM_TEXT_TYPE = {
+  [ITEM_TYPE.CREDENTIALS]: 'password',
+  [ITEM_TYPE.DOCUMENT]: 'secure note',
+};
+
 export const ITEM_ICON_TYPE = {
   [ITEM_TYPE.CREDENTIALS]: 'key',
   [ITEM_TYPE.DOCUMENT]: 'securenote',

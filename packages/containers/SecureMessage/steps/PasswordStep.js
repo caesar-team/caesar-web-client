@@ -1,6 +1,6 @@
 import React from 'react';
 import { useFormik } from 'formik';
-import { LockInput } from '@caesar/components';
+import { Button, LockInput } from '@caesar/components';
 import {
   decryptSecretMessage,
   getDecodedSecret,
@@ -12,6 +12,7 @@ import { schema } from '../schema';
 export const PasswordStep = ({
   message,
   password,
+  noPasswordInput = false,
   setPassword,
   setDecryptedMessage,
 }) => {
@@ -50,17 +51,21 @@ export const PasswordStep = ({
 
   return (
     <form onSubmit={handleSubmit}>
-      <LockInput
-        autoFocus
-        name="messagePassword"
-        value={values.messagePassword}
-        onChange={e => {
-          if (Object.keys(errors).length) setErrors({});
-          handleChange(e);
-        }}
-        onClick={submitForm}
-        isError={Object.keys(errors).length !== 0}
-      />
+      {noPasswordInput ? (
+        <Button color="white" onClick={submitForm}>View the message</Button>
+        ) : (
+        <LockInput
+          autoFocus
+          name="messagePassword"
+          value={values.messagePassword}
+          onChange={e => {
+            if (Object.keys(errors).length) setErrors({});
+            handleChange(e);
+          }}
+          onClick={submitForm}
+          isError={Object.keys(errors).length !== 0}
+        />  
+      )}
     </form>
   );
 };

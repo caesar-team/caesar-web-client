@@ -39,6 +39,20 @@ const SecureMessageContainerComponent = ({
 
     return raws;
   };
+  
+  const getFormTitle = () => {
+    if (!!passwordFromLink && !decryptedMessage) {
+      return (
+        <AdaptiveTitle>Your secret is here. Click the button below to see the message</AdaptiveTitle>
+      );
+    }
+
+    return decryptedMessage ? (
+      <Title>It’s your secret</Title>
+    ) : (
+      <AdaptiveTitle>Enter the password to access the message</AdaptiveTitle>
+    );
+  };
 
   const handleClickCopyText = () => {
     copy(decryptedMessage.text);
@@ -71,11 +85,6 @@ const SecureMessageContainerComponent = ({
     downloadAsZip({ files: attachments });
   };
 
-  const title = decryptedMessage ? (
-    <Title>It’s your secret</Title>
-  ) : (
-    <AdaptiveTitle>Enter the password to access the message</AdaptiveTitle>
-  );
   const shouldShowButtons = !!decryptedMessage;
   const shouldShowDownloadButton =
     decryptedMessage &&
@@ -98,7 +107,7 @@ const SecureMessageContainerComponent = ({
         />
       </Header>
       <Content>
-        {title}
+        {getFormTitle()}
         {decryptedMessage ? (
           <MessageStep
             decryptedMessage={decryptedMessage}
@@ -108,6 +117,7 @@ const SecureMessageContainerComponent = ({
           <PasswordStep
             message={message}
             password={password}
+            noPasswordInput={!!passwordFromLink}
             setPassword={setPassword}
             setDecryptedMessage={setDecryptedMessage}
           />

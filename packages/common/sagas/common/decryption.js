@@ -126,6 +126,8 @@ export function* decryption({
     );
   }
 
+  // If use just coresCount decryption will be broken when queue is empty
+  // If use just chunkSize decryption will be broken when queue is not empty
   const normalizeEventCount = chunkSize > coresCount ? coresCount : chunkSize;
   const normalizerEvent = normalizeEvent(normalizeEventCount);
 

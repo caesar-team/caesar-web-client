@@ -1,6 +1,7 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import styled from 'styled-components';
+import { media } from '@caesar/assets/styles/media';
 import { logout } from '@caesar/common/actions/currentUser';
 import { Avatar } from '../Avatar';
 import { Button } from '../Button';
@@ -14,6 +15,10 @@ const Wrapper = styled.div`
   padding: 16px 60px;
   width: 100%;
   margin-bottom: 20px;
+
+  ${media.wideMobile`
+    padding: 8px 24px;
+  `}  
 `;
 
 const LogoWrapper = styled.div``;

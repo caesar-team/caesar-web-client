@@ -1,5 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
+import { useMedia } from '@caesar/common/hooks';
 import zxcvbn from 'zxcvbn';
 import { Formik, FastField } from 'formik';
 import {
@@ -139,6 +140,15 @@ const SignUpForm = ({ onSubmit }) => (
     }) => {
       const showTooltip =
         (values.password && checkError(touched, errors, 'password')) || false;
+      const { isDesktop, isWideDesktop } = useMedia();
+      const tooltipParams = !isDesktop && !isWideDesktop ? {
+        arrowAlign: 'end',
+        position: 'bottom right',
+        moveRight: '-15px',
+      } : {
+        arrowAlign: 'top',
+        position: 'right center',
+      };
 
       return (
         <Form onSubmit={handleSubmit}>
@@ -172,8 +182,7 @@ const SignUpForm = ({ onSubmit }) => (
               <Tooltip
                 show={showTooltip}
                 textBoxWidth="280px"
-                arrowAlign="top"
-                position="right center"
+                {...tooltipParams}
               >
                 <StyledStrengthIndicator
                   text="Our recommendations for creating a good password:"

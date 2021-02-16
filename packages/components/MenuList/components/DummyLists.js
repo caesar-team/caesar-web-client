@@ -28,7 +28,7 @@ const Title = styled(DummyRect)`
 
 const DummyItem = (
   <ListItem>
-    <DummyIcon width={30} height={30}/>
+    <DummyIcon width={30} height={30} />
     <Title width={150} height={24} />
     <DummyRect width={20} height={24} />
   </ListItem>
@@ -39,7 +39,10 @@ export const DummyLists = () => (
     <Loader>
       <Icon name="caesar" width={30} height={40} />
       Decryption in progress...
-    </Loader>   
-    {[DummyItem, DummyItem, DummyItem, DummyItem]}
-  </Wrapper>  
+    </Loader>
+    {DummyItem}
+    {DummyItem}
+    {DummyItem}
+    {DummyItem}
+  </Wrapper>
 );

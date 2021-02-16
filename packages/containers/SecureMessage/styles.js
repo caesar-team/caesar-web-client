@@ -26,7 +26,7 @@ export const Content = styled.div`
 `;
 
 export const Title = styled.div`
-  font-size: 18px;
+  font-size: ${({ theme }) => theme.font.size.main};
   color: ${({ theme }) => theme.color.lightGray};
   margin-bottom: 23px;
 `;

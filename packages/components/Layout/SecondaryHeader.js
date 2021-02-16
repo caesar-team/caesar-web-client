@@ -1,4 +1,4 @@
-import React, { Fragment } from 'react';
+import React from 'react';
 import styled from 'styled-components';
 import { withRouter } from 'next/router';
 import { useMedia } from '@caesar/common/hooks';

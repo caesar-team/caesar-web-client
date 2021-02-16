@@ -1,5 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
+import { media } from '@caesar/assets/styles/media';
 
 const Wrapper = styled.div`
   display: flex;
@@ -12,6 +13,10 @@ const Wrapper = styled.div`
   overflow: auto;
   min-height: 100vh;
   height: 100%;
+
+  ${media.wideMobile`
+    padding: 8px 0;
+  `}
 `;
 
 const TopWrapper = styled.div`

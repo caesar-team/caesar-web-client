@@ -1,14 +1,21 @@
-import React, { Fragment } from 'react';
+import React from 'react';
 import styled from 'styled-components';
 import { withRouter } from 'next/router';
+import { useMedia } from '@caesar/common/hooks';
 import { IS_AUTHORIZATION_ENABLE, ROUTES } from '@caesar/common/constants';
+import { media } from '@caesar/assets/styles/media';
 import { Logo } from './Logo';
 import { Button } from '../Button';
 
-const StyledButton = styled(Button)`
-  font-size: 18px;
-  padding: 18px 30px;
-  height: 60px;
+const Wrapper = styled.div`
+  display: flex;
+  align-items: center;
+  width: 100%;
+
+  ${media.wideMobile`
+    padding: 0 24px 8px;
+    border-bottom: 1px solid ${({ theme }) => theme.color.lighterGray};
+  `}
 `;
 
 const SecondaryHeader = ({
@@ -16,13 +23,27 @@ const SecondaryHeader = ({
   buttonText = 'Sign In',
   url = IS_AUTHORIZATION_ENABLE ? ROUTES.SIGN_IN : ROUTES.MAIN,
   isButtonShow = IS_AUTHORIZATION_ENABLE,
-}) => (
-  <Fragment>
-    <Logo href={url} width={142} height={40} />
-    {isButtonShow && (
-      <StyledButton onClick={() => router.push(url)}>{buttonText}</StyledButton>
-    )}
-  </Fragment>
-);
+}) => {
+  const { isDesktop, isWideDesktop } = useMedia();
+  const isNotMobile = isDesktop || isWideDesktop;
+
+  return (
+    <Wrapper>
+      {isNotMobile
+        ? <Logo href={url} width={142} height={40} />
+        : <Logo href={url} width={114} height={32} />
+      }
+      {isButtonShow && (
+        <Button
+          isHigh={isNotMobile}
+          isUppercase
+          onClick={() => router.push(url)}
+        >
+          {buttonText}
+        </Button>
+      )}
+    </Wrapper>
+  );
+};
 
 export default withRouter(SecondaryHeader);

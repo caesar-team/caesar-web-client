@@ -17,6 +17,7 @@ import {
   moveItemsBatchRequest,
 } from '@caesar/common/actions/entities/item';
 import { ConfirmModal } from '@caesar/components';
+import { ITEM_TEXT_TYPE } from '@caesar/common/constants';
 
 export const ConfirmMoveToTrashModal = ({ isOpened, handleCloseModal }) => {
   const dispatch = useDispatch();
@@ -50,7 +51,8 @@ export const ConfirmMoveToTrashModal = ({ isOpened, handleCloseModal }) => {
           teamId: workInProgressItem.teamId,
           listId: trashList.id,
           notification,
-          notificationText: `The '${workInProgressItem.data.name}' has been removed`,
+          notificationText:
+            `The ${ITEM_TEXT_TYPE[workInProgressItem.type]} '${workInProgressItem.data.name}' has been removed`,
         }),
       );
       dispatch(setWorkInProgressItem(null));

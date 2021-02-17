@@ -66,6 +66,7 @@ import {
   ROUTES,
   TEAM_TYPE,
   ITEM_TYPE,
+  ITEM_TEXT_TYPE,
   IMPORT_CHUNK_SIZE,
   REMOVE_CHUNK_SIZE,
 } from '@caesar/common/constants';
@@ -859,7 +860,7 @@ export function* editItemSaga({
       setSubmitting(false);
       yield put(
         updateGlobalNotification(
-          `The '${item.data.name}' has not been updated`,
+          `The ${ITEM_TEXT_TYPE[item.type]} '${item.data.name}' has not been updated`,
           false,
           true,
         ),
@@ -878,7 +879,7 @@ export function* editItemSaga({
 
     yield put(updateWorkInProgressItem(item.id));
     yield call(notification.show, {
-      text: `The '${item.data.name}' has been updated`,
+      text: `The ${ITEM_TEXT_TYPE[item.type]} '${item.data.name}' has been updated`,
     });
   } catch (error) {
     // eslint-disable-next-line no-console

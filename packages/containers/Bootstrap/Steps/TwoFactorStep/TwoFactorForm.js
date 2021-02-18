@@ -2,6 +2,8 @@ import React, { memo } from 'react';
 import styled from 'styled-components';
 import copy from 'copy-text-to-clipboard';
 import { useNotification } from '@caesar/common/hooks';
+import { media } from '@caesar/assets/styles/media';
+import { useMedia } from '@caesar/common/hooks';
 import {
   AuthTitle,
   AuthDescription,
@@ -62,14 +64,16 @@ const QrCodeDescription = styled.div`
 `;
 
 const QrCodeKey = styled.span`
-  font-size: 36px;
+  font-size: ${({ theme }) => theme.font.size.large};
   text-align: center;
+
+  ${media.wideMobile`
+    font-size: ${({ theme }) => theme.font.size.big};
+  `}
 `;
 
 const NextButton = styled(Button)`
   width: 100%;
-  height: 60px;
-  font-size: 18px;
   max-width: 400px;
 `;
 
@@ -94,6 +98,7 @@ const CheckboxWrapper = styled.div`
 
 const TwoFactorForm = ({ qr, code, onSubmit }) => {
   const notification = useNotification();
+  const { isDesktop, isWideDesktop } = useMedia();
 
   const handleCopy = value => () => {
     if (copy(value)) {
@@ -164,6 +169,8 @@ const TwoFactorForm = ({ qr, code, onSubmit }) => {
             </CheckboxWrapper>
             <NextButton
               htmlType="submit"
+              isHigh={isDesktop || isWideDesktop}
+              isUpperCase
               disabled={isSubmitting || values.code.length !== CODE_LENGTH}
             >
               Continue

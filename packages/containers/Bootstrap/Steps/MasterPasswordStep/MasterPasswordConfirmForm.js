@@ -3,6 +3,7 @@ import styled from 'styled-components';
 import { useFormik } from 'formik';
 import { useEffectOnce } from 'react-use';
 import { checkError } from '@caesar/common/utils/formikUtils';
+import { useMedia } from '@caesar/common/hooks';
 import {
   AuthTitle,
   AuthDescription,
@@ -19,8 +20,6 @@ const Form = styled.form`
 `;
 
 const StyledButton = styled(Button)`
-  height: 60px;
-  font-size: 18px;
   width: 130px;
 `;
 
@@ -51,6 +50,8 @@ const  MasterPasswordConfirmForm = ({
     validationSchema: createConfirmPasswordSchema(masterPassword),
     onSubmit,
   });
+  const { isMobile, isWideMobile } = useMedia();
+
   useEffectOnce(() => {
     validateForm();
   });
@@ -58,7 +59,9 @@ const  MasterPasswordConfirmForm = ({
   return (
     <Form onSubmit={handleSubmit}>
       <AuthTitle>Confirmation</AuthTitle>
-      <AuthDescription>Confirm your master password</AuthDescription>
+      <AuthDescription isCompact={isMobile || isWideMobile}>
+        Confirm your master password
+      </AuthDescription>
       <MasterPasswordInput
         name="confirmPassword"
         value={values.confirmPassword}
@@ -73,7 +76,12 @@ const  MasterPasswordConfirmForm = ({
         <BackLink disabled={isSubmitting} onClick={onClickReturn}>
           Change password
         </BackLink>
-        <StyledButton htmlType="submit" disabled={isSubmitting || !isValid}>
+        <StyledButton
+          htmlType="submit"
+          isHigh={!isMobile && !isWideMobile}
+          isUpperCase          
+          disabled={isSubmitting || !isValid}
+        >
           Confirm
         </StyledButton>
       </ButtonsWrapper>      

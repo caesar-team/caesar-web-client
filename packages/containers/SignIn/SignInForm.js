@@ -1,6 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
 import { Formik, FastField } from 'formik';
+import { useMedia } from '@caesar/common/hooks';
 import {
   Input,
   PasswordInput,
@@ -60,12 +61,6 @@ const Prefix = styled.div`
   border-right: 1px solid ${({ theme }) => theme.color.lightGray};
 `;
 
-const StyledButton = styled(Button)`
-  font-size: 18px;
-  padding: 18px 30px;
-  height: 60px;
-`;
-
 const ButtonWrapper = styled.div`
   display: flex;
   align-items: center;
@@ -90,56 +85,65 @@ const PasswordInputPrefix = (
   </Prefix>
 );
 
-const SignInForm = ({ onSubmit }) => (
-  <Formik
-    key="documentForm"
-    onSubmit={onSubmit}
-    initialValues={{ email: '', password: '' }}
-    validationSchema={schema}
-    validateOnBlur={false}
-    validateOnChange={false}
-  >
-    {({ errors, touched, handleSubmit, handleBlur, isSubmitting }) => (
-      <Form onSubmit={handleSubmit}>
-        <Row>
-          <FastField name="email">
-            {({ field }) => (
-              <StyledEmailInput
-                {...field}
-                onBlur={handleBlur}
-                placeholder="Email"
-                prefix={EmailInputPrefix}
-              />
+const SignInForm = ({ onSubmit }) => {
+  const { isDesktop, isWideDesktop } = useMedia();
+
+  return (
+    <Formik
+      key="documentForm"
+      onSubmit={onSubmit}
+      initialValues={{ email: '', password: '' }}
+      validationSchema={schema}
+      validateOnBlur={false}
+      validateOnChange={false}
+    >
+      {({ errors, touched, handleSubmit, handleBlur, isSubmitting }) => (
+        <Form onSubmit={handleSubmit}>
+          <Row>
+            <FastField name="email">
+              {({ field }) => (
+                <StyledEmailInput
+                  {...field}
+                  onBlur={handleBlur}
+                  placeholder="Email"
+                  prefix={EmailInputPrefix}
+                />
+              )}
+            </FastField>
+            {checkError(touched, errors, 'email') && (
+              <TextError marginTop={8}>{errors.email}</TextError>
             )}
-          </FastField>
-          {checkError(touched, errors, 'email') && (
-            <TextError marginTop={8}>{errors.email}</TextError>
-          )}
-        </Row>
-        <Row>
-          <FastField name="password">
-            {({ field }) => (
-              <StyledPasswordInput
-                {...field}
-                onBlur={handleBlur}
-                placeholder="Password"
-                prefix={PasswordInputPrefix}
-              />
+          </Row>
+          <Row>
+            <FastField name="password">
+              {({ field }) => (
+                <StyledPasswordInput
+                  {...field}
+                  onBlur={handleBlur}
+                  placeholder="Password"
+                  prefix={PasswordInputPrefix}
+                />
+              )}
+            </FastField>
+            {checkError(touched, errors, 'password') && (
+              <TextError marginTop={8}>{errors.password}</TextError>
             )}
-          </FastField>
-          {checkError(touched, errors, 'password') && (
-            <TextError marginTop={8}>{errors.password}</TextError>
-          )}
-        </Row>
-        <ButtonWrapper>
-          {/* <StyledLink>Forgot password?</StyledLink> */}
-          <StyledButton htmlType="submit" disabled={isSubmitting}>
-            Login
-          </StyledButton>
-        </ButtonWrapper>
-      </Form>
-    )}
-  </Formik>
-);
+          </Row>
+          <ButtonWrapper>
+            {/* <StyledLink>Forgot password?</StyledLink> */}
+            <Button
+              htmlType="submit"
+              isHigh={isDesktop || isWideDesktop}
+              isUpperCase
+              disabled={isSubmitting}
+            >
+              Login
+            </Button>
+          </ButtonWrapper>
+        </Form>
+      )}
+    </Formik>
+  );
+}
 
 export default SignInForm;

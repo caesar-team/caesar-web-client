@@ -1,6 +1,8 @@
 import React, { useState, memo } from 'react';
 import { useEffectOnce } from 'react-use';
 import { useSelector, useDispatch } from 'react-redux';
+import { media } from '@caesar/assets/styles/media';
+import { useMedia } from '@caesar/common/hooks';
 import styled from 'styled-components';
 import {
   isLoadingSelector,
@@ -30,28 +32,37 @@ import {
 import { MODAL } from './constants';
 
 const CenterWrapper = styled.div`
-  display: flex;
+  display: grid;
+  grid-template-columns: 287px 431px 1fr;
   width: 100%;
   min-height: calc(100vh - 55px);
+
+  ${media.desktop`
+    grid-template-columns: 20% 30% 1fr;
+  `}
+
+  ${media.tablet`
+    grid-template-columns: 25% 25% 1fr;
+  `}
+  
+  ${media.wideMobile`
+    grid-template-columns: 40% 60%;
+  `}  
 `;
 
 const Sidebar = styled.aside`
-  flex: 0 0 287px;
   border-right: 1px solid ${({ theme }) => theme.color.gallery};
 `;
 
 const MiddleColumnWrapper = styled.div`
   display: flex;
   flex-direction: column;
-  flex: 0 0 431px;
   background: ${({ theme }) => theme.color.alto};
   border-right: 1px solid ${({ theme }) => theme.color.gallery};
 `;
 
 const RightColumnWrapper = styled.div`
   position: relative;
-  flex-grow: 1;
-  max-width: calc(100% - 287px - 431px);
 `;
 
 const StyledSecureMessage = styled(SecureMessage)`
@@ -69,6 +80,7 @@ const DashboardComponent = () => {
   const isLoading = useSelector(isLoadingSelector);
   const workInProgressItem = useSelector(workInProgressItemSelector);
   const workInProgressItemIds = useSelector(workInProgressItemIdsSelector);
+  const { isWideMobile } = useMedia();
 
   const handleOpenModal = modal => () => {
     setOpenedModal(modal);

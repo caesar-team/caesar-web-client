@@ -29,6 +29,7 @@ import {
   MOVING_IN_PROGRESS_NOTIFICATION,
   NOOP_NOTIFICATION,
   TEAM_TYPE,
+  ITEM_TEXT_TYPE,
   ENCRYPTION_CHUNK_SIZE,
 } from '@caesar/common/constants';
 import {
@@ -193,7 +194,8 @@ export function* moveItemSaga({
 
     if (notification) {
       yield call(notification.show, {
-        text: notificationText || `The '${item.meta.title}' has been moved`,
+        text: notificationText ||
+          `The ${ITEM_TEXT_TYPE[item.type]} '${item.meta.title}' has been moved`,
       });
     }
   } catch (error) {

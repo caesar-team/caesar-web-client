@@ -216,7 +216,7 @@ const SignUpForm = ({ onSubmit }) => (
             <Button
               htmlType="submit"
               isHigh={isDesktop || isWideDesktop}
-              isUpperCase              
+              isUppercase              
               disabled={isSubmitting || !isValid}
             >
               Sign Up

@@ -71,12 +71,6 @@ const Prefix = styled.div`
   border-right: 1px solid ${({ theme }) => theme.color.lightGray};
 `;
 
-const StyledButton = styled(Button)`
-  font-size: 18px;
-  padding: 18px 30px;
-  height: 60px;
-`;
-
 const ButtonWrapper = styled.div`
   display: flex;
   align-items: center;
@@ -219,9 +213,14 @@ const SignUpForm = ({ onSubmit }) => (
           </Row>
           {errors?.form && <TextError marginTop={30}>{errors.form}</TextError>}
           <ButtonWrapper>
-            <StyledButton htmlType="submit" disabled={isSubmitting || !isValid}>
+            <Button
+              htmlType="submit"
+              isHigh={isDesktop || isWideDesktop}
+              isUpperCase              
+              disabled={isSubmitting || !isValid}
+            >
               Sign Up
-            </StyledButton>
+            </Button>
           </ButtonWrapper>
         </Form>
       );

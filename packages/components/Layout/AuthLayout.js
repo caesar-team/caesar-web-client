@@ -7,7 +7,7 @@ const LayoutConstructorStyled = styled(LayoutConstructor)`
 
   ${LayoutConstructor.TopWrapper} {
     justify-content: space-between;
-    margin-bottom: 40px;
+    margin-bottom: 20px;
   }
 
   ${LayoutConstructor.MainWrapper} {

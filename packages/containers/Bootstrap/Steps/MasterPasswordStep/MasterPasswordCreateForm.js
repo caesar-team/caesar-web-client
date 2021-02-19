@@ -5,6 +5,7 @@ import zxcvbn from 'zxcvbn';
 import copy from 'copy-text-to-clipboard';
 import styled from 'styled-components';
 import { useNotification } from '@caesar/common/hooks';
+import { useMedia } from '@caesar/common/hooks';
 import { checkError } from '@caesar/common/utils/formikUtils';
 import {
   Head,
@@ -70,8 +71,6 @@ const StrengthIndicatorStyled = styled(StrengthIndicator)`
 
 const StyledButton = styled(Button)`
   width: 100%;
-  height: 60px;
-  font-size: 18px;
   margin-top: 45px;
 `;
 
@@ -84,6 +83,7 @@ const StyledTooltipPasswordGenerator = styled(TooltipPasswordGenerator)`
 
 const MasterPasswordCreateFormComponent = ({ initialValues, onSubmit }) => {
   const notification = useNotification();
+  const { isMobile, isWideMobile } = useMedia();
   const {
     errors,
     touched,
@@ -117,7 +117,9 @@ const MasterPasswordCreateFormComponent = ({ initialValues, onSubmit }) => {
     <Form onSubmit={handleSubmit}>
       <Head title="Create master password for Caesar" />
       <AuthTitle>Master Password</AuthTitle>
-      <AuthDescription>Create master password for Caesar</AuthDescription>
+      <AuthDescription isCompact={isMobile || isWideMobile}>
+        Create master password for Caesar
+      </AuthDescription>
       <FieldWrapper>
         <MasterPasswordInput
           name="password"
@@ -157,7 +159,12 @@ const MasterPasswordCreateFormComponent = ({ initialValues, onSubmit }) => {
         Please, copy & save the master password in a safe place. Relogin will
         not be possible without this password.
       </TipText>
-      <StyledButton htmlType="submit" disabled={isSubmitting || !isValid}>
+      <StyledButton
+        htmlType="submit"
+        isHigh={!isMobile && !isWideMobile}
+        isUpperCase
+        disabled={isSubmitting || !isValid}
+      >
         Continue
       </StyledButton>
     </Form>

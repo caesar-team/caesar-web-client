@@ -134,7 +134,7 @@ const SignInForm = ({ onSubmit }) => {
             <Button
               htmlType="submit"
               isHigh={isDesktop || isWideDesktop}
-              isUpperCase
+              isUppercase
               disabled={isSubmitting}
             >
               Login

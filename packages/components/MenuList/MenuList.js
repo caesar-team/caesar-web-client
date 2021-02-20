@@ -42,6 +42,8 @@ const ColumnHeader = styled.div`
 const ColumnTitle = styled.div`
   margin-left: 16px;
   text-align: left;
+  color: ${({ isDarkMode, theme }) =>
+    isDarkMode ? theme.color.white : theme.color.black};  
 `;
 
 const DropdownIcon = styled(Icon)`
@@ -75,7 +77,13 @@ const TeamAvatar = ({ team }) =>
     />
   );
 
-const MenuListComponent = ({ mode, setSearchedText, setMode }) => {
+const MenuListComponent = ({
+  mode,
+  setSearchedText,
+  setMode,
+  isDarkMode = false,
+  closeMobileMenu,
+}) => {
   const selectedVault =
     useSelector(currentTeamSelector) ||
     useSelector(teamSelector, { teamId: TEAM_TYPE.PERSONAL });
@@ -83,6 +91,7 @@ const MenuListComponent = ({ mode, setSearchedText, setMode }) => {
   const [isDropdownOpened, setDropdownOpened] = useState(false);
   const [isListsOpened, setListsOpened] = useState(true);
   const activeTeamId = selectedVault?.id;
+  const columnHeaderWhiteColor = isDropdownOpened ? 'white' : 'alto';
 
   const handleToggleDropdown = isOpened => {
     setDropdownOpened(isOpened);
@@ -103,15 +112,18 @@ const MenuListComponent = ({ mode, setSearchedText, setMode }) => {
         onToggle={handleToggleDropdown}
       >
         <ColumnHeader
-          bgColor={isDropdownOpened ? 'white' : 'alto'}
+          bgColor={isDarkMode ? 'emperor' : columnHeaderWhiteColor}
           isDropdownOpened={isDropdownOpened}
         >
           <TeamAvatar team={selectedVault} />
-          <ColumnTitle>{getTeamTitle(selectedVault)}</ColumnTitle>
+          <ColumnTitle isDarkMode={isDarkMode}>
+            {getTeamTitle(selectedVault)}
+          </ColumnTitle>
           <DropdownIcon
             name="arrow-triangle"
             width={16}
             height={16}
+            color={isDarkMode ? 'white' : 'black'}
             isDropdownOpened={isDropdownOpened}
           />
         </ColumnHeader>
@@ -123,7 +135,9 @@ const MenuListComponent = ({ mode, setSearchedText, setMode }) => {
             setSearchedText={setSearchedText}
             setMode={setMode}
             isListsOpened={isListsOpened}
+            isDarkMode={isDarkMode}
             setListsOpened={setListsOpened}
+            closeMobileMenu={closeMobileMenu}
           />
           <StyledAppVersion />
         </Menu>

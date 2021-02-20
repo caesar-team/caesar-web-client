@@ -46,7 +46,9 @@ const MenuListInnerComponent = ({
   setSearchedText,
   setMode,
   isListsOpened,
+  isDarkMode = false,
   setListsOpened,
+  closeMobileMenu = Function.prototype,
 }) => {
   const dispatch = useDispatch();
   const currentTeam = useSelector(currentTeamSelector);
@@ -83,6 +85,7 @@ const MenuListInnerComponent = ({
 
     setMode(DASHBOARD_MODE.DEFAULT);
     setSearchedText('');
+    closeMobileMenu();
   };
 
   const handleClickSecureMessage = () => {
@@ -177,6 +180,7 @@ const MenuListInnerComponent = ({
                 }
                 fontWeight={id === SECURE_MESSAGE_MODE ? 600 : 400}
                 withNested={withNested}
+                isDarkMode={isDarkMode}
                 onClick={() => {
                   if (id === SECURE_MESSAGE_MODE) {
                     return handleClickSecureMessage();
@@ -218,6 +222,7 @@ const MenuListInnerComponent = ({
                   {id === 'lists' && isCreatingMode && (
                     <ListItem
                       isCreatingMode={isCreatingMode}
+                      isDarkMode={isDarkMode}
                       setCreatingMode={setCreatingMode}
                       nestedListsLabels={nestedListsLabels}
                     />
@@ -231,6 +236,7 @@ const MenuListInnerComponent = ({
                           itemCount={getListCount(list.id)}
                           activeListId={activeListId}
                           index={index}
+                          isDarkMode={isDarkMode}
                           nestedListsLabels={nestedListsLabels}
                           onClickMenuItem={handleClickMenuItem}
                         />
@@ -254,6 +260,7 @@ const MenuListInnerComponent = ({
                                   itemCount={getListCount(list.id)}
                                   activeListId={activeListId}
                                   index={index}
+                                  isDarkMode={isDarkMode}
                                   isDraggable
                                   nestedListsLabels={nestedListsLabels}
                                   onClickMenuItem={handleClickMenuItem}

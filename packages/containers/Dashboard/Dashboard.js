@@ -24,6 +24,7 @@ import {
 import { DASHBOARD_MODE } from '@caesar/common/constants';
 import {
   MiddleColumn,
+  MobileMenu,
   ShareModal,
   MoveModal,
   ConfirmMoveToTrashModal,
@@ -81,6 +82,7 @@ const DashboardComponent = () => {
   const workInProgressItem = useSelector(workInProgressItemSelector);
   const workInProgressItemIds = useSelector(workInProgressItemIdsSelector);
   const { isWideMobile } = useMedia();
+  const isMobileMenuOpen = true;
 
   const handleOpenModal = modal => () => {
     setOpenedModal(modal);
@@ -117,14 +119,23 @@ const DashboardComponent = () => {
         setSearchedText={setSearchedText}
         setMode={setMode}
       >
+        {isWideMobile && (
+          <MobileMenu
+            mode={mode}
+            setSearchedText={setSearchedText}
+            setMode={setMode}
+          />
+        )}        
         <CenterWrapper>
-          <Sidebar>
-            <MenuList
-              mode={mode}
-              setSearchedText={setSearchedText}
-              setMode={setMode}
-            />
-          </Sidebar>
+          {!isWideMobile && (
+            <Sidebar>
+              <MenuList
+                mode={mode}
+                setSearchedText={setSearchedText}
+                setMode={setMode}
+              />
+            </Sidebar>
+          )}
           {mode === DASHBOARD_MODE.TOOL ? (
             <StyledSecureMessage withScroll />
           ) : (

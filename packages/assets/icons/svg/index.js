@@ -1,6 +1,7 @@
 import './icon-arrow-heavy.svg?sprite';
 import './icon-arrow-triangle.svg?sprite';
 import './icon-arrow.svg?sprite';
+import './icon-burger.svg?sprite';
 import './icon-caesar.svg?sprite';
 import './icon-checkmark.svg?sprite';
 import './icon-clip.svg?sprite';

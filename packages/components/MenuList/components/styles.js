@@ -9,10 +9,20 @@ export const MenuItemInner = styled.div`
   padding: 7px 24px;
   font-weight: ${({ fontWeight, isActive }) =>
     isActive ? 600 : fontWeight || 400};
-  color: ${({ isActive, theme }) =>
-    isActive ? theme.color.black : theme.color.emperor};
-  background-color: ${({ isActive, theme }) =>
-    isActive ? theme.color.snow : theme.color.white};
+  color: ${({ isActive, isDarkMode, theme }) => {
+    if (isActive) {
+      return theme.color.black;
+    }
+
+    return isDarkMode ? theme.color.white : theme.color.emperor;
+  }};
+  background-color: ${({ isActive, isDarkMode, theme }) => {
+    if (isActive) {
+      return theme.color.snow;
+    }
+
+    return isDarkMode ? theme.color.emperor : theme.color.white;
+  }};
   border-top: 1px solid transparent;
   border-bottom: 1px solid transparent;
   cursor: pointer;
@@ -110,8 +120,13 @@ export const DnDIcon = styled(ActionIcon)`
 export const Wrapper = styled(MenuItemInner)`
   position: relative;
   padding: ${({ isEdit }) => (isEdit ? '0 24px 0 40px' : '7px 24px 7px 56px')};
-  color: ${({ isActive, theme }) =>
-    isActive ? theme.color.black : theme.color.gray};
+  color: ${({ isActive, isDarkMode, theme }) => {
+    if (isActive) {
+      return theme.color.black;
+    }
+
+    return isDarkMode ? theme.color.white : theme.color.gray;
+  }};
 
   &:hover {
     color: ${({ theme }) => theme.color.black};

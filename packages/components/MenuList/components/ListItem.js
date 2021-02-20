@@ -28,6 +28,7 @@ export const ListItem = ({
   nestedListsLabels = [],
   activeListId,
   index,
+  isDarkMode,
   onClickMenuItem = Function.prototype,
   isCreatingMode,
   isDraggable,
@@ -156,6 +157,7 @@ export const ListItem = ({
       onClick={() => onClickMenuItem(id)}
       isEdit={isEditMode}
       isDefault={isDefault}
+      isDarkMode={isDarkMode}
     >
       {renderInner()}
     </Wrapper>
@@ -173,6 +175,7 @@ export const ListItem = ({
             onClick={() => onClickMenuItem(id)}
             isEdit={isEditMode}
             isDefault={isDefault}
+            isDarkMode={isDarkMode}
             ref={provided.innerRef}
             {...provided.draggableProps}
           >

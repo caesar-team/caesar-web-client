@@ -87,16 +87,17 @@ const StyledPasswordIndicator = styled(PasswordIndicator)`
 const StyledStrengthIndicator = styled(StrengthIndicator)`
   font-size: ${({ theme }) => theme.font.size.small};
   color: ${({ theme }) => theme.color.gray};
-  padding: 16px;
+  padding: ${({ isMobile }) => (isMobile ? '12px 0' : '16px')};
 
   ${StrengthIndicator.Text} {
     margin-bottom: 15px;
   }
 
   ${StrengthIndicator.HelperText} {
-    font-size: ${({ theme }) => theme.font.size.small};
+    font-size: ${({ theme, isMobile }) =>
+      isMobile ? theme.font.size.xs : theme.font.size.small};
     color: ${({ theme }) => theme.color.gray};
-    margin-bottom: 8px;
+    margin-bottom: ${({ isMobile }) => isMobile ? '4px' : '8px'};
 
     &:last-of-type {
       margin-bottom: 0;
@@ -135,14 +136,6 @@ const SignUpForm = ({ onSubmit }) => (
       const showTooltip =
         (values.password && checkError(touched, errors, 'password')) || false;
       const { isDesktop, isWideDesktop } = useMedia();
-      const tooltipParams = !isDesktop && !isWideDesktop ? {
-        arrowAlign: 'end',
-        position: 'bottom right',
-        moveRight: '-15px',
-      } : {
-        arrowAlign: 'top',
-        position: 'right center',
-      };
 
       return (
         <Form onSubmit={handleSubmit}>
@@ -173,17 +166,26 @@ const SignUpForm = ({ onSubmit }) => (
                   />
                 )}
               </FastField>
-              <Tooltip
-                show={showTooltip}
-                textBoxWidth="280px"
-                {...tooltipParams}
-              >
+              {isDesktop || isWideDesktop ? (
+                <Tooltip
+                  show={showTooltip}
+                  textBoxWidth="280px"
+                  arrowAlign="top"
+                  position="right center"
+                >
+                  <StyledStrengthIndicator
+                    text="Our recommendations for creating a good password:"
+                    value={values.password}
+                    rules={GOOD_PASSWORD_RULES}
+                  />
+                </Tooltip>
+              ) : (
                 <StyledStrengthIndicator
-                  text="Our recommendations for creating a good password:"
                   value={values.password}
                   rules={GOOD_PASSWORD_RULES}
-                />
-              </Tooltip>
+                  isMobile
+                />                
+              )}
             </FieldWrapper>
             {values.password && (
               <StyledPasswordIndicator

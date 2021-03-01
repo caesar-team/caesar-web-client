@@ -4,11 +4,12 @@ import styled from 'styled-components';
 import { FastField, Formik } from 'formik';
 import copy from 'copy-text-to-clipboard';
 import { getBackupCodes } from '@caesar/common/api';
-import { useNotification } from '@caesar/common/hooks';
+import { useMedia, useNotification } from '@caesar/common/hooks';
 import { formatNumbersByColumns } from '@caesar/common/utils/format';
 import { downloadTextData } from '@caesar/common/utils/download';
 import { printData } from '@caesar/common/utils/print';
 import { Button, Checkbox, AuthTitle, LogoLoader } from '@caesar/components';
+import { media } from '@caesar/assets/styles/media';
 import { backupInitialValues } from './constants';
 import { agreeSchema } from './schema';
 
@@ -34,6 +35,10 @@ const Description = styled.div`
   font-size: 18px;
   text-align: center;
   color: ${({ theme }) => theme.color.gray};
+
+  ${media.wideMobile`
+    font-size: ${({ theme }) => theme.font.size.main};
+  `}
 `;
 
 const Codes = styled.div`
@@ -68,6 +73,10 @@ const StyledButton = styled(Button)`
 const StyledCheckbox = styled(Checkbox)`
   ${Checkbox.Text} {
     font-size: 18px;
+
+    ${media.wideMobile`
+      font-size: ${({ theme }) => theme.font.size.main};
+    `}
   }
 `;
 
@@ -81,6 +90,7 @@ const TwoFactorBackupFormComponent = ({ onSubmit }) => {
   const [codes, setCodes] = useState([]);
   const notification = useNotification();
   const numbersByColumns = formatNumbersByColumns(codes, 4);
+  const { isMobile, isWideMobile } = useMedia();
 
   useEffectOnce(() => {
     const setBackupCodes = async () => {
@@ -155,6 +165,8 @@ const TwoFactorBackupFormComponent = ({ onSubmit }) => {
               </FastField>
               <NextButton
                 htmlType="submit"
+                isHigh={!isMobile && !isWideMobile}
+                isUpperCase                
                 disabled={isSubmitting || !isValid || !dirty}
               >
                 Continue

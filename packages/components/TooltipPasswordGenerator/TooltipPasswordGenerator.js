@@ -1,5 +1,6 @@
 import React, { useState, useRef, memo } from 'react';
 import { useUpdateEffect, useClickAway } from 'react-use';
+import { useMedia } from '@caesar/common/hooks';
 import styled from 'styled-components';
 import { passwordGenerator } from '@caesar/common/utils/passwordGenerator';
 import { Icon } from '../Icon';
@@ -33,6 +34,16 @@ const TooltipPasswordGeneratorComponent = ({
   });
   const { length, digits, specials } = state;
   const tooltipRef = useRef(null);
+  const { isDesktop, isWideDesktop } = useMedia();
+  const tooltipParams = !isDesktop && !isWideDesktop ? {
+    arrowAlign: 'end',
+    position: 'bottom right',
+    moveRight: '15px',
+  } : {
+    arrowAlign: 'start',
+    position: 'right center',
+    moveRight: '8px',
+  };
 
   const getLengthValue = event => event.target.value.toValue;
 
@@ -76,10 +87,8 @@ const TooltipPasswordGeneratorComponent = ({
       />
       <Tooltip
         show={isVisible}
-        arrowAlign="start"
-        position="right center"
         textBoxWidth="300px"
-        moveRight="8px"
+        {...tooltipParams}
         {...tooltipProps}
       >
         <PasswordGenerator

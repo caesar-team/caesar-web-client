@@ -18,9 +18,14 @@ const StyledDropdown = styled(Dropdown)`
   ${Dropdown.Box} {
     width: 100%;
     max-height: calc(100vh - 150px);
+    ${({ isDarkMode }) => isDarkMode && 'border: 0'};
+    background-color: ${({ theme, isDarkMode }) =>
+      isDarkMode ? theme.color.emperor : theme.color.white};
   }
 
   ${Dropdown.OptionsList} {
+    background-color: ${({ theme, isDarkMode }) =>
+      isDarkMode ? theme.color.emperor : theme.color.white};
     overflow: auto;
   }
 `;
@@ -100,10 +105,12 @@ const MenuListComponent = ({
   return (
     <>
       <StyledDropdown
+        isDarkMode={isDarkMode}
         renderOverlay={handleToggle => (
           <VaultList
             activeTeamId={activeTeamId}
             handleToggle={handleToggle}
+            isDarkMode={isDarkMode}
             setListsOpened={setListsOpened}
             setSearchedText={setSearchedText}
             setMode={setMode}

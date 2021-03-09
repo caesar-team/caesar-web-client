@@ -2,6 +2,8 @@
 import React, { memo } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import styled from 'styled-components';
+import { useMedia } from '@caesar/common/hooks';
+import { media } from '@caesar/assets/styles/media';
 import {
   TEAM_TYPE,
   TEAM_TEXT_TYPE,
@@ -29,6 +31,10 @@ const ColumnHeader = styled.div`
   padding: 8px 24px;
   background-color: ${({ theme }) => theme.color.alto};
   border-bottom: 1px solid ${({ theme }) => theme.color.gallery};
+  
+  ${media.mobile`
+    padding: 8px 16px;
+  `};
 `;
 
 const Empty = styled.div`
@@ -83,6 +89,7 @@ const ItemHeaderComponent = ({
   const trashList = useSelector(currentTeamTrashListSelector);
   const teamsById = useSelector(teamsByIdSelector);
   const listsById = useSelector(listsByIdSelector);
+  const { isMobile } = useMedia();
 
   const teamTitle = item.teamId
     ? getTeamTitle(teamsById[item.teamId])
@@ -126,21 +133,31 @@ const ItemHeaderComponent = ({
       ) : (
         <>
           <Can I={PERMISSION.MOVE} an={_permissions}>
-            <StyledHintPath text="Move the item">
-              <PathButton color="white" onClick={onClickMove}>
+            {isMobile ? (
+              <StyledHintPath text="Move the item">
+                <Button icon="move" color="white" onClick={onClickMove}>
+                  Move
+                </Button>
+              </StyledHintPath>
+              ) : (
+              <StyledHintPath text="Move the item">
+                <PathButton color="white" onClick={onClickMove}>
+                  <PathText>{teamTitle}</PathText>
+                  <Delimeter>|</Delimeter>
+                  <PathText>{listTitle}</PathText>
+                </PathButton>
+              </StyledHintPath>
+            )}
+          </Can>
+          {!isMobile && (
+            <Can not I={PERMISSION.MOVE} an={_permissions}>
+              <PathWrapper>
                 <PathText>{teamTitle}</PathText>
                 <Delimeter>|</Delimeter>
                 <PathText>{listTitle}</PathText>
-              </PathButton>
-            </StyledHintPath>
-          </Can>
-          <Can not I={PERMISSION.MOVE} an={_permissions}>
-            <PathWrapper>
-              <PathText>{teamTitle}</PathText>
-              <Delimeter>|</Delimeter>
-              <PathText>{listTitle}</PathText>
-            </PathWrapper>
-          </Can>
+              </PathWrapper>
+            </Can>
+          )}
           <Can I={PERMISSION.SHARE} an={_permissions}>
             <StyledHint text="Share the item">
               <Button icon="share" color="white" onClick={onClickShare} />

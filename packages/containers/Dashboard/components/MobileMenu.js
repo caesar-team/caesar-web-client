@@ -7,7 +7,7 @@ const Wrapper = styled.div`
   position: absolute;
   top: 0;
   left: 0;
-  width: 40%;
+  width: ${({ isFullWidth }) => (isFullWidth ? '100%' : '40%')};
   height: 100%;
 `;
 
@@ -25,7 +25,7 @@ const Menu = styled.div`
   left: ${({ isOpen }) => (isOpen ? '0' : '-100%')};
   width: 100%;
   height: 100%;
-  z-index: ${({ theme }) => theme.zIndex.basic};
+  z-index: ${({ theme }) => theme.zIndex.overlay};
   background-color: ${({ theme }) => theme.color.emperor};
 `;
 
@@ -35,13 +35,14 @@ const IconWrapper = styled.div`
 
 const MobileMenuComponent = ({
   mode,
+  isFullWidth,
   setSearchedText,
   setMode,
 }) => {
   const [isOpen, setOpen] = useState(false);
 
   return (
-    <Wrapper>
+    <Wrapper isFullWidth={isFullWidth}>
       <Header isOpen={isOpen}>
         <IconWrapper>
           {isOpen ? (

@@ -48,7 +48,11 @@ const CenterWrapper = styled.div`
   
   ${media.wideMobile`
     grid-template-columns: 40% 60%;
-  `}  
+  `}
+  
+  ${media.mobile`
+    grid-template-columns: 1fr;
+  `}
 `;
 
 const Sidebar = styled.aside`
@@ -81,8 +85,9 @@ const DashboardComponent = () => {
   const isLoading = useSelector(isLoadingSelector);
   const workInProgressItem = useSelector(workInProgressItemSelector);
   const workInProgressItemIds = useSelector(workInProgressItemIdsSelector);
-  const { isWideMobile } = useMedia();
-  const isMobileMenuOpen = true;
+  const { isMobile, isWideMobile } = useMedia();
+  const isItemViewActive = (isMobile && workInProgressItem) || !isMobile;
+  const isMiddleColumnActive = (isMobile && !workInProgressItem) || !isMobile;
 
   const handleOpenModal = modal => () => {
     setOpenedModal(modal);
@@ -119,15 +124,16 @@ const DashboardComponent = () => {
         setSearchedText={setSearchedText}
         setMode={setMode}
       >
-        {isWideMobile && (
+        {(isMobile || isWideMobile) && (
           <MobileMenu
             mode={mode}
             setSearchedText={setSearchedText}
             setMode={setMode}
+            isFullWidth={isMobile}
           />
         )}        
         <CenterWrapper>
-          {!isWideMobile && (
+          {(!isWideMobile && !isMobile) && (
             <Sidebar>
               <MenuList
                 mode={mode}
@@ -140,24 +146,28 @@ const DashboardComponent = () => {
             <StyledSecureMessage withScroll />
           ) : (
             <>
-              <MiddleColumnWrapper>
-                <MiddleColumn
-                  mode={mode}
-                  searchedText={searchedText}
-                  hasOpenedModal={openedModal}
-                  handleOpenModal={handleOpenModal}
-                  handleCtrlSelectionItemBehaviour={
-                    handleCtrlSelectionItemBehaviour
-                  }
-                />
-              </MiddleColumnWrapper>
-              <RightColumnWrapper>
-                <Item
-                  onClickShare={handleOpenModal(MODAL.SHARE)}
-                  onClickMoveToTrash={handleOpenModal(MODAL.MOVE_TO_TRASH)}
-                  onClickRemoveItem={handleOpenModal(MODAL.REMOVE_ITEM)}
-                />
-              </RightColumnWrapper>
+              {isMiddleColumnActive && (
+                <MiddleColumnWrapper>
+                  <MiddleColumn
+                    mode={mode}
+                    searchedText={searchedText}
+                    hasOpenedModal={openedModal}
+                    handleOpenModal={handleOpenModal}
+                    handleCtrlSelectionItemBehaviour={
+                      handleCtrlSelectionItemBehaviour
+                    }
+                  />
+                </MiddleColumnWrapper>
+              )}
+              {isItemViewActive && (
+                <RightColumnWrapper>
+                  <Item
+                    onClickShare={handleOpenModal(MODAL.SHARE)}
+                    onClickMoveToTrash={handleOpenModal(MODAL.MOVE_TO_TRASH)}
+                    onClickRemoveItem={handleOpenModal(MODAL.REMOVE_ITEM)}
+                  />
+                </RightColumnWrapper>
+              )}
             </>
           )}
         </CenterWrapper>

@@ -28,19 +28,18 @@ export default class Document extends NextDocument {
       <Html lang="en">
         <Head>
           {this.props.styleTags}
-          <link rel="manifest" href="/manifest.json" />
+          <link rel="icon" href="/public/images/favicon/favicon.ico" />
+          <link
+            rel="icon"
+            type="image/svg+xml"
+            href="/public/images/favicon/safari-favicon.svg"
+          />
           <link
             rel="apple-touch-icon"
             sizes="180x180"
-            href="/public/images/favicon/apple-touch-icon.png"
+            href="/public/images/favicon/apple-touch-favicon.png"
           />
-          <link
-            rel="mask-icon"
-            href="/public/images/favicon/safari-pinned-tab.svg"
-            color="#5bbad5"
-          />
-          <meta name="msapplication-TileColor" content="#da532c" />
-          <meta name="theme-color" content="#ffffff" />
+          <link rel="manifest" href="/manifest.json" />
         </Head>
         <body>
           <div dangerouslySetInnerHTML={{ __html: this.props.spriteContent }} />

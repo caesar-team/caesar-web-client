@@ -1,5 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
+import { useMedia } from '@caesar/common/hooks';
 import zxcvbn from 'zxcvbn';
 import { Formik, FastField } from 'formik';
 import {
@@ -70,12 +71,6 @@ const Prefix = styled.div`
   border-right: 1px solid ${({ theme }) => theme.color.lightGray};
 `;
 
-const StyledButton = styled(Button)`
-  font-size: 18px;
-  padding: 18px 30px;
-  height: 60px;
-`;
-
 const ButtonWrapper = styled.div`
   display: flex;
   align-items: center;
@@ -92,16 +87,17 @@ const StyledPasswordIndicator = styled(PasswordIndicator)`
 const StyledStrengthIndicator = styled(StrengthIndicator)`
   font-size: ${({ theme }) => theme.font.size.small};
   color: ${({ theme }) => theme.color.gray};
-  padding: 16px;
+  padding: ${({ isMobile }) => (isMobile ? '12px 0' : '16px')};
 
   ${StrengthIndicator.Text} {
     margin-bottom: 15px;
   }
 
   ${StrengthIndicator.HelperText} {
-    font-size: ${({ theme }) => theme.font.size.small};
+    font-size: ${({ theme, isMobile }) =>
+      isMobile ? theme.font.size.xs : theme.font.size.small};
     color: ${({ theme }) => theme.color.gray};
-    margin-bottom: 8px;
+    margin-bottom: ${({ isMobile }) => isMobile ? '4px' : '8px'};
 
     &:last-of-type {
       margin-bottom: 0;
@@ -139,6 +135,7 @@ const SignUpForm = ({ onSubmit }) => (
     }) => {
       const showTooltip =
         (values.password && checkError(touched, errors, 'password')) || false;
+      const { isDesktop, isWideDesktop } = useMedia();
 
       return (
         <Form onSubmit={handleSubmit}>
@@ -169,18 +166,26 @@ const SignUpForm = ({ onSubmit }) => (
                   />
                 )}
               </FastField>
-              <Tooltip
-                show={showTooltip}
-                textBoxWidth="280px"
-                arrowAlign="top"
-                position="right center"
-              >
+              {isDesktop || isWideDesktop ? (
+                <Tooltip
+                  show={showTooltip}
+                  textBoxWidth="280px"
+                  arrowAlign="top"
+                  position="right center"
+                >
+                  <StyledStrengthIndicator
+                    text="Our recommendations for creating a good password:"
+                    value={values.password}
+                    rules={GOOD_PASSWORD_RULES}
+                  />
+                </Tooltip>
+              ) : (
                 <StyledStrengthIndicator
-                  text="Our recommendations for creating a good password:"
                   value={values.password}
                   rules={GOOD_PASSWORD_RULES}
-                />
-              </Tooltip>
+                  isMobile
+                />                
+              )}
             </FieldWrapper>
             {values.password && (
               <StyledPasswordIndicator
@@ -208,10 +213,16 @@ const SignUpForm = ({ onSubmit }) => (
               <TextError marginTop={8}>{errors.confirmPassword}</TextError>
             )}
           </Row>
+          {errors?.form && <TextError marginTop={30}>{errors.form}</TextError>}
           <ButtonWrapper>
-            <StyledButton htmlType="submit" disabled={isSubmitting || !isValid}>
+            <Button
+              htmlType="submit"
+              isHigh={isDesktop || isWideDesktop}
+              isUppercase              
+              disabled={isSubmitting || !isValid}
+            >
               Sign Up
-            </StyledButton>
+            </Button>
           </ButtonWrapper>
         </Form>
       );

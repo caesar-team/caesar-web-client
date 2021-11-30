@@ -9,7 +9,10 @@ import {
 } from '@caesar/components';
 import { useNotification } from '@caesar/common/hooks';
 import { registration } from '@caesar/common/utils/authUtils';
-import { getServerErrorsByName } from '@caesar/common/utils/error';
+import {
+  getServerErrorMessage,
+  getServerErrorsByName,
+} from '@caesar/common/utils/error';
 import SignUpForm from './SignUpForm';
 
 const headerComponent = <SecondaryHeader buttonText="Sign In" url="/signin" />;
@@ -25,14 +28,19 @@ const SignUpContainer = () => {
       await registration(email, password);
 
       notification.show({
-        text: 'You have successfully signed up',
+        text:
+          'You will recieve a registration link via email. Please check your Inbox',
+        options: {
+          timeout: 10000,
+        },
       });
 
       Router.push(ROUTES.SIGN_IN);
     } catch (e) {
+      const errorText = getServerErrorMessage(e);
       const serverErrorsByName = getServerErrorsByName(e);
 
-      setErrors(serverErrorsByName);
+      setErrors(serverErrorsByName || { form: errorText });
       setSubmitting(false);
     }
   };

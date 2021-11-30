@@ -11,7 +11,9 @@ const Wrapper = styled.div`
 
 const Helpers = styled.div`
   display: flex;
-  flex-direction: column;
+  flex-direction: ${({ isMobile }) => isMobile ? 'row' : 'column'};
+  ${({ isMobile }) => isMobile && 'justify-content: space-between'};
+  flex-wrap: wrap;
 `;
 
 const HelperText = styled(({ isActive, ...props }) => <div {...props} />)`
@@ -26,13 +28,13 @@ const HelperText = styled(({ isActive, ...props }) => <div {...props} />)`
 
   &::before {
     content: '\\A';
-    width: 10px;
-    height: 10px;
+    width: ${({ isMobile }) => isMobile ? '8px' : '10px'};
+    height: ${({ isMobile }) => isMobile ? '8px' : '10px'};
     border-radius: 50%;
     background: ${({ theme, isActive }) =>
       isActive ? theme.color.black : theme.color.gallery};
     display: inline-block;
-    margin-right: 10px;
+    margin-right: ${({ isMobile }) => isMobile ? '8px' : '10px'};
   }
 `;
 
@@ -49,7 +51,7 @@ const validate = (rules, value) =>
   }));
 
 const StrengthIndicator = forwardRef(
-  ({ text = '', rules, value, ...props }, ref) => {
+  ({ text = '', rules, value, isMobile = false, ...props }, ref) => {
     const matches = validate(rules, value);
 
     const renderedHelpers = rules.map(({ text: ruleText }, index) => {
@@ -65,7 +67,7 @@ const StrengthIndicator = forwardRef(
     return (
       <Wrapper {...props} ref={ref}>
         {text && <Text>{text}</Text>}
-        <Helpers>{renderedHelpers}</Helpers>
+        <Helpers isMobile={isMobile}>{renderedHelpers}</Helpers>
       </Wrapper>
     );
   },

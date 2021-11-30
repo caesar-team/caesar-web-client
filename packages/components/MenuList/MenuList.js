@@ -96,6 +96,8 @@ const MenuListComponent = ({ mode, setSearchedText, setMode }) => {
             activeTeamId={activeTeamId}
             handleToggle={handleToggle}
             setListsOpened={setListsOpened}
+            setSearchedText={setSearchedText}
+            setMode={setMode}
           />
         )}
         onToggle={handleToggleDropdown}

@@ -40,6 +40,7 @@ export const DEFAULT_CORES_COUNT = 4;
 export const DECRYPTION_CHUNK_SIZE = 25;
 export const ENCRYPTION_CHUNK_SIZE = 25;
 export const IMPORT_CHUNK_SIZE = 100;
+export const REMOVE_CHUNK_SIZE = 50;
 
 export const LIST_TYPE = {
   INBOX: 'inbox',
@@ -96,6 +97,11 @@ export const ITEM_TYPES_ARRAY = [
 export const ITEM_CONTENT_TYPE = {
   [ITEM_TYPE.CREDENTIALS]: 'credential',
   [ITEM_TYPE.DOCUMENT]: 'note',
+};
+
+export const ITEM_TEXT_TYPE = {
+  [ITEM_TYPE.CREDENTIALS]: 'password',
+  [ITEM_TYPE.DOCUMENT]: 'secure note',
 };
 
 export const ITEM_ICON_TYPE = {

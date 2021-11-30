@@ -96,6 +96,7 @@ export function* decryption({
   });
 
   const poolChannel = yield call(createPoolChannel, pool);
+
   while (poolChannel) {
     const event = yield take(poolChannel);
 
@@ -109,6 +110,7 @@ export function* decryption({
   if (items) {
     const chunks = chunk(items, DECRYPTION_CHUNK_SIZE);
     chunkSize = chunks.length;
+
     chunks.map(itemsChunk =>
       pool.queue(taskAction(itemsChunk, null, key, masterPassword)),
     );
@@ -118,12 +120,16 @@ export function* decryption({
   if (raws) {
     const rawsChunks = chunk([raws], DECRYPTION_CHUNK_SIZE);
     chunkSize = rawsChunks.length;
+
     rawsChunks.map(rawsChunk =>
       pool.queue(taskAction(null, rawsChunk?.shift(), key, masterPassword)),
     );
   }
 
-  const normalizerEvent = normalizeEvent(chunkSize);
+  // If use just coresCount decryption will be broken when queue is empty
+  // If use just chunkSize decryption will be broken when queue is not empty
+  const normalizeEventCount = chunkSize > coresCount ? coresCount : chunkSize;
+  const normalizerEvent = normalizeEvent(normalizeEventCount);
 
   while (poolChannel) {
     try {

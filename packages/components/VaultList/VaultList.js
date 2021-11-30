@@ -2,11 +2,15 @@ import React, { memo } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import styled from 'styled-components';
 import { sortByName } from '@caesar/common/utils/sort';
-import { TEAM_TYPE } from '@caesar/common/constants';
+import { DASHBOARD_MODE, TEAM_TYPE } from '@caesar/common/constants';
 import {
   currentUserVaultListSelector,
   currentTeamSelector,
 } from '@caesar/common/selectors/currentUser';
+import {
+  setWorkInProgressItem,
+  setWorkInProgressListId,
+} from '@caesar/common/actions/workflow';
 import { setCurrentTeamId } from '@caesar/common/actions/currentUser';
 import { getTeamTitle } from '@caesar/common/utils/team';
 import { Avatar } from '../Avatar';
@@ -80,7 +84,13 @@ const VaultAvatar = ({ vault }) =>
     />
   );
 
-const VaultListComponent = ({ activeTeamId, handleToggle, setListsOpened }) => {
+const VaultListComponent = ({
+  activeTeamId,
+  handleToggle,
+  setListsOpened,
+  setSearchedText,
+  setMode, 
+}) => {
   const dispatch = useDispatch();
   const currentTeam = useSelector(currentTeamSelector);
 
@@ -93,7 +103,13 @@ const VaultListComponent = ({ activeTeamId, handleToggle, setListsOpened }) => {
     setListsOpened(true);
 
     if (currentTeam?.id !== teamId) {
+
+      dispatch(setWorkInProgressItem(null));
+      dispatch(setWorkInProgressListId(null));
       dispatch(setCurrentTeamId(teamId));
+
+      setMode(DASHBOARD_MODE.DEFAULT);
+      setSearchedText('');
     }
   };
 

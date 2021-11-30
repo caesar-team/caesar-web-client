@@ -18,9 +18,8 @@ import {
   listSelector,
   nestedListsSelector,
   currentTeamTrashListSelector,
-  trashListSelector,
 } from '@caesar/common/selectors/entities/list';
-import { moveItemsBatchSaga } from '@caesar/common/sagas/entities/item';
+import { moveItemsBatchSaga } from '@caesar/common/sagas/common/move';
 import { checkIfUserWasKickedFromTeam } from '@caesar/common/sagas/currentUser';
 import {
   postCreateList,
@@ -31,7 +30,7 @@ import {
   patchTeamList,
   removeTeamList,
 } from '@caesar/common/api';
-import { ENTITY_TYPE, LIST_TYPE, TEAM_TYPE } from '@caesar/common/constants';
+import { LIST_TYPE, TEAM_TYPE } from '@caesar/common/constants';
 import { getServerErrors } from '@caesar/common/utils/error';
 import { convertListsToEntities } from '@caesar/common/normalizers/normalizers';
 import { itemsByListIdSelector } from '../../selectors/entities/item';
@@ -97,7 +96,6 @@ export function* createListSaga({
       id: listId,
       type: LIST_TYPE.LIST,
       sort: 0,
-      __type: ENTITY_TYPE.LIST,
       _links,
       ...list,
     };
@@ -161,10 +159,7 @@ export function* removeListSaga({
     const list = yield select(listSelector, { listId });
     const listItems = yield select(itemsByListIdSelector, { listId });
     const listItemIds = listItems?.map(item => item.id) || [];
-
-    const trashList = teamId
-      ? yield select(currentTeamTrashListSelector)
-      : yield select(trashListSelector);
+    const trashList = yield select(currentTeamTrashListSelector);
 
     yield call(moveItemsBatchSaga, {
       payload: {

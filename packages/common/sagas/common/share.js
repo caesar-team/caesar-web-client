@@ -191,6 +191,7 @@ export function* updateSharedItemFromServer({ payload: { itemId } }) {
     ...itemFromState,
     invited: itemFromServer?.invited,
     isShared: true,
+    lastUpdated: itemFromServer?.lastUpdated,
   };
 
   return updatedItem;
@@ -270,7 +271,11 @@ export function* removeShareSaga({ payload: { itemId, memberIds = [] } }) {
       sharedKeyPairs.map(id => `items[]=${id}`).join('&'),
     );
 
-    yield put(removeShareSuccess(itemId, memberIds));
+    const updatedSharedItemData = yield call(
+      updateSharedItemFromServer, 
+      { payload: { itemId } },
+    );
+    yield put(removeShareSuccess(itemId, updatedSharedItemData));
     yield put(updateWorkInProgressItem());
 
     yield put(updateGlobalNotification(NOOP_NOTIFICATION, false));

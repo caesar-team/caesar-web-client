@@ -7,10 +7,7 @@ import {
   workInProgressItemIdsSelector,
   workInProgressListSelector,
 } from '@caesar/common/selectors/workflow';
-import {
-  trashListSelector,
-  teamsTrashListsSelector,
-} from '@caesar/common/selectors/entities/list';
+import { currentTeamTrashListSelector } from '@caesar/common/selectors/entities/list';
 import {
   setWorkInProgressItem,
   resetWorkInProgressItemIds,
@@ -20,24 +17,17 @@ import {
   moveItemsBatchRequest,
 } from '@caesar/common/actions/entities/item';
 import { ConfirmModal } from '@caesar/components';
+import { ITEM_TEXT_TYPE } from '@caesar/common/constants';
 
 export const ConfirmMoveToTrashModal = ({ isOpened, handleCloseModal }) => {
   const dispatch = useDispatch();
   const workInProgressItemIds = useSelector(workInProgressItemIdsSelector);
   const workInProgressList = useSelector(workInProgressListSelector);
   const workInProgressItem = useSelector(workInProgressItemSelector);
-  const teamsTrashLists = useSelector(teamsTrashListsSelector);
-  const trashList = useSelector(trashListSelector);
+  const trashList = useSelector(currentTeamTrashListSelector);
   const notification = useNotification();
 
   const handleMoveToTrash = () => {
-    const isTeamList = !!workInProgressList?.teamId;
-    const trashListId = isTeamList
-      ? teamsTrashLists.find(
-          ({ teamId }) => teamId === workInProgressList.teamId,
-        ).id
-      : trashList.id;
-
     if (workInProgressItemIds.length > 0) {
       dispatch(
         moveItemsBatchRequest({
@@ -45,7 +35,7 @@ export const ConfirmMoveToTrashModal = ({ isOpened, handleCloseModal }) => {
           oldTeamId: workInProgressList?.teamId,
           previousListId: workInProgressList.id,
           teamId: workInProgressList?.teamId,
-          listId: trashListId,
+          listId: trashList.id,
           notification,
           notificationText: `The ${getPlural(workInProgressItemIds?.length, [
             'item has',
@@ -59,9 +49,10 @@ export const ConfirmMoveToTrashModal = ({ isOpened, handleCloseModal }) => {
         moveItemRequest({
           itemId: workInProgressItem.id,
           teamId: workInProgressItem.teamId,
-          listId: trashListId,
+          listId: trashList.id,
           notification,
-          notificationText: `The '${workInProgressItem.data.name}' has been removed`,
+          notificationText:
+            `The ${ITEM_TEXT_TYPE[workInProgressItem.type]} '${workInProgressItem.data.name}' has been removed`,
         }),
       );
       dispatch(setWorkInProgressItem(null));

@@ -1,7 +1,6 @@
 import React, { memo, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { DragDropContext, Droppable } from 'react-beautiful-dnd';
-import styled from 'styled-components';
 import {
   DASHBOARD_MODE,
   LIST_TYPE,
@@ -15,7 +14,10 @@ import {
   favoritesListSelector,
 } from '@caesar/common/selectors/entities/list';
 import { itemsByListIdSelector } from '@caesar/common/selectors/entities/item';
-import { workInProgressListSelector } from '@caesar/common/selectors/workflow';
+import {
+  workInProgressListSelector,
+  isVaultLoadingSelector,
+} from '@caesar/common/selectors/workflow';
 import {
   setWorkInProgressItem,
   setWorkInProgressListId,
@@ -27,55 +29,15 @@ import { Can } from '../../Ability';
 import { Icon } from '../../Icon';
 import { Scrollbar } from '../../Scrollbar';
 import { ListItem } from './ListItem';
-import { MenuItemInner } from './styledComponents';
-
-const MenuItem = styled.div``;
-
-const MenuItemTitle = styled.div`
-  display: flex;
-  align-items: center;
-  flex-grow: 1;
-  padding-left: 16px;
-  margin-right: auto;
-`;
-
-const MenuItemCounter = styled.span`
-  margin-left: auto;
-`;
-
-const ListAddIcon = styled(Icon)`
-  margin-right: 16px;
-  transform: ${({ isListsOpened }) =>
-    isListsOpened ? 'scaleY(-1)' : 'scaleY(1)'};
-  transition: transform 0.2s;
-  opacity: 0;
-  transition: opacity 0.2s, color 0.2s;
-
-  &:hover {
-    color: ${({ theme }) => theme.color.black};
-  }
-`;
-
-const StyledMenuItemInner = styled(MenuItemInner)`
-  &:hover {
-    background-color: ${({ withNested, isEdit, theme }) =>
-      !withNested && !isEdit && theme.color.snow};
-    border-top-color: ${({ withNested, isEdit, theme }) =>
-      !withNested && !isEdit && theme.color.gallery};
-    border-bottom-color: ${({ withNested, isEdit, theme }) =>
-      !withNested && !isEdit && theme.color.gallery};
-
-    ${ListAddIcon} {
-      opacity: 1;
-    }
-  }
-`;
-
-const ListToggleIcon = styled(Icon)`
-  transform: ${({ isListsOpened }) =>
-    isListsOpened ? 'scaleY(-1)' : 'scaleY(1)'};
-  transition: transform 0.2s;
-`;
+import { DummyLists } from './DummyLists';
+import {
+  MenuItem,
+  MenuItemTitle,
+  MenuItemCounter,
+  ListAddIcon,
+  StyledMenuItemInner,
+  ListToggleIcon,
+} from './styles';
 
 const SECURE_MESSAGE_MODE = 'SECURE_MESSAGE_MODE';
 
@@ -92,7 +54,7 @@ const MenuListInnerComponent = ({
   const currentTeamId = currentTeam?.id;
   const activeListId = workInProgressList?.id;
   const [isCreatingMode, setCreatingMode] = useState(false);
-
+  const isVaultLoading = useSelector(isVaultLoadingSelector);
   const teamLists = useSelector(state =>
     teamListsSelector(state, { teamId: currentTeamId }),
   );
@@ -194,6 +156,10 @@ const MenuListInnerComponent = ({
         ? PERMISSION_ENTITY.LIST
         : PERMISSION_ENTITY.TEAM_LIST,
   };
+
+  if (isVaultLoading) {
+    return <DummyLists />;
+  }
 
   return (
     <Scrollbar>

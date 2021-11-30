@@ -63,10 +63,11 @@ const SecureMessageComponent = ({ withScroll = false, className }) => {
             position: 'bottom-right',
           },
         });
-
+        const { text: unsafedText, attachments } = secret;
+        const safedText = encodeURIComponent(unsafedText);
         const passphrase = passwordValue || passwordGenerator();
         const { encryptedMessage, encryptedRaws } = await encryptSecret(
-          secret,
+          { text: safedText, attachments },
           passphrase,
         );
 

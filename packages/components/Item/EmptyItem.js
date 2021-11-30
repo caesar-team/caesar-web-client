@@ -8,18 +8,6 @@ const Wrapper = styled.div`
   justify-content: center;
   align-items: center;
   overflow: hidden;
-  background-image: url('/images/empty-item.png');
-  background-size: 672px auto;
-  background-position: center center;
-  background-repeat: no-repeat;
-
-  @media (min-resolution: 144dpi) and (min-resolution: 1.5dppx) {
-    background-image: url('/images/empty-item@2x.png');
-  }
-
-  @media (min-resolution: 288dpi) and (min-resolution: 3dppx) {
-    background-image: url('/images/empty-item@3x.png');
-  }
 `;
 
 export const EmptyItem = () => (

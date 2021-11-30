@@ -3,13 +3,10 @@ import React, { memo, useState, useRef, useCallback } from 'react';
 import { useEvent } from 'react-use';
 import { useSelector, useDispatch } from 'react-redux';
 import styled from 'styled-components';
-import { PERMISSION } from '@caesar/common/constants';
+import { PERMISSION, ITEM_TEXT_TYPE } from '@caesar/common/constants';
 import { useNotification } from '@caesar/common/hooks';
 import { workInProgressItemSelector } from '@caesar/common/selectors/workflow';
-import {
-  trashListSelector,
-  teamsTrashListsSelector,
-} from '@caesar/common/selectors/entities/list';
+import { currentTeamTrashListSelector } from '@caesar/common/selectors/entities/list';
 import { setWorkInProgressItem } from '@caesar/common/actions/workflow';
 import {
   moveItemRequest,
@@ -46,8 +43,7 @@ const ItemComponent = ({
 }) => {
   const dispatch = useDispatch();
   const item = useSelector(workInProgressItemSelector);
-  const trashList = useSelector(trashListSelector);
-  const teamsTrashLists = useSelector(teamsTrashListsSelector);
+  const trashList = useSelector(currentTeamTrashListSelector);
   const [isSubmitting, setSubmitting] = useState(false);
   const [isMoveModalOpened, setMoveModalOpened] = useState(false);
   const [isVisibleDragZone, setVisibleDragZone] = useState(false);
@@ -84,10 +80,7 @@ const ItemComponent = ({
     return <EmptyItem />;
   }
 
-  const isTrashItem =
-    item &&
-    (item.listId === trashList?.id ||
-      teamsTrashLists.map(({ id }) => id).includes(item.listId));
+  const isTrashItem = item && item.listId === trashList?.id;
 
   const handleClickAcceptEdit = patchData => {
     setSubmitting(true);
@@ -111,7 +104,8 @@ const ItemComponent = ({
         teamId: item.teamId,
         listId: item.previousListId,
         notification,
-        notificationText: `The item "${item?.meta?.title}" has been restored`,
+        notificationText:
+          `The ${ITEM_TEXT_TYPE[item.type]} "${item?.meta?.title}" has been restored`,
       }),
     );
     dispatch(setWorkInProgressItem(null));

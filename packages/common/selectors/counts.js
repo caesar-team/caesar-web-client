@@ -5,8 +5,8 @@ import { teamListIdsSelector } from './entities/list';
 export const listsItemsSelector = createSelector(
   teamListIdsSelector,
   state => state,
-  (listsId, state) => {
-    return itemsByListIdsSelector(state, { listIds: listsId });
+  (listIds, state) => {
+    return itemsByListIdsSelector(state, { listIds });
   },
 );
 
@@ -20,7 +20,7 @@ export const teamListsSizesByIdSelector = createSelector(
         [listId]: items.filter(item => item.listId === listId)?.length || 0,
       }),
       {},
-    ),
+    ) || {},
 );
 
 const listsIdPropSelector = (_, prop) => prop.listsId;

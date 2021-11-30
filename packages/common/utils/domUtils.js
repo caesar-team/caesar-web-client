@@ -62,10 +62,7 @@ export const getFaviconURL = () => {
   let tag = null;
 
   for (let i = 0, l = links.length; i < l; i++) {
-    if (
-      links[i].getAttribute('rel') === 'icon' ||
-      links[i].getAttribute('rel') === 'shortcut icon'
-    ) {
+    if (links[i].getAttribute('rel') === 'icon') {
       tag = links[i];
     }
   }
@@ -81,22 +78,18 @@ export const removeFaviconTag = () => {
   const head = document.getElementsByTagName('head')[0];
 
   for (let i = 0, l = links.length; i < l; i++) {
-    if (
-      links[i].getAttribute('rel') === 'icon' ||
-      links[i].getAttribute('rel') === 'shortcut icon'
-    ) {
+    if (links[i].getAttribute('rel') === 'icon') {
       head.removeChild(links[i]);
     }
   }
 };
 
-export const setFaviconTag = url => {
+export const setFaviconTag = name => {
   removeFaviconTag();
 
   const link = document.createElement('link');
-  link.type = 'image/x-icon';
   link.rel = 'icon';
-  link.href = url;
+  link.href = `/public/images/favicon/${name}.ico`;
 
   document.getElementsByTagName('head')[0].appendChild(link);
 };

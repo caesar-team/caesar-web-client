@@ -100,7 +100,8 @@ const StyledButton = styled.button`
   cursor: pointer;
   transition: all 0.2s;
 
-  ${({ isHigh }) => !isHigh && `text-transform: uppercase;`}
+  ${({ isHigh, isUppercase }) =>
+    (!isHigh || isUppercase) && `text-transform: uppercase;`}
 
   ${({ onlyIcon }) =>
     onlyIcon &&

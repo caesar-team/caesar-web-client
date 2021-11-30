@@ -1,5 +1,6 @@
 import { createSelector } from 'reselect';
-import { allTrashListIdsSelector } from './list';
+import { currentTeamTrashListSelector } from './list';
+import { isCurrentTeamPersonalSelector } from '../currentUser';
 import { isGeneralItem } from '../../utils/item';
 import { LIST_TYPE } from '../../constants';
 
@@ -12,7 +13,26 @@ export const itemEntitySelector = createSelector(
 
 export const itemsByIdSelector = createSelector(
   itemEntitySelector,
-  itemEntity => itemEntity.byId,
+  isCurrentTeamPersonalSelector,
+  (itemEntity, isPersonal) => {
+    if (!Object.keys(itemEntity.byId).length) return {};
+
+    if (isPersonal) {
+      return itemEntity.byId;
+    }
+
+    return Object.keys(itemEntity.byId).reduce((acc, id) => {
+      const item = itemEntity.byId[id];
+
+      return {
+        ...acc,
+        [id]: {
+          ...item,
+          listId: item.teamListId,
+        },
+      };
+    }, {});
+  },
 );
 
 export const itemIdsSelector = createSelector(
@@ -104,7 +124,7 @@ export const itemsGeneralListSelector = createSelector(
 export const teamItemsSelector = createSelector(
   itemArraySelector,
   teamIdPropSelector,
-  (itemList, teamId) => itemList.filter(item => item.teamId === teamId),
+  (itemList, teamId) => itemList.filter(item => item.teamId === teamId) || [],
 );
 
 export const teamItemIdsSelector = createSelector(
@@ -119,16 +139,16 @@ export const generalItemsSelector = createSelector(
 
 export const itemsByListIdSelector = createSelector(
   itemArraySelector,
-  allTrashListIdsSelector,
+  currentTeamTrashListSelector,
   teamIdPropSelector,
   listIdPropSelector,
-  (itemList, trashListIds, teamId, listId) => {
+  (itemList, currentTeamTrashList, teamId, listId) => {
     if (listId === LIST_TYPE.FAVORITES) {
       return itemList.filter(
         item =>
           item.favorite &&
           item.teamId === teamId &&
-          !trashListIds.includes(item.listId),
+          item.listId !== currentTeamTrashList.id,
       );
     }
 
@@ -140,20 +160,10 @@ const listIdsPropSelector = (_, props) => props.listIds;
 export const itemsByListIdsSelector = createSelector(
   itemArraySelector,
   listIdsPropSelector,
-  (itemList, listIds) => {
-    return itemList?.filter(
+  (itemList, listIds) =>
+    itemList?.filter(
       item => listIds?.includes(item.listId) && isGeneralItem(item),
-    );
-  },
-);
-
-export const itemsByListIdVisibleSelector = createSelector(
-  itemArraySelector,
-  listIdPropSelector,
-  (itemList, listId) =>
-    itemList.filter(
-      item => item.listId === listId && isGeneralItem(item) && !!item?.data,
-    ),
+    ) || [],
 );
 
 export const importProgressPercentSelector = createSelector(

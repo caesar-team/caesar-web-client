@@ -2,6 +2,7 @@ import React from 'react';
 import styled from 'styled-components';
 import { joinChildren } from '@caesar/common/utils/reactUtils';
 import { Icon } from '@caesar/components';
+import { media } from '@caesar/assets/styles/media';
 
 const Wrapper = styled.div``;
 
@@ -9,6 +10,10 @@ const StepsRow = styled.div`
   position: relative;
   display: flex;
   align-items: center;
+
+  ${media.wideMobile`
+    justify-content: center;
+  `}    
 `;
 
 const StepBox = styled.div`

@@ -8,4 +8,4 @@ services:
       context: ./
     env_file: .env.development
     ports:
-      - "${EXTERNAL_PORT}:3000"
+      - '${EXTERNAL_PORT}:3000'

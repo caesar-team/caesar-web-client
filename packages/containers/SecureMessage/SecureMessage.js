@@ -39,11 +39,13 @@ const SecureMessageContainerComponent = ({
 
     return raws;
   };
-  
+
   const getFormTitle = () => {
     if (!!passwordFromLink && !decryptedMessage) {
       return (
-        <AdaptiveTitle>Your secret is here. Click the button below to see the message</AdaptiveTitle>
+        <AdaptiveTitle>
+          Your secret is here. Click the button below to see the message
+        </AdaptiveTitle>
       );
     }
 
@@ -55,7 +57,7 @@ const SecureMessageContainerComponent = ({
   };
 
   const handleClickCopyText = () => {
-    copy(decryptedMessage.text);
+    copy(decodeURIComponent(decryptedMessage.text));
 
     notification.show({
       text: `The text has been copied`,

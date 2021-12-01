@@ -9,7 +9,7 @@ WORKDIR /var/app
 #
 # ---- Dependencies (with packages) ----
 FROM base AS dependencies
-RUN apk add --update python build-base
+RUN apk add --update python3 build-base 
 # Copy project file
 COPY package.json .
 COPY yarn.lock .

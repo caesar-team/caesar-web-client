@@ -100,7 +100,6 @@ name: 4xxi
 
 image_pull_secrets:
   - dockerconfig
-
 globals:
   - &confNoSaveBuild
     dockerfile: Dockerfile
@@ -259,7 +258,6 @@ trigger:
   branch:
     - master
     - develop
-    - release/*
     - feature/*
     - hotfix/*
   event:

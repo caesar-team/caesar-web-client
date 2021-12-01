@@ -13,6 +13,8 @@ import { persistOptions } from './persist';
 let store;
 
 export function configureWebStore(preloadedState) {
+  const isServer = typeof window === 'undefined';
+
   const composeEnhancers = composeWithDevTools({});
 
   const sagaMiddleware = createSagaMiddleware();
@@ -32,14 +34,22 @@ export function configureWebStore(preloadedState) {
     offlineEnhanceReducer(rootReducer),
   );
 
-  store = createStore(
-    persistedReducer,
-    preloadedState,
-    composeEnhancers(
-      offlineEnhanceStore,
+  if (isServer) {
+    store = createStore(
+      rootReducer,
+      preloadedState,
       applyMiddleware(sagaMiddleware, offlineMiddleware),
-    ),
-  );
+    );
+  } else {
+    store = createStore(
+      persistedReducer,
+      preloadedState,
+      composeEnhancers(
+        offlineEnhanceStore,
+        applyMiddleware(sagaMiddleware, offlineMiddleware),
+      ),
+    );
+  }
 
   let sagaTask = sagaMiddleware.run(rootSaga);
 

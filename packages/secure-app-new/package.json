@@ -5,7 +5,7 @@
   "repository": "git@github.com:caesar-team/caesar-web-client.git",
   "author": "<ave@caesar.team>",
   "license": "SEE LICENSE IN LICENSE",
-  "private":  true,
+  "private": true,
   "scripts": {
     "dev": "next dev",
     "build": "next build",

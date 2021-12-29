@@ -5,12 +5,13 @@
   "repository": "git@github.com:caesar-team/caesar-web-client.git",
   "author": "<ave@caesar.team>",
   "license": "SEE LICENSE IN LICENSE",
-  "private": "true",
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
-    "start": "next start",
-    "lint": "next lint"
+    "build:production": "$(yarn bin)/cross-env NODE_ENV=production next build",
+    "start:production": "$(yarn bin)/cross-env NODE_ENV=production next dev",
+    "prod": "yarn start:production",
+    "dev-extension": "$(yarn bin)/cross-env NODE_ENV=development webpack --config extension/webpack.dev.config.js --watch",
+    "build:extension": "$(yarn bin)/cross-env NODE_ENV=production webpack --config extension/webpack.prod.config.js"
   },
   "dependencies": {
     "@caesar/assets": "1.0.0",

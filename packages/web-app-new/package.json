@@ -7,11 +7,9 @@
   "license": "SEE LICENSE IN LICENSE",
   "scripts": {
     "dev": "next dev",
-    "build:production": "$(yarn bin)/cross-env NODE_ENV=production next build",
-    "start:production": "$(yarn bin)/cross-env NODE_ENV=production next dev",
-    "prod": "yarn start:production",
-    "dev-extension": "$(yarn bin)/cross-env NODE_ENV=development webpack --config extension/webpack.dev.config.js --watch",
-    "build:extension": "$(yarn bin)/cross-env NODE_ENV=production webpack --config extension/webpack.prod.config.js"
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
   },
   "dependencies": {
     "next": "^12.0.7",
@@ -34,6 +32,9 @@
     "eslint-plugin-react": "^7.28.0",
     "eslint-plugin-react-hooks": "^4.3.0",
     "eslint-plugin-unused-imports": "^2.0.0",
+    "next-compose-plugins": "^2.2.1",
+    "next-offline": "^5.0.5",
+    "next-transpile-modules": "^9.0.0",
     "prettier": "2.5.1",
     "typescript": "^4.5.4"
   },

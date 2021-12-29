@@ -1,6 +1,11 @@
 {
-  "name": "secure-app-new",
-  "private": true,
+  "name": "@caesar/secure-app",
+  "version": "1.0.0",
+  "main": "index.js",
+  "repository": "git@github.com:caesar-team/caesar-web-client.git",
+  "author": "<ave@caesar.team>",
+  "license": "SEE LICENSE IN LICENSE",
+  "private":  true,
   "scripts": {
     "dev": "next dev",
     "build": "next build",

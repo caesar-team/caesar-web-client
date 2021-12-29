@@ -15,6 +15,7 @@
   "npmClient": "yarn",
   "useWorkspaces": true,
   "dependencies": {
+    "eslint-plugin-prettier": "^4.0.0",
     "wait-on": "^5.2.0"
   },
   "engines": {

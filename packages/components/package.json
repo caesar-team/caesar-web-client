@@ -5,8 +5,8 @@
   "author": "<ave@caesar.team>",
   "license": "SEE LICENSE IN LICENSE",
   "dependencies": {
-    "@caesar/containers": "1.0.0",
     "@caesar/common": "1.0.0",
+    "@caesar/containers": "1.0.0",
     "react-contenteditable": "^3.3.5"
   }
 }

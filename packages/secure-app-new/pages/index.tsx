@@ -1,5 +1,12 @@
+import { styled } from 'linaria/react';
+
+const Wrapper = styled.div`
+  color: white;
+  background: black;
+`;
+
 function Home() {
-  return <div>secure-app-new</div>;
+  return <Wrapper>secure-app-new</Wrapper>;
 }
 
 export default Home;

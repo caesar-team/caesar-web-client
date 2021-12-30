@@ -16,6 +16,7 @@
     }
   },
   "rules": {
+    "react/function-component-definition": "off",
     "react/require-extension": "off",
     "react/jsx-filename-extension": 0,
     "react/no-danger": 0,

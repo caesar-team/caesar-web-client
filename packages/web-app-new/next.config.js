@@ -19,6 +19,7 @@ const withTM = require('next-transpile-modules')([
   '@caesar/containers',
   '@caesar/components',
 ]);
+const withLinaria = require('next-linaria');
 
 const publicRuntimeConfig = {
   IS_PROD: process.env.NODE_ENV === 'production',
@@ -73,7 +74,7 @@ const workboxOptions = {
   ],
 };
 
-module.exports = withPlugins([withOffline, withTM], {
+module.exports = withPlugins([withOffline, withTM, withLinaria], {
   reactStrictMode: true,
   publicRuntimeConfig,
   serverRuntimeConfig,

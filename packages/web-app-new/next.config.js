@@ -74,7 +74,7 @@ const workboxOptions = {
   ],
 };
 
-module.exports = withPlugins([withOffline, withTM, withLinaria], {
+module.exports = withPlugins([withOffline, withLinaria, withTM], {
   reactStrictMode: true,
   publicRuntimeConfig,
   serverRuntimeConfig,

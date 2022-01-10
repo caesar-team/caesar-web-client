@@ -19,6 +19,8 @@
     "wait-on": "^5.2.0"
   },
   "engines": {
-    "node": ">=14.15"
+    "node": ">=14.15",
+    "yarn": ">=1.22.0",
+    "npm": "please-use-yarn"
   }
 }

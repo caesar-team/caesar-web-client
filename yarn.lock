@@ -2852,7 +2852,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@caesar/assets@1.0.0, @caesar/assets@workspace:packages/assets":
+"@caesar/assets@1.0.0, @caesar/assets@workspace:*, @caesar/assets@workspace:packages/assets":
   version: 0.0.0-use.local
   resolution: "@caesar/assets@workspace:packages/assets"
   dependencies:
@@ -2861,7 +2861,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@caesar/common@1.0.0, @caesar/common@workspace:packages/common":
+"@caesar/common@1.0.0, @caesar/common@workspace:*, @caesar/common@workspace:packages/common":
   version: 0.0.0-use.local
   resolution: "@caesar/common@workspace:packages/common"
   dependencies:
@@ -2872,7 +2872,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@caesar/components@workspace:packages/components":
+"@caesar/components@workspace:*, @caesar/components@workspace:packages/components":
   version: 0.0.0-use.local
   resolution: "@caesar/components@workspace:packages/components"
   dependencies:
@@ -2882,7 +2882,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@caesar/containers@1.0.0, @caesar/containers@workspace:packages/containers":
+"@caesar/containers@1.0.0, @caesar/containers@workspace:*, @caesar/containers@workspace:packages/containers":
   version: 0.0.0-use.local
   resolution: "@caesar/containers@workspace:packages/containers"
   dependencies:
@@ -2901,6 +2901,10 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@caesar/secure-app-new@workspace:packages/secure-app-new"
   dependencies:
+    "@caesar/assets": "workspace:*"
+    "@caesar/common": "workspace:*"
+    "@caesar/components": "workspace:*"
+    "@caesar/containers": "workspace:*"
     "@types/node": 17.0.5
     "@types/react": 17.0.38
     "@typescript-eslint/eslint-plugin": ^5.0.0
@@ -3060,6 +3064,10 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@caesar/web-app-new@workspace:packages/web-app-new"
   dependencies:
+    "@caesar/assets": "workspace:*"
+    "@caesar/common": "workspace:*"
+    "@caesar/components": "workspace:*"
+    "@caesar/containers": "workspace:*"
     "@types/node": 17.0.5
     "@types/react": 17.0.38
     "@typescript-eslint/eslint-plugin": ^5.8.1

@@ -1,10 +1,5 @@
 {
   "extends": "../../tsconfig.json",
-  "include": [
-    "next-env.d.ts",
-    "**/*.ts",
-    "**/*.tsx"
-  ],
   "compilerOptions": {
     "paths": {
       "@caesar/components/*": ["../components/*"],

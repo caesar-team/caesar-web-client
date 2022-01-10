@@ -1,13 +1,15 @@
 {
   "extends": "../../tsconfig.json",
-  "paths": {
-    "@caesar/components/*": ["../components/*"],
-    "@caesar/components": ["../components/index"],
-    "@caesar/assets/*": ["../assets/*"],
-    "@caesar/assets": ["../assets/index"],
-    "@caesar/common/*": ["../common/*"],
-    "@caesar/common": ["../common/index"],
-    "@caesar/containers/*": ["../containers/*"],
-    "@caesar/containers": ["../containers/index"]
+  "compilerOptions": {
+    "paths": {
+      "@caesar/components/*": ["../components/*"],
+      "@caesar/components": ["../components/index"],
+      "@caesar/assets/*": ["../assets/*"],
+      "@caesar/assets": ["../assets/index"],
+      "@caesar/common/*": ["../common/*"],
+      "@caesar/common": ["../common/index"],
+      "@caesar/containers/*": ["../containers/*"],
+      "@caesar/containers": ["../containers/index"]
+    }
   }
 }

@@ -1,5 +1,5 @@
 import { styled } from 'linaria/react';
-import { Button } from '@caesar/components';
+// import { Button } from '@caesar/components';
 
 const Wrapper = styled.div`
   color: white;
@@ -9,7 +9,8 @@ const Wrapper = styled.div`
 const Home = () => {
   return (
     <Wrapper>
-      <Button>wfwe</Button>
+      {/*<Button>wfwe</Button>*/}
+      <Test />
       <span> web-app-new</span>
     </Wrapper>
   );

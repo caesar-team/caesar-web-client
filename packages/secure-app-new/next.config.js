@@ -74,9 +74,25 @@ const workboxOptions = {
   ],
 };
 
-module.exports = withPlugins([withOffline, withLinaria, withTM], {
-  reactStrictMode: true,
-  publicRuntimeConfig,
-  serverRuntimeConfig,
-  workboxOpts: workboxOptions,
-});
+module.exports = withPlugins(
+  [
+    withOffline,
+    [
+      withLinaria,
+      {
+        linaria: {
+          babelOptions: {
+            rootMode: 'upward',
+          },
+        },
+      },
+    ],
+    withTM,
+  ],
+  {
+    reactStrictMode: true,
+    publicRuntimeConfig,
+    serverRuntimeConfig,
+    workboxOpts: workboxOptions,
+  },
+);

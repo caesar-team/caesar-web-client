@@ -6,7 +6,11 @@ const Wrapper = styled.div`
 `;
 
 function Home() {
-  return <Wrapper>secure-app-new</Wrapper>;
+  return (
+    <div>
+      <Wrapper>secure-app-new</Wrapper>
+    </div>
+  );
 }
 
 export default Home;

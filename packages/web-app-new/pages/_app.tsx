@@ -1,8 +1,9 @@
 import type { AppProps } from 'next/app';
 import { withHydrate } from 'effector-next';
+import globalStyles from '@caesar/assets/styles/globalStyles';
 
 function MyApp({ Component, pageProps }: AppProps) {
-  return <Component {...pageProps} />;
+  return <Component className={globalStyles} {...pageProps} />;
 }
 
 const enhance = withHydrate();

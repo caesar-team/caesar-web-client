@@ -2909,6 +2909,9 @@ __metadata:
     "@types/react": 17.0.38
     "@typescript-eslint/eslint-plugin": ^5.0.0
     "@typescript-eslint/parser": ^5.0.0
+    effector: ^22.1.2
+    effector-next: ^1.3.2
+    effector-react: ^22.0.6
     eslint: ^8.2.0
     eslint-config-airbnb: 19.0.4
     eslint-config-airbnb-typescript: ^16.1.0
@@ -4025,6 +4028,13 @@ __metadata:
   version: 1.1.2
   resolution: "@tootallnate/once@npm:1.1.2"
   checksum: e1fb1bbbc12089a0cb9433dc290f97bddd062deadb6178ce9bcb93bb7c1aecde5e60184bc7065aec42fe1663622a213493c48bbd4972d931aae48315f18e1be9
+  languageName: node
+  linkType: hard
+
+"@types/cookie@npm:^0.3.3":
+  version: 0.3.3
+  resolution: "@types/cookie@npm:0.3.3"
+  checksum: 450c930d792a4fd5a93645b4123f02596368f904dbb1fe6fbb5043bce8f6ecf877a08511c6ba11c8e28168f62bc278e68d214f002fab927c9056c0bc69f21370
   languageName: node
   linkType: hard
 
@@ -8987,6 +8997,37 @@ __metadata:
   version: 1.1.1
   resolution: "ee-first@npm:1.1.1"
   checksum: 1b4cac778d64ce3b582a7e26b218afe07e207a0f9bfe13cc7395a6d307849cfe361e65033c3251e00c27dd060cab43014c2d6b2647676135e18b77d2d05b3f4f
+  languageName: node
+  linkType: hard
+
+"effector-next@npm:^1.3.2":
+  version: 1.3.2
+  resolution: "effector-next@npm:1.3.2"
+  dependencies:
+    next-cookies: ^2.0.3
+  peerDependencies:
+    effector: ">=20.13.5"
+    effector-react: ">=20.6.0"
+    next: ">=9.0.0"
+    react: ">=16.0.0"
+  checksum: 05ddd3daecc997ddbcfa8403ca6b1cae70da90c4e87152de893204da5efcbecccea1cc37bc4225d724648d707dd686cab6cb63fd4b37fc041c246d4e29318e1f
+  languageName: node
+  linkType: hard
+
+"effector-react@npm:^22.0.6":
+  version: 22.0.6
+  resolution: "effector-react@npm:22.0.6"
+  peerDependencies:
+    effector: ^22.0.2
+    react: ">=16.8.0 <19.0.0"
+  checksum: afb8d9a797b8aa52e7172468d8f012d1d93c06028d456ece433f18775def3234e99b3452086687eaeea2f4756606b606ce56b2ed4d5ab5a8e4230f8adaf488a1
+  languageName: node
+  linkType: hard
+
+"effector@npm:^22.1.2":
+  version: 22.1.2
+  resolution: "effector@npm:22.1.2"
+  checksum: 06151e91a26a1ee59066c9ee68d196c85970c3ab1204473318c72bdb0b05281bc2ec592908c8d28fd8c491a7a87a8d9b6c1c8a3b016b3c48d73aabb0af96f043
   languageName: node
   linkType: hard
 
@@ -14951,6 +14992,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"next-cookies@npm:^2.0.3":
+  version: 2.0.3
+  resolution: "next-cookies@npm:2.0.3"
+  dependencies:
+    universal-cookie: ^4.0.2
+  checksum: 147889501751629dab6af690491ca50f94d1538d2cc9a440cf0e4fa0d99b5594a6014505875c11a7b2536c919e93a84d0a48588958757756eed3afdc7918c482
+  languageName: node
+  linkType: hard
+
 "next-fonts@npm:^0.17.0":
   version: 0.17.0
   resolution: "next-fonts@npm:0.17.0"
@@ -20653,6 +20703,16 @@ __metadata:
   dependencies:
     crypto-random-string: ^1.0.0
   checksum: 588f16bd4ec99b5130f237793d1a5694156adde20460366726573238e41e93b739b87987e863792aeb2392b26f8afb292490ace119c82ed12c46816c9c859f5f
+  languageName: node
+  linkType: hard
+
+"universal-cookie@npm:^4.0.2":
+  version: 4.0.4
+  resolution: "universal-cookie@npm:4.0.4"
+  dependencies:
+    "@types/cookie": ^0.3.3
+    cookie: ^0.4.0
+  checksum: bb2bafa7eb7e213e5448924329572dd1a913be00e23906189be2a0dc889b0eea1750f9c33462fc1c911d89092dbd82f6e220c2d61c4057bb3f69e7665d9d8ddf
   languageName: node
   linkType: hard
 

@@ -20,7 +20,7 @@ const withTM = require('next-transpile-modules')([
   '@caesar/components',
 ]);
 const withLinaria = require('next-linaria');
-const { withEffectorReactAliases } = require("effector-next/tools");
+const { withEffectorReactAliases } = require('effector-next/tools');
 
 const withEffector = withEffectorReactAliases();
 
@@ -91,7 +91,7 @@ module.exports = withPlugins(
       },
     ],
     withTM,
-    withEffector
+    withEffector,
   ],
   {
     reactStrictMode: true,

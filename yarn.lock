@@ -2742,6 +2742,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@babel/runtime@npm:^7.16.7":
+  version: 7.16.7
+  resolution: "@babel/runtime@npm:7.16.7"
+  dependencies:
+    regenerator-runtime: ^0.13.4
+  checksum: 47912f0aaacd1cab2e2552aaf3e6eaffbcaf2d5ac9b07a89a12ac0d42029cb92c070b0d16f825e4277c4a34677c54d8ffe85e1f7c6feb57de58f700eec67ce2f
+  languageName: node
+  linkType: hard
+
 "@babel/template@npm:>=7, @babel/template@npm:^7.16.0":
   version: 7.16.0
   resolution: "@babel/template@npm:7.16.0"
@@ -2857,7 +2866,7 @@ __metadata:
   resolution: "@caesar/assets@workspace:packages/assets"
   dependencies:
     "@caesar/assets": 1.0.0
-    polished: ^3.5.2
+    polished: ^4.1.4
   languageName: unknown
   linkType: soft
 
@@ -16439,12 +16448,21 @@ __metadata:
   languageName: node
   linkType: hard
 
-"polished@npm:^3.4.1, polished@npm:^3.5.2":
+"polished@npm:^3.4.1":
   version: 3.6.7
   resolution: "polished@npm:3.6.7"
   dependencies:
     "@babel/runtime": ^7.9.2
   checksum: 4aff8dfe2cd7ddd79f9366bb1039d8f85a0ff43e30d44e861c662d5e8e948f02dce7f3513f27cfc0c54d391cb95d3c24fb69194252c43c48b68d38ef07ebdea7
+  languageName: node
+  linkType: hard
+
+"polished@npm:^4.1.4":
+  version: 4.1.4
+  resolution: "polished@npm:4.1.4"
+  dependencies:
+    "@babel/runtime": ^7.16.7
+  checksum: 8faa41958df921e1441afc78c31dbe05b09b5b234b2a64ebfae56350c4580105f06e1ef4b3dcb69e86c28b354059e876ced36ba4deb3fb16e67485e1f59753f4
   languageName: node
   linkType: hard
 

@@ -6,6 +6,6 @@
   "license": "SEE LICENSE IN LICENSE",
   "dependencies": {
     "@caesar/assets": "1.0.0",
-    "polished": "^3.5.2"
+    "polished": "^4.1.4"
   }
 }
